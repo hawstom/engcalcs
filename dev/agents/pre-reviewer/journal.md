@@ -4617,3 +4617,19 @@ OBSERVED: a fresh project (localStorage cleared) is Base only on branch and mast
 OBSERVED: Net1 Tables XLSX: sheets Junctions..Pumps, Text, Settings, Scenarios, Patterns, Curves-Pump_head, Controls (2), Rules (2 rules, 5 lines each, no blank lines). Net3: Controls 6, no Rules sheet (none). Confirm box on Net1-Scenarios quoted; Cancel and Escape write nothing; Export writes.
 OBSERVED: .inp export of Novato byte-identical to master.
 Decays: re-verify.
+
+## 2026-10-22 Perry, feat/clear-same-overrides
+- OBSERVED: builder's harness passes 18/18 (plain Basic-mode scenario, diameters). Did not test alternatives, demand lists, settings rows.
+- OBSERVED: an override of 18.0000004 against inherited 18 shows "18 (same)" and enables the new button, because "(same)" compares printed text (6 decimals). Clearing would change the value, contradicting "Each value stays as it is".
+- CITED (code read, not run): demand-list rows print only base demands, so a list differing only in pattern/category would also read "(same)". Bubble-set rows with no per-graph record are always same:true.
+- OBSERVED: button not clipped at 1400px; bar wraps, "Clear all overrides" drops to a second line. No new storage in the diff.
+- Not exercised: shared alternative, demand-list, settings/Presentation rows, Undo on those, narrow/phone width.
+## 2026-10-22 Perry, second look at 5560add37
+- OBSERVED: probe1 rerun: 18.0000004 vs 18 now marks nothing "(same)", button disabled. Fixed.
+- CITED (grep): ownOverrideInherited has 3 callers, all in the Override manager/ownOverrideItems; inherited text for demand lists prints only .base (ovlValueText), so the added pattern/category is unread elsewhere. Properties, Tables, .inp export, solve do not call it. Not run: demand-list-with-pattern scenario in a browser.
+
+## 2026-10-22 feat/export-scenario-confirm (Perry)
+OBSERVED: own harness 93/93; backdrop-export-roundtrip 89/89; inp-export-scenario-name 6/6; scenario-receipt 24/24; fittings all passed.
+OBSERVED: Base-only receipt reads "Exported X from Base of P." ; Escape and Enter work on question and receipt; odd names sanitize in file, raw in receipt; no new localStorage keys; phone 390 px fits.
+OBSERVED: receipt untitled; es page shows English for the 3 new keys (untranslated, expected).
+NOT CHECKED: zip receipt in browser (code reads zipName); visual feel of two dialogs.

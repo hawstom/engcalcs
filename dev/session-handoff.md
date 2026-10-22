@@ -95,24 +95,26 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-21 evening (thirty-fourth session, Arizona time)
+## STATE — 2026-10-22 early morning (thirty-fifth session, Arizona time)
 
-- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.**
-- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions.
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Master pushed at 34a1bccd9 (2026-10-22).
+- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions. The 2026-10-22 report there holds his open questions: read it before reporting.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
-- Merged 2026-10-21 as defect fixes: pump/valve symbol at half the polyline, and a zero-length one points along its downstream pipe (his "Yes"); label grab shape follows the drawn level form (link 233; he confirmed it was one-line, "Thanks"); `PUMP id Efficiency`; CV pipes kept, exported and solved natively (Properties/Tables "Check valve (CV)"); run box names unbalanced steps and warnings; paste refreshes the override count and the Full report reads one run's inputs; built-in solver reads multi-point pump curves as EPANET's custom curves (a two-point curve no longer prints an equation; Tom, 2026-10-22: *"Follow EPANET, I suppose."*, so it stays custom, as EPANET reads it).
-- `label-pass-economy-browser-harness.js` failed once alone at a9acc8e65 while agents ran checks; 29/29 three times after. Load flake.
-- Map labels still resolve Demand from the open scenario with Recalculate off (fix/scenario-report-mix left them); worth a task.
+- Two-point pump curve: Tom, 2026-10-22: *"Follow EPANET, I suppose."* It stays custom, as EPANET reads it (master already does this).
+- His "Ask your AI agent" idea (Task 818): his 10-22 correction is on the roadmap; Mary's answer is `dev/agents/market-researcher/ai-agent-interface.md` (a documented in-page API: read, change a copy, solve repeatedly). Brainstorm only; he said "We have our hands full".
+- WaterGEMS: he worked out labels himself (12, "It's hard to use, but it works"). Export test files for him: `~/tom-files/2026-10-22/wtg-export/` (readme inside); results of his opening them decide whether `feat/wtg-export` becomes a product (`dev/wtg-export.md` on that branch).
+- Load flakes seen 2026-10-22 in master's suite: `new-project-pan-harness.js` (passed alone twice), `label-form-n600-browser-harness` (an agent's run).
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/sqlite-reader` (8104, Task 749): Bentley-style pump/valve junctions (46-A/46-B coincident), Unbalanced Continue, continuous-pattern start fixed, pattern-averaging caveat in the report; fixture is his 18:46 save copied to `~/webdev/fixtures/wtg-tgh-1/` (he keeps it stable). Perry passed it. Owed by him: where he read "12 psi" (WaterGEMS's saved PMP-1 head change is -5.8 psi at step 0); whether to import WaterGEMS's hourly-averaged continuous patterns instead of Bentley's export values. Summaries: the sqlite-pmp1-summary page on the panel (localhost:8080/img/).
-- Merged 2026-10-22 on his typed word: `feat/calculate-hint` (stores `lpn_calchint`), `feat/import-export-receipts`, `feat/native-eps-3` (its reverse-flow pump branch now sends a custom-curve pump through `customPumpCoeffs()`; three cannot-lift cases added to `pump-curve-multipoint-harness.js`).
-- `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}."
-- `feat/theme-default` (8106, Task 811): gentle default refinement; screenshots `_panel/www/img/theme-default-*`.
-- Port 8102 (the archived label-margin preview) dropped 2026-10-21 once link 233 was settled.
-- His "Ask your AI agent" box is on Task 818 with Mary's (`dev/agents/market-researcher/ai-agent-box.md`) and Sue's findings. A comparison model for WaterGEMS is in `~/tom-files/2026-10-21/`.
-- `feat/desktop`: untouched.
+- `feat/native-eps-4`, `-5`, `-6` (Task 733 slices 4 [RULES], 5 tank volume curves/min volume/overflow, 6 pump energy; stacked, each green, nothing visible on the page). Merge on his word; merging -6 brings all three. Slice 7 (wiring) only on his word; Task 821 first.
+- `feat/export-scenario-confirm` (8101, Task 814): one receipt dialog after every .inp/GeoJSON/DXF export; deleted `lpn_inp_export_flat_heading`. Perry passed it. His calls owed: two boxes in a row; does a Base-only export need a receipt.
+- `feat/clear-same-overrides` (8103, Sue's wish): Override manager button clearing "(same)" rows; "(same)" now compares stored values. Perry passed it on the second look.
+- `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}." His item 6 question ("Max day: ✓ Shared with: Peak hour with main break") is about master's existing override note under an overridden row (`inheritedLine()` + `smSharedText()`), not this branch; explained and rewording proposed in the 10-22 report.
+- `feat/theme-default` (8106, Task 811): he said "I agree that it's better. Continue or recommend a merge." Recommended a merge; waits on his typed word.
+- `feat/wtg-export` (no port; a spike, dev scripts only): see above.
+- `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
+- `feat/desktop`, `fix/bottom-pane-lag`: untouched.
 
 ### Traps met 2026-10-21 (thirty-third session)
 
