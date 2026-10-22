@@ -5252,3 +5252,6 @@ $ec_lang['lpn_calib_scenario']='Compared with the results of the scenario {scena
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
 $ec_lang['lpn_export_confirm_title']='Export {format}';
 $ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';
+$ec_lang['lpn_export_receipt_heading']='Exported {file} from {scenario} of {project}.';
+$ec_lang['lpn_export_receipt_note']='This is an export, not a save: this project is not connected to the file.';
+$ec_lang['lpn_dxf_exported_geo_tail']='Its coordinates are {crs}, in meters, not latitude and longitude.';
