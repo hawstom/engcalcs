@@ -5592,6 +5592,10 @@ var EngCalcs = EngCalcs || {};
 	// {id, own, inh} naming it on both sides; a held set no graph of which differs is the one item it
 	// always was, so a set equal to what it replaces still counts, as every override does.
 	function ovlIsBubbleSet(it) { return !!it.path && it.path.length === 1 && it.path[0] === 'bubbles'; }
+	function ovlSetsEqual(x, y) {
+		var sig = function (l) { return tsbClean(l || []).map(ovlBubbleSig).sort().join('|'); };
+		return sig(x) === sig(y);
+	}
 	function ovlBubbleSig(b) { return JSON.stringify(tsbClean([b])[0] || null); }
 	function ovlBubbleItems(it, inh) {
 		var own = Array.isArray(it.value) ? it.value : [], from = inh && !inh.none && Array.isArray(inh.value) ? inh.value : [],
@@ -5642,6 +5646,8 @@ var EngCalcs = EngCalcs || {};
 			if (!el) { return { none: true }; }
 			if (it.prop === 'demands') {
 				rows = [{ base: baseValue(el, 'demand') }];
+				if (el.demandPattern !== undefined) { rows[0].pattern = el.demandPattern; }
+				if (el.demandCategory !== undefined) { rows[0].category = el.demandCategory; }
 				(el.extraDemands || []).forEach(function (d) { rows.push(d); });
 				return { value: rows };
 			}
@@ -43827,7 +43833,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice((pic === false
 					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
 					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
-				showInpExportFlattening(out.differences, inpName);
+				showExportReceipt(inpName, inpFlatteningLines(out.differences));
 				return;
 			}
 			var built;
@@ -43844,7 +43850,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
 					.split('\u0001').join(zipName).split('\u0002').join(inpName)
 					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
-				showInpExportFlattening(out.differences, inpName);
+				showExportReceipt(zipName, inpFlatteningLines(out.differences));
 			}, function () {
 				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
 				finish(false);
@@ -43939,10 +43945,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
 			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
 			var staleScn = geoJsonStaleScenario();
-			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence() + ' ' +
-				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
-					: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
-					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+			var resultsSentence = out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+				: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
+				: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.');
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence() + ' ' + resultsSentence);
+			showExportReceipt(a.download, [], [resultsSentence]);
 		});
 	}
 	// ---- IMPORT GeoJSON SHAPES (Task 779) ----------------------------------------------------------
@@ -44813,6 +44820,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
 				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code)) + exportScenarioSentence()
 			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence());
+		showExportReceipt(a.download, [], frame.kind === 'geo' ? [(pcX.lpn_dxf_exported_geo_tail || 'Its coordinates are {crs}, in meters, not latitude and longitude.').replace('{crs}', dxfCrsName(frame.code))] : []);
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -44834,7 +44842,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * then the one that mattered is dismissed too. The other export differences keep their place in
 	 * the status line and are deliberately not raised to a dialog here.
 	 */
-	function showInpExportFlattening(differences, fileName) {
+	function inpFlatteningLines(differences) {
 		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [],
 			offCust = null, offNames = [];
 		(differences || []).forEach(function (d) {
@@ -44851,7 +44859,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (d.code === 'customer-inactive-node') { offCust = d; }
 			if (d.code === 'inactive-control' || d.code === 'inactive-rule') { offNames = offNames.concat(d.ids); }
 		});
-		if (!types && !fittings && !coords && !custs && !offNames.length) { return; }
 		if (types) {
 			said.push((pc.lpn_inp_export_flat_types || 'Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
@@ -44874,19 +44881,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
+		return said;
+	}
+	/**
+	 * **EVERY EXPORT TO A FORMAT THAT HOLDS ONE SCENARIO ENDS IN THIS RECEIPT** (Task 814; Tom,
+	 * 2026-10-18: *"a major event that deserves a major answer"*). It names the file, the scenario and
+	 * the project, says the file is a copy and not a save, says what is left behind when something is,
+	 * and, for an .inp, lists what the format cannot hold. One dialog serves the three formats and
+	 * replaces the .inp's flattening box, so a file never ends in two. It is asked BEFORE the file
+	 * only when something is left behind (confirmExportLeaves); this one reports the file as written.
+	 * `lines` are the .inp's flattening sentences; `extra` are further sentences (GeoJSON results).
+	 */
+	function showExportReceipt(fileName, lines, extra) {
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario();
+		lines = lines || [];
 		openDialog(function (body) {
-			var h = document.createElement('p'), lead = document.createElement('p'),
-				ul = document.createElement('ul');
-			h.style.margin = '0 0 8px';
-			h.style.fontWeight = 'bold';
-			h.textContent = (pc.lpn_inp_export_flat_heading || 'Saved {file}').replace('{file}', fileName) + exportScenarioSentence();
-			body.appendChild(h);
-			lead.style.margin = '0 0 6px';
-			lead.textContent = pc.lpn_inp_export_flat_lead || 'The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
-			body.appendChild(lead);
+			function p(text, bold) {
+				var e = document.createElement('p');
+				e.style.margin = '0 0 8px';
+				if (bold) { e.style.fontWeight = 'bold'; }
+				e.textContent = text;
+				body.appendChild(e);
+			}
+			var left = exportScenarioSentence().replace(/^\s+/, ''), ul = document.createElement('ul');
+			p((pc.lpn_export_receipt_heading || 'Exported {file} from {scenario} of {project}.').split('{file}').join('\u0001')
+				.split('{scenario}').join('\u0002').split('{project}').join('\u0003')
+				.split('\u0001').join(fileName).split('\u0002').join(scn ? scenarioDisplayName(scn) : '')
+				.split('\u0003').join(projectDisplayName(project)), true);
+			p((pc.lpn_export_receipt_note || 'This is an export, not a save: this project is not connected to the file.') + (left ? ' ' + left : ''));
+			(extra || []).forEach(function (t) { if (t) { p(t); } });
+			if (!lines.length) { return; }
+			p(pc.lpn_inp_export_flat_lead || 'The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:');
 			ul.style.margin = '0';
 			ul.style.paddingLeft = '20px';
-			said.forEach(function (text) {
+			lines.forEach(function (text) {
 				var li = document.createElement('li');
 				li.style.marginBottom = '4px';
 				li.textContent = text;
@@ -44894,6 +44922,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 			body.appendChild(ul);
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	/** The .inp's flattening report alone: silent when nothing flattened (a harness drives this). */
+	function showInpExportFlattening(differences, fileName) {
+		var lines = inpFlatteningLines(differences);
+		if (lines.length) { showExportReceipt(fileName, lines); }
 	}
 	function projectFileName(name) {
 		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_EXT;
@@ -82382,6 +82415,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// The groups: [{cat, name, items: [{asset, id, group, property, value, inherited, valueTip, inhTip}]}],
 	// in category order, the scenario's own values before the alternative it names.
+	// Two stored values equal EXACTLY, not as the list prints them: numbers by value (18.0000004 is not 18),
+	// lists and objects member by member (`tok`, the typed characters, is not a value). A member that is absent, null or an empty string counts the
+	// same as one that is missing, because the holders write it either way. The "(same)" mark and the
+	// Clear overrides equal to inherited button both read this, so they cannot disagree.
+	function ovlValuesEqual(a, b) {
+		var ka, kb, i, has = Object.prototype.hasOwnProperty;
+		function blank(v) { return v === undefined || v === null || v === ''; }
+		if (blank(a) || blank(b)) { return blank(a) && blank(b); }
+		if (Array.isArray(a) || Array.isArray(b)) {
+			if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) { return false; }
+			for (i = 0; i < a.length; i++) { if (!ovlValuesEqual(a[i], b[i])) { return false; } }
+			return true;
+		}
+		if (typeof a === 'object' && typeof b === 'object') {
+			ka = Object.keys(a).filter(function (k) { return k !== 'tok' && !blank(a[k]); });
+			kb = Object.keys(b).filter(function (k) { return k !== 'tok' && !blank(b[k]); });
+			if (ka.length !== kb.length) { return false; }
+			for (i = 0; i < ka.length; i++) { if (!has.call(b, ka[i]) || !ovlValuesEqual(a[ka[i]], b[ka[i]])) { return false; } }
+			return true;
+		}
+		return a === b;
+	}
 	function ownOverrideGroups(scn) {
 		var groups = [], byHolder = {};
 		ownOverrideItems(scn).forEach(function (it) {
@@ -82407,7 +82462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			o.inherited = own.text; o.inhTip = own.tip;
 			// Equal to what it replaces, and still counted (Tom, 2026-10-05: *"It's still an override?
 			// Yes."*): said beside the value, so the count needs no explaining.
-			o.same = !inh.none && o.value === o.inherited && (o.valueTip || '') === (o.inhTip || '');
+			o.same = !inh.none && ovlValuesEqual(it.value, inh.value);
 			o.item = it;
 			g.items.push(o);
 		});
@@ -82431,7 +82486,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lp = smLeafParts(it.path);
 			own = tsbSummaryText(it.value); inh = tsbSummaryText(it.inhList);
 			return { asset: lp.owner, id: null, group: null, gone: false, property: lp.setting, value: own, valueTip: '',
-				inherited: inh, inhTip: '', same: true, item: it };
+				inherited: inh, inhTip: '', same: ovlSetsEqual(it.value, it.inhList), item: it };
 		}
 		rec = b.own || b.inh;
 		parts = smItemParts(ovKeyFor(rec.g === 'link' ? 'link' : 'node', rec.n), '');
@@ -82496,7 +82551,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (dialogIsOpen()) { smActListOverrides(key, top); }
 		}
 		openDialog(function (body) {
-			var bar, all;
+			var bar, all, same, sameItems;
 			ffEl('p', 'lpn-dialog-msg', (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + n, body);
 			if (!n) { ffEl('p', 'lpn-ff-note', pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.', body); }
 			else { ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.', body); }
@@ -82508,6 +82563,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				clearSel.addEventListener('click', function () {
 					var items = picks.filter(function (p) { return p.box.checked; }).map(function (p) { return p.o.item; });
 					if (items.length) { clearNow(items); }
+				});
+				sameItems = [];
+				groups.forEach(function (g) { g.items.forEach(function (o) { if (o.same) { sameItems.push(o.item); } }); });
+				same = ffEl('button', 'lpn-ovl-clearsame', pc.lpn_ovl_clear_same || 'Clear overrides equal to inherited', bar);
+				same.type = 'button';
+				same.disabled = !sameItems.length;
+				same.addEventListener('click', function () {
+					closeDialog();
+					askDialog({ kind: 'confirm', text: (pc.lpn_ovl_clear_same_ask || 'Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.')
+						.replace('{n}', String(sameItems.length)).replace(/\{name\}/g, scenarioDisplayName(scn)) }, function (yes) {
+						if (yes) { ovlClearItems(scn, sameItems); }
+						smActListOverrides(key);
+					});
 				});
 				all = ffEl('button', 'lpn-ovl-clearall', pc.lpn_ovl_clear_all || 'Clear all overrides', bar);
 				all.type = 'button';

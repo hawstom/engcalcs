@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='အခြား ချိတ်ဆက်ပစ္
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} ကို သိမ်းဆည်းပြီးပါပြီ';
 $ec_lang['lpn_inp_export_flat_lead']='ထုတ်ယူထားသော EPANET ဖိုင်သည် ဤပရောဂျက်နှင့် ဂဏန်းအရ ညီမျှသည်။ သို့သော် အောက်ပါအရာများအတွက် နေရာမရှိပါ -';
 $ec_lang['lpn_inp_export_flat_types']='ဤနေရာရှိ ပိုက်လိုင်းများ ({n}) သည် ပိုက်အမျိုးအစားများ ({t}) ကို ရည်ညွှန်းသည်။ ဖိုင်တွင် ထိုပိုက်လိုင်းတစ်ခုစီသည် ဂဏန်းများ၏ ကိုယ်ပိုင်မိတ္တူကို ဆောင်သဖြင့် အဖြေများ တူညီသည်။ ဖိုင်က မသိမ်းနိုင်သည်မှာ ပိုက်အမျိုးအစားကိုယ်တိုင်ဖြစ်သဖြင့် အဓိပ္ပာယ်ဖွင့်ဆိုချက်တစ်ခုနှင့် ၎င်းကိုသုံးသော ပိုက်လိုင်းတိုင်းကြား ချိတ်ဆက်မှုကို ပရောဂျက်ဖိုင်တွင်သာ မှတ်တမ်းတင်သည်။';
 $ec_lang['lpn_inp_export_flat_coords']='EPANET ဖိုင်သည် node တစ်ခုစီအတွက် တည်နေရာတစ်ခုကို သိမ်းသည်။ ဤအခြေအနေသည် ၎င်းတို့အနက် {n} ခုကို အခြားနေရာတွင် ထားပြီး ဖိုင်ရှိ တည်နေရာများမှာ ထိုနေရာများဖြစ်သည်။ အခြားအခြေအနေတိုင်းသည် ၎င်း၏ တည်နေရာများကို ပရောဂျက်ဖိုင်တွင်သာ ထားသည်။';

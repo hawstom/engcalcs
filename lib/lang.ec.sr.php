@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='Други фитинг';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='Сачувано {file}';
 $ec_lang['lpn_inp_export_flat_lead']='Извезена EPANET датотека бројчано је истоветна овом пројекту. Али у њој нема места за следеће ствари:';
 $ec_lang['lpn_inp_export_flat_types']='Цеви овде ({n}) позивају се на типове цеви ({t}). У датотеци свака од тих цеви носи сопствену копију бројева, тако да су одговори исти. Оно што датотека не може да сачува је сам тип цеви, па везу између једне дефиниције и сваке цеви која је користи бележи само ваша сопствена пројектна датотека.';
 $ec_lang['lpn_inp_export_flat_coords']='EPANET датотека чува једну позицију за сваки чвор. Овај сценарио поставља {n} од њих негде другде, и то су позиције у датотеци. Сваки други сценарио чува своје сопствене позиције само у вашој пројектној датотеци.';

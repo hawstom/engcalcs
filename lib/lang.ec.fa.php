@@ -4378,7 +4378,6 @@ $ec_lang['lpn_fitting_other']='اتصال دیگر';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} ذخیره شد';
 $ec_lang['lpn_inp_export_flat_lead']='پروندهٔ EPANET صادرشده از نظر عددی معادل این پروژه است. اما برای موارد زیر جایی ندارد:';
 $ec_lang['lpn_inp_export_flat_types']='لوله‌های اینجا ({n}) به نوع‌های لوله ({t}) ارجاع می‌دهند. در فایل، هر یک از آن لوله‌ها نسخهٔ جداگانهٔ خود از عددها را دارد، پس پاسخ‌ها یکسان‌اند. آنچه فایل نمی‌تواند نگه دارد خود نوع لوله است، پس پیوند میان یک تعریف و هر لوله‌ای که از آن استفاده می‌کند فقط در فایل پروژه ثبت می‌شود.';
 $ec_lang['lpn_inp_export_flat_coords']='یک فایل EPANET برای هر گره یک موقعیت نگه می‌دارد. این سناریو {n} تا از آن‌ها را جای دیگری قرار می‌دهد، و همان‌ها موقعیت‌های موجود در فایل‌اند. هر سناریوی دیگر موقعیت‌هایش را فقط در فایل پروژه نگه می‌دارد.';

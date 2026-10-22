@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='Fitting lainnya';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='Tersimpan {file}';
 $ec_lang['lpn_inp_export_flat_lead']='Berkas EPANET yang diekspor secara numerik setara dengan proyek ini. Namun berkas ini tidak memiliki tempat untuk hal-hal berikut:';
 $ec_lang['lpn_inp_export_flat_types']='Pipa di sini ({n}) merujuk pada jenis pipa ({t}). Dalam berkas, setiap pipa itu membawa salinan angkanya sendiri, sehingga jawabannya sama. Yang tidak dapat ditampung berkas adalah jenis pipanya sendiri, sehingga hubungan antara satu definisi dan setiap pipa yang memakainya dicatat hanya di berkas proyek.';
 $ec_lang['lpn_inp_export_flat_coords']='Berkas EPANET menyimpan satu posisi untuk setiap simpul. Skenario ini menempatkan {n} di antaranya di tempat lain, dan itulah posisi dalam berkas. Setiap skenario lain menyimpan posisinya hanya di berkas proyek.';

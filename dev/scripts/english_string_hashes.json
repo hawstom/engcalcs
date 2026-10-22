@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 3039,
+    "count": 3038,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7515,7 +7515,6 @@
         "lpn_inp_export_flat_customers": "7c33c013f4286cc5883f81ac6a6349af52289a96",
         "lpn_inp_export_flat_customers_inactive": "0475a5f0c40a7f960685cef67e6872f694a136c0",
         "lpn_inp_export_flat_fittings": "31dcf8e5edf46549649adfba56dea06b5ffd2aa1",
-        "lpn_inp_export_flat_heading": "d7ad08a0673dc3891880e9c564debd4372da123e",
         "lpn_inp_export_flat_inactive_controls": "7d65203f73efef6edce933eb8803642ba6b75fef",
         "lpn_inp_export_flat_lead": "5566057bbe7ee897de4bc343c02e8c93647d10de",
         "lpn_inp_export_flat_types": "0f1942ca3c1adede9581c77a2b519689502b32cb",
@@ -14926,10 +14925,6 @@
         "lpn_inp_export_flat_fittings": {
             "words": 47,
             "ends_sentence": true
-        },
-        "lpn_inp_export_flat_heading": {
-            "words": 2,
-            "ends_sentence": false
         },
         "lpn_inp_export_flat_inactive_controls": {
             "words": 22,
