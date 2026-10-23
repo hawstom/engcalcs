@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**27 still to read on master**, of 192 untranslated keys, of 3210 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**30 still to read on master**, of 195 untranslated keys, of 3213 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (192, 27 to read @@ NEEDS RULING)
+## lpn_  (195, 30 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -541,8 +541,17 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_zoom`**
   > Zoom
   _Ruled OK 2026-10-20._
+- **`lpn_settings_held_default`**
+  > the default
+  @@ NEEDS RULING
+- **`lpn_settings_held_from`**
+  > the value in {parent}
+  @@ NEEDS RULING
 - **`lpn_settings_held_item`**
-  > {setting}: clear restores {value}, the value in {parent}.
+  > {setting}: clear restores {value}, {source}.
+  @@ NEEDS RULING
+- **`lpn_settings_held_none`**
+  > no text
   @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
@@ -612,7 +621,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**17 still to read**, of 60 new keys across 8 unmerged branch(es).
+**19 still to read**, of 62 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -627,10 +636,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/import-new-scenario (`8a56c9dbf`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/import-new-scenario (`27700ccbd`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_inpup_btn_newscn`**
   > A new scenario, child of {parent}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_newscn_basic`**
+  > A new scenario
   @@ NEEDS RULING
 - **`lpn_inpup_new_none`**
   > No scenario was created.
@@ -638,8 +650,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inpup_new_scn`**
   > Created the scenario {scenario}, a child of {parent}, and opened it.
   @@ NEEDS RULING
+- **`lpn_inpup_new_scn_basic`**
+  > Created the scenario {scenario} and opened it.
+  @@ NEEDS RULING
 - **`lpn_inpup_newscn_name`**
-  > Name of the new scenario
+  > Name, if you choose a new scenario
   @@ NEEDS RULING
 - **`lpn_survey_where_lead`**
   > Each point becomes a node. Choose where the nodes go.
@@ -813,9 +828,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-whimsy (`47f555b2c`) — adds no English strings
+### feat/theme-whimsy (`5cc3fc78a`) — adds no English strings
 
-### feat/value-source (`a6c1ad3f0`) — adds no English strings
+### feat/value-source (`6e60751ec`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — adds no English strings
 

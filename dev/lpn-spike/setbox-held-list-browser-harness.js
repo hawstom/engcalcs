@@ -84,7 +84,12 @@ async function main() {
 		let s = await state();
 		ok('S1 the Diameter row has its group dot and a list of two', s.rowDot && s.items.length === 2, JSON.stringify(s));
 		ok('S1 every item has its own dot with the short tip', s.items.every((i) => i.tip === CLEAR_ONE), JSON.stringify(s.items));
-		ok('S1 each item says what Clear restores and where from, in Base', s.items.every((i) => /: clear restores .+, the value in Base\.$/.test(i.text)), JSON.stringify(s.items.map((i) => i.text)));
+		const T = await page.evaluate(() => EngCalcs.pageConfig);
+		const fromBase = T.lpn_settings_held_from.replace('{parent}', 'Base');
+		const texts = s.items.map((i) => i.text);
+		ok('S1 the row name is not repeated: items start with the setting alone', texts.every((t) => t.indexOf('Link labels') < 0), JSON.stringify(texts));
+		ok('S1 empty Before text reads as no text, from the default, with no quotes and no (default)', texts.some((t) => t.indexOf(T.lpn_settings_held_none) > 0 && t.indexOf('"') < 0 && t.indexOf('(default)') < 0), JSON.stringify(texts));
+		ok('S1 a stated Base value says the value in Base', texts.some((t) => t.endsWith(', ' + fromBase + '.')), JSON.stringify(texts));
 
 		console.log('--- S2 ---');
 		const before = await stored();

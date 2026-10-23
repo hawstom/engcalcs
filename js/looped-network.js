@@ -63642,6 +63642,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// (settingRowClear()), so the line under the row names each one that the open scenario holds,
 	// what Clear restores and where from, and clears just that one. A row that edits one setting
 	// needs no list: its dot is that one.
+	// The name of one setting under its own row: the row's name is already above it.
+	function setboxHeldItemName(p) {
+		var pc = EngCalcs.pageConfig || {}, partKey = LPN_SETTAB_LABEL_PARTS[p[1]];
+		if (p[0] === 'labelSettings' && p.length === 4 && partKey && pc[partKey]) { return pc[partKey]; }
+		return settingTableLabelBare(p);
+	}
+	// What Clear restores, in words, and where it comes from: the parent scenario's stated value, or
+	// the default when nothing up the chain states one. Blank text reads as no text, never as "".
+	function setboxHeldRestores(r, par) {
+		var pc = EngCalcs.pageConfig || {}, stated = settingRowValue(r, par) !== undefined, t = settingRowText(r, par), tail;
+		if (!stated) {
+			tail = String(pc.lpn_settings_row_default || '{value} (default)').split('{value}')[1];
+			if (tail && t.slice(-tail.length) === tail) { t = t.slice(0, -tail.length); }
+		}
+		if (t === '' || t === '""') { t = pc.lpn_settings_held_none || 'no text'; }
+		return { value: t, source: stated ? (pc.lpn_settings_held_from || 'the value in {parent}').split('{parent}').join(scenarioDisplayName(par)) : (pc.lpn_settings_held_default || 'the default') };
+	}
 	function setboxHeldList(el, paths, held, scn, rows) {
 		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
 		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
@@ -63650,10 +63667,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		line.className = 'lpn-set-heldlist';
 		line.setAttribute('data-lpn-noseam', '1');
 		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
-			var item = document.createElement('span'), text = document.createElement('span');
+			var item = document.createElement('span'), text = document.createElement('span'), v = setboxHeldRestores(r, par);
 			item.className = 'lpn-set-helditem';
-			text.textContent = (pc.lpn_settings_held_item || '{setting}: clear restores {value}, the value in {parent}.')
-				.split('{setting}').join(settingTableLabelBare(r.path)).split('{value}').join(settingRowText(r, par)).split('{parent}').join(scenarioDisplayName(par));
+			text.textContent = (pc.lpn_settings_held_item || '{setting}: clear restores {value}, {source}.')
+				.split('{setting}').join(setboxHeldItemName(r.path)).split('{value}').join(v.value).split('{source}').join(v.source);
 			item.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
 				setboxPinRow(el);
 				clearHeldSetboxRows([r], scn);
