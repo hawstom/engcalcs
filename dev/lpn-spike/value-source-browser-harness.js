@@ -2,11 +2,18 @@
 //   node dev/lpn-spike/value-source-browser-harness.js   (takes the browser lock itself)
 // Sue's wish (2026-10-05, item 1): "Where-from on every value (inherited from Base / local here)."
 // Base > Peak > Fire. Peak states junction 10's elevation and demand; Fire states its elevation.
-//   V1  Fire open: elevation wears the solid dot ("Override in Fire."); demand is hollow and its tip
+//   V1  Fire open: elevation wears the solid dot ("Click to clear this override."); demand is hollow and its tip
 //       says "Inherited from Peak"; every other overridable row is hollow and says "Inherited from Base".
 //   V2  every marker's source equals an independent walk of the stored project (Fire, Peak, Base).
 //   V3  the solid dot's click is the reset: elevation turns hollow and now says "Inherited from Peak".
 //   V4  Base shows no dot and no hollow dot.
+//   V6  the line under an overridden row is back (what Clear restores); with Basic mode off and a stored
+//       alternative it adds 'This override is stored in alternative "X".' or, when another scenario names
+//       the same alternative, 'This override is stored in alternative "X", also used by Y, so clear or edits
+//       change them too.'; with Basic mode on, no alternative is mentioned.
+//   V7  the Properties pane does not jump: a typed edit that adds the note line, and Clear that takes it
+//       away, leave the row at the same screen position (getBoundingClientRect().top), pane scrolled to
+//       the bottom included. Fails without propsScrollKeep().
 //   V5  a phone-width page keeps the marker on screen and the box without sideways scroll.
 'use strict';
 const path = require('path');
@@ -43,18 +50,19 @@ async function main() {
 	const errors = [];
 	let a = null, page = null;
 	try {
-		const open = async (active, w, h) => {
+		const open = async (active, w, h, mut, basicOff) => {
 			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
 			d.scenarios.push({ id: 'peak', name: 'Peak', overrides: { 'n:10': { elev: 701, demand: 150 } } },
 				{ id: 'fire', name: 'Fire', parent: 'peak', overrides: { 'n:10': { elev: 702 } } });
 			d.project = Object.assign({}, d.project, { activeScenario: active });
+			if (mut) { mut(d); }
 			if (a) { await a.context.close(); }
 			a = await Session.open(browser, 'A', { serviceWorkers: 'block' });
 			page = a.page;
 			page.on('pageerror', (e) => errors.push(String(e && e.message)));
 			await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 			await a.goto('Looped-Network.php?ec_nolog=1');
-			await page.evaluate(([txt]) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, [JSON.stringify(d)]);
+			await page.evaluate(([txt, off]) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); if (off) { localStorage.setItem('lpn_scnbasic', 'off'); } }, [JSON.stringify(d), !!basicOff]);
 			await a.reload();
 			await a.answerTrainingPanel().catch(() => {});
 			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -85,7 +93,7 @@ async function main() {
 		// The independent walk: nearest of Fire, Peak, Base that states the property.
 		const chain = [['Fire', d.scenarios.find((s) => s.id === 'fire')], ['Peak', d.scenarios.find((s) => s.id === 'peak')]];
 		const src = (prop) => { for (const [n, s] of chain) { if (s.overrides['n:10'] && prop in s.overrides['n:10']) { return n; } } return 'Base'; };
-		ok('V1 Fire: elevation is the one solid dot', dots.length === 1 && /Fire/.test(dots[0].tip), JSON.stringify(dots));
+		ok('V1 Fire: elevation is the one solid dot', dots.length === 1 && dots[0].tip === 'Click to clear this override.', JSON.stringify(dots));
 		ok('V1 ...and the rest are hollow dots', hol.length > 3, String(hol.length));
 		const inh = (n) => hol.filter((x) => x.tip.indexOf('Inherited from ' + n + '.') === 0);
 		ok('V2 exactly one row inherits from Peak (demand), matching the stored chain (' + src('demand') + ')', src('demand') === 'Peak' && inh('Peak').length === 1, JSON.stringify(inh('Peak')));
@@ -117,6 +125,57 @@ async function main() {
 		ok('V5 markers present and on screen', m.length > 3 && m.every((x) => x.rect.w > 0 && x.rect.l >= 0 && x.rect.r <= fit.vw), JSON.stringify({ n: m.length, fit }));
 		ok('V5 no sideways scroll in the box', fit.sw <= fit.cw + 1, JSON.stringify(fit));
 		ok('V5 the tip still names the source', m.some((x) => x.tip.indexOf('Inherited from Peak.') === 0), '');
+
+		const noteTexts = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-ov-note')).map((n) => n.textContent.replace(/\s+/g, ' ').trim()));
+		console.log('--- V6. the note line under the row ---');
+		await open('fire', 1400, 900, null, true);
+		await openNode('10');
+		let notes = await noteTexts();
+		ok('V6 Fire, no stored alternative: one note line, "Peak: 701", and no alternative sentence', notes.length === 1 && notes[0] === 'Peak: 701' && !/alternative/.test(notes[0]), JSON.stringify(notes));
+		const altOf = (d) => { d.alternatives = [{ id: 'pa', category: 'physical', name: 'Peak elev', parent: null, values: { 'n:10': { elev: 701 } } }]; };
+		await open('peak', 1400, 900, (d) => { altOf(d); const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; }, true);
+		await openNode('10');
+		notes = await noteTexts();
+		const ALT = await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_alt);
+		ok('V6 Peak, alternative used by Peak alone: the note ends with the alternative sentence', notes.length === 1 && notes[0].endsWith('This override is stored in alternative "Peak elev".') && ALT === 'This override is stored in alternative "{alternative}".', JSON.stringify(notes));
+		await open('peak', 1400, 900, (d) => { altOf(d); const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; d.scenarios.find((x) => x.id === 'fire').alternatives = { physical: 'pa' }; }, true);
+		await openNode('10');
+		notes = await noteTexts();
+		ok('V6 Peak and Fire name it: "...also used by Fire, so clear or edits change them too."', notes.length === 1 && notes[0].endsWith('This override is stored in alternative "Peak elev", also used by Fire, so clear or edits change them too.'), JSON.stringify(notes));
+		await open('fire', 1400, 900);
+		await openNode('10');
+		notes = await noteTexts();
+		ok('V6 Basic mode on: the note never mentions an alternative', notes.length === 1 && !/alternative/.test(notes[0]), JSON.stringify(notes));
+
+		console.log('--- V7. the pane does not jump ---');
+		await open('peak', 1400, 600, (d) => { d.scenarios.find((x) => x.id === 'peak').overrides = {}; }, true);
+		await openNode('10');
+		const geom = (rowText) => page.evaluate((t) => {
+			const sc = document.getElementById('lpn_popup_fields').parentElement;
+			const g = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-ovm')).find((x) => x.nextElementSibling && x.nextElementSibling.textContent.indexOf(t) >= 0);
+			return { top: g.getBoundingClientRect().top, st: sc.scrollTop, scrolls: sc.scrollHeight > sc.clientHeight };
+		}, rowText);
+		const ROW = 'Source quality';
+		const field = page.locator('#lpn_popup_fields label', { hasText: ROW }).locator('input').first();
+		await field.scrollIntoViewIfNeeded();
+		await page.evaluate(() => { const sc = document.getElementById('lpn_popup_fields').parentElement; sc.scrollTop = sc.scrollHeight; });
+		await field.fill('5');
+		const before = await geom(ROW);
+		ok('V7 the pane is scrolled down', before.scrolls && before.st > 100, JSON.stringify(before));
+		await field.evaluate((e) => e.blur());
+		await a.settle(700);
+		const added = await geom(ROW);
+		ok('V7 typing the value adds the note line and the row stays within 2 px (' + before.top.toFixed(1) + ' to ' + added.top.toFixed(1) + ')', Math.abs(added.top - before.top) <= 2 && (await noteTexts()).length === 1, JSON.stringify([before, added]));
+		await page.evaluate(() => { const sc = document.getElementById('lpn_popup_fields').parentElement; sc.scrollTop = sc.scrollHeight; });
+		const b2 = await geom(ROW);
+		await page.evaluate((t) => { const g = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-ovm')).find((x) => x.nextElementSibling && x.nextElementSibling.textContent.indexOf(t) >= 0); g.querySelector('.lpn-ovm-dot').click(); }, ROW);
+		await a.settle(700);
+		const cleared = await geom(ROW);
+		ok('V7 Clear takes the note line away and the row stays within 2 px, pane at the bottom (' + b2.top.toFixed(1) + ' to ' + cleared.top.toFixed(1) + ')', Math.abs(cleared.top - b2.top) <= 2 && (await noteTexts()).length === 0, JSON.stringify([b2, cleared]));
+		await page.evaluate((t) => { const g = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-ovm')).find((x) => x.nextElementSibling && x.nextElementSibling.textContent.indexOf(t) >= 0); g.querySelector('.lpn-ovm-hollow').click(); }, ROW);
+		await a.settle(700);
+		const set2 = await geom(ROW);
+		ok('V7 the hollow dot adds the line back and the row stays within 2 px (' + cleared.top.toFixed(1) + ' to ' + set2.top.toFixed(1) + ')', Math.abs(set2.top - cleared.top) <= 2, JSON.stringify([cleared, set2]));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

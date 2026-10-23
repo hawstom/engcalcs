@@ -167,7 +167,7 @@ async function main() {
 				notes: Array.from(f.querySelectorAll('.lpn-ov-base')).map((n) => n.textContent.trim()) };
 		});
 		ok('Properties marks the overridden Diameter with one solid dot, and the other rows with hollow dots', marks.dots === 1 && marks.hollow > 3, JSON.stringify({ d: marks.dots, h: marks.hollow }));
-		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_settings_held_in')).replace('{scenario}', 'Larger main') + ' ' + (await T('lpn_ovm_dot_clear')), marks.dotTip);
+		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_ovm_dot_clear_one')), marks.dotTip);
 		// feat/value-source: the hollow dot also names where the inherited value comes from.
 		const fromTip = (await T('lpn_ovm_dot_set_from')).split('{name}');
 		ok('...the hollow dot says where the value comes from and what clicking it does', !!marks.hollowTip && marks.hollowTip.startsWith(fromTip[0]) && marks.hollowTip.endsWith(fromTip[1])

@@ -7473,12 +7473,13 @@ var EngCalcs = EngCalcs || {};
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
 	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
-	function smSharedText(cats) {
-		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
-		if (!scn || plainBase(scn)) { return ''; }
+	function smStoredIn(cats) {
+		var scn = activeScenario(), names = [], seen = {}, alt = null;
+		if (!scn || plainBase(scn)) { return null; }
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
+			if (alt === null) { alt = String(t.obj.name || ''); }
 			// **ONLY SCENARIOS THAT NAME IT** (Sue, 2026-10-12): a child that inherits it is
 			// inheritance, the point of a child, not the sharing "Share edits" sets up.
 			storedUsers(t.kind === 'calc' ? 'calc' : 'alt', t.obj.id).scenarios.forEach(function (id) {
@@ -7486,7 +7487,22 @@ var EngCalcs = EngCalcs || {};
 				if (u && u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
 			});
 		});
-		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
+		return alt === null ? null : { alt: alt, users: names };
+	}
+	function smSharedText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = smStoredIn(cats);
+		return st && st.users.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', st.users.join(', ')) : '';
+	}
+	// **THE LINE UNDER AN OVERRIDDEN ROW, WITH BASIC MODE OFF, SAYS WHERE THE OVERRIDE IS STORED**
+	// (Tom, 2026-10-23, after the tip-only try: *we need to use additional lines to document and
+	// manage overrides*). A tip cannot be read from a keyboard or a phone. With Basic mode on,
+	// alternatives are hidden, so the line stays the shared-with note alone.
+	function ovmStoredText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = scenarioBasicMode ? null : smStoredIn(cats);
+		if (!st) { return smSharedText(cats); }
+		return st.users.length
+			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
+			: (pc.lpn_ovm_dot_alt || 'This override is stored in alternative "{alternative}".').split('{alternative}').join(st.alt);
 	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
 	// stored, every scenario, so an old file behaves as before.
@@ -69685,6 +69701,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// attached tooltip instances to. A tooltip that is OPEN at that moment lives in document.body,
 	// not in the popup, so wiping innerHTML would strand it on screen with nothing to close it.
 	// Dispose first, then clear.
+	// **THE PROPERTIES PANE DOES NOT JUMP WHEN A NOTE LINE COMES OR GOES** (Tom, 2026-10-23: *we
+	// need to use additional lines to document and manage overrides*, *as long as we manage
+	// properly the vertical position of the pane scrolling*). An edit rebuilds the rows. The box
+	// is emptied and refilled, and any layout read in between (the gutter's, the width pass)
+	// clamps scrollTop to the emptied box, so the pane came back scrolled elsewhere. For the same
+	// asset in the same scenario this pins the box to the height it had and puts scrollTop back
+	// once the rebuild ends (a microtask, before paint). The pin stays, so a note that goes away
+	// leaves its line blank instead of pulling the row you just cleared down the screen; it is
+	// dropped when a different asset or scenario is shown. dev/lpn-spike/value-source-browser-harness.js.
+	var propsScrollKey = null;
+	function propsScrollKeep(fields) {
+		var sc = fields.parentElement, scn = activeScenario(),
+			key = currentPopup ? currentPopup.kind + ':' + currentPopup.id + ':' + (scn ? scn.id : '') : null,
+			st, h;
+		if (!sc || key === null || key !== propsScrollKey) { propsScrollKey = key; fields.style.minHeight = ''; return; }
+		st = sc.scrollTop;
+		h = fields.offsetHeight;
+		fields.style.minHeight = h + 'px';
+		Promise.resolve().then(function () { sc.scrollTop = st; });
+	}
 	function clearFields(fields) {
 		if (window.bootstrap && bootstrap.Tooltip) {
 			Array.prototype.forEach.call(fields.querySelectorAll('.ec-help'), function (el) {
@@ -69692,6 +69728,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (t) { t.dispose(); }
 			});
 		}
+		if (fields.id === 'lpn_popup_fields') { propsScrollKeep(fields); }
 		fields.innerHTML = '';
 		// The ID line's room goes with the Properties box's own rows, not another box's.
 		[fields, fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
@@ -69940,8 +69977,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.className = 'lpn-ovm';
 		if (baseHere) { /* the triangle alone */ }
 		else if (o.on) {
-			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			g.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
 				saveUndoSnapshot();
 				o.clear();
 				afterPropertyEdit(o.el);
@@ -69975,7 +70011,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		inheritedLineCat = o.cats[0];
 		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
 		note.appendChild(base);
-		shared = smSharedText(o.cats);
+		shared = ovmStoredText(o.cats);
 		if (shared) {
 			base = document.createElement('span');
 			base.className = 'lpn-ov-base lpn-ov-shared';
