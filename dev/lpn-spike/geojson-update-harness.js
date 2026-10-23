@@ -113,7 +113,7 @@ console.log('\n--- a child scenario is open: it receives the values, Base is unt
 	const baseElev20 = L.nodeById('20').elev;
 	importText(TEXT, 'edited.geojson');
 	const names = dialogButtons();
-	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[3] === PC.lpn_scenario_base && names[2] === PC.lpn_inpup_btn_newscn.replace('{parent}', 'Base'), JSON.stringify(names));
+	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[3] === PC.lpn_scenario_base && names[2] === PC.lpn_inpup_btn_newscn_basic, JSON.stringify(names));
 	press(names[1]);
 	ok('Base holds the old value', L.nodeById('20').elev === baseElev20);
 	ok('the scenario reads the file value', L.effective(L.nodeById('20'), 'elev') === oldElev + 7);

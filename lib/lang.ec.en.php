@@ -2437,8 +2437,10 @@ $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 // {scenario} is a scenario name; it labels a button.
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
 $ec_lang['lpn_inpup_btn_newscn']='A new scenario, child of {parent}';
-$ec_lang['lpn_inpup_newscn_name']='Name of the new scenario';
+$ec_lang['lpn_inpup_newscn_name']='Name, if you choose a new scenario';
 $ec_lang['lpn_inpup_new_scn']='Created the scenario {scenario}, a child of {parent}, and opened it.';
+$ec_lang['lpn_inpup_btn_newscn_basic']='A new scenario';
+$ec_lang['lpn_inpup_new_scn_basic']='Created the scenario {scenario} and opened it.';
 $ec_lang['lpn_inpup_new_none']='No scenario was created.';
 $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';

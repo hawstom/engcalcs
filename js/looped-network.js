@@ -46270,15 +46270,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var nAssets = {}, nVals = plan.changes.length, nAdded = plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length,
 				kept = plan.keptNodes.concat(plan.keptLinks);
 			plan.changes.forEach(function (c) { nAssets[c.kind + c.id] = 1; });
-			p((pc.lpn_inpup_heading || 'Imported {file} into {scenario} of {project}').replace('{project}', projName).replace('{file}', fileName)
-				.replace('{scenario}', scnName), true);
+			// Nothing written: say so, never "Imported".
+			p((nVals || nAdded ? (pc.lpn_inpup_heading || 'Imported {file} into {scenario} of {project}') : (pc.lpn_inpup_refused_heading || 'Nothing was changed in {project}.'))
+				.replace('{project}', projName).replace('{file}', fileName).replace('{scenario}', scnName), true);
 			p((pc.lpn_inpup_counts || 'Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).')
 				.replace('{n}', String(nVals)).replace('{m}', String(Object.keys(nAssets).length))
 				.replace('{a}', String(nAdded)).replace('{k}', String(kept.length)) +
 				(nVals || nAdded ? ' ' + (pc.lpn_inpup_undo || 'Undo reverses all of it in one step.') : ''));
 			if (plan.newScn && !plan.newScn.none) {
-				p((pc.lpn_inpup_new_scn || 'Created the scenario {scenario}, a child of {parent}, and opened it.')
-					.replace('{scenario}', plan.newScn.name).replace('{parent}', plan.newScn.parent));
+				p(importNewScenarioCreatedText(plan.newScn.name, plan.newScn.parent));
 			}
 			if (!nVals && !nAdded) { p((pc.lpn_inpup_nothing || 'Every value in the file that matches an asset here is already the same in {scenario}.').replace('{scenario}', scnName) +
 				(plan.newScn && plan.newScn.none ? ' ' + (pc.lpn_inpup_new_none || 'No scenario was created.') : '')); }
@@ -46341,26 +46341,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function updateProjectWithPlan(makePlan, fileName, target, msxFile, kind, newName) {
 		var pc = EngCalcs.pageConfig || {}, fresh = target === 'new', from = activeScenario(), parent = importNewScenarioParent(),
 			scn = target === 'base' ? baseScenario() : from, scnName = scenarioDisplayName(scn), plan, touched, snapped = false;
-		// **A NEW SCENARIO IS MADE FIRST, UNDER THE ONE UNDO STEP, so the file is compared with what it will
-		// inherit** (Task 814; Tom's standard, question 1). It is taken back if there turns out to be
-		// nothing to write, so a refused or empty update leaves no empty scenario behind.
+		// **THE FILE IS COMPARED WITH THE PARENT, BEFORE ANYTHING IS MADE** (Task 814): a new child inherits
+		// exactly what its parent reads, so the plan is the same, and an update with nothing to write, or a
+		// refused one, touches nothing at all: no scenario, no undo step, the redo list and the edited
+		// state as they were.
 		if (fresh) {
-			saveUndoSnapshot();
-			snapped = true;
-			scn = createScenario(newName, parent.id);
-			scnName = scenarioDisplayName(scn);
-		}
-		plan = inpWithScenario(scn.id, makePlan);
-		if (fresh) {
-			plan.newScn = { name: scnName, parent: scenarioDisplayName(parent) };
+			plan = inpWithScenario(parent.id, makePlan);
+			plan.newScn = { name: newName, parent: scenarioDisplayName(parent) };
 			if (plan.refused.length || !(plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
-				undo();
-				redoStack.length = 0;
 				plan.newScn = { none: true };
-				scnName = scenarioDisplayName(from);
-				scn = from;
-				snapped = false;
+				scnName = scenarioDisplayName(parent);
+			} else {
+				saveUndoSnapshot();
+				snapped = true;
+				scn = createScenario(newName, parent.id);
+				scnName = scenarioDisplayName(scn);
 			}
+		} else {
+			plan = inpWithScenario(scn.id, makePlan);
 		}
 		if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
 			if (!snapped) { saveUndoSnapshot(); }
@@ -46451,8 +46449,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// it is made there and the button says so.
 	function importNewScenarioParent() { return scenarioBasicMode ? baseScenario() : activeScenario(); }
 	function importNewScenarioLabel() {
-		return ((EngCalcs.pageConfig || {}).lpn_inpup_btn_newscn || 'A new scenario, child of {parent}')
+		var pc = EngCalcs.pageConfig || {};
+		// Basic mode hides the tree words: the scenario is simply a new one.
+		if (scenarioBasicMode) { return pc.lpn_inpup_btn_newscn_basic || 'A new scenario'; }
+		return (pc.lpn_inpup_btn_newscn || 'A new scenario, child of {parent}')
 			.replace('{parent}', scenarioDisplayName(importNewScenarioParent()));
+	}
+	function importNewScenarioCreatedText(name, parentName) {
+		var pc = EngCalcs.pageConfig || {};
+		if (scenarioBasicMode) { return (pc.lpn_inpup_new_scn_basic || 'Created the scenario {scenario} and opened it.').replace('{scenario}', name); }
+		return (pc.lpn_inpup_new_scn || 'Created the scenario {scenario}, a child of {parent}, and opened it.').replace('{scenario}', name).replace('{parent}', parentName);
 	}
 	function importNewScenarioName() {
 		var pc = EngCalcs.pageConfig || {}, n = scenarios.length, name;
@@ -46467,7 +46473,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		inp.id = 'lpn_import_newscn';
 		inp.value = prior || importNewScenarioName();
 		lab.htmlFor = inp.id;
-		lab.textContent = (pc.lpn_inpup_newscn_name || 'Name of the new scenario') + ' ';
+		lab.textContent = pc.lpn_inpup_newscn_name || 'Name, if you choose a new scenario';
+		lab.style.marginRight = '8px';
 		row.appendChild(lab);
 		row.appendChild(inp);
 		body.appendChild(row);
@@ -47685,8 +47692,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.split('{scenario}').join(scenarioDisplayName(svScn)), raw: null }].concat(lines);
 		}
 		if (madeUnder) {
-			lines = [{ text: (pc.lpn_inpup_new_scn || 'Created the scenario {scenario}, a child of {parent}, and opened it.')
-				.replace('{scenario}', scenarioDisplayName(svScn)).replace('{parent}', madeUnder), raw: null }].concat(lines);
+			lines = [{ text: importNewScenarioCreatedText(scenarioDisplayName(svScn), madeUnder), raw: null }].concat(lines);
 		}
 		openDialog(function (body) {
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it

@@ -134,11 +134,25 @@ async function main() {
 		};
 		// Further questions the page queues behind a receipt (looking up elevations) are declined, never answered yes.
 		const declineMore = async () => { for (let k = 0; k < 3; k++) { const q = await a.dialog(); if (!q) { return; } await page.keyboard.press('Escape'); await a.settle(500); } };
+		// The open dialog sits inside the viewport and its name field can be reached.
+		const dialogFits = async () => page.evaluate(() => {
+			const d = document.getElementById('lpn_dialog'), i = document.getElementById('lpn_import_newscn');
+			if (!d || !i) { return 'no dialog or field'; }
+			const r = d.getBoundingClientRect(), ir = i.getBoundingClientRect(), lab = document.querySelector('label[for=lpn_import_newscn]').getBoundingClientRect();
+			const bad = [];
+			if (r.left < -1 || r.right > innerWidth + 1) { bad.push('dialog ' + Math.round(r.left) + '..' + Math.round(r.right)); }
+			if (ir.right > innerWidth + 1 || ir.width < 40) { bad.push('field ' + Math.round(ir.left) + '..' + Math.round(ir.right)); }
+			if (ir.left < lab.right + 4 && Math.abs(ir.top - lab.top) < 10) { bad.push('no gap between label and field'); }
+			if (document.documentElement.scrollWidth > innerWidth + 1) { bad.push('page scrolls sideways'); }
+			return bad.join('; ');
+		});
 		const undo = async () => { await page.keyboard.press('Control+z'); await a.settle(1500); const dd = await a.dialog(); if (dd) { console.log('   (dialog after undo: ' + dd.text.slice(0, 200) + ' / ' + dd.buttons.join(' | ') + ')'); await a.dialogClick(dd.buttons[0]); await a.settle(600); } };
-		const NB = await L('lpn_inpup_btn_newscn');
-		const newBtn = (parent) => NB.replace('{parent}', parent);
+		const NB = await L('lpn_inpup_btn_newscn'), NBB = await L('lpn_inpup_btn_newscn_basic');
+		// Basic mode hides the tree words; with it off the button names the parent.
+		let basicOn = true;
+		const newBtn = (parent) => (basicOn ? NBB : NB.replace('{parent}', parent));
 		const added = async (scn) => (await L('lpn_survey_added_scenario')).split('{scenario}').join(scn).split('.')[0] + '.';
-		const created = async (scn, parent) => (await L('lpn_inpup_new_scn')).replace('{scenario}', scn).replace('{parent}', parent);
+		const created = async (scn, parent) => basicOn ? (await L('lpn_inpup_new_scn_basic')).replace('{scenario}', scn) : (await L('lpn_inpup_new_scn')).replace('{scenario}', scn).replace('{parent}', parent);
 
 		// ---- the files ----
 		await toScenario('Base');
@@ -211,6 +225,7 @@ async function main() {
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 		await clickRow('#lpn_menu_list button.lpn-menu-row, #lpn_menu_list2 button.lpn-menu-row', await L('lpn_scenario_basic'));
 		await a.settle(900);
+		basicOn = false;
 		let more = await a.dialog();
 		if (more) { await a.dialogClick(more.buttons[0]); await a.settle(600); }
 		await importInp('edited2.inp');
@@ -228,7 +243,9 @@ async function main() {
 		await undo();
 		ok('one undo again', (await state()).scn.length === st0.scn.length);
 
-		console.log('--- N3. GeoJSON network into a new scenario ---');
+		console.log('--- N3. GeoJSON network into a new scenario (at phone width, 390 px) ---');
+		await page.setViewportSize({ width: 390, height: 844 });
+		await a.settle(800);
 		await toScenario('Base');
 		const gj = await doExport('lpn_file_export_item_geojson');
 		const g = JSON.parse(gj);
@@ -245,12 +262,13 @@ async function main() {
 		await page.waitForSelector('#lpn_dialog_buttons button', { state: 'visible', timeout: 8000 });
 		await a.settle(400);
 		dlg = await a.dialog();
+		ok('at 390 px the GeoJSON question fits and its field has a gap after the label', (await dialogFits()) === '', await dialogFits());
 		ok('the GeoJSON question has the same choice', dlg && dlg.buttons.indexOf(newBtn('Peak hour')) >= 0 || dlg.buttons.indexOf(newBtn('Base')) >= 0, dlg && dlg.buttons.join(' | '));
-		const gbtn = dlg.buttons.find((b) => b.indexOf(NB.split('{parent}')[0]) === 0);
+		const gbtn = dlg.buttons.find((b) => b.indexOf((basicOn ? NBB : NB.split('{parent}')[0])) === 0);
 		await a.dialogClick(gbtn);
 		await a.settle(1200);
 		dlg = await a.dialog();
-		ok('its receipt names the new scenario', dlg && dlg.text.indexOf((await L('lpn_inpup_new_scn')).split('{scenario}')[0]) >= 0 && dlg.text.indexOf('NEWG') >= 0, dlg && dlg.text.slice(0, 200));
+		ok('its receipt names the new scenario', dlg && dlg.text.indexOf((await created('@', '@')).split('@')[0]) >= 0 && dlg.text.indexOf('NEWG') >= 0, dlg && dlg.text.slice(0, 200));
 		await a.dialogClick(await L('lpn_dialog_ok'));
 		await declineMore();
 		const st4 = await state();
@@ -305,7 +323,7 @@ async function main() {
 		await a.settle(600);
 		rep = await finish();
 		s = await state();
-		ok('Base: no scenario sentence', rep.indexOf((await L('lpn_survey_added_scenario')).split('{scenario}')[0]) < 0 && rep.indexOf((await L('lpn_inpup_new_scn')).split('{scenario}')[0]) < 0, rep.slice(0, 120));
+		ok('Base: no scenario sentence', rep.indexOf((await L('lpn_survey_added_scenario')).split('{scenario}')[0]) < 0 && rep.indexOf((await created('@', '@')).split('@')[0]) < 0, rep.slice(0, 120));
 		ok('two nodes added, active in Base, no Peak hour overrides for them', s.nodes.length === n0 + 2 && s.nodes.slice(n0).every((n) => n._active !== false) && JSON.stringify(own(s, s.scn.find((x) => x.name === 'Peak hour'))).indexOf('active') < 0);
 		ok('Peak hour is still the open scenario', (await scnButton()).indexOf('Peak hour') >= 0, await scnButton());
 		await undo();
@@ -313,7 +331,7 @@ async function main() {
 		// (c) a new scenario
 		await survey();
 		await page.fill('#lpn_import_newscn', 'Survey');
-		await a.dialogClick((await a.dialog()).buttons.find((b) => b.indexOf(NB.split('{parent}')[0]) === 0));
+		await a.dialogClick((await a.dialog()).buttons.find((b) => b.indexOf((basicOn ? NBB : NB.split('{parent}')[0])) === 0));
 		await a.settle(700);
 		rep = await finish();
 		s = await state();
@@ -324,6 +342,51 @@ async function main() {
 		await undo();
 		s = await state();
 		ok('ONE undo removes the scenario and the nodes', s.scn.length === st0.scn.length && s.nodes.length === n0 && (await scnButton()).indexOf('Peak hour') >= 0, names(s).join(',') + ' / ' + s.nodes.length);
+
+		console.log('--- N6. a no-change import into a new scenario leaves redo and the edited state alone ---');
+		await page.setViewportSize({ width: 1600, height: 1000 });
+		await a.settle(800);
+		await toScenario('Peak hour');
+		await survey();
+		await a.dialogClick(open);
+		await a.settle(600);
+		await finish();
+		ok('an edit was made (two nodes)', (await countNodes()) === n0 + 2);
+		await undo();
+		ok('undone', (await countNodes()) === n0);
+		const dirtyBefore = await a.currentTabDirty();
+		await page.setInputFiles('#lpn_inp_file', { name: 'same.inp', mimeType: 'text/plain', buffer: Buffer.from(inpBase) });
+		await a.settle(900);
+		await a.dialogClick((await a.dialog()).buttons.find((b) => b.indexOf((basicOn ? NBB : NB.split('{parent}')[0])) === 0));
+		await a.settle(900);
+		dlg = await a.dialog();
+		ok('the receipt heading does not say Imported', dlg && dlg.text.indexOf((await L('lpn_inpup_refused_heading')).split('{project}')[0]) === 0 && dlg.text.indexOf('Imported') !== 0, dlg && dlg.text.slice(0, 80));
+		ok('and says no scenario was created', dlg && dlg.text.indexOf(await L('lpn_inpup_new_none')) >= 0);
+		await a.dialogClick(await L('lpn_dialog_ok'));
+		await declineMore();
+		ok('no scenario was made', (await state()).scn.length === st0.scn.length);
+		ok('the project is marked edited exactly as before', (await a.currentTabDirty()) === dirtyBefore, String(dirtyBefore) + ' -> ' + (await a.currentTabDirty()));
+		await page.keyboard.press('Control+y');
+		await a.settle(1500);
+		ok('Redo still redoes the earlier edit', (await countNodes()) === n0 + 2, String(await countNodes()));
+		await undo();
+
+		console.log('--- N7. Basic mode on: the survey dialog says just "A new scenario" (390 px) ---');
+		await page.click('#lpn_scenario_btn');
+		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		await clickRow('#lpn_menu_list button.lpn-menu-row, #lpn_menu_list2 button.lpn-menu-row', await L('lpn_scenario_basic'));
+		await a.settle(900);
+		more = await a.dialog();
+		if (more) { await a.dialogClick(more.buttons[0]); await a.settle(600); }
+		basicOn = true;
+		await page.setViewportSize({ width: 390, height: 844 });
+		await a.settle(800);
+		await survey();
+		dlg = await a.dialog();
+		ok('Basic mode on: the survey choice is just the new-scenario label', dlg && dlg.buttons.indexOf(NBB) >= 0 && !dlg.buttons.some((b) => b.indexOf(',') >= 0 && b.indexOf(NBB) === 0), dlg && dlg.buttons.join(' | '));
+		ok('at 390 px the survey question fits and its field has a gap after the label', (await dialogFits()) === '', await dialogFits());
+		await a.dialogClick(await L('lpn_cancel'));
+		await page.setViewportSize({ width: 1600, height: 1000 });
 
 		console.log('--- N5. Base alone: no question for surveyed points ---');
 		const d5 = JSON.parse(JSON.stringify(d));
