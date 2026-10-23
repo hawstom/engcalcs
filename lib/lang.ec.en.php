@@ -3560,6 +3560,7 @@ $ec_lang['lpn_settings_row_new_asset']='New assets: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (default)';
 $ec_lang['lpn_settings_row_view_value']='Center {x}, {y}; scale {s}';
 $ec_lang['lpn_settings_held_in']='Override in {scenario}.';
+$ec_lang['lpn_settings_held_item']='{setting}: clear restores {value}, the value in {parent}.';
 $ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Map center';
 $ec_lang['lpn_settings_view_scale']='Map scale';

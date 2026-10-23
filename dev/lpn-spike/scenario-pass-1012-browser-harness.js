@@ -15,7 +15,7 @@
 //       a paste in another scenario writes there (Base unchanged) and names the alternative it made;
 //   M2  in Basic mode a new scenario is a child of Base, even made while Fig 5 is current;
 //   F7  the menu's New and Rename refuse a name already used;
-//   F8  "Shared with" names a scenario that names the alternative, not a child that inherits it.
+//   F8  the line names (as "also used by") a scenario that names the alternative, not a child that inherits it.
 //   Q2  the line beside an override says what Clear override restores, named by where it comes from
 //       (the parent scenario, or Base);
 //   Q3  an .inp export from Fig 5 writes Fig 5's Text position, as it writes its node values.
@@ -435,7 +435,7 @@ async function main() {
 		}, true);
 		await clickNode('10');
 		const shared = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
+		const want = (await L('lpn_ovm_dot_alt_shared')).replace('{alternative}', 'Fig 4').replace('{list}', 'Fig 9');
 		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
 			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
 

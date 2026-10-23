@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**26 still to read on master**, of 191 untranslated keys, of 3209 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**27 still to read on master**, of 192 untranslated keys, of 3210 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (191, 26 to read @@ NEEDS RULING)
+## lpn_  (192, 27 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -541,6 +541,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_zoom`**
   > Zoom
   _Ruled OK 2026-10-20._
+- **`lpn_settings_held_item`**
+  > {setting}: clear restores {value}, the value in {parent}.
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -609,7 +612,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**17 still to read**, of 60 new keys across 7 unmerged branch(es).
+**17 still to read**, of 60 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -624,7 +627,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/import-new-scenario (`55ff26c0d`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/import-new-scenario (`8a56c9dbf`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inpup_btn_newscn`**
   > A new scenario, child of {parent}
@@ -810,8 +813,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`a6efd80ba`) — adds no English strings
+### feat/theme-whimsy (`47f555b2c`) — adds no English strings
 
-### feat/wtg-export (`39b66393d`) — adds no English strings
+### feat/value-source (`a6c1ad3f0`) — adds no English strings
+
+### feat/wtg-export (`8edd6369b`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings

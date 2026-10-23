@@ -4202,6 +4202,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_row_default: <?=json_encode($ec_lang['lpn_settings_row_default'])?>,
 	lpn_settings_row_view_value: <?=json_encode($ec_lang['lpn_settings_row_view_value'])?>,
 	lpn_settings_held_in: <?=json_encode($ec_lang['lpn_settings_held_in'])?>,
+	lpn_settings_held_item: <?=json_encode($ec_lang['lpn_settings_held_item'])?>,
 	lpn_settings_held_base: <?=json_encode($ec_lang['lpn_settings_held_base'])?>,
 	lpn_settings_view_center: <?=json_encode($ec_lang['lpn_settings_view_center'])?>,
 	lpn_settings_view_scale: <?=json_encode($ec_lang['lpn_settings_view_scale'])?>,

@@ -63586,7 +63586,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
 		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
-		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm'), function (n) { n.parentNode.removeChild(n); });
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm, .lpn-set-heldlist'), function (n) { n.parentNode.removeChild(n); });
 		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
 		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
@@ -63597,6 +63597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			held = setboxHeldRowsOf(paths, scn, rows);
 			setboxMarks(el, paths, held, scn, rows);
 			if (!held.length) { return; }
+			setboxHeldList(el, paths, held, scn, rows);
 			el.classList.add('lpn-set-held');
 			setboxIndexMarkHeld(el);
 		});
@@ -63633,6 +63634,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
 		el.appendChild(g);
+	}
+	// **A ROW THAT EDITS SEVERAL SETTINGS LISTS THE OVERRIDDEN ONES, EACH WITH ITS OWN DOT** (Tom,
+	// 2026-10-23: *Is it completely unfeasible to show these individually?*). A Labels row edits
+	// its show tick, decimals, before, after, units tick and priority: six Settings table rows,
+	// one dot, one group clear. Each of those is already a table row with its own clear
+	// (settingRowClear()), so the line under the row names each one that the open scenario holds,
+	// what Clear restores and where from, and clears just that one. A row that edits one setting
+	// needs no list: its dot is that one.
+	function setboxHeldList(el, paths, held, scn, rows) {
+		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
+		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
+		if (all.length < 2 || !el.parentNode) { return; }
+		line = document.createElement('div');
+		line.className = 'lpn-set-heldlist';
+		line.setAttribute('data-lpn-noseam', '1');
+		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
+			var item = document.createElement('span'), text = document.createElement('span');
+			item.className = 'lpn-set-helditem';
+			text.textContent = (pc.lpn_settings_held_item || '{setting}: clear restores {value}, the value in {parent}.')
+				.split('{setting}').join(settingTableLabelBare(r.path)).split('{value}').join(settingRowText(r, par)).split('{parent}').join(scenarioDisplayName(par));
+			item.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
+				setboxPinRow(el);
+				clearHeldSetboxRows([r], scn);
+				setboxKeepPlaceSoon();
+			}));
+			item.appendChild(text);
+			line.appendChild(item);
+		});
+		el.parentNode.insertBefore(line, el.nextSibling);
 	}
 	// The box's left index marks a sub-heading that holds an override, so a held value can be found.
 	function setboxIndexMarkHeld(el) {
@@ -63985,6 +64015,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
 			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			// A row's list of its overridden settings goes with its row.
+			if (kid.classList.contains('lpn-set-heldlist')) { setboxShow(kid, lastShown); return; }
 			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			setboxShow(kid, m);
 			lastShown = m;
