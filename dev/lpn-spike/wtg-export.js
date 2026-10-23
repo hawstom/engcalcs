@@ -210,7 +210,7 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	let nextId = DEFAULT_MAX + 1;
 	const newId = () => nextId++;
 	const live = { 55: 0, 56: 0, 52: 0, 69: 0, 68: 0, 64: 0, 65: 0, 66: 0, 60: 0, 61: 0, 62: 0 };
-	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 63: 0 };
+	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 59: 0, 63: 0 };
 
 	function modeling(id, type, label, notes) {
 		insert(db, 'HMIModelingElement', {
@@ -544,8 +544,77 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 		const clock = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (ss ? ':' + String(ss).padStart(2, '0') : '');
 		return { cond: 'Clock Time  = ' + clock + ' ', act: linkLabel + ' Pipe Status = ' + status + ' ' };
 	}
-	let nCtl = 0;
+	let nCtl = 0, nLevel = 0;
+	const controlIds = [];
+	// Tank-level controls ("Link 335 OPEN IF Node 1 BELOW 17.1") are written as real tank-level controls,
+	// in the codes Tom's own saved wtg-control-1 showed (dev/wtg-export.md, "Tank-level controls").
+	// A junction-pressure condition has no sample, so its link keeps the frozen clock schedule.
+	const levelCtl = opts.frozenLevelControls ? [] : (parsed.controls || []).filter((c) => c.condition && c.condition.kind === 'node'
+		&& nodeById[c.condition.node] && nodeById[c.condition.node].type === 'tank' && pipeElId[c.link]
+		&& (c.condition.cmp === 'below' || c.condition.cmp === 'above'));
+	const realLinks = {};
+	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
+	const fmt2 = (v) => Number(v).toFixed(2);
+	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
+	levelCtl.forEach((c) => {
+		const isPump = !!pumpNodeId[c.link];
+		const pipeLabel = isPump ? (c.link + '-A') : c.link;
+		const statusWord = c.action.status === 'open' ? 'Open' : 'Closed';
+		const sym = c.condition.cmp === 'below' ? '<' : '>';
+		const cId = newId(), aId = newId(), kId = newId();
+		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
+		const aName = statusWord + '-' + pipeLabel;
+		const condTxt = cName + ' {"' + c.condition.node + '" Level ' + sym + ' ' + fmt2(c.condition.value) + ' ft}';
+		const actTxt = aName + ' {"' + pipeLabel + '" Pipe Status = ' + statusWord + ' }';
+		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
+		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
+		supportElement(kId, 54, 'LC' + kId, '');
+		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
+		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
+		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
+			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: 0,
+			ElementType_TankLevel: c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
+			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
+			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
+			ControlConditionElementType: 52
+		});
+		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', 1], TankType: ['ControlConditionTankType', 'TankAttribute', 3],
+			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
+			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
+			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],
+			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
+			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
+		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
+		setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
+		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, { SimpleActionType_Element: pipeElId[c.link], ElementType: 69 });
+		const aSub = [
+			['IdahoControlAction_ElementType_ControlActionPipeType', { PipeAttribute: 0 }],
+			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: c.action.status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpSettingType', { ActionPumpSettingType_RelativeSpeedFactor: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpPressureSettingType', { ActionPumpPressureSettingType_TargetPressure: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpHeadSettingType', { ActionPumpHeadSettingType_TargetHead: 0 }],
+			['IdahoControlAction_ElementType_ControlActionTCVType', { TCVAttribute: 0 }],
+			['IdahoControlAction_TCVAttribute_ActionTCVStatusType', { TCVStatus: 1 }],
+			['IdahoControlAction_TCVAttribute_ActionTCVSettingType', { ActionTCVSettingType_HeadlossCoefficient: 0 }],
+			['IdahoControlAction_ElementType_ControlActionGPVType', { GPVAttribute: 0 }],
+			['IdahoControlAction_GPVAttribute_ActionGPVStatusType', { GPVStatus: 1 }],
+			['IdahoControlAction_ElementType_ControlActionFCVType', { FCVAttribute: 0 }],
+			['IdahoControlAction_FCVAttribute_ActionFCVSettingType', { ActionFCVSettingType_Discharge: 0 }],
+			['IdahoControlAction_FCVAttribute_ActionFCVStatusType', { FCVStatus: 1 }],
+			['IdahoControlAction_ElementType_ControlActionPressureValveType', { PRVAttribute: 0 }],
+			['IdahoControlAction_PRVAttribute_ActionPressureValveSettingType', { ActionPressureValveSettingType_HydraulicGrade: 0, ActionPressureValveSettingType_Pressure: 0 }],
+			['IdahoControlAction_PRVAttribute_ActionPressureValveStatusType', { ActionPressureValveStatus: 1 }]
+		];
+		aSub.forEach((r) => { setRows(r[0], aId, r[1]); });
+		const words = 'IF ' + condTxt + ' THEN ' + actTxt;
+		setRows('IdahoControl', kId, { IdahoControl_DefineDescription: 0, IdahoControl_Description: words, IdahoControl_ExpandedDescription: words, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, IdahoControl_ControlNotes: '', ControlType: 0 });
+		setRows('IdahoControl_ControlType_LogicalType', kId, { LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
+		controlIds.push(kId); nCtl++; nLevel++;
+	});
 	changes.forEach((ch) => {
+		if (realLinks[ch.link]) { return; }
 		const pipeEl = pipeElId[ch.link];
 		if (!pipeEl) { return; }
 		const isPump = !!pumpNodeId[ch.link];
@@ -562,10 +631,20 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 		insert(db, 'IdahoControlAction_PipeAttribute_ActionPipeStatusType', { SupportElementID: aId, ActionPipeStatus: ch.status === 'open' ? 0 : 1 });
 		insert(db, 'IdahoControl', { SupportElementID: kId, IdahoControl_DefineDescription: 0, IdahoControl_Description: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ExpandedDescription: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, ControlType: 1 });
 		insert(db, 'IdahoControl_ControlType_LogicalType', { SupportElementID: kId, LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
-		nCtl++;
+		controlIds.push(kId); nCtl++;
 	});
-	report.counts.controls = nCtl;
-	carried('controls: ' + nCtl + ' clock-time pipe-status controls (the schedule EPANET followed; see dev/wtg-export.md)');
+	// One control set holding every control, made the Base operational alternative's active set: Tom's
+	// wtg-control-1 showed a control lives in a set, and the alternative's set is NULL until assigned.
+	if (controlIds.length) {
+		const setId = newId();
+		supportElement(setId, 59, 'Logical Control Set - 1', '');
+		setRows('IdahoLogicalControlSet', setId, { LogicalControlCollectionCount: controlIds.length });
+		controlIds.forEach((k) => { insert(db, 'IdahoLogicalControlSet_LogicalControlCollection', { SupportElementID: setId, LogicalControlCollection_IdahoLogicalControlID: k }); });
+		db.run('UPDATE Operational_SystemData SET Operational_IdahoControlSetID = ?', [setId]);
+		report.controlSetId = setId;
+	}
+	report.counts.controls = nCtl; report.counts.levelControls = nLevel;
+	carried('controls: ' + nLevel + ' tank-level controls and ' + (nCtl - nLevel) + ' clock-time pipe-status controls, in one control set assigned to the Base operational alternative');
 
 	// ---- analysis options: the template's own EPS options already read 24 h, 1 h step; set them explicitly ----
 	const T = parsed.times;
@@ -599,7 +678,7 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	db.close();
 	report.ids = { firstId: DEFAULT_MAX + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
 	report.notCarried.push('quality analysis (Trace Lake), reactions, mixing, sources, energy price and pattern, the [REPORT] settings');
-	report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed');
+	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	report.notCarried.push('pipe material (every pipe keeps the template default)');
 	return { bytes: bytes, report: report };
 }

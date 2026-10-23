@@ -85,19 +85,49 @@ head loss worth the name (the harness holds EPANET to 0.014 ft over 24 h across 
 this). The pump node sits at the midpoint of the two end nodes and takes the suction node's elevation. The
 pump's on/off state is carried by the status of `10-A`.
 
-**Controls.** A control is three support elements, a condition, an action and a control joining them. The
-only condition and action codes seen in any file we may use are: a clock-time condition
-(`SimpleConditionType` 2, `CompareOperator` 0, the time stored as seconds since 1970 with the time of day in
-it) and a pipe-status action (`PipeAttribute` 0, `ActionPipeStatus` 1 closed; 0 for open is by symmetry with
-`PipeStatus`, unproven). Net3's pump 10 controls are clock-driven ("OPEN AT TIME 1", "CLOSED AT TIME 15") and
-map directly. Its four tank-level controls ("Link 335 OPEN IF Node 1 BELOW 17.1") need a tank-level
-condition whose codes appear in no file we have. **They are carried as clock-time controls at the seconds
-at which EPANET actually switched them** (4:13:33 and 21:19:39), taken from a reference run, on the
-upstream pipe of the pump (`335-A`) and on bypass pipe 330. That reproduces EPANET's 24 hours to 0.014 ft,
-but it is a frozen schedule, not the control: it would not respond to a changed demand. It is the one
-place the export is not faithful, and the report must say so by name. A pump status or speed action is also
-unseen (`PumpStatus` 1 is "taken as off" in the reader, unproven), so a pump is stopped by closing its
-pipe, which is hydraulically the same.
+**Controls.** A control is three support elements, a condition, an action and a control joining them, and the
+controls live in a **control set** that the operational alternative names. Net3's pump 10 controls are
+clock-driven ("OPEN AT TIME 1", "CLOSED AT TIME 15") and are written as clock-time conditions
+(`SimpleConditionType` 2, `CompareOperator` 0, the time stored as seconds since 1970 with the time of day in it).
+Net3's four tank-level controls ("Link 335 OPEN IF Node 1 BELOW 17.1") are written as real tank-level
+controls, in the codes below, which Tom's own saved `wtg-control-1` taught us. The pump is stopped by
+closing its upstream pipe `335-A`, which is hydraulically the same as a pump status action (those codes are
+still unseen). A junction-pressure condition has no sample; its link would keep the frozen clock schedule
+(`opts.frozenLevelControls` forces that for every level control; Net3 has no pressure condition).
+
+### Tank-level controls: the codes (from Tom's `wtg-control-1`, 2026-10-23)
+
+Tom followed Ask 1 in WaterGEMS 26.0.0.532 and saved. Diffing his file against the tiny file he started from
+shows every table WaterGEMS touched. A table-by-table record:
+
+| What | Where | Code |
+|---|---|---|
+| Support element types | `HMISupportElement.SupportElementTypeID` | 54 control, 55 action, 56 condition, **59 logical control set** (type counts in `HMIElementTypeCount`) |
+| Condition | `IdahoControlCondition` | `ConditionType` 0 (simple); `DefineDescription` 1 with a template `name {"%e" %a %o %v %u}` and the expanded text `name {"T1" Level < 5.00 ft}` |
+| Operator | `..._ConditionType_SimpleConditionType` | `SimpleConditionType` 0 (an element attribute), `CompareOperator` **3 is less than, 1 is greater than** (other operators unseen) |
+| What it tests | `..._SimpleConditionType_ElementType` | `ElementType_Element` the tank's ElementID; `ElementType_TankLevel` the value (5.0 for "5.00 ft", stored in feet); `ControlConditionElementType` **52 (a tank)**; the other value columns 0 |
+| Attribute | `..._ControlConditionElementType_ControlConditionTankType` | `TankAttribute` **3 is Level** (a new condition starts at `ControlConditionElementType` 50, `NodeAttribute` 1); every other attribute table gets a row at 0, the node, hydropneumatic and surge tank ones at 1 |
+| Action | `IdahoControlAction` | `ControlActionType` 0 (simple), same description template style; `..._SimpleActionType`: `SimpleActionType_Element` the pipe's ElementID, `ElementType` 69 (pipe) |
+| Action attribute | `..._ControlActionPipeType`, `..._ActionPipeStatusType` | `PipeAttribute` 0 is Status; `ActionPipeStatus` **0 is Open, 1 is Closed** (Open confirmed; it was symmetry before). The pump, TCV, GPV, FCV and PRV action tables each get a default row |
+| Control | `IdahoControl` | `ControlType` 0, `IdahoControl_ControlCondition`, `IdahoControl_ControlAction`; description `IF <condition text> THEN <action text>`; `IdahoControl_ControlType_LogicalType` one row (no priority, no ELSE, `ElseAction` NULL) |
+| Control set | `IdahoLogicalControlSet` (`LogicalControlCollectionCount`) and `IdahoLogicalControlSet_LogicalControlCollection` (one row per control) | support element type 59, label `Logical Control Set - 1` |
+| **Assigned to an alternative** | `Operational_SystemData.Operational_IdahoControlSetID` | the set's SupportElementID. **Tom's file left it NULL**, because he did not choose it in the operational alternative. That is what "not assigned" means: the set and its controls exist in the file, and no alternative uses them. |
+
+Also in his file: the `.wtg` grew a `ControlSetTableEditorModel` table-width block (presentation only), and the
+UI left soft-deleted scratch support elements (a condition and two actions it creates empty before filling
+them). Neither matters to the writer.
+
+The writer therefore emits all controls (clock and level) as members of one control set and writes that set's
+ID into `Operational_SystemData` for the Base operational alternative. **Unproven**: that WaterGEMS then
+applies them (the one reading of "assigned" that Tom's file supports; the column is the only place a set is
+named), and that a tank's `Level` is the depth above its base elevation, as EPANET's is (the control text says
+"Level"; WaterGEMS also has a hydraulic grade attribute, `ElementType_HydraulicGrade`, so Level is probably
+not the grade). The reader on `feat/sqlite-reader` reads a project whose alternative names a control set as
+"controls unread" (its own note), so the harness reads the control tables itself.
+
+The older clock controls kept `ControlType` 1, which they were first written with; Tom's logical control has
+`ControlType` 0, which is the schema default. If a clock control fails to fire while a level control does,
+try 0.
 
 ## What cannot be carried, and how a product would say so
 
@@ -106,7 +136,7 @@ import already keeps). In the spike they are in `report.notCarried`.
 
 | Not carried | Why | Net3 |
 |---|---|---|
-| Tank-level (and any non-clock) controls, as controls | condition codes unseen | 4 of 6, carried as a frozen schedule |
+| Rule-based and pressure-condition controls | condition codes unseen (tank level is now known) | none in Net3 |
 | `[RULES]` | logical-control codes unseen | none in Net3 |
 | Water quality: trace, age, reactions, mixing, sources | not written, not studied | Net3 traces Lake |
 | Energy price and price pattern | not written | price 0 |
@@ -165,8 +195,8 @@ the plan:
    files already showed duplicate labels within one kind.
 9. Does the saved file WaterGEMS writes on File > Save As differ from ours in any table? That diff is the
    cheapest complete audit available.
-10. Codes still needed: tank-level condition, pump status and speed actions, valve kinds, the child
-    scenario (below). Tom saving one control of each kind by hand, and a model with one child scenario,
+10. Codes still needed: pump status and speed actions, a pressure condition and a time-from-start condition, an ELSE action, the child
+    scenario (below). (The tank-level condition was learned from Tom's `wtg-control-1`.) Tom saving one control of each kind by hand, and a model with one child scenario,
     closes all of them.
 
 ## Feasibility verdict
@@ -181,14 +211,14 @@ mostly data entry rather than discovery.
 
 **What a real product would take**, in steps:
 
-1. Tom's test of the three files, and the Save As diff. Fix whatever it shows. (Days, if it opens; if it
+1. Tom's test of the files, and the Save As diff. Fix whatever it shows. (Days, if it opens; if it
    does not, the error text decides whether the route survives.)
 2. Move the writer into a DOM-free `js/` module that reads the page's document, not an `.inp` (units
    from the document, SI and US, every storage unit code in the schema blob checked rather than assumed), and
    put a File > Export entry behind it that takes the user's blank project as the template, reads
    `HMICoreSchemaVersion`, and refuses a version not on a tested list. The sql.js engine is already vendored on
    `feat/sqlite-reader`.
-3. Samples for each unseen code, saved by Tom once: tank-level, time-from-start and pressure conditions; pump
+3. Samples for each unseen code, saved by Tom once: time-from-start and pressure conditions; pump
    status, speed and target-head actions; each valve kind with a setting; a pump with a multipoint curve and one
    with constant power; a tank with a volume curve; a reservoir with a head pattern. The template already holds
    a live prototype of every element kind, so the element side is mostly written.
@@ -272,9 +302,9 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[CURVES]` efficiency curve | constant only | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2) | a curve: not yet written; no new file needed, but nothing in Net3 uses it |
 | `[ENERGY]` global efficiency | yes | constant efficiency | done |
 | `[ENERGY]` price, price pattern, demand charge | no | `EnergyCost_EnergyPricingID` points at an energy-pricing support element; no sample holds one | no |
-| `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls | the one sample control (Zenodo) | done; see the warning on control sets below |
-| `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | frozen schedule only | the tables exist (`..._ControlConditionTankType.TankAttribute`, `..._ElementType.ElementType_TankLevel`, `CompareOperator`); the codes are in no file we may use | **no: ask 1** |
-| `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes | no (after ask 1) |
+| `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls in the same control set | the one sample control (Zenodo) | done |
+| `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | yes, as tank-level controls in a control set | Tom's `wtg-control-1` (see "Tank-level controls: the codes") | done; whether WaterGEMS fires them is Tom's test |
+| `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes (the ELSE column and a priority column are in `IdahoControl_ControlType_LogicalType`) | needs a sample with an ELSE |
 | `[QUALITY]`, `[REACTIONS]`, `[SOURCES]` | no | trace and constituent tables exist; nothing stored in any file | no |
 | `[TIMES]` duration, hydraulic step, start | yes | | done |
 | `[TIMES]` pattern step, report step | pattern step through each pattern's points; report step not written | `EpsType_ReportingTimeStep` | yes, not done: no effect on results |
@@ -285,30 +315,17 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[LABELS]`, `[BACKDROP]`, `[TAGS]` | no | | no equivalent worth the effort |
 | Units other than US/GPM | refused | storage units measured for US only | yes in principle: SI conversions are the schema's own storage units |
 
-**Control sets (a warning that needs Tom's eyes).** The only sample control (Zenodo) sits in a project whose
-operational alternative holds a NULL control set (`Operational_SystemData.Operational_IdahoControlSetID`), as
-Tom's fixture and our files do. The reader's own note says a project with a control set holds its controls
-there. If WaterGEMS applies only controls that a control set names, then our six clock controls exist in the
-file but do not fire. Ask 1 answers this at the same time, because it makes WaterGEMS create a control set.
-Until then, `3-net3`'s agreement with EPANET after hour 1 is the thing to look at (the pump `10` should start
-at 1:00).
+**Control sets.** Resolved in form by Tom's `wtg-control-1`: controls belong to a control set, and the set is
+assigned to an alternative in `Operational_SystemData`. The writer now does both (see "Tank-level controls: the
+codes"). Round two's clock controls were written without a set; Tom saw pump 10 behave (see his 2026-10-23 words),
+which leaves open whether WaterGEMS applies controls that no set names. Round three assigns the set, so either
+way it fires if assignment is the rule.
 
 ## The smallest asks of Tom
 
-Three, one thing per file, each starting from the tiny project (`wtg-export/1-tiny/Tiny.wtg`, which Tom has
+Two remain (Ask 1, the tank-level control, was done by Tom on 2026-10-23 and is closed), one thing per file, each starting from the tiny project (`wtg-export/1-tiny/Tiny.wtg`, which Tom has
 already opened) so that nothing has to be drawn. Where a menu name below is a guess it says so; Tom reports
 what he sees instead.
-
-**Ask 1: a tank-level control (closes tank-level controls, and the control-set question).**
-1. Open `Tiny.wtg`. File > Save As: `wtg-control-1`.
-2. Open the controls editor: Components > Controls (if the menu differs, look for "Controls" or for the Operational alternative in the Explorer).
-3. New condition, "simple": element type Tank, element `T1`, attribute Level (or "Tank Level"), operator "less than", value 5 ft. Name it `T1-low`.
-4. A second condition the same way: "greater than", 15 ft, `T1-high`.
-5. New action, "simple": element Pipe `PU1-A`, attribute Status, value Open. Name `Open-pump`. A second action, status Closed, `Close-pump`.
-6. New control (logical): IF `T1-low` THEN `Open-pump`. A second: IF `T1-high` THEN `Close-pump`.
-7. If WaterGEMS has "control sets": make a set containing both controls and make it the active one in the Base operational alternative. If it does not ask, do nothing.
-8. Compute, and note whether the pump pipe closes when the tank passes 15 ft.
-9. File > Save, close WaterGEMS, and send `wtg-control-1.wtg` and `wtg-control-1.wtg.sqlite`.
 
 **Ask 2: an emitter (closes emitters, and the storage unit).**
 1. Open `Tiny.wtg`. File > Save As: `wtg-emitter-1`.

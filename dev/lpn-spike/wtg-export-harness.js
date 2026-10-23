@@ -106,7 +106,7 @@ function head(t) { console.log('\n' + t); }
 	ok('92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps',
 		R.counts.junctions === 92 && R.counts.reservoirs === 2 && R.counts.tanks === 3 && R.counts.pipes === 117 && R.counts.pumps === 2, JSON.stringify(R.counts));
 	ok('4 pipes added for the pumps (one each side of each pump node)', R.counts.pumpConnectingPipes === 4);
-	ok('6 clock-time controls: pump 10 at 1:00 and 15:00, and 335/330 at the two tank-level crossings', R.counts.controls === 6,
+	ok('6 controls: 2 clock-time (pump 10 at 1:00 and 15:00) and 4 tank-level (335 and 330)', R.counts.controls === 6 && R.counts.levelControls === 4,
 		JSON.stringify(ref.changes));
 	ok('sql.js integrity_check ok and no foreign key violations', R.integrity === 'ok' && R.foreignKeyViolations === 0, R.integrity + ' / ' + R.foreignKeyViolations);
 
@@ -196,13 +196,64 @@ function head(t) { console.log('\n' + t); }
 	});
 	ok('all 5 patterns: 24 hourly values each', patBad.length === 0, patBad.join());
 	ok('EPS: 24 h, 1 h step, starting at midnight', back.times.duration === 86400 && back.times.hydraulicStep === 3600 && back.times.startClock === 0, JSON.stringify(back.times && { d: back.times.duration, h: back.times.hydraulicStep }));
-	ok('the six controls come back as clock-time controls', back.controls.length === 6 && back.controls.every((c) => /CLOCKTIME/i.test(c.raw)), String(back.controls.length));
+	// The reader reports every control as unread once the alternative names a control set (its comment: a
+	// project with a control set holds its controls there), so the controls are read from the tables here,
+	// the way the sheet of EPANET control lines says them, and put into the read-back .inp for the solve.
+	function q(sql) { return db.select(sql).rows; }
+	const setId = q('SELECT Operational_IdahoControlSetID FROM Operational_SystemData')[0][0];
+	ok('the Base operational alternative names a control set (Tom\'s wtg-control-1 left it NULL)', setId !== null && setId === R.controlSetId, String(setId));
+	const members = q('SELECT LogicalControlCollection_IdahoLogicalControlID FROM IdahoLogicalControlSet_LogicalControlCollection WHERE SupportElementID = ' + setId).map((r) => r[0]);
+	ok('the control set holds all six controls, and its count column says so', members.length === 6
+		&& q('SELECT LogicalControlCollectionCount FROM IdahoLogicalControlSet WHERE SupportElementID = ' + setId)[0][0] === 6, String(members.length));
+	const label = (id) => q('SELECT Label FROM HMIModelingElement WHERE ElementID = ' + id)[0][0];
+	const ctlLines = [];
+	const hm = (secs) => { const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), x = secs % 60; return (h % 12 === 0 ? 12 : h % 12) + ':' + String(m).padStart(2, '0') + (x ? ':' + String(x).padStart(2, '0') : '') + (h < 12 ? ' AM' : ' PM'); };
+	let nLevelBack = 0;
+	members.forEach((k) => {
+		const c = q('SELECT IdahoControl_ControlCondition, IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = ' + k)[0];
+		const sc = q('SELECT SimpleConditionType, CompareOperator FROM IdahoControlCondition_ConditionType_SimpleConditionType WHERE SupportElementID = ' + c[0])[0];
+		const act = q('SELECT SimpleActionType_Element, ElementType FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0];
+		const st = q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0] === 0 ? 'OPEN' : 'CLOSED';
+		let when;
+		if (sc[0] === 2) {
+			when = 'AT CLOCKTIME ' + hm(q('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType WHERE SupportElementID = ' + c[0])[0][0] % 86400);
+		} else {
+			const e = q('SELECT ElementType_Element, ElementType_TankLevel, ControlConditionElementType FROM IdahoControlCondition_SimpleConditionType_ElementType WHERE SupportElementID = ' + c[0])[0];
+			const tk = q('SELECT TankAttribute FROM IdahoControlCondition_ControlConditionElementType_ControlConditionTankType WHERE SupportElementID = ' + c[0])[0][0];
+			if (sc[0] !== 0 || e[2] !== 52 || tk !== 3 || (sc[1] !== 3 && sc[1] !== 1) || act[1] !== 69) { throw new Error('unexpected control codes for ' + k); }
+			when = 'IF NODE ' + label(e[0]) + ' ' + (sc[1] === 3 ? 'BELOW' : 'ABOVE') + ' ' + e[1];
+			nLevelBack++;
+		}
+		ctlLines.push('LINK ' + label(act[0]) + ' ' + st + ' ' + when);
+	});
+	ok('four tank-level controls read back as tank-level conditions (less than = 3, greater than = 1) on tank 1',
+		nLevelBack === 4 && ctlLines.filter((l) => /IF NODE 1 (BELOW 17\.1|ABOVE 19\.1)$/.test(l)).length === 4, ctlLines.join(' | '));
+	ok('they act on pump 335\'s upstream pipe and bypass pipe 330',
+		['LINK 335-A OPEN IF NODE 1 BELOW 17.1', 'LINK 335-A CLOSED IF NODE 1 ABOVE 19.1', 'LINK 330 CLOSED IF NODE 1 BELOW 17.1', 'LINK 330 OPEN IF NODE 1 ABOVE 19.1'].every((w) => ctlLines.indexOf(w) >= 0), ctlLines.join(' | '));
+	ok('the two clock controls stay clock controls (pump 10 at 1:00 AM and 3:00 PM)', ctlLines.filter((l) => /^LINK 10-A (OPEN AT CLOCKTIME 1:00 AM|CLOSED AT CLOCKTIME 3:00 PM)$/.test(l)).length === 2, ctlLines.join(' | '));
+	ok('the reader, which does not yet know control sets, leaves them unread rather than guessing', back.controls.length === 0, String(back.controls.length));
+	// Against Tom's own saved wtg-control-1 (outside the repo; skipped when absent): the same tables hold a row
+	// for a level condition, a level action and a control as WaterGEMS wrote them.
+	const TOM = process.env.WTG_CONTROL_SAMPLE || path.join(os.homedir(), 'tom-files', '2026-10-22', 'wtg-export', '1-tiny', 'wtg-control-1.wtg.sqlite');
+	if (fs.existsSync(TOM)) {
+		const tdb = await EngCalcs.lpnSqliteOpen(fs.readFileSync(TOM));
+		const tablesWith = (d, id) => d.select("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'IdahoControl%' OR name LIKE 'IdahoLogicalControl%'").rows.map((r) => r[0])
+			.filter((t) => { try { return d.select('SELECT 1 FROM "' + t + '" WHERE SupportElementID = ' + id).rows.length > 0; } catch (e) { return false; } }).sort().join(',');
+		const k0 = members[0];
+		const ours = [q('SELECT IdahoControl_ControlCondition FROM IdahoControl WHERE SupportElementID = ' + k0)[0][0], q('SELECT IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = ' + k0)[0][0]];
+		const tomK = tdb.select('SELECT SupportElementID, IdahoControl_ControlCondition, IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = 45').rows[0];
+		ok('a tank-level condition has rows in the same tables as the one WaterGEMS saved for Tom', tablesWith(db, ours[0]) === tablesWith(tdb, tomK[1]), tablesWith(db, ours[0]) + ' / ' + tablesWith(tdb, tomK[1]));
+		ok('an action has rows in the same tables', tablesWith(db, ours[1]) === tablesWith(tdb, tomK[2]));
+		ok('a control has rows in the same tables', tablesWith(db, k0) === tablesWith(tdb, 45));
+		ok('the control set has rows in the same tables', tablesWith(db, setId) === tablesWith(tdb, 46));
+	}
+	const rbInp = rb.inp.replace(/\[CONTROLS\][\s\S]*?(?=\n\[)/, '').replace(/\n\[TIMES\]/, '\n[CONTROLS]\n' + ctlLines.join('\n') + '\n\n[TIMES]');
 
 	// ---- 5. EPANET solves both ----
 	head('5. EPANET solves Net3 and the read-back network over 24 hours');
 	const ids = parsed.nodes.map((n) => n.id), lids = parsed.links.filter((l) => l.type !== 'pump').map((l) => l.id).concat(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id));
 	const A = await lib.epanetReference(inpText, [], ids, lids);
-	const B = await lib.epanetReference(rb.inp, [], ids, lids);
+	const B = await lib.epanetReference(rbInp, [], ids, lids);
 	const hours = Object.keys(A.snapshots).map(Number).sort((a, b) => a - b);
 	ok('25 hourly results in each', hours.length === 25 && Object.keys(B.snapshots).length === 25);
 	let wh = 0, whAt = '', wq = 0, wqAt = '', wt = 0, nh = 0, nq = 0;
@@ -217,8 +268,8 @@ function head(t) { console.log('\n' + t); }
 	// The database holds the seconds exactly (checked below).
 	ok('flow: ' + nq + ' comparisons, worst ' + wq.toFixed(3) + ' gpm at ' + wqAt + ' (tolerance 3 gpm)', wq < 3.0);
 	const stored = db.select('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType').rows.map((r) => r[0] % 86400).sort((p, q) => p - q);
-	const wanted = ref.changes.map((c) => c.t % 86400).sort((p, q) => p - q);
-	ok('the six switching times are stored to the second: ' + wanted.join(', '), JSON.stringify(stored) === JSON.stringify(wanted), stored.join(', '));
+	const wanted = ref.changes.filter((c) => c.link === '10').map((c) => c.t % 86400).sort((p, q) => p - q);
+	ok('the two clock times are stored to the second: ' + wanted.join(', '), JSON.stringify(stored) === JSON.stringify(wanted), stored.join(', '));
 	// The time-zero comparison alone, which does not depend on the control schedule at all.
 	let w0 = 0; ids.forEach((id) => { w0 = Math.max(w0, Math.abs(A.snapshots[0].heads[id] - B.snapshots[0].heads[id])); });
 	ok('time zero: heads at all 97 nodes agree within 0.001 ft (worst ' + w0.toExponential(2) + ')', w0 < 0.001);
