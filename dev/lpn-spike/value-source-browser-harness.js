@@ -14,6 +14,7 @@
 //   V7  the Properties pane does not jump: a typed edit that adds the note line, and Clear that takes it
 //       away, leave the row at the same screen position (getBoundingClientRect().top), pane scrolled to
 //       the bottom included. Fails without propsScrollKeep().
+//   V8  three Clears in a row leave at most one line of blank, never the sum of them.
 //   V5  a phone-width page keeps the marker on screen and the box without sideways scroll.
 'use strict';
 const path = require('path');
@@ -177,6 +178,18 @@ async function main() {
 		await a.settle(700);
 		const set2 = await geom(ROW);
 		ok('V7 the hollow dot adds the line back and the row stays within 2 px (' + cleared.top.toFixed(1) + ' to ' + set2.top.toFixed(1) + ')', Math.abs(set2.top - cleared.top) <= 2, JSON.stringify([cleared, set2]));
+
+		console.log('--- V8. the blank a Clear leaves does not pile up ---');
+		await open('peak', 1400, 600, (d) => { d.scenarios.find((x) => x.id === 'peak').overrides = {}; }, true);
+		await openNode('10');
+		const slack = () => page.evaluate(() => { const f = document.getElementById('lpn_popup_fields'), pin = f.style.minHeight; f.style.minHeight = ''; const nat = f.offsetHeight; f.style.minHeight = pin; return { shown: f.offsetHeight, natural: nat }; });
+		const dotsNow = () => page.evaluate(() => document.querySelectorAll('#lpn_popup_fields .lpn-ovm-hollow').length);
+		const clickFirst = async (cls) => { await page.evaluate((c) => document.querySelector('#lpn_popup_fields .' + c).click(), cls); await a.settle(900); };
+		await clickFirst('lpn-ovm-hollow'); await clickFirst('lpn-ovm-hollow'); await clickFirst('lpn-ovm-hollow');
+		const mid = await slack();
+		await clickFirst('lpn-ovm-dot'); await clickFirst('lpn-ovm-dot'); await clickFirst('lpn-ovm-dot');
+		const end = await slack();
+		ok('V8 three overrides added then three cleared: the kept blank is at most one line (' + (end.shown - end.natural) + ' px), and the box is no taller than before the first Clear (' + end.shown + ' vs ' + mid.shown + ')', end.shown - end.natural <= 26 && end.shown <= mid.shown, JSON.stringify({ mid, end }));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

@@ -10,6 +10,9 @@
 //   S3  the row's group dot clears what is left and the list goes away.
 //   S4  a search that shows the row keeps its list; one that hides the row hides it.
 //   S5  Base shows no list.
+//   S6  in the node, link and customer label lists every item is visible at the row's width (>= 200 px,
+//       one or two lines) and its dot can be clicked; an earlier build hid the first item and squeezed
+//       the rest to one word per line.
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -47,7 +50,7 @@ async function main() {
 	try {
 		const open = async (active) => {
 			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
-			d.scenarios.push({ id: 'peak', name: 'Peak', overrides: {}, settings: { labelSettings: { decimals: { link: { diameter: 3 } }, prefix: { link: { diameter: 'D=' } } } } });
+			d.scenarios.push({ id: 'peak', name: 'Peak', overrides: {}, settings: { labelSettings: { decimals: { link: { diameter: 3 }, node: { elev: 2 }, customer: { demand: 1 } }, prefix: { link: { diameter: 'D=' }, node: { elev: 'E=' }, customer: { demand: 'Q=' } } } } });
 			d.project = Object.assign({}, d.project, { activeScenario: active });
 			a = await Session.open(browser, 'A', { serviceWorkers: 'block' });
 			page = a.page;
@@ -91,6 +94,21 @@ async function main() {
 		ok('S1 empty Before text reads as no text, from the default, with no quotes and no (default)', texts.some((t) => t.indexOf(T.lpn_settings_held_none) > 0 && t.indexOf('"') < 0 && t.indexOf('(default)') < 0), JSON.stringify(texts));
 		ok('S1 a stated Base value says the value in Base', texts.some((t) => t.endsWith(', ' + fromBase + '.')), JSON.stringify(texts));
 
+		console.log('--- S6 ---');
+		for (const [grp, key] of [['node', 'elev'], ['link', 'diameter'], ['customer', 'demand']]) {
+			const sel = `#lpn_settings_box [data-lpn-setting*='"decimals","${grp}","${key}"']`;
+			await page.evaluate((x) => { const r = document.querySelector(x); if (r) { r.scrollIntoView({ block: 'center' }); } }, sel);
+			const geo = await page.evaluate((x) => {
+				const row = document.querySelector(x), list = row && row.nextElementSibling;
+				if (!list || !list.classList.contains('lpn-set-heldlist')) { return null; }
+				return Array.from(list.querySelectorAll('.lpn-set-helditem')).map((i) => {
+					const r = i.getBoundingClientRect(), d = i.querySelector('.lpn-ovm-dot').getBoundingClientRect(), t = i.lastChild;
+					const lh = parseFloat(getComputedStyle(i).lineHeight) || 16;
+					return { shown: i.offsetParent !== null, w: Math.round(r.width), lines: Math.round(r.height / lh), dot: d.width > 0 && d.height > 0, hit: (() => { const e = document.elementFromPoint(d.left + d.width / 2, d.top + d.height / 2); return !!e && e.classList.contains('lpn-ovm-dot'); })() };
+				});
+			}, sel);
+			ok(`S6 ${grp} labels: two items, each visible, wide enough, one or two lines, dot clickable`, !!geo && geo.length === 2 && geo.every((g) => g.shown && g.w >= 200 && g.lines <= 2 && g.dot && g.hit), JSON.stringify(geo));
+		}
 		console.log('--- S2 ---');
 		const before = await stored();
 		await clickItem(0);

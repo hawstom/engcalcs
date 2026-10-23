@@ -63663,7 +63663,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
 		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		if (all.length < 2 || !el.parentNode) { return; }
-		line = document.createElement('div');
+		// Not a div and not a span: the Labels lists style every div child by position and hide a
+		// row's first span, which hid the first item and squeezed the rest.
+		line = document.createElement('p');
 		line.className = 'lpn-set-heldlist';
 		line.setAttribute('data-lpn-noseam', '1');
 		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
@@ -69759,15 +69761,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// once the rebuild ends (a microtask, before paint). The pin stays, so a note that goes away
 	// leaves its line blank instead of pulling the row you just cleared down the screen; it is
 	// dropped when a different asset or scenario is shown. dev/lpn-spike/value-source-browser-harness.js.
-	var propsScrollKey = null;
+	var propsScrollKey = null, propsKeepSameAct = false;
 	function propsScrollKeep(fields) {
 		var sc = fields.parentElement, scn = activeScenario(),
 			key = currentPopup ? currentPopup.kind + ':' + currentPopup.id + ':' + (scn ? scn.id : '') : null,
 			st, h;
 		if (!sc || key === null || key !== propsScrollKey) { propsScrollKey = key; fields.style.minHeight = ''; return; }
 		st = sc.scrollTop;
+		// **ONE USER ACT MAY REBUILD THE BOX TWICE** (the edit, then the solve's refresh), so within
+		// one act the pin is the height the box is showing. A NEW act pins the box's own height,
+		// without the blank an earlier Clear kept: the blank is the one line the act in hand
+		// removes, never the sum of several Clears.
+		if (!propsKeepSameAct) { fields.style.minHeight = ''; }
 		h = fields.offsetHeight;
 		fields.style.minHeight = h + 'px';
+		if (!propsKeepSameAct) { propsKeepSameAct = true; setTimeout(function () { propsKeepSameAct = false; }, 450); }
 		Promise.resolve().then(function () { sc.scrollTop = st; });
 	}
 	function clearFields(fields) {

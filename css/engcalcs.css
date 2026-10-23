@@ -2418,7 +2418,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* Settings box: the overridden settings of a multi-setting row, one dot each, under the row. */
-.lpn-set-heldlist { display: flex; flex-wrap: wrap; column-gap: 1em; margin-inline-start: 1.9em; font-size: 0.85em; color: var(--ec-ink-subtle); }
+.lpn-set-heldlist { display: flex; flex-wrap: wrap; column-gap: 1em; margin: 0 0 0.2em; margin-inline-start: 1.9em; width: auto; font-size: 0.85em; color: var(--ec-ink-subtle); }
 .lpn-set-helditem { display: inline-flex; align-items: center; }
 /* The override list (Task 800): an override equal to the value it replaces, still counted. */
 .lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
