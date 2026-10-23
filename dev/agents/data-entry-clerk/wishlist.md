@@ -596,3 +596,7 @@ Ctrl+Enter shape from Task 690 applied to the assignment column. Size: small on 
 
 ### E. Keyboard tree: arrows move, Enter/F2 rename, Ctrl+Up/Down reparent (or Tab/Shift+Tab to indent/outdent), Delete refuses with named users (already specced).
 Ranked below A; muffle: no confirmation on rename/reparent, undo covers it (doc.alternatives is under undo).
+
+## Added 2026-10-23 (pump and valve assemblies, expert levels)
+
+The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".

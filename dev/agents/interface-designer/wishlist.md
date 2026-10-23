@@ -569,3 +569,7 @@ N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > 
 - **THEME GALLERY, branch 1.** Seed-derived tokens, hover-preview gallery in Settings > Page, High contrast, Amber, Green, Platinum, and the chrome-surface change ("the same, but better" #1). `dev/themes-plan.md`. Buys: Tom's fun-and-useful theme selector and the first real accessibility theme, on no new storage. Journal 2026-10-17.
 - **Ramp versus paper floor.** A check that every value ramp stop reads 3:1 against every theme's map paper, plus a halo rule for dark paper. Without it a display theme makes a velocity map lie by omission. SPECULATION on the exact fix; the defect is OBSERVED in the prototype.
 - **Contrast fixes in the default light theme** (warn-ink 3.69:1, help glyph 4.11:1, control borders 1.6:1). Small and measurable; independent of themes.
+
+## Added 2026-10-23 (pump and valve assemblies, expert levels)
+
+The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".
