@@ -625,9 +625,13 @@ freshly painted board. **Brick was considered for the lower chrome and not used*
 the project tabs, and a second red would compete with it; Tom can ask for brick instead. Measured in Chromium
 with the pane open: the worst word on Prairie's chrome is 6.3:1, the worst icon 6.0:1.
 
-**Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
-purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
-stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.
+**The ramp's darkest class on a dark paper** (built, `feat/theme-whimsy`). The stop is not lifted, so a visitor's
+colouring is unchanged on every light paper. A dark-paper theme (Dark, High contrast's dark palette, Amber, Green,
+Arcade, Space) states `--ec-map-casing`, the paper's own opposite tone (its map ink); any class drawn under 3:1
+against the paper then takes `.lpn-ramp-cased`, a thin outline (`drop-shadow` on a link, node or symbol, the swatch's
+own border in the legend). Light papers state none, so nothing is marked and Light draws what it always drew
+(`casingRead()` in js/looped-network.js; a theme change re-marks without a solve). Held by
+`theme-ramp-casing-browser-harness.js`. The basemap tiles are still not filtered.
 
 ## Proposed ROADMAP row (Tom promotes; I do not edit the roadmap)
 

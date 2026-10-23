@@ -177,6 +177,8 @@
 	   Text label's own weight) is written on the element itself and wins over all of these. Print and the
 	   screenshot draw Light whatever the theme (see printing and snipCloneSvg() in js/looped-network.js). */
 	--ec-map-paper: #fff;
+	/* The casing round a ramp class the paper swallows (js/looped-network.js casingRead()): none on a light paper. */
+	--ec-map-casing: none;
 	/* Neutral ink: leaders, service lines, meters, the drag flash. */
 	--ec-map-ink: #000;
 	/* The network's own ink: pipes, node outlines, symbols, flow arrows, vertices (--lpn-map-ink). */
@@ -3686,6 +3688,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* A swatch has to survive being white or very light on white paper, so it carries a hairline
    border of its own -- otherwise the top band of the gray ramp is an invisible row. */
+/* The casing (Task 811): a ramp class the dark paper swallows, outlined in the paper's opposite tone. */
+:root[data-theme="dark"], :root[data-theme="hc-dark"], :root[data-theme="amber"], :root[data-theme="green"],
+:root[data-theme="arcade"], :root[data-theme="space"] { --ec-map-casing: var(--ec-map-ink); }
+.lpn-ramp-cased { filter: drop-shadow(0 0 1px var(--ec-map-casing)) drop-shadow(0 0 1px var(--ec-map-casing)) drop-shadow(0 0 1.5px var(--ec-map-casing)); }
+.lpn-color-swatch.lpn-ramp-cased { filter: none; border-color: var(--ec-map-casing); }
 .lpn-color-swatch {
 	display: inline-block;
 	flex: 0 0 auto;
