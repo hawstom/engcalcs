@@ -95,19 +95,18 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-22 early morning (thirty-fifth session, Arizona time)
+## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
 
-- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides.
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides (pushed 1c75721e0); then fix/energy-count (Task 821, his call "Count as EPANET does").
 - **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions. The 2026-10-22 report there holds his open questions: read it before reporting.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
-- Two-point pump curve: Tom, 2026-10-22: *"Follow EPANET, I suppose."* It stays custom, as EPANET reads it (master already does this).
-- His "Ask your AI agent" idea (Task 818): his 10-22 correction is on the roadmap; Mary's answer is `dev/agents/market-researcher/ai-agent-interface.md` (a documented in-page API: read, change a copy, solve repeatedly). Brainstorm only; he said "We have our hands full".
-- WaterGEMS: he worked out labels himself (12, "It's hard to use, but it works"). Export test files for him: `~/tom-files/2026-10-22/wtg-export/` (readme inside); results of his opening them decide whether `feat/wtg-export` becomes a product; its write-up lives only on that branch until it merges (`git show feat/wtg-export:dev/wtg-export.md`).
+- His "Ask your AI agent" idea (Task 818): on hold. Tom, 2026-10-22: *"It may be premature to do much about this, but maybe Mary can guide us. I need to focus on wtg export."* Mary's answer so far: `dev/agents/market-researcher/ai-agent-interface.md`.
+- WaterGEMS export (`feat/wtg-export`, his focus): his 10-22 test of the first files: tiny, Net3 at hour zero and full Net3 all open and give the same results, no messages; only the symbols came in very tiny. Fixed (symbol and text size from the map extent); valves, volume curves, pump speed and head patterns added. New files `~/tom-files/2026-10-22/wtg-export-2/` (readme inside). Three one-thing asks of him (tank-level control, emitter, five-point pump curve), click steps in `git show feat/wtg-export:dev/wtg-export.md`; the control one also settles whether our clock controls fire.
 - Load flakes seen 2026-10-22 in master's suite: `new-project-pan-harness.js` (passed alone twice), `label-form-n600-browser-harness` (an agent's run).
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}." His item 6 question ("Max day: ✓ Shared with: Peak hour with main break") is about master's existing override note under an overridden row (`inheritedLine()` + `smSharedText()`), not this branch; explained and rewording proposed in the 10-22 report.
+- `feat/value-source` (8105): his item 4 built as he wrote it: the filled dot's tip says what Clear restores and from where, plus (Basic mode off) the alternative and who shares it; the note line under a row is gone. Perry passed it. Two guide strings rewritten (their 26 translations now stale). Merge on his word.
 - `feat/wtg-export` (no port; a spike, dev scripts only): see above.
 - `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
 - `feat/desktop`, `fix/bottom-pane-lag`: untouched.
