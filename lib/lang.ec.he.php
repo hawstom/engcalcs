@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. מוצגים {n} מתוך {all}
 $ec_lang['lpn_ovm_child_ask']='לנקות את הערכים המותאמים של התרחישים הצאצאים ({n} בסך הכל)?';
 $ec_lang['lpn_ovm_child_tip']='תרחישים צאצאים מתאימים ערך זה ({n} בסך הכל). לחצו כדי לנקות את הערכים המותאמים שלהם.';
 $ec_lang['lpn_ovm_dot_clear']='לחצו כדי לנקות אותו.';
+$ec_lang['lpn_ovm_dot_set']='עובר בירושה. לחצו כדי להפוך אותו לערך מותאם בתרחיש הזה, עם הערך המוצג.';
 $ec_lang['lpn_pane_clear_override']='ניקוי ערך מותאם';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='אי אפשר למחוק את הת
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='תרחיש בסיס: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} אינו כלול ברשת ב-{scenario}. הוא נשאר בשרטוט ובתרחישים האחרים.';
 $ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} נמחק. הוא היה חלק מ-{scenario} בלבד.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='ללא';
 $ec_lang['lpn_sm_all_row_tip']='לחיצה כפולה פותחת אותו בעץ הקטגוריה שלו.';
 $ec_lang['lpn_sm_compare_tip']='כלול בהשוואת תרחישים';
 $ec_lang['lpn_sm_inherited']='עבר בירושה';
+$ec_lang['lpn_sm_shared_note']='משותף עם: {list}';
 $ec_lang['lpn_scncmp_none_checked']='אין תרחיש שסומן להשוואה. סמנו תרחישים במנהל התרחישים.';
 $ec_lang['lpn_time_scn_overrides']='ערכים מותאמים בתרחיש:';
 $ec_lang['lpn_settings_table_major']='כותרת ראשית';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='נכסים חדשים: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ברירת מחדל)';
 $ec_lang['lpn_settings_row_view_value']='מרכז {x}, {y}; קנה מידה {s}';
 $ec_lang['lpn_settings_held_in']='ערך מותאם ב-{scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='מרכז המפה';
 $ec_lang['lpn_settings_view_scale']='קנה מידה של המפה';
 $ec_lang['lpn_settings_view_scale_tip']='קנה המידה במרכז המפה, בצורת 1:N. הקלידו 1:2000, או רק 2000, כדי להתקרב לקנה מידה זה.';

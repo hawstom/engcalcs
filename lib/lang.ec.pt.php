@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Mostrando {n} de {all}.';
 $ec_lang['lpn_ovm_child_ask']='Limpar os valores individuais dos cenários filhos (total: {n})?';
 $ec_lang['lpn_ovm_child_tip']='Cenários filhos têm valores individuais para este valor (total: {n}). Clique para limpá-los.';
 $ec_lang['lpn_ovm_dot_clear']='Clique para limpá-lo.';
+$ec_lang['lpn_ovm_dot_set']='Herdado. Clique para torná-lo um valor individual neste cenário, mantendo o valor mostrado.';
 $ec_lang['lpn_pane_clear_override']='Limpar valor individual';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='O cenário {name} não pode ser ex
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Cenário base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluído da rede em {scenario}. Permanece no desenho e nos outros cenários.';
 $ec_lang['lpn_scenario_delete_in_base']='Para removê-lo do desenho, exclua-o no cenário {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} foi excluído. Fazia parte somente de {scenario}.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Nenhum';
 $ec_lang['lpn_sm_all_row_tip']='Clique duas vezes para abri-lo na sua árvore de categoria.';
 $ec_lang['lpn_sm_compare_tip']='Incluir em Cenários: comparação';
 $ec_lang['lpn_sm_inherited']='herdado';
+$ec_lang['lpn_sm_shared_note']='Compartilhado com: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Nenhum cenário está marcado para comparação. Marque cenários na caixa Cenários: gerenciador.';
 $ec_lang['lpn_time_scn_overrides']='Valores individuais do cenário:';
 $ec_lang['lpn_settings_table_major']='Título principal';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Novos elementos: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (predefinido)';
 $ec_lang['lpn_settings_row_view_value']='Centro {x}, {y}; escala {s}';
 $ec_lang['lpn_settings_held_in']='Valor individual em {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centro do mapa';
 $ec_lang['lpn_settings_view_scale']='Escala do mapa';
 $ec_lang['lpn_settings_view_scale_tip']='A escala no centro do mapa, no formato 1:N. Digite 1:2000, ou apenas 2000, para dar zoom nessa escala.';

@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}။ {all} ခုမှ {n} ခု
 $ec_lang['lpn_ovm_child_ask']='ကလေး အခြေအနေများ၏ ကိုယ်ပိုင်တန်ဖိုးများ ({n} စုစုပေါင်း) ကို ဖယ်ရှားမလား။';
 $ec_lang['lpn_ovm_child_tip']='ကလေး အခြေအနေများက ဤတန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားသည် ({n} စုစုပေါင်း)။ ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားရန် နှိပ်ပါ။';
 $ec_lang['lpn_ovm_dot_clear']='ဖယ်ရှားရန် နှိပ်ပါ။';
+$ec_lang['lpn_ovm_dot_set']='ဆက်ခံထားသည်။ ပြထားသောတန်ဖိုးကို ထိန်းထားပြီး ဤအခြေအနေတွင် ကိုယ်ပိုင်တန်ဖိုးအဖြစ် သတ်မှတ်ရန် နှိပ်ပါ။';
 $ec_lang['lpn_pane_clear_override']='ကိုယ်ပိုင်တန်ဖိုး ဖယ်ရှားရန်';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='အခြေအနေ {name} တ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='အခြေခံ အခြေအနေ - {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ကို {scenario} တွင် ကွန်ရက်မှ ဖယ်ထားသည်။ ၎င်းသည် ပုံဆွဲမှုတွင်နှင့် အခြားအခြေအနေများတွင် ဆက်ရှိသည်။';
 $ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
 $ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='မရှိ';
 $ec_lang['lpn_sm_all_row_tip']='၎င်း၏ အမျိုးအစားသစ်ပင်တွင် ဖွင့်ရန် နှစ်ချက်နှိပ်ပါ။';
 $ec_lang['lpn_sm_compare_tip']='အခြေအနေ နှိုင်းယှဉ်ချက်တွင် ထည့်သွင်းရန်';
 $ec_lang['lpn_sm_inherited']='ဆက်ခံထားသည်';
+$ec_lang['lpn_sm_shared_note']='မျှဝေထားသူများ- {list}';
 $ec_lang['lpn_scncmp_none_checked']='နှိုင်းယှဉ်ရန် အမှန်ခြစ်ထားသော အခြေအနေ မရှိပါ။ အခြေအနေ စီမံခန့်ခွဲမှုတွင် အခြေအနေများကို အမှန်ခြစ်ပါ။';
 $ec_lang['lpn_time_scn_overrides']='အခြေအနေ၏ ကိုယ်ပိုင်တန်ဖိုးများ -';
 $ec_lang['lpn_settings_table_major']='ခေါင်းစဉ်ကြီး';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='အစိတ်အပိုင်းအ�
 $ec_lang['lpn_settings_row_default']='{value} (မူလ)';
 $ec_lang['lpn_settings_row_view_value']='ဗဟို {x}၊ {y}၊ စကေး {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} တွင် ကိုယ်ပိုင်တန်ဖိုး။';
+$ec_lang['lpn_settings_held_base']='{base} - {value}';
 $ec_lang['lpn_settings_view_center']='မြေပုံဗဟို';
 $ec_lang['lpn_settings_view_scale']='မြေပုံစကေး';
 $ec_lang['lpn_settings_view_scale_tip']='မြေပုံ၏ ဗဟိုရှိ စကေးကို 1:N အဖြစ် ဖော်ပြသည်။ ထိုစကေးသို့ ဇူးမ်လုပ်ရန် 1:2000 သို့မဟုတ် 2000 ဟု ရိုက်ပါ။';

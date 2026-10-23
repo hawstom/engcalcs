@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Inaonyesha {n} kati ya {all}.';
 $ec_lang['lpn_ovm_child_ask']='Ondoa thamani maalum za senario watoto (jumla {n})?';
 $ec_lang['lpn_ovm_child_tip']='Senario watoto zina thamani maalum ya thamani hii (jumla {n}). Bofya ili kuondoa thamani zao maalum.';
 $ec_lang['lpn_ovm_dot_clear']='Bofya ili kuiondoa.';
+$ec_lang['lpn_ovm_dot_set']='Imerithiwa. Bofya ili kuifanya thamani maalum katika senario hii, ikishikilia thamani inayoonyeshwa.';
 $ec_lang['lpn_pane_clear_override']='Ondoa thamani maalum';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='Senario {name} haiwezi kufutwa kwa
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Senario ya Msingi: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} imetengwa na mtandao katika {scenario}. Inabaki kwenye mchoro na katika senario nyingine.';
 $ec_lang['lpn_scenario_delete_in_base']='Ili kukiondoa kwenye mchoro, kifute kwenye senario ya {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} kimefutwa. Kilikuwa sehemu ya {scenario} pekee.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Hakuna';
 $ec_lang['lpn_sm_all_row_tip']='Bofya mara mbili ili kuifungua katika mti wa kategoria yake.';
 $ec_lang['lpn_sm_compare_tip']='Jumuisha katika Ulinganisho wa senario';
 $ec_lang['lpn_sm_inherited']='imerithiwa';
+$ec_lang['lpn_sm_shared_note']='Inashirikiwa na: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Hakuna senario iliyowekewa alama ya kulinganisha. Weka alama kwenye senario katika Senario: msimamizi.';
 $ec_lang['lpn_time_scn_overrides']='Thamani maalum za senario:';
 $ec_lang['lpn_settings_table_major']='Kichwa kikuu';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Vipengele vipya: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (chaguo-msingi)';
 $ec_lang['lpn_settings_row_view_value']='Kituo {x}, {y}; kipimo {s}';
 $ec_lang['lpn_settings_held_in']='Thamani maalum katika {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Kituo cha ramani';
 $ec_lang['lpn_settings_view_scale']='Kipimo cha ramani';
 $ec_lang['lpn_settings_view_scale_tip']='Kipimo katika kituo cha ramani, kama 1:N. Andika 1:2000, au 2000 tu, ili kukuza hadi kipimo hicho.';

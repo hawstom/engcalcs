@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Affichage de {n} sur {all}.';
 $ec_lang['lpn_ovm_child_ask']='Effacer les valeurs personnalisées des scénarios enfants ({n} au total) ?';
 $ec_lang['lpn_ovm_child_tip']='Des scénarios enfants personnalisent cette valeur ({n} au total). Cliquez pour effacer leurs valeurs personnalisées.';
 $ec_lang['lpn_ovm_dot_clear']='Cliquez pour l\'effacer.';
+$ec_lang['lpn_ovm_dot_set']='Héritée. Cliquez pour en faire une valeur personnalisée dans ce scénario, avec la valeur affichée.';
 $ec_lang['lpn_pane_clear_override']='Effacer la valeur personnalisée';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='Le scénario {name} ne peut pas ê
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Scénario de base : {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} est exclu du réseau dans {scenario}. Il reste dans le dessin et dans les autres scénarios.';
 $ec_lang['lpn_scenario_delete_in_base']='Pour le retirer du dessin, supprimez-le dans le scénario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} est supprimé. Il faisait partie de {scenario} seulement.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Aucun';
 $ec_lang['lpn_sm_all_row_tip']='Double-cliquez pour l\'ouvrir dans son arborescence de catégorie.';
 $ec_lang['lpn_sm_compare_tip']='Inclure dans la Comparaison des scénarios';
 $ec_lang['lpn_sm_inherited']='hérité';
+$ec_lang['lpn_sm_shared_note']='Partagé avec : {list}';
 $ec_lang['lpn_scncmp_none_checked']='Aucun scénario n\'est coché pour la comparaison. Cochez des scénarios dans le Gestionnaire de scénarios.';
 $ec_lang['lpn_time_scn_overrides']='Valeurs propres au scénario :';
 $ec_lang['lpn_settings_table_major']='Titre principal';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Nouveaux éléments : {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (par défaut)';
 $ec_lang['lpn_settings_row_view_value']='Centre {x}, {y} ; échelle {s}';
 $ec_lang['lpn_settings_held_in']='Valeur personnalisée dans {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base} : {value}';
 $ec_lang['lpn_settings_view_center']='Centre de la carte';
 $ec_lang['lpn_settings_view_scale']='Échelle de la carte';
 $ec_lang['lpn_settings_view_scale_tip']='L\'échelle au centre de la carte, sous la forme 1:N. Saisissez 1:2000, ou simplement 2000, pour zoomer à cette échelle.';

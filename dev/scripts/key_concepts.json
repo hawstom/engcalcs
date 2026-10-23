@@ -315,6 +315,9 @@
         "lpn_ovm_child_tip": [
             "family-tree-child"
         ],
+        "lpn_ovm_dot_set": [
+            "family-tree-inherit"
+        ],
         "lpn_field_type_tip": [
             "family-tree-parent"
         ],

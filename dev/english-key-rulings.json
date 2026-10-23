@@ -5238,6 +5238,11 @@
             "ruled": "2026-10-13",
             "answer": "Approved as written."
         },
+        "lpn_ovm_dot_set": {
+            "on": "Inherited. Click to make it an override in this scenario, holding the value shown.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
         "lpn_pane_colmenu_tip": {
             "on": "Hide or manage columns",
             "ruled": "2026-09-28",
@@ -6684,6 +6689,11 @@
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_held_base": {
+            "on": "{base}: {value}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_held_in": {
             "on": "Override in {scenario}.",
             "ruled": "2026-10-16",
@@ -7365,6 +7375,11 @@
         "lpn_sm_rename_alts_ask": {
             "on": "Rename equally named alternatives?",
             "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_sm_shared_note": {
+            "on": "Shared with: {list}",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_sm_title": {

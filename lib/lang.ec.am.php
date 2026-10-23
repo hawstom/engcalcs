@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}። ከ{all} ውስጥ {n} እየ
 $ec_lang['lpn_ovm_child_ask']='የልጅ የራስ ዋጋዎችን አጽዳ (በጠቅላላ {n})?';
 $ec_lang['lpn_ovm_child_tip']='የልጅ ሁኔታዎች ይህን ዋጋ ይተካሉ (በጠቅላላ {n})። የራስ ዋጋዎቻቸውን ለማጽዳት ይጫኑ።';
 $ec_lang['lpn_ovm_dot_clear']='ለማጽዳት ይጫኑ።';
+$ec_lang['lpn_ovm_dot_set']='የተወረሰ። በዚህ ሁኔታ ውስጥ የሚታየውን ዋጋ በመያዝ የራስ ዋጋ ለማድረግ ይጫኑ።';
 $ec_lang['lpn_pane_clear_override']='የራስ ዋጋን አጽዳ';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='ሁኔታ {name} ልጆች ስላ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='መሠረት፦ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} በ{scenario} ውስጥ ከመረቡ ውጭ ነው። በስዕሉ እና በሌሎች ሁኔታዎች ውስጥ ይቀራል።';
 $ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';
 $ec_lang['lpn_scenario_only_deleted']='{id} ተሰርዟል። የ{scenario} ክፍል ብቻ ነበር።';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='ምንም';
 $ec_lang['lpn_sm_all_row_tip']='በምድቡ ዛፍ ውስጥ ለመክፈት ሁለቴ ይጫኑ።';
 $ec_lang['lpn_sm_compare_tip']='በሁኔታዎች ንጽጽር ውስጥ አካት';
 $ec_lang['lpn_sm_inherited']='የተወረሰ';
+$ec_lang['lpn_sm_shared_note']='የሚጋራው ከ፦ {list}';
 $ec_lang['lpn_scncmp_none_checked']='ለንጽጽር ምንም ሁኔታ አልተመረጠም። በሁኔታዎች አስተዳዳሪ ውስጥ ሁኔታዎችን ይምረጡ።';
 $ec_lang['lpn_time_scn_overrides']='የሁኔታ የራስ ዋጋዎች፦';
 $ec_lang['lpn_settings_table_major']='ዋና ርዕስ';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='አዲስ አካሎች፦ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ነባሪ)';
 $ec_lang['lpn_settings_row_view_value']='መሃል {x}፣ {y}፤ መጠን {s}';
 $ec_lang['lpn_settings_held_in']='በ{scenario} ውስጥ የራስ ዋጋ።';
+$ec_lang['lpn_settings_held_base']='{base}፦ {value}';
 $ec_lang['lpn_settings_view_center']='የካርታ መሃል';
 $ec_lang['lpn_settings_view_scale']='የካርታ መጠን';
 $ec_lang['lpn_settings_view_scale_tip']='በካርታው መሃል ያለው መጠን፣ እንደ 1:N። ወደዚያ መጠን ለማጉላት 1:2000፣ ወይም ዝም ብሎ 2000 ይተይቡ።';

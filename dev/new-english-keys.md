@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**26 still to read on master**, of 191 untranslated keys, of 3205 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 187 untranslated keys, of 3205 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (191, 26 to read @@ NEEDS RULING)
+## lpn_  (187, 22 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -439,18 +439,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ovl_clear_same_ask`**
   > Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.
   @@ NEEDS RULING
-- **`lpn_ovm_dot_alt`**
-  > This override is stored in alternative "{alternative}".
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_alt_shared`**
-  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_clear_to`**
-  > Click to clear override and restore {value}, the value in {parent}.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_set_from`**
-  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
 - **`lpn_pane_pasted_overrides`**
   > New overrides ({n}).
   @@ NEEDS RULING
@@ -609,7 +597,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 6 unmerged branch(es).
+**11 still to read**, of 54 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -784,10 +772,12 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`472c82137`) — adds no English strings
+### feat/value-source (`7fc9e5a41`) — 1 new, 1 to read @@ NEEDS RULING
 
-### feat/wtg-export (`18cd7a6d4`) — adds no English strings
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+
+### feat/wtg-export (`431463258`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
-
-### fix/energy-count (`ee6c2981e`) — adds no English strings

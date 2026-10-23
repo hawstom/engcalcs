@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}। {all} में से {n} �
 $ec_lang['lpn_ovm_child_ask']='चाइल्ड परिदृश्यों के अपने मान हटाएँ (कुल {n})?';
 $ec_lang['lpn_ovm_child_tip']='चाइल्ड परिदृश्यों ने इस मान को अपना बनाया है (कुल {n})। उनके अपने मान हटाने के लिए क्लिक करें।';
 $ec_lang['lpn_ovm_dot_clear']='इसे हटाने के लिए क्लिक करें।';
+$ec_lang['lpn_ovm_dot_set']='पैरेंट से मिला। दिखाए गए मान को इस परिदृश्य में अपना मान बनाने के लिए क्लिक करें।';
 $ec_lang['lpn_pane_clear_override']='अपना मान हटाएँ';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='परिदृश्य {name} �
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='आधार परिदृश्य: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} को {scenario} में नेटवर्क से बाहर रखा गया है। यह ड्राइंग में और अन्य परिदृश्यों में बना रहता है।';
 $ec_lang['lpn_scenario_delete_in_base']='इसे ड्रॉइंग से हटाने के लिए, इसे {base} परिदृश्य में हटाएँ।';
 $ec_lang['lpn_scenario_only_deleted']='{id} हटा दिया गया। यह केवल {scenario} का भाग था।';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='कोई नहीं';
 $ec_lang['lpn_sm_all_row_tip']='इसे इसकी श्रेणी के वृक्ष में खोलने के लिए डबल-क्लिक करें।';
 $ec_lang['lpn_sm_compare_tip']='परिदृश्य तुलना में शामिल करें';
 $ec_lang['lpn_sm_inherited']='पैरेंट से मिला';
+$ec_lang['lpn_sm_shared_note']='इनके साथ साझा: {list}';
 $ec_lang['lpn_scncmp_none_checked']='तुलना के लिए किसी परिदृश्य पर टिक नहीं है। परिदृश्य प्रबंधक में परिदृश्यों पर टिक करें।';
 $ec_lang['lpn_time_scn_overrides']='परिदृश्य के अपने मान:';
 $ec_lang['lpn_settings_table_major']='मुख्य शीर्षक';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='नए तत्व: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (डिफ़ॉल्ट)';
 $ec_lang['lpn_settings_row_view_value']='केंद्र {x}, {y}; स्केल {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} में अपना मान।';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='मानचित्र केंद्र';
 $ec_lang['lpn_settings_view_scale']='मानचित्र स्केल';
 $ec_lang['lpn_settings_view_scale_tip']='मानचित्र के केंद्र पर स्केल, 1:N के रूप में। उस स्केल पर ज़ूम करने के लिए 1:2000, या केवल 2000, टाइप करें।';

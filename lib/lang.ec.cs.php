@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Zobrazeno {n} z {all}.';
 $ec_lang['lpn_ovm_child_ask']='Zrušit specifické hodnoty podřízených scénářů (celkem {n})?';
 $ec_lang['lpn_ovm_child_tip']='Podřízené scénáře tuto hodnotu přepisují (celkem {n}). Kliknutím zrušíte jejich specifické hodnoty.';
 $ec_lang['lpn_ovm_dot_clear']='Kliknutím ji zrušíte.';
+$ec_lang['lpn_ovm_dot_set']='Zděděno. Kliknutím z ní uděláte specifickou hodnotu v tomto scénáři se zobrazenou hodnotou.';
 $ec_lang['lpn_pane_clear_override']='Zrušit specifickou hodnotu';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='Scénář {name} nelze smazat, pro
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Základní scénář: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je ve scénáři {scenario} vyloučen ze sítě. Zůstává ve výkresu a v ostatních scénářích.';
 $ec_lang['lpn_scenario_delete_in_base']='Chcete-li prvek odstranit z výkresu, smažte jej ve scénáři {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je smazán. Byl součástí pouze scénáře {scenario}.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Žádné';
 $ec_lang['lpn_sm_all_row_tip']='Dvojitým kliknutím jej otevřete v jeho stromu kategorie.';
 $ec_lang['lpn_sm_compare_tip']='Zahrnout do Porovnání scénářů';
 $ec_lang['lpn_sm_inherited']='zděděno';
+$ec_lang['lpn_sm_shared_note']='Sdíleno s: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Pro porovnání není zaškrtnut žádný scénář. Zaškrtněte scénáře ve Správci scénářů.';
 $ec_lang['lpn_time_scn_overrides']='Specifické hodnoty scénáře:';
 $ec_lang['lpn_settings_table_major']='Hlavní nadpis';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Nové prvky: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (výchozí)';
 $ec_lang['lpn_settings_row_view_value']='Střed {x}, {y}; měřítko {s}';
 $ec_lang['lpn_settings_held_in']='Specifická hodnota ve scénáři {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Střed mapy';
 $ec_lang['lpn_settings_view_scale']='Měřítko mapy';
 $ec_lang['lpn_settings_view_scale_tip']='Měřítko ve středu mapy ve tvaru 1:N. Zadáním 1:2000 nebo jen 2000 se přiblíží na toto měřítko.';

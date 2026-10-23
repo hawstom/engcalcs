@@ -586,6 +586,15 @@
             ],
             "reason": "'Base' is a real word in each of these, with this exact sense, and it is a scenario's proper NAME on screen. Sprint 316 (2026-08-14): four Romance agents arrived at it independently."
         },
+        "lpn_scenario_base_value": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "it",
+                "pt"
+            ],
+            "reason": "'Base: {value}' -- follows lpn_scenario_base, since it reuses that scenario's name verbatim. Only the punctuation and placeholder surround it."
+        },
         "lpn_scenario_label": {
             "category": "cognate",
             "languages": [
@@ -983,6 +992,11 @@
             "category": "placeholder",
             "languages": "*",
             "reason": "Placeholders and punctuation only ('{labels}: {field}, {part}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_settings_held_base": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{base}: {value}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
         },
         "lpn_field_type": {
             "category": "cognate",

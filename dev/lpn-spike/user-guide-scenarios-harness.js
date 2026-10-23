@@ -164,16 +164,16 @@ async function main() {
 			const f = document.getElementById('lpn_popup_fields');
 			const dots = Array.from(f.querySelectorAll('.lpn-ovm-dot')), hollow = Array.from(f.querySelectorAll('.lpn-ovm-hollow'));
 			return { dots: dots.length, dotTip: dots[0] && dots[0].title, hollow: hollow.length, hollowTip: hollow[0] && hollow[0].title,
-				notes: f.querySelectorAll('.lpn-ov-note').length };
+				notes: Array.from(f.querySelectorAll('.lpn-ov-base')).map((n) => n.textContent.trim()) };
 		});
 		ok('Properties marks the overridden Diameter with one solid dot, and the other rows with hollow dots', marks.dots === 1 && marks.hollow > 3, JSON.stringify({ d: marks.dots, h: marks.hollow }));
-		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_ovm_dot_clear_to')).replace('{value}', '18').replace('{parent}', await T('lpn_scenario_base')), marks.dotTip);
+		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_settings_held_in')).replace('{scenario}', 'Larger main') + ' ' + (await T('lpn_ovm_dot_clear')), marks.dotTip);
 		// feat/value-source: the hollow dot also names where the inherited value comes from.
 		const fromTip = (await T('lpn_ovm_dot_set_from')).split('{name}');
 		ok('...the hollow dot says where the value comes from and what clicking it does', !!marks.hollowTip && marks.hollowTip.startsWith(fromTip[0]) && marks.hollowTip.endsWith(fromTip[1])
 			&& marks.hollowTip.length > fromTip[0].length + fromTip[1].length, marks.hollowTip);
-		const clearTip = (await T('lpn_ovm_dot_clear_to')).replace('{value}', '18').replace('{parent}', await T('lpn_scenario_base'));
-		ok('...no line is drawn beneath the row; the chapter quotes the solid dot\'s tip: ' + clearTip, marks.notes === 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(clearTip) >= 0, JSON.stringify(marks.notes));
+		const baseLine = (await T('lpn_scenario_base_value')).replace('{value}', '18');
+		ok('...the inherited value shows beneath the row, as the chapter quotes it: ' + baseLine, marks.notes.indexOf(baseLine) >= 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(baseLine) >= 0, JSON.stringify(marks.notes));
 		await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 		await settle(300);
 		const rings = () => P.evaluate(() => ({ amber: document.querySelectorAll('#lpn_canvas .lpn-override').length, gray: document.querySelectorAll('#lpn_canvas .lpn-override-inh').length }));

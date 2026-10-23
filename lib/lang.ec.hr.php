@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Prikazano {n} od {all}.';
 $ec_lang['lpn_ovm_child_ask']='Ukloniti zamjene podređenih scenarija (ukupno {n})?';
 $ec_lang['lpn_ovm_child_tip']='Podređeni scenariji zamjenjuju ovu vrijednost (ukupno {n}). Kliknite da uklonite njihove zamjene.';
 $ec_lang['lpn_ovm_dot_clear']='Kliknite da je uklonite.';
+$ec_lang['lpn_ovm_dot_set']='Naslijeđeno. Kliknite da u ovom scenariju postane zamjena s prikazanom vrijednošću.';
 $ec_lang['lpn_pane_clear_override']='Ukloni vrijednost scenarija';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='Scenarij {name} ne može se izbris
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Bazni scenarij: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je isključen iz mreže u scenariju {scenario}. Ostaje u crtežu i u drugim scenarijima.';
 $ec_lang['lpn_scenario_delete_in_base']='Da biste ga uklonili iz crteža, izbrišite ga u scenariju {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je izbrisan. Bio je dio samo scenarija {scenario}.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Nijedna';
 $ec_lang['lpn_sm_all_row_tip']='Dvaput kliknite da je otvorite u stablu njezine kategorije.';
 $ec_lang['lpn_sm_compare_tip']='Uključi u Usporedbu scenarija';
 $ec_lang['lpn_sm_inherited']='naslijeđeno';
+$ec_lang['lpn_sm_shared_note']='Dijeli se s: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Nijedan scenarij nije označen za usporedbu. Označite scenarije u Upravitelju scenarija.';
 $ec_lang['lpn_time_scn_overrides']='Vrijednosti scenarija:';
 $ec_lang['lpn_settings_table_major']='Glavni naslov';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Novi elementi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (zadano)';
 $ec_lang['lpn_settings_row_view_value']='Središte {x}, {y}; mjerilo {s}';
 $ec_lang['lpn_settings_held_in']='Zamjena u {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Središte karte';
 $ec_lang['lpn_settings_view_scale']='Mjerilo karte';
 $ec_lang['lpn_settings_view_scale_tip']='Mjerilo u središtu karte, kao 1:N. Upišite 1:2000 ili samo 2000 da zumirate na to mjerilo.';

@@ -2394,6 +2394,7 @@ html[lang="zh"] .ec-welcome {
    row above stays the property and this reads as a note about it -- there is one of these under
    every editable field once you are inside a scenario, and at full weight they would outnumber and
    outshout the numbers they annotate. */
+.lpn-ov-note { margin-inline-start: 1.5em; font-size: 0.85em; }
 /* THE OVERRIDE MARKER (Task 790, Ida's design): a two-cell gutter at the inline start of a row, drawn
    in CSS so no font and no translation is involved. A filled dot is an override here, a hollow dot a
    value inherited, a down triangle one the scenarios below override. Placed in the padding the
@@ -2415,6 +2416,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-hollow::before { border: 1px solid var(--ec-ink-subtle); opacity: 0.6; }
 .lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
+.lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* The override list (Task 800): an override equal to the value it replaces, still counted. */
 .lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
 /* Manage overrides: a box to select each row, Clear override at its end, the two bulk clears above. */

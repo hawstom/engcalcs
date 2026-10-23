@@ -196,7 +196,7 @@ async function main() {
 		await page.evaluate(() => { const i = document.querySelector('#lpn_popup_fields .lpn-demand-table input'); const sc = i.closest('.lpn-popover-body'); const r = i.getBoundingClientRect(), b = sc.getBoundingClientRect(); sc.scrollTop += (r.top - b.top) - sc.clientHeight / 2; });
 		await a.settle(200);
 		const pa = await pw();
-		ok('Properties: 333 typed in the scenario makes the demand an override, with its dot and no line under it', !!pa && !!pa.dot && pa.notes === 0, JSON.stringify(pa));
+		ok('Properties: 333 typed in the scenario makes the demand an override, with its dot and the line under it', !!pa && !!pa.dot && pa.notes === 1, JSON.stringify(pa));
 		if (pa && pa.dot) { await page.mouse.click(pa.dot.x, pa.dot.y); }
 		await a.settle(1000);
 		const pb = await pw();

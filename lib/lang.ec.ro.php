@@ -1659,6 +1659,7 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Se afișează {n} din {all}.';
 $ec_lang['lpn_ovm_child_ask']='Ștergeți valorile specifice ale scenariilor copil ({n} în total)?';
 $ec_lang['lpn_ovm_child_tip']='Scenariile copil înlocuiesc această valoare ({n} în total). Faceți clic pentru a le șterge valorile specifice.';
 $ec_lang['lpn_ovm_dot_clear']='Faceți clic pentru a o șterge.';
+$ec_lang['lpn_ovm_dot_set']='Moștenită. Faceți clic pentru a o face valoare specifică în acest scenariu, păstrând valoarea afișată.';
 $ec_lang['lpn_pane_clear_override']='Șterge valoarea specifică';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3308,6 +3309,7 @@ $ec_lang['lpn_scenario_delete_has_children']='Scenariul {name} nu poate fi șter
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}. Rămâne pe desen și în celelalte scenarii.';
 $ec_lang['lpn_scenario_delete_in_base']='Pentru a-l elimina din desen, ștergeți-l în scenariul {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} este șters. Făcea parte numai din {scenario}.';
@@ -3388,6 +3390,7 @@ $ec_lang['lpn_sm_unused_none']='Niciuna';
 $ec_lang['lpn_sm_all_row_tip']='Faceți dublu clic pentru a-l deschide în arborele categoriei lui.';
 $ec_lang['lpn_sm_compare_tip']='Include în Comparație scenarii';
 $ec_lang['lpn_sm_inherited']='moștenit';
+$ec_lang['lpn_sm_shared_note']='Partajat cu: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Niciun scenariu nu este bifat pentru comparație. Bifați scenarii în Managerul de scenarii.';
 $ec_lang['lpn_time_scn_overrides']='Valori specifice scenariului:';
 $ec_lang['lpn_settings_table_major']='Titlu principal';
@@ -3441,6 +3444,7 @@ $ec_lang['lpn_settings_row_new_asset']='Elemente noi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (implicit)';
 $ec_lang['lpn_settings_row_view_value']='Centru {x}, {y}; scară {s}';
 $ec_lang['lpn_settings_held_in']='Valoare specifică în {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centrul hărții';
 $ec_lang['lpn_settings_view_scale']='Scara hărții';
 $ec_lang['lpn_settings_view_scale_tip']='Scara în centrul hărții, ca 1:N. Tastați 1:2000, sau doar 2000, pentru a mări la acea scară.';
