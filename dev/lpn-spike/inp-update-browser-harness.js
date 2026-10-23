@@ -86,7 +86,7 @@ async function main() {
 		await a.page.setInputFiles('#lpn_inp_file', { name: 'upd2.inp', mimeType: 'text/plain', buffer: Buffer.from(B) });
 		await a.settle(900);
 		const bs = await buttons(a);
-		ok('the buttons are: a new project, this project, a new scenario, Cancel', bs.length === 4 && bs[0] === T.lpn_inpup_btn_new && bs[1] === proj.replace('{project}', 'upd') && bs[2] === (await a.lang('lpn_inpup_btn_newscn')).trim().replace('{parent}', 'Base') && bs[3] === T.lpn_cancel, bs.join(' | '));
+		ok('the buttons are: a new project, this project, a new scenario, Cancel', bs.length === 4 && bs[0] === T.lpn_inpup_btn_new && bs[1] === proj.replace('{project}', 'upd') && bs[2] === (await a.lang('lpn_inpup_btn_newscn_basic')).trim() && bs[3] === T.lpn_cancel, bs.join(' | '));
 		await a.page.click('#lpn_dialog_buttons button:has-text("' + bs[1] + '")');
 		await a.settle(900);
 		const rec = await dialogText(a);
