@@ -246,7 +246,7 @@ async function main() {
 		await a.settle(400);
 		dlg = await a.dialog();
 		ok('the GeoJSON question has the same choice', dlg && dlg.buttons.indexOf(newBtn('Peak hour')) >= 0 || dlg.buttons.indexOf(newBtn('Base')) >= 0, dlg && dlg.buttons.join(' | '));
-		const gbtn = dlg.buttons.find((b) => b.indexOf('A new scenario') === 0);
+		const gbtn = dlg.buttons.find((b) => b.indexOf(NB.split('{parent}')[0]) === 0);
 		await a.dialogClick(gbtn);
 		await a.settle(1200);
 		dlg = await a.dialog();
@@ -313,7 +313,7 @@ async function main() {
 		// (c) a new scenario
 		await survey();
 		await page.fill('#lpn_import_newscn', 'Survey');
-		await a.dialogClick((await a.dialog()).buttons.find((b) => b.indexOf('A new scenario') === 0));
+		await a.dialogClick((await a.dialog()).buttons.find((b) => b.indexOf(NB.split('{parent}')[0]) === 0));
 		await a.settle(700);
 		rep = await finish();
 		s = await state();

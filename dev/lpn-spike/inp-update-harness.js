@@ -167,7 +167,7 @@ console.log('\n--- a new scenario, child of the open one (Task 814) ---');
 	importText(B, 'b.inp');
 	const names = dialogButtons();
 	ok('the choice reads "A new scenario, child of Base" in Basic mode', names.indexOf(PC.lpn_inpup_btn_newscn.replace('{parent}', 'Base')) >= 0, JSON.stringify(names));
-	ok('the dialog has the name field', !!byId.lpn_dialog_body.children.length && /Name of the new scenario/.test(dialogText()) || dialogText().indexOf(PC.lpn_inpup_newscn_name) >= 0);
+	ok('the dialog has the name field', !!byId.lpn_dialog_body.children.length && dialogText().indexOf(PC.lpn_inpup_newscn_name) >= 0);
 	press(PC.lpn_inpup_btn_newscn.replace('{parent}', 'Base'));
 	const made = L.scenarios()[L.scenarios().length - 1];
 	ok('one scenario was created and is open', L.scenarios().length === nScn + 1 && L.getProject().activeScenario === made.id, made.name);
