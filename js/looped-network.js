@@ -12677,13 +12677,36 @@ var EngCalcs = EngCalcs || {};
 		a = lumOf(q); b = lumOf(k.paper);
 		return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) < 3;
 	}
-	function casingMark(el, col) {
-		if (el && el.classList) { el.classList.toggle('lpn-ramp-cased', rampNeedsCasing(col)); }
+	// Three drawings, three casings (css/engcalcs.css): a link's own halo line (already under every pipe, in step
+	// with its geometry) takes the casing as its stroke; a junction's ring and a legend swatch's border take it as
+	// a colour; a tank, pump or valve symbol, few and drawn as one picture, takes a drop shadow. A filter is
+	// never put on a pipe or a junction: hundreds of them stalled the paint of a large network.
+	function casingMark(el, col, cls) {
+		if (el && el.classList) { el.classList.toggle(cls || 'lpn-ramp-cased', rampNeedsCasing(col)); }
+	}
+	// A theme change re-reads each drawn colour against the new paper. Marks only: no colour is recomputed, and
+	// no contour or label pass runs (refreshValueColors() would, on every sweep across the gallery).
+	function recaseAll() {
+		if (!svg || !doc || !(colorFieldOf('node') || colorFieldOf('link'))) { return; }
+		var legend = document.getElementById('lpn_color_legend');
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], t = ne && (isFixedHeadNode(n) ? ne.symbol : ne.circle);
+			if (t) { casingMark(t, t.style.color, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased'); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || !le.line) { return; }
+			casingMark(le.halo, le.line.style.stroke);
+			if (le.symbolSvg) { casingMark(le.symbolSvg, le.symbolSvg.style.color, 'lpn-ramp-cased-sym'); }
+		});
+		if (legend) {
+			Array.prototype.forEach.call(legend.querySelectorAll('.lpn-color-swatch'), function (sw) { casingMark(sw, sw.style.background); });
+		}
 	}
 	if (typeof window !== 'undefined' && window.addEventListener) {
 		window.addEventListener('ec-theme', function () {
 			casingMemo = null;
-			if (svg && doc && (colorFieldOf('node') || colorFieldOf('link'))) { refreshValueColors(); }
+			recaseAll();
 		});
 	}
 	// **A VALUE THAT DOES NOT EXIST IS null, NOT CLASS 0.** classIndex() answers null for it and
@@ -12726,7 +12749,7 @@ var EngCalcs = EngCalcs || {};
 		var target = isFixedHeadNode(n) ? ne.symbol : ne.circle;
 		if (target) {
 			target.style.color = col;
-			casingMark(target, col);
+			casingMark(target, col, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased');
 			if (col) { target.style.setProperty('--lpn-shade', '100%'); }
 			else { target.style.removeProperty('--lpn-shade'); }
 		}
@@ -12738,10 +12761,10 @@ var EngCalcs = EngCalcs || {};
 		if (breaks === undefined) { breaks = field ? effectiveBreaks('link', field) : []; }
 		var col = field ? colorForValue('link', colorLinkValue(l, field), breaks) : '';
 		le.line.style.stroke = col;
-		casingMark(le.line, col);
+		casingMark(le.halo, col);
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
-		if (le.symbolSvg) { le.symbolSvg.style.color = col; casingMark(le.symbolSvg, col); }
+		if (le.symbolSvg) { le.symbolSvg.style.color = col; casingMark(le.symbolSvg, col, 'lpn-ramp-cased-sym'); }
 		// **AND SO DO THE FLOW ARROWS** (Task 671, Tom 2026-09-15). Same argument as the symbol one
 		// line above, and the same argument Tom already made about the vertex dot (2026-09-02:
 		// *"Change vertex color too."*): a chevron sitting ON a pipe is part of that pipe's mark,

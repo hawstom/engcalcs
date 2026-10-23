@@ -628,7 +628,7 @@ with the pane open: the worst word on Prairie's chrome is 6.3:1, the worst icon 
 **The ramp's darkest class on a dark paper** (built, `feat/theme-whimsy`). The stop is not lifted, so a visitor's
 colouring is unchanged on every light paper. A dark-paper theme (Dark, High contrast's dark palette, Amber, Green,
 Arcade, Space) states `--ec-map-casing`, the paper's own opposite tone (its map ink); any class drawn under 3:1
-against the paper then takes `.lpn-ramp-cased`, a thin outline (`drop-shadow` on a link, node or symbol, the swatch's
+against the paper then takes `.lpn-ramp-cased`, a thin outline (the pipe's own halo line, a junction ring, a drop shadow on the few tank, pump and valve symbols, the swatch's
 own border in the legend). Light papers state none, so nothing is marked and Light draws what it always drew
 (`casingRead()` in js/looped-network.js; a theme change re-marks without a solve). Held by
 `theme-ramp-casing-browser-harness.js`. The basemap tiles are still not filtered.
