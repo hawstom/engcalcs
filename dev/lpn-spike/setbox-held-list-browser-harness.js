@@ -80,9 +80,10 @@ async function main() {
 
 		console.log('--- S1 ---');
 		await open('peak');
+		const CLEAR_ONE = await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_clear_one);
 		let s = await state();
 		ok('S1 the Diameter row has its group dot and a list of two', s.rowDot && s.items.length === 2, JSON.stringify(s));
-		ok('S1 every item has its own dot, "Click to clear this override."', s.items.every((i) => i.tip === 'Click to clear this override.'), JSON.stringify(s.items));
+		ok('S1 every item has its own dot with the short tip', s.items.every((i) => i.tip === CLEAR_ONE), JSON.stringify(s.items));
 		ok('S1 each item says what Clear restores and where from, in Base', s.items.every((i) => /: clear restores .+, the value in Base\.$/.test(i.text)), JSON.stringify(s.items.map((i) => i.text)));
 
 		console.log('--- S2 ---');

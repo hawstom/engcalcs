@@ -218,7 +218,7 @@ async function main() {
 		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
 		await a.settle(800);
 		const L_clear = await L('lpn_ovm_dot_clear');
-		const dots = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-ovm-dot')).map((n) => n.getAttribute('aria-label')));
+		const dots = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-ovm .lpn-ovm-dot')).map((n) => n.getAttribute('aria-label')));
 		const wantIn = (await L('lpn_settings_held_in')).replace('{scenario}', 'Fig 5');
 		ok('B1 a held row is marked with a dot in Fig 5', dots.length >= 1, JSON.stringify(dots));
 		ok('B1 every dot names Fig 5, the scenario holding the override, and says Click to clear it', dots.length > 0 && dots.every((n) => n === wantIn + ' ' + (L_clear)), JSON.stringify(dots));

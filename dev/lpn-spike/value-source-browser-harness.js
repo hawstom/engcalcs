@@ -2,7 +2,7 @@
 //   node dev/lpn-spike/value-source-browser-harness.js   (takes the browser lock itself)
 // Sue's wish (2026-10-05, item 1): "Where-from on every value (inherited from Base / local here)."
 // Base > Peak > Fire. Peak states junction 10's elevation and demand; Fire states its elevation.
-//   V1  Fire open: elevation wears the solid dot ("Click to clear this override."); demand is hollow and its tip
+//   V1  Fire open: elevation wears the solid dot (lpn_ovm_dot_clear_one, short: the line carries the detail); demand is hollow and its tip
 //       says "Inherited from Peak"; every other overridable row is hollow and says "Inherited from Base".
 //   V2  every marker's source equals an independent walk of the stored project (Fire, Peak, Base).
 //   V3  the solid dot's click is the reset: elevation turns hollow and now says "Inherited from Peak".
@@ -93,7 +93,7 @@ async function main() {
 		// The independent walk: nearest of Fire, Peak, Base that states the property.
 		const chain = [['Fire', d.scenarios.find((s) => s.id === 'fire')], ['Peak', d.scenarios.find((s) => s.id === 'peak')]];
 		const src = (prop) => { for (const [n, s] of chain) { if (s.overrides['n:10'] && prop in s.overrides['n:10']) { return n; } } return 'Base'; };
-		ok('V1 Fire: elevation is the one solid dot', dots.length === 1 && dots[0].tip === 'Click to clear this override.', JSON.stringify(dots));
+		ok('V1 Fire: elevation is the one solid dot', dots.length === 1 && dots[0].tip === (await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_clear_one)), JSON.stringify(dots));
 		ok('V1 ...and the rest are hollow dots', hol.length > 3, String(hol.length));
 		const inh = (n) => hol.filter((x) => x.tip.indexOf('Inherited from ' + n + '.') === 0);
 		ok('V2 exactly one row inherits from Peak (demand), matching the stored chain (' + src('demand') + ')', src('demand') === 'Peak' && inh('Peak').length === 1, JSON.stringify(inh('Peak')));
@@ -136,12 +136,13 @@ async function main() {
 		await open('peak', 1400, 900, (d) => { altOf(d); const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; }, true);
 		await openNode('10');
 		notes = await noteTexts();
-		const ALT = await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_alt);
-		ok('V6 Peak, alternative used by Peak alone: the note ends with the alternative sentence', notes.length === 1 && notes[0].endsWith('This override is stored in alternative "Peak elev".') && ALT === 'This override is stored in alternative "{alternative}".', JSON.stringify(notes));
+		const wantAlt = (await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_alt)).replace('{alternative}', 'Peak elev');
+		ok('V6 Peak, alternative used by Peak alone: the note ends with the alternative sentence', notes.length === 1 && notes[0].endsWith(wantAlt), JSON.stringify(notes));
 		await open('peak', 1400, 900, (d) => { altOf(d); const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; d.scenarios.find((x) => x.id === 'fire').alternatives = { physical: 'pa' }; }, true);
 		await openNode('10');
 		notes = await noteTexts();
-		ok('V6 Peak and Fire name it: "...also used by Fire, so clear or edits change them too."', notes.length === 1 && notes[0].endsWith('This override is stored in alternative "Peak elev", also used by Fire, so clear or edits change them too.'), JSON.stringify(notes));
+		const wantShared = (await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_alt_shared)).replace('{alternative}', 'Peak elev').replace('{list}', 'Fire');
+		ok('V6 Peak and Fire name it: "...also used by Fire, so clear or edits change them too."', notes.length === 1 && notes[0].endsWith(wantShared), JSON.stringify(notes));
 		await open('fire', 1400, 900);
 		await openNode('10');
 		notes = await noteTexts();
