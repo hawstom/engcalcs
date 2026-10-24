@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**22 still to read on master**, of 187 untranslated keys, of 3205 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (187, 22 to read @@ NEEDS RULING)
+## lpn_  (196, 31 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -289,6 +289,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_btn_new`**
   > A new project
   _Ruled OK 2026-10-20._
+- **`lpn_inpup_btn_newscn`**
+  > A new scenario, child of {parent}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_newscn_basic`**
+  > A new scenario
+  @@ NEEDS RULING
 - **`lpn_inpup_btn_project`**
   > This project, {project}
   _Ruled OK 2026-10-20._
@@ -373,6 +379,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_na_type`**
   > The file states a different type for these assets, so none of their values were changed: {ids}
   _Ruled OK 2026-10-20._
+- **`lpn_inpup_new_none`**
+  > No scenario was created.
+  @@ NEEDS RULING
+- **`lpn_inpup_new_scn`**
+  > Created the scenario {scenario}, a child of {parent}, and opened it.
+  @@ NEEDS RULING
+- **`lpn_inpup_new_scn_basic`**
+  > Created the scenario {scenario} and opened it.
+  @@ NEEDS RULING
+- **`lpn_inpup_newscn_name`**
+  > Name, if you choose a new scenario
+  @@ NEEDS RULING
 - **`lpn_inpup_nothing`**
   > Every value in the file that matches an asset here is already the same in {scenario}.
   _Ruled OK 2026-10-20._
@@ -532,6 +550,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_survey_where_lead`**
+  > Each point becomes a node. Choose where the nodes go.
+  @@ NEEDS RULING
+- **`lpn_survey_where_note`**
+  > In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.
+  @@ NEEDS RULING
+- **`lpn_survey_where_title`**
+  > Import surveyed points
+  @@ NEEDS RULING
 - **`lpn_theme_amber`**
   > Amber
   _Ruled OK 2026-10-17._
@@ -597,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**11 still to read**, of 54 new keys across 5 unmerged branch(es).
+**15 still to read**, of 58 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -608,7 +635,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/handoff-1023 (`d291e0dda`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/import-new-scenario (`59e85ab9e`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -772,12 +803,26 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`7fc9e5a41`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/theme-whimsy (`47f555b2c`) — adds no English strings
 
+### feat/value-source (`f40299430`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_ovm_dot_alt`**
+  > This override is stored in alternative "{alternative}".
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt_shared`**
+  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear_one`**
+  > Click to clear this override.
+  @@ NEEDS RULING
 - **`lpn_ovm_dot_set_from`**
   > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
+- **`lpn_settings_held_item`**
+  > {setting}: clear restores {value}, the value in {parent}.
+  @@ NEEDS RULING
 
-### feat/wtg-export (`431463258`) — adds no English strings
+### feat/wtg-export (`8edd6369b`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
