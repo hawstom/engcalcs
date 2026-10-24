@@ -3912,3 +3912,12 @@ Written up in full in `dev/themes-plan.md`. Entries, each tagged:
 - OBSERVED (Chromium 1400x900, lpn_theme=prairie; shots in this folder): chrome rows are menubar y1-31, toolbar 35-71, tabs 75-110, canvas from 116. Sky gradient #3a78b6 starts behind the menu bar, so the menu items (red text on wheat chips) are small islands on the darkest blue: red-on-blue is the clash Tom saw. Toolbar pressed = pink-red wash with red outline, reads as an error chip not as a tool in use.
 - SPECULATION (arithmetic, WCAG relative luminance): ink #2b2418 on mid sky #7fb0dc about 6.6:1; on the old #3a78b6 only about 3.2:1, so the deep blue must not sit behind icons. Barn red #9e2a1e on steel lighter than #c4ccd1 is at least 4.5:1, on #aeb7bd 3.8:1 (fails), so letters on the tank band are dark navy-ink, red only on paper.
 - Tom's mapping adopted: tabs = barns, menus = water-tower tank band, toolbar = clouds. Direction in the report to the coordinator; CSS not built by me.
+
+## 2026-10-24 - First-time view of the map app
+
+Full text: `first-time-view-2026-10-24.md`.
+- OBSERVED (Chromium 1400x900 fresh profile, scratchpad shots): first view has no boxes; the Mode line overlaps and clips the gallery welcome heading; consent banner about 150 px.
+- OBSERVED (js/looped-network.js:40773, lib/config.inc.php:461): only `first:example` is logged, not which example; `project.gallery` holds the file but is not sent.
+- OBSERVED (css/engcalcs.css:5550-5562): Clean map hides the notice, keeps Mode line by Tom's 2026-09-22 call.
+- OBSERVED (dev/looped-network-calculator-scope.md:697): Settings rule "if it is for the entire project, it is in Settings".
+- SPECULATION: pinned-plus-two-auto-hidden mix reads better than all hidden; not rendered.
