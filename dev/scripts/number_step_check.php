@@ -29,7 +29,7 @@
  * constrains. It costs a keypress by somebody who is already in the field.
  *
  * WHAT `step` IS CORRECTLY SET TO IS NOT THIS SCRIPT'S BUSINESS: `any` for a physical quantity and
- * `1` for the small bounded integers that opt back into the spinner with `.ec-spin` are both
+ * `1` for the small bounded integers that opt back into the spinner (formerly `.ec-spin`) are both
  * declarations, and which one a field wants is a judgement about the field. The check holds only
  * that SOMETHING was decided.
  *
@@ -185,9 +185,9 @@ function ecStepJsFindings(array $files): array
                 . "`$var.step`. An input with no step has step=1 -- the HTML default -- so the "
                 . 'arrow keys SNAP a quantity the user typed to a whole number (125.43 becomes 126) '
                 . 'and the field reads as :invalid the whole time it holds a decimal. The suite '
-                . 'hides the spinner on every number input but .ec-spin, so the keyboard is the '
+                . 'hides the spinner on every number input, so the keyboard is the '
                 . "only stepper left. Declare it: `$var.step = 'any';` for a physical quantity, "
-                . "`$var.step = '1';` for a small bounded integer that opts back into the spinner. "
+                . "`$var.step = '1';` for a small bounded integer. "
                 . '105 of 105 rendered from PHP already say `any`.';
         }
         $away = array_merge($away, ecStepAwayIn($rel, $src));

@@ -443,7 +443,7 @@ exports.run = async function ({ browser, report }) {
 			const out = { number: [], text: [], spin: [], select: [] };
 			[...document.querySelectorAll('#lpn_settings_box .lpn-set-secbody input')].forEach((i) => {
 				const ta = getComputedStyle(i).textAlign;
-				if (i.classList.contains('ec-spin')) { out.spin.push(ta); }
+				if (i.classList.contains('lpn-digit')) { out.spin.push(ta); }
 				else if (i.type === 'number' || i.classList.contains('lpn-set-num')) { out.number.push(ta); }
 				else if (i.type === 'text') { out.text.push(ta); }
 			});

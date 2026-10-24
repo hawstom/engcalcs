@@ -59886,7 +59886,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * screen this box is TEXT with `inputmode="numeric"`: the whole value is selected on the tap
 	 * (EngCalcs.wireSelectAllOnFocus(), which already covers every text box on the page), and the
 	 * phone opens its digit keypad, which is the honest version of "the scroll/spin interface". A
-	 * pointer keeps the real number box and its arrows. The same test the stylesheet's touch block
+	 * pointer keeps the real number box WITHOUT arrows (Tom, 2026-10-23: a held arrow ran the
+	 * number away, and the arrows are a debatable convenience). The same test the stylesheet's touch block
 	 * asks, `(hover: none) and (pointer: coarse)`, so the two cannot disagree about which device
 	 * this is.
 	 */
@@ -59917,8 +59918,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			box.setAttribute('pattern', '[0-9]*');
 		} else {
 			box.type = 'number'; box.min = '0'; box.max = String(spec.max); box.step = '1';
-			// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide.
-			box.className = 'ec-spin';
+			box.setAttribute('inputmode', 'numeric');
+			// No spinner arrows (Tom, 2026-10-23): css/engcalcs.css strips them suite-wide, and a held
+			// arrow ran the number away. .lpn-digit only centres the one or two digits.
+			box.className = 'lpn-digit';
 		}
 		box.value = spec.value;
 		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
@@ -60100,7 +60103,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			wrap = document.createElement('span'), input = document.createElement('input'),
 			unit = document.createElement('span'), btn = document.createElement('button');
 		wrap.className = 'lpn-set-ctlgroup';
-		input.type = 'number'; input.step = 'any'; input.min = '0';
+		input.type = 'number'; input.step = 'any'; input.min = '0'; input.setAttribute('inputmode', 'decimal');
 		// **THE SAME WIDTH ON BOTH ROWS** (Tom, 2026-09-23 pre-review: the customer box was 2.6rem,
 		// the all-labels box 7em -- visibly narrower for no reason tied to what either box holds).
 		input.style.width = '7em'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
@@ -61828,6 +61831,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				text.appendChild(savedMarker(saved));
 			}
 			line.appendChild(text);
+			// A phone opens a digit keypad for a number box named so (Tom, 2026-10-23: no spinners,
+			// but "if phone knows they are numeric"). Only where the minimum is not negative: iOS's
+			// decimal keypad has no minus key, so a box that may go negative keeps type=number's own.
+			if (input.type === 'number' && !input.getAttribute('inputmode') && input.min !== '' && +input.min >= 0) {
+				input.setAttribute('inputmode', /^\d+$/.test(input.step) ? 'numeric' : 'decimal');
+			}
 			line.appendChild(input);
 			target.appendChild(line);
 			return line;
@@ -62379,7 +62388,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			thematicBody = minorGroup(mapBody2, pc.lpn_settings_grp_thematic || 'Thematic'),
 			fadeBody = thematicBody;
 		var sizeInput = document.createElement('input');
-		sizeInput.type = 'number'; sizeInput.className = 'ec-spin';
+		sizeInput.type = 'number'; sizeInput.className = 'lpn-digit';
 		sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
 		sizeInput.addEventListener('change', function () {
 			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
@@ -62392,7 +62401,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// expressed as a multiple of a text size made the user do a division to answer "how big is
 		// the dot", which is the only question they were ever asking.
 		var symInput = document.createElement('input');
-		symInput.type = 'number'; symInput.className = 'ec-spin';
+		symInput.type = 'number'; symInput.className = 'lpn-digit';
 		symInput.step = '1'; symInput.min = '1'; symInput.value = settings.symbolSize;
 		symInput.addEventListener('change', function () {
 			if (+symInput.value > 0) { settings.symbolSize = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
@@ -62400,7 +62409,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		setboxTag(row(sizeBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput), [['settings', 'symbolSize']]);
 		var lwInput = document.createElement('input');
-		lwInput.type = 'number'; lwInput.className = 'ec-spin';
+		lwInput.type = 'number'; lwInput.className = 'lpn-digit';
 		lwInput.step = '1'; lwInput.min = '1'; lwInput.value = settings.linkWidth;
 		// **THE HANDLER HONOURS THE MIN THE MARKUP DECLARES.** `min="1"` is advice a browser gives
 		// the spinner and nothing at all to a typed entry, so `> 0` accepted 0.5 through the
@@ -62439,7 +62448,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
 		// main barely cares.
 		var biasInput = document.createElement('input');
-		biasInput.type = 'number'; biasInput.className = 'ec-spin';
+		biasInput.type = 'number'; biasInput.className = 'lpn-digit';
 		biasInput.step = '1'; biasInput.min = LPN_FLIP_LEFT_MIN; biasInput.max = LPN_FLIP_LEFT_MAX;
 		biasInput.value = labelFlipLeftOfVertical();
 		biasInput.addEventListener('change', function () {
@@ -62461,7 +62470,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		setboxTag(row(showBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput), [['settings', 'maskLabels']]);
 		var haloInput = document.createElement('input');
-		haloInput.type = 'number'; haloInput.className = 'ec-spin';
+		haloInput.type = 'number'; haloInput.className = 'lpn-digit';
 		haloInput.step = '5'; haloInput.min = '0'; haloInput.max = '100'; haloInput.value = textHaloPct();
 		haloInput.addEventListener('change', function () {
 			var v = +haloInput.value;
@@ -62535,7 +62544,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
 			capPctInput = document.createElement('input'), capPctSign = document.createElement('span');
 		capWrap.className = 'lpn-set-ctlgroup';
-		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
+		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0'; capMultInput.setAttribute('inputmode', 'decimal');
 		capMultInput.id = 'lpn_set_symbol_cap_mult';
 		capMultInput.style.width = '4em';
 		capMultInput.value = trimNum(symbolCapMultiple());
@@ -62547,7 +62556,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				capMultInput.value = trimNum(symbolCapMultiple());
 			}
 		});
-		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
+		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100'; capPctInput.setAttribute('inputmode', 'decimal');
 		capPctInput.id = 'lpn_set_symbol_cap_pct';
 		capPctInput.style.width = '4em';
 		capPctInput.value = trimNum(symbolCapPercentile());
