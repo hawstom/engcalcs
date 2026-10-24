@@ -165,7 +165,7 @@ function describe(edges) {
 			[4, 5, 6].every((k) => head[k].style.textAlign === 'center'),
 			[4, 5, 6].map((k) => head[k].style.textAlign).join(','));
 		ok('...with the spinners themselves centred by the stylesheet',
-			/#lpn_settings_box \.lpn-set-secbody input\.ec-spin \{ text-align: center; \}/.test(css));
+			/#lpn_settings_box \.lpn-set-secbody input\.lpn-digit \{ text-align: center; \}/.test(css));
 		const affix = rows[1].children[1];
 		ok('...and the text boxes carrying no alignment of their own',
 			!affix.style.textAlign, affix.style.textAlign || '(none)');

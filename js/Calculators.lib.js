@@ -1859,6 +1859,21 @@ EngCalcs.wireSelectAllOnFocus = function () {
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireSelectAllOnFocus(); });
 
 /**
+ * A MOUSE WHEEL OVER A FOCUSED NUMBER FIELD MUST NOT CHANGE ITS VALUE (Tom, 2026-10-23, on the
+ * Settings spinners). Chromium steps a focused `type=number` field on a wheel notch, so scrolling the
+ * box with the pointer parked over a field quietly edits a setting. One delegated, passive listener
+ * drops focus from the field, which ends the stepping and lets the notch scroll the page as usual.
+ */
+EngCalcs.wireNoWheelStep = function () {
+	'use strict';
+	document.addEventListener('wheel', function (e) {
+		var el = e.target;
+		if (el && el.tagName === 'INPUT' && el.type === 'number' && document.activeElement === el) { el.blur(); }
+	}, { passive: true });
+};
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireNoWheelStep(); });
+
+/**
 	* niceTicks() -- round values to mark an axis, 
 	*
 	* Steps are 1, 2, 2.5 or 5 times a power of ten. Of every step that puts 4 to 8 marks inside

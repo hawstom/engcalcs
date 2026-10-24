@@ -394,8 +394,8 @@ console.log('== 6b. on a touch screen the Decimals, Show and Drop boxes select w
 	global.window.matchMedia = realMM;
 	L.rebuildLabels();
 	const row2 = byId['lpn_labels_node_fields'].children.find((r) => (r.children[0].textContent || '').indexOf('Pressure') >= 0);
-	ok('with a pointer they stay spinners', [4, 5, 6].every((k) => row2.children[k].type === 'number' &&
-		row2.children[k].className === 'ec-spin'));
+	ok('with a pointer they stay number boxes (no arrows)', [4, 5, 6].every((k) => row2.children[k].type === 'number' &&
+		row2.children[k].className === 'lpn-digit'));
 	if (had) { EC.selectAllCandidate = had; }
 }
 
