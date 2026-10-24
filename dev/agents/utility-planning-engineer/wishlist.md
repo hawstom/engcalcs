@@ -1043,3 +1043,7 @@ I want the safeguards before the box, in this order. Ranked low against the road
 4. **Model QA lint as a read-only question**: orphans, zero-demand dead ends, C range, elevation versus DEM, pump shutoff versus static lift. Small to medium. The one item here that would change my week even without an agent.
 5. **An agent action exported as a readable operation list (or WNTR/Python script)**, so it can be replayed in another tool. Small once 2 exists. My interoperability reason, and the thing I would want most if the box ships.
 Not wanted: free-form "design for me" requests (examples 4 and 5) as one-click actions. Source for the data-leaving risk: WaterISAC advisory, 2026-06-04 (journal).
+
+## Added 2026-10-23 (pump and valve assemblies, expert levels)
+
+The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".

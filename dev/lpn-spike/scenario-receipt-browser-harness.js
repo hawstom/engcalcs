@@ -157,6 +157,9 @@ async function main() {
 		const createLabel = (await L('lpn_survey_create')).trim();
 		await page.click('#lpn_dialog_buttons button:text-is("' + createLabel + '")');
 		await a.settle(600);
+		// With more than Base in the project the points are asked where they go (Task 814): the open scenario.
+		await a.dialogClick((await L('lpn_inpup_btn_scenario')).replace('{scenario}', 'Peak hour').trim());
+		await a.settle(600);
 		const rep = await page.evaluate(() => { const b = document.querySelector('#lpn_dialog_body, .lpn-dialog-body, #lpn_dialog'); return b ? b.innerText : ''; });
 		ok('R3 the survey report opens with the scenario sentence', /The nodes were added to Peak hour\. In Base they are inactive\./.test(rep), rep.slice(0, 200));
 		await a.dialogClick((await L('lpn_dialog_ok')).trim());

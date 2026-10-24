@@ -749,3 +749,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|816| CLOSED 2026-10-19 (merged on Tom's word, `feat/guide-page`): User-Manual.php?lang=xx&chapter=slug, a page per chapter per language.
 - 0|819| CLOSED 2026-10-21 (merged on Tom's word, `feat/import-export-menu`): Import and Export grouped into Network, Shapes and Tables submenus; libraries in the tables export.
 - 0|821| CLOSED 2026-10-22 (Tom: "Count as EPANET does", `fix/energy-count`): the energy summary counts an open pump and a single instant (one hour) as EPANET does.
+- 0|811| CLOSED 2026-10-23 (merged on Tom's word, `feat/theme-whimsy`): ten colour themes, the better default, Newspaper and Arcade design themes, the dark-paper ramp casing.

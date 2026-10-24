@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 3205,
-        "delta_key_count": 231,
+        "expected_key_count": 3214,
+        "delta_key_count": 240,
         "english_changed_key_count": 44,
         "exempt_key_count": 39,
         "exempt_keys": [
@@ -130,6 +130,15 @@
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_newscn": "A new scenario, child of {parent}",
+        "lpn_inpup_newscn_name": "Name, if you choose a new scenario",
+        "lpn_inpup_new_scn": "Created the scenario {scenario}, a child of {parent}, and opened it.",
+        "lpn_inpup_btn_newscn_basic": "A new scenario",
+        "lpn_inpup_new_scn_basic": "Created the scenario {scenario} and opened it.",
+        "lpn_inpup_new_none": "No scenario was created.",
+        "lpn_survey_where_title": "Import surveyed points",
+        "lpn_survey_where_lead": "Each point becomes a node. Choose where the nodes go.",
+        "lpn_survey_where_note": "In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.",
         "lpn_inpup_title": "Update from EPANET file",
         "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_gjup_title": "Update from GeoJSON file",
@@ -363,6 +372,15 @@
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_newscn": "A new scenario, child of {parent}",
+        "lpn_inpup_newscn_name": "Name, if you choose a new scenario",
+        "lpn_inpup_new_scn": "Created the scenario {scenario}, a child of {parent}, and opened it.",
+        "lpn_inpup_btn_newscn_basic": "A new scenario",
+        "lpn_inpup_new_scn_basic": "Created the scenario {scenario} and opened it.",
+        "lpn_inpup_new_none": "No scenario was created.",
+        "lpn_survey_where_title": "Import surveyed points",
+        "lpn_survey_where_lead": "Each point becomes a node. Choose where the nodes go.",
+        "lpn_survey_where_note": "In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.",
         "lpn_inpup_title": "Update from EPANET file",
         "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_gjup_title": "Update from GeoJSON file",
@@ -1467,6 +1485,150 @@
             }
         },
         "lpn_inpup_btn_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_newscn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_newscn_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_new_scn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_newscn_basic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_new_scn_basic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_new_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_survey_where_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_survey_where_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_survey_where_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

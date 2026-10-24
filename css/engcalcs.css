@@ -177,6 +177,8 @@
 	   Text label's own weight) is written on the element itself and wins over all of these. Print and the
 	   screenshot draw Light whatever the theme (see printing and snipCloneSvg() in js/looped-network.js). */
 	--ec-map-paper: #fff;
+	/* The casing round a ramp class the paper swallows (js/looped-network.js casingRead()): none on a light paper. */
+	--ec-map-casing: none;
 	/* Neutral ink: leaders, service lines, meters, the drag flash. */
 	--ec-map-ink: #000;
 	/* The network's own ink: pipes, node outlines, symbols, flow arrows, vertices (--lpn-map-ink). */
@@ -2113,6 +2115,8 @@ html[lang="zh"] .ec-welcome {
    condition here (.lpn-node-pending). Hidden until refreshScenarioMarks() adds .lpn-override,
    which is why every link can carry one at no visual cost. */
 .lpn-link-halo { stroke: none; pointer-events: none; }
+/* The casing of a ramp class the paper swallows (Task 811), ahead of the audit and selection halos below so they win. */
+.lpn-link-halo.lpn-ramp-cased { stroke: var(--ec-map-casing); stroke-width: calc(2.4 * var(--lpn-lw, 0)); }
 /* ---- THE GRAB BAND, AND IT IS NOT PART OF THE DRAWING (Tom's 2026-09-08 worklist) ----
    A pipe ships two pixels wide and an SVG hit test is exactly the drawn stroke, so before this the
    only way to reach a pipe with a mouse was to land on those two pixels. This is a wider,
@@ -2336,6 +2340,8 @@ html[lang="zh"] .ec-welcome {
    FIRST of the four ring rules that follow, deliberately: override, selection and the pending mark
    are all statements about what you are DOING and each of them overrides this, which is a statement
    about what was calculated. */
+/* A junction ring in the casing colour (Task 811), ahead of the state rings below so they win. */
+.lpn-node.lpn-ramp-cased { stroke: var(--ec-map-casing); stroke-width: calc(0.22 * var(--lpn-sym, 0)); }
 .lpn-node.lpn-ff-pass { stroke: #2e7d32; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
 .lpn-node.lpn-ff-fail { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 0.6 0.6; }
 .lpn-node.lpn-ff-design { stroke: #ef6c00; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 1.6 0.8; }
@@ -3689,6 +3695,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* A swatch has to survive being white or very light on white paper, so it carries a hairline
    border of its own -- otherwise the top band of the gray ramp is an invisible row. */
+/* The casing (Task 811): a ramp class the dark paper swallows, outlined in the paper's opposite tone. */
+:root[data-theme="dark"], :root[data-theme="hc-dark"], :root[data-theme="amber"], :root[data-theme="green"],
+:root[data-theme="arcade"], :root[data-theme="space"] { --ec-map-casing: var(--ec-map-ink); }
+.lpn-ramp-cased-sym { filter: drop-shadow(0 0 1px var(--ec-map-casing)) drop-shadow(0 0 1.5px var(--ec-map-casing)); }
+.lpn-color-swatch.lpn-ramp-cased { border-color: var(--ec-map-casing); }
 .lpn-color-swatch {
 	display: inline-block;
 	flex: 0 0 auto;

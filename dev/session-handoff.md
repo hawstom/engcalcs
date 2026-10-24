@@ -95,6 +95,16 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-10-23 afternoon (thirty-seventh session)
+
+- **Interview "Pump and Valve Assemblies"** (16 calls: assemblies, expert levels, WaterGEMS naming and licence): https://claude.ai/artifact/9fmKVp5sBuRjwuQvnn72R8 . Read his answers with ArtifactData list, collection `answers`; write rules from his free text, never the option label. Seats' answers: `dev/agents/*/assemblies-2026-10-23.md`; Mary's licence review: `dev/agents/market-researcher/wtg-legal.md`.
+- **Three branches green and waiting on his browser pass** (each suite's only failure is the expected `payload freshness`): `feat/value-source` (8105, 23aa4ccf1: his item 3, the line under the row restored with his alternative sentences, pane scroll held, short dot tip, Settings overrides listed one by one; Perry passed it after the Labels-list fix); `feat/import-new-scenario` (8101, Task 814, 8a8d8178a: a new scenario as an import destination, the survey question; Perry passed it, his five points fixed); `feat/theme-whimsy` (8102, Task 811, 5cc3fc78a: the darkest ramp class outlined on dark papers; Newspaper and Arcade were already on master, so Task 811's design themes are done apart from this). Merge each on his word only.
+- **`feat/wtg-export`**: real tank-level controls in an assigned control set (8edd6369b). **The push was refused by the classifier**; push it. Tom's round 3: `~/tom-files/2026-10-23/wtg-export-3/`.
+- Tasks 733 slice 7, 737 sprint, 681 wait on his word. 812 not touched this session.
+- **Trap met:** a Settings Labels list built as `div > span` was hidden by that box's positional CSS (`> div > span:first-child { display:none }`); the harness checked text only and passed. Perry caught it. A harness for anything drawn checks visibility and width, not text.
+- **Trap met:** a usage limit killed three agents mid-task; their detached suites survived and their commits held. Resume from `git log` and the logs, not by relaunching.
+- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/aaf154be-77c7-4d38-b977-59110ebc67e4/scratchpad
+
 ## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
 
 - Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides (pushed 1c75721e0); then fix/energy-count (Task 821, his call "Count as EPANET does").
