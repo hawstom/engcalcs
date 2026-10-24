@@ -448,14 +448,15 @@ async function main() {
 		});
 		await clickNode('10');
 		let lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const HB = await L('lpn_settings_held_base'), await0bv = await L('lpn_scenario_base_value');
-		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === HB.replace('{base}', 'Fig 4').replace('{value}', '720')), JSON.stringify(lines));
+		const RS = await L('lpn_ovm_restores'), FR = await L('lpn_settings_held_from'), sayFrom = (nm, v) => RS.replace('{value}', v).replace('{source}', FR.replace('{parent}', nm));
+		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === sayFrom('Fig 4', '720 ft H2O') || t === sayFrom('Fig 4', '720')), JSON.stringify(lines));
 		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
 		await scenarioMenu('Fig 4');
 		await clickNode('10');
 		lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
 		const baseElev = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
-		ok('Q2 in Fig 4, a child of Base, it reads Base scenario: ' + baseElev, lines.some((t) => t === (await0bv).replace('{value}', baseElev)), JSON.stringify(lines));
+		const base4Name = await L('lpn_scenario_base');
+		ok('Q2 in Fig 4, a child of Base, it reads Clear restores ' + baseElev + ', the value in Base: ' + baseElev, lines.some((t) => t === sayFrom(base4Name, baseElev + ' ft H2O') || t === sayFrom(base4Name, baseElev)), JSON.stringify(lines));
 
 		// ---- q01: what Basic mode can show; Copy scenario ----
 		console.log('\n--- q01. a project Basic mode cannot show turns it off; Copy scenario in Basic mode ---');

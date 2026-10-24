@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='سناریو {name} نشي ړنګ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='د اساس سناریو: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} په {scenario} کې د شبکې نه بهر دی. دا لاهم په انځور کې دی، او ستاسو په نورو سناریوګانو کې هم.';
 $ec_lang['lpn_scenario_delete_in_base']='له انځور څخه یې لرې کولو لپاره، یې په {base} سناریو کې ړنګ کړئ.';
 $ec_lang['lpn_scenario_only_deleted']='{id} ړنګ شو. دا یوازې د {scenario} برخه وه.';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='نوې شتمنۍ: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ډیفالټ)';
 $ec_lang['lpn_settings_row_view_value']='مرکز {x}، {y}؛ پیمانه {s}';
 $ec_lang['lpn_settings_held_in']='په {scenario} کې ځانګړی ارزښت.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='د نقشې مرکز';
 $ec_lang['lpn_settings_view_scale']='د نقشې پیمانه';
 $ec_lang['lpn_settings_view_scale_tip']='د نقشې په مرکز کې پیمانه، لکه 1:N. 1:2000، یا یوازې 2000 ولیکئ، ترڅو هغه پیمانې ته زوم شي.';

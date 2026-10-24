@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='परिदृश्य {name} �
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='आधार परिदृश्य: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} को {scenario} में नेटवर्क से बाहर रखा गया है। यह ड्राइंग में और अन्य परिदृश्यों में बना रहता है।';
 $ec_lang['lpn_scenario_delete_in_base']='इसे ड्रॉइंग से हटाने के लिए, इसे {base} परिदृश्य में हटाएँ।';
 $ec_lang['lpn_scenario_only_deleted']='{id} हटा दिया गया। यह केवल {scenario} का भाग था।';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='नए तत्व: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (डिफ़ॉल्ट)';
 $ec_lang['lpn_settings_row_view_value']='केंद्र {x}, {y}; स्केल {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} में अपना मान।';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='मानचित्र केंद्र';
 $ec_lang['lpn_settings_view_scale']='मानचित्र स्केल';
 $ec_lang['lpn_settings_view_scale_tip']='मानचित्र के केंद्र पर स्केल, 1:N के रूप में। उस स्केल पर ज़ूम करने के लिए 1:2000, या केवल 2000, टाइप करें।';

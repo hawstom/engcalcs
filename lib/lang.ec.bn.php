@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} দৃশ্যকল্প
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='ভিত্তি দৃশ্যকল্প: {value}';
 $ec_lang['lpn_scenario_deactivated']='{scenario}-এ {id} নেটওয়ার্ক থেকে বাদ দেওয়া হয়েছে। এটি অঙ্কনে এবং অন্য দৃশ্যকল্পগুলোতে থাকে।';
 $ec_lang['lpn_scenario_delete_in_base']='অঙ্কন থেকে সরাতে {base} দৃশ্যকল্পে এটি মুছুন।';
 $ec_lang['lpn_scenario_only_deleted']='{id} মুছে ফেলা হয়েছে। এটি শুধু {scenario}-এর অংশ ছিল।';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='নতুন অ্যাসেট: {set
 $ec_lang['lpn_settings_row_default']='{value} (ডিফল্ট)';
 $ec_lang['lpn_settings_row_view_value']='কেন্দ্র {x}, {y}; স্কেল {s}';
 $ec_lang['lpn_settings_held_in']='{scenario}-এ নিজস্ব মান।';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='মানচিত্রের কেন্দ্র';
 $ec_lang['lpn_settings_view_scale']='মানচিত্রের স্কেল';
 $ec_lang['lpn_settings_view_scale_tip']='মানচিত্রের কেন্দ্রে স্কেল, 1:N হিসেবে। সেই স্কেলে জুম করতে 1:2000 টাইপ করুন, অথবা শুধু 2000।';

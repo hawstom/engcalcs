@@ -6689,11 +6689,6 @@
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
-        "lpn_settings_held_base": {
-            "on": "{base}: {value}",
-            "ruled": "2026-10-16",
-            "answer": "OK."
-        },
         "lpn_settings_held_in": {
             "on": "Override in {scenario}.",
             "ruled": "2026-10-16",

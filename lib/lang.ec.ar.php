@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='لا يمكن حذف السينا�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='سيناريو الأساس: {value}';
 $ec_lang['lpn_scenario_deactivated']='يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.';
 $ec_lang['lpn_scenario_delete_in_base']='لإزالته من الرسم، احذفه في السيناريو {base}.';
 $ec_lang['lpn_scenario_only_deleted']='حُذف {id}. كان جزءاً من {scenario} فقط.';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='العناصر الجديدة: {setting}
 $ec_lang['lpn_settings_row_default']='{value} (افتراضي)';
 $ec_lang['lpn_settings_row_view_value']='المركز {x}، {y}؛ المقياس {s}';
 $ec_lang['lpn_settings_held_in']='تجاوز في {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='مركز الخريطة';
 $ec_lang['lpn_settings_view_scale']='مقياس الخريطة';
 $ec_lang['lpn_settings_view_scale_tip']='المقياس عند مركز الخريطة، بصيغة 1:N. اكتب 1:2000، أو 2000 فقط، للتكبير إلى ذلك المقياس.';

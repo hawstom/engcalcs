@@ -3311,7 +3311,6 @@ $ec_lang['lpn_scenario_delete_has_children']='سناریوی {name} حذف نم�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='سناریوی پایه: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} در {scenario} از شبکه کنار گذاشته شده است. در ترسیم و در سناریوهای دیگر می‌ماند.';
 $ec_lang['lpn_scenario_delete_in_base']='برای حذف آن از ترسیم، آن را در سناریوی {base} حذف کنید.';
 $ec_lang['lpn_scenario_only_deleted']='{id} حذف شد. فقط بخشی از {scenario} بود.';
@@ -3446,7 +3445,6 @@ $ec_lang['lpn_settings_row_new_asset']='المان‌های جدید: {setting}'
 $ec_lang['lpn_settings_row_default']='{value} (پیش‌فرض)';
 $ec_lang['lpn_settings_row_view_value']='مرکز {x}، {y}؛ مقیاس {s}';
 $ec_lang['lpn_settings_held_in']='مقدار اختصاصی در {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='مرکز نقشه';
 $ec_lang['lpn_settings_view_scale']='مقیاس نقشه';
 $ec_lang['lpn_settings_view_scale_tip']='مقیاس در مرکز نقشه، به‌صورت 1:N. برای بزرگ‌نمایی به آن مقیاس 1:2000 یا فقط 2000 را تایپ کنید.';

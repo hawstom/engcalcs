@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 3038,
+    "count": 3036,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -8061,7 +8061,6 @@
         "lpn_saved_project": "84e6ba1544c3b24302272c60f189cc2689c62c37",
         "lpn_saved_session": "3d56409d02fb296df0b0fc7db20e48fdb249a262",
         "lpn_scenario_base": "077fe9c54ed5ed26fa547f4ded3ef9a9bb066d65",
-        "lpn_scenario_base_value": "85aac122ab80c9b097d80d80bc89c3cebd922797",
         "lpn_scenario_basic": "700ed102a28fe8fc4eddc583c6a8a0bbe5b01d1d",
         "lpn_scenario_basic_misfit": "7877c48533b795f3690396a67c87361ce12b63d8",
         "lpn_scenario_basic_misfit_base": "f0435e92e4d4e5a0fab58a65d2d202ff269628e5",
@@ -8206,7 +8205,6 @@
         "lpn_settings_flow_change_tip": "130b22713ebb4e466de553a8fd19226f8c4ef07a",
         "lpn_settings_head_error": "8be0d6b0b1ce6b6b74e6172b44585dd09eed2afd",
         "lpn_settings_head_error_tip": "4d347e591eea019c69c5b62bff7369c10e1c1b6e",
-        "lpn_settings_held_base": "a8125023fa2345266e1ab1434f596f2ad53b4558",
         "lpn_settings_held_in": "858240f63d6c25ce332859a97d492080ab7fc32e",
         "lpn_settings_hover_card": "b05aaad3bd1ea12cc9fc701f605b0e2d40e5e752",
         "lpn_settings_hover_card_tip": "8dae0791d65cc5a63ae8b6f484881e92ac0c6905",
@@ -17110,10 +17108,6 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_scenario_base_value": {
-            "words": 3,
-            "ends_sentence": false
-        },
         "lpn_scenario_basic": {
             "words": 2,
             "ends_sentence": false
@@ -17689,10 +17683,6 @@
         "lpn_settings_head_error_tip": {
             "words": 26,
             "ends_sentence": true
-        },
-        "lpn_settings_held_base": {
-            "words": 2,
-            "ends_sentence": false
         },
         "lpn_settings_held_in": {
             "words": 3,

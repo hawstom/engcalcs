@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Senario {name} haiwezi kufutwa kwa
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Senario ya Msingi: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} imetengwa na mtandao katika {scenario}. Inabaki kwenye mchoro na katika senario nyingine.';
 $ec_lang['lpn_scenario_delete_in_base']='Ili kukiondoa kwenye mchoro, kifute kwenye senario ya {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} kimefutwa. Kilikuwa sehemu ya {scenario} pekee.';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='Vipengele vipya: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (chaguo-msingi)';
 $ec_lang['lpn_settings_row_view_value']='Kituo {x}, {y}; kipimo {s}';
 $ec_lang['lpn_settings_held_in']='Thamani maalum katika {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Kituo cha ramani';
 $ec_lang['lpn_settings_view_scale']='Kipimo cha ramani';
 $ec_lang['lpn_settings_view_scale_tip']='Kipimo katika kituo cha ramani, kama 1:N. Andika 1:2000, au 2000 tu, ili kukuza hadi kipimo hicho.';

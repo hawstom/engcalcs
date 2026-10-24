@@ -63868,12 +63868,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (tail && t.slice(-tail.length) === tail) { t = t.slice(0, -tail.length); }
 		}
 		if (t === '' || t === '""') { t = pc.lpn_settings_held_none || 'no text'; }
-		return { value: t, source: stated ? (pc.lpn_settings_held_from || 'the value in {parent}').split('{parent}').join(scenarioDisplayName(par)) : (pc.lpn_settings_held_default || 'the default') };
+		return { value: t, parent: stated ? scenarioDisplayName(par) : null };
 	}
+	// "Show: clear restores No, ...": the sentence follows its setting's name mid-line.
+	function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
 	function setboxHeldList(el, paths, held, scn, rows) {
 		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
 		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
-		if (all.length < 2 || !el.parentNode) { return; }
+		if (!all.length || !el.parentNode) { return; }
+		// A row that edits one setting: its dot is that one, so the line is the sentence alone.
+		if (all.length < 2) {
+			line = document.createElement('p');
+			line.className = 'lpn-set-heldlist';
+			line.setAttribute('data-lpn-noseam', '1');
+			held.forEach(function (r) {
+				var v = setboxHeldRestores(r, par), text = document.createElement('span');
+				text.textContent = clearRestoresText(v.value, v.parent);
+				line.appendChild(text);
+			});
+			el.parentNode.insertBefore(line, el.nextSibling);
+			return;
+		}
 		// Not a div and not a span: the Labels lists style every div child by position and hide a
 		// row's first span, which hid the first item and squeezed the rest.
 		line = document.createElement('p');
@@ -63882,8 +63897,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
 			var item = document.createElement('span'), text = document.createElement('span'), v = setboxHeldRestores(r, par);
 			item.className = 'lpn-set-helditem';
-			text.textContent = (pc.lpn_settings_held_item || '{setting}: clear restores {value}, {source}.')
-				.split('{setting}').join(setboxHeldItemName(r.path)).split('{value}').join(v.value).split('{source}').join(v.source);
+			text.textContent = (pc.lpn_settings_held_item || '{setting}: {restores}')
+				.split('{setting}').join(setboxHeldItemName(r.path)).split('{restores}').join(lowerFirst(clearRestoresText(v.value, v.parent)));
 			item.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
 				setboxPinRow(el);
 				clearHeldSetboxRows([r], scn);
@@ -70009,10 +70024,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// one confusing case the delta model leaves, needing no change-tracking bookkeeping.
 	function formatPropValue(v) {
 		if (v === undefined || v === null || v === '') { return ''; }
-		// A boolean reads as a MARK, not as a word: "Base: ✓" beside a checkbox is exactly the box's
-		// own vocabulary, it is language-free and RTL-safe (the same reason the suite's verdict
-		// strings lead with a glyph), and it costs no key in 27 languages to say Yes and No.
-		if (typeof v === 'boolean') { return v ? '✓' : '—'; }
+		// A boolean reads in words, Yes and No, as the Settings table does (Tom, 2026-10-24: a check
+		// mark under "Is active" told him nothing about what Clear restores).
+		if (typeof v === 'boolean') { return v ? settingTableYes() : settingTableNo(); }
 		return (typeof v === 'number') ? String(+v.toFixed(6)) : String(v);
 	}
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
@@ -70087,18 +70101,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE LINE BESIDE AN OVERRIDE SAYS WHAT CLEAR OVERRIDE WOULD RESTORE, AND FROM WHERE** (Tom,
 	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
 	// The category of the marker whose line is being written, for Base (ovmGutter()).
-	var inheritedLineCat = null;
+	var inheritedLineCat = null, inheritedLineUnit = '';
+	// **ONE SENTENCE FOR WHAT CLEAR RESTORES, EVERYWHERE** (Tom, 2026-10-24: *"Clear restores Yes, the
+	// value in Base."*): Properties' note line, a Settings row's held list and a single Settings row
+	// all say it through here. `value` is in words (Yes, No), with its unit; `parentName` is the
+	// scenario it comes from, or null for the default.
+	function clearRestoresText(value, parentName) {
+		var pc = EngCalcs.pageConfig || {}, source = parentName === null
+			? (pc.lpn_settings_held_default || 'the default')
+			: (pc.lpn_settings_held_from || 'the value in {parent}').split('{parent}').join(parentName);
+		if (value === '') { value = pc.lpn_settings_held_none || 'no text'; }
+		return (pc.lpn_ovm_restores || 'Clear restores {value}, {source}.').split('{value}').join(value).split('{source}').join(source);
+	}
 	function inheritedLine(fn) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), par = parentScenarioOf(scn), v;
+		var scn = activeScenario(), par = parentScenarioOf(scn), v;
 		// Base naming an alternative: what Clear restores is that alternative's parent's value, so the
 		// line reads Base with the alternative's parent named in its place, for that moment.
 		if (scn.isBase && inheritedLineCat !== null && basePick(scn, inheritedLineCat) !== undefined) {
 			v = withBasePick(scn, inheritedLineCat, (writeTargetFor(scn, inheritedLineCat).obj || {}).parent, fn);
-			return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v);
+			par = baseScenario();
+		} else {
+			v = paneInScenario(par, fn);
+			if (!par) { par = baseScenario(); }
 		}
-		v = paneInScenario(par, fn);
-		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
-		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
+		if (inheritedLineUnit && /^-?[\d.]+( \+ -?[\d.]+)*$/.test(v)) { v += ' ' + inheritedLineUnit; }
+		return clearRestoresText(v, scenarioDisplayName(par));
 	}
 	// ---- THE OVERRIDE MARKER: A DOT AND A DOWN TRIANGLE (Task 790) ----
 	//
@@ -70277,7 +70304,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		base = document.createElement('span');
 		base.className = 'lpn-ov-base';
 		inheritedLineCat = o.cats[0];
-		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
+		// The unit the row's own label states, "Length (ft)": a number's note keeps it.
+		inheritedLineUnit = ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || '';
+		try { base.textContent = o.line(); } finally { inheritedLineCat = null; inheritedLineUnit = ''; }
 		note.appendChild(base);
 		shared = ovmStoredText(o.cats);
 		if (shared) {

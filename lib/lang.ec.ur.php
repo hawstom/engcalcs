@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='منظرنامہ {name} حذف ن�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='بنیادی منظرنامہ: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}، {scenario} میں نیٹ ورک سے باہر ہے۔ یہ اب بھی ڈرائنگ میں، اور آپ کے دیگر منظرناموں میں موجود ہے۔';
 $ec_lang['lpn_scenario_delete_in_base']='اسے ڈرائنگ سے ہٹانے کے لیے {base} منظرنامے میں حذف کریں۔';
 $ec_lang['lpn_scenario_only_deleted']='{id} حذف ہو گیا۔ یہ صرف {scenario} کا حصہ تھا۔';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='نئے اثاثے: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ڈیفالٹ)';
 $ec_lang['lpn_settings_row_view_value']='مرکز {x}، {y}؛ اسکیل {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} میں اپنی قدر۔';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='نقشے کا مرکز';
 $ec_lang['lpn_settings_view_scale']='نقشے کا اسکیل';
 $ec_lang['lpn_settings_view_scale_tip']='نقشے کے مرکز پر اسکیل، 1:N کے طور پر۔ اس اسکیل پر زوم کرنے کے لیے 1:2000 لکھیں، یا صرف 2000۔';

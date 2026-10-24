@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарио {name} не мо�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Основни сценарио: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.';
 $ec_lang['lpn_scenario_delete_in_base']='Да бисте га уклонили са цртежа, обришите га у сценарију {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} је обрисан. Био је део само сценарија {scenario}.';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='Нови елементи: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (подразумевано)';
 $ec_lang['lpn_settings_row_view_value']='Центар {x}, {y}; размера {s}';
 $ec_lang['lpn_settings_held_in']='Сопствена вредност у {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Центар мапе';
 $ec_lang['lpn_settings_view_scale']='Размера мапе';
 $ec_lang['lpn_settings_view_scale_tip']='Размера у центру мапе, као 1:N. Упишите 1:2000, или само 2000, да зумирате на ту размеру.';

@@ -3309,7 +3309,6 @@ $ec_lang['lpn_scenario_delete_has_children']='O cenário {name} não pode ser ex
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Cenário base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluído da rede em {scenario}. Permanece no desenho e nos outros cenários.';
 $ec_lang['lpn_scenario_delete_in_base']='Para removê-lo do desenho, exclua-o no cenário {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} foi excluído. Fazia parte somente de {scenario}.';
@@ -3444,7 +3443,6 @@ $ec_lang['lpn_settings_row_new_asset']='Novos elementos: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (predefinido)';
 $ec_lang['lpn_settings_row_view_value']='Centro {x}, {y}; escala {s}';
 $ec_lang['lpn_settings_held_in']='Valor individual em {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centro do mapa';
 $ec_lang['lpn_settings_view_scale']='Escala do mapa';
 $ec_lang['lpn_settings_view_scale_tip']='A escala no centro do mapa, no formato 1:N. Digite 1:2000, ou apenas 2000, para dar zoom nessa escala.';

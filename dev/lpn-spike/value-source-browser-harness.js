@@ -132,7 +132,7 @@ async function main() {
 		await open('fire', 1400, 900, null, true);
 		await openNode('10');
 		let notes = await noteTexts();
-		ok('V6 Fire, no stored alternative: one note line, "Peak: 701", and no alternative sentence', notes.length === 1 && notes[0] === 'Peak: 701' && !/alternative/.test(notes[0]), JSON.stringify(notes));
+		ok('V6 Fire, no stored alternative: one note line, "Clear restores 701 ft H2O, the value in Peak.", and no alternative sentence', notes.length === 1 && /^Clear restores 701 [^,]+, the value in Peak\.$/.test(notes[0]) && !/alternative/.test(notes[0]), JSON.stringify(notes));
 		const altOf = (d) => { d.alternatives = [{ id: 'pa', category: 'physical', name: 'Peak elev', parent: null, values: { 'n:10': { elev: 701 } } }]; };
 		await open('peak', 1400, 900, (d) => { altOf(d); const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; }, true);
 		await openNode('10');
