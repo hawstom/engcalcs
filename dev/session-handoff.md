@@ -95,15 +95,18 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-23 afternoon (thirty-seventh session)
+## STATE — 2026-10-24 (thirty-eighth session)
 
-- **Interview "Pump and Valve Assemblies"** (16 calls: assemblies, expert levels, WaterGEMS naming and licence): https://claude.ai/artifact/9fmKVp5sBuRjwuQvnn72R8 . Read his answers with ArtifactData list, collection `answers`; write rules from his free text, never the option label. Seats' answers: `dev/agents/*/assemblies-2026-10-23.md`; Mary's licence review: `dev/agents/market-researcher/wtg-legal.md`.
-- **Three branches green and waiting on his browser pass** (each suite's only failure is the expected `payload freshness`): `feat/value-source` (8105, 23aa4ccf1: his item 3, the line under the row restored with his alternative sentences, pane scroll held, short dot tip, Settings overrides listed one by one; Perry passed it after the Labels-list fix); `feat/import-new-scenario` (8101, Task 814, 8a8d8178a: a new scenario as an import destination, the survey question; Perry passed it, his five points fixed); `feat/theme-whimsy` (8102, Task 811, 5cc3fc78a: the darkest ramp class outlined on dark papers; Newspaper and Arcade were already on master, so Task 811's design themes are done apart from this). Merge each on his word only.
-- **`feat/wtg-export`**: real tank-level controls in an assigned control set (8edd6369b). **The push was refused by the classifier**; push it. Tom's round 3: `~/tom-files/2026-10-23/wtg-export-3/`.
-- Tasks 733 slice 7, 737 sprint, 681 wait on his word. 812 not touched this session.
-- **Trap met:** a Settings Labels list built as `div > span` was hidden by that box's positional CSS (`> div > span:first-child { display:none }`); the harness checked text only and passed. Perry caught it. A harness for anything drawn checks visibility and width, not text.
-- **Trap met:** a usage limit killed three agents mid-task; their detached suites survived and their commits held. Resume from `git log` and the logs, not by relaunching.
-- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/aaf154be-77c7-4d38-b977-59110ebc67e4/scratchpad
+- **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
+- **His interview answers are in `dev/assemblies.md`** (Task 822, still negotiating; his questions are answered in messenger.md). Expert levels: *"Day 1 must be pure joy and fun"*; he wants a coach-marks mockup. WaterGEMS menu name: "Export > .wtg.sqlite file…". **Nag him to write to Bentley** before any public release of the export (his ask).
+- **Waiting on his browser pass:** `feat/value-source` (8105, ffa674794: same-name alternative now silent; Settings item reads "Show: clear restores No, the value in Base."; green but payload freshness); `feat/scenario-io` (8101, f9413e8fb, Task 814: scenario in Tables-export, print and screenshot names, DEM and shapes notices say where they write; Perry passed; four questions for him in messenger.md).
+- **`feat/wtg-page-export`** (no port yet): File > Export > .wtg.sqlite file from the page, built on `feat/wtg-export`; never merges before his word and his letter to Bentley. Its suite was unfinished at /clear: read `git log` in its worktree and the log `feat-wtg-page-export-full*.log` in this session's scratch.
+- Task 812 Step 2 (`fix/label-last-pad`) measured and rejected; what is left is design work, not a port.
+- Tasks 733 slice 7, 737 sprint, 681 wait on his word.
+- **Trap met:** a harness DOM stub lacks `hasAttribute`; page code using it threw in 150 harnesses. Use `getAttribute`.
+- **Trap met:** a Settings list built as `div > span` was hidden by the box's positional CSS; a harness for anything drawn checks visibility and width.
+- **Trap met:** a usage limit kills every agent; detached suites and commits survive. Resume with SendMessage, not a new agent.
+- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1a7bdf36-0009-45e7-8601-e5252dbb9d6a/scratchpad
 
 ## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
 
@@ -116,7 +119,6 @@ lines rather than appending corrections.
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/value-source` (8105): his item 4 built as he wrote it: the filled dot's tip says what Clear restores and from where, plus (Basic mode off) the alternative and who shares it; the note line under a row is gone. Perry passed it. Two guide strings rewritten (their 26 translations now stale). Merge on his word.
 - `feat/wtg-export` (no port; a spike, dev scripts only): see above.
 - `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
 - `feat/desktop`, `fix/bottom-pane-lag`: untouched.

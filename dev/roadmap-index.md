@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 6 · Soon (75): 11 · Someday (50): 28 · Maybe (25): 16 · Parked (5): 20
+**84 open tasks.** Next (100): 6 · Soon (75): 13 · Someday (50): 28 · Maybe (25): 17 · Parked (5): 20
 
 ## 100 — Next (6)
 
@@ -18,7 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (11)
+## 75 — Soon (13)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -31,6 +31,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 818 — An MCP server, so an AI agent can run a network.
 - Task 820 — Map labels mix scenarios with Recalculate off.
+- Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
+- Task 823 — Starter examples a new user can build from.
 
 ## 50 — Someday (28)
 
@@ -63,7 +65,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 817 — Sketch a network that arrives without coordinates.
 
-## 25 — Maybe (16)
+## 25 — Maybe (17)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
@@ -81,6 +83,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 729 — Type a node's location in State Plane or UTM.
 - ! Task 731 — At whole-world zoom the map drags past the 180th meridian and a continent-sized model tears across it.
 - Task 778 — Read pipe size and material from survey field codes.
+- Task 824 — Randomly vary a new browser's theme and expert level, and log engagement.
 
 ## 5 — Parked (20)
 
@@ -109,5 +112,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-73 of 81 titles are within 4–12 words. `!` marks the rest;
+76 of 84 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
