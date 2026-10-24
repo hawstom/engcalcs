@@ -12644,6 +12644,71 @@ var EngCalcs = EngCalcs || {};
 		if (i > cols.length - 1) { i = cols.length - 1; }
 		return cols[i];
 	}
+	// **THE CASING: A RAMP CLASS THE PAPER SWALLOWS GETS A THIN OUTLINE** (Task 811; dev/themes-plan.md). A ramp's
+	// darkest class (viridis purple) nearly vanishes on a dark paper. The class keeps its colour, so a visitor's
+	// colouring is unchanged on every light paper, and a dark-paper theme states `--ec-map-casing` (the paper's
+	// opposite tone); a class under 3:1 against the paper then takes `.lpn-ramp-cased` (css/engcalcs.css), on the
+	// map's links, nodes and symbols and on the legend swatch. A theme with no casing (every light paper) marks
+	// nothing, so Light draws exactly what it always drew.
+	var casingMemo = null;
+	function casingRead() {
+		if (casingMemo) { return casingMemo; }
+		casingMemo = { on: false, paper: null };
+		if (svg && typeof getComputedStyle === 'function') {
+			var cs = getComputedStyle(svg), c = (cs.getPropertyValue('--ec-map-casing') || '').trim();
+			if (c && c !== 'none' && c !== 'transparent') { casingMemo = { on: true, paper: rgbOf(cs.getPropertyValue('--ec-map-paper')) }; }
+		}
+		return casingMemo;
+	}
+	function rgbOf(c) {
+		var m, t = String(c || '').trim();
+		if ((m = /^#([0-9a-f]{3})$/i.exec(t))) { return [parseInt(m[1][0] + m[1][0], 16), parseInt(m[1][1] + m[1][1], 16), parseInt(m[1][2] + m[1][2], 16)]; }
+		if ((m = /^#([0-9a-f]{6})$/i.exec(t))) { return [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)]; }
+		if ((m = /rgba?\(([^)]+)\)/.exec(t))) { return m[1].split(/[\s,\/]+/).filter(Boolean).slice(0, 3).map(parseFloat); }
+		return null;
+	}
+	function lumOf(q) {
+		var f = q.map(function (x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
+		return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2];
+	}
+	function rampNeedsCasing(col) {
+		var k = casingRead(), q = col ? rgbOf(col) : null, a, b;
+		if (!k.on || !k.paper || !q) { return false; }
+		a = lumOf(q); b = lumOf(k.paper);
+		return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) < 3;
+	}
+	// Three drawings, three casings (css/engcalcs.css): a link's own halo line (already under every pipe, in step
+	// with its geometry) takes the casing as its stroke; a junction's ring and a legend swatch's border take it as
+	// a colour; a tank, pump or valve symbol, few and drawn as one picture, takes a drop shadow. A filter is
+	// never put on a pipe or a junction: hundreds of them stalled the paint of a large network.
+	function casingMark(el, col, cls) {
+		if (el && el.classList) { el.classList.toggle(cls || 'lpn-ramp-cased', rampNeedsCasing(col)); }
+	}
+	// A theme change re-reads each drawn colour against the new paper. Marks only: no colour is recomputed, and
+	// no contour or label pass runs (refreshValueColors() would, on every sweep across the gallery).
+	function recaseAll() {
+		if (!svg || !doc || !(colorFieldOf('node') || colorFieldOf('link'))) { return; }
+		var legend = document.getElementById('lpn_color_legend');
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], t = ne && (isFixedHeadNode(n) ? ne.symbol : ne.circle);
+			if (t) { casingMark(t, t.style.color, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased'); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || !le.line) { return; }
+			casingMark(le.halo, le.line.style.stroke);
+			if (le.symbolSvg) { casingMark(le.symbolSvg, le.symbolSvg.style.color, 'lpn-ramp-cased-sym'); }
+		});
+		if (legend) {
+			Array.prototype.forEach.call(legend.querySelectorAll('.lpn-color-swatch'), function (sw) { casingMark(sw, sw.style.background); });
+		}
+	}
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('ec-theme', function () {
+			casingMemo = null;
+			recaseAll();
+		});
+	}
 	// **A VALUE THAT DOES NOT EXIST IS null, NOT CLASS 0.** classIndex() answers null for it and
 	// this returns the empty string, so the element keeps NO inline style at all and the
 	// stylesheet's black stands -- exactly how an uncoloured map is drawn. A pump has no velocity,
@@ -12684,6 +12749,7 @@ var EngCalcs = EngCalcs || {};
 		var target = isFixedHeadNode(n) ? ne.symbol : ne.circle;
 		if (target) {
 			target.style.color = col;
+			casingMark(target, col, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased');
 			if (col) { target.style.setProperty('--lpn-shade', '100%'); }
 			else { target.style.removeProperty('--lpn-shade'); }
 		}
@@ -12695,9 +12761,10 @@ var EngCalcs = EngCalcs || {};
 		if (breaks === undefined) { breaks = field ? effectiveBreaks('link', field) : []; }
 		var col = field ? colorForValue('link', colorLinkValue(l, field), breaks) : '';
 		le.line.style.stroke = col;
+		casingMark(le.halo, col);
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
-		if (le.symbolSvg) { le.symbolSvg.style.color = col; }
+		if (le.symbolSvg) { le.symbolSvg.style.color = col; casingMark(le.symbolSvg, col, 'lpn-ramp-cased-sym'); }
 		// **AND SO DO THE FLOW ARROWS** (Task 671, Tom 2026-09-15). Same argument as the symbol one
 		// line above, and the same argument Tom already made about the vertex dot (2026-09-02:
 		// *"Change vertex color too."*): a chevron sitting ON a pipe is part of that pipe's mark,
@@ -12824,6 +12891,7 @@ var EngCalcs = EngCalcs || {};
 					crow.style.cssText = 'display:flex;gap:0.5em;align-items:center';
 					csw.className = 'lpn-color-swatch';
 					csw.style.background = bandColor(group, ci === null ? 0 : ci, breaks.length + 1);
+					casingMark(csw, csw.style.background);
 					ctxt.textContent = pc[c.key] || c.text;
 					crow.appendChild(csw); crow.appendChild(ctxt);
 					box.appendChild(crow);
@@ -12835,6 +12903,7 @@ var EngCalcs = EngCalcs || {};
 				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';
 				sw.className = 'lpn-color-swatch';
 				sw.style.background = bandColor(group, i, breaks.length + 1);
+				casingMark(sw, sw.style.background);
 				// Range text is built from glyphs, not words: '<', '≤' and an en dash are the
 				// same marks in all 27 languages and need no key. (An RTL reader gets them mirrored
 				// by the bidi algorithm, which is the correct rendering.)
