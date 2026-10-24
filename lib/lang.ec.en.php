@@ -3098,9 +3098,9 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
-// crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
+// crowded row. 'lpn_labels_priority' is the tips' heading, "Drop order" (Tom, 2026-10-24: priority 1 reads as top priority here, and 1 is lowest) --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Priority';
+$ec_lang['lpn_labels_priority']='Drop order';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link

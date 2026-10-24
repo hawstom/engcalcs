@@ -60292,7 +60292,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					pc.lpn_labels_col_decimals || 'Decimals', 'center'],
 				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
-					(pc.lpn_labels_priority || 'Priority') + ' — ' + (labelDropTip(group) || ''), 'center']
+					(pc.lpn_labels_priority || 'Drop order') + ': ' + (labelDropTip(group) || ''), 'center']
 			].forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
