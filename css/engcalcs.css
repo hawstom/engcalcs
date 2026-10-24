@@ -3546,7 +3546,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	pointer-events: auto;
 	max-width: 68rem;
 	margin: 0 auto;
-	padding: 1rem 1rem 1.5rem;
+	/* Clear of the Mode line row over the map's top-left (--lpn-overlay-h, set by keepExamplesBelowOverlay()). */
+	padding: calc(var(--lpn-overlay-h, 0px) + 12px) 1rem 1.5rem;
 	text-align: center;
 }
 /* The welcome line above the gallery heading (Task 222). Quieter than the heading it sits over:

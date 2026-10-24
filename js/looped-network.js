@@ -40617,6 +40617,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// until that one has either landed or failed, and the gallery closes on the FIRST activation
 	// (below) rather than waiting for the import to finish, which is the delay itself.
 	var exampleOpenInFlight = false;
+	// **THE GALLERY STARTS BELOW THE TOP-LEFT OVERLAY ROW** (Tom, 2026-10-24: "Welcome to water supply
+	// network modelling" overlapped the Mode line). The row is absolutely positioned over the map and
+	// the Mode line wraps to one, two or three lines with the window, so the gallery's top padding
+	// follows the row's measured height through --lpn-overlay-h, which css/engcalcs.css reads.
+	function keepExamplesBelowOverlay() {
+		var row = document.getElementById('lpn_map_overlay_tl'), hint = document.getElementById('lpn_empty_hint');
+		if (!row || !hint) { return; }
+		function sync() { hint.style.setProperty('--lpn-overlay-h', row.offsetHeight + 'px'); }
+		sync();
+		if (typeof ResizeObserver === 'function') { new ResizeObserver(sync).observe(row); }
+		else { window.addEventListener('resize', sync); }
+	}
 	function examplesPane() { return document.getElementById('lpn_examples_pane'); }
 	// Cards are built from the manifest, which is FETCHED -- so this cannot be rendered by PHP, and
 	// a PHP copy of the list would be a second index to keep in step with the generated one.
@@ -56325,6 +56337,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		applyCleanMap();   // Task 805: a clean map stays clean across a reload (lpn_cleanmap)
+		keepExamplesBelowOverlay();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
