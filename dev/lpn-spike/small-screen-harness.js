@@ -750,24 +750,21 @@ const TOUCH = true;
 			winning(RULES, h, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, h, WIDE, DOC_IDS, false, 'width') &&
 			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, b, WIDE, DOC_IDS, false, 'width'));
 	});
-	// The two numeric boxes give up their spinner on touch, and only there.
+	// The numeric boxes draw no spinner at all now (Tom, 2026-10-23); the digit boxes are still found by class.
 	// EVERY spinner in the list, not the first row's -- a node's ID row has neither, so a check
 	// written against one row would have asserted nothing on half the lists.
 	const spin = [];
-	rows.forEach((r) => r.children.forEach((c) => { if (c.cls.indexOf('ec-spin') >= 0) { spin.push(c); } }));
+	rows.forEach((r) => r.children.forEach((c) => { if (c.cls.indexOf('lpn-digit') >= 0) { spin.push(c); } }));
 	ok(group + ' has spinner boxes on its field rows', spin.length > 0, spin.length + ' found');
 	spin.forEach((b) => {
-		ok('...the spinner goes on a touch screen below the breakpoint',
-			winning(RULES, b, SMALL, DOC_IDS, TOUCH, 'appearance') === 'textfield');
-		ok('...and stays for a pointer at the same width',
-			winning(RULES, b, SMALL, DOC_IDS, false, 'appearance') === null);
-		ok('...and stays on a touch screen above it',
-			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'appearance') === null);
+		ok('...no stylesheet rule restores a spinner (appearance is never auto)',
+			[[SMALL, TOUCH], [SMALL, false], [WIDE, TOUCH], [WIDE, false]]
+				.every((c) => winning(RULES, b, c[0], DOC_IDS, c[1], 'appearance') !== 'auto'));
 	});
 	// And the list's own floor comes down, or the box still refuses to narrow.
 	ok(group + ' list floor is 11.4rem on a small screen',
 		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '11.4rem');
-	ok('...11.4rem when the spinners have gone too',
+	ok('...11.4rem on a touch screen too',
 		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '11.4rem');
 	ok('...and 15.3rem on the desktop, whatever the pointer',
 		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '15.3rem' &&

@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**18 still to read**, of 61 new keys across 8 unmerged branch(es).
+**49 still to read**, of 92 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -635,11 +635,23 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1023 (`c79eb40fa`) — adds no English strings
+### chore/handoff-1023b (`17f419334`) — already merged into chore/merge-1024; its strings are listed there
+
+### chore/merge-1024 (`2dcd62d93`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/import-new-scenario (`8a8d8178a`) — already merged into chore/merge-1023; its strings are listed there
+### feat/scenario-io (`f9413e8fb`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_dem_base`**
+  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
+  @@ NEEDS RULING
+- **`lpn_dem_scenario`**
+  > Elevations written here are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_shapes_every_scenario`**
+  > Shapes appear in every scenario.
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -803,9 +815,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-whimsy (`5cc3fc78a`) — already merged into chore/merge-1023; its strings are listed there
-
-### feat/value-source (`23aa4ccf1`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/value-source (`ffa674794`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -832,6 +842,95 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/wtg-export (`8edd6369b`) — adds no English strings
+### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
+
+### feat/wtg-page-export (`d5ab971ba`) — 28 new, 28 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_wtg`**
+  > .wtg.sqlite file…
+  @@ NEEDS RULING
+- **`lpn_file_export_wtg_tip`**
+  > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, written into a project you saved yourself from the program that opens .wtg files.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_choose`**
+  > Choose the saved project…
+  @@ NEEDS RULING
+- **`lpn_wtg_export_exported`**
+  > Exported {zip}, holding {wtg} and {sqlite}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_extract`**
+  > Extract both files into one folder, then open the .wtg.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_failed`**
+  > The .wtg project was not written: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_left_out`**
+  > Left out: {items}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_controls_pressure`**
+  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_emitters`**
+  > Emitter coefficients: {ids}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_energy_price`**
+  > Energy price, price pattern, and demand charge.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_extra_demands`**
+  > Second and later demands on a junction: {ids}. Only the first demand is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_lead`**
+  > The file cannot carry the following, so they are left out:
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_material`**
+  > Pipe material and installation year. Every pipe keeps the saved project's default material.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_positions`**
+  > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_pump_efficiency_curve`**
+  > Pump efficiency curve (pumps {ids}). A constant efficiency is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_pump_speed_pattern`**
+  > Pump speed pattern (pumps {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_quality`**
+  > Water quality: the analysis, reactions, sources, and tank mixing.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_rules`**
+  > Rule-based controls.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_minvol`**
+  > Tank minimum volume (tanks {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_mixing`**
+  > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_need`**
+  > The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_need_both`**
+  > Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_empty`**
+  > This project has no nodes, so there is nothing to export.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_headloss`**
+  > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_pump_curve`**
+  > This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_units`**
+  > This network cannot be written: its flow unit is {unit}, and only gpm is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_refused`**
+  > This project cannot be written as a .wtg project: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_working`**
+  > Writing the .wtg project…
+  @@ NEEDS RULING
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+
+### fix/settings-spinners (`5c93c7ca0`) — already merged into chore/merge-1024; its strings are listed there
