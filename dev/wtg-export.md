@@ -213,11 +213,20 @@ mostly data entry rather than discovery.
 
 1. Tom's test of the files, and the Save As diff. Fix whatever it shows. (Days, if it opens; if it
    does not, the error text decides whether the route survives.)
-2. Move the writer into a DOM-free `js/` module that reads the page's document, not an `.inp` (units
-   from the document, SI and US, every storage unit code in the schema blob checked rather than assumed), and
-   put a File > Export entry behind it that takes the user's blank project as the template, reads
-   `HMICoreSchemaVersion`, and refuses a version not on a tested list. The sql.js engine is already vendored on
-   `feat/sqlite-reader`.
+2. **Built on `feat/wtg-page-export` (2026-10-23, not merged until Tom says).** The writer is `js/lpn-wtg-export.js`
+   (DOM-free; `dev/lpn-spike/wtg-export.js` is now only the command line). File > Export > Network >
+   `.wtg.sqlite file…` (key `lpn_file_export_item_wtg`; no program named, Tom's call) asks a box BEFORE writing: the
+   scenario, the instruction to choose a project the visitor saved, and what the files cannot carry by asset ID.
+   The visitor then chooses the saved project's `.wtg` and `.wtg.sqlite` together; one `.zip` of the pair
+   downloads. The document is read through `lpnExportInp` and `lpnInpParse` (the .inp is built in memory and
+   never offered), so the open scenario's resolved values and the flattening are the .inp export's own. The schema
+   version is read from the user's file and refused unless on `TESTED_SCHEMAS` (1.0.54.0). SQLite is sql.js 1.14.2
+   (MIT, 46 KB script + 658 KB wasm), fetched from this site only when the command is used. Harnesses:
+   `wtg-page-export-harness.js` (page route against the spike's known-good database, table by table) and
+   `wtg-page-export-browser-harness.js`. **Refused by name:** a flow unit other than gpm, a head loss formula other
+   than Hazen-Williams, a pump without a three-point head curve (asks 2 and 3 stay open). **The saved project must
+   already hold one of every element kind the network uses** (the writer clones prototypes), so a brand-new empty
+   project does not work; the box says so, and a missing kind is refused by name.
 3. Samples for each unseen code, saved by Tom once: time-from-start and pressure conditions; pump
    status, speed and target-head actions; each valve kind with a setting; a pump with a multipoint curve and one
    with constant power; a tank with a volume curve; a reservoir with a head pattern. The template already holds
