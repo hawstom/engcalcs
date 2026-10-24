@@ -44008,7 +44008,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}, r = e && e.reason, v = (e && e.vals) || {};
 		if (r === 'need_both') { return wtgFill('lpn_wtg_export_need_both', 'Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).', {}); }
 		if (r === 'units' || r === 'headloss' || r === 'pump_curve') { return wtgRefusalText({ code: r, detail: v.unit || v.method, ids: e.ids }); }
-		if (r && fb[r]) { return wtgFill('lpn_wtg_export_t_' + r, fb[r], v); }
+		if (r && fb[r]) {
+			// Each token spelled out, once and globally (the placeholder check reads these spellings).
+			return String((EngCalcs.pageConfig || {})['lpn_wtg_export_t_' + r] || fb[r]).split('{found}').join(v.found || '').split('{tested}').join(v.tested || '')
+				.split('{kind}').join(v.kind || '').split('{id}').join(v.id || '');
+		}
 		return (e && e.message) ? e.message : String(e);
 	}
 	function exportWtgFile() {
