@@ -85,6 +85,11 @@
      "parent": "Export…"
     },
     {
+     "id": "file/file_export_menu/file_export_item_wtg",
+     "label": ".wtg.sqlite file…",
+     "parent": "Export…"
+    },
+    {
      "id": "file/file_export_menu/file_export_item_ods",
      "label": "ODS file…",
      "parent": "Export…"

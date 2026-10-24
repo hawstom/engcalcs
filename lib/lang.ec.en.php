@@ -2298,6 +2298,36 @@ $ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules refe
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
+// Task 749: File > Export > Network > .wtg.sqlite file. The pair of files that programs opening .wtg projects use.
+// The menu names no program (Tom, 2026-10-23); {ids} is a list of asset IDs as the project spells them.
+$ec_lang['lpn_file_export_item_wtg']='.wtg.sqlite file…';
+$ec_lang['lpn_file_export_wtg_tip']='Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, written into a project you saved yourself from the program that opens .wtg files.';
+$ec_lang['lpn_wtg_export_choose']='Choose the saved project…';
+$ec_lang['lpn_wtg_export_need']='The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.';
+$ec_lang['lpn_wtg_export_lost_lead']='The file cannot carry the following, so they are left out:';
+$ec_lang['lpn_wtg_export_lost_emitters']='Emitter coefficients: {ids}.';
+$ec_lang['lpn_wtg_export_lost_extra_demands']='Second and later demands on a junction: {ids}. Only the first demand is written.';
+$ec_lang['lpn_wtg_export_lost_quality']='Water quality: the analysis, reactions, sources, and tank mixing.';
+$ec_lang['lpn_wtg_export_lost_energy_price']='Energy price, price pattern, and demand charge.';
+$ec_lang['lpn_wtg_export_lost_rules']='Rule-based controls.';
+$ec_lang['lpn_wtg_export_lost_controls_pressure']='Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.';
+$ec_lang['lpn_wtg_export_lost_tank_mixing']='Tank mixing model (tanks {ids}). Tanks are written fully mixed.';
+$ec_lang['lpn_wtg_export_lost_tank_minvol']='Tank minimum volume (tanks {ids}).';
+$ec_lang['lpn_wtg_export_lost_pump_speed_pattern']='Pump speed pattern (pumps {ids}).';
+$ec_lang['lpn_wtg_export_lost_pump_efficiency_curve']='Pump efficiency curve (pumps {ids}). A constant efficiency is written.';
+$ec_lang['lpn_wtg_export_lost_material']='Pipe material and installation year. Every pipe keeps the saved project\'s default material.';
+$ec_lang['lpn_wtg_export_lost_positions']='True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.';
+$ec_lang['lpn_wtg_export_no_empty']='This project has no nodes, so there is nothing to export.';
+$ec_lang['lpn_wtg_export_no_units']='This network cannot be written: its flow unit is {unit}, and only gpm is written.';
+$ec_lang['lpn_wtg_export_no_headloss']='This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.';
+$ec_lang['lpn_wtg_export_no_pump_curve']='This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.';
+$ec_lang['lpn_wtg_export_refused']='This project cannot be written as a .wtg project: {detail}';
+$ec_lang['lpn_wtg_export_need_both']='Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).';
+$ec_lang['lpn_wtg_export_working']='Writing the .wtg project…';
+$ec_lang['lpn_wtg_export_failed']='The .wtg project was not written: {detail}';
+$ec_lang['lpn_wtg_export_exported']='Exported {zip}, holding {wtg} and {sqlite}.';
+$ec_lang['lpn_wtg_export_extract']='Extract both files into one folder, then open the .wtg.';
+$ec_lang['lpn_wtg_export_left_out']='Left out: {items}';
 // Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
 $ec_lang['lpn_file_export_item_dxf']='DXF file…';
 $ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.';

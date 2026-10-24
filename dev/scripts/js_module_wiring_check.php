@@ -94,6 +94,10 @@ const EC_HARNESS_LAZY_MODULES = [
     'lpn-dxf.js' => 'writing a DXF file of the model. Pure text, no DOM and no request; the editor calls it '
                   . 'when File > Export DXF file is chosen, not during boot, and '
                   . 'dev/lpn-spike/dxf-export-harness.js loads it.',
+    'lpn-wtg-export.js' => 'writing a .wtg project of the model (Task 749). No DOM; it fetches sql.js and its '
+                         . '658 KB wasm on first use, so booting it in the shared stub would buy nothing. The editor '
+                         . 'calls it when File > Export > .wtg.sqlite file is chosen, and '
+                         . 'dev/lpn-spike/wtg-page-export-harness.js loads it.',
     'lpn-crs.js' => 'the projected-coordinate transform. It fetches js/vendor/proj4.js and 62 KB '
                   . 'of definitions on first use, so booting it in the shared stub would make '
                   . 'every harness pay for a library almost none of them touch; the projection '

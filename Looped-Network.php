@@ -222,6 +222,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,.msx,text/plain" multiple style="display:none">
 	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
+	<?php // File > Export > .wtg.sqlite file (Task 749). The saved project the export is written into: its
+	      // .wtg and its .wtg.sqlite, chosen together. Its own input, as every picker here is. ?>
+	<input type="file" id="lpn_wtg_template_file" accept=".wtg,.sqlite" multiple style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
@@ -2314,6 +2317,34 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
 	lpn_file_export_item_dxf: <?=json_encode($ec_lang['lpn_file_export_item_dxf'])?>,
 	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
+	lpn_file_export_item_wtg: <?=json_encode($ec_lang['lpn_file_export_item_wtg'])?>,
+	lpn_file_export_wtg_tip: <?=json_encode($ec_lang['lpn_file_export_wtg_tip'])?>,
+	lpn_wtg_export_choose: <?=json_encode($ec_lang['lpn_wtg_export_choose'])?>,
+	lpn_wtg_export_need: <?=json_encode($ec_lang['lpn_wtg_export_need'])?>,
+	lpn_wtg_export_lost_lead: <?=json_encode($ec_lang['lpn_wtg_export_lost_lead'])?>,
+	lpn_wtg_export_lost_emitters: <?=json_encode($ec_lang['lpn_wtg_export_lost_emitters'])?>,
+	lpn_wtg_export_lost_extra_demands: <?=json_encode($ec_lang['lpn_wtg_export_lost_extra_demands'])?>,
+	lpn_wtg_export_lost_quality: <?=json_encode($ec_lang['lpn_wtg_export_lost_quality'])?>,
+	lpn_wtg_export_lost_energy_price: <?=json_encode($ec_lang['lpn_wtg_export_lost_energy_price'])?>,
+	lpn_wtg_export_lost_rules: <?=json_encode($ec_lang['lpn_wtg_export_lost_rules'])?>,
+	lpn_wtg_export_lost_controls_pressure: <?=json_encode($ec_lang['lpn_wtg_export_lost_controls_pressure'])?>,
+	lpn_wtg_export_lost_tank_mixing: <?=json_encode($ec_lang['lpn_wtg_export_lost_tank_mixing'])?>,
+	lpn_wtg_export_lost_tank_minvol: <?=json_encode($ec_lang['lpn_wtg_export_lost_tank_minvol'])?>,
+	lpn_wtg_export_lost_pump_speed_pattern: <?=json_encode($ec_lang['lpn_wtg_export_lost_pump_speed_pattern'])?>,
+	lpn_wtg_export_lost_pump_efficiency_curve: <?=json_encode($ec_lang['lpn_wtg_export_lost_pump_efficiency_curve'])?>,
+	lpn_wtg_export_lost_material: <?=json_encode($ec_lang['lpn_wtg_export_lost_material'])?>,
+	lpn_wtg_export_lost_positions: <?=json_encode($ec_lang['lpn_wtg_export_lost_positions'])?>,
+	lpn_wtg_export_no_empty: <?=json_encode($ec_lang['lpn_wtg_export_no_empty'])?>,
+	lpn_wtg_export_no_units: <?=json_encode($ec_lang['lpn_wtg_export_no_units'])?>,
+	lpn_wtg_export_no_headloss: <?=json_encode($ec_lang['lpn_wtg_export_no_headloss'])?>,
+	lpn_wtg_export_no_pump_curve: <?=json_encode($ec_lang['lpn_wtg_export_no_pump_curve'])?>,
+	lpn_wtg_export_refused: <?=json_encode($ec_lang['lpn_wtg_export_refused'])?>,
+	lpn_wtg_export_need_both: <?=json_encode($ec_lang['lpn_wtg_export_need_both'])?>,
+	lpn_wtg_export_working: <?=json_encode($ec_lang['lpn_wtg_export_working'])?>,
+	lpn_wtg_export_failed: <?=json_encode($ec_lang['lpn_wtg_export_failed'])?>,
+	lpn_wtg_export_exported: <?=json_encode($ec_lang['lpn_wtg_export_exported'])?>,
+	lpn_wtg_export_extract: <?=json_encode($ec_lang['lpn_wtg_export_extract'])?>,
+	lpn_wtg_export_left_out: <?=json_encode($ec_lang['lpn_wtg_export_left_out'])?>,
 	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
 	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
 	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
@@ -4768,6 +4799,9 @@ EngCalcs.pageConfig = {
 <?php // Writing a DXF file of the model (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
       // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
 <script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
+<?php // Writing a .wtg project of the model (ROADMAP Task 749). No DOM; the 658 KB SQLite engine it needs
+      // (js/vendor/sql-wasm.*) is fetched only when File > Export > .wtg.sqlite file is used. BEFORE looped-network.js. ?>
+<script src="/engcalcs/js/lpn-wtg-export.js?v=<?=filemtime(__DIR__.'/js/lpn-wtg-export.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

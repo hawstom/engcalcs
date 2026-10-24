@@ -181,6 +181,33 @@
           ]
         }
       ]
+    },
+    {
+      "name": "sql.js",
+      "version": "1.14.2",
+      "licence": "MIT",
+      "upstream": "https://www.npmjs.com/package/sql.js",
+      "notes": "SQLite compiled to WebAssembly. Copied from the npm tarball package-lock.json pins by sha512 (3ZGPovOb...). Vendored 2026-10-17 for Task 749: the read-only reader js/lpn-sqlite.js, the foundation for opening a Bentley .wtg.sqlite. Fetched from this site only when a database is opened; never precached (lib/ServiceWorker.lib.php). Record: dev/sqlite-reader.md.",
+      "files": [
+        {
+          "path": "js/vendor/sql-wasm.js",
+          "from": "dist/sql-wasm.js",
+          "digest": "7Zym2PlgXfg8ap8cqJUwlZrLl+VEwt0NVbzYfhH28IWLnSpAgQOnSCY2+EXo5MtM",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/sql-wasm.wasm",
+          "from": "dist/sql-wasm.wasm",
+          "digest": "x0YkuPkDHnKTZcB1JO4eb6j5+eU36aka+jBA6tOKTFaTz98b9V7fPT0QgZ9qyQW2",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/sql.js.LICENSE",
+          "from": "LICENSE",
+          "digest": "fAqxaCuuvOMGw+5ppM3KD5J96nhrYILOvzBIyvktepGPn5EAo3qy4zRqw6nfbgtj",
+          "modifications": []
+        }
+      ]
     }
   ]
 }

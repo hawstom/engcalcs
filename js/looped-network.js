@@ -43928,6 +43928,170 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		backdropExportPicture(finish);
 	}
 	/**
+	 * **EXPORT .wtg.sqlite (ROADMAP Task 749; Tom, 2026-10-23: the menu names no program, *"We don't
+	 * have to name WaterGEMS. We mostly mean WaterCAD anyway, and they are ambiguous. So .wtg
+	 * works."*).** The writer is js/lpn-wtg-export.js and the record is dev/wtg-export.md. It writes a
+	 * `.wtg` and a `.wtg.sqlite` INTO A PROJECT THE VISITOR SAVED THEMSELVES from the program that
+	 * opens them: that file supplies the database layout, so none of it is in this repository. A
+	 * format that holds one scenario (level 1 of dev/import-export-scenarios.md): the open scenario's
+	 * resolved values, read through the .inp writer's own flattening, and the box says which.
+	 *
+	 * **THE BOX IS ASKED BEFORE ANYTHING IS WRITTEN** and names, by asset ID, everything the files
+	 * cannot carry; a network the files cannot hold at all is refused by name in place of the box.
+	 * Its one action is choosing the saved project, so the file picker opens from the click that
+	 * asks for it (a browser allows no other way). Two files travel in ONE .zip, because Chrome lets a
+	 * click download one file (exportInpFile()). Exporting is not saving: no stampProjectSaved().
+	 */
+	function wtgExportPlan() {
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		return withLightMap(function () { return EngCalcs.lpnWtgExportPlan(inpExportDocument(), inpExportOptions()); });
+	}
+	function wtgIdList(ids) {
+		var shown = (ids || []).slice(0, 12).join(', ');
+		return (ids || []).length > 12 ? shown + ', …' : shown;
+	}
+	// A line's text from its language key; {ids} and {unit} filled once, by split and join, so an ID
+	// that spells another placeholder is never filled a second time.
+	function wtgFill(key, fallback, values) {
+		var pcX = EngCalcs.pageConfig || {}, s = String(pcX[key] || fallback), ks = Object.keys(values);
+		ks.forEach(function (k, i) { s = s.split('{' + k + '}').join('\u0001' + i + '\u0002'); });
+		ks.forEach(function (k, i) { s = s.split('\u0001' + i + '\u0002').join(values[k]); });
+		return s;
+	}
+	function wtgNotCarriedLines(items) {
+		var texts = {
+			emitters: 'Emitter coefficients: {ids}.',
+			extra_demands: 'Second and later demands on a junction: {ids}. Only the first demand is written.',
+			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
+			energy_price: 'Energy price, price pattern, and demand charge.',
+			rules: 'Rule-based controls.',
+			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',
+			tank_mixing: 'Tank mixing model (tanks {ids}). Tanks are written fully mixed.',
+			tank_minvol: 'Tank minimum volume (tanks {ids}).',
+			pump_speed_pattern: 'Pump speed pattern (pumps {ids}).',
+			pump_efficiency_curve: 'Pump efficiency curve (pumps {ids}). A constant efficiency is written.',
+			material: 'Pipe material and installation year. Every pipe keeps the saved project\'s default material.',
+			positions: 'True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.'
+		};
+		return (items || []).map(function (it) {
+			return wtgFill('lpn_wtg_export_lost_' + it.code, texts[it.code] || it.code, { ids: wtgIdList(it.ids) });
+		});
+	}
+	function wtgRefusalText(r) {
+		var fb = {
+			empty: 'This project has no nodes, so there is nothing to export.',
+			units: 'This network cannot be written: its flow unit is {unit}, and only gpm is written.',
+			headloss: 'This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.',
+			pump_curve: 'This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.'
+		};
+		return wtgFill('lpn_wtg_export_no_' + r.code, fb[r.code] || r.code, { unit: r.detail || '', method: r.detail || '', ids: wtgIdList(r.ids) });
+	}
+	function exportWtgFile() {
+		var pcX = EngCalcs.pageConfig || {}, planned = wtgExportPlan(), fmt, scnSentence;
+		fmt = String(pcX.lpn_file_export_item_wtg || '.wtg.sqlite file…').replace(/…$/, '');
+		if (!planned.ok) {
+			askDialog({ kind: 'alert', title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+				text: wtgFill('lpn_wtg_export_refused', 'This project cannot be written as a .wtg project: {detail}', { detail: planned.detail || planned.error || '?' }) });
+			return;
+		}
+		if (planned.refused.length) {
+			askDialog({ kind: 'alert', title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+				text: planned.refused.map(wtgRefusalText).join('\n') });
+			return;
+		}
+		scnSentence = exportScenarioSentence().replace(/^\s+/, '');
+		openDialog(function (body) {
+			function p(text) {
+				var e = document.createElement('p');
+				e.style.margin = '0 0 8px';
+				e.textContent = text;
+				body.appendChild(e);
+			}
+			var ul = document.createElement('ul');
+			if (scnSentence) { p(scnSentence); }
+			p(pcX.lpn_wtg_export_need || 'The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.');
+			p(pcX.lpn_wtg_export_lost_lead || 'The file cannot carry the following, so they are left out:');
+			ul.id = 'lpn_wtg_export_lost';
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			wtgNotCarriedLines(planned.notCarried).forEach(function (text) {
+				var li = document.createElement('li');
+				li.style.marginBottom = '4px';
+				li.textContent = text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [
+			{ label: pcX.lpn_wtg_export_choose || 'Choose the saved project…', isDefault: true, fn: pickWtgTemplate },
+			{ label: pcX.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt) });
+	}
+	function pickWtgTemplate() {
+		var input = document.getElementById('lpn_wtg_template_file');
+		if (input) { input.click(); }
+	}
+	function readFileBytes(f) {
+		if (f.arrayBuffer) { return f.arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+		return new Promise(function (resolve, reject) {
+			var r = new FileReader();
+			r.onload = function () { resolve(new Uint8Array(r.result)); };
+			r.onerror = function () { reject(new Error('read')); };
+			r.readAsArrayBuffer(f);
+		});
+	}
+	/**
+	 * The files chosen in the box: the project's `.wtg` and `.wtg.sqlite`, in either order. `done` is
+	 * called with the Blob of the .zip and its name, or with an error message; a harness drives this.
+	 */
+	function wtgExportWrite(files, done) {
+		var pcX = EngCalcs.pageConfig || {}, sqliteFile = null, wtgFile = null, planned, base = inpExportBaseName();
+		files.forEach(function (f) {
+			if (/\.sqlite$/i.test(f.name)) { sqliteFile = f; } else if (/\.wtg$/i.test(f.name)) { wtgFile = f; }
+		});
+		if (!sqliteFile || !wtgFile) {
+			done(null, wtgFill('lpn_wtg_export_need_both', 'Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).', {}));
+			return;
+		}
+		planned = wtgExportPlan();
+		if (!planned.ok || planned.refused.length) {
+			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}', { detail: planned.ok ? planned.refused.map(wtgRefusalText).join(' ') : (planned.detail || planned.error || '?') }));
+			return;
+		}
+		function fail(e) {
+			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}',
+				{ detail: (e && e.message ? e.message : String(e)) + (e && e.ids && e.ids.length && e.code !== 'template-kind' ? ' (' + wtgIdList(e.ids) + ')' : '') }));
+		}
+		Promise.all([readFileBytes(sqliteFile), readFileBytes(wtgFile), EngCalcs.lpnEpanetLoad()]).then(function (got) {
+			// ignoreBOM: the saved .wtg opens with a byte order mark, and the file written keeps it as the template had it.
+			var xml = new TextDecoder('utf-8', { ignoreBOM: true }).decode(got[1]);
+			return EngCalcs.lpnWtgExportBuild(planned, { sqlite: got[0], wtg: xml, epanet: got[2], name: projectDisplayName(project) }).then(function (built) {
+				return buildZip([{ name: base + '.wtg', data: built.wtg }, { name: base + '.wtg.sqlite', data: built.sqlite }]).then(function (zip) {
+					done({ zip: zip, zipName: base + '.wtg.zip', wtgName: base + '.wtg', sqliteName: base + '.wtg.sqlite', planned: planned, report: built.report });
+				});
+			});
+		}).catch(fail);
+	}
+	function wtgExportFinish(out, err) {
+		var left, extract = wtgFill('lpn_wtg_export_extract', 'Extract both files into one folder, then open the .wtg.', {});
+		if (!out) { setWarning(err); return; }
+		downloadBlob(out.zip, out.zipName);
+		setNotice(wtgFill('lpn_wtg_export_exported', 'Exported {zip}, holding {wtg} and {sqlite}.',
+			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + exportScenarioSentence());
+		left = wtgNotCarriedLines(out.planned.notCarried).join(' ');
+		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Left out: {items}', { items: left })]);
+	}
+	function wireWtgTemplatePicker() {
+		var input = document.getElementById('lpn_wtg_template_file');
+		if (!input) { return; }
+		input.addEventListener('change', function () {
+			var fs = Array.prototype.slice.call(input.files);
+			input.value = '';
+			if (!fs.length) { return; }
+			setNotice(wtgFill('lpn_wtg_export_working', 'Writing the .wtg project…', {}));
+			wtgExportWrite(fs, wtgExportFinish);
+		});
+	}
+	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
 	 * first).** The writer is js/lpn-geojson.js and its rules are dev/geojson.md; this is the way in
 	 * (the document, the scenario on screen, the results on screen) and the way out (a download).
@@ -52761,7 +52925,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
-			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } }
+			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } },
+			// .wtg project (Task 749): a .wtg and its .wtg.sqlite, written into a project the visitor saved.
+			// Asks its own box (scenario, what is left out, which saved project), so no confirmExportLeaves().
+			{ icon: 'save', label: pc.lpn_file_export_item_wtg || '.wtg.sqlite file…', key: 'lpn_file_export_item_wtg',
+			  tip: pc.lpn_file_export_wtg_tip, fn: exportWtgFile }
 		];
 	}
 	function exportTableRows() {
@@ -55957,6 +56125,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Its own picker rather than a second accept type on the one above: the two land in
 		// different places (our document reader vs the EPANET reader), and one input serving both
 		// would have to guess which from the extension -- a guess with a silent wrong answer.
+		wireWtgTemplatePicker();
 		var inpInput = document.getElementById('lpn_inp_file');
 		if (!inpInput) { return; }
 		inpInput.addEventListener('change', function () {
