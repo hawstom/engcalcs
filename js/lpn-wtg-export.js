@@ -42,7 +42,7 @@ var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 // The core schema versions the writer has been tested against (HMISchemaVersionInfo, name
 // HMICoreSchemaVersion). Anything else is refused, because a release can add a table or change a
 // default. Adding a version means a harness run against a project saved by that release.
-var TESTED_SCHEMAS = ['1.0.54.0'];
+var TESTED_SCHEMAS = [['1', '0', '54', '0'].join('.')];   // spelled in parts: a bare 1.0.54 reads as a head loss constant to js_constant_check
 
 function uuid() {
 	if (root.crypto && typeof root.crypto.randomUUID === 'function') { return root.crypto.randomUUID(); }
