@@ -1323,11 +1323,23 @@
 :root[data-theme="prairie"] #lpn_toolbar_run .lpn-transport-btn { background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); color: var(--ec-steel-ink); }
 :root[data-theme="prairie"] .lpn-tab {
 	clip-path: polygon(0 100%, 0 40%, 12% 15%, 26% 0, 74% 0, 88% 15%, 100% 40%, 100% 100%);
-	background: var(--ec-barn); border: 0; border-radius: 0; box-shadow: inset 1px 0 var(--ec-barn-edge), inset -1px 0 var(--ec-barn-edge);
+	/* A barn, painted rather than outlined (Tom, 2026-10-24: the active tab's pale edge strip and the black
+	   upright lines looked unfinished): sunlit along the roof, a darker sill at the foot, and no wall lines.
+	   The wall is the silhouette itself; the name and the close mark are parted by a short faint seam. */
+	background: linear-gradient(to bottom, color-mix(in srgb, var(--ec-bg) 45%, transparent), transparent 50%), var(--ec-barn);
+	border: 0; border-radius: 0; box-shadow: inset 0 -3px 0 var(--ec-barn-edge);
 }
 :root[data-theme="prairie"] .lpn-tab > button { padding-top: 13px; }
-:root[data-theme="prairie"] .lpn-tab-current { background: var(--ec-accent); color: var(--ec-bg); box-shadow: inset 2px 0 var(--ec-bg), inset -2px 0 var(--ec-bg), inset 0 -2px var(--ec-bg); }
-:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); border-left-color: color-mix(in srgb, var(--ec-bg) 50%, transparent); }
+:root[data-theme="prairie"] .lpn-tab .lpn-tab-caret, :root[data-theme="prairie"] .lpn-tab .lpn-tab-x { border-left: 0; position: relative; }
+:root[data-theme="prairie"] .lpn-tab .lpn-tab-caret::before, :root[data-theme="prairie"] .lpn-tab .lpn-tab-x::before {
+	content: ''; position: absolute; inset-inline-start: 0; top: 55%; bottom: 6px; width: 1px; background: color-mix(in srgb, var(--ec-barn-edge) 55%, transparent);
+}
+:root[data-theme="prairie"] .lpn-tab-current {
+	background: linear-gradient(to bottom, color-mix(in srgb, var(--ec-bg) 28%, transparent), transparent 50%), var(--ec-accent);
+	color: var(--ec-bg); box-shadow: inset 0 -3px 0 var(--ec-accent-open);
+}
+:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); }
+:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-caret::before, :root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x::before { background: color-mix(in srgb, var(--ec-bg) 55%, transparent); }
 :root[data-theme="prairie"] .lpn-tab-current > button:hover { background: color-mix(in srgb, var(--ec-ink-black) 18%, transparent); }
 :root[data-theme="prairie"] .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
 .ec-theme-card[data-theme="prairie"] .ec-tc-menu i { background: var(--ec-steel); border-color: var(--ec-steel-edge); border-radius: 4px / 50%; }
