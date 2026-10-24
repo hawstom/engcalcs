@@ -7499,6 +7499,9 @@ var EngCalcs = EngCalcs || {};
 	// alternatives are hidden, so the line stays the shared-with note alone.
 	function ovmStoredText(cats) {
 		var pc = EngCalcs.pageConfig || {}, st = scenarioBasicMode ? null : smStoredIn(cats);
+		// An alternative named exactly as the open scenario (what a new scenario's own alternative is)
+		// would only repeat the name the reader is already in: silent, shared-with note aside.
+		if (st && st.alt === scenarioDisplayName(activeScenario())) { st = null; }
 		if (!st) { return smSharedText(cats); }
 		return st.users.length
 			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
@@ -63843,6 +63846,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function setboxHeldItemName(p) {
 		var pc = EngCalcs.pageConfig || {}, partKey = LPN_SETTAB_LABEL_PARTS[p[1]];
 		if (p[0] === 'labelSettings' && p.length === 4 && partKey && pc[partKey]) { return pc[partKey]; }
+		// The label's tick is the Labels list's Show column: "Show", not "Link labels: Length" (Tom, 2026-10-23).
+		if (p[0] === 'labelSettings' && p.length === 3 && (p[1] === 'node' || p[1] === 'link' || p[1] === 'customer')) { return pc.lpn_labels_col_show || 'Show'; }
 		return settingTableLabelBare(p);
 	}
 	// What Clear restores, in words, and where it comes from: the parent scenario's stated value, or

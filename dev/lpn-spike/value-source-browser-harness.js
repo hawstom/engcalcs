@@ -144,6 +144,13 @@ async function main() {
 		notes = await noteTexts();
 		const wantShared = (await page.evaluate(() => EngCalcs.pageConfig.lpn_ovm_dot_alt_shared)).replace('{alternative}', 'Peak elev').replace('{list}', 'Fire');
 		ok('V6 Peak and Fire name it: "...also used by Fire, so clear or edits change them too."', notes.length === 1 && notes[0].endsWith(wantShared), JSON.stringify(notes));
+		await open('peak', 1400, 900, (d) => { d.alternatives = [{ id: 'pa', category: 'physical', name: 'Peak', parent: null, values: { 'n:10': { elev: 701 } } }]; const pk = d.scenarios.find((x) => x.id === 'peak'); pk.overrides = {}; pk.alternatives = { physical: 'pa' }; }, true);
+		await openNode('10');
+		notes = await noteTexts();
+		const tipsSame = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-ovm-dot')).map((d) => d.title));
+		console.log('    same-name alternative note: ' + JSON.stringify(notes) + ' dot tips: ' + JSON.stringify(tipsSame));
+		ok('V6 alternative named like its scenario ("Peak" in Peak): the note is the value alone, no alternative sentence', notes.length === 1 && !/alternative/.test(notes[0]), JSON.stringify(notes));
+		ok('V6 same-name alternative: no dot tip mentions an alternative', !tipsSame.some((t) => /alternative/.test(t)), JSON.stringify(tipsSame));
 		await open('fire', 1400, 900);
 		await openNode('10');
 		notes = await noteTexts();

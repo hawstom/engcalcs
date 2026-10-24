@@ -48,9 +48,10 @@ async function main() {
 	const errors = [];
 	let a = null, page = null;
 	try {
-		const open = async (active) => {
+		const open = async (active, tweak) => {
 			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
 			d.scenarios.push({ id: 'peak', name: 'Peak', overrides: {}, settings: { labelSettings: { decimals: { link: { diameter: 3 }, node: { elev: 2 }, customer: { demand: 1 } }, prefix: { link: { diameter: 'D=' }, node: { elev: 'E=' }, customer: { demand: 'Q=' } } } } });
+			if (tweak) { tweak(d); }
 			d.project = Object.assign({}, d.project, { activeScenario: active });
 			a = await Session.open(browser, 'A', { serviceWorkers: 'block' });
 			page = a.page;
@@ -109,6 +110,24 @@ async function main() {
 			}, sel);
 			ok(`S6 ${grp} labels: two items, each visible, wide enough, one or two lines, dot clickable`, !!geo && geo.length === 2 && geo.every((g) => g.shown && g.w >= 200 && g.lines <= 2 && g.dot && g.hit), JSON.stringify(geo));
 		}
+		console.log('--- S7 ---');
+		{
+			// The label tick overridden beside a decimals override: Link labels, Length (Base: off).
+			const sel7 = `#lpn_settings_box [data-lpn-setting*='"decimals","link","length"']`;
+			await a.context.close();
+			await open('peak', (d) => { const ls = d.scenarios.find((x) => x.id === 'peak').settings.labelSettings; ls.link = { length: true }; ls.decimals.link.length = 1; });
+			const items7 = await page.evaluate((x) => {
+				const rows = Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-heldlist'));
+				return rows.map((l) => Array.from(l.querySelectorAll('.lpn-set-helditem')).map((i) => { const r = i.getBoundingClientRect(); return { text: i.textContent.trim(), w: Math.round(r.width), shown: i.offsetParent !== null }; }));
+			}, sel7);
+			const flat7 = [].concat(...items7);
+			console.log('    held-list items: ' + JSON.stringify(flat7.map((i) => i.text)));
+			const showItems = flat7.filter((i) => /^Show:/.test(i.text));
+			ok('S7 the label tick reads "Show: clear restores No, the value in Base." (not "Link labels: Length")', showItems.length >= 1 && showItems.every((i) => i.text === 'Show: clear restores No, the value in ' + 'Base.') && flat7.every((i) => i.text.indexOf('Link labels') < 0), JSON.stringify(flat7));
+			ok('S7 every item is visible with width', flat7.length >= 2 && flat7.every((i) => i.shown && i.w >= 200), JSON.stringify(flat7));
+		}
+		await a.context.close();
+		await open('peak');
 		console.log('--- S2 ---');
 		const before = await stored();
 		await clickItem(0);
