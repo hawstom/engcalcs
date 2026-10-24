@@ -28819,6 +28819,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
 				},
 				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
+			// **BESIDE THE CONNECTED ASSET, WHERE A CUSTOMER ON A NODE IS READ** (Tom, 2026-10-24: customers on a
+			// reservoir that became a Junction "look orphaned"; the node they are on was a last column
+			// nobody saw). The Connected asset cell is blank when the connection is exactly a node, so the
+			// node is named here, next to it. An EMPTY link cell is a detached meter, and it is the one reading in the table
+			// that says its demand is in no answer. The popup says so in words.
+			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
+				refTo: function (c) {
+					var n = customerNodeId(c);
+					return (n === null || n === undefined) ? null : { group: 'node', id: n };
+				},
+				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
 			// through the same two seams: setCustomerStation() slides the connection ALONG the main
@@ -28908,15 +28919,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					customerEdited(c);
 				} },
 			{ key: 'total', label: 'lpn_field_meter_total', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
-				get: function (c) { return customerFlow(c); } },
-			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
-			// that says its demand is in no answer. The popup says so in words.
-			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
-				refTo: function (c) {
-					var n = customerNodeId(c);
-					return (n === null || n === undefined) ? null : { group: 'node', id: n };
-				},
-				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
+				get: function (c) { return customerFlow(c); } }
 		];
 	}
 	/**
