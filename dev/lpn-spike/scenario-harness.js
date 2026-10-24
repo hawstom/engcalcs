@@ -288,7 +288,7 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 	// identically in all 26 translations, which is the tell that the assertion was testing the
 	// wording rather than the behaviour. What matters here is that BASE'S NUMBER is shown beside the
 	// scenario's, not which words surround it.
-	const restoresHead = ((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_ovm_restores) || 'Clear restores {value}, {source}.').split('{value}')[0];
+	const restoresHead = EngCalcs.pageConfig.lpn_ovm_restores.split('{value}')[0];
 	const baseShown = restoresHead + '100';
 	ok('...and shows Base\'s value beside the scenario\'s', txt.indexOf(baseShown) !== -1, txt);
 
