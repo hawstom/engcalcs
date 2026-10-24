@@ -61834,7 +61834,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A phone opens a digit keypad for a number box named so (Tom, 2026-10-23: no spinners,
 			// but "if phone knows they are numeric"). Only where the minimum is not negative: iOS's
 			// decimal keypad has no minus key, so a box that may go negative keeps type=number's own.
-			if (input.type === 'number' && !input.hasAttribute('inputmode') && input.min !== '' && +input.min >= 0) {
+			if (input.type === 'number' && !input.getAttribute('inputmode') && input.min !== '' && +input.min >= 0) {
 				input.setAttribute('inputmode', /^\d+$/.test(input.step) ? 'numeric' : 'decimal');
 			}
 			line.appendChild(input);
