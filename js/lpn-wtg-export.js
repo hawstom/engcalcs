@@ -113,12 +113,12 @@ function collectPrototype(db, tables, id, baseAlts) {
 function findProto(db, typeId, label) {
 	const r = rowsOf(db, 'SELECT m.ElementID AS id FROM HMIModelingElement m JOIN HMIDomainElement d ON d.DomainElementID = m.ElementID '
 		+ 'WHERE d.DomainElementTypeID = ? AND d.IsDeleted = 0 AND m.IsDeleted = 0 ORDER BY m.ElementID', [typeId]);
-	if (!r.length) { throw fail('template-kind', 'The template has no ' + label + ' to copy. Save the project from WaterGEMS with at least one of each element kind the network uses.', [label]); }
+	if (!r.length) { throw fail('template-kind', 'The saved project has no ' + label + ' to copy.', [label], 'kind', { kind: label }); }
 	return r[0].id;
 }
 function findSupportProto(db, typeId, label) {
 	const r = rowsOf(db, 'SELECT SupportElementID AS id FROM HMISupportElement WHERE SupportElementTypeID = ? AND IsDeleted = 0 ORDER BY SupportElementID', [typeId]);
-	if (!r.length) { throw fail('template-kind', 'The template has no ' + label + ' to copy. Save the project from WaterGEMS with at least one of each element kind the network uses.', [label]); }
+	if (!r.length) { throw fail('template-kind', 'The saved project has no ' + label + ' to copy.', [label], 'kind', { kind: label }); }
 	return r[0].id;
 }
 
@@ -136,10 +136,15 @@ function wkbLine(pts) {
 	pts.forEach((p, i) => { dv.setFloat64(9 + 16 * i, p[0], true); dv.setFloat64(17 + 16 * i, p[1], true); });
 	return b;
 }
-function fail(code, message, ids) {
+// `reason` and `vals` are what the page turns into a sentence of its own (language keys
+// lpn_wtg_export_t_<reason>, {name} placeholders filled from `vals`); `message` is the plain
+// English for a harness or a console and names no program.
+function fail(code, message, ids, reason, vals) {
 	const e = new Error(message);
 	e.code = code;
 	if (ids) { e.ids = ids; }
+	e.reason = reason || code;
+	e.vals = vals || {};
 	return e;
 }
 function polyLength(pts) {
@@ -174,22 +179,22 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	function lost(s) { report.notCarried.push(s); }
 
 	if (String(parsed.flowUnits).toUpperCase() !== 'GPM') {
-		throw fail('units', 'WaterGEMS storage units were measured for US customary projects only, so the flow unit must be gpm; this project writes ' + parsed.flowUnits + '.');
+		throw fail('units', 'Only US customary projects are written, so the flow unit must be gpm; this project writes ' + parsed.flowUnits + '.', null, 'units', { unit: String(parsed.flowUnits) });
 	}
 	if (String(parsed.headloss || 'H-W').toUpperCase().indexOf('H-W') < 0) {
-		throw fail('headloss', 'Only the Hazen-Williams head loss formula is written.');
+		throw fail('headloss', 'Only the Hazen-Williams head loss formula is written.', null, 'headloss', { method: String(parsed.headloss) });
 	}
 
 	let db;
-	try { db = new SQL.Database(new Uint8Array(templateBytes)); } catch (e) { throw fail('template', 'The template is not a SQLite database.'); }
+	try { db = new SQL.Database(new Uint8Array(templateBytes)); } catch (e) { throw fail('template', 'The saved project is not a SQLite database.', null, 'not_project'); }
 	hold(db);
 	{
 		let ver = null;
 		try { ver = rowsOf(db, "SELECT Value FROM HMISchemaVersionInfo WHERE Name = 'HMICoreSchemaVersion'")[0]; } catch (e) { ver = null; }
-		if (!ver) { throw fail('template', 'The template is not a WaterGEMS or WaterCAD project (no HMICoreSchemaVersion).'); }
+		if (!ver) { throw fail('template', 'The saved project has no schema version.', null, 'not_project'); }
 		report.schemaVersion = String(ver.Value);
 		if (!opts.allowUntestedSchema && TESTED_SCHEMAS.indexOf(report.schemaVersion) < 0) {
-			throw fail('schema', 'The template\'s schema version is ' + report.schemaVersion + '; this writer has been tested only against ' + TESTED_SCHEMAS.join(', ') + '.');
+			throw fail('schema', 'The saved project\'s schema version is ' + report.schemaVersion + '; this writer has been tested only against ' + TESTED_SCHEMAS.join(', ') + '.', null, 'schema', { found: report.schemaVersion, tested: TESTED_SCHEMAS.join(', ') });
 		}
 	}
 	const tables = tablesOf(db);
@@ -280,7 +285,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			const ov = overrides && overrides[pr.table];
 			if (ov) {
 				Object.keys(ov).forEach((c) => {
-					if (!(c in row)) { throw fail('data', 'Template table ' + pr.table + ' has no column ' + c + ' (the schema differs from the one this writer was written against).'); }
+					if (!(c in row)) { throw fail('data', 'The saved project is laid out differently from the version this writer was written against.', null, 'layout'); }
 					row[c] = ov[c];
 				});
 			}
@@ -357,7 +362,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	links.filter((l) => l.type === 'pump').forEach((pm) => {
 		const c = curveById[pm.curveId];
 		if (!c || c.points.length !== 3 || c.points[0][0] !== 0) {
-			throw fail('pump-curve', 'Pump ' + pm.id + ' has no three-point head curve (shutoff, design, maximum). Power pumps and multiple-point curves are not written.', [pm.id]);
+			throw fail('pump-curve', 'Pump ' + pm.id + ' has no three-point head curve (shutoff, design, maximum). Power pumps and multiple-point curves are not written.', [pm.id], 'pump_curve', { ids: pm.id });
 		}
 		if (pumpDefId[pm.curveId]) { return; }
 		const id = newId(); pumpDefId[pm.curveId] = id;
@@ -382,9 +387,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const gpvCurveId = {};
 	links.filter((l) => l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV').forEach((v) => {
 		const c = curveById[v.curveId];
-		if (!c || !c.points || c.points.length < 2) { throw fail('data', 'GPV ' + v.id + ': the headloss curve ' + v.curveId + ' is not in the file.'); }
+		if (!c || !c.points || c.points.length < 2) { throw fail('data', 'GPV ' + v.id + ': the headloss curve ' + v.curveId + ' is not in the project.', [v.id], 'gpv_curve', { id: v.id }); }
 		if (gpvCurveId[c.id]) { return; }
-		if (!gpvCurveProto) { throw fail('data', 'The template holds no GPV headloss curve to copy.'); }
+		if (!gpvCurveProto) { throw fail('data', 'The saved project has no GPV headloss curve to copy.', null, 'kind', { kind: 'general purpose valve headloss curve' }); }
 		const id = newId(); gpvCurveId[c.id] = id;
 		supportElement(id, 63, c.id, 'EPANET headloss curve ' + c.id);
 		cloneRows(gpvCurveProto, id, { GpvHeadlossCurve_GpvHeadlossFlowCurve: 1 }, { GpvHeadlossCurve: { GpvHeadlossFlowCurveCount: c.points.length } });
@@ -399,7 +404,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		// Linear interpolation of the curve at the tank's minimum and maximum level, then the points between.
 		const pts = vc.points.slice().sort((a, b) => a[0] - b[0]);
 		const at = (d) => {
-			if (d < pts[0][0] - 1e-9 || d > pts[pts.length - 1][0] + 1e-9) { throw fail('data', 'Tank ' + n.id + ': volume curve ' + vc.id + ' does not cover its level range ' + n.minLevel + ' to ' + n.maxLevel + '.'); }
+			if (d < pts[0][0] - 1e-9 || d > pts[pts.length - 1][0] + 1e-9) { throw fail('data', 'Tank ' + n.id + ': volume curve ' + vc.id + ' does not cover its level range ' + n.minLevel + ' to ' + n.maxLevel + '.', [n.id], 'vol_range', { id: n.id }); }
 			for (let i = 1; i < pts.length; i++) {
 				if (d <= pts[i][0] + 1e-12) { const f = pts[i][0] === pts[i - 1][0] ? 0 : (d - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]); return pts[i - 1][1] + f * (pts[i][1] - pts[i - 1][1]); }
 			}
@@ -444,7 +449,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			domainElement(id, 56, n.id);
 			const resOv = Object.assign({}, geo, { BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.head } });
 			if (n.headPattern) {
-				if (patId[n.headPattern] === undefined) { throw fail('data', 'Reservoir ' + n.id + ' names head pattern ' + n.headPattern + ', which the file does not define.'); }
+				if (patId[n.headPattern] === undefined) { throw fail('data', 'Reservoir ' + n.id + ' names head pattern ' + n.headPattern + ', which the project does not define.', [n.id], 'head_pattern', { id: n.id }); }
 				resOv.IdahoReservoir_Physical_Data = { Physical_HglPattern: patId[n.headPattern] };
 			}
 			cloneRows(proto.reservoir, id, null, resOv);
@@ -457,7 +462,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			// active volume, the inactive volume below the minimum level, and TankSection 2.
 			const vc = n.volCurve ? curveById[n.volCurve] : null;
 			let tankSection = null;
-			if (n.volCurve && !(vc && vc.points && vc.points.length >= 2)) { throw fail('data', 'Tank ' + n.id + ' names volume curve ' + n.volCurve + ', which the file does not define.'); }
+			if (n.volCurve && !(vc && vc.points && vc.points.length >= 2)) { throw fail('data', 'Tank ' + n.id + ' names volume curve ' + n.volCurve + ', which the project does not define.', [n.id], 'vol_missing', { id: n.id }); }
 			if (vc) { tankSection = volumeCurveRows(n, vc); }
 			cloneRows(proto.tank, id, tankSection ? { ConventionalTank_Physical_DepthRatioVolumeRatioCurve: 1 } : null, Object.assign({}, geo, {
 				BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.elev },
@@ -479,7 +484,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			}
 			nT++;
 		} else {
-			throw fail('node-kind', 'Node ' + n.id + ' is of kind ' + n.type + ', which is not written.', [n.id]);
+			throw fail('node-kind', 'Node ' + n.id + ' is of kind ' + n.type + ', which is not written.', [n.id], 'asset_kind', { id: n.id });
 		}
 	});
 	report.counts.junctions = nJ; report.counts.reservoirs = nR; report.counts.tanks = nT;
@@ -511,7 +516,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	let nValve = 0;
 	function writeValve(l) {
 		const vt = String(l.valveType || '').toUpperCase();
-		if (!valveProto[vt]) { throw fail('data', 'Valve ' + l.id + ' is a ' + vt + ', and the template holds no ' + vt + ' to copy.'); }
+		if (!valveProto[vt]) { throw fail('data', 'Valve ' + l.id + ' is a ' + vt + ', and the saved project holds no ' + vt + ' to copy.', [l.id], 'kind', { kind: vt + ' valve' }); }
 		const a = nodeById[l.from], b = nodeById[l.to];
 		const mid = [(P(a)[0] + P(b)[0]) / 2, (P(a)[1] + P(b)[1]) / 2];
 		const valveId = newId(), aId = newId(), bId = newId();
@@ -530,7 +535,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		} else if (vt === 'TCV') {
 			ov.TCV_InitialSettings_Data = { InitialSettings_HeadlossCoefficient: l.setting, TCVCoefficientType: 1 };
 		} else if (vt === 'GPV') {
-			if (!(l.curveId && gpvCurveId[l.curveId])) { throw fail('data', 'GPV ' + l.id + ' has no headloss curve.'); }
+			if (!(l.curveId && gpvCurveId[l.curveId])) { throw fail('data', 'GPV ' + l.id + ' has no headloss curve.', [l.id], 'gpv_curve', { id: l.id }); }
 			ov.GPV_Physical_Data = { Physical_GpvHeadlossCurveID: gpvCurveId[l.curveId] };
 		}
 		domainElement(valveId, VALVE_TYPE_ID[vt], l.id);
@@ -556,7 +561,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	links.forEach((l) => {
 		if (l.type === 'pipe') { return; }
 		if (l.type === 'valve') { writeValve(l); return; }
-		if (l.type !== 'pump') { throw fail('link-kind', 'Link ' + l.id + ' is a ' + l.type + ', which is not written.', [l.id]); }
+		if (l.type !== 'pump') { throw fail('link-kind', 'Link ' + l.id + ' is a ' + l.type + ', which is not written.', [l.id], 'asset_kind', { id: l.id }); }
 		// A pump is a NODE between two pipes. Upstream pipe "<id>-A", downstream "<id>-B", both
 		// 1 ft long and 99 in across as WaterGEMS's own .inp import makes them (EPS sample: length 1,
 		// diameter 8.25 ft), so they add no head loss worth the name. The pump node sits at the
@@ -885,6 +890,14 @@ function plan(doc, opts) {
 	if (sp.length) { notCarried.push({ code: 'pump_speed_pattern', ids: sp }); }
 	const ec = idsOf(links, (l) => l.type === 'pump' && l.efficCurveId);
 	if (ec.length) { notCarried.push({ code: 'pump_efficiency_curve', ids: ec }); }
+	// Settings and drawing data with no place in the file. The multiplier and the demand model change the
+	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.
+	const hy = parsed.hydraulics || {};
+	if (hy.demandMultiplier !== undefined && Number(hy.demandMultiplier) !== 1) { notCarried.push({ code: 'demand_multiplier', ids: [], value: String(hy.demandMultiplier) }); }
+	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA') { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
+	if ((parsed.labels || []).length) { notCarried.push({ code: 'texts', ids: [] }); }
+	if ((secs.TAGS || []).length) { notCarried.push({ code: 'tags', ids: [] }); }
+	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
 	// Always: these have no place in the file, whatever the network.
 	notCarried.push({ code: 'material', ids: [] });
 	notCarried.push({ code: 'positions', ids: [] });
@@ -930,7 +943,7 @@ function getEngine() {
 	}
 	engine = p.catch((e) => {
 		engine = null;   // a failed fetch may succeed on the next attempt
-		throw fail('engine', 'The SQLite engine could not be loaded (' + (e && e.message) + ').');
+		throw fail('engine', 'The SQLite engine could not be loaded (' + (e && e.message) + ').', null, 'offline');
 	});
 	return engine;
 }
@@ -949,8 +962,8 @@ function getEngine() {
  */
 async function build(planned, o) {
 	if (!planned || !planned.ok || planned.refused.length) { throw fail('refused', 'The plan was refused.'); }
-	if (!o || !o.sqlite || typeof o.wtg !== 'string') { throw fail('template', 'Both files of the saved project are needed: the .wtg and the .wtg.sqlite.'); }
-	if (!o.epanet) { throw fail('engine', 'The EPANET engine is needed to find when each pump switches.'); }
+	if (!o || !o.sqlite || typeof o.wtg !== 'string') { throw fail('template', 'Both files of the saved project are needed: the .wtg and the .wtg.sqlite.', null, 'need_both'); }
+	if (!o.epanet) { throw fail('engine', 'The EPANET engine is needed to find when each pump switches.', null, 'offline'); }
 	const SQL = await getEngine();
 	const parsed = planned.parsed;
 	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat((parsed.controls || []).map((c) => c.link))));
@@ -960,7 +973,7 @@ async function build(planned, o) {
 	const out = writeWtg(SQL, o.sqlite, parsed, sched, { name: o.name || 'Network', efficiency: eff, allowUntestedSchema: !!o.allowUntestedSchema });
 	const R = out.report;
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
-		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.');
+		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
 	}
 	const wtg = patchWtgXml(o.wtg, R.removedChildScenarios, 1, R.removedChildAlternatives, R.extentFt);
 	return { sqlite: out.bytes, wtg: wtg, report: R };

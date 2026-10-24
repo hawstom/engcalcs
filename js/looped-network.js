@@ -43971,10 +43971,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pump_speed_pattern: 'Pump speed pattern (pumps {ids}).',
 			pump_efficiency_curve: 'Pump efficiency curve (pumps {ids}). A constant efficiency is written.',
 			material: 'Pipe material and installation year. Every pipe keeps the saved project\'s default material.',
+			demand_multiplier: 'Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.',
+			demand_model: 'Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.',
+			texts: 'Text on the map.',
+			tags: 'Tags.',
+			backdrop: 'The background picture.',
 			positions: 'True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.'
 		};
 		return (items || []).map(function (it) {
-			return wtgFill('lpn_wtg_export_lost_' + it.code, texts[it.code] || it.code, { ids: wtgIdList(it.ids) });
+			return wtgFill('lpn_wtg_export_lost_' + it.code, texts[it.code] || it.code, { ids: wtgIdList(it.ids), value: it.value === undefined ? '' : it.value });
 		});
 	}
 	function wtgRefusalText(r) {
@@ -43985,6 +43990,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pump_curve: 'This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.'
 		};
 		return wtgFill('lpn_wtg_export_no_' + r.code, fb[r.code] || r.code, { unit: r.detail || '', method: r.detail || '', ids: wtgIdList(r.ids) });
+	}
+	// A thrown reason (js/lpn-wtg-export.js `reason` and `vals`) as a sentence: no program and no column named.
+	function wtgErrorText(e) {
+		var fb = {
+			not_project: 'This file is not a saved project of the kind this export needs. Choose the .wtg file and the .wtg.sqlite file of a project you saved.',
+			schema: 'This saved project is laid out as version {found}, and this export has been tested only with {tested}. Save the project from a program version that writes {tested}.',
+			kind: 'The saved project has no {kind} to copy from. Add one, save the project, and choose it again.',
+			layout: 'The saved project is laid out differently from the one this export was tested with.',
+			gpv_curve: 'Valve {id} has no headloss curve in this project.',
+			vol_range: 'The volume curve of tank {id} does not cover the tank\'s range of water depth.',
+			head_pattern: 'Reservoir {id} names a head pattern that this project does not define.',
+			vol_missing: 'Tank {id} names a volume curve that this project does not define.',
+			asset_kind: 'Asset {id} is of a kind this export does not write.',
+			offline: 'The export needs a connection to this site the first time, to load the database and EPANET engines. Check the connection and try again.',
+			integrity: 'The files written failed their own check, so they were not offered.'
+		}, r = e && e.reason, v = (e && e.vals) || {};
+		if (r === 'need_both') { return wtgFill('lpn_wtg_export_need_both', 'Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).', {}); }
+		if (r === 'units' || r === 'headloss' || r === 'pump_curve') { return wtgRefusalText({ code: r, detail: v.unit || v.method, ids: e.ids }); }
+		if (r && fb[r]) { return wtgFill('lpn_wtg_export_t_' + r, fb[r], v); }
+		return (e && e.message) ? e.message : String(e);
 	}
 	function exportWtgFile() {
 		var pcX = EngCalcs.pageConfig || {}, planned = wtgExportPlan(), fmt, scnSentence;
@@ -44059,9 +44084,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		function fail(e) {
 			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}',
-				{ detail: (e && e.message ? e.message : String(e)) + (e && e.ids && e.ids.length && e.code !== 'template-kind' ? ' (' + wtgIdList(e.ids) + ')' : '') }));
+				{ detail: wtgErrorText(e) }));
 		}
-		Promise.all([readFileBytes(sqliteFile), readFileBytes(wtgFile), EngCalcs.lpnEpanetLoad()]).then(function (got) {
+		Promise.all([readFileBytes(sqliteFile), readFileBytes(wtgFile), Promise.resolve(EngCalcs.lpnEpanetLoad()).catch(function () { var x = new Error('EPANET engine'); x.reason = 'offline'; throw x; })]).then(function (got) {
 			// ignoreBOM: the saved .wtg opens with a byte order mark, and the file written keeps it as the template had it.
 			var xml = new TextDecoder('utf-8', { ignoreBOM: true }).decode(got[1]);
 			return EngCalcs.lpnWtgExportBuild(planned, { sqlite: got[0], wtg: xml, epanet: got[2], name: projectDisplayName(project) }).then(function (built) {

@@ -160,49 +160,23 @@ function head(t) { console.log('\n' + t); }
 	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 406 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220, JSON.stringify(pyOut));
 
 	// ---- 4. the same as the spike's known-good output ----
-	head('4. Identical to the database the spike writes straight from Net3.inp');
-	const spike = require('./wtg-export.js');
-	const parsed = EngCalcs.lpnInpParse(NET3);
-	parsed.title = planned.parsed.title;   // the page's .inp states the project's name as the title; Notes follow it
-	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat(parsed.controls.map((c) => c.link))));
-	const ref = await spike.epanetReference(NET3, watch, parsed.nodes.map((n) => n.id), parsed.links.map((l) => l.id));
-	const known = spike.writeWtg(SQL, tplBytes, parsed, { initial: ref.initial, changes: ref.changes }, { name: 'Net3', efficiency: 75 });
-	const MASK = /guid|datemodified/i;
-	function dump(bytes) {
-		const db = new SQL.Database(new Uint8Array(bytes)), res = {};
-		const names = [];
-		const st = db.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
-		while (st.step()) { names.push(st.get()[0]); }
-		st.free();
-		names.forEach((t) => {
-			const cols = [], c = db.prepare('PRAGMA table_info("' + t + '")');
-			while (c.step()) { cols.push(c.get()[1]); }
-			c.free();
-			const rows = [], r = db.prepare('SELECT * FROM "' + t + '"');
-			while (r.step()) {
-				rows.push(JSON.stringify(r.get().map((v, i) => MASK.test(cols[i]) ? '#' : (v instanceof Uint8Array ? 'x' + Buffer.from(v).toString('hex') : v))));
-			}
-			r.free();
-			res[t] = rows.sort();
-		});
-		db.close();
-		return res;
-	}
-	const A = dump(pageBytes), B = dump(known.bytes);
-	const tableNames = Object.keys(B);
-	const differing = tableNames.filter((t) => JSON.stringify(A[t]) !== JSON.stringify(B[t]));
-	differing.slice(0, 3).forEach((t) => { console.log('   ' + t + '\n     page : ' + A[t].join('\n            ').slice(0, 600) + '\n     spike: ' + B[t].join('\n            ').slice(0, 600)); });
-	ok('all ' + tableNames.length + ' tables hold the same rows (identifiers, save times masked)', differing.length === 0 && Object.keys(A).length === tableNames.length, differing.slice(0, 5).join(', '));
-	let rowCount = 0; tableNames.forEach((t) => { rowCount += B[t].length; });
+	head('4. Identical to the frozen golden: the spike writer\'s output for Net3, before it moved into js/lpn-wtg-export.js');
+	const { dump, digests } = require('./wtg-dump.js');
+	const golden = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), 'utf8'));
+	const D = digests(dump(SQL, pageBytes));
+	const gNames = Object.keys(golden.tables);
+	const differing = gNames.filter((n) => !D[n] || D[n].sha256 !== golden.tables[n].sha256 || D[n].rows !== golden.tables[n].rows);
+	ok('all ' + gNames.length + ' tables hold the golden rows, by digest (identifiers, save times and the project Notes masked)', differing.length === 0 && Object.keys(D).length === gNames.length, differing.slice(0, 6).join(', '));
+	let rowCount = 0; gNames.forEach((n) => { rowCount += golden.tables[n].rows; });
 	ok('...and that is not an empty comparison: ' + rowCount + ' rows', rowCount > 3000);
-	const knownWtg = spike.patchWtgXml(tplWtg.toString('utf8'), known.report.removedChildScenarios, 1, known.report.removedChildAlternatives, known.report.extentFt);
 	const noId = (s) => s.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1#$2');
-	if (noId(pageWtg) !== noId(knownWtg)) { const x = noId(pageWtg).split(/\r?\n/), y = noId(knownWtg).split(/\r?\n/); for (let i = 0; i < Math.max(x.length, y.length); i++) { if (x[i] !== y[i]) { console.log('   line ' + i + '\n     page : ' + String(x[i]).slice(0, 300) + '\n     spike: ' + String(y[i]).slice(0, 300)); break; } } }
-	ok('the .wtg is the spike\'s, apart from its new identity', noId(pageWtg) === noId(knownWtg));
+	ok('the .wtg matches the golden digest, apart from its new identity', require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex') === golden.wtgSha256);
 	ok('the .wtg\'s identity is new, not the template\'s', !pageWtg.includes((/<StorageFileHeader [^>]*\bId="([0-9a-f-]{36})"/.exec(tplWtg.toString('utf8')) || [])[1]));
 	ok('the project name written is the project\'s own', (() => {
 		const d = new SQL.Database(new Uint8Array(pageBytes)); const n = d.exec('SELECT Name FROM HMIDomainDataSet')[0].values[0][0]; d.close(); return n === 'Net3';
 	})());
+
+	const parsed = EngCalcs.lpnInpParse(NET3);
 
 	// ---- 5. the reader and EPANET ----
 	head('5. Read back with the WaterGEMS reader, then solved by EPANET');
@@ -241,6 +215,7 @@ function head(t) { console.log('\n' + t); }
 	});
 	const rbInp = rb.inp.replace(/\[CONTROLS\][\s\S]*?(?=\n\[)/, '').replace(/\n\[TIMES\]/, '\n[CONTROLS]\n' + ctl.join('\n') + '\n\n[TIMES]');
 	const ids = parsed.nodes.map((n) => n.id), lids = parsed.links.map((l) => l.id);
+	const spike = require('./wtg-export.js');   // only its EPANET reference run
 	const R0 = await spike.epanetReference(NET3, [], ids, lids), R1 = await spike.epanetReference(rbInp, [], ids, lids);
 	let wh = 0, wq = 0;
 	Object.keys(R0.snapshots).forEach((t) => {
@@ -273,6 +248,55 @@ function head(t) { console.log('\n' + t); }
 	const em = pe.ok && pe.notCarried.filter((x) => x.code === 'emitters')[0];
 	ok('an emitter on junction 15 is named in what the file cannot carry', !!em && JSON.stringify(em.ids) === '["15"]', pe.ok && JSON.stringify(pe.notCarried.map((x) => x.code)));
 	ok('...with a sentence naming the junction', !!em && L.wtgLines([em])[0] === fillP('lpn_wtg_export_lost_emitters', { ids: '15' }), em && L.wtgLines([em])[0]);
+
+	// ---- 6b. what changes the numbers or has no place in the file is named, with its value ----
+	head('6b. Settings and drawing data the files cannot hold');
+	L.importInp({ name: 'Net3-mult.inp', _text: NET3.replace(/(Demand Multiplier\s+)[\d.]+/i, '$12.0') });
+	const pm = L.wtgPlan();
+	const dm = pm.ok && pm.notCarried.filter((x) => x.code === 'demand_multiplier')[0];
+	ok('a Demand Multiplier of 2.0 is named in the left-out list, with its value', !!dm && dm.value === '2', pm.ok && JSON.stringify(pm.notCarried.map((x) => x.code + ':' + (x.value || ''))));
+	ok('...in the sentence the language file gives', !!dm && L.wtgLines([dm])[0] === fillP('lpn_wtg_export_lost_demand_multiplier', { value: '2' }), dm && L.wtgLines([dm])[0]);
+	ok('...and Net3 itself (multiplier 1) does not name it', !planned.notCarried.some((x) => x.code === 'demand_multiplier'));
+	L.importInp({ name: 'Net3-pda.inp', _text: NET3.replace(/(\[OPTIONS\][^\n]*\n)/, '$1 Demand Model       \tPDA\n') });
+	const pd = L.wtgPlan();
+	const dd = pd.ok && pd.notCarried.filter((x) => x.code === 'demand_model')[0];
+	ok('a pressure-driven demand model (PDA) is named, with its value', !!dd && dd.value === 'PDA' && L.wtgLines([dd])[0] === fillP('lpn_wtg_export_lost_demand_model', { value: 'PDA' }), pd.ok && JSON.stringify(pd.notCarried.map((x) => x.code)));
+	// Map Text, tags, a backdrop: built as parsed networks, since the .inp writer's own output decides what reaches the plan
+	const withExtras = Object.assign({}, planned.parsed, { labels: [{ id: 't1' }], inpSections: Object.assign({}, planned.parsed.inpSections, { TAGS: [' NODE 10 foo'] }), backdrop: { file: 'x.bmp' } });
+	const codesExtras = [];
+	{
+		const origExport = EngCalcs.lpnExportInp, origParse = EngCalcs.lpnInpParse;
+		EngCalcs.lpnInpParse = () => withExtras;
+		EngCalcs.lpnExportInp = () => ({ ok: true, inp: planned.inp, differences: [] });
+		const px = EngCalcs.lpnWtgExportPlan(L.getDoc(), {});
+		EngCalcs.lpnInpParse = origParse; EngCalcs.lpnExportInp = origExport;
+		px.notCarried.forEach((x) => codesExtras.push(x.code));
+		ok('map Text, tags and a backdrop are each named when the project has them', ['texts', 'tags', 'backdrop'].every((c) => codesExtras.indexOf(c) >= 0), codesExtras.join(','));
+		ok('...each with a sentence of its own', L.wtgLines(px.notCarried.filter((x) => ['texts', 'tags', 'backdrop'].indexOf(x.code) >= 0)).join('|') === [PC.lpn_wtg_export_lost_texts, PC.lpn_wtg_export_lost_tags, PC.lpn_wtg_export_lost_backdrop].join('|'));
+	}
+	L.importInp({ name: 'Net3.inp', _text: NET3 });
+
+	// ---- 6c. a refusal of the saved project reads plainly: no program, no column ----
+	head('6c. The saved project is refused in plain words');
+	const tKeys = Object.keys(PC).filter((k) => /^lpn_wtg_export_(t_|no_|failed|need)/.test(k));
+	ok('no refusal sentence names a program, a vendor, a column or a table', tKeys.length >= 14 && tKeys.every((k) => !/water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])), tKeys.filter((k) => /water(cad|gems)|bentley|HMI|Idaho|column|table/i.test(PC[k])).join());
+	const junk = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', Uint8Array.from([1, 2, 3, 4]))]);
+	ok('a file that is not a saved project: the "not a saved project" sentence', junk.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_not_project }), junk.err);
+	const odd2 = new SQL.Database(new Uint8Array(tplBytes));
+	odd2.run("UPDATE HMISchemaVersionInfo SET Value = '1.0.99.0' WHERE Name = 'HMICoreSchemaVersion'");
+	const oddB = odd2.export(); odd2.close();
+	const sch = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', oddB)]);
+	ok('a schema version not tested: the version found and the one tested are in the sentence',
+		sch.err === fillP('lpn_wtg_export_failed', { detail: fillP('lpn_wtg_export_t_schema', { found: '1.0.99.0', tested: EngCalcs.lpnWtgExportTestedSchemas.join(', ') }) }), sch.err);
+	const bare2 = new SQL.Database(new Uint8Array(tplBytes));
+	bare2.run('UPDATE HMIDomainElement SET IsDeleted = 1 WHERE DomainElementTypeID = 52');
+	const bareB = bare2.export(); bare2.close();
+	const kd = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', bareB)]);
+	ok('a saved project with no tank: the sentence names the tank', kd.err === fillP('lpn_wtg_export_failed', { detail: fillP('lpn_wtg_export_t_kind', { kind: 'tank' }) }), kd.err);
+	EngCalcs.lpnWtgExportSetEngine(() => Promise.reject(new Error('Failed to fetch')), wasm);
+	const off = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', tplBytes)]);
+	ok('the SQLite engine cannot be fetched (offline): the sentence says the first use needs a connection', off.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_offline }), off.err);
+	EngCalcs.lpnWtgExportSetEngine(initSqlJs, wasm);
 
 	// ---- 7. the schema gate and the template checks ----
 	head('7. The template is checked before anything is written');

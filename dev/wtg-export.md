@@ -227,6 +227,11 @@ mostly data entry rather than discovery.
    than Hazen-Williams, a pump without a three-point head curve (asks 2 and 3 stay open). **The saved project must
    already hold one of every element kind the network uses** (the writer clones prototypes), so a brand-new empty
    project does not work; the box says so, and a missing kind is refused by name.
+   **Left out and named in the box with their value:** a Demand Multiplier other than 1 and a pressure-driven demand
+   model (the schema has `NormalDemandAdjustments` and `PressureDependentDemand` tables, but no sample file states a
+   non-empty row, so no code is known), map Text, tags and a backdrop. Refusals of the saved project are language
+   keys (`lpn_wtg_export_t_*`) that name no program and no column. `wtg-page-export-harness.js` compares every table to
+   `reference/wtg-net3-golden.json`, digests of the spike writer's output at 8edd6369b (`wtg-dump.js` makes them).
 3. Samples for each unseen code, saved by Tom once: time-from-start and pressure conditions; pump
    status, speed and target-head actions; each valve kind with a setting; a pump with a multipoint curve and one
    with constant power; a tank with a volume curve; a reservoir with a head pattern. The template already holds

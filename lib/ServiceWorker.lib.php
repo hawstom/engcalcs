@@ -118,8 +118,8 @@ function ecSwAssetExclusions() {
         // Referenced by no page (verified 2026-08-14). Precaching an unreferenced file would
         // paper over the fact that it is unreferenced.
         'js/vendor/slim/index.js' => 'not referenced by any page',
-        // sql.js (Task 749), fetched by js/lpn-sqlite.js only when somebody opens a SQLite
-        // database. Its 658 KB sql-wasm.wasm sits outside the asset globs and is not precached
+        // sql.js (Task 749), fetched by js/lpn-sqlite.js and js/lpn-wtg-export.js only when somebody opens a
+        // SQLite database or exports a .wtg project. Its 658 KB sql-wasm.wasm sits outside the asset globs and is not precached
         // either; this is the 46 KB script that drives it, useless without it.
         'js/vendor/sql-wasm.js'   => 'opt-in SQLite reader; fetched only when a database is opened',
     ];

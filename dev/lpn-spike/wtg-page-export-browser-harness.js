@@ -130,8 +130,8 @@ async function main() {
 		ok('a box opens before any file is made', !!box && seen.length === 0, box && box.text.slice(0, 60));
 		ok('it holds the instruction to choose a saved project, and names no program', !!box && box.text.indexOf(labels.need) >= 0 && !/water(cad|gems)|bentley/i.test(box.text));
 		const items = await s.page.$$eval('#lpn_dialog_body li', (els) => els.map((e) => e.textContent));
-		ok('it lists what the files cannot carry, as list entries (water quality, pipe material, map positions)', items.length === 3
-			&& /quality/i.test(items[0]) && /material/i.test(items[1]) && /position/i.test(items[2]), JSON.stringify(items));
+		const wantItems = await s.page.evaluate(() => ['quality', 'texts', 'material', 'positions'].map((c) => EngCalcs.pageConfig['lpn_wtg_export_lost_' + c]));
+		ok('it lists what the files cannot carry, as list entries (water quality, map Text, pipe material, map positions)', JSON.stringify(items) === JSON.stringify(wantItems), JSON.stringify(items));
 		const dlgW = await s.page.evaluate(() => { const b = document.getElementById('lpn_dialog_body'), r = b.getBoundingClientRect(); return { w: r.width, h: r.height, sw: b.scrollWidth, cw: b.clientWidth }; });
 		ok('the box is visible and its text does not overflow sideways', dlgW.w > 200 && dlgW.h > 100 && dlgW.sw <= dlgW.cw + 1, JSON.stringify(dlgW));
 		ok('its buttons are Choose the saved project and Cancel', JSON.stringify(box.buttons) === JSON.stringify([labels.choose, labels.cancel]), JSON.stringify(box.buttons));
