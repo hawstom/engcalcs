@@ -59866,7 +59866,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and five 4px gaps come to 15.3rem, which fits the 252 px a squeezed pane leaves -- the test
 	// that caught the Settings box scrolling sideways (Tom, 2026-08-19: "It should not"). The Use
 	// units column is as wide as its heading's longer word, so "units" never breaks.
-	var LPN_LABEL_COL_W = '2.6rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
+	var LPN_LABEL_COL_W = '2.34rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
 		LPN_LABEL_UNITS_W = '1.85rem', LPN_LABEL_ROW_GAP = '4px';
 	function labelColumnSpacer(width, isUnits) {
 		var spacer = document.createElement('span');
@@ -65270,6 +65270,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
 	}
+	// **A DOCKED BOX KEEPS ITS OWN OPTIMAL WIDTH, NEVER ONE WIDTH FOR ALL** (Tom, 2026-10-24: the default
+	// docks "made them all a uniform width instead of leveraging our pre-existing knowledge about their
+	// ideal widths... the default docked Settings box is too narrow for the label rows"). A box's
+	// optimal width is the width its own CSS gives it floating, read off a bare copy of the box so
+	// the stylesheet stays the one place that states it. LPN_DOCK_OPTIMAL_REM lists the two that
+	// differ: Settings needs more docked than floating (50% over the old 360 px) and Properties sizes
+	// itself to its rows. A width the visitor has set (`dockW`, or a floating size they dragged) is
+	// theirs and wins. The shipped list, with each width, is dev/box-width-audit.md.
+	var LPN_DOCK_OPTIMAL_REM = { lpn_settings_box: 33.75, lpn_popup: 28 }, dockOptimalCache = {};
+	function dockOptimalW(d) {
+		var id = d.box.id, vw = window.innerWidth || 0, c = dockOptimalCache[id], rem = smTableRem(), probe, w = 0;
+		if (c && c.vw === vw && c.rem === rem) { return c.w; }
+		if (LPN_DOCK_OPTIMAL_REM[id]) { w = Math.round(LPN_DOCK_OPTIMAL_REM[id] * rem); }
+		else if (document.body) {
+			probe = d.box.cloneNode(false);
+			probe.removeAttribute('style');
+			probe.style.cssText = 'display:flex;visibility:hidden;position:fixed;left:-10000px;top:0;height:1px;';
+			document.body.appendChild(probe);
+			w = Math.round(probe.getBoundingClientRect().width);
+			document.body.removeChild(probe);
+		}
+		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		dockOptimalCache[id] = { vw: vw, rem: rem, w: w };
+		return w;
+	}
+	function dockWidthOf(d) { return d.rec.dockW || dockOptimalW(d); }
 	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
 	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
 	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
@@ -65367,9 +65393,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The width it floats at is the width it docks at, the first time, with no share of the
 			// window capping it (Tom, 2026-10-07, card E02: "no first-dock limit"); only the map's
 			// LPN_DOCK_MAP_MIN does, in layoutDocks().
+			// A width the visitor dragged it to is kept; otherwise it docks at its own optimal width.
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (d.rec.userSized && r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				else { d.rec.dockW = dockOptimalW(d); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
@@ -65589,7 +65617,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
-			sides[s].pinned.forEach(function (d) { w = Math.max(w, d.rec.dockW || 0); });
+			sides[s].pinned.forEach(function (d) { w = Math.max(w, dockWidthOf(d)); });
 			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
 		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
@@ -65616,7 +65644,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
+				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -65624,7 +65652,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
+				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
