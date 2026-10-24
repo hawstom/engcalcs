@@ -161,6 +161,8 @@ surprising thing. Questions 2 and 3 appear only when they apply.
    *{scenario}'s own alternative* (default) / *A new alternative, child of {parent}* (name field) /
    *The Base alternative.*
 
+**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is not asked.
+
 Then one **preview line** and the buttons. Imports that can be previewed without cost (a table of
 values, survey points) preview; a whole network preview is the existing import report afterwards.
 
@@ -168,8 +170,8 @@ values, survey points) preview; a whole network preview is the existing import r
 
 | Command (numbers from part 1) | Format level | Today | Treatment under the standard |
 |---|---|---|---|
-| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / Base); no "new scenario" choice yet, for either door. Receipt is a dialog naming the scenario |
-| 9 Survey points | 0 | Silent into open scenario | Wizard questions 1-3 (scenario matters: nodes are born only in the chosen scenario) |
+| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Receipt is a dialog naming the scenario |
+| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Alternative question (3) not asked |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct | No question; receipt line "visible in every scenario" |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
 | 14 Workspace, 15 Calibration | none | Silent | No change; calibration's header names the scenario it was compared with |

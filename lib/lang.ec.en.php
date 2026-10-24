@@ -2436,6 +2436,15 @@ $ec_lang['lpn_inpup_btn_new']='A new project';
 $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 // {scenario} is a scenario name; it labels a button.
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
+$ec_lang['lpn_inpup_btn_newscn']='A new scenario, child of {parent}';
+$ec_lang['lpn_inpup_newscn_name']='Name, if you choose a new scenario';
+$ec_lang['lpn_inpup_new_scn']='Created the scenario {scenario}, a child of {parent}, and opened it.';
+$ec_lang['lpn_inpup_btn_newscn_basic']='A new scenario';
+$ec_lang['lpn_inpup_new_scn_basic']='Created the scenario {scenario} and opened it.';
+$ec_lang['lpn_inpup_new_none']='No scenario was created.';
+$ec_lang['lpn_survey_where_title']='Import surveyed points';
+$ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
+$ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
 $ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_gjup_title']='Update from GeoJSON file';

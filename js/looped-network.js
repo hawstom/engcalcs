@@ -12644,6 +12644,71 @@ var EngCalcs = EngCalcs || {};
 		if (i > cols.length - 1) { i = cols.length - 1; }
 		return cols[i];
 	}
+	// **THE CASING: A RAMP CLASS THE PAPER SWALLOWS GETS A THIN OUTLINE** (Task 811; dev/themes-plan.md). A ramp's
+	// darkest class (viridis purple) nearly vanishes on a dark paper. The class keeps its colour, so a visitor's
+	// colouring is unchanged on every light paper, and a dark-paper theme states `--ec-map-casing` (the paper's
+	// opposite tone); a class under 3:1 against the paper then takes `.lpn-ramp-cased` (css/engcalcs.css), on the
+	// map's links, nodes and symbols and on the legend swatch. A theme with no casing (every light paper) marks
+	// nothing, so Light draws exactly what it always drew.
+	var casingMemo = null;
+	function casingRead() {
+		if (casingMemo) { return casingMemo; }
+		casingMemo = { on: false, paper: null };
+		if (svg && typeof getComputedStyle === 'function') {
+			var cs = getComputedStyle(svg), c = (cs.getPropertyValue('--ec-map-casing') || '').trim();
+			if (c && c !== 'none' && c !== 'transparent') { casingMemo = { on: true, paper: rgbOf(cs.getPropertyValue('--ec-map-paper')) }; }
+		}
+		return casingMemo;
+	}
+	function rgbOf(c) {
+		var m, t = String(c || '').trim();
+		if ((m = /^#([0-9a-f]{3})$/i.exec(t))) { return [parseInt(m[1][0] + m[1][0], 16), parseInt(m[1][1] + m[1][1], 16), parseInt(m[1][2] + m[1][2], 16)]; }
+		if ((m = /^#([0-9a-f]{6})$/i.exec(t))) { return [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)]; }
+		if ((m = /rgba?\(([^)]+)\)/.exec(t))) { return m[1].split(/[\s,\/]+/).filter(Boolean).slice(0, 3).map(parseFloat); }
+		return null;
+	}
+	function lumOf(q) {
+		var f = q.map(function (x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
+		return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2];
+	}
+	function rampNeedsCasing(col) {
+		var k = casingRead(), q = col ? rgbOf(col) : null, a, b;
+		if (!k.on || !k.paper || !q) { return false; }
+		a = lumOf(q); b = lumOf(k.paper);
+		return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) < 3;
+	}
+	// Three drawings, three casings (css/engcalcs.css): a link's own halo line (already under every pipe, in step
+	// with its geometry) takes the casing as its stroke; a junction's ring and a legend swatch's border take it as
+	// a colour; a tank, pump or valve symbol, few and drawn as one picture, takes a drop shadow. A filter is
+	// never put on a pipe or a junction: hundreds of them stalled the paint of a large network.
+	function casingMark(el, col, cls) {
+		if (el && el.classList) { el.classList.toggle(cls || 'lpn-ramp-cased', rampNeedsCasing(col)); }
+	}
+	// A theme change re-reads each drawn colour against the new paper. Marks only: no colour is recomputed, and
+	// no contour or label pass runs (refreshValueColors() would, on every sweep across the gallery).
+	function recaseAll() {
+		if (!svg || !doc || !(colorFieldOf('node') || colorFieldOf('link'))) { return; }
+		var legend = document.getElementById('lpn_color_legend');
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], t = ne && (isFixedHeadNode(n) ? ne.symbol : ne.circle);
+			if (t) { casingMark(t, t.style.color, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased'); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || !le.line) { return; }
+			casingMark(le.halo, le.line.style.stroke);
+			if (le.symbolSvg) { casingMark(le.symbolSvg, le.symbolSvg.style.color, 'lpn-ramp-cased-sym'); }
+		});
+		if (legend) {
+			Array.prototype.forEach.call(legend.querySelectorAll('.lpn-color-swatch'), function (sw) { casingMark(sw, sw.style.background); });
+		}
+	}
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('ec-theme', function () {
+			casingMemo = null;
+			recaseAll();
+		});
+	}
 	// **A VALUE THAT DOES NOT EXIST IS null, NOT CLASS 0.** classIndex() answers null for it and
 	// this returns the empty string, so the element keeps NO inline style at all and the
 	// stylesheet's black stands -- exactly how an uncoloured map is drawn. A pump has no velocity,
@@ -12684,6 +12749,7 @@ var EngCalcs = EngCalcs || {};
 		var target = isFixedHeadNode(n) ? ne.symbol : ne.circle;
 		if (target) {
 			target.style.color = col;
+			casingMark(target, col, isFixedHeadNode(n) ? 'lpn-ramp-cased-sym' : 'lpn-ramp-cased');
 			if (col) { target.style.setProperty('--lpn-shade', '100%'); }
 			else { target.style.removeProperty('--lpn-shade'); }
 		}
@@ -12695,9 +12761,10 @@ var EngCalcs = EngCalcs || {};
 		if (breaks === undefined) { breaks = field ? effectiveBreaks('link', field) : []; }
 		var col = field ? colorForValue('link', colorLinkValue(l, field), breaks) : '';
 		le.line.style.stroke = col;
+		casingMark(le.halo, col);
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
-		if (le.symbolSvg) { le.symbolSvg.style.color = col; }
+		if (le.symbolSvg) { le.symbolSvg.style.color = col; casingMark(le.symbolSvg, col, 'lpn-ramp-cased-sym'); }
 		// **AND SO DO THE FLOW ARROWS** (Task 671, Tom 2026-09-15). Same argument as the symbol one
 		// line above, and the same argument Tom already made about the vertex dot (2026-09-02:
 		// *"Change vertex color too."*): a chevron sitting ON a pipe is part of that pipe's mark,
@@ -12824,6 +12891,7 @@ var EngCalcs = EngCalcs || {};
 					crow.style.cssText = 'display:flex;gap:0.5em;align-items:center';
 					csw.className = 'lpn-color-swatch';
 					csw.style.background = bandColor(group, ci === null ? 0 : ci, breaks.length + 1);
+					casingMark(csw, csw.style.background);
 					ctxt.textContent = pc[c.key] || c.text;
 					crow.appendChild(csw); crow.appendChild(ctxt);
 					box.appendChild(crow);
@@ -12835,6 +12903,7 @@ var EngCalcs = EngCalcs || {};
 				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';
 				sw.className = 'lpn-color-swatch';
 				sw.style.background = bandColor(group, i, breaks.length + 1);
+				casingMark(sw, sw.style.background);
 				// Range text is built from glyphs, not words: '<', '≤' and an en dash are the
 				// same marks in all 27 languages and need no key. (An RTL reader gets them mirrored
 				// by the bidi algorithm, which is the correct rendering.)
@@ -46270,13 +46339,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var nAssets = {}, nVals = plan.changes.length, nAdded = plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length,
 				kept = plan.keptNodes.concat(plan.keptLinks);
 			plan.changes.forEach(function (c) { nAssets[c.kind + c.id] = 1; });
-			p((pc.lpn_inpup_heading || 'Imported {file} into {scenario} of {project}').replace('{project}', projName).replace('{file}', fileName)
-				.replace('{scenario}', scnName), true);
+			// Nothing written: say so, never "Imported".
+			p((nVals || nAdded ? (pc.lpn_inpup_heading || 'Imported {file} into {scenario} of {project}') : (pc.lpn_inpup_refused_heading || 'Nothing was changed in {project}.'))
+				.replace('{project}', projName).replace('{file}', fileName).replace('{scenario}', scnName), true);
 			p((pc.lpn_inpup_counts || 'Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).')
 				.replace('{n}', String(nVals)).replace('{m}', String(Object.keys(nAssets).length))
 				.replace('{a}', String(nAdded)).replace('{k}', String(kept.length)) +
 				(nVals || nAdded ? ' ' + (pc.lpn_inpup_undo || 'Undo reverses all of it in one step.') : ''));
-			if (!nVals && !nAdded) { p((pc.lpn_inpup_nothing || 'Every value in the file that matches an asset here is already the same in {scenario}.').replace('{scenario}', scnName)); }
+			if (plan.newScn && !plan.newScn.none) {
+				p(importNewScenarioCreatedText(plan.newScn.name, plan.newScn.parent));
+			}
+			if (!nVals && !nAdded) { p((pc.lpn_inpup_nothing || 'Every value in the file that matches an asset here is already the same in {scenario}.').replace('{scenario}', scnName) +
+				(plan.newScn && plan.newScn.none ? ' ' + (pc.lpn_inpup_new_none || 'No scenario was created.') : '')); }
 			if (nVals) {
 				p(pc.lpn_inpup_h_changed || 'Values changed', true);
 				list(plan.changes.slice(0, 200).map(function (c) {
@@ -46324,21 +46398,39 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return kind === 'geojson' ? (pc.lpn_gjup_title || 'Update from GeoJSON file') : (pc.lpn_inpup_title || 'Update from EPANET file');
 	}
 	// Compare, apply as one step, say what happened. `target` is 'open' (the open scenario) or 'base'.
-	function updateProjectFromInp(text, fileName, target, msxFile) {
+	function updateProjectFromInp(text, fileName, target, msxFile, newName) {
 		var pc = EngCalcs.pageConfig || {}, parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
 		if (!parsed.ok) { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); return false; }
 		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName);
-		return updateProjectWithPlan(function () { return inpUpdatePlan(parsed, name); }, fileName, target, msxFile, 'inp');
+		return updateProjectWithPlan(function () { return inpUpdatePlan(parsed, name); }, fileName, target, msxFile, 'inp', newName);
 	}
 	// **THE ONE LANDING IN THE OPEN PROJECT, FOR EVERY FORMAT** (Task 814): `makePlan()` compares and
 	// writes nothing (it runs with the target scenario open); the apply, the one undo step, the
 	// failure rollback, the notice and the receipt dialog are the same whatever the file was.
-	function updateProjectWithPlan(makePlan, fileName, target, msxFile, kind) {
-		var pc = EngCalcs.pageConfig || {},
-			scn = target === 'base' ? baseScenario() : activeScenario(), scnName = scenarioDisplayName(scn), plan, touched;
-		plan = inpWithScenario(scn.id, makePlan);
+	function updateProjectWithPlan(makePlan, fileName, target, msxFile, kind, newName) {
+		var pc = EngCalcs.pageConfig || {}, fresh = target === 'new', from = activeScenario(), parent = importNewScenarioParent(),
+			scn = target === 'base' ? baseScenario() : from, scnName = scenarioDisplayName(scn), plan, touched, snapped = false;
+		// **THE FILE IS COMPARED WITH THE PARENT, BEFORE ANYTHING IS MADE** (Task 814): a new child inherits
+		// exactly what its parent reads, so the plan is the same, and an update with nothing to write, or a
+		// refused one, touches nothing at all: no scenario, no undo step, the redo list and the edited
+		// state as they were.
+		if (fresh) {
+			plan = inpWithScenario(parent.id, makePlan);
+			plan.newScn = { name: newName, parent: scenarioDisplayName(parent) };
+			if (plan.refused.length || !(plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
+				plan.newScn = { none: true };
+				scnName = scenarioDisplayName(parent);
+			} else {
+				saveUndoSnapshot();
+				snapped = true;
+				scn = createScenario(newName, parent.id);
+				scnName = scenarioDisplayName(scn);
+			}
+		} else {
+			plan = inpWithScenario(scn.id, makePlan);
+		}
 		if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
-			saveUndoSnapshot();
+			if (!snapped) { saveUndoSnapshot(); }
 			try {
 				touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan); });
 				afterPropertyEdits(touched);
@@ -46369,18 +46461,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		function landNew() { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } }
 		askImportDestination(fileName, pc.lpn_inpup_lead || 'Choose where to import this file. Note that EPANET files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
-			landNew, function (target) { updateProjectFromInp(text, fileName, target, msxFile); });
+			landNew, function (target, newName) { updateProjectFromInp(text, fileName, target, msxFile, newName); });
 	}
 	// **THE ONE QUESTION, FOR EVERY FILE THAT MAY LAND IN THE OPEN PROJECT** (Task 814). `landNew()`
 	// makes the new project; `update(target)` lands in the open project, target 'open' or 'base'.
-	function askImportDestination(fileName, lead, landNew, update) {
+	function askImportDestination(fileName, lead, landNew, update, priorName) {
 		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), inBase = !!scn.isBase,
-			projName = projectDisplayName(project), buttons = [], seam = window.lpnInpDestination;
+			projName = projectDisplayName(project), buttons = [], seam = window.lpnInpDestination, nameInput;
 		// THE HARNESS SEAM, as window.lpnDialogAnswerer is for askDialog(): only the headless DOM stub
 		// sets it, to 'new' so that the many harnesses that import one file after another still make
-		// a project each time. A real page has none and always asks.
+		// a project each time. A real page has none and always asks. 'new-scenario' makes a new scenario
+		// with its default name.
 		if (typeof seam === 'string') {
-			if (seam === 'new') { landNew(); } else { update(seam); }
+			if (seam === 'new') { landNew(); }
+			else if (seam === 'new-scenario') { update('new', importNewScenarioName()); }
+			else { update(seam); }
 			return;
 		}
 		buttons.push({ label: pc.lpn_inpup_btn_new || 'A new project', isDefault: true, fn: landNew });
@@ -46390,6 +46485,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			buttons.push({ label: (pc.lpn_inpup_btn_scenario || '{scenario}, open now').replace('{scenario}', scenarioDisplayName(scn)),
 				fn: function () { update('open'); } });
+		}
+		buttons.push({ label: importNewScenarioLabel(), fn: function () {
+			var name = importNewScenarioChosen(nameInput);
+			if (name === null) { askImportDestination(fileName, lead, landNew, update, nameInput.value); return; }
+			update('new', name);
+		} });
+		if (!inBase) {
 			buttons.push({ label: pc.lpn_scenario_base || 'Base',
 				fn: function () { update('base'); } });
 		}
@@ -46408,7 +46510,80 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A lead of one paragraph (a translation not yet updated) still gets the matching rule beneath it.
 			if (leadParas.length < 2) { p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.')); }
 			if (!inBase) { p(pc.lpn_inpup_base_note || 'Choosing Base doesn\'t clear any scenario overrides.'); }
+			nameInput = importNewScenarioField(body, priorName);
 		}, buttons, { title: (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName) });
+	}
+	// **THE NEW-SCENARIO CHOICE, SHARED BY EVERY IMPORT THAT ASKS WHERE IT GOES** (Task 814). The new
+	// scenario is a child of the open one; with Basic mode on every scenario is a child of Base, so
+	// it is made there and the button says so.
+	function importNewScenarioParent() { return scenarioBasicMode ? baseScenario() : activeScenario(); }
+	function importNewScenarioLabel() {
+		var pc = EngCalcs.pageConfig || {};
+		// Basic mode hides the tree words: the scenario is simply a new one.
+		if (scenarioBasicMode) { return pc.lpn_inpup_btn_newscn_basic || 'A new scenario'; }
+		return (pc.lpn_inpup_btn_newscn || 'A new scenario, child of {parent}')
+			.replace('{parent}', scenarioDisplayName(importNewScenarioParent()));
+	}
+	function importNewScenarioCreatedText(name, parentName) {
+		var pc = EngCalcs.pageConfig || {};
+		if (scenarioBasicMode) { return (pc.lpn_inpup_new_scn_basic || 'Created the scenario {scenario} and opened it.').replace('{scenario}', name); }
+		return (pc.lpn_inpup_new_scn || 'Created the scenario {scenario}, a child of {parent}, and opened it.').replace('{scenario}', name).replace('{parent}', parentName);
+	}
+	function importNewScenarioName() {
+		var pc = EngCalcs.pageConfig || {}, n = scenarios.length, name;
+		do { name = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', n); n++; } while (smNameTaken('scenarios', name));
+		return name;
+	}
+	function importNewScenarioField(body, prior) {
+		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), lab = document.createElement('label'),
+			inp = document.createElement('input');
+		row.style.margin = '8px 0 0';
+		inp.type = 'text';
+		inp.id = 'lpn_import_newscn';
+		inp.value = prior || importNewScenarioName();
+		lab.htmlFor = inp.id;
+		lab.textContent = pc.lpn_inpup_newscn_name || 'Name, if you choose a new scenario';
+		lab.style.marginRight = '8px';
+		row.appendChild(lab);
+		row.appendChild(inp);
+		body.appendChild(row);
+		return inp;
+	}
+	// The name typed, or null (after saying why) when it cannot be used; the caller asks again.
+	function importNewScenarioChosen(inp) {
+		var pc = EngCalcs.pageConfig || {}, v = String((inp && inp.value) || '').trim();
+		if (!v) { return importNewScenarioName(); }
+		if (smNameTaken('scenarios', v)) {
+			setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace(/\{name\}/g, v));
+			return null;
+		}
+		return v;
+	}
+	// **SURVEYED POINTS: WHERE DO THEY GO?** (Task 814, Tom's call 1.) Asked only when the project holds
+	// more than Base; with Base alone there is nothing to choose. `go(target, name)`, target 'open', 'base' or 'new'.
+	function askSurveyDestination(go, priorName) {
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), inBase = !!scn.isBase, buttons = [], nameInput,
+			seam = window.lpnInpDestination;
+		if (scenarios.length < 2) { go('open'); return; }
+		if (typeof seam === 'string') {
+			if (seam === 'new-scenario') { go('new', importNewScenarioName()); } else { go(seam === 'base' ? 'base' : 'open'); }
+			return;
+		}
+		buttons.push({ label: (pc.lpn_inpup_btn_scenario || '{scenario}, open now').replace('{scenario}', scenarioDisplayName(scn)),
+			isDefault: true, fn: function () { go('open'); } });
+		buttons.push({ label: importNewScenarioLabel(), fn: function () {
+			var name = importNewScenarioChosen(nameInput);
+			if (name === null) { askSurveyDestination(go, nameInput.value); return; }
+			go('new', name);
+		} });
+		if (!inBase) { buttons.push({ label: pc.lpn_scenario_base || 'Base', fn: function () { go('base'); } }); }
+		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () { setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.'); } });
+		openDialog(function (body) {
+			function p(t) { var e = document.createElement('p'); e.style.margin = '0 0 8px'; e.textContent = t; body.appendChild(e); }
+			p(pc.lpn_survey_where_lead || 'Each point becomes a node. Choose where the nodes go.');
+			p(pc.lpn_survey_where_note || 'In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.');
+			nameInput = importNewScenarioField(body, priorName);
+		}, buttons, { title: pc.lpn_survey_where_title || 'Import surveyed points' });
 	}
 	function projectHasAssets() { return !!doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length)); }
 
@@ -46627,7 +46802,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!choice && projectHasAssets()) {
 			askImportDestination(fileName, pc.lpn_gjup_lead || 'Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
 				function () { landGeoJsonNetNew(scan, fileName, done, choice); },
-				function (target) { updateProjectFromGeoJson(scan, fileName, target, done); });
+				function (target, newName) { updateProjectFromGeoJson(scan, fileName, target, done, newName); });
 			return;
 		}
 		landGeoJsonNetNew(scan, fileName, done, choice);
@@ -46660,14 +46835,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((net.customProps || []).length) { na.custom = true; }
 		return { refused: [], na: na, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
 	}
-	function updateProjectFromGeoJson(scan, fileName, target, done) {
+	function updateProjectFromGeoJson(scan, fileName, target, done, newName) {
 		function land(net, refusedRows) {
 			var ok = updateProjectWithPlan(function () {
 				var plan = refusedRows && refusedRows.length ? inpPlanFromSource({ refused: refusedRows })
 					: inpPlanFromSource(geoJsonPlanSource(net));
 				if (net) { plan.noteLines = geoJsonNetNoteLines(net); }
 				return plan;
-			}, fileName, target, null, 'geojson');
+			}, fileName, target, null, 'geojson', newName);
 			if (done) { done({ ok: ok, updated: true, net: net }); }
 		}
 		var before = readUnitSelections(), net, rows;
@@ -47418,7 +47593,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: createPlain, fn: function () {
 				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
-				showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan()));
+				// With more than Base in the project the points are asked where they go (Task 814).
+				askSurveyDestination(function (target, newName) {
+					var from = activeScenario(), outcome, scn = from, made = null;
+					if (target === 'open') { showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan())); return; }
+					// One undo step for the new scenario and its nodes together.
+					undoGroup = { taken: false };
+					try {
+						saveUndoSnapshot();
+						if (target === 'new') {
+							made = createScenario(newName, importNewScenarioParent().id);
+							scn = made;
+							outcome = createSurveyNodes(parsed, assetType, plan());
+						} else {
+							scn = baseScenario();
+							outcome = inpWithScenario(scn.id, function () { return createSurveyNodes(parsed, assetType, plan()); });
+							applyScenarioChange();
+						}
+					} finally { undoGroup = null; }
+					showSurveyReport(parsed, outcome, scn, made && made.parent !== undefined ? scenarioDisplayName(scenarioById(made.parent)) : made ? scenarioDisplayName(baseScenario()) : null);
+				});
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
 				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
@@ -47557,14 +47751,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It
 	// used to open with the file's name in bold. The reader chose that file a moment ago and is
 	// looking at the box they asked for; what they do not know is how many points came out of it.
-	function showSurveyReport(parsed, outcome) {
+	function showSurveyReport(parsed, outcome, scnGiven, madeUnder) {
 		var pc = EngCalcs.pageConfig || {},
 			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes()),
-			svScn = activeScenario();
+			svScn = scnGiven || activeScenario();
 		// Task 814, defect 3: in a scenario other than Base the nodes are born inactive in Base.
 		if (svScn && !svScn.isBase && outcome && outcome.created) {
 			lines = [{ text: (pc.lpn_survey_added_scenario || 'The nodes were added to {scenario}. In Base they are inactive.')
 				.split('{scenario}').join(scenarioDisplayName(svScn)), raw: null }].concat(lines);
+		}
+		if (madeUnder) {
+			lines = [{ text: importNewScenarioCreatedText(scenarioDisplayName(svScn), madeUnder), raw: null }].concat(lines);
 		}
 		openDialog(function (body) {
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
