@@ -37128,7 +37128,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the chart, never the size of the drawing already in it. It comes before the axis bounds
 		// because the room decides how many gridlines there is room to LABEL (Task 527).
 		lay = profileLayout(host, series.nodes.map(function (n) { return n.id; }));
-		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		// The heads of every time step of the run join the vertical bounds (see simulationRange()), so
+		// the axis does not move as the clock does. The ground is the same at every step.
+		var profSpan = simulationRange('profile|' + path.nodes.join(',') + '|' + unitLabel(resultUnit('elevhead')), function () {
+			var out = [];
+			EngCalcs.lpnProfile.profileSeries(path, profileData()).nodes.forEach(function (n) {
+				if (typeof n.head === 'number') { out.push(n.head); }
+			});
+			return out;
+		});
+		yB = EngCalcs.lpnProfile.axisBounds(profSpan ? values.concat([profSpan.lo, profSpan.hi]) : values, lay.y);
 		xB = EngCalcs.lpnProfile.stationBounds(series.length);
 		profileLastSize = { w: lay.w, h: lay.h };
 		box = lay.box;
@@ -37373,6 +37382,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		readTimeOverride = (frame && typeof frame.t === 'number') ? frame.t : null;
 		try { return fn(); }
 		finally { lastSolveResult = wasResult; readTimeOverride = wasTime; }
+	}
+	// **AN AXIS THAT HOLDS STILL WHILE THE CLOCK MOVES** (Tom, 2026-10-24: Net3's pressure axis jumped
+	// between 100 and 140 from one time step to the next). The Frequency x axis and the Profile y axis
+	// are drawn over the lowest and highest value found in ANY frame of the run, so a curve is read
+	// against the same scale at every time. `valuesAtFrame` returns the numbers one frame contributes
+	// (it runs with that frame standing in for the result, as tsSeries() does). {lo, hi}, or null with
+	// no run. Kept until the run is replaced; `key` names what is measured (field, units, route).
+	var simRangeCache = { token: null, by: {} };
+	function simulationRange(key, valuesAtFrame) {
+		var token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null, lo = Infinity, hi = -Infinity, frames, hit;
+		if (!token) { return null; }
+		if (simRangeCache.token !== token) { simRangeCache = { token: token, by: {} }; }
+		if (Object.prototype.hasOwnProperty.call(simRangeCache.by, key)) { return simRangeCache.by[key]; }
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		frames.forEach(function (f) {
+			tsAsOfFrame(f, function () {
+				valuesAtFrame().forEach(function (v) {
+					if (typeof v === 'number' && isFinite(v)) { if (v < lo) { lo = v; } if (v > hi) { hi = v; } }
+				});
+			});
+		});
+		hit = hi >= lo ? { lo: lo, hi: hi } : null;
+		simRangeCache.by[key] = hit;
+		return hit;
 	}
 	// One entry per plotted asset: its id, its color, and its points in reporting-step order.
 	//
@@ -38594,7 +38627,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// two plots of the same network read against the same scale.
 		// A network whose pipes are all one diameter is a real answer: its curve is one vertical run,
 		// centred in a window a fiftieth of its own size rather than an axis of zero width.
-		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }), {
+		// The axis spans the whole run, not only this time step (see simulationRange()).
+		var freqSpan = simulationRange('freq|' + group + '|' + field + '|' + colorFieldUnitText(group, field), function () {
+			return freqValues(group, field).map(function (o) { return o.v; });
+		});
+		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }).concat(freqSpan ? [freqSpan.lo, freqSpan.hi] : []), {
 			ticks: 5, maxTicks: 8,
 			minSpan: Math.max(Math.abs(pts[0].x), Math.abs(pts[pts.length - 1].x)) / 50 || 1
 		});
