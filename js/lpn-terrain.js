@@ -484,6 +484,11 @@
 	// `replacing` is the starting elevation, when this run is the SECOND question -- the one about
 	// nodes that still hold the number a new node is born with. Naming that number is the whole
 	// point of asking separately, so it is never summarised away.
+	// Which scenario the elevations will be written to, said by the page (Task 814); empty in a
+	// project that is Base alone, or when no page has said.
+	function scenarioLine() {
+		return (seam && typeof seam.scenarioSentence === 'function' && seam.scenarioSentence()) || '';
+	}
 	EC.lpnTerrainPlanText = function (want, keep, tileCount, replacing) {
 		var fillCount = (want || []).length, keepCount = (keep || []).length;
 		var s = (replacing === undefined)
@@ -507,6 +512,7 @@
 				+ ' ' + named('lpn_terrain_keep_ids', 'They are: {ids}', keep);
 		}
 		s += '\n\n' + accuracy();
+		if (scenarioLine()) { s += '\n\n' + scenarioLine(); }
 		s += '\n\n' + (window.EngCalcs && EngCalcs.macWords ? EngCalcs.macWords : String)(t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.'));
 		// **THE COUNT IS SUBSTITUTED, NOT CONCATENATED** -- Turkish filed this against sprint 459's
 		// English and was right: `count + ' ' + string` fixes the number to the FRONT of the sentence,
@@ -547,6 +553,7 @@
 			parts.push(t('lpn_terrain_partial',
 				'{f} terrain tile(s) did not respond.').replace('{f}', failedTiles));
 		}
+		parts.push(scenarioLine());
 		parts.push(accuracy());
 		parts.push(CREDIT);
 		return parts.filter(function (x) { return !!x; }).join(' ');

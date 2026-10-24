@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 199 untranslated keys, of 3217 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (196, 31 to read @@ NEEDS RULING)
+## lpn_  (199, 34 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -64,6 +64,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_crit_stopped_at`**
   > run stopped at {time}
   _Ruled OK 2026-10-20._
+- **`lpn_dem_base`**
+  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
+  @@ NEEDS RULING
+- **`lpn_dem_scenario`**
+  > Elevations written here are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   _Ruled OK 2026-10-20._
@@ -547,6 +553,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_zoom`**
   > Zoom
   _Ruled OK 2026-10-20._
+- **`lpn_shapes_every_scenario`**
+  > Shapes appear in every scenario.
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -635,11 +644,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1023 (`c79eb40fa`) — adds no English strings
+### chore/handoff-1023b (`05c9be59c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/import-new-scenario (`8a8d8178a`) — already merged into chore/merge-1023; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -803,9 +810,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-whimsy (`5cc3fc78a`) — already merged into chore/merge-1023; its strings are listed there
-
-### feat/value-source (`23aa4ccf1`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/value-source (`7eae1cf8f`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -832,6 +837,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/wtg-export (`8edd6369b`) — adds no English strings
+### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
+
+### feat/wtg-page-export (`df21bbbaa`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+
+### fix/settings-spinners (`52579066f`) — adds no English strings

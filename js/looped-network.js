@@ -35583,7 +35583,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
 		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
 		panePrintPrevTitle = document.title;
-		document.title = (projectName ? projectName + '-' : '') + tableName;
+		document.title = (projectName ? projectName + '-' : '') + tableName + (spec.scnRows ? '' : paneSanitizeFileName(openScenarioFileSuffix()));
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
 			window.addEventListener('afterprint', paneEndPrint);
 			window.print();
@@ -35652,7 +35652,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	};
 	function paneExportTable(spec, kind) {
 		var pc = EngCalcs.pageConfig || {}, d = paneSheetData(spec), table = paneTableLabel(spec),
-			name = paneProjectPrefix() + paneNoSpace(table) + '.' + kind, data;
+			name = paneProjectPrefix() + paneNoSpace(table) + (spec.scnRows ? '' : paneNoSpace(openScenarioFileSuffix())) + '.' + kind, data;
 		if (!EngCalcs.lpnTableCsv) { return; }
 		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : kind === 'xlsx'
 			? EngCalcs.lpnTableXlsx(d.heads, d.cells, table, d.numeric)
@@ -43824,6 +43824,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!scn || scn.isBase) { return base; }
 		return base + '-' + safeFileName(scenarioDisplayName(scn));
 	}
+	// The `-<scenario>` tail of a file name for a file that shows the open scenario (Task 814, rule 6):
+	// empty in Base, so Base keeps the project name alone. The picture, the table export and the
+	// printed table use it; inpExportBaseName() is the same rule for the project-name part as well.
+	function openScenarioFileSuffix() {
+		var scn = activeScenario();
+		return (!scn || scn.isBase) ? '' : '-' + safeFileName(scenarioDisplayName(scn));
+	}
+	/**
+	 * **A WRITE THAT LANDS IN A SCENARIO SAYS WHICH ONE** (Task 814, rule 5; the Mapbox DEM doors).
+	 * Empty when the project is Base alone, where there is no other place it could have gone.
+	 */
+	function writeScenarioSentence(scnKey, scnFallback, baseKey, baseFallback) {
+		var pcX = EngCalcs.pageConfig || {}, scn = activeScenario();
+		if (scenarios.length < 2) { return ''; }
+		return (!scn || scn.isBase) ? String(pcX[baseKey] || baseFallback)
+			: String(pcX[scnKey] || scnFallback).split('{scenario}').join(scenarioDisplayName(scn));
+	}
+	function demScenarioSentence() {
+		return writeScenarioSentence('lpn_dem_scenario', 'Elevations written here are overrides in the scenario {scenario}.',
+			'lpn_dem_base', 'Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.');
+	}
 	/**
 	 * **AN EXPORT NAMES THE ONE SCENARIO IT HOLDS** (Task 814, defect 1). The .inp, GeoJSON and DXF
 	 * formats carry a single set of values; with more than Base in the project the other scenarios
@@ -44028,6 +44049,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// characters and all, through the same source record a typed coordinate uses; a projected one
 	// converts them by the transform its map uses (numbers of ours). A local grid has no place on
 	// the Earth and is refused, as the export refuses it. One undo step for the whole import.
+	// A Shape belongs to no scenario (Task 814, rule 5): said once, and only where a second scenario exists.
+	function shapesEveryScenarioLine() {
+		return String((EngCalcs.pageConfig || {}).lpn_shapes_every_scenario || 'Shapes appear in every scenario.');
+	}
 	function pickGeoJsonFile() {
 		var input = document.getElementById('lpn_geojson_file');
 		if (input) { input.click(); }
@@ -44111,6 +44136,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			lines.push(counted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
 				'One Shape imported from {file}.').replace('{file}', fileName));
+			if (made.length && scenarios.length > 1) { lines.push(shapesEveryScenarioLine()); }
 			if (renamed.length) {
 				lines.push(counted('lpn_geojson_import_renamed', renamed.length,
 					'{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.',
@@ -44226,6 +44252,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{list}', renamed.slice(0, 5).join(', ') + (renamed.length > 5 ? ', ' +
 					String(pc.lpn_shapes_import_more || 'and {n} more').replace('{n}', String(renamed.length - 5)) : '')));
 		}
+		if (made.length && scenarios.length > 1) { lines.push(shapesEveryScenarioLine()); }
 		Array.prototype.push.apply(lines, skippedLines);
 		Array.prototype.push.apply(lines, extraLines);
 		setNotice(lines.join(' '));
@@ -54906,7 +54933,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function snipDownload(blob) {
 		var a = document.createElement('a'), url = URL.createObjectURL(blob);
 		a.href = url;
-		a.download = safeFileName((project && project.name) || 'map') + '-screenshot.png';
+		a.download = safeFileName((project && project.name) || 'map') + openScenarioFileSuffix() + '-screenshot.png';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -70476,6 +70503,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (shown !== null) {
 				saveUndoSnapshot();
 				setElev(shown);
+				demNoticeScenario();
 				refreshPopupIfOpen();
 				return;
 			}
@@ -70514,6 +70542,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * `terrainAsked` is set BEFORE the request, so the row can tell "asked and got nothing" from
 	 * "not asked yet" even when the request fails.
 	 */
+	function demNoticeScenario() {
+		var t = demScenarioSentence();
+		if (t) { setNotice(t); }
+	}
 	function demSample(nodeId, andSet) {
 		terrainAsked[nodeId] = true;
 		EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function (heights) {
@@ -70521,6 +70553,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (andSet && typeof m === 'number' && isFinite(m)) {
 				saveUndoSnapshot();
 				andSet(+toDisplay(m, 'lpn_u_elevhead').toFixed(2));
+				demNoticeScenario();
 			}
 			refreshPopupIfOpen();
 		});
@@ -84607,6 +84640,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		EngCalcs.lpnTerrainInit({
 			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
 			fill: terrainFillElevations,
+			scenarioSentence: demScenarioSentence,
 			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
 			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let
 			// a person decide -- Tom's ruling that a number reported after the write is a receipt,
