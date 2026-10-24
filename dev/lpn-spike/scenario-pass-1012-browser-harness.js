@@ -435,7 +435,8 @@ async function main() {
 		}, true);
 		await clickNode('10');
 		const shared = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const want = (await L('lpn_ovm_dot_alt_shared')).replace('{alternative}', 'Fig 4').replace('{list}', 'Fig 9');
+		// The alternative is named like its scenario, so the line stays silent about it and keeps only who shares it.
+		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
 		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
 			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
 
