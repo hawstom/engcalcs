@@ -75919,6 +75919,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hrow.appendChild(show);
 			panel.appendChild(hrow);
 		}
+		// **THE PRIVACY DISCLOSURE SITS AT THE TOP OF THE LIST, between the Mode line and the first
+		// message** (Tom, 2026-10-24: he thought so the first time he saw it). It survived the move
+		// from dialog to panel as the closing paragraph; at the bottom of a long list it was never
+		// read. It says something none of the rows do: the ring is bounded and nothing in it reaches
+		// the visitor's device. Not shown when there is nothing to list.
+		if (noticeLog.length || hiddenText || hiddenNotes) {
+			var note = document.createElement('div');
+			note.className = 'lpn-msglog-panel-note';
+			note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
+				.replace('{n}', NOTICE_LOG_MAX);
+			panel.appendChild(note);
+		}
 		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
 		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
 		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
@@ -75946,15 +75958,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pill.appendChild(what);
 			panel.appendChild(pill);
 		});
-		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
-		// paragraph of Ida's dialog design; it says something none of the pills above it do --
-		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
-		// as the last row rather than dropped along with the dialog chrome around it.
-		var note = document.createElement('div');
-		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
-			.replace('{n}', NOTICE_LOG_MAX);
-		panel.appendChild(note);
 	}
 	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
 	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
