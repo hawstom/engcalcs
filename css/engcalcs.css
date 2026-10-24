@@ -4241,6 +4241,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    alternative, re-proposed easily: `max-content` for unset pull-downs only -- it would hold the
    column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
+/* THE CHOICES OF A TABLE PULL-DOWN HAVE PAPER OF THEIR OWN (Tom, 2026-10-24: in Dark, the unselected
+   options of a Settings Value selector looked empty). The select above is transparent and draws on
+   the cell, so its option list inherited a transparent background and the browser's white popup under
+   light ink. An option states both colours. dev/lpn-spike/pane-select-option-colour-browser-harness.js. */
+.lpn-pane-table tbody td select option, .lpn-pane-table tbody td select optgroup {
+	background-color: var(--ec-bg); color: var(--ec-ink);
+}
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
