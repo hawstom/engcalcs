@@ -22705,6 +22705,18 @@ var EngCalcs = EngCalcs || {};
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
 			'Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.');
 		box.appendChild(line);
+		// **AN EXIT IN THE BUBBLE** (Tom, 2026-10-24, on a phone: the mode could be left only by Esc,
+		// by the Select tool or by an insert tool). It returns to the normal Select mode, with
+		// whatever is selected left as it is. It is not a <div>, so it takes the press the way the
+		// checkbox below does; while a ring is open the whole bubble is inert, so the button cannot
+		// eat the closing click.
+		var exitBtn = document.createElement('button');
+		exitBtn.type = 'button';
+		exitBtn.className = 'lpn-area-hint-exit';
+		exitBtn.id = 'lpn_area_hint_exit';
+		exitBtn.textContent = pc.lpn_fitting_exit || 'Exit';
+		exitBtn.addEventListener('click', function () { setMode('select'); });
+		box.appendChild(exitBtn);
 		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
 		// Checked, always: it is the state you are looking at, and the only act it offers is
 		// turning the bubble off. The way back is Settings, Map and page, Page -- named in the row
@@ -23055,6 +23067,12 @@ var EngCalcs = EngCalcs || {};
 		// something. A ring that caught nothing opens nothing, because there would be nothing in
 		// the box to show.
 		if (selectionCount()) { openMultiProperties(); }
+		// **A RING THAT CAUGHT SOMETHING ENDS THE TOOL** (Tom, 2026-10-24: "select area mode should
+		// exit automatically after a successful area selection of at least one asset"). The caught
+		// things are what the reader wants to work on, and every other tool now needs a deliberate
+		// exit. An empty result stays in the tool, to try again; a Shift ring stays too, because
+		// Shift is the reader saying the selection is still being built.
+		if (found.length && !areaKeep) { setMode('select'); }
 		return found.length;
 	}
 
@@ -25478,7 +25496,7 @@ var EngCalcs = EngCalcs || {};
 	// `source` is 'value' or 'dem' (Task 542). It only ever means anything with Elevation chosen,
 	// and replaceNormalize() puts it back to 'value' the moment the property changes -- a hidden
 	// state that survives a property change is how a Replace writes something nobody asked for.
-	var replaceState = { prop: '', value: '', source: 'value' };
+	var replaceState = { prop: '', value: '', source: 'value', selOnly: false };
 	// The element buildReplaceForm() drew into, so a control that changes WHICH CONTROLS THERE ARE
 	// can redraw them. Only the property and the source do that (Task 542).
 	var replaceBox = null;
@@ -25785,14 +25803,23 @@ var EngCalcs = EngCalcs || {};
 	 * count the user had read and approved. The doc block above already claimed a compound query
 	 * was fine here; this makes it true.
 	 */
-	function replaceFoundSet() {
+	function replaceFoundAll() {
 		var run = findRunQuery();
 		return run.ok ? run.list : [];
+	}
+	function replaceFoundSet() {
+		var run = findRunQuery();
+		if (!run.ok) { return []; }
+		// **ONLY THE SELECTED ASSETS** (Tom, 2026-10-24: *"I would like a way to set all selected
+		// elevations from DEM."*), through the box that already owns the DEM fill, not a third door:
+		// the found set is cut to what is selected on the map when the box says so.
+		if (replaceState.selOnly) { return run.list.filter(function (c) { return isSelected(c.group, c.el.id); }); }
+		return run.list;
 	}
 	function replaceSpecs() {
 		var cands;
 		if (findQueryError) { return []; }
-		if (findQueryAst) { cands = replaceFoundSet(); }
+		if (findQueryAst) { cands = replaceFoundAll(); }   // the list of properties is the whole found set's, not the selection's
 		else {
 			var d = findScopeDef(findState.scope);
 			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
@@ -26126,6 +26153,19 @@ var EngCalcs = EngCalcs || {};
 			renderReplace(null);
 			return;
 		}
+		// The found set cut to the selection. Visible whenever the box can write, so the state is never hidden.
+		var selLbl = document.createElement('label'), selBox = document.createElement('input');
+		selLbl.className = 'lpn-replace-selonly';
+		selLbl.style.display = 'flex'; selLbl.style.alignItems = 'center'; selLbl.style.gap = '4px'; selLbl.style.margin = '2px 0 4px';
+		selBox.type = 'checkbox';
+		selBox.id = 'lpn_replace_selonly';
+		selBox.checked = !!replaceState.selOnly;
+		selBox.addEventListener('change', function () {
+			replaceState.selOnly = selBox.checked; replacePending = null; rebuildReplaceForm();
+		});
+		selLbl.appendChild(selBox);
+		selLbl.appendChild(document.createTextNode(' ' + (pc.lpn_replace_selected_only || 'Only the selected assets')));
+		box.appendChild(selLbl);
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
 				// Same rule as Find's own Property select: switching AWAY from a choice property
@@ -40192,7 +40232,153 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
 			.concat([{ separator: true }])
-			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
+			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }))
+			// **A JUNCTION BECOMES A VERTEX OF ITS PIPE** (Tom, 2026-10-24); see morphJunctionsToVertices().
+			.concat([{ separator: true }, {
+				icon: 'vertices', label: pc.lpn_morph_vertex || 'Vertex',
+				disabled: !nodes.some(function (n) { return n.type === 'junction'; }),
+				fn: function () { closeMenu(); morphJunctionsToVertices(); }
+			}]);
+	}
+	/**
+	 * **MORPH A JUNCTION INTO A VERTEX** (Tom, 2026-10-24: *"It would be nice to be able to Morph a
+	 * Junction into a vertex."*). A vertex lives on exactly one pipe, so the one case that works is a
+	 * junction that joins exactly two pipes: they become ONE pipe whose polyline bends at the
+	 * junction's place. Anything else is refused BY NAME and in plain words (vertexMorphProblem()),
+	 * and what is refused is not partly done.
+	 *
+	 * **THE FIRST OF THE TWO PIPES SURVIVES** (the earlier in the document), with its ID and values.
+	 * The other is deleted; a Customer or a Text attached to it by station is restated along the
+	 * merged line first, so it stays where it was drawn. A typed length of both is added; if either
+	 * is Auto the merged pipe is Auto, because a typed number is only ever the user's own.
+	 *
+	 * **BASE ONLY**: the bends and the ends of a pipe are the same in every scenario. One snapshot
+	 * for the whole command, as every other Morph takes, so one Undo reverses it.
+	 * dev/lpn-spike/morph-vertex-harness.js.
+	 */
+	function vertexMorphProblem(n) {
+		var pc = EngCalcs.pageConfig || {}, ids, a, b, demandSpec;
+		function say(key, dflt, extra) {
+			return String(pc[key] || dflt).replace('{id}', n.id).replace('{n}', String(extra));
+		}
+		if (n.type !== 'junction') { return say('lpn_morph_vertex_type', '{id} was not morphed into a vertex: only a junction can become one.', ''); }
+		ids = (incidentLinks[n.id] || []).slice();
+		if (ids.length !== 2) {
+			return say('lpn_morph_vertex_links', '{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.', ids.length);
+		}
+		a = linkById(ids[0]); b = linkById(ids[1]);
+		if (!a || !b || a.type !== 'pipe' || b.type !== 'pipe') {
+			return say('lpn_morph_vertex_kind', '{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.', '');
+		}
+		if ((a.from === n.id ? a.to : a.from) === (b.from === n.id ? b.to : b.from)) {
+			return say('lpn_morph_vertex_loop', '{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.', '');
+		}
+		demandSpec = typeOwnedNodeSpecs()[0];
+		if (demandSpec.value(n) !== undefined || (n._emitter && +n._emitter !== 0)) {
+			return say('lpn_morph_vertex_demand', '{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.', '');
+		}
+		if ((doc.customers || []).some(function (c) { return c.node === n.id; })) {
+			return say('lpn_morph_vertex_customers', '{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.', '');
+		}
+		if ((labelsByAnchor[n.id] || []).length) {
+			return say('lpn_morph_vertex_text', '{id} was not morphed into a vertex: a Text is attached to it.', '');
+		}
+		return '';
+	}
+	function mergeAtJunction(n) {
+		var ids = incidentLinks[n.id].slice(), A = linkById(ids[0]), B = linkById(ids[1]), S, O, lenS, lenO, total,
+			rev = function (v) { return v.slice().reverse(); }, vtx, sameDir, newVerts, farO, bothTyped, typed, i;
+		// The earlier in the document survives.
+		for (i = 0; i < doc.links.length; i++) {
+			if (doc.links[i] === A || doc.links[i] === B) { S = doc.links[i]; break; }
+		}
+		O = S === A ? B : A;
+		lenS = Geom.polylineLength(linkPointList(S)); lenO = Geom.polylineLength(linkPointList(O));
+		total = lenS + lenO;
+		vtx = { x: n.x, y: n.y };
+		if (n.tok && (n.tok.x || n.tok.y)) { vtx.tok = { x: n.tok.x, y: n.tok.y }; }
+		bothTyped = !S.lenAuto && !O.lenAuto;
+		typed = (+S._length || 0) + (+O._length || 0);
+		farO = O.from === n.id ? O.to : O.from;
+		if (S.to === n.id) {
+			// S runs into the junction; the merged line is S, the junction, then O outward.
+			sameDir = O.from === n.id;
+			newVerts = S.verts.concat([vtx], sameDir ? O.verts : rev(O.verts));
+			remapStations(S, O, function (t) { return t * lenS; }, function (t) { return lenS + (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.to] = incidentLinks[S.to].filter(function (x) { return x !== S.id; });
+			S.to = farO;   // base-write: identity -- Base is showing (the command is Base-only), like breakPipeAtPoint()
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		} else {
+			// S runs out of the junction; the merged line is O inward, the junction, then S.
+			sameDir = O.to === n.id;
+			newVerts = (sameDir ? O.verts : rev(O.verts)).concat([vtx], S.verts);
+			remapStations(S, O, function (t) { return lenO + t * lenS; }, function (t) { return (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.from] = incidentLinks[S.from].filter(function (x) { return x !== S.id; });
+			S.from = farO;   // base-write: identity, as above
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		}
+		S.verts = newVerts;   // base-write: identity, as above
+		if (bothTyped) { S._length = typed; if (S.tok) { delete S.tok._length; if (!Object.keys(S.tok).length) { delete S.tok; } } }   // base-write: the sum of two lengths the user typed
+		else { S.lenAuto = true; }
+		eachOverrideMap(function (map) { var ov = map[ovKeyFor('link', S.id)]; if (ov) { delete ov.length; } });
+		deleteLink(O.id);
+		deleteNode(n.id);
+		rebuildLink(S);
+		updateLinkGeometry(S.id);
+		if (nodeEls[S.from]) { layoutNodeLabel(S.from); }
+		if (nodeEls[S.to]) { layoutNodeLabel(S.to); }
+	}
+	// The Customers and Texts attached to O by station move to S, restated along the merged line; those
+	// already on S are restated along it too. `posS` and `posO` give the distance along the merged line.
+	function remapStations(S, O, posS, posO, total) {
+		function go(from, list, get, set, attach) {
+			(list[from.id] || []).slice().forEach(function (id) {
+				var it = get(id), t;
+				if (!it || typeof it.t !== 'number' && typeof it.anchorT !== 'number') { return; }
+				t = from === S ? posS(it.t !== undefined ? it.t : it.anchorT) : posO(it.t !== undefined ? it.t : it.anchorT);
+				set(it, total > 0 ? t / total : 0);
+				if (from === O) { attach(it, id); }
+			});
+		}
+		go(S, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function () {});
+		go(O, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function (c, id) {
+				c.link = S.id;
+				customersByLink[O.id] = customersByLink[O.id].filter(function (x) { return x !== id; });
+				(customersByLink[S.id] = customersByLink[S.id] || []).push(id);
+			});
+		go(S, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function () {});
+		go(O, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function (lb, id) {
+			lb.anchorLink = S.id;
+			labelsByLinkAnchor[O.id] = labelsByLinkAnchor[O.id].filter(function (x) { return x !== id; });
+			(labelsByLinkAnchor[S.id] = labelsByLinkAnchor[S.id] || []).push(id);
+		});
+	}
+	function morphJunctionsToVertices() {
+		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
+		if (!nodes.length) { return 0; }
+		if (!inBaseFor('topology')) { setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.'); return 0; }
+		nodes.forEach(function (n) {
+			var why = vertexMorphProblem(n);
+			if (why) { problems.push(why); return; }
+			if (!snap) { saveUndoSnapshot(); snap = true; }
+			mergeAtJunction(n);
+			done++;
+		});
+		if (done) {
+			buildDom();
+			refreshScenarioMarks();
+			refreshScenarioStatus();
+			refreshPaneIfOpen();
+			refreshPopupIfOpen();
+			scheduleSolve();
+			scheduleSave();
+		}
+		setNotice(problems.slice(0, 5).concat(problems.length > 5 ? ['...'] : [])
+			.concat(done ? [String(pc.lpn_morph_vertex_done || 'Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.').replace('{n}', String(done))] : []).join(' '));
+		return done;
 	}
 	// ---- MORPH IN A SCENARIO: AN ASSET'S TYPE AS AN OVERRIDE (Task 781) ----------------------------
 	//
@@ -55161,6 +55347,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{
 				icon: 'library', label: pc.lpn_library_menu || 'Libraries',
 				fn: function () { toggleLibraryBox(); }
+			},
+			// **A CLOSED PROPERTIES BOX CAN ALWAYS COME BACK** (Tom, 2026-10-24, on a phone: closing it
+			// left no way to get it back). It opens on the selection, or empty when nothing is selected.
+			{
+				icon: 'info', label: pc.lpn_popup_boxtitle || 'Properties',
+				fn: function () { closeMenu(); if (!openMultiProperties()) { openPopupEmpty(); } }
 			},
 			{ separator: true },
 			// The row that came out of View (Tom, 2026-08-21). Since Task 434 the profile is a TAB

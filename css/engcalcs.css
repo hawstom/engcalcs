@@ -2479,6 +2479,8 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-area-hint > div { pointer-events: none; }
 .lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
+.lpn-area-hint-exit { margin-top: 5px; padding: 3px 14px; font-size: 12px; cursor: pointer; }
+@media (pointer: coarse) { .lpn-area-hint-exit { min-height: 40px; min-width: 88px; font-size: 14px; } }
 /* The bubble's own "Show this" checkbox (Tom's 2026-09-08 worklist). A <label> rather than a <div>, so the
    rule above does not make it inert -- the checkbox is the one thing in this panel that must take
    a press, and the panel's own drag still works everywhere else. */
@@ -2599,6 +2601,18 @@ html[lang="zh"] .ec-welcome {
    comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
    which is the half of that signal a reader is looking at anyway. */
 .lpn-meter.lpn-selected { fill: var(--ec-map-select); stroke: var(--ec-map-select); }
+/* **A SELECTED CUSTOMER WEARS A HALO** (Tom, 2026-10-24: "It's hard for me to see that a Customer is
+   selected on my phone."). The dot is three to seven pixels across, where a change of blue alone is
+   invisible to a finger and a thumb covers it. The glow is drawn in screen pixels by a filter, so it
+   is the same size at every zoom and in every project's units. A touch screen (the primary pointer,
+   as elsewhere in this file) or a narrow window gets three stacked layers out to 8 px; a mouse gets
+   one. dev/lpn-spike/phone-select-browser-harness.js holds it. */
+.lpn-meter.lpn-selected { filter: drop-shadow(0 0 2px var(--ec-map-select)); }
+@media (pointer: coarse), (max-width: 700px) {
+	.lpn-meter.lpn-selected {
+		filter: drop-shadow(0 0 2px var(--ec-map-select)) drop-shadow(0 0 4px var(--ec-map-select)) drop-shadow(0 0 8px var(--ec-map-select));
+	}
+}
 /* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
    above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */
 .lpn-meter.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); stroke: var(--lpn-hover-color); }

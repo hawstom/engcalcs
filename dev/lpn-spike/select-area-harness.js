@@ -422,7 +422,34 @@ console.log('\n--- the bubble ---');
 	L.setAreaShape('window');
 	L.setRing([{ x: 5, y: -5 }, { x: 25, y: 5 }]);
 	L.commitArea(false);
-	report(/3 selected/.test(L.hintText()), 'after a commit the bubble carries what the ring caught', L.hintText());
+	// **A RING THAT CAUGHT SOMETHING ENDS THE TOOL** (Tom, 2026-10-24); the count rides in the notice.
+	report(L.mode() === 'select' && L.selectionCount() === 3,
+		'a ring that caught something returns to the normal Select mode, selection kept', L.mode() + ' / ' + L.selectionCount());
+	L.setAreaShape('window');
+	L.clearSelection();
+	L.setRing([{ x: 5000, y: 5000 }, { x: 5010, y: 5010 }]);
+	L.commitArea(false);
+	report(L.mode() === 'select-area', 'an empty ring stays in the tool, to try again', L.mode());
+	L.setRing([{ x: 5, y: -5 }, { x: 25, y: 5 }]);
+	L.commitArea(true);
+	report(L.mode() === 'select-area' && L.selectionCount() === 3,
+		'a Shift ring stays in the tool, because the selection is still being built', L.mode());
+	// The Exit control in the bubble.
+	function findExit(n) {
+		if (!n) { return null; }
+		if (n.id === 'lpn_area_hint_exit' || (n.className === 'lpn-area-hint-exit')) { return n; }
+		const kids = n.children || n.childNodes || [];
+		for (let i = 0; i < kids.length; i++) { const r = findExit(kids[i]); if (r) { return r; } }
+		return null;
+	}
+	L.setAreaShape('lasso');
+	const exitBtn = findExit(L.hintBox());
+	report(!!exitBtn, 'the bubble carries an Exit control', exitBtn ? exitBtn.textContent : '');
+	if (exitBtn) {
+		fire(exitBtn, 'click');
+		report(L.mode() === 'select', 'pressing Exit returns to the normal Select mode', L.mode());
+	}
+	L.setAreaShape('window');
 	// A finger's window or lasso is press-drag-lift, and the bubble says so.
 	L.setLastPointer('touch');
 	L.setAreaShape('lasso');
@@ -932,6 +959,7 @@ console.log('\n--- a press-drag-release ends the ring, and nothing outlives the 
 	// still a click and still does its work on the way DOWN, so the ring it opens survives the
 	// release and waits for the second click.
 	L.clearSelection(); L.closePopup();
+	L.setAreaShape('window');   // the drag above caught something, which ended the tool
 	fireSvg('pointerdown', at(A.cx, A.cy));
 	fireSvg('pointerup', at(A.cx, A.cy));
 	report(L.drawing(), 'a click with no travel still OPENS a ring that survives the release');
@@ -944,6 +972,7 @@ console.log('\n--- a press-drag-release ends the ring, and nothing outlives the 
 	// A CANCELLED POINTER SELECTS NOTHING. The browser took the gesture away, so the release never
 	// says where the user meant to stop, and a ring committed at wherever the pointer happened to
 	// be is the unasked-for selection this whole section is about.
+	L.setAreaShape('window');
 	drag(A, B, 'pointercancel');
 	report(!L.drawing(), 'a pointercancel mid-drag ends the ring');
 	report(L.selectionCount() === 0, '...without selecting anything', String(L.selectionCount()));

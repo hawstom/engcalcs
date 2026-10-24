@@ -1742,6 +1742,19 @@ $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_morph_menu']='Morph';
 $ec_lang['lpn_morph_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.';
 $ec_lang['lpn_morph_ok']='Morph';
+// Morph, Vertex (Tom, 2026-10-24: "It would be nice to be able to Morph a Junction into a vertex."). {id} is the
+// junction's ID, {n} a count. A vertex lives on exactly one pipe, so only a junction that joins exactly two
+// pipes and holds nothing of its own can become one.
+$ec_lang['lpn_morph_vertex']='Vertex';
+$ec_lang['lpn_morph_vertex_base']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.';
+$ec_lang['lpn_morph_vertex_type']='{id} was not morphed into a vertex: only a junction can become one.';
+$ec_lang['lpn_morph_vertex_links']='{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.';
+$ec_lang['lpn_morph_vertex_kind']='{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.';
+$ec_lang['lpn_morph_vertex_loop']='{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.';
+$ec_lang['lpn_morph_vertex_demand']='{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.';
+$ec_lang['lpn_morph_vertex_customers']='{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.';
+$ec_lang['lpn_morph_vertex_text']='{id} was not morphed into a vertex: a Text is attached to it.';
+$ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
 $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
@@ -1979,6 +1992,7 @@ $ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two search
 // says what the section does to the list above it rather than naming a second tool. "Assets" is the
 // word this page already uses for its nodes and pipes.
 $ec_lang['lpn_replace_title']='Change what was found';
+$ec_lang['lpn_replace_selected_only']='Only the selected assets';
 $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
 $ec_lang['lpn_replace_source']='New value source';
