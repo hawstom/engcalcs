@@ -5548,8 +5548,10 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    display:none, not opacity, so a hidden control can be neither seen nor reached by Tab. !important
    because several of these carry an inline display the page sets (the teaser, the notice), and
    that inline value is left alone so turning Clean map off restores it exactly. NOT here, on
-   purpose: #lpn_status (the standing error stays visible), the readouts in the bottom strip and the
-   mode line (Tom retired hiding readouts, 2026-09-22), the basemap credit (required attribution),
+   purpose: the readouts in the bottom strip (Tom retired hiding readouts, 2026-09-22), the basemap
+   credit (required attribution), the selection help (it is ephemeral and has its own checkbox,
+   Settings, Show the selection help; Tom, 2026-10-24), #lpn_status when it says a run gave no answer
+   (.lpn-status-blocking, set by paintStatus(): the one message that stays),
    the offscreen notice and the empty-map examples (the way back to a drawing), the placement bars
    (a tool in progress), and the toolbar, which holds the Map menu and the way out. The override
    rings are not CSS: overrideMarksShown() keeps their classes off. */
@@ -5557,9 +5559,11 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 .lpn-map-wrap.lpn-clean-map #lpn_map_notice,
 .lpn-map-wrap.lpn-clean-map #lpn_msglog_btn,
 .lpn-map-wrap.lpn-clean-map #lpn_msglog_panel,
-.lpn-map-wrap.lpn-clean-map #lpn_area_hint,
 .lpn-map-wrap.lpn-clean-map #lpn_basemap_teaser,
-.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn { display: none !important; }
+.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn,
+.lpn-map-wrap.lpn-clean-map #lpn_mode_hint,
+.lpn-map-wrap.lpn-clean-map #lpn_status_notes,
+.lpn-map-wrap.lpn-clean-map #lpn_status:not(.lpn-status-blocking) { display: none !important; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */

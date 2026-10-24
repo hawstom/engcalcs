@@ -54264,7 +54264,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshScenarioMarks();
 	}
 	// For dev/lpn-spike/clean-map-browser-harness.js, which proves the project file never changes.
-	EngCalcs.lpnCleanMap = { on: cleanMapOn, set: setCleanMap, marksShown: overrideMarksShown,
+	EngCalcs.lpnCleanMap = { on: cleanMapOn, set: setCleanMap, marksShown: overrideMarksShown, setStatus: setStatus,
 		projectText: function () { return JSON.stringify(serializeProject()); } };
 	function mapMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
@@ -76267,6 +76267,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
 	// the x and the history row's Show, which must not re-log a message that has not changed.
+	// The statuses that mean the run gave no answer: the diagnostics that refuse to solve, no
+	// convergence, an engine error, a unit this page does not know, and a project that cannot be
+	// kept. Progress lines, run summaries and notes about a run that DID answer are not.
+	var STATUS_BLOCKING_CODES = { 'not-converged': 1, 'solve-error': 1, 'engine-refused': 1, 'unit-unknown': 1,
+		'storage-full': 1, 'storage-unreadable': 1 };
+	function statusBlocksRun(st) { return !!(st && st.text && (st.diag || STATUS_BLOCKING_CODES[st.code] === 1)); }
 	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
@@ -76277,6 +76283,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		// Clean map hides this box UNLESS it is the message that says no answer can be given
+		// (css/engcalcs.css, .lpn-status-blocking); every other status is a progress line or a note.
+		el.classList.toggle('lpn-status-blocking', !hide && statusBlocksRun(statusLast));
 		// The x serves the notes beside the text too (H10): shown while either has something on the map.
 		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
 		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
