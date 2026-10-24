@@ -1533,25 +1533,11 @@ input[type=number] {
 	-moz-appearance: textfield;
 }
 
-/* Opt back IN to the browser's native spinner arrows, per input (Tom, 2026-07-30, on the map-label
-   decimal-places field). The two rules above strip the arrows from every number input in the suite
-   -- right for a physical quantity, where the arrows are useless (a 1-unit step means nothing to a
-   diameter or a flow) and only steal width from the number. It is wrong for a SMALL BOUNDED INTEGER
-   like "decimal places, 0-4", where clicking up/down is the natural gesture and the arrows are what
-   tell the user at a glance that this field is not a free-form number. Add .ec-spin to such a field.
-   opacity:1 is not redundant: Chrome/Safari hide the spinner until the pointer is over the input, so
-   without it the control is invisible exactly when the user is looking for it. */
-input.ec-spin::-webkit-outer-spin-button,
-input.ec-spin::-webkit-inner-spin-button {
-	-webkit-appearance: auto;
-	appearance: auto;
-	opacity: 1;
-	margin: 0;
-}
-input.ec-spin[type=number] {
-	-moz-appearance: auto;
-	appearance: auto;
-}
+/* No input in the suite shows spinner arrows (Tom, 2026-10-23: "The spinners spin out of control. It
+   would be better not to have them"). A held arrow auto-repeats about twenty steps a second, and a
+   Settings box applies a value only on change, so the number raced away with nothing applied. The
+   keyboard (Up/Down) still steps, and a phone still opens its numeric keypad. The old `.ec-spin`
+   opt-back-in is gone; `.lpn-digit` only centres a one or two digit box under its centred heading. */
 
 .blink {
   animation: blinker 1s step-start 15;
@@ -5343,12 +5329,12 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
      * WORDS ARE NOT. Text boxes (the Before/After affixes), selects, checkboxes and the ramp
        picker keep their natural start alignment, which is also what makes them read correctly in
        an RTL language.
-     * ONE EXCEPTION, and it is about the widget rather than the value: a box that draws its own
-       spinner arrows (`.ec-spin` -- the Decimals and Rank columns) has no free right edge, so its
-       single digit is CENTRED under its centred heading instead. */
+     * ONE EXCEPTION, and it is about the widget rather than the value: a one or two digit box
+       (`.lpn-digit` -- the Decimals, Show and Drop columns and the size boxes) is
+       CENTRED under its centred heading instead. */
 #lpn_settings_box .lpn-set-secbody input[type="number"],
 #lpn_settings_box .lpn-set-secbody input.lpn-set-num { text-align: right; }
-#lpn_settings_box .lpn-set-secbody input.ec-spin { text-align: center; }
+#lpn_settings_box .lpn-set-secbody input.lpn-digit { text-align: center; }
 /* The ramp strip: a full-width band whose boxes are placed by js/lpn-ramps.js's swatchBoxes(), each
    at x = index * width/n. `position: relative` is the frame those percentages are measured in, and
    border-box keeps each swatch's own hairline border inside its share instead of adding to it. */
@@ -6749,9 +6735,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	/* 8. NO SPINNER ON A TOUCH SCREEN, AND THE WIDTH THAT PAID FOR IT COMES BACK (Tom: "since the
 	   spinner is not available on touch screen, drop the spinner on touch screen and on touch screen
-	   CSS only"). `.ec-spin` exists to put the native up/down arrows BACK on these two columns after
-	   the suite strips them everywhere else, and a touch keyboard draws no arrows to put back -- so
-	   on a coarse pointer the column is paying ~17 px for furniture that is not there.
+	   CSS only"). The columns once paid ~17 px for native up/down arrows on a pointer; a touch keyboard never
+	   drew any, so on a coarse pointer the column paid for furniture that was not there.
 
 	   **A MEDIA QUERY IS A VIEWPORT TEST, NOT A TOUCH TEST**, which is Tom's own caution, so the
 	   touch half is asked as a touch question -- and asked INSIDE the 640px block on purpose. Nested
@@ -6778,17 +6763,6 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin { appearance: textfield; -moz-appearance: textfield; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin::-webkit-inner-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin::-webkit-inner-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin::-webkit-inner-spin-button {
-			appearance: none; -webkit-appearance: none; margin: 0;
-		}
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
