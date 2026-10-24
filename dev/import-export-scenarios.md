@@ -49,7 +49,7 @@ where marked **(not traced)**.
 | 10 | File > Import > GeoJSON shapes… | `pickGeoJsonFile`, `landGeoJsonShapes` | GeoJSON | Shapes are "in no scenario" (`js/lpn-geojson.js`). Open project, one undo step. The receipt says "Shapes appear in every scenario." when the project holds more than Base. Built, `scenario-io-names-browser-harness.js` S1 | P |
 | 11 | File > Import > DXF shapes… | `pickDxfShapesFile`, `importDxfShapesFromFile` | ASCII DXF | As 10 The same receipt line as row 10. Built | P |
 | 12 | File > Import > Shapefile shapes… | `pickShapefile`, `importShapefileFromFiles` | `.zip`, or `.shp` with sidecars | As 10 The same receipt line as row 10. Built | P |
-| 13 | File > Import > Libraries… | `libImportPick`, `libImportText` | A project file, libraries only | Copies patterns, curves, pipe types, fittings, controls, rules into the **document**; libraries belong to no scenario, but every scenario can then refer to them | P |
+| 13 | File > Import > Libraries… | `libImportPick`, `libImportText` | A project file, libraries only | Copies patterns, curves, pipe types, fittings, controls, rules into the **document**; libraries belong to no scenario, but every scenario can then refer to them. The receipt says "Every scenario can use them." when the project holds more than Base. Built, harness L1 | P |
 | 14 | File > Import > Workspace… | `pickWorkspaceFile`, `importWorkspaceFromFile` | JSON | Browser layout and display options only; no project, no scenario | - |
 | 15 | Water > Reports > Calibration > Load calibration file… | `loadCalibFile`, `landCalibText` | text `.dat`/`.txt`/`.cal` | Held for the session, compared with **the last run**, whichever scenario that was **(not traced further)**. Not stored in the project | - |
 | 16 | Profile > Saved paths > Open EPANET profile file… | `pickProfileFile`, `importProfileFromFile`, `loadProfileFileText` | `.pro`/`.txt` | Adds saved paths to the project (`doc.profiles`); a path is a list of node IDs, in no scenario | P |
@@ -69,9 +69,9 @@ where marked **(not traced)**.
 | 25 | File > Export > XLSX file… | as 24 | XLSX | as 24 | S, or all |
 | 26 | File > Export > CSV file… | as 24 (a zip when more than one) | CSV | as 24 | S, or all |
 | 27 | File > Export > Workspace… | `exportWorkspaceFile` | JSON | None (browser furniture) | - |
-| 28 | Tables pane > right-click > Export to CSV / ODS / XLSX | `paneExportTable` | CSV, ODS, XLSX | The one table as shown; the open scenario's values. File named `<project>-<table>-<scenario>` outside Base (not when Show scenarios holds every scenario in the table). Built, harness N1 | S |
+| 28 | Tables pane > right-click > Export to CSV / ODS / XLSX | `paneExportTable` | CSV, ODS, XLSX | The one table as shown; the open scenario's values. File named `<project>-<scenario>-<table>` outside Base (not when Show scenarios holds every scenario in the table). Built, harness N1 | S |
 | 29 | Tables pane > Ctrl+C, right-click Copy, Copy with column headings | `paneCopyTsv` | TSV on the clipboard | As shown: the open scenario's values. No notice, deliberately (a cell-level gesture) | S |
-| 30 | Tables pane > right-click > Print table | `paneBuildPrintable`, `printPaneTable` | Print | As shown; the suggested PDF name is `<project>-<table>-<scenario>` outside Base. Built, harness N2 | S |
+| 30 | Tables pane > right-click > Print table | `paneBuildPrintable`, `printPaneTable` | Print | As shown; the suggested PDF name is `<project>-<scenario>-<table>` outside Base. Built, harness N2 | S |
 | 31 | Water > Reports > Full > Download CSV | `downloadFullReportCsv`, `fullReportFilename` | CSV | Results of the last run; file `<project>-<scenario of the run>-Full report.csv` when the project holds more than Base. Built, `import-export-receipts-browser-harness.js` F1 | S |
 | 32 | Water > Reports > Full > Print report | `printFullReport` | Print | As 31 | S |
 | 33 | Run report box > Copy | `openRunReportBox` | Text on the clipboard | EPANET's report of the last run, verbatim | S |
@@ -98,7 +98,7 @@ where marked **(not traced)**.
 
 Rows 9, 18, 19 and 20 write into whichever scenario is open, and each now says which; 21, 22, 23 leave the other scenarios behind, and each now asks first and says so. What still does not tell is listed in the next paragraph.
 
-**Rows still short of the standard (2026-10-23):** 17 and 13 and 16 (no receipt line saying the data is shared by every scenario); 24-26 (the box does not say what All leaves out); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
+**Rows still short of the standard (2026-10-24):** none for 13, 16 and 17 (Tom: profiles and pictures get no scenario line at all); 24-26 (the box does not say what All leaves out); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
 
 ## Part 2. The standard
 

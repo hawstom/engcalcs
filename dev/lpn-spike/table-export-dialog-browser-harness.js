@@ -500,7 +500,7 @@ async function main() {
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
-		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B__C__Peak\.csv$/.test(r.name), r.name);
+		ok('CSV, current scenario: one file named with the scenario', /A_B__C__Peak-Junctions\.csv$/.test(r.name), r.name);
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
 		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));

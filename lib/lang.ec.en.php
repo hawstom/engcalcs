@@ -5082,6 +5082,7 @@ $ec_lang['lpn_gjnet_note_not_held']='A GeoJSON file does not hold controls, rule
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
 $ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
 $ec_lang['lpn_shapes_every_scenario']='Shapes appear in every scenario.';
+$ec_lang['lpn_library_import_every_scenario']='Every scenario can use them.';
 $ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.';
 $ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.';
 $ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';

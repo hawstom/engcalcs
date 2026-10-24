@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 199 untranslated keys, of 3217 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 200 untranslated keys, of 3218 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (199, 34 to read @@ NEEDS RULING)
+## lpn_  (200, 35 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -427,6 +427,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_unit_row`**
   > {family}: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
+- **`lpn_library_import_every_scenario`**
+  > Every scenario can use them.
+  @@ NEEDS RULING
 - **`lpn_menu_back`**
   > Back
   @@ NEEDS RULING
@@ -633,7 +636,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 105 new keys across 7 unmerged branch(es).
+**62 still to read**, of 105 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -646,7 +649,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/scenario-io (`0457825cb`) — adds no English strings
+### feat/scenario-io (`e0bcfb56c`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -975,3 +978,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+
+### fix/browser-pass-a (`77f505a8d`) — adds no English strings
+
+### fix/dock-widths (`f52132a34`) — adds no English strings

@@ -35574,7 +35574,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (panePrintPrevTitle !== null) { document.title = panePrintPrevTitle; panePrintPrevTitle = null; }
 	}
 	function printPaneTable(spec) {
-		var pc = EngCalcs.pageConfig || {}, projectName, tableName;
+		var pc = EngCalcs.pageConfig || {}, projectName, tableName, scnTail;
 		if (!spec || !document.body) { return; }
 		paneEndPrint();
 		panePrintArea = paneBuildPrintable(spec);
@@ -35583,7 +35583,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		projectName = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
 		tableName = paneSanitizeFileName(pc[spec.label] || spec.id);
 		panePrintPrevTitle = document.title;
-		document.title = (projectName ? projectName + '-' : '') + tableName + (spec.scnRows ? '' : paneSanitizeFileName(openScenarioFileSuffix()));
+		scnTail = spec.scnRows ? '' : paneSanitizeFileName(openScenarioFileSuffix()).replace(/^-/, '');
+		document.title = [projectName, scnTail, tableName].filter(function (x) { return !!x; }).join('-');
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
 			window.addEventListener('afterprint', paneEndPrint);
 			window.print();
@@ -35612,6 +35613,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function paneProjectPrefix() {
 		var proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || '');
 		return proj ? paneNoSpace(proj) + '-' : '';
+	}
+	// `<project>-<scenario>-`: the scenario follows the project name, then the table (Tom, 2026-10-24).
+	// With `withScn` false, or in Base, it is the project prefix alone.
+	function paneProjectScnPrefix(withScn) {
+		var pre = paneProjectPrefix(), suf = withScn ? paneNoSpace(openScenarioFileSuffix()) : '';
+		if (!suf) { return pre; }
+		return pre ? pre.replace(/-$/, '') + suf + '-' : suf.replace(/^-/, '') + '-';
 	}
 	// One table as the three arrays a file writer takes. With `scn` the table is read as Show scenarios
 	// reads it -- its scenario-wrapped columns, so a result that belongs to a scenario that is not the
@@ -35652,7 +35660,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	};
 	function paneExportTable(spec, kind) {
 		var pc = EngCalcs.pageConfig || {}, d = paneSheetData(spec), table = paneTableLabel(spec),
-			name = paneProjectPrefix() + paneNoSpace(table) + (spec.scnRows ? '' : paneNoSpace(openScenarioFileSuffix())) + '.' + kind, data;
+			name = paneProjectScnPrefix(!spec.scnRows) + paneNoSpace(table) + '.' + kind, data;
 		if (!EngCalcs.lpnTableCsv) { return; }
 		data = kind === 'csv' ? EngCalcs.lpnTableCsv(d.heads, d.cells) : kind === 'xlsx'
 			? EngCalcs.lpnTableXlsx(d.heads, d.cells, table, d.numeric)
@@ -35767,7 +35775,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		items.forEach(function (it) { tables[it.table] = true; });
 		multiTables = Object.keys(tables).length > 1;
 		// A file name, so the scenario's own name (free text: "A/B: C?") is made safe like the table's.
-		function part(it, sep) { return paneNoSpace(paneSanitizeFileName(it.table)) + (it.scn ? sep + paneNoSpace(paneSanitizeFileName(it.scn)) : ''); }
+		// The scenario comes first, right after the project name, then the table (Tom, 2026-10-24).
+		function part(it, sep) { return (it.scn ? paneNoSpace(paneSanitizeFileName(it.scn)) + sep : '') + paneNoSpace(paneSanitizeFileName(it.table)); }
 		// A sheet name, 31 characters at most: the scenario first, the table shortened before it, so
 		// two scenarios of one table stay distinguishable. Trailing spaces are trimmed.
 		function sheetPart(it) {
@@ -44158,6 +44167,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				lines.push(counted('lpn_geojson_import_parts', r.multipart, '{n} multipart features imported as one Shape for each part.',
 					'One multipart feature imported as one Shape for each part.'));
 			}
+			// With a second scenario the receipt waits for OK, so the scenario line cannot vanish in 8 s (Task 814).
+			if (made.length && scenarios.length > 1) { tellNotice(lines.join(' ')); if (done) { done({ ok: true, made: made.map(function (s) { return s.id; }), skipped: r.skipped, holes: r.holes, multipart: r.multipart, renamed: renamed }); } return; }
 			say(lines.join(' '), { ok: true, made: made.map(function (s) { return s.id; }), skipped: r.skipped, holes: r.holes, multipart: r.multipart, renamed: renamed });
 		}
 		if (!isLatLonProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) { EngCalcs.lpnCrsLoad(go); return; }
@@ -44255,7 +44266,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (made.length && scenarios.length > 1) { lines.push(shapesEveryScenarioLine()); }
 		Array.prototype.push.apply(lines, skippedLines);
 		Array.prototype.push.apply(lines, extraLines);
-		setNotice(lines.join(' '));
+		if (made.length && scenarios.length > 1) { tellNotice(lines.join(' ')); } else { setNotice(lines.join(' ')); }
 		if (done) {
 			done(Object.assign({ ok: true, made: made.map(function (s) { return s.id; }), renamed: renamed }, extra || {}));
 		}
@@ -66678,6 +66689,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			blocks.push({ title: '', lines: [pc.lpn_library_import_no_libraries
 				|| 'That project file has no libraries to copy.'] });
 		}
+		// Libraries belong to no scenario (Task 814): said once, where a second scenario exists and something was copied in.
+		if (scenarios.length > 1 && plan.some(function (p) { return p.added.length; })) {
+			blocks.push({ title: '', lines: [String(pc.lpn_library_import_every_scenario || 'Every scenario can use them.')] });
+		}
 		showLibraryImportReport(fileName, blocks);
 	}
 	/**
@@ -84650,6 +84665,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
 			fill: terrainFillElevations,
 			scenarioSentence: demScenarioSentence,
+			receipt: tellNotice,
 			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
 			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let
 			// a person decide -- Tom's ruling that a number reported after the write is a receipt,

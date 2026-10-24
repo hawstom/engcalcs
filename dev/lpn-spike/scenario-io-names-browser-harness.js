@@ -1,13 +1,17 @@
 // A FILE THAT SHOWS ONE SCENARIO NAMES IT, AND A DEM WRITE SAYS WHERE IT WENT, IN A REAL CHROMIUM
 // (Task 814, standard rules 5 and 6).   node dev/lpn-spike/scenario-io-names-browser-harness.js
 // Base and "Peak hour".
-//   N1  The table right-click export (CSV) is named <project>-<table>-<scenario> in Peak hour,
+//   N1  The table right-click export (CSV) is named <project>-<scenario>-<table> in Peak hour,
 //       and <project>-<table> in Base.
 //   N2  Print table suggests a PDF name carrying the scenario in Peak hour, and none in Base.
 //   N3  The map picture (Screenshot, no clipboard) is named <project>-<scenario>-screenshot.png in
 //       Peak hour and <project>-screenshot.png in Base.
 //   S1  A GeoJSON shapes import says the Shapes appear in every scenario when a second scenario
 //       exists, and says nothing of the kind in a project that is Base alone.
+//   L1  A Libraries import says "Every scenario can use them." when a second scenario exists, and
+//       not in a project that is Base alone. Profile and picture imports say nothing about scenarios.
+//   D2  With a second scenario the DEM fill's answer is a dialog waiting for OK (the 8-second notice
+//       could not be found), the scenario sentence near its front; Shapes imports likewise (S1).
 //   D1  The Mapbox DEM fill question and its answer afterwards (the page's own plan and done texts)
 //       say the elevations are overrides in Peak hour, say they go into Base in Base, and say
 //       nothing in a project that is Base alone.
@@ -36,6 +40,35 @@ function ok(label, cond, detail) {
 	checks++;
 	if (!cond) { failures++; }
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
+}
+async function openFindDem(page, a, L) {
+	const lbl = await L('lpn_find_menu');
+	await page.evaluate((t) => {
+		const b = Array.from(document.querySelectorAll('#lpn_toolbar button')).find((x) => (x.getAttribute('aria-label') || x.textContent || '').trim() === t);
+		if (b) { b.click(); }
+	}, lbl);
+	await a.settle(600);
+	const q = await page.$('#lpn_find_popup .lpn-find-query');
+	await q.click({ clickCount: 3 });
+	await page.keyboard.press('Control+A');
+	await page.keyboard.type("Junction.ID equal to '10'", { delay: 2 });
+	await page.keyboard.press('Enter');
+	await a.settle(700);
+	const pick = (labelText, val) => page.evaluate(([t, v]) => {
+		const l = Array.from(document.querySelectorAll('#lpn_find_popup label')).find((x) => x.textContent.trim().indexOf(t) === 0 && x.querySelector('select'));
+		const s = l && l.querySelector('select');
+		if (!s || !Array.from(s.options).some((o) => o.value === v)) { return false; }
+		s.value = v; s.dispatchEvent(new Event('change', { bubbles: true }));
+		return true;
+	}, [labelText, val]);
+	(await pick(await L('lpn_replace_prop'), 'elev'));
+	await a.settle(300);
+	(await pick(await L('lpn_replace_source'), 'dem'));
+	await a.settle(300);
+	const click = (t) => page.evaluate((t) => { const b = Array.from(document.querySelectorAll('#lpn_find_popup button')).find((x) => x.textContent.trim() === t); if (b) { b.click(); return true; } return false; }, t);
+	(await click(await L('lpn_replace_btn')));
+	await a.settle(500);
+	await click(await L('lpn_replace_apply'));
 }
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -109,9 +142,9 @@ async function main() {
 		console.log('--- N1/N2. the Tables pane, in Peak hour and in Base ---');
 		ok('Peak hour is opened', await toScenario('Peak hour'));
 		const n1 = await csvName();
-		ok('N1 Peak hour: the CSV name carries the scenario', /^Elm_Street-Junctions-Peak-hour\.csv$/.test(n1), n1);
+		ok('N1 Peak hour: the CSV name carries the scenario', /^Elm_Street-Peak-hour-Junctions\.csv$/.test(n1), n1);
 		const p1 = await printTitle();
-		ok('N2 Peak hour: the PDF name carries the scenario', p1 === 'Elm Street-Junctions-Peak-hour', JSON.stringify(p1));
+		ok('N2 Peak hour: the PDF name carries the scenario', p1 === 'Elm Street-Peak-hour-Junctions', JSON.stringify(p1));
 		await toScenario('Base');
 		const n0 = await csvName();
 		ok('N1 Base: the CSV name is the project and table alone', n0 === 'Elm_Street-Junctions.csv', n0);
@@ -144,9 +177,18 @@ async function main() {
 		const gj = JSON.stringify({ type: 'FeatureCollection', features: [{ type: 'Feature', properties: { name: 'Lot' }, geometry: { type: 'Point', coordinates: [-122.57, 38.1] } }] });
 		const notice = () => page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
 		const everyLine = (await L('lpn_shapes_every_scenario')).trim();
-		const importShape = async () => { await page.setInputFiles('#lpn_geojson_file', { name: 'lot.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(gj) }); await a.settle(700); return notice(); };
+		// With a second scenario the receipt is a dialog waiting for OK (Tom could not find the 8-second notice).
+		let lastDialog = null;
+		const importShape = async () => {
+			await page.setInputFiles('#lpn_geojson_file', { name: 'lot.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(gj) });
+			await a.settle(700);
+			const dlg = await a.dialog();
+			lastDialog = dlg ? dlg.text : null;
+			if (dlg) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); await a.settle(300); }
+			return lastDialog || await notice();
+		};
 		let sn = await importShape();
-		ok('S1 Peak hour exists: the receipt says Shapes appear in every scenario', /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(everyLine) >= 0, sn);
+		ok('S1 Peak hour exists: the receipt is a dialog and says Shapes appear in every scenario', lastDialog !== null && /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(everyLine) >= 0, sn);
 
 		console.log('--- D1. the DEM fill says where it writes ---');
 		const dem = () => page.evaluate(() => ({
@@ -161,13 +203,47 @@ async function main() {
 		await toScenario('Base');
 		t = await dem();
 		ok('D1 Base with other scenarios: the question says they go into Base', t.plan.indexOf(inB) >= 0 && t.done.indexOf(inB) >= 0);
+		console.log('--- D2. the live Find and replace DEM door, autoRun ON ---');
+		const d5 = JSON.parse(JSON.stringify(d));
+		d5.settings.autoRun = true;
+		d5.project.activeScenario = 's1';
+		await load(d5);
+		await page.evaluate(() => {
+			const v = Math.round((300 + 10000) / 0.1), r = Math.floor(v / 65536), g = Math.floor((v % 65536) / 256), b = v % 256;
+			EngCalcs.lpnTerrainConsented = () => true;
+			EngCalcs.lpnTerrainFetchPixels = (tile) => Promise.resolve(tile.points.map((p) => ({ id: p.id, r, g, b })));
+		});
+		ok('D2 the page has a Mapbox token (else the door is not offered)', await page.evaluate(() => !!(EngCalcs.pageConfig || {}).lpn_mapbox_token));
+		await openFindDem(page, a, L);
+		await a.settle(2500);
+		const rc = await a.dialog();
+		ok('D2 Peak hour: the receipt is a dialog that names the scenario, near its front', !!rc && rc.text.indexOf(inP) >= 0 && rc.text.indexOf(inP) < 120, rc ? rc.text.slice(0, 220) : 'no dialog');
+		if (rc) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); await a.settle(300); }
+		console.log('--- L1. a Libraries import says every scenario can use them ---');
+		const libFile = JSON.parse(JSON.stringify(d));
+		libFile.patterns = [{ id: 'NEWPAT', multipliers: [1, 2, 3], note: '' }];
+		['curves', 'pipeTypes', 'fittingSets', 'controls', 'rules'].forEach((k) => { libFile[k] = []; });
+		const libLine = (await L('lpn_library_import_every_scenario')).trim();
+		const libImport = async () => {
+			await page.setInputFiles('#lpn_library_file', { name: 'libs.lwn', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(libFile)) });
+			await a.settle(700);
+			await a.dialogClick((await L('lpn_library_import_go')).trim());
+			await a.settle(500);
+			const dlg = await a.dialog();
+			if (dlg) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); await a.settle(300); }
+			return dlg ? dlg.text : '';
+		};
+		let lib = await libImport();
+		ok('L1 Peak hour exists: the Libraries receipt says every scenario can use them', lib.indexOf('NEWPAT') >= 0 && lib.indexOf(libLine) >= 0, lib.slice(0, 200));
 		const d4 = JSON.parse(JSON.stringify(d));
 		d4.scenarios = [d4.scenarios[0]];
 		d4.project.activeScenario = 'base';
 		await load(d4);
 		t = await dem();
 		sn = await importShape();
-		ok('S1 Base alone: the receipt does not say it', /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(everyLine) < 0, sn);
+		lib = await libImport();
+		ok('L1 Base alone: the Libraries receipt does not say it', lib.indexOf('NEWPAT') >= 0 && lib.indexOf(libLine) < 0, lib.slice(0, 200));
+		ok('S1 Base alone: the receipt is a plain notice and does not say it', lastDialog === null && /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(everyLine) < 0, sn);
 		ok('D1 Base alone: neither text mentions a scenario', t.plan.indexOf(inB) < 0 && t.done.indexOf(inB) < 0 && t.plan.indexOf((await L('lpn_dem_scenario')).split('{scenario}')[0].trim()) < 0);
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

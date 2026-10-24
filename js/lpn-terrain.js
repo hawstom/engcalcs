@@ -541,6 +541,7 @@
 	EC.lpnTerrainDoneText = function (filledIds, blankIds, failedTiles) {
 		var parts = [
 			t('lpn_terrain_done', '{n} elevation(s) filled in.').replace('{n}', (filledIds || []).length),
+			scenarioLine(),
 			named('lpn_terrain_filled_ids', 'These nodes were filled in: {ids}', filledIds)
 		];
 		if ((blankIds || []).length) {
@@ -553,7 +554,6 @@
 			parts.push(t('lpn_terrain_partial',
 				'{f} terrain tile(s) did not respond.').replace('{f}', failedTiles));
 		}
-		parts.push(scenarioLine());
 		parts.push(accuracy());
 		parts.push(CREDIT);
 		return parts.filter(function (x) { return !!x; }).join(' ');
@@ -873,7 +873,12 @@
 			// request was in flight -- is named exactly once and named correctly.
 			var blank = want.map(function (p) { return p.id; })
 				.filter(function (id) { return !wrote[id]; });
-			if (!quiet || blank.length || failed) { notice(EC.lpnTerrainDoneText(filled, blank, failed)); }
+			if (!quiet || blank.length || failed) {
+				// With a second scenario the receipt waits for OK (the page's own dialog, which also logs it),
+				// so the line saying where the elevations went cannot vanish with the 8-second notice (Task 814).
+				if (!quiet && filled.length && scenarioLine() && seam.receipt) { seam.receipt(EC.lpnTerrainDoneText(filled, blank, failed)); }
+				else { notice(EC.lpnTerrainDoneText(filled, blank, failed)); }
+			}
 		});
 	}
 
