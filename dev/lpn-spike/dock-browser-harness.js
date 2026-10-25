@@ -19,8 +19,7 @@
 //   4. Q5. Fire flow, Criticality and Demand scaling carry one `?` in the row, focusable, whose tip
 //      is the tool's whole explanation (its intro, then its scope tip); no other box carries one.
 //      Enter on the `?` opens it (Task 759: one door) and a click on the title bar closes it.
-//   5. A PHONE (390 x 844). No dock buttons, and a box stored as docked opens filling the screen with
-//      the map at full width.
+//   5. A PHONE (390 x 844). A box stored as docked is an auto-hide tab, never a pinned column, and the map keeps its width.
 //
 //   node dev/lpn-spike/dock-browser-harness.js        (takes the browser lock itself)
 // DOCK_SHOT=<dir> also writes a screenshot of each view there, for a person to look at.
@@ -429,9 +428,11 @@ async function sectionPhone(Session, browser) {
 		const g = await geom(a.page, 'lpn_settings_box');
 		await shot(a.page, 'dock-phone');
 		ok('a box stored as docked opens on a phone', g.open);
-		ok('...filling the screen, not docked', !g.docked && g.box.l >= -0.5 && g.box.r <= g.vw + 0.5, JSON.stringify(g.box));
-		ok('...with the map at full width', Math.abs(g.svg.r - g.wrap.r) <= 1 && g.wrap.l <= 2 && g.wrap.r >= g.vw - 3, JSON.stringify(g.wrap));
-		ok('...and no dock buttons offered', g.acts.length === 0, g.acts.join());
+		// A phone cannot hold a pinned column (it would leave the map 320 px and the box about 70), so a
+		// docked box there is always an auto-hide tab (Tom, 2026-10-24).
+		ok('...as an auto-hide tab, tucked away: docked, and not hiding the map', g.docked && !g.visible, JSON.stringify(g.box));
+		ok('...the map keeps the whole width but the 24 px strip', g.wrap.l <= 2 + 24 && g.wrap.r >= g.vw - 3 - 24, JSON.stringify(g.wrap));
+		ok('...and no pin button is offered', !g.acts.includes('autohide'), g.acts.join());
 		const rec = await stored(a.page, 'lpn_setbox');
 		ok('...while the docking is kept for a wider window', rec && rec.dock === 'right', JSON.stringify(rec));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
