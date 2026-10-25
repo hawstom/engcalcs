@@ -68,6 +68,8 @@ async function main() {
 			await settle(1200);
 			return hit;
 		};
+		// The status bar's override count, read off the Scenario button (its last number).
+		const bar = () => P.evaluate(() => { const m = /(\d+)\s*$/.exec(document.getElementById('lpn_scenario_btn').textContent.trim()); return m ? +m[1] : -1; });
 		const shapeDxfCount = async () => {
 			const downloads = [], onDl = (d) => downloads.push(d);
 			P.on('download', onDl);
@@ -107,6 +109,7 @@ async function main() {
 		const inAnyMap = held.some((m) => m && here && m['s:' + here.id] && m['s:' + here.id].active === true);
 		ok('the scenario holds it active under the key s:' + (here && here.id), inAnyMap, JSON.stringify(sc).slice(0, 300));
 		ok('both are drawn in the scenario', (await drawn()).length === 2);
+		ok('the status bar counts the drawn Shape as one override', (await bar()) === 1, String(await bar()));
 
 		// One Shape selected opens the multi-properties box, which carries its Is active row.
 		await esc(); await a.toolbarClick('Select').catch(async () => { await P.keyboard.press('1'); }); await settle(200);
@@ -154,6 +157,7 @@ async function main() {
 		let bx = await boxFor(base1.id);
 		ok('the Base Shape reads active in the scenario', !!bx && bx.checked === true, JSON.stringify(bx));
 		await flip(base1.id); await settle(700);
+		ok('unticked: the status bar counts two overrides', (await bar()) === 2, String(await bar()));
 		ok('unticked: it leaves the scenario\'s map', (await drawn()).join() === here.id, (await drawn()).join());
 		d = await stored();
 		ok('Base itself is unchanged', (d.shapes || []).find((s) => s.id === base1.id)._active !== false);
@@ -179,6 +183,7 @@ async function main() {
 		d = await stored();
 		ok('Delete on a Base Shape inside a scenario keeps it in the document', (d.shapes || []).some((s) => s.id === base1.id));
 		ok('...and switches it off here', (await drawn()).join() === here.id, (await drawn()).join());
+		ok('...the bar still counts two', (await bar()) === 2, String(await bar()));
 		// Delete the scenario-only Shape: really gone.
 		const pl = await P.evaluate((id) => {
 			const e = document.querySelector('#lpn_canvas .lpn-shape[data-shape="' + id + '"] polyline');
@@ -191,6 +196,7 @@ async function main() {
 		if (dlg) { await a.dialogClick((await a.lang('lpn_dialog_ok')).trim()).catch(() => {}); await settle(400); }
 		d = await stored();
 		ok('Delete on a scenario-only Shape deletes it', !(d.shapes || []).some((s) => s.id === here.id), JSON.stringify((d.shapes || []).map((s) => s.id)));
+		ok('...the bar falls to one', (await bar()) === 1, String(await bar()));
 		ok('...with its override', (JSON.stringify(d.scenarios) + JSON.stringify(d.alternatives || [])).indexOf('"s:' + here.id + '"') < 0);
 
 		console.log('--- 6. a reload keeps the membership ---');

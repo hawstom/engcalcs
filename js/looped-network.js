@@ -10227,6 +10227,7 @@ var EngCalcs = EngCalcs || {};
 		if (isSelected('shape', id)) { deselectOne('shape', id); }
 		doc.shapes = docShapesRead().filter(function (s) { return s.id !== id; });
 		purgeOverrides(ovKeyFor('shape', id));   // see deleteNode(): a real deletion takes them with it
+		refreshScenarioStatus();
 		removeShapeEls(id);
 	}
 	// What a press at this screen point lands on among the Shapes. A grip of a SELECTED Shape first
@@ -39329,6 +39330,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (inBaseScenario()) { return; }
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
+		refreshScenarioStatus();   // the status bar's override count follows (a Shape draws no solve)
 	}
 	// **AN ASSET THAT EXISTS ONLY IN THE CURRENT SCENARIO IS REALLY DELETED THERE** (Tom,
 	// 2026-10-11: *"I created a junction in a Scenario 1, and it doesn't exist in Base scenario. But

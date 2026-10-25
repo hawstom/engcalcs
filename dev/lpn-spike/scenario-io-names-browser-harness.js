@@ -188,7 +188,11 @@ async function main() {
 			if (dlg) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); await a.settle(300); }
 			return lastDialog || await notice();
 		};
+		const barCount = () => page.evaluate(() => { const m = /(\d+)\s*$/.exec(document.getElementById('lpn_scenario_btn').textContent.trim()); return m ? +m[1] : -1; });
+		const bar0 = await barCount();
 		let sn = await importShape();
+		const bar1 = await barCount();
+		ok('S1 Peak hour open: the status bar counts the imported Shape as one override', bar1 === bar0 + 1, bar0 + ' -> ' + bar1);
 		ok('S1 Peak hour open: the receipt is a dialog and says Shapes appear in Peak hour only', lastDialog !== null && /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(hereLine) >= 0 && sn.indexOf(everyLine) < 0, sn);
 		// ... and it is true: the Shape is inactive in Base and active in Peak hour (Task 831).
 		const shapeState = () => page.evaluate(() => {
