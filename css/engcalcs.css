@@ -2598,20 +2598,20 @@ html[lang="zh"] .ec-welcome {
    (.lpn-node.lpn-selected above), on the symbol itself.
 
    Two classes, so it outranks the loose white above it while a customer is selected, and that
-   comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
-   which is the half of that signal a reader is looking at anyway. */
+   comes back the moment it is not. A selected customer connected to nothing loses its dashes
+   meanwhile (the halo below is a solid stroke); its blue fill still says it is selected. */
 .lpn-meter.lpn-selected { fill: var(--ec-map-select); stroke: var(--ec-map-select); }
 /* **A SELECTED CUSTOMER WEARS A HALO** (Tom, 2026-10-24: "It's hard for me to see that a Customer is
-   selected on my phone."). The dot is three to seven pixels across, where a change of blue alone is
-   invisible to a finger and a thumb covers it. The glow is drawn in screen pixels by a filter, so it
-   is the same size at every zoom and in every project's units. A touch screen (the primary pointer,
-   as elsewhere in this file) or a narrow window gets three stacked layers out to 8 px; a mouse gets
-   one. dev/lpn-spike/phone-select-browser-harness.js holds it. */
-.lpn-meter.lpn-selected { filter: drop-shadow(0 0 2px var(--ec-map-select)); }
+   selected on my phone." and, after the first try with a CSS drop-shadow, "I don't see it."). The dot
+   is three to seven pixels across, and a drop-shadow of so small a shape is nearly transparent
+   (measured: no more than a few percent of the paper's colour). So the halo is the dot's OWN stroke,
+   drawn first and wide, in screen pixels (non-scaling, so the same size at every zoom and in every
+   project's units), translucent, with the dot painted over its middle: a disc of selection blue
+   around a solid dot. A touch screen (the primary pointer) or a narrow window gets 22 px across; a
+   mouse 12 px. dev/lpn-spike/phone-select-browser-harness.js counts the blue pixels. */
+.lpn-meter.lpn-selected { stroke-width: 12px; vector-effect: non-scaling-stroke; paint-order: stroke; stroke-opacity: 0.45; stroke-dasharray: none; }
 @media (pointer: coarse), (max-width: 700px) {
-	.lpn-meter.lpn-selected {
-		filter: drop-shadow(0 0 2px var(--ec-map-select)) drop-shadow(0 0 4px var(--ec-map-select)) drop-shadow(0 0 8px var(--ec-map-select));
-	}
+	.lpn-meter.lpn-selected { stroke-width: 22px; }
 }
 /* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
    above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */

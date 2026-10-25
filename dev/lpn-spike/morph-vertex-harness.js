@@ -131,6 +131,24 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	refuse(J, 'lpn_morph_vertex_customers', '', '3.6 a junction with a Customer connected to it is refused');
 	L.getDoc().customers = [];
 
+	// A simple merge only (Tom, 2026-10-24): different pipes, or data on the junction, are refused.
+	const pipeB = L.linkById(half2), dWas = pipeB._diameter;
+	pipeB._diameter = dWas + 2;
+	refuse(J, 'lpn_morph_vertex_pipes', '', '3.7 two pipes of different diameter are refused');
+	pipeB._diameter = dWas;
+	const rWas = pipeB._roughness;
+	pipeB._roughness = rWas + 10;
+	refuse(J, 'lpn_morph_vertex_pipes', '', '3.8 two pipes of different roughness are refused');
+	pipeB._roughness = rWas;
+	[['elev', 12.5, 'its own elevation'], ['tag', 'zoneA', 'a tag'], ['desc', 'hydrant tee', 'a description'], ['_initQuality', 0.4, 'an initial quality']].forEach((f) => {
+		const was = L.nodeById(J)[f[0]];
+		L.nodeById(J)[f[0]] = f[1];
+		refuse(J, 'lpn_morph_vertex_own', '', '3.9 a junction with ' + f[2] + ' is refused');
+		if (was === undefined) { delete L.nodeById(J)[f[0]]; } else { L.nodeById(J)[f[0]] = was; }
+	});
+	sel(L, [J]);
+	ok('3.10 with those put back it morphs again (and is undone)', L.morphVertex() === 1 && (L.undo(), true));
+
 	console.log('\n--- 4. a Customer on the second half keeps its place ---');
 	const h2 = L.linkById(half2), mid2 = { x: (L.nodeById(h2.from).x + L.nodeById(h2.to).x) / 2, y: (L.nodeById(h2.from).y + L.nodeById(h2.to).y) / 2 };
 	L.addCustomer(mid2.x, mid2.y + 5, { link: half2, t: 0.5 });

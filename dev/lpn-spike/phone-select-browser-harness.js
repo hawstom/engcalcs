@@ -5,8 +5,8 @@
 //      nothing stays in the mode; a Shift area (not available on touch) is covered in
 //      select-area-harness.js;
 //   3. a closed Properties box comes back from Water > Properties, with a selection or without;
-//   4. a selected Customer wears a halo (a CSS filter) that an unselected one does not, clearly
-//      stronger on a touch screen than on a mouse.
+//   4. a selected Customer shows a halo that can be counted in the screen's own pixels, larger on a
+//      touch screen than with a mouse.
 //
 //   node dev/lpn-spike/phone-select-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -158,33 +158,49 @@ async function main() {
 		await tapAt(a, cdp, "#lpn_popup_close");
 
 		console.log('\n--- 4. a selected Customer is easy to see ---');
-		const halo = () => page.evaluate(() => {
-			const m = document.querySelector('.lpn-meter[data-cust="M1"]');
-			return m ? { filter: getComputedStyle(m).filter, sel: m.classList.contains('lpn-selected') } : null;
-		});
-		const before = await halo();
-		ok('4.1 the customer is drawn and not selected, with no halo', !!before && !before.sel && before.filter === 'none', JSON.stringify(before));
-		await page.evaluate(() => {
+		// Counted from the screen's own pixels (Tom, 2026-10-24: a CSS drop-shadow passed a style check
+		// and he still could not see it): the pixels in a 40 px square round the dot that are clearly
+		// blue, before and after the tap, with Properties hidden so it is not what is being counted.
+		const bluePixels = async (pg) => {
+			const r = await pg.evaluate(() => { const b = document.querySelector('.lpn-meter[data-cust="M1"]').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+			const buf = await pg.screenshot({ clip: { x: Math.max(0, r.x - 20), y: Math.max(0, r.y - 20), width: 40, height: 40 } });
+			return pg.evaluate(async (b64) => {
+				const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+				const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+				const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+				const d = g.getImageData(0, 0, c.width, c.height).data; let n = 0;
+				for (let k = 0; k < d.length; k += 4) { if (d[k + 2] > 150 && d[k + 2] - d[k] > 40 && d[k + 2] - d[k + 1] > 20) { n++; } }
+				return { n, total: c.width * c.height };
+			}, buf.toString('base64'));
+		};
+		const hidePopup = (pg) => pg.evaluate(() => { document.getElementById('lpn_popup').style.visibility = 'hidden'; });
+		const showPopup = (pg) => pg.evaluate(() => { document.getElementById('lpn_popup').style.visibility = ''; });
+		const sel1 = (pg) => pg.evaluate(() => {
 			const m = document.querySelector('.lpn-meter[data-cust="M1"]');
 			const b = m.getBoundingClientRect();
-			m.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, pointerId: 5, pointerType: 'touch', button: 0, isPrimary: true }));
-			m.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, pointerId: 5, pointerType: 'touch', button: 0, isPrimary: true }));
+			const o = { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, pointerId: 5, pointerType: 'touch', button: 0, isPrimary: true };
+			m.dispatchEvent(new PointerEvent('pointerdown', o)); m.dispatchEvent(new PointerEvent('pointerup', o));
 		});
+		const before = await bluePixels(page);
+		await sel1(page);
 		await a.settle(500);
-		const after = await halo();
-		ok('4.2 tapped: it is selected and wears a halo', !!after && after.sel && after.filter !== 'none', JSON.stringify(after));
-		const phoneShadows = (after && after.filter.match(/drop-shadow/g) || []).length;
-		ok('4.3 on a touch screen the halo is at least three layers', phoneShadows >= 3, String(phoneShadows));
+		const isSel = await page.evaluate(() => document.querySelector('.lpn-meter[data-cust="M1"]').classList.contains('lpn-selected'));
+		await hidePopup(page);
+		const after = await bluePixels(page);
 		await page.screenshot({ path: process.env.PHONESEL_SHOT || '/tmp/phone-select-halo.png' });
+		await showPopup(page);
+		ok('4.1 tapped: the customer is selected', isSel);
+		ok('4.2 before the tap almost no blue round the dot', before.n < 15, JSON.stringify(before));
+		ok('4.3 after the tap, a halo: at least 600 blue pixels in the 40 px square (a 22 px disc is about 1000 of 6400 at 2x)', after.n >= 600, JSON.stringify(after));
 		await a.close();
 
 		const d = await open(Session, browser, { viewport: { width: 1200, height: 800 } });
-		await d.page.evaluate(() => {
-			const m = document.querySelector('.lpn-meter[data-cust="M1"]'); m.classList.add('lpn-selected');
-		});
-		const dh = await d.page.evaluate(() => getComputedStyle(document.querySelector('.lpn-meter[data-cust="M1"]')).filter);
-		const deskShadows = (dh.match(/drop-shadow/g) || []).length;
-		ok('4.4 with a mouse a selected customer also wears a halo, lighter than the phone\'s', deskShadows >= 1 && deskShadows < phoneShadows, dh);
+		const dBefore = await bluePixels(d.page);
+		await sel1(d.page);
+		await d.settle(500);
+		await hidePopup(d.page);
+		const dAfter = await bluePixels(d.page);
+		ok('4.4 with a mouse a selected customer also shows a halo, smaller than the phone\'s', dAfter.n > dBefore.n + 20 && dAfter.n <= after.n, JSON.stringify([dBefore, dAfter]));
 		ok('no page errors', !a.errors.length && !d.errors.length, (a.errors[0] || d.errors[0] || '').slice(0, 200));
 		await d.close();
 	} finally {

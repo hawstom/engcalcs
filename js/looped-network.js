@@ -40283,6 +40283,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((labelsByAnchor[n.id] || []).length) {
 			return say('lpn_morph_vertex_text', '{id} was not morphed into a vertex: a Text is attached to it.', '');
 		}
+		// A simple merge only: the one pipe that survives keeps ONE diameter and ONE roughness, and a
+		// junction's own data (its elevation, tag, description, anything stated on it) would be dropped.
+		if (a._diameter !== b._diameter || a._roughness !== b._roughness) {
+			return say('lpn_morph_vertex_pipes', '{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.', '');
+		}
+		if (Object.keys(n).some(function (k) {
+			var v = n[k];
+			if (k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok' || k === 'lx' || k === 'ly') { return false; }
+			if (v === undefined || v === null || v === '' || v === 0 || v === false) { return false; }
+			if (typeof v === 'object' && !Object.keys(v).length) { return false; }
+			return true;
+		})) {
+			return say('lpn_morph_vertex_own', '{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.', '');
+		}
 		return '';
 	}
 	function mergeAtJunction(n) {
@@ -65266,10 +65280,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Calibration) keep their docks in one key of their own, `lpn_dockbox` (see
 	// saveDockShared()); where they float still lasts one page load.
 	//
-	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
-	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
-	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
-	// window.
+	// **ON A PHONE TOO.** Below the one breakpoint a box that is not docked fills the window
+	// (placePanelForScreen()); a docked one keeps its column or tab, and an auto-hidden one flies out
+	// over the map. A first visit on a phone docks Properties alone (LPN_PHONE_DOCKS).
 	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
 	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
@@ -65282,7 +65295,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockMargins = { left: 0, right: 0 }, dockWasSmall = null;
 	function dockSideOf(d) {
 		var s = d && d.rec.dock;
-		return ((s === 'left' || s === 'right') && !smallScreen()) ? s : null;
+		return (s === 'left' || s === 'right') ? s : null;
 	}
 	function boxIsDocked(box) { return !!(box && box.__lpnDock && dockSideOf(box.__lpnDock)); }
 	// A toggle (the gear, a Help row) that finds its box tucked away brings it out instead of closing
@@ -65338,8 +65351,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
 	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
 	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
-	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
-	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
+	// the visitor's own and is left alone. A phone gets its own shorter list, LPN_PHONE_DOCKS. Nothing is stored until the visitor changes something (boxSaveHeld()).
 	var LPN_DEFAULT_DOCKS = {
 		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
 		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
@@ -65353,16 +65365,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.EC_DEFAULT_DOCKS === false) { return false; }
 		return !(navigator && navigator.webdriver);
 	}
+	// **ON A PHONE, ONE AUTO-HIDE TAB: PROPERTIES** (Tom, 2026-10-24: *"I asked that phones dock and
+	// autohide the properties box automatically"*). Docking is allowed on a phone; the box tucks to a
+	// slim tab at the right edge and unfurls itself over the map when an element is selected.
+	var LPN_PHONE_DOCKS = { left: [], right: ['lpn_popup'] };
 	function applyDefaultDocks() {
-		var byId = {};
-		if (!defaultDocksWanted() || smallScreen()) { return; }
+		var byId = {}, list = smallScreen() ? LPN_PHONE_DOCKS : LPN_DEFAULT_DOCKS;
+		if (!defaultDocksWanted()) { return; }
 		try {
 			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
 			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
 		} catch (e) { return; }
 		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
 		['left', 'right'].forEach(function (side) {
-			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
+			list[side].forEach(function (id, i) {
 				var d = byId[id];
 				if (!d) { return; }
 				d.rec.dock = side;
@@ -65373,6 +65389,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 		dockDefaultHold = true;
+		// Each docked box's corner buttons were drawn while it floated; draw them for the dock it now has.
+		dockBoxes.forEach(function (d) { if (d.byDefault && d.corner) { renderDockCorner(d); } });
 	}
 	function restoreDefaultDocks() {
 		var openers = {
@@ -65458,7 +65476,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
 	function clampDockW(w, room, over) {
 		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
-		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		if (!(w > 0)) { w = smallScreen() ? Math.round((window.innerWidth || 390) * 0.7) : LPN_DOCK_DEFAULT_W; }   // a phone's flyout leaves the left 30% of the map to look at
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
 	}
@@ -65538,7 +65556,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				document.activeElement.getAttribute('data-dock') : null, next;
 		hideTipsIn(row);
 		while (row.firstChild) { row.removeChild(row.firstChild); }
-		if (!smallScreen()) {
+		{
 			if (side) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
 			if (side !== 'left') { row.appendChild(dockButton(d, 'left', pc.lpn_dock_left || 'Dock at the left of the map')); n++; }
 			if (side !== 'right') { row.appendChild(dockButton(d, 'right', pc.lpn_dock_right || 'Dock at the right of the map')); n++; }
@@ -66072,7 +66090,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_ds_box: openDemandScaleBox,
 			lpn_calib_box: openCalibBox
 		};
-		if (smallScreen()) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
 			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
 		});
@@ -71299,7 +71316,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// placed through, so raising here needs no per-opener edit and a seventh box cannot arrive
 		// half-wired -- the same argument that put `touch-action` inside makePanelDraggable().
 		if (box && box.__lpnRaise) { box.__lpnRaise(); }
-		if (smallScreen()) { return fillPanelToScreen(box); }
+		if (smallScreen()) {
+			var fh = fillPanelToScreen(box);
+			if (box && box.__lpnDock) { dockPlaced(box); }
+			return fh;
+		}
 		resetPanelFill(box);
 		place();
 		// A docked box keeps its floating place underneath and is laid into its column (Task 441).

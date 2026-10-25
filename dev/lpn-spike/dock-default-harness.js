@@ -8,7 +8,8 @@
 //   2. The first change the visitor makes (closing one box) stores the whole layout, so the next
 //      reload keeps every other default dock, in order, and the closed one stays closed.
 //   3. A browser with any saved layout keeps its own and gets no defaults.
-//   4. A 390 px phone keeps its behaviour: no tab, no box opened, nothing stored.
+//   4. A 390 px phone starts with one tab, Properties, docked and auto-hidden at the right; selecting
+//      an element unfurls it; nothing is stored.
 //   5. A browser driven by a harness gets no defaults unless it asks (window.EC_DEFAULT_DOCKS).
 //
 //   node dev/lpn-spike/dock-default-harness.js     (takes the browser lock itself)
@@ -138,12 +139,24 @@ async function main() {
 		ok('no uncaught page errors', c.errors.length === 0, c.errors.slice(0, 2).join(' | '));
 		await c.close();
 
-		console.log('\n--- 4. a phone ---');
+		console.log('\n--- 4. a phone: Properties alone, docked and auto-hidden (Tom, 2026-10-24) ---');
 		const p = await visit(Session, browser, 'phone', { width: 390, height: 844 }, true);
 		got = await strips(p.page);
-		ok('390 px: no tab', got[0].length + got[1].length === 0, JSON.stringify(got));
+		ok('390 px: exactly one tab, Properties, at the right', JSON.stringify(got) === JSON.stringify([[], ['lpn_popup']]), JSON.stringify(got));
 		ok('...no box opened over the page', (await openBoxes(p)).length === 0, JSON.stringify(await openBoxes(p)));
 		ok('...nothing stored', (await layoutKeys(p)).length === 0);
+		await p.openExampleCard(await p.lang('lpn_ex_net1_title')).catch(() => {});
+		await p.settle(2000);
+		await p.page.evaluate(() => {
+			const n = document.querySelector('#lpn_canvas circle.lpn-node'), b = n.getBoundingClientRect();
+			const o = { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, pointerId: 5, pointerType: 'touch', button: 0, isPrimary: true };
+			n.dispatchEvent(new PointerEvent('pointerdown', o)); n.dispatchEvent(new PointerEvent('pointerup', o));
+		});
+		await p.settle(800);
+		ok('selecting an element unfurls Properties out of its tab', (await openBoxes(p)).includes('lpn_popup'), JSON.stringify(await openBoxes(p)));
+		const w = await p.page.evaluate(() => Math.round(document.getElementById('lpn_popup').getBoundingClientRect().width));
+		ok('...and it leaves part of the map showing (under 90% of the window wide)', w > 200 && w < 351, String(w));
+		ok('the dock buttons are offered on a phone', await p.page.evaluate(() => !!document.querySelector('#lpn_popup [data-dock="float"]')));
 		ok('no uncaught page errors', p.errors.length === 0, p.errors.slice(0, 2).join(' | '));
 		await p.close();
 

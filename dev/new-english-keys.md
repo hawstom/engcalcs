@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**42 still to read on master**, of 207 untranslated keys, of 3225 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**44 still to read on master**, of 209 untranslated keys, of 3227 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (207, 42 to read @@ NEEDS RULING)
+## lpn_  (209, 44 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -448,6 +448,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_morph_vertex_loop`**
   > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
   @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
 - **`lpn_morph_vertex_text`**
   > {id} was not morphed into a vertex: a Text is attached to it.
   @@ NEEDS RULING
@@ -657,7 +663,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**67 still to read**, of 110 new keys across 10 unmerged branch(es).
+**68 still to read**, of 111 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -668,9 +674,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
+
+### chore/verdicts-1024 (`4408d276f`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/scenario-io (`10c03e6ef`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/first-view (`4408d276f`) — already merged into chore/verdicts-1024; its strings are listed there
+
+### feat/scenario-io (`24c49ecae`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -847,7 +859,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`1c10d47f6`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -1016,8 +1028,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
 
-### fix/browser-pass-a (`ec99c4357`) — adds no English strings
+### fix/browser-pass-a (`3a2117228`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_field_meter_at_node`**
+  > Node
+  @@ NEEDS RULING
 
 ### fix/dock-widths (`595e17b9f`) — adds no English strings
 
-### fix/phone-select (`45c415c85`) — adds no English strings
+### fix/example-crs (`4408d276f`) — already merged into chore/verdicts-1024; its strings are listed there
+
+### fix/phone-select (`ab528c1a8`) — adds no English strings
