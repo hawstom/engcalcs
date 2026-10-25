@@ -20481,7 +20481,7 @@ var EngCalcs = EngCalcs || {};
 	// `done(spanSI)` gets 0 for a cancel or an unreadable answer (Task 710: asked in the page's box).
 	function georefAskSize(defSI, done) {
 		var pc = EngCalcs.pageConfig || {};
-		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
+		var text = (pc.lpn_georef_size_prompt || 'Approximate project width east to west?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
 		var def = defSI > 0 ? +toDisplay(defSI, 'lpn_u_length').toPrecision(6) : georefDefaultSpan();
 		askDialog({ kind: 'prompt', text: text, value: String(def) }, function (v) {
@@ -45999,7 +45999,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The tip is on `.ec-help` wrapping the button, as the Filter in table button does,
 				// and initTipsIn() arms it (EngCalcs.initTips() wires `.ec-help[title]` and nothing else).
 				bdBtn.className = 'ec-help';
-				bdBtn.title = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+				bdBtn.title = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.';
 				bdStatus.setAttribute('role', 'status');
 				bdBtn.addEventListener('click', function () {
 					var pick = document.createElement('input');

@@ -1500,7 +1500,7 @@ $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — precise';
 $ec_lang['lpn_georef_step1_hint']='The project stays fixed on the screen. Pan and zoom the map underneath it until the map shows approximately the right location at approximately the right scale, then press the Put the model here button.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
-$ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
+$ec_lang['lpn_georef_size_prompt']='Approximate project width east to west?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -2376,7 +2376,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 $ec_lang['lpn_inp_backdrop_attach']='Attach {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.';
 $ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
