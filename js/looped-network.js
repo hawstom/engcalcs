@@ -65676,20 +65676,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// element was under it, so nothing of the selection mark could be seen. The map moves sideways until
 	// the selection is in the middle of what the box leaves uncovered. Never on a PC, where the box
 	// leaves the map most of the window.
+	var dockPan = null;
 	function dockClearSelection(d) {
-		var mark, r, b, rm, left, right, dx;
+		var mark, r, b, rm, dx;
 		if (!smallScreen() || dockFlyout !== d || d.box.id !== 'lpn_popup' || !selection || !svg) { return; }
 		mark = selectionMarkEl(selection);
 		if (!mark || !mark.getBoundingClientRect) { return; }
 		r = mark.getBoundingClientRect();
 		b = d.box.getBoundingClientRect();
 		rm = svg.getBoundingClientRect();
-		if (!(r.width >= 0) || !(b.width > 0)) { return; }
-		left = rm.left; right = b.left;
-		if (r.left + r.width / 2 < right - 24 && r.right > left) { return; }
-		dx = (left + right) / 2 - (r.left + r.width / 2);
+		if (!(r.width >= 0) || !(b.width > 0) || r.right <= b.left) { return; }
+		// Only when the flyout really covers it, and by the least distance that uncovers it (8 px clear).
+		dx = (b.left - 8) - r.right;
+		if (r.left + dx < rm.left + 4) { dx = rm.left + 4 - r.left; }
+		if (dx >= 0) { return; }
 		state.tx += dx;
 		setTransform();
+		dockPan = { d: d, dx: (dockPan && dockPan.d === d ? dockPan.dx : 0) + dx, tx: state.tx, ty: state.ty, s: state.s };
+	}
+	// The flyout has tucked or closed: the map goes back by what it moved, unless the visitor has panned
+	// or zoomed since (then the view is theirs).
+	function dockUnpan() {
+		var p = dockPan;
+		if (!p || dockFlyout === p.d) { return; }
+		dockPan = null;
+		if (state.tx === p.tx && state.ty === p.ty && state.s === p.s) { state.tx -= p.dx; setTransform(); }
 	}
 	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
 	function dockLayoutSoon() {
@@ -65859,6 +65870,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (dockFlyout && !(dockAuto(dockFlyout) && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
+		dockUnpan();
 		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
 		// dragged has none and follows, in the order the boxes were registered.
 		['left', 'right'].forEach(function (s) {

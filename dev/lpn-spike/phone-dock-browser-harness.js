@@ -155,11 +155,12 @@ async function main() {
 		const stroke = (pg) => pg.evaluate(() => getComputedStyle(document.querySelector('.lpn-meter[data-cust="M1"]')).strokeWidth);
 		a = await visit(Session, browser, 'phone', {}, true);
 		const pBefore = await blue(a.page);
+		const pMeter0 = (await rect(a.page, '.lpn-meter[data-cust="M1"]')).l;
 		await sel1(a.page);
 		await a.settle(1000);
 		const pStroke = await stroke(a.page), pFly = await rect(a.page, '#lpn_popup'), pMeter = await rect(a.page, '.lpn-meter[data-cust="M1"]');
 		ok('d.1 tapping the Customer selects it and Properties flies out', await a.page.evaluate(() => document.querySelector('.lpn-meter[data-cust="M1"]').classList.contains('lpn-selected')) && pFly && pFly.w > 0);
-		ok('d.2 the Customer is not under the Properties flyout', pMeter.l + pMeter.w / 2 < pFly.l - 10, JSON.stringify({ meter: pMeter.l, flyout: pFly.l }));
+		ok('d.2 the Customer is not under the Properties flyout', pMeter.l + pMeter.w <= pFly.l, JSON.stringify({ meter: pMeter.l, flyout: pFly.l }));
 		const pAfter = await blue(a.page);   // the flyout stays up: it must not be what hides the mark
 		await a.page.screenshot({ path: process.env.PHONEDOCK_SHOT || '/tmp/phone-dock-customer.png' });
 		ok('d.3 the phone shows a blue halo round it, counted from the screen\'s own pixels', pAfter - pBefore > 0.04, JSON.stringify([pBefore, pAfter]));
@@ -173,6 +174,52 @@ async function main() {
 		ok('d.5 ...and about the same amount of blue (within 25%)', Math.abs((pAfter - pBefore) - (dAfter - dBefore)) <= 0.25 * (dAfter - dBefore), JSON.stringify([pAfter - pBefore, dAfter - dBefore]));
 		ok('no page errors', !a.errors.length && !d.errors.length, (a.errors[0] || d.errors[0] || '').slice(0, 160));
 		await d.close();
+
+		console.log('\n--- e. the map pans only as far as it must, and comes back ---');
+		const cdpE = await a.context.newCDPSession(a.page);
+		const tapOut = async () => { await tapXY(a, cdpE, 62, 790); await a.settle(400); };
+		const meterAt = async () => { const r = await rect(a.page, '.lpn-meter[data-cust="M1"]'); return r && r.l; };
+		const gripR = await rect(a.page, '.lpn-dock-grip.lpn-dock-grip-live');
+		ok('e.1 the flyout\'s edge grip lies inside the box (it does not reach over the map)', gripR && gripR.l >= pFly.l - 1, JSON.stringify({ grip: gripR, flyout: pFly.l }));
+		const hit = await a.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.id || e.className.toString()) : null; }, [pFly.l - 5, pFly.t + 300]);
+		ok('e.2 a point 5 px beside the flyout is the map, not the grip', !/grip/.test(String(hit)), String(hit));
+		const afterPan = await meterAt();
+		ok('e.3 the pan moved the Customer only to just clear of the flyout (8 px), not to the middle', Math.abs(afterPan + 4 - (pFly.l - 8)) <= 6 || afterPan < pFly.l - 8, JSON.stringify([afterPan, pFly.l]));
+		await tapOut();
+		await a.settle(900);
+		ok('e.4 the flyout tucks', !(await a.page.evaluate(() => document.getElementById('lpn_popup').classList.contains('lpn-dock-out'))));
+		const back = await meterAt();
+		ok('e.5 ...and the map is back where it was before the selection', Math.abs(back - pMeter0) <= 1, JSON.stringify([back, pMeter0]));
+		for (let i = 0; i < 3; i++) {
+			await sel1(a.page); await a.settle(900);
+			await tapOut(); await a.settle(900);
+		}
+		ok('e.6 three more select-and-tuck rounds leave the map where it was', Math.abs((await meterAt()) - pMeter0) <= 1, String(await meterAt()));
+		await tapOut(); await a.settle(500);
+		const nodeInfo = () => a.page.evaluate(() => {
+			const ns = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node')).filter((c) => { const r = c.getBoundingClientRect(); return r.width > 0 && r.left > 28 && r.right < 105 && r.top > 140 && r.bottom < 800; });
+			if (!ns.length) { return null; }
+			const r = ns[0].getBoundingClientRect();
+			return { x: r.left + r.width / 2, y: r.top + r.height / 2, id: ns[0].getAttribute('data-node') };
+		});
+		const n0 = await nodeInfo();
+		if (n0) {
+			await a.page.evaluate((n) => {
+				const c = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + n.id + '"]');
+				const o = { bubbles: true, clientX: n.x, clientY: n.y, pointerId: 6, pointerType: 'touch', button: 0, isPrimary: true };
+				c.dispatchEvent(new PointerEvent('pointerdown', o)); c.dispatchEvent(new PointerEvent('pointerup', o));
+			}, n0);
+			await a.settle(900);
+			const n1 = await a.page.evaluate((id) => { const r = document.querySelector('#lpn_canvas circle.lpn-node[data-node="' + id + '"]').getBoundingClientRect(); return r.left + r.width / 2; }, n0.id);
+			ok('e.8 a selection the flyout does not cover does not move the map', Math.abs(n1 - n0.x) <= 1, JSON.stringify([n0.x, n1]));
+		} else { ok('e.8 a node left of the flyout exists to test with', false); }
+		await sel1(a.page); await a.settle(900);
+		const m1 = await meterAt();
+		await a.page.evaluate(() => { const c = document.getElementById('lpn_canvas'); c.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, clientX: 60, clientY: 400, bubbles: true, cancelable: true })); });
+		await a.settle(400);
+		const zoomed = await meterAt();
+		await tapOut(); await a.settle(900);
+		ok('e.7 if the visitor zoomed meanwhile, the map is not pulled back', Math.abs(zoomed - m1) < 1 || Math.abs((await meterAt()) - zoomed) <= 1, JSON.stringify([m1, zoomed, await meterAt()]));
 		await a.close();
 	} finally {
 		await browser.close();

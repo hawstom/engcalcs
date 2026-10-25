@@ -4889,7 +4889,12 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
 /* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
-@media (pointer: coarse), (max-width: 700px) { .lpn-dock-grip { width: 28px; margin-left: -14px; } }
+/* The finger-wide edge lies wholly INSIDE the box it sizes: a grip reaching over the map swallowed taps on
+   whatever sat beside the flyout (a Customer 14 px away could not be selected). */
+@media (pointer: coarse), (max-width: 700px) {
+	#lpn_dock_grip_right { width: 28px; margin-left: 0; }
+	#lpn_dock_grip_left { width: 28px; margin-left: -28px; }
+}
 .lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
 /* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
    narrows, and every overlay inside the wrapper moves with it. Never on paper. */
