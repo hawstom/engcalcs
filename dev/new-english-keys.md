@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**80 still to read**, of 123 new keys across 17 unmerged branch(es).
+**82 still to read**, of 125 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -637,15 +637,25 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
 
-### chore/verdicts-1024 (`027657edb`) — adds no English strings
+### chore/verdicts-1024 (`29985fba3`) — already merged into feat/box-rows; its strings are listed there
 
-### feat/box-rows (`027657edb`) — already merged into chore/verdicts-1024; its strings are listed there
+### feat/box-rows (`857eb07c0`) — adds no English strings
+
+### feat/box-rows-properties (`857eb07c0`) — already merged into feat/box-rows; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/first-view (`3e2ea9f17`) — adds no English strings
+### feat/first-view (`930266e87`) — already merged into fix/phone-select; its strings are listed there
 
-### feat/scenario-io (`24c49ecae`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/report-buttons (`731c7d9fc`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+
+### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+
+### feat/shape-scenario (`b7607a7c4`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -659,8 +669,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
   @@ NEEDS RULING
-
-### feat/shape-scenario (`24c49ecae`) — already merged into feat/scenario-io; its strings are listed there
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -995,11 +1006,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/browser-pass-a (`2554e1000`) — adds no English strings
 
-### fix/dock-widths (`6ab3ddd9a`) — adds no English strings
+### fix/dock-widths (`2474b5d15`) — adds no English strings
 
 ### fix/example-crs (`1fba54d64`) — adds no English strings
 
-### fix/phone-select (`716f1e842`) — 13 new, 13 to read @@ NEEDS RULING
+### fix/phone-select (`9bc00cca1`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
@@ -1041,4 +1052,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Only the selected assets
   @@ NEEDS RULING
 
-### fix/wording-1024 (`ea94a80d5`) — adds no English strings
+### fix/wording-1024 (`ae3fbf122`) — adds no English strings
