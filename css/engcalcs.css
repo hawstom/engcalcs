@@ -2607,12 +2607,11 @@ html[lang="zh"] .ec-welcome {
    (measured: no more than a few percent of the paper's colour). So the halo is the dot's OWN stroke,
    drawn first and wide, in screen pixels (non-scaling, so the same size at every zoom and in every
    project's units), translucent, with the dot painted over its middle: a disc of selection blue
-   around a solid dot. A touch screen (the primary pointer) or a narrow window gets 22 px across; a
-   mouse 12 px. dev/lpn-spike/phone-select-browser-harness.js counts the blue pixels. */
+   around a solid dot, 12 px across. **ONE RULE FOR EVERY SCREEN** (Tom, 2026-10-24: *"Why treat it any
+   differently on phone?"*): a touch screen used to get 22 px by a media query of its own, which is gone;
+   the phone sees what a PC sees, and a flyout that would cover the selection moves the map instead
+   (dockClearSelection()). dev/lpn-spike/phone-dock-browser-harness.js counts the blue pixels. */
 .lpn-meter.lpn-selected { stroke-width: 12px; vector-effect: non-scaling-stroke; paint-order: stroke; stroke-opacity: 0.45; stroke-dasharray: none; }
-@media (pointer: coarse), (max-width: 700px) {
-	.lpn-meter.lpn-selected { stroke-width: 22px; }
-}
 /* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
    above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */
 .lpn-meter.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); stroke: var(--lpn-hover-color); }
@@ -4888,6 +4887,8 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	display: none;
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
+/* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
+@media (pointer: coarse), (max-width: 700px) { .lpn-dock-grip { width: 28px; margin-left: -14px; } }
 .lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
 /* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
    narrows, and every overlay inside the wrapper moves with it. Never on paper. */

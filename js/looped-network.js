@@ -65299,6 +65299,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var s = d && d.rec.dock;
 		return (s === 'left' || s === 'right') ? s : null;
 	}
+	// **ON A PHONE EVERY DOCKED BOX AUTO-HIDES** (Tom, 2026-10-24: *"There is no auto-hide tab, the pinned
+	// box is unsizeable and very narrow"*). A pinned column on a 390 px window leaves the map its 320 px
+	// floor and the box what remains, about 70 px; no saved record can put one there, whatever it says.
+	function dockAuto(d) { return !!d && (!!d.rec.autohide || smallScreen()); }
 	function boxIsDocked(box) { return !!(box && box.__lpnDock && dockSideOf(box.__lpnDock)); }
 	// A toggle (the gear, a Help row) that finds its box tucked away brings it out instead of closing
 	// a box the reader cannot see.
@@ -65376,6 +65380,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !(navigator && navigator.webdriver);
 	}
 	function freshLayoutProfile() {
+		// **A PHONE'S OLD RECORDS DO NOT COUNT UNLESS A BOX WAS DOCKED** (Tom, 2026-10-24, phone: *"Properties
+		// now starts docked at the right and autohidden"* -- he did not see it). Before docking reached a
+		// phone every record there held a floating position, and a box on a phone fills the window, so
+		// none of them is a layout anybody chose; only a stored dock is the visitor's own.
+		if (smallScreen()) { return !dockBoxes.some(function (d) { return !!d.rec.dock; }); }
 		try {
 			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null || localStorage.getItem(LPN_PANEBOXES_KEY) !== null) { return false; }
 			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return false; }
@@ -65388,7 +65397,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Writes the records only; restoreDefaultDocks() opens what they name.
 	function setDefaultDockRecords() {
 		var byId = {}, ord = { left: 0, right: 0 };
-		paneBoxEntry('junctions');
 		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
 		LPN_DEFAULT_DOCKS.forEach(function (r) {
 			var d = byId[r.id];
@@ -65587,7 +65595,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		hideTipsIn(row);
 		while (row.firstChild) { row.removeChild(row.firstChild); }
 		{
-			if (side) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
+			if (side && !smallScreen()) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
 			if (side !== 'left') { row.appendChild(dockButton(d, 'left', pc.lpn_dock_left || 'Dock at the left of the map')); n++; }
 			if (side !== 'right') { row.appendChild(dockButton(d, 'right', pc.lpn_dock_right || 'Dock at the right of the map')); n++; }
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
@@ -65660,8 +65668,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
 		dockNoteOpen(d, true);
-		if (d.rec.autohide && !dockBooting) { dockFlyout = d; }
+		if (dockAuto(d) && !dockBooting) { dockFlyout = d; }
 		layoutDocks();
+		dockClearSelection(d);
+	}
+	// **A PHONE'S FLYOUT LEAVES THE SELECTION IN VIEW** (Tom, 2026-10-24, phone: *"there still is no visible
+	// change to a selected Customer"*). Properties flies out over 70% of a 390 px map and the selected
+	// element was under it, so nothing of the selection mark could be seen. The map moves sideways until
+	// the selection is in the middle of what the box leaves uncovered. Never on a PC, where the box
+	// leaves the map most of the window.
+	function dockClearSelection(d) {
+		var mark, r, b, rm, left, right, dx;
+		if (!smallScreen() || dockFlyout !== d || d.box.id !== 'lpn_popup' || !selection || !svg) { return; }
+		mark = selectionMarkEl(selection);
+		if (!mark || !mark.getBoundingClientRect) { return; }
+		r = mark.getBoundingClientRect();
+		b = d.box.getBoundingClientRect();
+		rm = svg.getBoundingClientRect();
+		if (!(r.width >= 0) || !(b.width > 0)) { return; }
+		left = rm.left; right = b.left;
+		if (r.left + r.width / 2 < right - 24 && r.right > left) { return; }
+		dx = (left + right) / 2 - (r.left + r.width / 2);
+		state.tx += dx;
+		setTransform();
 	}
 	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
 	function dockLayoutSoon() {
@@ -65753,7 +65782,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
+			var wrap = dockMapWrap(), over = dockAuto(from.list[0]);
 			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
@@ -65800,6 +65829,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE ONE PLACE A DOCKED BOX, ITS TAB AND THE MAP'S MARGINS ARE PLACED.** Everything is
 	// measured from the map's OUTER edges -- the wrapper's rect plus the margins this function
 	// last gave it -- so a pass that changes the margins does not move what it has just placed.
+	// The chrome above the map wraps and unwraps (a phone's toolbar, the project tab row on the first
+	// open) without the map's own size changing, so each piece of it is watched from the first layout
+	// that finds it (the tab row is built after the dock is wired).
+	function dockChromeBottom() {
+		var lowest = 0;
+		['lpn_menubar', 'lpn_toolbar', 'lpn_tabs'].forEach(function (id) {
+			var e = document.getElementById(id), b;
+			if (e && !e.__lpnDockWatched && window.ResizeObserver) {
+				e.__lpnDockWatched = true;
+				new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(e, { box: 'border-box' });
+			}
+			if (!e || !e.offsetParent) { return; }
+			b = e.getBoundingClientRect().bottom;
+			if (b > lowest) { lowest = b; }
+		});
+		return Math.round(lowest);
+	}
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
 			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
@@ -65807,10 +65853,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!wrap) { return; }
 		dockBoxes.forEach(function (d) {
 			var side = dockSideOf(d);
-			if (side && dockBoxShown(d)) { (d.rec.autohide ? sides[side].auto : sides[side].pinned).push(d); }
+			if (side && dockBoxShown(d)) { (dockAuto(d) ? sides[side].auto : sides[side].pinned).push(d); }
 			else { dockRelease(d); }
 		});
-		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
+		if (dockFlyout && !(dockAuto(dockFlyout) && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
 		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
@@ -65825,7 +65871,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;
 		outerR = wr.right + dockMargins.right;
-		top = Math.max(0, sr.top);
+		// **NEVER UNDER THE PROJECT CHROME** (Tom, 2026-10-24, phone: *"the top of the Properties tab is
+		// hidden beneath the project chrome. When I open the box the tab repairs its position"*): the
+		// map's own top can lag the chrome above it while that wraps, so the lowest of the two wins.
+		top = Math.max(0, sr.top, dockChromeBottom());
 		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
@@ -65901,7 +65950,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockFlyOut(d, focusIn) {
 		var f;
 		clearTimeout(dockTimer);
-		if (dockFlyout !== d) { dockFlyout = d; layoutDocks(); }
+		if (dockFlyout !== d) { dockFlyout = d; layoutDocks(); dockClearSelection(d); }
 		if (focusIn) {
 			f = d.corner.querySelector('button');
 			if (f) { f.focus(); }
@@ -66162,6 +66211,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.ResizeObserver && svg) {
 			new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(svg);
 		}
+		window.addEventListener('scroll', function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }, { passive: true });
 		document.addEventListener('pointerdown', dockOutsidePress, true);
 	}
 

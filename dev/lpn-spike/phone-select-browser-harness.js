@@ -188,19 +188,22 @@ async function main() {
 		await hidePopup(page);
 		const after = await bluePixels(page);
 		await page.screenshot({ path: process.env.PHONESEL_SHOT || '/tmp/phone-select-halo.png' });
+		const phoneStroke = await page.evaluate(() => getComputedStyle(document.querySelector('.lpn-meter[data-cust="M1"]')).strokeWidth);
 		await showPopup(page);
 		ok('4.1 tapped: the customer is selected', isSel);
 		ok('4.2 before the tap almost no blue round the dot', before.n < 15, JSON.stringify(before));
-		ok('4.3 after the tap, a halo: at least 600 blue pixels in the 40 px square (a 22 px disc is about 1000 of 6400 at 2x)', after.n >= 600, JSON.stringify(after));
+		ok('4.3 after the tap, a halo: at least 300 blue pixels in the 40 px square (a 12 px disc is about 450 of 6400 at 2x)', after.n >= 300, JSON.stringify(after));
 		await a.close();
 
 		const d = await open(Session, browser, { viewport: { width: 1200, height: 800 } });
 		const dBefore = await bluePixels(d.page);
+		const strokeW = (pg) => pg.evaluate(() => getComputedStyle(document.querySelector('.lpn-meter[data-cust="M1"]')).strokeWidth);
 		await sel1(d.page);
 		await d.settle(500);
+		const sameStroke = [(await strokeW(d.page)) === phoneStroke];
 		await hidePopup(d.page);
 		const dAfter = await bluePixels(d.page);
-		ok('4.4 with a mouse a selected customer also shows a halo, smaller than the phone\'s', dAfter.n > dBefore.n + 20 && dAfter.n <= after.n, JSON.stringify([dBefore, dAfter]));
+		ok('4.4 with a mouse a selected customer shows the same halo as the phone: one rule, the same stroke width', dAfter.n > dBefore.n + 20 && sameStroke.join() === 'true', JSON.stringify([dBefore, dAfter]));
 		ok('no page errors', !a.errors.length && !d.errors.length, (a.errors[0] || d.errors[0] || '').slice(0, 200));
 		await d.close();
 	} finally {
