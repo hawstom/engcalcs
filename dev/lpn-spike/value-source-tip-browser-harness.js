@@ -55,9 +55,10 @@ async function main() {
 		await page.setViewportSize({ width: 1400, height: 900 });
 		await a.settle(2500);
 		const centre = (id) => page.evaluate((i) => { const r = document.querySelector('#lpn_canvas .lpn-node[data-node="' + i + '"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, id);
-		const open = () => page.evaluate(() => ({
+		const ringText = (await a.lang('lpn_scenario_mark_inh_tip')).split('{name}').join('Fire');
+		const open = () => page.evaluate((want) => ({
 			card: Array.from(document.querySelectorAll('.tooltip.lpn-hovercard')).filter((e) => e.classList.contains('show')).length,
-			ring: Array.from(document.querySelectorAll('.tooltip')).filter((e) => !e.classList.contains('lpn-hovercard') && e.classList.contains('show') && /dashed gray ring/.test(e.textContent)).length }));
+			ring: Array.from(document.querySelectorAll('.tooltip')).filter((e) => !e.classList.contains('lpn-hovercard') && e.classList.contains('show') && e.textContent.trim() === want).length }), ringText);
 		const rest = async (id) => { const p = await centre(id); await page.mouse.move(p.x + 40, p.y + 40); await a.settle(300); await page.mouse.move(p.x, p.y); await a.settle(1800); return open(); };
 		let o = await rest('10');
 		ok('T1 junction 10: the ring tip is open and the hover card is not', o.ring === 1 && o.card === 0, JSON.stringify(o));
