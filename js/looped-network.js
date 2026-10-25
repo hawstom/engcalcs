@@ -1843,13 +1843,17 @@ var EngCalcs = EngCalcs || {};
 	// Pipes are SEGMENTS rather than boxes -- Net3 has 119 pipes, and chopped at three screen pixels
 	// a zoomed-in drawing produces thousands of boxes to test every candidate against. A diagonal
 	// pipe's bounding box is also mostly empty space, so boxing it pushes labels off clear ground.
-	// **A TEXT THAT LIES ON A TEXT KEPT BEFORE IT IS NOT DRAWN AT THIS ZOOM** (Tom's Net1, 14 wheel
-	// notches out, 2026-10-19: "Pump" printed across "Source"). A Text is a note sized in screen
-	// pixels at a point fixed in the drawing, so two that clear each other at one zoom meet at a
-	// zoom further out, and neither may move: one of them goes, as a data label goes when nothing
-	// fits, and it comes back when the view has room. Kept first: a Text shown at all zoom levels,
-	// then the larger, then the earlier in the file. A pure function of the view, decided wherever
-	// the obstacles are, and drawn by applyTextHidden().
+	// **A TEXT THAT LIES ON A TEXT KEPT BEFORE IT IS NUDGED, NEVER HIDDEN** (Tom, 2026-10-24, of ROAD
+	// on Elm Street Center, hidden because it crosses ST. FRANCIS: *"I guess I was wrong to advise
+	// hiding/dropping user Text. Should we nudge it instead?"* ... *"Probably C or revert the hiding
+	// decision and leave the overlap in the user's hands."*). This replaces the 2026-10-19 rule that
+	// hid one of two meeting Texts. A Text is a note sized in screen pixels at a point fixed in the
+	// drawing, so two that clear each other at one zoom can meet at another. The later one (the
+	// order is: a Text shown at all zoom levels, then the larger, then the earlier in the file)
+	// slides ALONG ITS OWN LINE, by the least distance that clears every Text kept before it, and is
+	// drawn there at this zoom only; nothing is stored. If no slide within three quarters of its own
+	// length clears them, it stays exactly where the user put it, overlap and all. Data labels still
+	// go round every Text. Decided wherever the obstacles are, drawn by applyTextNudge().
 	function textObstacleBox(lb, le) {
 		var pt = textLabelPoint(lb);
 		return Geom.orientedLabelBox(pt.x, pt.y, textLabelWidth(le), textLabelHeight(lb),
@@ -1903,23 +1907,52 @@ var EngCalcs = EngCalcs || {};
 		return Collide.box(pt.x + dx * Math.cos(rad) - dy * Math.sin(rad), pt.y + dx * Math.sin(rad) + dy * Math.cos(rad), x1 - x0, y1 - y0, a);
 	}
 	function crowdedTexts() {
-		var out = { hidden: {}, box: {}, ink: {} }, ink = out.ink, list = [], kept = [], tol = 0.5 / (state.s || 1);
+		var out = { hidden: {}, box: {}, ink: {}, nudge: {} }, ink = out.ink, list = [], kept = [], tol = 0.5 / (state.s || 1);
 		doc.labels.forEach(function (lb, i) {
 			var le = labelEls[lb.id]; if (!le) { return; }
 			out.box[lb.id] = textObstacleBox(lb, le);
 			ink[lb.id] = textInkBox(lb, le, out.box[lb.id]);
 			le.crowdHidden = false;
-			if (le.suppressed || !String(le.text && le.text.textContent || '').length) { return; }
+			if (le.suppressed || !String(le.text && le.text.textContent || '').length) { le.crowdNudge = null; return; }
 			list.push({ lb: lb, le: le, i: i, all: textAllZoom(lb) ? 1 : 0, size: textSizeMult(lb) });
 		});
 		list.sort(function (a, b) { return (b.all - a.all) || (b.size - a.size) || (a.i - b.i); });
-		// Hidden only where the ink of one truly lies on the ink of another, by more than half a pixel.
+		function hits(bx) {
+			return kept.some(function (k) { return Collide.boxOverlapDepth(bx, k) > tol; });
+		}
+		function shifted(bx, d, rad) {
+			return { cx: bx.cx + Math.cos(rad) * d, cy: bx.cy + Math.sin(rad) * d, w: bx.w, h: bx.h, a: bx.a };
+		}
+		// Overlap is judged on the ink, by more than half a pixel. Along the Text's own line, nearest first.
 		list.forEach(function (t) {
-			var bx = ink[t.lb.id];
-			if (kept.some(function (k) { return Collide.boxOverlapDepth(bx, k) > tol; })) {
-				t.le.crowdHidden = true; out.hidden[t.lb.id] = true; return;
+			var id = t.lb.id, bx = ink[id], rad, step, max, d, k, trial, found = null;
+			if (hits(bx)) {
+				rad = (bx.a || 0) * Math.PI / 180;
+				step = Math.max(bx.h, 1) * 0.25; max = bx.w * 0.75;
+				for (d = step; d <= max && !found; d += step) {
+					for (k = 1; k >= -1 && !found; k -= 2) {
+						trial = shifted(bx, d * k, rad);
+						if (!hits(trial)) { found = { d: d * k, box: trial }; }
+					}
+				}
+			}
+			if (found) {
+				rad = (bx.a || 0) * Math.PI / 180;
+				out.nudge[id] = { x: Math.round(Math.cos(rad) * found.d * 1e4) / 1e4, y: Math.round(Math.sin(rad) * found.d * 1e4) / 1e4 };
+				out.box[id] = shifted(out.box[id], found.d, rad);
+				ink[id] = found.box;
+				bx = found.box;
 			}
 			kept.push(bx);
+		});
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id], nu = out.nudge[lb.id] || null, was;
+			if (!le) { return; }
+			was = le.crowdNudge;
+			if ((was && was.x) === (nu && nu.x) && (was && was.y) === (nu && nu.y)) { return; }
+			le.crowdNudge = nu;
+			var pt = textLabelPoint(lb);
+			applyTextLabelRotation(lb, le, pt.x, pt.y);
 		});
 		return out;
 	}
@@ -1939,10 +1972,10 @@ var EngCalcs = EngCalcs || {};
 		});
 		// A TEXT LABEL IS AN OBSTACLE, NEVER A PARTICIPANT: the user typed those words and chose
 		// that spot, so a data label goes round it and never the reverse.
-		// **BUT TWO TEXTS CAN MEET, AND THEN ONE IS NOT DRAWN** (crowdedTexts()).
+		// **BUT TWO TEXTS CAN MEET, AND THEN THE LATER SLIDES ALONG ITS LINE** (crowdedTexts()).
 		var crowd = crowdedTexts();
 		doc.labels.forEach(function (lb) {
-			var le = labelEls[lb.id]; if (!le || crowd.hidden[lb.id]) { return; }
+			var le = labelEls[lb.id]; if (!le) { return; }
 			var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
 				px = pt.x, py = pt.y,
 				b = crowd.box[lb.id];
@@ -14233,9 +14266,11 @@ var EngCalcs = EngCalcs || {};
 	// The attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
 	// transform is invisible in the code and obvious on screen.
 	function applyTextLabelRotation(lb, le, px, py) {
-		var a = textLabelSvgAngle(lb),
+		var a = textLabelSvgAngle(lb), nu = le.crowdNudge,
 			t = a ? 'rotate(' + a.toFixed(3) + ' ' + px + ' ' + py + ')' : null;
 		if (!le.text) { return; }
+		// The slide crowdedTexts() gave this Text at this zoom: drawn there, stored nowhere.
+		if (nu) { t = 'translate(' + nu.x + ' ' + nu.y + ')' + (t ? ' ' + t : ''); }
 		if (t) { le.text.setAttribute('transform', t); } else { le.text.removeAttribute('transform'); }
 		// **AFTER, NOT BEFORE**: updateLabelGeometry() positions the words and then turns them, so
 		// the grab shape copied at repositionMultilineText() time carried the PREVIOUS rotation.
@@ -28800,9 +28835,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// somebody states one. A guess would be the invisible kind of wrong at a corner where
 			// four mains meet: the customer appears, every number calculates, and the demand is on
 			// the wrong main. Re-read after every write, because the setter may refuse the id.
-			// **BLANK WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25), the same swap
-			// renderCustomerFields() makes: the `atNode` column below names the junction, so this
-			// column stops repeating a pipe id that is, at that point, almost incidental. Still
+			// **A NODE'S ID WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-10-24). Still
 			// writable -- typing a pipe id here is exactly the keyboard way of dragging the
 			// connection grip off the node, and setCustomerLink() clears the node fallback itself.
 			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
@@ -28813,12 +28846,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						'The nearest asset is {id}. Enter it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
-				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
+				// **EXACTLY A NODE READS THAT NODE'S ID** (Tom, 2026-10-24, reversing the 2026-09-25 blank: a
+				// customer on a reservoir that became a Junction "looks orphaned" with an empty cell).
+				// An empty cell stays the detached customer.
+				get: function (c) {
+					var l = customerLink(c), n;
+					if (!l) { return ''; }
+					if (!customerAtNodeEnd(c)) { return l.id; }
+					n = customerNodeId(c);
+					return (n === null || n === undefined) ? '' : n;
+				},
 				refTo: function (c) {
 					var l = customerLink(c);
 					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
 				},
-				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
+				set: function (c, v) {
+					// The node id the cell shows is not an asset id; writing it back changes nothing.
+					if (customerLink(c) && customerAtNodeEnd(c) && String(v) === String(customerNodeId(c))) { return; }
+					setCustomerLink(c, v); customerEdited(c);
+				} },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
 			// through the same two seams: setCustomerStation() slides the connection ALONG the main
@@ -37128,7 +37174,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the chart, never the size of the drawing already in it. It comes before the axis bounds
 		// because the room decides how many gridlines there is room to LABEL (Task 527).
 		lay = profileLayout(host, series.nodes.map(function (n) { return n.id; }));
-		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		// The heads of every time step of the run join the vertical bounds (see simulationRange()), so
+		// the axis does not move as the clock does. The ground is the same at every step.
+		var profSpan = simulationRange('profile|' + path.nodes.join(',') + '|' + unitLabel(resultUnit('elevhead')), function () {
+			var out = [];
+			EngCalcs.lpnProfile.profileSeries(path, profileData()).nodes.forEach(function (n) {
+				if (typeof n.head === 'number') { out.push(n.head); }
+			});
+			return out;
+		});
+		yB = EngCalcs.lpnProfile.axisBounds(profSpan ? values.concat([profSpan.lo, profSpan.hi]) : values, lay.y);
 		xB = EngCalcs.lpnProfile.stationBounds(series.length);
 		profileLastSize = { w: lay.w, h: lay.h };
 		box = lay.box;
@@ -37373,6 +37428,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		readTimeOverride = (frame && typeof frame.t === 'number') ? frame.t : null;
 		try { return fn(); }
 		finally { lastSolveResult = wasResult; readTimeOverride = wasTime; }
+	}
+	// **AN AXIS THAT HOLDS STILL WHILE THE CLOCK MOVES** (Tom, 2026-10-24: Net3's pressure axis jumped
+	// between 100 and 140 from one time step to the next). The Frequency x axis and the Profile y axis
+	// are drawn over the lowest and highest value found in ANY frame of the run, so a curve is read
+	// against the same scale at every time. `valuesAtFrame` returns the numbers one frame contributes
+	// (it runs with that frame standing in for the result, as tsSeries() does). {lo, hi}, or null with
+	// no run. Kept until the run is replaced; `key` names what is measured (field, units, route).
+	var simRangeCache = { token: null, by: {} };
+	function simulationRange(key, valuesAtFrame) {
+		var token = EngCalcs.lpnTimeRunToken ? EngCalcs.lpnTimeRunToken() : null, lo = Infinity, hi = -Infinity, frames, hit;
+		if (!token) { return null; }
+		if (simRangeCache.token !== token) { simRangeCache = { token: token, by: {} }; }
+		if (Object.prototype.hasOwnProperty.call(simRangeCache.by, key)) { return simRangeCache.by[key]; }
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		frames.forEach(function (f) {
+			tsAsOfFrame(f, function () {
+				valuesAtFrame().forEach(function (v) {
+					if (typeof v === 'number' && isFinite(v)) { if (v < lo) { lo = v; } if (v > hi) { hi = v; } }
+				});
+			});
+		});
+		hit = hi >= lo ? { lo: lo, hi: hi } : null;
+		simRangeCache.by[key] = hit;
+		return hit;
 	}
 	// One entry per plotted asset: its id, its color, and its points in reporting-step order.
 	//
@@ -38594,7 +38673,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// two plots of the same network read against the same scale.
 		// A network whose pipes are all one diameter is a real answer: its curve is one vertical run,
 		// centred in a window a fiftieth of its own size rather than an axis of zero width.
-		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }), {
+		// The axis spans the whole run, not only this time step (see simulationRange()).
+		var freqSpan = simulationRange('freq|' + group + '|' + field + '|' + colorFieldUnitText(group, field), function () {
+			return freqValues(group, field).map(function (o) { return o.v; });
+		});
+		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }).concat(freqSpan ? [freqSpan.lo, freqSpan.hi] : []), {
 			ticks: 5, maxTicks: 8,
 			minSpan: Math.max(Math.abs(pts[0].x), Math.abs(pts[pts.length - 1].x)) / 50 || 1
 		});
@@ -40617,6 +40700,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// until that one has either landed or failed, and the gallery closes on the FIRST activation
 	// (below) rather than waiting for the import to finish, which is the delay itself.
 	var exampleOpenInFlight = false;
+	// **THE GALLERY STARTS BELOW THE TOP-LEFT OVERLAY ROW** (Tom, 2026-10-24: "Welcome to water supply
+	// network modelling" overlapped the Mode line). The row is absolutely positioned over the map and
+	// the Mode line wraps to one, two or three lines with the window, so the gallery's top padding
+	// follows the row's measured height through --lpn-overlay-h, which css/engcalcs.css reads.
+	function keepExamplesBelowOverlay() {
+		var row = document.getElementById('lpn_map_overlay_tl'), hint = document.getElementById('lpn_empty_hint');
+		if (!row || !hint) { return; }
+		function sync() { hint.style.setProperty('--lpn-overlay-h', row.offsetHeight + 'px'); }
+		sync();
+		if (typeof ResizeObserver === 'function') { new ResizeObserver(sync).observe(row); }
+		else { window.addEventListener('resize', sync); }
+	}
 	function examplesPane() { return document.getElementById('lpn_examples_pane'); }
 	// Cards are built from the manifest, which is FETCHED -- so this cannot be rendered by PHP, and
 	// a PHP copy of the list would be a second index to keep in step with the generated one.
@@ -54223,6 +54318,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// nothing the page set on those elements was touched. The ERRORS stay: #lpn_status, the standing
 	// message, is not in the list, and every notice still goes to the message history. The Map menu
 	// is on the toolbar, which this never hides, so a keyboard user can always turn it off again.
+	// **THE MODE LINE GOES TOO, AND STAYS GONE** (Tom, 2026-10-24: *"Clean map mode is not for
+	// clicking, it's for IO"*): a clean map is for output and input to files and pictures, not for
+	// working the tools, so no tool's hint is shown in it.
 	var LPN_CLEANMAP_KEY = 'lpn_cleanmap';
 	var LPN_OVRMARKS_KEY = 'lpn_ovrmarks';
 	var cleanMapState = null, overrideMarksPref = null;   // null: not read from storage yet
@@ -54264,7 +54362,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshScenarioMarks();
 	}
 	// For dev/lpn-spike/clean-map-browser-harness.js, which proves the project file never changes.
-	EngCalcs.lpnCleanMap = { on: cleanMapOn, set: setCleanMap, marksShown: overrideMarksShown,
+	EngCalcs.lpnCleanMap = { on: cleanMapOn, set: setCleanMap, marksShown: overrideMarksShown, setStatus: setStatus,
 		projectText: function () { return JSON.stringify(serializeProject()); } };
 	function mapMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
@@ -56325,6 +56423,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		applyCleanMap();   // Task 805: a clean map stays clean across a reload (lpn_cleanmap)
+		keepExamplesBelowOverlay();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
@@ -61043,7 +61142,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// whichever of its own Text objects is the largest, which is what keeps a note like
 			// Net3's "Zoom in to see labels" readable when the labels have gone.
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
-			// of the words, so nothing hides it by inheritance. applyTextHidden() adds a Text another
+			// of the words, so nothing hides it by inheritance. applyTextHidden() leaves a Text another
 			// Text covers (crowdedTexts()).
 			le.suppressed = !isActive(lb) || (past && !textAllZoom(lb));
 			applyTextHidden(le);
@@ -75919,6 +76018,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hrow.appendChild(show);
 			panel.appendChild(hrow);
 		}
+		// **THE PRIVACY DISCLOSURE SITS AT THE TOP OF THE LIST, between the Mode line and the first
+		// message** (Tom, 2026-10-24: he thought so the first time he saw it). It survived the move
+		// from dialog to panel as the closing paragraph; at the bottom of a long list it was never
+		// read. It says something none of the rows do: the ring is bounded and nothing in it reaches
+		// the visitor's device. Not shown when there is nothing to list.
+		if (noticeLog.length || hiddenText || hiddenNotes) {
+			var note = document.createElement('div');
+			note.className = 'lpn-msglog-panel-note';
+			note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
+				.replace('{n}', NOTICE_LOG_MAX);
+			panel.appendChild(note);
+		}
 		if (hiddenText) { hiddenRow(hiddenText, unhideStatus); }
 		if (hiddenNotes) { hiddenRow(hiddenNotes, unhideEngineNotes); }
 		if (!noticeLog.length && !hiddenText && !hiddenNotes) {
@@ -75946,15 +76057,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pill.appendChild(what);
 			panel.appendChild(pill);
 		});
-		// **THE PRIVACY DISCLOSURE SURVIVES THE MOVE FROM DIALOG TO PANEL.** This was the closing
-		// paragraph of Ida's dialog design; it says something none of the pills above it do --
-		// that the ring is bounded and nothing in it reaches the visitor's device -- so it is kept
-		// as the last row rather than dropped along with the dialog chrome around it.
-		var note = document.createElement('div');
-		note.className = 'lpn-msglog-panel-note';
-		note.textContent = (pc.lpn_msglog_note || 'Newest first. This page keeps the last {n} messages while it is open and does not store them on your computer.')
-			.replace('{n}', NOTICE_LOG_MAX);
-		panel.appendChild(note);
 	}
 	// **CLOSED BY A SECOND PRESS, ESCAPE, OR A CLICK OUTSIDE IT** -- the ordinary disclosure-widget
 	// contract, so a keyboard user who opened it with Enter/Space can dismiss it the same way
@@ -76264,6 +76366,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Paints what setStatus() last stated, honouring the hidden set. Called by setStatus(), and by
 	// the x and the history row's Show, which must not re-log a message that has not changed.
+	// The statuses that mean the run gave no answer: the diagnostics that refuse to solve, no
+	// convergence, an engine error, a unit this page does not know, and a project that cannot be
+	// kept. Progress lines, run summaries and notes about a run that DID answer are not.
+	var STATUS_BLOCKING_CODES = { 'not-converged': 1, 'solve-error': 1, 'engine-refused': 1, 'unit-unknown': 1,
+		'storage-full': 1, 'storage-unreadable': 1 };
+	function statusBlocksRun(st) { return !!(st && st.text && (st.diag || STATUS_BLOCKING_CODES[st.code] === 1)); }
 	function paintStatus() {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
@@ -76274,6 +76382,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
 		// where the span is absent, so a harness or a page that has not been updated still works.
 		(textEl || el).textContent = hide ? '' : (statusLast.text || '');
+		// Clean map hides this box UNLESS it is the message that says no answer can be given
+		// (css/engcalcs.css, .lpn-status-blocking); every other status is a progress line or a note.
+		el.classList.toggle('lpn-status-blocking', !hide && statusBlocksRun(statusLast));
 		// The x serves the notes beside the text too (H10): shown while either has something on the map.
 		if (xEl) { xEl.style.display = ((statusLast.text && !hide) || (notesLast && !notesHidden)) ? '' : 'none'; }
 		// An open history panel follows: a hidden message forgotten by an edit leaves its top row.
