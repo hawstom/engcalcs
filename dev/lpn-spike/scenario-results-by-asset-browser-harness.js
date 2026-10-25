@@ -205,19 +205,18 @@ async function main() {
 		// Copy and Download CSV of the pipe-flow view.
 		console.log('\n--- S2: Copy and Download CSV ---');
 		await chooseKind('pipes', ['flow']);
-		const copyCalls = [];
-		await page.exposeFunction('__scnresCopied', (s) => { copyCalls.push(s); });
-		await page.evaluate(() => {
-			const orig = window.EngCalcs.lpnCopyText;
-			window.EngCalcs.lpnCopyText = function (text, btn) { window.__scnresCopied(text); return orig(text, btn); };
-		});
-		await page.click('#lpn_scnres_copy');
-		await a.settle(400);
-		let clip = '';
-		try { clip = await page.evaluate(() => navigator.clipboard.readText()); } catch (e) { clip = ''; }
-		const copied = copyCalls[0] || '';
-		ok('Copy hands one text to the clipboard', copyCalls.length === 1, copyCalls.length);
-		if (clip) { ok('...and the clipboard holds it', clip === copied, JSON.stringify(clip.slice(0, 60))); }
+		// Task 829: the box's shared row (Download CSV, Copy HTML, Print report) replaced this section's own
+		// Copy and Download CSV. The CSV holds the comparison table and then Results by asset, the
+		// last block, with the unrounded numbers.
+		const dls = [];
+		page.on('download', (d) => dls.push(d));
+		await page.click('#lpn_scncmp_csv');
+		await a.settle(1200);
+		ok('Download CSV gives exactly one file per click', dls.length === 1, dls.length);
+		const csvFile = dls.length ? fs.readFileSync(await dls[0].path(), 'utf8').replace(/^\uFEFF/, '') : '';
+		const csvBlocks = csvFile.replace(/\r\n$/, '').split('\r\n\r\n');
+		const resBlock = csvBlocks[csvBlocks.length - 1].split('\r\n');
+		const copied = resBlock.map((l) => csvCells(l).join('\t')).join('\n');
 		const lines = copied.split('\n'), headRow = lines[0].split('\t');
 		ok('the copied text is tab-separated, one line per pipe plus the headings', lines.length === 13 && headRow.length === 4, lines.length + ' lines, ' + headRow.length + ' columns');
 		ok('the copied headings carry the units', headRow[1] === F + ' (gpm), Base' && headRow[3] === F + ' (gpm), Max day', headRow.join(' | '));
@@ -228,19 +227,9 @@ async function main() {
 			full10[1].length > shown10[1].length && Math.abs(+full10[1] - +shown10[1]) < 1, full10.join(' | ') + '  vs  ' + shown10.join(' | '));
 		ok('the copied flows carry the minus sign of a reversed one', lines.slice(1).some((l) => /^[^\t]*\t-\d/.test(l)), lines.slice(1).map((l) => l.split('\t')[1]).join(' '));
 		ok('the table carries the sign note', (await page.evaluate(() => document.getElementById('lpn_scnres').textContent)).indexOf((await L('lpn_scnres_flow_tip')).slice(0, 30)) >= 0);
-		const dls = [];
-		page.on('download', (d) => dls.push(d));
-		await page.click('#lpn_scnres_csv');
-		await a.settle(1200);
-		ok('Download CSV gives exactly one file per click', dls.length === 1, dls.length);
 		if (dls.length) {
-			const file = await dls[0].path();
-			const csv = fs.readFileSync(file, 'utf8').replace(/^﻿/, '');
-			ok('the CSV is named for the project, the table, and the asset type', dls[0].suggestedFilename() === 'Elm_Street-Results_by_asset-Pipes.csv', dls[0].suggestedFilename());
-			const csvLines = csv.replace(/\r\n$/, '').split('\r\n');
-			ok('the CSV holds the same headings and numbers as the copy', csvLines.length === lines.length &&
-				csvLines.every((l, i) => csvCells(l).join('\t') === lines[i]), csvLines[0] + ' | ' + lines[0]);
-			ok('a heading with a comma in it is quoted', csvLines[0].indexOf('"' + F + ' (gpm), Base"') >= 0, csvLines[0]);
+			ok('the CSV is named for the project, the open scenario and the box', dls[0].suggestedFilename() === 'Elm_Street-Max_day-Scenario_comparison.csv', dls[0].suggestedFilename());
+			ok('a heading with a comma in it is quoted', resBlock[0].indexOf('"' + F + ' (gpm), Base"') >= 0, resBlock[0]);
 		}
 
 		console.log('\n--- S3 after: nothing on screen moved ---');
@@ -364,15 +353,12 @@ async function main() {
 		const esT = await resTable();
 		ok('the Spanish table has nine junction rows and three scenarios', esT && esT.rows.length === 9 && esT.heads.length === 4, esT && esT.heads.join(' | '));
 		ok('Spanish numbers use a point, as a spreadsheet reads them', esT && esT.rows.every((r) => /^-?\d+(\.\d+)?$/.test(r[1])), esT && esT.rows[0].join(' | '));
-		const esCopies = [];
-		await page.exposeFunction('__scnresCopiedEs', (s) => { esCopies.push(s); });
-		await page.evaluate(() => {
-			const orig = window.EngCalcs.lpnCopyText;
-			window.EngCalcs.lpnCopyText = function (text, btn) { window.__scnresCopiedEs(text); return orig(text, btn); };
-		});
-		await page.click('#lpn_scnres_copy');
-		await a.settle(300);
-		ok('Copy works on the Spanish page', esCopies.length === 1 && esCopies[0].split('\n').length === 10, esCopies.length);
+		const esDl = a.page.waitForEvent('download', { timeout: 10000 }).catch(() => null);
+		await page.click('#lpn_scncmp_csv');
+		const esF = await esDl;
+		const esCsv = esF ? fs.readFileSync(await esF.path(), 'utf8') : '';
+		const esBlocks = esCsv.replace(/\r\n$/, '').split('\r\n\r\n');
+		ok('Download CSV works on the Spanish page', esBlocks[esBlocks.length - 1].split('\r\n').length === 10, esBlocks[esBlocks.length - 1].split('\r\n').length);
 		ok('no uncaught page errors (es)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 
 		// ================================ FAILED, NOT CONVERGED, ORDER ================================
@@ -394,16 +380,13 @@ async function main() {
 		ok('...and a note names it and says why', n7.indexOf(failedLead) >= 0 && n7.indexOf(failedLead) + failedLead.length < n7.length, n7.slice(n7.indexOf('Dead'), n7.indexOf('Dead') + 160));
 		ok('the scenario that did not converge is marked in its heading', t7 && t7.heads[2] === P + ' (psi), One trial ' + NC, t7 && t7.heads[2]);
 		ok('...with a note saying what the mark means', n7.indexOf((await L('lpn_scnres_not_converged_note')).replace('{mark}', NC)) >= 0);
-		const c7 = [];
-		await page.exposeFunction('__scnresCopied7', (x) => { c7.push(x); });
-		await page.evaluate(() => {
-			const orig = window.EngCalcs.lpnCopyText;
-			window.EngCalcs.lpnCopyText = function (text, btn) { window.__scnresCopied7(text); return orig(text, btn); };
-		});
-		await page.click('#lpn_scnres_copy');
-		await a.settle(300);
-		const h7 = (c7[0] || '').split('\n')[0].split('\t');
-		ok('the copied heading carries the mark too', h7[2] === P + ' (psi), One trial ' + NC && h7[3] === P + ' (psi), Dead', h7.join(' | '));
+		const d7dl = a.page.waitForEvent('download', { timeout: 10000 }).catch(() => null);
+		await page.click('#lpn_scncmp_csv');
+		const d7f = await d7dl;
+		const d7csv = d7f ? fs.readFileSync(await d7f.path(), 'utf8') : '';
+		const d7blocks = d7csv.replace(/\r\n$/, '').split('\r\n\r\n');
+		const h7 = csvCells(d7blocks[d7blocks.length - 1].split('\r\n')[0]);
+		ok('the CSV heading carries the mark too', h7[2] === P + ' (psi), One trial ' + NC && h7[3] === P + ' (psi), Dead', h7.join(' | '));
 		ok('no uncaught page errors (S7)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 
 		// ================================ RECALCULATE OFF ================================

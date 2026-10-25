@@ -130,7 +130,7 @@ async function main() {
 		const fullTitle = (await L('lpn_full_title')).trim();
 		const note = await text('#lpn_full_scenario_note');
 		ok('F1 the Full report box names the scenario of the run', note.indexOf(await line('lpn_run_of_scenario', 'Peak hour')) >= 0, JSON.stringify(note));
-		ok('F1 the CSV name carries the scenario of the run', (await csvName()) === 'Elm Street-Peak hour-Full report.csv', await csvName());
+		ok('F1 the CSV name carries the scenario of the run', (await csvName()) === 'Elm_Street-Peak_hour-Full_report.csv', await csvName());
 		await closeBox('lpn_full_box');
 		await dock.openBox(a, 'lpn_rptbox');
 		const rs = await text('#lpn_rptbox_scn');
@@ -147,7 +147,7 @@ async function main() {
 		console.log('--- F1b. a run in Base: the CSV name is the project alone plus the report name ---');
 		await calculate();
 		await dock.openBox(a, 'lpn_full_box');
-		ok('F1 Base run: no scenario in the CSV name', (await csvName()) === 'Elm Street-Full report.csv', await csvName());
+		ok('F1 Base run: no scenario in the CSV name', (await csvName()) === 'Elm_Street-Full_report.csv', await csvName());
 		await closeBox('lpn_full_box');
 
 		console.log('--- F3. paste into Peak hour counts the overrides ---');
@@ -182,7 +182,7 @@ async function main() {
 		await calculate();
 		await dock.openBox(a, 'lpn_full_box');
 		ok('F4 no scenario note in the Full report', (await text('#lpn_full_scenario_note')) === '');
-		ok('F4 CSV name has no scenario', (await csvName()) === 'Elm Street-Full report.csv', await csvName());
+		ok('F4 CSV name has no scenario', (await csvName()) === 'Elm_Street-Full_report.csv', await csvName());
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();

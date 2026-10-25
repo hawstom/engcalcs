@@ -56316,6 +56316,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireScenarioManager();
 		wireFullReportBox();
 		wireCalibBox();
+		reportToolsInit();
 		buildMenuBar();
 		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
@@ -81446,24 +81447,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scnResFull(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toPrecision(10)) : '';
 	}
-	function scenarioResultsText(t, csv) {
-		var rows = t.rows.map(function (r) {
-			return [r[0]].concat(r.slice(1).map(scnResFull));
-		});
-		return csv ? EngCalcs.lpnTableCsv(t.heads, rows) : EngCalcs.lpnTableTsv(t.heads, rows);
-	}
-	function scenarioResultsFileName(t) {
-		var pc = EngCalcs.pageConfig || {};
-		return paneProjectPrefix() + paneNoSpace(paneSanitizeFileName(pc.lpn_scnres_title || 'Results by asset')) + '-' +
-			paneNoSpace(paneSanitizeFileName(pc[t.kind.label] || t.kind.fb)) + '.csv';
-	}
-	function downloadScenarioResultsCsv() {
-		var pc = EngCalcs.pageConfig || {}, t = scenarioResultsTable(), name = scenarioResultsFileName(t);
-		downloadTextFile(name, scenarioResultsText(t, true), PANE_EXPORT_MIME.csv);
-		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
-	}
 	function buildScenarioResultsSection(host) {
-		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, btns, copy, csv, sorted;
+		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, sorted;
 		if (!scenarioCompareRun || !scenarioCompareRun.some(function (r) { return r.ok; })) { return; }
 		sec = ffEl('div', 'lpn-scnres', null, host);
 		sec.id = 'lpn_scnres';
@@ -81510,19 +81495,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_scnres_empty || 'This project has none of these assets.', sec);
 			return;
 		}
-		btns = ffEl('div', 'lpn-ff-buttons', null, sec);
-		copy = ffEl('button', 'lpn-rptbox-copy', pc.lpn_time_run_report_copy || 'Copy', btns);
-		copy.type = 'button';
-		copy.id = 'lpn_scnres_copy';
-		copy.title = pc.lpn_scnres_copy_tip ||
-			'Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
-		copy.addEventListener('click', function () {
-			if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(scenarioResultsText(scenarioResultsTable(), false), copy); }
-		});
-		csv = ffEl('button', 'lpn-rptbox-copy', pc.lpn_full_download_csv || 'Download CSV', btns);
-		csv.type = 'button';
-		csv.id = 'lpn_scnres_csv';
-		csv.addEventListener('click', downloadScenarioResultsCsv);
 		// Sorted on the numbers, never on their text, with a blank last both ways (ffSortResults()).
 		sorted = t.rows.map(function (r, i) { return { r: r, i: i }; });
 		if (scnResState.sort.col !== null) {
@@ -81550,7 +81522,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
 			// lines up against a sheet exported from there.
 			ffCell(tr, x.r[0]);
-			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
+			// The CSV carries the full number, the box and the print its rounded one.
+			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num').setAttribute('data-ec-full', scnResFull(x.r[k + 1])); });
 		});
 		if (hasFlow) { ffEl('p', 'lpn-ff-note', flowTip, sec); }
 		t.failed.forEach(function (r) {
@@ -83670,70 +83643,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var name = lastRunScenarioName(), pc = EngCalcs.pageConfig || {};
 		return name ? String(pc[key] || fallback).split('{scenario}').join(name) : '';
 	}
-	function fullReportFilename(ext) {
-		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project'),
-			scn = lastRunScenarioName(), id = lastSolveResult && lastSolveResult._scn;
-		// Base keeps the project name alone, as the .inp export does.
-		if (scn && id !== 'base') { name += '-' + sanitizeFilename(scn); }
-		return name + '-Full report.' + ext;
-	}
-	function downloadFullReportCsv() {
-		downloadTextFile(fullReportFilename('csv'), fullReportCsvText(fullReportRows()), 'text/csv');
-	}
-	/** THE SAME STATIC-COPY, ONE-PRINTER APPROACH paneBuildPrintable() uses for the Tables pane
-	 * (`#lpn_print_area`, see css/engcalcs.css): a plain table built from the rows, never the live
-	 * box, so nothing modal or scrolling ends up on the page. */
-	function fullReportPrintable(rows) {
-		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'), h, table, thead, tbody;
-		wrap.id = 'lpn_print_area';
-		h = document.createElement('h1');
-		h.textContent = (typeof project === 'object' && project && project.name) || '';
-		wrap.appendChild(h);
-		h = document.createElement('h2');
-		h.textContent = pc.lpn_full_title || 'Full report';
-		wrap.appendChild(h);
-		if (lastRunScenarioName()) {
-			h = document.createElement('h3');
-			h.textContent = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
-			wrap.appendChild(h);
-		}
-		if (!rows.length) {
-			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
-			wrap.appendChild(h);
-			return wrap;
-		}
-		table = document.createElement('table');
-		table.className = 'lpn-pane-table lpn-print-table';
-		thead = document.createElement('thead');
-		(function () {
-			var tr = document.createElement('tr');
-			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
-				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
-				.forEach(function (text) {
-					var th = document.createElement('th');
-					th.textContent = text;
-					tr.appendChild(th);
-				});
-			thead.appendChild(tr);
-		}());
-		table.appendChild(thead);
-		tbody = document.createElement('tbody');
-		rows.forEach(function (r) {
-			var tr = document.createElement('tr'), td;
-			[EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
-				.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
-				.forEach(function (text) {
-					td = document.createElement('td');
-					td.textContent = text;
-					tr.appendChild(td);
-				});
-			tbody.appendChild(tr);
-		});
-		table.appendChild(tbody);
-		wrap.appendChild(table);
-		return wrap;
-	}
+	// The shared button row (reportToolsInit, below) prints, copies and downloads the Full report
+	// like every other report box; this keeps only what is the Full report's own: all its rows.
 	var fullPrintArea = null;
 	function endFullPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
@@ -83741,13 +83652,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fullPrintArea = null;
 	}
 	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
-	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
-	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
-	// does for the Tables pane; neither function touches the tab at all.
-	function printFullReport() {
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, report title)
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() does for
+	// the Tables pane; this touches the tab not at all.
+	function printReportArea(wrap) {
 		if (!document.body) { return; }
 		endFullPrint();
-		fullPrintArea = fullReportPrintable(fullReportRows());
+		fullPrintArea = wrap;
 		document.body.appendChild(fullPrintArea);
 		document.body.classList.add('lpn-printing-table');
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
@@ -83756,6 +83667,243 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			try { window.print(); } finally { endFullPrint(); }
 		}
+	}
+	/**
+	 * **ONE BUTTON ROW FOR EVERY ANALYSIS AND REPORT BOX** (ROADMAP Task 829; Tom, 2026-10-24: each
+	 * "Needs printout and/or Copy HTML", the Full report "possibly a good model", and Scenario
+	 * comparison's lone Copy and Download CSV "a little confusing since they appear only in this
+	 * box"). Download CSV, Copy HTML and Print report, in the sticky `.lpn-box-tools` row, acting on
+	 * what the box SHOWS: its headings, notes and tables are read back from the box's own report
+	 * element, so a box that gains a table is covered without a line here. A cell may carry
+	 * `data-ec-full` (the unrounded number) for the CSV only. The Full report alone supplies its
+	 * own blocks, because its box shows one time step and the file carries every one. Disabled while
+	 * the box holds no table (a "press Calculate" note). Nothing is stored on the device.
+	 */
+	var REPORT_TOOL_BOXES = [
+		{ box: 'lpn_ff_box', host: 'lpn_ff_report', title: 'lpn_ff_title', fb: 'Fire flow analysis' },
+		{ box: 'lpn_crit_box', host: 'lpn_crit_report', title: 'lpn_crit_title', fb: 'Criticality analysis' },
+		{ box: 'lpn_ds_box', host: 'lpn_ds_report', title: 'lpn_ds_title', fb: 'Demand scaling' },
+		{ box: 'lpn_energy_box', host: 'lpn_energy_report', title: 'lpn_energy_title', fb: 'Pump energy report' },
+		{ box: 'lpn_scncmp_box', host: 'lpn_scncmp_report', title: 'lpn_scncmp_title', fb: 'Scenario comparison' },
+		{ box: 'lpn_status_box', host: 'lpn_status_report', title: 'lpn_status_title', fb: 'Status changes' },
+		{ box: 'lpn_calib_box', host: 'lpn_calib_report', title: 'lpn_calib_title', fb: 'Calibration report' },
+		{ box: 'lpn_full_box', host: 'lpn_full_report', title: 'lpn_full_title', fb: 'Full report', full: true }
+	];
+	function reportCellText(el, forCsv) {
+		var full = forCsv && el.getAttribute && el.getAttribute('data-ec-full'), inp, c, junk, i;
+		if (full !== null && full !== undefined && full !== false && full !== '') { return full; }
+		inp = el.querySelector && el.querySelector('input, select');
+		if (inp && !(el.textContent || '').trim()) { return String(inp.type === 'checkbox' ? (inp.checked ? '1' : '0') : inp.value); }
+		c = el.cloneNode(true);
+		junk = c.querySelectorAll('.lpn-pane-sortarrow, .ec-tip, input, select');
+		for (i = 0; i < junk.length; i++) { junk[i].parentNode.removeChild(junk[i]); }
+		return (c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	/** The box's report element as blocks: `{text}` for a note or heading, `{heads, rows, full}` for a table. */
+	function reportDomBlocks(hosts) {
+		var out = [];
+		hosts.forEach(function (h) { out = out.concat(reportDomBlocksOf(h)); });
+		return out;
+	}
+	function reportDomBlocksOf(host) {
+		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, heads;
+		if (!host) { return out; }
+		nodes = host.querySelectorAll('table, p, h1, h2, h3, h4, .lpn-ff-head');
+		for (i = 0; i < nodes.length; i++) {
+			el = nodes[i];
+			if (el.tagName !== 'TABLE') {
+				if (el.closest('table')) { continue; }
+				t = reportCellText(el, false);
+				if (t) { out.push({ text: t }); }
+				continue;
+			}
+			heads = [];
+			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) { heads.push(reportCellText(th, false)); });
+			rows = []; frow = [];
+			trs = el.querySelectorAll('tbody tr');
+			for (j = 0; j < trs.length; j++) {
+				tds = trs[j].children; row = []; k = 0;
+				var fr = [];
+				for (k = 0; k < tds.length; k++) { row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true)); }
+				rows.push(row); frow.push(fr);
+			}
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow }); }
+		}
+		return out;
+	}
+	function fullReportBlocks() {
+		var pc = EngCalcs.pageConfig || {}, rows = fullReportRows();
+		if (!rows.length) { return []; }
+		return [{
+			heads: [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			rows: rows.map(function (r) {
+				return [EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
+					.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }));
+			})
+		}];
+	}
+	/** The elements a box's report is read from. Demand scaling answers inside its controls (the
+	 * `data-ds` blocks) and lists its tables in the report element. */
+	function reportHostsFor(spec) {
+		var out = [], c;
+		if (spec.box === 'lpn_ds_box') {
+			c = document.getElementById('lpn_ds_controls');
+			if (c) { Array.prototype.forEach.call(c.querySelectorAll('[data-ds]'), function (e) { out.push(e); }); }
+		}
+		out.push(document.getElementById(spec.host));
+		return out;
+	}
+	function reportBlocksFor(spec) {
+		return spec.full ? fullReportBlocks() : reportDomBlocks(reportHostsFor(spec));
+	}
+	function reportScenarioName(spec) {
+		var s;
+		if (spec.full) { return lastRunScenarioName(); }
+		if (scenarios.length < 2) { return ''; }
+		s = activeScenario();
+		return s ? scenarioDisplayName(s) : '';
+	}
+	function reportTitleText(spec) {
+		return (EngCalcs.pageConfig || {})[spec.title] || spec.fb;
+	}
+	function reportDateText() {
+		var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+		return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+	}
+	/** Project, scenario, analysis, date: the one line that says what a pasted or printed table is. */
+	function reportTitleLine(spec) {
+		var proj = (typeof project === 'object' && project && project.name) || '', scn = reportScenarioName(spec);
+		return [proj, scn, reportTitleText(spec), reportDateText()].filter(function (x) { return x; }).join(' - ');
+	}
+	function reportFilename(spec, ext) {
+		var proj = paneProjectPrefix(), scn = reportScenarioName(spec), id = spec.full && lastSolveResult && lastSolveResult._scn;
+		return proj + ((scn && !(spec.full && id === 'base')) ? paneNoSpace(paneSanitizeFileName(scn)) + '-' : '') +
+			paneNoSpace(paneSanitizeFileName(reportTitleText(spec))) + '.' + ext;
+	}
+	function reportCsvText(blocks) {
+		var parts = [];
+		blocks.forEach(function (b) {
+			if (!b.heads) { return; }
+			parts.push(EngCalcs.lpnTableCsv(b.heads, b.full || b.rows));
+		});
+		return parts.join('\r\n');
+	}
+	function reportEsc(t) {
+		return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	/** Self-contained: inline styles only, so it pastes into a mail or a document the same everywhere. */
+	function reportHtmlText(spec, blocks) {
+		var cell = 'border:1px solid #999;padding:2px 6px;text-align:left;', out = ['<p><b>' + reportEsc(reportTitleLine(spec)) + '</b></p>'];
+		blocks.forEach(function (b) {
+			if (!b.heads) { out.push('<p>' + reportEsc(b.text) + '</p>'); return; }
+			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:10pt;"><thead><tr>' +
+				b.heads.map(function (h) { return '<th style="' + cell + 'background:#eee;">' + reportEsc(h) + '</th>'; }).join('') +
+				'</tr></thead><tbody>' +
+				b.rows.map(function (r) {
+					return '<tr>' + r.map(function (c) { return '<td style="' + cell + '">' + reportEsc(c) + '</td>'; }).join('') + '</tr>';
+				}).join('') + '</tbody></table>');
+		});
+		return out.join('\n');
+	}
+	function reportPrintable(spec, blocks) {
+		var wrap = document.createElement('div'), h, line;
+		wrap.id = 'lpn_print_area';
+		h = document.createElement('h1');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = reportTitleText(spec) + ' - ' + reportDateText();
+		wrap.appendChild(h);
+		line = reportScenarioName(spec);
+		if (line) {
+			h = document.createElement('h3');
+			h.textContent = line;
+			wrap.appendChild(h);
+		}
+		blocks.forEach(function (b) {
+			var table, thead, tbody, tr, e;
+			if (!b.heads) {
+				e = document.createElement('p');
+				e.textContent = b.text;
+				wrap.appendChild(e);
+				return;
+			}
+			table = document.createElement('table');
+			table.className = 'lpn-pane-table lpn-print-table';
+			thead = document.createElement('thead');
+			tr = document.createElement('tr');
+			b.heads.forEach(function (t) { e = document.createElement('th'); e.textContent = t; tr.appendChild(e); });
+			thead.appendChild(tr);
+			table.appendChild(thead);
+			tbody = document.createElement('tbody');
+			b.rows.forEach(function (r) {
+				tr = document.createElement('tr');
+				r.forEach(function (t) { e = document.createElement('td'); e.textContent = t; tr.appendChild(e); });
+				tbody.appendChild(tr);
+			});
+			table.appendChild(tbody);
+			wrap.appendChild(table);
+		});
+		return wrap;
+	}
+	function reportCopyHtml(spec, btn) {
+		var blocks = reportBlocksFor(spec), html = reportHtmlText(spec, blocks), pc = EngCalcs.pageConfig || {},
+			was = btn.textContent, plain = blocks.filter(function (b) { return b.heads; })
+				.map(function (b) { return EngCalcs.lpnTableTsv(b.heads, b.rows); }).join('\n');
+		function done(okay) {
+			if (!okay) { return; }
+			btn.textContent = pc.lpn_time_run_report_copied || 'Copied';
+			setTimeout(function () { btn.textContent = was; }, 1500);
+		}
+		if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+			navigator.clipboard.write([new ClipboardItem({
+				'text/html': new Blob([html], { type: 'text/html' }),
+				'text/plain': new Blob([plain], { type: 'text/plain' })
+			})]).then(function () { done(true); }, function () {
+				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(html, btn); }
+			});
+		} else if (EngCalcs.lpnCopyText) {
+			EngCalcs.lpnCopyText(html, btn);
+		}
+	}
+	function reportToolsInit() {
+		var pc = EngCalcs.pageConfig || {};
+		REPORT_TOOL_BOXES.forEach(function (spec) {
+			var box = document.getElementById(spec.box), body = box && box.querySelector('.lpn-popover-body'),
+				host = document.getElementById(spec.host), row, csv, html, pr, old;
+			if (!body || !host || body.querySelector('.lpn-report-tools')) { return; }
+			old = body.querySelector('.lpn-box-tools');
+			if (old) { old.parentNode.removeChild(old); }
+			row = document.createElement('div');
+			row.className = 'lpn-box-tools lpn-report-tools';
+			function mk(id, label, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.className = 'lpn-rptbox-copy'; b.id = spec.host.replace(/_report$/, '') + id; b.textContent = label;
+				b.addEventListener('click', function () { fn(b); });
+				row.appendChild(b);
+				return b;
+			}
+			csv = mk('_csv', pc.lpn_full_download_csv || 'Download CSV', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) {
+					downloadTextFile(reportFilename(spec, 'csv'), spec.full ? fullReportCsvText(fullReportRows()) : reportCsvText(blocks), 'text/csv');
+				}
+			});
+			html = mk('_copyhtml', pc.lpn_report_copy_html || 'Copy HTML', function (b) { reportCopyHtml(spec, b); });
+			pr = mk('_print', pc.lpn_full_print || 'Print report', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) { printReportArea(reportPrintable(spec, blocks)); }
+			});
+			body.insertBefore(row, body.firstChild);
+			function sync() {
+				var has = reportHostsFor(spec).some(function (h) { return !!(h && h.querySelector('table')); });
+				[csv, html, pr].forEach(function (b) { b.disabled = !has; });
+			}
+			sync();
+			if (typeof MutationObserver !== 'undefined') {
+				new MutationObserver(sync).observe(spec.box === 'lpn_ds_box' ? body : host, { childList: true, subtree: true });
+			}
+		});
 	}
 	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
 	function fullBoxIsOpen() {
@@ -83846,12 +83994,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
 	}
 	function wireFullReportBox() {
-		var box = fullBoxEl(), x = document.getElementById('lpn_full_close'),
-			csv = document.getElementById('lpn_full_csv'), pr = document.getElementById('lpn_full_print');
+		var box = fullBoxEl(), x = document.getElementById('lpn_full_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeFullReportBox); }
-		if (csv) { csv.addEventListener('click', downloadFullReportCsv); }
-		if (pr) { pr.addEventListener('click', printFullReport); }
 		wireBoxMemory(box, LPN_FULLBOX_KEY, fullboxLayout, saveFullboxLayout, fullBoxIsOpen);
 	}
 	function refreshFullReportBoxIfOpen() {
