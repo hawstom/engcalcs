@@ -84042,6 +84042,39 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return out.join('\n');
 	}
+	/**
+	 * **A FIGURE STAYS WITH ITS UNIT ON PAPER** (Task 829, Tom 2026-10-25, printing the reports to PDF:
+	 * "Some of the column widths need tweaking"). A cell that is a number then a unit ("77.81 m H2O",
+	 * "63.09 L/s") is written with no-break spaces in the printed copy only, so a narrow column
+	 * breaks between cells' words and never between a figure and its unit. Prose keeps its spaces.
+	 */
+	function reportFigureUnitKept(text) {
+		var t = String(text === undefined || text === null ? '' : text);
+		return (/^[-\u2212]?[\d.,]+ [^\s\d]+(?: [A-Za-z0-9]+)?$/).test(t) ? t.replace(/ /g, '\u00A0') : t;
+	}
+	/**
+	 * **A REPORT TABLE IS AS WIDE AS ITS CONTENT, NEVER WIDER THAN THE SHEET, AND BREAKS NO WORD.**
+	 * Each column needs the width of its longest unbreakable word (a heading's, a figure with its
+	 * unit's), measured as the pane's tables are and given the same print headroom
+	 * (PANE_PRINT_HEADROOM) plus the print cell's padding. The table's font is then the 9 pt it
+	 * normally has, or, when those needs added together exceed the sheet, exactly the smaller size at
+	 * which they fit. The columns are left to the browser's own table layout, which wraps a heading
+	 * at its spaces and gives a wide column the room it asks for (css/engcalcs.css, `.lpn-print-report`).
+	 */
+	function reportPrintFit(table, b) {
+		var ncol = b.heads.length, need = [], sum = 0, j;
+		function note(col, text, head) {
+			String(text).split(/\s+/).forEach(function (w) {
+				if (w) { need[col] = Math.max(need[col] || 0, paneMeasureEm(w, head) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); }
+			});
+		}
+		b.heads.forEach(function (t, c) { note(c, t, true); });
+		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol) { note(c, reportFigureUnitKept(t), false); } }); });
+		for (j = 0; j < ncol; j++) { sum += need[j] || PANE_PRINT_TD_PAD_EM; }
+		if (!(sum > 0)) { return; }
+		sum = Math.round(sum * 100) / 100;
+		table.style.fontSize = 'min(12px, calc((100cqw - ' + (ncol + 1) + 'px) / ' + sum + '))';
+	}
 	function reportPrintable(spec, blocks) {
 		var wrap = document.createElement('div'), h, line;
 		wrap.id = 'lpn_print_area';
@@ -84065,7 +84098,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return;
 			}
 			table = document.createElement('table');
-			table.className = 'lpn-pane-table lpn-print-table';
+			table.className = 'lpn-pane-table lpn-print-table lpn-print-report';
 			thead = document.createElement('thead');
 			tr = document.createElement('tr');
 			b.heads.forEach(function (t) { e = document.createElement('th'); e.textContent = t; tr.appendChild(e); });
@@ -84074,10 +84107,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			tbody = document.createElement('tbody');
 			b.rows.forEach(function (r) {
 				tr = document.createElement('tr');
-				r.forEach(function (t) { e = document.createElement('td'); e.textContent = t; tr.appendChild(e); });
+				r.forEach(function (t) { e = document.createElement('td'); e.textContent = reportFigureUnitKept(t); tr.appendChild(e); });
 				tbody.appendChild(tr);
 			});
 			table.appendChild(tbody);
+			reportPrintFit(table, b);
 			wrap.appendChild(table);
 		});
 		return wrap;
