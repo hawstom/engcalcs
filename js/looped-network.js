@@ -59965,7 +59965,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and five 4px gaps come to 15.3rem, which fits the 252 px a squeezed pane leaves -- the test
 	// that caught the Settings box scrolling sideways (Tom, 2026-08-19: "It should not"). The Use
 	// units column is as wide as its heading's longer word, so "units" never breaks.
-	var LPN_LABEL_COL_W = '2.6rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
+	var LPN_LABEL_COL_W = '2.34rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
 		LPN_LABEL_UNITS_W = '1.85rem', LPN_LABEL_ROW_GAP = '4px';
 	function labelColumnSpacer(width, isUnits) {
 		var spacer = document.createElement('span');
@@ -60391,7 +60391,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					pc.lpn_labels_col_decimals || 'Decimals', 'center'],
 				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
-					(pc.lpn_labels_priority || 'Priority') + ' — ' + (labelDropTip(group) || ''), 'center']
+					(pc.lpn_labels_priority || 'Drop order') + ': ' + (labelDropTip(group) || ''), 'center']
 			].forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
@@ -65185,7 +65185,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
-	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
+	var dockBoxes = [], dockFlyout = null, dockSoft = null, dockTimer = null, dockBooting = false, dockQueued = false,
 		dockMargins = { left: 0, right: 0 }, dockWasSmall = null;
 	function dockSideOf(d) {
 		var s = d && d.rec.dock;
@@ -65369,6 +65369,49 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
 	}
+	// **A DOCKED BOX KEEPS ITS OWN OPTIMAL WIDTH, NEVER ONE WIDTH FOR ALL** (Tom, 2026-10-24: the default
+	// docks "made them all a uniform width instead of leveraging our pre-existing knowledge about their
+	// ideal widths"; then, of a first pass that read each box's floating CSS width: "a single 'wide'
+	// width applied without discretion ... not the individualized optimization I requested").
+	// **EACH NUMBER BELOW IS MEASURED, NOT CHOSEN**: the narrowest width at which that box's own
+	// content (Net3, run, its analysis run) has no sideways scroll and no row or short label wrapped
+	// that would not wrap with all the room in the world (dev/lpn-spike/box-natural-width.js), rounded
+	// up to half a rem. Two limits, each a stated reason: no box under 20 rem, so a note under a
+	// two-column table still reads as a sentence; no box over 52 rem, so the map keeps half of a
+	// 1600 px window (the Full report, Scenario comparison and Fire flow tables are wider than that and
+	// wrap their headings). The Manual is prose: its reading column is about 36 rem. **Three boxes are
+	// held narrower than their measurement, on Tom's word** (2026-10-24: Fire flow "far too wide",
+	// Criticality "50% wider than it needs to be", Contour plot "would be nice narrower"): Fire flow 35
+	// rem and Criticality 33 rem, each with its results table reflowing (headings and cells wrap, and
+	// Fire flow's ten columns scroll inside their own container), Contour plot at the floor. The
+	// harness measures those three with the results table left out.
+	// dev/lpn-spike/dock-width-harness.js re-measures every box and fails when a number here stops
+	// matching its content, or when two boxes share a width with no reason. dev/box-width-audit.md
+	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
+	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
+	var LPN_DOCK_OPTIMAL_REM = {
+		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
+		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
+	}, dockOptimalCache = {};
+	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
+	function dockOptimalW(d) {
+		var id = d.box.id, vw = window.innerWidth || 0, c = dockOptimalCache[id], rem = smTableRem(), probe, w = 0;
+		if (c && c.vw === vw && c.rem === rem) { return c.w; }
+		if (LPN_DOCK_OPTIMAL_REM[id]) { w = Math.round(LPN_DOCK_OPTIMAL_REM[id] * rem); }
+		else if (document.body) {
+			probe = d.box.cloneNode(false);
+			probe.removeAttribute('style');
+			probe.style.cssText = 'display:flex;visibility:hidden;position:fixed;left:-10000px;top:0;height:1px;';
+			document.body.appendChild(probe);
+			w = Math.round(probe.getBoundingClientRect().width);
+			document.body.removeChild(probe);
+		}
+		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		dockOptimalCache[id] = { vw: vw, rem: rem, w: w };
+		return w;
+	}
+	function dockWidthOf(d) { return d.rec.dockW || dockOptimalW(d); }
 	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
 	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
 	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
@@ -65463,12 +65506,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time, with no share of the
-			// window capping it (Tom, 2026-10-07, card E02: "no first-dock limit"); only the map's
+			// **A FLOATING BOX DOCKS AT THE WIDTH IT HAD** (Tom, 2026-10-24: *"I think that your undocked
+			// width should dock."*), clamped to the 20 rem floor and the map's minimum, and saved as
+			// `dockW` exactly as a resize of the docked box would be. Only a first-visit dock
+			// (EC_DEFAULT_DOCKS, which never comes through here) uses LPN_DOCK_OPTIMAL_REM. No share of
+			// the window caps it (Tom, 2026-10-07, card E02: "no first-dock limit"); only the map's
 			// LPN_DOCK_MAP_MIN does, in layoutDocks().
-			if (!wasSide && !d.rec.dockW) {
+			if (!wasSide) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+				if (r.width > 0) { d.rec.dockW = clampDockW(Math.round(r.width), 0, false); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
@@ -65519,7 +65565,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
 		dockNoteOpen(d, true);
-		if (d.rec.autohide && !dockBooting) { dockFlyout = d; }
+		if (d.rec.autohide && !dockBooting) { dockFlyout = d; dockSoft = null; }
 		layoutDocks();
 	}
 	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
@@ -65672,6 +65718,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
+		if (dockSoft && dockSoft !== dockFlyout) { dockSoft = null; }
 		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
 		// dragged has none and follows, in the order the boxes were registered.
 		['left', 'right'].forEach(function (s) {
@@ -65688,7 +65735,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
-			sides[s].pinned.forEach(function (d) { w = Math.max(w, d.rec.dockW || 0); });
+			sides[s].pinned.forEach(function (d) { w = Math.max(w, dockWidthOf(d)); });
 			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
 		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
@@ -65715,7 +65762,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
+				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -65723,7 +65770,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
+				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
@@ -65760,7 +65807,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockFlyOut(d, focusIn) {
 		var f;
 		clearTimeout(dockTimer);
-		if (dockFlyout !== d) { dockFlyout = d; layoutDocks(); }
+		if (dockFlyout !== d) { dockFlyout = d; dockSoft = null; layoutDocks(); }
 		if (focusIn) {
 			f = d.corner.querySelector('button');
 			if (f) { f.focus(); }
@@ -65769,6 +65816,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockTuck(d, focusTab) {
 		var had;
 		clearTimeout(dockTimer);
+		if (dockSoft === d) { dockSoft = null; }
 		if (dockFlyout !== d) { return; }
 		had = !!document.activeElement && d.box.contains(document.activeElement);
 		dockFlyout = null;
@@ -65780,7 +65828,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockTuckLater(d) {
 		clearTimeout(dockTimer);
 		dockTimer = setTimeout(function () {
-			if (dockFlyout !== d || dockPointerOver(d)) { return; }
+			if (dockFlyout !== d || dockPointerOver(d) || dockSoft === d) { return; }
 			if (document.activeElement && d.box.contains(document.activeElement)) { return; }
 			dockTuck(d);
 		}, LPN_DOCK_TUCK_MS);
@@ -65949,6 +65997,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
+		// **A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT** (Tom, 2026-10-24: *"why doesn't
+		// the box 'soft-pin' when I click a button?"*): it stays out when the pointer leaves, until a
+		// press outside it (the map, another tab; dockOutsidePress) or Escape tucks it. Not the corner
+		// row: the pin button there pins for good, and the others only move the box. Judged in the capture
+		// phase, before the button's own handler can redraw the box and take the button out of it.
+		box.addEventListener('click', function (e) {
+			var b = e.target && e.target.closest ? e.target.closest('button, [role="button"], input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], select') : null;
+			if (dockFlyout === d && b && box.contains(b) && !b.closest('.lpn-box-corner')) { dockSoft = d; clearTimeout(dockTimer); }
+		}, true);
 		box.addEventListener('focusout', function () {
 			if (dockFlyout === d) { setTimeout(function () { if (dockFlyout === d) { dockTuckLater(d); } }, 0); }
 		});
@@ -66022,6 +66079,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(svg);
 		}
 		document.addEventListener('pointerdown', dockOutsidePress, true);
+		// A soft-pinned flyout closes on Escape wherever the keyboard is (the box's own handler covers
+		// the keyboard being inside it).
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && dockSoft && dockFlyout === dockSoft && !e.defaultPrevented) { dockTuck(dockSoft, false); }
+		});
 	}
 
 	// ---- what the document holds, and the one place each kind is written --------------------------
