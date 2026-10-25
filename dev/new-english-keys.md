@@ -637,17 +637,17 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
 
-### chore/verdicts-1024 (`29985fba3`) — already merged into feat/box-rows; its strings are listed there
+### chore/verdicts-1024 (`bf9ff6b8a`) — adds no English strings
 
-### feat/box-rows (`857eb07c0`) — adds no English strings
+### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
 
-### feat/box-rows-properties (`857eb07c0`) — already merged into feat/box-rows; its strings are listed there
+### feat/box-rows-properties (`89c6d1b91`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/first-view (`930266e87`) — already merged into fix/phone-select; its strings are listed there
+### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`731c7d9fc`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/report-buttons (`9bbdbd88a`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_report_copy_html`**
   > Copy HTML
@@ -655,7 +655,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`b7607a7c4`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/shape-scenario (`8c0bc5d7a`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -1004,13 +1004,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
 
-### fix/browser-pass-a (`2554e1000`) — adds no English strings
+### fix/browser-pass-a (`f64a03834`) — adds no English strings
 
 ### fix/dock-widths (`2474b5d15`) — adds no English strings
 
 ### fix/example-crs (`1fba54d64`) — adds no English strings
 
-### fix/phone-select (`9bc00cca1`) — 13 new, 13 to read @@ NEEDS RULING
+### fix/phone-select (`415f4a7fb`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
@@ -1052,4 +1052,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Only the selected assets
   @@ NEEDS RULING
 
-### fix/wording-1024 (`ae3fbf122`) — adds no English strings
+### fix/wording-1024 (`e01a0292a`) — already merged into chore/verdicts-1024; its strings are listed there

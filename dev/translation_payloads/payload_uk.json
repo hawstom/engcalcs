@@ -2,8 +2,8 @@
     "meta": {
         "language": "uk",
         "expected_key_count": 3214,
-        "delta_key_count": 240,
-        "english_changed_key_count": 44,
+        "delta_key_count": 244,
+        "english_changed_key_count": 48,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -86,6 +86,7 @@
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -95,6 +96,8 @@
         "lpn_result_status_cv": "CV",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
+        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -196,6 +199,7 @@
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
@@ -328,6 +332,7 @@
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -337,6 +342,8 @@
         "lpn_result_status_cv": "CV",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
+        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -438,6 +445,7 @@
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
@@ -825,6 +833,22 @@
                 }
             }
         },
+        "lpn_guide_ct_box_def": {
+            "reason": "english_changed",
+            "current_value": "<p>«Показати ізолінії», коли знято, ховає заливку й лінії та зберігає кольори вузлів. У вікні також є «Забарвлювати вузли за» та «Кольорова схема», які є тими самими двома налаштуваннями, що й у Налаштування, Візуалізація, Кольори вузлів, «Заливка» (Немає, Плавна або Смуги, що фарбує кожен клас рівномірно), «Непрозорість заливки», «Лінії рівня» з їхніми «Інтервал» і «Підписи» та «Буфер» у кратних медіанної довжини труби. У проєкті, розміщеному на Землі, вікно також може брати ґрунт між вузлами з DEM Mapbox, після того як відвідувач погодиться надіслати номери плиток області мережі. Ці налаштування зберігаються разом із проєктом і можуть бути перевизначені сценарієм. Карта змінює лише відображення, а не мережу.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ct_box_term",
+                    "value": "Вікно",
+                    "english": "The box"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ct_example_term",
+                    "value": "Приклад на Net1",
+                    "english": "Example on Net1"
+                }
+            }
+        },
         "lpn_ex_net1_title": {
             "reason": "english_changed",
             "current_value": "EPANET Net1 із керуванням на основі правил",
@@ -967,6 +991,43 @@
                     "value": "Розрахунок цієї мережі тривав {secs} с, а вона налаштована перераховуватися після кожної зміни. Щоб зупинити це й повернути кнопку Розрахувати, вимкніть «Перераховувати автоматично» в Налаштуваннях, у розділі Розрахунок, Гідравліка.",
                     "english": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics."
                 }
+            }
+        },
+        "lpn_find_prop_demand_desc": {
+            "reason": "english_changed",
+            "current_value": "Опис цієї категорії витрати споживання",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_prop_connection",
+                    "value": "Зв'язність",
+                    "english": "Connectivity"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_conn_unlinked",
+                    "value": "без з'єднань у вузлі",
+                    "english": "no links at node"
+                }
+            }
+        },
+        "lpn_contour_buffer": {
+            "reason": "english_changed",
+            "current_value": "Буфер",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_interval",
+                    "value": "Інтервал",
+                    "english": "Interval"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_buffer_unit",
+                    "value": "× медіанна довжина труби",
+                    "english": "× median pipe length"
+                }
+            },
+            "tip": {
+                "key": "lpn_contour_buffer_tip",
+                "english": "Reach of the color from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
+                "value": "Охоплення кольору від кожної труби як кратне медіанної довжини труби. На зовнішній частині він згасає."
             }
         },
         "lpn_file_import_inp": {
@@ -2631,6 +2692,22 @@
                     "key": "lpn_sm_delete_alt_ask",
                     "value": "Видалити альтернативу {name}?",
                     "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_settings_elev_source_typed": {
+            "reason": "english_changed",
+            "current_value": "Вище",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_elev_source_tip",
+                    "value": "Точність DEM Mapbox у 2026 році, спершу горизонтальна, потім вертикальна: 1–10 м і менше ніж 1 м у США, 2–10 м і 1–3 м у Європі та Японії, 30 м і 10–16 м у світі загалом, 90 м і понад 16 м на полюсах.",
+                    "english": "Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_elev_source_dem",
+                    "value": "DEM Mapbox",
+                    "english": "Mapbox DEM"
                 }
             }
         },
