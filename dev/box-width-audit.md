@@ -37,16 +37,16 @@ a width only when each has its own reason (both past the cap, or two measurement
 | Properties | 416 | 416 (26 rem) | A junction's demand table (a pipe needs 352) |
 | Find and replace | 368 | 368 (23 rem) | Its condition rows |
 | Libraries | 432 | 432 (27 rem) | Its section list ("Pipe types") and the pattern rows |
-| Contour plot | 336 | 336 (21 rem) | Its setting rows |
-| Fire flow analysis | 1272 after a run (456 before) | 832, cap | The results table |
-| Criticality analysis | 792 after a run (344 before) | 792 (49.5 rem) | The results table's "and 5 more affected" cells |
+| Contour plot | 336 | 320 (floor) | Tom: narrower. Three labels wrap onto two lines; nothing scrolls |
+| Fire flow analysis | 1272 after a run (456 before) | 560 (35 rem) | Tom: far too wide. Controls need 456; the ten-column results table wraps its headings and scrolls sideways inside its own container (777 px in 542) |
+| Criticality analysis | 792 after a run (344 before) | 528 (33 rem) | Tom: 50% too wide. Controls need 344; the four-column table fits at 528 with its "Worst effect" cells wrapping onto more lines |
 | Demand scaling | 384 after a run | 384 (24 rem) | Its setting rows and verdict |
 | User manual | prose | 848 (53 rem) | Contents list plus a 36 rem reading column |
 | Scenario manager | not measured | own rule | Widens to its table (Task 746 code); unchanged |
 | Screenshot | not measured | 288 (its CSS) | Not in the table; docks at its floating width |
 | A pane tab popped out as a box | not measured | 480 (its CSS) | Unchanged |
 
-Floating widths are unchanged: the report-type boxes still float at 52 rem.
+A box the visitor docks by its button takes the width it had floating (floor 320; the map's minimum caps it) and saves it as its docked width. Floating widths are unchanged: the report-type boxes still float at 52 rem.
 
 Also in this branch: the Decimals, Show and Drop columns of the label rows are 2.34 rem (90% of 2.6).
 A row without one of those boxes holds the column open with a spacer, and the spacer is now the same
@@ -62,7 +62,8 @@ Initial status, Status, Water age) up to 12 px left of the others.
    which box and a number.
 3. Float Settings, then click its dock-left button. It docks at 552. Do the same for Libraries (432)
    and Contour plot (336).
-4. Drag a floating box to a width of your own, then dock it. It keeps your width.
+4. Drag a floating box to a width of your own, then dock it. It docks at that width (not under 320), and keeps it after a reload.
+   Fly out any docked box by pointing at its tab, click a button inside it and move off: it stays out until you press on the map or another tab, or Escape (Task 830).
 5. Resize a docked box by its edge, reload. It keeps the width you set.
 6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
    the window.

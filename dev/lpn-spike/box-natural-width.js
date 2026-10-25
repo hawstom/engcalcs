@@ -12,6 +12,8 @@
 // The natural width is the first at which nothing scrolls sideways, short text wraps at most two
 // lines more than at `hi`, and each height is at most 2% (plus 8 px) more than at `hi`.
 //
+// `hide` (a selector) leaves out what the box lets reflow or scroll inside its own container.
+//
 // Pass it to page.evaluate as a string: `(${naturalWidth.toString()})(${JSON.stringify({ id })})`.
 'use strict';
 
@@ -37,11 +39,12 @@ function naturalWidth(arg) {
 		if (!prose) { texts.push(n); }
 	}
 	const st = document.createElement('style');
+	const skip = arg.hide ? Array.from(box.querySelectorAll(arg.hide)) : [];
 	st.textContent = '.ecw-measure-hide { display: none !important; }';
 	document.head.appendChild(st);
 	const hidden = [];
 	box.querySelectorAll('*').forEach((e) => {
-		if ((/^(svg|canvas|img)$/i.test(e.tagName) && !e.closest('.lpn-box-corner')) || isProse(e)) { e.classList.add('ecw-measure-hide'); hidden.push(e); }
+		if ((/^(svg|canvas|img)$/i.test(e.tagName) && !e.closest('.lpn-box-corner')) || isProse(e) || skip.indexOf(e) >= 0) { e.classList.add('ecw-measure-hide'); hidden.push(e); }
 	});
 	const notField = (e) => !/^(INPUT|TEXTAREA|SELECT)$/.test(e.tagName) && !e.closest('svg');
 	const scrollersX = Array.from(box.querySelectorAll('*')).filter((e) => notField(e) && /auto|scroll|hidden/.test(getComputedStyle(e).overflowX));

@@ -14,7 +14,8 @@
 //      measurement is past it. Two boxes may share a width only for one of those reasons. The table
 //      is printed, so a changed number has its evidence beside it.
 //   3. The first-visit docks fly out at those widths; Settings' rows are not cut off at its width.
-//   4. A box the visitor docks by its own button docks at that width; a stored width is theirs.
+//   4. A box the visitor docks by its own button docks at the width it had floating (Tom, 2026-10-24:
+//      "I think that your undocked width should dock"), saved as the docked width; a stored width is theirs.
 //
 //   node dev/lpn-spike/dock-width-harness.js     (takes the browser lock itself)
 'use strict';
@@ -60,11 +61,15 @@ const PROSE = { lpn_hotkeys_popup: '#lpn_guide_content' };
 const FIRST = ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box',
 	'lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box', 'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box'];
 const LEFT = ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'];
+// Tom's three narrower-than-measured boxes (2026-10-24): each lets its content reflow, never cuts it.
+// `hide` leaves the results table out of the measurement (it wraps its headings and, for Fire flow,
+// scrolls inside its own container); what is left must not scroll sideways at the width given.
+const REFLOW = { lpn_ff_box: { hide: '.lpn-ff-tablewrap', max: 35 }, lpn_crit_box: { hide: '.lpn-ff-tablewrap', max: 33 }, lpn_contour_box: { hide: null, max: 20 } };
 const ANALYSES = ['lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box'];
 
 const noConsent = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 const widthOf = (a, id) => a.page.evaluate((i) => Math.round(document.getElementById(i).getBoundingClientRect().width), id);
-const measure = (a, id) => a.page.evaluate(`(${naturalWidth.toString()})(${JSON.stringify({ id })})`);
+const measure = (a, id, hide) => a.page.evaluate(`(${naturalWidth.toString()})(${JSON.stringify({ id, hide })})`);
 const closeBox = (a, id) => a.page.evaluate((i) => {
 	const b = document.getElementById(i), x = b && b.querySelector('.lpn-popover-x');
 	if (x) { x.click(); } else if (b) { b.style.display = 'none'; }
@@ -170,7 +175,7 @@ async function main() {
 		await m.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
 		await m.waitFor(() => m.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'Net3 EPS frames', 120000);
 		await m.settle(600);
-		const nat = {};
+		const nat = {}, reflow = {};
 		const keep = (id, r, how) => { if (r && r.natural !== null && (!nat[id] || r.natural > nat[id].natural)) { nat[id] = Object.assign({ how }, r); } };
 		// Properties: a junction (its demand table) and a pipe, the wider of the two.
 		for (const k of ['junction', 'pipe']) {
@@ -213,6 +218,19 @@ async function main() {
 					await m.waitFor(() => m.page.evaluate((i) => { const b = Array.from(document.querySelectorAll('#' + i + ' button')).find((x) => x.textContent.trim() === 'Stop'); return !!b && b.disabled; }, id), id + ' run', 120000);
 					await m.settle(600);
 					keep(id, await measure(m, id), 'after its run');
+					if (REFLOW[id]) {
+						const rf = await measure(m, id, REFLOW[id].hide);
+						// What the results table does at the width the box docks at.
+						const t = await m.page.evaluate((a) => {
+							const b = document.getElementById(a[0]), saved = b.getAttribute('style') || '';
+							b.style.setProperty('width', a[1] + 'px', 'important');
+							const w = b.querySelector('.lpn-ff-tablewrap'), th = Array.from(b.querySelectorAll('.lpn-ff-table th')).filter((x) => x.getBoundingClientRect().height > 30).length;
+							const r = { scrolls: !!w && w.scrollWidth > w.clientWidth + 1, tableW: w ? w.scrollWidth : 0, paneW: w ? w.clientWidth : 0, wrappedHeadings: th };
+							b.setAttribute('style', saved);
+							return r;
+						}, [id, Math.round(table[id] * 16)]);
+						reflow[id] = Object.assign({ rf }, t);
+					}
 				}
 			}
 			await closeBox(m, id);
@@ -223,6 +241,7 @@ async function main() {
 		for (const id of Object.keys(table)) {
 			const want = Math.round(table[id] * 16), n = nat[id];
 			if (!n) { ok(id + ' was measured', false); continue; }
+			if (REFLOW[id]) { reason[id] = 'reflow'; justified[id] = true; console.log('  ' + id.padEnd(20) + String(n.natural).padStart(8) + '  ' + String(want).padStart(6) + '  Tom: narrower; content reflows (below)'); continue; }
 			if (n.prose !== undefined) {
 				reason[id] = 'prose';
 				console.log('  ' + id.padEnd(20) + '   prose  ' + String(want).padStart(6) + '  reading column ' + n.prose + ' px');
@@ -242,6 +261,18 @@ async function main() {
 					'LPN_DOCK_OPTIMAL_REM says ' + table[id] + ' rem = ' + want + ' px; the measurement says ' + (Math.ceil(n.natural / 8) / 2) + ' rem');
 			}
 		}
+		console.log('\n  reflow boxes (Tom 2026-10-24): what is left out of the measurement, and what the results table does at the docked width');
+		Object.keys(REFLOW).forEach((id) => {
+			const want = Math.round(table[id] * 16), n = nat[id], r = reflow[id];
+			if (id === 'lpn_contour_box') {
+				ok(id + ' docks at the ' + FLOOR + ' px floor (Tom: narrower)', want === FLOOR, want + ' px; its controls first stop scrolling sideways at ' + (n && n.firstClean) + ' px');
+				ok(id + ' does not scroll sideways at ' + want + ' px', !!n && n.firstClean !== null && n.firstClean <= want, 'first clean at ' + (n && n.firstClean));
+				return;
+			}
+			ok(id + ' docks at no more than ' + REFLOW[id].max + ' rem', table[id] <= REFLOW[id].max, table[id] + ' rem');
+			ok(id + ' controls and verdict do not scroll or wrap at ' + want + ' px (results table left out)', !!r && r.rf.natural !== null && r.rf.natural <= want, 'they need ' + (r && r.rf.natural) + ' px');
+			console.log('       results table at ' + want + ' px: ' + (r.scrolls ? 'scrolls sideways inside its own container (' + r.tableW + ' px in ' + r.paneW + ')' : 'fits, no scroll') + '; ' + r.wrappedHeadings + ' headings wrap onto 2+ lines');
+		});
 		const byW = {};
 		Object.keys(table).forEach((id) => { const w = Math.round(table[id] * 16); (byW[w] = byW[w] || []).push(id); });
 		Object.keys(byW).forEach((w) => {
@@ -281,19 +312,32 @@ async function main() {
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
-		console.log('\n--- 4. a box the visitor docks keeps its width; a stored width is theirs ---');
+		console.log('\n--- 4. a box the visitor docks keeps the width it had floating; a stored width is theirs ---');
 		const b = await visit(Session, browser, 'user', false);
 		for (const id of ['lpn_settings_box', 'lpn_library_box', 'lpn_contour_box', 'lpn_find_popup', 'lpn_energy_box', 'lpn_crit_box', 'lpn_hotkeys_popup']) {
-			const want = Math.round(table[id] * 16);
 			if (id === 'lpn_settings_box') { await openSettings(b); } else { await openBox(b, id); }
+			const had = await widthOf(b, id);
 			await b.page.click('#' + id + ' .lpn-corner-btn[data-dock="left"]', { timeout: 4000 });
 			await b.settle(400);
 			const w = await widthOf(b, id);
-			ok(id + ' docked by the visitor is ' + want + ' px', Math.abs(w - want) <= 1, w + ' px');
+			ok(id + ' floated at ' + had + ' px docks at ' + Math.max(FLOOR, had) + ' px', Math.abs(w - Math.max(FLOOR, had)) <= 1, w + ' px');
 			await b.page.click('#' + id + ' .lpn-corner-btn[data-dock="float"]', { timeout: 4000 });
 			await b.page.evaluate((i) => { document.getElementById(i).style.display = 'none'; }, id);
 			await b.settle(300);
 		}
+		// A width of the visitor's own, then docked: kept, and saved as the docked width (it survives a reload).
+		await openBox(b, 'lpn_library_box');
+		await b.page.evaluate(() => { document.getElementById('lpn_library_box').style.setProperty('width', '470px', 'important'); });
+		await b.page.click('#lpn_library_box .lpn-corner-btn[data-dock="right"]', { timeout: 4000 });
+		await b.settle(400);
+		await b.page.evaluate(() => { document.getElementById('lpn_library_box').style.removeProperty('width'); });
+		ok('a floating 470 px Libraries docks at 470 px', Math.abs(await widthOf(b, 'lpn_library_box') - 470) <= 1, await widthOf(b, 'lpn_library_box') + ' px');
+		await b.page.reload();
+		await b.settle(1500);
+		const kept = await b.page.evaluate(() => { const r = document.getElementById('lpn_library_box').getBoundingClientRect(); return r.width ? Math.round(r.width) : null; });
+		await b.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_library_box"]').catch(() => {});
+		await b.settle(500);
+		ok('and the 470 px is the docked width after a reload', Math.abs(await widthOf(b, 'lpn_library_box') - 470) <= 1, await widthOf(b, 'lpn_library_box') + ' px');
 		ok('no uncaught page errors', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.close();
 		const c = await visit(Session, browser, 'stored', true, ['lpn_setbox', JSON.stringify({ left: 300, top: 200, w: null, h: null, open: true, dock: 'right', autohide: true, dockW: 420 })]);
