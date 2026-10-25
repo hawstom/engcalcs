@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='ከቧንቧው ያለ ርቀት';
 $ec_lang['lpn_field_meter_offset_tip']='አዎንታዊ ማለት ከመጀመሪያ ነጥቡ ወደ ሁለተኛው ሲታይ ከቧንቧው በስተቀኝ ማለት ነው። እዚህ ዋጋ መተየብ ደንበኛውን ወደ ዋናው ቧንቧ ሌላ ጎን ሊያንቀሳቅሰው ይችላል፣ የአገልግሎት መስመሩንም ሁልጊዜ ከዋናው ጋር ቀጥ ያደርገዋል።';
 $ec_lang['lpn_field_meter_lumped']='ወደ ነጥብ የታከለ';
 $ec_lang['lpn_field_meter_lumped_tip']='በጣም ቅርቡ ነጥብ፤ የዚህ ደንበኛ ፍላጎቶች እዚያ ይታከላሉ።';
+$ec_lang['lpn_field_meter_at_node']='ነጥብ';
 $ec_lang['lpn_node_customers']='የደንበኛ ፍላጎቶች';
 $ec_lang['lpn_node_customers_tip']='ይህ በጣም ቅርብ ነጥባቸው ስለነበር እዚህ የታከሉ የደንበኞች ዝርዝር። የደንበኛ ፍላጎቶች እዚህ ከተዘረዘሩት ሌሎች ፍላጎቶች በተጨማሪ ናቸው። ደንበኛ የሚስተካከለው በካርታው ላይ ባለበት ቦታ ወይም በደንበኞች ሠንጠረዥ ውስጥ ነው።';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} ከደንበኞች ({n})';

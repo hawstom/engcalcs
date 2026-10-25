@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='Décalage par rapport à la conduite';
 $ec_lang['lpn_field_meter_offset_tip']='Positif est à droite de la conduite en regardant depuis son premier nœud vers son second. Saisir une valeur ici peut déplacer le client de l\'autre côté de la conduite principale, et cela met toujours la ligne de branchement à angle droit avec la conduite principale.';
 $ec_lang['lpn_field_meter_lumped']='Ajoutée au nœud';
 $ec_lang['lpn_field_meter_lumped_tip']='Nœud le plus proche ; les demandes de ce client y sont ajoutées.';
+$ec_lang['lpn_field_meter_at_node']='Nœud';
 $ec_lang['lpn_node_customers']='Demandes des clients';
 $ec_lang['lpn_node_customers_tip']='Liste des clients ajoutés à ce nœud (parce que c\'était le plus proche). Les demandes des clients s\'ajoutent aux autres demandes indiquées ici. Un client se modifie à l\'endroit où il se trouve sur la carte ou dans le tableau Clients.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} provenant des clients ({n})';

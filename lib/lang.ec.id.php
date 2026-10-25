@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='Jarak dari pipa';
 $ec_lang['lpn_field_meter_offset_tip']='Nilai positif berada di sebelah kanan pipa jika dilihat dari simpul pertamanya menuju simpul keduanya. Mengetik nilai di sini dapat memindahkan pelanggan ke sisi lain pipa utama, dan selalu membuat garis sambungan tegak lurus terhadap pipa utama.';
 $ec_lang['lpn_field_meter_lumped']='Ditambahkan ke simpul';
 $ec_lang['lpn_field_meter_lumped_tip']='Simpul terdekat; kebutuhan pelanggan ini ditambahkan di sana.';
+$ec_lang['lpn_field_meter_at_node']='Simpul';
 $ec_lang['lpn_node_customers']='Kebutuhan pelanggan';
 $ec_lang['lpn_node_customers_tip']='Daftar pelanggan yang ditambahkan di sini karena simpul ini adalah simpul terdekatnya. Kebutuhan pelanggan ditambahkan di luar kebutuhan lain yang tercantum di sini. Pelanggan diedit di tempatnya pada peta atau pada tabel Pelanggan.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} dari Pelanggan ({n})';

@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='Odsazení od potrubí';
 $ec_lang['lpn_field_meter_offset_tip']='Kladná hodnota je vpravo od potrubí při pohledu od jeho prvního uzlu k druhému. Zadáním hodnoty zde lze odběratele přesunout na druhou stranu hlavního řadu a vždy se tím přípojka vede kolmo k hlavnímu řadu.';
 $ec_lang['lpn_field_meter_lumped']='Přidáno k uzlu';
 $ec_lang['lpn_field_meter_lumped_tip']='Nejbližší uzel; odběry tohoto odběratele se přičítají zde.';
+$ec_lang['lpn_field_meter_at_node']='Uzel';
 $ec_lang['lpn_node_customers']='Odběry odběratelů';
 $ec_lang['lpn_node_customers_tip']='Seznam odběratelů přidaných zde, protože tento uzel byl jejich nejbližším uzlem. Odběry odběratelů se přičítají k ostatním zde uvedeným odběrům. Odběratel se upravuje tam, kde je na mapě, nebo v tabulce Odběratelé.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} od odběratelů ({n})';

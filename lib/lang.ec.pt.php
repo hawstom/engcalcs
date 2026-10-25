@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='Deslocamento do tubo';
 $ec_lang['lpn_field_meter_offset_tip']='Positivo é à direita do tubo olhando do primeiro nó em direção ao segundo. Digitar um valor aqui pode mover o cliente para o outro lado da rede principal, e sempre esquadra a linha de serviço em relação a ela.';
 $ec_lang['lpn_field_meter_lumped']='Somado ao nó';
 $ec_lang['lpn_field_meter_lumped_tip']='Nó mais próximo; as demandas deste cliente são somadas ali.';
+$ec_lang['lpn_field_meter_at_node']='Nó';
 $ec_lang['lpn_node_customers']='Demandas de clientes';
 $ec_lang['lpn_node_customers_tip']='Lista de clientes adicionados aqui porque este era o nó mais próximo deles. As demandas dos clientes se somam às outras demandas listadas aqui. Um cliente é editado onde está no mapa ou na tabela Clientes.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de Clientes ({n})';

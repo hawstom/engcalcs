@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='与管道的偏移';
 $ec_lang['lpn_field_meter_offset_tip']='正值表示从管道第一个节点看向第二个节点时的右侧。在此输入数值可将用户移到干管的另一侧，且接户管始终与干管垂直。';
 $ec_lang['lpn_field_meter_lumped']='计入节点';
 $ec_lang['lpn_field_meter_lumped_tip']='最近的节点；该用户的需水量会加到此节点上。';
+$ec_lang['lpn_field_meter_at_node']='节点';
 $ec_lang['lpn_node_customers']='用户需水量';
 $ec_lang['lpn_node_customers_tip']='添加在此节点（因为这是最近的节点）的用户列表。用户需水量是在此处列出的其他需水量之外另加的。用户可在地图上其所在位置或在“用户”表格中编辑。';
 $ec_lang['lpn_node_customers_sum']='{total} {unit}，来自用户（{n}）';

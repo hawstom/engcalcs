@@ -350,12 +350,12 @@ function run(mutate, quiet) {
 	{
 		// "Customers connected to a reservoir, morphed into a Junction, look orphaned." The same holds in
 		// both directions: the node keeps its ID, so the customer still lumps there, and the table's
-		// node column (beside Connected asset) names it before and after.
+		// Added to node column names it before and after.
 		const c = L.customerById ? L.customerById(doc().customers[0].id) : doc().customers[0];
 		const spec = L.paneTableById('customers');
 		const cols = L.paneCols(spec), keys = cols.map(k => k.key);
 		const nodeCol = cols.filter(k => k.key === 'atNode')[0];
-		ok('8b.1 the node column sits right beside Connected asset', keys.indexOf('atNode') === keys.indexOf('link') + 1, keys.join(','));
+		ok('8b.1 no node column sits beside Connected asset (Tom: confusingly too much)', keys.indexOf('atNode') !== keys.indexOf('link') + 1, keys.join(','));
 		ok('8b.2 as a junction, the customer\'s node is ' + J, nodeCol.get(c) === J && L.customerNodeId(c) === J, nodeCol.get(c));
 		const linkWas = c.link;
 		change(J, 'reservoir', true);

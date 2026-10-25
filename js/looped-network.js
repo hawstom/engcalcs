@@ -1843,13 +1843,17 @@ var EngCalcs = EngCalcs || {};
 	// Pipes are SEGMENTS rather than boxes -- Net3 has 119 pipes, and chopped at three screen pixels
 	// a zoomed-in drawing produces thousands of boxes to test every candidate against. A diagonal
 	// pipe's bounding box is also mostly empty space, so boxing it pushes labels off clear ground.
-	// **A TEXT THAT LIES ON A TEXT KEPT BEFORE IT IS NOT DRAWN AT THIS ZOOM** (Tom's Net1, 14 wheel
-	// notches out, 2026-10-19: "Pump" printed across "Source"). A Text is a note sized in screen
-	// pixels at a point fixed in the drawing, so two that clear each other at one zoom meet at a
-	// zoom further out, and neither may move: one of them goes, as a data label goes when nothing
-	// fits, and it comes back when the view has room. Kept first: a Text shown at all zoom levels,
-	// then the larger, then the earlier in the file. A pure function of the view, decided wherever
-	// the obstacles are, and drawn by applyTextHidden().
+	// **A TEXT THAT LIES ON A TEXT KEPT BEFORE IT IS NUDGED, NEVER HIDDEN** (Tom, 2026-10-24, of ROAD
+	// on Elm Street Center, hidden because it crosses ST. FRANCIS: *"I guess I was wrong to advise
+	// hiding/dropping user Text. Should we nudge it instead?"* ... *"Probably C or revert the hiding
+	// decision and leave the overlap in the user's hands."*). This replaces the 2026-10-19 rule that
+	// hid one of two meeting Texts. A Text is a note sized in screen pixels at a point fixed in the
+	// drawing, so two that clear each other at one zoom can meet at another. The later one (the
+	// order is: a Text shown at all zoom levels, then the larger, then the earlier in the file)
+	// slides ALONG ITS OWN LINE, by the least distance that clears every Text kept before it, and is
+	// drawn there at this zoom only; nothing is stored. If no slide within three quarters of its own
+	// length clears them, it stays exactly where the user put it, overlap and all. Data labels still
+	// go round every Text. Decided wherever the obstacles are, drawn by applyTextNudge().
 	function textObstacleBox(lb, le) {
 		var pt = textLabelPoint(lb);
 		return Geom.orientedLabelBox(pt.x, pt.y, textLabelWidth(le), textLabelHeight(lb),
@@ -1903,23 +1907,52 @@ var EngCalcs = EngCalcs || {};
 		return Collide.box(pt.x + dx * Math.cos(rad) - dy * Math.sin(rad), pt.y + dx * Math.sin(rad) + dy * Math.cos(rad), x1 - x0, y1 - y0, a);
 	}
 	function crowdedTexts() {
-		var out = { hidden: {}, box: {}, ink: {} }, ink = out.ink, list = [], kept = [], tol = 0.5 / (state.s || 1);
+		var out = { hidden: {}, box: {}, ink: {}, nudge: {} }, ink = out.ink, list = [], kept = [], tol = 0.5 / (state.s || 1);
 		doc.labels.forEach(function (lb, i) {
 			var le = labelEls[lb.id]; if (!le) { return; }
 			out.box[lb.id] = textObstacleBox(lb, le);
 			ink[lb.id] = textInkBox(lb, le, out.box[lb.id]);
 			le.crowdHidden = false;
-			if (le.suppressed || !String(le.text && le.text.textContent || '').length) { return; }
+			if (le.suppressed || !String(le.text && le.text.textContent || '').length) { le.crowdNudge = null; return; }
 			list.push({ lb: lb, le: le, i: i, all: textAllZoom(lb) ? 1 : 0, size: textSizeMult(lb) });
 		});
 		list.sort(function (a, b) { return (b.all - a.all) || (b.size - a.size) || (a.i - b.i); });
-		// Hidden only where the ink of one truly lies on the ink of another, by more than half a pixel.
+		function hits(bx) {
+			return kept.some(function (k) { return Collide.boxOverlapDepth(bx, k) > tol; });
+		}
+		function shifted(bx, d, rad) {
+			return { cx: bx.cx + Math.cos(rad) * d, cy: bx.cy + Math.sin(rad) * d, w: bx.w, h: bx.h, a: bx.a };
+		}
+		// Overlap is judged on the ink, by more than half a pixel. Along the Text's own line, nearest first.
 		list.forEach(function (t) {
-			var bx = ink[t.lb.id];
-			if (kept.some(function (k) { return Collide.boxOverlapDepth(bx, k) > tol; })) {
-				t.le.crowdHidden = true; out.hidden[t.lb.id] = true; return;
+			var id = t.lb.id, bx = ink[id], rad, step, max, d, k, trial, found = null;
+			if (hits(bx)) {
+				rad = (bx.a || 0) * Math.PI / 180;
+				step = Math.max(bx.h, 1) * 0.25; max = bx.w * 0.75;
+				for (d = step; d <= max && !found; d += step) {
+					for (k = 1; k >= -1 && !found; k -= 2) {
+						trial = shifted(bx, d * k, rad);
+						if (!hits(trial)) { found = { d: d * k, box: trial }; }
+					}
+				}
+			}
+			if (found) {
+				rad = (bx.a || 0) * Math.PI / 180;
+				out.nudge[id] = { x: Math.round(Math.cos(rad) * found.d * 1e4) / 1e4, y: Math.round(Math.sin(rad) * found.d * 1e4) / 1e4 };
+				out.box[id] = shifted(out.box[id], found.d, rad);
+				ink[id] = found.box;
+				bx = found.box;
 			}
 			kept.push(bx);
+		});
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id], nu = out.nudge[lb.id] || null, was;
+			if (!le) { return; }
+			was = le.crowdNudge;
+			if ((was && was.x) === (nu && nu.x) && (was && was.y) === (nu && nu.y)) { return; }
+			le.crowdNudge = nu;
+			var pt = textLabelPoint(lb);
+			applyTextLabelRotation(lb, le, pt.x, pt.y);
 		});
 		return out;
 	}
@@ -1939,10 +1972,10 @@ var EngCalcs = EngCalcs || {};
 		});
 		// A TEXT LABEL IS AN OBSTACLE, NEVER A PARTICIPANT: the user typed those words and chose
 		// that spot, so a data label goes round it and never the reverse.
-		// **BUT TWO TEXTS CAN MEET, AND THEN ONE IS NOT DRAWN** (crowdedTexts()).
+		// **BUT TWO TEXTS CAN MEET, AND THEN THE LATER SLIDES ALONG ITS LINE** (crowdedTexts()).
 		var crowd = crowdedTexts();
 		doc.labels.forEach(function (lb) {
-			var le = labelEls[lb.id]; if (!le || crowd.hidden[lb.id]) { return; }
+			var le = labelEls[lb.id]; if (!le) { return; }
 			var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
 				px = pt.x, py = pt.y,
 				b = crowd.box[lb.id];
@@ -14233,9 +14266,11 @@ var EngCalcs = EngCalcs || {};
 	// The attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
 	// transform is invisible in the code and obvious on screen.
 	function applyTextLabelRotation(lb, le, px, py) {
-		var a = textLabelSvgAngle(lb),
+		var a = textLabelSvgAngle(lb), nu = le.crowdNudge,
 			t = a ? 'rotate(' + a.toFixed(3) + ' ' + px + ' ' + py + ')' : null;
 		if (!le.text) { return; }
+		// The slide crowdedTexts() gave this Text at this zoom: drawn there, stored nowhere.
+		if (nu) { t = 'translate(' + nu.x + ' ' + nu.y + ')' + (t ? ' ' + t : ''); }
 		if (t) { le.text.setAttribute('transform', t); } else { le.text.removeAttribute('transform'); }
 		// **AFTER, NOT BEFORE**: updateLabelGeometry() positions the words and then turns them, so
 		// the grab shape copied at repositionMultilineText() time carried the PREVIOUS rotation.
@@ -28813,23 +28848,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						'The nearest asset is {id}. Enter it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
-				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
+				// **EXACTLY A NODE READS "Node"** (Tom, 2026-10-24, reversing the 2026-09-25 blank: a
+				// customer on a reservoir that became a Junction "looks orphaned" with an empty cell).
+				// An empty cell stays the detached customer; the node's own id is in Properties.
+				get: function (c) {
+					var l = customerLink(c);
+					if (!l) { return ''; }
+					return customerAtNodeEnd(c) ? (pc.lpn_field_meter_at_node || 'Node') : l.id;
+				},
 				refTo: function (c) {
 					var l = customerLink(c);
 					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
 				},
-				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
-			// **BESIDE THE CONNECTED ASSET, WHERE A CUSTOMER ON A NODE IS READ** (Tom, 2026-10-24: customers on a
-			// reservoir that became a Junction "look orphaned"; the node they are on was a last column
-			// nobody saw). The Connected asset cell is blank when the connection is exactly a node, so the
-			// node is named here, next to it. An EMPTY link cell is a detached meter, and it is the one reading in the table
-			// that says its demand is in no answer. The popup says so in words.
-			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
-				refTo: function (c) {
-					var n = customerNodeId(c);
-					return (n === null || n === undefined) ? null : { group: 'node', id: n };
-				},
-				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } },
+				set: function (c, v) {
+					// The word the cell shows for a node is not an asset id; writing it back changes nothing.
+					if (customerLink(c) && customerAtNodeEnd(c) && String(v) === (pc.lpn_field_meter_at_node || 'Node')) { return; }
+					setCustomerLink(c, v); customerEdited(c);
+				} },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
 			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
 			// through the same two seams: setCustomerStation() slides the connection ALONG the main
@@ -28919,7 +28954,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					customerEdited(c);
 				} },
 			{ key: 'total', label: 'lpn_field_meter_total', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
-				get: function (c) { return customerFlow(c); } }
+				get: function (c) { return customerFlow(c); } },
+			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
+			// that says its demand is in no answer. The popup says so in words.
+			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
+				refTo: function (c) {
+					var n = customerNodeId(c);
+					return (n === null || n === undefined) ? null : { group: 'node', id: n };
+				},
+				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
 	}
 	/**
@@ -54275,6 +54318,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// nothing the page set on those elements was touched. The ERRORS stay: #lpn_status, the standing
 	// message, is not in the list, and every notice still goes to the message history. The Map menu
 	// is on the toolbar, which this never hides, so a keyboard user can always turn it off again.
+	// **THE MODE LINE GOES TOO, AND STAYS GONE** (Tom, 2026-10-24: *"Clean map mode is not for
+	// clicking, it's for IO"*): a clean map is for output and input to files and pictures, not for
+	// working the tools, so no tool's hint is shown in it.
 	var LPN_CLEANMAP_KEY = 'lpn_cleanmap';
 	var LPN_OVRMARKS_KEY = 'lpn_ovrmarks';
 	var cleanMapState = null, overrideMarksPref = null;   // null: not read from storage yet
@@ -61096,7 +61142,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// whichever of its own Text objects is the largest, which is what keeps a note like
 			// Net3's "Zoom in to see labels" readable when the labels have gone.
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
-			// of the words, so nothing hides it by inheritance. applyTextHidden() adds a Text another
+			// of the words, so nothing hides it by inheritance. applyTextHidden() leaves a Text another
 			// Text covers (crowdedTexts()).
 			le.suppressed = !isActive(lb) || (past && !textAllZoom(lb));
 			applyTextHidden(le);

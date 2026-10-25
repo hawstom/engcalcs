@@ -706,6 +706,7 @@ $ec_lang['lpn_field_meter_offset']='Scostamento dalla tubazione';
 $ec_lang['lpn_field_meter_offset_tip']='Positivo è a destra della tubazione guardando dal suo primo nodo verso il secondo. Digitare un valore qui può spostare il cliente sull\'altro lato della condotta, e mette sempre la linea di servizio ad angolo retto con la condotta.';
 $ec_lang['lpn_field_meter_lumped']='Aggiunto al nodo';
 $ec_lang['lpn_field_meter_lumped_tip']='Nodo più vicino; qui vengono aggiunte le richieste di questo cliente.';
+$ec_lang['lpn_field_meter_at_node']='Nodo';
 $ec_lang['lpn_node_customers']='Richieste dei clienti';
 $ec_lang['lpn_node_customers_tip']='Elenco dei clienti aggiunti qui perché questo era il loro nodo più vicino. Le richieste dei clienti si sommano alle altre richieste elencate qui. Un cliente si modifica dove si trova sulla mappa o nella tabella Clienti.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} da Clienti ({n})';
