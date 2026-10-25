@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**49 still to read**, of 92 new keys across 10 unmerged branch(es).
+**82 still to read**, of 125 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -635,13 +635,25 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1023b (`17f419334`) — already merged into chore/merge-1024; its strings are listed there
+### chore/merge-1025 (`905e0e14a`) — adds no English strings
 
-### chore/merge-1024 (`2dcd62d93`) — adds no English strings
+### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
+
+### feat/box-rows-properties (`695348b38`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/scenario-io (`f9413e8fb`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/first-view (`20ee39a5d`) — adds no English strings
+
+### feat/report-buttons (`9bbdbd88a`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+
+### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+
+### feat/shape-scenario (`8c0bc5d7a`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -649,8 +661,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dem_scenario`**
   > Elevations written here are overrides in the scenario {scenario}.
   @@ NEEDS RULING
+- **`lpn_library_import_every_scenario`**
+  > Every scenario can use them.
+  @@ NEEDS RULING
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
+  @@ NEEDS RULING
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
   @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
@@ -815,7 +833,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`ffa674794`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -829,6 +847,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ovm_dot_set_from`**
   > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
 - **`lpn_settings_held_default`**
   > the default
   @@ NEEDS RULING
@@ -836,7 +857,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > the value in {parent}
   @@ NEEDS RULING
 - **`lpn_settings_held_item`**
-  > {setting}: clear restores {value}, {source}.
+  > {setting}: {restores}
   @@ NEEDS RULING
 - **`lpn_settings_held_none`**
   > no text
@@ -844,7 +865,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`d5ab971ba`) — 28 new, 28 to read @@ NEEDS RULING
+### feat/wtg-page-export (`ad86a1b96`) — 44 new, 44 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -867,8 +888,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_left_out`**
   > Left out: {items}
   @@ NEEDS RULING
+- **`lpn_wtg_export_lost_backdrop`**
+  > The background picture.
+  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_controls_pressure`**
   > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_model`**
+  > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_multiplier`**
+  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_emitters`**
   > Emitter coefficients: {ids}.
@@ -900,11 +930,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_lost_rules`**
   > Rule-based controls.
   @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tags`**
+  > Tags.
+  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_tank_minvol`**
   > Tank minimum volume (tanks {ids}).
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_tank_mixing`**
   > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_texts`**
+  > Text on the map.
   @@ NEEDS RULING
 - **`lpn_wtg_export_need`**
   > The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.
@@ -927,10 +963,89 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_refused`**
   > This project cannot be written as a .wtg project: {detail}
   @@ NEEDS RULING
+- **`lpn_wtg_export_t_asset_kind`**
+  > Asset {id} is of a kind this export does not write.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_gpv_curve`**
+  > Valve {id} has no headloss curve in this project.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_head_pattern`**
+  > Reservoir {id} names a head pattern that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_integrity`**
+  > The files written failed their own check, so they were not offered.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_kind`**
+  > The saved project has no {kind} to copy from. Add one, save the project, and choose it again.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_layout`**
+  > The saved project is laid out differently from the one this export was tested with.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_not_project`**
+  > This file is not a saved project of the kind this export needs. Choose the .wtg file and the .wtg.sqlite file of a project you saved.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_offline`**
+  > The export needs a connection to this site the first time, to load the database and EPANET engines. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_schema`**
+  > This saved project is laid out as version {found}, and this export has been tested only with {tested}. Save the project from a program version that writes {tested}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_missing`**
+  > Tank {id} names a volume curve that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_range`**
+  > The volume curve of tank {id} does not cover the tank's range of water depth.
+  @@ NEEDS RULING
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
 
-### fix/settings-spinners (`5c93c7ca0`) — already merged into chore/merge-1024; its strings are listed there
+### fix/browser-pass-a (`f64a03834`) — already merged into chore/merge-1025; its strings are listed there
+
+### fix/dock-widths (`2474b5d15`) — already merged into chore/merge-1025; its strings are listed there
+
+### fix/example-crs (`1fba54d64`) — adds no English strings
+
+### fix/phone-select (`415f4a7fb`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING

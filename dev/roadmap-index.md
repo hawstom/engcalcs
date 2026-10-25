@@ -7,15 +7,15 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 6 · Soon (75): 14 · Someday (50): 28 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**91 open tasks.** Next (100): 6 · Soon (75): 14 · Someday (50): 29 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
 ## 100 — Next (6)
 
+- Task 825 — Audit every dockable box's width, with a checklist.
 - Task 826 — No lat/lon CRS in the shipped examples.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 830 — A box soft-pins when a button in it is clicked.
 - Task 831 — Shapes honour Is active per scenario, in the Presentation category.
 
 ## 95 — Priority 95 (6)
@@ -44,7 +44,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
 - Task 823 — Starter examples a new user can build from.
 
-## 50 — Someday (28)
+## 50 — Someday (29)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -74,6 +74,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 817 — Sketch a network that arrives without coordinates.
+- Task 832 — Compare Google Docs' Help menu with ours.
 
 ## 25 — Maybe (17)
 
@@ -121,5 +122,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-82 of 90 titles are within 4–12 words. `!` marks the rest;
+83 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
