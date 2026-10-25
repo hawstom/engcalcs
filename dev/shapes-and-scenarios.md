@@ -9,9 +9,8 @@ design them to use our scenario system with respect to 'Is active'?"*
   hydraulics: nothing that solves reads it. The code comment on `docShapesRead()` and
   `dev/shapes.md` both say "a Shape is in no scenario".
 - It is drawn once, in every scenario. Imports say so ("Shapes appear in every scenario.").
-- Shapes have no row in the override map: keys are `n:` (node), `l:` (link), `t:` (Text),
-  built by `ovKeyFor()`. `elGroup()` already tells a Shape from the rest, but only the Tables
-  pane asks it. `LPN_OVERRIDABLE` has no `shape` entry, so `setOverride()` refuses a Shape.
+- Override keys are `n:`, `l:`, `t:` (Text), built by `ovKeyFor()`. `LPN_OVERRIDABLE` has no
+  `shape` entry, so `setOverride()` refuses a Shape.
 - So yes: today a Shape can neither be switched off in a scenario nor exist in only one.
 
 ## The precedent: Text
@@ -40,15 +39,11 @@ not free. The pieces:
    copy/merge/delete, the scenario workbook, the tree view, and `.inp`/GeoJSON/DXF export (the
    open scenario's active Shapes only). `ovKeyGroup()` defaults an unknown key to `node`, which
    would misfile a Shape override silently; that default must change first.
-6. Harnesses: scenario-seam, stale-snapshot, and one new browser harness for draw-in-scenario.
-
-Only `active` is wanted; position per scenario for Shapes is not (a Shape's points are the
-user's survey numbers, see Option C).
+6. Harnesses: scenario-seam, stale-snapshot, and a new one for draw-in-scenario.
 
 ## Options
 
-- **A. Leave as is.** Shapes are a base map layer, the same in every scenario. Zero work. Fails
-  the case Tom named: a proposed-alignment polyline that belongs to one alternative.
+- **A. Leave as is.** Zero work. Fails a proposed alignment that belongs to one alternative.
 - **B. Is active only, in the Text category (recommended).** Steps 1-6 above. Shapes join the
   existing `text` alternative category, so no new category in the tree. One Shape set, one id
   space; a scenario switches Shapes on or off exactly like Text.
@@ -60,7 +55,6 @@ user's survey numbers, see Option C).
 
 ## Recommendation
 
-Option B. It reuses the Text precedent, fits Tom's "use our scenario system" instinct, and keeps
-the id space single. Build it after `feat/scenario-io` merges, because step 5 touches the same
+Option B. It reuses the Text precedent and keeps the id space single. Build it after `feat/scenario-io` merges, because step 5 touches the same
 override-key seam and the import/export receipts ("They appear in every scenario") change
 wording once Shapes honour scenarios. Until then, the receipt line stays true.
