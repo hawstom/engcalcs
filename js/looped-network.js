@@ -83669,7 +83669,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 	}
 	/**
-	 * **ONE BUTTON ROW FOR EVERY ANALYSIS AND REPORT BOX** (ROADMAP Task 829; Tom, 2026-10-24: each
+	 * **ONE BUTTON ROW FOR EVERY ANALYSIS AND REPORT BOX** (Tom, 2026-10-24: each
 	 * "Needs printout and/or Copy HTML", the Full report "possibly a good model", and Scenario
 	 * comparison's lone Copy and Download CSV "a little confusing since they appear only in this
 	 * box"). Download CSV, Copy HTML and Print report, in the sticky `.lpn-box-tools` row, acting on

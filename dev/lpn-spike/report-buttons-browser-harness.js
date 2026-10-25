@@ -149,7 +149,7 @@ async function main() {
 		await dock.openBox(a, 'lpn_ff_box');
 		await pressRun('#lpn_ff_controls', runLabel);
 		await waitReport('#lpn_ff_report');
-		await checkBox('Fire flow analysis', 'lpn_ff_box', 'lpn_ff_report', 'lpn_ff', 'lpn_ff_title');
+		await checkBox('Fire flow box', 'lpn_ff_box', 'lpn_ff_report', 'lpn_ff', 'lpn_ff_title');
 		await closeBox('lpn_ff_box');
 
 		await dock.openBox(a, 'lpn_crit_box');
@@ -166,7 +166,7 @@ async function main() {
 
 		await dock.openBox(a, 'lpn_energy_box');
 		await a.settle(500);
-		await checkBox('Pump energy report', 'lpn_energy_box', 'lpn_energy_report', 'lpn_energy', 'lpn_energy_title');
+		await checkBox('Pump energy box', 'lpn_energy_box', 'lpn_energy_report', 'lpn_energy', 'lpn_energy_title');
 		await closeBox('lpn_energy_box');
 
 		await dock.openBox(a, 'lpn_scncmp_box');
