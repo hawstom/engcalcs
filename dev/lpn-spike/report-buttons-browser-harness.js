@@ -109,7 +109,12 @@ async function main() {
 			ok(label + ': ...named project-analysis (no spaces)', !!f && /^Elm_Street-(Base-)?[A-Za-z_]+\.csv$/.test(f.suggestedFilename()) &&
 				f.suggestedFilename().replace(/\.csv$/, '').toLowerCase().indexOf(title.replace(/\s+/g, '_').toLowerCase()) > 0, f && f.suggestedFilename());
 			const sample = shown[1], sample0 = shown[0];
-			ok(label + ': ...and holds the box\'s first row (' + sample0 + ', ' + sample + ')', csv.indexOf(sample0) >= 0 && (label === 'Full report' || csv.indexOf(sample) >= 0), csv.slice(0, 120).replace(/\r?\n/g, ' / '));
+			// The CSV carries the figure in full: its row starts with the first cell, and the second cell is the
+			// shown figure to within its rounding, as a bare number.
+			const rowCells = (csv.split(/\r?\n/).find((l) => l.indexOf(sample0 + ',') === 0) || '').split(',');
+			const shownNum = parseFloat(sample);
+			ok(label + ': ...and holds the box\'s first row (' + sample0 + ', ' + sample + ')', csv.indexOf(sample0) >= 0 &&
+				(label === 'Full report' || isNaN(shownNum) || (rowCells.length > 1 && /^-?\d+(\.\d+)?$/.test(rowCells[1]) && Math.abs(+rowCells[1] - shownNum) <= Math.max(0.5, Math.abs(shownNum) * 0.01))), csv.slice(0, 160).replace(/\r?\n/g, ' / '));
 
 			await page.evaluate(() => { window.__clip = null; });
 			await page.click('#' + prefix + '_copyhtml');
@@ -122,10 +127,11 @@ async function main() {
 			ok(label + ': ...holding the box\'s numbers', !!html && html.indexOf(sample0) >= 0 && (label === 'Full report' || html.indexOf(sample) >= 0));
 			ok(label + ': ...with a plain-text copy beside it', !!clip && !!clip['text/plain'] && clip['text/plain'].indexOf(sample0) >= 0);
 
-			await page.evaluate(() => { window.__printed = false; document.documentElement.setAttribute('data-bs-theme', 'dark'); });
+			await page.evaluate(() => { window.__printed = false; document.documentElement.setAttribute('data-theme', 'dark'); });
 			await page.click('#' + prefix + '_print');
 			await a.settle(200);
 			ok(label + ': Print report asks the browser to print', await page.evaluate(() => window.__printed));
+			const screenPaper = await page.evaluate((bid) => getComputedStyle(document.getElementById(bid)).backgroundColor, boxId);
 			await page.emulateMedia({ media: 'print' });
 			const pr = await page.evaluate((bid) => {
 				const area = document.getElementById('lpn_print_area'), td = area && area.querySelector('td'), h1 = area && area.querySelector('h1');
@@ -133,15 +139,23 @@ async function main() {
 					text: area.innerText, tables: area.querySelectorAll('table').length,
 					ink: td ? getComputedStyle(td).color : '', head: h1 ? getComputedStyle(h1).color : '',
 					paper: getComputedStyle(document.body).backgroundColor,
-					hidden: getComputedStyle(document.getElementById(bid)).display
+					hidden: getComputedStyle(document.getElementById(bid)).display,
+					sizes: ['h1', 'h2', 'h3'].map((t) => parseFloat(getComputedStyle(area.querySelector(t)).fontSize)), first: area.querySelector('h1').textContent
 				} : null;
 			}, boxId);
 			await page.emulateMedia({ media: 'screen' });
-			await page.evaluate(() => { document.documentElement.removeAttribute('data-bs-theme'); });
+			await page.evaluate(() => { document.documentElement.removeAttribute('data-theme'); });
 			ok(label + ': Print report builds a sheet with the box\'s table', !!pr && pr.tables >= 1 && pr.text.indexOf('Elm Street') >= 0 && pr.text.indexOf(title) >= 0 && pr.text.indexOf(sample0) >= 0, pr && pr.text.slice(0, 100).replace(/\n/g, ' / '));
 			ok(label + ': ...that prints alone (the page and the box are hidden)', !!pr && pr.hidden === 'none');
 			const lum = (c) => { const m = /\d+/g, v = (c.match(m) || []).slice(0, 3).map(Number); return (v[0] + v[1] + v[2]) / 3; };
 			ok(label + ': ...dark ink on white paper, whatever the page theme', !!pr && lum(pr.ink) < 100 && lum(pr.head) < 100 && /rgba?\(255, 255, 255|rgba\(0, 0, 0, 0\)/.test(pr.paper), pr && [pr.ink, pr.head, pr.paper].join(' '));
+			const lumOf = (c) => { const v = (c.match(/\d+/g) || []).slice(0, 3).map(Number); return (v[0] + v[1] + v[2]) / 3; };
+			ok(label + ': ...and the dark theme really was on (the box is dark on screen)', lumOf(screenPaper) < 110, screenPaper);
+			ok(label + ': ...the title prints largest, then the project, then the scenario line', !!pr && pr.sizes[0] > pr.sizes[1] && pr.sizes[1] >= pr.sizes[2] && pr.first === title, pr && (pr.sizes.join(',') + ' ' + pr.first));
+			ok(label + ': the CSV file name has no doubled underscore', !!f && !/__|^_|_\.|-_|_-/.test(f.suggestedFilename()), f && f.suggestedFilename());
+			ok(label + ': the CSV opens with one byte-order mark and no other', csv.charCodeAt(0) === 0xFEFF && csv.indexOf('\uFEFF', 1) < 0);
+			const cellsAll = csv.replace(/^\uFEFF/, '').split(/\r?\n/).filter((l) => l).map((l) => l.split(','));
+			ok(label + ': the CSV has no figure with a unit stuck to it', !cellsAll.some((r) => r.some((c) => /^-?\d+(\.\d+)?\s+(psi|gpm|ft|ft\/s|in|kW|kWh|%)$/.test(c))), cellsAll.filter((r) => r.some((c) => /^-?\d+(\.\d+)?\s+[a-z%]/i.test(c)))[0]);
 			await page.evaluate(() => { const b = document.getElementById('lpn_print_area'); if (b) { b.remove(); } document.body.classList.remove('lpn-printing-table'); });
 		};
 		const closeBox = async (id) => { await page.evaluate((i) => { const x = document.querySelector('#' + i + ' .lpn-popover-x'); if (x) { x.click(); } }, id); await a.settle(250); };
@@ -200,6 +214,22 @@ async function main() {
 		await a.settle(500);
 		await checkBox('Full report', 'lpn_full_box', 'lpn_full_report', 'lpn_full', 'lpn_full_title');
 		await closeBox('lpn_full_box');
+		console.log('\n--- A refused rich clipboard write falls back to plain text ---');
+		await dock.openBox(a, 'lpn_status_box');
+		await a.settle(400);
+		await page.evaluate(() => {
+			window.__clip = null;
+			Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
+				write: async () => { throw new Error('refused'); },
+				writeText: async (t) => { window.__clip = { 'text/plain': t }; }
+			} });
+		});
+		await page.click('#lpn_status_copyhtml');
+		await a.settle(400);
+		const fbClip = await page.evaluate(() => window.__clip);
+		ok('the plain copy holds the title line and tabs, no markup', !!fbClip && fbClip['text/plain'].indexOf('Elm Street') >= 0 && fbClip['text/plain'].indexOf('\t') > 0 && !/<(table|p|td)/.test(fbClip['text/plain']), fbClip && fbClip['text/plain'].slice(0, 80));
+		await closeBox('lpn_status_box');
+
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

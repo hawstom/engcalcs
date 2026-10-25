@@ -73,7 +73,7 @@ where marked **(not traced)**.
 | 28 | Tables pane > right-click > Export to CSV / ODS / XLSX | `paneExportTable` 34849, menu 34266 | CSV, ODS, XLSX | The one table as shown; the open scenario's values | S |
 | 29 | Tables pane > Ctrl+C, right-click Copy, Copy with column headings | `paneCopyTsv` 32257, listeners 33850 and 34175 | TSV on the clipboard | As shown: the open scenario's values | S |
 | 30 | Tables pane > right-click > Print table | `paneBuildPrintable` 34592 | Print | As shown | S |
-| 31 | Water > Reports > Full > Download CSV | `downloadFullReportCsv` 80369, `fullReportFilename` 80365 | CSV | Results of the last run; file `<project>-Full report.csv`, **no scenario in the name or (not traced) the rows** | S |
+| 31 | Water > Reports > Full > Download CSV | the shared report row (`reportToolsInit`, `reportFilename`) | CSV | Results of the last run; file `<project>[-<scenario of the run>]-Full_report.csv`, **scenario in the name only when the run was not Base; the rows carry none (not traced)** | S |
 | 32 | Water > Reports > Full > Print report | `printFullReport` 80431 | Print | As 31 | S |
 | 33 | Run report box > Copy | `openRunReportBox` 78424 | Text on the clipboard | EPANET's report of the last run, verbatim | S |
 | 34 | Map > Screenshot (and Snip, Copy) | `startScreenshot` 52701, `openSnipBox` 52523, `copyBlob` 53147 | PNG | The map as the open scenario draws it (Presentation of that scenario) | S |

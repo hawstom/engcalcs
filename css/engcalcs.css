@@ -4588,6 +4588,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	body.lpn-printing-table #lpn_print_area { display: block !important; }
 	#lpn_print_area h1 { font-size: 14pt; margin: 0 0 2pt; }
 	#lpn_print_area h2 { font-size: 12pt; margin: 0 0 8pt; font-weight: normal; }
+	#lpn_print_area h3 { font-size: 10pt; margin: 0 0 8pt; font-weight: normal; }
 	/* The heading row repeats on every sheet -- a page 3 of figures with no headings on it is a
 	   page of numbers nobody can read. Not sticky: sticky is a screen idea, and print needs the
 	   table-header-group behaviour a <thead> already has. */

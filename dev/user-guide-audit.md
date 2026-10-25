@@ -420,7 +420,7 @@ not keep up with the morning peak.
 - Without an extended-period run it shows the single current solve, from either engine, updated as
   the network is edited.
 - Pump head has its own column; Quality fills only after a water quality run.
-- Download is a CSV named `<project>-Full report.csv`; values are rounded to 2 decimals.
+- Download is a CSV named `<project>-<scenario of the run, not Base>-<report title>.csv`, without spaces (`Elm_Street-Full_report.csv`); values are as shown in the box.
 - The time step choice resets on each page load.
 
 (b) FIXED. Contradicted: "It is available after Calculate": with no run it shows the live single-instant

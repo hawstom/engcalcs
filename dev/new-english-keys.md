@@ -260,7 +260,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of the Fire flow analysis, Criticality analysis, Demand scaling, Pump energy report, Status changes, Calibration report, and Full report boxes. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
@@ -637,19 +637,19 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
 
-### chore/verdicts-1024 (`027657edb`) — adds no English strings
+### chore/verdicts-1024 (`027657edb`) — already merged into feat/box-rows; its strings are listed there
 
-### feat/box-rows (`027657edb`) — already merged into chore/verdicts-1024; its strings are listed there
+### feat/box-rows (`71cfda266`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`930266e87`) — already merged into fix/phone-select; its strings are listed there
 
-### feat/report-buttons (`1a1d219be`) — adds no English strings
+### feat/report-buttons (`33ad55c19`) — adds no English strings
 
 ### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`16a33b3c0`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/shape-scenario (`b7607a7c4`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -1000,11 +1000,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/browser-pass-a (`2554e1000`) — adds no English strings
 
-### fix/dock-widths (`6ab3ddd9a`) — adds no English strings
+### fix/dock-widths (`2474b5d15`) — adds no English strings
 
 ### fix/example-crs (`1fba54d64`) — adds no English strings
 
-### fix/phone-select (`049f72452`) — 13 new, 13 to read @@ NEEDS RULING
+### fix/phone-select (`9bc00cca1`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex

@@ -78318,17 +78318,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A number for a box or a readout. Not the label machinery's fieldDecimals(): these are single
 	// values in a sentence or a narrow column, and a fire-flow number quoted to two decimals of a
 	// gpm would claim a precision the search does not have.
+	// **THE LAST NUMBER FORMATTED, so the cell built right after it can carry the unrounded one**
+	// (`data-ec-full`, and `data-ec-unit` for a quantity): the shared report row writes a CSV from
+	// those, a table as shown is for the eye. ffCell() takes it only when its text is exactly the
+	// text formatted, then forgets it.
+	var ffLastNum = null;
 	function ffNum(v) {
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
-		var a = Math.abs(v);
-		if (a >= 100) { return String(Math.round(v)); }
-		if (a >= 1) { return String(+v.toFixed(2)); }
-		return String(+v.toPrecision(3));
+		var a = Math.abs(v), t;
+		if (a >= 100) { t = String(Math.round(v)); }
+		else if (a >= 1) { t = String(+v.toFixed(2)); }
+		else { t = String(+v.toPrecision(3)); }
+		ffLastNum = { text: t, full: v, unit: '' };
+		return t;
 	}
 	// A quantity with its unit, converted at the boundary and nowhere else. `si` is what the engine
 	// speaks; `unitId` is one of this project's own unit selects.
 	function ffQty(si, unitId) {
-		return ffNum(toDisplay(si, unitId)) + ' ' + unitLabel(unitId);
+		var shown = toDisplay(si, unitId), t = ffNum(shown) + ' ' + unitLabel(unitId);
+		ffLastNum = { text: t, full: shown, unit: unitLabel(unitId) };
+		return t;
 	}
 	// What the boxes open on. Every one is a DISPLAY value in this project's units, because that is
 	// what a person reads and types; the conversion back to SI happens once, at the engine call.
@@ -79025,6 +79034,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function ffCell(row, text, cls) {
 		var td = ffEl('td', cls || null, text, row);
+		if (ffLastNum && ffLastNum.text === text) {
+			td.setAttribute('data-ec-full', String(+ffLastNum.full.toPrecision(12)));
+			if (ffLastNum.unit) { td.setAttribute('data-ec-unit', ffLastNum.unit); }
+		}
+		ffLastNum = null;
 		return td;
 	}
 	// **EVERY COLUMN SORTS FROM ITS HEADING** (Tom, 2026-09-28: *"Sort Fire flow analysis
@@ -80801,11 +80815,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/** A money figure with the currency the document states, or with none where it states none. */
 	function energyMoney(v) {
-		var money = currencyLabel();
-		return money ? ffNum(v) + ' ' + money : ffNum(v);
+		var money = currencyLabel(), t = money ? ffNum(v) + ' ' + money : ffNum(v);
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = money || ''; }
+		return t;
 	}
 	function energyPercent(fraction) {
-		return ffNum(fraction * 100) + '%';
+		var t = ffNum(fraction * 100) + '%';
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = '%'; }
+		return t;
 	}
 	/**
 	 * **WHAT THE DOCUMENT STATES ABOUT PRICE, WHICH IS NOT WHAT THE ANSWER CAME TO** (Task 581).
@@ -83706,7 +83723,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 	function reportDomBlocksOf(host) {
-		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, heads;
+		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, urow, heads;
 		if (!host) { return out; }
 		nodes = host.querySelectorAll('table, p, h1, h2, h3, h4, .lpn-ff-head');
 		for (i = 0; i < nodes.length; i++) {
@@ -83719,15 +83736,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			heads = [];
 			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) { heads.push(reportCellText(th, false)); });
-			rows = []; frow = [];
+			rows = []; frow = []; urow = [];
 			trs = el.querySelectorAll('tbody tr');
 			for (j = 0; j < trs.length; j++) {
 				tds = trs[j].children; row = []; k = 0;
-				var fr = [];
-				for (k = 0; k < tds.length; k++) { row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true)); }
-				rows.push(row); frow.push(fr);
+				var fr = [], ur = [];
+				for (k = 0; k < tds.length; k++) {
+					row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true));
+					ur.push(tds[k].getAttribute('data-ec-unit') || '');
+				}
+				rows.push(row); frow.push(fr); urow.push(ur);
 			}
-			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow }); }
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow }); }
 		}
 		return out;
 	}
@@ -83775,16 +83795,60 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var proj = (typeof project === 'object' && project && project.name) || '', scn = reportScenarioName(spec);
 		return [proj, scn, reportTitleText(spec), reportDateText()].filter(function (x) { return x; }).join(' - ');
 	}
+	// One part of a file name: no spaces, no runs of underscores, none at either end; letters with
+	// accents stay (Criticidad_análisis).
+	function reportNamePart(t) {
+		return paneNoSpace(paneSanitizeFileName(t)).replace(/_+/g, '_').replace(/^[_-]+|[_-]+$/g, '');
+	}
 	function reportFilename(spec, ext) {
-		var proj = paneProjectPrefix(), scn = reportScenarioName(spec), id = spec.full && lastSolveResult && lastSolveResult._scn;
-		return proj + ((scn && !(spec.full && id === 'base')) ? paneNoSpace(paneSanitizeFileName(scn)) + '-' : '') +
-			paneNoSpace(paneSanitizeFileName(reportTitleText(spec))) + '.' + ext;
+		var scn = reportScenarioName(spec), id = spec.full && lastSolveResult && lastSolveResult._scn;
+		return [(typeof project === 'object' && project && project.name) || '',
+			(scn && !(spec.full && id === 'base')) ? scn : '', reportTitleText(spec)]
+			.map(reportNamePart).filter(function (x) { return x; }).join('-') + '.' + ext;
+	}
+	/**
+	 * **A SPREADSHEET-READY TABLE**: a column whose figures all share one unit becomes bare numbers
+	 * with the unit in the heading ("Static pressure (psi)"), and a number carries its unrounded
+	 * value where the box kept one (`data-ec-full`). A cell that is not a figure (a dash, a word, a
+	 * time) stays as it is, except that a lone dash is blank. A column with mixed units is left as
+	 * shown. `b.full` holds the per-cell unrounded text and `b.unit` the per-cell unit, from the DOM.
+	 */
+	function reportSheetBlock(b) {
+		var heads = b.heads.slice(), rows = b.rows.map(function (r) { return r.slice(); }), c, r, cells, unit, ok, n, any, m;
+		for (c = 0; c < heads.length; c++) {
+			cells = []; unit = null; ok = true; any = false;
+			for (r = 0; r < rows.length && ok; r++) {
+				var shown = rows[r][c], fullT = b.full && b.full[r] && b.full[r][c], u = b.unit && b.unit[r] && b.unit[r][c];
+				if (shown === undefined || shown === '' || /^[\u2013\u2014-]$/.test(shown)) { cells.push(null); continue; }
+				if (fullT && fullT !== shown && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(fullT)) {
+					n = fullT; m = [null, null, u || ''];
+					if (!u && shown.indexOf(fullT) !== 0) {
+						m = /^-?[\d.]+(?:e[+-]?\d+)?\s*(.*)$/i.exec(shown);
+						m = [null, null, m ? m[1] : ''];
+					}
+				} else {
+					m = /^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(%|[A-Za-z\u00b0\u00b5][^\s\d]{0,11}(?:\/[A-Za-z]+)?|[^\s\d]{1,4})?$/i.exec(shown);
+					if (!m || /^0\d/.test(m[1])) { cells.push({ text: true, v: shown }); continue; }
+					n = m[1];
+				}
+				if (unit === null) { unit = m[2] || ''; } else if (unit !== (m[2] || '')) { ok = false; break; }
+				any = true;
+				cells.push({ v: n });
+			}
+			if (!ok || !any) { continue; }
+			for (r = 0; r < rows.length; r++) { rows[r][c] = cells[r] === null ? '' : cells[r].v; }
+			if (unit && heads[c].indexOf('(' + unit + ')') < 0 && heads[c].indexOf(unit + ')') < 0 && heads[c].indexOf(unit) < 0) { heads[c] += ' (' + unit + ')'; }
+		}
+		return { heads: heads, rows: rows };
 	}
 	function reportCsvText(blocks) {
 		var parts = [];
 		blocks.forEach(function (b) {
+			var t;
 			if (!b.heads) { return; }
-			parts.push(EngCalcs.lpnTableCsv(b.heads, b.full || b.rows));
+			t = reportSheetBlock(b);
+			// The byte-order mark opens the file once, never again at a second table.
+			parts.push(EngCalcs.lpnTableCsv(t.heads, t.rows, { bom: parts.length === 0 }));
 		});
 		return parts.join('\r\n');
 	}
@@ -83808,18 +83872,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function reportPrintable(spec, blocks) {
 		var wrap = document.createElement('div'), h, line;
 		wrap.id = 'lpn_print_area';
+		// Largest first: the analysis, then the project, then the scenario and the date.
 		h = document.createElement('h1');
-		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		h.textContent = reportTitleText(spec);
 		wrap.appendChild(h);
 		h = document.createElement('h2');
-		h.textContent = reportTitleText(spec) + ' - ' + reportDateText();
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
 		wrap.appendChild(h);
 		line = reportScenarioName(spec);
-		if (line) {
-			h = document.createElement('h3');
-			h.textContent = line;
-			wrap.appendChild(h);
-		}
+		h = document.createElement('h3');
+		h.textContent = (line ? line + ' - ' : '') + reportDateText();
+		wrap.appendChild(h);
 		blocks.forEach(function (b) {
 			var table, thead, tbody, tr, e;
 			if (!b.heads) {
@@ -83846,10 +83909,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return wrap;
 	}
+	/** The title line, then each table as tab-separated text: what a plain-text paste gets. */
+	function reportPlainText(spec, blocks) {
+		return reportTitleLine(spec) + '\n' + blocks.filter(function (b) { return b.heads; })
+			.map(function (b) { return EngCalcs.lpnTableTsv(b.heads, b.rows); }).join('\n');
+	}
 	function reportCopyHtml(spec, btn) {
 		var blocks = reportBlocksFor(spec), html = reportHtmlText(spec, blocks), pc = EngCalcs.pageConfig || {},
-			was = btn.textContent, plain = blocks.filter(function (b) { return b.heads; })
-				.map(function (b) { return EngCalcs.lpnTableTsv(b.heads, b.rows); }).join('\n');
+			was = btn.textContent, plain = reportPlainText(spec, blocks);
 		function done(okay) {
 			if (!okay) { return; }
 			btn.textContent = pc.lpn_time_run_report_copied || 'Copied';
@@ -83860,10 +83927,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				'text/html': new Blob([html], { type: 'text/html' }),
 				'text/plain': new Blob([plain], { type: 'text/plain' })
 			})]).then(function () { done(true); }, function () {
-				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(html, btn); }
+				// A refused rich write falls back to the plain tab-separated text, never to raw markup.
+				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(plain, btn); }
 			});
 		} else if (EngCalcs.lpnCopyText) {
-			EngCalcs.lpnCopyText(html, btn);
+			EngCalcs.lpnCopyText(plain, btn);
 		}
 	}
 	function reportToolsInit() {
@@ -83886,7 +83954,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			csv = mk('_csv', pc.lpn_full_download_csv || 'Download CSV', function () {
 				var blocks = reportBlocksFor(spec);
 				if (blocks.some(function (b) { return b.heads; })) {
-					downloadTextFile(reportFilename(spec, 'csv'), spec.full ? fullReportCsvText(fullReportRows()) : reportCsvText(blocks), 'text/csv');
+					downloadTextFile(reportFilename(spec, 'csv'), spec.full ? '\uFEFF' + fullReportCsvText(fullReportRows()) : reportCsvText(blocks), 'text/csv');
 				}
 			});
 			html = mk('_copyhtml', pc.lpn_report_copy_html || 'Copy HTML', function (b) { reportCopyHtml(spec, b); });
@@ -83943,7 +84011,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (lastRunScenarioName()) {
 			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
 		}
-		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
