@@ -107,7 +107,7 @@ function ruleMisses(ru, rs) {
 	await EC.lpnEpanetLoad('file://' + ROOT + 'js/vendor/epanet-js.js');
 	const summary = [];
 
-	// kind: 'utm' is a project on State Plane in feet whose SI twin is on UTM in metres (Task 826: no
+	// kind: 'utm' is a project on State Plane in feet whose SI twin is on the same State Plane zone in metres (Task 826: no
 	// shipped example is lat/lon), so the drawings are different projections of the same ground;
 	// 'proj' a projected one whose drawing and origin shift convert and whose CRS becomes its metre twin.
 	const PAIRS = [['Net3-Novato-CA-World', 'utm', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2'], ['Net1', 'grid', 'Net1']];
@@ -199,11 +199,11 @@ function ruleMisses(ru, rs) {
 			}
 			ok('neither twin has a backdrop', !ru.backdrop && !rs.backdrop);
 			if (kind === 'utm') {
-				ok('neither twin is a lat/lon project; US on California zone 3 (EPSG:2227), SI on UTM 10N (EPSG:26910)',
-					!ru.project.coords && !rs.project.coords && ru.project.crs === 'EPSG:2227' && rs.project.crs === 'EPSG:26910');
+				ok('neither twin is a lat/lon project; US on California zone 3 (EPSG:2227), SI on its metre twin, California zone 3 (EPSG:26943)',
+					!ru.project.coords && !rs.project.coords && ru.project.crs === 'EPSG:2227' && rs.project.crs === 'EPSG:26943');
 				const P0 = require(ROOT + 'js/vendor/proj4.js'), P = P0.default || P0;
 				const D = JSON.parse(fs.readFileSync(ROOT + 'js/data/epsg-proj4.json', 'utf8')), D2 = D.defs || D;
-				P.defs('US', D2['2227']); P.defs('SI', D2['26910']);
+				P.defs('US', D2['2227']); P.defs('SI', D2['26943']);
 				let worstM = 0, at = '';
 				ru.nodes.forEach((n) => {
 					const m = NS[n.id], a = P('US', 'EPSG:4326', [ru.origin.x + n.x, ru.origin.y + n.y]), b = P('SI', 'EPSG:4326', [rs.origin.x + m.x, rs.origin.y + m.y]);

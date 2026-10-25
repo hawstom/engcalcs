@@ -103,6 +103,19 @@ const manifest = JSON.parse(fs.readFileSync(path.join(exDir, 'manifest.json'), '
 			!!global.EngCalcs.lpnCrsInverse(crs, { x: j.origin.x + j.nodes[0].x, y: j.origin.y + j.nodes[0].y }));
 	});
 
+	console.log('--- 2b. each US and SI pair sits on the same place and the same plane family (Task 826) ---');
+	const PLACE = { 'Net2-Branford-CT': [41.28, -72.81, ['EPSG:2234', 'EPSG:26956']], 'Net3-Novato-CA-World': [38.11, -122.57, ['EPSG:2227', 'EPSG:26943']] };
+	Object.keys(PLACE).forEach((base) => {
+		const pl = PLACE[base];
+		[base, base + '-SI'].forEach((nm, i) => {
+			const j = JSON.parse(fs.readFileSync(path.join(exDir, nm + '.lwn'), 'utf8'));
+			ok(nm + ' is on ' + pl[2][i], j.project.crs === pl[2][i], j.project.crs);
+			const ll = global.EngCalcs.lpnCrsInverse(j.project.crs, { x: j.origin.x + j.nodes[0].x, y: j.origin.y + j.nodes[0].y });
+			const lat = ll && (ll.lat !== undefined ? ll.lat : ll[1]), lon = ll && (ll.lon !== undefined ? ll.lon : ll[0]);
+			ok(nm + ' lands within 0.2 degrees of ' + pl[0] + ', ' + pl[1], !!ll && Math.abs(lat - pl[0]) < 0.2 && Math.abs(lon - pl[1]) < 0.2, JSON.stringify(ll));
+		});
+	});
+
 	console.log('--- 3 and 4. DXF out, DXF in: every position comes back where it went ---');
 	for (const f of files) {
 		const j = JSON.parse(fs.readFileSync(path.join(exDir, f), 'utf8'));

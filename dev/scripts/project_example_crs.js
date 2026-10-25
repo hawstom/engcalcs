@@ -26,7 +26,7 @@ const DEFS = JSON.parse(fs.readFileSync(path.join(ROOT, 'js', 'data', 'epsg-proj
 // County), well inside it; UTM zone 10N (123 W +/- 3) holds it too.
 const TARGETS = {
 	'Net3-Novato-CA-World.lwn': 'EPSG:2227',      // NAD83 / California zone 3 (ftUS)
-	'Net3-Novato-CA-World-SI.lwn': 'EPSG:26910'   // NAD83 / UTM zone 10N (m)
+	'Net3-Novato-CA-World-SI.lwn': 'EPSG:26943'   // NAD83 / California zone 3 (m), the metre twin of EPSG:2227
 };
 
 function convert(doc, crs) {
