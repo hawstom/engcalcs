@@ -95,6 +95,13 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-10-24 afternoon (thirty-ninth session, Sonnet main agent)
+
+- **Five branches built by Sonnet agents, none merged, each awaiting Tom's browser pass** (ports.conf rows say what to click): `fix/dock-widths` (8103, Task 825 opened at 100, checklist `dev/box-width-audit.md`), `fix/browser-pass-a` (8106), `fix/phone-select` (8107), `feat/value-source` (8105, "Clear restores" everywhere), `feat/scenario-io` (8101, scenario after project name; DEM/shapes notices now dialogs). All are green on `check_all --fast` except `payload freshness`; **no full run yet**. Task 825 may collide with another new ID at merge.
+- **Open calls for Tom:** ROAD text hides under the 10-19 overlap rule (options A/B/C in his report); keep or hide the Mode line in Clean map (Ida says keep; he asked to hide, branch hides it); revive `archive/feat/sheet-sync` for a complete scenario workbook (`dev/tables-file-scenario-structure.md`); first-time layout (`dev/agents/interface-designer/first-time-view-2026-10-24.md`).
+- Keys deleted: `lpn_scenario_base_value`, `lpn_settings_held_base` (feat/value-source). Keys added: lpn_ovm_restores, lpn_library_import_every_scenario, 11 `lpn_morph_vertex*`/`lpn_replace_selected_only`. Nothing new stored on a visitor's device.
+- **Trap met:** I emptied `_panel/ports.conf` with a bad script (it is not in git) and restored it from a scratchpad `.bak`; copy it before editing.
+
 ## STATE — 2026-10-24 (thirty-eighth session)
 
 - **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
