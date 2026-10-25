@@ -63,7 +63,7 @@ Initial status, Status, Water age) up to 12 px left of the others.
 3. Float Settings, then click its dock-left button. It docks at 552. Do the same for Libraries (432)
    and Contour plot (336).
 4. Drag a floating box to a width of your own, then dock it. It docks at that width (not under 320), and keeps it after a reload.
-   Fly out any docked box by pointing at its tab, click a button inside it and move off: it stays out until you press on the map or another tab, or Escape (Task 830).
+   Fly out any docked box by pointing at its tab, click a button inside it and move off: it stays out until you press on the map or another tab, or Escape.
 5. Resize a docked box by its edge, reload. It keeps the width you set.
 6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
    the window.

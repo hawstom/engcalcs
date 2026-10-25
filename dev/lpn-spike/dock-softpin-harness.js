@@ -1,4 +1,4 @@
-// A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT (Tom, 2026-10-24, Task 830: "why doesn't the box
+// A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT (Tom, 2026-10-24: "why doesn't the box
 // 'soft-pin' when I click a button? I think this would be a generally good rule to add."). An auto-hide
 // docked box flown out from its tab, and then clicked on a button inside, stays out when the pointer
 // leaves, until a press outside it (the map, another tab) or Escape. It is not pinned for good.

@@ -65898,7 +65898,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
-		// **A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT** (Tom, 2026-10-24, Task 830: *"why doesn't
+		// **A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT** (Tom, 2026-10-24: *"why doesn't
 		// the box 'soft-pin' when I click a button?"*): it stays out when the pointer leaves, until a
 		// press outside it (the map, another tab; dockOutsidePress) or Escape tucks it. Not the corner
 		// row: the pin button there pins for good, and the others only move the box. Judged in the capture
