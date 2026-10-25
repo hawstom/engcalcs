@@ -97,10 +97,9 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-24 afternoon (thirty-ninth session, Sonnet main agent)
 
-- **Five branches built by Sonnet agents, none merged, each awaiting Tom's browser pass** (ports.conf rows say what to click): `fix/dock-widths` (8103, Task 825 opened at 100, checklist `dev/box-width-audit.md`), `fix/browser-pass-a` (8106), `fix/phone-select` (8107), `feat/value-source` (8105, "Clear restores" everywhere), `feat/scenario-io` (8101, scenario after project name; DEM/shapes notices now dialogs). All are green on `check_all --fast` except `payload freshness`; **no full run yet**. Task 825 may collide with another new ID at merge.
-- **Open calls for Tom:** ROAD text hides under the 10-19 overlap rule (options A/B/C in his report); keep or hide the Mode line in Clean map (Ida says keep; he asked to hide, branch hides it); revive `archive/feat/sheet-sync` for a complete scenario workbook (`dev/tables-file-scenario-structure.md`); first-time layout (`dev/agents/interface-designer/first-time-view-2026-10-24.md`).
-- Keys deleted: `lpn_scenario_base_value`, `lpn_settings_held_base` (feat/value-source). Keys added: lpn_ovm_restores, lpn_library_import_every_scenario, 11 `lpn_morph_vertex*`/`lpn_replace_selected_only`. Nothing new stored on a visitor's device.
-- **Trap met:** I emptied `_panel/ports.conf` with a bad script (it is not in git) and restored it from a scratchpad `.bak`; copy it before editing.
+- Tom's review of its five branches came back in the fortieth session; the fortieth session's STATE supersedes this one.
+- Keys deleted: `lpn_scenario_base_value`, `lpn_settings_held_base` (feat/value-source). Nothing new stored on a visitor's device.
+- **Trap met:** the preview list (ports.conf in the panel folder) is not in git; copy it to the scratchpad before editing it.
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
