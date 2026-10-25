@@ -177,6 +177,7 @@ async function main() {
 		const gj = JSON.stringify({ type: 'FeatureCollection', features: [{ type: 'Feature', properties: { name: 'Lot' }, geometry: { type: 'Point', coordinates: [-122.57, 38.1] } }] });
 		const notice = () => page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
 		const everyLine = (await L('lpn_shapes_every_scenario')).trim();
+		const hereLine = (await L('lpn_shapes_this_scenario')).replace('{scenario}', 'Peak hour').trim();
 		// With a second scenario the receipt is a dialog waiting for OK (Tom could not find the 8-second notice).
 		let lastDialog = null;
 		const importShape = async () => {
@@ -188,7 +189,16 @@ async function main() {
 			return lastDialog || await notice();
 		};
 		let sn = await importShape();
-		ok('S1 Peak hour exists: the receipt is a dialog and says Shapes appear in every scenario', lastDialog !== null && /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(everyLine) >= 0, sn);
+		ok('S1 Peak hour open: the receipt is a dialog and says Shapes appear in Peak hour only', lastDialog !== null && /Shape imported from lot\.geojson/.test(sn) && sn.indexOf(hereLine) >= 0 && sn.indexOf(everyLine) < 0, sn);
+		// ... and it is true: the Shape is inactive in Base and active in Peak hour (Task 831).
+		const shapeState = () => page.evaluate(() => {
+			const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}'), p = JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') || {};
+			const sh = (p.shapes || [])[0] || {}, sc = (p.scenarios || []).find((x) => x.id === 's1') || {};
+			return { n: (p.shapes || []).length, baseActive: sh._active, peak: ((sc.overrides || {})['s:' + sh.id] || {}).active };
+		});
+		await a.settle(600);
+		const st1 = await shapeState();
+		ok('S1 stored: inactive in Base, active in Peak hour', st1.n === 1 && st1.baseActive === false && st1.peak === true, JSON.stringify(st1));
 
 		console.log('--- D1. the DEM fill says where it writes ---');
 		const dem = () => page.evaluate(() => ({
@@ -203,6 +213,10 @@ async function main() {
 		await toScenario('Base');
 		t = await dem();
 		ok('D1 Base with other scenarios: the question says they go into Base', t.plan.indexOf(inB) >= 0 && t.done.indexOf(inB) >= 0);
+		sn = await importShape();
+		ok('S1 Base open: the receipt says Shapes appear in every scenario', lastDialog !== null && sn.indexOf(everyLine) >= 0 && sn.indexOf(hereLine) < 0, sn);
+		const st2 = await shapeState();
+		ok('S1 stored: the Shape imported in Base has no inactive flag', st2.n === 2, JSON.stringify(st2));
 		console.log('--- D2. the live Find and replace DEM door, autoRun ON ---');
 		const d5 = JSON.parse(JSON.stringify(d));
 		d5.settings.autoRun = true;

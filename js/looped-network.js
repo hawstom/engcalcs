@@ -4924,7 +4924,9 @@ var EngCalcs = EngCalcs || {};
 		// and Show at all zoom levels. Its ATTACHMENT (anchorNode, anchorLink, anchorT) stays
 		// Base-owned: it decides what x and y mean, so it cannot differ under a scenario's x and y.
 		label: { text: true, active: true, x: true, y: true, sizeMult: true, align: true, valign: true,
-			bold: true, rot: true, allZoom: true }
+			bold: true, rot: true, allZoom: true },
+		// A Shape (Task 831): switched on or off per scenario and nothing else; its points are Base's.
+		shape: { active: true }
 	};
 	// The two overridable properties stored WITHOUT their underscore -- see the note above. Read by
 	// effective(), baseValue() and setProp(), which is every fork there is.
@@ -5059,13 +5061,13 @@ var EngCalcs = EngCalcs || {};
 	//
 	// ONE SEAM, so the format is stated once: every read, write, count, rename and purge goes
 	// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 't:' itself.
-	// 't:' is the Text label's prefix -- t for text. It is an INTERNAL namespace tag and deliberately
+	// 's:' is a Shape's (Task 831). 't:' is the Text label's prefix -- t for text. It is an INTERNAL namespace tag and deliberately
 	// not tied to settings.idPrefixes, which the user can change at will; a key format that moved
 	// when a preference moved would strand every override already written under the old one.
 	function ovKey(el) { return ovKeyFor(elGroup(el), el && el.id); }
 	// One line on purpose: dev/scripts/scenario_seam_check.php exempts this function BY NAME from the
 	// rule that nothing else spells a key prefix, and it reads the source a line at a time.
-	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 't:' : 'n:') + id; }
+	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 't:' : group === 'shape' ? 's:' : group === 'unknown' ? '' : 'n:') + id; }
 	// ---- CUSTOM PROPERTIES (ROADMAP Task 636; dev/custom-property-scope.md) --------------------
 	//
 	// A field the user invents: designed one row at a time in Settings > Assets, then carried by
@@ -5750,7 +5752,11 @@ var EngCalcs = EngCalcs || {};
 		// Presentation alternative split down the middle of one object. Presentation stays the
 		// category of the Settings box's drawing settings.
 		label: { text: 'text', active: 'text', x: 'text', y: 'text', sizeMult: 'text', align: 'text', valign: 'text',
-			bold: 'text', rot: 'text', allZoom: 'text' }
+			bold: 'text', rot: 'text', allZoom: 'text' },
+		// A Shape's only scenario value is whether it is shown (Task 831; Tom, 2026-10-24: *"I agree
+		// with lumping shapes into the Presentation category"* and *"No elements act jointly"*): it
+		// switches by itself, as a Text does, and is tied to no Text. Its points stay Base's.
+		shape: { active: 'presentation' }
 	};
 	// group 'setting': `prop` is a setting's path, answered by categoryOfSetting() -- null for one
 	// that may never vary by scenario, undefined for one no table names.
@@ -5762,11 +5768,15 @@ var EngCalcs = EngCalcs || {};
 	// The group an override KEY belongs to, asked of ovKeyFor() itself so the key format is still
 	// spelled in one place (dev/scripts/scenario_seam_check.php).
 	function ovKeyGroup(key) {
-		var groups = ['link', 'label', 'node'], i;
+		var groups = ['link', 'label', 'shape', 'node'], i;
 		for (i = 0; i < groups.length; i++) {
 			if (String(key).indexOf(ovKeyFor(groups[i], '')) === 0) { return groups[i]; }
 		}
-		return 'node';
+		// **NOT 'node'** (Task 831): a key with a prefix this page does not know is nobody's, and
+		// calling it a junction's would file its values under a junction's categories without a word.
+		// 'unknown' has no table in LPN_ALT_CATEGORY_OF, so its values read as User data, and
+		// ovKeyFor('unknown', id) is the bare id, so a caller that slices the prefix off loses nothing.
+		return 'unknown';
 	}
 	function altCopy(v) { return (v && typeof v === 'object') ? JSON.parse(JSON.stringify(v)) : v; }
 	function altBase(cat) {
@@ -7171,7 +7181,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function smMergeElement(key) {
 		var g = ovKeyGroup(key), id = String(key).slice(ovKeyFor(g, '').length);
-		return g === 'node' ? nodeById(id) : g === 'link' ? linkById(id) : g === 'label' ? labelById(id) : null;
+		return g === 'node' ? nodeById(id) : g === 'link' ? linkById(id) : g === 'label' ? labelById(id) : g === 'shape' ? shapeById(id) : null;
 	}
 	// "Junction 22: Diameter", for the list of skipped values: the asset as Base draws it, and the
 	// field as the Tables pane heads it.
@@ -7188,7 +7198,7 @@ var EngCalcs = EngCalcs || {};
 		look = look || prop;
 		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
-		t = g === 'label' ? (pc.lpn_tool_add_text || 'Text') : ((el ? words[morphBaseOf(el, 'type')] : '') || '');
+		t = g === 'label' ? (pc.lpn_tool_add_text || 'Text') : g === 'shape' ? (pc.lpn_tool_add_shape || 'Shape') : ((el ? words[morphBaseOf(el, 'type')] : '') || '');
 		if (LPN_MORPH_PROP[prop]) { label = pc.lpn_field_type || 'Type'; }
 		else if ((d = customPropDefs().length ? customPropDefByKey(prop) : null)) { label = customPropLabel(d); }
 		else {
@@ -10119,7 +10129,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **MAP ANNOTATION, NOT HYDRAULICS.** `doc.shapes` is a list of `{ id, pts: [{x, y}...], closed }`
 	// (plus `desc` where an import stated one). Nothing that solves, reports or writes an `.inp`
-	// reads it, and nothing in it is per scenario: a Shape is drawn once, for every scenario. Its
+	// reads it. Its one scenario value is Is active (Task 831, dev/shapes-and-scenarios.md): a Shape is
+	// drawn in the scenarios it is active in. Its
 	// points are POSITIONS, so eachStoredPoint() and flipStoredY() visit them exactly as they visit a
 	// node, and a geographic project stores them in longitude and latitude like every other point.
 	//
@@ -10138,6 +10149,15 @@ var EngCalcs = EngCalcs || {};
 	function addShapeToDoc(s) {
 		if (!doc.shapes) { doc.shapes = []; }
 		doc.shapes.push(s);
+	}
+	// **AN EXPORT WRITES THE OPEN SCENARIO'S SHAPES** (Task 831): those active in it. The project file
+	// keeps every Shape, with its membership; GeoJSON and DXF are pictures of one scenario.
+	function exportableShapes(list) {
+		return (list || []).filter(function (sh) { var live = shapeById(sh.id); return !live || isActive(live); });
+	}
+	function projectForExport() {
+		var snap = serializeProject();
+		return snap.shapes ? Object.assign({}, snap, { shapes: exportableShapes(snap.shapes) }) : snap;
 	}
 	function shapeById(id) {
 		var a = docShapesRead(), i;
@@ -10172,6 +10192,13 @@ var EngCalcs = EngCalcs || {};
 			g, rec, pts = s.pts || [];
 		removeShapeEls(s.id);
 		if (!shapesLayer) { return; }
+		// **A SHAPE SWITCHED OFF IN THE OPEN SCENARIO IS NOT THERE** (Task 831), as a Text is not: no
+		// drawing means no hit, no magnet, no marquee catch and no place in the extent, because all
+		// of those look for its drawing. It leaves the selection too.
+		if (!isActive(s)) {
+			if (isSelected('shape', s.id)) { deselectOne('shape', s.id); }
+			return;
+		}
 		g = el('g', { 'class': 'lpn-shape', 'data-shape': s.id }, shapesLayer);
 		rec = { g: g, handles: [] };
 		if (pts.length === 1) {
@@ -10199,6 +10226,7 @@ var EngCalcs = EngCalcs || {};
 	function deleteShapeById(id) {
 		if (isSelected('shape', id)) { deselectOne('shape', id); }
 		doc.shapes = docShapesRead().filter(function (s) { return s.id !== id; });
+		purgeOverrides(ovKeyFor('shape', id));   // see deleteNode(): a real deletion takes them with it
 		removeShapeEls(id);
 	}
 	// What a press at this screen point lands on among the Shapes. A grip of a SELECTED Shape first
@@ -10208,7 +10236,7 @@ var EngCalcs = EngCalcs || {};
 		var w = screenToWorld(cx, cy), tolW = px / (state.s || 1), best = null, bestD = tolW, list = docShapesRead(), i, j, s, d, n;
 		for (i = 0; i < list.length; i++) {
 			s = list[i];
-			if (!isSelected('shape', s.id)) { continue; }
+			if (!isSelected('shape', s.id) || !shapeEls[s.id]) { continue; }
 			for (j = 0; j < s.pts.length; j++) {
 				d = Math.hypot(s.pts[j].x - w.x, s.pts[j].y - w.y);
 				if (d <= bestD) { best = { shape: s, pidx: j }; bestD = d; }
@@ -10297,6 +10325,7 @@ var EngCalcs = EngCalcs || {};
 		logLpnFirstAction('element');
 		s = { id: mintId(LPN_ID_KEY.shape), pts: pts, closed: !!closed && pts.length >= 3 };
 		addShapeToDoc(s);
+		bornInScenario(s);   // drawn inside a scenario, it exists there only (Task 831)
 		buildShapeEls(s);
 		scheduleSave();
 		return s;
@@ -16530,6 +16559,7 @@ var EngCalcs = EngCalcs || {};
 		// A Shape's points are drawn content too (Task 779), each with the few pixels its x or grip
 		// takes, so a fit frames a Shape drawn beyond the network and a project of Shapes alone.
 		docShapesRead().forEach(function (sh) {
+			if (!isActive(sh)) { return; }
 			(sh.pts || []).forEach(function (p) { fitItem(out, p.x, p.y, 6, 6, 6, 6); });
 		});
 		doc.nodes.forEach(function (n) {
@@ -28697,6 +28727,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return [
 			paneColId(),
 			paneColDesc(),
+			paneColActive(),
 			{ key: 'closed', label: 'lpn_pane_shape_closed', bool: true, em: 2,
 				get: function (s) { return !!s.closed; },
 				// A polygon needs three points; fewer stays open, as the Shape tool leaves it.
@@ -29294,8 +29325,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				cols: paneCustomerCols()
 			},
 			// **THE SHAPE TABLE** (Task 779; Tom, 2026-10-11: *"I see no Shapes table. I need to be
-			// able to paste shapes so that I can import and export."*). A Shape is in no scenario,
-			// so like Customers it has no scenario view; see paneShapeCols() for the columns.
+			// able to paste shapes so that I can import and export."*). A Shape's only
+			// scenario value is Is active (Task 831); see paneShapeCols() for the columns.
 			{
 				id: 'shapes', panel: 'lpn_pane_shapes', label: 'lpn_pane_tab_shapes',
 				group: 'shape', type: 'shape',
@@ -30334,8 +30365,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return x ? name + ' ' + scenarioDisplayName(x.scn) : name;
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
-	// Nor does a Shape (Task 779): it is drawn once, for every scenario.
-	function paneScnAvailable(spec) { return spec.group !== 'customer' && spec.group !== 'scenario' && spec.group !== 'shape'; }
+	// A Shape has one, its Is active (Task 831).
+	function paneScnAvailable(spec) { return spec.group !== 'customer' && spec.group !== 'scenario'; }
 	// **A REDRAW ASKED FOR DURING THE SWAP WAITS FOR ITS END** (paneAfterScenarioSwap()), so it
 	// draws the scenario actually showing, not the row's.
 	var paneScnSwapDepth = 0, paneScnSwapPending = [];
@@ -33545,6 +33576,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else if (spec.group === 'shape') {
 			el = { id: plan.id, pts: plan.pts, closed: false };
 			addShapeToDoc(el);
+			bornInScenario(el);
 			buildShapeEls(el);
 		} else {
 			el = addCustomer(inwardX(plan.xv), inwardY(plan.yv),
@@ -39323,7 +39355,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function deleteElement(kind, id) {
 		var pc = EngCalcs.pageConfig || {},
 			el = kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id)
-				: kind === 'customer' ? customerById(id) : linkById(id);
+				: kind === 'shape' ? shapeById(id) : kind === 'customer' ? customerById(id) : linkById(id);
 		// **A METER IS DELETED OUTRIGHT IN EVERY SCENARIO, and that is not an oversight.** Nothing a
 		// customer carries is overridable (see the Task 247 section note), so it has no scenario
 		// values to lose, no `active` to switch and no override count to confirm -- the whole of the
@@ -39334,14 +39366,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!el) { return; }
 			saveUndoSnapshot();
 			deleteCustomerById(id);
-			return;
-		}
-		// A Shape is annotation and is in no scenario, so it goes outright, like a meter (Task 779).
-		if (kind === 'shape') {
-			if (!shapeById(id)) { return; }
-			saveUndoSnapshot();
-			deleteShapeById(id);
-			scheduleSave();
 			return;
 		}
 		// One guard for both branches. A delete gesture can name an element that is already gone --
@@ -39403,10 +39427,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function proceed() {
 			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
 			// one while the question was open.
-			if (!(kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id))) { return; }
+			if (!(kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : kind === 'shape' ? shapeById(id) : linkById(id))) { return; }
 			saveUndoSnapshot();
 			if (kind === 'node') { deleteNode(id); }
 			else if (kind === 'label') { deleteLabelById(id); }
+			else if (kind === 'shape') { deleteShapeById(id); refreshPaneIfOpen(); scheduleSave(); }
 			else { deleteLink(id); }
 			refreshScenarioStatus();
 			if (only) {
@@ -44013,7 +44038,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * called once, with the writer's result; a harness drives this half.
 	 */
 	function exportGeoJsonResult(done) {
-		function go() { done(EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions())); }
+		function go() { done(EngCalcs.lpnExportGeoJson(projectForExport(), geoJsonExportOptions())); }
 		saveToStorage();   // export what is on screen, including edits not yet saved
 		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
 			EngCalcs.lpnCrsLoad(go);
@@ -44059,7 +44084,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// converts them by the transform its map uses (numbers of ours). A local grid has no place on
 	// the Earth and is refused, as the export refuses it. One undo step for the whole import.
 	// A Shape belongs to no scenario (Task 814, rule 5): said once, and only where a second scenario exists.
+	// True in Base. In any other open scenario the imported Shapes were born there (bornInScenario()),
+	// so the line says that instead (Task 831).
 	function shapesEveryScenarioLine() {
+		if (!inBaseScenario()) {
+			return String((EngCalcs.pageConfig || {}).lpn_shapes_this_scenario || 'Shapes appear in {scenario} only.')
+				.split('{scenario}').join(scenarioDisplayName(activeScenario()));
+		}
 		return String((EngCalcs.pageConfig || {}).lpn_shapes_every_scenario || 'Shapes appear in every scenario.');
 	}
 	function pickGeoJsonFile() {
@@ -44140,7 +44171,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (made.length) {
 				saveUndoSnapshot();
 				logLpnFirstAction('element');
-				made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
+				made.forEach(function (s) { addShapeToDoc(s); bornInScenario(s); buildShapeEls(s); });
 				scheduleSave();
 			}
 			lines.push(counted('lpn_geojson_import_done', made.length, '{n} Shapes imported from {file}.',
@@ -44250,7 +44281,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (made.length) {
 			saveUndoSnapshot();
 			logLpnFirstAction('element');
-			made.forEach(function (s) { addShapeToDoc(s); buildShapeEls(s); });
+			made.forEach(function (s) { addShapeToDoc(s); bornInScenario(s); buildShapeEls(s); });
 			scheduleSave();
 		}
 		lines.push(made.length === 0 ? String(pc.lpn_shapes_import_none || 'Nothing was imported from {file}.').replace('{file}', fileName)
@@ -44843,7 +44874,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// **THE SHAPES** (Task 779): geometry only, a POINT or an LWPOLYLINE, from the file's numbers
 		// like a pipe's bends.
-		(snap.shapes || []).forEach(function (fs) {
+		exportableShapes(snap.shapes).forEach(function (fs) {
 			var pts = [];
 			(fs.pts || []).forEach(function (v) {
 				var q = G(v.x + org.x, v.y + org.y);
@@ -69968,6 +69999,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A Text label's redraw is its anchors, its style, its content, its measured width, its
 			// geometry and its visibility, whichever of its properties moved (textLabelRelayout()).
 			else if (group === 'label') { textLabelRelayout(el.id); }
+			else if (group === 'shape') { buildShapeEls(el); }
 			else if (nodeEls[el.id]) { updateNode(el.id, true); }
 		} finally { endMapBoxHold(); }
 		// **THE ELEMENT JUST EDITED, NOT EVERY ELEMENT ON THE MAP** (ROADMAP Task 706). The amber
@@ -70004,6 +70036,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var group = elGroup(el);
 				if (group === 'link') { rebuildLink(el); }
 				else if (group === 'label') { textLabelRelayout(el.id); }
+				else if (group === 'shape') { buildShapeEls(el); }
 				else if (nodeEls[el.id]) { updateNode(el.id, true); }
 				applyScenarioMarks(el);
 			}); });
@@ -73374,12 +73407,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			title = document.getElementById('lpn_popup_title'),
 			sel = selectedRef(), groups, at;
 		if (!fields || !title) { return false; }
-		if (selectionCount() === 1 && sel) {
+		// A Shape has no popup of its own (Task 779: its points are edited on the map), so one Shape
+		// is shown in the multi-properties box beside its Is active row (Task 831).
+		if (selectionCount() === 1 && sel && sel.kind !== 'shape') {
 			if (sel.kind === 'node') { openPopup(sel.id); }
 			else if (sel.kind === 'link') { openLinkPopup(sel.id); }
 			else if (sel.kind === 'customer') { openCustomerPopup(sel.id); }
-			// A Shape has no properties box (Task 779): its points are edited on the map.
-			else if (sel.kind === 'shape') { return false; }
 			else { openLabelPopup(sel.id); }
 			return true;
 		}
@@ -77735,6 +77768,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario, deleting one, pushing to base, rebuilding the DOM. An ordinary property edit is not
 	// one of those -- see applyScenarioMarks().
 	function refreshScenarioMarks() {
+		// A Shape is drawn only where it is active (Task 831), so a scenario change redraws them.
+		if (shapesLayer) { buildAllShapeEls(); }
 		// A node's own marks only: every link is marked once, by the second line.
 		doc.nodes.forEach(function (n) { nodeScenarioMarks(n); });
 		doc.links.forEach(function (l) { applyScenarioMarks(l); });
