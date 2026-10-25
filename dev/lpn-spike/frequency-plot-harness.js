@@ -42,6 +42,7 @@ const L = loadLoopedNetwork(
 	"\t\topenPane: openPane, wirePane: wirePane,\n" +
 	"\t\tpaneTabIds: function () { return paneTabs.map(function (t) { return t.id; }); },\n" +
 	"\t\tfreqState: function () { return freqState; }, freqValues: freqValues,\n" +
+	"\t\trenderProfile: renderProfile, profileSeedStops: profileSeedStops,\n" +
 	"\t\tfreqField: freqField, renderFrequency: renderFrequency, rebuildFreqForm: rebuildFreqForm,\n" +
 	"\t\tcolorFieldUnitText: colorFieldUnitText, colorFieldLabel: colorFieldLabel,\n" +
 	"\t\tunitLabel: unitLabel, unitFactor: unitFactor, serialize: serializeProject,\n" +
@@ -207,6 +208,57 @@ function curve(group, field) {
 	check(chartText().indexOf(title) >= 0, `the value axis says "${title}"`);
 	check(byId.lpn_freq_note._text.indexOf(EngCalcs.lpnFormatTime(frames[0].t)) >= 0,
 		`the summary names the frame's time: "${byId.lpn_freq_note._text}"`);
+
+	head('3b. THE VALUE AXIS HOLDS STILL ACROSS THE RUN (Tom, 2026-10-24: it jumped between 100 and 140)');
+	// The x ticks are the only 'middle'-anchored tick texts of this chart. Read at every frame.
+	function xTickLabels() {
+		return chartEls('lpn-profile-tick').filter((e) => e['text-anchor'] === 'middle').map((e) => {
+			const parts = []; (function walk(n) { if (!n) { return; } if (n.nodeType === 3) { parts.push(String(n.textContent)); } (n.children || []).forEach(walk); }(e));
+			return parts.join('');
+		});
+	}
+	{
+		const sig = [], lows = [], highs = [];
+		frames.forEach((f) => {
+			EngCalcs.lpnTimeGoTo(f.t);
+			L.renderFrequency();
+			sig.push(xTickLabels().join(' '));
+			const r = EngCalcs.lpnTimeFrameResult(EngCalcs.lpnTimeRunToken().frames ? EngCalcs.lpnTimeRunToken() : null, f.t);
+			const v = junctions.map((n) => r.pressures[n.id] * fp);
+			lows.push(Math.min.apply(null, v)); highs.push(Math.max.apply(null, v));
+		});
+		const lo = Math.min.apply(null, lows), hi = Math.max.apply(null, highs);
+		check(sig[0].length > 0, `the axis has labels: "${sig[0]}"`);
+		check(sig.every((x) => x === sig[0]), `the same value-axis labels at all ${frames.length} time steps: ${Array.from(new Set(sig)).length} distinct`);
+		const nums = sig[0].split(' ').map(Number).filter((x) => isFinite(x));
+		check(nums[0] <= lo + 1e-9 && nums[nums.length - 1] >= hi - 1e-9,
+			`and it spans the whole run's pressures ${lo.toFixed(1)} to ${hi.toFixed(1)}: ${nums[0]} to ${nums[nums.length - 1]}`);
+		check(Math.min.apply(null, highs) < hi - 1e-6, `(the pressure really does change over the run: highest per step ${Math.min.apply(null, highs).toFixed(1)} to ${hi.toFixed(1)})`);
+		EngCalcs.lpnTimeGoTo(frames[0].t);
+		L.renderFrequency();
+	}
+
+	head('3c. THE PROFILE\'S HEIGHT AXIS HOLDS STILL ACROSS THE RUN');
+	{
+		L.profileSeedStops();
+		const yLabels = () => {
+			const out = [];
+			(function walk(e) {
+				if (!e) { return; }
+				if (String(e['class'] || '') === 'lpn-profile-tick' && e['text-anchor'] === 'end') {
+					const parts = []; (function w2(n) { if (!n) { return; } if (n.nodeType === 3) { parts.push(String(n.textContent)); } (n.children || []).forEach(w2); }(e));
+					out.push(parts.join(''));
+				}
+				(e.children || []).forEach(walk);
+			}(byId.lpn_profile_chart));
+			return out.join(' ');
+		};
+		const sigP = [];
+		frames.forEach((f) => { EngCalcs.lpnTimeGoTo(f.t); L.renderProfile(); sigP.push(yLabels()); });
+		check(sigP[0].length > 0, `the profile has height labels: "${sigP[0]}"`);
+		check(sigP.every((x) => x === sigP[0]), `the same height-axis labels at all ${frames.length} time steps: ${Array.from(new Set(sigP)).length} distinct`);
+		EngCalcs.lpnTimeGoTo(frames[0].t);
+	}
 
 	head('4. LINKS: PIPES ONLY, FLOW AS AN ABSOLUTE VALUE');
 	const gSel = control('lpn_freq_group');

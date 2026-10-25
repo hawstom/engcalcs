@@ -312,6 +312,9 @@ ok('the warning rows are marked, and only them',
 	=== L.noticeLog().filter(r => r.severity === 'warning').length);
 ok('the panel still says the bound and that nothing is stored, as the dialog did',
 	panelText().indexOf(String(PC.lpn_msglog_note).replace('{n}', L.maxRows())) >= 0);
+ok('and that line is the FIRST child, above every message (Tom, 2026-10-24)',
+	String(byId.lpn_msglog_panel.children[0].className || '').indexOf('lpn-msglog-panel-note') >= 0
+	&& byId.lpn_msglog_panel.children.filter(c => String(c.className || '').indexOf('lpn-msglog-panel-note') >= 0).length === 1);
 (btn._listeners.click || []).forEach(fn => fn({ stopPropagation: () => {} }));
 ok('and a second press closes it', !L.panelOpen() && byId.lpn_msglog_panel.style.display === 'none');
 ok('collapsing it back on the button', btn.getAttribute('aria-expanded') === 'false');

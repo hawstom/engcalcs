@@ -2,8 +2,8 @@
     "meta": {
         "language": "km",
         "expected_key_count": 3214,
-        "delta_key_count": 244,
-        "english_changed_key_count": 48,
+        "delta_key_count": 249,
+        "english_changed_key_count": 53,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -79,6 +79,7 @@
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
@@ -91,6 +92,7 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
+        "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_find_prop_demand_desc": "Demand category description",
@@ -119,6 +121,7 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
         "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
@@ -182,6 +185,8 @@
         "lpn_field_cv": "Check valve (CV)",
         "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_labels_priority": "Drop order",
+        "lpn_clean_map_tip": "Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
         "lpn_theme_amber": "Amber",
@@ -325,6 +330,7 @@
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
@@ -337,6 +343,7 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
+        "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_find_prop_demand_desc": "Demand category description",
@@ -365,6 +372,7 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
         "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
@@ -428,6 +436,8 @@
         "lpn_field_cv": "Check valve (CV)",
         "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_labels_priority": "Drop order",
+        "lpn_clean_map_tip": "Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
         "lpn_theme_amber": "Amber",
@@ -766,6 +776,22 @@
                 }
             }
         },
+        "lpn_guide_bx_dock_def": {
+            "reason": "english_changed",
+            "current_value": "<p>ជ្រុងនៃរបារចំណងជើងរបស់ប្រអប់មាន ភ្ជាប់នៅខាងឆ្វេងនៃផែនទី ភ្ជាប់នៅខាងស្ដាំនៃផែនទី និង អណ្ដែត ហើយពេលប្រអប់ត្រូវបានភ្ជាប់ មាន លាក់ស្វ័យប្រវត្តិ។ ប្រអប់ដែលបានភ្ជាប់គឺជាជួរឈរមួយនៅជាប់ផែនទី។ ជាមួយ លាក់ស្វ័យប្រវត្តិ វាជាផ្ទាំងរងមួយលើបន្ទះស្តើងនៅគែមផែនទី។ ផ្ទាំងរងបើកប្រអប់ពេលដាក់ទ្រនិចពីលើ បន្ទាប់ពី 150 ms ជាមួយកណ្ដុរ ឬប៊ិច ឬពេលចុច ឬប៉ះ ហើយប្រអប់ត្រឡប់ទៅក្នុងផ្ទាំងរងរបស់វាដូចបានពិពណ៌នាខាងលើ។ ប្រអប់ដែលបានលាក់នៅតែបើក។ ជួរដេកម៉ឺនុយ ឬប៊ូតុងរបារឧបករណ៍ដែលបើកវា នាំវាចេញពីផ្ទាំងរងរបស់វា។<\/p><p>ការអូសប្រអប់ដែលបានភ្ជាប់ដោយរបារចំណងជើងរបស់វា ធ្វើឲ្យវាអណ្ដែត ហើយបិទការលាក់ស្វ័យប្រវត្តិ។ ប្រអប់ដែលភ្ជាប់នៅខាងតែមួយចែករំលែកទទឹងតែមួយ ហើយផែនទីរក្សាយ៉ាងតិច 320 px។ ផ្ទាំងរងត្រូវបានតម្រៀបឡើងវិញដោយការអូសពួកវា ឬដោយចុច Alt+Up ឬ Alt+Down លើផ្ទាំងរងដែលមានការផ្ដោត។<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_bx_dock_term",
+                    "value": "ការភ្ជាប់ និងផ្ទាំងរង",
+                    "english": "Docking and tabs"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_bx_keep_term",
+                    "value": "អ្វីដែលប្រអប់ចងចាំ",
+                    "english": "What a box remembers"
+                }
+            }
+        },
         "lpn_guide_ff_asks_def": {
             "reason": "english_changed",
             "current_value": "<p>ថ្នាំងនីមួយៗដែលបានសាកល្បងទទួលការធ្វើតេស្តពីរ លើច្បាប់ចម្លងនៃបណ្ដាញនៅជំហានពេលវេលាលើអេក្រង់ និងក្នុងសេណារីយ៉ូដែលបើក។ ទីមួយសួរថាតើថ្នាំងអាចបញ្ជូនលំហូរប៉ុន្មានខណៈរក្សាសម្ពាធសល់។ លំហូរមួយត្រូវបានដកនៅថ្នាំង ហើយការដោះស្រាយម្ដងហើយម្ដងទៀតបង្រួមវា រហូតដល់ពិដានស្មើនឹង 10000 gpm។ ថ្នាំងដែលនៅតែរក្សាសម្ពាធសល់នៅពិដាន ត្រូវបានរាយការណ៍ថាបញ្ជូនលើសពិដាន។ ការធ្វើតេស្តទីពីរ ការត្រួតពិនិត្យរចនា ដកលំហូរដែលត្រូវការនៅថ្នាំង ហើយសួរថាតើថ្នាំងផ្សេងទៀតណាមួយក្នុងវិសាលភាពរបស់វាធ្លាក់ក្រោម សម្ពាធទាបបំផុតដែលអនុញ្ញាតនៅកន្លែងផ្សេង ឬបំពង់ណាមួយក្នុងវិសាលភាពរបស់វាដំណើរការលើស ល្បឿនខ្ពស់បំផុតដែលអនុញ្ញាត។ ការត្រួតពិនិត្យរចនាមិនត្រូវបានធ្វើទេ ពេលវិសាលភាពរបស់វាគឺ គ្មាន។<\/p><p>ថ្នាំងដែលមានលក្ខណៈសម្បត្តិ លំហូរពន្លត់អគ្គីភ័យដែលត្រូវការ ផ្ទាល់ខ្លួនរបស់វា ត្រូវបានសាកល្បងតាមតម្លៃនោះ ហើយថ្នាំងផ្សេងទៀតទាំងអស់តាមតម្លៃក្នុងប្រអប់។<\/p>",
@@ -955,6 +981,22 @@
                     "key": "lpn_result_head",
                     "value": "ក្បាលទឹក",
                     "english": "Head"
+                }
+            }
+        },
+        "lpn_georef_size_prompt": {
+            "reason": "english_changed",
+            "current_value": "តំបន់នេះមានទទឹងប្រហែលប៉ុន្មាន គិតទូទាំងគម្រោង?",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_detach",
+                    "value": "លើកយកមកវិញ",
+                    "english": "Pick it up again"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_key_hint",
+                    "value": "ផ្លូវកាត់៖ ចុច {key}។",
+                    "english": "Shortcut: {key}"
                 }
             }
         },
@@ -1440,6 +1482,27 @@
                     "value": "កន្លែងធ្វើការត្រូវបានរក្សាទុកទៅ {file}៖ ការកំណត់ {n}។",
                     "english": "Workspace saved to {file}: {n} settings."
                 }
+            }
+        },
+        "lpn_inp_backdrop_attach_tip": {
+            "reason": "english_changed",
+            "current_value": "ទំព័រគេហទំព័រមិនអាចបើករូបភាពតាមឈ្មោះរបស់វាបានទេ។ ជ្រើសរើសវាលើឧបករណ៍របស់អ្នក ហើយវានឹងត្រូវបានដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_backdrop_attach",
+                    "value": "ភ្ជាប់ {file}…",
+                    "english": "Attach {file}…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_backdrop_attached",
+                    "value": "បានភ្ជាប់ {file} ដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។",
+                    "english": "Attached {file}, placed where the file says it belongs."
+                }
+            },
+            "label": {
+                "key": "lpn_inp_backdrop_attach",
+                "english": "Attach {file}…",
+                "value": "ភ្ជាប់ {file}…"
             }
         },
         "lpn_inpup_ask_title": {
@@ -2461,6 +2524,43 @@
                 "key": "lpn_field_text_all_zoom",
                 "english": "Show at all zoom levels",
                 "value": "បង្ហាញនៅគ្រប់កម្រិតពង្រីកទាំងអស់"
+            }
+        },
+        "lpn_labels_priority": {
+            "reason": "english_changed",
+            "current_value": "អាទិភាព",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_separator_tip",
+                    "value": "អត្ថបទរវាងតម្លៃមួយ និងតម្លៃបន្ទាប់នៅលើស្លាកមួយ។ លំនាំដើមជាចន្លោះមួយ។",
+                    "english": "Text between one property and the next on a label. A space by default."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_priority_node_tip",
+                    "value": "លំដាប់ដែលតម្លៃត្រូវបានលុបចោល នៅពេលស្លាកមួយមិនសមនឹងទំហំ។ តម្លៃដែលមានលេខ 1 ត្រូវបានលុបចោលមុនគេ។ នៅពេលនៅសល់តម្លៃតែមួយ ហើយស្លាកពីរនៅតែត្រួតគ្នា ស្លាកមួយត្រូវបានលាក់៖ ស្លាកដែលមានតម្រូវការទាបជាង មានសម្ពាធនៅជិតកណ្ដាលជួរជាង ឬមានកម្ពស់ ឬក្បាលទឹកជិតនឹងតម្លៃរបស់ថ្នាំងជិតខាងជាង។",
+                    "english": "The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes."
+                }
+            }
+        },
+        "lpn_clean_map_tip": {
+            "reason": "english_changed",
+            "current_value": "បានធីក៖ ប៊ូតុងពង្រីក ប៊ូតុងផែនទីផ្លូវ និងផ្កាយរណប ប៊ូតុងសារ និងសេចក្ដីជូនដំណឹង ជំនួយការជ្រើសរើស ប៊ូតុងមតិយោបល់ និងរង្វង់តម្លៃផ្ទាល់ខ្លួន ត្រូវបានលាក់។ បានដោះធីក៖ ពួកវាត្រូវបានបង្ហាញ។ កំហុសនៅតែត្រូវបានបង្ហាញលើផែនទី ហើយសេចក្ដីជូនដំណឹងនីមួយៗនៅតែត្រូវបានរក្សាក្នុង សារ។ នេះគឺជាការកំណត់សម្រាប់កម្មវិធីរុករកនេះ មិនមែនសម្រាប់គម្រោងទេ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "ផែនទីស្អាត",
+                    "english": "Clean map"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_theme",
+                    "value": "ស្បែកទំព័រ",
+                    "english": "Theme"
+                }
+            },
+            "label": {
+                "key": "lpn_clean_map",
+                "english": "Clean map",
+                "value": "ផែនទីស្អាត"
             }
         },
         "lpn_settings_theme_tip": {
