@@ -1922,7 +1922,7 @@ $ec_lang['lpn_find_no_value']='Enter what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_desc']='Description of this demand category';
+$ec_lang['lpn_find_prop_demand_desc']='Demand category description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2103,7 +2103,7 @@ $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
 // own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
-// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// distance in metres; all substituted. The Buffer label carries its own unit; lpn_contour_buffer_unit is the Tables settings row's unit text.
 // lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
 // plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contour';
@@ -2118,7 +2118,7 @@ $ec_lang['lpn_contour_fill_bands']='Bands';
 $ec_lang['lpn_contour_opacity']='Fill opacity';
 $ec_lang['lpn_contour_lines']='Contour lines';
 $ec_lang['lpn_contour_interval']='Interval';
-$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer']='Buffer (× median pipe length)';
 $ec_lang['lpn_contour_buffer_unit']='× median pipe length';
 $ec_lang['lpn_contour_buffer_tip']='Reach of the color from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
 $ec_lang['lpn_contour_few']='Too few nodes to contour.';
@@ -3630,7 +3630,7 @@ $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM elevation: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
 $ec_lang['lpn_settings_elev_source_tip']='Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.';
-$ec_lang['lpn_settings_elev_source_typed']='Above';
+$ec_lang['lpn_settings_elev_source_typed']='Typed value';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,

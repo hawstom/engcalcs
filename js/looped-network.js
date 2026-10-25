@@ -13567,9 +13567,9 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
-		row(pc.lpn_contour_buffer || 'Buffer', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
+		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
-		}), pc.lpn_contour_buffer_tip, pc.lpn_contour_buffer_unit || '× median pipe length');
+		}), pc.lpn_contour_buffer_tip);
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -23296,7 +23296,7 @@ var EngCalcs = EngCalcs || {};
 		var BAND_NODE = [
 			['elev', 'lpn_field_elev', 'Elevation'],
 			['demand', 'lpn_field_base_demand', 'Base demand'],
-			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
+			['demandCategory', 'lpn_find_prop_demand_desc', 'Demand category description'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
 			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
 			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
@@ -26144,7 +26144,7 @@ var EngCalcs = EngCalcs || {};
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
 		if (replaceState.prop === 'elev' && projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'New value source',
-				[['value', pc.lpn_settings_elev_source_typed || 'Above'],
+				[['value', pc.lpn_settings_elev_source_typed || 'Typed value'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
 					replaceState.source = (v === 'dem') ? 'dem' : 'value';
@@ -30985,7 +30985,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['bands', pc.lpn_contour_fill_bands || 'Bands']];
 		}
 		if (s === 'settings.nodeElevSource' || s === 'settings.defaults.nodeElevSource') {
-			return [['value', pc.lpn_settings_elev_source_typed || 'Above'], ['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']];
+			return [['value', pc.lpn_settings_elev_source_typed || 'Typed value'], ['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']];
 		}
 		if (s === 'project.basemap' || s === 'project.basemapLast') {
 			return [['osm', pc.lpn_settings_row_basemap_osm || 'Street map'],
@@ -62217,7 +62217,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// runs on a project switch, so the row appears and disappears with the project it is about.
 		if (projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
-			[['value', pc.lpn_settings_elev_source_typed || 'Above'],
+			[['value', pc.lpn_settings_elev_source_typed || 'Typed value'],
 				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];
