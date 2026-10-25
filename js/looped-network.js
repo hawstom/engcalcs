@@ -13562,10 +13562,12 @@ var EngCalcs = EngCalcs || {};
 		}), pc.lpn_contour_buffer_tip, '', 4);
 		// The unit is a phrase, not a symbol: it takes its own line under the box (Ida, 3a), so it
 		// never widens the unit track of every other row.
-		var bufUnit = document.createElement('span');
-		bufUnit.className = 'lpn-gunit';
-		bufUnit.textContent = pc.lpn_contour_buffer_unit || '× median pipe length';
-		lpnGridRow(body, { kind: 'span', control: bufUnit });
+		if (pc.lpn_contour_buffer_unit) {
+			var bufUnit = document.createElement('span');
+			bufUnit.className = 'lpn-gunit';
+			bufUnit.textContent = pc.lpn_contour_buffer_unit;
+			lpnGridRow(body, { kind: 'span', control: bufUnit });
+		}
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
