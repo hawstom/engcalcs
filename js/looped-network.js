@@ -22334,7 +22334,7 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) {}
 		if (!on) { hoverCardHide(); }
 	}
-	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	var hoverCard = { muteKey: null, timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
 	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
 	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
 	if (typeof document !== 'undefined' && document.addEventListener) {
@@ -22360,9 +22360,26 @@ var EngCalcs = EngCalcs || {};
 		hoverCard.x = x; hoverCard.y = y;
 		hoverCardRetarget(hoverCard.sel);
 	}
+	// **THE RING'S TIP OUTRANKS THE CARD ON THE SAME ASSET** (Tom, 2026-10-25: *"the tip for the dashed
+	// gray junction was hard to read because the label-on-hover opened over it"*). Both open at the
+	// pointer after the same rest, so the card covered the sentence that says why the ring is there.
+	// The ring's tip is the narrower and rarer message, so while it is showing for the asset under the
+	// pointer the card stays shut, until the pointer moves to another asset or off the map.
+	// dev/lpn-spike/value-source-tip-browser-harness.js.
+	function hoverCardKey(sel) { return sel ? sel.kind + '\u0000' + sel.id : null; }
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('show.bs.tooltip', function (e) {
+			var t = e.target;
+			if (!hoverCard.sel || !t || !t.closest || !t.closest('#lpn_canvas')) { return; }
+			hoverCard.muteKey = hoverCardKey(hoverCard.sel);
+			hoverCardHide();
+		}, true);
+	}
 	function hoverCardRetarget(sel) {
 		hoverCardHide();
 		hoverCard.sel = (sel && sel.kind !== 'label' && !sel.viaLabel) ? sel : null;
+		if (hoverCard.muteKey && hoverCard.muteKey !== hoverCardKey(hoverCard.sel)) { hoverCard.muteKey = null; }
+		if (hoverCard.muteKey) { return; }
 		if (!hoverCard.sel || !hoverCardOn()) { return; }
 		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
 		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
