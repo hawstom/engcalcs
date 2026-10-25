@@ -573,3 +573,6 @@ N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > 
 ## Added 2026-10-23 (pump and valve assemblies, expert levels)
 
 The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".
+
+## Added 2026-10-24 (Task 828)
+- **One grid row for every dockable box** (`lpnGridRow`, `.lpn-grid` family), converting Contour, Fire flow, Properties, Find/Replace, then Settings by alias. Full design: `standard-box-rows-2026-10-24.md`. The Properties conversion is the large one (24 sites, 64 harnesses touch its fields).

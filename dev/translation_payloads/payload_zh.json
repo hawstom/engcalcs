@@ -2,8 +2,8 @@
     "meta": {
         "language": "zh",
         "expected_key_count": 3214,
-        "delta_key_count": 240,
-        "english_changed_key_count": 44,
+        "delta_key_count": 249,
+        "english_changed_key_count": 53,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -71,10 +71,12 @@
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -82,8 +84,11 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
+        "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
+        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -108,6 +113,7 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
         "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
@@ -171,6 +177,8 @@
         "lpn_field_cv": "Check valve (CV)",
         "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_labels_priority": "Drop order",
+        "lpn_clean_map_tip": "Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
         "lpn_theme_amber": "Amber",
@@ -185,6 +193,7 @@
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
@@ -313,10 +322,12 @@
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -324,8 +335,11 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
+        "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
+        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -350,6 +364,7 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
         "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
@@ -413,6 +428,8 @@
         "lpn_field_cv": "Check valve (CV)",
         "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_labels_priority": "Drop order",
+        "lpn_clean_map_tip": "Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
         "lpn_theme_amber": "Amber",
@@ -427,6 +444,7 @@
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
@@ -750,6 +768,22 @@
                 }
             }
         },
+        "lpn_guide_bx_dock_def": {
+            "reason": "english_changed",
+            "current_value": "<p>框的标题栏角落有“停靠在地图左侧”、“停靠在地图右侧”和“浮动”，框停靠后还有“自动隐藏”。停靠的框是地图旁边的一列。启用“自动隐藏”后，它是地图边缘细长条上的一个选项卡。选项卡在悬停时打开该框（鼠标或笔悬停 150 ms 后），或在点击或轻点时打开，该框随后如上所述收回其选项卡。收起的框仍然是打开的。打开它的菜单行或工具栏按钮会把它从选项卡中带出来。<\/p><p>拖动停靠的框的标题栏会使其浮动，并关闭自动隐藏。停靠在同一侧的框共用一个宽度，地图至少保留 320 px。选项卡可以通过拖动，或在获得焦点的选项卡上按 Alt+上或 Alt+下来重新排序。<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_bx_dock_term",
+                    "value": "停靠与选项卡",
+                    "english": "Docking and tabs"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_bx_keep_term",
+                    "value": "框记住什么",
+                    "english": "What a box remembers"
+                }
+            }
+        },
         "lpn_guide_ff_asks_def": {
             "reason": "english_changed",
             "current_value": "<p>每个被测试的节点要经过两项测试，在管网的副本上，按屏幕上的时间步并在打开的方案中进行。第一项测试问：节点在维持余压的同时能输出多少流量。在节点处抽取一个流量，并反复求解来缩小范围，上限为 10000 gpm。在上限处仍能维持余压的节点，报告为输出流量超过上限。第二项测试即设计校核，在节点处抽取所需流量，并检查其范围内是否有其他节点低于“其他部位允许的最低压力”，或其范围内是否有管道的流速高于“允许的最高流速”。当范围为“无”时，不进行设计校核。<\/p><p>具有自己“所需消防流量”属性的节点，按该值测试；其他每个节点则按框中的值测试。<\/p>",
@@ -811,6 +845,22 @@
                     "key": "lpn_guide_ds_scope_term",
                     "value": "节点与时间步",
                     "english": "Junctions, and the time step"
+                }
+            }
+        },
+        "lpn_guide_ct_box_def": {
+            "reason": "english_changed",
+            "current_value": "<p>清除“显示等值线”会隐藏填充和线条，并保留节点颜色。该框还有：“节点着色依据”和“配色方案”（与“设置”、“可视化”、“节点颜色”中的两项设置相同）；“填充”（无、平滑或分级，分级时每一级平涂）；“填充不透明度”；带有“间隔”和“标签”的“等值线”；以及以中位管道长度倍数表示的“缓冲区”。在放置于地球上的项目中，经访客同意发送管网所在区域的瓦片编号后，该框还可以从 Mapbox DEM 获取节点之间的地面。这些设置随项目保存，并且方案可以覆盖。该图只改变显示，不改变管网。<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ct_box_term",
+                    "value": "该框",
+                    "english": "The box"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ct_example_term",
+                    "value": "Net1 上的示例",
+                    "english": "Example on Net1"
                 }
             }
         },
@@ -926,6 +976,22 @@
                 }
             }
         },
+        "lpn_georef_size_prompt": {
+            "reason": "english_changed",
+            "current_value": "整个项目场地大约有多宽？",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_detach",
+                    "value": "重新拿起",
+                    "english": "Pick it up again"
+                },
+                "next_translated": {
+                    "key": "lpn_tip_join",
+                    "value": "{name}：{tip}",
+                    "english": "{name} — {tip}"
+                }
+            }
+        },
         "lpn_calc_hint": {
             "reason": "missing",
             "current_value": null,
@@ -956,6 +1022,43 @@
                     "value": "此管网计算耗时 {secs} 秒，且设置为每次更改后自动重新计算。要停止这一行为并恢复\"计算\"按钮，请在\"设置\"的\"计算\"下\"水力计算\"中关闭\"自动重新计算\"。",
                     "english": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics."
                 }
+            }
+        },
+        "lpn_find_prop_demand_desc": {
+            "reason": "english_changed",
+            "current_value": "该需水类别的说明",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_prop_connection",
+                    "value": "连通性",
+                    "english": "Connectivity"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_conn_unlinked",
+                    "value": "节点无连接线",
+                    "english": "no links at node"
+                }
+            }
+        },
+        "lpn_contour_buffer": {
+            "reason": "english_changed",
+            "current_value": "缓冲范围",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_interval",
+                    "value": "间隔",
+                    "english": "Interval"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_buffer_unit",
+                    "value": "× 管道长度中位数",
+                    "english": "× median pipe length"
+                }
+            },
+            "tip": {
+                "key": "lpn_contour_buffer_tip",
+                "english": "Reach of the color from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
+                "value": "颜色从每条管道向外延伸的距离，以管道长度中位数的倍数表示。在外侧部分逐渐淡出。"
             }
         },
         "lpn_file_import_inp": {
@@ -1371,6 +1474,27 @@
                     "value": "工作区已保存到 {file}：{n} 项设置。",
                     "english": "Workspace saved to {file}: {n} settings."
                 }
+            }
+        },
+        "lpn_inp_backdrop_attach_tip": {
+            "reason": "english_changed",
+            "current_value": "网页无法按名称打开该图片。请在您的设备上选择它，它会被放置在文件所指定的位置。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_backdrop_attach",
+                    "value": "附加 {file}…",
+                    "english": "Attach {file}…"
+                },
+                "next_translated": {
+                    "key": "lpn_inp_backdrop_attached",
+                    "value": "已附加 {file}，并放置在文件所指定的位置。",
+                    "english": "Attached {file}, placed where the file says it belongs."
+                }
+            },
+            "label": {
+                "key": "lpn_inp_backdrop_attach",
+                "english": "Attach {file}…",
+                "value": "附加 {file}…"
             }
         },
         "lpn_inpup_ask_title": {
@@ -2394,6 +2518,43 @@
                 "value": "在所有缩放级别都显示"
             }
         },
+        "lpn_labels_priority": {
+            "reason": "english_changed",
+            "current_value": "优先级",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_separator_tip",
+                    "value": "一个属性与下一个属性之间的分隔文字。默认为一个空格。",
+                    "english": "Text between one property and the next on a label. A space by default."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_priority_node_tip",
+                    "value": "标签放不下时舍弃数值的先后顺序。编号为 1 的数值最先被舍弃。当只剩一个数值而两个标签仍然重叠时，会隐藏其中一个：隐藏需水量较低、压力更接近区间中间值，或高程或水头与相邻节点更相近的那个。",
+                    "english": "The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes."
+                }
+            }
+        },
+        "lpn_clean_map_tip": {
+            "reason": "english_changed",
+            "current_value": "选中时：缩放按钮、街道地图和卫星影像按钮、“消息”按钮和通知、选择提示、反馈按钮以及覆盖值圆环都被隐藏。清除时：它们都显示。错误仍会显示在地图上，每条通知仍保留在“消息”中。这是针对本浏览器的设置，不属于项目。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "清洁地图",
+                    "english": "Clean map"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_theme",
+                    "value": "主题",
+                    "english": "Theme"
+                }
+            },
+            "label": {
+                "key": "lpn_clean_map",
+                "english": "Clean map",
+                "value": "清洁地图"
+            }
+        },
         "lpn_settings_theme_tip": {
             "reason": "english_changed",
             "current_value": "为页面选择浅色或深色。“系统”跟随您设备的设置。地图图纸在每种主题下看起来都一样。这是针对本浏览器的设置，不属于项目。",
@@ -2620,6 +2781,22 @@
                     "key": "lpn_sm_delete_alt_ask",
                     "value": "删除备选方案 {name}？",
                     "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_settings_elev_source_typed": {
+            "reason": "english_changed",
+            "current_value": "上方",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_elev_source_tip",
+                    "value": "2026 年 Mapbox DEM 的水平和垂直精度范围：美国为 1–10 米和 <1 米，欧洲和日本为 2–10 米和 1–3 米，全球为 30 米和 10–16 米，两极为 90 米和 >16 米。",
+                    "english": "Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_elev_source_dem",
+                    "value": "Mapbox 高程模型（DEM）",
+                    "english": "Mapbox DEM"
                 }
             }
         },

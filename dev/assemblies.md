@@ -58,3 +58,15 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
 - Open to coach marks; asked for a mockup.
 - One drawing for everyone; levels change only what the page volunteers. *"I just don't want to
   overwhelm a new shopper."*
+
+## Insert menu and well assemblies, Tom's notes 2026-10-25
+
+- *Map, Insert, Basic:* Junction, Reservoir, Tank, Pipe, Pump, Valve.
+- *Map, Insert, ++:* Junction-Pipe chain, Well [reservoir, pump, tank], System curve [reservoir at
+  ground, pump], Virtual pipe [zero volume, length, velocity], Pump+ [2 x nodes, pump(s)], Valve+
+  [2 x nodes, valve(s)]. Icon and symbol sketches: `~/tom-files/sketches/insert-plus-icon-and-symbol-ideas-2026-10-25.png`.
+- *Well assembly properties:* groundwater static elevation, GPV drawdown curve, pump curve.
+  - *For pressure tank:* total tank volume, pump-on pressure, pump-off pressure, and empty pressure
+    (default = pump-on minus 2 psi). *"We build a pressure tank curve using Boyle's Ideal Gas Law.
+    Maybe we add Pressure Tank in our Libraries, shown only if somebody adds one."*
+  - *For open-air tank:* the normal tank parameters.

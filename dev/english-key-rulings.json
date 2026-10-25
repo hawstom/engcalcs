@@ -8657,6 +8657,16 @@
             "on": "See the {report}.",
             "ruled": "2026-10-22",
             "answer": "Approved."
+        },
+        "lpn_georef_size_prompt": {
+            "on": "Approximate project width east to west?",
+            "ruled": "2026-10-25",
+            "answer": "Tom's own wording."
+        },
+        "lpn_inp_backdrop_attach_tip": {
+            "on": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
+            "ruled": "2026-10-25",
+            "answer": "Tom's own wording."
         }
     }
 }

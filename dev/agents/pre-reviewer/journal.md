@@ -4633,3 +4633,8 @@ OBSERVED: own harness 93/93; backdrop-export-roundtrip 89/89; inp-export-scenari
 OBSERVED: Base-only receipt reads "Exported X from Base of P." ; Escape and Enter work on question and receipt; odd names sanitize in file, raw in receipt; no new localStorage keys; phone 390 px fits.
 OBSERVED: receipt untitled; es page shows English for the 3 new keys (untranslated, expected).
 NOT CHECKED: zip receipt in browser (code reads zipName); visual feel of two dialogs.
+
+## 2026-10-25 feat/shape-scenario (b7607a7c4), Task 831
+OBSERVED (real Chromium, scratch scripts perry-shape-scenario-*): draw in Base/scenario, Is active column, Delete in Base with override (asks, purges), copy scenario, delete scenario, Override manager, merge upward into Base, CSV/XLSX scenario workbook, DXF import receipts Base vs scenario, .inp byte-identical with shapes and after reload, GeoJSON export 2 vs 1 features, build agent's own harness 27/27.
+OBSERVED defects: status-bar override count stays 0 after drawing a Shape in a scenario (menu says 1; refreshes on next edit); deleting a scenario leaves its born-here Shapes inactive in Base, visible only as unticked rows in the Shapes table.
+NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the harness.

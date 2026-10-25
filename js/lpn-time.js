@@ -643,6 +643,10 @@
 	 * the built-in solver has no time dimension, so a page whose engine was unreachable holds one
 	 * instant and has nothing to plot against time.
 	 */
+	// Who the run in hand is, so a reader that scans every frame (the Frequency and Profile axes)
+	// can keep its answer until the run is replaced. Null with no run. Opaque: compare, never read.
+	EC.lpnTimeRunToken = function () { return state.run || null; };
+
 	EC.lpnTimeRunFrames = function () {
 		var run = state.run;
 		if (!run || !run.frames || !run.frames.length) { return []; }

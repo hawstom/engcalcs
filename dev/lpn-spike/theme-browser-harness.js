@@ -130,6 +130,9 @@ async function main() {
 	// visible text element whose centre is over the canvas, walk up to the element that holds the canvas and
 	// composite the backgrounds met on the way; an element on no background of its own is on the paper. A
 	// themed panel (an overlay with its own background) is judged against that panel.
+	// The gallery is a scrolling panel; its foot (the Privacy link) is below a 1200 px window since the
+	// welcome line was moved clear of the Mode line, so the scan scrolls the foot into view first.
+	const scrollGalleryToEnd = () => { const l = Array.from(document.querySelectorAll('#lpn_empty_hint a')).filter((e) => /Privacy/.test(e.textContent))[0]; if (l) { l.scrollIntoView({ block: 'end' }); } };
 	const mapText = (page) => page.evaluate(() => {
 		const cv = document.getElementById('lpn_canvas'), cr = cv.getBoundingClientRect();
 		const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) { return [0, 0, 0, 0]; } const p = m[1].split(/[ ,\/]+/).map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
@@ -212,6 +215,7 @@ async function main() {
 			ok('1. first load: no stored choice, so System (resolved to data-theme=dark here), nothing stored', first.choice === 'system' && first.theme === 'dark' && first.stored === null, JSON.stringify(first));
 			ok('1. ...and Bootstrap is told dark', first.bs === 'dark', first.bs);
 			await a.settle(1200);
+			await a.page.evaluate(scrollGalleryToEnd);
 			checkMapText('9. gallery, dark', await mapText(a.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			const thumb = await a.page.evaluate(() => { const t = document.querySelector('.lpn-example-thumb'); return t ? getComputedStyle(t).backgroundColor : null; });
 			ok('10. an example thumbnail keeps its white paper in dark', thumb === LIGHT_BG, String(thumb));
@@ -367,6 +371,7 @@ async function main() {
 			const sysTok = await b.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ec-bg').trim());
 			ok('1. System under a light OS paints light', t.choice === 'system' && t.theme === 'light' && t.bs === 'light' && sysTok === '#fff', JSON.stringify(t) + ' ' + sysTok);
 			await b.settle(1200);
+			await b.page.evaluate(scrollGalleryToEnd);
 			checkMapText('9. gallery, light', await mapText(b.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
 			checkMapText('9. Net1 open, light', await mapText(b.page), [/Something wrong/]);
