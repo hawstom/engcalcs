@@ -2640,6 +2640,7 @@ EngCalcs.pageConfig = {
 	lpn_time_settings_open: <?=json_encode($ec_lang['lpn_time_settings_open'])?>,
 <?php // Libraries (Tasks 462/460). ?>
 	lpn_library_menu: <?=json_encode($ec_lang['lpn_library_menu'])?>,
+	lpn_popup_boxtitle: <?=json_encode($ec_lang['lpn_popup_boxtitle'])?>,
 	lpn_library_patterns: <?=json_encode($ec_lang['lpn_library_patterns'])?>,
 	lpn_library_patterns_tip: <?=json_encode($ec_lang['lpn_library_patterns_tip'])?>,
 	lpn_library_curves: <?=json_encode($ec_lang['lpn_library_curves'])?>,

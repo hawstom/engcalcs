@@ -55155,6 +55155,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				submenu: insertAssetRows
 			},
 			{ separator: true },
+			// **PROPERTIES, SETTINGS, LIBRARIES, IN THAT ORDER, on a phone and on a PC** (Tom,
+			// 2026-10-24). A closed Properties box can always come back: it opens on the selection, or
+			// empty when nothing is selected.
+			{
+				icon: 'info', label: pc.lpn_popup_boxtitle || 'Properties',
+				fn: function () { closeMenu(); if (!openMultiProperties()) { openPopupEmpty(); } }
+			},
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				fn: function () { toggleSettingsBox(); }
@@ -65145,8 +65152,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
 	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
-	// ... It's cheap discoverability"*; revised 2026-10-24: Settings is the one PINNED box, and
-	// Properties, Libraries, Junctions, the Scenario manager and the User manual are auto-hide tabs,
+	// ... It's cheap discoverability"*; revised 2026-10-24: nothing is pinned, and
+	// Properties, Settings, Libraries (right) and the Scenario manager, User manual (left) are auto-hide tabs,
 	// so a visitor meets both ways of working with a box). Named by box and not by label so a
 	// renamed row changes nothing here. `pinned` leaves auto-hide off. Only a browser that holds NO
 	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
@@ -65154,12 +65161,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Properties default belongs to its own branch and never reads this table). Nothing is stored
 	// until the visitor changes something (boxSaveHeld()).
 	var LPN_DEFAULT_DOCKS = [
-		{ id: 'lpn_settings_box', side: 'right', pinned: true },
 		{ id: 'lpn_popup', side: 'right' },
+		{ id: 'lpn_settings_box', side: 'right' },
 		{ id: 'lpn_library_box', side: 'right' },
-		{ id: 'lpn_hotkeys_popup', side: 'right' },
-		{ id: 'lpn_panebox_junctions', side: 'left' },
-		{ id: 'lpn_sm_box', side: 'left' }
+		{ id: 'lpn_sm_box', side: 'left' },
+		{ id: 'lpn_hotkeys_popup', side: 'left' }
 	];
 	// True while a fresh browser is still looking at the gallery: the layout waits for the project.
 	var firstViewPending = false, dockWired = false;
@@ -82091,6 +82097,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (scenarioBasicMode !== was) {
 			if (scenarioBasicMode) { closeScenarioManager(); }
+			else { showDockedScenarioManager(); }
 			refreshScenariosTab();
 		}
 	}
@@ -82109,7 +82116,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
 		} catch (e) {}
 		if (scenarioBasicMode) { closeScenarioManager(); }
+		else { showDockedScenarioManager(); }
 		refreshScenariosTab();
+	}
+	// **THE SCENARIO MANAGER'S TAB APPEARS WHEN BASIC MODE GOES OFF** (Tom, 2026-10-24: first-view list).
+	// A fresh browser is in Basic mode, where the manager is not offered, so its default dock waits.
+	function showDockedScenarioManager() {
+		var box = smBoxEl(), d = box && box.__lpnDock;
+		if (!d || !d.rec.dock || !(d.open || smboxLayout.open) || smBoxIsOpen()) { return; }
+		dockBooting = true;
+		try { openScenarioManager(); } finally { dockBooting = false; }
+		renderDockCorner(d);
+		layoutDocks();
 	}
 	loadScenarioBasicPref();
 	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
