@@ -28835,9 +28835,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// somebody states one. A guess would be the invisible kind of wrong at a corner where
 			// four mains meet: the customer appears, every number calculates, and the demand is on
 			// the wrong main. Re-read after every write, because the setter may refuse the id.
-			// **BLANK WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-09-25), the same swap
-			// renderCustomerFields() makes: the `atNode` column below names the junction, so this
-			// column stops repeating a pipe id that is, at that point, almost incidental. Still
+			// **A NODE'S ID WHEN CONNECTED EXACTLY TO A NODE** (Tom, 2026-10-24). Still
 			// writable -- typing a pipe id here is exactly the keyboard way of dragging the
 			// connection grip off the node, and setCustomerLink() clears the node fallback itself.
 			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
@@ -28848,21 +28846,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						'The nearest asset is {id}. Enter it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
-				// **EXACTLY A NODE READS "Node"** (Tom, 2026-10-24, reversing the 2026-09-25 blank: a
+				// **EXACTLY A NODE READS THAT NODE'S ID** (Tom, 2026-10-24, reversing the 2026-09-25 blank: a
 				// customer on a reservoir that became a Junction "looks orphaned" with an empty cell).
-				// An empty cell stays the detached customer; the node's own id is in Properties.
+				// An empty cell stays the detached customer.
 				get: function (c) {
-					var l = customerLink(c);
+					var l = customerLink(c), n;
 					if (!l) { return ''; }
-					return customerAtNodeEnd(c) ? (pc.lpn_field_meter_at_node || 'Node') : l.id;
+					if (!customerAtNodeEnd(c)) { return l.id; }
+					n = customerNodeId(c);
+					return (n === null || n === undefined) ? '' : n;
 				},
 				refTo: function (c) {
 					var l = customerLink(c);
 					return (l && !customerAtNodeEnd(c)) ? { group: 'link', id: l.id } : null;
 				},
 				set: function (c, v) {
-					// The word the cell shows for a node is not an asset id; writing it back changes nothing.
-					if (customerLink(c) && customerAtNodeEnd(c) && String(v) === (pc.lpn_field_meter_at_node || 'Node')) { return; }
+					// The node id the cell shows is not an asset id; writing it back changes nothing.
+					if (customerLink(c) && customerAtNodeEnd(c) && String(v) === String(customerNodeId(c))) { return; }
 					setCustomerLink(c, v); customerEdited(c);
 				} },
 			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told

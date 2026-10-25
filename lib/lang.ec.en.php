@@ -710,7 +710,6 @@ $ec_lang['lpn_field_meter_offset']='Offset from the pipe';
 $ec_lang['lpn_field_meter_offset_tip']='Positive is to the right of the pipe looking from its first node toward its second. Entering a value here can move the customer to the other side of the main, and it always squares the service line to the main.';
 $ec_lang['lpn_field_meter_lumped']='Added to node';
 $ec_lang['lpn_field_meter_lumped_tip']='Nearest node; this customer\'s demands are added there.';
-$ec_lang['lpn_field_meter_at_node']='Node';
 $ec_lang['lpn_node_customers']='Customer demands';
 $ec_lang['lpn_node_customers_tip']='List of customers added here because this was their nearest node. Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} from Customers ({n})';

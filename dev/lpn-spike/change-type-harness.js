@@ -355,12 +355,13 @@ function run(mutate, quiet) {
 		const spec = L.paneTableById('customers');
 		const cols = L.paneCols(spec), keys = cols.map(k => k.key);
 		const nodeCol = cols.filter(k => k.key === 'atNode')[0];
-		ok('8b.1 no node column sits beside Connected asset (Tom: confusingly too much)', keys.indexOf('atNode') !== keys.indexOf('link') + 1, keys.join(','));
+		const linkCol = cols.filter(k => k.key === 'link')[0];
+		ok('8b.1 a customer on a pipe keeps its pipe id in Connected asset; the node is in Added to node', linkCol.get(c) === c.link && nodeCol.get(c) === J, linkCol.get(c));
 		ok('8b.2 as a junction, the customer\'s node is ' + J, nodeCol.get(c) === J && L.customerNodeId(c) === J, nodeCol.get(c));
 		const linkWas = c.link;
 		change(J, 'reservoir', true);
 		ok('8b.3 morphed to a reservoir: still on the same pipe, still on ' + J,
-			L.nodeById(J).type === 'reservoir' && c.link === linkWas && L.customerNodeId(c) === J && nodeCol.get(c) === J, nodeCol.get(c));
+			L.nodeById(J).type === 'reservoir' && c.link === linkWas && L.customerNodeId(c) === J && nodeCol.get(c) === J && linkCol.get(c) === linkWas, nodeCol.get(c));
 		change(J, 'junction', true);
 		ok('8b.4 and back to a junction: the same', L.nodeById(J).type === 'junction' && c.link === linkWas && nodeCol.get(c) === J, nodeCol.get(c));
 		L.undo(); L.undo();

@@ -706,7 +706,6 @@ $ec_lang['lpn_field_meter_offset']='Abstand vom Rohr';
 $ec_lang['lpn_field_meter_offset_tip']='Positiv ist rechts vom Rohr, vom ersten Knoten zum zweiten gesehen. Die Eingabe eines Werts hier kann den Kunden auf die andere Seite der Hauptleitung verschieben, und die Anschlussleitung steht dabei immer rechtwinklig zur Hauptleitung.';
 $ec_lang['lpn_field_meter_lumped']='Zum Knoten hinzugefügt';
 $ec_lang['lpn_field_meter_lumped_tip']='Nächstgelegener Knoten; die Entnahmen dieses Kunden werden dort hinzugefügt.';
-$ec_lang['lpn_field_meter_at_node']='Knoten';
 $ec_lang['lpn_node_customers']='Kundenentnahmen';
 $ec_lang['lpn_node_customers_tip']='Liste der Kunden, die hier hinzugefügt wurden, weil dieser Knoten ihr nächstgelegener war. Kundenentnahmen kommen zu den anderen hier aufgeführten Entnahmen hinzu. Ein Kunde wird dort bearbeitet, wo er auf der Karte liegt, oder in der Tabelle Kunden.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} von Kunden ({n})';

@@ -706,7 +706,6 @@ $ec_lang['lpn_field_meter_offset']='Borudan kaçıklık';
 $ec_lang['lpn_field_meter_offset_tip']='Pozitif değer, birinci düğümünden ikincisine bakıldığında borunun sağındadır. Buraya bir değer yazmak müşteriyi ana borunun diğer tarafına taşıyabilir ve servis hattını her zaman ana boruya dik açıyla hizalar.';
 $ec_lang['lpn_field_meter_lumped']='Eklendiği düğüm';
 $ec_lang['lpn_field_meter_lumped_tip']='En yakın düğüm; bu müşterinin talepleri orada toplanır.';
-$ec_lang['lpn_field_meter_at_node']='Düğüm';
 $ec_lang['lpn_node_customers']='Müşteri talepleri';
 $ec_lang['lpn_node_customers_tip']='Bu düğüme eklenmiş müşterilerin listesi (bu düğüm en yakını olduğu için). Müşteri talepleri, burada listelenen diğer taleplere ek olarak eklenir. Bir müşteri, haritadaki yerinde veya Müşteriler tablosunda düzenlenir.';
 $ec_lang['lpn_node_customers_sum']='Müşterilerden ({n}) {total} {unit}';

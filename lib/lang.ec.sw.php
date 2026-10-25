@@ -706,7 +706,6 @@ $ec_lang['lpn_field_meter_offset']='Mkengeuko kutoka kwenye bomba';
 $ec_lang['lpn_field_meter_offset_tip']='Chanya ni upande wa kulia wa bomba ukitazama kutoka kifundo chake cha kwanza kuelekea cha pili. Kuandika thamani hapa kunaweza kumhamisha mteja kwenda upande mwingine wa bomba kuu, na daima huweka mstari wa huduma sawia na bomba kuu.';
 $ec_lang['lpn_field_meter_lumped']='Imeongezwa kwenye kifundo';
 $ec_lang['lpn_field_meter_lumped_tip']='Kifundo kilicho karibu zaidi; mahitaji ya mteja huyu huongezwa hapo.';
-$ec_lang['lpn_field_meter_at_node']='Kifundo';
 $ec_lang['lpn_node_customers']='Mahitaji ya wateja';
 $ec_lang['lpn_node_customers_tip']='Orodha ya wateja walioongezwa hapa kwa sababu hiki kilikuwa kifundo chao cha karibu zaidi. Mahitaji ya wateja ni nyongeza ya mahitaji mengine yaliyoorodheshwa hapa. Mteja huhaririwa mahali alipo kwenye ramani au kwenye jedwali la Wateja.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} kutoka kwa Wateja ({n})';

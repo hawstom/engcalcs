@@ -706,7 +706,6 @@ $ec_lang['lpn_field_meter_offset']='Decalaj față de conductă';
 $ec_lang['lpn_field_meter_offset_tip']='Pozitiv înseamnă la dreapta conductei, privind de la primul ei nod spre al doilea. Introducerea unei valori aici poate muta abonatul de cealaltă parte a magistralei și aduce întotdeauna branșamentul perpendicular pe magistrală.';
 $ec_lang['lpn_field_meter_lumped']='Adăugat la nod';
 $ec_lang['lpn_field_meter_lumped_tip']='Cel mai apropiat nod; cerințele acestui abonat sunt adăugate acolo.';
-$ec_lang['lpn_field_meter_at_node']='Nod';
 $ec_lang['lpn_node_customers']='Cerințe ale abonaților';
 $ec_lang['lpn_node_customers_tip']='Lista abonaților adăugați aici pentru că acesta a fost cel mai apropiat nod al lor. Cerințele abonaților se adaugă la celelalte cerințe listate aici. Un abonat se editează acolo unde se află pe hartă sau în tabelul Abonați.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de la abonați ({n})';

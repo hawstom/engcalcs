@@ -706,7 +706,6 @@ $ec_lang['lpn_field_meter_offset']='Odmak od cijevi';
 $ec_lang['lpn_field_meter_offset_tip']='Pozitivno je desno od cijevi gledano od njezina prvog čvora prema drugom. Unos vrijednosti ovdje može premjestiti korisnika na drugu stranu glavne cijevi, a priključni vod uvijek postavlja pod pravim kutom na glavnu cijev.';
 $ec_lang['lpn_field_meter_lumped']='Dodano čvoru';
 $ec_lang['lpn_field_meter_lumped_tip']='Najbliži čvor; potražnja ovog korisnika se ondje dodaje.';
-$ec_lang['lpn_field_meter_at_node']='Čvor';
 $ec_lang['lpn_node_customers']='Potražnje korisnika';
 $ec_lang['lpn_node_customers_tip']='Popis korisnika dodanih ovdje jer je ovo bio njihov najbliži čvor. Potražnje korisnika dodaju se ostalim ovdje navedenim potražnjama. Korisnik se uređuje ondje gdje se nalazi na karti ili u tablici Korisnici.';
 $ec_lang['lpn_node_customers_sum']='{total} {unit} od korisnika ({n})';

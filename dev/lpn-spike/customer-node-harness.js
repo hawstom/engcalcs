@@ -858,9 +858,9 @@ function popupText6() {
 		const stCol = cols.filter(c => c.key === 'station')[0];
 		const offCol = cols.filter(c => c.key === 'offset')[0];
 		const atCol = cols.filter(c => c.key === 'atNode')[0];
-		ok('6.5 the link cell reads the word Node for a node-exact connection (Tom, 2026-10-24)', linkCol.get(cust) === (PC.lpn_field_meter_at_node || 'Node') && linkCol.get(cust) !== '', linkCol.get(cust));
+		ok('6.5 the link cell reads the node id for a node-exact connection (Tom, 2026-10-24)', linkCol.get(cust) === jA.id, linkCol.get(cust));
 		linkCol.set(cust, linkCol.get(cust));
-		ok('6.5b ...and writing that word back changes nothing', L.customerNodeId(cust) === jA.id && linkCol.get(cust) === (PC.lpn_field_meter_at_node || 'Node'));
+		ok('6.5b ...and writing that id back changes nothing', L.customerNodeId(cust) === jA.id && linkCol.get(cust) === jA.id && cust.node === undefined);
 		ok('6.6 ...and so are station and offset',
 			stCol.get(cust) === '' && offCol.get(cust) === '');
 		ok('6.7 ...while the node column still names the junction', atCol.get(cust) === jA.id);

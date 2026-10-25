@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**31 still to read on master**, of 196 untranslated keys, of 3215 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**78 still to read**, of 121 new keys across 14 unmerged branch(es).
+**80 still to read**, of 123 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -637,11 +637,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
 
-### chore/verdicts-1024 (`4408d276f`) — adds no English strings
+### chore/verdicts-1024 (`027657edb`) — adds no English strings
+
+### feat/box-rows (`027657edb`) — already merged into chore/verdicts-1024; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/first-view (`4408d276f`) — already merged into chore/verdicts-1024; its strings are listed there
+### feat/first-view (`3e2ea9f17`) — adds no English strings
 
 ### feat/scenario-io (`24c49ecae`) — 4 new, 4 to read @@ NEEDS RULING
 
@@ -657,6 +659,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
   @@ NEEDS RULING
+
+### feat/shape-scenario (`24c49ecae`) — already merged into feat/scenario-io; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -989,13 +993,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
 
-### fix/browser-pass-a (`ec99c4357`) — adds no English strings
+### fix/browser-pass-a (`3a2117228`) — adds no English strings
 
-### fix/dock-widths (`595e17b9f`) — adds no English strings
+### fix/dock-widths (`6ab3ddd9a`) — adds no English strings
 
-### fix/example-crs (`4408d276f`) — already merged into chore/verdicts-1024; its strings are listed there
+### fix/example-crs (`1fba54d64`) — adds no English strings
 
-### fix/phone-select (`ab528c1a8`) — 11 new, 11 to read @@ NEEDS RULING
+### fix/phone-select (`716f1e842`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
@@ -1021,6 +1025,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_morph_vertex_loop`**
   > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
   @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
 - **`lpn_morph_vertex_text`**
   > {id} was not morphed into a vertex: a Text is attached to it.
   @@ NEEDS RULING
@@ -1030,3 +1040,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_replace_selected_only`**
   > Only the selected assets
   @@ NEEDS RULING
+
+### fix/wording-1024 (`ea94a80d5`) — adds no English strings
