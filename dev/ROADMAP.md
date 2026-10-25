@@ -66,6 +66,8 @@ the block.
 
 ## 100 — Next.
 
+- 100|831| **Shapes honour Is active per scenario (built on `feat/shape-scenario`, awaiting Tom's browser pass).** Presentation category, each Shape by itself (Tom, 2026-10-24); `dev/shapes-and-scenarios.md`.
+
 - 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Slice 2 (simple controls) merged. Slice 3 (pump speed patterns, stated SPEED 0, and a pump that cannot lift (XHEAD), which the built-in solver lacked even for one instant) merged 2026-10-22 on his word (`feat/native-eps-3`), within 0.8 mm of EPANET 2.3.5 on 12 constructed cases, Net3 with patterns and five examples; not wired to the page (slice 7, on his word). Slices 4 ([RULES]), 5 (tank volume curves, minimum volume, overflow) and 6 (pump energy) merged 2026-10-22 on his word (`feat/native-eps-6`), each within EPANET 2.3.5's tolerance. Next: slice 7, wiring to the page, on his word. Slice 6 found the page's own energy summary departs from EPANET's `addenergy()` (Task 821). Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**

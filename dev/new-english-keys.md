@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 200 untranslated keys, of 3218 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**36 still to read on master**, of 201 untranslated keys, of 3219 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (200, 35 to read @@ NEEDS RULING)
+## lpn_  (201, 36 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -559,6 +559,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
   @@ NEEDS RULING
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -636,7 +639,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 105 new keys across 9 unmerged branch(es).
+**77 still to read**, of 120 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -647,9 +650,25 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
+
+### chore/verdicts-1024 (`027657edb`) — adds no English strings
+
+### feat/box-rows (`027657edb`) — already merged into chore/verdicts-1024; its strings are listed there
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/scenario-io (`e0bcfb56c`) — adds no English strings
+### feat/first-view (`930266e87`) — already merged into fix/phone-select; its strings are listed there
+
+### feat/report-buttons (`1a1d219be`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+
+### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+
+### feat/shape-scenario (`16a33b3c0`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -813,7 +832,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`189bddb49`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -827,6 +846,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ovm_dot_set_from`**
   > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
 - **`lpn_settings_held_default`**
   > the default
   @@ NEEDS RULING
@@ -834,7 +856,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > the value in {parent}
   @@ NEEDS RULING
 - **`lpn_settings_held_item`**
-  > {setting}: clear restores {value}, {source}.
+  > {setting}: {restores}
   @@ NEEDS RULING
 - **`lpn_settings_held_none`**
   > no text
@@ -979,6 +1001,52 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
 
-### fix/browser-pass-a (`77f505a8d`) — adds no English strings
+### fix/browser-pass-a (`2554e1000`) — adds no English strings
 
-### fix/dock-widths (`f52132a34`) — adds no English strings
+### fix/dock-widths (`6ab3ddd9a`) — adds no English strings
+
+### fix/example-crs (`1fba54d64`) — adds no English strings
+
+### fix/phone-select (`049f72452`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING
+
+### fix/wording-1024 (`ae3fbf122`) — adds no English strings
