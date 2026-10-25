@@ -74,15 +74,10 @@ $offTier = array();
 // still reads, and every 60 is somebody's private opinion about a gap between Soon and Next that
 // nobody else can re-derive.
 //
-// **95 WAS A TEMPORARY SIXTH TIER AND IS RETIRED** (2026-09-12, the day it was created -- it held
-// work deferred past EWB). Branch work needs no parking: with master as the production line a task
-// ships when its branch is merged and not before, so a dated holding pen answers a question nobody
-// has. Removed from here and from ROADMAP.md's header table in the same edit, which is what its own
-// note said to do.
-//
-// **99 WAS A SECOND RANK INSIDE Next, 2026-09-23 to 2026-09-29**, retired the same way (Tom: *"Promote
-// to 100 and remove the 95 category: All"*, of the 99 tier). Every 99 task went to 100.
-$TIERS = array(0, 5, 25, 50, 75, 100);
+// **95 IS A TEMPORARY TIER FROM 2026-10-24** (Tom: *"Move all priority 100 tasks to 95 temporarily
+// while we work on production fit and finish and elimination of embarrassments."*). Remove it here
+// and from ROADMAP.md's header table in the same edit that returns its tasks to 100.
+$TIERS = array(0, 5, 25, 50, 75, 95, 100);
 
 foreach ($files as $which => $p) {
     $lines = file($p, FILE_IGNORE_NEW_LINES);
@@ -202,8 +197,8 @@ if ($offTier) {
                $h['file'], $h['line'], $h['id'], $h['priority'], $h['title']);
     }
     echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 Next, 75 Soon,\n";
-    echo "50 Someday, 25 Maybe, 5 Parked, 0 Closed. (A temporary 95 tier parked work past EWB for\n";
-    echo "one day and was retired on 2026-09-12: branch work needs no parking.)\n";
+    echo "50 Someday, 25 Maybe, 5 Parked, 0 Closed; 95 holds Next work behind fit and finish\n";
+    echo "(temporary, Tom 2026-10-24).\n";
     echo "Pick the tier that is TRUE, never the nearest one: a task at 60 is a 75 you are hedging\n";
     echo "about or a 50 you are flattering. 45-vs-50 is a distinction nobody can re-derive a month\n";
     echo "later, which is why the fine scale was retired on 2026-08-21.\n";
