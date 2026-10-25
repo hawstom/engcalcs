@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-421. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-428. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -160,9 +160,9 @@ judgement and does not belong to a script.
 
 ## 2026-10-24 afternoon (reply to the five-branch report)
 
-- [ ] R-400 fix/dock-widths | "Settings, Water age columns are misaligned ... several link and customer label rows' columns are misaligned, possibly related to whether or not they have a Decimals input. There seems to be a single 'wide' width applied without discretion ... This is not the individualized optimization I requested."
-- [ ] R-401 fix/phone-select | "I asked that phones dock and autohide the properties box automatically ... make it the initial default for Properties." Water menu order: "Properties, Settings, and Libraries may be a better order." Selected Customer glow: "I don't see it." "What does 'New value source: Above' mean?"
-- [ ] R-402 fix/phone-select | Morph a Junction into a vertex: "Refuse when it's not a simple merge/drop."
-- [ ] R-403 fix/browser-pass-a | ROAD text: "Probably C or revert the hiding decision and leave the overlap in the user's hands." Clean map: "is not for clicking, it's for IO." Customers table: put "Node" in the Connected asset column; "'Added to node' is confusingly too much."
-- [ ] R-404 feat/scenario-io | "I am startled by the message 'A DXF drawing is planar, and this project is in latitude and longitude...' In the past, EPP would try to import the shapefile." "Am I hearing that shapes have no alternative or scenarios? ... Don't we need to design them to use our scenario system with respect to 'Is active'?"
-- [ ] R-405 first-time view | "Go on the layout." Only Settings pinned; examples: "Maybe try creating a new design."; logging which example: "Does this mean yes, we can?"; workspaces: "Can it use the same paradigm [as the workspace export/import]?"
+- [ ] R-422 fix/dock-widths | "Settings, Water age columns are misaligned ... several link and customer label rows' columns are misaligned, possibly related to whether or not they have a Decimals input. There seems to be a single 'wide' width applied without discretion ... This is not the individualized optimization I requested."
+- [ ] R-423 fix/phone-select | "I asked that phones dock and autohide the properties box automatically ... make it the initial default for Properties." Water menu order: "Properties, Settings, and Libraries may be a better order." Selected Customer glow: "I don't see it." "What does 'New value source: Above' mean?"
+- [ ] R-424 fix/phone-select | Morph a Junction into a vertex: "Refuse when it's not a simple merge/drop."
+- [ ] R-425 fix/browser-pass-a | ROAD text: "Probably C or revert the hiding decision and leave the overlap in the user's hands." Clean map: "is not for clicking, it's for IO." Customers table: put "Node" in the Connected asset column; "'Added to node' is confusingly too much."
+- [ ] R-426 feat/scenario-io | "I am startled by the message 'A DXF drawing is planar, and this project is in latitude and longitude...' In the past, EPP would try to import the shapefile." "Am I hearing that shapes have no alternative or scenarios? ... Don't we need to design them to use our scenario system with respect to 'Is active'?"
+- [ ] R-427 feat/first-view | "Go on the layout." Only Settings pinned; examples: "Maybe try creating a new design."; logging which example: "Does this mean yes, we can?"; workspaces: "Can it use the same paradigm [as the workspace export/import]?"
