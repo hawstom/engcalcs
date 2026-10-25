@@ -107,9 +107,10 @@ function ruleMisses(ru, rs) {
 	await EC.lpnEpanetLoad('file://' + ROOT + 'js/vendor/epanet-js.js');
 	const summary = [];
 
-	// kind: 'geo' is a lat/lon project (degrees, drawing untouched), 'proj' a projected one whose
-	// drawing and origin shift convert and whose CRS becomes its metre twin.
-	const PAIRS = [['Net3-Novato-CA-World', 'geo', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2'], ['Net1', 'grid', 'Net1']];
+	// kind: 'utm' is a project on State Plane in feet whose SI twin is on UTM in metres (Task 826: no
+	// shipped example is lat/lon), so the drawings are different projections of the same ground;
+	// 'proj' a projected one whose drawing and origin shift convert and whose CRS becomes its metre twin.
+	const PAIRS = [['Net3-Novato-CA-World', 'utm', 'Net3'], ['Net2-Branford-CT', 'proj', 'Net2'], ['Net1', 'grid', 'Net1']];
 	for (const [file, kind, net] of PAIRS) {
 		console.log('\n== ' + file + ': US original against its SI twin');
 		const us = open(file + '.lwn'), si = open(file + '-SI.lwn');
@@ -172,7 +173,7 @@ function ruleMisses(ru, rs) {
 		{
 			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
 			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
-			const K = kind === 'geo' ? 1 : 0.3048, wd = worst(), wl = worst();
+			const K = kind === 'utm' ? 1 : 0.3048, wd = worst(), wl = worst();
 			const NU = {}, NS = {};
 			ru.nodes.forEach((n) => { NU[n.id] = n; }); rs.nodes.forEach((n) => { NS[n.id] = n; });
 			ru.nodes.forEach((n) => {
@@ -189,15 +190,28 @@ function ruleMisses(ru, rs) {
 			ru.links.forEach((l, i) => {
 				note(wl, rel(drawn(ru, NU, l) * K, drawn(rs, NS, rs.links[i]), 1e-3), 'link ' + l.id);
 			});
-			ok('every coordinate is the US one times ' + K, wd.v < 1e-6, 'worst ' + wd.v.toExponential(2) + ' (' + wd.at + ')');
-			ok('every drawn pipe length (the scale bar and auto-length measure) is ' + K + ' times the US one', wl.v < 1e-6,
-				'worst ' + wl.v.toExponential(2) + ' (' + wl.at + ')');
-			ok('the view is the same window (centre and pixels per unit)',
-				rel(ru.view.cx * K, rs.view.cx, 1e-3) < 1e-8 && rel(ru.view.s / K, rs.view.s, 1e-3) < 1e-8);
+			if (kind !== 'utm') {
+				ok('every coordinate is the US one times ' + K, wd.v < 1e-6, 'worst ' + wd.v.toExponential(2) + ' (' + wd.at + ')');
+				ok('every drawn pipe length (the scale bar and auto-length measure) is ' + K + ' times the US one', wl.v < 1e-6,
+					'worst ' + wl.v.toExponential(2) + ' (' + wl.at + ')');
+				ok('the view is the same window (centre and pixels per unit)',
+					rel(ru.view.cx * K, rs.view.cx, 1e-3) < 1e-8 && rel(ru.view.s / K, rs.view.s, 1e-3) < 1e-8);
+			}
 			ok('neither twin has a backdrop', !ru.backdrop && !rs.backdrop);
-			if (kind === 'geo') {
-				ok('the georeference is carried: lat/lon project, no CRS, origin unchanged',
-					rs.project.coords === 'geo' && !rs.project.crs && JSON.stringify(rs.origin) === JSON.stringify(ru.origin));
+			if (kind === 'utm') {
+				ok('neither twin is a lat/lon project; US on California zone 3 (EPSG:2227), SI on UTM 10N (EPSG:26910)',
+					!ru.project.coords && !rs.project.coords && ru.project.crs === 'EPSG:2227' && rs.project.crs === 'EPSG:26910');
+				const P0 = require(ROOT + 'js/vendor/proj4.js'), P = P0.default || P0;
+				const D = JSON.parse(fs.readFileSync(ROOT + 'js/data/epsg-proj4.json', 'utf8')), D2 = D.defs || D;
+				P.defs('US', D2['2227']); P.defs('SI', D2['26910']);
+				let worstM = 0, at = '';
+				ru.nodes.forEach((n) => {
+					const m = NS[n.id], a = P('US', 'EPSG:4326', [ru.origin.x + n.x, ru.origin.y + n.y]), b = P('SI', 'EPSG:4326', [rs.origin.x + m.x, rs.origin.y + m.y]);
+					const d = Math.hypot((a[0] - b[0]) * 87800, (a[1] - b[1]) * 111000);
+					if (d > worstM) { worstM = d; at = n.id; }
+				});
+				ok('every node lands on the same spot of the Earth in both twins', worstM < 0.05, worstM.toFixed(4) + ' m apart (node ' + at + ')');
+				ok('both twins have a saved view', !!ru.view && !!rs.view);
 			} else if (kind === 'grid') {
 				ok('a local drawing: no CRS, no origin in either twin',
 					!ru.project.crs && !rs.project.crs && !(ru.origin && (ru.origin.x || ru.origin.y)) && !(rs.origin && (rs.origin.x || rs.origin.y)));
