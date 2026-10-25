@@ -77756,6 +77756,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < el.childNodes.length; i++) {
 			if (el.childNodes[i].nodeName === 'title') { t = el.childNodes[i]; break; }
 		}
+		// **ONCE THE POINTER HAS REACHED THE RING, THE TIP LAYER OWNS ITS TEXT** (Tom, 2026-10-25: the
+		// dashed gray junction's tip kept opening after the parent's override was cleared). Arming
+		// (wireTipDelegation) removes the <title> child and caches its text in an attribute, so the
+		// child is gone and only writing the attribute changes or silences what the reader is shown.
+		if (el.hasAttribute('data-bs-original-title') || el.hasAttribute('title')) {
+			if (t) { el.removeChild(t); }
+			el.setAttribute('title', marked ? overrideMarkText(inherited) : '');
+			if (!marked && window.bootstrap && bootstrap.Tooltip) {
+				t = bootstrap.Tooltip.getInstance(el);
+				if (t) { t.hide(); }
+			}
+			return;
+		}
 		if (!marked) { if (t) { el.removeChild(t); } return; }
 		if (!t) {
 			t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
