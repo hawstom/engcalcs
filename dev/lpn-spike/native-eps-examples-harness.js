@@ -1,5 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES THAT HAVE CONTROLS (Task 733,
-// phase 3, slice 2).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-5).
 //
 //   node dev/lpn-spike/native-eps-examples-harness.js
 //
@@ -9,13 +8,36 @@
 // EngCalcs.lpnNativeRun and by EngCalcs.lpnEpanetRun (the vendored EPANET 2.3.5). At every reporting
 // step every head, tank level and link flow must agree, and every link's open/closed status.
 //
-// AS SHIPPED, every one of them is refused by name (each runs water quality and states [ENERGY],
-// and the Net1 ones have [RULES] as well), which is the caller's cue to use EPANET and the answer
-// the slice owes it. So each is then compared with what the loop does not yet own TAKEN OFF, from
-// both engines alike: water quality and pump energy, which change no head or flow in EPANET (quality
-// is worked out after the hydraulics; energy is bookkeeping), and [RULES], which DO change the
-// hydraulics -- an example compared without its rules says so in its name. Each example must have
-// controls; an example losing them fails rather than passing on nothing.
+// AS SHIPPED, every one of them is refused by name (each runs water quality and states [ENERGY]),
+// which is the caller's cue to use EPANET and the answer the slice owes it. So each is then compared
+// with what the loop does not yet own TAKEN OFF, from both engines alike: water quality and pump
+// energy, which change no head or flow in EPANET (quality is worked out after the hydraulics; energy
+// is bookkeeping). SLICE 4 owns [RULES], so the three Net1 examples (Net1, Net1-SI, Net1-Scenarios)
+// are compared WITH their rules, which DO change the hydraulics, and each must arrive on the model
+// with them and with its pump switching. Each example must have controls; an example losing them
+// fails rather than passing on nothing.
+//
+// SLICE 3, PUMP SPEED PATTERNS. No gallery example ships one, so every example with a pump and a
+// period (a duration; the Basic examples and Elm Street are single instants) is
+// opened again with a speed pattern ADDED to the document (one new pattern, named by each of its
+// pumps), through the same page path, and compared the same way. Each must still have its pumps on
+// the pattern when it reaches the model, and the pattern must move the pumps' speed; an example
+// whose pumps lost it fails.
+//
+// SLICE 5, TANK VOLUME CURVES. No gallery example ships one, so every example with a tank and a period
+// is opened again with a VOLUME curve ADDED to the document for each tank (a bowl: a third narrower at
+// the bottom than the cylinder of the stated diameter, in the document's own level and length units,
+// which is the unit the page's lpnTankVolumeAttach() converts), through the same page path, and
+// compared the same way. Each tank must arrive on the model with its curve rows in metres and cubic
+// metres, and the curve must move the tank's level away from the cylinder's.
+//
+// SLICE 6, PUMP ENERGY. No gallery example states a price, so every example with a pump and a period is
+// opened again with an [ENERGY] added to the document (a global efficiency, price, price pattern and demand
+// charge, a price of the pump's own on the first pump, and an efficiency curve in the document's own flow
+// unit on every pump, scaled to its head curve), through the same page path, and the loop's energy (usage,
+// efficiency, kWh per m3, average and peak kW, cost per day, demand charge) is held to what EPANET 2.3.5
+// itself accumulates (native-eps-energy-truth.js), with the example's own controls and rules in force. The
+// same again with a speed pattern on the pumps, where the speed enters the efficiency.
 //
 // TOLERANCE is native-eps-harness.js's, at Accuracy 1e-5 in both engines.
 //
@@ -26,6 +48,7 @@
 const fs = require('fs');
 const { ROOT, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS } = require('./example-fixture.js');
+const T = require('./native-eps-energy-truth.js');
 
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
@@ -44,27 +67,49 @@ function ok(name, cond, extra) {
 	if (cond) { pass++; } else { fail++; }
 }
 
-const EXAMPLES = fs.readdirSync(ROOT + 'examples').filter((f) => /\.lwn$/.test(f)).filter((f) => {
-	const d = JSON.parse(fs.readFileSync(ROOT + 'examples/' + f, 'utf8'));
-	return (d.controls || []).length > 0;
-});
+const ALL = fs.readdirSync(ROOT + 'examples').filter((f) => /\.lwn$/.test(f));
+const docOf = (f) => JSON.parse(fs.readFileSync(ROOT + 'examples/' + f, 'utf8'));
+const EXAMPLES = ALL.filter((f) => (docOf(f).controls || []).length > 0);
+const PUMPED = ALL.filter((f) => (docOf(f).links || []).some((l) => l.type === 'pump') &&
+	((docOf(f).times || {}).duration > 0));
+const SPEED = [1, 1, 0.95, 0.9, 0.9, 0.95, 1, 1.05, 1.1, 1.1, 1.05, 1];
 
-async function compare(file) {
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + file, 'utf8')));
+// The example's text with SPEED added to its patterns and named by every pump.
+function withSpeedPattern(file) {
+	const d = docOf(file);
+	d.patterns = (d.patterns || []).concat([{ id: 'SPEED', multipliers: SPEED }]);
+	d.links.forEach((l) => { if (l.type === 'pump') { l.speedPattern = 'SPEED'; } });
+	return JSON.stringify(d);
+}
+
+async function compare(file, text) {
+	const rulesInDoc = !text && (docOf(file).rules || []).length > 0;
+	L.applySaved(L.acceptImportedText(text || fs.readFileSync(ROOT + 'examples/' + file, 'utf8')));
 	EC.lpnTimeArrived();
 	const model = L.currentModel();
 	const nCtl = ((model.time && model.time.controls) || []).length;
-	if (!nCtl) { ok(file + ' reaches the model with its controls', false, 'no controls on the model'); return; }
+	if (!text && !nCtl) { ok(file + ' reaches the model with its controls', false, 'no controls on the model'); return; }
+	if (text) {
+		const pumps = model.links.filter((l) => l.type === 'pump');
+		if (!pumps.length || !pumps.every((l) => l.speedPattern === 'SPEED' && l.h0Base !== undefined)) {
+			ok(file + ' reaches the model with its pumps on the speed pattern', false, JSON.stringify(pumps.map((l) => [l.id, l.speedPattern])));
+			return;
+		}
+		file += ' with a speed pattern on ' + pumps.map((l) => l.id).join(', ');
+	}
 	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
 	const refused = EC.lpnNativeRunRefusals(model);
 	const r0 = EC.lpnNativeRun(model);
-	ok(file + ' as shipped: refused by name, so the caller uses EPANET', refused.length > 0 && r0.refused === true,
-		refused.map((r) => r.code).join(', '));
+	if (!text) {
+		ok(file + ' as shipped: refused by name, so the caller uses EPANET', refused.length > 0 && r0.refused === true,
+			refused.map((r) => r.code).join(', '));
+	}
 	const hadRules = !!(model.rules && model.rules.length);
-	delete model.quality; delete model.msx; delete model.energy; delete model.rules;
+	if (!text && rulesInDoc && !hadRules) { ok(file + ' reaches the model with its rules', false, 'no rules on the model'); return; }
+	delete model.quality; delete model.msx; delete model.energy;
 	const still = EC.lpnNativeRunRefusals(model);
 	if (still.length) { ok(file + ' with quality, energy and rules off', false, 'still refused: ' + JSON.stringify(still)); return; }
-	file += hadRules ? ', quality, energy AND RULES off' : ', quality and energy off';
+	file += hadRules ? `, quality and energy off, ${model.rules.length} RULES on` : ', quality and energy off';
 	const epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
 	const nat = EC.lpnNativeRun(model);
 	if (!epa.ok || !nat.ok) { ok(file, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
@@ -91,10 +136,132 @@ async function compare(file) {
 		});
 	}
 	const qTol = Math.max(FLOW_TOL, FLOW_REL * qMax);
-	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && sw > 0,
+	// A speed-pattern case need not switch a status; its pumps' flow must move with the pattern.
+	let qSwing = 0;
+	if (text && same) {
+		model.links.filter((l) => l.type === 'pump').forEach((l) => {
+			const q = epa.frames.map((f) => f.flows[l.id]);
+			qSwing = Math.max(qSwing, Math.max(...q) - Math.min(...q));
+		});
+	}
+	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
 		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
 		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
-		`[${sw} status changes in EPANET's frames${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
+		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
+}
+
+// The example's text with an [ENERGY] added. Efficiency points are in the document's flow unit, which is the
+// unit of its pump head curves' x axis, so each pump's curve is scaled to its own head curve's largest flow.
+function withEnergyDoc(file, speed) {
+	const d = JSON.parse(speed ? withSpeedPattern(file) : fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
+	d.patterns = (d.patterns || []).concat([{ id: 'TARIFF', multipliers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.4, 2, 2, 2, 1.4, 1, 0.8, 0.5] }]);
+	d.settings = d.settings || {};
+	d.settings.energy = { globalEfficiency: 70, globalPrice: 0.11, demandCharge: 7, globalPattern: 'TARIFF', effic: {} };
+	d.curves = d.curves || [];
+	let first = true;
+	d.links.forEach((l) => {
+		if (l.type !== 'pump') { return; }
+		const hc = d.curves.find((c) => c.id === l._curveId), cmax = hc ? Math.max(...hc.points.map((p) => p[0])) : 1000;
+		const id = 'EFF' + l.id;
+		d.curves.push({ id, kind: 'effic', points: [[0, 25], [0.4 * cmax, 60], [0.8 * cmax, 78], [1.2 * cmax, 70], [2 * cmax, 40]] });
+		l._efficCurveId = id;
+		if (first) { l.energyPrice = 0.16; first = false; }
+	});
+	return JSON.stringify(d);
+}
+async function compareEnergy(file, speed) {
+	L.applySaved(L.acceptImportedText(withEnergyDoc(file, speed)));
+	EC.lpnTimeArrived();
+	const model = L.currentModel();
+	const pumps = model.links.filter((l) => l.type === 'pump');
+	const label = file + (speed ? ' with a speed pattern,' : '') + ' with an [ENERGY] added (price, pattern, demand charge, efficiency curve on ' + pumps.map((l) => l.id).join(', ') + '), pump energy';
+	const e = model.energy || {};
+	if (!(e.globalPrice === 0.11 && e.globalPattern === 'TARIFF' && pumps.every((l) => (e.efficCurves || {})[(e.effic || {})[l.id]]))) {
+		ok(label, false, 'the energy did not reach the model: ' + JSON.stringify(e).slice(0, 300));
+		return;
+	}
+	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
+	delete model.quality; delete model.msx;
+	const nat = EC.lpnNativeRun(model);
+	if (!nat.ok) { ok(label, false, 'native: ' + JSON.stringify(nat.issues || '')); return; }
+	const tr = await T.truth(EC, model);
+	const df = T.diff(nat.energy, tr.bin);
+	const rows = nat.energy ? nat.energy.pumps : [];
+	ok(label, df.good && rows.length === pumps.length && nat.energy.totalCostPerDay > 0 && nat.energy.demandCharge > 0 && rows.some((r) => r.usage > 0.05 && r.avgEfficiency > 0.2 && Math.abs(r.avgEfficiency - 0.7) > 1e-3),
+		'worst gaps: usage ' + df.worst.usage.toExponential(1) + ', efficiency ' + df.worst.avgEfficiency.toExponential(1) + ', kWh/m3 ' + df.worst.kwhPerM3.toExponential(1) +
+		', avg kW ' + df.worst.avgKw.toExponential(1) + ', peak kW ' + df.worst.peakKw.toExponential(1) + ', cost ' + df.worst.costPerDay.toExponential(1) +
+		'  [' + rows.map((r) => r.id + ' ' + (r.usage * 100).toFixed(1) + '% ' + r.avgKw.toFixed(1) + ' kW ' + (r.avgEfficiency * 100).toFixed(1) + '%').join(', ') + '; demand ' + nat.energy.demandCharge.toFixed(1) + ']' + df.detail);
+}
+
+const TANKED = ALL.filter((f) => (docOf(f).nodes || []).some((n) => n.type === 'tank') && ((docOf(f).times || {}).duration > 0));
+
+// The example's text with a VOLUME curve added for each tank. Levels and the diameter are in the
+// document's units (a level in the elevation unit, a diameter in the length unit; the two are the same
+// foot or the same metre in every example), the volume in that unit cubed.
+function withVolumeCurves(file) {
+	const d = docOf(file);
+	d.curves = d.curves || [];
+	d.nodes.forEach((n) => {
+		if (n.type !== 'tank') { return; }
+		const top = n.maxLevel * 1.2, a = Math.PI * n.tankDiameter * n.tankDiameter / 4, pts = [];
+		for (let i = 0; i <= 12; i++) {
+			const L = top * i / 12;
+			pts.push([+L.toFixed(6), +(a * L * (0.65 + 0.35 * L / top)).toFixed(6)]);
+		}
+		d.curves.push({ id: 'BOWL' + n.id, kind: 'VOLUME', points: pts });
+		n.volCurve = 'BOWL' + n.id;
+	});
+	return JSON.stringify(d);
+}
+async function compareCurves(file) {
+	const text = withVolumeCurves(file);
+	L.applySaved(L.acceptImportedText(text));
+	EC.lpnTimeArrived();
+	const model = L.currentModel();
+	const tanks = model.nodes.filter((n) => n.type === 'tank');
+	if (!tanks.length || !tanks.every((n) => n.volCurve && n.volCurveSI && n.volCurveSI.length > 2)) {
+		ok(file + ' reaches the model with its tanks on volume curves', false, JSON.stringify(tanks.map((n) => [n.id, n.volCurve, (n.volCurveSI || []).length])));
+		return;
+	}
+	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
+	delete model.quality; delete model.msx; delete model.energy;
+	const still = EC.lpnNativeRunRefusals(model);
+	if (still.length) { ok(file + ' with volume curves, quality and energy off', false, 'still refused: ' + JSON.stringify(still)); return; }
+	const label = file + ' with ' + tanks.length + ' tank' + (tanks.length > 1 ? 's' : '') + ' on a volume curve, quality and energy off';
+	const epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
+	const nat = EC.lpnNativeRun(model);
+	if (!epa.ok || !nat.ok) { ok(label, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
+	// the same document without the curves: the cylinder
+	const plain = (() => { L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + file, 'utf8'))); EC.lpnTimeArrived();
+		const m = L.currentModel(); m.hydraulics = Object.assign({}, m.hydraulics || {}, { accuracy: 1e-5 }); delete m.quality; delete m.msx; delete m.energy; return m; })();
+	const cyl = EC.lpnNativeRun(plain);
+	const same = epa.frames.length === nat.frames.length && epa.frames.every((f, i) => f.t === nat.frames[i].t);
+	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, shape = 0;
+	if (same) {
+		epa.frames.forEach((fe, i) => {
+			const fn = nat.frames[i];
+			model.nodes.forEach((n) => {
+				const d = Math.abs(fn.heads[n.id] - fe.heads[n.id]);
+				if (d > dH) { dH = d; atH = n.id + '@' + fe.t / H + 'h'; }
+				if (n.type === 'tank') {
+					const dl = Math.abs(fn.levels[n.id] - fe.levels[n.id]);
+					if (dl > dL) { dL = dl; atL = n.id + '@' + fe.t / H + 'h'; }
+					if (cyl.ok && cyl.frames[i]) { shape = Math.max(shape, Math.abs(cyl.frames[i].levels[n.id] - fe.levels[n.id])); }
+				}
+			});
+			model.links.forEach((l) => {
+				qMax = Math.max(qMax, Math.abs(fe.flows[l.id]));
+				const d = Math.abs(fn.flows[l.id] - fe.flows[l.id]);
+				if (d > dQ) { dQ = d; atQ = l.id + '@' + fe.t / H + 'h'; }
+				if (fn.statuses[l.id] !== fe.statuses[l.id]) { st++; }
+			});
+		});
+	}
+	const qTol = Math.max(FLOW_TOL, FLOW_REL * qMax);
+	ok(label, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && shape > 1e-3,
+		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
+		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
+		`[the curve moves a level ${shape.toFixed(3)} m from the cylinder's${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
 (async function () {
@@ -102,6 +269,11 @@ async function compare(file) {
 	await warmEpanet();
 	ok('the gallery has examples with controls', EXAMPLES.length >= 2, EXAMPLES.join(', '));
 	for (const f of EXAMPLES) { await compare(f); }
+	ok('the gallery has examples with pumps', PUMPED.length >= 4, PUMPED.join(', '));
+	for (const f of PUMPED) { await compare(f, withSpeedPattern(f)); }
+	for (const f of PUMPED) { await compareEnergy(f, false); await compareEnergy(f, true); }
+	ok('the gallery has examples with tanks and a period', TANKED.length >= 5, TANKED.join(', '));
+	for (const f of TANKED) { await compareCurves(f); }
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

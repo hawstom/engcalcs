@@ -79,19 +79,19 @@ if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); }
 // What each theme block states, as the browser computes it. `face` is the first family of the page's face;
 // `glow`, `picture` and `shadow` are only "some" or "none". A key left out is Light's value.
 const LIGHT = { face: 'sans-serif', size: '16px', menuCase: 'none', menuCaps: 'normal', menuWeight: '400', btnRadius: '5px',
-	boxRadius: '0px', boxFrame: '1px solid', shadow: 'some', titleCase: 'none', tabsRule: '1px solid', iconStroke: 2,
+	boxRadius: '6px', boxFrame: '1px solid', shadow: 'some', titleCase: 'none', tabsRule: '1px solid', iconStroke: 2,
 	iconCap: 'round', picture: 'none', glow: 'none' };
 const DESIGN = {
 	light: {},
 	dark: {},
-	hc: { boxFrame: '2px solid', shadow: 'none', tabsRule: '2px solid', iconStroke: 2.5 },
+	hc: { boxRadius: '0px', boxFrame: '2px solid', shadow: 'none', tabsRule: '2px solid', iconStroke: 2.5 },
 	rounded: { face: '-apple-system', menuWeight: '500', btnRadius: '999px', boxRadius: '14px', iconStroke: 1.75 },
-	platinum: { face: 'Charcoal', size: '14px', menuWeight: '700', btnRadius: '2px', iconStroke: 1.75, iconCap: 'square', titlePicture: 'some' },
+	platinum: { boxRadius: '0px', face: 'Charcoal', size: '14px', menuWeight: '700', btnRadius: '2px', iconStroke: 1.75, iconCap: 'square', titlePicture: 'some' },
 	desktop: { face: '-apple-system', size: '15px', menuWeight: '500', btnRadius: '7px', boxRadius: '12px', iconStroke: 1.6, frosted: true },
-	newspaper: { face: 'Times New Roman', menuCaps: 'small-caps', btnRadius: '0px', boxFrame: '3px double', shadow: 'none',
+	newspaper: { boxRadius: '0px', face: 'Times New Roman', menuCaps: 'small-caps', btnRadius: '0px', boxFrame: '3px double', shadow: 'none',
 		titleCase: 'uppercase', tabsRule: '3px double', iconStroke: 1.5, iconCap: 'butt' },
-	amber: { face: 'ui-monospace', size: '15px', btnRadius: '0px', titleCase: 'uppercase', iconStroke: 2.25, iconCap: 'square', picture: 'some', glow: 'some' },
-	green: { face: 'ui-monospace', size: '15px', btnRadius: '0px', titleCase: 'uppercase', iconStroke: 2.25, iconCap: 'square', picture: 'some', glow: 'some' },
+	amber: { boxRadius: '0px', face: 'ui-monospace', size: '15px', btnRadius: '0px', titleCase: 'uppercase', iconStroke: 2.25, iconCap: 'square', picture: 'some', glow: 'some' },
+	green: { boxRadius: '0px', face: 'ui-monospace', size: '15px', btnRadius: '0px', titleCase: 'uppercase', iconStroke: 2.25, iconCap: 'square', picture: 'some', glow: 'some' },
 	arcade: { face: 'Arial Rounded MT Bold', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '10px', boxRadius: '12px',
 		boxFrame: '4px double', titleCase: 'uppercase', tabsRule: '4px double', iconStroke: 2.5, picture: 'some', titleInk: 'accent' },
 	space: { face: 'Futura', size: '15px', menuCase: 'uppercase', btnRadius: '2px', boxRadius: '3px', titleCase: 'uppercase',

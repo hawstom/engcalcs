@@ -95,31 +95,53 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 evening (thirty-second session, Arizona time)
+## STATE — 2026-10-25 (fortieth session, Opus main, Sonnet agents)
 
-### Master: native EPS slice 2 and label-leader merged on his word, plus chore/handoff-1020d. Production: what he last pulled
+- **Roadmap:** Tom moved every old 100 to a temporary 95 while fit and finish runs (check allows 95; return them and drop 95 together). New 100s: 825-831.
+- **Waiting on his browser pass** (each on the previews page, each green except payload freshness): `fix/browser-pass-a` (node ID in Connected asset, Text slides), `fix/wording-1024` (Typed value, Demand category description, Buffer label; merged on green this session), `fix/dock-widths` (825, 830 soft-pin), `fix/phone-select` (827; contains `feat/first-view`), `feat/report-buttons` (829), `feat/box-rows` (828, Contour and Fire flow), `feat/shape-scenario` (831, on `feat/scenario-io`; merge that first), `fix/example-crs` (826), plus the older `feat/value-source`, `feat/scenario-io`.
+- **In flight at /clear:** `feat/box-rows-properties` (Properties on the standard grid). Read `git log feat/box-rows..` in its worktree.
+- **Seams at merge:** dock-widths vs phone-select (`layoutDocks`, `dockPlaced`); box-rows vs dock-widths (`.lpn-contourbox` width line); box-rows vs report-buttons (Fire flow box); wording vs box-rows (Buffer unit line). Merge order: dock-widths, phone-select, report-buttons, box-rows.
+- **Asked of him:** Morph to Vertex refuses any junction with an elevation (recommend: allow, report the dropped elevations); Fire flow table scrolls at 560 (recommend leave); Close X removes the Properties tab; the phone map pan (unasked) is his call.
+- **Stored:** `lpn_gcols` (box column split), approved by Tom 2026-10-24. Keys deleted: `lpn_field_meter_at_node`, `lpn_scnres_copy_tip`. Keys added: `lpn_report_copy_html`, `lpn_shapes_this_scenario`.
+- **Trap met:** a 529 overload killed three agents at once; their worktrees kept uncommitted edits, and SendMessage resumed each.
+- **Trap met:** worktrees lack `dev/browser-pass/node_modules`; agents symlink the main checkout's (git-ignored), else ~200 browser harnesses fail.
 
-- Merged on his word: `feat/native-eps` (slice 2, simple controls), `feat/label-leader` ("merge this to
-  master", with lessons for the study in `dev/label-trials/tom-1020/lessons.md`).
-- Guide's `lpn_guide_cmp_byasset_def` flow-sign sentence now matches his tip rewrite (he: "Yes. Match.").
-- New Task 819 (organize Import and Export, plan with him first); his box-title instruction on Task 809;
-  his MCP words on Task 818 ("plan and get clarity before building").
-- **He cannot see jasmine:/tmp from lantana.** Put pictures for him in
-  `~/webdev/worktrees/_panel/www/img/` and link `http://localhost:8080/img/<name>.png`.
+## STATE — 2026-10-24 (thirty-eighth session)
+
+- **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
+- **His interview answers are in `dev/assemblies.md`** (Task 822, still negotiating; his questions are answered in messenger.md). Expert levels: *"Day 1 must be pure joy and fun"*; he wants a coach-marks mockup. WaterGEMS menu name: "Export > .wtg.sqlite file…". **Nag him to write to Bentley** before any public release of the export (his ask).
+- **Waiting on his browser pass:** `feat/value-source` (8105, ffa674794: same-name alternative now silent; Settings item reads "Show: clear restores No, the value in Base."; green but payload freshness); `feat/scenario-io` (8101, f9413e8fb, Task 814: scenario in Tables-export, print and screenshot names, DEM and shapes notices say where they write; Perry passed; four questions for him in messenger.md).
+- **`feat/wtg-page-export`** (no port yet): File > Export > .wtg.sqlite file from the page, built on `feat/wtg-export`; never merges before his word and his letter to Bentley. Its suite was unfinished at /clear: read `git log` in its worktree and the log `feat-wtg-page-export-full*.log` in this session's scratch.
+- Task 812 Step 2 (`fix/label-last-pad`) measured and rejected; what is left is design work, not a port.
+- Tasks 733 slice 7, 737 sprint, 681 wait on his word.
+- **Trap met:** a harness DOM stub lacks `hasAttribute`; page code using it threw in 150 harnesses. Use `getAttribute`.
+- **Trap met:** a Settings list built as `div > span` was hidden by the box's positional CSS; a harness for anything drawn checks visibility and width.
+- **Trap met:** a usage limit kills every agent; detached suites and commits survive. Resume with SendMessage, not a new agent.
+- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1a7bdf36-0009-45e7-8601-e5252dbb9d6a/scratchpad
+
+## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
+
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides (pushed 1c75721e0); then fix/energy-count (Task 821, his call "Count as EPANET does").
+- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions. The 2026-10-22 report there holds his open questions: read it before reporting.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
+- His "Ask your AI agent" idea (Task 818): on hold. Tom, 2026-10-22: *"It may be premature to do much about this, but maybe Mary can guide us. I need to focus on wtg export."* Mary's answer so far: `dev/agents/market-researcher/ai-agent-interface.md`.
+- WaterGEMS export (`feat/wtg-export`, his focus): his 10-22 test of the first files: tiny, Net3 at hour zero and full Net3 all open and give the same results, no messages; only the symbols came in very tiny. Fixed (symbol and text size from the map extent); valves, volume curves, pump speed and head patterns added. New files `~/tom-files/2026-10-22/wtg-export-2/` (readme inside). Three one-thing asks of him (tank-level control, emitter, five-point pump curve), click steps in `git show feat/wtg-export:dev/wtg-export.md`; the control one also settles whether our clock controls fire.
+- Load flakes seen 2026-10-22 in master's suite: `new-project-pan-harness.js` (passed alone twice), `label-form-n600-browser-harness` (an agent's run).
 
-### Branches waiting on him
+### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/label-margin` (8105): he called its Net1 overlaps "unreleaseable"; an agent is fixing them.
-- `feat/flow-arrow` (8102): rejected; he wants ONE outlined head with a notched back, line through it.
-- `feat/geojson-into-project` (8101): ready; the .inp box gets the same second paragraph ("Yes. Match.").
-- `feat/sqlite-reader` (8104): fixture to leave the repo (squash-merge it so master never carries it).
-- `feat/desktop`: untouched.
+- `feat/wtg-export` (no port; a spike, dev scripts only): see above.
+- `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
+- `feat/desktop`, `fix/bottom-pane-lag`: untouched.
 
-### Next job
+### Traps met 2026-10-21 (thirty-third session)
 
-Plan Tasks 819 (Import/Export) and 818 (MCP) with him before building. Task 681 after
-label-margin settles. Task 733 rules slice.
+- **Agents sharing one scratchpad overwrote each other's `full.log`.** Brief each agent to name its
+  logs after its branch.
+- **Tom's sample files can change under a branch**: he saved a bigger WTG-tgh-1 over the old one, and
+  the branch's harness failed on a fixture nobody had touched in git. Check file dates in tom-files first.
+- **`new_english_keys.php --write` refuses after a conflicted merge** even when the file equals
+  master's; check `git diff master -- dev/new-english-keys.md` is empty before `--force`.
 
 ### Traps met 2026-10-20 (thirty-first session)
 

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,11 +29,20 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (168, 1 to read @@ NEEDS RULING)
+## lpn_  (196, 31 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
   _Ruled OK 2026-10-20._
+- **`lpn_calc_hint`**
+  > When “Recalculate automatically” is on, this command is not needed.
+  @@ NEEDS RULING
+- **`lpn_calc_hint_mute`**
+  > Don’t show this again
+  @@ NEEDS RULING
+- **`lpn_calib_scenario`**
+  > Compared with the results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_crit_col_empty`**
   > Tank empties
   _Ruled OK 2026-10-20._
@@ -160,9 +169,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_start`**
   > Fire starts at
   _Ruled OK 2026-10-20._
-- **`lpn_eps_working`**
-  > Running the extended-period simulation.
-  _Ruled OK 2026-10-20._
+- **`lpn_dxf_exported_geo_tail`**
+  > Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   _Ruled OK 2026-10-20._
@@ -175,6 +184,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
+- **`lpn_export_confirm_lead`**
+  > The {format} holds one scenario, and this project has {n}.
+  @@ NEEDS RULING
+- **`lpn_export_confirm_title`**
+  > Export {format}
+  @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
   _Ruled 2026-10-18: I approved all._
@@ -184,6 +199,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_export_receipt_heading`**
+  > Exported {file} from {scenario} of {project}.
+  @@ NEEDS RULING
+- **`lpn_export_receipt_note`**
+  > This is an export, not a save: this project is not connected to the file.
+  @@ NEEDS RULING
 - **`lpn_ff_at_all`**
   > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
   _Ruled OK 2026-10-20._
@@ -205,6 +226,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
+- **`lpn_field_cv`**
+  > Check valve (CV)
+  _Ruled 2026-10-22: Approved._
+- **`lpn_field_cv_tip`**
+  > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
+  _Ruled 2026-10-22: Approved._
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -220,6 +247,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
 - **`lpn_gpv_one_point_note`**
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
@@ -245,14 +281,20 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Import {file}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_base_note`**
-  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
-  _Ruled OK 2026-10-20._
+  > Choosing Base doesn't clear any scenario overrides.
+  @@ NEEDS RULING
 - **`lpn_inpup_blank`**
   > blank
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_btn_new`**
   > A new project
   _Ruled OK 2026-10-20._
+- **`lpn_inpup_btn_newscn`**
+  > A new scenario, child of {parent}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_newscn_basic`**
+  > A new scenario
+  @@ NEEDS RULING
 - **`lpn_inpup_btn_project`**
   > This project, {project}
   _Ruled OK 2026-10-20._
@@ -281,8 +323,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Imported {file} into {scenario} of {project}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_how`**
-  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
-  _Ruled OK 2026-10-20._
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
 - **`lpn_inpup_i_connections`**
   > connections
   _Ruled OK 2026-10-20._
@@ -308,16 +350,13 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
-  _Ruled OK 2026-10-20._
+  > Choose where to import this file. Note that EPANET files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_more`**
   > {n} more
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_na_cv`**
-  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_na_general`**
   > The file also holds {items}. They were not applied.
@@ -340,6 +379,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_na_type`**
   > The file states a different type for these assets, so none of their values were changed: {ids}
   _Ruled OK 2026-10-20._
+- **`lpn_inpup_new_none`**
+  > No scenario was created.
+  @@ NEEDS RULING
+- **`lpn_inpup_new_scn`**
+  > Created the scenario {scenario}, a child of {parent}, and opened it.
+  @@ NEEDS RULING
+- **`lpn_inpup_new_scn_basic`**
+  > Created the scenario {scenario} and opened it.
+  @@ NEEDS RULING
+- **`lpn_inpup_newscn_name`**
+  > Name, if you choose a new scenario
+  @@ NEEDS RULING
 - **`lpn_inpup_nothing`**
   > Every value in the file that matches an asset here is already the same in {scenario}.
   _Ruled OK 2026-10-20._
@@ -370,6 +421,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_unit_row`**
   > {family}: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
+- **`lpn_menu_back`**
+  > Back
+  @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
   _Ruled OK 2026-10-20._
@@ -378,9 +432,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
-  _Ruled OK 2026-10-20._
-- **`lpn_msx_replace`**
-  > Replace…
   _Ruled OK 2026-10-20._
 - **`lpn_msx_report_heading`**
   > Attached {file}
@@ -400,6 +451,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_ovl_clear_same`**
+  > Clear overrides equal to inherited
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_same_ask`**
+  > Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_overrides`**
+  > New overrides ({n}).
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -407,8 +467,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Multi-species (EPANET-MSX)
   _Ruled OK 2026-10-20._
 - **`lpn_quality_msx_none`**
-  > No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.
-  _Ruled OK 2026-10-20._
+  > No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.
+  @@ NEEDS RULING
 - **`lpn_quality_msx_species`**
   > Species
   _Ruled OK 2026-10-20._
@@ -418,9 +478,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
+- **`lpn_result_status_cv`**
+  > CV
+  @@ NEEDS RULING
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
+- **`lpn_run_of_scenario`**
+  > Results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_scncmp_progress`**
   > Solving scenario {done} of {total}…
   _Ruled OK 2026-10-20._
@@ -484,6 +550,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_survey_where_lead`**
+  > Each point becomes a node. Choose where the nodes go.
+  @@ NEEDS RULING
+- **`lpn_survey_where_note`**
+  > In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.
+  @@ NEEDS RULING
+- **`lpn_survey_where_title`**
+  > Import surveyed points
+  @@ NEEDS RULING
 - **`lpn_theme_amber`**
   > Amber
   _Ruled OK 2026-10-17._
@@ -514,6 +589,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_theme_space`**
   > Space
   _Ruled OK 2026-10-20._
+- **`lpn_time_run_see_report`**
+  > See the {report}.
+  _Ruled 2026-10-22: Approved._
+- **`lpn_time_run_unbalanced`**
+  > Time steps not balanced ({n}).
+  _Ruled 2026-10-22: Approved._
+- **`lpn_time_run_warnings`**
+  > Warnings ({n}).
+  _Ruled 2026-10-22: Approved._
 - **`lpn_when`**
   > Reporting step tested
   _Ruled OK 2026-10-20._
@@ -540,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**4 still to read**, of 54 new keys across 5 unmerged branch(es).
+**82 still to read**, of 125 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -551,25 +635,45 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
+
+### chore/verdicts-1024 (`bf9ff6b8a`) — adds no English strings
+
+### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
+
+### feat/box-rows-properties (`89c6d1b91`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`ba35f09bf`) — adds no English strings
+### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/geojson-into-project (`7cc47d9a2`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/report-buttons (`9bbdbd88a`) — 1 new, 1 to read @@ NEEDS RULING
 
-- **`lpn_gjup_h_notes`**
-  > Reading the file
-  @@ NEEDS RULING
-- **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
-  @@ NEEDS RULING
-- **`lpn_gjup_title`**
-  > Update from GeoJSON file
+- **`lpn_report_copy_html`**
+  > Copy HTML
   @@ NEEDS RULING
 
-### feat/label-margin (`8691fa30e`) — adds no English strings
+### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
+### feat/shape-scenario (`8c0bc5d7a`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_dem_base`**
+  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
+  @@ NEEDS RULING
+- **`lpn_dem_scenario`**
+  > Elevations written here are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_library_import_every_scenario`**
+  > Every scenario can use them.
+  @@ NEEDS RULING
+- **`lpn_shapes_every_scenario`**
+  > Shapes appear in every scenario.
+  @@ NEEDS RULING
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
+  @@ NEEDS RULING
+
+### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -592,9 +696,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_note_active_scenario`**
   > The model was open on the scenario shown in parentheses. This project opens on Base.
   _Ruled OK 2026-10-20._
+- **`lpn_wtg_note_alternative_nameonly`**
+  > These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_alternative_unused`**
-  > No scenario uses these Physical alternatives. Each was imported as an alternative of its own, holding the values it states, so that a scenario can use it.
-  _Ruled OK 2026-10-20._
+  > No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_controls_unread`**
   > Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.
   _Ruled OK 2026-10-20._
@@ -608,8 +715,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pipes have a check valve and start closed. They were imported closed.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_directed_split`**
-  > In WaterGEMS a pump or valve is a node between two pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream).
-  _Ruled OK 2026-10-20._
+  > WaterGEMS models each pump and valve as a node. Each was imported as a pump or valve link between two new junctions at the node's location and elevation, as in WaterGEMS's own EPANET export. The junctions take the node's WaterGEMS ID number with the suffix -A (inlet side) or -B (outlet side), listed in parentheses. The pipe WaterGEMS designates as downstream connects to the -B junction; all other pipes at the node connect to the -A junction.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_element_unread`**
   > Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.
   _Ruled OK 2026-10-20._
@@ -629,8 +736,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > These elements are inactive in the model and were imported inactive.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_link_unjoined`**
-  > Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.
-  _Ruled OK 2026-10-20._
+  > Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_no_geometry`**
   > These nodes have no location in the file and were placed at 0, 0.
   _Ruled OK 2026-10-20._
@@ -641,17 +748,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not imported: the day of the week and month multipliers of these patterns.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_continuous`**
-  > These patterns are continuous in the model. Here each multiplier holds until the next time step.
-  _Ruled OK 2026-10-20._
+  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step. WaterGEMS's own solver instead applies a continuous pattern as the average over each time step, so results will not match WaterGEMS hour by hour.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pattern_irregular`**
   > These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_other`**
   > These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.
   _Ruled OK 2026-10-20._
+- **`lpn_wtg_note_pump_battery`**
+  > These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pump_curve`**
-  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.
-  _Ruled OK 2026-10-20._
+  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pump_efficiency`**
   > Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.
   _Ruled OK 2026-10-20._
@@ -662,11 +772,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_scenario_alternative`**
-  > These scenarios use a Physical alternative other than the one Base uses. The values in which it differs from Base were imported as the scenario's own overrides; the alternative itself was not imported.
-  _Ruled OK 2026-10-20._
+  > These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_scenario_category`**
-  > Not imported: the alternatives these scenarios use in categories other than Physical. There the scenario has the Base values.
-  _Ruled OK 2026-10-20._
+  > Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_scenario_root`**
   > These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.
   _Ruled OK 2026-10-20._
@@ -724,3 +834,222 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_ovm_dot_alt`**
+  > This override is stored in alternative "{alternative}".
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt_shared`**
+  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear_one`**
+  > Click to clear this override.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
+- **`lpn_settings_held_default`**
+  > the default
+  @@ NEEDS RULING
+- **`lpn_settings_held_from`**
+  > the value in {parent}
+  @@ NEEDS RULING
+- **`lpn_settings_held_item`**
+  > {setting}: {restores}
+  @@ NEEDS RULING
+- **`lpn_settings_held_none`**
+  > no text
+  @@ NEEDS RULING
+
+### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
+
+### feat/wtg-page-export (`ad86a1b96`) — 44 new, 44 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_wtg`**
+  > .wtg.sqlite file…
+  @@ NEEDS RULING
+- **`lpn_file_export_wtg_tip`**
+  > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, written into a project you saved yourself from the program that opens .wtg files.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_choose`**
+  > Choose the saved project…
+  @@ NEEDS RULING
+- **`lpn_wtg_export_exported`**
+  > Exported {zip}, holding {wtg} and {sqlite}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_extract`**
+  > Extract both files into one folder, then open the .wtg.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_failed`**
+  > The .wtg project was not written: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_left_out`**
+  > Left out: {items}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_backdrop`**
+  > The background picture.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_controls_pressure`**
+  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_model`**
+  > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_multiplier`**
+  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_emitters`**
+  > Emitter coefficients: {ids}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_energy_price`**
+  > Energy price, price pattern, and demand charge.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_extra_demands`**
+  > Second and later demands on a junction: {ids}. Only the first demand is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_lead`**
+  > The file cannot carry the following, so they are left out:
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_material`**
+  > Pipe material and installation year. Every pipe keeps the saved project's default material.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_positions`**
+  > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_pump_efficiency_curve`**
+  > Pump efficiency curve (pumps {ids}). A constant efficiency is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_pump_speed_pattern`**
+  > Pump speed pattern (pumps {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_quality`**
+  > Water quality: the analysis, reactions, sources, and tank mixing.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_rules`**
+  > Rule-based controls.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tags`**
+  > Tags.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_minvol`**
+  > Tank minimum volume (tanks {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_mixing`**
+  > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_texts`**
+  > Text on the map.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_need`**
+  > The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_need_both`**
+  > Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_empty`**
+  > This project has no nodes, so there is nothing to export.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_headloss`**
+  > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_pump_curve`**
+  > This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_units`**
+  > This network cannot be written: its flow unit is {unit}, and only gpm is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_refused`**
+  > This project cannot be written as a .wtg project: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_asset_kind`**
+  > Asset {id} is of a kind this export does not write.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_gpv_curve`**
+  > Valve {id} has no headloss curve in this project.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_head_pattern`**
+  > Reservoir {id} names a head pattern that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_integrity`**
+  > The files written failed their own check, so they were not offered.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_kind`**
+  > The saved project has no {kind} to copy from. Add one, save the project, and choose it again.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_layout`**
+  > The saved project is laid out differently from the one this export was tested with.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_not_project`**
+  > This file is not a saved project of the kind this export needs. Choose the .wtg file and the .wtg.sqlite file of a project you saved.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_offline`**
+  > The export needs a connection to this site the first time, to load the database and EPANET engines. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_schema`**
+  > This saved project is laid out as version {found}, and this export has been tested only with {tested}. Save the project from a program version that writes {tested}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_missing`**
+  > Tank {id} names a volume curve that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_range`**
+  > The volume curve of tank {id} does not cover the tank's range of water depth.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_working`**
+  > Writing the .wtg project…
+  @@ NEEDS RULING
+
+### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+
+### fix/browser-pass-a (`f64a03834`) — adds no English strings
+
+### fix/dock-widths (`2474b5d15`) — adds no English strings
+
+### fix/example-crs (`1fba54d64`) — adds no English strings
+
+### fix/phone-select (`415f4a7fb`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING
+
+### fix/wording-1024 (`e01a0292a`) — already merged into chore/verdicts-1024; its strings are listed there

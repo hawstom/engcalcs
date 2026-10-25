@@ -1466,6 +1466,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<button type="button" id="lpn_rptbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
 		<div class="lpn-box-tools"><button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button></div>
+		<p id="lpn_rptbox_scn" class="lpn-ff-note" style="display:none"></p>
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
@@ -1559,6 +1560,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_menu_list2"></div>
 </div>
+<?php // The THIRD level, used only by File > Import and File > Export (a group row such as Network opens
+      // its rows beside the Import fly-out). One element more, same reason as the second. ?>
+<div id="lpn_menu_popup3" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
+	<div id="lpn_menu_list3"></div>
+</div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
       // the close prompt, the read-only choice when somebody else has the file, and the first-run
       // file training panel. Deliberately NOT window.confirm(): showSaveFilePicker() needs a live
@@ -1570,7 +1576,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:var(--ec-a-0-0-0-25)"></div>
 <?php // **AND EVERY QUESTION THE PAGE ASKS** (Task 710): askDialog() in js/looped-network.js puts each
       // former alert/confirm/prompt in here, with the same title bar as the page's other boxes. ?>
-<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-bg);border:1px solid var(--ec-ink);box-shadow:2px 2px 12px var(--ec-a-0-0-0-4)">
+<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-box-bg);border:var(--ec-box-border);box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_dialog_title" class="lpn-setbox-title" style="display:none"></div>
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
@@ -2285,7 +2291,6 @@ EngCalcs.pageConfig = {
 	lpn_msx_report_missing: <?=json_encode($ec_lang['lpn_msx_report_missing'])?>,
 	lpn_msx_not_msx: <?=json_encode($ec_lang['lpn_msx_not_msx'])?>,
 	lpn_msx_attached_heading: <?=json_encode($ec_lang['lpn_msx_attached_heading'])?>,
-	lpn_msx_replace: <?=json_encode($ec_lang['lpn_msx_replace'])?>,
 	lpn_msx_removed: <?=json_encode($ec_lang['lpn_msx_removed'])?>,
 	lpn_quality_msx: <?=json_encode($ec_lang['lpn_quality_msx'])?>,
 	lpn_quality_msx_species: <?=json_encode($ec_lang['lpn_quality_msx_species'])?>,
@@ -2327,11 +2332,19 @@ EngCalcs.pageConfig = {
 	lpn_geojson_results_in: <?=json_encode($ec_lang['lpn_geojson_results_in'])?>,
 	lpn_geojson_results_out: <?=json_encode($ec_lang['lpn_geojson_results_out'])?>,
 	lpn_export_leaves_alternatives: <?=json_encode($ec_lang['lpn_export_leaves_alternatives'])?>,
+	lpn_export_confirm_title: <?=json_encode($ec_lang['lpn_export_confirm_title'])?>,
+	lpn_export_confirm_lead: <?=json_encode($ec_lang['lpn_export_confirm_lead'])?>,
+	lpn_export_receipt_heading: <?=json_encode($ec_lang['lpn_export_receipt_heading'])?>,
+	lpn_export_receipt_note: <?=json_encode($ec_lang['lpn_export_receipt_note'])?>,
+	lpn_dxf_exported_geo_tail: <?=json_encode($ec_lang['lpn_dxf_exported_geo_tail'])?>,
 	lpn_export_holds_scenario: <?=json_encode($ec_lang['lpn_export_holds_scenario'])?>,
 	lpn_export_holds_base: <?=json_encode($ec_lang['lpn_export_holds_base'])?>,
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
 	lpn_survey_added_scenario: <?=json_encode($ec_lang['lpn_survey_added_scenario'])?>,
 	lpn_pane_pasted_scenario: <?=json_encode($ec_lang['lpn_pane_pasted_scenario'])?>,
+	lpn_pane_pasted_overrides: <?=json_encode($ec_lang['lpn_pane_pasted_overrides'])?>,
+	lpn_run_of_scenario: <?=json_encode($ec_lang['lpn_run_of_scenario'])?>,
+	lpn_calib_scenario: <?=json_encode($ec_lang['lpn_calib_scenario'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_copy_props_menu: <?=json_encode($ec_lang['lpn_copy_props_menu'])?>,
 	lpn_copy_props_done: <?=json_encode($ec_lang['lpn_copy_props_done'])?>,
@@ -2599,6 +2612,9 @@ EngCalcs.pageConfig = {
 <?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
+	lpn_time_run_unbalanced: <?=json_encode($ec_lang['lpn_time_run_unbalanced'])?>,
+	lpn_time_run_warnings: <?=json_encode($ec_lang['lpn_time_run_warnings'])?>,
+	lpn_time_run_see_report: <?=json_encode($ec_lang['lpn_time_run_see_report'])?>,
 	lpn_time_runbox_hide: <?=json_encode($ec_lang['lpn_time_runbox_hide'])?>,
 	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
 	lpn_time_run_fell_back: <?=json_encode($ec_lang['lpn_time_run_fell_back'])?>,
@@ -2715,7 +2731,6 @@ EngCalcs.pageConfig = {
 	lpn_fitting_entrance: <?=json_encode($ec_lang['lpn_fitting_entrance'])?>,
 	lpn_fitting_exit: <?=json_encode($ec_lang['lpn_fitting_exit'])?>,
 	lpn_fitting_other: <?=json_encode($ec_lang['lpn_fitting_other'])?>,
-	lpn_inp_export_flat_heading: <?=json_encode($ec_lang['lpn_inp_export_flat_heading'])?>,
 	lpn_inp_export_flat_lead: <?=json_encode($ec_lang['lpn_inp_export_flat_lead'])?>,
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
@@ -2876,6 +2891,7 @@ EngCalcs.pageConfig = {
 		'lpn_result_pump_head',
 		'lpn_result_source_share',
 		'lpn_result_status_closed',
+		'lpn_result_status_cv',
 		'lpn_result_status_open',
 		'lpn_result_tank_volume',
 		'lpn_result_velocity',
@@ -2992,6 +3008,8 @@ EngCalcs.pageConfig = {
 	bpn_roughness_tip: <?=json_encode($ec_lang['bpn_roughness_tip'])?>,
 	lpn_field_closed: <?=json_encode($ec_lang['lpn_field_closed'])?>,
 	lpn_field_closed_tip: <?=json_encode($ec_lang['lpn_field_closed_tip'])?>,
+	lpn_field_cv: <?=json_encode($ec_lang['lpn_field_cv'])?>,
+	lpn_field_cv_tip: <?=json_encode($ec_lang['lpn_field_cv_tip'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
 	lpn_field_text_size: <?=json_encode($ec_lang['lpn_field_text_size'])?>,
@@ -3135,6 +3153,7 @@ EngCalcs.pageConfig = {
 	lpn_result_status: <?=json_encode($ec_lang['lpn_result_status'])?>,
 	lpn_result_status_open: <?=json_encode($ec_lang['lpn_result_status_open'])?>,
 	lpn_result_status_closed: <?=json_encode($ec_lang['lpn_result_status_closed'])?>,
+	lpn_result_status_cv: <?=json_encode($ec_lang['lpn_result_status_cv'])?>,
 	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
 	lpn_settings_quality_track: <?=json_encode($ec_lang['lpn_settings_quality_track'])?>,
 	lpn_settings_quality_track_tip: <?=json_encode($ec_lang['lpn_settings_quality_track_tip'])?>,
@@ -3479,6 +3498,8 @@ EngCalcs.pageConfig = {
 	lpn_run_menu_tip: <?=json_encode($ec_lang['lpn_run_menu_tip'])?>,
 	lpn_settings_auto_run: <?=json_encode($ec_lang['lpn_settings_auto_run'])?>,
 	lpn_settings_auto_run_tip: <?=json_encode($ec_lang['lpn_settings_auto_run_tip'])?>,
+	lpn_calc_hint: <?=json_encode($ec_lang['lpn_calc_hint'])?>,
+	lpn_calc_hint_mute: <?=json_encode($ec_lang['lpn_calc_hint_mute'])?>,
 	lpn_settings_runbox: <?=json_encode($ec_lang['lpn_settings_runbox'])?>,
 	lpn_settings_runbox_tip: <?=json_encode($ec_lang['lpn_settings_runbox_tip'])?>,
 	lpn_time_run_slow: <?=json_encode($ec_lang['lpn_time_run_slow'])?>,
@@ -3564,7 +3585,6 @@ EngCalcs.pageConfig = {
 	lpn_ds_limit_at: <?=json_encode($ec_lang['lpn_ds_limit_at'])?>,
 	lpn_ds_empties_at: <?=json_encode($ec_lang['lpn_ds_empties_at'])?>,
 	lpn_ds_lowest_at_time: <?=json_encode($ec_lang['lpn_ds_lowest_at_time'])?>,
-	lpn_eps_working: <?=json_encode($ec_lang['lpn_eps_working'])?>,
 	lpn_ff_working_steps: <?=json_encode($ec_lang['lpn_ff_working_steps'])?>,
 	lpn_ff_col_hour: <?=json_encode($ec_lang['lpn_ff_col_hour'])?>,
 	lpn_ds_col_hour: <?=json_encode($ec_lang['lpn_ds_col_hour'])?>,
@@ -3782,6 +3802,15 @@ EngCalcs.pageConfig = {
 	lpn_inpup_btn_new: <?=json_encode($ec_lang['lpn_inpup_btn_new'])?>,
 	lpn_inpup_btn_project: <?=json_encode($ec_lang['lpn_inpup_btn_project'])?>,
 	lpn_inpup_btn_scenario: <?=json_encode($ec_lang['lpn_inpup_btn_scenario'])?>,
+	lpn_inpup_btn_newscn: <?=json_encode($ec_lang['lpn_inpup_btn_newscn'])?>,
+	lpn_inpup_btn_newscn_basic: <?=json_encode($ec_lang['lpn_inpup_btn_newscn_basic'])?>,
+	lpn_inpup_new_scn_basic: <?=json_encode($ec_lang['lpn_inpup_new_scn_basic'])?>,
+	lpn_inpup_newscn_name: <?=json_encode($ec_lang['lpn_inpup_newscn_name'])?>,
+	lpn_inpup_new_scn: <?=json_encode($ec_lang['lpn_inpup_new_scn'])?>,
+	lpn_inpup_new_none: <?=json_encode($ec_lang['lpn_inpup_new_none'])?>,
+	lpn_survey_where_title: <?=json_encode($ec_lang['lpn_survey_where_title'])?>,
+	lpn_survey_where_lead: <?=json_encode($ec_lang['lpn_survey_where_lead'])?>,
+	lpn_survey_where_note: <?=json_encode($ec_lang['lpn_survey_where_note'])?>,
 	lpn_inpup_title: <?=json_encode($ec_lang['lpn_inpup_title'])?>,
 	lpn_inpup_heading: <?=json_encode($ec_lang['lpn_inpup_heading'])?>,
 	lpn_inpup_counts: <?=json_encode($ec_lang['lpn_inpup_counts'])?>,
@@ -3808,7 +3837,6 @@ EngCalcs.pageConfig = {
 	lpn_inpup_method_row: <?=json_encode($ec_lang['lpn_inpup_method_row'])?>,
 	lpn_inpup_refused_lead_formula: <?=json_encode($ec_lang['lpn_inpup_refused_lead_formula'])?>,
 	lpn_inpup_refused_lead_both: <?=json_encode($ec_lang['lpn_inpup_refused_lead_both'])?>,
-	lpn_inpup_na_cv: <?=json_encode($ec_lang['lpn_inpup_na_cv'])?>,
 	lpn_inpup_failed: <?=json_encode($ec_lang['lpn_inpup_failed'])?>,
 	lpn_inpup_i_positions: <?=json_encode($ec_lang['lpn_inpup_i_positions'])?>,
 	lpn_inpup_i_connections: <?=json_encode($ec_lang['lpn_inpup_i_connections'])?>,
@@ -3818,6 +3846,9 @@ EngCalcs.pageConfig = {
 	lpn_inpup_i_controls: <?=json_encode($ec_lang['lpn_inpup_i_controls'])?>,
 	lpn_inpup_i_rules: <?=json_encode($ec_lang['lpn_inpup_i_rules'])?>,
 	lpn_inpup_i_options: <?=json_encode($ec_lang['lpn_inpup_i_options'])?>,
+	lpn_gjup_lead: <?=json_encode($ec_lang['lpn_gjup_lead'])?>,
+	lpn_gjup_title: <?=json_encode($ec_lang['lpn_gjup_title'])?>,
+	lpn_gjup_h_notes: <?=json_encode($ec_lang['lpn_gjup_h_notes'])?>,
 	lpn_file_type_desc: <?=json_encode($ec_lang['lpn_file_type_desc'])?>,
 	lpn_status_file_opened: <?=json_encode($ec_lang['lpn_status_file_opened'])?>,
 	lpn_status_already_open: <?=json_encode($ec_lang['lpn_status_already_open'])?>,
@@ -4105,6 +4136,8 @@ EngCalcs.pageConfig = {
 	lpn_ovl_clear_selected: <?=json_encode($ec_lang['lpn_ovl_clear_selected'])?>,
 	lpn_ovl_clear_all: <?=json_encode($ec_lang['lpn_ovl_clear_all'])?>,
 	lpn_ovl_clear_all_ask: <?=json_encode($ec_lang['lpn_ovl_clear_all_ask'])?>,
+	lpn_ovl_clear_same: <?=json_encode($ec_lang['lpn_ovl_clear_same'])?>,
+	lpn_ovl_clear_same_ask: <?=json_encode($ec_lang['lpn_ovl_clear_same_ask'])?>,
 	lpn_ovl_pick_tip: <?=json_encode($ec_lang['lpn_ovl_pick_tip'])?>,
 	lpn_ovl_bubble_off: <?=json_encode($ec_lang['lpn_ovl_bubble_off'])?>,
 	lpn_ovl_bubble_moved: <?=json_encode($ec_lang['lpn_ovl_bubble_moved'])?>,
@@ -4465,6 +4498,7 @@ EngCalcs.pageConfig = {
 	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
 	lpn_file_import_shapes: <?=json_encode($ec_lang['lpn_file_import_shapes'])?>,
+	lpn_menu_back: <?=json_encode($ec_lang['lpn_menu_back'])?>,
 	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
 	lpn_file_import_gjnet: <?=json_encode($ec_lang['lpn_file_import_gjnet'])?>,
 	lpn_file_import_gjnet_tip: <?=json_encode($ec_lang['lpn_file_import_gjnet_tip'])?>,

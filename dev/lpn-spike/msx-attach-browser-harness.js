@@ -98,7 +98,13 @@ async function exportRows(a, L) {
 		r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
 	}, L.exp);
 	await a.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
-	const rows = await a.page.$$eval('#lpn_menu_list2 button.lpn-menu-row', (els) => els.map((b) => b.textContent.trim()));
+	// The export formats are in the Network group, the fly-out's first row (Task 819).
+	await a.page.evaluate(() => {
+		const r = document.querySelector('#lpn_menu_list2 button.lpn-menu-row[aria-haspopup]');
+		r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+	});
+	await a.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
+	const rows = await a.page.$$eval('#lpn_menu_list3 button.lpn-menu-row', (els) => els.map((b) => b.textContent.trim()));
 	await a.closeMenu();
 	return rows;
 }
@@ -115,7 +121,7 @@ async function main() {
 		const a = await open(browser);
 		const L = {};
 		for (const [k, key] of [['imp', 'lpn_file_import_menu'], ['impMsx', 'lpn_file_import_msx'], ['exp', 'lpn_file_export_menu'], ['expMsx', 'lpn_file_export_item_msx'],
-			['replace', 'lpn_msx_replace'], ['remove', 'lpn_fitting_remove'], ['kept', 'lpn_msx_report_kept'], ['saveas', 'lpn_file_saveas'], ['open', 'lpn_file_open']]) {
+			['replace', 'lpn_replace_btn'], ['remove', 'lpn_fitting_remove'], ['kept', 'lpn_msx_report_kept'], ['saveas', 'lpn_file_saveas'], ['open', 'lpn_file_open']]) {
 			L[k] = (await a.lang(key)).trim();
 		}
 		await a.page.setInputFiles('#lpn_inp_file', { name: 'msxnet.inp', mimeType: 'text/plain', buffer: Buffer.from(INP) });

@@ -4,7 +4,7 @@ Task 814, branch `docs/import-export-scenario`, 2026-10-17. Tom's brief: *"We mu
 about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."*
 His three classes: current scenario, current project, separate project. This file is the inventory
 (part 1), the standard (part 2), the draft English (part 3), the defects ranked (part 4), and the
-questions only Tom can answer (part 5). Nothing here is built. Line numbers are `master` at
+questions only Tom can answer (part 5). Built on master (Tasks 814, 819): rows 7 and 8 landing in the open project; the question before exports 21-23 and their `<project>-<scenario>` file names; reports and paste notices naming their scenario. The receipt after exports 21-23 merged 2026-10-22 (`feat/export-scenario-confirm`). Read the code before briefing a row: this inventory lagged the code once already. Line numbers are `master` at
 `459363356`; the two branches are read from `feat/sheet-sync` and `feat/sqlite-reader`.
 
 Terms used. **Aware** means the format can carry what the project's model carries: scenarios, the
@@ -44,8 +44,8 @@ where marked **(not traced)**.
 
 | # | Menu path (English) | Code | Format | Today, with scenarios | Class |
 |---|---|---|---|---|---|
-| 7 | File > Import > EPANET file… | `pickInpFile` 45110, `importInpFromFile` 45033, `landInpText` 45052 | `.inp`, or EPANET's `.net` | Always a **new project**; the file's one state becomes **Base**; no scenario exists. Says "Opened X from a file, and added it to this browser as a new project" (`lpn_status_imported`) and lists differences | X |
-| 8 | File > Import > GeoJSON network… | `pickGeoJsonNetFile` 45123, `openGeoJsonNetMapping` 45177 | GeoJSON | New project, Base only. A file this page wrote is "read as written" and asks nothing; its `scenario` property (`js/lpn-geojson.js` 381) is **not read back** | X |
+| 7 | File > Import > EPANET file… | `pickInpFile`, `importInpFromFile`, `landInpText`, `inpAskDestination`, `updateProjectFromInp` | `.inp`, or EPANET's `.net` | With the open project empty: a **new project**, Base only, as always. With assets in it: asks **a new project / this project (or the open scenario, or Base)**. *This project* matches assets by ID, updates differing values through `setProp()` (an override in a scenario), adds assets only in the file (inactive in Base when a scenario is the target), keeps and names assets only in the project, refuses a file whose units or head loss formula differ, is **one undo step**, and ends in a **receipt dialog** naming the scenario. Built, Task 814 | X, or S |
+| 8 | File > Import > GeoJSON network… | `pickGeoJsonNetFile`, `landGeoJsonNetText`, `askImportDestination`, `updateProjectFromGeoJson`, `finishGeoJsonNet` | GeoJSON | **The same as row 7, by the same code** (`askImportDestination`, `inpPlanFromSource`, `updateProjectWithPlan`, `showInpUpdateReceipt`): a file from another source passes the mapping step first, then the same question; a file this page wrote asks only the question. The receipt adds a *Reading the file* list of the importer's own differences. The file's `scenario` property is still not read back. Built, Task 814 | X, or S |
 | 9 | File > Import > Surveyed points… | `pickSurveyFile` 45585, `landSurveyText` 45662, `createSurveyNodes` 45905 | CSV, TXT, PNT | Into the **open project**. Each node goes through `addNode()`, which calls `bornInScenario()` (38062, 38417): in a scenario other than Base, the node is **inactive in Base and active only there**. The box and the report never say which scenario | S |
 | 10 | File > Import > GeoJSON shapes… | `pickGeoJsonFile` 43094, `landGeoJsonShapes` 43108 | GeoJSON | Shapes are "in no scenario" (`js/lpn-geojson.js` 339). Open project, one undo step | P |
 | 11 | File > Import > DXF shapes… | `pickDxfShapesFile` 43215, `importDxfShapesFromFile` 43223 | ASCII DXF | As 10 | P |
@@ -161,6 +161,8 @@ surprising thing. Questions 2 and 3 appear only when they apply.
    *{scenario}'s own alternative* (default) / *A new alternative, child of {parent}* (name field) /
    *The Base alternative.*
 
+**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is not asked.
+
 Then one **preview line** and the buttons. Imports that can be previewed without cost (a table of
 values, survey points) preview; a whole network preview is the existing import report afterwards.
 
@@ -168,8 +170,8 @@ values, survey points) preview; a whole network preview is the existing import r
 
 | Command (numbers from part 1) | Format level | Today | Treatment under the standard |
 |---|---|---|---|
-| 7 `.inp` import, 8 GeoJSON network | 1 | New project, silent | Wizard question 1 only at first (new project is the only landing built); receipt "as Base of a new project, one state" |
-| 9 Survey points | 0 | Silent into open scenario | Wizard questions 1-3 (scenario matters: nodes are born only in the chosen scenario) |
+| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Receipt is a dialog naming the scenario |
+| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Alternative question (3) not asked |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct | No question; receipt line "visible in every scenario" |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
 | 14 Workspace, 15 Calibration | none | Silent | No change; calibration's header names the scenario it was compared with |
@@ -245,20 +247,23 @@ Ranked by how likely a visitor is to be wrong afterwards, and how much work is l
    the screen holds a stale snapshot of the scenario last calculated, while the values and the stored
    `scenario` name are the open scenario's. **Likely, not reproduced.** Fix: attach results only when
    they belong to the open scenario, or name the scenario they belong to. GeoJSON and DXF file names
-   also lack the scenario that `.inp` has.
+   also lack the scenario that `.inp` has. **Built** (`scenario-receipt-browser-harness.js` R1, R2).
 3. **Survey points imported in a scenario other than Base exist only there** (9). The nodes are
    inactive in Base; the visitor sees them, switches to Base, and they are gone. Nothing said which
-   scenario received them. Fix: a first line in the report; later the wizard.
+   scenario received them. Fix: a first line in the report; later the wizard. **Built** (`lpn_survey_added_scenario`, R3).
 4. **Tables paste into a scenario makes overrides without saying so** (18). A pasted column of 400
    diameters in Peak becomes 400 overrides; the notice counts cells but names no scenario and does
-   not say they are overrides. Fix: the receipt wording above.
+   not say they are overrides. Fix: the receipt wording above. **Built**: the notice names the scenario, says the values are overrides, and counts those added ("Overrides added (n)."); `import-export-receipts-browser-harness.js` F3.
 5. **Full report, Run report and Calibration are tied to "the last run"** (31-33, 15). The file name
    and the comparison do not say which scenario that run was. Not traced to the row level. Fix: name
-   the scenario in the file name and heading.
+   the scenario in the file name and heading. **Built**: the Full report (box note, printed heading, CSV
+   name), the Run report and the Calibration report name the scenario of the run (`_scn` on the last
+   solve), only when the project holds more than Base; Base keeps the bare file name
+   (`import-export-receipts-browser-harness.js` F1, F2, F4).
 6. **A GeoJSON file this page wrote is "read as written" and its `scenario` property is ignored** (8).
    The scenario's values become Base of a new project with no mention. Folded into 7 and 8 under the
    standard (their receipt says "as the Base scenario").
-7. **The `.inp` and GeoJSON network imports can only make a new project** (7, 8). Not silent, but a
+7. **(Closed by Task 814: both may now land in the open project.)** The `.inp` and GeoJSON network imports could only make a new project (7, 8). Not silent, but a
    gap against Tom's brief ("current or new scenario/alternative, current or new project"). Needs a
    compare-and-apply engine (the workbook's) to land in an open project. See decision 2.
 

@@ -405,9 +405,14 @@
 						curves.push(vrows.join('\n'));
 					}
 				}
+				// **MinVol AND Overflow ARE WRITTEN ONLY WHEN THE MODEL STATES THEM** (`minVolume` in
+				// cubic metres, `overflow` true). The page holds neither, so its model never does; a
+				// model built by hand (dev/lpn-spike/native-eps-harness.js, Task 733 slice 5) can, and
+				// the built-in loop (js/lpn-native-run.js) then copies what EPANET does with them.
+				// The ninth column needs the eighth, and `*` is EPANET's own "no curve".
 				tanks.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.level || 0) + '  ' +
-					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0' +
-					(vname ? '  ' + vname : ''));
+					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  ' + (n.minVolume > 0 ? n.minVolume : 0) +
+					(vname || n.overflow ? '  ' + (vname || '*') : '') + (n.overflow ? '  YES' : ''));
 			} else {
 				// Demand m3/s -> L/s.
 				// **UNDER `eps` THE DEMAND IS THE BASE DEMAND AND THE PATTERN IS NAMED BESIDE IT**, so
@@ -588,7 +593,9 @@
 				pipes.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
 					link.length + '  ' + (link.diameter * 1000) + '  ' +
 					roughnessFor(method, link) + '  ' + (link.k || 0) + '  ' +
-					(link.status === 'closed' ? 'Closed' : 'Open'));
+					// A CHECK-VALVE PIPE IS WRITTEN CV, EPANET's own token, and EPANET solves the
+					// one-way rule itself (hydstatus.c cvstatus()).
+					(link.status === 'closed' ? 'Closed' : link.status === 'cv' ? 'CV' : 'Open'));
 			}
 		}
 
@@ -1200,26 +1207,26 @@
 	var session = null;
 
 	/**
-	 * **THE POINTS A PUMP'S CURVE STATES TO EPANET, IN SI** (Task 586). `[0, y]` first in every
-	 * branch, because EPANET fits a DIFFERENT curve through samples whose first point has Q > 0.
+	 * **THE POINTS A PUMP'S CURVE STATES TO EPANET, IN SI** (Task 586). `[0, y]` first when
+	 * sampled, because EPANET reads three samples whose first point has Q > 0 as a DIFFERENT curve.
 	 *
-	 * **MORE THAN THREE POINTS GO OUT AS THEMSELVES; THREE OR FEWER GO OUT AS THE FIT'S OWN
-	 * SAMPLING, AND THAT LINE IS DELIBERATE.** EPANET reads a 3-point curve by fitting exactly our
-	 * own H = h0 - a Q^b, and a 1-point one by its shutoff-1.33H/runout-2Q rule, which is the rule
-	 * EngCalcs.lpnPumpFromCurve already copies -- so for those the sampled fit and the typed points
-	 * describe the same pump, and sampling keeps every answer this page has ever given unchanged. A
-	 * TWO-point curve is the one EPANET reads as a piecewise-linear custom curve where we read a
-	 * power law, so it stays on the fit too: changing it would move an answer without buying the
-	 * user's own numbers back, which is what this task is for.
-	 *
-	 * Past three the two really differ, and the file's own curve is the honest input: sampling it
-	 * at three places was rewriting a manufacturer's curve into a three-point approximation of
-	 * itself. It is also the only branch that can move an answer, and it moves it toward the pump
-	 * the user typed.
+	 * **A CUSTOM CURVE GOES OUT AS ITSELF; A POWER-LAW ONE AS THE FIT'S OWN SAMPLING.** EPANET reads
+	 * a curve of one point, or of three starting at zero flow, as a power law, and
+	 * EngCalcs.lpnPumpFromCurve fits exactly that one, so for those the sampled fit and the typed
+	 * points describe the same pump, and sampling keeps the speed baked into h0/a on the warm
+	 * path. Every other curve -- two points, three not starting at zero, four or more -- EPANET
+	 * runs as straight segments between the points it states, and so does the built-in solver
+	 * (fix/pump-curve-multipoint), so the points themselves are the only honest input. That used to
+	 * be drawn at more than three points, which left a two-point curve running as a parabola here
+	 * and as a straight line in a file a visitor exported.
 	 */
+	function isCustomCurve(link) {
+		var real = link.curveSI || [];
+		return real.length > 0 && !!EngCalcs.lpnPumpFromCurve(real).custom;
+	}
 	function pumpCurveSamples(link, h0, a) {
 		var real = link.curveSI || [], pts = [0, 0.5, 0.9], xs = [], ys = [], j, q, qMax;
-		if (real.length > 3) {
+		if (isCustomCurve(link)) {
 			return {
 				real: true,
 				x: real.map(function (pt) { return pt[0] * 1000; }),
@@ -1313,7 +1320,8 @@
 				'\u0001' + (n.type === 'tank' && n.volCurve ? n.volCurve : '') +
 				'\u0001' + (n.type === 'tank' && n.volCurveSI
 					? n.volCurveSI.map(function (q) { return q[0] + ',' + q[1]; }).join(';')
-					: ''));
+					: '') +
+				'\u0001' + (n.type === 'tank' ? (n.minVolume > 0 ? n.minVolume : 0) + (n.overflow ? 'Y' : '') : ''));
 		}
 		for (i = 0; i < model.links.length; i++) {
 			l = model.links[i];
@@ -1338,7 +1346,7 @@
 				// which is the stale answer this signature exists to make impossible.
 				'\u0001' + (l.type === 'pump'
 					? String((l.curveSI || []).length)
-						+ ((l.curveSI || []).length > 3 ? ':' + l.speed + ':' + l.speedPattern : '')
+						+ (isCustomCurve(l) ? ':' + l.speed + ':' + l.speedPattern : '')
 					: '') +
 				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : '') +
 				// **A GPV'S CURVE IS IN THE SIGNATURE, AND IT HAS TO BE.** Every other valve's behaviour
@@ -1360,7 +1368,10 @@
 				// and opened by its control at 1:00, 30 psi low at Junction 10 against the run it was
 				// asked to reproduce, while the same model opened cold was right to 0.0001 psi. So a
 				// pump opening or shutting reopens the Project from its text, which is always right.
-				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : ''));
+				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : '') +
+				// **A CHECK-VALVE PIPE IS A LINK TYPE TO EPANET** (CVPIPE, fixed when the file is read),
+				// and error 207 refuses EN_INITSTATUS on one, so turning CV on or off reopens the Project.
+				'\u0001' + (l.type === 'pipe' && l.status === 'cv' ? 'cv' : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -1501,7 +1512,7 @@
 				// every time rather than skipped, for the same reason the emitter below is: a tank
 				// that HAD a curve and lost it must not go on filling on the old shape's schedule.
 				p.setTankData(idx, n.elev || 0, n.level || 0, n.minLevel || 0,
-					n.maxLevel || 0, n.diameter || 0, 0,
+					n.maxLevel || 0, n.diameter || 0, n.minVolume > 0 ? n.minVolume : 0,
 					(n.volCurve && n.volCurveSI && n.volCurveSI.length) ? 'V_' + n.volCurve : '');
 			} else {
 				// Demand m3/s -> L/s. Empty pattern id = no time pattern, matching the [JUNCTIONS]
@@ -1574,6 +1585,8 @@
 			}
 			// Valves never reach this line -- they `continue` above, having written their own
 			// status BEFORE their setting. See that comment for why the order cannot be shared.
+			// A CV pipe is skipped: EPANET decides its status itself, and refuses to be told (207).
+			if (l.type === 'pipe' && l.status === 'cv') { continue; }
 			p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 		}
 	}
@@ -1738,7 +1751,7 @@
 				// engine's statistics instead. See convergenceOf().
 				var conv = convergenceOf(p);
 
-				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {},
+				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {}, statuses = {},
 					demands = null, deficits = null, pda = EngCalcs.lpnDemandModelIsPda(model),
 					i, n, k, link, idx;
 				// **UNDER PDA A JUNCTION RECEIVES WHAT ITS PRESSURE ALLOWS** (Task 762). EN_DEMAND is
@@ -1763,6 +1776,9 @@
 					flows[link.id] = p.getLinkValue(idx, EN_FLOW) / 1000;
 					velocities[link.id] = p.getLinkValue(idx, EN_VELOCITY);
 					headlosses[link.id] = p.getLinkValue(idx, EN_HEADLOSS);
+					// A check-valve pipe's state is the solve's answer, so it is reported, as the
+					// built-in solver reports it.
+					if (link.status === 'cv') { statuses[link.id] = p.getLinkValue(idx, EN_STATUS) > 0 ? 'open' : 'closed'; }
 				}
 
 				// closeH() but NOT close(): the hydraulics workspace is per-solve, the parsed
@@ -1794,7 +1810,8 @@
 					demandDeficits: deficits,
 					flows: flows,
 					headlosses: headlosses,
-					velocities: velocities
+					velocities: velocities,
+					statuses: statuses
 				};
 			} catch (e) {
 				// A Project that threw part-way through is of unknown state -- half its values
@@ -1905,15 +1922,15 @@
 			if (!s || !a) { return; }
 			kw = (typeof s.kw === 'number' && isFinite(s.kw)) ? s.kw : 0;
 			total += kw;
-			// **ZERO POWER IS A PUMP THAT IS NOT RUNNING, AND IT IS NOT ON LINE.** Counting it
-			// would drag the average efficiency of a pump that ran beautifully for eight hours
-			// towards zero, and would make the usage factor say 100% of every pump in the model.
-			// EPANET's own rule is the pump's STATUS rather than its power, and the two agree
-			// wherever a control switches the pump: Net3's two usage factors come out at EPA's own
-			// 58.33% and 28.74% (dev/lpn-spike/energy-anchor-harness.js). They part on a pump left
-			// OPEN with nothing to deliver, which draws a whisper and reads here as running --
-			// measured, stated, and the honest reading of a pump nobody switched off.
-			if (!(kw > 0)) { return; }
+			// **ON LINE IS EPANET'S WORD: THE PUMP IS OPEN, WHICH IS WHEN ITS EFFICIENCY READS ABOVE
+			// 0, WHATEVER IT DELIVERS** (Task 821; hydraul.c addenergy() skips a pump whose
+			// efficiency is 0). getenergy() returns 0 power and 0 efficiency for a pump whose status
+			// is closed, temporarily closed or unable to lift (XHEAD), and a positive efficiency
+			// (never under 1 percent) for every other one, even with no flow at all. The page used to
+			// ask for power above 0; the two parted on a pump left open with nothing to deliver, and
+			// the page's Energy box now counts it as the engine's own report does
+			// (dev/lpn-spike/energy-count-harness.js).
+			if (!(typeof s.effic === 'number' && s.effic > 0)) { return; }
 			a.onSeconds += dt;
 			a.kwh += kw * hours;
 			a.effSum += ((typeof s.effic === 'number' && isFinite(s.effic)) ? s.effic : 0) * dt;
@@ -2657,7 +2674,10 @@
 									}
 								}
 								tstep = p.nextH();
-								if (pumpIds.length) { EngCalcs.lpnEnergyAccumulate(energyAcc, esample, tstep); }
+								// **A SINGLE INSTANT COUNTS AS ONE HOUR**, as EPANET's addenergy() does when
+								// the duration is 0 (nextH() then returns 0): the box shows the pump's
+								// power for an hour, not a table of nothing.
+								if (pumpIds.length) { EngCalcs.lpnEnergyAccumulate(energyAcc, esample, duration === 0 ? 3600 : tstep); }
 								// A guard, not a policy: a network that somehow never advances would hang
 								// the tab. 100000 steps is far past any real model at any real timestep.
 								if (!(tstep > 0) || ++guard >= 100000) { finished = true; break; }

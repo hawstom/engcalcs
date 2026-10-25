@@ -135,12 +135,95 @@ class Session {
 	}
 	// A row in the FLY-OUT (Task 264): "New project…" opens a second popup beside the first, and the
 	// command is in there. Two clicks in the page, one sentence in a spec.
-	async menuClickSub(parent, child, which = 'file') {
+	// `groupKey` (a language key such as 'lpn_pane_tab_shapes') names the group to look in when two groups
+	// hold a row of the same name (Import > Network > GeoJSON file and Import > Shapes > GeoJSON file).
+	async menuClickSub(parent, child, which = 'file', groupKey = null) {
 		await this.openMenu(which);
 		await this._clickRow('#lpn_menu_list', parent);
 		await this.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+		// File > Import and File > Export hold their rows in GROUPS (Network, Shapes, Tables; Task 819),
+		// a third level. A child not in the fly-out itself is looked for in each group, so a spec that
+		// names only the parent and the row still finds it.
+		const rowsOf = async (sel) => this.page.$$eval(`${sel} button.lpn-menu-row`, (els) => els.map((e) => {
+			const arrow = e.querySelector('.lpn-menu-arrow');
+			return { label: (arrow ? e.textContent.replace(arrow.textContent, '') : e.textContent).trim(), group: !!arrow };
+		}));
+		const here = await rowsOf('#lpn_menu_list2');
+		if (groupKey) {
+			await this._clickRow('#lpn_menu_list2', (await this.lang(groupKey)).trim());
+			await this.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
+			await this._clickRow('#lpn_menu_list3', child);
+			await this.settle();
+			await this._confirmExportIfAsked(parent, child);
+			return;
+		}
+		if (!here.some((r) => r.label === child)) {
+			const back = (await this.lang('lpn_menu_back').catch(() => 'Back')).trim();
+			const reopen = async () => {
+				await this.closeMenu();
+				await this.openMenu(which);
+				await this._clickRow('#lpn_menu_list', parent);
+				await this.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+			};
+			let tried = false;
+			for (const g of here.filter((r) => r.group)) {
+				if (tried) { await reopen(); }
+				tried = true;
+				// Hovering a group row already opens it, and on a phone-width page it opens IN PLACE, so the
+				// row under the pointer is gone before a click lands. Hover first; click only if nothing opened.
+				const opened = (b) => {
+					const p3 = document.getElementById('lpn_menu_popup3'), first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return (p3 && getComputedStyle(p3).display !== 'none' && p3.getBoundingClientRect().width > 0) || (!!first && first.textContent.trim() === b);
+				};
+				for (const r of await this.page.$$('#lpn_menu_list2 button.lpn-menu-row')) {
+					if ((await r.evaluate((e) => { const a = e.querySelector('.lpn-menu-arrow'); return (a ? e.textContent.replace(a.textContent, '') : e.textContent).trim(); })) === g.label) { await r.hover(); break; }
+				}
+				await this.page.waitForTimeout(300);
+				if (!(await this.page.evaluate(opened, back))) { await this._clickRow('#lpn_menu_list2', g.label); }
+				// On a phone the group takes the fly-out's place, under a Back row, instead of a third level.
+				await this.page.waitForFunction((b) => {
+					const p3 = document.getElementById('lpn_menu_popup3'), first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return (p3 && getComputedStyle(p3).display !== 'none' && p3.getBoundingClientRect().width > 0) || (first && first.textContent.trim() === b);
+				}, back);
+				const inPlace = await this.page.evaluate((b) => {
+					const first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return !!first && first.textContent.trim() === b;
+				}, back);
+				const sel = inPlace ? '#lpn_menu_list2' : '#lpn_menu_list3';
+				if ((await rowsOf(sel)).some((r) => r.label === child)) {
+					await this._clickRow(sel, child);
+					await this.settle();
+					await this._confirmExportIfAsked(parent, child);
+					return;
+				}
+			}
+			if (tried) { await reopen(); }
+		}
 		await this._clickRow('#lpn_menu_list2', child);
 		await this.settle();
+		await this._confirmExportIfAsked(parent, child);
+	}
+	// An export from a project that holds more than Base is CONFIRMED first (Task 819): a box titled
+	// "Export <kind>" with Export and Cancel. A spec that is not about that question presses Export,
+	// the way a visitor who wants the file does. A spec that IS about it sets `autoConfirmExport = false`.
+	async _confirmExportIfAsked(parent, child) {
+		if (this.autoConfirmExport === false) { return; }
+		let title, go, exp;
+		try {
+			title = (await this.lang('lpn_export_confirm_title')).replace('{format}', String(child).replace(/\u2026$/, ''));
+			go = (await this.lang('lpn_export_table_go')).trim();
+			exp = (await this.lang('lpn_file_export_menu')).trim();
+		} catch (e) { return; }
+		if (String(parent).trim() !== exp) { return; }
+		// The box can come a moment after the click; poll briefly, then conclude none was asked.
+		for (let i = 0; i < 12; i++) {
+			const shown = await this.page.evaluate((t) => {
+				const d = document.getElementById('lpn_dialog'), h = document.getElementById('lpn_dialog_title');
+				return !!d && d.style.display !== 'none' && !!h && h.textContent.trim() === t;
+			}, title);
+			if (shown) { await this.dialogClick(go); return; }
+			await this.page.waitForTimeout(100);
+		}
 	}
 	async _clickRow(listSel, label) {
 		const rows = await this.page.$$(`${listSel} button.lpn-menu-row`);
@@ -161,7 +244,7 @@ class Session {
 	}
 	async closeMenu() {
 		await this.page.evaluate(() => {
-			['lpn_menu_popup', 'lpn_menu_popup2'].forEach((id) => {
+			['lpn_menu_popup', 'lpn_menu_popup2', 'lpn_menu_popup3'].forEach((id) => {
 				const p = document.getElementById(id);
 				if (p) { p.style.display = 'none'; }
 			});

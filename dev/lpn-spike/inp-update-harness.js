@@ -109,7 +109,7 @@ console.log('\n--- Base only: update the open project ---');
 importText(B, 'b.inp');
 {
 	const names = dialogButtons();
-	ok('one small question: new project, this project, Cancel', names.length === 3 && names[0] === PC.lpn_inpup_btn_new && names[2] === PC.lpn_cancel, JSON.stringify(names));
+	ok('one small question: new project, this project, a new scenario, Cancel', names.length === 4 && names[0] === PC.lpn_inpup_btn_new && names[2] === PC.lpn_inpup_btn_newscn_basic && names[3] === PC.lpn_cancel, JSON.stringify(names));
 	ok('the default answer is a new project, as before', true);
 	const before = snap();
 	press(names[1]);
@@ -139,7 +139,7 @@ console.log('\n--- a scenario is open: it is the default target, Base is untouch
 	const before = snap();
 	importText(B, 'b.inp');
 	const names = dialogButtons();
-	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_scenario_base, JSON.stringify(names));
+	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[3] === PC.lpn_scenario_base && names[2] === PC.lpn_inpup_btn_newscn_basic, JSON.stringify(names));
 	press(names[1]);
 	const j2 = L.nodeById('J2');
 	ok('Base values are not changed', j2.elev === 95 && j2._demand === 120 && L.linkById('P1')._diameter === 12);
@@ -156,6 +156,34 @@ console.log('\n--- a scenario is open: it is the default target, Base is untouch
 	ok('the open scenario stays open', L.getProject().activeScenario === sc.id);
 	L.undo();
 	ok('undo of a Base update restores it', snap() === before);
+}
+
+console.log('\n--- a new scenario, child of the open one (Task 814) ---');
+{
+	L.switchScenario('base');
+	const peak = L.scenarios().filter(x => !x.isBase)[0];
+	L.switchScenario(peak.id);
+	const before = snap(), nScn = L.scenarios().length, peakOv = L.overrideCount(peak);
+	importText(B, 'b.inp');
+	const names = dialogButtons();
+	ok('the choice reads "A new scenario" in Basic mode', names.indexOf(PC.lpn_inpup_btn_newscn_basic) >= 0, JSON.stringify(names));
+	ok('the dialog has the name field', !!byId.lpn_dialog_body.children.length && dialogText().indexOf(PC.lpn_inpup_newscn_name) >= 0);
+	press(PC.lpn_inpup_btn_newscn_basic);
+	const made = L.scenarios()[L.scenarios().length - 1];
+	ok('one scenario was created and is open', L.scenarios().length === nScn + 1 && L.getProject().activeScenario === made.id, made.name);
+	ok('Base and the old scenario hold nothing of the file', L.nodeById('J2').elev === 95 && L.nodeById('J9')._active === false && L.overrideCount(peak) === peakOv);
+	ok('the new scenario reads the file values through overrides', L.effective(L.nodeById('J2'), 'elev') === 97.5 && L.overrideCount(made) >= 3);
+	ok('a new asset is active only in the new scenario', L.effective(L.nodeById('J9'), 'active') === true && L.nodeById('J9')._active === false);
+	ok('the receipt names the new scenario and says it was created', dialogText().indexOf(PC.lpn_inpup_new_scn_basic.replace('{scenario}', made.name)) >= 0, dialogText().slice(0, 200));
+	L.undo();
+	ok('ONE undo removes the scenario and everything the file did', snap() === before && L.scenarios().length === nScn && L.getProject().activeScenario === peak.id);
+	// A file that changes nothing creates nothing.
+	importText(A, 'a.inp');
+	press(PC.lpn_inpup_btn_newscn_basic);
+	ok('a file with nothing to change leaves no empty scenario', L.scenarios().length === nScn && snap() === before);
+	ok('and the receipt says so', dialogText().indexOf(PC.lpn_inpup_new_none) >= 0);
+	ok('its heading does not claim an import', dialogText().indexOf(PC.lpn_inpup_refused_heading.split('{project}')[0]) === 0 && dialogText().indexOf('Imported') !== 0, dialogText().slice(0, 80));
+	L.switchScenario('base');
 }
 
 console.log('\n--- a unit mismatch is refused by name ---');
@@ -252,7 +280,7 @@ all types
 		ok((ren ? 'renamed: ' : '') + 'the receipt appears', t.indexOf(PC.lpn_inpup_h_added) >= 0, t.slice(0, 120));
 		ok((ren ? 'renamed: ' : '') + 'the pump is added', !!L.linkById(id('PU1')) && L.linkById(id('PU1')).type === 'pump');
 		ok((ren ? 'renamed: ' : '') + 'all six valve types are added', ['V1', 'V2', 'V3', 'V4', 'V5', 'V6'].every((v, i) => { const l = L.linkById(id(v)); return l && l.type === 'valve' && l.valveType === ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'][i]; }));
-		ok((ren ? 'renamed: ' : '') + 'the CV pipe is read as open and the receipt says so', !!L.linkById(id('P2')) && dialogText().indexOf('Pipe ' + id('P2')) >= 0 && dialogText().indexOf(PC.lpn_inpup_na_cv.split(':')[0]) >= 0);
+		ok((ren ? 'renamed: ' : '') + 'the CV pipe is added as a check valve', !!L.linkById(id('P2')) && L.linkById(id('P2'))._status === 'cv', L.linkById(id('P2')) && L.linkById(id('P2'))._status);
 		ok((ren ? 'renamed: ' : '') + 'the tank is added', !!L.nodeById(id('T1')) && L.nodeById(id('T1')).type === 'tank');
 		L.undo();
 		ok((ren ? 'renamed: ' : '') + 'one undo restores the project', snap() === before);

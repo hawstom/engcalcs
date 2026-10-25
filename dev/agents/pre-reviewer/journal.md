@@ -4601,3 +4601,40 @@ OBSERVED: pan stable (0 moves). Phone 390x844 Net3 6 notches: leaders half off s
 OBSERVED: refreshOneLabelInPlace on an external pipe label: text moves 57-72 px left, leader unchanged (Net1 L11 524->467; Net3 l109, l117, l213, l215).
 OBSERVED arrow: path of two closed triangles, fill none, stroke map ink 0.25; same colour as pipe so interior is the pipe; dark/newspaper fine.
 Decays: re-verify.
+
+## 2026-10-21 Perry, feat/sqlite-reader (110f29428), Task 749 alternatives/pump-valve nodes/continuous patterns
+OBSERVED (Chromium, Tom's two files, own probe): import ok, 31 nodes/42 links GPM. Page solve of the import vs page solve of WaterGEMS's own .inp exports: Base heads/pressures max diff 1.4e-5, flows 1e-7; TGH-1 heads 1.5e-6, flows 5e-8 (31 nodes, 42 links, split nodes mapped 46-A->PMP-1-U).
+OBSERVED: Base does NOT solve in EPANET (Error 110, pumps have no curve in Base); page falls back to built-in, amber banner. WaterGEMS's own Base run (.rpc 478 B) produced nothing either. WaterGEMS's TGH-1 run itself is pathological (head error 1e10, supplied 0 gpm at t=0, pumps closed); page shows P-2 9966 gpm V=40.7: EPANET on the export, not WaterGEMS.
+OBSERVED: Basic mode is ON by default; Scenario manager row dimmed; alternatives tree (Physical/Demand, both named TGH-1) only after unchecking Basic mode. Scenario button says "TGH-1 (61)".
+OBSERVED: harness mutation (linear interpolation -> stepwise) fails wtg-tgh-harness against the export. wtg-import-browser-harness does not solve TGH against the exports; only structural.
+Decays: re-verify.
+
+## 2026-10-21 Perry, feat/import-export-menu (fc45cda4b), Task 819
+OBSERVED (Chromium, own probes in scratchpad p819): 1024x700, 800x600, 1600x900: third level opens at x = fly-out right - 5 px, no cover, on screen. Real-mouse diagonal hover Import>Network>EPANET file, Shapes switch, plain-row grace close all fine. Keyboard Right/Left/Escape one level at a time fine.
+OBSERVED: phone 390x844 (touch): third level lands at left 180-378, covers the Import fly-out rows Shapes, Surveyed points, Libraries (elementFromPoint says covered); a tap where Shapes is runs EPANET file. Network > EPANET file itself imports Net2.inp fine.
+OBSERVED: dir=rtl emulation: Export>Network third level opens at 844-1014 over the File menu (right of a flipped-left fly-out); emulation only.
+OBSERVED: a fresh project (localStorage cleared) is Base only on branch and master. "7" is harness data. Note: a.answerTrainingPanel installs window.lpnDialogAnswerer which auto-presses Export; delete it or confirmations vanish (cost me one false alarm).
+OBSERVED: Net1 Tables XLSX: sheets Junctions..Pumps, Text, Settings, Scenarios, Patterns, Curves-Pump_head, Controls (2), Rules (2 rules, 5 lines each, no blank lines). Net3: Controls 6, no Rules sheet (none). Confirm box on Net1-Scenarios quoted; Cancel and Escape write nothing; Export writes.
+OBSERVED: .inp export of Novato byte-identical to master.
+Decays: re-verify.
+
+## 2026-10-22 Perry, feat/clear-same-overrides
+- OBSERVED: builder's harness passes 18/18 (plain Basic-mode scenario, diameters). Did not test alternatives, demand lists, settings rows.
+- OBSERVED: an override of 18.0000004 against inherited 18 shows "18 (same)" and enables the new button, because "(same)" compares printed text (6 decimals). Clearing would change the value, contradicting "Each value stays as it is".
+- CITED (code read, not run): demand-list rows print only base demands, so a list differing only in pattern/category would also read "(same)". Bubble-set rows with no per-graph record are always same:true.
+- OBSERVED: button not clipped at 1400px; bar wraps, "Clear all overrides" drops to a second line. No new storage in the diff.
+- Not exercised: shared alternative, demand-list, settings/Presentation rows, Undo on those, narrow/phone width.
+## 2026-10-22 Perry, second look at 5560add37
+- OBSERVED: probe1 rerun: 18.0000004 vs 18 now marks nothing "(same)", button disabled. Fixed.
+- CITED (grep): ownOverrideInherited has 3 callers, all in the Override manager/ownOverrideItems; inherited text for demand lists prints only .base (ovlValueText), so the added pattern/category is unread elsewhere. Properties, Tables, .inp export, solve do not call it. Not run: demand-list-with-pattern scenario in a browser.
+
+## 2026-10-22 feat/export-scenario-confirm (Perry)
+OBSERVED: own harness 93/93; backdrop-export-roundtrip 89/89; inp-export-scenario-name 6/6; scenario-receipt 24/24; fittings all passed.
+OBSERVED: Base-only receipt reads "Exported X from Base of P." ; Escape and Enter work on question and receipt; odd names sanitize in file, raw in receipt; no new localStorage keys; phone 390 px fits.
+OBSERVED: receipt untitled; es page shows English for the 3 new keys (untranslated, expected).
+NOT CHECKED: zip receipt in browser (code reads zipName); visual feel of two dialogs.
+
+## 2026-10-25 feat/shape-scenario (b7607a7c4), Task 831
+OBSERVED (real Chromium, scratch scripts perry-shape-scenario-*): draw in Base/scenario, Is active column, Delete in Base with override (asks, purges), copy scenario, delete scenario, Override manager, merge upward into Base, CSV/XLSX scenario workbook, DXF import receipts Base vs scenario, .inp byte-identical with shapes and after reload, GeoJSON export 2 vs 1 features, build agent's own harness 27/27.
+OBSERVED defects: status-bar override count stays 0 after drawing a Shape in a scenario (menu says 1; refreshes on next edit); deleting a scenario leaves its born-here Shapes inactive in Base, visible only as unticked rows in the Shapes table.
+NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the harness.

@@ -22,7 +22,7 @@
 //   4. XLSX: the same, as a frozen pane, wrapped heading style, column widths, numbers as numbers.
 //   5. Tables: All, ODS and XLSX: one sheet per table that has rows; CSV: a zip, one file each.
 //   5b. Libraries: a pipe type and a fittings list added through the real Libraries box; every
-//      workbook carries Patterns, Curves - Pump head, Pipe types and Fittings sheets whose IDs are
+//      workbook carries Patterns, Curves - Pump head, Pipe types, Fittings, Controls and Rules sheets whose IDs are
 //      the ones the asset tables name; a single CSV stays one file; a CSV zip carries them too.
 //   6. With a scenario: the Scenarios question appears; XLSX of the current table, all scenarios, has
 //      a sheet per scenario; CSV of all tables and all scenarios is a zip with a file per pair; the
@@ -251,9 +251,10 @@ async function main() {
 		};
 		const ns = (t) => t.replace(/\s+-\s+/g, '-').replace(/\s+/g, '_');
 		const libLbl = { pat: ns(await a.lang('lpn_library_patterns')), cur: ns(await a.lang('lpn_library_curves')),
-			typ: ns(await a.lang('lpn_library_pipetypes')), fit: ns(await a.lang('lpn_library_fittings')) };
+			typ: ns(await a.lang('lpn_library_pipetypes')), fit: ns(await a.lang('lpn_library_fittings')),
+			ctl: ns(await a.lang('lpn_library_controls')), rul: ns(await a.lang('lpn_library_rules')) };
 		const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		const LIBS = new RegExp('^(' + [libLbl.pat, libLbl.typ, libLbl.fit].map((t) => esc(t) + '$').concat([esc(libLbl.cur) + '-']).join('|') + ')');
+		const LIBS = new RegExp('^(' + [libLbl.pat, libLbl.typ, libLbl.fit, libLbl.ctl, libLbl.rul].map((t) => esc(t) + '$').concat([esc(libLbl.cur) + '-']).join('|') + ')');
 		const boxTitle = () => page.evaluate(() => { const t = document.getElementById('lpn_dialog_title'); return t ? t.textContent.trim() : ''; });
 		const groups = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-export-group')).map((g) => ({
 			head: g.firstChild.textContent, options: Array.from(g.querySelectorAll('input')).map((i) => i.value + (i.checked ? '*' : '') + (i.disabled ? '!' : ''))
@@ -428,7 +429,7 @@ async function main() {
 		ok('the curve a pump names is found by ID on the Curves sheet', curveCol > 0 && crv.rows.slice(1).some((row) => row[0] === pumps.rows[1][curveCol]), pumps && JSON.stringify([pumps.rows[0][curveCol], pumps.rows[1][curveCol]]));
 		r = await runExport('ods', 'current');
 		f = inspect(r.file, 'ods');
-		ok('ODS of the current table carries the same four library sheets, each frozen', f.sheets.length === 5 && f.sheets.slice(1).every((x) => LIBS.test(x.name) && (f.settings[x.name] || {}).VerticalSplitMode === '2'), f.sheets.map((x) => x.name).join(', '));
+		ok('ODS of the current table carries the same library sheets (controls and rules too, Task 819), each frozen', f.sheets.length === 7 && f.sheets.slice(1).every((x) => LIBS.test(x.name) && (f.settings[x.name] || {}).VerticalSplitMode === '2'), f.sheets.map((x) => x.name).join(', '));
 		r = await runExport('csv', 'current');
 		ok('one table to CSV is still one .csv file, no zip', /Junctions\.csv$/.test(r.name), r.name);
 		r = await runExport('csv', 'all');

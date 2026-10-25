@@ -73,21 +73,34 @@ async function main() {
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			await clickRow('#lpn_menu_list button.lpn-menu-row', (await L(top)).trim());
 			await page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
-			await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L(item)).trim());
+			// File > Import and File > Export hold their rows in groups (Network, Shapes, Tables; Task 819):
+			// the row is in the fly-out itself or, failing that, in the third level a group opens.
+			if (await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L(item)).trim())) { return; }
+			const groups = await page.$$eval('#lpn_menu_list2 button.lpn-menu-row', (els) => els.filter((e) => e.querySelector('.lpn-menu-arrow')).map((e) => e.textContent.replace(/[▸\s]+$/, '').trim()));
+			for (const g of groups) {
+				await clickRow('#lpn_menu_list2 button.lpn-menu-row', g);
+				await page.waitForSelector('#lpn_menu_list3 button.lpn-menu-row', { state: 'attached' });
+				if (await clickRow('#lpn_menu_list3 button.lpn-menu-row', (await L(item)).trim())) { return; }
+			}
 		};
 		const doExport = async (item) => {
 			let dl = null;
 			const p = page.waitForEvent('download', { timeout: 8000 }).then((x) => { dl = x; }, () => {});
 			await menuRow('lpn_file_export_menu', null, item);
+			// Task 819: a project that holds more than Base is asked BEFORE the file is written.
+			await a.settle(400);
+			const asked = await a.dialog();
+			if (asked && asked.buttons.indexOf((await L('lpn_export_table_go')).trim()) >= 0) { await a.dialogClick((await L('lpn_export_table_go')).trim()); }
 			await p;
 			await a.settle(500);
 			const n = await notice();
 			let text = null;
 			if (dl) { text = fs.readFileSync(await dl.path(), 'utf8'); }
-			// Tom, 2026-10-18: a file that leaves scenarios behind is answered with a dialog to dismiss.
+			// The .inp's own flattening report may follow the file; it is dismissed. A second "holds one
+			// scenario" question after the download would be a defect (the question is asked first now).
 			const dlg = await a.dialog();
 			if (dlg) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); }
-			return { name: dl ? dl.suggestedFilename() : null, notice: n, text, dialog: dlg ? dlg.text : null };
+			return { name: dl ? dl.suggestedFilename() : null, notice: n, text, dialog: dlg ? dlg.text : null, asked: asked ? asked.text : null };
 		};
 		const toScenario = async (name) => {
 			await page.click('#lpn_scenario_btn');
@@ -122,15 +135,15 @@ async function main() {
 		ok('R1 GeoJSON notice names the scenario', /It holds the scenario Peak hour only\./.test(gp.notice), gp.notice);
 		ok('R2 stale results are not attached to Peak hour', gp.text && !/"has_results":\s*true/.test(gp.text) && !/"head":/.test(gp.text.replace(/"has_results"/g, '')), gp.text && String(/"has_results":\s*true/.test(gp.text)));
 		ok('R2 the notice names Base as the results\' scenario', gp.notice.indexOf((await L('lpn_geojson_results_other')).replace('{scenario}', base).trim()) >= 0, gp.notice);
-		ok('R1 the GeoJSON notice is a dialog too', gp.dialog && gp.dialog.indexOf('It holds the scenario Peak hour only') >= 0 || (gp.dialog || '').indexOf(gp.notice) === 0, gp.dialog);
-		ok('R1 Base export is a dialog while Peak hour exists', gb.dialog && gb.dialog.indexOf(gb.notice) === 0, gb.dialog);
+		ok('R1 the GeoJSON export from Peak hour is asked first, naming the scenario', gp.asked && gp.asked.indexOf('It holds the scenario Peak hour only') >= 0, gp.asked);
+		ok('R1 Base export is asked first while Peak hour exists', gb.asked && gb.asked.indexOf((await L('lpn_export_holds_base')).trim()) >= 0, gb.asked);
 		const ip = await doExport('lpn_file_export_item_inp');
 		ok('R1 EPANET file name carries the scenario', ip.name === 'Elm-Street-Peak-hour.inp', ip.name);
-		ok('R1 the EPANET notice is a dialog', ip.dialog && ip.dialog.indexOf(ip.notice) === 0, ip.dialog);
+		ok('R1 the EPANET export is asked first', ip.asked && ip.asked.indexOf('It holds the scenario Peak hour only') >= 0, ip.asked);
 		ok('R1 EPANET notice names the scenario', /It holds the scenario Peak hour only\./.test(ip.notice), ip.notice);
 		const dp = await doExport('lpn_file_export_item_dxf');
 		ok('R1 DXF file name carries the scenario', dp.name === 'Elm-Street-Peak-hour.dxf', dp.name);
-		ok('R1 the DXF notice is a dialog', dp.dialog && dp.dialog.indexOf(dp.notice) === 0, dp.dialog);
+		ok('R1 the DXF export is asked first', dp.asked && dp.asked.indexOf('It holds the scenario Peak hour only') >= 0, dp.asked);
 		ok('R1 DXF notice names the scenario', /It holds the scenario Peak hour only\./.test(dp.notice), dp.notice);
 
 		console.log('--- R3. survey points in Peak hour ---');
@@ -143,6 +156,9 @@ async function main() {
 		await a.settle(300);
 		const createLabel = (await L('lpn_survey_create')).trim();
 		await page.click('#lpn_dialog_buttons button:text-is("' + createLabel + '")');
+		await a.settle(600);
+		// With more than Base in the project the points are asked where they go (Task 814): the open scenario.
+		await a.dialogClick((await L('lpn_inpup_btn_scenario')).replace('{scenario}', 'Peak hour').trim());
 		await a.settle(600);
 		const rep = await page.evaluate(() => { const b = document.querySelector('#lpn_dialog_body, .lpn-dialog-body, #lpn_dialog'); return b ? b.innerText : ''; });
 		ok('R3 the survey report opens with the scenario sentence', /The nodes were added to Peak hour\. In Base they are inactive\./.test(rep), rep.slice(0, 200));
@@ -193,12 +209,13 @@ async function main() {
 		d6.project.activeScenario = 'base';
 		await reopen(d6);
 		const e0 = await doExport('lpn_file_export_item_inp');
-		ok('R6 Base alone, no alternatives: no dialog, no sentence', !e0.dialog && !/It holds/.test(e0.notice), e0.notice);
+		// Task 814: a receipt dialog now ends every export, but with Base alone it claims nothing is left behind.
+		ok('R6 Base alone, no alternatives: no question, a receipt, no sentence about what is left', !(e0.asked && e0.asked.indexOf((await L('lpn_export_confirm_lead')).split('{format}')[1].split('{n}')[0]) >= 0) && !!e0.dialog && /Elm-Street\.inp/.test(e0.dialog) && !/It holds/.test(e0.dialog) && !/It holds/.test(e0.notice), e0.dialog + ' | ' + e0.notice);
 		d6.alternatives = [{ id: 'a1', category: 'physical', name: 'A', parent: null }, { id: 'a2', category: 'physical', name: 'B', parent: 'a1', values: {} }];
 		await reopen(d6);
 		const e1 = await doExport('lpn_file_export_item_geojson');
 		const leaves = (await L('lpn_export_leaves_alternatives')).trim();
-		ok('R6 Base alone with stored alternatives: a dialog that names what is left behind', e1.dialog && e1.dialog.indexOf(leaves) >= 0 && e1.notice.indexOf(leaves) >= 0, e1.dialog);
+		ok('R6 Base alone with stored alternatives: asked first, naming what is left behind', e1.asked && e1.asked.indexOf(leaves) >= 0 && e1.notice.indexOf(leaves) >= 0, e1.asked);
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();

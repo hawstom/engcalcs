@@ -1033,3 +1033,17 @@ Correction to my 2026-10-08 row 4: Bentley DOES have Merge Alternative (35003.ht
 restricted form of a Bentley command, not an invention.
 
 - **2026-10-19, fire flow, criticality and demand scaling over an EPS** (rank: with Task 578). Fire flow EPS in two stages, not one: (1) hour picker plus "hour of minimum pressure" auto-pick (Bentley EPS Fire Flow tool shape); (2) a single named fire, flow x duration, inside the EPS, reporting tank low level and minimum pressure. Do NOT sweep-with-duration. Criticality over EPS: per-outage min pressure over run, hours below limit, unserved volume, tank emptied time; and outage by valve segment before it by pipe. Demand scaling over EPS: lowest priority, no cited demand.
+
+### 2026-10-21 — from Tom's "Ask your AI agent" box (journal, same date; sizes are guesses, SPECULATION)
+
+I want the safeguards before the box, in this order. Ranked low against the roadmap's order: none of this is queued, and I would not build any of it before the scenario manager.
+1. **Preview and diff before an agent write** (old, new, count, extremes). Medium. Without it I refuse the box.
+2. **A change record that lives in the project file**: what, when, by agent, the operation list, scenario touched. Medium. This, not the chat, is what a reviewer can accept. CITED prior art for the clone-not-mutate pattern: Eurecat EPANET MCP server (search summary, secondary).
+3. **Agent writes only through the existing `setProp` seam and its validation**, and Base writes need their own confirm. Small if the seam is already the only door (OBSERVED in scenario-alternatives.md); but Tom must rule on the "no third elevation door" line.
+4. **Model QA lint as a read-only question**: orphans, zero-demand dead ends, C range, elevation versus DEM, pump shutoff versus static lift. Small to medium. The one item here that would change my week even without an agent.
+5. **An agent action exported as a readable operation list (or WNTR/Python script)**, so it can be replayed in another tool. Small once 2 exists. My interoperability reason, and the thing I would want most if the box ships.
+Not wanted: free-form "design for me" requests (examples 4 and 5) as one-click actions. Source for the data-leaving risk: WaterISAC advisory, 2026-06-04 (journal).
+
+## Added 2026-10-23 (pump and valve assemblies, expert levels)
+
+The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".

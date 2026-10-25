@@ -52,6 +52,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_theme` | Settings > Map and page > Page > Theme (the gallery: System, Light, Dark, High contrast, Amber, Green, Platinum) |
 | `lpn_msghidden` | The x on a message in the amber box on the map (and Show in the message history): which messages this reader hid |
 | `lpn_areahint` | Settings > Map and page > Page > Show the selection help, and the bubble's own checkbox |
+| `lpn_calchint` | The Don't show this again button on the notice shown when Water, Calculate is chosen with Recalculate automatically on |
 | `lpn_survey_format` | The column order last chosen when importing a surveyed point list |
 | `lpn_show_titles` | None: the control is gone (Task 625) |
 

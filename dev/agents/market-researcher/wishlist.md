@@ -5,6 +5,13 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0s. Run the experiment: Tom's questions against a documented page surface, with Claude in Chrome (2026-10-22)
+Nothing found shows any agent answering an unanticipated hydraulic question through a page API with a measured result (ai-agent-interface.md section 4). The cheapest evidence is a trial: expose read, change-a-scenario-copy and solve as a documented in-page surface, give Claude in Chrome a one-line instruction and ten questions (Tom's five plus five unannounced from Perry or a utility engineer), and record whether it completes change-solve-read loops and whether Tom can see and undo the edits. Cost: a small build on existing code plus an afternoon; it is Tom's call whether to build, and nothing else on this list depends on it. Do not wait for WebMCP (Chrome origin trial to March 2027, no ship date, Claude and Copilot do not yet consume it).
+
+## 0r. Close the AI-assistant data question with one licence holder (2026-10-21)
+Also: confirm what data Claude in Chrome, Gemini auto browse and the ChatGPT desktop browser send to their providers per page; none of the three help pages says.
+Bentley Copilot, Autodesk Assistant (InfoWater 2027.x) and the epanet-js agent publish no provider, price or data-handling page I can read. A person with a licence can open the Assistant settings and Autodesk's AI transparency card, and ask Iterating (support@epanetjs.com) the three questions. Also: the KWR Water Research PDF needs real text extraction (poppler) to read the failure modes. Cost: an hour and a package. See ai-agent-box.md section 7.
+
 ## 0q. Task 818 (MCP): matrix done 2026-10-20; remaining items (updated 2026-10-20)
 DONE: read all four servers' tools in source (journal 2026-10-20 second entry). Gap verified: no fire flow, no criticality sweep, no open-in-app link in KWR (8 tools), Eurecat (44), hjlrosales (33), Tamrakar (5, and it does not run EPANET). Recommended first slice: fire_flow at a named node plus the open-in-app link.
 1. A practitioner source for what engineers ask AI to do with a model (AWWA, Bentley/Autodesk community, r/CivilEngineering, eng-tips). Still only research papers. Cost: a morning; may return nothing.
@@ -623,3 +630,5 @@ The icon artwork (down arrow, its pending state, the lock) and whether WaterGEMS
 
 ## Length adjustment factor: I could not find a tool that offers one (2026-10-14)
 Per-pipe user length override and a 3D (x,y,z) length exist in WaterGEMS (docs.bentley.com SS6 Pipe Attributes); no project-wide factor found anywhere I could reach. Wish: someone with a WaterGEMS/InfoWater/KYPipe licence confirm in the product, and read Walski's Advanced Water Distribution Modeling and AWWA M32 on length from maps. Cost: an hour with the books.
+
+(Addition to wishlist, rank near top) Ask Tom for 2-3 engineers who already use Claude/ChatGPT on models and read their actual prompts: the one gap my searches could not fill (Task 818). Also measure one EPANET solve's CPU time in a Worker before any hosting cost is quoted.

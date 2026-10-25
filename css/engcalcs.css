@@ -98,10 +98,13 @@
 	--ec-radius-l: calc(6px * var(--ec-radius-scale));
 	--ec-radius-xl: calc(8px * var(--ec-radius-scale));
 	--ec-radius-pill: calc(10px * var(--ec-radius-scale));
-	--ec-box-radius: 0;
-	/* A box's frame and its shadow: Settings, Properties, Find, every dialog and floating panel. */
-	--ec-box-border: 1px solid var(--ec-ink);
-	--ec-box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3);
+	--ec-box-radius: 6px;
+	/* A box's frame and its shadow: Settings, Properties, Find, every dialog and floating panel. Light's
+	   (and Dark's) is a hairline in the panel-rule grey and one soft two-layer shadow, "the same, but nicer"
+	   (Task 811). The square, ink-framed boxes of the themes that want them are restated in the rule that
+	   precedes the High contrast block. */
+	--ec-box-border: 1px solid var(--ec-border-strong);
+	--ec-box-shadow: 0 1px 3px rgba(0, 0, 0, .14), 0 6px 20px rgba(0, 0, 0, .16);
 	/* A box's surface, and a frosted blur of whatever is behind it (Desktop); the page's own surface and no
 	   blur in Light. The chrome may be frosted too. Where the browser cannot blur, the theme falls back to a
 	   solid surface (the @supports rule after the theme blocks). */
@@ -174,6 +177,8 @@
 	   Text label's own weight) is written on the element itself and wins over all of these. Print and the
 	   screenshot draw Light whatever the theme (see printing and snipCloneSvg() in js/looped-network.js). */
 	--ec-map-paper: #fff;
+	/* The casing round a ramp class the paper swallows (js/looped-network.js casingRead()): none on a light paper. */
+	--ec-map-casing: none;
 	/* Neutral ink: leaders, service lines, meters, the drag flash. */
 	--ec-map-ink: #000;
 	/* The network's own ink: pipes, node outlines, symbols, flow arrows, vertices (--lpn-map-ink). */
@@ -487,6 +492,18 @@
 /* HIGH CONTRAST (Task 811): pure ink on pure paper, black rules, every text pair at 7:1 (WCAG AAA). One
    choice, two palettes: this one, and the next when the device is set to dark. System chooses it when the
    device asks for more contrast (prefers-contrast: more). */
+/* THE THEMES THAT KEEP LIGHT'S OLD, SQUARE BOX: Light's boxes now carry a 6 px corner and a grey hairline (the
+   first rule). These themes are square by design, and the three phosphor and desktop ones frame in ink. A theme
+   block after this one that states its own wins, as before. */
+:root[data-theme="hc"], .ec-theme-card[data-theme="hc"], :root[data-theme="hc-dark"], .ec-theme-card[data-theme="hc-dark"],
+:root[data-theme="amber"], .ec-theme-card[data-theme="amber"], :root[data-theme="green"], .ec-theme-card[data-theme="green"],
+:root[data-theme="platinum"], .ec-theme-card[data-theme="platinum"], :root[data-theme="newspaper"], .ec-theme-card[data-theme="newspaper"] {
+	--ec-box-radius: 0;
+}
+:root[data-theme="amber"], .ec-theme-card[data-theme="amber"], :root[data-theme="green"], .ec-theme-card[data-theme="green"],
+:root[data-theme="platinum"], .ec-theme-card[data-theme="platinum"] {
+	--ec-box-border: 1px solid var(--ec-ink);
+}
 :root[data-theme="hc"], .ec-theme-card[data-theme="hc"] {
 	--ec-bg: #fff;
 	--ec-chrome-bg: #fff;
@@ -1333,7 +1350,7 @@ body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
    --ec-field-text-scale (1 in Light) so a wider face does not cut "Init." or break "units" in two. */
 :is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > :nth-child(n+2) { font-size: calc(1em * var(--ec-field-text-scale)); }
 .ec-theme-card svg { text-shadow: none; }
-.lpn-popover, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu {
+.lpn-popover, #lpn_dialog, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu {
 	border-radius: var(--ec-box-radius); -webkit-backdrop-filter: var(--ec-box-blur); backdrop-filter: var(--ec-box-blur);
 }
 /* PRINT IS LIGHT (Task 811). The theme blocks are screen-only, so the tokens print as Light; Bootstrap's own
@@ -1516,25 +1533,11 @@ input[type=number] {
 	-moz-appearance: textfield;
 }
 
-/* Opt back IN to the browser's native spinner arrows, per input (Tom, 2026-07-30, on the map-label
-   decimal-places field). The two rules above strip the arrows from every number input in the suite
-   -- right for a physical quantity, where the arrows are useless (a 1-unit step means nothing to a
-   diameter or a flow) and only steal width from the number. It is wrong for a SMALL BOUNDED INTEGER
-   like "decimal places, 0-4", where clicking up/down is the natural gesture and the arrows are what
-   tell the user at a glance that this field is not a free-form number. Add .ec-spin to such a field.
-   opacity:1 is not redundant: Chrome/Safari hide the spinner until the pointer is over the input, so
-   without it the control is invisible exactly when the user is looking for it. */
-input.ec-spin::-webkit-outer-spin-button,
-input.ec-spin::-webkit-inner-spin-button {
-	-webkit-appearance: auto;
-	appearance: auto;
-	opacity: 1;
-	margin: 0;
-}
-input.ec-spin[type=number] {
-	-moz-appearance: auto;
-	appearance: auto;
-}
+/* No input in the suite shows spinner arrows (Tom, 2026-10-23: "The spinners spin out of control. It
+   would be better not to have them"). A held arrow auto-repeats about twenty steps a second, and a
+   Settings box applies a value only on change, so the number raced away with nothing applied. The
+   keyboard (Up/Down) still steps, and a phone still opens its numeric keypad. The old `.ec-spin`
+   opt-back-in is gone; `.lpn-digit` only centres a one or two digit box under its centred heading. */
 
 .blink {
   animation: blinker 1s step-start 15;
@@ -2054,7 +2057,7 @@ html[lang="zh"] .ec-welcome {
    inline style and clears it with the empty string, so this is what a cleared field falls back to.
    Still an OPEN stroke and still not a filled triangle: a filled one reads as absorbed into the
    pipe, which is the whole reason it is drawn this way. */
-.lpn-arrow { fill: none; stroke: var(--lpn-map-ink); stroke-width: 0.3; pointer-events: none; }
+.lpn-arrow { fill: none; stroke: var(--lpn-map-ink); stroke-width: 0.25; stroke-linejoin: miter; pointer-events: none; }
 /* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
@@ -2098,6 +2101,8 @@ html[lang="zh"] .ec-welcome {
    condition here (.lpn-node-pending). Hidden until refreshScenarioMarks() adds .lpn-override,
    which is why every link can carry one at no visual cost. */
 .lpn-link-halo { stroke: none; pointer-events: none; }
+/* The casing of a ramp class the paper swallows (Task 811), ahead of the audit and selection halos below so they win. */
+.lpn-link-halo.lpn-ramp-cased { stroke: var(--ec-map-casing); stroke-width: calc(2.4 * var(--lpn-lw, 0)); }
 /* ---- THE GRAB BAND, AND IT IS NOT PART OF THE DRAWING (Tom's 2026-09-08 worklist) ----
    A pipe ships two pixels wide and an SVG hit test is exactly the drawn stroke, so before this the
    only way to reach a pipe with a mouse was to land on those two pixels. This is a wider,
@@ -2321,6 +2326,8 @@ html[lang="zh"] .ec-welcome {
    FIRST of the four ring rules that follow, deliberately: override, selection and the pending mark
    are all statements about what you are DOING and each of them overrides this, which is a statement
    about what was calculated. */
+/* A junction ring in the casing colour (Task 811), ahead of the state rings below so they win. */
+.lpn-node.lpn-ramp-cased { stroke: var(--ec-map-casing); stroke-width: calc(0.22 * var(--lpn-sym, 0)); }
 .lpn-node.lpn-ff-pass { stroke: #2e7d32; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
 .lpn-node.lpn-ff-fail { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 0.6 0.6; }
 .lpn-node.lpn-ff-design { stroke: #ef6c00; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 1.6 0.8; }
@@ -2893,6 +2900,18 @@ html[lang="zh"] .ec-welcome {
 #lpn_toolbar_run .lpn-transport-btn:focus-visible, #lpn_toolbar select:focus-visible {
 	outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: 2px; position: relative; z-index: 1;
 }
+/* THE DEFAULT, CALMER (Task 811, "the better default"; dev/themes-plan.md "better" #8 and #9). A keyboard ring
+   on every control, not only the menu bar and toolbar: `:where()` makes it weigh nothing, so each rule above
+   and below that draws its own ring or states `outline: 0` for a reason still wins. A text box, a drop-down and
+   the transport's buttons take the field edge and the small corner; --ec-radius-scale squares them in a theme
+   that is square. Size is untouched (a border keeps its width), so nothing moves. */
+:where(a, button, input, select, textarea, summary, [role="button"], [role="tab"], [role="menuitem"]):focus-visible {
+	outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: 2px;
+}
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), select, textarea) {
+	border-radius: var(--ec-radius-m);
+}
+.lpn-transport-btn { border-color: var(--ec-control-border); }
 #lpn_toolbar button:not(.lpn-transport-btn) {
 	background: none; color: inherit; padding: 3px 5px; line-height: 1;
 }
@@ -3659,6 +3678,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* A swatch has to survive being white or very light on white paper, so it carries a hairline
    border of its own -- otherwise the top band of the gray ramp is an invisible row. */
+/* The casing (Task 811): a ramp class the dark paper swallows, outlined in the paper's opposite tone. */
+:root[data-theme="dark"], :root[data-theme="hc-dark"], :root[data-theme="amber"], :root[data-theme="green"],
+:root[data-theme="arcade"], :root[data-theme="space"] { --ec-map-casing: var(--ec-map-ink); }
+.lpn-ramp-cased-sym { filter: drop-shadow(0 0 1px var(--ec-map-casing)) drop-shadow(0 0 1.5px var(--ec-map-casing)); }
+.lpn-color-swatch.lpn-ramp-cased { border-color: var(--ec-map-casing); }
 .lpn-color-swatch {
 	display: inline-block;
 	flex: 0 0 auto;
@@ -4902,7 +4926,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-new-actions > button:first-child { font-weight: bold; }
 .lpn-setbox-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .lpn-setbox-search { flex: 0 0 auto; padding-bottom: 6px; }
-.lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 3px 6px; }
+.lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 4px 8px; border-color: var(--ec-control-border); }
 .lpn-setbox-panes { display: flex; flex: 1 1 auto; min-height: 0; gap: 10px; }
 /* The index. Its own scrollbar, because it is as long as the content is and the two do not scroll
    together -- that non-coupling is the whole point of the paradigm.
@@ -5302,12 +5326,12 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
      * WORDS ARE NOT. Text boxes (the Before/After affixes), selects, checkboxes and the ramp
        picker keep their natural start alignment, which is also what makes them read correctly in
        an RTL language.
-     * ONE EXCEPTION, and it is about the widget rather than the value: a box that draws its own
-       spinner arrows (`.ec-spin` -- the Decimals and Rank columns) has no free right edge, so its
-       single digit is CENTRED under its centred heading instead. */
+     * ONE EXCEPTION, and it is about the widget rather than the value: a one or two digit box
+       (`.lpn-digit` -- the Decimals, Show and Drop columns and the size boxes) is
+       CENTRED under its centred heading instead. */
 #lpn_settings_box .lpn-set-secbody input[type="number"],
 #lpn_settings_box .lpn-set-secbody input.lpn-set-num { text-align: right; }
-#lpn_settings_box .lpn-set-secbody input.ec-spin { text-align: center; }
+#lpn_settings_box .lpn-set-secbody input.lpn-digit { text-align: center; }
 /* The ramp strip: a full-width band whose boxes are placed by js/lpn-ramps.js's swatchBoxes(), each
    at x = index * width/n. `position: relative` is the frame those percentages are measured in, and
    border-box keeps each swatch's own hairline border inside its share instead of adding to it. */
@@ -6708,9 +6732,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	/* 8. NO SPINNER ON A TOUCH SCREEN, AND THE WIDTH THAT PAID FOR IT COMES BACK (Tom: "since the
 	   spinner is not available on touch screen, drop the spinner on touch screen and on touch screen
-	   CSS only"). `.ec-spin` exists to put the native up/down arrows BACK on these two columns after
-	   the suite strips them everywhere else, and a touch keyboard draws no arrows to put back -- so
-	   on a coarse pointer the column is paying ~17 px for furniture that is not there.
+	   CSS only"). The columns once paid ~17 px for native up/down arrows on a pointer; a touch keyboard never
+	   drew any, so on a coarse pointer the column paid for furniture that was not there.
 
 	   **A MEDIA QUERY IS A VIEWPORT TEST, NOT A TOUCH TEST**, which is Tom's own caution, so the
 	   touch half is asked as a touch question -- and asked INSIDE the 640px block on purpose. Nested
@@ -6737,17 +6760,6 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin { appearance: textfield; -moz-appearance: textfield; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_node_fields input.ec-spin::-webkit-inner-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin::-webkit-outer-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_link_fields input.ec-spin::-webkit-inner-spin-button,
-		html:has(#lpn_canvas) #lpn_labels_customer_fields input.ec-spin::-webkit-inner-spin-button {
-			appearance: none; -webkit-appearance: none; margin: 0;
-		}
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }

@@ -2051,11 +2051,6 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
-        "lpn_eps_working": {
-            "on": "Running the extended-period simulation.",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_ex_net1_scn_desc": {
             "on": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
             "ruled": "2026-10-20",
@@ -4004,11 +3999,6 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
-        "lpn_inp_export_flat_heading": {
-            "on": "Saved {file}",
-            "ruled": "2026-09-09",
-            "answer": "OK"
-        },
         "lpn_inp_export_flat_inactive_controls": {
             "on": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
             "ruled": "2026-10-16",
@@ -4156,11 +4146,6 @@
         },
         "lpn_inpup_more": {
             "on": "{n} more",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
-        "lpn_inpup_na_cv": {
-            "on": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
             "ruled": "2026-10-20",
             "answer": "OK."
         },
@@ -5029,11 +5014,6 @@
         },
         "lpn_msx_removed": {
             "on": "Removed {file} from this project.",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
-        "lpn_msx_replace": {
-            "on": "Replace…",
             "ruled": "2026-10-20",
             "answer": "OK."
         },
@@ -8657,6 +8637,31 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_field_cv": {
+            "on": "Check valve (CV)",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_field_cv_tip": {
+            "on": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_unbalanced": {
+            "on": "Time steps not balanced ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_warnings": {
+            "on": "Warnings ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_see_report": {
+            "on": "See the {report}.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
         }
     }
 }
