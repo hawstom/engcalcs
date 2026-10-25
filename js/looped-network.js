@@ -40846,6 +40846,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// on screen never pays for the manifest at all, which is the point of doing this here
 		// rather than at boot.
 		if (show) { loadExamplesManifest(); renderExamplesGallery(); }
+		else if (firstViewPending) { applyFirstViewDocks(); }
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
@@ -65142,17 +65143,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockBoxes.forEach(function (d) { if (d.save && d.rec.dock) { d.save(); } });
 		return false;
 	}
-	// **A FIRST VISIT STARTS WITH TOM'S DOCKS** (Tom, 2026-10-07, card E02: *"I want to give the
-	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
-	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
-	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
-	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
-	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
-	var LPN_DEFAULT_DOCKS = {
-		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
-		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
-			'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
-	};
+	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
+	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
+	// ... It's cheap discoverability"*; revised 2026-10-24: Settings is the one PINNED box, and
+	// Properties, Libraries, Junctions, the Scenario manager and the User manual are auto-hide tabs,
+	// so a visitor meets both ways of working with a box). Named by box and not by label so a
+	// renamed row changes nothing here. `pinned` leaves auto-hide off. Only a browser that holds NO
+	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
+	// alone. Not on a phone, where nothing docks: a phone opens as it always did (the phone's own
+	// Properties default belongs to its own branch and never reads this table). Nothing is stored
+	// until the visitor changes something (boxSaveHeld()).
+	var LPN_DEFAULT_DOCKS = [
+		{ id: 'lpn_settings_box', side: 'right', pinned: true },
+		{ id: 'lpn_popup', side: 'right' },
+		{ id: 'lpn_library_box', side: 'right' },
+		{ id: 'lpn_hotkeys_popup', side: 'right' },
+		{ id: 'lpn_panebox_junctions', side: 'left' },
+		{ id: 'lpn_sm_box', side: 'left' }
+	];
+	// True while a fresh browser is still looking at the gallery: the layout waits for the project.
+	var firstViewPending = false, dockWired = false;
 	// **A BROWSER DRIVEN BY A TEST HARNESS STARTS WITHOUT THEM** (navigator.webdriver), because two
 	// hundred harnesses were written against a first visit with no docks; a harness that wants them
 	// says so with `window.EC_DEFAULT_DOCKS = true` in an init script (dock-default-harness.js).
@@ -65161,26 +65171,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.EC_DEFAULT_DOCKS === false) { return false; }
 		return !(navigator && navigator.webdriver);
 	}
-	function applyDefaultDocks() {
-		var byId = {};
-		if (!defaultDocksWanted() || smallScreen()) { return; }
+	function freshLayoutProfile() {
 		try {
-			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
-			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
-		} catch (e) { return; }
+			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null || localStorage.getItem(LPN_PANEBOXES_KEY) !== null) { return false; }
+			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return false; }
+		} catch (e) { return false; }
+		return true;
+	}
+	function galleryUpNow() {
+		return galleryIsUp() || !doc || !doc.nodes || doc.nodes.length === 0;
+	}
+	// Writes the records only; restoreDefaultDocks() opens what they name.
+	function setDefaultDockRecords() {
+		var byId = {}, ord = { left: 0, right: 0 };
+		paneBoxEntry('junctions');
 		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
-		['left', 'right'].forEach(function (side) {
-			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
-				var d = byId[id];
-				if (!d) { return; }
-				d.rec.dock = side;
-				d.rec.autohide = true;
-				d.rec.dockOrd = i;
-				d.open = true;
-				d.byDefault = true;
-			});
+		LPN_DEFAULT_DOCKS.forEach(function (r) {
+			var d = byId[r.id];
+			if (!d) { return; }
+			d.rec.dock = r.side;
+			if (r.pinned) { delete d.rec.autohide; } else { d.rec.autohide = true; }
+			d.rec.dockOrd = ord[r.side]++;
+			d.open = true;
+			d.byDefault = true;
 		});
 		dockDefaultHold = true;
+	}
+	function applyDefaultDocks() {
+		firstViewPending = false;
+		if (!defaultDocksWanted() || smallScreen() || !freshLayoutProfile()) { return; }
+		if (galleryUpNow()) { firstViewPending = true; return; }
+		setDefaultDockRecords();
+	}
+	// Called when the gallery goes away: the first project is on the map.
+	function applyFirstViewDocks() {
+		if (!firstViewPending || !dockWired || galleryUpNow()) { return; }
+		firstViewPending = false;
+		if (smallScreen() || !freshLayoutProfile()) { return; }
+		setDefaultDockRecords();
+		dockBooting = true;
+		try { restoreDefaultDocks(); } finally { dockBooting = false; }
+		dockBoxes.forEach(renderDockCorner);
+		layoutDocks();
 	}
 	function restoreDefaultDocks() {
 		var openers = {
@@ -65190,7 +65222,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
 			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
 			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
-			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox
+			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox,
+			lpn_hotkeys_popup: openHotkeysBox, lpn_sm_box: openScenarioManager,
+			lpn_panebox_junctions: function () { paneBoxPop('junctions', true); }
 		};
 		if (!dockDefaultHold) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
@@ -65905,6 +65939,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_calib_box', calibboxLayout, null, null],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockWired = true;
 		applyDefaultDocks();
 		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
