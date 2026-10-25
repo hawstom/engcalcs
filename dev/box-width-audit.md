@@ -1,43 +1,75 @@
-# Dockable box widths: Tom's browser pass and the full checklist
+# Dockable box widths: measurements and Tom's checklist
 
-Branch `fix/dock-widths` (Task 825). Harness: `node dev/lpn-spike/dock-width-harness.js` (27 checks).
+Branch `fix/dock-widths` (Task 825). Harness: `node dev/lpn-spike/dock-width-harness.js` (73 checks;
+it prints the measurement table below each run).
+
+## How a width is chosen
+
+Each docked width is **measured from the box's own content**, not taken from its floating CSS.
+`dev/lpn-spike/box-natural-width.js` sets the box to every width from 240 to 1400 px in 8 px
+steps, on Net3 after its run (and, for Fire flow, Criticality and Demand scaling, after the analysis
+has run too). It leaves out prose paragraphs, pictures and charts, which wrap or stretch to any
+width. The measured width is the narrowest at which nothing scrolls sideways, at most two short
+labels wrap that would not wrap with all the room in the world, and the content is at most 2% (plus
+8 px) taller than it is then. The docked width is that, rounded up to half a rem, with two limits:
+
+- **Floor 20 rem (320 px)**, so a note under a two-column table still reads as a sentence.
+- **Cap 52 rem (832 px)**, so the map keeps about half of a 1600 px window. A box measured wider
+  than that docks at the cap, and its table wraps its headings.
+
+The Manual is prose; it docks so its reading column is about 36 rem (580 px).
+
+The numbers live in `LPN_DOCK_OPTIMAL_REM` in `js/looped-network.js`. Changing one changes that box's
+docked width and nothing else; the harness then says whether the content agrees. Two boxes may share
+a width only when each has its own reason (both past the cap, or two measurements that agree).
+
+## The table (English, 16 px root font, 1600 px window)
+
+| Box | Measured | Docked | What sets it |
+|---|---|---|---|
+| Pump energy report | 496 | 496 (31 rem) | The pump table's headings (% of run, Avg. kW, Peak kW) |
+| Scenario comparison | 1056 | 832, cap | Its scenario table's headings; wider with more scenarios |
+| Run report | 544 | 544 (34 rem) | The EPANET text report's line length |
+| Status changes | 256 | 320, floor | The title bar; the table is only Time and Event |
+| Calibration report | 496 | 496 (31 rem) | The Parameter row; measured with no calibration file loaded |
+| Full report | 1248 | 832, cap | Eleven result columns |
+| Settings | 552 | 552 (34.5 rem) | The label rows, with "Bulk reaction coefficient" on one line |
+| Properties | 416 | 416 (26 rem) | A junction's demand table (a pipe needs 352) |
+| Find and replace | 368 | 368 (23 rem) | Its condition rows |
+| Libraries | 432 | 432 (27 rem) | Its section list ("Pipe types") and the pattern rows |
+| Contour plot | 336 | 336 (21 rem) | Its setting rows |
+| Fire flow analysis | 1272 after a run (456 before) | 832, cap | The results table |
+| Criticality analysis | 792 after a run (344 before) | 792 (49.5 rem) | The results table's "and 5 more affected" cells |
+| Demand scaling | 384 after a run | 384 (24 rem) | Its setting rows and verdict |
+| User manual | prose | 848 (53 rem) | Contents list plus a 36 rem reading column |
+| Scenario manager | not measured | own rule | Widens to its table (Task 746 code); unchanged |
+| Screenshot | not measured | 288 (its CSS) | Not in the table; docks at its floating width |
+| A pane tab popped out as a box | not measured | 480 (its CSS) | Unchanged |
+
+Floating widths are unchanged: the report-type boxes still float at 52 rem.
+
+Also in this branch: the Decimals, Show and Drop columns of the label rows are 2.34 rem (90% of 2.6).
+A row without one of those boxes holds the column open with a spacer, and the spacer is now the same
+2.34 rem; it was still 2.6 in `css/engcalcs.css`, which put every such row (ID, Description, Tag,
+Initial status, Status, Water age) up to 12 px left of the others.
 
 ## Tom's browser pass (open Looped-Network on a fresh browser profile at about 1600 px wide)
 
-1. Settings tab (right edge): fly it out. It should be 540 px wide (it was 360). Open Node labels. No label is cut off; the Decimals, Show and Drop boxes are narrower than before.
-2. Fly out each other tab in turn. The report-type boxes on the left (Pump energy, Scenario comparison, Run report, Status changes, Calibration, Full report) are wide, 832 px. Find and replace is narrow (352), Contour plot 384, Properties 448, Libraries 704. If any width feels wrong, say which box and a number; each is one line in the table below.
-3. Float Settings, then click its dock-left button. It docks at 540. Do the same for Libraries (704) and Contour plot (384).
+1. Settings tab (right edge): fly it out. Node labels, Link labels and Customer: every column of
+   boxes is straight, the rows without a Decimals box included. Choose Water age under Quality and
+   look again.
+2. Fly out each other tab in turn. Each box has its own width (table above). If one feels wrong, say
+   which box and a number.
+3. Float Settings, then click its dock-left button. It docks at 552. Do the same for Libraries (432)
+   and Contour plot (336).
 4. Drag a floating box to a width of your own, then dock it. It keeps your width.
 5. Resize a docked box by its edge, reload. It keeps the width you set.
-6. Narrow the window to about 1100 px and fly out Run report. It is capped to the room, never past the window.
-
-## The checklist
-
-Optimal width is what the box's own CSS gives it floating, except Settings and Properties (two overrides in `LPN_DOCK_OPTIMAL_REM` in `js/looped-network.js`; changing a number there changes the docked width, and nothing else). Widths in px at the 16 px root font, at a 1600 px window. "Docked before" is the old shared 360 px for the default docks; a box the visitor docked used its floating width. "Truncation" is whether the box's own content is drawn whole at the docked width.
-
-| Box | Id | Optimal | Docked before | Docked now | Truncation check |
-|---|---|---|---|---|---|
-| Pump energy report | lpn_energy_box | 832 (52 rem) | 360 | 832 | Harness: width only. Browser pass |
-| Scenario comparison | lpn_scncmp_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Run report | lpn_rptbox | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Status changes | lpn_status_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Calibration report | lpn_calib_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Full report | lpn_full_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Settings | lpn_settings_box | 540 (33.75 rem; floats at 462) | 360 | 540 | Harness: Node labels rows checked, nothing past the pane, no label cut. Other sections: browser pass |
-| Properties | lpn_popup | 448 (28 rem; sizes to its rows when open) | 360 | 448 | Harness: width only. Browser pass |
-| Find and replace | lpn_find_popup | 352 (22 rem) | 360 | 352 | Harness: width only. Browser pass |
-| Libraries | lpn_library_box | 704 (44 rem) | 360 | 704 | Harness: width only. Browser pass |
-| Contour plot | lpn_contour_box | 384 (24 rem) | 360 | 384 | Harness: width only. Browser pass |
-| Fire flow analysis | lpn_ff_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Criticality analysis | lpn_crit_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Demand scaling | lpn_ds_box | 832 | 360 | 832 | Harness: width only. Browser pass |
-| Scenario manager | lpn_sm_box | 352 (22 rem) | own rule | own rule: widens to its table (Task 746 code) | Not changed; browser pass |
-| Screenshot | lpn_snip_box | 288 (18 rem) | 360 | 288 | Not in the harness. Browser pass |
-| Manual (Guide) | lpn_hotkeys_popup | 992 (62 rem) | 360 | 992 | Not in the harness. Browser pass |
-| A pane tab popped out as a box | lpn_pane_* | 480 (30 rem) | 480 | 480 | Unchanged; browser pass |
-
-Also changed in this branch: the Decimals, Show and Drop columns of the label rows (`LPN_LABEL_COL_W`) from 2.6 rem to 2.34 rem (90%).
+6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
+   the window.
 
 ## What is not covered
 
-The harness proves widths and the Node labels rows. It does not read every Settings section, nor the inside of the 832 px reports; those are the browser pass above. At a narrow window the docked width is capped to the room beside the map (unchanged behavior).
+Measured in English only; a longer translation can need more. Calibration was measured with no
+calibration file loaded. Scenario comparison was measured with the Base scenario only. A box the
+visitor docked on an earlier preview of this branch kept the width it docked at then; a fresh
+profile shows the new widths.

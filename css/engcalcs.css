@@ -5719,7 +5719,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_customer_fields > div > span:nth-child(6),
 #lpn_labels_node_fields > div > span:nth-child(7),
 #lpn_labels_link_fields > div > span:nth-child(7),
-#lpn_labels_customer_fields > div > span:nth-child(7) { width: 2.6rem !important; }
+#lpn_labels_customer_fields > div > span:nth-child(7) { width: 2.34rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns

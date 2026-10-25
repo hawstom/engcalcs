@@ -65272,13 +65272,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A DOCKED BOX KEEPS ITS OWN OPTIMAL WIDTH, NEVER ONE WIDTH FOR ALL** (Tom, 2026-10-24: the default
 	// docks "made them all a uniform width instead of leveraging our pre-existing knowledge about their
-	// ideal widths... the default docked Settings box is too narrow for the label rows"). A box's
-	// optimal width is the width its own CSS gives it floating, read off a bare copy of the box so
-	// the stylesheet stays the one place that states it. LPN_DOCK_OPTIMAL_REM lists the two that
-	// differ: Settings needs more docked than floating (50% over the old 360 px) and Properties sizes
-	// itself to its rows. A width the visitor has set (`dockW`, or a floating size they dragged) is
-	// theirs and wins. The shipped list, with each width, is dev/box-width-audit.md.
-	var LPN_DOCK_OPTIMAL_REM = { lpn_settings_box: 33.75, lpn_popup: 28 }, dockOptimalCache = {};
+	// ideal widths"; then, of a first pass that read each box's floating CSS width: "a single 'wide'
+	// width applied without discretion ... not the individualized optimization I requested").
+	// **EACH NUMBER BELOW IS MEASURED, NOT CHOSEN**: the narrowest width at which that box's own
+	// content (Net3, run, its analysis run) has no sideways scroll and no row or short label wrapped
+	// that would not wrap with all the room in the world (dev/lpn-spike/box-natural-width.js), rounded
+	// up to half a rem. Two limits, each a stated reason: no box under 20 rem, so a note under a
+	// two-column table still reads as a sentence; no box over 52 rem, so the map keeps half of a
+	// 1600 px window (the Full report, Scenario comparison and Fire flow tables are wider than that and
+	// wrap their headings). The Manual is prose: its reading column is about 36 rem.
+	// dev/lpn-spike/dock-width-harness.js re-measures every box and fails when a number here stops
+	// matching its content, or when two boxes share a width with no reason. dev/box-width-audit.md
+	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
+	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
+	var LPN_DOCK_OPTIMAL_REM = {
+		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
+		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_contour_box: 21, lpn_ff_box: 52, lpn_crit_box: 49.5, lpn_ds_box: 24, lpn_hotkeys_popup: 53
+	}, dockOptimalCache = {};
+	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {
 		var id = d.box.id, vw = window.innerWidth || 0, c = dockOptimalCache[id], rem = smTableRem(), probe, w = 0;
 		if (c && c.vw === vw && c.rem === rem) { return c.w; }
@@ -65390,14 +65402,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time, with no share of the
-			// window capping it (Tom, 2026-10-07, card E02: "no first-dock limit"); only the map's
-			// LPN_DOCK_MAP_MIN does, in layoutDocks().
-			// A width the visitor dragged it to is kept; otherwise it docks at its own optimal width.
+			// A width the visitor dragged it to is kept; otherwise it docks at its own optimal width
+			// (LPN_DOCK_OPTIMAL_REM), read each time rather than stored, so a later change to that
+			// width reaches it. No share of the window caps it (Tom, 2026-10-07, card E02: "no
+			// first-dock limit"); only the map's LPN_DOCK_MAP_MIN does, in layoutDocks().
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
 				if (d.rec.userSized && r.width > 0) { d.rec.dockW = Math.round(r.width); }
-				else { d.rec.dockW = dockOptimalW(d); }
 			}
 			if (d.rec.dock !== act || d.rec.dockOrd === undefined) { d.rec.dockOrd = dockNextOrd(act, d); }
 			d.rec.dock = act;
