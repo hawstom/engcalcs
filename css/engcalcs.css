@@ -2478,6 +2478,7 @@ html[lang="zh"] .ec-welcome {
 	box-shadow: 0 2px 6px var(--ec-a-0-0-0-3);
 }
 .lpn-area-hint > div { pointer-events: none; }
+.lpn-replace-selonly { display: flex; align-items: center; gap: 4px; margin: 2px 0 4px; }
 .lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
 .lpn-area-hint-exit { margin-top: 5px; padding: 3px 14px; font-size: 12px; cursor: pointer; }
 @media (pointer: coarse) { .lpn-area-hint-exit { min-height: 40px; min-width: 88px; font-size: 14px; } }

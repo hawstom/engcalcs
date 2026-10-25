@@ -26156,7 +26156,6 @@ var EngCalcs = EngCalcs || {};
 		// The found set cut to the selection. Visible whenever the box can write, so the state is never hidden.
 		var selLbl = document.createElement('label'), selBox = document.createElement('input');
 		selLbl.className = 'lpn-replace-selonly';
-		selLbl.style.display = 'flex'; selLbl.style.alignItems = 'center'; selLbl.style.gap = '4px'; selLbl.style.margin = '2px 0 4px';
 		selBox.type = 'checkbox';
 		selBox.id = 'lpn_replace_selonly';
 		selBox.checked = !!replaceState.selOnly;
@@ -65846,6 +65845,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return Math.round(lowest);
 	}
+	var dockRemeasuring = false;
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
 			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
@@ -65867,6 +65867,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
+		// A column wider than the window (a desktop's, on a window narrowed to a phone's) squeezes the map
+		// to nothing and so hides the very measure that would take it back: give the margins up and
+		// measure again.
+		if (!(wr.width > 0) && (dockMargins.left || dockMargins.right) && !dockRemeasuring) {
+			dockMargins = { left: 0, right: 0 };
+			wrap.style.setProperty('--lpn-dock-ml', '0px');
+			wrap.style.setProperty('--lpn-dock-mr', '0px');
+			dockRemeasuring = true;
+			try { layoutDocks(); } finally { dockRemeasuring = false; }
+			return;
+		}
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;

@@ -333,6 +333,11 @@
      "parent": "Insert"
     },
     {
+     "id": "project/popup_boxtitle",
+     "label": "Properties",
+     "parent": ""
+    },
+    {
      "id": "project/tool_settings",
      "label": "Settings",
      "parent": ""
@@ -485,6 +490,11 @@
     {
      "id": "project/morph_menu/tool_add_valve",
      "label": "Valve",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/morph_vertex",
+     "label": "Vertex",
      "parent": "Morph"
     }
    ]
