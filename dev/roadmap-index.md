@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**84 open tasks.** Next (100): 6 · Soon (75): 13 · Someday (50): 28 · Maybe (25): 17 · Parked (5): 20
+**86 open tasks.** Next (100): 8 · Soon (75): 14 · Someday (50): 28 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (6)
+## 100 — Next (8)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
@@ -17,14 +17,17 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
+- Task 826 — No lat/lon CRS in the shipped examples.
+- Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 
-## 75 — Soon (13)
+## 75 — Soon (14)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 720 — Background layers from a GIS server.
+- ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
@@ -85,7 +88,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 778 — Read pipe size and material from survey field codes.
 - Task 824 — Randomly vary a new browser's theme and expert level, and log engagement.
 
-## 5 — Parked (20)
+## 5 — Parked (19)
 
 *Ruled against, or set aside, and kept here for documentation. A row is alive only so that it is not re-proposed from scratch.*
 
@@ -108,9 +111,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 537 — [H] · PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.
 - Task 616 — Visual feedback: a prompt history in the banner area.
 - Task 730 — Ctrl+Space selects the current column in the Tables pane.
-- ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 
 ---
 
-76 of 84 titles are within 4–12 words. `!` marks the rest;
+78 of 86 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
