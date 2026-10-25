@@ -55370,12 +55370,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				icon: 'library', label: pc.lpn_library_menu || 'Libraries',
 				fn: function () { toggleLibraryBox(); }
 			},
-			// **A CLOSED PROPERTIES BOX CAN ALWAYS COME BACK** (Tom, 2026-10-24, on a phone: closing it
-			// left no way to get it back). It opens on the selection, or empty when nothing is selected.
-			{
-				icon: 'info', label: pc.lpn_popup_boxtitle || 'Properties',
-				fn: function () { closeMenu(); if (!openMultiProperties()) { openPopupEmpty(); } }
-			},
 			{ separator: true },
 			// The row that came out of View (Tom, 2026-08-21). Since Task 434 the profile is a TAB
 			// in the bottom pane, so this opens the pane on that tab -- open, never toggle: a menu
