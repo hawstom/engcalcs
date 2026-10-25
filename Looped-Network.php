@@ -4320,6 +4320,7 @@ EngCalcs.pageConfig = {
 	lpn_dem_scenario: <?=json_encode($ec_lang['lpn_dem_scenario'])?>,
 	lpn_dem_base: <?=json_encode($ec_lang['lpn_dem_base'])?>,
 	lpn_shapes_every_scenario: <?=json_encode($ec_lang['lpn_shapes_every_scenario'])?>,
+	lpn_shapes_this_scenario: <?=json_encode($ec_lang['lpn_shapes_this_scenario'])?>,
 	lpn_library_import_every_scenario: <?=json_encode($ec_lang['lpn_library_import_every_scenario'])?>,
 	lpn_settings_elev_source: <?=json_encode($ec_lang['lpn_settings_elev_source'])?>,
 	lpn_settings_elev_source_tip: <?=json_encode($ec_lang['lpn_settings_elev_source_tip'])?>,

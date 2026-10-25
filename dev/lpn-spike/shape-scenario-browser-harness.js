@@ -108,6 +108,18 @@ async function main() {
 		ok('the scenario holds it active under the key s:' + (here && here.id), inAnyMap, JSON.stringify(sc).slice(0, 300));
 		ok('both are drawn in the scenario', (await drawn()).length === 2);
 
+		// One Shape selected opens the multi-properties box, which carries its Is active row.
+		await esc(); await a.toolbarClick('Select').catch(async () => { await P.keyboard.press('1'); }); await settle(200);
+		const sx = await centre('#lpn_canvas .lpn-shape[data-shape="' + base1.id + '"] .lpn-shape-x');
+		await click(sx); await settle(500);
+		const rowTxt = await P.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields');
+			return f ? Array.from(f.querySelectorAll('label, .lpn-multi-section *')).map((l) => (l.textContent || '').replace(/\u00ad/g, '').trim().slice(0, 40)) : ['no fields box'];
+		});
+		const actWord = (await a.lang('lpn_field_active')).replace(/\u00ad/g, '').trim();
+		ok('a selected Shape\'s Properties box has an Is active row', rowTxt.some((t) => t.indexOf(actWord) === 0), JSON.stringify(rowTxt));
+		await esc();
+
 		console.log('--- 3. Base shows only its own ---');
 		await toScenario('Base');
 		ok('in Base only the Base Shape is drawn', (await drawn()).join() === base1.id, (await drawn()).join());

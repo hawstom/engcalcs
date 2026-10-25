@@ -194,7 +194,10 @@ async function main() {
 		const shapeState = () => page.evaluate(() => {
 			const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}'), p = JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') || {};
 			const sh = (p.shapes || [])[0] || {}, sc = (p.scenarios || []).find((x) => x.id === 's1') || {};
-			return { n: (p.shapes || []).length, baseActive: sh._active, peak: ((sc.overrides || {})['s:' + sh.id] || {}).active };
+			// The scenario's own values, or the stored Presentation alternative it names.
+			const maps = [sc.overrides || {}].concat((p.alternatives || []).map((x) => x.values || {}));
+			const hit = maps.map((m) => (m['s:' + sh.id] || {}).active).find((v) => v !== undefined);
+			return { n: (p.shapes || []).length, baseActive: sh._active, peak: hit };
 		});
 		await a.settle(600);
 		const st1 = await shapeState();

@@ -28727,7 +28727,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return [
 			paneColId(),
 			paneColDesc(),
-			paneColActive(),
 			{ key: 'closed', label: 'lpn_pane_shape_closed', bool: true, em: 2,
 				get: function (s) { return !!s.closed; },
 				// A polygon needs three points; fewer stays open, as the Shape tool leaves it.
@@ -28743,7 +28742,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (pts.length < 3) { s.closed = false; }
 					buildShapeEls(s);
 					scheduleSave();
-				} }
+				} },
+			// Last, so a spreadsheet pasted with the four columns it always had (ID, Description,
+			// Closed, Points) still lands in the right cells (Task 831).
+			paneColActive()
 		];
 	}
 	// One coordinate of a Shape point as the table shows it: the text it was pasted or read as,
@@ -57952,6 +57954,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// third of a second reads as a page that missed.
 				openCustomerPopup(t.dataset.cust !== undefined ? t.dataset.cust : t.dataset.custhandle,
 					e.clientX, e.clientY);
+			} else if (mode === 'select' && (function (h) { return h && (h.dataset.shape !== undefined || h.dataset.shapept !== undefined); }(shapeHitOver(e.clientX, e.clientY, t, reachPx(e))))) {
+				// A Shape's box carries its Is active row (Task 831); the press already selected it.
+				openMultiProperties();
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
 				// Delayed, not immediate: gives the native dblclick listener above a chance to
 				// cancel this if a second tap arrives (add-a-vertex), matching the browser's own
@@ -73271,7 +73276,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// A Text and a meter both carry no `type`; their tables are keyed 'text' and
 				// 'customer'. Never undefined -- that was Tom's *"9 undefined assets selected"*.
 				ty = s.kind === 'label' ? 'text' : s.kind === 'customer' ? 'customer'
-					: s.kind === 'shape' ? String((EngCalcs.pageConfig || {}).lpn_tool_add_shape || 'Shape')
+					: s.kind === 'shape' ? 'shape'
 					: (el && el.type) || s.kind;
 			if (!el) { return; }
 			if (!byType[ty]) { byType[ty] = []; }

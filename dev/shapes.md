@@ -8,7 +8,7 @@ reads as the stored number).
 
 ## The Shapes table
 
-Columns ID (plain: a Shape has no rename), Description, Is active, Closed, Points. Points is the pipe Vertices
+Columns ID (plain: a Shape has no rename), Description, Closed, Points, then Is active (last, so a four-column paste still lands). Points is the pipe Vertices
 cell's format, `a/b|a/b|...` in the project's axis order (Lat/Lon, N/E, or X/Y) under the same
 heading, so one reader serves both. Pasting over rows updates them in place, as every table does;
 Paste as new rows (Ctrl+Shift+V) creates; one undo step either way. A Shape's one scenario value is Is
