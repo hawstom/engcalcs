@@ -1,16 +1,15 @@
-// A FIRST VISIT STARTS WITH TOM'S AUTO-HIDE DOCKS (Tom, 2026-10-07, card E02: "I want to give the
-// initial user default my auto-hidden docks ... It's cheap discoverability").
+// A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS (Tom, 2026-10-07 card E02; revised
+// 2026-10-24: Settings is the one pinned box, the rest are auto-hide tabs).
 //
-//   1. A browser with no saved layout opens with exactly his tabs: left, top to bottom, Pump energy,
-//      Scenario comparison, EPANET run, Status, Calibration, Full; right, Settings, Properties, Find
-//      and replace, Libraries, Contour plot, Fire flow, Criticality, Demand scaling. Nothing is
-//      stored for them, through a load, an example opened and a reload.
-//   2. The first change the visitor makes (closing one box) stores the whole layout, so the next
-//      reload keeps every other default dock, in order, and the closed one stays closed.
-//   3. A browser with any saved layout keeps its own and gets no defaults.
-//   4. A 390 px phone starts with one tab, Properties, docked and auto-hidden at the right; selecting
-//      an element unfurls it; nothing is stored.
-//   5. A browser driven by a harness gets no defaults unless it asks (window.EC_DEFAULT_DOCKS).
+//   1. A browser with no saved layout shows NO box and NO tab over the examples gallery.
+//   2. Opening the first project docks five auto-hide tabs and pins nothing: right, Properties,
+//      Settings, Libraries; left, User manual (the Scenario manager joins it, first, once Basic mode
+//      is off: a fresh browser is in Basic mode). Nothing is stored for them, through a reload.
+//   3. The first change the visitor makes (closing one tab's box) stores the whole layout.
+//   4. A browser with any saved layout keeps its own and gets no defaults.
+//   5. A 390 px phone keeps its behaviour: no tab, no box opened, nothing stored.
+//   6. A browser driven by a harness gets no defaults unless it asks (window.EC_DEFAULT_DOCKS).
+//   Set SHOT=/path.png to also save a screenshot of the first view with the first project open.
 //
 //   node dev/lpn-spike/dock-default-harness.js     (takes the browser lock itself)
 'use strict';
@@ -46,9 +45,10 @@ function ok(label, cond, detail) {
 	if (!cond) { failures++; }
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
-const { strips } = require('./dock-boxes.js');
-const LEFT = ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'];
-const RIGHT = ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box', 'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box'];
+const { strips, clickNode } = require('./dock-boxes.js');
+// The Scenario manager is in the table too but a fresh browser is in Basic mode, where it is not offered at all.
+const LEFT = ['lpn_hotkeys_popup'];
+const RIGHT = ['lpn_popup', 'lpn_settings_box', 'lpn_library_box'];
 const WANT = JSON.stringify([LEFT, RIGHT]);
 const noConsent = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 // Box records and the dock key: the layout this feature must not write on its own.
@@ -85,45 +85,71 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const DESK = { width: 1600, height: 1000 };
 	try {
-		console.log('\n--- 1. a first visit ---');
+		console.log('\n--- 1. a first visit: the gallery is not covered ---');
 		const a = await visit(Session, browser, 'first', DESK, true);
 		let got = await strips(a.page);
-		ok('his fourteen auto-hide tabs, each edge in his order', JSON.stringify(got) === WANT, JSON.stringify(got));
+		ok('over the gallery: no tab on either edge', got[0].length + got[1].length === 0, JSON.stringify(got));
+		ok('...and no box open', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
+		console.log('\n--- 2. the first project opens ---');
+		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+		await a.settle(2500);
+		got = await strips(a.page);
+		ok('four auto-hide tabs (the Scenario manager waits for Basic mode off), each edge in order', JSON.stringify(got) === WANT, JSON.stringify(got));
 		const titles = await a.page.evaluate(() => Array.from(document.querySelectorAll('.lpn-dock-tab')).map((t) => {
 			const b = document.getElementById(t.getAttribute('aria-controls')), h = b && b.querySelector('.lpn-setbox-title');
 			return t.textContent === (h ? h.textContent.replace(/\s+/g, ' ').trim() : '');
 		}));
-		ok('each tab reads its box\'s own title', titles.length === 14 && titles.every(Boolean));
-		ok('every box is tucked: none stands over the map', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
-		ok('nothing is stored for the layout on load', (await layoutKeys(a)).length === 0, JSON.stringify(await layoutKeys(a)));
-		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
-		await a.settle(2000);
-		ok('...nor after opening an example', (await layoutKeys(a)).length === 0, JSON.stringify(await layoutKeys(a)));
-		await a.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]');
+		ok('each tab reads its box\'s own title', titles.length === 4 && titles.every(Boolean));
+		ok('nothing is pinned: every box is tucked away', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
+		ok('nothing is stored for the layout', (await layoutKeys(a)).length === 0, JSON.stringify(await layoutKeys(a)));
+		if (process.env.SHOT) { await a.page.screenshot({ path: process.env.SHOT }); }
+		await a.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_library_box"]');
 		await a.settle(500);
-		ok('a tab flies its box out', (await openBoxes(a)).includes('lpn_settings_box'), JSON.stringify(await openBoxes(a)));
+		ok('a tab flies its box out', (await openBoxes(a)).includes('lpn_library_box'), JSON.stringify(await openBoxes(a)));
 		await a.page.keyboard.press('Escape');
 		await a.settle(500);
 		ok('...looking is not changing: still nothing stored', (await layoutKeys(a)).length === 0, JSON.stringify(await layoutKeys(a)));
 		await a.reload();
 		await noConsent(a);
-		await a.settle(1500);
+		await a.settle(2000);
 		got = await strips(a.page);
-		ok('a reload with nothing stored shows the same defaults', JSON.stringify(got) === WANT, JSON.stringify(got));
+		ok('a reload with the project and nothing stored shows the same layout', JSON.stringify(got) === WANT, JSON.stringify(got));
 
-		console.log('\n--- 2. the first change stores the whole layout ---');
-		await a.page.click('#lpn_dock_strip_left .lpn-dock-tab[aria-controls="lpn_scncmp_box"]');
+		console.log('\n--- 2a. Basic mode off brings the Scenario manager tab, first on the left ---');
+		await a.page.click('#lpn_scenario_btn');
+		await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		const basicLabel = await a.lang('lpn_scenario_basic');
+		for (const r of await a.page.$$('#lpn_menu_list button.lpn-menu-row')) {
+			if ((await r.textContent()).trim().replace(/^[\u2713]\s*/, '') === basicLabel.trim()) { await r.click(); break; }
+		}
+		await a.settle(1200);
+		got = await strips(a.page);
+		ok('Basic mode off: the Scenario manager tab is first on the left', JSON.stringify(got) === JSON.stringify([['lpn_sm_box'].concat(LEFT), RIGHT]), JSON.stringify(got));
+		ok('...still tucked away', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
+		await a.page.evaluate(() => localStorage.removeItem('lpn_scnbasic'));
+		console.log('\n--- 2a2. selecting something unfurls Properties; the Water menu lists the same three rows ---');
+		await clickNode(a);
+		await a.settle(800);
+		ok('selecting a node flies Properties out', (await openBoxes(a)).includes('lpn_popup'), JSON.stringify(await openBoxes(a)));
+		await a.page.keyboard.press('Escape');
+		await a.settle(400);
+		const water = (await a.menuRows('project')).map((r) => r.label);
+		const names = [await a.lang('lpn_popup_boxtitle'), await a.lang('lpn_tool_settings'), await a.lang('lpn_library_menu')];
+		const at = names.map((n) => water.indexOf(n));
+		ok('Water menu: Properties, Settings, Libraries in that order', at.every((x) => x >= 0) && at[0] < at[1] && at[1] < at[2], JSON.stringify(water));
+		console.log('\n--- 2b. the first change stores the whole layout ---');
+		await a.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_library_box"]');
 		await a.settle(500);
-		await a.page.click('#lpn_scncmp_close');
+		await a.page.click('#lpn_library_box .lpn-popover-x');
 		await a.settle(500);
 		const keys = await layoutKeys(a);
-		ok('closing Scenario comparison stores the layout', keys.length >= 10 && keys.includes('lpn_dockbox') && keys.includes('lpn_cmpbox'), JSON.stringify(keys));
+		ok('closing Libraries stores the layout', keys.includes('lpn_dockbox') && keys.includes('lpn_setbox'), JSON.stringify(keys));
 		await a.reload();
 		await noConsent(a);
-		await a.settle(1500);
+		await a.settle(2000);
 		got = await strips(a.page);
-		ok('after a reload: every other default dock, in order, and Scenario comparison closed',
-			JSON.stringify(got) === JSON.stringify([LEFT.filter((x) => x !== 'lpn_scncmp_box'), RIGHT]), JSON.stringify(got));
+		ok('after a reload: every other default tab, in order, and Libraries closed',
+			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_library_box')]), JSON.stringify(got));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
@@ -139,14 +165,17 @@ async function main() {
 		ok('no uncaught page errors', c.errors.length === 0, c.errors.slice(0, 2).join(' | '));
 		await c.close();
 
-		console.log('\n--- 4. a phone: Properties alone, docked and auto-hidden (Tom, 2026-10-24) ---');
+		console.log('\n--- 4. a phone gets the same list as a PC (Tom, 2026-10-24) ---');
 		const p = await visit(Session, browser, 'phone', { width: 390, height: 844 }, true);
 		got = await strips(p.page);
-		ok('390 px: exactly one tab, Properties, at the right', JSON.stringify(got) === JSON.stringify([[], ['lpn_popup']]), JSON.stringify(got));
-		ok('...no box opened over the page', (await openBoxes(p)).length === 0, JSON.stringify(await openBoxes(p)));
+		ok('390 px over the gallery: no tab', got[0].length + got[1].length === 0, JSON.stringify(got));
 		ok('...nothing stored', (await layoutKeys(p)).length === 0);
 		await p.openExampleCard(await p.lang('lpn_ex_net1_title')).catch(() => {});
-		await p.settle(2000);
+		await p.settle(2500);
+		got = await strips(p.page);
+		ok('390 px, project open: the same tabs as a PC', JSON.stringify(got) === WANT, JSON.stringify(got));
+		ok('...no box opened over the page', (await openBoxes(p)).length === 0, JSON.stringify(await openBoxes(p)));
+		ok('...nothing stored', (await layoutKeys(p)).length === 0);
 		await p.page.evaluate(() => {
 			const n = document.querySelector('#lpn_canvas circle.lpn-node'), b = n.getBoundingClientRect();
 			const o = { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, pointerId: 5, pointerType: 'touch', button: 0, isPrimary: true };

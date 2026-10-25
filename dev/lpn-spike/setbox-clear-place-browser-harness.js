@@ -16,7 +16,7 @@
 //   3. Properties, a junction's demand: its dot clears it and removes the line under it, and the
 //      demand field stays put (it did before the fix too; held here as a guard).
 //   4. Tom's own case, in Spanish with the box docked at the right: as a first visit docks it
-//      (auto-hidden, EC_DEFAULT_DOCKS), pinned, and auto-hidden. The dot is HOVERED until its tip
+//      (auto-hide, EC_DEFAULT_DOCKS), pinned, and auto-hidden. The dot is HOVERED until its tip
 //      shows, then clicked. Before the fix this threw the content 561 px: something read layout
 //      half way through the rebuild (only with a tip showing), when the content was shorter than
 //      the scroll position, and the browser clamped scrollTop there.
@@ -229,7 +229,9 @@ async function main() {
 				if ((await r.textContent()).trim().replace(/^✓\s*/, '') === newRow.trim()) { await r.click(); break; }
 			}
 			await b.settle(1500);
-			await b.toolbarClick(await b.lang('lpn_tool_settings'));
+			// A first visit with a project open already has Settings as an auto-hide tab at the right: fly it out.
+			if (mode === 'defaults') { await P.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]'); }
+			else { await b.toolbarClick(await b.lang('lpn_tool_settings')); }
 			await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
 			await b.settle(600);
 			if (mode !== 'defaults') { await P.click('#lpn_settings_box .lpn-corner-btn[data-dock="right"]'); await b.settle(800); }
