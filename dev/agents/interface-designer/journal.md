@@ -3913,11 +3913,10 @@ Written up in full in `dev/themes-plan.md`. Entries, each tagged:
 - SPECULATION (arithmetic, WCAG relative luminance): ink #2b2418 on mid sky #7fb0dc about 6.6:1; on the old #3a78b6 only about 3.2:1, so the deep blue must not sit behind icons. Barn red #9e2a1e on steel lighter than #c4ccd1 is at least 4.5:1, on #aeb7bd 3.8:1 (fails), so letters on the tank band are dark navy-ink, red only on paper.
 - Tom's mapping adopted: tabs = barns, menus = water-tower tank band, toolbar = clouds. Direction in the report to the coordinator; CSS not built by me.
 
-## 2026-10-24 - First-time view of the map app
-
-Full text: `first-time-view-2026-10-24.md`.
-- OBSERVED (Chromium 1400x900 fresh profile, scratchpad shots): first view has no boxes; the Mode line overlaps and clips the gallery welcome heading; consent banner about 150 px.
-- OBSERVED (js/looped-network.js:40773, lib/config.inc.php:461): only `first:example` is logged, not which example; `project.gallery` holds the file but is not sent.
-- OBSERVED (css/engcalcs.css:5550-5562): Clean map hides the notice, keeps Mode line by Tom's 2026-09-22 call.
-- OBSERVED (dev/looped-network-calculator-scope.md:697): Settings rule "if it is for the entire project, it is in Settings".
-- SPECULATION: pinned-plus-two-auto-hidden mix reads better than all hidden; not rendered.
+## 2026-10-24 - Task 828: one standard row for the dockable boxes
+Written up in full in `standard-box-rows-2026-10-24.md` (this folder).
+- OBSERVED (css/engcalcs.css:3727, 5219-5224, 6235-6241; js/looped-network.js:13485, 70235-70298, 24377-24399, 78618): Contour hand-sets Settings' two track numbers per box; Fire flow's name is `flex:1`, the `1fr` defect Settings already fixed; Properties emits `<label>text<input></label><br>`, so inputs start at nine different x; Find stacks. Four row systems, one good (Settings).
+- OBSERVED (probe, Net1, Chromium 1440x900): Contour value track 208 against widest control 183; Fire flow docked name 606, control at x=623; Properties input left edges 0 to 240.
+- SPECULATION: the fix is a measure not a number: name track ceilinged and the only draggable one, value track max-content capped, unit its own shared track; digits per field type in `ch`.
+- CITED (Tom's description, not fetched by me): WTG and EPANET truncate with sizable columns; epanetjs wraps with fixed proportions.
+- Recommendation: `lpnGridRow(parent, spec)` and `.lpn-grid` family; order Contour, Fire flow, Properties, Find/Replace, Settings. New localStorage key `lpn_gcols` must be reported to Tom.
