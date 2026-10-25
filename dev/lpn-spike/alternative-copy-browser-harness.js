@@ -119,7 +119,7 @@ async function main() {
 		ok('U1 the alternatives tree has a "' + CU + '" button, reading exactly "Copy upward"', !!ub && ub.text === CU && CU === 'Copy upward', JSON.stringify(ub));
 		ok('U1 ...greyed on Base, saying why', !!ub && ub.off === true && ub.title === await L('lpn_sm_copy_up_root'), JSON.stringify(ub));
 		// Copy stays greyed on Base (Tom, 2026-10-16, of a copy-as-child built and removed: "I guess that Copy upward is the answer").
-		ok('U1 ...and Copy is greyed on Base', await page.evaluate(() => { const b = document.getElementById('lpn_sm_copy'); return !!b && b.getAttribute('aria-disabled') === 'true'; }));
+		ok('U1 ...and Copy is greyed on Base', await page.evaluate(() => { const b = document.getElementById('points_data_copy'); return !!b && b.getAttribute('aria-disabled') === 'true'; }));
 		await clickRow('C');
 		ub = await cuBtn();
 		ok('U1 ...live on C, its tip saying C keeps its overrides', !!ub && ub.off === false && ub.title === await L('lpn_sm_copy_up_tip'), JSON.stringify(ub));

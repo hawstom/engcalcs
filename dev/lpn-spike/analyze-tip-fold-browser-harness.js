@@ -213,9 +213,9 @@ async function main() {
 			ffRows: [await L('lpn_ff_scope'), await L('lpn_when'), await L('lpn_ff_required'), await L('lpn_ff_residual'), await L('lpn_ff_design'),
 				await L('lpn_ff_minpressure'), await L('lpn_ff_maxvelocity')],
 			ffButtons: [await L('lpn_ff_calculate'), await L('lpn_ff_stop'), await L('lpn_ff_clear')],
-			dsRows: [await L('lpn_ds_scope'), await L('lpn_when'), await L('lpn_ds_minpressure'), await L('lpn_ds_multiplier')],
+			dsRows: [await L('lpn_ds_scope'), await L('lpn_when'), await L('lpn_crit_minpressure'), await L('lpn_ds_multiplier')],
 			dsHeads: [await L('lpn_ds_head_scale'), await L('lpn_ds_head_search')],
-			dsButtons: [await L('lpn_ds_run'), await L('lpn_find_btn'), await L('lpn_ff_stop')]
+			dsButtons: [await L('lpn_ff_calculate'), await L('lpn_find_btn'), await L('lpn_ff_stop')]
 		};
 		try {
 			await sectionFireFlow(a, lang);

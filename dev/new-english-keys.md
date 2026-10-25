@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**31 still to read on master**, of 196 untranslated keys, of 3165 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**82 still to read**, of 125 new keys across 19 unmerged branch(es).
+**82 still to read**, of 125 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -635,19 +635,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1024b (`5423b0189`) — already merged into chore/verdicts-1024; its strings are listed there
-
-### chore/verdicts-1024 (`bf9ff6b8a`) — adds no English strings
-
 ### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
 
-### feat/box-rows-properties (`89c6d1b91`) — adds no English strings
+### feat/box-rows-properties (`e550c09a8`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`9bbdbd88a`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/report-buttons (`6016cdebf`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_report_copy_html`**
   > Copy HTML
@@ -835,7 +831,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/value-source (`1b81ab811`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -1002,15 +998,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+### fix/bottom-pane-lag (`ee6757472`) — adds no English strings
 
-### fix/browser-pass-a (`f64a03834`) — adds no English strings
+### fix/example-crs (`26f11ff68`) — adds no English strings
 
-### fix/dock-widths (`2474b5d15`) — adds no English strings
-
-### fix/example-crs (`1fba54d64`) — adds no English strings
-
-### fix/phone-select (`415f4a7fb`) — 13 new, 13 to read @@ NEEDS RULING
+### fix/phone-select (`4157f8d34`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
@@ -1051,5 +1043,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_replace_selected_only`**
   > Only the selected assets
   @@ NEEDS RULING
-
-### fix/wording-1024 (`e01a0292a`) — already merged into chore/verdicts-1024; its strings are listed there

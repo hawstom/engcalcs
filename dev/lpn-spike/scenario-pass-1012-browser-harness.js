@@ -385,13 +385,13 @@ async function main() {
 
 		// ---- B4 ----
 		console.log('\n--- B4. one Copy button; a scenario is copied from the menu, in Basic mode ---');
-		const COPY = await L('lpn_sm_copy');
+		const COPY = await L('points_data_copy');
 		ok('B4 the Scenarios tree\'s button reads Copy, greyed (Tom, 2026-10-12: Copy scenario is Basic mode\'s)',
-			(await page.evaluate(() => { const b = document.getElementById('lpn_sm_copy'); return b ? [b.textContent, b.getAttribute('aria-disabled'), b.title] : null; })).join('|') ===
+			(await page.evaluate(() => { const b = document.getElementById('points_data_copy'); return b ? [b.textContent, b.getAttribute('aria-disabled'), b.title] : null; })).join('|') ===
 			[COPY, 'true', await L('lpn_scenario_copy_off')].join('|'));
 		await page.selectOption('#lpn_sm_tree_select', 'demand');
 		await a.settle(500);
-		ok('B4 a category tree\'s button reads Copy too', (await page.evaluate(() => (document.getElementById('lpn_sm_copy') || {}).textContent)) === COPY);
+		ok('B4 a category tree\'s button reads Copy too', (await page.evaluate(() => (document.getElementById('points_data_copy') || {}).textContent)) === COPY);
 
 		// ---- B3 ----
 		console.log('\n--- B3. a right-click action keeps an auto-hidden Scenario manager out ---');
