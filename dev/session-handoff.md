@@ -95,11 +95,16 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-24 afternoon (thirty-ninth session, Sonnet main agent)
+## STATE — 2026-10-25 (fortieth session, Opus main, Sonnet agents)
 
-- Tom's review of its five branches came back in the fortieth session; the fortieth session's STATE supersedes this one.
-- Keys deleted: `lpn_scenario_base_value`, `lpn_settings_held_base` (feat/value-source). Nothing new stored on a visitor's device.
-- **Trap met:** the preview list (ports.conf in the panel folder) is not in git; copy it to the scratchpad before editing it.
+- **Roadmap:** Tom moved every old 100 to a temporary 95 while fit and finish runs (check allows 95; return them and drop 95 together). New 100s: 825-831.
+- **Waiting on his browser pass** (each on the previews page, each green except payload freshness): `fix/browser-pass-a` (node ID in Connected asset, Text slides), `fix/wording-1024` (Typed value, Demand category description, Buffer label; merged on green this session), `fix/dock-widths` (825, 830 soft-pin), `fix/phone-select` (827; contains `feat/first-view`), `feat/report-buttons` (829), `feat/box-rows` (828, Contour and Fire flow), `feat/shape-scenario` (831, on `feat/scenario-io`; merge that first), `fix/example-crs` (826), plus the older `feat/value-source`, `feat/scenario-io`.
+- **In flight at /clear:** `feat/box-rows-properties` (Properties on the standard grid). Read `git log feat/box-rows..` in its worktree.
+- **Seams at merge:** dock-widths vs phone-select (`layoutDocks`, `dockPlaced`); box-rows vs dock-widths (`.lpn-contourbox` width line); box-rows vs report-buttons (Fire flow box); wording vs box-rows (Buffer unit line). Merge order: dock-widths, phone-select, report-buttons, box-rows.
+- **Asked of him:** Morph to Vertex refuses any junction with an elevation (recommend: allow, report the dropped elevations); Fire flow table scrolls at 560 (recommend leave); Close X removes the Properties tab; the phone map pan (unasked) is his call.
+- **Stored:** `lpn_gcols` (box column split), approved by Tom 2026-10-24. Keys deleted: `lpn_field_meter_at_node`, `lpn_scnres_copy_tip`. Keys added: `lpn_report_copy_html`, `lpn_shapes_this_scenario`.
+- **Trap met:** a 529 overload killed three agents at once; their worktrees kept uncommitted edits, and SendMessage resumed each.
+- **Trap met:** worktrees lack `dev/browser-pass/node_modules`; agents symlink the main checkout's (git-ignored), else ~200 browser harnesses fail.
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 

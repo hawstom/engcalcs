@@ -7,7 +7,7 @@
 //      and Dock right while it floats, each a named button; the title stops short of the row.
 //   2. DOCK. Settings docked right takes a column at the map's right edge and the canvas gives up
 //      exactly that width (no overlap); the box offers Auto-hide, Dock left and Float instead. The
-//      record `lpn_setbox` gains `dock` and `dockW` and nothing new appears in storage; a reload
+//      record `lpn_setbox` gains `dock` (no `dockW` until the visitor sets one) and nothing new; a reload
 //      brings it back docked. Find docked on the same side shares the column, stacked. Float hands
 //      the box back to the corner it floated at and the map its width, and the fields go. A drag on a
 //      docked box's title band floats it; a click there does not.
@@ -171,10 +171,12 @@ async function sectionDock(Session, browser) {
 			g.svg.r <= g.box.l + 1 && Math.abs((fullW - g.svg.w) - g.box.w) <= 2, JSON.stringify({ full: fullW, now: g.svg.w, box: g.box.w }));
 		ok('...top to bottom of the map', Math.abs(g.box.t - g.svg.t) <= 1.5 && Math.abs(g.box.b - Math.min(g.svg.b, g.vh)) <= 1.5,
 			JSON.stringify({ box: g.box, svg: g.svg }));
-		ok('...at the width it floated at', Math.abs(g.box.w - floatG.box.w) <= 2, g.box.w + ' vs ' + floatG.box.w);
+		// At the width it floated at (Tom, 2026-10-24: "your undocked width should dock"; dock-width-harness.js).
+		ok('...at the width it floated at', Math.abs(g.box.w - floatG.box.w) <= 2, g.box.w + ' vs floated at ' + floatG.box.w);
 		ok('...and its row now offers Auto-hide, Dock left and Float', g.acts.join() === 'autohide,left,float', g.acts.join());
 		const rec = await stored(a.page, 'lpn_setbox');
-		ok('lpn_setbox records dock "right" and the docked width', rec && rec.dock === 'right' && rec.dockW > 200 && rec.autohide === undefined,
+		// The floating width is saved as the docked width, as a resize of the docked box would be.
+		ok('lpn_setbox records dock "right" and the width it floated at', rec && rec.dock === 'right' && Math.abs(rec.dockW - floatG.box.w) <= 2 && rec.autohide === undefined,
 			JSON.stringify(rec));
 		const keysAfter = await storageKeys(a.page);
 		ok('...and docking wrote no new key', keysAfter.filter((k) => keysBefore.indexOf(k) < 0).every((k) => /^lpn_(setbox|project_|index)/.test(k)),

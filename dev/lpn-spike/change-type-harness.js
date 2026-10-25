@@ -74,6 +74,7 @@ const INJECT =
 	"\t\temitterToStore: emitterToStore, runSolve: runSolve, lastResult: function () { return lastSolveResult; },\n" +
 	"\t\tcolorNodeValue: colorNodeValue, fixedHeadPressure: fixedHeadPressure,\n" +
 	"\t\tcolorLinkValue: colorLinkValue, linkStatusText: linkStatusText,\n" +
+	"\t\tcustomerNodeId: customerNodeId, paneTableById: paneTableById, paneCols: paneCols,\n" +
 	"\t\tcustomerPoint: customerPoint, linkGeomLength: linkGeomLength, customerById: customerById,\n" +
 	"\t\timportInp: importInpFromFile, assembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()); },\n" +
@@ -344,6 +345,27 @@ function run(mutate, quiet) {
 		ok('8.2 the emitter reads as typed, with its two-unit unit', /Emitter coefficient 1\.5 gpm\/psi/.test(q[0]) ||
 			q[0].indexOf(PC.lpn_field_emitter + ' 1.5 ') >= 0, q[0]);
 		L.setProp(L.nodeById(J), 'emitter', undefined);
+	}
+
+	say('\n--- 8b. customers survive a node changing type, and the Customers table names the node (Tom, 2026-10-24) ---');
+	{
+		// "Customers connected to a reservoir, morphed into a Junction, look orphaned." The same holds in
+		// both directions: the node keeps its ID, so the customer still lumps there, and the table's
+		// Added to node column names it before and after.
+		const c = L.customerById ? L.customerById(doc().customers[0].id) : doc().customers[0];
+		const spec = L.paneTableById('customers');
+		const cols = L.paneCols(spec), keys = cols.map(k => k.key);
+		const nodeCol = cols.filter(k => k.key === 'atNode')[0];
+		const linkCol = cols.filter(k => k.key === 'link')[0];
+		ok('8b.1 a customer on a pipe keeps its pipe id in Connected asset; the node is in Added to node', linkCol.get(c) === c.link && nodeCol.get(c) === J, linkCol.get(c));
+		ok('8b.2 as a junction, the customer\'s node is ' + J, nodeCol.get(c) === J && L.customerNodeId(c) === J, nodeCol.get(c));
+		const linkWas = c.link;
+		change(J, 'reservoir', true);
+		ok('8b.3 morphed to a reservoir: still on the same pipe, still on ' + J,
+			L.nodeById(J).type === 'reservoir' && c.link === linkWas && L.customerNodeId(c) === J && nodeCol.get(c) === J && linkCol.get(c) === linkWas, nodeCol.get(c));
+		change(J, 'junction', true);
+		ok('8b.4 and back to a junction: the same', L.nodeById(J).type === 'junction' && c.link === linkWas && nodeCol.get(c) === J, nodeCol.get(c));
+		L.undo(); L.undo();
 	}
 
 	say('\n--- 10. Recalculate off: a converted node keeps its stale results until Calculate ---');

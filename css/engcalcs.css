@@ -1323,11 +1323,23 @@
 :root[data-theme="prairie"] #lpn_toolbar_run .lpn-transport-btn { background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); color: var(--ec-steel-ink); }
 :root[data-theme="prairie"] .lpn-tab {
 	clip-path: polygon(0 100%, 0 40%, 12% 15%, 26% 0, 74% 0, 88% 15%, 100% 40%, 100% 100%);
-	background: var(--ec-barn); border: 0; border-radius: 0; box-shadow: inset 1px 0 var(--ec-barn-edge), inset -1px 0 var(--ec-barn-edge);
+	/* A barn, painted rather than outlined (Tom, 2026-10-24: the active tab's pale edge strip and the black
+	   upright lines looked unfinished): sunlit along the roof, a darker sill at the foot, and no wall lines.
+	   The wall is the silhouette itself; the name and the close mark are parted by a short faint seam. */
+	background: linear-gradient(to bottom, color-mix(in srgb, var(--ec-bg) 45%, transparent), transparent 50%), var(--ec-barn);
+	border: 0; border-radius: 0; box-shadow: inset 0 -3px 0 var(--ec-barn-edge);
 }
 :root[data-theme="prairie"] .lpn-tab > button { padding-top: 13px; }
-:root[data-theme="prairie"] .lpn-tab-current { background: var(--ec-accent); color: var(--ec-bg); box-shadow: inset 2px 0 var(--ec-bg), inset -2px 0 var(--ec-bg), inset 0 -2px var(--ec-bg); }
-:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); border-left-color: color-mix(in srgb, var(--ec-bg) 50%, transparent); }
+:root[data-theme="prairie"] .lpn-tab .lpn-tab-caret, :root[data-theme="prairie"] .lpn-tab .lpn-tab-x { border-left: 0; position: relative; }
+:root[data-theme="prairie"] .lpn-tab .lpn-tab-caret::before, :root[data-theme="prairie"] .lpn-tab .lpn-tab-x::before {
+	content: ''; position: absolute; inset-inline-start: 0; top: 55%; bottom: 6px; width: 1px; background: color-mix(in srgb, var(--ec-barn-edge) 55%, transparent);
+}
+:root[data-theme="prairie"] .lpn-tab-current {
+	background: linear-gradient(to bottom, color-mix(in srgb, var(--ec-bg) 28%, transparent), transparent 50%), var(--ec-accent);
+	color: var(--ec-bg); box-shadow: inset 0 -3px 0 var(--ec-accent-open);
+}
+:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); }
+:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-caret::before, :root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x::before { background: color-mix(in srgb, var(--ec-bg) 55%, transparent); }
 :root[data-theme="prairie"] .lpn-tab-current > button:hover { background: color-mix(in srgb, var(--ec-ink-black) 18%, transparent); }
 :root[data-theme="prairie"] .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
 .ec-theme-card[data-theme="prairie"] .ec-tc-menu i { background: var(--ec-steel); border-color: var(--ec-steel-edge); border-radius: 4px / 50%; }
@@ -3560,7 +3572,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	pointer-events: auto;
 	max-width: 68rem;
 	margin: 0 auto;
-	padding: 1rem 1rem 1.5rem;
+	/* Clear of the Mode line row over the map's top-left (--lpn-overlay-h, set by keepExamplesBelowOverlay()). */
+	padding: calc(var(--lpn-overlay-h, 0px) + 12px) 1rem 1.5rem;
 	text-align: center;
 }
 /* The welcome line above the gallery heading (Task 222). Quieter than the heading it sits over:
@@ -4254,6 +4267,13 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    alternative, re-proposed easily: `max-content` for unset pull-downs only -- it would hold the
    column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
+/* THE CHOICES OF A TABLE PULL-DOWN HAVE PAPER OF THEIR OWN (Tom, 2026-10-24: in Dark, the unselected
+   options of a Settings Value selector looked empty). The select above is transparent and draws on
+   the cell, so its option list inherited a transparent background and the browser's white popup under
+   light ink. An option states both colours. dev/lpn-spike/pane-select-option-colour-browser-harness.js. */
+.lpn-pane-table tbody td select option, .lpn-pane-table tbody td select optgroup {
+	background-color: var(--ec-bg); color: var(--ec-ink);
+}
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
@@ -5569,8 +5589,10 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    display:none, not opacity, so a hidden control can be neither seen nor reached by Tab. !important
    because several of these carry an inline display the page sets (the teaser, the notice), and
    that inline value is left alone so turning Clean map off restores it exactly. NOT here, on
-   purpose: #lpn_status (the standing error stays visible), the readouts in the bottom strip and the
-   mode line (Tom retired hiding readouts, 2026-09-22), the basemap credit (required attribution),
+   purpose: the readouts in the bottom strip (Tom retired hiding readouts, 2026-09-22), the basemap
+   credit (required attribution), the selection help (it is ephemeral and has its own checkbox,
+   Settings, Show the selection help; Tom, 2026-10-24), #lpn_status when it says a run gave no answer
+   (.lpn-status-blocking, set by paintStatus(): the one message that stays),
    the offscreen notice and the empty-map examples (the way back to a drawing), the placement bars
    (a tool in progress), and the toolbar, which holds the Map menu and the way out. The override
    rings are not CSS: overrideMarksShown() keeps their classes off. */
@@ -5578,9 +5600,11 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 .lpn-map-wrap.lpn-clean-map #lpn_map_notice,
 .lpn-map-wrap.lpn-clean-map #lpn_msglog_btn,
 .lpn-map-wrap.lpn-clean-map #lpn_msglog_panel,
-.lpn-map-wrap.lpn-clean-map #lpn_area_hint,
 .lpn-map-wrap.lpn-clean-map #lpn_basemap_teaser,
-.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn { display: none !important; }
+.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn,
+.lpn-map-wrap.lpn-clean-map #lpn_mode_hint,
+.lpn-map-wrap.lpn-clean-map #lpn_status_notes,
+.lpn-map-wrap.lpn-clean-map #lpn_status:not(.lpn-status-blocking) { display: none !important; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */
@@ -5649,9 +5673,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	border: 1px solid var(--ec-gray-bbb); border-radius: var(--ec-radius-s);
 	padding: 10px 16px;
 }
-/* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
-   on why. No background of its own: it is a caption under the pills, not one more of them. */
-.lpn-msglog-panel-note { font-size: 0.85em; color: var(--ec-ink-subtle); padding: 2px 6px; }
+/* The privacy line at the top of the history, above the first message -- see the JS comment on why.
+   Over the map's tiles, so it carries the overlay's own paper. */
+.lpn-msglog-panel-note { font-size: 0.85em; color: var(--ec-ink-subtle); padding: 2px 6px; background: var(--ec-map-overlay-bg); }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;
@@ -5740,7 +5764,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_customer_fields > div > span:nth-child(6),
 #lpn_labels_node_fields > div > span:nth-child(7),
 #lpn_labels_link_fields > div > span:nth-child(7),
-#lpn_labels_customer_fields > div > span:nth-child(7) { width: 2.6rem !important; }
+#lpn_labels_customer_fields > div > span:nth-child(7) { width: 2.34rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns

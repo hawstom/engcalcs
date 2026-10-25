@@ -268,14 +268,21 @@ map label shows the first line and an ellipsis. CSV and XLSX/ODS keep real line 
 spreadsheet cell holds them), GeoJSON is JSON, and DXF writes the caret escape `^J`.
 `description-lines-harness.js`, `description-lines-browser-harness.js`.
 
+## Clean map hides the Mode line
+
+Clean map hides the Mode line and keeps the selection help (Tom, 2026-10-24: *"Clean map mode is not for clicking, it's for IO"*): it is for output and input, not for working the tools.
+
 ## Label leaders: master's rule stands; a leader that costs labels is refused
 
 Tom, 2026-10-20, asked whether a rule that a label away from home always gets a leader was worth
 Net3 at 9 notches in showing 138 labels against master's 145: *"A cost for no benefit is pointless.
 Revert."* The leader threshold is master's again, and a pipe may not run through a one-line node
 label. Kept from that work: a label hung left is right-justified (every row ends at the leader's
-end), and a Text that another Text kept before it overprints is not drawn at that zoom
-(`crowdedTexts()`). `label-form-wheel-browser-harness.js` lays out master's own files beside the
+end), and a Text that another Text kept before it overprints slides along its own line, by the
+least distance that clears it, and is never hidden (`crowdedTexts()`; Tom, 2026-10-24, of ROAD on
+Elm Street Center: *"I guess I was wrong to advise hiding/dropping user Text"*, option C). If no
+slide of three quarters of its length clears the other, it stays where the user put it and the
+overlap is the user's to fix. Data labels still yield to every Text; `text-nudge-harness.js`. `label-form-wheel-browser-harness.js` lays out master's own files beside the
 branch's and fails on any view with fewer labels or values than master.
 
 ### A column of one-line labels at the edge of a crowd: prototyped, off, does not pay

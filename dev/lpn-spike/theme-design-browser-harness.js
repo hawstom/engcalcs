@@ -275,6 +275,9 @@ async function main() {
 							let n = el;
 							for (; n && !n.matches('#lpn_menubar, #lpn_toolbar, #lpn_tabs, .lpn-pane-strip'); n = n.parentElement) {
 								const c = getComputedStyle(n);
+								// A project tab (Prairie's barn) is a base colour under a faint roof-light wash and a clipped outline: its
+								// base colour is what its words stand on; sampling beside the word would land outside the clipped shape.
+								if (n.matches('.lpn-tab') && parse(c.backgroundColor)[3] >= 1) { return parse(c.backgroundColor); }
 								if (c.backgroundImage !== 'none') { return null; }   // a picture (fence boards, a tank): pixels
 								const b = parse(c.backgroundColor); if (b[3] >= 1) { return b; }
 							}
