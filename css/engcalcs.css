@@ -3724,16 +3724,50 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
-.lpn-contourbox { width: min(24rem, calc(100vw - 8px)); --lpn-set-name: 8.5rem; --lpn-set-col: 13rem; }
-.lpn-contourbox .lpn-set-row { margin: 7px 0; }
+.lpn-contourbox { width: min(24rem, calc(100vw - 8px)); }
 .lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }
-.lpn-contour-ctl { display: flex; gap: 4px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
-/* The colour scheme button draws its swatches absolutely, so as a flex item it has no width of its
-   own to offer: it takes the row. */
-.lpn-contour-ctl > .lpn-ramp-picker { flex: 1 1 8rem; min-width: 8rem; }
-.lpn-contour-num { width: 5em; }
-.lpn-contour-unit { font-size: .85em; opacity: .8; }
+/* ==== THE STANDARD BOX ROW (Task 828; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
+   One grid, name | value | unit, built by lpnGridRow() in js/looped-network.js. The NAME track hugs
+   its widest label up to a ceiling (the ceiling is Settings' own lesson: a `1fr` name takes every
+   pixel the box is widened by and strands the control at the far edge). The VALUE track hugs its
+   widest control, up to --lpn-g-valmax, so no box carries a column wider than what is in it. The
+   UNIT track takes what is left, and is empty on a unitless row. A drag of the split writes
+   --lpn-g-name on the host only (remembered in `lpn_gcols`); double-click resets it. The host is
+   the size container, because a grid cannot query its own width. */
+.lpn-gridhost { container-type: inline-size; container-name: lpngrid; }
+.lpn-grid {
+	position: relative; display: grid; align-items: baseline; justify-content: start; margin: 3px 0;
+	grid-template-columns: var(--lpn-g-name, fit-content(12rem)) fit-content(var(--lpn-g-valmax, 17rem)) auto;
+	gap: var(--lpn-g-rowgap, 6px) var(--lpn-g-gap, 6px);
+}
+.lpn-grow, .lpn-gspan-row { display: contents; }
+.lpn-grow > * { min-width: 0; }
+/* ONE LINE, TRUNCATED: a row keeps its height, so a column reads as a column. The words are clipped
+   and the `?` (the tip's target) is not. */
+.lpn-gname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; opacity: .8; }
+.lpn-gname.ec-help { display: flex; align-items: baseline; gap: .25em; }
+.lpn-gname .lpn-gtext { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.lpn-gname .ec-tip { flex: 0 0 auto; }
+.lpn-grow > :nth-child(2) { justify-self: start; max-width: 100%; }
+.lpn-gunit { font-size: .85em; opacity: .8; overflow-wrap: anywhere; }
+/* A number box is as wide as the digits it can hold: --d, set by the build from `digits` or a limit. */
+.lpn-gw-num { width: calc(var(--d, 7) * 1ch + 1.5em); box-sizing: border-box; text-align: right; font-variant-numeric: tabular-nums; }
+.lpn-gw-fill { width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; }
+.lpn-gw-read { overflow-wrap: anywhere; }
+.lpn-grow > .lpn-ramp-picker { width: 100%; min-width: 8rem; }
+.lpn-gspan, .lpn-ghead { grid-column: 1 / -1; min-width: 0; }
+.lpn-gspan.lpn-gunit { margin-top: -4px; }
+.lpn-ghead { font-weight: bold; margin-top: 10px; }
+.lpn-gsplit { position: absolute; top: 0; bottom: 0; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
+.lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: var(--ec-select); opacity: .35; outline: none; }
+/* Narrow: the name goes above its value and the unit stays on the value's line (a container query
+   on the host, as Settings does on its own content). */
+@container lpngrid (max-width: 18rem) {
+	.lpn-grid { grid-template-columns: fit-content(var(--lpn-g-valmax, 17rem)) auto; }
+	.lpn-grow > .lpn-gname { grid-column: 1 / -1; }
+	.lpn-gsplit { display: none; }
+}
 /* ==== END: colour by value ================================================================== */
 
 /* The units strip is TWO GROUPS since Task 422: what you enter, and how answers are read. The
@@ -6232,12 +6266,6 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-bar-fill { height: 100%; width: 0; background: var(--ec-hue-1565c0); transition: width .15s linear; }
 .lpn-ff-controls, .lpn-ff-report { flex: 0 0 auto; }
 .lpn-ff-report { overflow: auto; min-height: 0; }
-.lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
-.lpn-ff-row > span:first-child { flex: 1 1 auto; }
-.lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
-.lpn-ff-row > select.lpn-ff-wide { flex: 0 1 auto; max-width: 70%; }
-.lpn-ff-firejunction { flex: 0 1 60%; min-width: 0; text-align: right; }
-.lpn-ff-unit { flex: 0 0 4rem; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
 .lpn-ff-note { margin: .3em 0; font-size: .9em; color: var(--ec-gray-444); }
 .lpn-ff-summary { margin: .4em 0; font-weight: bold; }

@@ -13484,17 +13484,8 @@ var EngCalcs = EngCalcs || {};
 		if (!body) { return; }
 		var focusedId = document.activeElement && body.contains && body.contains(document.activeElement) ? document.activeElement.id : '';
 		body.innerHTML = '';
-		function row(label, control, tip, suffix) {
-			var r = document.createElement('div'), lab = document.createElement('span'), cell = document.createElement('span');
-			r.className = 'lpn-set-row';
-			lab.textContent = label;
-			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
-			cell.className = 'lpn-contour-ctl';
-			cell.appendChild(control);
-			if (suffix) { var u = document.createElement('span'); u.className = 'lpn-contour-unit'; u.textContent = suffix; cell.appendChild(u); }
-			r.appendChild(lab); r.appendChild(cell);
-			body.appendChild(r);
-			return r;
+		function row(label, control, tip, suffix, digits) {
+			return lpnGridRow(body, { label: label, tip: tip, control: control, unit: suffix, digits: digits });
 		}
 		function select(id, opts, cur, onPick) {
 			var sel = document.createElement('select');
@@ -13517,7 +13508,6 @@ var EngCalcs = EngCalcs || {};
 		function number(id, v, min, step, onPick) {
 			var n = document.createElement('input');
 			n.type = 'number'; n.id = id; n.value = String(v); n.min = String(min); n.step = String(step);
-			n.className = 'lpn-contour-num';
 			n.addEventListener('change', function () {
 				var x = parseFloat(n.value);
 				if (isFinite(x) && x > 0) { onPick(x); } else { n.value = String(v); }
@@ -13554,7 +13544,7 @@ var EngCalcs = EngCalcs || {};
 		}), pc.lpn_contour_fill_tip);
 		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
 			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
-		}), null, '%');
+		}), null, '%', 3);
 		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
 			settings.contourLines = on; contourChanged();
 		}));
@@ -13563,13 +13553,19 @@ var EngCalcs = EngCalcs || {};
 			if (!field) { return; }
 			settings.contourInterval = settings.contourInterval || {};
 			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
-		}), null, field ? colorFieldUnitText('node', field) : '');
+		}), null, field ? colorFieldUnitText('node', field) : '', 6);
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
 		row(pc.lpn_contour_buffer || 'Buffer', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
-		}), pc.lpn_contour_buffer_tip, pc.lpn_contour_buffer_unit || '× median pipe length');
+		}), pc.lpn_contour_buffer_tip, '', 4);
+		// The unit is a phrase, not a symbol: it takes its own line under the box (Ida, 3a), so it
+		// never widens the unit track of every other row.
+		var bufUnit = document.createElement('span');
+		bufUnit.className = 'lpn-gunit';
+		bufUnit.textContent = pc.lpn_contour_buffer_unit || '× median pipe length';
+		lpnGridRow(body, { kind: 'span', control: bufUnit });
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -24994,15 +24990,218 @@ var EngCalcs = EngCalcs || {};
 	 * whole label, not one character), and only the glyph gets `.ec-tip`. `EngCalcs.initTips()`
 	 * wires `.ec-help[title]` and nothing else, so a title put anywhere else is dead on touch.
 	 */
-	function findHelpLabel(text, tip) {
-		var help = document.createElement('span'), glyph = document.createElement('span');
+	function findHelpLabel(text, tip, clip) {
+		var help = document.createElement('span'), glyph = document.createElement('span'), words;
 		help.className = 'ec-help';
 		help.title = tip;
-		help.appendChild(document.createTextNode(text + ' '));
+		if (clip) {
+			// The standard box row clips the words and keeps the `?` (lpnGridRow).
+			words = document.createElement('span');
+			words.className = 'lpn-gtext';
+			words.textContent = text;
+			help.appendChild(words);
+		} else { help.appendChild(document.createTextNode(text + ' ')); }
 		glyph.className = 'ec-tip';
 		glyph.textContent = '?';
 		help.appendChild(glyph);
 		return help;
+	}
+	// ---- THE STANDARD BOX ROW (Task 828, Ida's design: dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
+	//
+	// One function builds every label=control row of a box that has been converted to the standard:
+	// `name | value | unit`, three tracks shared by all rows of a grid. The name track is a CEILING
+	// (it hugs the widest label, up to --lpn-g-name, 12rem), the value track HUGS its widest control
+	// (capped at --lpn-g-valmax), the unit track takes the rest. A user drag of the split changes
+	// the name track only, and is remembered in `lpn_gcols` (window furniture, browser only, never in
+	// serializeProject(); Tom, 2026-10-24: "lpn_gcols is fine; go ahead.").
+	//
+	// THE HOST (`parent`) is the container the phone rule queries; the GRID is a child of it. A row is
+	// `display: contents` with exactly three children (name, control, unit), the control being the
+	// caller's own element so a caller's reference to it stays good. Anything a caller appends to the
+	// host between rows (a note, a button row) ends the grid; the next row starts a new one, and
+	// both share the host's remembered name width.
+	var LPN_GCOLS_KEY = 'lpn_gcols';
+	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 5, LPN_GSTEP = 0.5;   // rem
+	var gcolPrefs = null;
+	function gcolRead() {
+		var raw = null, v;
+		if (gcolPrefs) { return gcolPrefs; }
+		gcolPrefs = {};
+		try { raw = localStorage.getItem(LPN_GCOLS_KEY); } catch (e) { return gcolPrefs; }
+		if (!raw) { return gcolPrefs; }
+		try { v = JSON.parse(raw); } catch (e2) { return gcolPrefs; }
+		if (v && typeof v === 'object') { gcolPrefs = v; }
+		return gcolPrefs;
+	}
+	function gcolSave() {
+		var k, any = false;
+		if (furnitureFrozen) { return; }
+		for (k in gcolPrefs) { if (Object.prototype.hasOwnProperty.call(gcolPrefs, k)) { any = true; } }
+		try {
+			if (any) { localStorage.setItem(LPN_GCOLS_KEY, JSON.stringify(gcolPrefs)); }
+			else { localStorage.removeItem(LPN_GCOLS_KEY); }
+		} catch (e) {}
+	}
+	function gcolId(host) { return host && host.id ? host.id : ''; }
+	function gcolApply(host) {
+		var id = gcolId(host), w = id ? gcolRead()[id] : 0;
+		if (host && host.style && host.style.setProperty) {
+			if (typeof w === 'number' && isFinite(w) && w >= LPN_GNAME_MIN) { host.style.setProperty('--lpn-g-name', w + 'rem'); }
+			else { host.style.removeProperty('--lpn-g-name'); }
+		}
+	}
+	// Where the split handle sits: on the gap after the name track, measured from the real cells.
+	function gridPlaceSplit(grid) {
+		var split = grid.__lpnSplit, name, gr, nr, rtl, edge, gap;
+		if (!split || !grid.getBoundingClientRect) { return; }
+		name = grid.querySelector('.lpn-gname');
+		if (!name) { return; }
+		gr = grid.getBoundingClientRect(); nr = name.getBoundingClientRect();
+		if (!gr.width) { return; }
+		rtl = window.getComputedStyle(grid).direction === 'rtl';
+		gap = parseFloat(window.getComputedStyle(grid).columnGap) || 0;
+		edge = (rtl ? gr.right - nr.left : nr.right - gr.left) + gap / 2 - 3;
+		split.style.insetInlineStart = Math.round(edge) + 'px';
+	}
+	// A name the row is too narrow for says its full words on hover (the suite's one tip: a title).
+	// A name that carries a `?` tip keeps that tip, and is not touched here.
+	function gridClipTitles(grid) {
+		Array.prototype.forEach.call(grid.querySelectorAll('.lpn-gname'), function (n) {
+			var clipped, was = n.getAttribute('data-clip-title');
+			if (n.classList.contains('ec-help')) { return; }
+			clipped = n.scrollWidth > n.clientWidth + 1;
+			if (clipped && !was) { n.setAttribute('data-clip-title', '1'); n.title = n.textContent; }
+			else if (!clipped && was) { n.removeAttribute('data-clip-title'); n.title = ''; }
+		});
+	}
+	function gridWireSplit(grid, host) {
+		var split = document.createElement('div'), startX, startRem, dragging = false, rem = 16;
+		split.className = 'lpn-gsplit';
+		split.setAttribute('role', 'separator');
+		split.setAttribute('aria-orientation', 'vertical');
+		split.tabIndex = 0;
+		grid.__lpnSplit = split;
+		grid.appendChild(split);
+		function nameRem() {
+			var n = grid.querySelector('.lpn-gname'), px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+			rem = px;
+			return n ? n.getBoundingClientRect().width / px : 12;
+		}
+		function room() {
+			// The name may grow until the value track keeps LPN_GVAL_MIN rem.
+			var gr = grid.getBoundingClientRect();
+			return Math.max(LPN_GNAME_MIN, gr.width / rem - LPN_GVAL_MIN);
+		}
+		function setRem(v, keep) {
+			var id = gcolId(host);
+			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
+			host.style.setProperty('--lpn-g-name', v + 'rem');
+			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
+			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
+			Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) { gridPlaceSplit(g); gridClipTitles(g); });
+		}
+		function reset() {
+			var id = gcolId(host), prefs = gcolRead();
+			if (id) { delete prefs[id]; gcolSave(); }
+			host.style.removeProperty('--lpn-g-name');
+			Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) { gridPlaceSplit(g); gridClipTitles(g); });
+		}
+		function dirSign() { return window.getComputedStyle(grid).direction === 'rtl' ? -1 : 1; }
+		split.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			dragging = true; startX = e.clientX; startRem = nameRem();
+			try { split.setPointerCapture(e.pointerId); } catch (err) {}
+			e.preventDefault();
+		});
+		split.addEventListener('pointermove', function (e) {
+			if (dragging) { setRem(startRem + dirSign() * (e.clientX - startX) / rem, false); }
+		});
+		function endDrag(e) {
+			var v;
+			if (!dragging) { return; }
+			dragging = false;
+			try { split.releasePointerCapture(e.pointerId); } catch (err) {}
+			v = parseFloat(host.style.getPropertyValue('--lpn-g-name'));
+			if (isFinite(v)) { setRem(v, true); }
+		}
+		split.addEventListener('pointerup', endDrag);
+		split.addEventListener('pointercancel', endDrag);
+		split.addEventListener('dblclick', function (e) { e.preventDefault(); reset(); });
+		split.addEventListener('keydown', function (e) {
+			var k = e.key, s = dirSign();
+			if (k === 'ArrowLeft' || k === 'ArrowRight') {
+				e.preventDefault();
+				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
+			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
+		});
+		if (typeof ResizeObserver !== 'undefined') {
+			new ResizeObserver(function () { gridPlaceSplit(grid); gridClipTitles(grid); }).observe(grid);
+		}
+	}
+	// The grid the next row goes into: the host's last child when that is a grid, else a new one.
+	function gridFor(host) {
+		var last = host.lastChild, grid;
+		if (last && last.className && String(last.className).indexOf('lpn-grid') >= 0) { return last; }
+		if (!host.__lpnGridHost) {
+			host.__lpnGridHost = true;
+			host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost';
+		}
+		gcolApply(host);
+		grid = document.createElement('div');
+		grid.className = 'lpn-grid';
+		host.appendChild(grid);
+		try { gridWireSplit(grid, host); } catch (e) { /* a page without pointer events keeps the grid */ }
+		return grid;
+	}
+	// spec = {label, tip, control, unit, kind, digits, max, cls}. kind: 'num' | 'text' | 'select' |
+	// 'check' | 'button' | 'readout' | 'head' | 'span'; absent, it is read off the control.
+	function lpnGridRow(parent, spec) {
+		var grid = gridFor(parent), row = document.createElement('div'), name, unit, c = spec.control, kind = spec.kind, d, tag, type;
+		if (!kind) {
+			tag = c && c.tagName ? String(c.tagName).toLowerCase() : '';
+			type = c && c.type ? String(c.type) : '';
+			kind = tag === 'select' ? 'select'
+				: tag === 'button' ? 'button'
+				: tag === 'input' ? (type === 'checkbox' || type === 'radio' ? 'check' : (type === 'number' ? 'num' : 'text'))
+				: 'readout';
+		}
+		row.className = 'lpn-grow' + (spec.cls ? ' ' + spec.cls : '');
+		row.setAttribute('role', 'group');
+		if (kind === 'head' || kind === 'span') {
+			row.className += ' lpn-gspan-row';
+			c = c || document.createElement('span');
+			c.className = (c.className ? c.className + ' ' : '') + (kind === 'head' ? 'lpn-ghead' : 'lpn-gspan');
+			if (spec.label && !spec.control) { c.textContent = spec.label; }
+			row.appendChild(c);
+			grid.appendChild(row);
+			return row;
+		}
+		if (spec.tip) {
+			// The words are clipped; the `?` is the tip's target and never is.
+			name = findHelpLabel(spec.label || '', spec.tip, true);
+			name.className += ' lpn-gname';
+		} else {
+			name = document.createElement('span');
+			name.className = 'lpn-gname';
+			name.textContent = spec.label || '';
+		}
+		row.appendChild(name);
+		if (c) {
+			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
+			if (kind === 'num') {
+				c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-num';
+				if (c.style && c.style.setProperty) { c.style.setProperty('--d', String(d || 7)); }
+			} else if (kind === 'select') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-fill'; }
+			else if (kind === 'text') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-fill'; }
+			else if (kind === 'readout') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-read'; }
+			row.appendChild(c);
+		}
+		unit = document.createElement('span');
+		unit.className = 'lpn-gunit';
+		unit.textContent = spec.unit || '';
+		row.appendChild(unit);
+		grid.appendChild(row);
+		return row;
 	}
 	function rebuildFindForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
@@ -41321,7 +41520,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
-			LPN_PANEBOXES_KEY,
+			LPN_PANEBOXES_KEY, LPN_GCOLS_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
@@ -41360,7 +41559,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			doomed.forEach(function (k) { localStorage.removeItem(k); });
 		} catch (err) { /* private mode -- nothing to remove */ }
 		// Read again from the (now empty) store, so a wipe without a reload is not still clean.
-		cleanMapState = null; overrideMarksPref = null;
+		cleanMapState = null; overrideMarksPref = null; gcolPrefs = null;
 		// ALSO expire the suite unit cookie, or the promise this button makes is not kept.
 		// Looped-Network.php calls echoCookieScript() and echoUnitSelect() hardcodes
 		// onchange="EngCalcs.submitForm()", so the unit dropdowns ARE saved to a cookie and ARE
@@ -78616,12 +78815,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// One labelled row. A tip is an explanation, so it carries the `?` that every explanation does
 	// and opens from that glyph (Task 759: a tip with no glyph was the one-?-per-label defect).
 	function ffRow(parent, labelText, tip, control, unitText) {
-		var row = ffEl('div', 'lpn-ff-row', null, parent), name;
-		if (tip) { name = findHelpLabel(labelText || '', tip); row.appendChild(name); }
-		else { ffEl('span', null, labelText || '', row); }
-		row.appendChild(control);
-		ffEl('span', 'lpn-ff-unit', unitText || '', row);
-		return row;
+		// A text box in these boxes holds a number or a time ("2:00"): it is sized as one.
+		var isText = control && control.tagName && String(control.tagName).toLowerCase() === 'input' && control.type === 'text';
+		return lpnGridRow(parent, { label: labelText || '', tip: tip, control: control, unit: unitText || '', cls: 'lpn-ff-row', kind: isText ? 'num' : undefined, digits: 7 });
 	}
 	function ffInput(value) {
 		var i = document.createElement('input');
@@ -78708,8 +78904,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['all', pc.lpn_when_all || 'Every reporting step, worst case']
 			].concat(EngCalcs.lpnDurFireModel
 				? [['dur', pc.lpn_dur_option || 'A fire for a stated duration']] : []), ask.when || 'now');
-			// Wide enough for its longest choice rather than the 8rem the other selects share.
-			boxes.when.className = 'lpn-ff-wide';
 			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
 			boxes.when.addEventListener('change', function () {
 				ask.when = boxes.when.value;
