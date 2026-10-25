@@ -363,10 +363,10 @@ async function main() {
 		// ---- M6: Base's gutter, and the ID line ----
 		console.log('\n--- M6. the gutter in Base, and the ID line ---');
 		const lefts = () => page.evaluate(() => {
-			const t = document.querySelector('#lpn_popup_title input'), f = Array.from(document.querySelectorAll('#lpn_popup_fields > label')).filter((l) => l.offsetParent)[0];
+			const t = document.querySelector('#lpn_popup_title input'), f = Array.from(document.querySelectorAll('#lpn_popup_fields > label')).filter((l) => l.querySelector('.lpn-gname') || l.offsetParent)[0];   // a row is display: contents (Task 828): its name cell starts it
 			const g = document.querySelector('#lpn_popup_fields .lpn-ovm');
 			return { id: t ? Math.round(t.parentElement.getBoundingClientRect().left + parseFloat(getComputedStyle(t.parentElement).paddingInlineStart)) : null,
-				row: f ? Math.round(f.getBoundingClientRect().left) : null, gutter: !!g, cells: g ? g.children.length : 0,
+				row: f ? Math.round((f.querySelector('.lpn-gname') || f).getBoundingClientRect().left) : null, gutter: !!g, cells: g ? g.children.length : 0,
 				tcls: t ? t.parentElement.className + '/' + getComputedStyle(t.parentElement).paddingInlineStart + '/' + Math.round(t.parentElement.getBoundingClientRect().left) : '',
 				fcls: document.getElementById('lpn_popup_fields').className + '/' + getComputedStyle(document.getElementById('lpn_popup_fields')).paddingInlineStart + '/' + Math.round(document.getElementById('lpn_popup_fields').getBoundingClientRect().left) };
 		});

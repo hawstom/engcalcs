@@ -3749,7 +3749,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gname.ec-help { display: flex; align-items: baseline; gap: .25em; }
 .lpn-gname .lpn-gtext { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .lpn-gname .ec-tip { flex: 0 0 auto; }
-.lpn-grow > :nth-child(2) { justify-self: start; max-width: 100%; }
+.lpn-gval, .lpn-grow > :nth-child(2):not(.lpn-gname) { justify-self: start; max-width: 100%; }
 .lpn-gunit { font-size: .85em; opacity: .8; overflow-wrap: anywhere; }
 /* A number box is as wide as the digits it can hold: --d, set by the build from `digits` or a limit. */
 .lpn-gw-num { width: calc(var(--d, 7) * 1ch + 1.5em); box-sizing: border-box; text-align: right; font-variant-numeric: tabular-nums; }
@@ -3761,6 +3761,36 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-ghead { font-weight: bold; margin-top: 10px; }
 .lpn-gsplit { position: absolute; top: 0; bottom: 0; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
 .lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: var(--ec-select); opacity: .35; outline: none; }
+/* ==== THE PROPERTIES BOX'S ROWS (Task 828): the same grid, with a gutter for the override marker.
+   `fields` is the grid and each <label> a `display: contents` row of four cells (gutter, name, value,
+   unit), built by lpnPropsGrid(). The gutter track is nothing until a scenario holds a marker. A
+   block (a table, a note, a list) spans the grid; a spanning block asks for no width of its own, so
+   a long sentence cannot stretch the box. */
+.lpn-gprops {
+	display: grid; align-items: baseline; justify-content: start; row-gap: 4px; column-gap: 0;
+	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, fit-content(12rem)) fit-content(var(--lpn-g-valmax, 17rem)) minmax(0, 1fr);
+}
+#lpn_popup_fields.lpn-gprops.lpn-ovm-gut { --lpn-g-gutw: 1.9em; padding-inline-start: 0; }
+#lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; padding-inline-start: 0; }
+.lpn-gprops > br { display: none; }
+.lpn-gprops .lpn-grow > * { min-width: 0; }
+.lpn-gprops .lpn-gname { margin-inline-end: 6px; }
+.lpn-gprops .lpn-gname .ec-help { display: flex; align-items: baseline; gap: .25em; min-width: 0; }
+.lpn-gprops .lpn-gname > a { overflow: hidden; text-overflow: ellipsis; }
+.lpn-gprops .lpn-gval { margin-inline-end: 6px; }
+.lpn-gprops .lpn-gunit { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px .5em; opacity: 1; font-size: 1em; }
+.lpn-gprops .lpn-gutext { font-size: .85em; opacity: .8; }
+.lpn-gprops .lpn-ggut { display: block; }
+.lpn-gprops .lpn-ggut .lpn-ovm { position: static; margin: 0; }
+#lpn_popup_fields.lpn-gprops .lpn-ggut .lpn-ovm { position: static; margin: 0; }   /* beats the flow layout's own gutter offsets */
+.lpn-gprops .lpn-gw-chars { text-align: start; }
+.lpn-gprops > .lpn-gspan, .lpn-gprops > .lpn-gspan2, .lpn-gprops .lpn-gspan2 { min-width: 0; contain: inline-size; }
+.lpn-gprops > .lpn-gspan { grid-column: 1 / -1; }
+.lpn-gprops > .lpn-gspan2, .lpn-gprops .lpn-gspan2 { grid-column: 2 / -1; }
+.lpn-gprops > .lpn-ov-note { margin-inline-start: 0; }
+.lpn-gprops > .lpn-gloose > * + * { margin-inline-start: .4em; }
+.lpn-gprops > .lpn-gbtns { display: flex; flex-wrap: wrap; gap: 4px; }
+.lpn-gprops textarea.lpn-gw-fill { width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; }
 /* Narrow: the name goes above its value and the unit stays on the value's line (a container query
    on the host, as Settings does on its own content). */
 @container lpngrid (max-width: 18rem) {

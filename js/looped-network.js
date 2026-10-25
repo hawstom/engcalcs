@@ -25190,6 +25190,7 @@ var EngCalcs = EngCalcs || {};
 		row.appendChild(name);
 		if (c) {
 			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
+			c.className = (c.className ? c.className + ' ' : '') + 'lpn-gval';
 			if (kind === 'num') {
 				c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-num';
 				if (c.style && c.style.setProperty) { c.style.setProperty('--d', String(d || 7)); }
@@ -70061,6 +70062,196 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(help);
 		label.appendChild(document.createTextNode(' '));
 	}
+	// ---- THE STANDARD ROW, IN THE PROPERTIES BOX (Task 828, Ida's design; the Contour and Fire flow
+	// boxes build theirs with lpnGridRow() directly) ----
+	//
+	// The Properties popup is built by about fifty call sites that each append a `<label>` (name,
+	// then control) and a `<br>`, and the override marker and the value warning find their row by
+	// that shape (ovmRowStart(), valueWarnPaint()). So the shape stays, and ONE pass over the
+	// finished box puts every row on the grid: `[gutter] | name | value | unit`, `fields` itself the
+	// grid, each `<label>` a `display: contents` row of four cells. Nothing in the box is left out:
+	// a block (table, note, list, buttons) spans the grid; a run of loose controls is wrapped.
+	// A browser-only pass: the test stub has no ranges and no mixed text, so it keeps the flow shape.
+	var LPN_GP_DIGITS = { k: 5, diameter: 6, roughness: 7, length: 8 };   // Tom's own limits for the number boxes
+	var LPN_GP_BLOCK = /^(DIV|TABLE|FIELDSET|P|H\d|UL|OL|DETAILS|SECTION|HR|DATALIST)$/;
+	var LPN_GP_CONTROL = /^(INPUT|SELECT|TEXTAREA|BUTTON)$/;
+	function gpCell(tag, cls) { var e = document.createElement(tag); e.className = cls; return e; }
+	function gpIsName(n) {
+		var c;
+		if (n.nodeType === 3) { return true; }
+		if (n.nodeType !== 1) { return false; }
+		if (n.nodeName === 'A') { return true; }
+		c = ' ' + (n.className || '') + ' ';
+		return c.indexOf(' ec-help ') >= 0 && c.indexOf(' lpn-valwarn ') < 0;
+	}
+	// The words of a name that end in "(unit)" hand the unit to its own column.
+	function gpTakeUnit(nameEl) {
+		var leaf = null, m;
+		(function walk(n) {
+			var i, k;
+			for (i = 0; i < n.childNodes.length; i++) {
+				k = n.childNodes[i];
+				if (k.nodeType === 3) { if (/\S/.test(k.nodeValue)) { leaf = k; } }
+				else if (k.nodeType === 1 && !/(^| )ec-tip( |$)/.test(k.className || '')) { walk(k); }
+			}
+		}(nameEl));
+		if (!leaf) { return ''; }
+		m = /^([\s\S]*?\S)\s*\(([^()]+)\)\s*$/.exec(leaf.nodeValue);
+		if (!m) { return ''; }
+		leaf.nodeValue = m[1] + ' ';
+		return m[2];
+	}
+	// The words of every `?` name are clipped; the `?` itself never is.
+	function gpClipWords(nameEl) {
+		Array.prototype.slice.call(nameEl.querySelectorAll('.ec-help')).forEach(function (h) {
+			var t = h.firstChild, w;
+			if (t && t.nodeType === 3) {
+				w = gpCell('span', 'lpn-gtext');
+				w.textContent = t.nodeValue.replace(/\s+$/, '');
+				h.replaceChild(w, t);
+			}
+		});
+	}
+	function gpDigits(ctrl) {
+		var d = ctrl.getAttribute('data-gd'), p = ctrl.getAttribute('data-gprop');
+		if (d) { return +d; }
+		if (p && LPN_GP_DIGITS[p]) { return LPN_GP_DIGITS[p]; }
+		return 8;
+	}
+	function gpSizeControl(ctrl, kind) {
+		var cls = ctrl.className ? ctrl.className + ' ' : '';
+		ctrl.className = cls + 'lpn-gval';
+		if (ctrl.nodeName === 'SELECT') { ctrl.className += ' lpn-gw-fill'; }
+		else if (ctrl.nodeName === 'INPUT' && (ctrl.type === 'number' || (ctrl.type === 'text' && ctrl.getAttribute('data-gd')))) {
+			// A number is right-aligned, a run of characters (an id, a custom property) starts at the left.
+			ctrl.className += ctrl.type === 'number' ? ' lpn-gw-num' : ' lpn-gw-num lpn-gw-chars';
+			ctrl.style.setProperty('--d', String(gpDigits(ctrl)));
+		} else if (ctrl.nodeName === 'INPUT' && ctrl.type === 'text') { ctrl.className += ' lpn-gw-fill'; }
+		else if (ctrl.nodeName === 'TEXTAREA') { ctrl.className += ' lpn-gw-fill'; }
+		else if (kind === 'read') { ctrl.className += ' lpn-gw-read'; }
+	}
+	// One `<label>` into four cells: gutter, name, value, unit (and whatever trailed it).
+	function gpRow(label, gut) {
+		var kids = Array.prototype.slice.call(label.childNodes), i, k, ctrl = null, ctrlAt = -1, nameNodes = [], trail = [],
+			value, nameEl, unitEl, unitText = '', boxFirst, extra = [], kind = 'control', firstName = -1, cell;
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k.nodeType === 1 && k.nodeName === 'DATALIST') { extra.push(k); continue; }
+			if (firstName < 0 && gpIsName(k) && !(k.nodeType === 3 && !/\S/.test(k.nodeValue))) { firstName = i; }
+			if (!ctrl && k.nodeType === 1 && LPN_GP_CONTROL.test(k.nodeName)) { ctrl = k; ctrlAt = i; }
+		}
+		boxFirst = !!ctrl && /^(checkbox|radio)$/.test(ctrl.type || '') && (firstName < 0 || ctrlAt < firstName);
+		if (!ctrl) {
+			// A read-only result: the first plain span after the words is the value.
+			kind = 'read';
+			for (i = 0; i < kids.length; i++) {
+				k = kids[i];
+				if (k.nodeType === 1 && !gpIsName(k) && !/(^| )lpn-valwarn( |$)/.test(k.className || '') && k.nodeName !== 'DATALIST') { ctrl = k; ctrlAt = i; break; }
+			}
+		}
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k === ctrl || extra.indexOf(k) >= 0) { continue; }
+			if (boxFirst) { nameNodes.push(k); }
+			else if (ctrl && i > ctrlAt) { trail.push(k); }
+			else { nameNodes.push(k); }
+		}
+		nameEl = gpCell('span', 'lpn-gname');
+		nameNodes.forEach(function (n) { nameEl.appendChild(n); });
+		gpClipWords(nameEl);
+		if (ctrl && !boxFirst && (kind === 'read' || ctrl.type === 'number' || ctrl.type === 'text' || ctrl.nodeName === 'SELECT')) {
+			// Only a quantity has a unit column; a choice's parenthesis is its own words ("Check valve (CV)").
+			if (ctrl.nodeName !== 'SELECT') { unitText = gpTakeUnit(nameEl); }
+		}
+		unitEl = gpCell('span', 'lpn-gunit');
+		if (unitText) {
+			cell = gpCell('span', 'lpn-gutext');
+			cell.textContent = unitText;
+			unitEl.appendChild(cell);
+		}
+		trail.forEach(function (n) { if (n.nodeType === 3 && !/\S/.test(n.nodeValue)) { return; } unitEl.appendChild(n); });
+		while (label.firstChild) { label.removeChild(label.firstChild); }
+		label.className = (label.className ? label.className + ' ' : '') + 'lpn-grow';
+		label.appendChild(gut);
+		label.appendChild(nameEl);
+		if (ctrl) { gpSizeControl(ctrl, kind); label.appendChild(ctrl); }
+		else { label.appendChild(gpCell('span', 'lpn-gval')); }
+		label.appendChild(unitEl);
+		extra.forEach(function (d) { label.appendChild(d); });
+		return label;
+	}
+	function lpnPropsGrid(fields) {
+		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null;
+		if (!fields || typeof document === 'undefined' || typeof document.createRange !== 'function') { return; }
+		if ((' ' + fields.className + ' ').indexOf(' lpn-gprops ') < 0) { fields.className = (fields.className ? fields.className + ' ' : '') + 'lpn-gprops'; }
+		kids = Array.prototype.slice.call(fields.childNodes);
+		function endLoose() { loose = null; }
+		function gutterCell() {
+			var g = gut || gpCell('span', 'lpn-ggut');
+			gut = null;
+			if (g.className.indexOf('lpn-ggut') < 0) {
+				cell = gpCell('span', 'lpn-ggut');
+				cell.appendChild(g);
+				g = cell;
+			}
+			return g;
+		}
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k.nodeType === 3) {
+				if (!/\S/.test(k.nodeValue)) { fields.removeChild(k); continue; }
+			}
+			if (k.nodeType === 1 && k.nodeName === 'BR') { last = null; btns = null; endLoose(); continue; }
+			c = ' ' + (k.className || '') + ' ';
+			if (k.nodeType === 1 && c.indexOf(' lpn-ovm ') >= 0) { gut = k; fields.removeChild(k); continue; }
+			if (k.nodeType === 1 && k.nodeName === 'LABEL') {
+				endLoose();
+				if (last && !gut) {
+					// "Auto" beside Length: its box and words go into the row's last cell, not a label inside a label.
+					cell = gpCell('span', 'lpn-gauto');
+					while (k.firstChild) { cell.appendChild(k.firstChild); }
+					last.querySelector('.lpn-gunit').appendChild(cell);
+					fields.removeChild(k);
+					continue;
+				}
+				if (c.indexOf(' lpn-fill-row ') >= 0) {
+					// The Text's words: no name, the whole width after the gutter.
+					k.insertBefore(gutterCell(), k.firstChild);
+					k.className += ' lpn-grow';
+					Array.prototype.forEach.call(k.childNodes, function (x) { if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') { x.className += ' lpn-gspan2'; } });
+					last = null;
+					continue;
+				}
+				gpRow(k, gutterCell());
+				last = k;
+				continue;
+			}
+			if (k.nodeType === 1 && LPN_GP_BLOCK.test(k.nodeName)) {
+				endLoose(); last = null;
+				marked = !!gut;
+				if (marked) { fields.insertBefore(gutterCell(), k); }   // a marker over a table or a list
+				k.className = (k.className ? k.className + ' ' : '') + (marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
+				continue;
+			}
+			// A loose link or word after a row belongs to that row (the library link beside a curve);
+			// a button goes on a line of its own under it, so two long button words cannot stretch the box.
+			if (last && k.nodeType === 1 && k.nodeName === 'BUTTON') {
+				if (!btns) {
+					btns = gpCell('div', 'lpn-gspan2 lpn-gbtns');
+					fields.insertBefore(btns, last.nextSibling);
+				}
+				btns.appendChild(k);
+				continue;
+			}
+			if (last) { last.querySelector('.lpn-gunit').appendChild(k); continue; }
+			if (!loose) {
+				loose = gpCell('div', 'lpn-gspan lpn-gloose');
+				fields.insertBefore(loose, k);
+			}
+			loose.appendChild(k);
+		}
+		if (gut) { gut = null; }
+	}
 	function tipsIn(root) {
 		initTipsIn(root);
 	}
@@ -70436,6 +70627,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function unitNumberField(fields, labelText, unitId, get, set, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
 		// value was the result of a division and 4 places was a reasonable guess at it; now it is the
 		// number the user typed, and showing "8" back as "8.0000" makes their own input look computed.
@@ -70468,6 +70660,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var label = document.createElement('label'), input = document.createElement('input'),
 			v = get();
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
 		// A BLANK PLACEHOLDER STAYS BLANK. `+('')` is 0, so formatting unconditionally would print a
 		// fallback of zero into a field whose fallback is simply not known yet.
@@ -70513,11 +70706,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// also switches the read and the write onto the plain pair and drops the override marker, which
 	// is not a special case so much as the absence of one: there is no override to mark.
 	function customPropFields(fields, el, group) {
-		var plain = group === 'customer';
+		var plain = group === 'customer', lim;
 		customPropsFor(el, group).forEach(function (def) {
 			var label = document.createElement('label'), input = document.createElement('input'),
 				v = plain ? customerCustomValue(el, def) : customPropValue(el, def);
 			input.type = 'text';
+			// As wide as the longest value the design allows: its character limit, else its upper limit.
+			// A property with neither fills the value column.
+			lim = Number(def.maxLength);
+			if (!(lim > 0) && def.high !== '' && def.high !== null && def.high !== undefined) { lim = String(def.high).length; }
+			if (lim > 0) { input.setAttribute('data-gd', String(Math.min(40, lim))); }
 			input.value = (v === undefined || v === null) ? '' : String(v);
 			customPropPaintFlag(input, def, input.value);
 			input.addEventListener('change', function () {
@@ -70591,6 +70789,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var label = document.createElement('label'), input = document.createElement('input'),
 				v = nodeCoordAxis(n, slot);
 			input.type = 'number';
+			input.setAttribute('data-gd', '12');   // a surveyed northing
 			// step="any", unlike the elevation rows beside it: a latitude is six decimal places and
 			// the default step of 1 makes every one of them fail the browser's own validity test.
 			input.step = 'any';
@@ -70837,7 +71036,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
-		input.type = 'number'; input.step = 'any'; input.value = effective(l, 'length').toFixed(2);
+		input.type = 'number'; input.step = 'any'; input.setAttribute('data-gprop', 'length'); input.value = effective(l, 'length').toFixed(2);
 		input.addEventListener('change', function () {
 			setProp(l, 'length', +input.value);
 			// lenAuto IS BASE-OWNED and a scenario must not touch it -- geometry is shared, because a
@@ -71383,6 +71582,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var fields = document.getElementById('lpn_popup_fields'), widths = [], cur = [], i, k, n,
 			left, cs, minW, chrome, w;
 		if (!fields) { return popup.getBoundingClientRect().width; }
+		if (fields.classList.contains('lpn-gprops')) {
+			// The standard rows: the grid at its natural width (its spanning blocks ask for nothing),
+			// or the widest table, whichever is wider.
+			var prevW = fields.style.width, tabs = fields.querySelectorAll('table'), tw;
+			fields.style.width = 'max-content';
+			w = fields.getBoundingClientRect().width;
+			fields.style.width = prevW;
+			Array.prototype.forEach.call(tabs, function (t) {
+				var pw = t.style.width;
+				t.style.width = 'max-content'; tw = t.getBoundingClientRect().width; t.style.width = pw;
+				w = Math.max(w, tw);
+			});
+			cs = window.getComputedStyle(popup);
+			chrome = popup.getBoundingClientRect().width - fields.getBoundingClientRect().width;
+			minW = parseFloat(cs.minWidth) || 0;
+			return Math.max(minW, Math.ceil(w + chrome + 2 + (popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
+		}
 		left = fields.getBoundingClientRect().left;
 		function flush() {
 			var right = 0, j, el, rr, rg;
@@ -72225,6 +72441,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		customPropFields(fields, n);
 		activeField(fields, n);
 		importNotesField(fields, n);
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// **THE DEMAND CATEGORIES EDITOR** (ROADMAP Task 468).
@@ -72649,9 +72866,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * that quietly detached one property in one scenario would be a second detach mechanism nobody
 	 * could find again.
 	 */
-	function inheritedField(fields, labelText, value, tip) {
+	function inheritedField(fields, labelText, value, tip, prop) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any';
+		if (prop) { input.setAttribute('data-gprop', prop); }
 		input.disabled = true;
 		input.value = (value === undefined || value === null || value === '')
 			? '' : String(+(+value).toFixed(6));
@@ -73096,6 +73314,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input');
 		input.type = 'text';
+		input.setAttribute('data-gd', '10');   // a node id: ten characters, then it scrolls
 		input.value = l[end];
 		input.addEventListener('change', function () {
 			var newId = String(input.value).trim(), why;
@@ -73138,7 +73357,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pipeTypeChooser(fields, l);
 			if (pipeTypeOwns(l, 'diameter')) {
 				valueWarnPaint(inheritedField(fields, (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')',
-					effective(l, 'diameter'), pc.lpn_field_pipetype_tip), valueWarnText('diameter', l, effective(l, 'diameter')));
+					effective(l, 'diameter'), pc.lpn_field_pipetype_tip, 'diameter'), valueWarnText('diameter', l, effective(l, 'diameter')));
 			} else {
 				unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 					function () { return effective(l, 'diameter'); },
@@ -73149,7 +73368,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// unit is named too, because e is a length and the bare number would be ambiguous.
 			if (pipeTypeOwns(l, 'roughness')) {
 				valueWarnPaint(inheritedField(fields, pipeTypePropLabel('roughness'), effective(l, 'roughness'),
-					pc.lpn_field_pipetype_tip), valueWarnText('roughness', l, effective(l, 'roughness')));
+					pc.lpn_field_pipetype_tip, 'roughness'), valueWarnText('roughness', l, effective(l, 'roughness')));
 			} else {
 				numberFieldPlain(fields,
 					roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
@@ -73169,7 +73388,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// moves, and choosing no list is how the box becomes the user's again.
 			if (pipeKIsDerived(l)) {
 				inheritedField(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-					pipeK(l), pc.lpn_field_fittings_tip);
+					pipeK(l), pc.lpn_field_fittings_tip, 'k');
 			} else {
 				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
 					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, null,
@@ -73248,6 +73467,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		}
 		importNotesField(fields, l);
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// THE VALVE POPUP. Its shape changes with the type, and that is the point rather than an
@@ -73492,7 +73712,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {},
 			box = document.createElement('details'),
 			head = document.createElement('summary'),
-			name = group.spec ? (pc[group.spec.label] || group.spec.id) : (group.type || '');
+			name = group.spec ? (pc[group.spec.label] || group.spec.id) : (group.type || ''), rowsHost;
 		// **OPEN, ALL OF THEM.** Tom's own words are that a mixed selection shows both and NEITHER
 		// IS HIDDEN, so collapsing is something the reader does, never the default.
 		box.open = true;
@@ -73505,6 +73725,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			host.appendChild(box);
 			return;
 		}
+		rowsHost = document.createElement('div');
+		box.appendChild(rowsHost);
 		paneCols(group.spec).forEach(function (c) {
 			// A result and an identity are not editable one at a time and are not editable forty at
 			// a time either. `plainFor` is asked PER ELEMENT, so a property that is read-only on any
@@ -73512,8 +73734,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// only one that cannot write a number where a type or a fittings list owns it.
 			if (c.result || !c.set || c.noMulti) { return; }
 			if (group.els.some(function (el) { return paneCellIsPlain(c, el); })) { return; }
-			multiRow(box, c, group.els);
+			multiRow(rowsHost, c, group.els);
 		});
+		lpnPropsGrid(rowsHost);
 		host.appendChild(box);
 	}
 	/**
@@ -73815,6 +74038,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A multiplier is a short number (1, 1.5, 2): a short box (Tom, 2026-10-15: *"5 times longer
 		// than it ever needs to be"*).
 		sizeInput.className = 'lpn-num-short';
+		sizeInput.setAttribute('data-gprop', 'sizeMult'); sizeInput.setAttribute('data-gd', '4');
 		sizeInput.value = textSizeMult(lb);
 		sizeInput.addEventListener('change', function () {
 			var v = +sizeInput.value;
@@ -73999,6 +74223,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		customPropFields(fields, lb);
 		importNotesField(fields, lb);
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// ---- THE CUSTOMER'S OWN PROPERTY BOX (ROADMAP Task 247) ------------------------------------
@@ -74234,6 +74459,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Tom, 2026-09-18). `'customer'` is what tells customPropFields() which letter this object
 		// answers to and that its write is a plain one -- see customPropTypeKey().
 		customPropFields(fields, c, 'customer');
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	function openCustomerPopup(custId, sx, sy) {
@@ -74353,6 +74579,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function numberFieldBlank(fields, labelText, value, onChange, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		input.value = (value === undefined || value === null || value === '') ? '' : String(value);
 		input.addEventListener('change', function () {
 			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
@@ -74368,7 +74595,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.step = 'any'; input.value = value;
+		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); } input.value = value;
 		input.addEventListener('change', function () { saveUndoSnapshot(); onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);

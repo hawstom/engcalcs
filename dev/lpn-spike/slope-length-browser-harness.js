@@ -336,9 +336,7 @@ async function main() {
 			await page.evaluate((t) => {
 				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
 					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf(t) === 0)[0];
-				let n = l.nextElementSibling;
-				while (n && !(n.querySelector && n.querySelector('input[type="checkbox"]'))) { n = n.nextElementSibling; }
-				const box = n.querySelector('input[type="checkbox"]');
+				const box = l.querySelector('input[type="checkbox"]');   // Auto sits in the row's last cell (Task 828)
 				box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
 				box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true }));
 			}, esLen);
