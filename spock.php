@@ -230,6 +230,13 @@ days is ten uses and one browser. Codes began on 2026-10-08; a said-yes row from
 use and never a browser.
 <br><strong>PAGE LOADS</strong> counts rows marked <code>visit</code>: everybody else. Nothing may
 be stored to deduplicate against, so every page load writes a row.
+<br><strong>Robots.</strong> Nothing here reads the browser's user-agent, so no robot is filtered by
+name. What keeps most of them out is a time gate, and it applies to some sections only. Under
+<em>Looking</em> and <em>Calculating</em>, a row is written by the page's script once the visit is at
+least 10 seconds old (and, for Calculating, only after a real calculation), so a <code>visit</code>
+row there is most likely another human. Under <em>Language reach</em>, a row is written by the server
+on every page load with no wait, so its <code>visit</code> rows include robots. The gate trusts the
+visitor's own clock, so it is a best-effort filter and not a security boundary.
 <br>A sum of the two would have a denominator in two units and a numerator in neither. There is no
 total column on this page for that reason.
 </div>

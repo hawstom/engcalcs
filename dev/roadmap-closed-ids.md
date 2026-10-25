@@ -750,3 +750,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|819| CLOSED 2026-10-21 (merged on Tom's word, `feat/import-export-menu`): Import and Export grouped into Network, Shapes and Tables submenus; libraries in the tables export.
 - 0|821| CLOSED 2026-10-22 (Tom: "Count as EPANET does", `fix/energy-count`): the energy summary counts an open pump and a single instant (one hour) as EPANET does.
 - 0|811| CLOSED 2026-10-23 (merged on Tom's word, `feat/theme-whimsy`): ten colour themes, the better default, Newspaper and Arcade design themes, the dark-paper ramp casing.
+- 0|830| CLOSED 2026-10-25 (merged on Tom's word, `fix/dock-widths`): a flown-out box soft-pins when a button in it is clicked, until the map, another tab or Escape.

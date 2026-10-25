@@ -11,11 +11,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 100 — Next (6)
 
+- Task 825 — Audit every dockable box's width, with a checklist.
 - Task 826 — No lat/lon CRS in the shipped examples.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 830 — A box soft-pins when a button in it is clicked.
 - Task 831 — Shapes honour Is active per scenario, in the Presentation category.
 
 ## 95 — Priority 95 (6)

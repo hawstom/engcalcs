@@ -378,6 +378,7 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /lpn-lbl-hidden|lpn-labels-hidden/, 'a CSS class that blanks the map\'s data labels'],
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
+		[/^dockOptimalW$/, /^\.style\.cssText\s*=\s*'display:flex;visibility:hidden/, 'a hidden off-screen probe that measures a box\'s natural width; never shown'],
 		[/^guideApplyRail$/, /lpn-guide-rail-collapsed/, 'the Guide\'s Contents rail folding to a strip (or, on a phone, closing its disclosure); '
 			+ 'the Guide box itself stays open and keeps its display'],
 		[/^guideApplyNavFold$/, /lpn-guide-nav-folded/, 'an entry of the Guide\'s contents rail folding away under its folded parent (Tom, 2026-10-10); the Guide box stays open and keeps its display'],

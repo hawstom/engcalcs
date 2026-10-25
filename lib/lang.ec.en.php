@@ -1126,7 +1126,7 @@ $ec_lang['lpn_guide_tbl_fill_term']='Filling, filters, and scenarios';
 $ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D fills a selected range down from its top row, and Ctrl+Enter fills it with the value of the active cell. Both leave the ID column and read-only cells alone, and a notice states how many cells were filled and how many were not changed. Ctrl+Shift+L shows only the assets selected on the map. With a filter on, Ctrl+A and Ctrl+D act on the rows shown only, and a row edited so that it no longer matches stays until the filter is applied again.</p><p>In a scenario other than Base, a cell edit, Ctrl+D, Ctrl+Enter, and a paste are stored as overrides of the open scenario.</p>';
 // The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
 $ec_lang['lpn_guide_bx_dock_term']='Docking and tabs';
-$ec_lang['lpn_guide_bx_dock_def']='<p>The corner of a box\'s title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>';
+$ec_lang['lpn_guide_bx_dock_def']='<p>The corner of a box\'s title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>';
 $ec_lang['lpn_guide_bx_keep_term']='What a box remembers';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Each box keeps in this browser where it floats, its size, whether it is open, its dock side, whether it auto-hides, its docked width, and the place of its tab. Properties, Criticality analysis, Demand scaling, and Calibration keep only their dock side, auto-hide, tab place, and whether they are open; where they float lasts for one page load. A browser with no saved layout starts with some boxes docked as tabs, and nothing is stored until a box is changed.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='On a phone';
@@ -1500,7 +1500,7 @@ $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — precise';
 $ec_lang['lpn_georef_step1_hint']='The project stays fixed on the screen. Pan and zoom the map underneath it until the map shows approximately the right location at approximately the right scale, then press the Put the model here button.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
-$ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
+$ec_lang['lpn_georef_size_prompt']='Approximate project width east to west?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -2376,7 +2376,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 $ec_lang['lpn_inp_backdrop_attach']='Attach {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.';
 $ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
@@ -3098,9 +3098,9 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
-// crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
+// crowded row. 'lpn_labels_priority' is the tips' heading, "Drop order" (Tom, 2026-10-24: priority 1 reads as top priority here, and 1 is lowest) --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Priority';
+$ec_lang['lpn_labels_priority']='Drop order';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
@@ -3266,7 +3266,7 @@ $ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or cus
 $ec_lang['lpn_settings_override_marks']='Show override markers on the map';
 $ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_clean_map']='Clean map';
-$ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_theme']='Theme';
 $ec_lang['lpn_settings_theme_tip']='Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_theme_system']='System';
