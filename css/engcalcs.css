@@ -2846,6 +2846,11 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-table input[type="number"] { width: 5em; }
 .lpn-demand-table input[type="text"] { width: 7em; }
 .lpn-demand-table select { max-width: 7em; }
+/* In Properties the table shares the box's value and unit columns, so its headings wrap and its boxes are a little shorter. */
+.lpn-gprops .lpn-demand-table th { max-width: 6em; }
+.lpn-gprops .lpn-demand-table input[type="number"] { width: 4.6em; }
+.lpn-gprops .lpn-demand-table input[type="text"] { width: 6em; }
+.lpn-gprops .lpn-demand-table select { max-width: 6.5em; }
 /* THE METERS A JUNCTION CARRIES, LUMPED BEHIND ONE LINE (Tom, 2026-09-18). The summary is the
    count and the total, so it must read as one line of the box and not as a heading over an empty
    space; the table under it keeps the demand-table treatment it already had. */
