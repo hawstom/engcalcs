@@ -115,9 +115,9 @@ async function main() {
 		const SMMENU = await L('lpn_sm_menu');
 		const menuRows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).map((r) => r.textContent.trim()));
 		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(SMMENU) >= 0), JSON.stringify(menuRows));
-		ok('1.1b ...greyed, because the Scenario manager is disabled when Basic mode is on (Tom, 2026-10-13)', await page.evaluate((lab) => {
+		ok('1.1b ...and not greyed: Basic mode has a face of the box of its own (Tom, 2026-10-25)', await page.evaluate((lab) => {
 			const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).filter((b) => b.textContent.trim().indexOf(lab) >= 0)[0];
-			return !!r && r.disabled === true;
+			return !!r && r.disabled !== true;
 		}, SMMENU));
 		// Tom, 2026-10-16: "Scenarios manager..., Overrides manager..., Advanced mode, line, New, ..., line, list
 		// of scenarios." (Apply Base values is retired, Task 801.)
@@ -520,7 +520,7 @@ async function main() {
 		await settle(1500);
 		await page.evaluate(() => { let e = document.querySelector('.ec-consent-actions'); while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; } if (e) { e.style.display = 'none'; } });
 		await scenarioMenu(await L('lpn_scenario_basic'));
-		ok('7.3 the box is closed', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display === 'none'));
+		ok('7.3 the box stays open and shows its Basic face', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && !!document.getElementById('lpn_sm_basic_list') && !document.getElementById('lpn_sm_tree')));
 		ok('7.4 the Scenarios tab is hidden', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display === 'none'));
 		ok('no uncaught page errors', errors.length === 0, errors.join(' | '));
 	} finally { await browser.close(); env.stopServer(); }

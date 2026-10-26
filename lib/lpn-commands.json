@@ -333,11 +333,6 @@
      "parent": "Insert"
     },
     {
-     "id": "project/popup_boxtitle",
-     "label": "Properties",
-     "parent": ""
-    },
-    {
      "id": "project/tool_settings",
      "label": "Settings",
      "parent": ""

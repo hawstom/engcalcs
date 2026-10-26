@@ -233,7 +233,7 @@ async function main() {
 		await dst.settle(1500);
 		ok('no reload', await dst.page.evaluate(() => window.__marker === 'same page'));
 		const inPlace3 = await layoutSnapshot(dst, true);
-		ok('first-visit docks stand: four tabs', inPlace3.strips.left.length + inPlace3.strips.right.length === 4, JSON.stringify(inPlace3.strips));
+		ok('first-visit docks stand: five tabs', inPlace3.strips.left.length + inPlace3.strips.right.length === 5, JSON.stringify(inPlace3.strips));
 		ok('nothing is stored for them', Object.keys(await storageOf(dst)).length === 0, Object.keys(await storageOf(dst)).join(','));
 		await dst.reload();
 		await quiet(dst);

@@ -4760,7 +4760,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
    exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(38rem, 94vw);   /* 2026-10-25: wide enough for the labels table (420 px of rows) with no column cut off; was 28.865rem */
+	width: min(39rem, 94vw);   /* 2026-10-25: wide enough for the labels table (420 px of rows) with no column cut off; was 28.865rem */
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -5273,6 +5273,8 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
+.lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
    the row, and under it what Base has with Clear override. The edge is drawn inside the row's own
    box, so nothing beside it moves. */

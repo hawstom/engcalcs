@@ -95,7 +95,8 @@ async function main() {
 		got = await strips(a.page);
 		ok('five auto-hide tabs (the Scenario manager among them, in Basic mode), each edge in order', JSON.stringify(got) === WANT, JSON.stringify(got));
 		const titles = await a.page.evaluate(() => Array.from(document.querySelectorAll('.lpn-dock-tab')).map((t) => {
-			const b = document.getElementById(t.getAttribute('aria-controls')), h = b && b.querySelector('.lpn-setbox-title');
+			const b = document.getElementById(t.getAttribute('aria-controls')); let h = b && b.querySelector('.lpn-setbox-title');
+			if (h && h.querySelector('.ec-tip')) { h = h.cloneNode(true); h.querySelector('.ec-tip').remove(); }   // the Scenario manager's "?" is not its name
 			return t.textContent === (h ? h.textContent.replace(/\s+/g, ' ').trim() : '');
 		}));
 		ok('each tab reads its box\'s own title', titles.length === 5 && titles.every(Boolean));

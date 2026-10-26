@@ -38,7 +38,7 @@ async function measure(page) {
 		const c = document.getElementById('lpn_setbox_content');
 		const out = { rows: 0, wrapped: [], clipped: [], pane: c.clientWidth, scroll: c.scrollWidth, cols: null, index: null };
 		const ix = document.querySelector('.lpn-setbox-index');
-		out.listW = Math.max.apply(null, lists.map((id) => { const e = document.getElementById(id); return e ? Math.max.apply(null, Array.from(e.children).filter((r) => r.children.length >= 4).map((r) => Math.round(r.getBoundingClientRect().width))) : 0; }));
+		out.listW = Math.max.apply(null, lists.map((id) => { const e = document.getElementById(id); return e ? Math.max.apply(null, Array.from(e.children).filter((r) => r.children.length >= 4).map((r) => Math.round(r.lastElementChild.getBoundingClientRect().right - r.getBoundingClientRect().left))) : 0; }));
 		out.wide = Array.from(c.querySelectorAll('*')).filter((e) => e.offsetParent && e.getBoundingClientRect().right > c.getBoundingClientRect().left + c.clientWidth + 5).slice(0, 3).map((e) => e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 20));
 		out.dbg = Array.from(document.getElementById(lists[0]).children).slice(0, 3).map((r) => Math.round(r.getBoundingClientRect().width) + ':' + Array.from(r.children).map((k) => Math.round(k.getBoundingClientRect().width)).join(','));
 		out.index = ix ? Math.round(ix.getBoundingClientRect().width) : null;
@@ -107,7 +107,7 @@ async function run(browser, Session, label, viewport, touch) {
 		ok(label + ': Use units, Show, Drop no wider than their content', colW.every((w) => w <= 40) && m.cols[m.cols.length - 4] <= 40, m.cols.join(','));
 		console.log('  rows ' + m.dbg.join(' | '));
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
-		if (!touch) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW <= m.pane - 12, m.listW + ' vs ' + m.pane); }
+		if (!touch) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
 		if (touch) { ok(label + ': the Settings index is narrower than 4.5rem (72 px)', m.index !== null && m.index < 72, String(m.index)); }
 		// A scenario override on a label row.
 		await page.keyboard.press('Escape');

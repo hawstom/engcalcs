@@ -62,12 +62,19 @@ const pickButton = (a, id) => a.page.evaluate((i) => {
 
 async function visit(Session, browser, label) {
 	const a = await Session.open(browser, NAME + '-' + label, { viewport: { width: 1600, height: 1000 } });
-	await a.context.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
+	// The first-view layout is five boxes (feat/first-view); this harness needs these five on the right.
+	await a.context.addInitScript(() => {
+		window.EC_DEFAULT_DOCKS = true;
+		window.EC_DEFAULT_DOCK_LIST = ['lpn_contour_box', 'lpn_library_box', 'lpn_find_popup', 'lpn_settings_box', 'lpn_ds_box'].map((id) => ({ id, side: 'right' }));
+	});
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
 	await noConsent(a);
 	await a.settle(1500);
+	// First-view docks arrive when the first project opens (feat/first-view), not over the gallery.
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+	await a.settle(2500);
 	return a;
 }
 async function flyOut(a, id) {

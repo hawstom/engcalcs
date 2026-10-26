@@ -75,15 +75,18 @@ const closeBox = (a, id) => a.page.evaluate((i) => {
 	if (x) { x.click(); } else if (b) { b.style.display = 'none'; }
 }, id);
 
-async function visit(Session, browser, label, defaults, seed) {
+async function visit(Session, browser, label, defaults, seed, dockList) {
 	const a = await Session.open(browser, NAME + '-' + label, { viewport: { width: 1600, height: 1000 } });
 	await a.context.addInitScript((v) => { window.EC_DEFAULT_DOCKS = v; }, defaults);
+	if (dockList) { await a.context.addInitScript((l) => { window.EC_DEFAULT_DOCK_LIST = l; }, dockList); }
 	if (seed) { await a.context.addInitScript((kv) => { try { if (localStorage.getItem(kv[0]) === null) { localStorage.setItem(kv[0], kv[1]); } } catch (e) { /* none */ } }, seed); }
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
 	await noConsent(a);
 	await a.settle(1500);
+	// First-view docks arrive when the first project opens (feat/first-view), not over the gallery.
+	if (defaults) { await a.openExampleCard(await a.lang('lpn_ex_net3_title')); await a.settle(2500); }
 	return a;
 }
 async function openSettings(a) {
@@ -287,7 +290,8 @@ async function main() {
 		await m.close();
 
 		console.log('\n--- 3. the first-visit docks fly out at those widths ---');
-		const a = await visit(Session, browser, 'first', true);
+		// The first-view layout is five boxes now (feat/first-view); the fourteen are docked by a list of the harness's own.
+		const a = await visit(Session, browser, 'first', true, null, FIRST.map((id) => ({ id, side: LEFT.includes(id) ? 'left' : 'right' })));
 		const seen = {};
 		for (const id of FIRST) {
 			const side = LEFT.includes(id) ? 'left' : 'right', want = Math.round(table[id] * 16);
