@@ -95,16 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-25 (fortieth session, Opus main, Sonnet agents)
+## STATE — 2026-10-26 (forty-first session, Opus main, Sonnet agents)
 
-- **Roadmap:** Tom moved every old 100 to a temporary 95 while fit and finish runs (check allows 95; return them and drop 95 together). New 100s: 825-831.
-- **Waiting on his browser pass** (each on the previews page, each green except payload freshness): `fix/browser-pass-a` (node ID in Connected asset, Text slides), `fix/wording-1024` (Typed value, Demand category description, Buffer label; merged on green this session), `fix/dock-widths` (825, 830 soft-pin), `fix/phone-select` (827; contains `feat/first-view`), `feat/report-buttons` (829), `feat/box-rows` (828, Contour and Fire flow), `feat/shape-scenario` (831, on `feat/scenario-io`; merge that first), `fix/example-crs` (826), plus the older `feat/value-source`, `feat/scenario-io`.
-- **In flight at /clear:** `feat/box-rows-properties` (Properties on the standard grid). Read `git log feat/box-rows..` in its worktree.
-- **Seams at merge:** dock-widths vs phone-select (`layoutDocks`, `dockPlaced`); box-rows vs dock-widths (`.lpn-contourbox` width line); box-rows vs report-buttons (Fire flow box); wording vs box-rows (Buffer unit line). Merge order: dock-widths, phone-select, report-buttons, box-rows.
-- **Asked of him:** Morph to Vertex refuses any junction with an elevation (recommend: allow, report the dropped elevations); Fire flow table scrolls at 560 (recommend leave); Close X removes the Properties tab; the phone map pan (unasked) is his call.
-- **Stored:** `lpn_gcols` (box column split), approved by Tom 2026-10-24. Keys deleted: `lpn_field_meter_at_node`, `lpn_scnres_copy_tip`. Keys added: `lpn_report_copy_html`, `lpn_shapes_this_scenario`.
-- **Trap met:** a 529 overload killed three agents at once; their worktrees kept uncommitted edits, and SendMessage resumed each.
-- **Trap met:** worktrees lack `dev/browser-pass/node_modules`; agents symlink the main checkout's (git-ignored), else ~200 browser harnesses fail.
+- **Merged 2026-10-25 on his word:** `fix/browser-pass-a`, `fix/dock-widths` (830 closed). Merged 2026-10-26 on green (defect): `fix/bottom-pane-lag` (a shut pane is `lpn-pane-shut`, content-visibility hidden, not display:none).
+- **Waiting on his browser pass** (previews page): `fix/phone-select` (827, with Basic-mode Scenario manager and first-view docks), `feat/box-rows-properties` (828; supersedes `feat/box-rows`, kill that one when this merges), `feat/report-buttons` (829, print widths fixed), `fix/example-crs` (826, Net3 SI now EPSG:26943), `feat/shape-scenario` (831, on `feat/scenario-io`), `feat/value-source`, `feat/scenario-io`.
+- **Waiting on his typed word:** `fix/dup-keys` (deletes 49 keys; list in its commit and messenger.md).
+- **His calls 2026-10-25:** word wrap, mid-word included, is fine; a Settings labels row's CONTROLS never reflow onto two lines. Phone map pan dropped. Water menu loses Properties.
+- **Seams at merge:** phone-select vs box-rows-properties (Properties box CSS); box-rows vs report-buttons (Fire flow box).
+- **Trap met:** load flakes in full suites with four running: theme-design, label-pass-economy, geojson-import; each passed alone.
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
