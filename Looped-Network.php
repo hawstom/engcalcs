@@ -1621,7 +1621,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_title']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
+	<div class="lpn-popover-body lpn-gridhost" id="lpn_new_body">
 		<?php // THE TOP CHOICE, and it is top because it is the one that cannot be changed afterwards
 		      // (Task 641 phase 2, Tom's own specification of 2026-09-13). **TWO ANSWERS, NOT THREE.**
 		      // A geographic project states a PROJECTION, and lat/lon is one of them -- EPSG:3857, the
@@ -1635,14 +1635,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // Each radio carries its own "?" INSIDE its label, which is the shipped pattern one line
 		      // down in the legend rather than a new one: the glyph selects the radio it explains,
 		      // which is the radio you were reading about. ?>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
-			<div>
+		<?php // ONE GRID (Task 828, Tom 2026-10-25): a heading spans the box; each choice is a row, its
+		      // words in the name track, its radio, select or button in the value track, and what
+		      // belongs beside it (the projection chooser and its answer) in the last. ?>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></div>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
 				<?php // Reuses Convert as's own lpn_convas_epsg / lpn_convas_epsg_tip (2026-09-25):
 				      // once "projection" left both strings, this radio's own wording was identical
 				      // to Convert as's, and a second copy of the same sentence is the one that
 				      // could drift from it. ?>
-				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+				<span class="lpn-gname"><label for="lpn_new_coords_geo"><?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" id="lpn_new_coords_geo" name="lpn_new_coords" value="geo">
 				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
 				      // *"The button is not a good place for the full projection name. How about an
 				      // ellipsis button followed by the name?"*). It used to be one control doing both
@@ -1656,39 +1660,41 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // to, and it can wrap without dragging the button with it. The button names the
 				      // projection through aria-describedby, so a screen reader still hears what it
 				      // would be changing rather than a bare ellipsis. ?>
-				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button>
-				<span id="lpn_new_crs_name" class="lpn-new-crs-name"></span>
+				<span class="lpn-gunit"><button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button><span id="lpn_new_crs_name" class="lpn-new-crs-name"></span></span>
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_new_coords" value="local" checked> <?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_new_coords_local"><?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" id="lpn_new_coords_local" name="lpn_new_coords" value="local" checked>
+				<span class="lpn-gunit"></span>
 			</div>
-		</fieldset>
+		</div>
 		<?php // The units, as Tom answered it on 2026-08-24: *"all units are shown ... with the US and
 		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
 		      // two preset buttons are here because they are markup with strings in them. ?>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></legend>
-			<div class="lpn-new-presets">
-				<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
-				      // the suite serves a worldwide audience and most of it is metric). Same two
-				      // strings as that row, so there is one name for each system on this page. ?>
-				<button type="button" id="lpn_new_si"><?=$ec_lang['calc_units_si']?></button>
-				<button type="button" id="lpn_new_us"><?=$ec_lang['calc_units_us']?></button>
-			</div>
-			<div id="lpn_new_units_fields" class="lpn-units-group"></div>
-		</fieldset>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></div>
+		<div class="lpn-new-presets lpn-gcol2">
+			<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
+			      // the suite serves a worldwide audience and most of it is metric). Same two
+			      // strings as that row, so there is one name for each system on this page. ?>
+			<button type="button" id="lpn_new_si"><?=$ec_lang['calc_units_si']?></button>
+			<button type="button" id="lpn_new_us"><?=$ec_lang['calc_units_us']?></button>
+		</div>
+		<div id="lpn_new_units_fields" class="lpn-gsub"></div>
 		<?php // Head loss at CREATION rather than four levels down in Settings -- it is a decision
 		      // about the whole model and it decides what the roughness column of every pipe means.
 		      // Every label is borrowed from bpn_, so this row costs no new key. ?>
-		<div class="lpn-new-block">
-			<label for="lpn_new_method"><?=$ec_lang['bpn_method']?></label>
-			<select id="lpn_new_method">
-				<option value="hw"><?=$ec_lang['bpn_method_hw']?></option>
-				<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
-				<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
-			</select>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_new_method"><?=$ec_lang['bpn_method']?></label></span>
+				<select id="lpn_new_method" class="lpn-gval lpn-gw-fill">
+					<option value="hw"><?=$ec_lang['bpn_method_hw']?></option>
+					<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
+					<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
+				</select>
+				<span class="lpn-gunit"></span>
+			</div>
 		</div>
-		<div class="lpn-new-actions">
+		<div class="lpn-new-actions lpn-gcol2">
 			<button type="button" id="lpn_new_create"><?=$ec_lang['lpn_new_create']?></button>
 			<button type="button" id="lpn_new_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>

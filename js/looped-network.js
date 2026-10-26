@@ -13593,14 +13593,6 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
 		}), pc.lpn_contour_buffer_tip, '', 4);
-		// The unit is a phrase, not a symbol: it takes its own line under the box (Ida, 3a), so it
-		// never widens the unit track of every other row.
-		if (pc.lpn_contour_buffer_unit) {
-			var bufUnit = document.createElement('span');
-			bufUnit.className = 'lpn-gunit';
-			bufUnit.textContent = pc.lpn_contour_buffer_unit;
-			lpnGridRow(body, { kind: 'span', control: bufUnit });
-		}
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -24410,6 +24402,18 @@ var EngCalcs = EngCalcs || {};
 	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
+		if (!hideLabel) {
+			// A row of the box's one grid: the name in the name track, the pull-down in the value track.
+			options.forEach(function (o) {
+				var opt = document.createElement('option');
+				opt.value = o[0]; opt.textContent = o[1];
+				if (o[0] === value) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () { onChange(sel.value); });
+			lpnGridRow(parent, { label: labelText, control: sel, kind: 'select' });
+			return sel;
+		}
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
 		if (hideLabel) {
@@ -24914,7 +24918,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
-		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input, pair;
+		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input;
 		if (!box) { return; }
 		box.innerHTML = '';
 		if (!findControlsShown()) {
@@ -24925,6 +24929,7 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(note);
 			back = document.createElement('button');
 			back.type = 'button';
+			back.className = 'lpn-gcol2';
 			back.textContent = pc.lpn_find_q_restore || 'Use the controls instead';
 			back.addEventListener('click', function () {
 				// findState still holds the last query the controls DID express, so this is a
@@ -24949,10 +24954,7 @@ var EngCalcs = EngCalcs || {};
 		// wide at every size, so the pair fits everywhere and one layout is one thing to keep right.
 		// A long condition ellipsizes rather than wrapping the box, and the query line under it
 		// spells the whole thing out in words either way.
-		pair = document.createElement('div');
-		pair.className = 'lpn-find-pair';
-		box.appendChild(pair);
-		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+		findSelect(box, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
 			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
@@ -24977,7 +24979,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			rebuildFindForm(); renderFindResults(null);
 		});
-		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
+		findSelect(box, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
 		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
@@ -25001,23 +25003,15 @@ var EngCalcs = EngCalcs || {};
 			});
 			return;
 		}
-		valWrap = document.createElement('div');
-		valWrap.style.margin = '4px 0';
-		valLab = document.createElement('label');
-		valLab.textContent = pc.lpn_find_value || 'Value';
-		valLab.style.display = 'block';
 		input = document.createElement('input');
 		input.type = 'text';
 		input.value = findState.value;
-		input.style.width = '100%';
 		input.addEventListener('input', function () { findState.value = input.value; updateFindQuery(); });
 		// Enter is what a person presses in a search box, and this panel has no other use for it.
 		input.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
 		});
-		valLab.appendChild(input);
-		valWrap.appendChild(valLab);
-		box.appendChild(valWrap);
+		lpnGridRow(box, { label: pc.lpn_find_value || 'Value', control: input, kind: 'text' });
 	}
 	/**
 	 * A label carrying a tip, as `.ec-help` wrapping the text and a `.ec-tip` "?" glyph.
@@ -25175,19 +25169,38 @@ var EngCalcs = EngCalcs || {};
 			new ResizeObserver(function () { gridPlaceSplit(grid); gridClipTitles(grid); }).observe(grid);
 		}
 	}
+	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
+	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
+	function lpnGridHost(host) {
+		if (host.__lpnGridHost) { return host; }
+		host.__lpnGridHost = true;
+		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost';
+		// Narrower than 18rem the name goes above its value (the host cannot query its own width).
+		if (typeof ResizeObserver !== 'undefined') {
+			new ResizeObserver(function () {
+				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
+				if (w) { host.classList.toggle('lpn-gnarrow', w < 18 * px); }
+			}).observe(host);
+		}
+		return host;
+	}
 	// The grid the next row goes into: the host's last child when that is a grid, else a new one.
 	function gridFor(host) {
 		var last = host.lastChild, grid;
 		if (last && last.className && String(last.className).indexOf('lpn-grid') >= 0) { return last; }
-		if (!host.__lpnGridHost) {
-			host.__lpnGridHost = true;
-			host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost';
+		if (!host.__lpnGridHost && (' ' + host.className + ' ').indexOf(' lpn-gsub ') >= 0) { host.__lpnGridHost = true; }   // a stretch of its parent's grid
+		var top = host, sub = (' ' + host.className + ' ').indexOf(' lpn-gsub ') >= 0;
+		if (sub) {
+			// A stretch of its parent's grid: the tracks, and so the split, are the parent host's.
+			while (top.parentNode && (' ' + top.className + ' ').indexOf(' lpn-gridhost ') < 0) { top = top.parentNode; }
+			if (!top.parentNode && (' ' + top.className + ' ').indexOf(' lpn-gridhost ') < 0) { top = host; }
 		}
-		gcolApply(host);
+		lpnGridHost(top);
+		gcolApply(top);
 		grid = document.createElement('div');
 		grid.className = 'lpn-grid';
 		host.appendChild(grid);
-		try { gridWireSplit(grid, host); } catch (e) { /* a page without pointer events keeps the grid */ }
+		try { gridWireSplit(grid, top); } catch (e) { /* a page without pointer events keeps the grid */ }
 		return grid;
 	}
 	// spec = {label, tip, control, unit, kind, digits, max, cls}. kind: 'num' | 'text' | 'select' |
@@ -25218,8 +25231,9 @@ var EngCalcs = EngCalcs || {};
 			name = findHelpLabel(spec.label || '', spec.tip, true);
 			name.className += ' lpn-gname';
 		} else {
-			name = document.createElement('span');
+			name = document.createElement(spec.forId ? 'label' : 'span');
 			name.className = 'lpn-gname';
+			if (spec.forId) { name.htmlFor = spec.forId; }
 			name.textContent = spec.label || '';
 		}
 		row.appendChild(name);
@@ -25246,14 +25260,15 @@ var EngCalcs = EngCalcs || {};
 			qLab, hint, btn;
 		if (!box) { return; }
 		box.innerHTML = '';
+		lpnGridHost(box);   // the whole form is one grid; its runs of rows are stretches of it
 		findControlsBox = document.createElement('div');
+		findControlsBox.className = 'lpn-gsub';
 		box.appendChild(findControlsBox);
 		findQueryAst = null; findQueryError = null;
 		renderFindControls();
 		// Right above the button, which is where Tom asked for it: the last thing read before the
 		// search is pressed -- and now the thing that can be edited instead.
-		qLab = document.createElement('label');
-		qLab.style.display = 'block';
+		qLab = null;
 		// **THE TIP GOES ON A "?" GLYPH, NOT ON THE INPUT** (Tom, 2026-09-02: *"Find one-line query
 		// tip: Not showing. And there is no ? glyph."*). It was set as `title` on the text field,
 		// which is invisible to EngCalcs.initTips() -- that wires `.ec-help[title]` and nothing else
@@ -25263,8 +25278,6 @@ var EngCalcs = EngCalcs || {};
 		// Built as the same three-part shape ecTipLabel() emits in PHP: `.ec-help` carrying the
 		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
 		// label rather than one character. CLAUDE.md's rule for a label with no link.
-		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
-			pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
@@ -25272,15 +25285,16 @@ var EngCalcs = EngCalcs || {};
 		findQueryInput.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
 		});
-		qLab.appendChild(findQueryInput);
-		box.appendChild(qLab);
+		lpnGridRow(box, { label: pc.lpn_find_query_label || 'Query',
+			tip: pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.',
+			control: findQueryInput, kind: 'text' });
 		// Tom's own line, and "expandable" is his word: it says the grammar will grow.
 		hint = document.createElement('div');
-		hint.className = 'lpn-find-hint';
+		hint.className = 'lpn-find-hint lpn-gcol2';
 		hint.textContent = pc.lpn_find_query_hint || 'Combine conditions with AND, OR and ()';
 		box.appendChild(hint);
 		findQueryMsgEl = document.createElement('div');
-		findQueryMsgEl.className = 'lpn-find-msg';
+		findQueryMsgEl.className = 'lpn-find-msg lpn-gcol2';
 		box.appendChild(findQueryMsgEl);
 		findQueryInput.value = findQueryString();
 		renderFindMessage();
@@ -25314,6 +25328,7 @@ var EngCalcs = EngCalcs || {};
 		// select appear, choosing the DEM takes the value box away -- and a rebuild that cleared
 		// `box` would take the three Find pull-downs with it. `find-harness.js` caught it.
 		var rbox = document.createElement('div');
+		rbox.className = 'lpn-gsub';
 		box.appendChild(rbox);
 		buildReplaceForm(rbox);
 	}
@@ -25475,7 +25490,7 @@ var EngCalcs = EngCalcs || {};
 	// is exactly one Find button and exactly one place that wires its click.
 	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
-		row.className = 'lpn-find-filter';
+		row.className = 'lpn-find-filter lpn-gcol2';
 		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
@@ -26394,6 +26409,7 @@ var EngCalcs = EngCalcs || {};
 		if (replaceIsDem()) {
 			btn = document.createElement('button');
 			btn.type = 'button';
+			btn.className = 'lpn-gcol2';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
@@ -26418,21 +26434,16 @@ var EngCalcs = EngCalcs || {};
 			});
 			btn = document.createElement('button');
 			btn.type = 'button';
+			btn.className = 'lpn-gcol2';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
 			box.appendChild(msg);
 			return;
 		}
-		valWrap = document.createElement('div');
-		valWrap.style.margin = '4px 0';
-		valLab = document.createElement('label');
-		valLab.textContent = pc.lpn_replace_value || 'New value';
-		valLab.style.display = 'block';
 		input = document.createElement('input');
 		input.type = 'text';
 		input.value = replaceState.value;
-		input.style.width = '100%';
 		// A typed value drops the pending count: a number on screen about a value the box no longer
 		// holds is the one way a preview can lie.
 		input.addEventListener('input', function () {
@@ -26441,11 +26452,10 @@ var EngCalcs = EngCalcs || {};
 		input.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runReplacePreview(); }
 		});
-		valLab.appendChild(input);
-		valWrap.appendChild(valLab);
-		box.appendChild(valWrap);
+		lpnGridRow(box, { label: pc.lpn_replace_value || 'New value', control: input, kind: 'text' });
 		btn = document.createElement('button');
 		btn.type = 'button';
+		btn.className = 'lpn-gcol2';
 		setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 		btn.addEventListener('click', runReplacePreview);
 		box.appendChild(btn);
@@ -36075,22 +36085,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeMenu();
 		function radioGroup(body, key, label, options) {
 			var wrap = document.createElement('div'), head = document.createElement('div');
-			wrap.className = 'lpn-export-group';
-			head.style.fontWeight = 'bold';
+			wrap.className = 'lpn-export-group lpn-gsub';
+			head.className = 'lpn-ghead';
 			head.textContent = label;
 			wrap.appendChild(head);
 			options.forEach(function (o, i) {
-				var lab = document.createElement('label'), inp = document.createElement('input');
-				lab.style.display = 'block';
+				var inp = document.createElement('input');
 				inp.type = 'radio';
 				inp.name = 'lpn_export_' + key;
 				inp.value = o[0];
 				inp.id = 'lpn_export_' + key + '_' + o[0];
 				inp.checked = i === 0 || !!o[2];
 				if (o[2] === 'off') { inp.disabled = true; inp.checked = false; }
-				lab.appendChild(inp);
-				lab.appendChild(document.createTextNode(' ' + o[1]));
-				wrap.appendChild(lab);
+				lpnGridRow(wrap, { label: o[1], control: inp, kind: 'check', forId: inp.id });
 			});
 			body.appendChild(wrap);
 			groups[key] = wrap;
@@ -36099,7 +36106,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var el = groups[key] && groups[key].querySelector('input:checked');
 			return el ? el.value : '';
 		}
-		openDialog(function (body) {
+		openDialog(function (dlgBody) {
+			var body = document.createElement('div');
+			dlgBody.appendChild(body);
+			lpnGridHost(body);   // the whole dialog is one grid
+			body.style.minWidth = '19rem';   // wide enough that the name stays beside its choice
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
 				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
@@ -36111,6 +36122,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (withScn) {
 				var note = document.createElement('div');
 				note.id = 'lpn_export_scn_note';
+				note.className = 'lpn-gcol2';
 				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
@@ -52055,12 +52067,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return null;
 	}
 	// Shared with the File, Convert as box (Task 696), which asks the same units question of a copy.
-	function cloneUnitStrip(hostId) {
+	function cloneUnitStrip(hostId, asRows) {
 		var host = document.getElementById(hostId), out = [];
 		if (!host) { return out; }
 		host.innerHTML = '';
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var live = unitEl(name), item = unitStripItem(live), copy, sel;
+			var live = unitEl(name), item = unitStripItem(live), copy, sel, nm;
 			if (!item) { return; }
 			copy = item.cloneNode(true);
 			copy.removeAttribute('id');   // #lpn_u_roughness_row is the strip's, not ours
@@ -52069,13 +52081,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			sel.removeAttribute('name');
 			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
+			if (asRows) {
+				// A row of the box's one grid: the unit's name in the name track, its select in the value track.
+				nm = copy.querySelector('.lpn-units-name');
+				copy = lpnGridRow(host, { label: nm ? nm.textContent : '', control: sel, kind: 'select' });
+				out.push({ name: name, sel: sel, item: copy });
+				return;
+			}
 			host.appendChild(copy);
 			out.push({ name: name, sel: sel, item: copy });
 		});
 		return out;
 	}
 	function buildNewBoxUnits() {
-		newBoxUnits = cloneUnitStrip('lpn_new_units_fields');
+		newBoxUnits = cloneUnitStrip('lpn_new_units_fields', true);
 	}
 	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
 	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
@@ -69760,7 +69779,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			title = document.getElementById('lpn_popup_title'), fields = document.getElementById('lpn_popup_fields'), p;
 		hideTipsIn(popup);
 		currentPopup = null;
-		title.textContent = '';
+		popupTitleSet('');
 		clearFields(fields);
 		p = document.createElement('p');
 		p.className = 'lpn-popup-none';
@@ -70277,7 +70296,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var d = ctrl.getAttribute('data-gd'), p = ctrl.getAttribute('data-gprop');
 		if (d) { return +d; }
 		if (p && LPN_GP_DIGITS[p]) { return LPN_GP_DIGITS[p]; }
-		return 8;
+		return 12;   // a coordinate, an elevation, an id: the one width every like box shares
 	}
 	function gpSizeControl(ctrl, kind) {
 		var cls = ctrl.className ? ctrl.className + ' ' : '';
@@ -70342,7 +70361,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return label;
 	}
 	function lpnPropsGrid(fields) {
-		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null;
+		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null, nm;
 		if (!fields || typeof document === 'undefined' || typeof document.createRange !== 'function') { return; }
 		if ((' ' + fields.className + ' ').indexOf(' lpn-gprops ') < 0) { fields.className = (fields.className ? fields.className + ' ' : '') + 'lpn-gprops'; }
 		kids = Array.prototype.slice.call(fields.childNodes);
@@ -70376,10 +70395,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					continue;
 				}
 				if (c.indexOf(' lpn-fill-row ') >= 0) {
-					// The Text's words: no name, the whole width after the gutter.
+					// The Text's words: a row like any other, its name in the name track (the box's own
+					// title, which says it too, is hidden from the eye) and the box in the value track,
+					// reaching to the end of the grid.
+					Array.prototype.forEach.call(k.childNodes, function (x) {
+						if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') {
+							nm = gpCell('span', 'lpn-gname');
+							nm.textContent = x.getAttribute('aria-label') || '';
+							x.className += ' lpn-gval lpn-gtextarea';
+							k.insertBefore(nm, x);
+						}
+					});
 					k.insertBefore(gutterCell(), k.firstChild);
 					k.className += ' lpn-grow';
-					Array.prototype.forEach.call(k.childNodes, function (x) { if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') { x.className += ' lpn-gspan2'; } });
 					last = null;
 					continue;
 				}
@@ -70398,7 +70426,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// a button goes on a line of its own under it, so two long button words cannot stretch the box.
 			if (last && k.nodeType === 1 && k.nodeName === 'BUTTON') {
 				if (!btns) {
-					btns = gpCell('div', 'lpn-gspan2 lpn-gbtns');
+					btns = gpCell('div', 'lpn-gspan3 lpn-gbtns');
 					fields.insertBefore(btns, last.nextSibling);
 				}
 				btns.appendChild(k);
@@ -70406,7 +70434,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (last) { last.querySelector('.lpn-gunit').appendChild(k); continue; }
 			if (!loose) {
-				loose = gpCell('div', 'lpn-gspan lpn-gloose');
+				// Buttons stand in the value track, as a button does in every row; words span the grid.
+				loose = gpCell('div', k.nodeType === 1 && k.nodeName === 'BUTTON' ? 'lpn-gspan3 lpn-gbtns lpn-gloose' : 'lpn-gspan lpn-gloose');
 				fields.insertBefore(loose, k);
 			}
 			loose.appendChild(k);
@@ -70439,7 +70468,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		fields.innerHTML = '';
 		// The ID line's room goes with the Properties box's own rows, not another box's.
-		[fields, fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
+		[fields, fields.id === 'lpn_popup_fields' ? fields.parentNode : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
 	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
@@ -70664,7 +70693,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The gutter's room, given to the rows and to the ID line above them (#lpn_popup_title), so
 	// every line of the box starts at one x.
 	function ovmGutterOn(fields, cls) {
-		var t = fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null;
+		var t = fields.id === 'lpn_popup_fields' ? fields.parentNode : null;   // the body, which owns the tracks
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
@@ -70950,7 +70979,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var label = document.createElement('label'), input = document.createElement('input'),
 				v = nodeCoordAxis(n, slot);
 			input.type = 'number';
-			input.setAttribute('data-gd', '12');   // a surveyed northing
 			// step="any", unlike the elevation rows beside it: a latitude is six decimal places and
 			// the default step of 1 makes every one of them fail the browser's own validity test.
 			input.step = 'any';
@@ -71746,17 +71774,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (fields.classList.contains('lpn-gprops')) {
 			// The standard rows: the grid at its natural width (its spanning blocks ask for nothing),
 			// or the widest table, whichever is wider.
-			var prevW = fields.style.width, tabs = fields.querySelectorAll('table'), tw;
-			fields.style.width = 'max-content';
-			w = fields.getBoundingClientRect().width;
-			fields.style.width = prevW;
+			var body = fields.parentNode, own = body.classList.contains('lpn-popover-body') && window.getComputedStyle(fields).display === 'grid' &&
+				window.getComputedStyle(body).display === 'grid',
+				host = own ? body : fields, prevW = host.style.width, tabs = fields.querySelectorAll('table'), tw;
+			// With the shared tracks the BODY is the grid (its title, rows and graph are subgrids of it).
+			host.style.width = 'max-content';
+			w = host.getBoundingClientRect().width;
+			host.style.width = prevW;
 			Array.prototype.forEach.call(tabs, function (t) {
 				var pw = t.style.width;
 				t.style.width = 'max-content'; tw = t.getBoundingClientRect().width; t.style.width = pw;
 				w = Math.max(w, tw);
 			});
 			cs = window.getComputedStyle(popup);
-			chrome = popup.getBoundingClientRect().width - fields.getBoundingClientRect().width;
+			chrome = popup.getBoundingClientRect().width - host.getBoundingClientRect().width;
 			minW = parseFloat(cs.minWidth) || 0;
 			return Math.max(minW, Math.ceil(w + chrome + 2 + (popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
 		}
@@ -71919,16 +71950,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
+	// The line under the box's own title: a heading that spans the grid (a customer, a selection, a
+	// Text) or, for an element with an id, the ID row (idField). `cls` is the title's class, so a
+	// leftover from the last element never stays.
+	function popupTitleSet(text, cls) {
+		var t = document.getElementById('lpn_popup_title'), w;
+		if (!t) { return; }
+		t.className = cls || 'lpn-gtitle';
+		t.textContent = '';
+		if (text) {
+			w = document.createElement('span');
+			w.className = 'lpn-gtitle-text';
+			w.textContent = text;
+			t.appendChild(w);
+		}
+	}
 	// A text input in place of the static title -- shared by both popups since the validation/
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
 	function idField(currentId, onRename, group) {
 		var pc = EngCalcs.pageConfig || {},
-			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
+			title = document.getElementById('lpn_popup_title'), input = document.createElement('input'), nameEl;
 		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
 		// it?"*). It sits in the popup's title bar, where a bare text box holding "J12" reads as a
 		// heading somebody made editable rather than as the element's name.
-		title.textContent = (pc.lpn_field_id || 'ID') + ' ';
+		// ON THE ROW GRID (Task 828): the name in the name track, the box in the value track, as every
+		// row below it (the box's body shares the tracks with the title, graph and fields).
+		popupTitleSet('', 'lpn-gtitle lpn-gtitle-id');
+		nameEl = document.createElement('span');
+		nameEl.className = 'lpn-gname';
+		nameEl.textContent = pc.lpn_field_id || 'ID';
+		title.appendChild(nameEl);
+		title.appendChild(document.createTextNode(' '));
 		input.type = 'text'; input.value = currentId;
+		input.className = 'lpn-gval lpn-gw-num lpn-gw-chars';
+		input.style.setProperty('--d', '12');
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
 			var newId = input.value, result = validateNewId(newId, currentId, group);
@@ -73475,7 +73530,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input');
 		input.type = 'text';
-		input.setAttribute('data-gd', '10');   // a node id: ten characters, then it scrolls
+		input.setAttribute('data-gd', '12');   // a node id: as wide as every other box of characters
 		input.value = l[end];
 		input.addEventListener('change', function () {
 			var newId = String(input.value).trim(), why;
@@ -73924,8 +73979,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		groups = multiGroups();
 		currentPopup = { kind: 'multi', id: null };
 		clearFields(fields);
-		title.textContent = String(pc.lpn_multi_title || '{n} selected')
-			.replace('{n}', String(selectionCount()));
+		popupTitleSet(String(pc.lpn_multi_title || '{n} selected')
+			.replace('{n}', String(selectionCount())));
 		groups.forEach(function (g) { multiSection(fields, g); });
 		// **BESIDE THE SELECTION, NOT IN THE MIDDLE OF THE SCREEN** (Tom, 2026-09-08: *"Open it
 		// immediately next to the extent of the selection"*, his preference and subject to change).
@@ -74155,7 +74210,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			label = document.createElement('label'), input = document.createElement('textarea');
-		title.textContent = pc.lpn_tool_add_text || 'Text';
+		popupTitleSet(pc.lpn_tool_add_text || 'Text', 'lpn-gtitle lpn-gtitle-sr');   // the row below names it
 		clearFields(fields);
 		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
 		// writes through setProp(). Writing lb._text here edits Base from inside a scenario, under
@@ -74417,7 +74472,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
 			stLabel, stInput, offLabel, offInput, warn;
 		if (!c) { return; }
-		title.textContent = String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id);
+		popupTitleSet(String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id));
 		clearFields(fields);
 
 		// **THE SAME TWO IDENTITY FIELDS EVERY NODE AND LINK CARRIES**, built by the same two
@@ -81815,6 +81870,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		].filter(Boolean).forEach(function (pair) {
 			ffRow(host, pair[0], null, ffEl('span', null, pair[1], null), '');
 		});
+		// A table or a note after the rows would otherwise be the next row's neighbour; it spans.
 	}
 	// The three option cells of one row. A steady run has no time step to state, so it says so
 	// with a dash rather than a number nothing used.
@@ -82062,14 +82118,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildScenarioResultsSection(host) {
 		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, btns, copy, csv, sorted;
 		if (!scenarioCompareRun || !scenarioCompareRun.some(function (r) { return r.ok; })) { return; }
-		sec = ffEl('div', 'lpn-scnres', null, host);
+		sec = ffEl('div', 'lpn-scnres lpn-gsub', null, host);   // a stretch of the box's one grid
 		sec.id = 'lpn_scnres';
 		ffEl('p', 'lpn-ff-summary', pc.lpn_scnres_title || 'Results by asset', sec);
-		ctl = ffEl('div', 'lpn-scnres-controls', null, sec);
-		var lab = ffEl('label', null, null, ctl);
-		ffEl('span', null, (pc.lpn_survey_codes_col_type || 'Asset type') + ' ', lab);
-		sel = ffEl('select', null, null, lab);
+		sel = ffEl('select', null, null, null);
 		sel.id = 'lpn_scnres_kind';
+		ffRow(sec, pc.lpn_survey_codes_col_type || 'Asset type', null, sel, '');
+		ctl = ffEl('div', 'lpn-scnres-controls lpn-gcol2', null, sec);
 		SCNRES_KINDS.forEach(function (k) {
 			var o = ffEl('option', null, pc[k.label] || k.fb, sel);
 			o.value = k.id;
@@ -84565,7 +84620,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		if (!C) { return; }
 		def = calibParamDef(calibParam);
-		controls = ffEl('div', 'lpn-calib-controls', null, host);
+		controls = host;   // one grid: the Parameter row and the Load button are on the box's own grid
 		sel = ffSelect(C.PARAMS.map(function (p) { return [p.key, colorFieldLabel(p.group, p.field)]; }), def.key);
 		sel.id = 'lpn_calib_param';
 		sel.addEventListener('change', function () { calibParam = sel.value; rebuildCalibReport(); });
@@ -84573,6 +84628,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
 		btn.type = 'button';
 		btn.id = 'lpn_calib_load';
+		btn.className += ' lpn-gcol2';
 		if (pc.lpn_calib_load_tip) { btn.title = pc.lpn_calib_load_tip; }
 		btn.addEventListener('click', function () {
 			var input = document.getElementById('lpn_calib_file');
