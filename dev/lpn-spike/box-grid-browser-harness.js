@@ -27,7 +27,7 @@ if (process.env[LOCK_ENV] !== '1') {
 		process.exit(r.status === null ? 1 : r.status);
 	}
 }
-const { auditBox } = require('./box-grid-audit.js');
+const { auditBox, auditPhone } = require('./box-grid-audit.js');
 const { openBox } = require('./dock-boxes.js');
 let checks = 0, failures = 0;
 function ok(label, cond, detail) {
@@ -131,6 +131,29 @@ async function main() {
 			await shot(a, '#lpn_dialog', 'exporttables');
 		} else { ok('export tables: the dialog opened', false, 'could not open it'); }
 		await a.close();
+
+		// THE PHONE, 390 x 844: Fire flow, Demand scaling, Criticality, Contour, Find and New project.
+		console.log('\n--- the same boxes on a phone ---');
+		const ph = await Session.open(browser, NAME + '-phone', { viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+		await ph.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (r) => r.abort());
+		await ph.goto('Looped-Network.php?ec_nolog=1');
+		await ph.answerTrainingPanel().catch(() => {});
+		await ph.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await ph.openExampleCard(await ph.lang('lpn_ex_net1_title'));
+		await ph.settle(1500);
+		const PH = [['lpn_ff_box', 'fireflow', '#lpn_ff_box .lpn-popover-body'], ['lpn_ds_box', 'demscale', '#lpn_ds_box .lpn-popover-body'],
+			['lpn_crit_box', 'criticality', '#lpn_crit_box .lpn-popover-body'], ['lpn_contour_box', 'contour', '#lpn_contour_body'],
+			['lpn_find_popup', 'find', '#lpn_find_form']];
+		for (const [id, name, root] of PH) {
+			await openBox(ph, id);
+			await ph.settle(900);
+			await auditPhone(ph.page, { root, skip: [REPORT_BTNS] }, ok, name);
+			if (process.env.BOXROWS_SHOT) { await ph.page.locator('#' + id).screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-phone-' + name + '.png') }).catch(() => {}); }
+			await close(id).catch(() => {});
+			await ph.page.evaluate((i) => { const b = document.querySelector('#' + i + ' .lpn-popover-x, #' + i + ' [id$="_close"]'); if (b) { b.click(); } }, id);
+			await ph.settle(300);
+		}
+		await ph.close();
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
 	if (failures) { process.exitCode = 1; }

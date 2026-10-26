@@ -21,7 +21,7 @@ const REPO = path.resolve(__dirname, '..', '..');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_PROPROWS_LOCKED';
 const NAME = 'properties-rows-browser-harness';
-const { auditBox } = require('./box-grid-audit.js');
+const { auditBox, auditPhone } = require('./box-grid-audit.js');
 if (process.env[LOCK_ENV] !== '1') {
 	let has = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); has = true; } catch (e) { /* none */ }
@@ -98,14 +98,15 @@ async function main() {
 			};
 		});
 		if (phone) {
-			// A phone (390 px): the name goes above its value, and the box never scrolls sideways.
+			// A phone (390 px): the name goes above its value, and the box is usable (box-grid-audit.js).
 			const ph = await page.evaluate(() => {
 				const b = document.querySelector('#lpn_popup .lpn-popover-body'), r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && x.querySelector('input[type=number]'))[0];
 				const n = r.querySelector('.lpn-gname').getBoundingClientRect(), c = r.querySelector('input').getBoundingClientRect();
 				return { scroll: b.scrollWidth - b.clientWidth, above: c.top >= n.bottom - 2 };
 			});
-			ok(tag + 'on a phone the box does not scroll sideways', ph.scroll <= 1, JSON.stringify(ph));
 			ok(tag + 'on a phone a name stands above its value', ph.above, JSON.stringify(ph));
+			await auditPhone(page, { root: '#lpn_popup .lpn-popover-body' }, ok, tag + 'the box');
+			if (process.env.BOXROWS_SHOT) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-phone-' + (scn ? 'scn-' : '') + name + '.png') }); }
 			await a.close();
 			return;
 		}
@@ -118,6 +119,16 @@ async function main() {
 		});
 		ok(tag + 'X, Y and Elevation are one width', new Set(like.coords).size <= 1, JSON.stringify(like.coords));
 		ok(tag + 'Description and Tag are one width', new Set(like.text).size <= 1, JSON.stringify(like.text));
+		const dem = await page.evaluate(() => {
+			const t = document.querySelector('#lpn_popup_fields table.lpn-demand-table'), g = document.querySelector('#lpn_popup_fields .lpn-gval:not(table)'), b = document.querySelector('#lpn_popup .lpn-popover-body');
+			if (!t) { return null; }
+			const cut = Array.from(t.querySelectorAll('input, select, button')).filter((e) => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > b.getBoundingClientRect().right + 1).length;
+			return { left: Math.round(t.getBoundingClientRect().left), val: Math.round(g.getBoundingClientRect().left), cut };
+		});
+		if (dem && !phone) {
+			ok(tag + 'the demand table starts in the value column', Math.abs(dem.left - dem.val) <= 2, JSON.stringify(dem));
+			ok(tag + 'no demand control is cut by the box edge', dem.cut === 0, JSON.stringify(dem));
+		}
 		if (process.env.BOXROWS_SHOT && !scn) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-' + name + '.png') }); }
 		ok(tag + 'nothing is left off the grid', m.off.length === 0, JSON.stringify(m.off));
 		ok(tag + 'the box does not scroll sideways', m.scroll <= 1, String(m.scroll));
@@ -135,7 +146,8 @@ async function main() {
 			for (const t of [['junction', 'data-node', '11'], ['reservoir', 'data-node', '9'], ['tank', 'data-node', '2'], ['pipe', 'data-link', '10'], ['pump', 'data-link', '9'], ['customer', 'data-cust', 'M1'], ['text', 'data-lbl', 'X2']]) { await one(scn, 'Net1.lwn', ...t); }
 			for (const v of ['PBV1', 'PRV1', 'PSV1', 'FCV1', 'TCV1', 'GPV1']) { await one(scn, 'Valves.lwn', 'valve-' + v, 'data-link', v); }
 		}
-		await one(false, 'Net1.lwn', 'pipe-phone', 'data-link', '10', true);
+		for (const t of [['pipe', 'data-link', '10'], ['junction', 'data-node', '11'], ['text', 'data-lbl', 'X2'], ['customer', 'data-cust', 'M1']]) { await one(false, 'Net1.lwn', t[0] + '-phone', t[1], t[2], true); }
+		await one(true, 'Net1.lwn', 'pipe-phone', 'data-link', '10', true);
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
 	if (failures) { process.exitCode = 1; }

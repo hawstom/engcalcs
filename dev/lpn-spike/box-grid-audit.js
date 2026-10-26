@@ -94,4 +94,52 @@ async function auditBox(page, spec, ok, tag) {
 	return m;
 }
 
-module.exports = { auditInPage, auditBox };
+// THE PHONE (390 x 844). Tom 2026-10-25, of the first pass: a box that does not scroll sideways can still be
+// unusable: a Description 30 px wide, a pull-down showing one letter, a unit printed over its number, a name
+// one character a line. Here every visible control is a usable width, none is cut by the box's right edge,
+// no unit overlaps its control, and no name or unit wraps to one character a line.
+function phoneInPage(spec) {
+	const root = document.querySelector(spec.root);
+	if (!root) { return { missing: true }; }
+	const R = (e) => e.getBoundingClientRect();
+	const vis = (e) => { const r = R(e), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+	const box = root.closest('.lpn-popover, .lpn-dialog, #lpn_dialog') || root, edge = R(box).right;
+	const skip = (spec.skip || []).join(',');
+	const ctrls = Array.from(root.querySelectorAll('input, select, textarea, button')).filter(vis).filter((e) =>
+		e.type !== 'hidden' && !e.closest('table, .lpn-popover-x, .lpn-ovm, .lpn-gsplit, .lpn-corner-btn, .lpn-box-tools, .lpn-pgraph-chart, canvas, svg') && !(skip && e.closest(skip)));
+	const em = (e) => parseFloat(getComputedStyle(e).fontSize);
+	const tooNarrow = ctrls.filter((e) => {
+		const w = R(e).width, t = e.type;
+		if (t === 'checkbox' || t === 'radio' || e.tagName === 'BUTTON') { return false; }
+		// A box sized to its digits (3 digits for a percentage) is as narrow as its design; it still holds them.
+		return e.tagName === 'SELECT' ? w < 6 * em(e) : w < (e.classList.contains('lpn-gw-num') ? 2.8 : 4) * em(e);
+	}).map((e) => (e.id || e.className || e.tagName) + ':' + Math.round(R(e).width));
+	const clipped = ctrls.filter((e) => R(e).right > edge - 1).map((e) => (e.id || e.className || e.tagName) + ':' + Math.round(R(e).right - edge));
+	const overlap = [];
+	Array.from(root.querySelectorAll('.lpn-grow')).forEach((row) => {
+		const u = row.querySelector('.lpn-gunit'), c = row.querySelector('input, select, textarea');
+		if (!u || !c || !vis(u) || !vis(c) || !u.textContent.trim()) { return; }
+		const a = R(u), b = R(c), x = Math.min(a.right, b.right) - Math.max(a.left, b.left), y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+		if (x > 1 && y > 1) { overlap.push(u.textContent.trim().slice(0, 12)); }
+	});
+	const oneChar = Array.from(root.querySelectorAll('.lpn-gname, .lpn-gunit, .lpn-gspan, .lpn-ff-note, p')).filter(vis).filter((e) => {
+		const t = e.textContent.trim(); if (t.length < 4) { return false; }
+		const lh = (parseFloat(getComputedStyle(e).lineHeight) || em(e) * 1.25);
+		const lines = R(e).height / lh;
+		return (lines >= 3 && lines > t.length * 0.5) || (R(e).width < 1.2 * em(e) && lines >= 2);
+	}).map((e) => e.textContent.trim().slice(0, 16));
+	return { tooNarrow, clipped, overlap, oneChar, n: ctrls.length, scroll: root.scrollWidth - root.clientWidth };
+}
+async function auditPhone(page, spec, ok, tag) {
+	const m = await page.evaluate(phoneInPage, spec);
+	ok(tag + ' (phone): has controls', !m.missing && m.n > 0, m.missing ? 'no ' + spec.root : String(m.n));
+	if (m.missing) { return m; }
+	ok(tag + ' (phone): every control is a usable width', m.tooNarrow.length === 0, JSON.stringify(m.tooNarrow));
+	ok(tag + ' (phone): nothing is cut by the right edge', m.clipped.length === 0, JSON.stringify(m.clipped));
+	ok(tag + ' (phone): no unit overlaps its box', m.overlap.length === 0, JSON.stringify(m.overlap));
+	ok(tag + ' (phone): no name or unit wraps to a character a line', m.oneChar.length === 0, JSON.stringify(m.oneChar));
+	ok(tag + ' (phone): no sideways scroll', m.scroll <= 1, String(m.scroll));
+	return m;
+}
+
+module.exports = { auditInPage, auditBox, phoneInPage, auditPhone };
