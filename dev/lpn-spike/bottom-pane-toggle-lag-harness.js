@@ -2,12 +2,14 @@
 // Run with:
 //   node dev/lpn-spike/bottom-pane-toggle-lag-harness.js
 //
-// Tom, production, 2026-10-20: the bottom pane took about 4500 ms or longer on every open and
-// close after the first open, with Net3 at its initial view; the first open was instant.
-// Opens Net3, toggles the pane open and closed several times through the toolbar button, and
-// fails if any toggle (the first included) takes longer than the budget from click to settled.
-// NOT YET A REPRODUCTION: on jasmine (headless Chromium, also against production build c375f221)
-// every toggle settles in about 30 to 180 ms, so this passes on master. It guards the ceiling only.
+// Tom, 2026-10-25: *"Bottom pane is slow to open and close (about 4-5 seconds baseline) ... on dev
+// master w/ Net3."* Cause: closing the pane was `display:none`, which threw away the layout of the
+// shown table's ~1,300 form controls, and every open derived it again (forced by paneMaxHeight()).
+// Fixed by shutting the pane with content-visibility instead (applyPaneLayout()).
+// Opens Net3 with a first visit's docks, shows the Pipes table, then opens and closes the pane
+// through the toolbar button, and fails if any toggle takes longer than the ceiling from click to
+// settled. A fast CPU hides the cost, so the page runs 6x throttled (EC_BPLAG_THROTTLE=0 for none):
+// master measures about 900 to 1,200 ms to open here, the fix about 500 ms. EC_BPLAG_TAB picks the table.
 // EC_BPLAG_PROFILE=1 (self time) or =2 (also inclusive time) prints the top CPU self-time functions of the toggles.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
@@ -29,7 +31,7 @@ if (process.env.EC_BPLAG_LOCKED !== '1') {
 		process.exit(r.status === null ? 1 : r.status);
 	}
 }
-const BOUND_MS = +(process.env.EC_BPLAG_BOUND_MS || 600);
+const BOUND_MS = +(process.env.EC_BPLAG_BOUND_MS || 900);
 const ROUNDS = +(process.env.EC_BPLAG_ROUNDS || 4);
 let fails = 0;
 function ok(name, cond, extra) {
@@ -62,6 +64,8 @@ async function main() {
 		}
 		const tile = tilePng();
 		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: tile }));
+		// A first visit's own docks (the visitor's layout), which a driven browser starts without.
+		if (process.env.EC_BPLAG_DOCKS !== '0') { await page.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; }); }
 		await a.goto('Looped-Network.php');
 		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(2500);
@@ -85,13 +89,15 @@ async function main() {
 			document.getElementById('lpn_pane_btn').click();
 			requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => res(performance.now() - t0), 0)));
 		}));
-		if (process.env.EC_BPLAG_THROTTLE) {
+		const THROTTLE = process.env.EC_BPLAG_THROTTLE || '6';
+		if (THROTTLE !== '0') {
 			const c2 = await page.context().newCDPSession(page);
-			await c2.send('Emulation.setCPUThrottlingRate', { rate: +process.env.EC_BPLAG_THROTTLE });
+			await c2.send('Emulation.setCPUThrottlingRate', { rate: +THROTTLE });
 		}
-		if (process.env.EC_BPLAG_TAB) {
+		const TAB = process.env.EC_BPLAG_TAB || 'pipes';
+		if (TAB !== '0') {
 			await page.evaluate(() => document.getElementById('lpn_pane_btn').click());
-			await page.click('#lpn_pane_tab_' + process.env.EC_BPLAG_TAB);
+			await page.click('#lpn_pane_tab_' + TAB);
 			await a.settle(1500);
 			await page.evaluate(() => document.getElementById('lpn_pane_btn').click());
 			await a.settle(500);
@@ -99,7 +105,7 @@ async function main() {
 		const times = [];
 		for (let i = 0; i < ROUNDS; i++) {
 			const open = await toggle();
-			const isOpen = await page.evaluate(() => document.getElementById('lpn_pane').style.display !== 'none');
+			const isOpen = await page.evaluate(() => !document.getElementById('lpn_pane').classList.contains('lpn-pane-shut'));
 			await a.settle(+(process.env.EC_BPLAG_PAUSE || 300));
 			const close = await toggle();
 			await a.settle(+(process.env.EC_BPLAG_PAUSE || 300));
@@ -124,8 +130,23 @@ async function main() {
 				});
 				Object.entries(incl).sort((x, y) => y[1] - x[1]).slice(0, 40).forEach(([k, v]) => console.log('  incl ' + (v / 1000).toFixed(0).padStart(7) + ' ms  ' + k));
 			}
+			if (process.env.EC_BPLAG_PROFILE === '3') {
+				// where the self time of the chosen function (EC_BPLAG_FN) is called from: the 4 nearest callers
+				const parent = {}; profile.nodes.forEach((n) => (n.children || []).forEach((c) => { parent[c] = n.id; }));
+				const chain = {};
+				profile.samples.forEach((id, i) => {
+					if (byId[id].callFrame.functionName !== (process.env.EC_BPLAG_FN || 'viewportHeight')) { return; }
+					const names = []; let cur = parent[id];
+					while (cur && names.length < 5) { names.push(byId[cur].callFrame.functionName + ':' + byId[cur].callFrame.lineNumber); cur = parent[cur]; }
+					const k = names.join(' < '); chain[k] = (chain[k] || 0) + (dt[i] || 0);
+				});
+				Object.entries(chain).sort((x, y) => y[1] - x[1]).slice(0, 8).forEach(([k, v]) => console.log('  from ' + (v / 1000).toFixed(0).padStart(6) + ' ms  ' + k));
+			}
 			Object.entries(self).sort((x, y) => y[1] - x[1]).slice(0, 15).forEach(([k, v]) => console.log('  prof ' + (v / 1000).toFixed(0).padStart(7) + ' ms  ' + k));
 		}
+		// What keeps it fast: a shut pane still has a layout (display is not none), skipped by content-visibility.
+		const shut = await page.evaluate(() => { const p = document.getElementById('lpn_pane'), c = getComputedStyle(p); return { display: c.display, cv: c.contentVisibility, h: p.getBoundingClientRect().height }; });
+		ok('a shut pane keeps its layout (not display:none) and takes no height', shut.display !== 'none' && shut.cv === 'hidden' && shut.h === 0, JSON.stringify(shut));
 		times.forEach((t, i) => {
 			ok('round ' + (i + 1) + ': open settles within ' + BOUND_MS + ' ms', t.isOpen && t.open <= BOUND_MS, t.open.toFixed(0) + ' ms');
 			ok('round ' + (i + 1) + ': close settles within ' + BOUND_MS + ' ms', t.close <= BOUND_MS, t.close.toFixed(0) + ' ms');
