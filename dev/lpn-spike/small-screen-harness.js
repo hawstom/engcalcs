@@ -631,17 +631,19 @@ const TOUCH = true;
 	ok('...the first row is the column headings', heading.children.every((c) => c.tag === 'span'));
 	ok('...and a field row carries a label and its boxes', !!field && field.children[0].tag === 'label');
 
-	// (7) NO WRAP AT ANY WIDTH (Tom, 2026-10-25: "the labels rows wrap, which is unacceptable"): the name
-	// holds a fixed 11.5rem column and the four boxes stay on its line; the pane scrolls sideways.
-	ok(group + ': the name is a fixed column on a small screen and on the desktop',
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'flex') === '0 0 11.5rem' &&
-		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'flex') === '0 0 11.5rem');
-	ok('...and the row never wraps, small or wide',
-		winning(RULES, field, SMALL, DOC_IDS, false, 'flex-wrap') === 'nowrap' &&
-		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === 'nowrap');
-	ok('...and the name is cut, not broken, past its column',
+	// (7) NO WRAP AND NO CUT AT ANY WIDTH (Tom, 2026-10-25: "the labels rows wrap, which is unacceptable"; "no
+	// ellipsis ... size the name column to the longest name"): the list is a grid whose name column is as wide as
+	// the longest name, every row is a subgrid of it, and the pane scrolls sideways.
+	ok(group + ': the list is a grid with a name column as wide as its longest name, small or wide',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'grid-template-columns') === 'max-content repeat(6, auto)' &&
+		winning(RULES, list, WIDE, DOC_IDS, false, 'grid-template-columns') === 'max-content repeat(6, auto)');
+	ok('...every row is a subgrid of it',
+		winning(RULES, field, SMALL, DOC_IDS, false, 'grid-template-columns') === 'subgrid' &&
+		winning(RULES, field, WIDE, DOC_IDS, false, 'grid-template-columns') === 'subgrid');
+	ok('...and the name is never cut or broken',
 		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'text-overflow') === 'ellipsis');
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'text-overflow') === null &&
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'max-width') === 'none');
 	ok('...with no margin between rows, since nothing wraps',
 		winning(RULES, field, SMALL, DOC_IDS, false, 'margin-top') === null);
 	// **AND THE NAME ON THAT LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing `Dem/and`,

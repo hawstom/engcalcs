@@ -5831,29 +5831,30 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_customer_fields > div > span:first-child { max-width: 11.5rem; }
 /* 6. **A LABELS ROW NEVER WRAPS, AND THE PANE SCROLLS SIDEWAYS INSTEAD** (Tom, 2026-10-25, on his
    phone: "the labels rows wrap, which is unacceptable. The labels rows must stay intact. It's okay if
-   the user has to scroll left and right on a phone"). This replaces the 2026-08-22 rule that wrapped the
-   four columns as a block under the checkbox and name: with an override marker on a row, that wrap
-   broke the Drop column onto a line of its own. The name now holds a fixed column (11.5rem, the
-   same ceiling it has on a PC) and is cut with an ellipsis rather than broken; its tip names it in
-   full. Each row is as wide as its columns (min-width: max-content), so every row and its heading share one
-   set of x positions, and the content pane (overflow: auto) scrolls sideways when the box is narrower. */
+   the user has to scroll left and right on a phone"; then "no ellipsis ... size the name column to the
+   longest name"). This replaces the 2026-08-22 rule that wrapped the four columns as a block under the
+   checkbox and name. Each list is a grid of seven columns whose first (the name) is as wide as the longest
+   name in that list; every row is a SUBGRID of it, so all rows and the heading share one set of x
+   positions with nothing cut, and the content pane (overflow: auto) scrolls sideways when the box is
+   narrower. A note inside the list spans the columns and adds nothing to their widths. */
+#lpn_labels_node_fields,
+#lpn_labels_link_fields,
+#lpn_labels_customer_fields { display: grid; grid-template-columns: max-content repeat(6, auto); column-gap: 4px; width: max-content; justify-content: start; }
 #lpn_labels_node_fields > div,
 #lpn_labels_link_fields > div,
-#lpn_labels_customer_fields > div { flex-wrap: nowrap; }
-#lpn_labels_node_fields > div:not(.lpn-set-note),
-#lpn_labels_link_fields > div:not(.lpn-set-note),
-#lpn_labels_customer_fields > div:not(.lpn-set-note),
-#lpn_labels_node_fields > div.lpn-set-colhead,
-#lpn_labels_link_fields > div.lpn-set-colhead,
-#lpn_labels_customer_fields > div.lpn-set-colhead { min-width: max-content; }
+#lpn_labels_customer_fields > div { display: grid !important; grid-template-columns: subgrid; grid-column: 1 / -1; }
+#lpn_labels_node_fields > .lpn-set-row,
+#lpn_labels_node_fields > .lpn-set-note:not(.lpn-set-colhead),
+#lpn_labels_link_fields > .lpn-set-row,
+#lpn_labels_link_fields > .lpn-set-note:not(.lpn-set-colhead),
+#lpn_labels_customer_fields > .lpn-set-row,
+#lpn_labels_customer_fields > .lpn-set-note:not(.lpn-set-colhead) { display: block !important; grid-template-columns: none; inline-size: 0; min-inline-size: 100%; }
 #lpn_labels_node_fields > div > label,
 #lpn_labels_link_fields > div > label,
-#lpn_labels_customer_fields > div > label {
-	flex: 0 0 11.5rem !important; max-width: 11.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+#lpn_labels_customer_fields > div > label { max-width: none; white-space: nowrap; overflow: visible; }
 #lpn_labels_node_fields > div > span:first-child,
 #lpn_labels_link_fields > div > span:first-child,
-#lpn_labels_customer_fields > div > span:first-child { flex: 0 0 11.5rem !important; }
+#lpn_labels_customer_fields > div > span:first-child { max-width: none; }
 
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================

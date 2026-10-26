@@ -131,7 +131,7 @@ const labelColumns = (a) => a.page.evaluate(() => ['lpn_labels_node_fields', 'lp
 // Each Settings section's two-column rows: the second column's left edge, spread down the section.
 const rowGrids = (a) => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_setbox_content .lpn-set-secbody')).map((sec) => {
 	const xs = Array.from(sec.querySelectorAll('.lpn-set-row')).filter((r) => r.getBoundingClientRect().height > 0 && getComputedStyle(r).display === 'grid' && r.children[1])
-		.map((r) => r.children[1].getBoundingClientRect().left);
+		.map((r) => r.children[1].getBoundingClientRect().left - r.getBoundingClientRect().left);   // relative to the row: a custom property's body is indented 12 px on purpose (.lpn-cp-body)
 	return { sec: (sec.closest('.lpn-set-sec') || sec).id, n: xs.length, spread: xs.length ? Math.max.apply(null, xs) - Math.min.apply(null, xs) : 0 };
 }).filter((s) => s.n > 1));
 

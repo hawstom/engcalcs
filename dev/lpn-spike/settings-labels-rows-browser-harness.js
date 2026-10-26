@@ -6,6 +6,7 @@
 //   2. the Show and Drop columns are fully visible or reachable by scrolling the content pane
 //      sideways, and no ancestor between them and the pane clips them;
 //   3. the Use units, Show and Drop columns are no wider than their content needs;
+//   3b. no name is cut off (scrollWidth <= clientWidth), in English and in German and Russian;
 //   4. on a phone the Settings index (the list of sections) is narrower than 4.5rem.
 //
 //   node dev/lpn-spike/settings-labels-rows-browser-harness.js   (takes the browser lock itself)
@@ -41,6 +42,11 @@ async function measure(page) {
 		out.listW = Math.max.apply(null, lists.map((id) => { const e = document.getElementById(id); return e ? Math.max.apply(null, Array.from(e.children).filter((r) => r.children.length >= 4).map((r) => Math.round(r.lastElementChild.getBoundingClientRect().right - r.getBoundingClientRect().left))) : 0; }));
 		out.wide = Array.from(c.querySelectorAll('*')).filter((e) => e.offsetParent && e.getBoundingClientRect().right > c.getBoundingClientRect().left + c.clientWidth + 5).slice(0, 3).map((e) => e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 20));
 		out.dbg = Array.from(document.getElementById(lists[0]).children).slice(0, 3).map((r) => Math.round(r.getBoundingClientRect().width) + ':' + Array.from(r.children).map((k) => Math.round(k.getBoundingClientRect().width)).join(','));
+		out.cut = [];
+		lists.forEach((id) => {
+			const e = document.getElementById(id);
+			if (e) { e.querySelectorAll('label').forEach((l) => { if (l.offsetParent && (l.scrollWidth > l.clientWidth + 1 || getComputedStyle(l).textOverflow === 'ellipsis' && l.scrollWidth > l.clientWidth)) { out.cut.push(l.textContent.trim().slice(0, 30)); } }); }
+		});
 		out.index = ix ? Math.round(ix.getBoundingClientRect().width) : null;
 		lists.forEach((id) => {
 			const box = document.getElementById(id);
@@ -84,12 +90,12 @@ async function measure(page) {
 	}, LISTS);
 }
 
-async function run(browser, Session, label, viewport, touch) {
+async function run(browser, Session, label, viewport, touch, lang) {
 	const a = await Session.open(browser, NAME + '-' + label, Object.assign({ viewport }, touch ? { hasTouch: true, isMobile: true, deviceScaleFactor: 2 } : {}));
 	const page = a.page;
 	try {
 		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
-		await a.goto('Looped-Network.php?ec_nolog=1');
+		await a.goto('Looped-Network.php?ec_nolog=1' + (lang ? '&lang=' + lang : ''));
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
@@ -101,13 +107,14 @@ async function run(browser, Session, label, viewport, touch) {
 		console.log('  rows ' + m.rows + ', pane ' + m.pane + '/' + m.scroll + ', head widths ' + m.cols.join(',') + ', index ' + m.index);
 		ok(label + ': labels rows were found', m.rows > 10, String(m.rows));
 		ok(label + ': no labels row wraps', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
+		ok(label + ': no name is cut off (no ellipsis)', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
 		ok(label + ': Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
 		const colW = m.cols.slice(-3);
 		// Use units, Show, Drop: the width of the longest of their headings or their number boxes, plus slack.
 		ok(label + ': Use units, Show, Drop no wider than their content', colW.every((w) => w <= 40) && m.cols[m.cols.length - 4] <= 40, m.cols.join(','));
 		console.log('  rows ' + m.dbg.join(' | '));
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
-		if (!touch) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
+		if (!touch && !lang) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
 		if (touch) { ok(label + ': the Settings index is narrower than 4.5rem (72 px)', m.index !== null && m.index < 72, String(m.index)); }
 		// A scenario override on a label row.
 		await page.keyboard.press('Escape');
@@ -145,6 +152,8 @@ async function main() {
 	try {
 		await run(browser, Session, 'phone', { width: 390, height: 844 }, true);
 		await run(browser, Session, 'pc', { width: 1366, height: 768 }, false);
+		await run(browser, Session, 'phone-de', { width: 390, height: 844 }, true, 'de');
+		await run(browser, Session, 'pc-ru', { width: 1366, height: 768 }, false, 'ru');
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - fails) + '/' + checks + ' checks passed');
 	if (fails) { process.exitCode = 1; }
