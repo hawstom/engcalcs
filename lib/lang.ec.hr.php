@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Kopira otvoreni scenarij i njegove zamjene te
 $ec_lang['lpn_scenario_copy_off']='Kopiraj scenarij radi u Osnovnom načinu. Kad je Osnovni način isključen, dodajte scenarij i odaberite njegove alternative u tablici Scenariji.';
 $ec_lang['lpn_sm_title']='Upravitelj scenarija';
 $ec_lang['lpn_sm_menu']='Upravitelj scenarija…';
-$ec_lang['lpn_sm_basic_on']='Upravitelj scenarija onemogućen je kad je Osnovni način uključen.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenariji';
 $ec_lang['lpn_sm_col_parent']='Nadređeni';
 $ec_lang['lpn_sm_add_child']='Dodaj podređeni';

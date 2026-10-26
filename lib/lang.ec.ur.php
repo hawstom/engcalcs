@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='کھلے ہوئے منظرنامے اور ا�
 $ec_lang['lpn_scenario_copy_off']='منظرنامہ کاپی کریں بنیادی موڈ میں کام کرتا ہے۔ بنیادی موڈ بند ہو تو منظرنامہ شامل کریں اور اس کے متبادلات منظرناموں کے جدول میں چنیں۔';
 $ec_lang['lpn_sm_title']='منظرنامہ مینیجر';
 $ec_lang['lpn_sm_menu']='منظرنامہ مینیجر…';
-$ec_lang['lpn_sm_basic_on']='بنیادی موڈ آن ہو تو منظرنامہ مینیجر غیر فعال ہوتا ہے۔';
 $ec_lang['lpn_pane_tab_scenarios']='منظرنامے';
 $ec_lang['lpn_sm_col_parent']='والد';
 $ec_lang['lpn_sm_add_child']='ماتحت شامل کریں';

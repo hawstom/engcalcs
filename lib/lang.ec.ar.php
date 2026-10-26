@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='ينسخ السيناريو المفتوح و
 $ec_lang['lpn_scenario_copy_off']='يعمل نسخ السيناريو في الوضع الأساسي. ومع إيقاف الوضع الأساسي، أضف سيناريو واختر بدائله في جدول السيناريوهات.';
 $ec_lang['lpn_sm_title']='مدير السيناريوهات';
 $ec_lang['lpn_sm_menu']='مدير السيناريوهات…';
-$ec_lang['lpn_sm_basic_on']='مدير السيناريوهات معطَّل حين يكون الوضع الأساسي مشغَّلاً.';
 $ec_lang['lpn_pane_tab_scenarios']='السيناريوهات';
 $ec_lang['lpn_sm_col_parent']='الأصل';
 $ec_lang['lpn_sm_add_child']='إضافة عنصر فرعي';

@@ -3326,7 +3326,6 @@ $ec_lang['lpn_scenario_copy_tip']='سناریوی باز و مقادیر اخت�
 $ec_lang['lpn_scenario_copy_off']='کپی سناریو در حالت پایه کار می‌کند. با حالت پایهٔ خاموش، یک سناریو بیفزایید و گزینه‌های جایگزین آن را در جدول سناریوها انتخاب کنید.';
 $ec_lang['lpn_sm_title']='مدیر سناریو';
 $ec_lang['lpn_sm_menu']='مدیر سناریو…';
-$ec_lang['lpn_sm_basic_on']='وقتی حالت پایه روشن است مدیر سناریو غیرفعال است.';
 $ec_lang['lpn_pane_tab_scenarios']='سناریوها';
 $ec_lang['lpn_sm_col_parent']='والد';
 $ec_lang['lpn_sm_add_child']='افزودن فرزند';

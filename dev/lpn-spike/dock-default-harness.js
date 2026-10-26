@@ -3,8 +3,8 @@
 //
 //   1. A browser with no saved layout shows NO box and NO tab over the examples gallery.
 //   2. Opening the first project docks five auto-hide tabs and pins nothing: right, Properties,
-//      Settings, Libraries; left, User manual (the Scenario manager joins it, first, once Basic mode
-//      is off: a fresh browser is in Basic mode). Nothing is stored for them, through a reload.
+//      Settings, Libraries; left, Scenario manager, User manual (the manager has a Basic face of its
+//      own, and a fresh browser is in Basic mode). Nothing is stored for them, through a reload.
 //   3. The first change the visitor makes (closing one tab's box) stores the whole layout.
 //   4. A browser with any saved layout keeps its own and gets no defaults.
 //   5. A 390 px phone keeps its behaviour: no tab, no box opened, nothing stored.
@@ -46,8 +46,7 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 const { strips, clickNode } = require('./dock-boxes.js');
-// The Scenario manager is in the table too but a fresh browser is in Basic mode, where it is not offered at all.
-const LEFT = ['lpn_hotkeys_popup'];
+const LEFT = ['lpn_sm_box', 'lpn_hotkeys_popup'];
 const RIGHT = ['lpn_popup', 'lpn_settings_box', 'lpn_library_box'];
 const WANT = JSON.stringify([LEFT, RIGHT]);
 const noConsent = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -94,12 +93,12 @@ async function main() {
 		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(2500);
 		got = await strips(a.page);
-		ok('four auto-hide tabs (the Scenario manager waits for Basic mode off), each edge in order', JSON.stringify(got) === WANT, JSON.stringify(got));
+		ok('five auto-hide tabs (the Scenario manager among them, in Basic mode), each edge in order', JSON.stringify(got) === WANT, JSON.stringify(got));
 		const titles = await a.page.evaluate(() => Array.from(document.querySelectorAll('.lpn-dock-tab')).map((t) => {
 			const b = document.getElementById(t.getAttribute('aria-controls')), h = b && b.querySelector('.lpn-setbox-title');
 			return t.textContent === (h ? h.textContent.replace(/\s+/g, ' ').trim() : '');
 		}));
-		ok('each tab reads its box\'s own title', titles.length === 4 && titles.every(Boolean));
+		ok('each tab reads its box\'s own title', titles.length === 5 && titles.every(Boolean));
 		ok('nothing is pinned: every box is tucked away', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
 		ok('nothing is stored for the layout', (await layoutKeys(a)).length === 0, JSON.stringify(await layoutKeys(a)));
 		if (process.env.SHOT) { await a.page.screenshot({ path: process.env.SHOT }); }
@@ -115,7 +114,7 @@ async function main() {
 		got = await strips(a.page);
 		ok('a reload with the project and nothing stored shows the same layout', JSON.stringify(got) === WANT, JSON.stringify(got));
 
-		console.log('\n--- 2a. Basic mode off brings the Scenario manager tab, first on the left ---');
+		console.log('\n--- 2a. Basic mode off keeps the Scenario manager tab, first on the left ---');
 		await a.page.click('#lpn_scenario_btn');
 		await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 		const basicLabel = await a.lang('lpn_scenario_basic');
@@ -124,7 +123,7 @@ async function main() {
 		}
 		await a.settle(1200);
 		got = await strips(a.page);
-		ok('Basic mode off: the Scenario manager tab is first on the left', JSON.stringify(got) === JSON.stringify([['lpn_sm_box'].concat(LEFT), RIGHT]), JSON.stringify(got));
+		ok('Basic mode off: the Scenario manager tab is still first on the left', JSON.stringify(got) === WANT, JSON.stringify(got));
 		ok('...still tucked away', (await openBoxes(a)).length === 0, JSON.stringify(await openBoxes(a)));
 		await a.page.evaluate(() => localStorage.removeItem('lpn_scnbasic'));
 		console.log('\n--- 2a2. selecting something unfurls Properties; the Water menu lists Settings and Libraries, not Properties ---');

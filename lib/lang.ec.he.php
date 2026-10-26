@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='מעתיקה את התרחיש הפתוח ו�
 $ec_lang['lpn_scenario_copy_off']='העתקת תרחיש פועלת במצב בסיסי. כשמצב בסיסי כבוי, הוסיפו תרחיש ובחרו את החלופות שלו בטבלת התרחישים.';
 $ec_lang['lpn_sm_title']='מנהל תרחישים';
 $ec_lang['lpn_sm_menu']='מנהל תרחישים…';
-$ec_lang['lpn_sm_basic_on']='מנהל התרחישים מושבת כשמצב בסיסי פועל.';
 $ec_lang['lpn_pane_tab_scenarios']='תרחישים';
 $ec_lang['lpn_sm_col_parent']='הורה';
 $ec_lang['lpn_sm_add_child']='הוספת צאצא';

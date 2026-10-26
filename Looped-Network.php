@@ -4105,7 +4105,6 @@ EngCalcs.pageConfig = {
 	lpn_scenario_copy_off: <?=json_encode($ec_lang['lpn_scenario_copy_off'])?>,
 	lpn_sm_title: <?=json_encode($ec_lang['lpn_sm_title'])?>,
 	lpn_sm_menu: <?=json_encode($ec_lang['lpn_sm_menu'])?>,
-	lpn_sm_basic_on: <?=json_encode($ec_lang['lpn_sm_basic_on'])?>,
 	lpn_pane_tab_scenarios: <?=json_encode($ec_lang['lpn_pane_tab_scenarios'])?>,
 	lpn_sm_col_parent: <?=json_encode($ec_lang['lpn_sm_col_parent'])?>,
 	lpn_sm_add_child: <?=json_encode($ec_lang['lpn_sm_add_child'])?>,

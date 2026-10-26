@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='复制打开的方案及其覆盖值，并打
 $ec_lang['lpn_scenario_copy_off']='“复制方案”在“基本模式”下可用。关闭“基本模式”后，请添加方案，并在“方案”表中选择其备选方案。';
 $ec_lang['lpn_sm_title']='方案管理器';
 $ec_lang['lpn_sm_menu']='方案管理器…';
-$ec_lang['lpn_sm_basic_on']='启用“基本模式”时，“方案管理器”呈禁用状态。';
 $ec_lang['lpn_pane_tab_scenarios']='方案';
 $ec_lang['lpn_sm_col_parent']='父级';
 $ec_lang['lpn_sm_add_child']='添加子级';

@@ -6162,6 +6162,15 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-body { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 .lpn-sm-tools { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .lpn-sm-tools select { max-width: 100%; }
+/* The Basic face of the Scenario manager (Tom, 2026-10-25): a flat list, Scenario and No. of overrides. */
+.lpn-sm-basic-list { overflow: auto; border: 1px solid var(--ec-border-strong); min-height: 6em; padding: 2px 0; }
+.lpn-sm-basic-row { display: grid; grid-template-columns: 1.2em minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 2px 6px; min-height: 24px; cursor: default; }
+.lpn-sm-basic-list .lpn-sm-basic-row { cursor: pointer; }
+.lpn-sm-basic-row.lpn-sm-sel { background: var(--ec-select-bg-strong); }
+.lpn-sm-basic-row > :nth-child(2) { overflow-wrap: anywhere; }
+.lpn-sm-basic-row > :nth-child(3) { text-align: end; }
+.lpn-sm-basic-head { font-weight: bold; padding-block: 0; }
+.lpn-sm-basic-tick { display: block; margin-top: 2px; }
 .lpn-sm-tree { overflow: auto; border: 1px solid var(--ec-border-strong); min-height: 8em; padding: 2px 0; }
 .lpn-sm-row { display: flex; align-items: center; gap: 6px; padding: 2px 6px; cursor: default; position: relative; border-top: 2px solid transparent; border-bottom: 2px solid transparent; }
 .lpn-sm-row.lpn-sm-sel { background: var(--ec-select-bg-strong); }

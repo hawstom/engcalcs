@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Menyalin skenario yang terbuka beserta nilai 
 $ec_lang['lpn_scenario_copy_off']='Salin skenario berfungsi dalam Mode dasar. Dengan Mode dasar mati, tambahkan skenario dan pilih alternatifnya di tabel Skenario.';
 $ec_lang['lpn_sm_title']='Manajer skenario';
 $ec_lang['lpn_sm_menu']='Manajer skenario…';
-$ec_lang['lpn_sm_basic_on']='Manajer skenario dinonaktifkan ketika Mode dasar menyala.';
 $ec_lang['lpn_pane_tab_scenarios']='Skenario';
 $ec_lang['lpn_sm_col_parent']='Induk';
 $ec_lang['lpn_sm_add_child']='Tambah anak';

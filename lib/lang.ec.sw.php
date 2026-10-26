@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Hunakili senario iliyo wazi na thamani zake m
 $ec_lang['lpn_scenario_copy_off']='Nakili senario hufanya kazi katika Hali ya msingi. Hali ya msingi ikizimwa, ongeza senario na uchague mbadala zake katika jedwali la Senario.';
 $ec_lang['lpn_sm_title']='Senario: msimamizi';
 $ec_lang['lpn_sm_menu']='Msimamizi wa senario…';
-$ec_lang['lpn_sm_basic_on']='Msimamizi wa senario umezimwa wakati Hali ya msingi imewashwa.';
 $ec_lang['lpn_pane_tab_scenarios']='Senario';
 $ec_lang['lpn_sm_col_parent']='Mzazi';
 $ec_lang['lpn_sm_add_child']='Ongeza mtoto';

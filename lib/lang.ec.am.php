@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='የተከፈተውን ሁኔታ እና የራ
 $ec_lang['lpn_scenario_copy_off']='ሁኔታ ቅዳ በመሰረታዊ ሁነታ ይሠራል። መሰረታዊ ሁነታ ጠፍቶ፣ ሁኔታ ይጨምሩ እና አማራጮቹን በሁኔታዎች ሠንጠረዥ ውስጥ ይምረጡ።';
 $ec_lang['lpn_sm_title']='ሁኔታዎች አስተዳዳሪ';
 $ec_lang['lpn_sm_menu']='ሁኔታዎች አስተዳዳሪ…';
-$ec_lang['lpn_sm_basic_on']='መሰረታዊ ሁነታ ሲበራ የሁኔታዎች አስተዳዳሪ ተሰናክሏል።';
 $ec_lang['lpn_pane_tab_scenarios']='ሁኔታዎች';
 $ec_lang['lpn_sm_col_parent']='ወላጅ';
 $ec_lang['lpn_sm_add_child']='ልጅ ጨምር';

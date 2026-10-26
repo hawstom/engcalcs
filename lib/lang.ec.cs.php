@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Zkopíruje otevřený scénář s jeho specif
 $ec_lang['lpn_scenario_copy_off']='Kopírovat scénář funguje v Základním režimu. Při vypnutém Základním režimu přidejte scénář a zvolte jeho alternativy v tabulce Scénáře.';
 $ec_lang['lpn_sm_title']='Správce scénářů';
 $ec_lang['lpn_sm_menu']='Správce scénářů…';
-$ec_lang['lpn_sm_basic_on']='Správce scénářů je zakázán, dokud je Základní režim zapnut.';
 $ec_lang['lpn_pane_tab_scenarios']='Scénáře';
 $ec_lang['lpn_sm_col_parent']='Nadřazený';
 $ec_lang['lpn_sm_add_child']='Přidat potomka';

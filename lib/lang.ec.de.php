@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Kopiert das geöffnete Szenario mit seinen Ü
 $ec_lang['lpn_scenario_copy_off']='Szenario kopieren funktioniert im Basismodus. Fügen Sie bei ausgeschaltetem Basismodus ein Szenario hinzu und wählen Sie seine Alternativen in der Tabelle Szenarien.';
 $ec_lang['lpn_sm_title']='Szenarioverwaltung';
 $ec_lang['lpn_sm_menu']='Szenarioverwaltung…';
-$ec_lang['lpn_sm_basic_on']='Die Szenarioverwaltung ist deaktiviert, solange Basismodus eingeschaltet ist.';
 $ec_lang['lpn_pane_tab_scenarios']='Szenarien';
 $ec_lang['lpn_sm_col_parent']='Übergeordnet';
 $ec_lang['lpn_sm_add_child']='Untergeordnetes hinzufügen';

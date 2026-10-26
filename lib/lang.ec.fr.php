@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copie le scénario ouvert et ses valeurs pers
 $ec_lang['lpn_scenario_copy_off']='Copier le scénario fonctionne en Mode de base. Avec le Mode de base désactivé, ajoutez un scénario et choisissez ses alternatives dans le tableau Scénarios.';
 $ec_lang['lpn_sm_title']='Gestionnaire de scénarios';
 $ec_lang['lpn_sm_menu']='Gestionnaire de scénarios…';
-$ec_lang['lpn_sm_basic_on']='Le Gestionnaire de scénarios est désactivé lorsque le Mode de base est activé.';
 $ec_lang['lpn_pane_tab_scenarios']='Scénarios';
 $ec_lang['lpn_sm_col_parent']='Parent';
 $ec_lang['lpn_sm_add_child']='Ajouter un enfant';

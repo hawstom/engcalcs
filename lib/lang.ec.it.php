@@ -3324,7 +3324,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copia lo scenario aperto e i suoi valori pers
 $ec_lang['lpn_scenario_copy_off']='Copia scenario funziona in Modalità base. Con Modalità base deselezionata, aggiungi uno scenario e scegli le sue alternative nella tabella Scenari.';
 $ec_lang['lpn_sm_title']='Scenari: gestione';
 $ec_lang['lpn_sm_menu']='Gestione scenari…';
-$ec_lang['lpn_sm_basic_on']='La Gestione scenari è disattivata quando Modalità base è selezionata.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenari';
 $ec_lang['lpn_sm_col_parent']='Livello superiore';
 $ec_lang['lpn_sm_add_child']='Aggiungi figlio';

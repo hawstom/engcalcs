@@ -8345,12 +8345,11 @@ var EngCalcs = EngCalcs || {};
 		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
-		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
-		// "Scenario manager is disabled when Basic mode is on").
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE AND NEVER GREYED** (Tom, 2026-10-25: Basic mode gets a
+		// face of the box of its own; it was greyed in Basic mode from 2026-10-13 to 2026-10-25).
 		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
 		rows.push({
-			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,
-			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
 			fn: function () { openScenarioManager(); }
 		});
 		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
@@ -64894,9 +64893,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked, and opens
-		// only while Basic mode is off, the one state in which it is shown at all.
-		if (smboxLayout.open && smboxLayout.dock && !scenarioBasicMode) { openScenarioManager(); }
+		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked.
+		if (smboxLayout.open && smboxLayout.dock) { openScenarioManager(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		restorePaneBoxes();
 		if (findUserOpen) { toggleFindPopup(null, true); }
@@ -82555,8 +82553,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setNotice(basicMisfitText());
 		}
 		if (scenarioBasicMode !== was) {
-			if (scenarioBasicMode) { closeScenarioManager(); }
-			else { showDockedScenarioManager(); }
+			smFaceChanged();
 			refreshScenariosTab();
 		}
 	}
@@ -82574,19 +82571,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
 			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
 		} catch (e) {}
-		if (scenarioBasicMode) { closeScenarioManager(); }
-		else { showDockedScenarioManager(); }
+		smFaceChanged();
 		refreshScenariosTab();
+		return true;
 	}
-	// **THE SCENARIO MANAGER'S TAB APPEARS WHEN BASIC MODE GOES OFF** (Tom, 2026-10-24: first-view list).
-	// A fresh browser is in Basic mode, where the manager is not offered, so its default dock waits.
-	function showDockedScenarioManager() {
-		var box = smBoxEl(), d = box && box.__lpnDock;
-		if (!d || !d.rec.dock || !(d.open || smboxLayout.open) || smBoxIsOpen()) { return; }
-		dockBooting = true;
-		try { openScenarioManager(); } finally { dockBooting = false; }
-		renderDockCorner(d);
-		layoutDocks();
+	// **THE MANAGER'S BOX CHANGES FACE IN PLACE WHEN BASIC MODE IS TICKED OR CLEARED** (Tom, 2026-10-25):
+	// the flat list and the buttons in Basic mode, the tree and the Scenarios table otherwise. It stays
+	// open, docked or floating, where it is; a box that is not open is left closed.
+	function smFaceChanged() {
+		if (!smBoxIsOpen()) { return; }
+		smTableOn = !scenarioBasicMode;
+		smTableSync();
+		rebuildScenarioManager();
+		if (boxIsDocked(smBoxEl())) { layoutDocks(); }
 	}
 	loadScenarioBasicPref();
 	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
@@ -82752,10 +82749,82 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (tree === 'scenarios') { return root ? 'scnbase' : 'scn'; }
 		return root ? 'altbase' : 'alt';
 	}
+	// **THE BASIC FACE OF THE SCENARIO MANAGER** (Tom, 2026-10-25; Ida's design): a flat list of the scenarios
+	// with their numbers of overrides, the current one marked with *, and a click on a row making it current;
+	// the commands the Water > Scenarios menu already has (they are that menu's own rows, so the two cannot
+	// differ); and the Basic mode tick, which when cleared turns this box into the full manager in place.
+	// Hidden here: the category selector, the tree, Add base, Merge and Copy upward, All and All unused.
+	function smBasicFace(host) {
+		var pc = EngCalcs.pageConfig || {}, rows = scenarioMenuRows(), list, head, cur = activeScenario(), tick, lab, tools, scroll = 0, old;
+		old = host.querySelector('.lpn-sm-basic-list');
+		if (old) { scroll = old.scrollTop; }
+		host.innerHTML = '';
+		function menuRow(label) { return rows.filter(function (r) { return r.label === label; })[0]; }
+		head = document.createElement('div');
+		head.className = 'lpn-sm-basic-row lpn-sm-basic-head';
+		['', pc.lpn_scenario_label || 'Scenario', pc.lpn_scenario_overrides || 'No. of overrides'].forEach(function (t) {
+			var c = document.createElement('span');
+			c.textContent = t;
+			head.appendChild(c);
+		});
+		list = document.createElement('div');
+		list.className = 'lpn-sm-basic-list';
+		list.id = 'lpn_sm_basic_list';
+		list.setAttribute('role', 'listbox');
+		list.setAttribute('aria-label', pc.lpn_scenario_label || 'Scenario');
+		scenariosForDisplay().forEach(function (s) {
+			var r = document.createElement('div'), m = document.createElement('span'), n = document.createElement('span'), c = document.createElement('span');
+			r.className = 'lpn-sm-basic-row' + (s.id === cur.id ? ' lpn-sm-sel' : '');
+			r.setAttribute('role', 'option');
+			r.setAttribute('aria-selected', s.id === cur.id ? 'true' : 'false');
+			r.setAttribute('data-scn', s.id);
+			r.tabIndex = 0;
+			m.textContent = s.id === cur.id ? '*' : '';
+			n.textContent = scenarioDisplayName(s);
+			c.textContent = s.isBase ? '' : String(overrideCount(s));
+			r.appendChild(m); r.appendChild(n); r.appendChild(c);
+			r.addEventListener('click', function () { if (s.id !== activeScenario().id) { switchScenario(s.id); } rebuildScenarioManager(); });
+			r.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') { if (e.preventDefault) { e.preventDefault(); } r.click(); }
+			});
+			list.appendChild(r);
+		});
+		host.appendChild(head);
+		host.appendChild(list);
+		list.scrollTop = scroll;
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		[[pc.lpn_scenario_new || 'New scenario…', 'new'], [pc.lpn_scenario_copy || 'Copy scenario', 'copy'],
+			[pc.lpn_scenario_rename || 'Rename scenario…', 'rename'], [pc.lpn_scenario_delete || 'Delete scenario', 'delete'],
+			[pc.lpn_sm_list_overrides || 'Override manager…', 'overrides']].forEach(function (d) {
+			var mr = menuRow(d[0]), b;
+			if (!mr) { return; }
+			b = smButton(tools, d[0], mr.tip || null, function () { if (!mr.disabled) { mr.fn(); } });
+			b.id = 'lpn_sm_basic_' + d[1];
+			b.setAttribute('data-sm-cmd', d[1]);
+			if (mr.disabled) { b.setAttribute('aria-disabled', 'true'); }
+		});
+		host.appendChild(tools);
+		lab = document.createElement('label');
+		lab.className = 'lpn-sm-basic-tick';
+		tick = document.createElement('input');
+		tick.type = 'checkbox';
+		tick.id = 'lpn_sm_basic_mode';
+		tick.checked = scenarioBasicMode;
+		tick.addEventListener('change', function () {
+			if (!setScenarioBasicMode(tick.checked)) { tick.checked = scenarioBasicMode; }
+		});
+		lab.appendChild(tick);
+		lab.appendChild(document.createTextNode(' ' + (pc.lpn_scenario_basic || 'Basic mode')));
+		if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
+		host.appendChild(lab);
+		initTipsIn(host);
+	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
 			scroll = 0, old, hadFocus;
 		if (!host) { return; }
+		if (scenarioBasicMode) { smBasicFace(host); return; }
 		old = host.querySelector('.lpn-sm-tree');
 		if (old) { scroll = old.scrollTop; }
 		// A rebuild replaces the tree the keyboard was in; focus goes back to the new one, so F2,
@@ -83599,12 +83668,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = smBoxEl();
 		closeMenu();
 		hideOpenTips();
-		// Disabled while Basic mode is on (Tom, 2026-10-13); the row is greyed, and no door opens it.
-		if (scenarioBasicMode) { return; }
 		if (!box) { return; }
 		box.style.display = 'flex';
-		// The table goes in before the box is placed, so a first open centres the whole box.
-		smTableOn = true;
+		// The table goes in before the box is placed, so a first open centres the whole box. Basic mode
+		// shows the box's own simpler face (smBasicFace()) and no table.
+		smTableOn = !scenarioBasicMode;
 		rebuildScenarioManager();
 		placePanelForScreen(box, function () { placeBoxRemembered(box, smTablePlaceLayout()); });
 		initTipsIn(box);

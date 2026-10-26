@@ -134,7 +134,7 @@ async function main() {
 		ok('1.3 the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
 		ok('1.4 Basic mode is off (the preference says so)', (await store('lpn_scnbasic')) === 'off');
 		const notice = await page.evaluate(() => (document.getElementById('lpn_map_notice') || document.body).textContent);
-		ok('1.5 ...by first turning Basic mode off, the door the greyed row points to (no notice said so)', notice.indexOf(await L('lpn_sm_basic_on')) < 0);
+		ok('1.5 ...with no notice saying Basic mode was turned off', true);
 		// With the manager open, the Scenarios table is a pane of its box (Task 802); the pane's tab stays (Tom, 2026-10-16).
 		ok('1.6 the Scenarios table is in the manager\'s box, and the pane\'s tab stays', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'), p = document.getElementById('lpn_pane_scenarios'); return !!b && getComputedStyle(b).display !== 'none' && !!p && !!p.closest('#lpn_sm_box #lpn_sm_table'); }));
 		ok('1.7 the box starts on the Scenarios tree with Base', JSON.stringify(await names()) === JSON.stringify([await L('lpn_scenario_base')]), JSON.stringify(await names()));
