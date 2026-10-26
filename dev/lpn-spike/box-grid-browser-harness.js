@@ -153,6 +153,13 @@ async function main() {
 			await ph.page.evaluate((i) => { const b = document.querySelector('#' + i + ' .lpn-popover-x, #' + i + ' [id$="_close"]'); if (b) { b.click(); } }, id);
 			await ph.settle(300);
 		}
+		// New project on a phone: usable, and its Create button can be reached by scrolling the box.
+		await ph.menuClick(await ph.lang('lpn_file_new'), 'file').catch(() => {});
+		await ph.page.waitForSelector('#lpn_new_panel', { state: 'visible', timeout: 4000 }).catch(() => {});
+		await ph.settle(600);
+		await auditPhone(ph.page, { root: '#lpn_new_body' }, ok, 'new project');
+		const reach = await ph.page.click('#lpn_new_create', { timeout: 4000 }).then(() => true, () => false);
+		ok('new project (phone): Create can be reached and pressed', reach);
 		await ph.close();
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');

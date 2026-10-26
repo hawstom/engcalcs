@@ -25175,7 +25175,9 @@ var EngCalcs = EngCalcs || {};
 		if (host.__lpnGridHost) { return host; }
 		host.__lpnGridHost = true;
 		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost';
-		// Narrower than 18rem the name goes above its value (the host cannot query its own width).
+		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
+		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
+		if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth < 30 * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
 		if (typeof ResizeObserver !== 'undefined') {
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
@@ -52404,6 +52406,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		// A box taller than the room under the chrome (a phone) scrolls inside, so Create stays reachable.
+		capPanelToRoomBelow(box, parseFloat(box.style.top));
 		initTipsIn(box);
 		var create = document.getElementById('lpn_new_create');
 		if (create && create.focus) { create.focus(); }
