@@ -25179,7 +25179,8 @@ var EngCalcs = EngCalcs || {};
 		if (typeof ResizeObserver !== 'undefined') {
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
-				if (w) { host.classList.toggle('lpn-gnarrow', w < 18 * px); }
+				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
+				if (w) { host.classList.toggle('lpn-gnarrow', w < 18 * px || (window.innerWidth || 9999) < 30 * px); }
 			}).observe(host);
 		}
 		return host;
@@ -70411,7 +70412,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				endLoose(); last = null;
 				marked = !!gut;
 				if (marked) { fields.insertBefore(gutterCell(), k); }   // a marker over a table or a list
-				k.className = (k.className ? k.className + ' ' : '') + (marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
+				// The demand table starts at the value column and spans it and the unit column.
+				k.className = (k.className ? k.className + ' ' : '') + (c.indexOf(' lpn-demand-table ') >= 0 ? 'lpn-gspan3' : marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
 				continue;
 			}
 			// A loose link or word after a row belongs to that row (the library link beside a curve);
@@ -71774,13 +71776,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			w = host.getBoundingClientRect().width;
 			host.style.width = prevW;
 			Array.prototype.forEach.call(tabs, function (t) {
-				var pw = t.style.width;
-				t.style.width = 'max-content'; tw = t.getBoundingClientRect().width; t.style.width = pw;
-				w = Math.max(w, tw);
+				var pw = t.style.width, off = Math.max(0, t.getBoundingClientRect().left - host.getBoundingClientRect().left);
+				t.style.contain = 'none'; t.style.width = 'max-content'; tw = t.getBoundingClientRect().width; t.style.width = pw; t.style.contain = '';
+				w = Math.max(w, tw + off);
 			});
 			cs = window.getComputedStyle(popup);
 			chrome = popup.getBoundingClientRect().width - host.getBoundingClientRect().width;
 			minW = parseFloat(cs.minWidth) || 0;
+			// A phone: the box takes the width of the screen, so a value control has a whole row to itself.
+			if ((window.innerWidth || 9999) < 480) { w = Math.max(w, window.innerWidth - 2 * POPUP_EDGE - chrome - 2); }
 			return Math.max(minW, Math.ceil(w + chrome + 2 + (popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
 		}
 		left = fields.getBoundingClientRect().left;
