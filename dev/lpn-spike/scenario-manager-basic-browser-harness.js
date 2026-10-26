@@ -76,7 +76,7 @@ async function main() {
 		console.log('--- 2. the Basic face ---');
 		let i = await info();
 		ok('2.1 the box is out and shows a list headed Scenario and No. of overrides', i.shown && JSON.stringify(i.head) === JSON.stringify(['', await L('lpn_scenario_label'), await L('lpn_scenario_overrides')]), JSON.stringify(i.head));
-		ok('2.2 Base is the one row, marked * as current', i.rows.length === 1 && i.rows[0][0] === '*' && i.rows[0][1] === await L('lpn_scenario_base'), JSON.stringify(i.rows));
+		ok('2.2 Base is the one row, marked * as current, with its count 0', i.rows.length === 1 && i.rows[0][0] === '*' && i.rows[0][1] === await L('lpn_scenario_base') && i.rows[0][2] === '0', JSON.stringify(i.rows));
 		const want = [await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'), await L('lpn_sm_list_overrides')];
 		ok('2.3 buttons: New, Copy, Rename, Delete, Override manager', JSON.stringify(i.buttons.map((b) => b.t)) === JSON.stringify(want), JSON.stringify(i.buttons));
 		ok('2.4 Copy, Rename, Delete and Override manager are greyed on Base; New is not', i.buttons[0].off === false && i.buttons.slice(1).every((b) => b.off), JSON.stringify(i.buttons));

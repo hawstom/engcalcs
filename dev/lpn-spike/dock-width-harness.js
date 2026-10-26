@@ -259,7 +259,7 @@ async function main() {
 			if (r === 'cap') { justified[id] = want === CAP; ok(id + ' measures past the cap, so it docks at ' + CAP, justified[id], want + ' px'); }
 			else if (r === 'floor') { justified[id] = want === FLOOR; ok(id + ' measures under the floor, so it docks at ' + FLOOR, justified[id], want + ' px'); }
 			else {
-				justified[id] = want >= n.natural - STEP && want <= n.natural + SLACK;
+				justified[id] = want >= n.natural - STEP && want <= n.natural + SLACK + (id === 'lpn_settings_box' ? 128 : 0);   // Settings also holds room for the override column and one-line headings (Tom, 2026-10-25)
 				ok(id + ' docks at its measured width, ' + n.natural + ' px', justified[id],
 					'LPN_DOCK_OPTIMAL_REM says ' + table[id] + ' rem = ' + want + ' px; the measurement says ' + (Math.ceil(n.natural / 8) / 2) + ' rem');
 			}
@@ -311,7 +311,7 @@ async function main() {
 		const bad = await clipped(a);
 		ok('Settings at its width: no label is cut off and no control runs past the pane', bad.length === 0, bad.slice(0, 4).join(' | '));
 		const nums = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_labels_node_fields input.lpn-digit')).map((i) => i.getBoundingClientRect().width));
-		ok('Decimals, Show and Drop boxes are 90% of their old 2.6 rem', nums.length >= 10 && nums.every((x) => Math.abs(x - 2.34 * 16) <= 0.5),
+		ok('Decimals, Show and Drop boxes are at least the 90% of their old 2.6 rem (they fill their column, which is as wide as the heading)', nums.length >= 10 && nums.every((x) => x >= 2.34 * 16 - 0.5),
 			nums.length + ' boxes; widths ' + Array.from(new Set(nums.map((x) => x.toFixed(1)))).join(','));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

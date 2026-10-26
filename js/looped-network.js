@@ -65666,7 +65666,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
 		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
-		lpn_full_box: 52, lpn_settings_box: 35, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_full_box: 52, lpn_settings_box: 42, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
 		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
@@ -82782,7 +82782,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			r.tabIndex = 0;
 			m.textContent = s.id === cur.id ? '*' : '';
 			n.textContent = scenarioDisplayName(s);
-			c.textContent = s.isBase ? '' : String(overrideCount(s));
+			c.textContent = String(overrideCount(s));
 			r.appendChild(m); r.appendChild(n); r.appendChild(c);
 			r.addEventListener('click', function () { if (s.id !== activeScenario().id) { switchScenario(s.id); } rebuildScenarioManager(); });
 			r.addEventListener('keydown', function (e) {

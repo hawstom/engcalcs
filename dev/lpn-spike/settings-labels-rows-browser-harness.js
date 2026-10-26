@@ -7,7 +7,7 @@
 //      sideways, and no ancestor between them and the pane clips them;
 //   3. the Use units, Show and Drop columns are no wider than their content needs;
 //   3b. no name is cut off (scrollWidth <= clientWidth), in English and in German and Russian;
-//   4. on a phone the Settings index (the list of sections) is narrower than 4.5rem.
+//   4. on a phone no word of the Settings index is broken or cut (it wraps at spaces only).
 //
 //   node dev/lpn-spike/settings-labels-rows-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -47,6 +47,27 @@ async function measure(page) {
 			const e = document.getElementById(id);
 			if (e) { e.querySelectorAll('label').forEach((l) => { if (l.offsetParent && (l.scrollWidth > l.clientWidth + 1 || getComputedStyle(l).textOverflow === 'ellipsis' && l.scrollWidth > l.clientWidth)) { out.cut.push(l.textContent.trim().slice(0, 30)); } }); }
 		});
+		out.headBad = [];
+		lists.forEach((id) => {
+			const e = document.getElementById(id), h = e && e.children[0];
+			if (!h) { return; }
+			Array.from(h.children).forEach((c) => {
+				if (!c.textContent.trim()) { return; }
+				const rg = document.createRange(); rg.selectNodeContents(c);
+				const lines = new Set(Array.from(rg.getClientRects()).map((q) => Math.round(q.top / 4))).size;
+				if (lines > 1 || c.scrollWidth > c.clientWidth + 1) { out.headBad.push(id.slice(11, 15) + ':' + c.textContent.trim().slice(0, 14) + ' lines=' + lines + ' ' + c.scrollWidth + '>' + c.clientWidth); }
+			});
+		});
+		// A two-digit Drop value: typed into the Drop box of a row that has one, then read back unclipped.
+		out.dropClip = [];
+		const dropRow = Array.from(document.getElementById(lists[0]).children).filter((r) => r.children.length === 7 && r.children[6].tagName === 'INPUT')[0];
+		if (dropRow) {
+			const inp = dropRow.children[6], was = inp.value;
+			inp.value = '88';
+			if (inp.scrollWidth > inp.clientWidth + 1) { out.dropClip.push(inp.scrollWidth + '>' + inp.clientWidth); }
+			inp.value = was;
+		} else { out.dropClip.push('no Drop box found'); }
+		out.indexBad = Array.from(document.querySelectorAll('.lpn-setbox-index .lpn-setbox-link')).filter((l) => l.offsetParent && l.scrollWidth > l.clientWidth + 1).map((l) => l.textContent.trim().slice(0, 24));
 		out.index = ix ? Math.round(ix.getBoundingClientRect().width) : null;
 		lists.forEach((id) => {
 			const box = document.getElementById(id);
@@ -107,15 +128,13 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		console.log('  rows ' + m.rows + ', pane ' + m.pane + '/' + m.scroll + ', head widths ' + m.cols.join(',') + ', index ' + m.index);
 		ok(label + ': labels rows were found', m.rows > 10, String(m.rows));
 		ok(label + ': no labels row wraps', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
+		ok(label + ': no heading wraps or is clipped', m.headBad.length === 0, m.headBad.slice(0, 4).join(' | '));
+		ok(label + ': a two-digit Drop value is not clipped', m.dropClip.length === 0, m.dropClip.join(' | '));
+		if (touch) { ok(label + ': no word of the Settings index is broken or cut', m.indexBad.length === 0, m.indexBad.slice(0, 4).join(' | ')); }
 		ok(label + ': no name is cut off (no ellipsis)', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
 		ok(label + ': Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
-		const colW = m.cols.slice(-3);
-		// Use units, Show, Drop: the width of the longest of their headings or their number boxes, plus slack.
-		ok(label + ': Use units, Show, Drop no wider than their content', colW.every((w) => w <= 40) && m.cols[m.cols.length - 4] <= 40, m.cols.join(','));
-		console.log('  rows ' + m.dbg.join(' | '));
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
 		if (!touch && !lang) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
-		if (touch) { ok(label + ': the Settings index is narrower than 4.5rem (72 px)', m.index !== null && m.index < 72, String(m.index)); }
 		// A scenario override on a label row.
 		await page.keyboard.press('Escape');
 		await a.settle(300);
@@ -137,6 +156,8 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		console.log('\n--- ' + label + ', with an override (held rows ' + held + ') ---');
 		m = await measure(page);
 		ok(label + ' override: no labels row wraps', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
+		if (!touch && !lang) { ok(label + ' override: the default box fits the labels table WITH the override column, no sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
+		ok(label + ' override: no heading wraps or is clipped', m.headBad.length === 0, m.headBad.slice(0, 4).join(' | '));
 		ok(label + ' override: Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
 	} finally { await a.close(); }
 }

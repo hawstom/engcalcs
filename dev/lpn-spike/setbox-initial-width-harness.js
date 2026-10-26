@@ -127,8 +127,8 @@ console.log('\n-- the box\'s hard minimum (25rem) and the phone override are bot
 	// The phone rule derives its OWN figure from its OWN 4.5rem baseline (Task 527's transfer
 	// arithmetic) and must still be there, untouched by anything above.
 	const phoneBlock = (css.match(/@media \(max-width: 640px\) \{[\s\S]*/) || [''])[0];
-	ok('the phone index override is the narrow 3.8rem (Tom, 2026-10-25: narrower, with its entries wrapping)',
-		/html:has\(#lpn_canvas\) \.lpn-setbox-index \{ flex-basis: 3\.8rem; \}/.test(phoneBlock));
+	ok('the phone index override is min-content wide (Tom, 2026-10-25: narrower, with its entries wrapping)',
+		/html:has\(#lpn_canvas\) \.lpn-setbox-index \{ flex: 0 0 min-content; \}/.test(phoneBlock));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
