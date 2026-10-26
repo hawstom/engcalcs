@@ -26795,7 +26795,15 @@ var EngCalcs = EngCalcs || {};
 		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
 		if (!pane) { return; }
 		pass = pass || 0;
-		pane.style.display = paneState.open ? 'flex' : 'none';
+		// **A CLOSED PANE IS SHUT, NOT `display:none`** (Tom, 2026-10-25: *"Bottom pane is slow to open
+		// and close (about 4-5 seconds baseline) ... w/ Net3"*). `display:none` throws the whole pane's
+		// layout away, so every open re-derived style and layout for ~1,300 form controls in the shown
+		// table (measured ~270 ms on a 4x throttled CPU, against ~10 ms when the layout is kept). The
+		// `lpn-pane-shut` class collapses the pane to nothing with `content-visibility:hidden`, which
+		// skips its contents and KEEPS their last rendering: the same property that keeps a hidden
+		// tab's table. Open or shut is `paneState.open`, or the class; never `style.display`.
+		pane.style.display = 'flex';
+		pane.classList.toggle('lpn-pane-shut', !paneState.open);
 		// **THE STORED HEIGHT IS THE USER'S WISH; THE CLAMP IS APPLIED, NOT WRITTEN BACK.** A window
 		// narrowed to 520 px leaves room for a 168 px pane, and writing that back would mean the
 		// pane you dragged to 400 came back as 168 for good once you widened the window again. The
