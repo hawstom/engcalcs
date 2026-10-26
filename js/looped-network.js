@@ -43882,18 +43882,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * the export row's language key, which names the file kind in the box; `run` is the export.
 	 * (The attached EPANET-MSX file is written back as it came in, so it never asks.)
 	 */
+	/** "This project has {n} scenarios, but an EPANET file has no scenarios or alternatives." Empty for one scenario. */
+	function noScenarioNotice(fmtId) {
+		var pcX = EngCalcs.pageConfig || {};
+		if (scenarios.length < 2) { return ''; }
+		return String(pcX.lpn_noscn_lead || 'This project has {n} scenarios, but {format} has no scenarios or alternatives.')
+			.split('{format}').join(String(pcX['lpn_noscn_fmt_' + fmtId] || 'a file')).split('{n}').join(String(scenarios.length));
+	}
 	function confirmExportLeaves(rowKey, run) {
-		var pcX = EngCalcs.pageConfig || {}, fmt, lead;
+		var pcX = EngCalcs.pageConfig || {}, fmt, scn = activeScenario(), goes;
 		if (!exportLeavesSomething()) { run(); return; }
 		fmt = String(pcX[rowKey] || '').replace(/\u2026$/, '');
-		lead = scenarios.length > 1
-			? (pcX.lpn_export_confirm_lead || 'The {format} holds one scenario, and this project has {n}.')
-				.split('{format}').join(fmt).split('{n}').join(String(scenarios.length)) + ' '
-			: '';
+		// Tom, 2026-10-25: a title naming the export, then "This project has 5 scenarios, but an EPANET
+		// file has no scenarios or alternatives. Exporting the scenario "X" to a unique file name."
+		// The Base scenario is written under the bare project name, so it is not called a unique name.
+		goes = (!scn || scn.isBase) ? String(pcX.lpn_export_goes_base || 'Exporting the Base scenario.')
+			: String(pcX.lpn_export_goes_scenario || 'Exporting the scenario "{scenario}" to a unique file name.').split('{scenario}').join(scenarioDisplayName(scn));
 		askDialog({
 			kind: 'confirm',
 			title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
-			text: lead + exportScenarioSentence().replace(/^\s+/, ''),
+			text: scenarios.length > 1 ? noScenarioNotice(rowKey.replace('lpn_file_export_item_', '')) + ' ' + goes
+				: exportScenarioSentence().replace(/^\s+/, ''),
 			ok: pcX.lpn_export_table_go || 'Export',
 			cancel: pcX.lpn_cancel || 'Cancel'
 		}, function (yes) { if (yes) { run(); } });
@@ -46498,7 +46507,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function inpAskDestination(text, fileName, msxFile) {
 		var pc = EngCalcs.pageConfig || {};
 		function landNew() { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } }
-		askImportDestination(fileName, pc.lpn_inpup_lead || 'Choose where to import this file. Note that EPANET files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+		askImportDestination(fileName, noScenarioNotice('inp') + (scenarios.length > 1 ? '\n\n' : '') + (pc.lpn_inpup_lead || 'Choose where to import this EPANET file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.'),
 			landNew, function (target, newName) { updateProjectFromInp(text, fileName, target, msxFile, newName); });
 	}
 	// **THE ONE QUESTION, FOR EVERY FILE THAT MAY LAND IN THE OPEN PROJECT** (Task 814). `landNew()`
@@ -46838,7 +46847,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A project with something in it is asked where the file goes, as for an `.inp` (Task 814); a
 		// caller that hands in the mapping `choice` itself is a harness, and wants the new project.
 		if (!choice && projectHasAssets()) {
-			askImportDestination(fileName, pc.lpn_gjup_lead || 'Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+			askImportDestination(fileName, noScenarioNotice('geojson') + (scenarios.length > 1 ? '\n\n' : '') + (pc.lpn_gjup_lead || 'Choose where to import this GeoJSON file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.'),
 				function () { landGeoJsonNetNew(scan, fileName, done, choice); },
 				function (target, newName) { updateProjectFromGeoJson(scan, fileName, target, done, newName); });
 			return;

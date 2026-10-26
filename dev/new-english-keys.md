@@ -676,7 +676,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy HTML
   @@ NEEDS RULING
 
-### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+### feat/scenario-io (`6e858d7ec`) — adds no English strings
 
 ### feat/shape-scenario (`8c0bc5d7a`) — 1 new, 1 to read @@ NEEDS RULING
 

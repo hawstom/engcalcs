@@ -2428,7 +2428,7 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
 // {file} is a file name.
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
-$ec_lang['lpn_inpup_lead']='Choose where to import this file. Note that EPANET files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_lead']='Choose where to import this EPANET file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_base_note']='Choosing Base doesn\'t clear any scenario overrides.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
@@ -2446,7 +2446,7 @@ $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
 $ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
-$ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_gjup_lead']='Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_gjup_title']='Update from GeoJSON file';
 $ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
@@ -5265,7 +5265,13 @@ $ec_lang['lpn_run_of_scenario']='Results of the scenario {scenario}.';
 $ec_lang['lpn_calib_scenario']='Compared with the results of the scenario {scenario}.';
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
 $ec_lang['lpn_export_confirm_title']='Export {format}';
-$ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';
+// {format} is the file kind with its article ("an EPANET file", "a GeoJSON file", "a DXF file").
+$ec_lang['lpn_noscn_lead']='This project has {n} scenarios, but {format} has no scenarios or alternatives.';
+$ec_lang['lpn_noscn_fmt_inp']='an EPANET file';
+$ec_lang['lpn_noscn_fmt_geojson']='a GeoJSON file';
+$ec_lang['lpn_noscn_fmt_dxf']='a DXF file';
+$ec_lang['lpn_export_goes_scenario']='Exporting the scenario "{scenario}" to a unique file name.';
+$ec_lang['lpn_export_goes_base']='Exporting the Base scenario.';
 $ec_lang['lpn_export_receipt_heading']='Exported {file} from {scenario} of {project}.';
 $ec_lang['lpn_export_receipt_note']='This is an export, not a save: this project is not connected to the file.';
 $ec_lang['lpn_dxf_exported_geo_tail']='Its coordinates are {crs}, in meters, not latitude and longitude.';
