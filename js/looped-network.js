@@ -77777,7 +77777,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// dashed gray junction's tip kept opening after the parent's override was cleared). Arming
 		// (wireTipDelegation) removes the <title> child and caches its text in an attribute, so the
 		// child is gone and only writing the attribute changes or silences what the reader is shown.
-		if (el.hasAttribute('data-bs-original-title') || el.hasAttribute('title')) {
+		if (typeof el.hasAttribute === 'function' && (el.hasAttribute('data-bs-original-title') || el.hasAttribute('title'))) {
 			if (t) { el.removeChild(t); }
 			el.setAttribute('title', marked ? overrideMarkText(inherited) : '');
 			if (!marked && window.bootstrap && bootstrap.Tooltip) {
