@@ -25,6 +25,7 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const REPO = path.resolve(__dirname, '..', '..');
@@ -423,7 +424,8 @@ async function main() {
 		ok('released, Peak follows Base\'s view again', (await view()).scale === '1:' + NB3, (await view()).scale);
 
 		console.log('\n--- 7. a geographic project: the centre is a latitude and a longitude ---');
-		const b = await Session.open(browser, 'B');
+		const b = await Session.open(browser, 'B', { serviceWorkers: 'block' });
+		await serveLatLonNet3(b.page);
 		await b.goto('Looped-Network.php');
 		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
 		await b.settle(1500);

@@ -25,7 +25,7 @@ $known = array(
 	'Net3-Novato-CA-World-SI.lwn', 'Elm-Street-Center.lwn',
 	// Unpublished test fixtures (site plans behind them, so not gallery examples): the harnesses' ft-grid Net2 and Net3.
 	'Net2.lwn', 'Net3.lwn',
-	'Net1.inp', 'Net2.inp', 'Net3.inp', 'Net3.rpt'
+	'latlon-originals', 'Net1.inp', 'Net2.inp', 'Net3.inp', 'Net3.rpt'
 );
 $strays = array();
 foreach (scandir($dir) as $f) {
