@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='Imprimer le rapport';
 $ec_lang['lpn_full_col_time']='Temps';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Teneur';
+$ec_lang['lpn_quality_named_concentration_short']='Concentration de {chemical}';
 $ec_lang['lpn_full_row_count']='Lignes ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

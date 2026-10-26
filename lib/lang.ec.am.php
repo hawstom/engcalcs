@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='ሪፖርት አትም';
 $ec_lang['lpn_full_col_time']='ጊዜ';
 $ec_lang['lpn_full_col_type']='ዓይነት';
 $ec_lang['lpn_full_col_id']='መለያ';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ክምችት';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ክምችት';
 $ec_lang['lpn_full_row_count']='ረድፎች ({n})።';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

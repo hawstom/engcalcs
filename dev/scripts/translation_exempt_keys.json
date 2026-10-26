@@ -434,6 +434,11 @@
             ],
             "reason": "Type -- the French word is Type."
         },
+        "lpn_heading_unit": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "{label} ({unit}) -- the template that puts a unit in a column heading, English order and ASCII brackets. A language may choose its own bracket (Chinese full-width) or order; identical is allowed, never required."
+        },
         "lpn_geomap": {
             "category": "symbol",
             "languages": "*",

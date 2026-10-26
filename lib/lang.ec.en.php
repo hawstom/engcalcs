@@ -4260,6 +4260,9 @@ $ec_lang['lpn_report_copy_html']='Copy HTML';
 $ec_lang['lpn_full_col_time']='Time';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Conc.';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} conc.';
 $ec_lang['lpn_full_row_count']='Rows ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

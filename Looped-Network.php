@@ -3272,6 +3272,9 @@ EngCalcs.pageConfig = {
 	lpn_full_col_time: <?=json_encode($ec_lang['lpn_full_col_time'])?>,
 	lpn_full_col_type: <?=json_encode($ec_lang['lpn_full_col_type'])?>,
 	lpn_full_col_id: <?=json_encode($ec_lang['lpn_full_col_id'])?>,
+	lpn_heading_unit: <?=json_encode($ec_lang['lpn_heading_unit'])?>,
+	lpn_result_concentration_short: <?=json_encode($ec_lang['lpn_result_concentration_short'])?>,
+	lpn_quality_named_concentration_short: <?=json_encode($ec_lang['lpn_quality_named_concentration_short'])?>,
 	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
 	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
 <?php // The Calibration report (ROADMAP Task 601). ?>

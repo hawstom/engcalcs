@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='Отпечатай отчета';
 $ec_lang['lpn_full_col_time']='Време';
 $ec_lang['lpn_full_col_type']='Вид';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Концентрация';
+$ec_lang['lpn_quality_named_concentration_short']='Концентрация на {chemical}';
 $ec_lang['lpn_full_row_count']='Редове ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='Vytisknout sestavu';
 $ec_lang['lpn_full_col_time']='Čas';
 $ec_lang['lpn_full_col_type']='Typ';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Koncentrace';
+$ec_lang['lpn_quality_named_concentration_short']='Koncentrace {chemical}';
 $ec_lang['lpn_full_row_count']='Řádky ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

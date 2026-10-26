@@ -6311,6 +6311,13 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    exactly as wide as that word in the current language, never broken: `anywhere` above would let
    auto layout squeeze the column to one letter ("Junctio|n"). Nothing is reserved beyond the word. */
 .lpn-ff-table td.lpn-ff-fit { white-space: nowrap; overflow-wrap: normal; }
+/* **AN ASSET ID COLUMN HAS ONE MINIMUM WIDTH IN EVERY REPORT TABLE** (Task 829; Tom, 2026-10-26: "there
+   is no justification for them to vary"). Wide enough for N9999 or J-1234 at the table's own font,
+   screen and paper alike, and an id is never broken. Marked by the renderer, `lpn-rpt-id`, on the
+   heading and every cell of the column. */
+.lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
+/* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
+.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
    words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its

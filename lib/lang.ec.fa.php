@@ -4113,6 +4113,9 @@ $ec_lang['lpn_full_print']='چاپ گزارش';
 $ec_lang['lpn_full_col_time']='زمان';
 $ec_lang['lpn_full_col_type']='نوع';
 $ec_lang['lpn_full_col_id']='شناسه';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='غلظت';
+$ec_lang['lpn_quality_named_concentration_short']='غلظت {chemical}';
 $ec_lang['lpn_full_row_count']='ردیف‌ها ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

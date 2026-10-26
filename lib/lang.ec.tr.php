@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='Raporu yazdır';
 $ec_lang['lpn_full_col_time']='Zaman';
 $ec_lang['lpn_full_col_type']='Tür';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Derişim';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} derişimi';
 $ec_lang['lpn_full_row_count']='Satırlar ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

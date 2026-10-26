@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='បោះពុម្ពរបាយការណ៍'
 $ec_lang['lpn_full_col_time']='ពេលវេលា';
 $ec_lang['lpn_full_col_type']='ប្រភេទ';
 $ec_lang['lpn_full_col_id']='លេខសម្គាល់';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='កំហាប់';
+$ec_lang['lpn_quality_named_concentration_short']='កំហាប់ {chemical}';
 $ec_lang['lpn_full_row_count']='ជួរដេក ({n})។';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

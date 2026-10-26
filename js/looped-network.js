@@ -79455,7 +79455,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the Settings.Label prefix for Node IDs"*). Every id drawn on the map goes through
 			// labelPrefixFor(), so an id printed here without it is the same element under a second
 			// name -- and this table exists to send somebody to those elements.
-			ffGotoLink(ffCell(tr, ''), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
@@ -80020,7 +80020,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			d.tanks.forEach(function (t) {
 				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
 				tr = ffEl('tr', null, null, body);
-				ffCell(tr, labelPrefixFor('node', 'id') + t.id);
+				ffCell(tr, labelPrefixFor('node', 'id') + t.id, 'lpn-rpt-id');
 				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
 					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
 				ffCell(tr, lv(t.min));
@@ -80275,7 +80275,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
 			ffCell(tr, typeof rec.unserved === 'number'
 				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
 					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
@@ -80756,7 +80756,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
 			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
@@ -80770,7 +80770,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
 		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
 			var tr = ffEl('tr', null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
 		});
@@ -81090,7 +81090,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body), ran = row.onSeconds > 0;
 			// The user's own label prefix, for the reason the fire flow table wears it: an id
 			// printed here without it is the same element under a second name.
-			ffCell(tr, labelPrefixFor('link', 'id') + row.id);
+			ffCell(tr, labelPrefixFor('link', 'id') + row.id, 'lpn-rpt-id');
 			ffCell(tr, energyPercent(row.usage));
 			// **A PUMP THAT NEVER RAN GETS A DASH AND NOT A ZERO.** Its average efficiency is not
 			// 0%, it is nothing at all, and a column of zeros beside a 0% usage factor reads as a
@@ -81719,7 +81719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body);
 			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
 			// lines up against a sheet exported from there.
-			ffCell(tr, x.r[0]);
+			ffCell(tr, x.r[0], 'lpn-rpt-id');
 			// The CSV carries the full number, the box and the print its rounded one.
 			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num').setAttribute('data-ec-full', scnResFull(x.r[k + 1])); });
 		});
@@ -83741,11 +83741,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ key: 'pumphead', group: 'link', field: 'headloss', pump: true },
 		{ key: 'status', group: 'link', field: 'status' }
 	];
+	/**
+	 * A column's heading as its label and its unit, apart, so the unit can be isolated in a
+	 * right-to-left heading. **The concentration column wears the short label** ("Chlorine conc."):
+	 * on a sheet of twelve columns the long word was the one that set the whole table's type size
+	 * (Tom, 2026-10-26: "Conc." is acceptable). Its other modes (age, source share, a species) keep
+	 * their own names.
+	 */
+	function fullReportColParts(col) {
+		var pc = EngCalcs.pageConfig || {}, nm, label;
+		if (col.field === 'status') { return { label: pc.lpn_result_status || 'Status', unit: '' }; }
+		label = col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field);
+		if (col.key === 'quality' && qualityMode() === 'chemical') {
+			nm = chemicalName();
+			label = nm ? (pc.lpn_quality_named_concentration_short || '{chemical} conc.').replace('{chemical}', nm)
+				: (pc.lpn_result_concentration_short || 'Conc.');
+		}
+		return { label: label, unit: colorFieldUnitText(col.group, col.field) };
+	}
 	function fullReportColHeading(col) {
-		var pc = EngCalcs.pageConfig || {};
-		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
-		var unit = colorFieldUnitText(col.group, col.field);
-		return (col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
+		var p = fullReportColParts(col);
+		return reportHeadText(p.label, p.unit);
 	}
 	/**
 	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
@@ -83887,6 +83903,111 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ box: 'lpn_calib_box', host: 'lpn_calib_report', title: 'lpn_calib_title', fb: 'Calibration report' },
 		{ box: 'lpn_full_box', host: 'lpn_full_report', title: 'lpn_full_title', fb: 'Full report', full: true }
 	];
+	/**
+	 * **A UNIT GOES IN THE COLUMN HEADING, NEVER IN EVERY CELL** (Task 829; Tom, 2026-10-26: "in English
+	 * there is a universal convention for tables and spreadsheets to put units in the heading in
+	 * parentheses instead of in the data cells"). A report table whose figures in one column all
+	 * carry the same unit is rewritten after it is drawn: "Static pressure" over "111", "116",
+	 * not "111 psi". A column that mixes units, or whose cells are sentences ("N5 drops to 14 psi",
+	 * "108 psi at N32, 14:00"), is left exactly as it was drawn. The heading is built from ONE
+	 * localized template, `lpn_heading_unit` ('{label} ({unit})' in English), so a language can
+	 * choose its own brackets or order; the unit is wrapped in a `<bdi>` so a Latin unit inside a
+	 * right-to-left heading keeps its own direction and its brackets do not flip. The unit stays on
+	 * each cell as `data-ec-unit` where the box kept one, and the CSV, copy and print read the heading.
+	 */
+	var REPORT_UNIT_RE = /^((?:[^\d]*\s)?)([-\u2212]?\d[\d.,]*)\s*(%|[A-Za-z\u00b0\u00b5\u03bc][^\s\d.,]*(?: H2O)?)$/;
+	var REPORT_BARE_RE = /^[-\u2212]?\d[\d.,]*$/;
+	// '' for a cell with no unit to move (a word, a dash, a bare number), the unit for a figure with
+	// one, null for a cell that mixes a figure with other text.
+	function reportCellUnit(t) {
+		var m;
+		if (!/\d/.test(t) || REPORT_BARE_RE.test(t)) { return ''; }
+		m = REPORT_UNIT_RE.exec(t);
+		return m ? m[3] : null;
+	}
+	function reportHeadTemplate() {
+		return String((EngCalcs.pageConfig || {}).lpn_heading_unit || '{label} ({unit})');
+	}
+	function reportHeadText(label, unit) {
+		return unit ? reportHeadTemplate().replace('{label}', function () { return label; }).replace('{unit}', function () { return unit; }) : label;
+	}
+	/** The heading as nodes: label as text, unit in a `<bdi>`, the rest of the template as text. */
+	function reportHeadNodes(label, unit) {
+		var frag = document.createDocumentFragment();
+		reportHeadTemplate().split(/(\{label\}|\{unit\})/).forEach(function (part) {
+			var b;
+			if (part === '{label}') { frag.appendChild(document.createTextNode(label)); }
+			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = unit; frag.appendChild(b); }
+			else if (part) { frag.appendChild(document.createTextNode(part)); }
+		});
+		return frag;
+	}
+	function reportHeadHtml(label, unit) {
+		return reportHeadTemplate().split(/(\{label\}|\{unit\})/).map(function (part) {
+			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi>' + reportEsc(unit) + '</bdi>' : reportEsc(part);
+		}).join('');
+	}
+	function reportUnitInLabel(label, unit) {
+		var esc = unit.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+		return new RegExp('(^|[\\s(])' + esc + '($|[\\s),])').test(label);
+	}
+	/** Moves `unit` into the heading cell `th`; a heading that already names it is left as it is. */
+	function reportSetHeadUnit(th, unit) {
+		var walker, n, v, label, lead, trail;
+		if (!unit || th.getAttribute('data-ec-hu') !== null) { return; }
+		walker = document.createTreeWalker(th, NodeFilter.SHOW_TEXT);
+		while ((n = walker.nextNode())) {
+			if (n.parentNode.closest && n.parentNode.closest('.ec-tip, .lpn-pane-sortarrow')) { continue; }
+			if (n.nodeValue.trim()) { break; }
+		}
+		if (!n) { return; }
+		v = n.nodeValue; label = v.trim();
+		if (reportUnitInLabel(label, unit)) { return; }
+		lead = v.slice(0, v.indexOf(label)); trail = v.slice(lead.length + label.length);
+		th.setAttribute('data-ec-hl', label); th.setAttribute('data-ec-hu', unit);
+		n.parentNode.replaceChild((function () {
+			var f = document.createDocumentFragment();
+			if (lead) { f.appendChild(document.createTextNode(lead)); }
+			f.appendChild(reportHeadNodes(label, unit));
+			if (trail) { f.appendChild(document.createTextNode(trail)); }
+			return f;
+		})(), n);
+	}
+	function reportStripUnit(td, unit) {
+		var n = td.childNodes, t;
+		if (n.length !== 1 || n[0].nodeType !== 3) { return; }
+		t = n[0].nodeValue.replace(/\s+$/, '');
+		if (t.slice(-unit.length) === unit) { n[0].nodeValue = t.slice(0, -unit.length).replace(/\s+$/, ''); }
+	}
+	function reportTableUnits(table) {
+		var ths = table.querySelectorAll('thead th'), trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known;
+		if (!ths.length || table._ecUh === trs.length) { return; }
+		for (r = 0; r < trs.length; r++) { if (trs[r].children.length !== ths.length) { return; } }
+		table._ecUh = trs.length;
+		for (c = 0; c < ths.length; c++) {
+			if (trs.length && trs[0].children[c].classList.contains('lpn-rpt-id')) {
+				ths[c].classList.add('lpn-rpt-id');
+				for (r = 0; r < trs.length; r++) { trs[r].children[c].classList.add('lpn-rpt-id'); }
+				continue;
+			}
+			known = ths[c].getAttribute('data-ec-hu');
+			unit = known; ok = true; cells = [];
+			for (r = 0; r < trs.length && ok; r++) {
+				td = trs[r].children[c]; t = (td.textContent || '').replace(/\s+/g, ' ').trim();
+				u = reportCellUnit(t);
+				if (u === null) { ok = false; break; }
+				if (u) { if (unit === null) { unit = u; } else if (unit !== u) { ok = false; break; } }
+				cells.push(td);
+			}
+			if (!ok || !unit) { continue; }
+			for (r = 0; r < cells.length; r++) { reportStripUnit(cells[r], unit); }
+			reportSetHeadUnit(ths[c], unit);
+		}
+	}
+	function reportUnitsIntoHeads(root) {
+		if (!root || !root.querySelectorAll) { return; }
+		Array.prototype.forEach.call(root.querySelectorAll('table.lpn-ff-table'), reportTableUnits);
+	}
 	function reportCellText(el, forCsv) {
 		var full = forCsv && el.getAttribute && el.getAttribute('data-ec-full'), inp, c, junk, i;
 		if (full !== null && full !== undefined && full !== false && full !== '') { return full; }
@@ -83904,7 +84025,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 	function reportDomBlocksOf(host) {
-		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, urow, heads;
+		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, urow, heads, hl, hu, ids;
 		if (!host) { return out; }
 		nodes = host.querySelectorAll('table, p, h1, h2, h3, h4, .lpn-ff-head');
 		for (i = 0; i < nodes.length; i++) {
@@ -83915,8 +84036,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (t) { out.push({ text: t }); }
 				continue;
 			}
-			heads = [];
-			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) { heads.push(reportCellText(th, false)); });
+			heads = []; hl = []; hu = []; ids = [];
+			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) {
+				heads.push(reportCellText(th, false));
+				hl.push(th.getAttribute('data-ec-hl') || ''); hu.push(th.getAttribute('data-ec-hu') || '');
+				ids.push(th.classList.contains('lpn-rpt-id'));
+			});
 			rows = []; frow = []; urow = [];
 			trs = el.querySelectorAll('tbody tr');
 			for (j = 0; j < trs.length; j++) {
@@ -83928,15 +84053,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				rows.push(row); frow.push(fr); urow.push(ur);
 			}
-			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow }); }
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow, hl: hl, hu: hu, ids: ids }); }
 		}
 		return out;
 	}
 	function fullReportBlocks() {
 		var pc = EngCalcs.pageConfig || {}, rows = fullReportRows();
 		if (!rows.length) { return []; }
+		var parts = FULL_REPORT_COLS.map(fullReportColParts);
 		return [{
 			heads: [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			hl: ['', '', ''].concat(parts.map(function (p) { return p.label; })),
+			hu: ['', '', ''].concat(parts.map(function (p) { return p.unit; })),
+			ids: [false, false, true].concat(parts.map(function () { return false; })),
+			trunc: [false, true, false].concat(FULL_REPORT_COLS.map(function (c) { return c.field === 'status'; })),
 			rows: rows.map(function (r) {
 				return [EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
 					.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }));
@@ -84042,7 +84172,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		blocks.forEach(function (b) {
 			if (!b.heads) { out.push('<p>' + reportEsc(b.text) + '</p>'); return; }
 			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:10pt;"><thead><tr>' +
-				b.heads.map(function (h) { return '<th style="' + cell + 'background:#eee;">' + reportEsc(h) + '</th>'; }).join('') +
+				b.heads.map(function (h, c) { return '<th style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml(b.hl[c], b.hu[c]) : reportEsc(h)) + '</th>'; }).join('') +
 				'</tr></thead><tbody>' +
 				b.rows.map(function (r) {
 					return '<tr>' + r.map(function (c) { return '<td style="' + cell + '">' + reportEsc(c) + '</td>'; }).join('') + '</tr>';
@@ -84069,6 +84199,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * which they fit. The columns are left to the browser's own table layout, which wraps a heading
 	 * at its spaces and gives a wide column the room it asks for (css/engcalcs.css, `.lpn-print-report`).
 	 */
+	var REPORT_ID_SAMPLE = 'W-9999', REPORT_TRUNC_EM = 5.5;
 	function reportPrintFit(table, b) {
 		var ncol = b.heads.length, need = [], sum = 0, j;
 		function note(col, text, head) {
@@ -84077,7 +84208,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		b.heads.forEach(function (t, c) { note(c, t, true); });
-		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol) { note(c, reportFigureUnitKept(t), false); } }); });
+		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol && !(b.trunc && b.trunc[c])) { note(c, reportFigureUnitKept(t), false); } }); });
+		// A column that may be cut with an ellipsis asks for the cap and no more.
+		(b.trunc || []).forEach(function (on, c) { if (on && c < ncol) { need[c] = Math.max(need[c] || 0, REPORT_TRUNC_EM * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); } });
+		// An asset id column asks for the width of a wide five-character id, in every report alike.
+		(b.ids || []).forEach(function (on, c) { if (on && c < ncol) { note(c, REPORT_ID_SAMPLE, false); } });
 		for (j = 0; j < ncol; j++) { sum += need[j] || PANE_PRINT_TD_PAD_EM; }
 		if (!(sum > 0)) { return; }
 		sum = Math.round(sum * 100) / 100;
@@ -84109,13 +84244,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			table.className = 'lpn-pane-table lpn-print-table lpn-print-report';
 			thead = document.createElement('thead');
 			tr = document.createElement('tr');
-			b.heads.forEach(function (t) { e = document.createElement('th'); e.textContent = t; tr.appendChild(e); });
+			b.heads.forEach(function (t, c) {
+				e = document.createElement('th');
+				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes(b.hl[c], b.hu[c])); } else { e.textContent = t; }
+				if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+				tr.appendChild(e);
+			});
 			thead.appendChild(tr);
 			table.appendChild(thead);
 			tbody = document.createElement('tbody');
 			b.rows.forEach(function (r) {
 				tr = document.createElement('tr');
-				r.forEach(function (t) { e = document.createElement('td'); e.textContent = reportFigureUnitKept(t); tr.appendChild(e); });
+				r.forEach(function (t, c) {
+					var inner;
+					e = document.createElement('td');
+					if (b.trunc && b.trunc[c] && t) {
+						inner = document.createElement('span'); inner.className = 'lpn-rpt-trunc'; inner.title = t; inner.textContent = t; e.appendChild(inner);
+					} else { e.textContent = reportFigureUnitKept(t); }
+					if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+					tr.appendChild(e);
+				});
 				tbody.appendChild(tr);
 			});
 			table.appendChild(tbody);
@@ -84178,13 +84326,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (blocks.some(function (b) { return b.heads; })) { printReportArea(reportPrintable(spec, blocks)); }
 			});
 			body.insertBefore(row, body.firstChild);
+			var obs = null;
 			function sync() {
 				var has = reportHostsFor(spec).some(function (h) { return !!(h && h.querySelector('table')); });
 				[csv, html, pr].forEach(function (b) { b.disabled = !has; });
+				// Units into the headings (reportTableUnits); this pass's own edits are not fed back.
+				reportHostsFor(spec).forEach(reportUnitsIntoHeads);
+				if (obs) { obs.takeRecords(); }
 			}
 			sync();
 			if (typeof MutationObserver !== 'undefined') {
-				new MutationObserver(sync).observe(spec.box === 'lpn_ds_box' ? body : host, { childList: true, subtree: true });
+				obs = new MutationObserver(sync);
+				obs.observe(spec.box === 'lpn_ds_box' ? body : host, { childList: true, subtree: true });
 			}
 		});
 	}
@@ -84247,11 +84400,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
 		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
-			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+			.concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c).label; })));
+		FULL_REPORT_COLS.forEach(function (c, k) {
+			var th = body.parentNode.querySelectorAll('thead th')[k + 2];
+			if (th) { reportSetHeadUnit(th, fullReportColParts(c).unit); }
+		});
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, r.type, 'lpn-ff-fit');
-			ffCell(tr, r.id);
+			ffCell(tr, r.id, 'lpn-rpt-id');
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
 	}
@@ -84330,7 +84487,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function calibParamLabel(def) {
 		var unit = colorFieldUnitText(def.group, def.field);
-		return colorFieldLabel(def.group, def.field) + (unit ? ' (' + unit + ')' : '');
+		return reportHeadText(colorFieldLabel(def.group, def.field), unit);
 	}
 	// The frames compared against: the extended period run's, or the single solve standing alone
 	// at time 0 -- EPANET's own allowance ("for a single-period analysis all time values can be 0").
@@ -84485,18 +84642,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
 			body = ffEl('tbody', null, null, table), r = res.stats.r;
+		var calibUnit = res.def ? colorFieldUnitText(res.def.group, res.def.field) : '';
 		[[pc.lpn_calib_col_location || 'Location'],
 			[pc.lpn_calib_col_n || 'Num obs'],
-			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
-			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
-			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
-			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip]].forEach(function (h) {
+			[pc.lpn_calib_col_obs_mean || 'Observed mean', null, 1],
+			[pc.lpn_calib_col_sim_mean || 'Computed mean', null, 1],
+			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip, 1],
+			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip, 1]].forEach(function (h) {
 			var th = ffEl('th', null, h[0], hr);
 			if (h[1]) { th.title = h[1]; th.className = 'ec-help'; }
+			// The four means and errors are in the measured parameter's unit, so the heading says so.
+			if (calibUnit && h.length > 2) { reportSetHeadUnit(th, calibUnit); }
 		});
 		function row(name, s, cls) {
 			var tr = ffEl('tr', cls || null, null, body);
-			ffCell(tr, name);
+			ffCell(tr, name, 'lpn-rpt-id');
 			ffCell(tr, String(s.n));
 			ffCell(tr, calibNum(s.obsMean));
 			ffCell(tr, calibNum(s.simMean));

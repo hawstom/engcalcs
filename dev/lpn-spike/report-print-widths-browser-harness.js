@@ -8,6 +8,11 @@
 // For each sheet: no table is wider than the sheet; no WORD of any cell, heading or figure is broken
 // across lines (a heading may wrap only at its spaces); and a figure is never parted from its unit.
 //
+// Task 829 (Tom, 2026-10-26) adds, for every report table on SCREEN and on PAPER: a column whose figures
+// share one unit has bare numbers and "Heading (unit)" (units in the heading, not the cells); every asset
+// id column is as wide as N9999 and holds it on one line; Type and Status may be cut with an ellipsis,
+// the whole text in the cell's title.
+//
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
@@ -86,10 +91,30 @@ async function main() {
 		const measure = (paperW) => page.evaluate((W) => {
 			const area = document.getElementById('lpn_print_area');
 			if (!area) { return null; }
-			const sheet = area.getBoundingClientRect().width, out = { sheet, tables: [], broken: [], parted: [] };
+			const sheet = area.getBoundingClientRect().width, out = { sheet, tables: [], broken: [], parted: [], idBad: [], unitBad: [], truncBad: [], ids: 0 };
+			const probe = (el, text) => { const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'; sp.textContent = text; el.appendChild(sp); const w = sp.getBoundingClientRect().width; el.removeChild(sp); return w; };
+			const UNIT = /^((?:[^\d]*\s)?)([-\u2212]?\d[\d.,]*)\s*(%|[A-Za-z\u00b0\u00b5\u03bc][^\s\d.,]*(?: H2O)?)$/, BARE = /^[-\u2212]?\d[\d.,]*$/;
+			const cu = (t) => { t = t.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); if (!/\d/.test(t) || BARE.test(t)) { return ''; } const m = UNIT.exec(t); return m ? m[3] : null; };
 			area.querySelectorAll('table').forEach((t, ti) => {
 				const r = t.getBoundingClientRect();
 				out.tables.push({ i: ti, width: r.width, right: r.right - area.getBoundingClientRect().left, cols: t.rows[0] ? t.rows[0].cells.length : 0 });
+				const ths = Array.from(t.querySelectorAll('thead th')), trs = Array.from(t.querySelectorAll('tbody tr'));
+				ths.forEach((th, c) => {
+					const cells = trs.map((tr) => tr.children[c]).filter(Boolean);
+					if (th.classList.contains('lpn-rpt-id')) {
+						out.ids++;
+						const need = probe(th, 'N9999');
+						cells.concat([th]).forEach((cell) => {
+							const cs = getComputedStyle(cell), inner = cell.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+							if (inner + 0.5 < need) { out.idBad.push('table ' + ti + ' col ' + c + ': ' + Math.round(inner) + ' < ' + Math.round(need) + ' px'); }
+						});
+						return;
+					}
+					const us = cells.map((cell) => cu(cell.textContent));
+					const uniq = Array.from(new Set(us.filter((u) => u)));
+					if (us.every((u) => u !== null) && uniq.length === 1) { out.unitBad.push('table ' + ti + ' col ' + c + ' "' + th.textContent.trim() + '" cells still carry "' + uniq[0] + '"'); }
+				});
+				t.querySelectorAll('.lpn-rpt-trunc').forEach((sp) => { if (!sp.title) { out.truncBad.push(sp.textContent); } });
 				Array.from(t.querySelectorAll('th, td')).forEach((c) => {
 					const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
 					let n;
@@ -117,8 +142,45 @@ async function main() {
 			});
 			return out;
 		}, paperW);
+		const checkScreen = async (label, boxId) => {
+			const r = await page.evaluate((id) => {
+				const UNIT = /^((?:[^\d]*\s)?)([-\u2212]?\d[\d.,]*)\s*(%|[A-Za-z\u00b0\u00b5\u03bc][^\s\d.,]*(?: H2O)?)$/, BARE = /^[-\u2212]?\d[\d.,]*$/;
+				const cu = (t) => { t = t.replace(/\s+/g, ' ').trim(); if (!/\d/.test(t) || BARE.test(t)) { return ''; } const m = UNIT.exec(t); return m ? m[3] : null; };
+				const out = { tables: 0, headed: [], leftover: [], noParen: [], idBad: [], mixed: [], ids: 0 };
+				document.querySelectorAll('#' + id + ' table.lpn-ff-table').forEach((t, ti) => {
+					out.tables++;
+					const ths = Array.from(t.querySelectorAll('thead th')), trs = Array.from(t.querySelectorAll('tbody tr'));
+					ths.forEach((th, c) => {
+						const cells = trs.map((tr) => tr.children[c]).filter(Boolean), hu = th.getAttribute('data-ec-hu');
+						const probe = (el, text) => { const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'; sp.textContent = text; el.appendChild(sp); const w = sp.getBoundingClientRect().width; el.removeChild(sp); return w; };
+						if (th.classList.contains('lpn-rpt-id')) {
+							out.ids++;
+							const need = probe(th, 'N9999');
+							cells.forEach((cell) => { const cs = getComputedStyle(cell), inner = cell.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); if (inner + 0.5 < need) { out.idBad.push('table ' + ti + ' col ' + c + ': ' + Math.round(inner) + ' < ' + Math.round(need)); } });
+							return;
+						}
+						const us = cells.map((cell) => cu(cell.textContent)), uniq = Array.from(new Set(us.filter((u) => u)));
+						if (hu) {
+							out.headed.push(th.textContent.trim());
+							if (!/\(.+\)/.test(th.textContent) || th.textContent.indexOf(hu) < 0) { out.noParen.push(th.textContent.trim()); }
+							if (uniq.length) { out.leftover.push(th.textContent.trim() + ' cells carry ' + uniq.join('/')); }
+							if (!th.querySelector('bdi')) { out.noParen.push('no bdi in ' + th.textContent.trim()); }
+						} else if (us.every((u) => u !== null) && uniq.length === 1) { out.leftover.push('"' + th.textContent.trim() + '" cells carry ' + uniq[0]); }
+						else if (uniq.length > 1) { out.mixed.push(th.textContent.trim() + ' [' + uniq.join(' | ') + ']'); }
+					});
+				});
+				return out;
+			}, boxId.replace('_box', '_report') === 'lpn_ds_report' ? 'lpn_ds_box' : boxId.replace('_box', '_report'));
+			console.log('  screen ' + label + ': headed columns: ' + (r.headed.join(' ; ') || '(none)') + (r.mixed.length ? '   MIXED-UNIT COLUMNS: ' + r.mixed.join(' ; ') : ''));
+			ok(label + ' (screen): there is a table', r.tables >= 1, r.tables);
+			ok(label + ' (screen): units are in the headings, not the cells', r.leftover.length === 0, r.leftover.slice(0, 4).join(' ; '));
+			ok(label + ' (screen): a moved unit reads "Heading (unit)" with the unit isolated', r.noParen.length === 0, r.noParen.slice(0, 4).join(' ; '));
+			ok(label + ' (screen): every asset id column holds N9999 (' + r.ids + ' id columns)', r.idBad.length === 0, r.idBad.slice(0, 4).join(' ; '));
+			return r;
+		};
 		const checkPrint = async (label, boxId, prefix) => {
 			console.log('\n--- ' + label + ' ---');
+			await checkScreen(label, boxId);
 			await page.evaluate(() => { window.__printed = false; });
 			await page.click('#' + prefix + '_print');
 			await a.settle(200);
@@ -134,6 +196,9 @@ async function main() {
 					m.tables.every((t) => t.right <= m.sheet + 0.5), m.tables.map((t) => Math.round(t.right) + '/' + t.cols + 'cols').join(' '));
 				ok(label + ' on ' + paper + ': no word is broken across lines', m.broken.length === 0, m.broken.slice(0, 6).join(' ; '));
 				ok(label + ' on ' + paper + ': no figure is parted from its unit', m.parted.length === 0, m.parted.slice(0, 4).join(' ; '));
+				ok(label + ' on ' + paper + ': units are in the headings, not the cells', m.unitBad.length === 0, m.unitBad.slice(0, 4).join(' ; '));
+				ok(label + ' on ' + paper + ': every asset id column holds N9999 on one line (' + m.ids + ' id columns)', m.idBad.length === 0, m.idBad.slice(0, 4).join(' ; '));
+				ok(label + ' on ' + paper + ': a cut-off word carries its whole text in its title', m.truncBad.length === 0, m.truncBad.join(','));
 			}
 			if (process.env.RPT_PDF_DIR) { await page.pdf({ path: path.join(process.env.RPT_PDF_DIR, prefix + '.pdf'), format: 'Letter', margin: { top: '1in', bottom: '1in', left: '1in', right: '1in' } }); }
 			await page.emulateMedia({ media: 'screen' });
@@ -146,6 +211,16 @@ async function main() {
 		await pressRun('#lpn_ff_controls', runLabel);
 		await waitReport('#lpn_ff_report');
 		await checkPrint('Fire flow box', 'lpn_ff_box', 'lpn_ff');
+		// A language chooses its own bracket through the ONE template key (Chinese full-width brackets).
+		const tplHead = async (tpl) => {
+			await page.evaluate((t) => { EngCalcs.pageConfig.lpn_heading_unit = t; }, tpl);
+			await page.click('#lpn_ff_report th.lpn-ff-sortable');
+			await a.settle(300);
+			return page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_report thead th')).map((t) => t.textContent.trim()).join('|'));
+		};
+		ok('Fire flow: the heading follows the template key (full-width brackets)', /\uFF08(psi|gpm|m H2O|L\/s|kPa)\uFF09/.test(await tplHead('{label}\uFF08{unit}\uFF09')));
+		ok('Fire flow: the unit sits in a bdi so a right-to-left heading does not flip it', await page.evaluate(() => !!document.querySelector('#lpn_ff_report thead th bdi')));
+		await tplHead('{label} ({unit})');
 		await closeBox('lpn_ff_box');
 
 		await dock.openBox(a, 'lpn_crit_box');

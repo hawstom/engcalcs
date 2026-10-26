@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='طباعة التقرير';
 $ec_lang['lpn_full_col_time']='الزمن';
 $ec_lang['lpn_full_col_type']='النوع';
 $ec_lang['lpn_full_col_id']='المعرّف';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='التركيز';
+$ec_lang['lpn_quality_named_concentration_short']='تركيز {chemical}';
 $ec_lang['lpn_full_row_count']='الصفوف ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

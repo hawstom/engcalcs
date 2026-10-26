@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='প্রতিবেদন প্রিন্ট �
 $ec_lang['lpn_full_col_time']='সময়';
 $ec_lang['lpn_full_col_type']='ধরন';
 $ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ঘনমাত্রা';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ঘনমাত্রা';
 $ec_lang['lpn_full_row_count']='সারি ({n})।';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

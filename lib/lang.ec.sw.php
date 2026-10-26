@@ -4111,6 +4111,9 @@ $ec_lang['lpn_full_print']='Chapisha taarifa';
 $ec_lang['lpn_full_col_time']='Muda';
 $ec_lang['lpn_full_col_type']='Aina';
 $ec_lang['lpn_full_col_id']='Kitambulisho';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Mkusanyiko';
+$ec_lang['lpn_quality_named_concentration_short']='Mkusanyiko wa {chemical}';
 $ec_lang['lpn_full_row_count']='Safu mlalo ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
