@@ -33,6 +33,7 @@ const QUOTES = {
 		'lpn_tool_settings', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
 	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
+	lpn_guide_scn_move_def: ['lpn_pane_scn_show', ['lpn_field_active', 'Is active']],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
 		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_alt_cat_userdata', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_alt_cat_calculation',
 		'lpn_field_desc'],
@@ -49,7 +50,7 @@ const QUOTES = {
 };
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
-	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
+	'lpn_guide_scn_move_term', 'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
 const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_cmp_notes_term'];
 
 async function main() {

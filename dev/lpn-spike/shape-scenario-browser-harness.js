@@ -123,6 +123,17 @@ async function main() {
 		ok('a selected Shape\'s Properties box has an Is active row', rowTxt.some((t) => t.indexOf(actWord) === 0), JSON.stringify(rowTxt));
 		await esc();
 
+		const dots = () => P.evaluate(() => { const f = document.getElementById('lpn_popup_fields'); return f ? { dot: f.querySelectorAll('.lpn-ovm-dot').length, hollow: f.querySelectorAll('.lpn-ovm-hollow').length, vis: Array.from(f.querySelectorAll('.lpn-ovm-dot')).every((e) => { const r = e.getBoundingClientRect(); return r.width > 4 && r.height > 4; }) } : null; });
+		// Tom, 2026-10-25: a Shape overridden in the open scenario shows the orange dot in its Properties box.
+		let dd = await dots();
+		ok('Base\'s Shape, not overridden here, shows no orange dot in its box (a hollow one offers it)', !!dd && dd.dot === 0 && dd.hollow >= 1, JSON.stringify(dd));
+		await esc();
+		const onLine = await P.evaluate((id) => { const g = document.querySelector('#lpn_canvas .lpn-shape[data-shape="' + id + '"]'); if (!g) { return null; } const ps = Array.from(g.querySelectorAll('path, polyline, line')); for (let i = 0; i < ps.length; i++) { if (ps[i].getTotalLength && ps[i].getTotalLength() > 5) { const pt = ps[i].getPointAtLength(ps[i].getTotalLength() * 0.25); const m = ps[i].getScreenCTM(); return { x: m.a * pt.x + m.c * pt.y + m.e, y: m.b * pt.x + m.d * pt.y + m.f }; } } return null; }, here.id);
+		if (onLine) { await click(onLine); await settle(500); }
+		dd = await dots();
+		ok('the Shape this scenario made active (an override) shows the orange dot in its Properties box, visible', !!dd && dd.dot >= 1 && dd.vis, JSON.stringify(dd));
+		await esc();
+
 		console.log('--- 3. Base shows only its own ---');
 		await toScenario('Base');
 		ok('in Base only the Base Shape is drawn', (await drawn()).join() === base1.id, (await drawn()).join());

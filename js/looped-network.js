@@ -70194,6 +70194,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// every line of the box starts at one x.
 	function ovmGutterOn(fields, cls) {
 		var t = fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null;
+		// A section of the multi-properties box is not yet in the popup, whose own fields hold the room.
+		if (fields.className === 'lpn-multi-section') {
+			t = document.getElementById('lpn_popup_title');
+			fields = document.getElementById('lpn_popup_fields') || fields;
+		}
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
@@ -73400,6 +73405,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (c.result || !c.set || c.noMulti) { return; }
 			if (group.els.some(function (el) { return paneCellIsPlain(c, el); })) { return; }
 			multiRow(box, c, group.els);
+			// A Shape alone in this box shows its override marker as a junction's field does (Tom,
+			// 2026-10-25: *"No orange dot(s)"*). Several selected elements share one row, so none.
+			if (group.els.length === 1 && c.prop) { overrideMarker(box, group.els[0], c.prop); }
 		});
 		host.appendChild(box);
 	}
