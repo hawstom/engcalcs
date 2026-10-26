@@ -1170,7 +1170,7 @@ $ec_lang['lpn_guide_en_example_def']='<p>Open the Net1 example, which has a tota
 $ec_lang['lpn_guide_ct_what_term']='What the plot is';
 $ec_lang['lpn_guide_ct_what_def']='<p>Choose Water, Graphs, Contour. The row turns the plot on in the open scenario, as a smooth fill with labeled lines, using the pressure if the nodes are not colored yet, and opens the box. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.</p>';
 $ec_lang['lpn_guide_ct_box_term']='The box';
-$ec_lang['lpn_guide_ct_box_def']='<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer in multiples of the median pipe length. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
 $ec_lang['lpn_guide_ct_example_term']='Example on Net1';
 $ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
@@ -1924,7 +1924,7 @@ $ec_lang['lpn_find_no_value']='Enter what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_desc']='Description of this demand category';
+$ec_lang['lpn_find_prop_demand_desc']='Demand category description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2105,7 +2105,7 @@ $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
 // own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
-// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// distance in metres; all substituted. The Buffer label carries its own unit; lpn_contour_buffer_unit is the Tables settings row's unit text.
 // lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
 // plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contour';
@@ -2120,7 +2120,7 @@ $ec_lang['lpn_contour_fill_bands']='Bands';
 $ec_lang['lpn_contour_opacity']='Fill opacity';
 $ec_lang['lpn_contour_lines']='Contour lines';
 $ec_lang['lpn_contour_interval']='Interval';
-$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer']='Buffer (× median pipe length)';
 $ec_lang['lpn_contour_buffer_unit']='× median pipe length';
 $ec_lang['lpn_contour_buffer_tip']='Reach of the color from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
 $ec_lang['lpn_contour_few']='Too few nodes to contour.';
@@ -2430,7 +2430,7 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
 // {file} is a file name.
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
-$ec_lang['lpn_inpup_lead']='Choose where to import this file. Note that EPANET files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_lead']='Choose where to import this EPANET file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_base_note']='Choosing Base doesn\'t clear any scenario overrides.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
@@ -2448,7 +2448,7 @@ $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
 $ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
-$ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_gjup_lead']='Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_gjup_title']='Update from GeoJSON file';
 $ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
@@ -3634,7 +3634,7 @@ $ec_lang['lpn_dem_scenario']='Elevations written here are overrides in the scena
 $ec_lang['lpn_dem_base']='Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
 $ec_lang['lpn_settings_elev_source_tip']='Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.';
-$ec_lang['lpn_settings_elev_source_typed']='Above';
+$ec_lang['lpn_settings_elev_source_typed']='Typed value';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -5268,7 +5268,13 @@ $ec_lang['lpn_run_of_scenario']='Results of the scenario {scenario}.';
 $ec_lang['lpn_calib_scenario']='Compared with the results of the scenario {scenario}.';
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
 $ec_lang['lpn_export_confirm_title']='Export {format}';
-$ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';
+// {format} is the file kind with its article ("an EPANET file", "a GeoJSON file", "a DXF file").
+$ec_lang['lpn_noscn_lead']='This project has {n} scenarios, but {format} has no scenarios or alternatives.';
+$ec_lang['lpn_noscn_fmt_inp']='an EPANET file';
+$ec_lang['lpn_noscn_fmt_geojson']='a GeoJSON file';
+$ec_lang['lpn_noscn_fmt_dxf']='a DXF file';
+$ec_lang['lpn_export_goes_scenario']='Exporting the scenario "{scenario}" to a unique file name.';
+$ec_lang['lpn_export_goes_base']='Exporting the Base scenario.';
 $ec_lang['lpn_export_receipt_heading']='Exported {file} from {scenario} of {project}.';
 $ec_lang['lpn_export_receipt_note']='This is an export, not a save: this project is not connected to the file.';
 $ec_lang['lpn_dxf_exported_geo_tail']='Its coordinates are {crs}, in meters, not latitude and longitude.';

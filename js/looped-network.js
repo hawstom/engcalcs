@@ -13597,9 +13597,9 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
-		row(pc.lpn_contour_buffer || 'Buffer', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
+		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
-		}), pc.lpn_contour_buffer_tip, pc.lpn_contour_buffer_unit || '× median pipe length');
+		}), pc.lpn_contour_buffer_tip);
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -23327,7 +23327,7 @@ var EngCalcs = EngCalcs || {};
 		var BAND_NODE = [
 			['elev', 'lpn_field_elev', 'Elevation'],
 			['demand', 'lpn_field_base_demand', 'Base demand'],
-			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
+			['demandCategory', 'lpn_find_prop_demand_desc', 'Demand category description'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
 			// **THE EMITTER COEFFICIENT, JUNCTION-ONLY BESIDE THE FIRE FLOW** (Task 708, ranked
 			// gap #3 in dev/property-venue-matrix.md): a fire-protection input with its own popup
@@ -26175,7 +26175,7 @@ var EngCalcs = EngCalcs || {};
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
 		if (replaceState.prop === 'elev' && projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'New value source',
-				[['value', pc.lpn_settings_elev_source_typed || 'Above'],
+				[['value', pc.lpn_settings_elev_source_typed || 'Typed value'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
 					replaceState.source = (v === 'dem') ? 'dem' : 'value';
@@ -31019,7 +31019,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['bands', pc.lpn_contour_fill_bands || 'Bands']];
 		}
 		if (s === 'settings.nodeElevSource' || s === 'settings.defaults.nodeElevSource') {
-			return [['value', pc.lpn_settings_elev_source_typed || 'Above'], ['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']];
+			return [['value', pc.lpn_settings_elev_source_typed || 'Typed value'], ['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']];
 		}
 		if (s === 'project.basemap' || s === 'project.basemapLast') {
 			return [['osm', pc.lpn_settings_row_basemap_osm || 'Street map'],
@@ -43911,18 +43911,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * the export row's language key, which names the file kind in the box; `run` is the export.
 	 * (The attached EPANET-MSX file is written back as it came in, so it never asks.)
 	 */
+	/** "This project has {n} scenarios, but an EPANET file has no scenarios or alternatives." Empty for one scenario. */
+	function noScenarioNotice(fmtId) {
+		var pcX = EngCalcs.pageConfig || {};
+		if (scenarios.length < 2) { return ''; }
+		return String(pcX.lpn_noscn_lead || 'This project has {n} scenarios, but {format} has no scenarios or alternatives.')
+			.split('{format}').join(String(pcX['lpn_noscn_fmt_' + fmtId] || 'a file')).split('{n}').join(String(scenarios.length));
+	}
 	function confirmExportLeaves(rowKey, run) {
-		var pcX = EngCalcs.pageConfig || {}, fmt, lead;
+		var pcX = EngCalcs.pageConfig || {}, fmt, scn = activeScenario(), goes;
 		if (!exportLeavesSomething()) { run(); return; }
 		fmt = String(pcX[rowKey] || '').replace(/\u2026$/, '');
-		lead = scenarios.length > 1
-			? (pcX.lpn_export_confirm_lead || 'The {format} holds one scenario, and this project has {n}.')
-				.split('{format}').join(fmt).split('{n}').join(String(scenarios.length)) + ' '
-			: '';
+		// Tom, 2026-10-25: a title naming the export, then "This project has 5 scenarios, but an EPANET
+		// file has no scenarios or alternatives. Exporting the scenario "X" to a unique file name."
+		// The Base scenario is written under the bare project name, so it is not called a unique name.
+		goes = (!scn || scn.isBase) ? String(pcX.lpn_export_goes_base || 'Exporting the Base scenario.')
+			: String(pcX.lpn_export_goes_scenario || 'Exporting the scenario "{scenario}" to a unique file name.').split('{scenario}').join(scenarioDisplayName(scn));
 		askDialog({
 			kind: 'confirm',
 			title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
-			text: lead + exportScenarioSentence().replace(/^\s+/, ''),
+			text: scenarios.length > 1 ? noScenarioNotice(rowKey.replace('lpn_file_export_item_', '')) + ' ' + goes
+				: exportScenarioSentence().replace(/^\s+/, ''),
 			ok: pcX.lpn_export_table_go || 'Export',
 			cancel: pcX.lpn_cancel || 'Cancel'
 		}, function (yes) { if (yes) { run(); } });
@@ -46533,7 +46542,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function inpAskDestination(text, fileName, msxFile) {
 		var pc = EngCalcs.pageConfig || {};
 		function landNew() { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } }
-		askImportDestination(fileName, pc.lpn_inpup_lead || 'Choose where to import this file. Note that EPANET files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+		askImportDestination(fileName, noScenarioNotice('inp') + (scenarios.length > 1 ? '\n\n' : '') + (pc.lpn_inpup_lead || 'Choose where to import this EPANET file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.'),
 			landNew, function (target, newName) { updateProjectFromInp(text, fileName, target, msxFile, newName); });
 	}
 	// **THE ONE QUESTION, FOR EVERY FILE THAT MAY LAND IN THE OPEN PROJECT** (Task 814). `landNew()`
@@ -46873,7 +46882,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A project with something in it is asked where the file goes, as for an `.inp` (Task 814); a
 		// caller that hands in the mapping `choice` itself is a harness, and wants the new project.
 		if (!choice && projectHasAssets()) {
-			askImportDestination(fileName, pc.lpn_gjup_lead || 'Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+			askImportDestination(fileName, noScenarioNotice('geojson') + (scenarios.length > 1 ? '\n\n' : '') + (pc.lpn_gjup_lead || 'Choose where to import this GeoJSON file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.'),
 				function () { landGeoJsonNetNew(scan, fileName, done, choice); },
 				function (target, newName) { updateProjectFromGeoJson(scan, fileName, target, done, newName); });
 			return;
@@ -62293,7 +62302,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// runs on a project switch, so the row appears and disappears with the project it is about.
 		if (projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
-			[['value', pc.lpn_settings_elev_source_typed || 'Above'],
+			[['value', pc.lpn_settings_elev_source_typed || 'Typed value'],
 				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];

@@ -3912,3 +3912,11 @@ Written up in full in `dev/themes-plan.md`. Entries, each tagged:
 - OBSERVED (Chromium 1400x900, lpn_theme=prairie; shots in this folder): chrome rows are menubar y1-31, toolbar 35-71, tabs 75-110, canvas from 116. Sky gradient #3a78b6 starts behind the menu bar, so the menu items (red text on wheat chips) are small islands on the darkest blue: red-on-blue is the clash Tom saw. Toolbar pressed = pink-red wash with red outline, reads as an error chip not as a tool in use.
 - SPECULATION (arithmetic, WCAG relative luminance): ink #2b2418 on mid sky #7fb0dc about 6.6:1; on the old #3a78b6 only about 3.2:1, so the deep blue must not sit behind icons. Barn red #9e2a1e on steel lighter than #c4ccd1 is at least 4.5:1, on #aeb7bd 3.8:1 (fails), so letters on the tank band are dark navy-ink, red only on paper.
 - Tom's mapping adopted: tabs = barns, menus = water-tower tank band, toolbar = clouds. Direction in the report to the coordinator; CSS not built by me.
+
+## 2026-10-24 - Task 828: one standard row for the dockable boxes
+Written up in full in `standard-box-rows-2026-10-24.md` (this folder).
+- OBSERVED (css/engcalcs.css:3727, 5219-5224, 6235-6241; js/looped-network.js:13485, 70235-70298, 24377-24399, 78618): Contour hand-sets Settings' two track numbers per box; Fire flow's name is `flex:1`, the `1fr` defect Settings already fixed; Properties emits `<label>text<input></label><br>`, so inputs start at nine different x; Find stacks. Four row systems, one good (Settings).
+- OBSERVED (probe, Net1, Chromium 1440x900): Contour value track 208 against widest control 183; Fire flow docked name 606, control at x=623; Properties input left edges 0 to 240.
+- SPECULATION: the fix is a measure not a number: name track ceilinged and the only draggable one, value track max-content capped, unit its own shared track; digits per field type in `ch`.
+- CITED (Tom's description, not fetched by me): WTG and EPANET truncate with sizable columns; epanetjs wraps with fixed proportions.
+- Recommendation: `lpnGridRow(parent, spec)` and `.lpn-grid` family; order Contour, Fire flow, Properties, Find/Replace, Settings. New localStorage key `lpn_gcols` must be reported to Tom.
