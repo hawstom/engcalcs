@@ -4638,3 +4638,13 @@ NOT CHECKED: zip receipt in browser (code reads zipName); visual feel of two dia
 OBSERVED (real Chromium, scratch scripts perry-shape-scenario-*): draw in Base/scenario, Is active column, Delete in Base with override (asks, purges), copy scenario, delete scenario, Override manager, merge upward into Base, CSV/XLSX scenario workbook, DXF import receipts Base vs scenario, .inp byte-identical with shapes and after reload, GeoJSON export 2 vs 1 features, build agent's own harness 27/27.
 OBSERVED defects: status-bar override count stays 0 after drawing a Shape in a scenario (menu says 1; refreshes on next edit); deleting a scenario leaves its born-here Shapes inactive in Base, visible only as unticked rows in the Shapes table.
 NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the harness.
+
+2026-10-25 Task 828 review. OBSERVED: 8111 Properties == master (display block, 0 grid classes); 8113 Properties is a grid (names one x, values one x) but ID/Text-title row, buttons off-grid; Demand scaling has two grids with different value x; Scenario comparison unconverted. Settings Drop cut-off identical on master (462 wide) - not this branch. Shots: _panel/www/img/box-rows-1025/.
+2026-10-25 pass2 OBSERVED at 547697584: desktop Properties/boxes mostly one grid; phone 390 Properties inputs collapse (~30px), selects truncated, X value wraps per char; master phone fine; Fire flow phone clips selects/buttons. Junction demand block off-grid. Phone harness checks only no-scroll + name-above. Shots review2-*.png
+
+# Perry, fix/phone-select f6daea31d, 2026-10-25 (OBSERVED, decays)
+- OBSERVED phone 390: Settings Labels column headings break mid-word (Dro/p, Sh/ow, Us/e unit/s); 2-digit Drop numbers clipped. Index breaks mid-word (Nod/e/label/s).
+- OBSERVED PC en override: labels table 481 vs pane 416, Drop clipped until scrolled. German PC headings clipped at top ("Anzei/gen" -> "gen").
+- OBSERVED confirmed: Water menu no Properties (PC/phone, en); vertex morph prompts exact, undo restores; Basic scenario manager works; no phone pan.
+- Shots: /home/haws/webdev/worktrees/_panel/www/img/phone-select-1025/
+- Tom, 2026-10-25, overruled the mid-word findings above: word wrap, mid-word included, is fine; only a labels row's CONTROLS must stay on one line.
