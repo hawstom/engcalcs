@@ -231,7 +231,7 @@ async function measure(file, mode, opts) {
 			if (!byLink[b.linkOwner]) { byLink[b.linkOwner] = []; }
 			byLink[b.linkOwner].push(b);
 		});
-		// A Text another Text covers at this zoom is not drawn and is no obstacle (crowdedTexts()).
+		// A Text is never hidden by another Text (it slides instead, crowdedTexts()); crowdHidden stays false.
 		const textLabels = doc.labels.filter(function (lb) { return !!labelEls[lb.id] && !labelEls[lb.id].crowdHidden; });
 		if (textBoxes.length !== textLabels.length) {
 			throw new Error('label-crossing-harness: ' + textBoxes.length + ' unowned `label` boxes '

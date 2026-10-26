@@ -685,9 +685,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy HTML
   @@ NEEDS RULING
 
-### feat/scenario-io (`627fffec6`) — adds no English strings
+### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`2652e3beb`) — adds no English strings
+### feat/shape-scenario (`63d08a41a`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
