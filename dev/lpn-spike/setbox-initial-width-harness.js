@@ -112,8 +112,10 @@ console.log('\n-- the box\'s initial width is derived from that new index and th
 	ok('the Settings box\'s override gutter is still 1.9em', !!gutM && gutM[1] === '1.9', gutM && gutM[1]);
 	const expectedBoxPx = newIndexPx + overheadPx + seventyPct + (gutM ? parseFloat(gutM[1]) * 16 : 0);
 	const expectedBoxRem = expectedBoxPx / 16;
-	ok('...and the box\'s new initial width matches that arithmetic to a hundredth of a rem',
-		boxRem !== null && Math.abs(boxRem - expectedBoxRem) < 0.005,
+	// 2026-10-25 (Tom: the Order and Drop columns were cut off): the labels rows no longer wrap, so the
+	// width is now set by their 420 px (settings-labels-rows-browser-harness.js); the 70% arithmetic is a floor.
+	ok('...and the box\'s initial width is at least that arithmetic (the labels table sets it now)',
+		boxRem !== null && boxRem >= expectedBoxRem - 0.005,
 		boxRem + ' vs expected ' + expectedBoxRem.toFixed(3));
 }
 
@@ -125,8 +127,8 @@ console.log('\n-- the box\'s hard minimum (25rem) and the phone override are bot
 	// The phone rule derives its OWN figure from its OWN 4.5rem baseline (Task 527's transfer
 	// arithmetic) and must still be there, untouched by anything above.
 	const phoneBlock = (css.match(/@media \(max-width: 640px\) \{[\s\S]*/) || [''])[0];
-	ok('the phone index override still starts from 3.6rem (its own, unrelated figure)',
-		/html:has\(#lpn_canvas\) \.lpn-setbox-index \{ flex-basis: calc\(3\.6rem \+ 20% - 2px\); \}/.test(phoneBlock));
+	ok('the phone index override is the narrow 3.8rem (Tom, 2026-10-25: narrower, with its entries wrapping)',
+		/html:has\(#lpn_canvas\) \.lpn-setbox-index \{ flex-basis: 3\.8rem; \}/.test(phoneBlock));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

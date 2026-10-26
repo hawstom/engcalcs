@@ -631,59 +631,19 @@ const TOUCH = true;
 	ok('...the first row is the column headings', heading.children.every((c) => c.tag === 'span'));
 	ok('...and a field row carries a label and its boxes', !!field && field.children[0].tag === 'label');
 
-	// (7) IDEA B: the label takes a whole line, so the four boxes wrap together under it.
-	ok(group + ': the name takes the whole line on a small screen',
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'flex') === '1 1 100%');
-	ok('...and the row is allowed to wrap at all',
-		winning(RULES, field, SMALL, DOC_IDS, false, 'flex-wrap') === 'wrap');
-	ok('...and the 11.5rem ceiling on the name is lifted with it',
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'max-width') === 'none');
-	ok('...while on the desktop the name keeps its ceiling and no flex of its own',
-		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'flex') === null &&
-		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'max-width') === '11.5rem');
-	ok('...and the desktop row does not wrap',
-		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === null);
-
-	// **AND ONCE IT WRAPS, THE WHITE SPACE GOES ABOVE THE TOGGLE AND NOT BELOW IT** (Tom,
-	// 2026-08-31, on a phone: "the toggles and labels ... have a little gap below them from the row
-	// they belong with, but no gap above them from the row they don't belong with. This would be
-	// good to reverse.").
-	//
-	// It is proximity, and the whole defect is a consequence of the line above. labelCheckbox()
-	// writes ONE inline `gap`, which a nowrap row spends entirely between columns; the moment the
-	// row wraps, the same number is also a ROW-gap and lands between the name and its own four
-	// boxes. The rows themselves carry no margin, so every pixel of separation in the list was
-	// inside a group and none of it between groups -- measured in Chromium at 360x740 before the
-	// fix, 6.00px below a name and 0.00px above it.
-	//
-	// **THE ASSERTION IS THE COMPARISON, not either number**, because either one alone can be
-	// right while the reading is wrong: 6px below and 6px above groups nothing, and that is the
-	// state a later tidy-up would most plausibly drift back to.
-	// The gap is written through one constant since R-329 added the Show column (LPN_LABEL_ROW_GAP).
-	const inlineGap = /LPN_LABEL_ROW_GAP = '(\d+)px'/.exec(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'));
-	ok(group + ': labelCheckbox() still writes one inline gap, which a wrapped row spends BOTH ways',
-		!!inlineGap, inlineGap ? inlineGap[1] + 'px' : 'no inline gap found -- this check is vacuous');
-	if (inlineGap) {
-		const rg = winning(RULES, field, SMALL, DOC_IDS, false, 'row-gap');
-		const mt = winning(RULES, field, SMALL, DOC_IDS, false, 'margin-top');
-		// A stylesheet row-gap must be `!important` to beat the inline shorthand; with none, what a
-		// phone actually paints below the name is the inline number.
-		const below = rg === null ? parseFloat(inlineGap[1]) : parseFloat(rg);
-		const above = mt === null ? 0 : parseFloat(mt);
-		ok('...so on a phone the space ABOVE the toggles and labels exceeds the space below them',
-			above > below, 'above ' + above + 'px, below ' + below + 'px');
-		// And the desktop is not paying for it. The row does not wrap there, so there is no row-gap
-		// to reverse and no margin is added -- the layout Tom did not ask to move does not move.
-		ok('...while the desktop row, which never wraps, is left exactly as it was',
-			winning(RULES, field, WIDE, DOC_IDS, false, 'row-gap') === null &&
-			winning(RULES, field, WIDE, DOC_IDS, false, 'margin-top') === null,
-			'row-gap ' + winning(RULES, field, WIDE, DOC_IDS, false, 'row-gap') +
-			', margin-top ' + winning(RULES, field, WIDE, DOC_IDS, false, 'margin-top'));
-		// The heading row is the one row that owns nothing below it, so it takes no margin of its
-		// own -- it is `:first-child`, and that is what keeps the list from opening on a blank strip.
-		ok('...and the heading row takes no margin, being the one row with nothing above it',
-			winning(RULES, heading, SMALL, DOC_IDS, false, 'margin-top') === null);
-	}
+	// (7) NO WRAP AT ANY WIDTH (Tom, 2026-10-25: "the labels rows wrap, which is unacceptable"): the name
+	// holds a fixed 11.5rem column and the four boxes stay on its line; the pane scrolls sideways.
+	ok(group + ': the name is a fixed column on a small screen and on the desktop',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'flex') === '0 0 11.5rem' &&
+		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'flex') === '0 0 11.5rem');
+	ok('...and the row never wraps, small or wide',
+		winning(RULES, field, SMALL, DOC_IDS, false, 'flex-wrap') === 'nowrap' &&
+		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === 'nowrap');
+	ok('...and the name is cut, not broken, past its column',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'text-overflow') === 'ellipsis');
+	ok('...with no margin between rows, since nothing wraps',
+		winning(RULES, field, SMALL, DOC_IDS, false, 'margin-top') === null);
 	// **AND THE NAME ON THAT LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing `Dem/and`,
 	// `Hea/d`, `Pres/sure`, `Elev/ation` as the thing to stop). `overflow-wrap: anywhere` is what
 	// does it, and it is correct on the desktop, where the name shares its line with four columns
@@ -709,17 +669,17 @@ const TOUCH = true;
 		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
 	ok('...and never on the boxes beneath it, which are sized and not text',
 		winning(RULES, field.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
-	// The heading row's lead cell goes, so the headings start where the wrapped group starts.
-	ok(group + ": the heading row's lead cell goes on a small screen",
-		!!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
-	ok('...and stays on the desktop', !hiddenAt(RULES, heading.children[0], WIDE, DOC_IDS));
+	// The heading row's lead cell stays at every width: the name column it stands over is always there.
+	ok(group + ": the heading row's lead cell stays on a small screen",
+		!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
+	ok('...and on the desktop', !hiddenAt(RULES, heading.children[0], WIDE, DOC_IDS));
 
 	// (8) THE SIX COLUMNS, HEADING AND BOX ALIKE -- Before, Use units, After, Decimals, Show, Drop
 	// since R-326..R-331. A heading that is not the same width as the box under it is the defect this
 	// list has already been fixed for twice, so the assertion is that the two agree -- at every
 	// width, and with and without a spinner.
 	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.8rem', 6: '1.8rem', 7: '1.8rem' };
-	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem', 6: '1.6rem', 7: '1.6rem' };
+	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.4rem', 5: '1.6rem', 6: '1.5rem', 7: '1.5rem' };
 	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.34rem', 6: '2.34rem', 7: '2.34rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
 		const h = heading.children[i - 1], b = field.children[i - 1];
@@ -794,43 +754,11 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	// he rejected in those words, so the property checked here is the one that separates them.
 	const gap = winning(RULES, panes, SMALL, DOC_IDS, false, 'gap');
 	const basis = winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis');
-	ok('...and on a phone it is a calc against the panes, not a fixed width',
-		/^calc\(/.test(String(basis)), 'got ' + basis);
-	// **THE PERCENTAGE RESOLVES AGAINST THE CONTAINER'S INNER WIDTH AND THE GAP IS NOT DEDUCTED FROM
-	// IT** -- confirmed in Chromium at 360px, where the basis lands on 119.7px, which is what the
-	// arithmetic here predicts. That is why the expression carries a `- 2px`: it is a fifth of the
-	// gap, exact rather than a fudge. The gap is a constant in two places, so the one in the calc is
-	// checked against the one the container actually sets.
-	ok('...and the gap it accounts for is the gap the container actually sets',
-		gap === '10px' && /- 2px/.test(String(basis)), 'gap ' + gap + ', basis ' + basis);
-	// Resolved against the box the phone actually gets: 94vw less its 8px padding each side and its
-	// 1px border each side.
+	// Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." A fixed 3.8rem now
+	// (it was 4.5rem plus a fifth of the main pane); the entries wrap inside it.
+	ok('...and on a phone it is a fixed 3.8rem', basis === '3.8rem', 'got ' + basis);
 	{
-		const P = 0.94 * SMALL - 16 - 2, g = parseFloat(gap), REM = 16;
-		const m = /^calc\(([\d.]+)rem \+ ([\d.]+)% - ([\d.]+)px\)$/.exec(String(basis));
-		const idx = m ? parseFloat(m[1]) * REM + parseFloat(m[2]) / 100 * P - parseFloat(m[3]) : NaN;
-		const wasIdx = 4.5 * REM, wasContent = P - g - wasIdx, content = P - g - idx;
-		// THE TRANSFER, from both ends: the main pane keeps 80% of what it had, and every pixel it
-		// gave up is a pixel the index gained. Either alone would pass on a coincidence.
-		ok('...the main pane keeps 80% of the width it had at 360px',
-			Math.abs(content / wasContent - 0.80) < 0.001,
-			'was ' + wasContent.toFixed(1) + ', now ' + content.toFixed(1) +
-			' (' + (content / wasContent).toFixed(4) + ')');
-		// **AND THE ALGEBRA IS PINNED TO A REAL BROWSER, or this file is only checking itself.**
-		// "The index gained what the main pane gave up" is an identity here -- it falls out of
-		// `content = P - g - index` and can never fail -- so what is asserted instead is the number
-		// Chromium actually resolved the basis to at 360x640, which is what proves the percentage
-		// resolves against P with the gap NOT deducted from it. If a browser ever changed that, this
-		// is the line that would say so.
-		ok('...and the basis resolves to the 119.7px Chromium measured at 360x640',
-			Math.abs(idx - 119.68) < 0.05, 'computes to ' + idx.toFixed(2) +
-			' (index was ' + wasIdx.toFixed(1) + ')');
-		// The reading NOT taken, named so a re-read of his sentence is a decision rather than a
-		// rediscovery. `index = 0.2 x content` would have put the index at 51.7px -- NARROWER than
-		// it was -- which is the opposite of what he asked for.
-		ok('...and it is not the index REACHING 20%, which is the reading Tom rejected',
-			Math.abs(idx - (P - g) / 6) > 1,
-			'the target reading would give ' + ((P - g) / 6).toFixed(1) + 'px');
+		const P = 0.94 * SMALL - 16 - 2;
 		// **THE ONE THING THE NARROWER MAIN PANE STOPPED FITTING**, measured in Chromium rather
 		// than predicted: 17px of overflow, all of it the colour-ramp attribution footer, whose
 		// credit lines end in a bare URL. A URL is one unbreakable token, so no pane width would

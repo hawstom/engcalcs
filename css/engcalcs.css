@@ -4760,7 +4760,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
    exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(28.865rem, 94vw);
+	width: min(38rem, 94vw);   /* 2026-10-25: wide enough for the labels table (420 px of rows) with no column cut off; was 28.865rem */
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -5827,71 +5827,32 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields > div > span:first-child,
 #lpn_labels_link_fields > div > span:first-child,
 #lpn_labels_customer_fields > div > span:first-child { max-width: 11.5rem; }
-/* **AND WHEN THERE IS NO ROOM, THE FOUR COLUMNS DROP AS A BLOCK -- THE NAME NEVER WRAPS INSTEAD**
-   (Tom, 2026-08-24: "the labels are wrapping when what we want is for the four columns to wrap as a
-   block under the checkbox and label. Like the phone.").
-
-   The mid-word break the rules above allow is the LAST resort, and it had become the first: a name
-   is what the reader scans down, and breaking "Roughness, e" across two lines to keep four number
-   boxes on one is the wrong thing to protect. Below the same 24rem where .lpn-set-row gives up its
-   second column, a field row wraps instead -- name on its own line, then its four columns beneath
-   it, in the same order and at the same x as every other row's.
-
-   `flex-basis: 100%` on the name is what forces the break, and it is why the row needs `flex-wrap`
-   at all; the four columns stay direct children (the heading selectors above address them by
-   position, and three separate fixes have gone into keeping headings and boxes on one x), so they
-   move as a block because nothing else can fit beside them, not because they are boxed together.
-   The heading row's lead cell is EMPTY, so it is removed rather than given a blank line of its own:
-   its four headings then sit at the same left edge as the four boxes below them, which is the whole
-   invariant this list is held to.
-
-   The same container query as .lpn-set-row, deliberately -- one width at which this box changes
-   shape, not two. A browser without container queries keeps today's behaviour, which is the safe
-   direction. */
-@container lpnset (max-width: 24rem) {
-	#lpn_labels_node_fields > div,
-	#lpn_labels_link_fields > div,
-	#lpn_labels_customer_fields > div { flex-wrap: wrap; }
-	/* `!important` is not decoration, for the reason stated above the heading widths: labelCheckbox()
-	   sets `flex: 1 1 auto` INLINE on the name, and an inline shorthand carries a flex-basis of
-	   `auto` that a stylesheet longhand cannot outrank. */
-	#lpn_labels_node_fields > div > label,
-	#lpn_labels_link_fields > div > label,
-	#lpn_labels_customer_fields > div > label { flex-basis: 100% !important; max-width: 100%; }
-	#lpn_labels_node_fields > div > span:first-child,
-	#lpn_labels_link_fields > div > span:first-child,
-	#lpn_labels_customer_fields > div > span:first-child { display: none; }
-	/* **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, from a phone:
-	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
-	   gap above them from the row they don't belong with. This would be good to reverse.").
-
-	   Measured in Chromium at 360x740 before the fix: 6.00px between a name and its OWN four
-	   columns, 0.00px between those columns and the NEXT row's name. Once a row wraps, the inline
-	   `gap: 6px` labelCheckbox() writes becomes a row-gap as well as a column-gap, and the rows
-	   themselves carry no margin -- so every pixel of separation in the list was sitting inside a
-	   group and none of it between groups. Proximity then says the checkbox belongs to the boxes
-	   ABOVE it, which is the opposite of what it controls.
-
-	   The 6px is moved rather than added to: row-gap 0 inside the group, 6px margin between rows.
-	   `!important` because the gap is an INLINE shorthand and a stylesheet longhand cannot outrank
-	   one -- the same reason the flex and the widths in this block carry it. `column-gap` is
-	   untouched, so nothing horizontal moves and no column widens.
-
-	   Scoped to the two blocks where the row WRAPS. Where it does not -- the desktop box at its
-	   normal width -- the name shares its line with its columns, there is no row-gap to reverse,
-	   and the layout does not move. Measured at 1280x900 before and after: identical to the pixel.
-
-	   `:not(:first-child)` rather than `div + div`, which is the same set of rows here and would
-	   read better: the sibling combinator is the one selector shape
-	   dev/lpn-spike/small-screen-harness.js cannot parse, so it would land in that file's
-	   blind-spot report and this rule would go unasserted. */
-	#lpn_labels_node_fields > div,
-	#lpn_labels_link_fields > div,
-	#lpn_labels_customer_fields > div { row-gap: 0 !important; }
-	#lpn_labels_node_fields > div:not(:first-child),
-	#lpn_labels_link_fields > div:not(:first-child),
-	#lpn_labels_customer_fields > div:not(:first-child) { margin-top: 6px; }
+/* 6. **A LABELS ROW NEVER WRAPS, AND THE PANE SCROLLS SIDEWAYS INSTEAD** (Tom, 2026-10-25, on his
+   phone: "the labels rows wrap, which is unacceptable. The labels rows must stay intact. It's okay if
+   the user has to scroll left and right on a phone"). This replaces the 2026-08-22 rule that wrapped the
+   four columns as a block under the checkbox and name: with an override marker on a row, that wrap
+   broke the Drop column onto a line of its own. The name now holds a fixed column (11.5rem, the
+   same ceiling it has on a PC) and is cut with an ellipsis rather than broken; its tip names it in
+   full. Each row is as wide as its columns (min-width: max-content), so every row and its heading share one
+   set of x positions, and the content pane (overflow: auto) scrolls sideways when the box is narrower. */
+#lpn_labels_node_fields > div,
+#lpn_labels_link_fields > div,
+#lpn_labels_customer_fields > div { flex-wrap: nowrap; }
+#lpn_labels_node_fields > div:not(.lpn-set-note),
+#lpn_labels_link_fields > div:not(.lpn-set-note),
+#lpn_labels_customer_fields > div:not(.lpn-set-note),
+#lpn_labels_node_fields > div.lpn-set-colhead,
+#lpn_labels_link_fields > div.lpn-set-colhead,
+#lpn_labels_customer_fields > div.lpn-set-colhead { min-width: max-content; }
+#lpn_labels_node_fields > div > label,
+#lpn_labels_link_fields > div > label,
+#lpn_labels_customer_fields > div > label {
+	flex: 0 0 11.5rem !important; max-width: 11.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+#lpn_labels_node_fields > div > span:first-child,
+#lpn_labels_link_fields > div > span:first-child,
+#lpn_labels_customer_fields > div > span:first-child { flex: 0 0 11.5rem !important; }
+
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a
@@ -6555,7 +6516,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   The 3.6rem and the 2px are the arithmetic above, already reduced; the 2px is a fifth of
 	   `.lpn-setbox-panes`'s own 10px `gap`, restated because `calc()` cannot ask for it. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: calc(3.6rem + 20% - 2px); }
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 3.8rem; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." */
 
 	/* 5a. AND THE ONE THING THE NARROWER MAIN PANE NO LONGER FITS. Measured at 360px after the
 	   transfer above: the content pane overflows by exactly 17px, and every pixel of it is the
@@ -6635,50 +6596,6 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		overflow-wrap: anywhere; width: 3.7em; min-width: 3.7em;
 	}
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 3em; }
-
-	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
-	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox
-	   and label, and this is a better balance of width savings. So for the first row we would have
-	   them wrap gracefully to `checkbox ID\nbefore after decimal drop`"). Idea A -- the label first
-	   and everything else wrapping under it individually -- he weighed and rejected.
-
-	   THE FOUR STAY ONE GROUP because the label takes a whole line to itself (`flex-basis: 100%`)
-	   and nothing else can share it. Wrapping them individually would let a row break between After
-	   and Decimal, and a column that is on line two of one row and line one of the next is not a
-	   column at all.
-
-	   The name's 11.5rem ceiling goes with it: that ceiling exists to stop the four boxes walking
-	   right as the box widens, and there is nothing to walk right of once they are on their own
-	   line. `!important` on the flex for the same reason as the widths below: labelCheckbox() writes
-	   `flex: 1 1 auto` inline, and an inline declaration beats a stylesheet one.
-
-	   THE HEADING ROW'S LEAD CELL GOES, so the headings start at the left edge exactly where the
-	   wrapped group does. `display: none` does not renumber :nth-child, so the width rules below --
-	   and the ones above, which they override -- still count the lead as child 1. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div { flex-wrap: wrap; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > label,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > label,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > label { flex: 1 1 100% !important; max-width: none; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > span:first-child,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > span:first-child,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > span:first-child { display: none; }
-
-	/* 6a. **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, on a phone:
-	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
-	   gap above them from the row they don't belong with. This would be good to reverse.").
-
-	   Stated once beside the container-query copy of item 6 above, which carries the measurement and
-	   the reasoning; it is repeated here for the same reason every other rule in item 6 is -- a
-	   browser without container queries must still get the phone layout. Same declarations, so the
-	   two firing together is idempotent. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div { row-gap: 0 !important; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div:not(:first-child),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div:not(:first-child),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div:not(:first-child) { margin-top: 6px; }
 
 	/* 7. AND THE COLUMNS THEMSELVES SHRINK (Tom: "Let's get brave and use these shrink factors on
 	   the column inputs: Before 0.8, After 0.4, Decimal 0.8"). Against the shipped 2.6rem affix and
@@ -6805,6 +6722,16 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
+		/* Tom, 2026-10-25: Use units, Show and Drop "wider than it needs to be". Two digits and a tick fit these. */
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4) { width: 1.4rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.5rem !important; }
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
