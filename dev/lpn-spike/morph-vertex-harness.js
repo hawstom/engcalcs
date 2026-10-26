@@ -121,11 +121,45 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	const T = L.nodeById('21');
 	T._demand = 0; (T.extraDemands = []); T.demandCategory = '';
 	refuse('21', 'lpn_morph_vertex_links', 3, '3.4 a junction of three or more pipes is refused with the count');
-	// Demand on a two-pipe junction.
+	// Demand on a two-pipe junction: no longer a refusal. It is a question (Tom, 2026-10-25: "How about
+	// 'Clear elevation {} and demands {}?'"), and a morph only on a yes.
 	sel(L, [J]);
-	L.nodeById(J)._demand = 5;
-	refuse(J, 'lpn_morph_vertex_demand', '', '3.5 a two-pipe junction with demand is refused');
+	L.nodeById(J)._demand = 150;
+	let asked = [], answer = false;
+	const confirmWas = [global.window.confirm, global.confirm];
+	global.window.confirm = global.confirm = (t) => { asked.push(t); return answer; };
+	const beforeAsk = JSON.stringify(L.serializeProject());
+	let mv = L.morphVertex();
+	ok('3.5a demand alone asks first, and a No changes nothing', asked.length === 1 && mv === 0 && JSON.stringify(L.serializeProject()) === beforeAsk, JSON.stringify(asked));
+	ok('3.5b the question names the demand in the display unit and the junction', /demand/i.test(asked[0]) && asked[0].indexOf(J) >= 0 && /150 gpm/.test(asked[0]) && !/elevation/i.test(asked[0]), asked[0]);
+	answer = true; asked = [];
+	mv = L.morphVertex();
+	ok('3.5c a Yes morphs', mv === 1 && !L.nodeById(J) && asked.length === 1, String(mv));
+	L.undo();
+	ok('3.5d one Undo restores the junction with its demand, byte for byte', JSON.stringify(L.serializeProject()) === beforeAsk);
+	// Elevation alone, and both.
+	L.nodeById(J)._demand = 0; L.nodeById(J).elev = 210;
+	asked = []; answer = true; sel(L, [J]);
+	const beforeElev = JSON.stringify(L.serializeProject());
+	mv = L.morphVertex();
+	ok('3.5e elevation alone asks "Clear elevation ... on J" and a Yes morphs', mv === 1 && asked.length === 1 && /elevation/i.test(asked[0]) && !/demand/i.test(asked[0]) && asked[0].indexOf(J) >= 0 && /210 ft(?! H2O)/.test(asked[0]), asked[0]);
+	L.undo();
+	ok('3.5f Undo restores the elevation', JSON.stringify(L.serializeProject()) === beforeElev);
+	L.nodeById(J)._demand = 150; asked = []; sel(L, [J]);
+	mv = L.morphVertex();
+	ok('3.5g both ask ONE question naming elevation and demands', mv === 1 && asked.length === 1 && /elevation/i.test(asked[0]) && /demand/i.test(asked[0]), asked[0]);
+	L.undo();
+	// A tag as well as the demand: still a plain refusal, no question.
+	L.nodeById(J).tag = 'zoneA'; asked = [];
+	refuse(J, 'lpn_morph_vertex_own', '', '3.5h demand plus a tag is refused outright, and nothing is asked');
+	ok('3.5i ...no question was asked', asked.length === 0, JSON.stringify(asked));
+	delete L.nodeById(J).tag;
+	// An emitter is not a demand: refused as before.
+	L.nodeById(J)._demand = 0; delete L.nodeById(J).elev; L.nodeById(J)._emitter = 2;
+	refuse(J, 'lpn_morph_vertex_demand', '', '3.5j an emitter coefficient is still refused');
+	delete L.nodeById(J)._emitter;
 	L.nodeById(J)._demand = 0;
+	global.window.confirm = confirmWas[0]; global.confirm = confirmWas[1];
 	// Customers connected to the junction.
 	L.getDoc().customers = [{ id: 'M1', demand: 1, count: 1, node: J, x: 0, y: 0 }];
 	refuse(J, 'lpn_morph_vertex_customers', '', '3.6 a junction with a Customer connected to it is refused');
@@ -140,7 +174,7 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	pipeB._roughness = rWas + 10;
 	refuse(J, 'lpn_morph_vertex_pipes', '', '3.8 two pipes of different roughness are refused');
 	pipeB._roughness = rWas;
-	[['elev', 12.5, 'its own elevation'], ['tag', 'zoneA', 'a tag'], ['desc', 'hydrant tee', 'a description'], ['_initQuality', 0.4, 'an initial quality']].forEach((f) => {
+	[['tag', 'zoneA', 'a tag'], ['desc', 'hydrant tee', 'a description'], ['_initQuality', 0.4, 'an initial quality']].forEach((f) => {
 		const was = L.nodeById(J)[f[0]];
 		L.nodeById(J)[f[0]] = f[1];
 		refuse(J, 'lpn_morph_vertex_own', '', '3.9 a junction with ' + f[2] + ' is refused');

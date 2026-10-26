@@ -40338,8 +40338,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * for the whole command, as every other Morph takes, so one Undo reverses it.
 	 * dev/lpn-spike/morph-vertex-harness.js.
 	 */
-	function vertexMorphProblem(n) {
-		var pc = EngCalcs.pageConfig || {}, ids, a, b, demandSpec;
+	function vertexMorphProblem(n, info) {
+		var pc = EngCalcs.pageConfig || {}, ids, a, b, demandSpec, demandRows;
+		// Stored as typed, in the unit shown (CLAUDE.md, Unit Sets), so the number is read as it is.
+		function disp(v, unitId) { return String(+(+v).toPrecision(6)) + ' ' + unitLabel(unitId).replace(/\s*H2O$/, ''); }
 		function say(key, dflt, extra) {
 			return String(pc[key] || dflt).replace('{id}', n.id).replace('{n}', String(extra));
 		}
@@ -40355,9 +40357,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((a.from === n.id ? a.to : a.from) === (b.from === n.id ? b.to : b.from)) {
 			return say('lpn_morph_vertex_loop', '{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.', '');
 		}
+		// **ELEVATION AND DEMANDS ARE ASKED ABOUT, NOT REFUSED** (Tom, 2026-10-25: "How about 'Clear elevation {}
+		// and demands {}?' But I agree that Morph to vertex was intended to be a very low-power tool."). Only
+		// when nothing else stops the morph; info.ask holds the question's parts. An emitter coefficient, a
+		// tag, a description or any other data is still a refusal.
 		demandSpec = typeOwnedNodeSpecs()[0];
-		if (demandSpec.value(n) !== undefined || (n._emitter && +n._emitter !== 0)) {
+		demandRows = demandSpec.value(n);
+		if (n._emitter && +n._emitter !== 0) {
 			return say('lpn_morph_vertex_demand', '{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.', '');
+		}
+		if (info) {
+			info.elev = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
+			info.demands = demandRows ? demandRows.filter(function (v) { return v !== undefined && v !== null && v !== ''; })
+				.map(function (v) { return disp(v, 'lpn_u_flow'); }).join(', ') : '';
 		}
 		if ((doc.customers || []).some(function (c) { return c.node === n.id; })) {
 			return say('lpn_morph_vertex_customers', '{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.', '');
@@ -40373,6 +40385,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (Object.keys(n).some(function (k) {
 			var v = n[k];
 			if (k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok' || k === 'lx' || k === 'ly') { return false; }
+			if (k === 'elev' || demandSpec.keys.indexOf(k) >= 0 || k === 'demandPattern') { return false; }   // asked about, above
 			if (v === undefined || v === null || v === '' || v === 0 || v === false) { return false; }
 			if (typeof v === 'object' && !Object.keys(v).length) { return false; }
 			return true;
@@ -40456,24 +40469,44 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
 		if (!nodes.length) { return 0; }
 		if (!inBaseFor('topology')) { setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.'); return 0; }
-		nodes.forEach(function (n) {
-			var why = vertexMorphProblem(n);
-			if (why) { problems.push(why); return; }
+		function finish() {
+			if (done) {
+				buildDom();
+				refreshScenarioMarks();
+				refreshScenarioStatus();
+				refreshPaneIfOpen();
+				refreshPopupIfOpen();
+				scheduleSolve();
+				scheduleSave();
+			}
+			setNotice(problems.slice(0, 5).concat(problems.length > 5 ? ['...'] : [])
+				.concat(done ? [String(pc.lpn_morph_vertex_done || 'Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.').replace('{n}', String(done))] : []).join(' '));
+		}
+		function doMorph(n) {
 			if (!snap) { saveUndoSnapshot(); snap = true; }
 			mergeAtJunction(n);
 			done++;
-		});
-		if (done) {
-			buildDom();
-			refreshScenarioMarks();
-			refreshScenarioStatus();
-			refreshPaneIfOpen();
-			refreshPopupIfOpen();
-			scheduleSolve();
-			scheduleSave();
 		}
-		setNotice(problems.slice(0, 5).concat(problems.length > 5 ? ['...'] : [])
-			.concat(done ? [String(pc.lpn_morph_vertex_done || 'Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.').replace('{n}', String(done))] : []).join(' '));
+		// One question per junction that has an elevation or demands; the whole command is one Undo.
+		function step(i) {
+			var n, why, info, key, text;
+			for (; i < nodes.length; i++) {
+				n = nodes[i];
+				info = {};
+				why = vertexMorphProblem(n, info);
+				if (why) { problems.push(why); continue; }
+				if (!info.elev && !info.demands) { doMorph(n); continue; }
+				key = info.elev && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elev ? 'lpn_morph_vertex_clear_elev' : 'lpn_morph_vertex_clear_demand');
+				text = String(pc[key] || (info.elev && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
+					: (info.elev ? 'Clear elevation {elev} on {id}?' : 'Clear demands {demands} on {id}?')))
+					.split('{elev}').join(info.elev).split('{demands}').join(info.demands).split('{id}').join(n.id);
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex', text: text, ok: pc.lpn_dialog_ok || 'OK', cancel: pc.lpn_cancel || 'Cancel' },
+					(function (node, next) { return function (yes) { if (yes) { doMorph(node); } step(next); }; }(n, i + 1)));
+				return;
+			}
+			finish();
+		}
+		step(0);
 		return done;
 	}
 	// ---- MORPH IN A SCENARIO: AN ASSET'S TYPE AS AN OVERRIDE (Task 781) ----------------------------
@@ -65970,6 +66003,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return Math.round(lowest);
 	}
 	var dockRemeasuring = false;
+	// **ROOM A FLYOUT LEAVES FOR THE OPPOSITE SIDE'S TAB STRIP** (Tom, 2026-10-25, phone: the Settings box "is
+	// not being allowed to extend into the opposite docking area even when it is empty"). A strip with tabs in
+	// it keeps its width; on a phone an EMPTY opposite side (no tab strip drawn there) is room the box may use.
+	function dockOppReserve(side, col) {
+		var opp = side === 'left' ? 'right' : 'left', strip;
+		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
+		if (col) { strip = col[opp].strip; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		return strip ? LPN_DOCK_STRIP_W : 0;
+	}
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
 			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
@@ -66003,16 +66046,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			try { layoutDocks(); } finally { dockRemeasuring = false; }
 			return;
 		}
-	// **ROOM A FLYOUT LEAVES FOR THE OPPOSITE SIDE'S TAB STRIP** (Tom, 2026-10-25, phone: the Settings box "is
-	// not being allowed to extend into the opposite docking area even when it is empty"). A strip with tabs in
-	// it keeps its width; on a phone an EMPTY opposite side (no tab strip drawn there) is room the box may use.
-	function dockOppReserve(side, col) {
-		var opp = side === 'left' ? 'right' : 'left', strip;
-		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
-		if (col) { strip = col[opp].strip; }
-		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
-		return strip ? LPN_DOCK_STRIP_W : 0;
-	}
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;

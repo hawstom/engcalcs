@@ -1756,6 +1756,9 @@ $ec_lang['lpn_morph_vertex_customers']='{id} was not morphed into a vertex: Cust
 $ec_lang['lpn_morph_vertex_text']='{id} was not morphed into a vertex: a Text is attached to it.';
 $ec_lang['lpn_morph_vertex_pipes']='{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.';
 $ec_lang['lpn_morph_vertex_own']='{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.';
+$ec_lang['lpn_morph_vertex_clear_both']='Clear elevation {elev} and demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_elev']='Clear elevation {elev} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_demand']='Clear demands {demands} on {id}?';
 $ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
