@@ -65654,7 +65654,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockOptimalCache[id] = { vw: vw, rem: rem, w: w };
 		return w;
 	}
-	function dockWidthOf(d) { return d.rec.dockW || dockOptimalW(d); }
+	// A phone opens a flyout at no more than 70% of the window, so the left or right 30% of the map stays
+	// to look at and to tap away on; a width the visitor dragged to is theirs, up to the whole window.
+	function dockWidthOf(d) {
+		return d.rec.dockW || (smallScreen() ? Math.min(dockOptimalW(d), Math.round((window.innerWidth || 390) * 0.7)) : dockOptimalW(d));
+	}
 	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
 	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
 	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
@@ -65902,7 +65906,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
 			var wrap = dockMapWrap(), over = dockAuto(from.list[0]);
-			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W - dockOppReserve(side, null)) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -65999,6 +66003,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			try { layoutDocks(); } finally { dockRemeasuring = false; }
 			return;
 		}
+	// **ROOM A FLYOUT LEAVES FOR THE OPPOSITE SIDE'S TAB STRIP** (Tom, 2026-10-25, phone: the Settings box "is
+	// not being allowed to extend into the opposite docking area even when it is empty"). A strip with tabs in
+	// it keeps its width; on a phone an EMPTY opposite side (no tab strip drawn there) is room the box may use.
+	function dockOppReserve(side, col) {
+		var opp = side === 'left' ? 'right' : 'left', strip;
+		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
+		if (col) { strip = col[opp].strip; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		return strip ? LPN_DOCK_STRIP_W : 0;
+	}
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;
@@ -66037,7 +66051,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
+				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -66045,7 +66059,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
+				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);

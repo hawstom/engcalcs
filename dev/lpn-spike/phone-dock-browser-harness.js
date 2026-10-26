@@ -122,6 +122,16 @@ async function main() {
 			const wide = await rect(a.page, '#lpn_popup');
 			ok('b.6 a finger dragging the edge leftward widens the box', wide && wide.w > fly.w + 20, JSON.stringify([fly.w, wide && wide.w]));
 		}
+		const grip2 = await rect(a.page, '.lpn-dock-grip.lpn-dock-grip-live');
+		if (grip2) {
+			const y2 = grip2.t + grip2.h / 2, x2 = grip2.l + grip2.w / 2;
+			await touch(cdp, 'touchStart', [{ x: x2, y: y2, id: 1 }]);
+			for (let i = 1; i <= 8; i++) { await touch(cdp, 'touchMove', [{ x: Math.max(1, x2 - (x2 / 8) * i), y: y2, id: 1 }]); }
+			await touch(cdp, 'touchEnd', []);
+			await a.settle(500);
+			const full = await rect(a.page, '#lpn_popup');
+			ok('b.8 with nothing docked on the left, a finger can widen the box across that empty area (to within 8 px of the left edge)', full && full.l <= 8, JSON.stringify(full));
+		}
 		ok('b.7 no page error', !a.errors.length, (a.errors[0] || '').slice(0, 160));
 		await a.close();
 
