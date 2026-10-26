@@ -290,7 +290,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear overrides as desired in each scenario.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_move_term`**
-  > Moving or merging elements between scenarios
+  > Moving or merging between scenarios
   @@ NEEDS RULING
 - **`lpn_inpup_ask_title`**
   > Import {file}
@@ -687,7 +687,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`63d08a41a`) — adds no English strings
+### feat/shape-scenario (`2c3e433ea`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -851,7 +851,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`65196e541`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -1020,9 +1020,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag (`e503133a2`) — adds no English strings
 
-### fix/dup-keys (`357d4dfd5`) — adds no English strings
+### fix/dup-keys (`4cca5839a`) — adds no English strings
 
-### fix/example-crs (`26f11ff68`) — adds no English strings
+### fix/example-crs (`014a92cd7`) — adds no English strings
 
 ### fix/phone-select (`ad4d5a8d1`) — 16 new, 16 to read @@ NEEDS RULING
 
