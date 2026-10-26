@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 200 untranslated keys, of 3218 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 205 untranslated keys, of 3223 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (200, 35 to read @@ NEEDS RULING)
+## lpn_  (205, 40 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -190,11 +190,14 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
-- **`lpn_export_confirm_lead`**
-  > The {format} holds one scenario, and this project has {n}.
-  @@ NEEDS RULING
 - **`lpn_export_confirm_title`**
   > Export {format}
+  @@ NEEDS RULING
+- **`lpn_export_goes_base`**
+  > Exporting the Base scenario.
+  @@ NEEDS RULING
+- **`lpn_export_goes_scenario`**
+  > Exporting the scenario "{scenario}" to a unique file name.
   @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
@@ -257,7 +260,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  > Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
@@ -356,7 +359,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > Choose where to import this file. Note that EPANET files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  > Choose where to import this EPANET file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
@@ -460,6 +463,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_noscn_fmt_dxf`**
+  > a DXF file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_geojson`**
+  > a GeoJSON file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_inp`**
+  > an EPANET file
+  @@ NEEDS RULING
+- **`lpn_noscn_lead`**
+  > This project has {n} scenarios, but {format} has no scenarios or alternatives.
+  @@ NEEDS RULING
 - **`lpn_ovl_clear_same`**
   > Clear overrides equal to inherited
   @@ NEEDS RULING
@@ -636,7 +651,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 105 new keys across 9 unmerged branch(es).
+**81 still to read**, of 124 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -647,9 +662,27 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
+
+### feat/box-rows-properties (`0313d17c1`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/scenario-io (`e0bcfb56c`) — adds no English strings
+### feat/first-view (`20ee39a5d`) — adds no English strings
+
+### feat/report-buttons (`593bb7817`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+
+### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+
+### feat/shape-scenario (`8c0bc5d7a`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -813,7 +846,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`189bddb49`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/value-source (`65196e541`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -827,6 +860,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ovm_dot_set_from`**
   > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
 - **`lpn_settings_held_default`**
   > the default
   @@ NEEDS RULING
@@ -834,7 +870,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > the value in {parent}
   @@ NEEDS RULING
 - **`lpn_settings_held_item`**
-  > {setting}: clear restores {value}, {source}.
+  > {setting}: {restores}
   @@ NEEDS RULING
 - **`lpn_settings_held_none`**
   > no text
@@ -977,8 +1013,59 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+### fix/bottom-pane-lag (`e503133a2`) — adds no English strings
 
-### fix/browser-pass-a (`77f505a8d`) — adds no English strings
+### fix/dup-keys (`357d4dfd5`) — adds no English strings
 
-### fix/dock-widths (`f52132a34`) — adds no English strings
+### fix/example-crs (`26f11ff68`) — adds no English strings
+
+### fix/phone-select (`7ea7c57df`) — 16 new, 16 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_both`**
+  > Clear elevation {elev} and demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_demand`**
+  > Clear demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_elev`**
+  > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING
