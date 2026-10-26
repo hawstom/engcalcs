@@ -59,6 +59,7 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const path = require('path');
 const fs = require('fs');
@@ -368,7 +369,8 @@ async function main() {
 		// (a) new projects, local and lat/lon, with Net3 pasted in.
 		for (const geo of (PART === 'paste' ? [false, true] : [])) {
 			const label = geo ? 'new-latlon+Net3' : 'new-local+Net3';
-			const a = await Session.open(browser, label);
+			const a = await Session.open(browser, label, { serviceWorkers: 'block' });
+			if (geo) { await serveLatLonNet3(a.page); }
 			await a.context.grantPermissions(['clipboard-read', 'clipboard-write']);
 			await a.goto('Looped-Network.php');
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
