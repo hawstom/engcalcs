@@ -40366,7 +40366,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return say('lpn_morph_vertex_demand', '{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.', '');
 		}
 		if (info) {
-			info.elev = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
+			info.elevShown = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
 			info.demands = demandRows ? demandRows.filter(function (v) { return v !== undefined && v !== null && v !== ''; })
 				.map(function (v) { return disp(v, 'lpn_u_flow'); }).join(', ') : '';
 		}
@@ -40494,11 +40494,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				info = {};
 				why = vertexMorphProblem(n, info);
 				if (why) { problems.push(why); continue; }
-				if (!info.elev && !info.demands) { doMorph(n); continue; }
-				key = info.elev && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elev ? 'lpn_morph_vertex_clear_elev' : 'lpn_morph_vertex_clear_demand');
-				text = String(pc[key] || (info.elev && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
-					: (info.elev ? 'Clear elevation {elev} on {id}?' : 'Clear demands {demands} on {id}?')))
-					.split('{elev}').join(info.elev).split('{demands}').join(info.demands).split('{id}').join(n.id);
+				if (!info.elevShown && !info.demands) { doMorph(n); continue; }
+				key = info.elevShown && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elevShown ? 'lpn_morph_vertex_clear_elev' : 'lpn_morph_vertex_clear_demand');
+				text = String(pc[key] || (info.elevShown && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
+					: (info.elevShown ? 'Clear elevation {elev} on {id}?' : 'Clear demands {demands} on {id}?')))
+					.split('{elev}').join(info.elevShown).split('{demands}').join(info.demands).split('{id}').join(n.id);
 				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex', text: text, ok: pc.lpn_dialog_ok || 'OK', cancel: pc.lpn_cancel || 'Cancel' },
 					(function (node, next) { return function (yes) { if (yes) { doMorph(node); } step(next); }; }(n, i + 1)));
 				return;
