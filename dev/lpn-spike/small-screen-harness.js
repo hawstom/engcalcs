@@ -656,18 +656,61 @@ const TOUCH = true;
 		'small screen says ' + winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'overflow-wrap'));
 	ok('...while the desktop keeps the break-anywhere its column alignment depends on',
 		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
-	// **A HEADING NEVER WRAPS OR SPILLS; ITS COLUMN IS AS WIDE AS IT** (Tom, 2026-10-25: "Dro/p", "Us/e unit/s" were defects).
-	ok(group + ': a heading stays on one line, never broken mid-word',
-		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
-		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'white-space') === 'nowrap' &&
-		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === 'normal');
-	// (8) THE SIX COLUMNS take the wider of their heading and their boxes (the list is a grid of auto tracks): no
-	// stylesheet width remains on a heading or a box, at any width or pointer type; the boxes fill their column.
+	// **A HEADING MUST WRAP INSIDE ITS COLUMN, NOT PAINT PAST IT** (ROADMAP Task 527). Tom,
+	// 2026-08-25, from a phone: "BeforeAfter 0.000 Drop", the four headings touching. The widths
+	// below were right -- measured in a real browser, every heading box sits on its control's box to
+	// a tenth of a pixel -- but "Before" is one 40px word in a 33px column and a span with no break
+	// opportunity simply overflows. So the wrapping this list chose (Tom's option (c), against (b)
+	// abbreviations) needed a property to make it reachable. THE HEADING ROW ONLY.
+	ok(group + ': a heading that overflows its column breaks rather than spilling',
+		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
+		'got ' + winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap'));
+	// **AND ON THE DESKTOP TOO SINCE R-329**: six columns at 15.3rem leave "Before" and "Use units"
+	// little spare ink there as well, and a longer translation must break inside its own column.
+	ok('...and on the desktop too, where six columns leave little spare ink',
+		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	ok('...and never on the boxes beneath it, which are sized and not text',
+		winning(RULES, field.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
+	// The heading row's lead cell stays at every width: the name column it stands over is always there.
+	ok(group + ": the heading row's lead cell stays on a small screen",
+		!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
+	ok('...and on the desktop', !hiddenAt(RULES, heading.children[0], WIDE, DOC_IDS));
+
+	// (8) THE SIX COLUMNS, HEADING AND BOX ALIKE -- Before, Use units, After, Decimals, Show, Drop
+	// since R-326..R-331. A heading that is not the same width as the box under it is the defect this
+	// list has already been fixed for twice, so the assertion is that the two agree -- at every
+	// width, and with and without a spinner.
+	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.8rem', 6: '1.8rem', 7: '1.8rem' };
+	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.4rem', 5: '2rem', 6: '2rem', 7: '2rem' };
+	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.34rem', 6: '2.34rem', 7: '2.34rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
 		const h = heading.children[i - 1], b = field.children[i - 1];
-		ok(group + ' column ' + i + ' is sized by its content, heading and box alike, small or wide, touch or not',
-			[SMALL, WIDE].every((w) => [false, TOUCH].every((t) => winning(RULES, h, w, DOC_IDS, t, 'width') === 'auto' && winning(RULES, b, w, DOC_IDS, t, 'width') === 'auto')),
-			JSON.stringify([SMALL, WIDE].map((w) => [false, TOUCH].map((t) => [winning(RULES, h, w, DOC_IDS, t, 'width'), winning(RULES, b, w, DOC_IDS, t, 'width')]))));
+		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',
+			winning(RULES, h, SMALL, DOC_IDS, false, 'width') === want[i],
+			'heading says ' + winning(RULES, h, SMALL, DOC_IDS, false, 'width'));
+		ok('...and its box says the same thing',
+			winning(RULES, b, SMALL, DOC_IDS, false, 'width') === want[i],
+			'box says ' + winning(RULES, b, SMALL, DOC_IDS, false, 'width'));
+		// **ON THE DESKTOP THE BOX'S WIDTH IS NOT IN THE STYLESHEET AT ALL** -- labelCheckbox()
+		// writes it inline -- so the desktop question is asked of the two places it really lives:
+		// the heading's CSS rule and the box's own inline style. That they are the same string is
+		// the property the last two rounds of Task 435 were about.
+		ok('...the desktop heading is unchanged at ' + wantWide[i],
+			winning(RULES, h, WIDE, DOC_IDS, false, 'width') === wantWide[i],
+			'got ' + winning(RULES, h, WIDE, DOC_IDS, false, 'width'));
+		ok('...and the box it names still carries that width inline',
+			(b.el.style.width || wantWide[i]) === wantWide[i], 'inline width ' + b.el.style.width);
+		ok('...and on a TOUCH screen below the breakpoint it is ' + wantTouch[i],
+			winning(RULES, h, SMALL, DOC_IDS, TOUCH, 'width') === wantTouch[i] &&
+			winning(RULES, b, SMALL, DOC_IDS, TOUCH, 'width') === wantTouch[i]);
+		// **THE TOUCH RULE MAY NOT REACH THE DESKTOP.** It is nested inside the width block for
+		// exactly this reason, and a touchscreen laptop is the case that would prove it wrong.
+		// **THE TOUCH RULE MAY NOT REACH THE DESKTOP**, and the question is asked as "does the
+		// pointer type change the answer up here", which is the property, rather than as a width --
+		// a spacer <span> and an <input> legitimately answer differently on the desktop.
+		ok('...and a TOUCH screen ABOVE the breakpoint changes nothing',
+			winning(RULES, h, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, h, WIDE, DOC_IDS, false, 'width') &&
+			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, b, WIDE, DOC_IDS, false, 'width'));
 	});
 	// The numeric boxes draw no spinner at all now (Tom, 2026-10-23); the digit boxes are still found by class.
 	// EVERY spinner in the list, not the first row's -- a node's ID row has neither, so a check
@@ -715,7 +758,7 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	const basis = winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis');
 	// Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." A fixed 3.8rem now
 	// (it was 4.5rem plus a fifth of the main pane); the entries wrap inside it.
-	ok('...and on a phone it is as narrow as its longest word (min-content), wrapping at spaces only', winning(RULES, index, SMALL, DOC_IDS, false, 'flex') === '0 0 min-content', 'got ' + winning(RULES, index, SMALL, DOC_IDS, false, 'flex'));
+	ok('...and on a phone it is a fixed 3.8rem', basis === '3.8rem', 'got ' + basis);
 	{
 		const P = 0.94 * SMALL - 16 - 2;
 		// **THE ONE THING THE NARROWER MAIN PANE STOPPED FITTING**, measured in Chromium rather
@@ -768,9 +811,9 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	// Libraries index would keep its desktop 5.25rem on a phone and the two boxes would be two
 	// designs again.
 	ok('...and it takes the same phone ratio, from the same rule',
-		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex') ===
-		winning(RULES, index, SMALL, DOC_IDS, false, 'flex'),
-		'got ' + winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex'));
+		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') ===
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis'),
+		'got ' + winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis'));
 }
 
 // ============================================================================================

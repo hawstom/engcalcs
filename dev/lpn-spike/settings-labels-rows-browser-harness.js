@@ -1,13 +1,11 @@
 // THE SETTINGS LABELS ROWS NEVER WRAP, AND NO COLUMN IS CUT OFF (Tom, 2026-10-25, phone and PC).
 // Real Chromium, Settings > Labels, on a 390 x 844 phone and on a 1366 x 768 PC, in Base and with a
 // scenario override on a label row (the override mark adds a control to the row):
-//   1. every labels row (node, link, Text) is one line high: its cells share one top, and the field
-//      name's own text is on one line;
+//   1. every labels row (node, link, Text) keeps all its controls in one horizontal band (text inside a cell may wrap);
 //   2. the Show and Drop columns are fully visible or reachable by scrolling the content pane
 //      sideways, and no ancestor between them and the pane clips them;
-//   3. the Use units, Show and Drop columns are no wider than their content needs;
+//   3. a two-digit Drop value is not clipped, and the default PC box fits the table with its override column;
 //   3b. no name is cut off (scrollWidth <= clientWidth), in English and in German and Russian;
-//   4. on a phone no word of the Settings index is broken or cut (it wraps at spaces only).
 //
 //   node dev/lpn-spike/settings-labels-rows-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -47,17 +45,6 @@ async function measure(page) {
 			const e = document.getElementById(id);
 			if (e) { e.querySelectorAll('label').forEach((l) => { if (l.offsetParent && (l.scrollWidth > l.clientWidth + 1 || getComputedStyle(l).textOverflow === 'ellipsis' && l.scrollWidth > l.clientWidth)) { out.cut.push(l.textContent.trim().slice(0, 30)); } }); }
 		});
-		out.headBad = [];
-		lists.forEach((id) => {
-			const e = document.getElementById(id), h = e && e.children[0];
-			if (!h) { return; }
-			Array.from(h.children).forEach((c) => {
-				if (!c.textContent.trim()) { return; }
-				const rg = document.createRange(); rg.selectNodeContents(c);
-				const lines = new Set(Array.from(rg.getClientRects()).map((q) => Math.round(q.top / 4))).size;
-				if (lines > 1 || c.scrollWidth > c.clientWidth + 1) { out.headBad.push(id.slice(11, 15) + ':' + c.textContent.trim().slice(0, 14) + ' lines=' + lines + ' ' + c.scrollWidth + '>' + c.clientWidth); }
-			});
-		});
 		// A two-digit Drop value: typed into the Drop box of a row that has one, then read back unclipped.
 		out.dropClip = [];
 		const dropRow = Array.from(document.getElementById(lists[0]).children).filter((r) => r.children.length === 7 && r.children[6].tagName === 'INPUT')[0];
@@ -67,7 +54,6 @@ async function measure(page) {
 			if (inp.scrollWidth > inp.clientWidth + 1) { out.dropClip.push(inp.scrollWidth + '>' + inp.clientWidth); }
 			inp.value = was;
 		} else { out.dropClip.push('no Drop box found'); }
-		out.indexBad = Array.from(document.querySelectorAll('.lpn-setbox-index .lpn-setbox-link')).filter((l) => l.offsetParent && l.scrollWidth > l.clientWidth + 1).map((l) => l.textContent.trim().slice(0, 24));
 		out.index = ix ? Math.round(ix.getBoundingClientRect().width) : null;
 		lists.forEach((id) => {
 			const box = document.getElementById(id);
@@ -82,9 +68,14 @@ async function measure(page) {
 				const nameEl = row.querySelector('.lpn-set-name > span') || row.querySelector('.lpn-set-name') || row.children[0];
 				const rg = document.createRange(); rg.selectNodeContents(nameEl);
 				const lines = new Set(Array.from(rg.getClientRects()).map((q) => Math.round(q.top / 4))).size;
+				// Tom's definition (2026-10-25): a row's controls must not reflow onto a second line; text inside a cell
+				// (a name, a heading) may wrap, mid-word included. So only the controls are compared: every box and tick of
+				// the row sits in one horizontal band.
 				const heads = ri === 0;
-				if (!heads && (lines > 1 || rowH > tall + 8)) {
-					out.wrapped.push(id + ':' + (nameEl.textContent || '').trim().slice(0, 20) + ' lines=' + lines + ' rowH=' + Math.round(rowH) + ' tallest=' + Math.round(tall));
+				const ys = Array.from(row.children).map((k) => k.matches('input') ? k : k.querySelector('input')).filter((k) => k && k.offsetParent)
+					.map((k) => { const q = k.getBoundingClientRect(); return q.top + q.height / 2; });
+				if (!heads && ys.length > 1 && Math.max.apply(null, ys) - Math.min.apply(null, ys) > 8) {
+					out.wrapped.push(id + ':' + (nameEl.textContent || '').trim().slice(0, 20) + ' controls span ' + Math.round(Math.max.apply(null, ys) - Math.min.apply(null, ys)) + ' px');
 				}
 			});
 		});
@@ -127,10 +118,8 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		let m = await measure(page);
 		console.log('  rows ' + m.rows + ', pane ' + m.pane + '/' + m.scroll + ', head widths ' + m.cols.join(',') + ', index ' + m.index);
 		ok(label + ': labels rows were found', m.rows > 10, String(m.rows));
-		ok(label + ': no labels row wraps', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
-		ok(label + ': no heading wraps or is clipped', m.headBad.length === 0, m.headBad.slice(0, 4).join(' | '));
+		ok(label + ': every row of controls stays on one line (no control reflows onto a second line)', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
 		ok(label + ': a two-digit Drop value is not clipped', m.dropClip.length === 0, m.dropClip.join(' | '));
-		if (touch) { ok(label + ': no word of the Settings index is broken or cut', m.indexBad.length === 0, m.indexBad.slice(0, 4).join(' | ')); }
 		ok(label + ': no name is cut off (no ellipsis)', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
 		ok(label + ': Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
@@ -157,7 +146,6 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		m = await measure(page);
 		ok(label + ' override: no labels row wraps', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
 		if (!touch && !lang) { ok(label + ' override: the default box fits the labels table WITH the override column, no sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
-		ok(label + ' override: no heading wraps or is clipped', m.headBad.length === 0, m.headBad.slice(0, 4).join(' | '));
 		ok(label + ' override: Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
 	} finally { await a.close(); }
 }

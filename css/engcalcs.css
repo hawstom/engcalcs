@@ -4760,7 +4760,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
    exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(42rem, 94vw);   /* 2026-10-25: wide enough for the labels table with its headings on one line and the override column, no column cut off; was 28.865rem */
+	width: min(42rem, 94vw);   /* 2026-10-25: wide enough for the labels table and its override column, no column cut off; was 28.865rem */
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -6528,8 +6528,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   The 3.6rem and the 2px are the arithmetic above, already reduced; the 2px is a fifth of
 	   `.lpn-setbox-panes`'s own 10px `gap`, restated because `calc()` cannot ask for it. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex: 0 0 min-content; }
-	html:has(#lpn_canvas) .lpn-setbox-index .lpn-setbox-link { overflow-wrap: normal; word-break: normal; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." */
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 3.8rem; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." */
 
 	/* 5a. AND THE ONE THING THE NARROWER MAIN PANE NO LONGER FITS. Measured at 360px after the
 	   transfer above: the content pane overflows by exactly 17px, and every pixel of it is the
@@ -6739,12 +6738,15 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
 		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4) { width: 1.4rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
 		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
 		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.5rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 2rem !important; }   /* two digits, not clipped (Tom, 2026-10-25: "10" showed "1C") */
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
@@ -7247,71 +7249,5 @@ textarea.lpn-desc-ta {
 .lpn-theme-choice[aria-pressed="true"] .lpn-theme-choice-name { font-weight: bold; }
 .lpn-theme-choice:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: 1px; }
 .lpn-theme-choice-name { max-width: 132px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
-/* ==== Settings > Labels: THE COLUMNS ARE AS WIDE AS THEIR HEADING OR THEIR CONTENT, AND NEITHER WRAPS OR CLIPS ==
-   (Tom's verdicts 2026-10-25, from a phone and a PC in German: headings broke mid-word, "Dro/p", "Us/e unit/s";
-   a two-digit Drop value was clipped; German headings grew upward under the sticky section title.)
-   Each column of a list's grid takes the wider of its heading (kept on one line) and its boxes, so the earlier fixed
-   widths are lifted here: a box fills its column, and counts for nothing in sizing it (inline-size 0, min-inline-size
-   100%) except through a floor of two digits. The pane scrolls sideways when the table is wider than the box. */
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: auto !important; }
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div > input:nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div > input:nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div > input:nth-child(7) { inline-size: 0 !important; min-inline-size: 100% !important; box-sizing: border-box; }
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(7),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(4),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(5),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(6),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(7) { white-space: nowrap; overflow-wrap: normal !important; min-inline-size: 2.4rem; text-align: center; }
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_node_fields > div.lpn-set-colhead > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_link_fields > div.lpn-set-colhead > :nth-child(3),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(2),
-html:has(#lpn_canvas) #lpn_labels_customer_fields > div.lpn-set-colhead > :nth-child(3) { text-align: start; }
 @keyframes lpn-theme-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lpn-theme-choice { animation: none; } }
