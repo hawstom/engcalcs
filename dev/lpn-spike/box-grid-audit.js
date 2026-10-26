@@ -82,7 +82,7 @@ function auditInPage(spec) {
 // `ok(label, cond, detail)` is the caller's recorder. Returns the measurements.
 async function auditBox(page, spec, ok, tag) {
 	const m = await page.evaluate(auditInPage, spec);
-	ok(tag + ' is on the screen', !m.missing && m.vals > 0 && (m.ctrls > 0 || spec.noControls), m.missing ? 'no ' + spec.root : (m.vals + ' values, ' + m.ctrls + ' controls'));
+	ok(tag + ' shows rows and controls', !m.missing && m.vals > 0 && (m.ctrls > 0 || spec.noControls), m.missing ? 'no ' + spec.root : (m.vals + ' values, ' + m.ctrls + ' controls'));
 	if (m.missing || !m.vals) { return m; }
 	ok(tag + ': every visible control stands in the value column', m.offGrid.length === 0, JSON.stringify(m.offGrid));
 	ok(tag + ': every name starts at one x', m.offName.length === 0, JSON.stringify(m.offName));
