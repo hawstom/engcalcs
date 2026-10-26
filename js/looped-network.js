@@ -65611,9 +65611,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
-		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
-		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
+		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
+		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 31, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 27.5, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {
@@ -70395,19 +70395,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					continue;
 				}
 				if (c.indexOf(' lpn-fill-row ') >= 0) {
-					// The Text's words: a row like any other, its name in the name track (the box's own
-					// title, which says it too, is hidden from the eye) and the box in the value track,
-					// reaching to the end of the grid.
-					Array.prototype.forEach.call(k.childNodes, function (x) {
-						if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') {
-							nm = gpCell('span', 'lpn-gname');
-							nm.textContent = x.getAttribute('aria-label') || '';
-							x.className += ' lpn-gval lpn-gtextarea';
-							k.insertBefore(nm, x);
-						}
-					});
+					// The Text's words: the box's own title above says what it is, and the box spans the
+					// grid after the gutter (Tom, 2026-10-15: it fills the Properties box and follows it).
 					k.insertBefore(gutterCell(), k.firstChild);
 					k.className += ' lpn-grow';
+					Array.prototype.forEach.call(k.childNodes, function (x) { if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') { x.className += ' lpn-gspan2'; } });
 					last = null;
 					continue;
 				}
@@ -74210,7 +74202,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			label = document.createElement('label'), input = document.createElement('textarea');
-		popupTitleSet(pc.lpn_tool_add_text || 'Text', 'lpn-gtitle lpn-gtitle-sr');   // the row below names it
+		popupTitleSet(pc.lpn_tool_add_text || 'Text');
 		clearFields(fields);
 		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
 		// writes through setProp(). Writing lb._text here edits Base from inside a scenario, under

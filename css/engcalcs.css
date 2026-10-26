@@ -3734,7 +3734,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
-.lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-namemax: 11rem; --lpn-g-valmax: 11rem; }   /* a box of fixed width: a longer name wraps at a space, never widens it */
+.lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-namemax: 11rem; --lpn-g-valmax: 9.5rem; }   /* a box of fixed width: a longer name wraps at a space, never widens it */
 .lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }
 /* ==== THE STANDARD BOX ROW (Task 828; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
@@ -3760,6 +3760,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		grid-template-columns: var(--lpn-g-name, max-content) max-content minmax(0, 1fr);
 	}
 	.lpn-gridhost > * { grid-column: 1 / -1; min-width: 0; }
+	/* A box of fixed width (Contour, docked at the 20 rem floor on Tom's word) lets a name wrap at a space
+	   and a pull-down shrink before it lets the box scroll sideways. */
+	.lpn-contourbox .lpn-gridhost { grid-template-columns: minmax(min-content, max-content) minmax(min-content, max-content) minmax(max-content, 1fr); }
 	.lpn-gridhost > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	.lpn-gridhost.lpn-gnarrow { grid-template-columns: max-content auto; }
 	.lpn-gsub { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; min-width: 0; }
@@ -3782,7 +3785,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gname .lpn-gtext { min-width: 0; }
 .lpn-gname .ec-tip { flex: 0 0 auto; }
 .lpn-gval, .lpn-grow > :nth-child(2):not(.lpn-gname) { justify-self: start; max-width: var(--lpn-g-valmax, 17rem); }
-.lpn-gunit { font-size: .85em; opacity: .8; overflow-wrap: anywhere; }
+.lpn-gunit { font-size: .85em; opacity: .8; white-space: nowrap; }
 /* A number box is as wide as the digits it can hold: --d, set by the build from `digits` or a limit. */
 .lpn-gw-num { width: calc(var(--d, 7) * 1ch + 1.5em); box-sizing: border-box; text-align: right; font-variant-numeric: tabular-nums; }
 .lpn-gw-fill { width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; }
@@ -3817,12 +3820,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gw-chars, .lpn-gprops .lpn-gw-chars { text-align: start; }
 .lpn-gprops > .lpn-gspan, .lpn-gprops > .lpn-gspan2, .lpn-gprops .lpn-gspan2 { min-width: 0; contain: inline-size; }
 .lpn-gprops > .lpn-gspan { grid-column: 1 / -1; }
-.lpn-gprops > .lpn-gspan2, .lpn-gprops .lpn-gspan2 { grid-column: 2 / -1; }
+.lpn-gprops > .lpn-gspan2, .lpn-gprops .lpn-gspan2 { grid-column: 2 / -1; max-width: none; }
+.lpn-gprops .lpn-grow > textarea.lpn-gspan2 { max-width: none; width: 100%; }
 .lpn-gprops > .lpn-gspan3 { grid-column: 3 / -1; min-width: 0; contain: inline-size; }
 .lpn-gprops .lpn-gbtns button { white-space: normal; text-align: start; }
 .lpn-gprops .lpn-gbtns .lpn-pane-goto { margin-inline-start: 0; line-height: 1.3; color: var(--ec-accent); text-decoration: underline; }
 .lpn-gprops .lpn-gname:has(> a) { display: flex; align-items: baseline; gap: .25em; }
-.lpn-gprops textarea.lpn-gtextarea { grid-column: 3 / -1; width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; resize: vertical; justify-self: start; }
 .lpn-gprops > .lpn-ov-note { margin-inline-start: 0; }
 .lpn-gprops > .lpn-gloose > * + * { margin-inline-start: .4em; }
 .lpn-gprops > .lpn-gbtns { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -3849,9 +3852,18 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	#lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; justify-self: start; }
 	#lpn_popup_graph > .lpn-pgraph-chart, #lpn_popup_graph > .lpn-profile-say { grid-column: 1 / -1; }
 }
+/* A phone: the name goes above its value (the name track is nothing), as the other boxes' rows do under
+   18rem, so the box is no wider than a phone however long a name is. */
+@media (max-width: 30rem) {
+	@supports (grid-template-columns: subgrid) {
+		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 max-content minmax(max-content, 1fr); }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2 / -1; margin-inline-end: 0; }
+		.lpn-propbox #lpn_popup_title.lpn-gtitle-id > input { grid-column: 3; }
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > label { grid-column: 2 / -1; }
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; }
+	}
+}
 #lpn_popup_title.lpn-gtitle-text, #lpn_popup_title .lpn-gtitle-text { font-weight: bold; }
-/* A Text names itself in its row; its title says it once, to a screen reader. */
-#lpn_popup_title.lpn-gtitle-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* Narrow: the name goes above its value and the unit stays on the value's line (a container query
    on the host, as Settings does on its own content). */
 .lpn-gnarrow > .lpn-grid { grid-template-columns: max-content auto; }
