@@ -49,8 +49,12 @@ function auditInPage(spec) {
 	const GROUPS = '.lpn-ff-buttons, .lpn-gbtns, .lpn-find-filter, .lpn-new-actions, .lpn-new-presets, .lpn-scnres-controls';
 	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip)));
 	const lead = (e) => { const g = e.closest(GROUPS); return g && Array.from(g.querySelectorAll('input, select, textarea, button')).filter(vis)[0] !== e; };
-	const offGrid = ctrls.filter((e) => !lead(e) && Math.abs(R(e).left - valX) > 2).map((e) =>
-		(e.id || e.getAttribute('aria-label') || e.className || e.nodeName) + '@' + Math.round(R(e).left - valX))
+	// A control that SPANS the grid (a Text's words, which fills the box on Tom's word of 2026-10-15) starts
+	// at the name column instead; it is checked there.
+	const spans = (e) => !!e.closest('.lpn-gspan, .lpn-gspan2') || e.classList.contains('lpn-gspan2');
+	const offSpan = ctrls.filter((e) => spans(e) && Math.abs(R(e).left - nameX) > 2).map((e) => 'span ' + (e.className || e.nodeName) + '@' + Math.round(R(e).left - nameX));
+	const offGrid = offSpan.concat(ctrls.filter((e) => !spans(e) && !lead(e) && Math.abs(R(e).left - valX) > 2).map((e) =>
+		(e.id || e.getAttribute('aria-label') || e.className || e.nodeName) + '@' + Math.round(R(e).left - valX)))
 		.concat(groups.filter((g) => Math.abs(R(g).left - valX) > 2).map((g) => 'group ' + g.className + '@' + Math.round(R(g).left - valX)));
 	const offName = names.filter((e) => Math.abs(R(e).left - nameX) > 2).map((e) => e.textContent.trim().slice(0, 24) + '@' + Math.round(R(e).left - nameX));
 	const ellipsis = [], wrapped = [];

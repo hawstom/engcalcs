@@ -48,7 +48,7 @@ async function main() {
 	const executablePath = env.findChromium();
 	if (!executablePath) { console.error(NAME + ': no Chromium; SKIPPING'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
-	async function one(scn, file, name, attr, id) {
+	async function one(scn, file, name, attr, id, phone) {
 		const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', file), 'utf8'));
 		if (scn) {
 			d.scenarios.push({ id: 'f4', name: 'Fig 4', overrides: {} });
@@ -64,7 +64,7 @@ async function main() {
 		await a.reload();
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await page.setViewportSize({ width: 1366, height: 768 });
+		await page.setViewportSize(phone ? { width: 390, height: 844 } : { width: 1366, height: 768 });
 		await a.settle(2500);
 		const p = await page.evaluate(([g, i]) => {
 			let el = Array.from(document.querySelectorAll(g === 'data-cust' ? '.lpn-meter' : '#lpn_canvas [' + g + '="' + i + '"]')).filter((e) => e.getBoundingClientRect().width > 0)[0];
@@ -97,6 +97,18 @@ async function main() {
 				units: first('.lpn-gunit').filter((e) => e.textContent.trim()).length
 			};
 		});
+		if (phone) {
+			// A phone (390 px): the name goes above its value, and the box never scrolls sideways.
+			const ph = await page.evaluate(() => {
+				const b = document.querySelector('#lpn_popup .lpn-popover-body'), r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && x.querySelector('input[type=number]'))[0];
+				const n = r.querySelector('.lpn-gname').getBoundingClientRect(), c = r.querySelector('input').getBoundingClientRect();
+				return { scroll: b.scrollWidth - b.clientWidth, above: c.top >= n.bottom - 2 };
+			});
+			ok(tag + 'on a phone the box does not scroll sideways', ph.scroll <= 1, JSON.stringify(ph));
+			ok(tag + 'on a phone a name stands above its value', ph.above, JSON.stringify(ph));
+			await a.close();
+			return;
+		}
 		ok(tag + 'the box is a grid with rows', m.open && m.grid === 'grid' && m.rows >= 3, JSON.stringify({ grid: m.grid, rows: m.rows }));
 		await auditBox(page, { root: '#lpn_popup .lpn-popover-body' }, ok, tag + 'the box');
 		const like = await page.evaluate(() => {
@@ -123,6 +135,7 @@ async function main() {
 			for (const t of [['junction', 'data-node', '11'], ['reservoir', 'data-node', '9'], ['tank', 'data-node', '2'], ['pipe', 'data-link', '10'], ['pump', 'data-link', '9'], ['customer', 'data-cust', 'M1'], ['text', 'data-lbl', 'X2']]) { await one(scn, 'Net1.lwn', ...t); }
 			for (const v of ['PBV1', 'PRV1', 'PSV1', 'FCV1', 'TCV1', 'GPV1']) { await one(scn, 'Valves.lwn', 'valve-' + v, 'data-link', v); }
 		}
+		await one(false, 'Net1.lwn', 'pipe-phone', 'data-link', '10', true);
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
 	if (failures) { process.exitCode = 1; }
