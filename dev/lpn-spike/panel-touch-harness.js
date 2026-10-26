@@ -145,6 +145,8 @@ console.log('\n--- a panel that opens comes to the front ---');
 	// Declared: what is made visible that is NOT a draggable panel. A row here is a sentence somebody
 	// had to write, exactly as in section 2's NOT_A_PANEL.
 	const NOT_A_PANEL_SHOW = [
+		[/^pane @/, 'applyPaneLayout(): the bottom panel stays displayed and is shut or opened by the lpn-pane-shut class, '
+			+ 'which keeps the shown table\'s layout between opens; section 2c below holds that seam to being the only door'],
 		[/^lab @/, 'a node data label on the map'],
 		[/^valLab @/, 'a valve data label on the map'],
 		[/^qLab @/, 'a water-quality label on the map'],

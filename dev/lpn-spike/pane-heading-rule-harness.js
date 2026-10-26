@@ -304,7 +304,7 @@ async function measureAll(a, label, shots) {
 async function openPane(a) {
 	const open = await a.page.evaluate(() => {
 		const p = document.getElementById('lpn_pane_body');
-		return !!(p && p.offsetParent);
+		return !!(p && p.offsetParent && !p.closest('.lpn-pane-shut'));
 	});
 	if (!open) { await a.page.evaluate(() => { document.getElementById('lpn_pane_btn').click(); }); }
 	await a.settle(500);

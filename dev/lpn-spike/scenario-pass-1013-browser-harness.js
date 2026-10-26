@@ -143,7 +143,7 @@ async function main() {
 		const askOf = () => (a.dialogs.filter((x) => x.type === 'confirm')[0] || {}).message || '';
 		const plain = (d) => { d.scenarios = d.scenarios.filter((s) => s.id !== 'f4' && s.id !== 'f5'); d.project.activeScenario = d.scenarios[0].id; };
 		const pane = async () => {
-			if (!(await page.evaluate(() => { const p = document.getElementById('lpn_pane_tab_junctions'); return !!p && !!p.offsetParent; }))) {
+			if (!(await page.evaluate(() => { const p = document.getElementById('lpn_pane_tab_junctions'); return !!p && !!p.offsetParent && !p.closest('.lpn-pane-shut'); }))) {
 				await a.toolbarClick(await L('lpn_pane_toggle'));
 				await a.settle(500);
 			}

@@ -921,7 +921,7 @@ exports.run = async function ({ browser, report }) {
 		await b.toolbarClick('Bottom panel');
 		await b.settle(600);
 		const paneOpen = await b.page.evaluate(() =>
-			document.getElementById('lpn_pane').style.display !== 'none');
+			!document.getElementById('lpn_pane').classList.contains('lpn-pane-shut'));
 		report.ok(paneOpen, 'set up: the bottom pane is open, so the canvas is shorter and lower');
 
 		await drawL(b);

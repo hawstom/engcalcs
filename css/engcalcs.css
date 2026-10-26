@@ -3963,6 +3963,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    `flex: column` with the body carrying the only explicit height -- the grip and the tab strip
    are whatever they need, and JS writes one number in one place. */
 .lpn-pane { display: flex; flex-direction: column; border-top: 1px solid var(--ec-border-strong); background: var(--ec-bg); }
+/* A closed pane: no height, no border, contents skipped but their rendering kept (see applyPaneLayout()). */
+.lpn-pane.lpn-pane-shut { content-visibility: hidden; height: 0; min-height: 0; overflow: hidden; border-top-width: 0; }
 /* The drag handle IS the top edge, which is where a hand aims. Tall enough to hit with a mouse
    and a real amount of pointer slop; the ruled line inside says "grab me" without a glyph. */
 .lpn-pane-grip {
