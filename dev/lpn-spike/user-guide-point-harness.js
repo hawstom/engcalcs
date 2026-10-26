@@ -150,11 +150,11 @@ async function run(browser, Session, tag, url) {
 	ok('a card of another kind closes the first card\'s menu at once, and rings its own control', JSON.stringify(await menusOpen()) === '{"m":"none","s":"none"}' && p.n === 1 && p.id === 'select', JSON.stringify([await menusOpen(), p]));
 	await page.waitForTimeout(2800);
 
-	console.log('\n2b. Properties points at its Water row (Tom, 2026-10-24); the Scenario manager points at its menu row');
+	console.log('\n2b. Properties has no Water row (Tom, 2026-10-25); the Scenario manager points at its menu row');
 	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_popup'); }");
 	await a.settle(150);
 	const pp = await pointed(page);
-	ok('the Properties card rings its row in the Water menu', pp.n === 1 && pp.visible && pp.note === 0 && String(pp.id).indexOf(await a.lang('lpn_popup_boxtitle')) === 0, JSON.stringify(pp));
+	ok('the Properties card rings nothing (no Water row since 2026-10-25)', pp.n === 0, JSON.stringify(pp));
 	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_sm_box'); }");
 	await a.settle(150);
 	// Its row in the Scenarios menu is always there (H03), so its card rings that row instead.

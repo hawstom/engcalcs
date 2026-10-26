@@ -4,7 +4,7 @@
 //   2. an area that catches at least one asset ends the mode and opens Properties; one that catches
 //      nothing stays in the mode; a Shift area (not available on touch) is covered in
 //      select-area-harness.js;
-//   3. a closed Properties box comes back from Water > Properties, with a selection or without;
+//   3. the Water menu lists no Properties row from Water > Properties, with a selection or without;
 //   4. a selected Customer shows a halo that can be counted in the screen's own pixels, larger on a
 //      touch screen than with a mouse.
 //
@@ -136,26 +136,18 @@ async function main() {
 		ok('2.4 ...and ends the tool: help box gone, normal Select mode', !(await areaToolOn(page)) && !(await visible(page, '#lpn_area_hint')));
 		ok('2.5 ...and Properties opens on the selection', await visible(page, '#lpn_popup'));
 
-		console.log('\n--- 3. a closed Properties box comes back ---');
+		console.log('\n--- 3. the Water menu lists no Properties row ---');
 		await tapAt(a, cdp, "#lpn_popup_close");
 		await a.settle(400);
 		ok('3.1 closed with its X', !(await visible(page, '#lpn_popup')), await page.evaluate(() => { const p = document.getElementById('lpn_popup'); return 'display=' + getComputedStyle(p).display + ' style=' + p.style.display + ' class=' + p.className; }));
 		const rows = await a.menuRows('project');
 		await a.closeMenu();
 		const propLabel = await page.evaluate(() => document.getElementById('lpn_popup_boxtitle').textContent.trim());
-		ok('3.2 the Water menu has a Properties row', rows.some((r) => r.label === propLabel), JSON.stringify(rows.map((r) => r.label)));
-		await a.menuClick(propLabel, 'project');
-		await a.settle(500);
-		ok('3.3 choosing it brings Properties back on the selection', await visible(page, '#lpn_popup') && /selected/.test(await page.evaluate(() => document.getElementById('lpn_popup_title').textContent)),
-			await page.evaluate(() => document.getElementById('lpn_popup_title').textContent));
-		await tapAt(a, cdp, "#lpn_popup_close");
-		await a.settle(300);
+		ok('3.2 the Water menu has no Properties row (Tom, 2026-10-25)', !rows.some((r) => r.label === propLabel), JSON.stringify(rows.map((r) => r.label)));
+		const sl = await a.lang('lpn_tool_settings'), ll = await a.lang('lpn_library_menu');
+		ok('3.3 ...and still has Settings and Libraries', rows.some((r) => r.label === sl) && rows.some((r) => r.label === ll), JSON.stringify(rows.map((r) => r.label)));
 		await page.keyboard.press('Escape');
 		await a.settle(300);
-		await a.menuClick(propLabel, 'project');
-		await a.settle(500);
-		ok('3.4 with nothing selected it still opens', await visible(page, '#lpn_popup'));
-		await tapAt(a, cdp, "#lpn_popup_close");
 
 		console.log('\n--- 4. a selected Customer is easy to see ---');
 		// Counted from the screen's own pixels (Tom, 2026-10-24: a CSS drop-shadow passed a style check

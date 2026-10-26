@@ -55452,13 +55452,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				submenu: insertAssetRows
 			},
 			{ separator: true },
-			// **PROPERTIES, SETTINGS, LIBRARIES, IN THAT ORDER, on a phone and on a PC** (Tom,
-			// 2026-10-24). A closed Properties box can always come back: it opens on the selection, or
-			// empty when nothing is selected.
-			{
-				icon: 'info', label: pc.lpn_popup_boxtitle || 'Properties',
-				fn: function () { closeMenu(); if (!openMultiProperties()) { openPopupEmpty(); } }
-			},
+			// **SETTINGS, THEN LIBRARIES; NO PROPERTIES ROW, on a phone or a PC** (Tom, 2026-10-25:
+			// "Nobody will ever use Properties"). Properties opens on a selection, and its tab and
+			// the box's own button bring it back.
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				fn: function () { toggleSettingsBox(); }
