@@ -323,7 +323,7 @@ async function main() {
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
 		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, Copy upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), await L('lpn_sm_merge_up'), await L('lpn_sm_copy_up'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
-		await click('#points_data_copy');
+		await click('#lpn_sm_copy');
 		await settle(400);
 		ok('4.6 Copy makes Copy_of_Dry year beside it under the same parent', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', '-Copy_of_Dry year', 'Base2']), JSON.stringify(await names()));
 		await click('#lpn_sm_del');
@@ -486,8 +486,8 @@ async function main() {
 		// Copy scenario is the Scenarios menu's, in Basic mode (Tom, 2026-10-12): here it is greyed and says so.
 		const namesBeforeCopy = (await names()).length;
 		ok('6.1 on the Scenarios tree, Copy is greyed and its tip says where to copy a scenario',
-			JSON.stringify(await tipOf('points_data_copy')) === JSON.stringify(['true', await L('lpn_scenario_copy_off')]), JSON.stringify(await tipOf('points_data_copy')));
-		await click('#points_data_copy');
+			JSON.stringify(await tipOf('lpn_sm_copy')) === JSON.stringify(['true', await L('lpn_scenario_copy_off')]), JSON.stringify(await tipOf('lpn_sm_copy')));
+		await click('#lpn_sm_copy');
 		ok('6.2 ...and pressing it copies nothing, asking nothing', (await names()).length === namesBeforeCopy && !(await a.dialog()), JSON.stringify(await names()));
 		await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).filter((r) => /Night/.test(r.textContent))[0].querySelector('.lpn-sm-compare').click());
 		await settle(500);
