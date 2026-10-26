@@ -142,7 +142,7 @@ console.log('\n--- the state machine ---');
 	report(paneBody.style.height === '260px', '...at the default height', paneBody.style.height);
 	report(L.profileIsOpen(), '...on the profile tab');
 	L.togglePane();
-	report(!L.paneIsOpen() && byId.lpn_pane.style.display === 'none', 'the toolbar toggle closes it');
+	report(!L.paneIsOpen() && byId.lpn_pane.classList.contains('lpn-pane-shut'), 'the toolbar toggle closes it');
 	report(!L.profileIsOpen(), '...and the profile is not "open" behind a closed pane');
 	L.togglePane();
 	report(L.paneIsOpen(), 'and opens it again');
