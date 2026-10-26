@@ -2939,3 +2939,9 @@ Full document: dev/agents/market-researcher/ai-agent-interface.md (placed by the
 - **OBSERVED.** dev/positioning.md bans live commercial trademarks (WaterGEMS, Bentley) in titles/menus (Task 296): a menu row naming the product needs Tom's exception.
 - **NOT FOUND.** Any vendor objection to third-party reading/writing of Bentley/Innovyze project files; any other tool writing .wtg.sqlite.
 - **SPECULATION.** Ranking: Tom saving test files lowest; user-supplied template design cleanest; never ship a Bentley-generated template. Ask Bentley first; a lawyer for ~1 hour before public ship.
+
+## 2026-10-25 -- Pan map to uncover selected element under a phone panel (Tom's question)
+- **CITED.** QField does NOT auto-pan: feature request "Keep selected feature visible when opening attribute form" (2025-11-18, 1 vote, no status) says the clicked feature may end up under the form. https://ideas.qfield.org/app-feature-requests/p/keep-selected-feature-visible-when-opening-attribute-form . QField docs offer a manual centre button after identify. https://docs.qfield.org/how-to/map-interaction
+- **CITED.** Mapbox ships padding so floating UI does not cover the area of interest: https://docs.mapbox.com/mapbox-gl-js/example/offset-vanishing-point-with-padding/ . A toolkit affordance, not evidence any app does it on select.
+- **NOT FOUND.** Any doc or observation for Google Maps, Apple Maps, Field Maps, Collector, Mergin Maps, utility GIS viewers. Not tested on a device (I have none).
+- **SPECULATION.** Google/Apple Maps likely pan so the pin clears the sheet (from memory of use); re-derive by testing before quoting.
