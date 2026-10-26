@@ -344,7 +344,7 @@ function findAll(kids, tag) {
 		!labels.some(t => /^Demand pattern/.test(t)), labels.join(' | '));
 	// **THE CATEGORY FIELD IS GONE TOO, AND SINCE TASK 674 IT CANNOT BE FOUND BY ITS WORDS.** The
 	// element's own Description row is in the identity band at the top of the popup now, and
-	// `lpn_field_demand_category` is the same English word -- so this is asked STRUCTURALLY instead:
+	// `lpn_field_desc` is the same English word -- so this is asked STRUCTURALLY instead:
 	// the only Description label may sit ABOVE the Elevation row, where the identity band is. A
 	// standalone demand-category field is one that appears below it, beside the demand rows, which
 	// is where the two that vanished used to be.

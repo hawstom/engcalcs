@@ -20,7 +20,7 @@ const { U, ok, enString, plain, checkQuotes, openGuide, entry, esEntryCheck, fin
 const NAME = 'user-guide-reports-harness';
 U.takeBrowserLock(NAME, 'EC_UGRP_LOCKED');
 
-const RR = ['lpn_guide_rr_what_term', 'lpn_guide_rr_example_term'], ST = ['lpn_guide_st_what_term', 'lpn_guide_st_example_term'], FR = ['lpn_guide_fr_what_term', 'lpn_guide_fr_example_term'];
+const RR = ['lpn_guide_rr_what_term', 'lpn_guide_scn_example_term'], ST = ['lpn_guide_st_what_term', 'lpn_guide_scn_example_term'], FR = ['lpn_guide_cmp_cols_term', 'lpn_guide_scn_example_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));

@@ -153,7 +153,7 @@ console.log('\n--- 1. the first user is asked nothing at all ---');
 		dialogParagraphs().indexOf(PC.lpn_file_training_1) < 0 &&
 		dialogParagraphs().indexOf(PC.lpn_file_training_2) < 0);
 
-	press(PC.lpn_file_training_continue);
+	press(PC.lpn_backdrop_continue);
 	const idn = L.loadIdentity();
 	ok('Continue mints an identity', !!(idn && idn.holder));
 	ok('...with NO name on it', idn.name === '', JSON.stringify(idn.name));

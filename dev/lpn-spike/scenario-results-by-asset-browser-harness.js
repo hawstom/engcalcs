@@ -173,7 +173,7 @@ async function main() {
 
 		console.log('\n--- S1: Water > Reports > Scenario comparison, Results by asset ---');
 		await openCompare();
-		const P = (await L('lpn_result_pressure')), H = await L('lpn_result_head'), F = await L('lpn_result_flow'), PH = await L('lpn_result_pump_head');
+		const P = (await L('lpn_result_pressure')), H = await L('lpn_field_head'), F = await L('lpn_result_flow'), PH = await L('lpn_field_head');
 		let t = await resTable();
 		ok('the default table is junction pressure in three scenarios', t && t.heads.length === 4 && t.rows.length === 9, t && t.heads.join(' | '));
 		ok('the headings name the unit and the scenario', t && t.heads[1] === P + ' (psi), Base' && t.heads[2] === P + ' (psi), Big main' && t.heads[3] === P + ' (psi), Max day', t && t.heads.join(' | '));

@@ -211,7 +211,7 @@ async function main() {
 
 		console.log('\n--- 4. one command list: the buttons and the right-click menu ---');
 		const want = ['current', 'overrides', 'add', 'addbase', 'rename', 'copy', '|', 'del'];
-		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '|', await L('lpn_tool_delete')];
+		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), '|', await L('lpn_tool_delete')];
 		await h.rowOf('Night').locator('.lpn-sm-name').click({ button: 'right' });
 		await a.settle(300);
 		let m = await h.menu();
