@@ -287,7 +287,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
   _Ruled OK 2026-10-20._
 - **`lpn_guide_scn_move_def`**
-  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear overrides as desired in each scenario.</p>
+  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_move_term`**
   > Moving or merging between scenarios
@@ -673,7 +673,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
 
-### feat/box-rows-properties (`0313d17c1`) — adds no English strings
+### feat/box-rows-properties (`ad05811a6`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -687,7 +687,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`2c3e433ea`) — adds no English strings
+### feat/shape-scenario (`360fa0012`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -1018,13 +1018,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag (`e503133a2`) — adds no English strings
+### fix/bottom-pane-lag (`67136f3f0`) — adds no English strings
 
 ### fix/dup-keys (`4cca5839a`) — adds no English strings
 
 ### fix/example-crs (`014a92cd7`) — adds no English strings
 
-### fix/phone-select (`ad4d5a8d1`) — 16 new, 16 to read @@ NEEDS RULING
+### fix/phone-select (`92bd41410`) — 16 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex

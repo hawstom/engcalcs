@@ -49,7 +49,7 @@ if (process.env[LOCK_ENV] !== '1') {
 // not a junction, pipe, tank or any other network asset. Add the WHOLE sentence, with a reason.
 const ALLOW = [
 	// Tom's own sentence, 2026-10-25, kept nearly verbatim: it covers junctions, links, Texts and Shapes alike.
-	'To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear overrides as desired in each scenario.'
+	'To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.'
 ];
 
 let fails = 0;
