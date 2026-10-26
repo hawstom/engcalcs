@@ -642,7 +642,7 @@ function panelLines(box) {
 // calling the parser while the panel is wired to something else.
 function findQueryLine() {
 	let out = null;
-	walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { out = el; } });
+	walk(L.formBox(), function (el) { if (String(el.className).split(' ').indexOf('lpn-find-query') >= 0) { out = el; } });
 	return out;
 }
 function selectsIn() {

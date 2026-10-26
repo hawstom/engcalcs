@@ -6,11 +6,11 @@
 //   1. Contour plot, Net1 at 1440 x 900: every row's name starts at one x and every value at one x;
 //      no value cell is wider than its widest control (the old fixed 13rem track is gone); the
 //      Fill opacity box (3 digits) is narrower than the Interval box (6).
-//   2. Fire flow analysis: the same alignment, and the name track stays at or under 12rem however
-//      wide the box (the old 606 px name when docked wide).
+//   2. Fire flow analysis: the same alignment, and the name track is as wide as its longest name
+//      and no wider (the old 606 px name when docked wide), with no name cut off.
 //   3. The split: a drag widens the name column and writes `lpn_gcols`; ArrowLeft steps it back by
 //      0.5rem; a double-click resets it and removes the key.
-//   4. A name clipped by a narrow name column says its words on hover (a title); widening takes it back.
+//   4. A name in a narrow name column wraps at a space (never an ellipsis); one still overflowing says its words on hover.
 //   5. A host narrower than 18rem stacks name above value.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/box-rows-browser-harness.js
@@ -95,7 +95,7 @@ async function sectionAlignment(a, host, label) {
 	ok(label + ': every name starts at one x', uniq(f.rows.map((r) => r.name.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.name.x))));
 	ok(label + ': every value starts at one x', uniq(f.rows.map((r) => r.val.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
 	ok(label + ': every unit starts at one x', uniq(f.rows.map((r) => r.unit.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.unit.x))));
-	ok(label + ': the name track is at most 12rem', Math.max.apply(null, f.rows.map((r) => r.name.w)) <= 12 * f.rem + 1, String(f.rows[0].name.w));
+	ok(label + ': the name track holds its longest name on one line (no ellipsis, no wrap)', f.rows.every((r) => r.name.h < 2.2 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));
 	const fillers = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gw-fill')).map((e) => e.getBoundingClientRect().width), host);
 	ok(label + ': the value track is at most 17rem', f.rows.every((r) => r.val.w <= 17 * f.rem + 1), JSON.stringify(f.rows.map((r) => r.val.w)));
 	return { f, fillers };
@@ -122,7 +122,7 @@ async function main() {
 		const op = byId('lpn_contour_opacity'), iv = byId('lpn_contour_interval');
 		ok('Fill opacity (3 digits) is narrower than Interval (6)', op && iv && op.val.w < iv.val.w, op && iv && (op.val.w + ' < ' + iv.val.w));
 		const wideControl = await a.page.evaluate(() => Math.max.apply(null, Array.from(document.querySelectorAll('#lpn_contour_body .lpn-grow > :nth-child(2)')).map((e) => e.getBoundingClientRect().width)));
-		const track = await a.page.evaluate(() => getComputedStyle(document.querySelector('#lpn_contour_body .lpn-grid')).gridTemplateColumns.split(' ').map(parseFloat));
+		const track = await a.page.evaluate(() => getComputedStyle(document.querySelector('#lpn_contour_body')).gridTemplateColumns.split(' ').map(parseFloat));   // the host owns the tracks; its runs of rows are subgrids
 		ok('the value track is no wider than its widest control (was a fixed 13rem)', track[1] <= wideControl + 1, JSON.stringify(track) + ' control ' + wideControl);
 		ok('no row wraps: a value is one line high', c.f.rows.every((r) => r.val.h < 2.2 * c.f.rem), JSON.stringify(c.f.rows.map((r) => r.val.h)));
 		if (process.env.BOXROWS_SHOT) { await a.page.locator('#lpn_contour_box').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'contour.png') }); }
@@ -166,7 +166,10 @@ async function main() {
 		for (let i = 0; i < 40; i++) { await a.page.keyboard.press('ArrowLeft'); }
 		await a.settle(200);
 		const clip = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname:not(.ec-help)')).map((n) => ({ clipped: n.scrollWidth > n.clientWidth + 1, title: n.title, text: n.textContent })));
-		ok('at the narrowest, a clipped plain name carries its full words as a title', clip.length > 0 && clip.filter((n) => n.clipped).every((n) => n.title === n.text) && clip.some((n) => n.clipped), JSON.stringify(clip.slice(0, 2)));
+		// Names wrap at a space now, never ellipsis (Tom, 2026-10-25); a word longer than the column still
+		// says its words on hover.
+		const taller = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname:not(.ec-help)')).some((n) => n.getBoundingClientRect().height > 1.6 * parseFloat(getComputedStyle(n).fontSize)));
+		ok('at the narrowest, a plain name wraps at a space instead of being cut, and one that still overflows says its words', clip.length > 0 && taller && clip.filter((n) => n.clipped).every((n) => n.title === n.text), JSON.stringify(clip.slice(0, 2)));
 		const narrow = await facts(a.page, '#lpn_ff_controls');
 		ok('the drag floor holds: the name column is not narrower than 4rem', narrow.rows[0].name.w >= 4 * narrow.rem - 1, String(narrow.rows[0].name.w));
 		await a.page.locator('#lpn_ff_controls .lpn-gsplit').first().dblclick();

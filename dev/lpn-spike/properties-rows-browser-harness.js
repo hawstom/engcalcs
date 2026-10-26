@@ -1,15 +1,16 @@
 // THE PROPERTIES BOX ON THE STANDARD ROW GRID, IN A REAL BROWSER (ROADMAP Task 828; Ida's design,
-// dev/agents/interface-designer/standard-box-rows-2026-10-24.md). For a junction, a pipe, a pump, a
-// valve, a customer and a Text, each in Base and in a second scenario:
-//   1. every row's name starts at one x and every value at one x (the grid is #lpn_popup_fields);
-//   2. nothing is left off the grid: each child of the box is a row (a display: contents label), a
-//      spanning block, or a line break that draws nothing;
-//   3. the box never scrolls sideways;
-//   4. the override marker sits in the gutter cell of its own row and the gutter is nothing in Base
-//      where no marker shows;
-//   5. a pipe's number boxes are as wide as their digits: Minor loss (5) < Diameter (6) <
-//      Roughness (7) < Length (8);
-//   6. a unit has its own column, and no name carries "(unit)" any more.
+// dev/agents/interface-designer/standard-box-rows-2026-10-24.md; Tom 2026-10-25: "Properties did not
+// get any attention"). For every element type the box offers (a junction, a reservoir, a tank, a
+// pipe, a pump, each of the six valves, a customer and a Text), each in Base and in a second
+// scenario, at 1366 x 768, the whole box is audited by dev/lpn-spike/box-grid-audit.js:
+//   - EVERY visible control, not only the rows, stands in the value column (+-2 px): the ID line, a
+//     Text's words, the buttons, the Time series pull-down;
+//   - every name at one x; no name ellipsised; no name wrapped; like number boxes one width;
+//   - X, Y and Elevation are one width; Description and Tag are one width;
+//   - nothing is left off the grid, the override marker sits in its gutter cell, the gutter is nothing
+//     in Base with no marker, no name carries its unit in brackets, a pipe's number boxes are as wide
+//     as their digits (Minor loss 5 < Diameter 6 < Roughness 7 < Length 8).
+//   BOXROWS_SHOT=<dir> also writes a screenshot of each box there, as after-<type>.png.
 //
 //   node dev/lpn-spike/properties-rows-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -20,6 +21,7 @@ const REPO = path.resolve(__dirname, '..', '..');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_PROPROWS_LOCKED';
 const NAME = 'properties-rows-browser-harness';
+const { auditBox } = require('./box-grid-audit.js');
 if (process.env[LOCK_ENV] !== '1') {
 	let has = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); has = true; } catch (e) { /* none */ }
@@ -62,7 +64,7 @@ async function main() {
 		await a.reload();
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await page.setViewportSize({ width: 1600, height: 1000 });
+		await page.setViewportSize({ width: 1366, height: 768 });
 		await a.settle(2500);
 		const p = await page.evaluate(([g, i]) => {
 			let el = Array.from(document.querySelectorAll(g === 'data-cust' ? '.lpn-meter' : '#lpn_canvas [' + g + '="' + i + '"]')).filter((e) => e.getBoundingClientRect().width > 0)[0];
@@ -96,8 +98,15 @@ async function main() {
 			};
 		});
 		ok(tag + 'the box is a grid with rows', m.open && m.grid === 'grid' && m.rows >= 3, JSON.stringify({ grid: m.grid, rows: m.rows }));
-		ok(tag + 'every name starts at one x', uniq(m.names).length === 1, JSON.stringify(uniq(m.names)));
-		ok(tag + 'every value starts at one x', uniq(m.vals).length === 1, JSON.stringify(uniq(m.vals)));
+		await auditBox(page, { root: '#lpn_popup .lpn-popover-body' }, ok, tag + 'the box');
+		const like = await page.evaluate(() => {
+			const w = (sel) => Array.from(document.querySelectorAll('#lpn_popup_fields ' + sel)).filter((e) => e.getBoundingClientRect().width > 0).map((e) => Math.round(e.getBoundingClientRect().width));
+			return { coords: w('input.lpn-gw-num[type="number"]').length ? Array.from(document.querySelectorAll('#lpn_popup_fields input.lpn-gw-num[type="number"]')).filter((e) => e.style.getPropertyValue('--d') === '12' && e.getBoundingClientRect().width > 0).map((e) => Math.round(e.getBoundingClientRect().width)) : [],
+				text: w('input.lpn-gw-fill[type="text"]') };
+		});
+		ok(tag + 'X, Y and Elevation are one width', new Set(like.coords).size <= 1, JSON.stringify(like.coords));
+		ok(tag + 'Description and Tag are one width', new Set(like.text).size <= 1, JSON.stringify(like.text));
+		if (process.env.BOXROWS_SHOT && !scn) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-' + name + '.png') }); }
 		ok(tag + 'nothing is left off the grid', m.off.length === 0, JSON.stringify(m.off));
 		ok(tag + 'the box does not scroll sideways', m.scroll <= 1, String(m.scroll));
 		ok(tag + 'every override marker is in a gutter cell', m.marks === m.marksInGutter, m.marksInGutter + '/' + m.marks);
@@ -111,8 +120,8 @@ async function main() {
 	}
 	try {
 		for (const scn of [false, true]) {
-			for (const t of [['junction', 'data-node', '11'], ['pipe', 'data-link', '10'], ['pump', 'data-link', '9'], ['customer', 'data-cust', 'M1'], ['text', 'data-lbl', 'X2']]) { await one(scn, 'Net1.lwn', ...t); }
-			await one(scn, 'Valves.lwn', 'valve', 'data-link', 'PBV1');
+			for (const t of [['junction', 'data-node', '11'], ['reservoir', 'data-node', '9'], ['tank', 'data-node', '2'], ['pipe', 'data-link', '10'], ['pump', 'data-link', '9'], ['customer', 'data-cust', 'M1'], ['text', 'data-lbl', 'X2']]) { await one(scn, 'Net1.lwn', ...t); }
+			for (const v of ['PBV1', 'PRV1', 'PSV1', 'FCV1', 'TCV1', 'GPV1']) { await one(scn, 'Valves.lwn', 'valve-' + v, 'data-link', v); }
 		}
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');

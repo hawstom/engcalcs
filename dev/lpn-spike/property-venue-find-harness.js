@@ -64,7 +64,7 @@ const L = loadLoopedNetwork(
 	// button and the Filter button share a `.lpn-find-filter` parent.
 	"\t\tfilterRow: function () { var out = null;\n" +
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
-	"\t\t\t\tif (c.className === 'lpn-find-filter') { out = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\t\tif (String(c.className).split(' ').indexOf('lpn-find-filter') >= 0) { out = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
 	"\t\t\treturn out; },\n" +
 	"\t\tspecFields: function (scope) { findState.scope = scope; return replaceSpecs().map(function (s) { return s.field; }); },\n" +
 	"\t\tpreview: runReplacePreview, apply: applyReplace, cancel: cancelReplace,\n" +
