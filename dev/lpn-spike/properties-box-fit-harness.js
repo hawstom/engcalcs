@@ -95,10 +95,17 @@ async function main() {
 			if (kind === 'pipe' || kind === 'pump') {
 				// Minimal: a few pixels narrower must wrap more than the 5% allowance (or hit the CSS minimum).
 				const min = await page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('lpn_popup')).minWidth));
-				const narrower = await page.evaluate(WRAP, o.w - 8);
-				ok('8 px narrower would wrap more than the allowance (or is below the minimum)',
-					narrower.wrapped > allow(narrower.rows) || o.w - 8 < min,
-					o.w + ' wide; ' + narrower.wrapped + '/' + narrower.rows + ' wrap at ' + (o.w - 8) + '; min ' + min);
+				// On the row grid (Task 828) nothing re-wraps as the box narrows: the tracks are as wide
+				// as their contents, so the box is minimal when 8 px less makes its body scroll sideways.
+				const clipped = await page.evaluate((w) => {
+					const popup = document.getElementById('lpn_popup'), body = popup.querySelector('.lpn-popover-body'), keep = popup.style.width;
+					popup.style.width = w + 'px';
+					const over = body.scrollWidth - body.clientWidth;
+					popup.style.width = keep;
+					return over;
+				}, o.w - 8);
+				ok('8 px narrower would scroll the grid sideways (or is below the minimum)',
+					clipped > 0 || o.w - 8 < min, o.w + ' wide; ' + clipped + ' px over at ' + (o.w - 8) + '; min ' + min);
 			}
 			// Selecting another element while it is open does not change the width.
 			const other = await page.evaluate(() => {

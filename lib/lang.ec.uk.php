@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Режим: Додавання фігури. У�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Використовуйте цей режим, щоб змінювати, пересувати й перетягувати елементи карти або панорамувати карту. Це типовий режим карти. Повторне натискання Esc знімає виділення з усього, що вибрано.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Авто';
 $ec_lang['lpn_method_switch_confirm']='Зміна методу тертя не змінює числа шорсткості, вже введені на ваших трубах, а шорсткість для одного методу не має сенсу для іншого. Перевірте кожну трубу після цього. Усе одно змінити?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Скасувати (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Повторити (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Копіювати (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Розмір зображення як кратне області на екрані. Більший масштаб дає чіткіше зображення і більший файл.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

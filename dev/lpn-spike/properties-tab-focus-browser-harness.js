@@ -65,12 +65,12 @@ async function main() {
 		// The editable text and number boxes of the open Properties box, in tab order, by row label.
 		const rows = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields input'))
 			.filter((i) => (i.type === 'text' || i.type === 'number') && !i.readOnly && !i.disabled && i.offsetParent)
-			.map((i) => { const l = i.closest('label'); return (l ? l.firstChild.textContent : '').trim(); })
+			.map((i) => { const l = i.closest('label'); return (l ? (l.querySelector('.lpn-gname') || l.firstChild).textContent : '').trim(); })
 			.filter((t) => t));   // a box with no row label cannot be found again by name
 		const active = () => page.evaluate(() => {
 			const e = document.activeElement, l = e && e.closest && e.closest('label');
 			return { tag: e ? e.tagName : null, inPopup: !!(e && e.closest && e.closest('#lpn_popup')),
-				label: l ? l.firstChild.textContent.trim() : '', type: e ? e.type : '' };
+				label: l ? (l.querySelector('.lpn-gname') || l.firstChild).textContent.trim() : '', type: e ? e.type : '' };
 		});
 		// every tab stop of the box in DOM order, named tag|row label, with `#n` on the nth repeat of
 		// a name; and the index of the one that has focus
@@ -79,7 +79,7 @@ async function main() {
 				.filter((e) => !e.disabled && e.tabIndex >= 0 && e.type !== 'hidden' && (e.offsetParent || e.getClientRects().length));
 			const seen = {};
 			const x = els.map((e) => {
-				const l = e.closest('label'), n = e.tagName + '|' + (l ? l.firstChild.textContent.trim() : (e.id || e.title || ''));
+				const l = e.closest('label'), n = e.tagName + '|' + (l ? (l.querySelector('.lpn-gname') || l.firstChild).textContent.trim() : (e.id || e.title || ''));
 				seen[n] = (seen[n] || 0) + 1;
 				return seen[n] > 1 ? n + '#' + seen[n] : n;
 			});
@@ -89,18 +89,18 @@ async function main() {
 		// number is compared as a number.
 		const sameValue = (got, typed) => got === typed || (/^-?\d+(\.\d+)?$/.test(typed) && got !== null && got !== '' && Number(got) === Number(typed));
 		const valueOf = (label) => page.evaluate((t) => {
-			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
+			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => (x.querySelector('.lpn-gname') || x.firstChild).textContent.trim() === t)[0];
 			return l ? l.querySelector('input').value : null;
 		}, label);
 		const focusRow = async (label) => {
 			await page.evaluate((t) => {
-				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
+				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => (x.querySelector('.lpn-gname') || x.firstChild).textContent.trim() === t)[0];
 				const i = l.querySelector('input'); i.focus(); i.select();
 			}, label);
 		};
 		const typeFor = async (label, n) => {
 			const t = (await page.evaluate((l) => {
-				const x = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((y) => y.firstChild.textContent.trim() === l)[0];
+				const x = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((y) => (y.querySelector('.lpn-gname') || y.firstChild).textContent.trim() === l)[0];
 				return x.querySelector('input').type;
 			}, label));
 			return t === 'number' ? String(100 + n) : 'abc' + n;
@@ -185,7 +185,7 @@ async function main() {
 				await page.keyboard.type(' third');
 				const tgt = (await rows())[1];
 				const box = await page.evaluate((t) => {
-					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
+					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => (x.querySelector('.lpn-gname') || x.firstChild).textContent.trim() === t)[0];
 					const r = l.querySelector('input').getBoundingClientRect();
 					return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 				}, tgt);
@@ -202,7 +202,7 @@ async function main() {
 				await page.keyboard.type(await typeFor(now[0], 7));
 				const tgt = now[2];
 				const box = await page.evaluate((t) => {
-					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
+					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => (x.querySelector('.lpn-gname') || x.firstChild).textContent.trim() === t)[0];
 					const r = l.querySelector('input').getBoundingClientRect();
 					return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 				}, tgt);
@@ -228,7 +228,7 @@ async function main() {
 		await page.click('#lpn_popup_close'); await a.settle(300);
 		await clickAt('#lpn_canvas .lpn-symbols circle:not(.lpn-node-hit)', 0);
 		{
-			const now = await rows(), elev = (await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => l.firstChild.textContent.trim()))).filter((t) => /^Elevation/.test(t))[0];
+			const now = await rows(), elev = (await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => (l.querySelector('.lpn-gname') || l.firstChild).textContent.trim()))).filter((t) => /^Elevation/.test(t))[0];
 			const before = await valueOf(elev);
 			await focusRow(elev);
 			await page.keyboard.type('777');

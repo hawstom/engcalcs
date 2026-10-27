@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Način rada: Dodaj lik. Odredite svaku točku. P
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Koristite ovaj način rada za promjenu, pomicanje i povlačenje elemenata i teksta na karti ili za pomicanje karte. To je zadani način rada karte. Drugi pritisak na Esc poništava odabir.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automatski';
 $ec_lang['lpn_method_switch_confirm']='Promjena metode trenja ne mijenja brojeve hrapavosti već unesene na cijevima, a hrapavost za jednu metodu nema smisla za drugu. Nakon ovoga provjerite svaku cijev. Ipak promijeniti?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Poništi (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ponovi (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopiraj (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Veličina slike kao višekratnik područja na zaslonu. Veća je oštrija i daje veću datoteku.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

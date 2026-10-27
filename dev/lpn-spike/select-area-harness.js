@@ -21,6 +21,8 @@
 // is against that function directly, because it is the one piece with a right answer that can be
 // computed by hand.
 
+// A section's rows live in the one div after its heading (Task 828: that div is the rows' grid).
+const rowsOf = (sec) => (sec.children.filter((c) => c._tag === 'div')[0] || { children: [] }).children;
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -489,7 +491,7 @@ console.log('\n--- properties for many ---');
 
 	// Editing a row writes to every element of that type, through setProp().
 	const junctionSec = secs[0];
-	const rows = junctionSec.children.filter((c) => c._tag === 'label');
+	const rows = rowsOf(junctionSec).filter((c) => c._tag === 'label');
 	report(rows.length > 0, 'the junction section has editable rows', String(rows.length));
 	const elevRow = rows.filter((r) => (r.textContent || '').indexOf('Elev') >= 0)[0]
 		|| rows[0];
@@ -521,13 +523,13 @@ console.log('\n--- properties for many ---');
 	L.toggleInSelection('node', j[1].id);
 	L.openMulti();
 	const sec2 = L.popupSections()[0];
-	const kinds = sec2.children.map((c) => c._tag);
+	const kinds = rowsOf(sec2).map((c) => c._tag);
 	report(kinds.filter((k) => k === 'label').length > 0 &&
 		kinds.filter((k) => k === 'br').length === kinds.filter((k) => k === 'label').length,
 		'every row in a section is followed by a line break', kinds.join(','));
 	// **THE ACTIVE CHECKBOX IS ON EVERY TYPE** (Tom, 2026-09-08): a row whose control is a checkbox
 	// and whose words are the popup's own "Is active?".
-	const activeRow = sec2.children.filter((c) => c._tag === 'label' && /Is active\?/.test(c.textContent || ''))[0];
+	const activeRow = rowsOf(sec2).filter((c) => c._tag === 'label' && /Is active\?/.test(c.textContent || ''))[0];
 	report(!!activeRow, 'the junction section carries the Active row');
 	const activeBox = activeRow && activeRow.children.filter((c) => c._tag === 'input')[0];
 	report(!!activeBox && activeBox.type === 'checkbox', '...as a checkbox', activeBox && activeBox.type);
@@ -559,17 +561,17 @@ console.log('\n--- properties for many ---');
 	report(heads.every((h) => h.indexOf('undefined') < 0), 'no heading says undefined', heads.join(' / '));
 	report(heads.some((h) => /^Text \(2\)/.test(h)), 'the Text section is named and counted', heads.join(' / '));
 	const textSec = L.popupSections().filter((d) => /^Text/.test(d.children[0].textContent))[0];
-	const textRows = textSec.children.filter((c) => c._tag === 'label').map((r) => r.textContent || '');
+	const textRows = rowsOf(textSec).filter((c) => c._tag === 'label').map((r) => r.textContent || '');
 	report(/Size multiplier/.test(textRows.join('|')) && /Bold text/.test(textRows.join('|')) &&
 		/Horizontal alignment/.test(textRows.join('|')) && /Angle/.test(textRows.join('|')) &&
 		textRows.join('|').indexOf(PC.lpn_field_active) >= 0,
 		'with the words, size, alignments, Bold, angle and Active as rows', textRows.join(' | '));
-	const boldRow = textSec.children.filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
+	const boldRow = rowsOf(textSec).filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
 	const boldBox = boldRow.children.filter((c) => c._tag === 'input')[0];
 	boldBox.checked = true;
 	fire(boldBox, 'change', {});
 	report(tx.every((lb) => lb.bold === true), 'ticking Bold sets it on both Texts', tx.map((lb) => lb.bold).join(','));
-	const alignRow = textSec.children.filter((c) => c._tag === 'label' && /Horizontal alignment/.test(c.textContent || ''))[0];
+	const alignRow = rowsOf(textSec).filter((c) => c._tag === 'label' && /Horizontal alignment/.test(c.textContent || ''))[0];
 	const alignSel = alignRow.children.filter((c) => c._tag === 'select')[0];
 	report(!!alignSel, 'an alignment is a select, not a number box');
 	alignSel.value = 'left';

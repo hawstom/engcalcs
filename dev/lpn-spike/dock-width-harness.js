@@ -199,6 +199,8 @@ async function main() {
 			await m.settle(700);
 			keep('lpn_popup', await measure(m, 'lpn_popup'), k);
 			await m.page.keyboard.press('Escape');
+			// Escape leaves a floating Properties box standing over the map; close it so the next element can be clicked.
+			await m.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 			await m.settle(300);
 		}
 		for (const id of Object.keys(table)) {
@@ -269,7 +271,7 @@ async function main() {
 			const want = Math.round(table[id] * 16), n = nat[id], r = reflow[id];
 			if (id === 'lpn_contour_box') {
 				ok(id + ' docks at the ' + FLOOR + ' px floor (Tom: narrower)', want === FLOOR, want + ' px; its controls first stop scrolling sideways at ' + (n && n.firstClean) + ' px');
-				ok(id + ' does not scroll sideways at ' + want + ' px', !!n && n.firstClean !== null && n.firstClean <= want, 'first clean at ' + (n && n.firstClean));
+				ok(id + ' does not scroll sideways at ' + want + ' px', !!n && n.firstClean !== null && n.firstClean <= want, 'first clean at ' + (n && n.firstClean) + (n && n.lastDirty && n.lastDirty.length ? '; scrolling: ' + n.lastDirty.join(', ') : ''));
 				return;
 			}
 			ok(id + ' docks at no more than ' + REFLOW[id].max + ' rem', table[id] <= REFLOW[id].max, table[id] + ' rem');

@@ -76,7 +76,7 @@ function naturalWidth(arg) {
 		box.style.setProperty('max-width', 'none', 'important');
 		return { l: lines(), o: over(), h: height() };
 	};
-	let natural = null, firstClean = null, why = [], ref = null;
+	let natural = null, firstClean = null, why = [], ref = null, lastDirty = [];
 	const curve = [];
 	try {
 		ref = at(hi);
@@ -84,6 +84,7 @@ function naturalWidth(arg) {
 			const r = at(W);
 			if (arg.curve) { curve.push([W, r.l, r.h, r.o.length]); if (natural !== null) { continue; } }
 			if (r.o.length === 0 && firstClean === null) { firstClean = W; }
+			if (r.o.length && firstClean === null) { lastDirty = r.o; }
 			if (natural === null && r.o.length === 0 && r.l <= ref.l + 2 && settled(r.h, ref.h)) { natural = W; if (!arg.curve) { break; } }
 		}
 		// What still wraps or scrolls one step narrower: the content that sets this width.
@@ -97,7 +98,7 @@ function naturalWidth(arg) {
 		st.remove();
 		box.setAttribute('style', saved);
 	}
-	return { natural: natural, firstClean: firstClean, why: why.slice(0, 4), ref: ref && [ref.l, ref.h], curve: arg.curve ? curve : undefined };
+	return { natural: natural, firstClean: firstClean, lastDirty: lastDirty.slice(0, 3), why: why.slice(0, 4), ref: ref && [ref.l, ref.h], curve: arg.curve ? curve : undefined };
 }
 
 module.exports = { naturalWidth };

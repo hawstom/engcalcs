@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Modo: Adicionar Figura. Indique cada ponto. Indi
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use este modo para alterar, mover e arrastar elementos e textos no mapa, ou para deslocar o mapa. Este é o modo padrão do mapa. Pressionar Esc uma segunda vez limpa a seleção.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automático';
 $ec_lang['lpn_method_switch_confirm']='Mudar o método de atrito não altera os números de rugosidade já digitados nos seus tubos, e uma rugosidade de um método não tem sentido para outro. Verifique cada tubo depois disso. Mudar mesmo assim?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Desfazer (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refazer (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiar (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='O tamanho da imagem como múltiplo da área na tela. Um múltiplo maior é mais nítido e gera um arquivo maior.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

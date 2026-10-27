@@ -6,7 +6,7 @@
 // Net3 at 1600x1000 with the first-visit docks on (every default box is docked, auto-hidden and open
 // but tucked at its edge tab). For each door the target is tucked first, the door is used the way a
 // reader uses it, and the box must then be flown out: on screen, with size, with its section.
-//   1. Properties > Pipe types and Fittings links open Libraries on that section.
+//   1. Properties > the Edit types and Edit fittings options open Libraries on that section.
 //   2. Menu rows: Settings, Libraries, Find and replace, User manual, Analyze x3, Reports x5.
 //   3. The Settings toolbar button and the Find toolbar button; the "?" key.
 //   4. A box docked and PINNED is only raised, still on screen; a FLOATING box likewise.
@@ -142,19 +142,21 @@ async function main() {
 
 		console.log('\n--- 1. Properties links into Libraries ---');
 		ok('a pipe is selected (Properties opens)', await clickPipe(a));
-		for (const [key, sec] of [['lpn_library_pipetypes', 'pipetypes'], ['lpn_library_fittings', 'fittings']]) {
+		for (const [key, sec] of [['lpn_edit_pipetypes', 'pipetypes'], ['lpn_edit_fittings', 'fittings']]) {
 			const label = await L(key);
 			await clickPipe(a);
 			// Libraries tucked, Properties flown out: use the link as a reader does.
 			const tuckedLib = await a.page.evaluate(() => !document.getElementById('lpn_library_box').classList.contains('lpn-dock-out'));
 			ok('before "' + label + '": Libraries is tucked', tuckedLib);
 			const clicked = await a.page.evaluate((t) => {
-				const b = Array.from(document.querySelectorAll('#lpn_popup button.lpn-pane-goto')).find((x) => x.textContent.trim() === t);
-				if (!b) { return false; }
-				b.click();
+				// The last option of the pull-down (Task 828 replaced the link with it).
+				const sel = Array.from(document.querySelectorAll('#lpn_popup_fields select')).find((x) => Array.from(x.options).some((o) => o.textContent === t));
+				if (!sel) { return false; }
+				sel.value = Array.from(sel.options).find((o) => o.textContent === t).value;
+				sel.dispatchEvent(new Event('change', { bubbles: true }));
 				return true;
 			}, label);
-			ok('the "' + label + '" link is in Properties', clicked);
+			ok('the "' + label + '" option is in Properties', clicked);
 			await a.settle(700);
 			const v = await seen(a, 'lpn_library_box');
 			ok('"' + label + '" flies Libraries out, on screen', reader(v, true), JSON.stringify(v));
@@ -190,7 +192,7 @@ async function main() {
 		let v = await seen(a, 'lpn_library_box');
 		ok('Libraries pinned: shown in its column', v.docked && v.shown && v.inside, JSON.stringify(v));
 		await clickPipe(a);
-		await a.page.evaluate((t) => Array.from(document.querySelectorAll('#lpn_popup button.lpn-pane-goto')).find((x) => x.textContent.trim() === t).click(), await L('lpn_library_pipetypes'));
+		await a.page.evaluate((t) => { const sel = Array.from(document.querySelectorAll('#lpn_popup_fields select')).find((x) => Array.from(x.options).some((o) => o.textContent === t)); sel.value = Array.from(sel.options).find((o) => o.textContent === t).value; sel.dispatchEvent(new Event('change', { bubbles: true })); }, await L('lpn_edit_pipetypes'));
 		await a.settle(500);
 		v = await seen(a, 'lpn_library_box');
 		ok('pinned: the link leaves it shown and on screen', v.shown && v.inside && v.docked, JSON.stringify(v));
@@ -198,7 +200,7 @@ async function main() {
 		await corner(a, 'lpn_library_box', 'float');
 		await tuckAll(a);
 		await clickPipe(a);
-		await a.page.evaluate((t) => Array.from(document.querySelectorAll('#lpn_popup button.lpn-pane-goto')).find((x) => x.textContent.trim() === t).click(), await L('lpn_library_fittings'));
+		await a.page.evaluate((t) => { const sel = Array.from(document.querySelectorAll('#lpn_popup_fields select')).find((x) => Array.from(x.options).some((o) => o.textContent === t)); sel.value = Array.from(sel.options).find((o) => o.textContent === t).value; sel.dispatchEvent(new Event('change', { bubbles: true })); }, await L('lpn_edit_fittings'));
 		await a.settle(500);
 		v = await seen(a, 'lpn_library_box');
 		ok('floating: the link leaves it shown, with its title band on screen (a floating box may overhang)', v.shown && !v.docked && v.r[0] < 1500 && v.r[1] >= 0 && v.r[1] < 900, JSON.stringify(v));

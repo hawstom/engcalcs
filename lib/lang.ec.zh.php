@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='模式：添加形状。依次指定各点。再
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图上的元件和文字，或平移地图。这是地图的默认模式。再按一次 Esc 将清除所选内容。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_method_switch_confirm']='更改摩擦计算方法不会改变您已在管道中输入的糙率数值，而某一方法下的糙率对另一方法而言没有意义。更改后请检查每条管道。仍要更改吗？';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='撤销 (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='重做 (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='复制 (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}，{symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}，{symbol}';

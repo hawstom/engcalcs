@@ -247,13 +247,13 @@ function boxFacts(page, withDem) {
 		const b = document.getElementById('lpn_contour_box'), body = document.getElementById('lpn_contour_body');
 		if (dem) {
 			// The DEM row is offered only with a located project and a token; stand one in, labelled as the page words it.
-			const rows = body.querySelectorAll('.lpn-set-row'), c = rows[rows.length - 1].cloneNode(true);
+			const rows = body.querySelectorAll('.lpn-grow'), c = rows[rows.length - 1].cloneNode(true);
 			c.firstChild.textContent = EngCalcs.pageConfig.lpn_contour_dem;
-			body.appendChild(c);
+			rows[rows.length - 1].parentNode.appendChild(c);
 		}
 		const r = b.getBoundingClientRect();
 		return { w: Math.round(r.width), h: Math.round(r.height), l: r.left, t: r.top, rt: r.right, bt: r.bottom, vw: window.innerWidth, vh: window.innerHeight,
-			rows: body.querySelectorAll('.lpn-set-row').length, vScroll: body.scrollHeight - body.clientHeight, hScroll: body.scrollWidth - body.clientWidth,
+			rows: body.querySelectorAll('.lpn-grow').length, vScroll: body.scrollHeight - body.clientHeight, hScroll: body.scrollWidth - body.clientWidth,
 			saved: localStorage.getItem('lpn_contourbox') };
 	}, !!withDem);
 }
@@ -332,7 +332,7 @@ async function sectionPhone(Session, browser) {
 		await contourFromMenu(a);
 		const fit = await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_contour_box'), r = b.getBoundingClientRect(), body = document.getElementById('lpn_contour_body');
-			const wide = Array.from(b.querySelectorAll('input, select, button, .lpn-set-row')).filter((e) => {
+			const wide = Array.from(b.querySelectorAll('input, select, button, .lpn-grid')).filter((e) => {
 				const q = e.getBoundingClientRect();
 				return q.width > 0 && (q.right > r.right + 0.5 || q.left < r.left - 0.5);
 			}).map((e) => e.id || e.className);

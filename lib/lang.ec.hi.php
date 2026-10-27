@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='मोड: आकृति जोड़ें।
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='मानचित्र पर तत्वों और टेक्स्ट को बदलने, ले जाने और खींचने, या मानचित्र को पैन करने के लिए इस मोड का उपयोग करें। यह मानचित्र का डिफ़ॉल्ट मोड है। दूसरी बार Esc दबाने से चयन साफ़ हो जाता है।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='स्वचालित';
 $ec_lang['lpn_method_switch_confirm']='घर्षण विधि बदलने से आपके पाइपों पर पहले से टाइप किए गए खुरदरापन अंक नहीं बदलते, और एक विधि के लिए खुरदरापन दूसरी विधि के लिए अर्थहीन है। इसके बाद हर पाइप जाँच लें। फिर भी बदलें?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='पूर्ववत करें (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='फिर से करें (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='कॉपी करें (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

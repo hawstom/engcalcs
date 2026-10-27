@@ -49,7 +49,10 @@ async function main() {
 		const closePopup = async () => { await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }); await settle(400); };
 		const popupRows = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => {
 			const i = l.querySelector('input,select,textarea');
-			return { text: l.textContent.replace(/\s+/g, ' ').trim(), input: !!i, value: i ? i.value : null, ph: i ? i.placeholder : null, off: i ? !!(i.disabled || i.readOnly) : null };
+			// The row as the reader reads it, left to right: label (the unit stands in it), value.
+			const n = l.querySelector('.lpn-gname'), v = l.querySelector('.lpn-gval');
+			const text = n ? [n.textContent, i ? '' : (v ? v.textContent : '')].join(' ').replace(/\s+/g, ' ').trim() : l.textContent.replace(/\s+/g, ' ').trim();
+			return { text: text, input: !!i, value: i ? i.value : null, ph: i ? i.placeholder : null, off: i ? !!(i.disabled || i.readOnly) : null };
 		}));
 		// The middle of the asset's hit area. A vertical pipe has a bounding box of no width, so the hit
 		// polyline is asked for by its class rather than by a positive width.

@@ -155,7 +155,7 @@ async function sectionLpnDesktop(Session, browser) {
 		await page.mouse.click(g.x, g.y);
 		await a.settle(350);
 		ok('a second click opens it again', (await tipState(page, H)).shown);
-		const tb = await page.evaluate(() => { const r = document.querySelector('#lpn_ff_box .lpn-setbox-title').getBoundingClientRect(); return { x: r.left + 8, y: r.top + r.height / 2 }; });
+		const tb = await page.evaluate(() => { const r = document.querySelector('#lpn_ff_box .lpn-setbox-title').getBoundingClientRect(); return { x: r.left + r.width * 0.45, y: r.top + r.height / 2 }; });
 		await page.mouse.click(tb.x, tb.y);
 		await a.settle(350);
 		ok('a click on the box title bar closes it', !(await tipState(page, H)).shown);

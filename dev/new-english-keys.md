@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**49 still to read on master**, of 214 untranslated keys, of 3182 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 199 untranslated keys, of 3170 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (214, 49 to read @@ NEEDS RULING)
+## lpn_  (199, 34 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -172,6 +172,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   _Ruled OK 2026-10-20._
@@ -226,6 +232,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
 - **`lpn_field_cv`**
   > Check valve (CV)
   _Ruled 2026-10-22: Approved._
@@ -424,57 +433,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_menu_back`**
   > Back
   @@ NEEDS RULING
-- **`lpn_morph_vertex`**
-  > Vertex
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_base`**
-  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_also`**
-  > Initial quality {quality} is cleared too.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_both`**
-  > Clear elevation {elev} and demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_demand`**
-  > Clear demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_elev`**
-  > Clear elevation {elev} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_quality`**
-  > Clear initial quality {quality} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_customers`**
-  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_demand`**
-  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_done`**
-  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_kind`**
-  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_links`**
-  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_loop`**
-  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_own`**
-  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_pipes`**
-  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_text`**
-  > {id} was not morphed into a vertex: a Text is attached to it.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_type`**
-  > {id} was not morphed into a vertex: only a junction can become one.
-  @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
   _Ruled OK 2026-10-20._
@@ -526,9 +484,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_quality_msx_species_tip`**
   > The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.
   _Ruled OK 2026-10-20._
-- **`lpn_replace_selected_only`**
-  > Only the selected assets
-  @@ NEEDS RULING
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
@@ -678,7 +633,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**85 still to read**, of 128 new keys across 13 unmerged branch(es).
+**98 still to read**, of 141 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -689,31 +644,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1026c (`80f2a4a72`) — adds no English strings
+### chore/merge-1026c (`b3d493be3`) — adds no English strings
 
-### feat/box-rows-properties (`9ec48ca4d`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_edit_fittings`**
-  > Edit fittings…
-  @@ NEEDS RULING
-- **`lpn_edit_pipetypes`**
-  > Edit types…
-  @@ NEEDS RULING
-- **`lpn_field_auto_length`**
-  > Auto length
-  @@ NEEDS RULING
-- **`lpn_prop_label_symbol_unit`**
-  > {label}, {symbol} ({unit})
-  @@ NEEDS RULING
-- **`lpn_prop_label_unit`**
-  > {label} ({unit})
-  @@ NEEDS RULING
+### feat/box-rows-properties (`81bec0ecc`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`bf56f6391`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/report-buttons (`c4a7535e8`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_heading_unit`**
   > {label} ({unit})
@@ -1101,6 +1040,61 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag-2 (`1a2d010dc`) — adds no English strings
+### fix/bottom-pane-lag-2 (`e9a3e1a3b`) — already merged into chore/merge-1026c; its strings are listed there
 
-### fix/phone-select (`d0fcf68c2`) — adds no English strings
+### fix/phone-select (`9c284b295`) — 18 new, 18 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_also`**
+  > Initial quality {quality} is cleared too.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_both`**
+  > Clear elevation {elev} and demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_demand`**
+  > Clear demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_elev`**
+  > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_quality`**
+  > Clear initial quality {quality} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING

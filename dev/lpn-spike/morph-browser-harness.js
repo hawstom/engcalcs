@@ -132,7 +132,7 @@ async function main() {
 		const props = await page.evaluate((t) => {
 			const labels = Array.from(document.querySelectorAll('#lpn_popup_fields label'));
 			const row = labels.filter((l) => l.textContent.trim().indexOf(t) === 0)[0];
-			const g = row && row.previousElementSibling;
+			const g = row && row.querySelector('.lpn-ovm');   // the marker is the row's first cell (Task 828)
 			return { rows: labels.map((l) => l.textContent.trim().slice(0, 24)), type: row ? row.textContent : null,
 				dot: !!(g && g.classList.contains('lpn-ovm') && g.querySelector('.lpn-ovm-dot')) };
 		}, await L('lpn_full_col_type'));
@@ -179,7 +179,7 @@ async function main() {
 		await s.clickNode('22');
 		const hit = await page.evaluate((t) => {
 			const row = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((l) => l.textContent.trim().indexOf(t) === 0)[0];
-			const dot = row && row.previousElementSibling && row.previousElementSibling.querySelector('.lpn-ovm-dot');
+			const dot = row && row.querySelector('.lpn-ovm-dot');
 			if (dot) { dot.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
 			return !!dot;
 		}, await L('lpn_full_col_type'));

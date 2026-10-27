@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Modus: Figur hinzufügen. Geben Sie jeden Punkt 
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Mit diesem Modus werden Elemente und Text auf der Karte geändert, verschoben und gezogen oder die Karte verschoben. Dies ist der Standardmodus der Karte. Ein zweites Drücken von Esc hebt die Auswahl auf.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automatisch';
 $ec_lang['lpn_method_switch_confirm']='Das Ändern der Reibungsmethode ändert nicht die bereits für Ihre Rohre eingegebenen Rauheitswerte, und ein Rauheitswert für die eine Methode ist für eine andere bedeutungslos. Prüfen Sie danach jedes Rohr. Trotzdem ändern?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Rückgängig (Strg+Z)';
 $ec_lang['lpn_snip_tip_redo']='Wiederholen (Strg+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopieren (Strg+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Die Größe des Bildes als Vielfaches des Bereichs auf dem Bildschirm. Ein größerer Wert ist schärfer und ergibt eine größere Datei.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

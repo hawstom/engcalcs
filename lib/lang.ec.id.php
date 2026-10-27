@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Mode: Tambah Bentuk. Tentukan setiap titik. Tent
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Gunakan mode ini untuk mengubah, memindahkan, dan menyeret aset serta teks pada peta, atau untuk menggeser peta. Ini adalah mode default untuk peta. Menekan Esc kedua kalinya membatalkan pilihan.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Otomatis';
 $ec_lang['lpn_method_switch_confirm']='Mengganti metode gesekan tidak mengubah angka kekasaran yang sudah dimasukkan pada pipa Anda, dan kekasaran untuk satu metode tidak bermakna untuk metode lain. Periksa setiap pipa setelah ini. Tetap ganti?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Urungkan (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ulangi (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Salin (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Ukuran gambar sebagai kelipatan area di layar. Kelipatan yang lebih besar lebih tajam dan menghasilkan berkas lebih besar.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

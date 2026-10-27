@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='الوضع: إضافة شكل. حدّد كل ن�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='استخدم هذا الوضع لتغيير عناصر الخريطة ونصوصها وتحريكها وسحبها، أو لتحريك الخريطة. هذا هو الوضع الافتراضي للخريطة. الضغط على Esc مرة ثانية يلغي التحديد.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='تلقائي';
 $ec_lang['lpn_method_switch_confirm']='لا يغيّر تغيير طريقة الاحتكاك أرقام الخشونة المدخلة أصلاً على أنابيبك، وخشونة طريقة ما لا معنى لها في طريقة أخرى. تحقق من كل أنبوب بعد ذلك. هل تريد التغيير على أي حال؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='تراجع (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='إعادة (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='نسخ (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='حجم الصورة كمضاعف لمنطقة الشاشة. كلما كبر كانت الصورة أوضح وأكبر حجماً.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

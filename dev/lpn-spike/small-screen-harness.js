@@ -1206,15 +1206,13 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	console.log('\n--- the Find box, compacted for a phone ---');
 	const css = fs.readFileSync(CSS_PATH, 'utf8');
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-	// **`min-width: 0` IS THE LOAD-BEARING HALF AND IT IS INVISIBLE.** A flex item refuses by default
-	// to shrink below its content, so without it a long condition -- "no open path to a source" --
-	// pushes the pair wider than the phone and the box overflows instead of the select ellipsizing.
-	// A pairing that looks right on a desktop and breaks the box on a phone is exactly the defect
-	// this file exists for.
-	ok('the Property/Condition pair is a flex row',
-		/\.lpn-find-pair \{[^}]*display: flex/.test(css));
-	ok('...whose items may shrink below their content, or a long condition widens the whole box',
-		/\.lpn-find-pair > div \{[^}]*min-width: 0/.test(css));
+	// The Find box is one grid since Task 828 (name | value | unit, a stretch of rows per half); the
+	// Property/Condition pair that shared a line is two rows now. On a phone (a host under 18rem) the
+	// name goes above its value, and a pull-down never grows past the box.
+	ok('the Find box rows are a grid whose name goes above its value on a phone',
+		/\.lpn-gnarrow \.lpn-grow > \.lpn-gname \{[^}]*grid-column: 1 \/ -1/.test(css));
+	ok('...and a pull-down fills its track and no more',
+		/\.lpn-gw-fill \{[^}]*max-width/.test(css));
 	// The title is in the DRAG BAND now -- the 40px of padding at the top, which is the only part of
 	// the box where `e.target` is the box itself and therefore the only part that drags. It reuses
 	// the Settings box's own title class, whose `pointer-events: none` is what keeps that true.

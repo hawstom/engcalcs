@@ -2902,7 +2902,6 @@ $ec_lang['lpn_mode_add_shape']='Mod: Figür Ekle. Her noktayı belirtin. Bitirme
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Harita öğelerini değiştirmek, taşımak ve sürüklemek ya da haritayı kaydırmak için bu modu kullanın. Bu, harita için varsayılan moddur. Esc tuşuna ikinci kez basmak, seçili olan her şeyin seçimini kaldırır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Otomatik';
 $ec_lang['lpn_method_switch_confirm']='Sürtünme yöntemini değiştirmek, borularınıza zaten yazılmış olan pürüzlülük sayılarını değiştirmez, ve bir yöntem için pürüzlülük diğeri için anlamsızdır. Bundan sonra her boruyu kontrol edin. Yine de değiştirilsin mi?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -4989,3 +4988,6 @@ $ec_lang['lpn_snip_tip_undo']='Geri al (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Yinele (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopyala (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

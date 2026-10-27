@@ -1624,7 +1624,7 @@ echoHeader("EngCalcsApp", $html_title,
 <div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_tab_new']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
+	<div class="lpn-popover-body lpn-gridhost" id="lpn_new_body">
 		<?php // THE TOP CHOICE, and it is top because it is the one that cannot be changed afterwards
 		      // (Task 641 phase 2, Tom's own specification of 2026-09-13). **TWO ANSWERS, NOT THREE.**
 		      // A geographic project states a PROJECTION, and lat/lon is one of them -- EPSG:3857, the
@@ -1638,14 +1638,18 @@ echoHeader("EngCalcsApp", $html_title,
 		      // Each radio carries its own "?" INSIDE its label, which is the shipped pattern one line
 		      // down in the legend rather than a new one: the glyph selects the radio it explains,
 		      // which is the radio you were reading about. ?>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
-			<div>
+		<?php // ONE GRID (Task 828, Tom 2026-10-25): a heading spans the box; each choice is a row, its
+		      // words in the name track, its radio, select or button in the value track, and what
+		      // belongs beside it (the projection chooser and its answer) in the last. ?>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></div>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
 				<?php // Reuses Convert as's own lpn_convas_epsg / lpn_convas_epsg_tip (2026-09-25):
 				      // once "projection" left both strings, this radio's own wording was identical
 				      // to Convert as's, and a second copy of the same sentence is the one that
 				      // could drift from it. ?>
-				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+				<span class="lpn-gname"><label for="lpn_new_coords_geo"><?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label></span>
+				<span class="lpn-gval lpn-gwrap"><input type="radio" id="lpn_new_coords_geo" name="lpn_new_coords" value="geo">
 				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
 				      // *"The button is not a good place for the full projection name. How about an
 				      // ellipsis button followed by the name?"*). It used to be one control doing both
@@ -1659,39 +1663,39 @@ echoHeader("EngCalcsApp", $html_title,
 				      // to, and it can wrap without dragging the button with it. The button names the
 				      // projection through aria-describedby, so a screen reader still hears what it
 				      // would be changing rather than a bare ellipsis. ?>
-				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button>
-				<span id="lpn_new_crs_name" class="lpn-new-crs-name"></span>
+				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button><span id="lpn_new_crs_name" class="lpn-new-crs-name"></span></span>
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_new_coords" value="local" checked> <?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_new_coords_local"><?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" id="lpn_new_coords_local" name="lpn_new_coords" value="local" checked>
 			</div>
-		</fieldset>
+		</div>
 		<?php // The units, as Tom answered it on 2026-08-24: *"all units are shown ... with the US and
 		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
 		      // two preset buttons are here because they are markup with strings in them. ?>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></legend>
-			<div class="lpn-new-presets">
-				<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
-				      // the suite serves a worldwide audience and most of it is metric). Same two
-				      // strings as that row, so there is one name for each system on this page. ?>
-				<button type="button" id="lpn_new_si"><?=$ec_lang['calc_units_si']?></button>
-				<button type="button" id="lpn_new_us"><?=$ec_lang['calc_units_us']?></button>
-			</div>
-			<div id="lpn_new_units_fields" class="lpn-units-group"></div>
-		</fieldset>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></div>
+		<div class="lpn-new-presets lpn-gcol2">
+			<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
+			      // the suite serves a worldwide audience and most of it is metric). Same two
+			      // strings as that row, so there is one name for each system on this page. ?>
+			<button type="button" id="lpn_new_si"><?=$ec_lang['calc_units_si']?></button>
+			<button type="button" id="lpn_new_us"><?=$ec_lang['calc_units_us']?></button>
+		</div>
+		<div id="lpn_new_units_fields" class="lpn-gsub"></div>
 		<?php // Head loss at CREATION rather than four levels down in Settings -- it is a decision
 		      // about the whole model and it decides what the roughness column of every pipe means.
 		      // Every label is borrowed from bpn_, so this row costs no new key. ?>
-		<div class="lpn-new-block">
-			<label for="lpn_new_method"><?=$ec_lang['bpn_method']?></label>
-			<select id="lpn_new_method">
-				<option value="hw"><?=$ec_lang['bpn_method_hw']?></option>
-				<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
-				<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
-			</select>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_new_method"><?=$ec_lang['bpn_method']?></label></span>
+				<select id="lpn_new_method" class="lpn-gval lpn-gw-fill">
+					<option value="hw"><?=$ec_lang['bpn_method_hw']?></option>
+					<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
+					<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
+				</select>
+			</div>
 		</div>
-		<div class="lpn-new-actions">
+		<div class="lpn-new-actions lpn-gcol2">
 			<button type="button" id="lpn_new_create"><?=$ec_lang['lpn_new_create']?></button>
 			<button type="button" id="lpn_new_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
@@ -1710,30 +1714,33 @@ echoHeader("EngCalcsApp", $html_title,
 <div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></legend>
-			<div id="lpn_convas_from"></div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+	<?php // The coordinate system and the units are Label | Value rows of the box's one grid, as in New project
+	      // (Task 828); the rounding table below is its own three-column table and stays one. ?>
+	<div class="lpn-popover-body lpn-gridhost" id="lpn_convas_body">
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></div>
+		<div id="lpn_convas_from" class="lpn-gspan"></div>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_epsg"><?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label></span>
+				<span class="lpn-gval lpn-gwrap"><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg">
 				<button type="button" id="lpn_convas_crs_pick" aria-describedby="lpn_convas_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_epsg']))?>">&hellip;</button>
-				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span>
+				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span></span>
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed"> <?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_unnamed"><?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed">
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none"> <?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_none"><?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none">
 			</div>
-		</fieldset>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></legend>
-			<div class="lpn-new-presets">
-				<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
-				<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
-			</div>
-			<div id="lpn_convas_units_fields" class="lpn-units-group"></div>
-		</fieldset>
+		</div>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></div>
+		<div class="lpn-new-presets lpn-gcol2">
+			<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
+			<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
+		</div>
+		<div id="lpn_convas_units_fields" class="lpn-gsub"></div>
 		<?php // Tom's rounding request (Task 688): "Diameter, Depth, Demand and Flow, Head", each a
 		      // selector of nearest 100, 10, 1, 0.1, 0.01, 0.001. The steps are numbers, not words, so
 		      // they are not language keys. "No rounding" is the default: rounding changes a number
@@ -1780,10 +1787,11 @@ echoHeader("EngCalcsApp", $html_title,
 			<?php } ?>
 		</fieldset>
 		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
-		<div class="lpn-new-actions">
-			<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
-			<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
-		</div>
+	</div>
+	<?php // OK and Cancel stand in a footer outside the scrolling body, so they are always in view. ?>
+	<div class="lpn-new-actions lpn-convas-foot">
+		<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
+		<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
 	</div>
 </div>
 
@@ -2813,6 +2821,7 @@ EngCalcs.pageConfig = {
 	      // to the code, so a new property key that is missing here fails there. ?>
 	findEnglishWords: <?=json_encode(ecEnglishStrings(array(
 		'bpn_demand',
+		'lpn_prop_label_symbol',
 		'lpn_energy_price',
 		'lpn_energy_price_pattern',
 		'lpn_ff_required',
@@ -2999,7 +3008,12 @@ EngCalcs.pageConfig = {
 	lpn_km_url: <?=json_encode(ecRefUrl('minor_loss_k'))?>,
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,
-	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
+	lpn_field_auto_length: <?=json_encode($ec_lang['lpn_field_auto_length'])?>,
+	lpn_prop_label_unit: <?=json_encode($ec_lang['lpn_prop_label_unit'])?>,
+	lpn_prop_label_symbol_unit: <?=json_encode($ec_lang['lpn_prop_label_symbol_unit'])?>,
+	lpn_prop_label_symbol: <?=json_encode($ec_lang['lpn_prop_label_symbol'])?>,
+	lpn_edit_pipetypes: <?=json_encode($ec_lang['lpn_edit_pipetypes'])?>,
+	lpn_edit_fittings: <?=json_encode($ec_lang['lpn_edit_fittings'])?>,
 	lpn_method_switch_confirm: <?=json_encode($ec_lang['lpn_method_switch_confirm'])?>,
 	<?php // Borrowed for the roughness field, whose meaning follows the friction method (Task 271):
 	      // bpn_roughness_tip names Manning n, Hazen-Williams C and Darcy-Weisbach e in one

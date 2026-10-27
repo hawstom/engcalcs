@@ -300,7 +300,7 @@ async function main() {
 			await a.settle(800);
 			const offLabel = await S('lpn_field_meter_offset');
 			const readOff = () => page.evaluate((lab) => {
-				const l = Array.from(document.querySelectorAll('label')).find((e) => e.offsetParent && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
+				const l = Array.from(document.querySelectorAll('label')).find((e) => (e.offsetParent || e.querySelector('.lpn-gname')) && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
 				return l ? l.querySelector('input').value : null;
 			}, offLabel);
 			const shown = await readOff();
@@ -308,7 +308,7 @@ async function main() {
 				shown !== null && Math.abs(Math.abs(parseFloat(shown)) - truth) / truth < 0.005, shown + ' vs ' + truth.toFixed(3) + ' m');
 			if (shown !== null) {
 				await page.evaluate((lab) => {
-					const l = Array.from(document.querySelectorAll('label')).find((e) => e.offsetParent && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
+					const l = Array.from(document.querySelectorAll('label')).find((e) => (e.offsetParent || e.querySelector('.lpn-gname')) && e.textContent.indexOf(lab) === 0 && e.querySelector('input'));
 					const i = l.querySelector('input');
 					i.value = String(Math.sign(parseFloat(i.value) || 1) * 25);
 					i.dispatchEvent(new Event('change', { bubbles: true }));
@@ -318,6 +318,9 @@ async function main() {
 				ok('...and typing 25 m puts the customer 25 m off the pipe on the ground, within 0.5%',
 					Math.abs(typed - 25) / 25 < 0.005, typed.toFixed(3) + ' m');
 			}
+			// Escape closes the box only with the focus in it and the pointer over it (escapeOwnsBox()); the field the typing re-drew is gone, and where the box lands depends on its size.
+			await page.evaluate(() => { const b = document.getElementById('lpn_popup').getBoundingClientRect(); window.__escAt = { x: b.left + b.width / 2, y: b.top + 20 }; const i = document.querySelector('#lpn_popup_fields input'); if (i) { i.focus(); } });
+			{ const at = await page.evaluate(() => window.__escAt); await page.mouse.move(at.x, at.y); }
 			await page.keyboard.press('Escape');
 			await a.settle(300);
 		}
