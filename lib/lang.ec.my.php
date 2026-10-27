@@ -2841,8 +2841,6 @@ $ec_lang['lpn_curve_none']='ကွေးမျဉ်း မရွေးချယ
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='ကွေးမျဉ်းများ';
-$ec_lang['lpn_curve_library_link_tip']='ကွေးမျဉ်းတစ်ခုကို ထည့်ခြင်း၊ ဖော်ပြခြင်း၊ တည်းဖြတ်ခြင်းနှင့် ဖျက်ခြင်း ပြုလုပ်သည့် ကွေးမျဉ်းများ အပိုင်းတွင် စာရင်းများ ဘောက်စ်ကို ဖွင့်ပါ။ အစိတ်အပိုင်းတစ်ခုသည် မည်သည့်ကွေးမျဉ်းကို သုံးကြောင်း ဖော်ပြသည်။';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.

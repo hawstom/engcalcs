@@ -28,7 +28,7 @@ const QUOTES = {
 	lpn_guide_lib_kinds_def: ['lpn_library_patterns', 'lpn_library_curves', 'lpn_library_pipetypes', 'lpn_library_fittings', 'lpn_library_controls',
 		'lpn_library_rules', 'lpn_library_pattern_default_mark', 'lpn_settings_sec_calculation', 'lpn_settings_hydraulics', 'lpn_curve_kind_head',
 		'lpn_curve_kind_effic', 'lpn_curve_kind_volume', 'lpn_curve_kind_headloss', 'lpn_library_curve_type', 'lpn_library_curve_equation',
-		'lpn_curve_library_link', 'lpn_pipetype_detach', 'lpn_fitting_other', 'lpn_library_pattern_values'],
+		'lpn_edit_curves', 'lpn_pipetype_detach', 'lpn_fitting_other', 'lpn_library_pattern_values'],
 	lpn_guide_lib_ctl_def: ['lpn_library_control_add', 'lpn_time_duration'],
 	lpn_guide_lib_import_def: ['lpn_file_import_menu', 'lpn_library_import'],
 	lpn_guide_lib_example_def: ['lpn_menu_project', 'lpn_library_menu', 'lpn_library_patterns', 'lpn_library_pattern_default_mark', 'lpn_library_curves',

@@ -2841,8 +2841,6 @@ $ec_lang['lpn_curve_none']='Nicio curbă aleasă';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curbe';
-$ec_lang['lpn_curve_library_link_tip']='Deschide caseta Biblioteci la secțiunea Curbe, unde o curbă este adăugată, descrisă, editată și ștearsă. Un element precizează ce curbă folosește.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.

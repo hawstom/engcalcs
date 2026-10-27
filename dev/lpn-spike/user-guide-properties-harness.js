@@ -25,7 +25,7 @@ const QUOTES = {
 	lpn_guide_prop_open_def: ['lpn_tool_select', 'lpn_copy_props_menu', 'lpn_paste_props_menu', 'lpn_tsb_menu'],
 	lpn_guide_prop_edit_def: ['lpn_pipetype_detach', 'lpn_settings_auto_run'],
 	lpn_guide_prop_multi_def: ['lpn_multi_varies'],
-	lpn_guide_prop_example_def: ['lpn_field_desc', 'lpn_field_active', 'lpn_field_diameter', 'lpn_multi_varies']
+	lpn_guide_prop_example_def: ['lpn_field_desc', 'lpn_field_active_short', 'lpn_field_diameter', 'lpn_multi_varies']
 };
 const TERMS = ['lpn_guide_prop_open_term', 'lpn_guide_prop_edit_term', 'lpn_guide_prop_id_term', 'lpn_guide_prop_scn_term',
 	'lpn_guide_prop_multi_term', 'lpn_guide_scn_example_term'];
@@ -87,9 +87,9 @@ async function main() {
 		await settle(500);
 		let rows = await popupRows();
 		const idx = (rows, start) => rows.findIndex((r) => r.text.indexOf(start) === 0);
-		const lastInput = idx(rows, await T('lpn_field_active'));
+		const lastInput = idx(rows, await T('lpn_field_active_short'));
 		const flow = idx(rows, await T('lpn_result_flow')), vel = idx(rows, await T('lpn_result_velocity'));
-		ok('Pipe 10: Description is the first row and Is active? the last input; the calculated rows follow it', idx(rows, await T('lpn_field_desc')) === 0 && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
+		ok('Pipe 10: Description is the first row and Active the last input; the calculated rows follow it', idx(rows, await T('lpn_field_desc')) === 0 && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
 		ok('...the calculated rows have no box to type in', rows.slice(lastInput + 1).every((r) => !r.input), JSON.stringify(rows.slice(lastInput + 1).map((r) => r.input)));
 		const ex = plain(enString('lpn_guide_prop_example_def'));
 		const val = (i) => rows[i].text.replace(/[^0-9.]+$/, '').split(' ').pop();
@@ -103,7 +103,7 @@ async function main() {
 		rows = await popupRows();
 		const head = idx(rows, await T('lpn_field_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
 		ok('Junction 11: Head and Pressure are read-only rows that sit before its last inputs', head > 0 && pressure > head && initq > pressure && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
-		ok('...and the last row is an input again, Is active?', rows[rows.length - 1].text.indexOf(await T('lpn_field_active')) === 0 && rows[rows.length - 1].input);
+		ok('...and the last row is an input again, Is active?', rows[rows.length - 1].text.indexOf(await T('lpn_field_active_short')) === 0 && rows[rows.length - 1].input);
 
 		// ---- 4. the ID ------------------------------------------------------------------------------
 		console.log('\n4. The ID');

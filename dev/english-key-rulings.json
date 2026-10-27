@@ -1325,15 +1325,6 @@
             "on": "Tank volume",
             "ruled": "2026-09-05"
         },
-        "lpn_curve_library_link": {
-            "on": "Curves",
-            "ruled": "2026-09-06",
-            "answer": "OK."
-        },
-        "lpn_curve_library_link_tip": {
-            "on": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
-            "ruled": "2026-09-06"
-        },
         "lpn_curve_long_note": {
             "on": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
             "ruled": "2026-09-05"

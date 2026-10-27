@@ -2841,8 +2841,6 @@ $ec_lang['lpn_curve_none']='لم يُختر منحنى';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='المنحنيات';
-$ec_lang['lpn_curve_library_link_tip']='يفتح مربع المكتبات عند قسم المنحنيات، حيث يُضاف المنحنى ويُوصف ويُعدَّل ويُحذف. يذكر كل عنصر أي منحنى يستخدمه.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.

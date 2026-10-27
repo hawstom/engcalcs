@@ -122,7 +122,7 @@ async function main() {
 		ok('Length carries its unit and has no Auto toggle beside it', /^Length \(ft\)\s*\??$/.test(m.lenName || ''), m.lenName);
 		ok('Auto length is its own row above Length', m.autoAbove, '');
 		ok('...with its toggle in the value column', m.autoInValueCol, '');
-		ok('the Label column is fitted: no wider than the widest label, wider than the median', m.labelCol <= m.widest + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
+		ok('the Label column is fitted: no wider than the widest label or the 140 px floor (LPN_GFIT_FLOOR), wider than the median', m.labelCol <= Math.max(m.widest, 140) + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
 		ok('nothing is cut at the right edge', m.cut === 0 && m.scroll <= 1, JSON.stringify({ cut: m.cut, scroll: m.scroll }));
 
 		const glue = await page.evaluate(() => {

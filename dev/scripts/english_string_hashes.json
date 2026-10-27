@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 2989,
+    "count": 2987,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6614,8 +6614,6 @@
         "lpn_curve_kind_head": "191aad36553c2ec0c08ef3626a1fd1a7d9fcb204",
         "lpn_curve_kind_headloss": "ff763caf7e8f51b6815d8eefafda570e2ec96199",
         "lpn_curve_kind_volume": "22b2b224f2a5aef6c3f70f5babd1f73e16a05afa",
-        "lpn_curve_library_link": "07c83b93abf0b3e27a0cdff87660d5bd4d44c60e",
-        "lpn_curve_library_link_tip": "af73ed0a799bfd73685fccbea9cfee9ded7a63e7",
         "lpn_curve_none": "10fcfce86c18b233accee7a232e7bbfc22c478d3",
         "lpn_curve_volume_col": "3b18e8e332500f3dfedb21b0aed686cfa9832cfe",
         "lpn_customer_detached": "5906b3bd115e1670f96b5afc4b8cc5e4acd737ed",
@@ -11272,14 +11270,6 @@
         "lpn_curve_kind_volume": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_curve_library_link": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_curve_library_link_tip": {
-            "words": 24,
-            "ends_sentence": true
         },
         "lpn_curve_none": {
             "words": 3,
