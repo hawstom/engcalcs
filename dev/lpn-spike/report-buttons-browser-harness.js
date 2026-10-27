@@ -173,7 +173,7 @@ async function main() {
 		await closeBox('lpn_crit_box');
 
 		await dock.openBox(a, 'lpn_ds_box');
-		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_run'));
+		await pressRun('#lpn_ds_controls', await a.lang('lpn_ff_calculate'));
 		await waitReport('#lpn_ds_box');
 		await checkBox('Demand scaling', 'lpn_ds_box', 'lpn_ds_report', 'lpn_ds', 'lpn_ds_title');
 		await closeBox('lpn_ds_box');
