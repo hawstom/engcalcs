@@ -1646,7 +1646,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // to Convert as's, and a second copy of the same sentence is the one that
 				      // could drift from it. ?>
 				<span class="lpn-gname"><label for="lpn_new_coords_geo"><?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label></span>
-				<input type="radio" class="lpn-gval" id="lpn_new_coords_geo" name="lpn_new_coords" value="geo">
+				<span class="lpn-gval lpn-gwrap"><input type="radio" id="lpn_new_coords_geo" name="lpn_new_coords" value="geo">
 				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
 				      // *"The button is not a good place for the full projection name. How about an
 				      // ellipsis button followed by the name?"*). It used to be one control doing both
@@ -1660,12 +1660,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // to, and it can wrap without dragging the button with it. The button names the
 				      // projection through aria-describedby, so a screen reader still hears what it
 				      // would be changing rather than a bare ellipsis. ?>
-				<span class="lpn-gunit"><button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button><span id="lpn_new_crs_name" class="lpn-new-crs-name"></span></span>
+				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button><span id="lpn_new_crs_name" class="lpn-new-crs-name"></span></span>
 			</div>
 			<div class="lpn-grow">
 				<span class="lpn-gname"><label for="lpn_new_coords_local"><?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label></span>
 				<input type="radio" class="lpn-gval" id="lpn_new_coords_local" name="lpn_new_coords" value="local" checked>
-				<span class="lpn-gunit"></span>
 			</div>
 		</div>
 		<?php // The units, as Tom answered it on 2026-08-24: *"all units are shown ... with the US and
@@ -1691,7 +1690,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 					<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
 					<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
 				</select>
-				<span class="lpn-gunit"></span>
 			</div>
 		</div>
 		<div class="lpn-new-actions lpn-gcol2">
@@ -3007,6 +3005,11 @@ EngCalcs.pageConfig = {
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
+	lpn_field_auto_length: <?=json_encode($ec_lang['lpn_field_auto_length'])?>,
+	lpn_prop_label_unit: <?=json_encode($ec_lang['lpn_prop_label_unit'])?>,
+	lpn_prop_label_symbol_unit: <?=json_encode($ec_lang['lpn_prop_label_symbol_unit'])?>,
+	lpn_edit_pipetypes: <?=json_encode($ec_lang['lpn_edit_pipetypes'])?>,
+	lpn_edit_fittings: <?=json_encode($ec_lang['lpn_edit_fittings'])?>,
 	lpn_method_switch_confirm: <?=json_encode($ec_lang['lpn_method_switch_confirm'])?>,
 	<?php // Borrowed for the roughness field, whose meaning follows the friction method (Task 271):
 	      // bpn_roughness_tip names Manning n, Hazen-Williams C and Darcy-Weisbach e in one

@@ -25013,6 +25013,33 @@ var EngCalcs = EngCalcs || {};
 		});
 		lpnGridRow(box, { label: pc.lpn_find_value || 'Value', control: input, kind: 'text' });
 	}
+	// ---- A UNIT STANDS IN ITS LABEL (Tom, 2026-10-26: "Diameter, D (mm)"). ONE template key says how:
+	// `lpn_prop_label_unit` ('{label} ({unit})') and, with a symbol, `lpn_prop_label_symbol_unit`
+	// ('{label}, {symbol} ({unit})'), so a language can change the punctuation (a Chinese or Arabic
+	// comma, full-width brackets). The unit and the symbol are wrapped in <bdi>, so a right-to-left
+	// language does not flip "(mm)". The string this returns holds those `<bdi>` marks; only
+	// lpnRichInto() reads it, and it builds elements, never markup.
+	function lpnLabelWithUnit(label, unit, symbol) {
+		var pc = EngCalcs.pageConfig || {}, tpl;
+		if (!unit) { return symbol ? label + ', ' + symbol : label; }
+		tpl = symbol ? (pc.lpn_prop_label_symbol_unit || '{label}, {symbol} ({unit})') : (pc.lpn_prop_label_unit || '{label} ({unit})');
+		return tpl.replace(/\{(label|symbol|unit)\}/g, function (m, k) {
+			return k === 'label' ? label : '<bdi>' + (k === 'symbol' ? symbol : unit) + '</bdi>';
+		});
+	}
+	function lpnRichInto(el, text) {
+		var parts, i, b;
+		if (String(text).indexOf('<bdi>') < 0) { el.appendChild(document.createTextNode(text)); return; }
+		parts = String(text).split(/(<bdi>[\s\S]*?<\/bdi>)/);
+		for (i = 0; i < parts.length; i++) {
+			if (!parts[i]) { continue; }
+			if (parts[i].indexOf('<bdi>') === 0) {
+				b = document.createElement('bdi');
+				b.textContent = parts[i].slice(5, -6);
+				el.appendChild(b);
+			} else { el.appendChild(document.createTextNode(parts[i])); }
+		}
+	}
 	/**
 	 * A label carrying a tip, as `.ec-help` wrapping the text and a `.ec-tip` "?" glyph.
 	 *
@@ -25029,9 +25056,9 @@ var EngCalcs = EngCalcs || {};
 			// The standard box row clips the words and keeps the `?` (lpnGridRow).
 			words = document.createElement('span');
 			words.className = 'lpn-gtext';
-			words.textContent = text;
+			lpnRichInto(words, text);
 			help.appendChild(words);
-		} else { help.appendChild(document.createTextNode(text + ' ')); }
+		} else { lpnRichInto(help, text + ' '); }
 		glyph.className = 'ec-tip';
 		glyph.textContent = '?';
 		help.appendChild(glyph);
@@ -25073,7 +25100,7 @@ var EngCalcs = EngCalcs || {};
 			else { localStorage.removeItem(LPN_GCOLS_KEY); }
 		} catch (e) {}
 	}
-	function gcolId(host) { return host && host.id ? host.id : ''; }
+	function gcolId(host) { return host ? (host.getAttribute && host.getAttribute('data-gcols-id')) || host.id || '' : ''; }
 	function gcolApply(host) {
 		var id = gcolId(host), w = id ? gcolRead()[id] : 0;
 		if (host && host.style && host.style.setProperty) {
@@ -25081,47 +25108,69 @@ var EngCalcs = EngCalcs || {};
 			else { host.style.removeProperty('--lpn-g-name'); }
 		}
 	}
-	// Where the split handle sits: on the gap after the name track, measured from the real cells.
-	function gridPlaceSplit(grid) {
-		var split = grid.__lpnSplit, name, gr, nr, rtl, edge, gap;
-		if (!split || !grid.getBoundingClientRect) { return; }
-		name = grid.querySelector('.lpn-gname');
-		if (!name) { return; }
-		gr = grid.getBoundingClientRect(); nr = name.getBoundingClientRect();
-		if (!gr.width) { return; }
-		rtl = window.getComputedStyle(grid).direction === 'rtl';
-		gap = parseFloat(window.getComputedStyle(grid).columnGap) || 0;
-		edge = (rtl ? gr.right - nr.left : nr.right - gr.left) + gap / 2 - 3;
-		split.style.insetInlineStart = Math.round(edge) + 'px';
-	}
-	// A name the row is too narrow for says its full words on hover (the suite's one tip: a title).
-	// A name that carries a `?` tip keeps that tip, and is not touched here.
-	function gridClipTitles(grid) {
-		Array.prototype.forEach.call(grid.querySelectorAll('.lpn-gname'), function (n) {
-			var clipped, was = n.getAttribute('data-clip-title');
-			if (n.classList.contains('ec-help')) { return; }
-			clipped = n.scrollWidth > n.clientWidth + 1;
-			if (clipped && !was) { n.setAttribute('data-clip-title', '1'); n.title = n.textContent; }
-			else if (!clipped && was) { n.removeAttribute('data-clip-title'); n.title = ''; }
+	// ---- THE SPREADSHEET HEADER (Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET and
+	// WaterGEMS"): a header row with two cells, Label and Value, and a divider between them the reader
+	// drags. The divider writes --lpn-g-name on the host and remembers it per box in `lpn_gcols`.
+	// With no remembered width the label column is FITTED: wide enough for most labels (the 90th
+	// percentile of their natural widths), so one long label wraps instead of widening the whole
+	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
+	var LPN_GFIT_PCT = 0.9;
+	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
+	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
+	// The label column's natural widths, one a label: a range over each name's words, with its track
+	// left at max-content so nothing has wrapped.
+	function gridNaturalNames(host) {
+		var out = [];
+		if (typeof document.createRange !== 'function') { return out; }
+		Array.prototype.forEach.call(host.querySelectorAll('.lpn-gname'), function (n) {
+			var r = document.createRange(), w;
+			if (!n.getBoundingClientRect().width) { return; }
+			r.selectNodeContents(n);
+			w = r.getBoundingClientRect().width;
+			if (w > 0) { out.push(w); }
 		});
+		return out;
 	}
-	function gridWireSplit(grid, host) {
+	function gridFitNow(host) {
+		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
+		host.__lpnFitQ = false;
+		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
+		if (id && typeof prefs[id] === 'number') { gcolApply(host); return; }
+		host.style.setProperty('--lpn-g-name', 'max-content');
+		hr = host.getBoundingClientRect();
+		names = gridNaturalNames(host);
+		if (!hr.width || !names.length) { host.style.removeProperty('--lpn-g-name'); return; }
+		px = gridRem();
+		names.sort(function (a, b) { return a - b; });
+		w = names[Math.min(names.length - 1, Math.ceil(LPN_GFIT_PCT * names.length) - 1)];
+		cs = window.getComputedStyle(host);
+		pad = 14;   // the cell's own padding and the divider line
+		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
+		for (i = 0; i < vals.length; i++) { valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
+		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - 14;
+		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
+		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
+	}
+	function gridFitSoon(host) {
+		if (host.__lpnFitQ) { return; }
+		host.__lpnFitQ = true;
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridFitNow(host); });
+	}
+	function gridWireSplit(hdr, host, labelCell) {
 		var split = document.createElement('div'), startX, startRem, dragging = false, rem = 16;
 		split.className = 'lpn-gsplit';
 		split.setAttribute('role', 'separator');
 		split.setAttribute('aria-orientation', 'vertical');
+		split.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_cp_label || 'Label');
 		split.tabIndex = 0;
-		grid.__lpnSplit = split;
-		grid.appendChild(split);
+		labelCell.appendChild(split);
 		function nameRem() {
-			var n = grid.querySelector('.lpn-gname'), px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
-			rem = px;
-			return n ? n.getBoundingClientRect().width / px : 12;
+			rem = gridRem();
+			return labelCell.getBoundingClientRect().width / rem;
 		}
 		function room() {
-			// The name may grow until the value track keeps LPN_GVAL_MIN rem.
-			var gr = grid.getBoundingClientRect();
-			return Math.max(LPN_GNAME_MIN, gr.width / rem - LPN_GVAL_MIN);
+			// The label column may grow until the value column keeps LPN_GVAL_MIN rem.
+			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - LPN_GVAL_MIN);
 		}
 		function setRem(v, keep) {
 			var id = gcolId(host);
@@ -25129,15 +25178,14 @@ var EngCalcs = EngCalcs || {};
 			host.style.setProperty('--lpn-g-name', v + 'rem');
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
-			Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) { gridPlaceSplit(g); gridClipTitles(g); });
 		}
 		function reset() {
 			var id = gcolId(host), prefs = gcolRead();
 			if (id) { delete prefs[id]; gcolSave(); }
 			host.style.removeProperty('--lpn-g-name');
-			Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) { gridPlaceSplit(g); gridClipTitles(g); });
+			gridFitSoon(host);
 		}
-		function dirSign() { return window.getComputedStyle(grid).direction === 'rtl' ? -1 : 1; }
+		function dirSign() { return window.getComputedStyle(hdr).direction === 'rtl' ? -1 : 1; }
 		split.addEventListener('pointerdown', function (e) {
 			if (e.button !== undefined && e.button !== 0) { return; }
 			dragging = true; startX = e.clientX; startRem = nameRem();
@@ -25165,16 +25213,36 @@ var EngCalcs = EngCalcs || {};
 				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
 			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
 		});
-		if (typeof ResizeObserver !== 'undefined') {
-			new ResizeObserver(function () { gridPlaceSplit(grid); gridClipTitles(grid); }).observe(grid);
-		}
+	}
+	// The header row of a host: Label | Value, and the divider. A host is given one once and rebuilt
+	// with its rows (a rebuilt body loses it, so every build asks again).
+	// `before` is the first run of rows, which the header stands above (a box with a note or a table
+	// above its rows keeps them above the header); with none it is the host's first child.
+	function gridHeaderEnsure(host, before) {
+		var pc = EngCalcs.pageConfig || {}, hdr, l, v, at = before && before.parentNode ? before.parentNode : host;
+		if (host.classList.contains('lpn-gplain')) { return; }
+		if (host.__lpnHdr && host.contains(host.__lpnHdr)) { return; }
+		hdr = document.createElement('div');
+		hdr.className = 'lpn-ghdr';
+		hdr.setAttribute('role', 'row');
+		l = document.createElement('div');
+		l.className = 'lpn-ghcell lpn-ghlabel';
+		l.textContent = pc.lpn_cp_label || 'Label';
+		v = document.createElement('div');
+		v.className = 'lpn-ghcell lpn-ghvalue';
+		v.textContent = pc.lpn_find_value || 'Value';
+		hdr.appendChild(l);
+		hdr.appendChild(v);
+		at.insertBefore(hdr, before && before.parentNode ? before : at.firstChild);
+		host.__lpnHdr = hdr;
+		try { gridWireSplit(hdr, host, l); } catch (e) { /* a page without pointer events keeps the header */ }
 	}
 	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
 	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
-	function lpnGridHost(host) {
+	function lpnGridHost(host, opts) {
 		if (host.__lpnGridHost) { return host; }
 		host.__lpnGridHost = true;
-		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost';
+		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost' + (opts && opts.plain ? ' lpn-gplain' : '');
 		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
 		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
 		if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth < 30 * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
@@ -25182,7 +25250,11 @@ var EngCalcs = EngCalcs || {};
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
-				if (w) { host.classList.toggle('lpn-gnarrow', w < 18 * px || (window.innerWidth || 9999) < 30 * px); }
+				if (w) {
+					var was = host.classList.contains('lpn-gnarrow'), now = w < 18 * px || (window.innerWidth || 9999) < 30 * px;
+					host.classList.toggle('lpn-gnarrow', now);
+					if (!host.__lpnFitted || was !== now) { host.__lpnFitted = true; gridFitSoon(host); }   // the first time it has a width, and when it stops being stacked
+				}
 			}).observe(host);
 		}
 		return host;
@@ -25203,13 +25275,14 @@ var EngCalcs = EngCalcs || {};
 		grid = document.createElement('div');
 		grid.className = 'lpn-grid';
 		host.appendChild(grid);
-		try { gridWireSplit(grid, top); } catch (e) { /* a page without pointer events keeps the grid */ }
+		gridHeaderEnsure(top, grid);
+		gridFitSoon(top);
 		return grid;
 	}
 	// spec = {label, tip, control, unit, kind, digits, max, cls}. kind: 'num' | 'text' | 'select' |
 	// 'check' | 'button' | 'readout' | 'head' | 'span'; absent, it is read off the control.
 	function lpnGridRow(parent, spec) {
-		var grid = gridFor(parent), row = document.createElement('div'), name, unit, c = spec.control, kind = spec.kind, d, tag, type;
+		var grid = gridFor(parent), row = document.createElement('div'), name, labelText, c = spec.control, kind = spec.kind, d, tag, type;
 		if (!kind) {
 			tag = c && c.tagName ? String(c.tagName).toLowerCase() : '';
 			type = c && c.type ? String(c.type) : '';
@@ -25229,15 +25302,16 @@ var EngCalcs = EngCalcs || {};
 			grid.appendChild(row);
 			return row;
 		}
+		// The unit stands in the name, by the one template (lpnLabelWithUnit); the row has two cells.
+		labelText = lpnLabelWithUnit(spec.label || '', spec.unit || '');
 		if (spec.tip) {
-			// The words are clipped; the `?` is the tip's target and never is.
-			name = findHelpLabel(spec.label || '', spec.tip, true);
+			name = findHelpLabel(labelText, spec.tip, true);
 			name.className += ' lpn-gname';
 		} else {
 			name = document.createElement(spec.forId ? 'label' : 'span');
 			name.className = 'lpn-gname';
 			if (spec.forId) { name.htmlFor = spec.forId; }
-			name.textContent = spec.label || '';
+			lpnRichInto(name, labelText);
 		}
 		row.appendChild(name);
 		if (c) {
@@ -25251,10 +25325,6 @@ var EngCalcs = EngCalcs || {};
 			else if (kind === 'readout') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-read'; }
 			row.appendChild(c);
 		}
-		unit = document.createElement('span');
-		unit.className = 'lpn-gunit';
-		unit.textContent = spec.unit || '';
-		row.appendChild(unit);
 		grid.appendChild(row);
 		return row;
 	}
@@ -70277,9 +70347,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		c = ' ' + (n.className || '') + ' ';
 		return c.indexOf(' ec-help ') >= 0 && c.indexOf(' lpn-valwarn ') < 0;
 	}
-	// The words of a name that end in "(unit)" hand the unit to its own column.
-	function gpTakeUnit(nameEl) {
-		var leaf = null, m;
+	// A name that ends in "(unit)" is said again by the one template (lpnLabelWithUnit): the unit and the
+	// symbol in <bdi>, the punctuation the language's own. A short symbol after a comma ("Roughness, e")
+	// is the template's {symbol}.
+	function gpTemplateUnit(nameEl) {
+		var leaf = null, m, sy, frag;
 		(function walk(n) {
 			var i, k;
 			for (i = 0; i < n.childNodes.length; i++) {
@@ -70288,11 +70360,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else if (k.nodeType === 1 && !/(^| )ec-tip( |$)/.test(k.className || '')) { walk(k); }
 			}
 		}(nameEl));
-		if (!leaf) { return ''; }
+		if (!leaf) { return; }
 		m = /^([\s\S]*?\S)\s*\(([^()]+)\)\s*$/.exec(leaf.nodeValue);
-		if (!m) { return ''; }
-		leaf.nodeValue = m[1] + ' ';
-		return m[2];
+		if (!m) { return; }
+		sy = /^([\s\S]*?\S)\s*[,\uFF0C\u060C]\s*(\S{1,3})$/.exec(m[1]);
+		frag = document.createDocumentFragment();
+		lpnRichInto(frag, sy ? lpnLabelWithUnit(sy[1], m[2], sy[2]) : lpnLabelWithUnit(m[1], m[2]));
+		leaf.parentNode.replaceChild(frag, leaf);
 	}
 	// The words of every `?` name are clipped; the `?` itself never is.
 	function gpClipWords(nameEl) {
@@ -70326,7 +70400,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// One `<label>` into four cells: gutter, name, value, unit (and whatever trailed it).
 	function gpRow(label, gut) {
 		var kids = Array.prototype.slice.call(label.childNodes), i, k, ctrl = null, ctrlAt = -1, nameNodes = [], trail = [],
-			value, nameEl, unitEl, unitText = '', boxFirst, extra = [], kind = 'control', firstName = -1, cell;
+			value, nameEl, boxFirst, extra = [], kind = 'control', firstName = -1;
 		for (i = 0; i < kids.length; i++) {
 			k = kids[i];
 			if (k.nodeType === 1 && k.nodeName === 'DATALIST') { extra.push(k); continue; }
@@ -70353,28 +70427,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		nameNodes.forEach(function (n) { nameEl.appendChild(n); });
 		gpClipWords(nameEl);
 		if (ctrl && !boxFirst && (kind === 'read' || ctrl.type === 'number' || ctrl.type === 'text' || ctrl.nodeName === 'SELECT')) {
-			// Only a quantity has a unit column; a choice's parenthesis is its own words ("Check valve (CV)").
-			if (ctrl.nodeName !== 'SELECT') { unitText = gpTakeUnit(nameEl); }
+			// Only a quantity states a unit; a choice's parenthesis is its own words ("Check valve (CV)").
+			if (ctrl.nodeName !== 'SELECT') { gpTemplateUnit(nameEl); }
 		}
-		unitEl = gpCell('span', 'lpn-gunit');
-		if (unitText) {
-			cell = gpCell('span', 'lpn-gutext');
-			cell.textContent = unitText;
-			unitEl.appendChild(cell);
-		}
-		trail.forEach(function (n) { if (n.nodeType === 3 && !/\S/.test(n.nodeValue)) { return; } unitEl.appendChild(n); });
+		label.__gtrail = trail.filter(function (n) { return !(n.nodeType === 3 && !/\S/.test(n.nodeValue)); });
 		while (label.firstChild) { label.removeChild(label.firstChild); }
 		label.className = (label.className ? label.className + ' ' : '') + 'lpn-grow';
 		label.appendChild(gut);
 		label.appendChild(nameEl);
 		if (ctrl) { gpSizeControl(ctrl, kind); label.appendChild(ctrl); }
 		else { label.appendChild(gpCell('span', 'lpn-gval')); }
-		label.appendChild(unitEl);
 		extra.forEach(function (d) { label.appendChild(d); });
 		return label;
 	}
 	function lpnPropsGrid(fields) {
 		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null, nm;
+		// What stands after a row's control (a link, a button, a word) goes on a line of its own under the row,
+		// from the value column: the row has a label and a value and no third cell.
+		function trailOf(row) {
+			if (!row.__gtrailBlock) {
+				row.__gtrailBlock = gpCell('div', 'lpn-gspan3 lpn-gbtns lpn-gtrail');
+				fields.insertBefore(row.__gtrailBlock, row.nextSibling);
+			}
+			return row.__gtrailBlock;
+		}
 		if (!fields || typeof document === 'undefined' || typeof document.createRange !== 'function') { return; }
 		if ((' ' + fields.className + ' ').indexOf(' lpn-gprops ') < 0) { fields.className = (fields.className ? fields.className + ' ' : '') + 'lpn-gprops'; }
 		kids = Array.prototype.slice.call(fields.childNodes);
@@ -70399,14 +70475,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (k.nodeType === 1 && c.indexOf(' lpn-ovm ') >= 0) { gut = k; fields.removeChild(k); continue; }
 			if (k.nodeType === 1 && k.nodeName === 'LABEL') {
 				endLoose();
-				if (last && !gut) {
-					// "Auto" beside Length: its box and words go into the row's last cell, not a label inside a label.
-					cell = gpCell('span', 'lpn-gauto');
-					while (k.firstChild) { cell.appendChild(k.firstChild); }
-					last.querySelector('.lpn-gunit').appendChild(cell);
-					fields.removeChild(k);
-					continue;
-				}
 				if (c.indexOf(' lpn-fill-row ') >= 0) {
 					// The Text's words: the box's own title above says what it is, and the box spans the
 					// grid after the gutter (Tom, 2026-10-15: it fills the Properties box and follows it).
@@ -70418,6 +70486,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				gpRow(k, gutterCell());
 				last = k;
+				if (k.__gtrail && k.__gtrail.length) { k.__gtrail.forEach(function (n) { trailOf(k).appendChild(n); }); }
 				continue;
 			}
 			if (k.nodeType === 1 && LPN_GP_BLOCK.test(k.nodeName)) {
@@ -70430,15 +70499,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			// A loose link or word after a row belongs to that row (the library link beside a curve);
 			// a button goes on a line of its own under it, so two long button words cannot stretch the box.
-			if (last && k.nodeType === 1 && k.nodeName === 'BUTTON') {
-				if (!btns) {
-					btns = gpCell('div', 'lpn-gspan3 lpn-gbtns');
-					fields.insertBefore(btns, last.nextSibling);
-				}
-				btns.appendChild(k);
-				continue;
-			}
-			if (last) { last.querySelector('.lpn-gunit').appendChild(k); continue; }
+			if (last) { trailOf(last).appendChild(k); continue; }
 			if (!loose) {
 				// Buttons stand in the value track, as a button does in every row; words span the grid.
 				loose = gpCell('div', k.nodeType === 1 && k.nodeName === 'BUTTON' ? 'lpn-gspan3 lpn-gbtns lpn-gloose' : 'lpn-gspan lpn-gloose');
@@ -70447,6 +70508,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			loose.appendChild(k);
 		}
 		if (gut) { gut = null; }
+		if (fields.id === 'lpn_popup_fields' && fields.parentNode) {
+			// The box's body owns the tracks: it gets the Label | Value header and the remembered or fitted width.
+			nm = fields.parentNode;
+			nm.setAttribute('data-gcols-id', 'lpn_popup');
+			gcolApply(nm);
+			gridHeaderEnsure(nm);
+			gridFitSoon(nm);
+			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
+				nm.__lpnRO = true;
+				new ResizeObserver(function () { gridFitSoon(nm); }).observe(nm);
+			}
+		}
 	}
 	function tipsIn(root) {
 		initTipsIn(root);
@@ -71265,9 +71338,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')', pc.lpn_field_length_slope_tip);
 		label.appendChild(input);
 		valueWarnPaint(label, valueWarnText('length', l, effective(l, 'length')));   // dev/value-warning.md
+		// Auto length is its own row above Length, its toggle in the value column (Tom, 2026-10-26: the toggle
+		// beside Length broke the table).
+		setFieldLabel(autoLabel, pc.lpn_field_auto_length || 'Auto length');
 		autoLabel.appendChild(auto);
-		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
-		fields.appendChild(label); fields.appendChild(autoLabel);
+		fields.appendChild(autoLabel);
+		fields.appendChild(document.createElement('br'));
+		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'length');
 	}
@@ -73141,6 +73218,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			missing.selected = true;
 			sel.appendChild(missing);
 		}
+		addEditOption(sel, pc.lpn_edit_pipetypes || 'Edit types…', 'pipetypes');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setPipeType(l, sel.value || null);
@@ -73151,7 +73229,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, pc.lpn_field_pipetype || 'Pipe type', pc.lpn_field_pipetype_tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(pipeTypeLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'typeId');
 		if (elementPipeType(l)) { pipeTypeDetachButton(fields, l); }
@@ -73179,6 +73256,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			fields.appendChild(document.createElement('br'));
 			return;
 		}
+		addEditOption(sel, pc.lpn_edit_fittings || 'Edit fittings…', 'fittings');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setProp(l, 'fittingsId', sel.value || null);
@@ -73189,30 +73267,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, pc.lpn_field_fittings || 'Fittings list', pc.lpn_field_fittings_tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(fittingsLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'fittingsId');
 	}
-	function fittingsLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_library_fittings || 'Fittings', function () {
-				openLibrarySection('fittings');
-			}, pc.lpn_library_fittings_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap -- see curveLibraryLink().
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
-	}
-	function pipeTypeLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_library_pipetypes || 'Pipe types', function () {
-				openLibrarySection('pipetypes');
-			}, pc.lpn_library_pipetypes_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap -- see curveLibraryLink(), where the same line is the
-		// difference between a readable tip and one no touch screen can get at.
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
+	// The last option of a Library chooser opens the Libraries box on its section, and the pull-down
+	// goes back to what it held (Tom, 2026-10-26: it replaces the "Pipe types" and "Fittings" links).
+	// Registered BEFORE the chooser's own change handler, which it stops for this one value.
+	function addEditOption(sel, text, section) {
+		var o = document.createElement('option'), prev = sel.value;
+		o.value = '__edit__';
+		o.textContent = text;
+		sel.appendChild(o);
+		sel.addEventListener('change', function (e) {
+			if (sel.value !== '__edit__') { prev = sel.value; return; }
+			if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); }
+			sel.value = prev;
+			openLibrarySection(section);
+		});
+		return o;
 	}
 	// **DETACH, AND IT IS A BUTTON RATHER THAN A BLANK OPTION IN THE SELECTOR.** Choosing "No pipe
 	// type" and detaching are two different actions and only one of them keeps the numbers: the

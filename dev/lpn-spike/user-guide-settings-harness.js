@@ -87,7 +87,7 @@ async function main() {
 		const diameter = async () => {
 			await U.openProperties(ctx, 'link', '10');
 			await settle(500);
-			const v = await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf('Diameter') === 0)[0]; const n = l.querySelector('.lpn-gname'), u = l.querySelector('.lpn-gutext'); return { label: (n ? n.textContent + (u ? '(' + u.textContent + ')' : '') : l.textContent).replace(/\s+/g, ' ').trim(), value: l.querySelector('input').value }; });
+			const v = await P.evaluate(() => { const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.textContent.replace(/\s+/g, ' ').trim().indexOf('Diameter') === 0)[0]; const n = l.querySelector('.lpn-gname'); return { label: (n ? n.textContent : l.textContent).replace(/\s+/g, ' ').trim(), value: l.querySelector('input').value }; });
 			await closePopup();
 			return v;
 		};

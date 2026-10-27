@@ -38,17 +38,16 @@ function ok(label, cond, detail) {
 // The report buttons belong to another branch (Download CSV, Copy, Print report): not audited here.
 const REPORT_BTNS = '.lpn-ff-buttons:not(:has(> .lpn-ff-run, > .lpn-ff-stopbtn)), .lpn-box-tools';
 
-// One set of columns: the x of the name, value and unit cells of every row, over the whole box.
+// One set of columns: the x of the label and value cells of every row, over the whole box.
 function columns(page, root) {
 	return page.evaluate((sel) => {
 		const R = document.querySelector(sel), x = (e) => Math.round(e.getBoundingClientRect().left);
-		const rows = Array.from(R.querySelectorAll('.lpn-grow')).filter((r) => r.children.length >= 3 && r.getBoundingClientRect().height > 0 || (r.children[0] && r.children[0].getBoundingClientRect().width > 0));
 		const vis = (e) => e && e.getBoundingClientRect().width > 0;
+		const rows = Array.from(R.querySelectorAll('.lpn-grow')).filter((r) => vis(r.querySelector('.lpn-gname')));
 		return {
 			rows: rows.length,
-			name: Array.from(new Set(rows.map((r) => r.children[1] && r.children[0].classList.contains('lpn-ggut') ? x(r.children[1]) : x(r.children[0])))),
-			val: Array.from(new Set(rows.filter((r) => vis(r.children[1])).map((r) => x(r.querySelector('.lpn-gval') || r.children[1])))),
-			unit: Array.from(new Set(rows.map((r) => r.querySelector('.lpn-gunit')).filter(vis).map(x)))
+			name: Array.from(new Set(rows.map((r) => x(r.querySelector('.lpn-gname'))))),
+			val: Array.from(new Set(rows.filter((r) => vis(r.querySelector('.lpn-gval'))).map((r) => x(r.querySelector('.lpn-gval')))))
 		};
 	}, root);
 }
@@ -89,7 +88,7 @@ async function main() {
 			if (id === 'lpn_scncmp_box') { await a.settle(1500); }
 			const m = await auditBox(a.page, { root, skip: [REPORT_BTNS], noControls, wrapOk }, ok, name);
 			const c = await columns(a.page, root);
-			ok(name + ': one set of columns (one name x, one value x, one unit x)', c.name.length <= 1 && c.val.length <= 1 && c.unit.length <= 1, JSON.stringify(c));
+			ok(name + ': one set of columns (one label x, one value x)', c.name.length <= 1 && c.val.length <= 1, JSON.stringify(c));
 			ok(name + ': it has rows', c.rows >= 1, String(c.rows));
 			await shot(a, '#' + id, name);
 			await close(id);
@@ -114,7 +113,7 @@ async function main() {
 		await a.settle(600);
 		await auditBox(a.page, { root: '#lpn_new_body' }, ok, 'new project');
 		const nc = await columns(a.page, '#lpn_new_body');
-		ok('new project: one set of columns', nc.name.length <= 1 && nc.val.length <= 1 && nc.unit.length <= 1, JSON.stringify(nc));
+		ok('new project: one set of columns', nc.name.length <= 1 && nc.val.length <= 1, JSON.stringify(nc));
 		await shot(a, '#lpn_new_panel', 'newproject');
 		await a.page.click('#lpn_new_cancel').catch(() => {});
 		await a.settle(300);

@@ -9,8 +9,8 @@
 //      +-2 px), except a control in a unit cell, a table's own, the report buttons another branch owns,
 //      and a control named in `skip`;
 //   2. every name starts at the one name x (+-2 px);
-//   3. no name is ellipsised (scrollWidth > clientWidth, or text-overflow: ellipsis in force) and none
-//      is wrapped (taller than one line) in English;
+//   3. no name is ellipsised (scrollWidth > clientWidth, or text-overflow: ellipsis in force). A name
+//      may wrap (Tom, 2026-10-26: "wrap, even mid-word, is fine"); it is never cut;
 //   4. number boxes that hold the same number of digits share one width (+-1 px);
 //   5. the box does not scroll sideways.
 'use strict';
@@ -37,10 +37,13 @@ function auditInPage(spec) {
 	const names = Array.from(root.querySelectorAll('.lpn-gname')).filter(vis).filter((e) => !(skip && e.closest(skip)));
 	const vals = Array.from(root.querySelectorAll('.lpn-gval')).filter(vis).filter((e) => !(skip && e.closest(skip)));
 	const nameX = mode(names.map((e) => R(e).left)), valX = mode(vals.map((e) => R(e).left));
+	// The Value cell's left edge is the right edge of the Label cell; a control stands inside it, up to its own
+	// margin (8 px) from that edge, and a run of buttons at it.
+	const cellX = mode(names.map((e) => R(e).right));
 	// Every control a person can put a hand on.
 	const ctrls = Array.from(root.querySelectorAll('input, select, textarea, button')).filter(vis).filter((e) => {
 		if (e.type === 'hidden') { return false; }
-		if (e.closest('.lpn-gunit, .lpn-gsplit, table, .lpn-box-tools, .lpn-popover-x, .lpn-ovm, .lpn-corner-btn, .lpn-setbox-title, .lpn-pgraph-chart, canvas, svg')) { return false; }
+		if (e.closest('.lpn-gsplit, table, .lpn-box-tools, .lpn-popover-x, .lpn-ovm, .lpn-corner-btn, .lpn-setbox-title, .lpn-pgraph-chart, canvas, svg')) { return false; }
 		if (skip && e.closest(skip)) { return false; }
 		return true;
 	});
@@ -53,9 +56,9 @@ function auditInPage(spec) {
 	// at the name column instead; it is checked there.
 	const spans = (e) => !!e.closest('.lpn-gspan, .lpn-gspan2') || e.classList.contains('lpn-gspan2');
 	const offSpan = ctrls.filter((e) => spans(e) && Math.abs(R(e).left - nameX) > 2).map((e) => 'span ' + (e.className || e.nodeName) + '@' + Math.round(R(e).left - nameX));
-	const offGrid = offSpan.concat(ctrls.filter((e) => !spans(e) && !lead(e) && Math.abs(R(e).left - valX) > 2).map((e) =>
-		(e.id || e.getAttribute('aria-label') || e.className || e.nodeName) + '@' + Math.round(R(e).left - valX)))
-		.concat(groups.filter((g) => Math.abs(R(g).left - valX) > 2).map((g) => 'group ' + g.className + '@' + Math.round(R(g).left - valX)));
+	const offGrid = offSpan.concat(ctrls.filter((e) => !spans(e) && !lead(e) && (R(e).left - cellX < -2 || R(e).left - cellX > 8)).map((e) =>
+		(e.id || e.getAttribute('aria-label') || e.className || e.nodeName) + '@' + Math.round(R(e).left - cellX)))
+		.concat(groups.filter((g) => (R(g).left - cellX < -2 || R(g).left - cellX > 8)).map((g) => 'group ' + g.className + '@' + Math.round(R(g).left - cellX)));
 	const offName = names.filter((e) => Math.abs(R(e).left - nameX) > 2).map((e) => e.textContent.trim().slice(0, 24) + '@' + Math.round(R(e).left - nameX));
 	const ellipsis = [], wrapped = [];
 	names.forEach((e) => {
@@ -87,7 +90,6 @@ async function auditBox(page, spec, ok, tag) {
 	ok(tag + ': every visible control stands in the value column', m.offGrid.length === 0, JSON.stringify(m.offGrid));
 	ok(tag + ': every name starts at one x', m.offName.length === 0, JSON.stringify(m.offName));
 	ok(tag + ': no name is ellipsised', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
-	ok(tag + ': no name is wrapped', m.wrapped.length === 0, JSON.stringify(m.wrapped));
 	ok(tag + ': like number boxes share a width', m.unlike.length === 0, JSON.stringify(m.unlike));
 	ok(tag + ': the value stands beside its name, not under it', m.beside >= 20, String(m.beside));
 	ok(tag + ': does not scroll sideways', m.scroll <= 1, String(m.scroll));
@@ -95,9 +97,9 @@ async function auditBox(page, spec, ok, tag) {
 }
 
 // THE PHONE (390 x 844). Tom 2026-10-25, of the first pass: a box that does not scroll sideways can still be
-// unusable: a Description 30 px wide, a pull-down showing one letter, a unit printed over its number, a name
+// unusable: a Description 30 px wide, a pull-down showing one letter, a name
 // one character a line. Here every visible control is a usable width, none is cut by the box's right edge,
-// no unit overlaps its control, and no name or unit wraps to one character a line.
+// and no name wraps to one character a line.
 function phoneInPage(spec) {
 	const root = document.querySelector(spec.root);
 	if (!root) { return { missing: true }; }
@@ -115,20 +117,13 @@ function phoneInPage(spec) {
 		return e.tagName === 'SELECT' ? w < 6 * em(e) : w < (e.classList.contains('lpn-gw-num') ? 2.8 : 4) * em(e);
 	}).map((e) => (e.id || e.className || e.tagName) + ':' + Math.round(R(e).width));
 	const clipped = ctrls.filter((e) => R(e).right > edge - 1).map((e) => (e.id || e.className || e.tagName) + ':' + Math.round(R(e).right - edge));
-	const overlap = [];
-	Array.from(root.querySelectorAll('.lpn-grow')).forEach((row) => {
-		const u = row.querySelector('.lpn-gunit'), c = row.querySelector('input, select, textarea');
-		if (!u || !c || !vis(u) || !vis(c) || !u.textContent.trim()) { return; }
-		const a = R(u), b = R(c), x = Math.min(a.right, b.right) - Math.max(a.left, b.left), y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-		if (x > 1 && y > 1) { overlap.push(u.textContent.trim().slice(0, 12)); }
-	});
-	const oneChar = Array.from(root.querySelectorAll('.lpn-gname, .lpn-gunit, .lpn-gspan, .lpn-ff-note, p')).filter(vis).filter((e) => {
+	const oneChar = Array.from(root.querySelectorAll('.lpn-gname, .lpn-gspan, .lpn-ff-note, p')).filter(vis).filter((e) => {
 		const t = e.textContent.trim(); if (t.length < 4) { return false; }
 		const lh = (parseFloat(getComputedStyle(e).lineHeight) || em(e) * 1.25);
 		const lines = R(e).height / lh;
 		return (lines >= 3 && lines > t.length * 0.5) || (R(e).width < 1.2 * em(e) && lines >= 2);
 	}).map((e) => e.textContent.trim().slice(0, 16));
-	return { tooNarrow, clipped, overlap, oneChar, n: ctrls.length, scroll: root.scrollWidth - root.clientWidth };
+	return { tooNarrow, clipped, oneChar, n: ctrls.length, scroll: root.scrollWidth - root.clientWidth };
 }
 async function auditPhone(page, spec, ok, tag) {
 	const m = await page.evaluate(phoneInPage, spec);
@@ -136,7 +131,6 @@ async function auditPhone(page, spec, ok, tag) {
 	if (m.missing) { return m; }
 	ok(tag + ' (phone): every control is a usable width', m.tooNarrow.length === 0, JSON.stringify(m.tooNarrow));
 	ok(tag + ' (phone): nothing is cut by the right edge', m.clipped.length === 0, JSON.stringify(m.clipped));
-	ok(tag + ' (phone): no unit overlaps its box', m.overlap.length === 0, JSON.stringify(m.overlap));
 	ok(tag + ' (phone): no name or unit wraps to a character a line', m.oneChar.length === 0, JSON.stringify(m.oneChar));
 	ok(tag + ' (phone): no sideways scroll', m.scroll <= 1, String(m.scroll));
 	return m;

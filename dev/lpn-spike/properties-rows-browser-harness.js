@@ -83,7 +83,7 @@ async function main() {
 			const rows = Array.from(f.children).filter((c) => c.nodeName === 'LABEL' && c.querySelector('.lpn-gname'));
 			const off = Array.from(f.children).filter((c) => {
 				const cs = getComputedStyle(c), k = c.className || '';
-				return !(cs.display === 'contents' || cs.display === 'none' || /lpn-gspan/.test(k) || /lpn-ggut/.test(k));
+				return !(cs.display === 'contents' || cs.display === 'none' || (cs.display === 'grid' && /lpn-grow/.test(k)) || /lpn-gspan/.test(k) || /lpn-ggut/.test(k));
 			}).map((c) => c.nodeName + '.' + c.className);
 			const first = (sel) => rows.map((r) => r.querySelector(sel)).filter(Boolean);
 			const w = (prop) => { const i = f.querySelector('input[data-gprop="' + prop + '"]'); return i ? Math.round(R(i).width) : null; };
@@ -93,8 +93,10 @@ async function main() {
 				rows: rows.length, names: first('.lpn-gname').map((e) => R(e).left), vals: first('.lpn-gval').map((e) => R(e).left).filter((x) => x > 0),
 				off, scroll: f.scrollWidth - f.clientWidth, w: { k: w('k'), diameter: w('diameter'), roughness: w('roughness'), length: w('length') },
 				marks: marks.length, marksInGutter: marks.filter((e) => e.closest('.lpn-ggut')).length,
-				gutterW: Math.round(R(f.querySelector('.lpn-ggut') || f).width), paren: first('.lpn-gname').filter((e) => !e.closest('label').querySelector('input[type=checkbox]')).filter((e) => / \([^)]*\)\s*$/.test(e.textContent.replace(/\?\s*$/, '').trim())).map((e) => e.textContent.trim()),
-				units: first('.lpn-gunit').filter((e) => e.textContent.trim()).length
+				gutterW: Math.round(R(f.querySelector('.lpn-ggut') || f).width),
+				// The unit stands in its label, in <bdi>; no row has a third cell.
+				bdi: first('.lpn-gname').filter((e) => e.querySelector('bdi')).length,
+				thirdCell: rows.filter((r) => r.querySelector('.lpn-gunit')).length
 			};
 		});
 		if (phone) {
@@ -134,10 +136,10 @@ async function main() {
 		ok(tag + 'the box does not scroll sideways', m.scroll <= 1, String(m.scroll));
 		ok(tag + 'every override marker is in a gutter cell', m.marks === m.marksInGutter, m.marksInGutter + '/' + m.marks);
 		if (!scn && m.marks === 0) { ok(tag + 'no marker, no gutter', m.gutterW === 0, String(m.gutterW)); }
-		ok(tag + 'no name still carries its unit in brackets', m.paren.length === 0, JSON.stringify(m.paren));
+		ok(tag + 'no row has a third (unit) cell', m.thirdCell === 0, String(m.thirdCell));
 		if (name === 'pipe') {
 			ok(tag + 'Minor loss 5 < Diameter 6 < Roughness 7 < Length 8 digits wide', m.w.k < m.w.diameter && m.w.diameter < m.w.roughness && m.w.roughness < m.w.length, JSON.stringify(m.w));
-			ok(tag + 'units have their own column (diameter, length, ...)', m.units >= 2, String(m.units));
+			ok(tag + 'units stand in the labels, in <bdi> (Diameter (in), Length (ft), ...)', m.bdi >= 2, String(m.bdi));
 		}
 		await a.close();
 	}

@@ -3742,82 +3742,99 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-namemax: 11rem; --lpn-g-valmax: 9.5rem; }   /* a box of fixed width: a longer name wraps at a space, never widens it */
 .lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }
-/* ==== THE STANDARD BOX ROW (Task 828; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
-   One grid, name | value | unit, built by lpnGridRow() in js/looped-network.js. The NAME track hugs
-   its widest label up to a ceiling (the ceiling is Settings' own lesson: a `1fr` name takes every
-   pixel the box is widened by and strands the control at the far edge). THE CEILING IS HIGH ENOUGH
-   THAT NO ENGLISH NAME REACHES IT (Tom, 2026-10-25: "Average Chlorine concentr..." was cut with
-   300 px of the box empty): a name is never ellipsised, and wraps at a space only when the ceiling
-   itself is met. The VALUE track hugs its
-   widest control, up to --lpn-g-valmax, so no box carries a column wider than what is in it. The
-   UNIT track takes what is left, and is empty on a unitless row. A drag of the split writes
-   --lpn-g-name on the host only (remembered in `lpn_gcols`); double-click resets it. The host is
-   the size container, because a grid cannot query its own width. */
+/* ==== THE SPREADSHEET BOX ROW (Task 828; Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET
+   and WaterGEMS"; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
+   One grid of two columns, Label | Value, built by lpnGridRow() in js/looped-network.js. A unit is
+   part of its Label ("Diameter (mm)"), so there is no third column. A header row names the two
+   columns and carries the divider the reader drags (--lpn-g-name on the host, remembered per box in
+   `lpn_gcols`). The Label column is FITTED to the 90th percentile of its labels' natural widths, so
+   one long label wraps (even mid-word) instead of widening the column for all the rest; the Value
+   column takes what is left and its controls hug the Label column's edge. Gridlines are
+   --ec-border-strong, the header's fill --ec-chrome-bg. The host is the grid and every run of rows in it
+   is a subgrid of it, so a heading, a note or a button row between two rows never starts a second
+   set of columns. A phone (or a host under 18 rem) stacks each Label above its Value and drops the
+   header and the lines. */
 .lpn-gridhost { }
-/* ONE GRID PER BOX (Tom, 2026-10-25: "Demand scaling has two grids in one box"). The HOST is the grid
-   that owns the three tracks; every run of rows inside it is a subgrid of it, so a heading, a note or a
-   button row between two rows never starts a second set of columns. Anything else a caller puts in
-   the host spans the grid. The unit track takes what is left, so a table or a sentence that spans
-   asks for no width of its own. */
 @supports (grid-template-columns: subgrid) {
 	.lpn-gridhost {
-		display: grid; align-content: start; column-gap: var(--lpn-g-gap, 6px); row-gap: 0;
-		grid-template-columns: var(--lpn-g-name, max-content) max-content minmax(0, 1fr);
+		display: grid; align-content: start; column-gap: 0; row-gap: 0;
+		grid-template-columns: var(--lpn-g-name, max-content) minmax(max-content, 1fr);
 	}
 	.lpn-gridhost > * { grid-column: 1 / -1; min-width: 0; }
-	/* A box of fixed width (Contour, docked at the 20 rem floor on Tom's word) lets a name wrap at a space
-	   and a pull-down shrink before it lets the box scroll sideways. */
-	.lpn-contourbox .lpn-gridhost { grid-template-columns: minmax(min-content, max-content) minmax(min-content, max-content) minmax(max-content, 1fr); }
 	.lpn-gridhost > .lpn-grid { display: grid; grid-template-columns: subgrid; }
-	.lpn-gridhost.lpn-gnarrow { grid-template-columns: max-content auto; }
+	.lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 	.lpn-gsub { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > * { grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	/* What stands in the value column when it is not a row's control: a button row, a lone button, a run of ticks. */
 	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: start; }
+	/* The header row. */
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-ghdr {
+		display: grid; grid-template-columns: subgrid; align-items: stretch;
+		box-shadow: inset 0 0 0 1px var(--ec-border-strong); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
+	}
+	/* A row: a subgrid of the host's two tracks, ruled below and at both sides. */
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow:not(.lpn-gspan-row) {
+		display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
+		box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);   /* a rule, not a border: a border on a subgrid widens the host's tracks */
+	}
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grid { margin: 0; row-gap: 0; }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-border-strong); }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gval { margin: 2px 6px; align-self: start; }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gw-read,
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
 }
+/* A box that wraps its content is no narrower than a Label column and a Value column need. */
+#lpn_new_panel { min-width: min(26rem, 94vw); }
+.lpn-ghdr { display: none; }
+.lpn-ghcell { position: relative; min-width: 0; padding: 3px 6px; }
+.lpn-ghlabel { border-inline-end: 1px solid var(--ec-border-strong); }
+.lpn-propbox .lpn-ghdr > .lpn-ghlabel { grid-column: 2; }
+.lpn-propbox .lpn-ghdr > .lpn-ghvalue { grid-column: 3; }
 .lpn-grid {
 	position: relative; display: grid; align-items: baseline; justify-content: start; margin: 3px 0;
-	grid-template-columns: var(--lpn-g-name, max-content) max-content auto;
+	grid-template-columns: var(--lpn-g-name, max-content) minmax(0, 1fr);
 	gap: var(--lpn-g-rowgap, 6px) var(--lpn-g-gap, 6px);
 }
+.lpn-gplain.lpn-gridhost { column-gap: 6px; }
+.lpn-gplain .lpn-grid { row-gap: 6px; }
 .lpn-grow, .lpn-gspan-row { display: contents; }
 .lpn-grow > * { min-width: 0; }
-/* ONE LINE, TRUNCATED: a row keeps its height, so a column reads as a column. The words are clipped
-   and the `?` (the tip's target) is not. */
-.lpn-gname { min-width: 0; max-width: var(--lpn-g-namemax, 24rem); overflow-wrap: normal; font-size: .85em; opacity: .8; }
+/* A label wraps at a space, and mid-word when a word is longer than the column (Tom, 2026-10-26: wrap,
+   even mid-word, is fine). The words and the `?` (the tip's target) stay together. */
+.lpn-gname { min-width: 0; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
 .lpn-gname.ec-help { display: flex; align-items: baseline; gap: .25em; }
 .lpn-gname .lpn-gtext { min-width: 0; }
 .lpn-gname .ec-tip { flex: 0 0 auto; }
 .lpn-gval, .lpn-grow > :nth-child(2):not(.lpn-gname) { justify-self: start; max-width: var(--lpn-g-valmax, 17rem); }
-.lpn-gunit { font-size: .85em; opacity: .8; white-space: nowrap; }
+/* A control of one Value cell with something beside it: a radio and its button (New project). */
+.lpn-gwrap { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 6px; }
+.lpn-gwrap .lpn-gval { margin: 0; }
 /* A number box is as wide as the digits it can hold: --d, set by the build from `digits` or a limit. */
 .lpn-gw-num { width: calc(var(--d, 7) * 1ch + 1.5em); box-sizing: border-box; text-align: right; font-variant-numeric: tabular-nums; }
 .lpn-gw-fill { width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; }
 .lpn-gw-read { overflow-wrap: anywhere; }
 .lpn-grow > .lpn-ramp-picker { width: 100%; min-width: 8rem; }
 .lpn-gspan, .lpn-ghead { grid-column: 1 / -1; min-width: 0; }
-.lpn-gspan.lpn-gunit { margin-top: -4px; }
 .lpn-ghead { font-weight: bold; margin-top: 10px; }
-.lpn-gsplit { position: absolute; top: 0; bottom: 0; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
+/* The divider: the right edge of the Label header cell, six pixels wide so it can be picked up. */
+.lpn-gsplit { position: absolute; top: 0; bottom: 0; inset-inline-end: -3px; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
 .lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: var(--ec-select); opacity: .35; outline: none; }
 /* ==== THE PROPERTIES BOX'S ROWS (Task 828): the same grid, with a gutter for the override marker.
-   `fields` is the grid and each <label> a `display: contents` row of four cells (gutter, name, value,
-   unit), built by lpnPropsGrid(). The gutter track is nothing until a scenario holds a marker. A
-   block (a table, a note, a list) spans the grid; a spanning block asks for no width of its own, so
-   a long sentence cannot stretch the box. */
+   `fields` is the grid and each <label> a row of three cells (gutter, label, value), built by
+   lpnPropsGrid(). The gutter track is nothing until a scenario holds a marker. A block (a table, a
+   note, a list) spans the grid; a spanning block asks for no width of its own, so a long sentence
+   cannot stretch the box. */
 .lpn-gprops {
-	display: grid; align-items: baseline; justify-content: start; row-gap: 4px; column-gap: 0;
-	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) max-content minmax(max-content, 1fr);
+	display: grid; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
+	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut { --lpn-g-gutw: 1.9em; padding-inline-start: 0; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; padding-inline-start: 0; }
 .lpn-gprops > br { display: none; }
 .lpn-gprops .lpn-grow > * { min-width: 0; }
-.lpn-gprops .lpn-gname { margin-inline-end: 6px; }
-.lpn-gprops .lpn-gname .ec-help { display: flex; align-items: baseline; gap: .25em; min-width: 0; }
-.lpn-gprops .lpn-gval { margin-inline-end: 6px; }
-.lpn-gprops .lpn-gunit { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px .5em; opacity: 1; font-size: 1em; }
+.lpn-gprops .lpn-gname .ec-help { display: inline-flex; align-items: baseline; gap: .25em; min-width: 0; max-width: 100%; }
 .lpn-gprops .lpn-gutext { font-size: .85em; opacity: .8; }
 .lpn-gprops .lpn-ggut { display: block; }
 .lpn-gprops .lpn-ggut .lpn-ovm { position: static; margin: 0; }
@@ -3830,7 +3847,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gprops > table.lpn-gspan3 { width: 100%; }
 .lpn-gprops > .lpn-gspan3 { grid-column: 3 / -1; min-width: 0; contain: inline-size; }
 .lpn-gprops .lpn-gbtns button { white-space: normal; text-align: start; }
-.lpn-gprops .lpn-gbtns .lpn-pane-goto { margin-inline-start: 0; line-height: 1.3; color: var(--ec-accent); text-decoration: underline; }
 .lpn-gprops .lpn-gname:has(> a) { display: flex; align-items: baseline; gap: .25em; }
 .lpn-gprops > .lpn-ov-note { margin-inline-start: 0; }
 .lpn-gprops > .lpn-gloose > * + * { margin-inline-start: .4em; }
@@ -3838,12 +3854,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gprops textarea.lpn-gw-fill { width: 100%; max-width: var(--lpn-g-valmax, 17rem); box-sizing: border-box; }
 /* THE WHOLE PROPERTIES BOX IS ONE GRID (Task 828, Tom 2026-10-25: the ID row, a Text's words, the
    buttons and the Time series row stood outside the grid and were the first ragged thing seen).
-   The box's body owns the four tracks; the ID line, the rows and the Time series row are subgrids
-   of it, so every one of them reads the same name, value and unit x. */
+   The box's body owns the three tracks; the header, the ID line, the rows and the Time series row are
+   subgrids of it, so every one of them reads the same label and value x. */
 @supports (grid-template-columns: subgrid) {
 	.lpn-propbox .lpn-popover-body {
-		display: grid; align-content: start; justify-content: start; align-items: baseline; column-gap: 0; row-gap: 4px;
-		grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) max-content minmax(max-content, 1fr);
+		display: grid; align-content: start; justify-content: start; align-items: start; column-gap: 0; row-gap: 0;
+		grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
 	}
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut { --lpn-g-gutw: 1.9em; }
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; }
@@ -3851,24 +3867,45 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	.lpn-propbox .lpn-popover-body > #lpn_popup_fields.lpn-gprops,
 	.lpn-propbox .lpn-popover-body > #lpn_popup_title.lpn-gtitle-id,
 	.lpn-propbox .lpn-popover-body > #lpn_popup_graph { display: grid; grid-template-columns: subgrid; column-gap: 0; }
-	.lpn-propbox .lpn-popover-body > #lpn_popup_title.lpn-gtitle-id { align-items: baseline; }
-	#lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2; margin-inline-end: 6px; }
+	.lpn-propbox .lpn-popover-body > #lpn_popup_fields.lpn-gprops { row-gap: 0; }
+	.lpn-propbox .lpn-popover-body > #lpn_popup_title.lpn-gtitle-id { align-items: stretch; }
+	#lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2; }
 	#lpn_popup_title.lpn-gtitle-id > input { grid-column: 3; }
 	#lpn_popup_graph .lpn-pgraph-row { display: contents; }
 	#lpn_popup_graph .lpn-pgraph-row > label { grid-column: 2; margin-inline-end: 6px; font-size: .85em; opacity: .8; }
 	#lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; justify-self: start; }
 	#lpn_popup_graph > .lpn-pgraph-chart, #lpn_popup_graph > .lpn-profile-say { grid-column: 1 / -1; }
 }
+/* Spreadsheet look (a box wider than a phone): the header, the ruled rows. */
+@media (min-width: 30.01rem) {
+	@supports (grid-template-columns: subgrid) {
+		.lpn-propbox .lpn-popover-body > .lpn-ghdr {
+			display: grid; grid-template-columns: subgrid; align-items: stretch;
+			box-shadow: inset 0 0 0 1px var(--ec-border-strong); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
+		}
+		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
+			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
+			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);   /* a rule, not a border: a border on a subgrid widens the host's tracks */
+		}
+		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-border-strong); }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gval { margin: 2px 6px; align-self: start; }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname { grid-column: 2; }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
+		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
+		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
+	}
+}
 /* A phone: the name goes above its value (the name track is nothing), as the other boxes' rows do under
-   18rem, so the box is no wider than a phone however long a name is. */
+   18rem, so the box is no wider than a phone however long a name is. No header, no divider. */
 @media (max-width: 30rem) {
 	@supports (grid-template-columns: subgrid) {
-		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr) max-content; }
+		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
 		.lpn-propbox .lpn-gprops .lpn-gw-fill, .lpn-propbox .lpn-gprops .lpn-grow > select, .lpn-propbox .lpn-gprops .lpn-grow > input[type="text"] { width: 100%; max-width: none; min-width: 6em; }
 		.lpn-propbox .lpn-gprops .lpn-gw-num { min-width: 4em; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
-		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gunit { grid-column: 4; }
 		.lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { grid-column: 2 / -1; }
 		.lpn-propbox #lpn_popup_title.lpn-gtitle-id > input { max-width: 100%; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2 / -1; margin-inline-end: 0; }
@@ -3877,16 +3914,15 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	}
 }
 #lpn_popup_title.lpn-gtitle-text, #lpn_popup_title .lpn-gtitle-text { font-weight: bold; }
-/* Narrow: the name goes above its value and the unit stays on the value's line (a container query
-   on the host, as Settings does on its own content). */
-.lpn-gridhost.lpn-gnarrow, .lpn-contourbox .lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr) auto; }
+/* Narrow: the label goes above its value (a container query on the host, as Settings does on its own content). */
+.lpn-gridhost.lpn-gnarrow, .lpn-contourbox .lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 .lpn-gnarrow .lpn-gw-fill { max-width: none; }
 .lpn-gnarrow .lpn-gcol2, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }
 .lpn-gnarrow .lpn-grow > .lpn-gval { max-width: 100%; }
-.lpn-gnarrow > .lpn-grid { grid-template-columns: max-content auto; }
+.lpn-gnarrow > .lpn-grid { grid-template-columns: minmax(0, 1fr); }
 @supports (grid-template-columns: subgrid) { .lpn-gnarrow > .lpn-grid { grid-template-columns: subgrid; } }
 .lpn-gnarrow .lpn-grow > .lpn-gname { grid-column: 1 / -1; }
-.lpn-gnarrow .lpn-gsplit { display: none; }
+.lpn-gnarrow .lpn-ghdr { display: none; }
 /* ==== END: colour by value ================================================================== */
 
 /* The units strip is TWO GROUPS since Task 422: what you enter, and how answers are read. The
