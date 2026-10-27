@@ -67,7 +67,7 @@
 		"entries": [
 			{
 				"file": "js/looped-network.js",
-				"match": "var cell = 'border:1px solid #999|background:#eee;",
+				"match": "cell = 'border:1px solid #999|background:#eee;",
 				"reason": "Copy HTML writes a table for another program's clipboard (a mail, a document), where this page's tokens do not exist: plain grey rules on white, the same in every theme"
 			},
 			{
