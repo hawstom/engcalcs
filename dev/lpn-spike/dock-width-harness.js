@@ -109,14 +109,14 @@ const clipped = (a) => a.page.evaluate(() => {
 // Every label-row column's left and right edge, on every row of each group: the spread of each
 // edge down the group, and a row that sits off the others.
 const labelColumns = (a) => a.page.evaluate(() => ['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_customer_fields'].map((gid) => {
-	// The heading and the field rows: seven children each (name, Before, After, Use units, Decimals,
-	// Show, Drop). A whole-list row under them (the customer label-width limit) is not a column row.
-	const g = document.getElementById(gid), rows = g ? Array.from(g.children).filter((r) => r.getBoundingClientRect().height > 0 && r.children.length === 7) : [];
+	// The heading and the field rows: the name (or the heading's lead) and ONE group of six columns (Before,
+	// After, Use units, Decimals, Show, Drop). A whole-list row under them (the customer label-width limit) is not a column row.
+	const g = document.getElementById(gid), rows = g ? Array.from(g.children).filter((r) => r.getBoundingClientRect().height > 0 && r.children.length === 2 && r.children[1].className === 'lpn-lblgroup') : [];
 	const cols = [];
-	for (let c = 1; c <= 6; c++) {
+	for (let c = 0; c < 6; c++) {
 		const ls = [], rs = [];
 		rows.forEach((r) => {
-			const e = r.children[c];
+			const e = r.children[1].children[c];
 			if (!e) { return; }
 			const b = e.getBoundingClientRect();
 			ls.push([b.left, (r.textContent || '').trim().slice(0, 20) || '(heading)']);
@@ -124,7 +124,7 @@ const labelColumns = (a) => a.page.evaluate(() => ['lpn_labels_node_fields', 'lp
 		});
 		const lmin = Math.min.apply(null, ls.map((x) => x[0])), lmax = Math.max.apply(null, ls.map((x) => x[0]));
 		const odd = ls.find((x) => Math.abs(x[0] - lmin) <= 0.5);
-		cols.push({ c: c + 1, n: ls.length, lspread: lmax - lmin, rspread: Math.max.apply(null, rs) - Math.min.apply(null, rs), odd: odd && odd[1] });
+		cols.push({ c: c + 2, n: ls.length, lspread: lmax - lmin, rspread: Math.max.apply(null, rs) - Math.min.apply(null, rs), odd: odd && odd[1] });
 	}
 	return { gid, rows: rows.length, cols };
 }));
@@ -150,7 +150,7 @@ async function main() {
 	try {
 		console.log('\n--- 1. the label columns line up on every row ---');
 		const s = await visit(Session, browser, 'columns', true);
-		await s.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]');
+		// Settings starts pinned open on a PC (Tom, 2026-10-26): nothing to fly out.
 		await s.settle(500);
 		// Water age as the quality parameter, so every row it adds is drawn and measured.
 		await s.page.evaluate(() => {

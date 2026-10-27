@@ -205,10 +205,10 @@ console.log('== 4. "Use units" defaults to the mark, ticks, disables, follows an
 	// Row 0 is the headings; find a row by its label text.
 	const rowOf = (box, text) => box.children.find((r) => r.children[0] && (r.children[0].textContent || '').indexOf(text) >= 0);
 	const lenRow = rowOf(linkBox, 'Length'), diaRow = rowOf(linkBox, 'Diameter');
-	ok('every field row has seven children: name, Before, After, Use units, Decimals, Show, Drop',
-		linkBox.children.slice(1).every((r) => r.children.length === 7),
+	ok('every field row has the name and ONE group of six controls: Before, After, Use units, Decimals, Show, Drop',
+		linkBox.children.slice(1).every((r) => r.children.length === 2 && r.children[1].children.length === 6),
 		q(linkBox.children.map((r) => r.children.length)));
-	const tickOf = (row) => row && row.children[3].children[0], afterOf = (row) => row && row.children[2];
+	const tickOf = (row) => row && row.children[1].children[2].children[0], afterOf = (row) => row && row.children[1].children[1];
 	let tick = tickOf(lenRow), after = afterOf(lenRow);
 	ok('Length opens UNTICKED in a US project (R-347)', !!tick && tick.type === 'checkbox' && tick.checked === false);
 	ok('its After box shows the foot mark, as ordinary editable text', after && after.value === "'" && after.disabled === false,
@@ -257,7 +257,7 @@ console.log('== 4. "Use units" defaults to the mark, ticks, disables, follows an
 	ok('...while a row it never typed into takes the ticked default',
 		L.ls().useUnits.node.initQuality === true && L.suffixFor('node', 'initQuality') === ' mg/L');
 	L.setQuality(MODES.age);
-	ok('a row with no unit has no tick (ID)', rowOf(linkBox, 'ID') && rowOf(linkBox, 'ID').children[3].children.length === 0);
+	ok('a row with no unit has no tick (ID)', rowOf(linkBox, 'ID') && rowOf(linkBox, 'ID').children[1].children[2].children.length === 0);
 
 	// **AND AN SI PROJECT TICKS BOTH BY DEFAULT** (R-347's "may have intended it for SI"): neither
 	// metres nor millimetres draws a mark of its own, so there is nothing fixed to fall back to.
@@ -313,7 +313,7 @@ console.log('== 5. decimals by unit (R-328) ==');
 	// reinterpretation dialog's Non-destructive and Destructive buttons end in.
 	L.rebuildLabels();
 	const flowBox = () => byId['lpn_labels_link_fields'].children
-		.find((r) => (r.children[0].textContent || '').indexOf('Flow') >= 0).children[4];
+		.find((r) => (r.children[0].textContent || '').indexOf('Flow') >= 0).children[1].children[3];
 	ok('the open panel shows Flow at 1 place', String(flowBox().value) === '1', flowBox().value);
 	L.applyOneUnit('lpn_u_flow', 'mgd');
 	L.afterUnitChange({ lpn_u_flow: 'gpm' });
@@ -360,13 +360,13 @@ console.log('== 6. Settings > Symbology is Node labels, Node colors, Link labels
 	L.buildColoring();
 	[['lpn_labels_node_fields', L.nodeDefs().length], ['lpn_labels_link_fields', L.linkDefs().length],
 		['lpn_labels_customer_fields', L.custDefs().length]].forEach(([id, n]) => {
-		const box = byId[id], fieldRows = box.children.filter((r) => r.children.length === 7);
+		const box = byId[id], fieldRows = box.children.filter((r) => r.children.length === 2 && r.children[1].className === 'lpn-lblgroup');
 		ok(id + ' shows a heading and ' + n + ' rows', fieldRows.length === n + 1, fieldRows.length);
 	});
 	ok('Node colors fills', byId['lpn_set_colors_node'].children.length > 0);
 	ok('Link colors fills', byId['lpn_set_colors_link'].children.length > 0);
-	const headings = byId['lpn_labels_node_fields'].children[0].children.map((c) => c.textContent);
-	ok('the headings name all six columns', q(headings.slice(1)) === q(['Bef.', 'Aft.', 'Use units', '0.000', 'Show', 'Drop']),
+	const headings = byId['lpn_labels_node_fields'].children[0].children[1].children.map((c) => c.textContent);
+	ok('the headings name all six columns', q(headings) === q(['Bef.', 'Aft.', 'Use units', '0.000', 'Show', 'Drop']),
 		q(headings));
 }
 
@@ -384,7 +384,7 @@ console.log('== 6b. on a touch screen the Decimals, Show and Drop boxes select w
 	L.resetLS();
 	L.rebuildLabels();
 	const row = byId['lpn_labels_node_fields'].children.find((r) => (r.children[0].textContent || '').indexOf('Pressure') >= 0);
-	const nums = [4, 5, 6].map((k) => row.children[k]);
+	const nums = [3, 4, 5].map((k) => row.children[1].children[k]);
 	ok('on touch they are text boxes with a digit keypad', nums.every((b) => b.type === 'text' &&
 		b.getAttribute('inputmode') === 'numeric'), q(nums.map((b) => b.type + '/' + b.getAttribute('inputmode'))));
 	ok('...which the page-wide select-on-focus rule covers', nums.every((b) => {
@@ -394,8 +394,8 @@ console.log('== 6b. on a touch screen the Decimals, Show and Drop boxes select w
 	global.window.matchMedia = realMM;
 	L.rebuildLabels();
 	const row2 = byId['lpn_labels_node_fields'].children.find((r) => (r.children[0].textContent || '').indexOf('Pressure') >= 0);
-	ok('with a pointer they stay number boxes (no arrows)', [4, 5, 6].every((k) => row2.children[k].type === 'number' &&
-		row2.children[k].className === 'lpn-digit'));
+	ok('with a pointer they stay number boxes (no arrows)', [3, 4, 5].every((k) => row2.children[1].children[k].type === 'number' &&
+		row2.children[1].children[k].className === 'lpn-digit'));
 	if (had) { EC.selectAllCandidate = had; }
 }
 

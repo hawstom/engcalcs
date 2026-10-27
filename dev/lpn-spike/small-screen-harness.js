@@ -627,25 +627,25 @@ const TOUCH = true;
 	const list = adopt(stub.byId['lpn_labels_' + group + '_fields'], body);
 	const rows = list.children;
 	ok(group + ' symbology built its rows for real', rows.length > 3, rows.length + ' rows');
-	const heading = rows[0], field = rows.filter((r) => r.children.some((c) => c.tag === 'input'))[0];
-	ok('...the first row is the column headings', heading.children.every((c) => c.tag === 'span'));
-	ok('...and a field row carries a label and its boxes', !!field && field.children[0].tag === 'label');
+	const heading = rows[0], field = rows.filter((r) => r.children[1] && r.children[1].children.some((c) => c.tag === 'input'))[0];
+	const gH = heading.children[1], gF = field.children[1];
+	ok('...the first row is the column headings, in one group', heading.children.every((c) => c.tag === 'span') && gH.children.length === 6);
+	ok('...and a field row carries a label and ONE group of boxes', !!field && field.children[0].tag === 'label' && gF.children.length === 6);
 
-	// (7) NO WRAP AND NO CUT AT ANY WIDTH (Tom, 2026-10-25: "the labels rows wrap, which is unacceptable"; "no
-	// ellipsis ... size the name column to the longest name"): the list is a grid whose name column is as wide as
-	// the longest name, every row is a subgrid of it, and the pane scrolls sideways.
-	ok(group + ': the list is a grid with a name column as wide as its longest name, small or wide',
-		winning(RULES, list, SMALL, DOC_IDS, false, 'grid-template-columns') === 'max-content repeat(6, auto)' &&
-		winning(RULES, list, WIDE, DOC_IDS, false, 'grid-template-columns') === 'max-content repeat(6, auto)');
-	ok('...every row is a subgrid of it',
-		winning(RULES, field, SMALL, DOC_IDS, false, 'grid-template-columns') === 'subgrid' &&
-		winning(RULES, field, WIDE, DOC_IDS, false, 'grid-template-columns') === 'subgrid');
-	ok('...and the name is never cut or broken',
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'text-overflow') === null &&
-		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'max-width') === 'none');
-	ok('...with no margin between rows, since nothing wraps',
-		winning(RULES, field, SMALL, DOC_IDS, false, 'margin-top') === null);
+	// (7) THE SIX CONTROLS WRAP AS ONE GROUP (Tom, 2026-10-26: "Sub-row 1 is to have the label and the display toggle ...
+	// Sub-row 2 has all the input boxes and the units toggle"): each row is a wrapping flex row, the name and the
+	// heading's lead share one basis so every row wraps at once, and the group is one flex item that never breaks.
+	// The wrap itself is measured in Chromium by settings-labels-wrap-browser-harness.js.
+	ok(group + ': a row wraps, small or wide', field.el.style.flexWrap === 'wrap' && heading.el.style.flexWrap === 'wrap');
+	ok('...the name and the heading lead share one 11.5rem basis',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'flex') === '0 0 11.5rem' &&
+		winning(RULES, heading.children[0], SMALL, DOC_IDS, false, 'flex') === '0 0 11.5rem' &&
+		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'flex') === '0 0 11.5rem');
+	ok('...and the group is one unbreakable flex item',
+		winning(RULES, gF, SMALL, DOC_IDS, false, 'flex') === '0 0 auto' && winning(RULES, gF, WIDE, DOC_IDS, false, 'display') === 'flex');
+	ok('...and the list no longer scrolls sideways: it is not a grid',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'grid-template-columns') === null &&
+		winning(RULES, list, WIDE, DOC_IDS, false, 'grid-template-columns') === null);
 	// **AND THE NAME ON THAT LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing `Dem/and`,
 	// `Hea/d`, `Pres/sure`, `Elev/ation` as the thing to stop). `overflow-wrap: anywhere` is what
 	// does it, and it is correct on the desktop, where the name shares its line with four columns
@@ -663,14 +663,14 @@ const TOUCH = true;
 	// opportunity simply overflows. So the wrapping this list chose (Tom's option (c), against (b)
 	// abbreviations) needed a property to make it reachable. THE HEADING ROW ONLY.
 	ok(group + ': a heading that overflows its column breaks rather than spilling',
-		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
-		'got ' + winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap'));
+		winning(RULES, gH.children[0], SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
+		'got ' + winning(RULES, gH.children[0], SMALL, DOC_IDS, false, 'overflow-wrap'));
 	// **AND ON THE DESKTOP TOO SINCE R-329**: six columns at 15.3rem leave "Before" and "Use units"
 	// little spare ink there as well, and a longer translation must break inside its own column.
 	ok('...and on the desktop too, where six columns leave little spare ink',
-		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+		winning(RULES, gH.children[0], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
 	ok('...and never on the boxes beneath it, which are sized and not text',
-		winning(RULES, field.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
+		winning(RULES, gF.children[0], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
 	// The heading row's lead cell stays at every width: the name column it stands over is always there.
 	ok(group + ": the heading row's lead cell stays on a small screen",
 		!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
@@ -684,7 +684,7 @@ const TOUCH = true;
 	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.4rem', 5: '2rem', 6: '2rem', 7: '2rem' };
 	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.34rem', 6: '2.34rem', 7: '2.34rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
-		const h = heading.children[i - 1], b = field.children[i - 1];
+		const h = gH.children[i - 2], b = gF.children[i - 2];
 		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',
 			winning(RULES, h, SMALL, DOC_IDS, false, 'width') === want[i],
 			'heading says ' + winning(RULES, h, SMALL, DOC_IDS, false, 'width'));
@@ -716,7 +716,7 @@ const TOUCH = true;
 	// EVERY spinner in the list, not the first row's -- a node's ID row has neither, so a check
 	// written against one row would have asserted nothing on half the lists.
 	const spin = [];
-	rows.forEach((r) => r.children.forEach((c) => { if (c.cls.indexOf('lpn-digit') >= 0) { spin.push(c); } }));
+	rows.forEach((r) => (r.children[1] ? r.children[1].children : []).forEach((c) => { if (c.cls.indexOf('lpn-digit') >= 0) { spin.push(c); } }));
 	ok(group + ' has spinner boxes on its field rows', spin.length > 0, spin.length + ' found');
 	spin.forEach((b) => {
 		ok('...no stylesheet rule restores a spinner (appearance is never auto)',

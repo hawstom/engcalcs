@@ -229,8 +229,8 @@ async function main() {
 				if ((await r.textContent()).trim().replace(/^✓\s*/, '') === newRow.trim()) { await r.click(); break; }
 			}
 			await b.settle(1500);
-			// A first visit with a project open already has Settings as an auto-hide tab at the right: fly it out.
-			if (mode === 'defaults') { await P.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]'); }
+			// A first visit with a project open already has Settings pinned open at the right (Tom, 2026-10-26).
+			if (mode === 'defaults') { /* nothing to open */ }
 			else { await b.toolbarClick(await b.lang('lpn_tool_settings')); }
 			await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
 			await b.settle(600);

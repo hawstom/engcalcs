@@ -100,7 +100,7 @@ const TAG = () => {
 		const row = e.closest('.lpn-set-row[data-saved]');
 		const body = e.closest('.lpn-set-subbody');
 		const sub = body && body.previousElementSibling;
-		const holder = e.closest('.lpn-set-row, tr, label') || e.parentNode;
+		const holder = (e.closest('.lpn-lblgroup') && e.closest('.lpn-lblgroup').parentNode) || e.closest('.lpn-set-row, tr, label') || e.parentNode;   // a labels row's six controls sit in a group; the row holds the name
 		const clone = holder.cloneNode(true);
 		clone.querySelectorAll('.lpn-saved, .ec-tip, input, select, button').forEach((x) => x.remove());
 		const label = clone.textContent.replace(/\s+/g, ' ').replace(/\s*\([^)]*\)/g, '').trim().slice(0, 60) || e.type;

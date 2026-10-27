@@ -5760,9 +5760,15 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields .lpn-lblgroup > span:nth-child(3),
 #lpn_labels_link_fields .lpn-lblgroup > span:nth-child(3),
 #lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(3) { width: 1.85rem !important; }
-#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(n+4),
-#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(n+4),
-#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(n+4) { width: 2.34rem !important; }
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(6),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(6),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(6) { width: 2.34rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns
