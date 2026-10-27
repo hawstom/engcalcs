@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='Režim: Přidat útvar. Zadejte každý bod. Dok
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Tento režim použijte ke změně, přesunu a přetahování prvků a textu na mapě nebo k posouvání mapy. Je to výchozí režim mapy. Druhým stisknutím klávesy Esc se výběr zruší.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automaticky';
 $ec_lang['lpn_method_switch_confirm']='Změna metody tření nemění čísla drsnosti již zadaná u potrubí a drsnost pro jednu metodu je pro jinou bezvýznamná. Poté zkontrolujte každé potrubí. Přesto změnit?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='Kopírovat (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

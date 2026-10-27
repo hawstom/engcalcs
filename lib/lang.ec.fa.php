@@ -2935,7 +2935,6 @@ $ec_lang['lpn_mode_add_shape']='حالت: افزودن شکل. هر نقطه ر�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='از این حالت برای تغییر، جابه‌جایی و کشیدن المان‌ها و متن روی نقشه، یا پن کردن نقشه استفاده کنید. این حالت پیش‌فرض نقشه است. فشردن دوبارهٔ Esc انتخاب را پاک می‌کند.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='خودکار';
 $ec_lang['lpn_method_switch_confirm']='تغییر روش اصطکاک، عددهای زبری را که از پیش روی لوله‌ها وارد شده‌اند تغییر نمی‌دهد، و زبری یک روش برای روش دیگر بی‌معنی است. پس از این، همهٔ لوله‌ها را بررسی کنید. با این حال تغییر داده شود؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5051,6 +5050,3 @@ $ec_lang['lpn_snip_tip_copy']='کپی (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='اندازهٔ تصویر به‌صورت مضربی از ناحیهٔ روی صفحه. مضرب بزرگ‌تر واضح‌تر است و فایل بزرگ‌تری می‌سازد.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

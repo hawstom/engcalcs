@@ -110,6 +110,7 @@ const EC_TABLE_PARITY_EXEMPT = [
     'pipe/fn:pipeTypePropLabel' => 'b. the reaction pair a pipe type owns; the columns are '
         . 'lpn_reaction_bulk_short and lpn_reaction_wall_short',
     'pipe/lpn_field_km' => 'b. the column is lpn_field_km_short',
+    'pipe/lpn_field_auto_length' => 'b. the Length column is the property; Auto length is the flag that says the drawing sets it (lenAuto)',
     'valve/lpn_field_km' => 'b. the column is lpn_field_km_short, which states the rule on a TCV row',
     'tank/lpn_reaction_tank' => 'b. the column is lpn_reaction_tank_short',
     'valve/lpn_field_valve_setting_drop' => 'b. the column is lpn_field_valve_setting, which carries '

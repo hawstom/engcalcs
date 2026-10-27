@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='Modalità: Aggiungi Figura. Indica ogni punto. I
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Usa questa modalità per modificare, spostare e trascinare elementi e testo sulla mappa, o per spostare la mappa. È la modalità predefinita della mappa. Premendo Esc una seconda volta si cancella la selezione.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Cambiare il metodo di attrito non modifica i valori di scabrezza già inseriti nelle tubazioni, e un valore di scabrezza per un metodo non ha senso per un altro. Controllare ogni tubazione dopo questa modifica. Cambiare comunque?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='Copia (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='La dimensione dell\'immagine come multiplo dell\'area sullo schermo. Un multiplo maggiore dà un\'immagine più nitida e un file più grande.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

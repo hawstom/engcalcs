@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='Режим: добавление фигуры. �
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Используйте этот режим, чтобы изменять, перемещать и перетаскивать элементы и текст на карте или панорамировать карту. Это режим карты по умолчанию. Второе нажатие Esc снимает выбор.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Авто';
 $ec_lang['lpn_method_switch_confirm']='Изменение метода расчёта трения не меняет значения шероховатости, уже введённые для труб, а шероховатость для одного метода не имеет смысла для другого. После этого проверьте каждую трубу. Всё равно изменить?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='Копировать (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Размер изображения как кратное размеру области на экране. Больший масштаб даёт более чёткое изображение и больший файл.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

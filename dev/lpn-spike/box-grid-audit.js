@@ -49,7 +49,7 @@ function auditInPage(spec) {
 	});
 	// A run of buttons or ticks is ONE thing in the value column: its group starts there, and its
 	// later members follow the first.
-	const GROUPS = '.lpn-ff-buttons, .lpn-gbtns, .lpn-find-filter, .lpn-new-actions, .lpn-new-presets, .lpn-scnres-controls';
+	const GROUPS = '.lpn-gwrap, .lpn-ff-buttons, .lpn-gbtns, .lpn-find-filter, .lpn-new-actions, .lpn-new-presets, .lpn-scnres-controls';
 	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip)));
 	const lead = (e) => { const g = e.closest(GROUPS); return g && Array.from(g.querySelectorAll('input, select, textarea, button')).filter(vis)[0] !== e; };
 	// A control that SPANS the grid (a Text's words, which fills the box on Tom's word of 2026-10-15) starts

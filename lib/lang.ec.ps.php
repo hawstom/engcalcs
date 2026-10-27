@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='حالت: شکل اضافه کول. هر ټکی 
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='دا حالت د نقشې شتمنیو او متن د بدلولو، خوځولو، او راکاږلو، یا د نقشې د پین کولو لپاره وکاروئ. دا د نقشې ډیفالټ حالت دی. د Esc دویم ځل فشار ټاکنه پاکوي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='اوتو';
 $ec_lang['lpn_method_switch_confirm']='د اصطکاک میتود بدلول ستاسو په پایپونو لیکل شوي د خشونت شمېرې نه بدلوي، او د یو میتود لپاره خشونت د بل میتود لپاره بې مانا دی. له دې وروسته هر پایپ وګورئ. بیا هم یې بدلوم؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='کاپي (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

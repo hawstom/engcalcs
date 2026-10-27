@@ -24,6 +24,16 @@
         "below even carry the tag. An explicit list is the honest mechanism."
     ],
     "exempt": {
+        "lpn_prop_label_unit": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label} ({unit}) -- a punctuation template; English is the neutral form and a language changes it only to use its own comma or brackets."
+        },
+        "lpn_prop_label_symbol_unit": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label}, {symbol} ({unit}) -- a punctuation template; see lpn_prop_label_unit."
+        },
         "bpn_id": {
             "category": "symbol",
             "languages": "*",
@@ -292,16 +302,6 @@
             "category": "brand",
             "languages": "*",
             "reason": "EPANET Net3 is the sample network's own name, and the rest of the title is the project-mode name. Where a language keeps 'lat/lon' literal the whole title is legitimately identical to English; where it translates the mode name (10 of 26 files do) the value differs on its own. Exempt means identical is permanently CORRECT here, not that it must be identical. Added 2026-08-19 after the gate pushed three agents into distorting a correct title to defeat it -- an invented phrase, an em dash for a comma, and a coinage inconsistent with the same file's other mode-name strings."
-        },
-        "lpn_field_auto": {
-            "category": "cognate",
-            "languages": [
-                "es",
-                "fr",
-                "it",
-                "sw"
-            ],
-            "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13. Added sw, Task 251 wave 3, 2026-08-13: Latin script, so this is NOT the script-contamination defect that made hi and de fail here, and Swahili has no false-friend collision (a car is gari, not auto). The sw agent declared the choice explicitly as asked, reasoning that Otomatiki does not fit a narrow toggle and that Auto is the field register -- consistent with this project's finding that Tanzanian engineering practice is English-medium. Flag for native review; a native reader could still prefer Otomatiki."
         },
         "lpn_field_desc": {
             "category": "cognate",

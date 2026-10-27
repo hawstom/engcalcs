@@ -25023,9 +25023,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, tpl;
 		if (!unit) { return symbol ? label + ', ' + symbol : label; }
 		tpl = symbol ? (pc.lpn_prop_label_symbol_unit || '{label}, {symbol} ({unit})') : (pc.lpn_prop_label_unit || '{label} ({unit})');
-		return tpl.replace(/\{(label|symbol|unit)\}/g, function (m, k) {
-			return k === 'label' ? label : '<bdi>' + (k === 'symbol' ? symbol : unit) + '</bdi>';
-		});
+		return tpl.replace(/\{label\}/g, function () { return label; })
+			.replace(/\{symbol\}/g, function () { return '<bdi>' + symbol + '</bdi>'; })
+			.replace(/\{unit\}/g, function () { return '<bdi>' + unit + '</bdi>'; });
 	}
 	function lpnRichInto(el, text) {
 		var parts, i, b;
@@ -25067,17 +25067,18 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE STANDARD BOX ROW (Task 828, Ida's design: dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
 	//
 	// One function builds every label=control row of a box that has been converted to the standard:
-	// `name | value | unit`, three tracks shared by all rows of a grid. The name track is a CEILING
-	// (it hugs the widest label, up to --lpn-g-name, 12rem), the value track HUGS its widest control
-	// (capped at --lpn-g-valmax), the unit track takes the rest. A user drag of the split changes
-	// the name track only, and is remembered in `lpn_gcols` (window furniture, browser only, never in
+	// `Label | Value`, two tracks shared by all rows of a grid, under a header row that names them and
+	// carries the divider (Tom, 2026-10-26: "Make it look like a spreadsheet"). A unit stands in its
+	// label ("Diameter (mm)", lpnLabelWithUnit), so there is no third column. The Label track is
+	// FITTED (gridFitNow: the 90th percentile of the labels' natural widths) and a user drag of the
+	// divider overrides it, remembered in `lpn_gcols` (window furniture, browser only, never in
 	// serializeProject(); Tom, 2026-10-24: "lpn_gcols is fine; go ahead.").
 	//
 	// THE HOST (`parent`) is the container the phone rule queries; the GRID is a child of it. A row is
-	// `display: contents` with exactly three children (name, control, unit), the control being the
-	// caller's own element so a caller's reference to it stays good. Anything a caller appends to the
-	// host between rows (a note, a button row) ends the grid; the next row starts a new one, and
-	// both share the host's remembered name width.
+	// `display: contents` on a phone and a subgrid with its rules elsewhere, with exactly two children
+	// (label, control), the control being the caller's own element so a caller's reference to it stays
+	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
+	// the next row starts a new one, and both share the host's one width.
 	var LPN_GCOLS_KEY = 'lpn_gcols';
 	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 5, LPN_GSTEP = 0.5;   // rem
 	var gcolPrefs = null;
@@ -25219,9 +25220,11 @@ var EngCalcs = EngCalcs || {};
 	// `before` is the first run of rows, which the header stands above (a box with a note or a table
 	// above its rows keeps them above the header); with none it is the host's first child.
 	function gridHeaderEnsure(host, before) {
-		var pc = EngCalcs.pageConfig || {}, hdr, l, v, at = before && before.parentNode ? before.parentNode : host;
+		var pc = EngCalcs.pageConfig || {}, hdr, l, v, at;
 		if (host.classList.contains('lpn-gplain')) { return; }
 		if (host.__lpnHdr && host.contains(host.__lpnHdr)) { return; }
+		before = (host.querySelector && host.querySelector('.lpn-grid')) || before;   // the first run of rows, built or in the markup
+		at = before && before.parentNode ? before.parentNode : host;
 		hdr = document.createElement('div');
 		hdr.className = 'lpn-ghdr';
 		hdr.setAttribute('role', 'row');
@@ -36190,7 +36193,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		openDialog(function (dlgBody) {
 			var body = document.createElement('div');
 			dlgBody.appendChild(body);
-			lpnGridHost(body);   // the whole dialog is one grid
+			lpnGridHost(body, { plain: true });   // the whole dialog is one grid; a choice is not a Label and a Value
 			body.style.minWidth = '19rem';   // wide enough that the name stays beside its choice
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]

@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='မုဒ် - ရေးဆွဲပုံ ထ�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='မြေပုံပေါ်ရှိ အစိတ်အပိုင်းများနှင့် စာသားကို ပြောင်းရန်၊ ရွှေ့ရန်၊ ဆွဲရန် သို့မဟုတ် မြေပုံကို ရွှေ့ရန် ဤမုဒ်ကို သုံးပါ။ ၎င်းသည် မြေပုံ၏ မူလမုဒ်ဖြစ်သည်။ Esc ကို ဒုတိယအကြိမ် နှိပ်လျှင် ရွေးချယ်မှုကို ရှင်းသည်။';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='အလိုအလျောက်';
 $ec_lang['lpn_method_switch_confirm']='ပွတ်တိုက်မှုနည်းလမ်း ပြောင်းခြင်းသည် သင့်ပိုက်လိုင်းများတွင် ထည့်ထားပြီးသော ကြမ်းတမ်းမှုဂဏန်းများကို မပြောင်းလဲပါ၊ နည်းလမ်းတစ်ခုအတွက် ကြမ်းတမ်းမှုသည် အခြားနည်းလမ်းအတွက် အဓိပ္ပာယ်မရှိပါ။ ဤနောက် ပိုက်လိုင်းတိုင်းကို စစ်ဆေးပါ။ ဤသို့ဖြစ်စေ ပြောင်းမလား။';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='ကူးယူရန် (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

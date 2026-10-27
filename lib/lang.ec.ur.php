@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='موڈ: شکل شامل کریں۔ ہر پوائ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='نقشے پر اثاثوں اور متن کو بدلنے، منتقل کرنے اور گھسیٹنے، یا نقشہ پین کرنے کے لیے یہ موڈ استعمال کریں۔ یہ نقشے کا ڈیفالٹ موڈ ہے۔ Esc دوسری بار دبانے سے انتخاب ختم ہو جاتا ہے۔';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='خودکار';
 $ec_lang['lpn_method_switch_confirm']='رگڑ کا طریقہ بدلنے سے آپ کے پائپوں پر پہلے سے درج کھردرا پن کی قدریں تبدیل نہیں ہوتیں، اور ایک طریقے کا کھردرا پن دوسرے کے لیے بے معنی ہوتا ہے۔ اس کے بعد ہر پائپ چیک کریں۔ پھر بھی تبدیل کریں؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='کاپی کریں (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='تصویر کا سائز اسکرین پر موجود علاقے کے ضرب کے طور پر۔ بڑا ضرب زیادہ صاف تصویر دیتا ہے اور فائل بڑی بناتا ہے۔';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';

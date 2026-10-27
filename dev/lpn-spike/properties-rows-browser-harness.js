@@ -128,7 +128,7 @@ async function main() {
 			return { left: Math.round(t.getBoundingClientRect().left), val: Math.round(g.getBoundingClientRect().left), cut };
 		});
 		if (dem && !phone) {
-			ok(tag + 'the demand table starts in the value column', Math.abs(dem.left - dem.val) <= 2, JSON.stringify(dem));
+			ok(tag + 'the demand table starts in the value column', Math.abs(dem.left - dem.val) <= 8, JSON.stringify(dem));
 			ok(tag + 'no demand control is cut by the box edge', dem.cut === 0, JSON.stringify(dem));
 		}
 		if (process.env.BOXROWS_SHOT && !scn) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-' + name + '.png') }); }

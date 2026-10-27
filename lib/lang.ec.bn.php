@@ -2933,7 +2933,6 @@ $ec_lang['lpn_mode_add_shape']='মোড: চিত্র যোগ করু�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='মানচিত্রের উপাদান পরিবর্তন, সরানো ও টেনে আনতে অথবা মানচিত্র প্যান করতে এই মোড ব্যবহার করুন। এটি মানচিত্রের ডিফল্ট মোড। Esc দ্বিতীয়বার চাপলে যা নির্বাচিত আছে তা নির্বাচনমুক্ত হয়।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='স্বয়ংক্রিয়';
 $ec_lang['lpn_method_switch_confirm']='ঘর্ষণ পদ্ধতি বদলালে পাইপে ইতিমধ্যে লেখা রাফনেস সংখ্যা বদলায় না, এবং এক পদ্ধতির রাফনেস অন্য পদ্ধতির জন্য অর্থহীন। এরপর প্রতিটি পাইপ পরীক্ষা করুন। তবুও বদলাবেন?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -5041,6 +5040,3 @@ $ec_lang['lpn_snip_tip_copy']='কপি করুন (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
-$ec_lang['lpn_field_auto_length']='Auto length';
-$ec_lang['lpn_edit_pipetypes']='Edit types…';
-$ec_lang['lpn_edit_fittings']='Edit fittings…';
