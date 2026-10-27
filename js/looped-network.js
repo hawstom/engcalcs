@@ -66303,6 +66303,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (d.tab.textContent !== t) { d.tab.textContent = t; }
 			d.tab.title = t;
 			d.tab.setAttribute('aria-expanded', d === dockFlyout ? 'true' : 'false');
+			// A pinned box keeps its tab, shown pressed (Tom, 2026-10-27: "I find it disorienting to have the
+			// tab gone"), so the strip never changes membership on a pin. Pressing it unpins.
+			d.tab.setAttribute('aria-pressed', dockAuto(d) ? 'false' : 'true');
 		});
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
@@ -66413,7 +66416,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var opp = side === 'left' ? 'right' : 'left', strip;
 		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
 		if (col) { strip = col[opp].strip; }
-		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
 		return strip ? LPN_DOCK_STRIP_W : 0;
 	}
 	function layoutDocks() {
@@ -66461,7 +66464,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
 			sides[s].pinned.forEach(function (d) { w = Math.max(w, dockWidthOf(d)); });
-			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
+			col[s] = { strip: (sides[s].auto.length || sides[s].pinned.length) ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
 		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
 		// (Tom, 2026-10-07: the Alternatives box "gets wider, but it's still limited to about 80% of
@@ -66491,7 +66494,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
-			renderDockStrip(s, S.auto, s === 'left' ? outerL : outerR - c.strip, top, h);
+			renderDockStrip(s, S.auto.concat(S.pinned).sort(dockByOrd), s === 'left' ? outerL : outerR - c.strip, top, h);
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
@@ -66670,6 +66673,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.className = 'lpn-dock-tab';
 		tab.setAttribute('aria-controls', d.box.id);
 		tab.addEventListener('pointerenter', function (e) {
+			if (!dockAuto(d)) { return; }
 			if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') { return; }
 			clearTimeout(dockTimer);
 			dockTimer = setTimeout(function () { dockFlyOut(d, false); }, LPN_DOCK_HOVER_MS);
@@ -66680,6 +66684,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.addEventListener('click', function () {
 			// The click that ends a reordering drag is not a request to open the box.
 			if (tab.lpnDragged) { tab.lpnDragged = false; return; }
+			// A pinned box's tab is its pressed button: pressing it unpins, as in JetBrains and VS Code.
+			if (!dockAuto(d)) { dockAct(d, 'autohide'); return; }
 			dockFlyOut(d, true);
 		});
 		tab.lpnDock = d;

@@ -165,10 +165,11 @@ async function sectionDock(Session, browser) {
 		let g = await geom(a.page, 'lpn_settings_box');
 		await shot(a.page, 'dock-right');
 		ok('Dock right: the box is docked', g.docked && g.open);
-		ok('...flush with the right edge of the window the map spans', Math.abs(g.box.r - (g.wrap.r + g.box.w)) <= 1.5 && g.box.r <= g.vw + 0.5,
+		// A pinned box keeps its tab (2026-10-27), so its column sits inside the 24 px strip at the edge.
+		ok('...flush with the tab strip at the right edge of the window the map spans', Math.abs(g.box.r - (g.wrap.r + g.box.w)) <= 1.5 && g.box.r + 24 <= g.vw + 0.5,
 			JSON.stringify({ box: g.box, wrap: g.wrap }));
 		ok('...the map gives up exactly the column, so nothing of the drawing is under the box',
-			g.svg.r <= g.box.l + 1 && Math.abs((fullW - g.svg.w) - g.box.w) <= 2, JSON.stringify({ full: fullW, now: g.svg.w, box: g.box.w }));
+			g.svg.r <= g.box.l + 1 && Math.abs((fullW - g.svg.w) - g.box.w - 24) <= 2, JSON.stringify({ full: fullW, now: g.svg.w, box: g.box.w }));
 		ok('...top to bottom of the map', Math.abs(g.box.t - g.svg.t) <= 1.5 && Math.abs(g.box.b - Math.min(g.svg.b, g.vh)) <= 1.5,
 			JSON.stringify({ box: g.box, svg: g.svg }));
 		// At the width it floated at (Tom, 2026-10-24: "your undocked width should dock"; dock-width-harness.js).
@@ -216,7 +217,7 @@ async function sectionDock(Session, browser) {
 		console.log('\n--- 2d. a drag on a docked box floats it; a click does not ---');
 		await corner(a, 'lpn_settings_box', 'left');
 		g = await geom(a.page, 'lpn_settings_box');
-		ok('Dock left: the box sits at the map\'s left, and the map starts after it', g.docked && g.box.l <= 2 && g.svg.l >= g.box.r - 1,
+		ok('Dock left: the box sits at the map\'s left (after its 24 px tab strip), and the map starts after it', g.docked && g.box.l <= 26 && g.svg.l >= g.box.r - 1,
 			JSON.stringify({ box: g.box, svg: g.svg }));
 		const bandX = g.box.l + 30, bandY = g.box.t + 4;
 		await a.page.mouse.click(bandX, bandY);
@@ -258,11 +259,11 @@ async function sectionProperties(Session, browser) {
 		ok('a click on a junction opens Properties', g.open);
 		await corner(a, 'lpn_popup', 'left');
 		g = await geom(a.page, 'lpn_popup');
-		ok('Dock left: Properties takes the left column', g.docked && g.box.l <= 2 && g.svg.l >= g.box.r - 1, JSON.stringify({ box: g.box, svg: g.svg }));
+		ok('Dock left: Properties takes the left column', g.docked && g.box.l <= 26 && g.svg.l >= g.box.r - 1, JSON.stringify({ box: g.box, svg: g.svg }));
 		await clickNode(20);
 		g = await geom(a.page, 'lpn_popup');
 		await shot(a.page, 'dock-properties');
-		ok('...and the next junction clicked opens in the column, not beside the junction', g.open && g.docked && g.box.l <= 2);
+		ok('...and the next junction clicked opens in the column, not beside the junction', g.open && g.docked && g.box.l <= 26);
 		// Properties keeps no record of its own; its dock alone is kept in `lpn_dockbox` (Tom, 2026-10-07:
 		// "All the docks I make need to be remembered."), and nothing else is written for it.
 		const added = (await storageKeys(a.page)).filter((k) => keysBefore.indexOf(k) < 0 && !/^lpn_(project_|index)/.test(k));
@@ -372,7 +373,7 @@ async function sectionAutohide(Session, browser) {
 		await corner(a, 'lpn_settings_box', 'autohide');
 		g = await geom(a.page, 'lpn_settings_box');
 		st = await strip();
-		ok('the pin puts it back in its column, and the strip goes', g.visible && g.docked && !st.shown && g.svg.r <= g.box.l + 1, JSON.stringify(st));
+		ok('the pin puts it back in its column, and its tab stays, pressed', g.visible && g.docked && st.shown && st.tabs.length === 1 && g.svg.r <= g.box.l + 1, JSON.stringify(st));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();
