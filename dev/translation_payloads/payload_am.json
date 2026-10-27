@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 3190,
-        "delta_key_count": 275,
-        "english_changed_key_count": 58,
+        "expected_key_count": 3200,
+        "delta_key_count": 292,
+        "english_changed_key_count": 59,
         "exempt_key_count": 39,
         "exempt_keys": [
             "u_imgd",
@@ -71,7 +71,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ፍጥነት\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ሄድ\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ሄድ ኪሳራ\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: ኤሚተር\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ክፍል\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ጥቃቅን (አካባቢያዊ) ኪሳራ\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ግፊት\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: ከፍታ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- bend, corner, or turning point in a drawn pipe\n    English: vertex\n    Your language: {link}፣ መታጠፊያ\n- curve, graph, or line telling how the energy per weight of water added by a pump changes as its flow changes\n    English: pump curve\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ነባሪ\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ፈታች\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ታንክ\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ቫልቭ\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: የራሱ ዋጋዎች\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short word, name, or tag stuck on a pipe or point\n    English: tag (EPANET)\n    Your language: ተለጣፊ\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ደንበኛ\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: ወሳኝነት\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ስዕል\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ፍጥነት\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ሄድ\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ሄድ ኪሳራ\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: ኤሚተር\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ክፍል\n- energy per weight of water from its speed, as an elevation, height, or level\n    English: velocity head (H_v)\n    Your language: (no preferred translation yet: use your language's standard term)\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ጥቃቅን (አካባቢያዊ) ኪሳራ\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ግፊት\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: ከፍታ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- bend, corner, or turning point in a drawn pipe\n    English: vertex\n    Your language: {link}፣ መታጠፊያ\n- curve, graph, or line telling how the energy per weight of water added by a pump changes as its flow changes\n    English: pump curve\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ነባሪ\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ፈታች\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ታንክ\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ቫልቭ\n- number, value, or setting that tells how a valve acts, works, or behaves\n    English: valve setting\n    Your language: (no preferred translation yet: use your language's standard term)\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: የራሱ ዋጋዎች\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short word, name, or tag stuck on a pipe or point\n    English: tag (EPANET)\n    Your language: ተለጣፊ\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ደንበኛ\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: ወሳኝነት\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ስዕል\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_page_open": "Open the application",
@@ -85,8 +85,9 @@
         "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
-        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
@@ -293,12 +294,13 @@
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
+        "lpn_col_level": "Level",
         "lpn_dur_col_margin": "Above lowest water depth",
         "lpn_dur_col_drop": "Drop from start",
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
-        "lpn_at_time": "{value} at {time}",
         "lpn_crit_col_hours": "Hours below minimum",
+        "lpn_crit_col_stopped": "Run stopped at",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
         "lpn_ds_limit_at": "Limiting reporting step: {time}.",
@@ -312,10 +314,10 @@
         "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
         "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
         "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
-        "lpn_crit_stopped_at": "run stopped at {time}",
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
+        "lpn_ff_col_more": "More affected",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -347,7 +349,22 @@
         "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude.",
         "lpn_field_auto_length": "Auto length",
         "lpn_edit_pipetypes": "Edit types…",
-        "lpn_edit_fittings": "Edit fittings…"
+        "lpn_edit_fittings": "Edit fittings…",
+        "lpn_edit_curves": "Edit curves…",
+        "lpn_field_tank_level_short": "Initial depth",
+        "lpn_field_tank_minlevel_short": "Minimum depth",
+        "lpn_field_tank_maxlevel_short": "Maximum depth",
+        "lpn_field_active_short": "Active",
+        "lpn_field_cv_short": "Check valve",
+        "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
+        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.",
+        "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
+        "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_reaction_tank_short_tip": "Reaction coefficient: the rate of reaction in the water held in this tank, in 1\/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
+        "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
+        "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -362,8 +379,9 @@
         "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
-        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
@@ -570,12 +588,13 @@
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
+        "lpn_col_level": "Level",
         "lpn_dur_col_margin": "Above lowest water depth",
         "lpn_dur_col_drop": "Drop from start",
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
-        "lpn_at_time": "{value} at {time}",
         "lpn_crit_col_hours": "Hours below minimum",
+        "lpn_crit_col_stopped": "Run stopped at",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
         "lpn_ds_limit_at": "Limiting reporting step: {time}.",
@@ -589,10 +608,10 @@
         "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
         "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
         "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
-        "lpn_crit_stopped_at": "run stopped at {time}",
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
+        "lpn_ff_col_more": "More affected",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -624,7 +643,22 @@
         "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude.",
         "lpn_field_auto_length": "Auto length",
         "lpn_edit_pipetypes": "Edit types…",
-        "lpn_edit_fittings": "Edit fittings…"
+        "lpn_edit_fittings": "Edit fittings…",
+        "lpn_edit_curves": "Edit curves…",
+        "lpn_field_tank_level_short": "Initial depth",
+        "lpn_field_tank_minlevel_short": "Minimum depth",
+        "lpn_field_tank_maxlevel_short": "Maximum depth",
+        "lpn_field_active_short": "Active",
+        "lpn_field_cv_short": "Check valve",
+        "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
+        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.",
+        "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
+        "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_reaction_tank_short_tip": "Reaction coefficient: the rate of reaction in the water held in this tank, in 1\/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.",
+        "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
+        "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
+        "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom."
     },
     "key_context": {
         "consent_body": {
@@ -848,6 +882,22 @@
                     "key": "lpn_guide_lib_example_def",
                     "value": "<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ቤተመዛግብትን ይምረጡ። ስርዓቶች ስርዓት 1ን፣ Demand Pattern፣ በ2:00 ልዩነት 12 ማባዣዎች ያሉት፣ 24:00ን የሚሸፍን፣ (ነባሪ) ተብሎ ምልክት የተደረገበት ይዟል። ኩርባዎች ኩርባ 1ን፣ Pump Curve for Pump 9፣ አንድ ነጥብ ያለው የፓምፕ ሄድ ኩርባ፣ 1500 gpm በ250 ft ይዟል። መቆጣጠሪያዎች ሁለት መግለጫዎች ይዟል፦ የመጀመሪያው ነጥብ 2 ከ110 በታች ሲወድቅ ግንኙነት 9ን ይከፍታል፣ ሁለተኛው ነጥብ 2 ከ140 በላይ ሲወጣ ይዘጋዋል። ህጎች የሰዓት ጊዜውን እና የታንክ 2 ደረጃን የሚፈትኑ ሁለት ህጎች ይዟል።<\/p><p>ውሃ፣ አስላን፣ ከዚያም ውሃ፣ ዘገባዎች፣ የሁኔታ ለውጦችን ይምረጡ። ፓምፕ L9 በ10:00 አሁን ዝግ ነው፣ በ15:00 አሁን ክፍት፣ በ21:00 አሁን ዝግ፣ ታንክ N2 ደግሞ በ22:00 አሁን እየወጣ ነው። በመቆጣጠሪያዎች ውስጥ፣ በሁለተኛው መቆጣጠሪያ 140ን ወደ 135 ይቀይሩ እና ውሃ፣ አስላን እንደገና ይምረጡ። የመጨረሻው መዘጋት ወደ 20:00 ይሸጋገራል፣ ታንክ N2 ደግሞ በ21:00 አሁን እየወጣ ነው።<\/p>",
                     "english": "<p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.<\/p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.<\/p>"
+                }
+            }
+        },
+        "lpn_guide_prop_example_def": {
+            "reason": "english_changed",
+            "current_value": "<p>የNet1 ምሳሌን ይክፈቱ እና ቧንቧ 10ን ይጫኑ። ንብረቶች ግቤቶቹን ከመግለጫ እስከ ንቁ ነው? ድረስ፣ ከዚያም በሚታየው ሰዓት ውጤቶቹን ይዘረዝራል፦ ፍሰት 1866.2 gpm፣ ፍጥነት 2.4 ft\/sec እና የሄድ ኪሳራ 19.12 ft H2O።<\/p><p>ቧንቧ 113ን ይጫኑ እና Shift ተጭነው ቧንቧ 31ን ይጫኑ። ርዕሱ 2 ተመርጠዋል ይነበባል፣ አንዱ ክፍል ቧንቧዎች (2) ነው፣ ዲያሜትር የተለያዩ ያሳያል፣ ምክንያቱም ቧንቧ 31 6 in. ነው እና ቧንቧ 113 8 in. ነው። ለዲያሜትር 10 ያስገቡ። ማሳወቂያው ዲያሜትር (in) በ2 ላይ ተዘጋጅቷል ይነበባል፣ ሁለቱም ቧንቧዎች 10 in. ናቸው፣ አንድ ቀልብስም ወደ 6 እና 8 in. ይመልሳቸዋል።<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_prop_multi_def",
+                    "value": "<p>ርዕሱ ለምሳሌ 2 ተመርጠዋል ይነበባል። ሳጥኑ በምርጫው ውስጥ ላለ እያንዳንዱ የአካል ዓይነት አንድ ክፍል አለው፣ በዓይነቱ ስም እና በዚያ ዓይነት የአካሎች ብዛት የተሰየመ፣ ለምሳሌ ቧንቧዎች (2)፣ እያንዳንዱ ክፍል ሊታጠፍ ይችላል። ክፍል ሠንጠረዦች እንደ አምድ ያላቸውን እና በውስጡ ባለ እያንዳንዱ አካል ላይ ሊዘጋጁ የሚችሉ ንብረቶችን ይዘረዝራል። ውጤቶች እና የቧንቧ ዓይነት የሚገልጻቸው ዋጋዎች አይዘረዘሩም። ረድፍ አካሎቹ የሚጋሩትን ዋጋ ወይም የሚለያዩበት ቦታ የተለያዩ ያሳያል።<\/p><p>ወደ ረድፍ ዋጋ መተየብ በምርጫው ውስጥ ባለ የዚያ ዓይነት እያንዳንዱ አካል ላይ ያዘጋጀዋል። ያልተነካ ረድፍ ምንም አይጽፍም። ማሳወቂያ ቁጥሩን ይናገራል፣ ለምሳሌ ዲያሜትር (in) በ2 ላይ ተዘጋጅቷል፣ አንድ ቀልብስም ሙሉውን ረድፍ ይቀለብሳል። ከመሠረት ሌላ ሁኔታ ውስጥ ዋጋዎቹ እንደ የራስ ዋጋዎች ይከማቻሉ።<\/p>",
+                    "english": "<p>The title reads, for example, 2 selected. The box has one section for each type of asset in the selection, headed by the name of the type and the number of assets of it, as in Pipes (2), and each section can be collapsed. A section lists the properties that Tables has as columns and that can be set on every asset in it. Results and values that a pipe type states are not listed. A row shows the value the assets share, or Various where they differ.<\/p><p>Typing a value into a row sets it on every asset of that type in the selection. A row that is not touched writes nothing. A notice states the count, as in Set Diameter (in) on 2., and one Undo reverses the whole row. In a scenario other than Base the values are stored as overrides.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "ክፍሎች፣ እና ቅንብሮች የሚቀመጡበት",
+                    "english": "Sections, and where settings are saved"
                 }
             }
         },
@@ -4239,6 +4289,22 @@
                 }
             }
         },
+        "lpn_col_level": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "በስራ ላይ፦ ከ{total} መገናኛዎች {done}ኙ ተጠናቀዋል።",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "ከ{total} መገናኛዎች {done}ኙ ላይ ቆሟል። ከታች ያሉት ውጤቶች ቀድሞውኑ የተጠናቀቁት ናቸው።",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
         "lpn_dur_col_margin": {
             "reason": "missing",
             "current_value": null,
@@ -4303,7 +4369,7 @@
                 }
             }
         },
-        "lpn_at_time": {
+        "lpn_crit_col_hours": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -4319,7 +4385,7 @@
                 }
             }
         },
-        "lpn_crit_col_hours": {
+        "lpn_crit_col_stopped": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -4543,22 +4609,6 @@
                 }
             }
         },
-        "lpn_crit_stopped_at": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "በስራ ላይ፦ ከ{total} መገናኛዎች {done}ኙ ተጠናቀዋል።",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "ከ{total} መገናኛዎች {done}ኙ ላይ ቆሟል። ከታች ያሉት ውጤቶች ቀድሞውኑ የተጠናቀቁት ናቸው።",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
         "lpn_ff_at_step": {
             "reason": "missing",
             "current_value": null,
@@ -4604,6 +4654,22 @@
                     "key": "lpn_ff_stopped",
                     "value": "ከ{total} መገናኛዎች {done}ኙ ላይ ቆሟል። ከታች ያሉት ውጤቶች ቀድሞውኑ የተጠናቀቁት ናቸው።",
                     "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_col_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_affected",
+                    "value": "ትልቁ ተጽዕኖ",
+                    "english": "Worst effect"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_limit",
+                    "value": "የንድፍ ገደብ",
+                    "english": "Design limit"
                 }
             }
         },
@@ -5084,6 +5150,220 @@
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
                 "next_translated": null
+            }
+        },
+        "lpn_edit_curves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_tank_level_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "tip": {
+                "key": "lpn_field_tank_level_short_tip",
+                "english": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom."
+            }
+        },
+        "lpn_field_tank_minlevel_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "tip": {
+                "key": "lpn_field_tank_minlevel_short_tip",
+                "english": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom."
+            }
+        },
+        "lpn_field_tank_maxlevel_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "tip": {
+                "key": "lpn_field_tank_maxlevel_short_tip",
+                "english": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom."
+            }
+        },
+        "lpn_field_active_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_cv_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_km_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "label": {
+                "key": "lpn_field_km_short",
+                "english": "Minor loss, k",
+                "value": "ጥቃቅን ኪሳራ፣ k"
+            }
+        },
+        "lpn_field_km_fittings_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_valve_km_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_reaction_bulk_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_reaction_wall_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_reaction_tank_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "label": {
+                "key": "lpn_reaction_tank_short",
+                "english": "Reaction",
+                "value": "ግብረመልስ"
+            }
+        },
+        "lpn_field_tank_level_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "label": {
+                "key": "lpn_field_tank_level_short",
+                "english": "Initial depth"
+            }
+        },
+        "lpn_field_tank_minlevel_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "label": {
+                "key": "lpn_field_tank_minlevel_short",
+                "english": "Minimum depth"
+            }
+        },
+        "lpn_field_tank_maxlevel_short_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            },
+            "label": {
+                "key": "lpn_field_tank_maxlevel_short",
+                "english": "Maximum depth"
             }
         }
     },

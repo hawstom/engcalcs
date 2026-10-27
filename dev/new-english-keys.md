@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 218 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**71 still to read on master**, of 233 untranslated keys, of 3200 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (218, 56 to read @@ NEEDS RULING)
+## lpn_  (233, 71 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -172,6 +172,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
+- **`lpn_edit_curves`**
+  > Edit curves…
+  @@ NEEDS RULING
 - **`lpn_edit_fittings`**
   > Edit fittings…
   @@ NEEDS RULING
@@ -235,15 +238,48 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
+- **`lpn_field_active_short`**
+  > Active
+  @@ NEEDS RULING
 - **`lpn_field_auto_length`**
   > Auto length
   @@ NEEDS RULING
 - **`lpn_field_cv`**
   > Check valve (CV)
   _Ruled 2026-10-22: Approved._
+- **`lpn_field_cv_short`**
+  > Check valve
+  @@ NEEDS RULING
 - **`lpn_field_cv_tip`**
   > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
   _Ruled 2026-10-22: Approved._
+- **`lpn_field_km_fittings_tip`**
+  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.
+  @@ NEEDS RULING
+- **`lpn_field_km_short_tip`**
+  > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short`**
+  > Initial depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short_tip`**
+  > Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short`**
+  > Maximum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short_tip`**
+  > Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short`**
+  > Minimum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short_tip`**
+  > Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_valve_km_short_tip`**
+  > Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -538,6 +574,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_quality_msx_species_tip`**
   > The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.
   _Ruled OK 2026-10-20._
+- **`lpn_reaction_bulk_pipe_tip`**
+  > Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_tank_short_tip`**
+  > Reaction coefficient: the rate of reaction in the water held in this tank, in 1/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_wall_pipe_tip`**
+  > Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
 - **`lpn_replace_selected_only`**
   > Only the selected assets
   @@ NEEDS RULING
@@ -690,7 +735,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**76 still to read**, of 119 new keys across 15 unmerged branch(es).
+**76 still to read**, of 119 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -701,7 +746,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`a7ec33554`) — adds no English strings
+### box-design (`8b209e745`) — adds no English strings
+
+### feat/box-polish (`5d43a5dec`) — already merged into box-design; its strings are listed there
 
 ### feat/box-rows-properties (`2b8b40918`) — already merged into box-design; its strings are listed there
 
@@ -711,7 +758,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/report-buttons (`c4a7535e8`) — already merged into box-design; its strings are listed there
 
-### feat/report-columns (`a7ec33554`) — already merged into box-design; its strings are listed there
+### feat/report-columns (`b38cd7757`) — already merged into box-design; its strings are listed there
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
@@ -757,7 +804,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Shapes appear in {scenario} only.
   @@ NEEDS RULING
 
-### feat/short-labels (`a7ec33554`) — already merged into box-design; its strings are listed there
+### feat/short-labels (`6de3f9384`) — already merged into box-design; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
