@@ -152,7 +152,7 @@ async function main() {
 		await dismiss();
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1200);
-		const word = await a.lang('lpn_library_curve_note_label');
+		const word = await a.lang('lpn_field_desc');
 
 		console.log('\n--- 1. type a description in each of the three sections ---');
 		for (const sec of ['patterns', 'controls', 'rules']) {
@@ -252,7 +252,7 @@ async function main() {
 		await b.settle(1200);
 		await b.menuClick(await b.lang('lpn_library_menu'), 'project');
 		await b.page.waitForSelector('#lpn_library_box', { state: 'visible' });
-		const esWord = await b.lang('lpn_library_curve_note_label');
+		const esWord = await b.lang('lpn_field_desc');
 		for (const sec of ['patterns', 'controls', 'rules']) {
 			await b.page.evaluate((s) => {
 				document.getElementById('lpn_libbox_link_' + s)

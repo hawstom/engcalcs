@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**49 still to read on master**, of 214 untranslated keys, of 3231 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 214 untranslated keys, of 3182 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -678,7 +678,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**85 still to read**, of 128 new keys across 16 unmerged branch(es).
+**85 still to read**, of 128 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -689,9 +689,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1026b (`221e002d2`) — adds no English strings
+### chore/merge-1026c (`80f2a4a72`) — adds no English strings
 
-### feat/box-rows-properties (`4063bda90`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/box-rows-properties (`9ec48ca4d`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_edit_fittings`**
   > Edit fittings…
@@ -713,7 +713,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`f0c15601b`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/report-buttons (`bf56f6391`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_heading_unit`**
   > {label} ({unit})
@@ -1101,12 +1101,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/dup-keys (`4cca5839a`) — already merged into chore/merge-1026b; its strings are listed there
+### fix/bottom-pane-lag-2 (`1a2d010dc`) — adds no English strings
 
-### fix/example-crs (`014a92cd7`) — already merged into chore/merge-1026b; its strings are listed there
-
-### fix/form-restore (`b2365d3f8`) — adds no English strings
-
-### fix/open-docked (`7af58dac7`) — adds no English strings
-
-### fix/phone-select (`f1baa2714`) — adds no English strings
+### fix/phone-select (`d0fcf68c2`) — adds no English strings

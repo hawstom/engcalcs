@@ -213,7 +213,7 @@ $ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
 $ec_lang['mphl_main_menu']='Manning የቧንቧ ሄድ ኪሳራ';
 $ec_lang['mphl_main_title']='ነፃ ኦንላይን Manning የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
 $ec_lang['mphl_main_desc']='Manning ቀመር ሄድ ኪሳራ ሙሉ ፍሰት ሲሰጥ';
-$ec_lang['mphl_pipe_length']='የቧንቧ ርዝመት, L';
+$ec_lang['mphl_pipe_length']='ርዝመት፣ L';
 $ec_lang['mphl_area']='ስፋት, A';
 $ec_lang['mphl_total_junction_k']='ጥቃቅን (አካባቢያዊ) ኪሳራ ቅንጅት, k<sub>m</sub>';
 $ec_lang['mphl_total_junction_k_short']='ኪሳራ ቅንጅት, k<sub>m</sub>';
@@ -319,7 +319,6 @@ $ec_lang['mhp_main_title']='ነፃ የመስመር ላይ ማይክሮ-ሃይድ
 $ec_lang['mhp_main_desc']='የወንዝ-ፍሰት ማይክሮ-ሃይድሮ ኃይል ውፅዓት ካልኩሌተር';
 $ec_lang['mhp_gross_head']='ጠቅላላ ሄድ፣ H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="የግፊት ቧንቧ (የአቅርቦት ቧንቧ) ዲያሜትር">የግፊት ቧንቧ ዲያሜትር፣ D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='ርዝመት፣ L';
 $ec_lang['mhp_efficiency']='የሃይል ማመንጫ ብቃት፣ η (0–1)';
 $ec_lang['mhp_vel_check']='የፍጥነት ምርመራ';
 $ec_lang['mhp_hl_check']='ሄድ ኪሳራ ምርመራ';
@@ -474,13 +473,11 @@ $ec_lang['rc_SD_check']='የቅንብር ስርጭት SD ምርመራ';
 $ec_lang['rc_sg_ok']   ='sg በትክክለኛ ወሰን ውስጥ ነው';
 $ec_lang['rc_sg_ok_tip']='2.54–2.82 (Robinson)';
 $ec_lang['rc_sg_low']  ='sg ከ Robinson ወሰን በታች';
-$ec_lang['rc_sg_low_tip']='ትክክለኛ ወሰን፦ 2.54–2.82';
 $ec_lang['rc_sg_high'] ='sg ከ Robinson ወሰን በላይ';
 $ec_lang['rc_sg_high_tip']='ትክክለኛ ወሰን፦ 2.54–2.82';
 $ec_lang['rc_SD_ok']   ='SD በትክክለኛ ወሰን ውስጥ ነው';
 $ec_lang['rc_SD_ok_tip']='1.15–1.47 (Robinson)';
 $ec_lang['rc_SD_low']  ='SD ከ Robinson ወሰን በታች';
-$ec_lang['rc_SD_low_tip']='ትክክለኛ ወሰን፦ 1.15–1.47';
 $ec_lang['rc_SD_high'] ='SD ከ Robinson ወሰን በላይ';
 $ec_lang['rc_SD_high_tip']='ትክክለኛ ወሰን፦ 1.15–1.47';
 $ec_lang['rc_layer']='የድንጋይ ሽፋን ውፍረት (2 × D<sub>50</sub>)';
@@ -589,7 +586,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='የቧንቧ መስመሮች';
-$ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='የዚህ የቧንቧ መስመር ስም። ሌሎች መስመሮች በ«የላይኛው መለያ» ዓምድ ውስጥ ይህንኑ ይጠቅሳሉ።';
 $ec_lang['bpn_upstream']='የላይኛው መለያ';
 // Edited by TGH 2026-09-07
@@ -1012,7 +1008,6 @@ $ec_lang['lpn_guide_find_results_term']='ውጤቶች፣ ምርጫው እና ሠ
 $ec_lang['lpn_guide_find_results_def']='<p>የተመሳሰሉት አካሎች ከፈልግ አዝራሩ በታች ተዘርዝረዋል። ይበልጣል እና ከፍተኛ n ከፍተኛውን ዋጋ መጀመሪያ፣ ያንሳል እና ዝቅተኛ n ዝቅተኛውን ዋጋ መጀመሪያ ይዘረዝራሉ፣ ሌሎች መስፈርቶች በተገኘው ዋጋ፣ ከዚያም በመለያ ይዘረዝራሉ። በእና ወይም በወይም የተያያዙ መስፈርቶች ያሉት መጠይቅ ነጥቦቹን ከዚያ ግንኙነቶቹን፣ እያንዳንዱን በመለያ ይዘረዝራል። አንድ ብቻ ተመሳሳይ ሲሆን ወዲያውኑ በካርታው ላይ ይታያል። ካርታውን በዚያ አካል ላይ ለማድረግ ረድፍ ይምረጡ። ምንም ካልተመረጠ አካሉም ይመረጣል፤ የሆነ ነገር ከተመረጠ አካሉ ይደምቃል፣ ምርጫው አይቀየርም። ወደ ምርጫው ለመጨመር ወይም ለማስወገድ በረድፍ ላይ Shift+ጠቅ ወይም Ctrl+ጠቅ ያድርጉ። ፈልግ ሁሉንም ተመሳሳዮች ራሱ አይመርጥም።</p><p>በአሁኑ ሠንጠረዥ ውስጥ አጣራ አዝራሩ ተመሳሳዩን መጠይቅ በሠንጠረዦች ፓነል ላይ ይተገብራል። መጠይቁ የሚመለከተው እያንዳንዱ ሠንጠረዥ የተመሳሰሉትን ረድፎች ብቻ ያሳያል፣ ከላያቸው መጠይቁንና የረድፍ ቁጥሩን። ሁሉንም ተመሳሳዮች በካርታው ላይ ለመምረጥ እነዚያን ረድፎች ይምረጡና ከቀኝ-ጠቅ ምናሌ ካርታ ላይ ምረጥ ይምረጡ። የሠንጠረዥ ማጣሪያ ከፕሮጀክቱ ጋር አይቀመጥም፣ ገጹ እንደገና ሲጫን ያበቃል። ከእንግዲህ እንዳይመሳሰል የተስተካከለ ረድፍ በሠንጠረዡ ውስጥ ይቆያል፣ ደብዝዞ በማስጠንቀቂያ ምልክት ተለይቶ፣ በአሁኑ ሠንጠረዥ ውስጥ አጣራ አዝራሩ እንደገና እስኪጫን ድረስ።</p>';
 $ec_lang['lpn_guide_find_replace_term']='ተካ እና ቀልብስ';
 $ec_lang['lpn_guide_find_replace_def']='<p>የተገኙትን ለውጥ የሳጥኑ ክፍል መጠይቁ ባገኘው እያንዳንዱ አካል ላይ አንድ ንብረት ይጽፋል። ንብረቱን በሚቀየረው ንብረት ዝርዝር ውስጥ ይምረጡ፣ አዲሱን ዋጋ በአዲስ ዋጋ ሳጥን ውስጥ በሚታየው አሃድ ያስገቡ፣ ከዚያም ለውጥ አዝራሩን ይጫኑ። ሳጥኑ ከዚያ አዲሱ ዋጋ ያላቸውን ሳይቆጥር ስንት አካሎች እንደሚለወጡ ይናገራል። ለውጡን ለመተግበር ይቀይሩ አዝራሩን ይጫኑ፣ ወይም ይቅር። አንድ ቀልብስ ሙሉውን ምትክ ይቀለብሳል።</p><p>በNet1 ላይ ምሳሌ፦ <code>Pipe.Diameter below 10</code> ቧንቧዎች 31፣ 122፣ 113 እና 121ን ያገኛል። ዲያሜትር ይምረጡ፣ 10 ያስገቡ እና ለውጥ ይጫኑ፤ ሳጥኑ "4 አካሎችን ይቀየሩ?" ያሳያል። አራቱንም ቧንቧዎች ወደ 10 in. ለማዘጋጀት ይቀይሩ ይጫኑ። አንድ ቀልብስ ወደ 6 እና 8 in. ይመልሳቸዋል።</p><p>በNet3 ላይ ምሳሌ፦ <code>Pipe.ID equal to \'247\'</code> ቧንቧ 247ን ያገኛል። ዝግ ይምረጡ፣ በአዲስ ዋጋ ዝርዝር ውስጥ እንደገና ዝግ ይምረጡ፣ ከዚያ ለውጥ፣ ይቀይሩ ይጫኑ፣ ለላይኛው የግንኙነት ምሳሌ ቧንቧውን ለመዝጋት። ቀልብስ እንደገና ይከፍተዋል።</p><p>ለውጥ አንድ ዓይነት አካል ይፈልጋል፣ ስለዚህ በሁሉም ነገር ስር መጀመሪያ በምን መፈለግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ። ከመሠረት ሌላ በሆነ ሁኔታ ውስጥ፣ ምትክ በዚያ ሁኔታ ውስጥ ይቀመጣል፣ በንብረቶች ውስጥ ያው ማስተካከያ እንደሚሆነው። የMapbox ከፍታዎች ባሉበት፣ ከፍታ ከተተየበ ዋጋ ይልቅ ከMapbox DEM ሊተካ ይችላል።</p>';
-$ec_lang['lpn_guide_find_notes_term']='ልብ ሊባሉ የሚገባቸው ነጥቦች';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>ዋጋዎች በሙሉ ትክክለኛነት ይነጻጸራሉ፣ እስከ አራት የአስርዮሽ ቦታዎችም ይዘረዘራሉ። እኩል ነው ከተሰላ ውጤት ጋር አልፎ አልፎ ይመሳሰላል፤ ይበልጣል እና ያንሳል ይጠቀሙ።</li><li>ግፊት፣ ሄድ፣ ፍሰት፣ ፍጥነት እና ሌሎቹ ውጤቶች የመጨረሻው ስሌት ናቸው። በራስ-ሰር እንደገና አስላ ቅንብር ሲጸዳ፣ መረቡን በመጨረሻው አስላ ጊዜ እንደነበረ ይገልጻሉ።</li><li>በጽሑፍ ላይ ይበልጣል እና ያንሳል የመዝገበ ቃላት ቅደም ተከተል ይጠቀማሉ፣ ቁጥሮች በቁጥር ቅደም ተከተል፦ በNet1 ላይ <code>Junction.ID above \'20\'</code> መገናኛዎች 21፣ 22፣ 23፣ 31 እና 32ን ያገኛል።</li><li>በሁሉም ነገር ስር የሚቀርቡት መለያ፣ መግለጫ፣ ተለጣፊ እና ግንኙነት ብቻ ናቸው። ሙሉ የንብረት ዝርዝሩን ለማየት በምን መፈለግ ዝርዝር ውስጥ አንድ ዓይነት አካል ይምረጡ።</li><li>የጽሑፍ ንጥል መለያ የለውም። በቃላቱ ይፈልጉት፣ እንደ <code>Text.Text contains \'pump\'</code>።</li><li>ለአንድ ነጥብ አራቱ የግንኙነት መስፈርቶች በመገናኛው ላይ ምንም አገናኝ የለም፣ በመገናኛው ላይ ክፍት አገናኝ የለም፣ ወደ ምንጭ የሚወስድ አገናኝ መንገድ የለም እና ወደ ምንጭ የሚወስድ ክፍት መንገድ የለም ናቸው። ምንጭ ማጠራቀሚያ ወይም ታንክ ነው።</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1038,7 +1033,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='ሠንጠረዡ የያዘው';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>ሁኔታ</td><td>የሁኔታው ስም። የተከፈተው ሁኔታ ምልክት ተደርጎበታል (አሁን ክፍት)።</td></tr><tr><td>የራስ ዋጋዎች ብዛት</td><td>የሁኔታው የራሱ የራስ ዋጋዎች፣ በሁኔታዎች ዝርዝር ውስጥ እንደሚቆጠሩት። እንደ የፍላጎት ማባዣ ያለ የስሌት አማራጭ እንደ አንድ ይቆጠራል፣ ከተወረሰው ዋጋ ጋር እኩል የሆነ የራስ ዋጋም ይቆጠራል።</td></tr><tr><td>የፍላጎት ማባዣ፣ ጠቅላላ የመሮጫ ጊዜ፣ የሃይድሮሊክ ጊዜ ደረጃ</td><td>ሁኔታው የተፈታባቸው ዋጋዎች፣ የራሱ ወይም የፕሮጀክቱ። የተረጋጋ-ሁኔታ ሁኔታ ለጊዜ ደረጃው ሰረዝ ያሳያል።</td></tr><tr><td>ዝቅተኛ ግፊት</td><td>በመገናኛ ላይ ያለው ዝቅተኛ ግፊት፣ ከመለያው እና ከሚከሰትበት ሰዓት ጋር። ማጠራቀሚያዎች እና ታንኮች ይተዋሉ ምክንያቱም እያንዳንዳቸው ቋሚ ሄድ አላቸው።</td></tr><tr><td>ከፍተኛ ፍጥነት</td><td>በቧንቧ ወይም ቫልቭ ውስጥ ያለው ከፍተኛ ፍጥነት፣ ከመለያው እና ከሚከሰትበት ሰዓት ጋር። ፓምፖች ይተዋሉ።</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='የተረጋጋ-ሁኔታ እና የተራዘመ-ጊዜ ሁኔታዎች';
 $ec_lang['lpn_guide_cmp_run_def']='<p>ጠቅላላ የመሮጫ ጊዜው ከ0 የሚበልጥ ሁኔታ በመላው ጊዜ በEPANET ሞተር በኩል ይሮጣል። ዝቅተኛው ግፊቱ እና ከፍተኛው ፍጥነቱ በእያንዳንዱ የጊዜ ደረጃ ላይ ያሉ ጽንፎች ናቸው፣ እያንዳንዳቸው ከሰዓቱ ጋር ይታያሉ። ጠቅላላ የመሮጫ ጊዜው 0 የሆነ ሁኔታ በአንድ ቅጽበት ይፈታል። ጠቅላላ የመሮጫ ጊዜ ሁኔታ ሊተካቸው ከሚችሉ አማራጮች አንዱ ነው፣ ስለዚህ አንድ ሠንጠረዥ ሁለቱንም ዓይነት ሊይዝ ይችላል።</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='ልብ ሊሏቸው የሚገቡ ነጥቦች';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>ሊፈታ የማይችል ሁኔታ ከሁለቱ ውጤቶቹ ይልቅ ምክንያቱን ያሳያል፣ ለምሳሌ ቧንቧ ንቁ እንዳይሆን ከተደረገ በኋላ መገናኛ ወደ ምንጭ መንገድ እንደሌለው። ሌሎቹ ሁኔታዎች አሁንም ይፈታሉ። ያልተጣጠመ ሁኔታ የመጨረሻ ውጤቶቹን እና መልዕክት ያሳያል።</li><li>ከሠንጠረዡ በላይ ያለው ብሎክ፣ በእያንዳንዱ ሁኔታ ተመሳሳይ፣ የግጭት ዘዴውን፣ መለኪያ ክፍሎቹን፣ ትክክለኛነቱን እና ከፍተኛ ሙከራዎቹን ይናገራል። በሁኔታዎች መካከል የሚለያይ ቅንብር ከብሎኩ ይወጣል።</li><li>ማለፊያ ወይም መውደቅ ደፍ የለም። ቁጥሮቹን በሚሞዴለው ስርዓት የንድፍ መስፈርቶች ያንብቡ።</li><li>በሁኔታዎች አስተዳዳሪ ግቤት ውስጥ የተሰጠው ምሳሌ በNet1 ላይ ሦስት ሁኔታዎችን ያወዳድራል።</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
@@ -1053,9 +1047,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='መቆጣጠሪያዎች እና ህጎች �
 $ec_lang['lpn_guide_lib_ctl_def']='<p>መቆጣጠሪያ አንድ መግለጫ ነው። ህግ በRULE የሚጀምሩ በርካታ መስመሮች ነው። ቁልፍ ቃላት የገጹ ቋንቋ ምንም ይሁን ምን በእንግሊዝኛ ይተየባሉ፣ ቁጥሮችም በፕሮጀክቱ መለኪያ ክፍሎች ናቸው። መቆጣጠሪያ ጨምር ከመረቡ ከተገነባ መግለጫ ይጀምራል፣ ከዚያም ወደታሰበው ይስተካከላል።</p><p>መቆጣጠሪያዎች እና ህጎች ውጤትን የሚለውጡት በተራዘመ ጊዜ ማስመሰያ ውስጥ ብቻ ነው፣ ማለትም ጠቅላላ የመሮጫ ጊዜ ከ0 ሲበልጥ። የተረጋጋ-ሁኔታ መፍትሔን አንዱም አይለውጥም። ህጎች የሚተገበሩት በEPANET ሞተር ብቻ ነው። ሁለቱም ከፕሮጀክቱ ጋር ይቀመጣሉ እና ወደ EPANET ፋይል ይጻፋሉ።</p>';
 $ec_lang['lpn_guide_lib_import_term']='ቤተመዛግብትን ከሌላ ፕሮጀክት ማስገባት';
 $ec_lang['lpn_guide_lib_import_def']='<p>ፋይል፣ አስገባ…፣ ቤተ-መጻሕፍት አስገባ… ሌላ የፕሮጀክት ፋይል ይከፍታል እና ሙሉ ቤተመዛግብትን ከእሱ ወደዚህ ፕሮጀክት ይቀዳል። እዚህ ቀድሞ ስሙ ጥቅም ላይ የዋለ ንጥል ይዘለላል እና ይዘረዘራል፣ ስለዚህ ቀድሞ እዚህ ያለ ምንም አይለወጥም። ፋይሉ እና ፕሮጀክቱ አንድን ብዛት በተለያዩ መለኪያ ክፍሎች ሲገልጹ ማስጠንቀቂያ ይታያል፣ ንጥሎቹም እንደተጻፉ ይገባሉ። ይህ ፕሮጀክት የሌለውን የማገናኛ ዝርዝር የሚያመለክቱ የቧንቧ ዓይነቶች ይዘረዘራሉ፤ እነሱን ለመፍታት የማገናኛዎቹን ቤተመዛግብት ከተመሳሳይ ፋይል ያስገቡ።</p>';
-$ec_lang['lpn_guide_lib_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_lib_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ቤተመዛግብትን ይምረጡ። ስርዓቶች ስርዓት 1ን፣ Demand Pattern፣ በ2:00 ልዩነት 12 ማባዣዎች ያሉት፣ 24:00ን የሚሸፍን፣ (ነባሪ) ተብሎ ምልክት የተደረገበት ይዟል። ኩርባዎች ኩርባ 1ን፣ Pump Curve for Pump 9፣ አንድ ነጥብ ያለው የፓምፕ ሄድ ኩርባ፣ 1500 gpm በ250 ft ይዟል። መቆጣጠሪያዎች ሁለት መግለጫዎች ይዟል፦ የመጀመሪያው ነጥብ 2 ከ110 በታች ሲወድቅ ግንኙነት 9ን ይከፍታል፣ ሁለተኛው ነጥብ 2 ከ140 በላይ ሲወጣ ይዘጋዋል። ህጎች የሰዓት ጊዜውን እና የታንክ 2 ደረጃን የሚፈትኑ ሁለት ህጎች ይዟል።</p><p>ውሃ፣ አስላን፣ ከዚያም ውሃ፣ ዘገባዎች፣ የሁኔታ ለውጦችን ይምረጡ። ፓምፕ L9 በ10:00 አሁን ዝግ ነው፣ በ15:00 አሁን ክፍት፣ በ21:00 አሁን ዝግ፣ ታንክ N2 ደግሞ በ22:00 አሁን እየወጣ ነው። በመቆጣጠሪያዎች ውስጥ፣ በሁለተኛው መቆጣጠሪያ 140ን ወደ 135 ይቀይሩ እና ውሃ፣ አስላን እንደገና ይምረጡ። የመጨረሻው መዘጋት ወደ 20:00 ይሸጋገራል፣ ታንክ N2 ደግሞ በ21:00 አሁን እየወጣ ነው።</p>';
-$ec_lang['lpn_guide_lib_notes_term']='ልብ ሊሏቸው የሚገቡ ነጥቦች';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>ስርዓት ሩጫው እስከቆየ ድረስ ይደገማል፣ ስለዚህ መላውን ሩጫ መሸፈን አያስፈልገውም።</li><li>የEPANET ፋይል ለቧንቧ ዓይነት ወይም ለማገናኛ ዝርዝር ቦታ የለውም። ፋይሉ እያንዳንዱ ቧንቧ የሚያነባቸውን ቁጥሮች ይይዛል፣ ላኪውም የትኞቹ ቧንቧዎች እንደተጠፍጠፉ ይናገራል።</li><li>የቤተመዛግብት ሳጥኑ ቦታና መጠን በዚህ አሳሽ ውስጥ ይቀመጣሉ። ንጥሎቹ ከፕሮጀክቱ ጋር ይቀመጣሉ።</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1069,7 +1061,6 @@ $ec_lang['lpn_guide_prop_scn_term']='በሁኔታ ውስጥ';
 $ec_lang['lpn_guide_prop_scn_def']='<p>ከመሠረት ሌላ ሁኔታ ውስጥ፣ ሁኔታዎች ሊተኩት በሚችሉት ዋጋ ላይ የተደረገ ማስተካከያ እንደ የተከፈተው ሁኔታ የራስ ዋጋ ይከማቻል፣ ረድፉም በግራው ምልክት ይደረግበታል። የሁኔታዎች አስተዳዳሪ ግቤት ምልክቶቹን ይገልጻል እና በእያንዳንዱ ሁኔታ ተመሳሳይ የሆነውን ይዘረዝራል፦ መለያ፣ መግለጫ እና ተለጣፊ ናቸው። ደንበኛ የሁኔታ ዋጋዎች የሉትም። ሁኔታዎችን መቀያየር ንብረቶችን በተመሳሳይ አካል ላይ ክፍት ያደርጋል፣ አሁን የተከፈተውን ሁኔታ ዋጋዎች ያሳያል።</p>';
 $ec_lang['lpn_guide_prop_multi_term']='በርካታ አካሎች ተመርጠዋል';
 $ec_lang['lpn_guide_prop_multi_def']='<p>ርዕሱ ለምሳሌ 2 ተመርጠዋል ይነበባል። ሳጥኑ በምርጫው ውስጥ ላለ እያንዳንዱ የአካል ዓይነት አንድ ክፍል አለው፣ በዓይነቱ ስም እና በዚያ ዓይነት የአካሎች ብዛት የተሰየመ፣ ለምሳሌ ቧንቧዎች (2)፣ እያንዳንዱ ክፍል ሊታጠፍ ይችላል። ክፍል ሠንጠረዦች እንደ አምድ ያላቸውን እና በውስጡ ባለ እያንዳንዱ አካል ላይ ሊዘጋጁ የሚችሉ ንብረቶችን ይዘረዝራል። ውጤቶች እና የቧንቧ ዓይነት የሚገልጻቸው ዋጋዎች አይዘረዘሩም። ረድፍ አካሎቹ የሚጋሩትን ዋጋ ወይም የሚለያዩበት ቦታ የተለያዩ ያሳያል።</p><p>ወደ ረድፍ ዋጋ መተየብ በምርጫው ውስጥ ባለ የዚያ ዓይነት እያንዳንዱ አካል ላይ ያዘጋጀዋል። ያልተነካ ረድፍ ምንም አይጽፍም። ማሳወቂያ ቁጥሩን ይናገራል፣ ለምሳሌ ዲያሜትር (in) በ2 ላይ ተዘጋጅቷል፣ አንድ ቀልብስም ሙሉውን ረድፍ ይቀለብሳል። ከመሠረት ሌላ ሁኔታ ውስጥ ዋጋዎቹ እንደ የራስ ዋጋዎች ይከማቻሉ።</p>';
-$ec_lang['lpn_guide_prop_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_prop_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ቧንቧ 10ን ይጫኑ። ንብረቶች ግቤቶቹን ከመግለጫ እስከ ንቁ ነው? ድረስ፣ ከዚያም በሚታየው ሰዓት ውጤቶቹን ይዘረዝራል፦ ፍሰት 1866.2 gpm፣ ፍጥነት 2.4 ft/sec እና የሄድ ኪሳራ 19.12 ft H2O።</p><p>ቧንቧ 113ን ይጫኑ እና Shift ተጭነው ቧንቧ 31ን ይጫኑ። ርዕሱ 2 ተመርጠዋል ይነበባል፣ አንዱ ክፍል ቧንቧዎች (2) ነው፣ ዲያሜትር የተለያዩ ያሳያል፣ ምክንያቱም ቧንቧ 31 6 in. ነው እና ቧንቧ 113 8 in. ነው። ለዲያሜትር 10 ያስገቡ። ማሳወቂያው ዲያሜትር (in) በ2 ላይ ተዘጋጅቷል ይነበባል፣ ሁለቱም ቧንቧዎች 10 in. ናቸው፣ አንድ ቀልብስም ወደ 6 እና 8 in. ይመልሳቸዋል።</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
@@ -1101,7 +1092,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>ከAlt+Shift በኋላ ያሉት ፊደላ�
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='ቀልብስ እና መልስ';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z የመጨረሻውን ለውጥ ይቀለብሳል፣ Ctrl+Y ወይም Ctrl+Shift+Z ደግሞ ይመልሰዋል። በሠንጠረዦች ክፍል ውስጥ፣ ክፍሉ ሲመረጥ ብቻ ቁልፎቹ የፕሮጀክቱ ናቸው፣ መተየብ ከጀመረ በኋላ ደግሞ የክፍሉ ጽሑፍ ናቸው። ገጹ የመጨረሻዎቹን 20 ደረጃዎች በማህደረ ትውስታ ውስጥ ብቻ ይይዛል፣ ፕሮጀክት መቀየር ያጠፋቸዋል። ደረጃ ሁኔታዎቹን፣ የተከፈተውን ሁኔታ እና መለኪያ ክፍሎቹን ከስዕሉ ጋር ይመልሳል።</p>';
-$ec_lang['lpn_guide_map_del_term']='ሰርዝ';
 $ec_lang['lpn_guide_map_del_def']='<p>ሰርዝ ወይም Backspace ምርጫውን ይሰርዛል፣ በመስክ ውስጥ በሚተይቡበት ጊዜ ካልሆነ፣ ያኔ ቁልፉ የመስኩ ነው። ምንም ባልተመረጠ ጊዜ ሰርዝ ያንኑ ይናገራል፣ Backspace ደግሞ ምንም አያደርግም። አንድ ቀልብስ የበርካታ አካሎችን መሰረዝ ይቀለብሳል። ከመሠረት ሌላ ሁኔታ ውስጥ፣ ሰርዝ በመሠረት ውስጥ ያለ አካልን አያስወግድም፤ ምን እንደሚያደርግ የሁኔታዎች አስተዳዳሪ ግቤት ይገልጻል።</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>ምናሌን፣ ተቆልቋይ ዝርዝርን ወይም ሳጥንን የሚዘጋ Esc ሌላ ምንም አያደርግም። የንብረቶች፣ የቅንብሮች እና የቤተመዛግብት ሳጥኖች የሚዘጉት ትኩረቱ በሳጥኑ ውስጥ ሆኖ ጠቋሚው በላዩ ላይ ሲሆን ብቻ ነው። ከእነዚህ ምንም ክፍት ባልሆነ ጊዜ፣ Esc ንቁውን መሳሪያ ወደ ምረጥ ይመልሳል፣ በምረጥ ደግሞ ምርጫውን ያጸዳል። ግማሽ የተሳለ ቧንቧ ለመተው አንድ Esc ይወስዳል፣ ወደ ምረጥ ለመመለስ ሁለተኛ። በመስክ ውስጥ Esc የመስኩ ነው።</p>';
@@ -1128,57 +1118,45 @@ $ec_lang['lpn_guide_ff_result_term']='ውጤቶቹን ማንበብ';
 $ec_lang['lpn_guide_ff_result_def']='<p>ማጠቃለያው ሁሉንም ምርመራዎች ያለፉ መገናኛዎችን፣ የእሳት ፍሰቱን ያልፈጸሙ መገናኛዎችን፣ እና የቀረውን ስርዓት የነኩ መገናኛዎችን ይቆጥራል። ሠንጠረዡ ለእያንዳንዱ የተፈተነ መገናኛ ይዘረዝራል፦ ምንም የእሳት ፍሰት ሳይወሰድ ያለውን ስታቲክ ግፊት፣ የሚያስፈልግ ፍሰት፣ በሚያስፈልግ ፍሰት ያለው ግፊት፣ የሚገኝ ፍሰት፣ የተያዘ ቀሪ ግፊት፣ የንድፍ ምርመራው ከፋ ያለ ተጽዕኖ እና የንድፍ ገደብ፣ የሩጫዎች ብዛት ይህም የመላው መረብ መፍትሔዎች ብዛት ነው፣ እና የውድቀት ዓይነቶች። ቁጥር የሌለው ክፍል ሰረዝ ያሳያል፣ ዜሮ በጭራሽ። ሊፈታ ያልቻለ መገናኛ ከቁጥሮች ይልቅ ምክንያቱን ያሳያል። ሠንጠረዡ ቢበዛ 200 መገናኛዎችን ያትማል እና ስንቱን እንዳላተመ ይናገራል።</p>';
 $ec_lang['lpn_guide_ff_marks_term']='ቀለበቶች፣ አቁም እና በአንድ ጊዜ አንድ ትንተና';
 $ec_lang['lpn_guide_ff_marks_def']='<p>ከሩጫ በኋላ፣ የእያንዳንዱ የተፈተነ መገናኛ ክብ በውጤቱ መሠረት በካርታው ላይ ይከበባል፣ ከበቦቹም በቀለም ብቻ ሳይሆን በመስመር ዘይቤም ይለያያሉ። በካርታው ላይ የተመረጡትን መገናኛዎች ብቻ ለመፈተን የተመረጡ መገናኛዎችን ይምረጡ፤ የተመረጠ ሌላ ማንኛውም ነገር ይቆጠራል እና አይፈተንም። አቁም ሩጫን ያቆማል እና ቀድሞ የተጠናቀቁትን መገናኛዎች ይይዛል። ከእሳት ፍሰት፣ ወሳኝነት እና የፍላጎት ማመጣጠኛ ትንተናዎች አንዱ ብቻ በአንድ ጊዜ ይሮጣል።</p>';
-$ec_lang['lpn_guide_ff_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_ff_example_def']='<p>የNet1 ምሳሌን ይክፈቱ፣ ውሃ፣ ተንትን፣ የእሳት ፍሰት ትንተና…ን ይምረጡ፣ እና ሳጥኑ እንደተከፈተ አሩጥን ይጫኑ። የጊዜ ደረጃው 0:00 ነው፣ ሩጫውም መላውን መረብ 135 ጊዜ ይፈታል። ከዘጠኙ መገናኛዎች ስምንቱ ሁሉንም ምርመራዎች ያልፋሉ። መገናኛ N32 የእሳት ፍሰቱን ይወድቃል፦ ስታቲክ ግፊቱ 111 psi ነው፣ በሚያስፈልገው 1000 gpm 1.19 psi ብቻ ይቀራል፣ የሚገኘው ፍሰቱም 892 gpm ነው። መገናኛ N31 1339 gpm ማድረስ ይችላል፣ መገናኛ N12 ደግሞ ከ10000 gpm በላይ።</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='እያንዳንዱ ጉዳይ የሚያደርገው';
 $ec_lang['lpn_guide_cr_case_def']='<p>በወሰኑ ውስጥ ላለ እያንዳንዱ ግንኙነት፣ ግንኙነቱ በመረቡ ቅጂ ላይ ንቁ እንዳይሆን ይደረጋል፣ ቅጂውም በስክሪኑ ላይ ባለው የጊዜ ደረጃ በተከፈተው ሁኔታ ውስጥ ይፈታል። ሩጫ ለእያንዳንዱ ግንኙነት አንድ መፍትሔ ሲሆን ምንም ሳይሰበር አንድ ተጨማሪ ነው። ወደ ማጠራቀሚያ ወይም ታንክ ምንም ክፍት መንገድ የሌለው መገናኛ ተቋርጧል፦ ከመፍትሔው በፊት ይወገዳል፣ ፍላጎቱም እንደ ያልተሟላ ፍላጎት ይቆጠራል። አሁንም ከተገናኙት መገናኛዎች ውስጥ፣ ከዝቅተኛው በታች ያሉ መገናኛዎች ግፊታቸው ከሚፈቀድ ዝቅተኛ ግፊት በታች የሚወድቅን ይዘረዝራል። ምንም ሳይሰበር ቀድሞውኑ ከእሱ በታች የሆነ መገናኛ በየትኛውም ግንኙነት ላይ አይቆጠርም፣ ማጠቃለያውም ስንት እንደሆኑ ይናገራል። የሚፈቀድ ዝቅተኛ ግፊት በእሳት ፍሰት ትንተና ውስጥ ካለው በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት ሳጥን ጋር አንድ ቅንብር ነው።</p>';
 $ec_lang['lpn_guide_cr_dead_term']='የሞቱ ጫፎች እና ዝርዝሩ';
 $ec_lang['lpn_guide_cr_dead_def']='<p>የሞተ-ጫፍ ግንኙነት ማለት መወገዱ በእሱ በኩል ብቻ ሊደረስባቸው የሚችሉ መገናኛዎችን የሚያቋርጥ ነው። ከእሱ ባሻገር ያለው ሁሉ የእሱ ኪሳራ ነው፣ ስለዚህ የሞቱ ጫፎችን ዝለል ሲመረጥ ግንኙነቱ አይፈታም፣ ማጠቃለያውም ስንቶች እንደተዘለሉ ይናገራል። ዝርዝሩ ለእያንዳንዱ ግንኙነት ያልተሟላ ፍላጎትን፣ የተቋረጡ መገናኛዎችን እና ከዝቅተኛው በታች ያሉ መገናኛዎችን ያሳያል፣ እያንዳንዱ በቁጥሩ እና በመጀመሪያዎቹ አምስት መለያዎች፣ በመለያ ላይ መጫንም በካርታው ላይ ወደ እሱ ይወስዳል። ስርዓቱን የሚያስከፍሉ ግንኙነቶች የአምድ ርዕስ ለመደርደር እስኪጫን ድረስ መጀመሪያ ይዘረዘራሉ፣ ማጠቃለያውም ከተፈተኑት ግንኙነቶች ብዛት ጋር ይቆጥራቸዋል። በካርታው ላይ የተመረጡትን ግንኙነቶች ብቻ ለመስበር የተመረጡ ግንኙነቶችን ይምረጡ።</p>';
-$ec_lang['lpn_guide_cr_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_cr_example_def']='<p>የNet1 ምሳሌን ይክፈቱ፣ ውሃ፣ ተንትን፣ የወሳኝነት ትንተና…ን ይምረጡ፣ ለሚፈቀድ ዝቅተኛ ግፊት 116 ያስገቡ፣ እና አሩጥን ይጫኑ። የጊዜ ደረጃው 0:00 ነው፣ ሩጫውም መላውን መረብ 14 ጊዜ ይፈታል። ከ13 ግንኙነቶች አራቱ ሲወጡ መገናኛን ከ116 psi በታች ይጥላሉ፦ L9 (N10፣ N11 እና N21)፣ L10 (N11 እና N21)፣ L111 (N21 እና N22) እና L112 (N21 እና N22)። ሁለት መገናኛዎች ምንም ሳይሰበር ቀድሞውኑ ከ116 psi በታች ናቸው እና አይቆጠሩም። Net1 ቀለበት ስላለው፣ አንድ ግንኙነት ማጣት መገናኛን ያለ አቅርቦት በጭራሽ አይተውም።</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='አሩጥ';
 $ec_lang['lpn_guide_ds_run_def']='<p>አሩጥ በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛ ያባዛል፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ እና በተከፈተው ሁኔታ ውስጥ በመረቡ ቅጂ ላይ። ሁለት መፍትሔዎችን ያደርጋል፣ አንዱ ፍላጎቶቹ እንዳሉ፣ አንዱ ተመጣጥኖ። ውጤቱ ዝቅተኛ ግፊቶችን እና ከፍተኛ ፍጥነቶችን ይዘረዝራል፣ እያንዳንዱ የተመጣጠነ ዋጋ ካርታው ከሚያሳየው ያልተመጣጠነ ዋጋ አጠገብ። እያንዳንዱ ዝርዝር አሥር ረድፎችን ይይዛል፣ ሳጥኑም ስንት ግንኙነቶችን እንደማያሳይ ይናገራል። የፍላጎት ማመጣጠኛ በተከፈተው ሁኔታ የፍላጎት ማባዣ ላይ በተጨማሪ ይተገበራል፣ በፕሮጀክቱ ውስጥም በጭራሽ አይቀመጥም።</p>';
-$ec_lang['lpn_guide_ds_find_term']='ፈልግ';
 $ec_lang['lpn_guide_ds_find_def']='<p>ፈልግ ከ0 እስከ 20 የፍላጎት ማመጣጠኛዎችን፣ እስከ ቅርብ 0.01፣ ይፈልጋል፣ እያንዳንዱ የተመረጠ መገናኛ ቢያንስ የሚፈቀድ ዝቅተኛ ግፊትን የሚይዝበትን ትልቁን። ማመጣጠኛውን እና እዚያ ያለውን ዝቅተኛ ግፊት ሪፖርት ያደርጋል፣ እንዲሁም ግፊቱ መጀመሪያ ከገደቡ በታች የሚወድቅበትን ቀጣዩን ደረጃ። እንደገቡት ያሉ ፍላጎቶች ቀድሞውኑ መገናኛን ከገደቡ በታች ከተዉ፣ መልሱ በማስጠንቀቂያ ምልክት ምልክት ይደረግበታል። በ20 እያንዳንዱ መገናኛ ገደቡን ከያዘ፣ መልሱ ያንኑ ይናገራል። አቁም ፍለጋን ያለ መልስ ያቆማል። የሚፈቀድ ዝቅተኛ ግፊት በእሳት ፍሰት ትንተና ውስጥ ካለው በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት ሳጥን ጋር አንድ ቅንብር ነው።</p>';
 $ec_lang['lpn_guide_ds_scope_term']='መገናኛዎች እና የጊዜ ደረጃ';
 $ec_lang['lpn_guide_ds_scope_def']='<p>በተመረጡ መገናኛዎች ሲሆን፣ በካርታው ላይ የተመረጡት መገናኛዎች ብቻ ይመጠናሉ እና ይመረመራሉ። ሌሎች መገናኛዎች እንዳሉ ይቀራሉ፣ ከገደቡ በታች የሚወድቁትም መልሱን ሳይገድቡ ይዘረዘራሉ። በስክሪኑ ላይ ያለው የጊዜ ደረጃ ብቻ ይመጠናል፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ። ከፍተኛውን ለመፈተን፣ ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛው ፍላጎት ያንቀሳቅሱ።</p>';
-$ec_lang['lpn_guide_ds_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_ds_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ተንትን፣ የፍላጎት ማመጣጠኛ…ን ይምረጡ። በጊዜ ደረጃ 0:00፣ ሳጥኑ እንደተከፈተ ፈልግን ይጫኑ። እያንዳንዱ መገናኛ እስከ 5.76 የፍላጎት ማመጣጠኛ ድረስ ቢያንስ 20 psi ይይዛል፣ እዚያም ዝቅተኛው ግፊት በመገናኛ N32 20.11 psi ነው። በ5.77 19.8 psi ነው፣ ፍለጋውም 13 መፍትሔዎችን ወሰደ። ለፍላጎት ማመጣጠኛ 3 ያስገቡ እና አሩጥን ይጫኑ፦ መገናኛ N32 ካልተመጣጠነ 111 psi ወደ 85.99 psi ይወድቃል፣ ግንኙነት L112 ደግሞ ከ0.535 ft/sec ወደ 3.13 ft/sec ይወጣል።</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='ዘገባውን ማንበብ';
 $ec_lang['lpn_guide_en_read_def']='<p>ውሃ፣ ዘገባዎች፣ የፓምፕ ኃይልን ይምረጡ። ዘገባው በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ላይ የእያንዳንዱን ፓምፕ ኃይል ያጠቃልላል፣ ስለዚህ ከ0 የሚበልጥ ጠቅላላ የመሮጫ ጊዜ እና ስሌት ይፈልጋል። ለእያንዳንዱ ፓምፕ የስራ %፣ ብቃት፣ አማካይ kW፣ ከፍተኛ kW፣ kWh እና ወጪን ይዘረዝራል። አማካይ kW ፓምፑ በሚሮጥበት ጊዜ ያለው አማካይ ነው፣ ስራ ፈት ጊዜዎችን አያካትትም። ከሠንጠረዡ በታች የተጠቀመው ኃይል፣ የኃይል ወጪ፣ ከፍተኛ የኃይል አጠቃቀም፣ የከፍተኛ ፍላጎት ወጪ እና ጠቅላላ ወጪ አሉ። ፓምፕ የሌለው መረብ ሪፖርት የሚደረግ ነገር የለውም።</p>';
 $ec_lang['lpn_guide_en_set_term']='ቁጥሮቹን የሚወስነው';
 $ec_lang['lpn_guide_en_set_def']='<p>ቅንብሮች፣ ኃይል የፓምፕ ብቃት (በመቶኛ)ን፣ የብቃት ኩርባ ለሌለው እያንዳንዱ ፓምፕ የሚያገለግለውን፣ የአንድ ኪሎዋት ሰዓት የኃይል ዋጋን፣ በእያንዳንዱ የስርዓት ደረጃ ዋጋውን የሚያባዛ የዋጋ ስርዓትን፣ የከፍተኛ ፍላጎት ክፍያ በkW፣ እና ከወጪዎቹ አጠገብ የሚታተም እና ወጪዎቹን የማይለውጥ የምንዛሬ ጽሑፍን ይይዛል። ፓምፕ በንብረቶች ውስጥ የራሱ ዋጋ፣ የዋጋ ስርዓት እና የብቃት ኩርባ ሊኖረው ይችላል። ዋጋዎቹ፣ ስርዓቱ፣ የከፍተኛ ፍላጎት ክፍያ፣ የፓምፕ ብቃት (በመቶኛ) እና የፓምፕ የራሱ ዋጋዎች በኃይል ወጪ ምድብ ውስጥ ናቸው፣ ስለዚህ ሁኔታ ሊተካቸው ይችላል። ዋጋ ካልተገለጸ ወይም ዋጋው ዜሮ ከሆነ፣ እያንዳንዱ ወጪ ዜሮ ነው እና ሪፖርቱ ያንኑ ይናገራል። መተግበሪያው ምንም ዋጋ አይጠቁምም።</p>';
-$ec_lang['lpn_guide_en_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_en_example_def']='<p>ጠቅላላ የመሮጫ ጊዜው 24:00 የሆነውን የNet1 ምሳሌ ይክፈቱ እና ያስሉ። ውሃ፣ ዘገባዎች፣ የፓምፕ ኃይልን ይምረጡ። ፓምፕ L9 ከስራው 65.71% በ75% ብቃት ይሮጣል፣ እና በአማካይ 96.22 kW፣ በከፍተኛው 96.71 kW እና 1518 kWh ይጠቀማል። ምንም ዋጋ አልተገለጸም፣ ስለዚህ ወጪው 0 ነው እና ሪፖርቱ ያንኑ ይናገራል። በቅንብሮች፣ ኃይል ውስጥ ለኃይል ዋጋ 0.12 ያስገቡ እና እንደገና ያስሉ፦ የL9 ወጪ 182 ነው፣ ጠቅላላ ወጪው።</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='ሥዕሉ ምንድን ነው';
 $ec_lang['lpn_guide_ct_what_def']='<p>ውሃ፣ ግራፎች፣ ኮንቱርን ይምረጡ። ረድፉ ሥዕሉን በተከፈተው ሁኔታ ውስጥ ያበራል፣ እንደ ለስላሳ መሙያ ምልክት ከተደረገባቸው መስመሮች ጋር፣ ነጥቦቹ ገና ካልተቀቡ ግፊቱን ተጠቅሞ፣ እና ሳጥኑን ይከፍታል። ሥዕሉ የነጥቦቹን ቀለሞች በቧንቧዎቹ ላይ እና ከጎናቸው እስከ የመካከለኛ ቧንቧ ርዝመት የተወሰነ ብዜት ድረስ ያሰራጫል፣ በውጫዊው ክፍል እየደበዘዘ። በፓምፖች፣ ቫልቮች ወይም ዝግ ግንኙነቶች ላይ አይቀባም። ከቀለም ቁልፉ በታች ያለው መስመር ሥዕሉ ስንት ነጥቦችና ቧንቧዎች እንደሚጠቀም፣ ከቧንቧዎቹ ጎን ያለውን ስፋት እና የመስመሮቹን ክፍተት ይናገራል። በጣም ጥቂት ነጥቦች ሲኖሩ ያንኑ ይናገራል።</p>';
 $ec_lang['lpn_guide_ct_box_term']='ሳጥኑ';
 $ec_lang['lpn_guide_ct_box_def']='<p>ኮንቱሮችን አሳይ ሲጸዳ መሙያውን እና መስመሮቹን ይደብቃል እና የነጥብ ቀለሞችን ይይዛል። ሳጥኑ ነጥብ ቀለም በ እና የቀለም እቅድንም ይይዛል፣ እነሱም በቅንብሮች፣ እይታ፣ የነጥብ ቀለሞች ውስጥ ያሉት ተመሳሳይ ሁለት ቅንብሮች ናቸው፣ መሙያ (ምንም፣ ለስላሳ ወይም ባንዶች፣ ይህም እያንዳንዱን ክፍል ጠፍጣፋ ይቀባል)፣ የመሙያ ግልጽነት፣ የኮንቱር መስመሮች ከክፍተታቸው እና ምልክቶቻቸው ጋር፣ እና ማቋረጫ ስፋት በመካከለኛ ቧንቧ ርዝመት ብዜቶች። በምድር ላይ በተቀመጠ ፕሮጀክት ውስጥ፣ ሳጥኑ ጎብኚው የመረቡን አካባቢ የሰቆች ቁጥሮች ለመላክ ከተስማማ በኋላ በነጥቦች መካከል ያለውን መሬት ከMapbox DEM ሊወስድ ይችላል። እነዚህ ቅንብሮች ከፕሮጀክቱ ጋር ይቀመጣሉ እና በሁኔታ ሊተኩ ይችላሉ። ሥዕሉ ማሳያውን ብቻ ይለውጣል፣ መረቡን አይደለም።</p>';
-$ec_lang['lpn_guide_ct_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_ct_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ግራፎች፣ ኮንቱርን ይምረጡ። ነጥቦቹ በግፊት ተቀብተዋል፣ ከቀለም ቁልፉ በታች ያለው መስመርም 9 ነጥቦች፣ 11 ቧንቧዎች፣ ከጎናቸው የመካከለኛ ቧንቧ ርዝመት 2.5 እጥፍ ስፋት፣ እና በየ5 psi መስመሮች ይናገራል። ፓምፑ፣ ግንኙነት 9፣ ከ11 ቧንቧዎች አንዱ አይደለም። ኮንቱሮችን አሳይ ሲጸዳ፣ ነጥቦቹ በግፊት ተቀብተው ይቆያሉ።</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='ዘገባው የያዘው';
 $ec_lang['lpn_guide_rr_what_def']='<p>ውሃ፣ ዘገባዎች፣ ስራን ይምረጡ። ዘገባው EPANET ፈታች ለመጨረሻው የተራዘመ ጊዜ ማስመሰያ የጻፈው ጽሑፍ ነው፣ በገጾች። በባነሩ እና በመረቡ ስም ይጀምራል፣ ከዚያም መገናኛዎቹን፣ ማጠራቀሚያዎቹን፣ ታንኮቹን፣ ቧንቧዎቹን፣ ፓምፖቹን እና ቫልቮቹን ይቆጥራል፣ ከዚያም የትንተና አማራጮቹን ይናገራል፣ ከዚያም የሩጫውን የሃይድሮሊክ ሁኔታ ከማስጠንቀቂያዎቹ ጋር ይዘረዝራል። ቅዳ አዝራሩ ጽሑፉን ይቀዳል።</p>';
-$ec_lang['lpn_guide_rr_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_rr_example_def']='<p>አስቀድሞ የተሰላውን የNet1 ምሳሌ ይክፈቱ እና ውሃ፣ ዘገባዎች፣ ስራን ይምረጡ። ማጠቃለያው 9 መገናኛዎች፣ 1 ማጠራቀሚያ፣ 1 ታንክ፣ 12 ቧንቧዎች፣ 1 ፓምፕ እና 0 ቫልቮች ይቆጥራል። የሄድ ኪሳራ ቀመር Hazen-Williams ነው፣ የሃይድሮሊክ ጊዜ ደረጃው 1.00 hrs ነው፣ ጠቅላላ ቆይታውም 24.00 hrs ነው።</p>';
 $ec_lang['lpn_guide_st_what_term']='የሚዘረዘረው';
 $ec_lang['lpn_guide_st_what_def']='<p>ውሃ፣ ዘገባዎች፣ የሁኔታ ለውጦችን ይምረጡ። እያንዳንዱ ረድፍ የለውጥ ሰዓትን እና ለውጡን ይሰጣል፦ ፓምፕ፣ ቫልቭ ወይም ቧንቧ አሁን ክፍት ወይም አሁን ዝግ፣ ወይም ታንክ አሁን እየሞላ፣ እየወጣ፣ ሙሉ ወይም ባዶ። ሙሉ በሙሉ ያልተጣጠመ የጊዜ ደረጃም ይዘረዘራል። ዝርዝሩ በጊዜ ቅደም ተከተል ነው እና ለውጦችን ብቻ ይይዛል፣ እያንዳንዱን ደረጃ አይደለም። ከሠንጠረዦች ፓነል እና ከሙሉ ሪፖርት ጋር ከተመሳሳይ የተራዘመ ጊዜ ሩጫ ይነበባል።</p>';
-$ec_lang['lpn_guide_st_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_st_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ዘገባዎች፣ የሁኔታ ለውጦችን ይምረጡ። ታንክ N2 በ1:00 አሁን እየሞላ ነው፣ በ11:00 እየወጣ፣ በ16:00 እየሞላ፣ እና በ22:00 እየወጣ። ፓምፕ L9 በ10:00 አሁን ዝግ ነው፣ በ15:00 አሁን ክፍት፣ እና በ21:00 አሁን ዝግ።</p>';
-$ec_lang['lpn_guide_fr_what_term']='ሠንጠረዡ የያዘው';
 $ec_lang['lpn_guide_fr_what_def']='<p>ውሃ፣ ዘገባዎች፣ ሙሉን ይምረጡ። ሠንጠረዡ በእያንዳንዱ የሪፖርት ጊዜ ደረጃ ለእያንዳንዱ ነጥብ እና ግንኙነት አንድ ረድፍ አለው፣ በሠንጠረዦች ፓነል መለኪያ ክፍሎች። አምዶቹ ዓይነት፣ መለያ፣ ፍላጎት፣ ሄድ፣ ግፊት፣ የክሎሪን መጠን፣ ፍሰት፣ ፍጥነት፣ የሄድ ኪሳራ፣ የፓምፕ ሄድ እና ሁኔታ ናቸው፣ አካሉ እንደዚህ ያለ ብዛት ከሌለው ክፍሉ ባዶ ነው። የጊዜ ደረጃ ዝርዝር የሚታየውን ደረጃ ይመርጣል፣ CSV አውርድ እና ሪፖርት አትም ደግሞ እያንዳንዱን ደረጃ ይይዛሉ። የተራዘመ ጊዜ ማስመሰያ ከሌለ፣ ሠንጠረዡ አሁን ያለውን መፍትሔ በአንድ ቅጽበት ያሳያል።</p>';
-$ec_lang['lpn_guide_fr_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_fr_example_def']='<p>የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ዘገባዎች፣ ሙሉን ይምረጡ። 24ቱ አካሎች በ25 የሪፖርት ደረጃዎች ከ0:00 እስከ 24:00 ተዘርዝረዋል፣ ይህም 600 ረድፎች ነው። በ0:00፣ መገናኛ 11 የ150 gpm ፍላጎት፣ የ985.23 ft H2O ሄድ እና የ119.26 psi ግፊት አለው።</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='ዘገባው የሚያወዳድረው';
 $ec_lang['lpn_guide_cal_what_def']='<p>ውሃ፣ ዘገባዎች፣ ካሊብሬሽንን ይምረጡ። የመለኪያ ዝርዝር ፋይሉ የሚለካውን ይመርጣል፦ ፍላጎት፣ ሄድ፣ ግፊት፣ የክሎሪን መጠን፣ ፍሰት ወይም ፍጥነት። ለእያንዳንዱ መለኪያ አንድ ፋይል ይያዛል፣ የካሊብሬሽን ፋይል ጫን… አዝራርም የፋይል መምረጫ ይከፍታል። ዘገባው ሦስት ገጾች አለው። ስታቲስቲክስ ለእያንዳንዱ ቦታ የምልከታዎችን ብዛት፣ የታየውን አማካይ፣ የተሰላውን አማካይ፣ አማካይ ስህተቱን እና RMS ስህተቱን ይሰጣል፣ ከዚያም ለሁሉም ቦታዎች በአንድነት የመረብ ረድፍ እና በአማካዮቹ መካከል ያለውን ዝምድና። የዝምድና ሥዕል እያንዳንዱን መለኪያ በታየው ዋጋ በአግድም እና በተሰላው ዋጋ በቁመት ያስቀምጣል፣ ሁለቱ በሚስማሙበት ሰያፍ መስመር። የአማካይ ንጽጽሮች የታዩትን እና የተሰሉትን አማካዮች ለእያንዳንዱ ቦታ እንደ ጥንድ አሞሌዎች ይስላል።</p><p>የተሰላው ዋጋ ከተራዘመው ጊዜ ሩጫ ይነበባል፣ በሁለት የሪፖርት ደረጃዎች መካከል ያለ መለኪያም በመካከላቸው ከተጠጋጋው ዋጋ ጋር ይነጻጸራል። ሩጫው ሪፖርት ካደረገባቸው ጊዜያት ውጪ የሆነ መለኪያ ይዘለላል እና ይቆጠራል። በአንድ ቅጽበት መፍትሔ፣ እያንዳንዱ መለኪያ ፋይሉ የትኛውንም ሰዓት ቢሰጥ ከዚያ አንድ ውጤት ጋር ይነጻጸራል። ዘገባው መረቡ ከተሰላ በኋላ ይሞላል።</p>';
 $ec_lang['lpn_guide_cal_file_term']='የካሊብሬሽን ፋይል';
 $ec_lang['lpn_guide_cal_file_def']='<p>በእያንዳንዱ መስመር የቦታ መለያ፣ ሰዓት እና የተለካ ዋጋ ያለው የጽሑፍ ፋይል። ሰዓቱ ከማስመሰያው መጀመሪያ ይለካል፣ በአስርዮሽ ሰዓቶች ወይም ሰዓት:ደቂቃ። ሴሚኮሎን አስተያየት ይጀምራል። ሰዓትና ዋጋ ብቻ ያለው መስመር ከላዩ ያለው ቦታ ነው። ዋጋዎቹ በፕሮጀክቱ መለኪያ ክፍሎች ይነበባሉ፣ ዘገባውም የትኛው ክፍል እንደሆነ ይናገራል። በመረቡ ውስጥ የሌለ ቦታ ይዘረዘራል እና መለኪያዎቹ እንደተዘለሉ ይቆጠራሉ፣ የማይነበብ መስመር በመስመር ቁጥር ይዘረዘራል፣ የቀረውም የፋይሉ ክፍል ጥቅም ላይ ይውላል። ፋይል ለተከፈተው ፕሮጀክት እና ለዚህ የገጽ ጭነት ብቻ በማህደረ ትውስታ ውስጥ ይቆያል። ከፕሮጀክቱ ጋር ወይም በዚህ መሣሪያ ላይ አይቀመጥም። የጊዜ ተከታታይ ገበታ ተመሳሳዩን ብዛት ሲያሳይ፣ የተለኩት ዋጋዎች እንደ ቀለበቶች በላዩ ላይ ይሳላሉ።</p>';
-$ec_lang['lpn_guide_cal_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_cal_example_def']='<p>የNet1 ምሳሌን ይክፈቱ፣ ያስሉት፣ እና ውሃ፣ ዘገባዎች፣ ካሊብሬሽንን ይምረጡ። ግፊት ሲመረጥ፣ መገናኛ 11ን በ0:00 118.5 psi እና በ12:00 121.0 psi፣ መገናኛ 31ን በ6:00 110.2 psi እና በ18:00 108.7 psi፣ እና መገናኛ 99ን በ0:00 50 psi የሚሰጥ ፋይል ይጫኑ፣ ከዚያም መረጃ ያልሆነ መስመር ይከተል። ዘገባው ፋይሉ በ3 ቦታዎች 5 መለኪያዎች እንዳሉት ይናገራል፣ መገናኛ 99ን በመረቡ ውስጥ እንደሌለ ከ1 የተዘለለ መለኪያ ጋር ይሰይማል፣ የማይነበበውንም መስመር ይዘረዝራል። ስታቲስቲክስ መገናኛ 11ን ከ2 ምልከታዎች፣ የታየ አማካይ 119.75 psi፣ የተሰላ አማካይ 116.53 psi፣ አማካይ ስህተት 3.98 እና RMS ስህተት 5.12 ጋር ያሳያል። መገናኛ 31 109.45፣ 118.71፣ 9.26 እና 9.79 አለው። የመረብ ረድፍ 4 ምልከታዎች፣ አማካይ ስህተት 6.62 እና RMS ስህተት 7.81 አለው።</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='መመሪያውን መጠቀም';
@@ -1223,7 +1201,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='እዚህ የሆነ ችግር አለ?';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='ይህን መልእክት ደብቅ';
 $ec_lang['lpn_msglog_hidden']='የተደበቀ';
 $ec_lang['lpn_msglog_unhide']='አሳይ';
 $ec_lang['lpn_status_hidden_tip']='የተደበቀውን መልእክት በካርታው ላይ እንደገና አሳይ።';
@@ -1358,7 +1335,6 @@ $ec_lang['lpn_result_reaction_rate']='የምላሽ መጠን';
 $ec_lang['lpn_result_status']='ሁኔታ';
 $ec_lang['lpn_result_status_open']='ክፍት';
 $ec_lang['lpn_result_status_closed']='ዝግ';
-$ec_lang['lpn_result_head']='ሄድ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='በዚህ ነጥብ ላይ ያለው የውሃ እምቅ ኃይል፣ እንደ የውሃ አምድ ከፍታ የተጻፈ። ግፊት የመለኪያ ንባብ ሲሆን፣ ይህ ፍጹም ከፍታ ነው።';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1731,7 +1707,6 @@ $ec_lang['lpn_morph_ok']='ቀይር';
 $ec_lang['lpn_morph_other_kind']='ነጥብ ወደ ሌላ የነጥብ ዓይነት ብቻ፣ ግንኙነትም ወደ ሌላ የግንኙነት ዓይነት ብቻ ሊቀየር ይችላል። አልተቀየረም፦ {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='ዓይነት';
 $ec_lang['lpn_field_type_tip']='የዚህ አካል ዓይነት በዚህ ሁኔታ ውስጥ፣ በዓይነት ቀይር የተዘጋጀ። የወላጅ ሁኔታን ዓይነት ለመጠቀም የራስ ዋጋውን ያጽዱ።';
 $ec_lang['lpn_change_type_lost']='እነዚህ ዋጋዎች ይጠፋሉ፦';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -2055,7 +2030,6 @@ $ec_lang['lpn_pgraph_none']='ይህ ንብረት በአሁኑ ስራ ውስጥ �
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='ከ{node} የምንጭ ድርሻ';
-$ec_lang['lpn_result_pump_head']='ሄድ';
 $ec_lang['lpn_result_pump_head_tip']='ፓምፑ ከመምጠጫ እስከ መልቀቂያ የሚጨምረው ሄድ፣ እንደ አዎንታዊ ቁጥር ይታያል። ፈታቹና የEPANET ፋይሎች እንደ አሉታዊ የሄድ ኪሳራ ይይዙታል።';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2145,7 +2119,6 @@ $ec_lang['lpn_file_new']='አዲስ ፕሮጀክት…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='አዲስ ፕሮጀክት';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2571,7 +2544,6 @@ $ec_lang['lpn_file_training_permission']='ለመጀመሪያ ጊዜ ሲያስቀ
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='ቀጥል';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ፋይሉን እንደገና ይምረጡ';
@@ -2683,7 +2655,6 @@ $ec_lang['lpn_notes_engine_def']='በዚህ ገጽ ላይ ያለው የEPANET �
 $ec_lang['lpn_guide_nt_example_term']='በNet1 ላይ ምሳሌ፦ ከኩርባው ያለፈ ፓምፕ';
 $ec_lang['lpn_guide_nt_example_def']='የNet1 ምሳሌን ይክፈቱ እና ውሃ፣ ቤተመዛግብትን ይምረጡ። ኩርባ 1፣ የፓምፕ 9 የፓምፕ ኩርባ፣ አንድ ነጥብ አለው፣ 1500 gpm በ250 ft። ፍሰቱ ዜሮ ሲሆን ያለው ሄድ 333.3 ft ነው፣ ከፍተኛው ፍሰትም 3000 gpm ነው። በ3500 gpm፣ ማለትም ከኩርባው ጫፍ ባሻገር፣ ኩርባው −120.4 ft ሄድ ይሰጣል። የEPANET ፈታች ያንኑ ሄድ ሪፖርት ያደርጋል፣ በፓምፑ ላይ የ120.4 ft ኪሳራ፣ እና ፓምፖች በቂ ፍሰት ወይም ሄድ ማድረስ እንደማይችሉ ያስጠነቅቃል።';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='በNet1 ላይ ምሳሌ';
 $ec_lang['lpn_guide_own_example_def']='<p>የNet1 ምሳሌን ይክፈቱ፣ Ctrl+K ይጫኑ እና critical ብለው ይተይቡ። ምናሌዎች ከውሃ፣ ተንትን በታች የወሳኝነት ትንተና… ረድፉን ያሳያል። ሳጥኖች የሚጠቅሱትን ግቤቶች ያሳያል፣ ከእነሱም ፈልግና ተካ፣ የእሳት ፍሰት ትንተና እና የወሳኝነት ትንተና፣ እንዲሁም ይህ ግቤት። ረድፉን መምረጥ የወሳኝነት ትንተና… በተንትን ምናሌ ውስጥ የት እንዳለ ያሳያል፣ አያስኬደውም።</p>';
 $ec_lang['lpn_id_invalid']='ክፍተትና ጥቅስ ምልክት የሌለበት መለያ ያስገቡ።';
 $ec_lang['lpn_id_taken']='ያ መለያ አስቀድሞ ጥቅም ላይ ውሏል።';
@@ -2756,8 +2727,6 @@ $ec_lang['lpn_link_end_same']='ከ እና ወደ የተለያዩ ነጥቦች �
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='ቧንቧ {id} በዚህ ነጥብ ይከፈል?';
-$ec_lang['lpn_split_yes']='አዎ';
-$ec_lang['lpn_split_no']='አይ';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}፣ መታጠፊያ {n}';
@@ -3015,7 +2984,6 @@ $ec_lang['lpn_labels_col_decimals']='አስርዮሽ';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='አሳይ';
 $ec_lang['lpn_labels_show_tip']='ዋጋዎች በምልክት ላይ የሚታዩበት ቅደም ተከተል። ቁጥር 1 የተባለው ዋጋ መጀመሪያ ይመጣል፦ በተደራረበ ምልክት አናት ላይ፣ በአንድ መስመር ምልክት ደግሞ በመጀመሪያ።';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3339,7 +3307,6 @@ $ec_lang['lpn_sm_make_current']='የአሁኑ አድርግ';
 $ec_lang['lpn_sm_current_already']='ይህ ሁኔታ ቀድሞውኑ የአሁኑ ሁኔታ ነው።';
 $ec_lang['lpn_sm_none_selected']='መጀመሪያ በዛፉ ውስጥ ንጥል ይምረጡ።';
 $ec_lang['lpn_sm_base_named']='የዛፍ መሠረት ዳግም አይሰየምም።';
-$ec_lang['lpn_sm_copy']='ቅዳ';
 $ec_lang['lpn_sm_merge_up']='ወደ ላይ አዋህድ';
 $ec_lang['lpn_sm_merge_up_tip']='የተመረጠውን አማራጭ የራስ ዋጋዎች በዛፉ ውስጥ ከሱ በላይ ወዳለ አማራጭ ያንቀሳቅሳል። የተመረጠው አማራጭ ከዚያ እነዚያን ዋጋዎች ይወርሳል።';
 $ec_lang['lpn_sm_merge_up_root']='የመሠረት አማራጭ ከላዩ የሚዋሃድበት ምንም የለውም።';
@@ -3464,10 +3431,8 @@ $ec_lang['lpn_alt_cat_initial']='የመጀመሪያ ቅንብሮች';
 $ec_lang['lpn_alt_cat_constituent']='ንጥረ ነገር';
 $ec_lang['lpn_alt_cat_fireflow']='የእሳት ፍሰት';
 $ec_lang['lpn_alt_cat_energy']='የኃይል ወጪ';
-$ec_lang['lpn_alt_cat_userdata']='ብጁ ንብረቶች';
 $ec_lang['lpn_alt_cat_text']='ጽሑፍ';
 $ec_lang['lpn_alt_cat_presentation']='አቀራረብ';
-$ec_lang['lpn_alt_cat_calculation']='ስሌት';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3814,7 +3779,6 @@ $ec_lang['lpn_settings_runbox']='የሩጫ ሂደት ሳጥን አሳይ';
 $ec_lang['lpn_settings_runbox_tip']='የአንድ ስራ እድገትና ውጤት የሚዘግብ ሳጥን። ሲጠፋ፣ የተጠናቀቀ ስራ በምትኩ ተመሳሳዩን መረጃ ለጥቂት ሰከንዶች በሁኔታ መስመር ላይ ያሳያል። ይህ ለዚህ አሳሽ እንጂ ለፕሮጀክቱ ቅንብር አይደለም።';
 $ec_lang['lpn_time_run_failed']='ስራው አልተጠናቀቀም፣ ስለዚህ ለኋለኞቹ ጊዜያት ውጤት የለም።';
 $ec_lang['lpn_time_run_report']='የስራ ሪፖርት';
-$ec_lang['lpn_time_run_report_copy']='ቅዳ';
 $ec_lang['lpn_time_run_report_copied']='ተቀድቷል';
 $ec_lang['lpn_time_run_report_tip']='EPANET ለመጨረሻው ስራ የጻፈው ሪፖርት፣ ቃል በቃል፦ ተጣጥሞ እንደሆነ፣ እና ማንኛውም ማስጠንቀቂያ። ጽሑፉ የሚመነጨው በEPANET ፈታች እንጂ በዚህ ገጽ አይደለም።';
 
@@ -3994,7 +3958,6 @@ $ec_lang['lpn_reaction_order_wall']='የግድግዳ ግብረመልስ ደረ�
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='1 ማለት የግድግዳ ግብረመልስ በተሰጠው(ው) ቅንጅት(ቶች) መሠረት ይከሰታል ማለት ነው። 0 ማለት አይከሰትም ማለት ነው። ይህ የመክፈቻ እና የመዝጊያ ማብሪያ ነው። ነባሪ ዋጋው 1 ነው።';
-$ec_lang['lpn_reaction_order_unstated']='አልተገለጸም';
 $ec_lang['lpn_reaction_order_zero']='0፣ ዜሮ ደረጃ';
 $ec_lang['lpn_reaction_order_first']='1፣ የመጀመሪያ ደረጃ';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4070,7 +4033,6 @@ $ec_lang['lpn_energy_col_avg_kw']='አማካይ kW';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='ይህ ፓምፕ በርቶ በነበረበት ጊዜ ጥቅም ላይ የዋለ አማካይ ኃይል። በቁም ጊዜያት ላይ አማካይ አይደረግም፣ ስለዚህ በተራዘመ ጊዜ ማስመሰያው አብዛኛውን ጊዜ ቁም የነበረ ፓምፕ በርቶ በነበረበት ጊዜ የተጠቀመውን ኃይል ብቻ ያሳያል።';
 $ec_lang['lpn_energy_col_peak_kw']='ከፍተኛ kW';
-$ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='ወጪ';
 $ec_lang['lpn_energy_total_kwh']='የተጠቀመ ኃይል';
 $ec_lang['lpn_energy_total_energy_cost']='የኃይል ወጪ';
@@ -4109,7 +4071,6 @@ $ec_lang['lpn_full_download_csv']='CSV አውርድ';
 $ec_lang['lpn_full_print']='ሪፖርት አትም';
 $ec_lang['lpn_full_col_time']='ጊዜ';
 $ec_lang['lpn_full_col_type']='ዓይነት';
-$ec_lang['lpn_full_col_id']='መለያ';
 $ec_lang['lpn_full_row_count']='ረድፎች ({n})።';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4243,7 +4204,6 @@ $ec_lang['lpn_library_curve_equation_tip']='በነጥቦቹ ውስጥ የተስ�
 $ec_lang['lpn_library_curve_values_tip']='በስፕሬድሺት ውስጥ አንድ ወይም ሁለት አምዶችን ይምረጡ፣ ይቅዷቸው፣ ወደ መጀመሪያው ዒላማ ሴል ይለጥፉ። ረድፎች እንደ አስፈላጊነቱ ይጨመራሉ። የኩርባውን ስም ጨምሮ በቀጥታ ከEPANET ፋይል የተቀዱ መስመሮችም ሊለጠፉ ይችላሉ።';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='መግለጫ';
 $ec_lang['lpn_library_curve_remove_point']='ይህን ነጥብ አስወግድ';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4444,7 +4404,6 @@ $ec_lang['lpn_field_demand_pattern']='የፍላጎት ስርዓት';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='መግለጫ';
 $ec_lang['lpn_demand_add']='የፍላጎት ምድብ ጨምር';
 $ec_lang['lpn_demand_remove']='ይህን ፍላጎት አስወግድ';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
@@ -4744,14 +4703,9 @@ $ec_lang['lpn_ds_menu_tip']='በመረቡ ቅጂ ላይ ፍላጎቶችን ያ�
 $ec_lang['lpn_ds_title']='የፍላጎት ማመጣጠኛ';
 $ec_lang['lpn_ds_intro']='በተመረጡት መገናኛዎች ላይ ያሉትን ፍላጎቶች በፍላጎት ማመጣጠኛው ለማባዛት እና ግፊቶቹንና ፍጥነቶቹን ለማየት አስላ አዝራሩን ይጫኑ።\n\nእነዚህ ሁሉ መገናኛዎች የሚፈቀደውን ዝቅተኛ ግፊት ቢያንስ የሚጠብቁበትን ትልቁን የፍላጎት ማመጣጠኛ፣ እስከ ቅርብ {step} ድረስ ለማግኘት ፈልግ አዝራሩን ይጫኑ፤ ከ0 እስከ {max} ይፈልጋል።\n\nሁለቱም በመረቡ ቅጂ ላይ ይሠራሉ፣ በስክሪኑ ላይ ባለው የጊዜ ደረጃ በንቁ ሁኔታ ተፈትተው፣ ስለዚህ በፕሮጀክትዎ ውስጥ ምንም አይለወጥም። የሚመጣጠነው ያ የጊዜ ደረጃ ብቻ ነው፣ ደረጃዎችና ሁኔታዎችም ከእሱ ይወሰዳሉ፤ ከፍተኛውን ለመፈተን ከማስኬድዎ በፊት ሰዓቱን ወደ ከፍተኛ ፍላጎት ያንቀሳቅሱ።';
 $ec_lang['lpn_ds_scope']='የሚመጣጠኑ መገናኛዎች';
-$ec_lang['lpn_ds_scope_all']='ሁሉም መገናኛዎች';
-$ec_lang['lpn_ds_scope_selected']='የተመረጡ መገናኛዎች';
-$ec_lang['lpn_ds_minpressure']='የሚፈቀድ ዝቅተኛ ግፊት';
-$ec_lang['lpn_ds_minpressure_tip']='ይህ በእሳት ፍሰት ትንተና ውስጥ በሌላ ቦታ ካለው የሚፈቀድ ዝቅተኛ ግፊት ጋር አንድ ቁጥር ነው። እዚህ መለወጥ እዚያም ይለውጠዋል።';
 $ec_lang['lpn_ds_head_scale']='ፍላጎቶቹን አመጣጥን';
 $ec_lang['lpn_ds_multiplier']='የፍላጎት ማመጣጠኛ';
 $ec_lang['lpn_ds_multiplier_tip']='እያንዳንዱ ፍላጎት የሚባዛበት ቅንጅት፤ 1.5 የ50% ጭማሪ ነው። አስቀድሞ በፍላጎቶቹ ውስጥ ካለው የንቁ ሁኔታ የፍላጎት ማባዣ በተጨማሪ ይተገበራል፣ በፕሮጀክቱ ውስጥም በፍጹም አይቀመጥም።';
-$ec_lang['lpn_ds_run']='አስላ';
 $ec_lang['lpn_ds_head_search']='ስርዓቱ ምን ያህል የፍላጎት ማመጣጠኛ መሸከም ይችላል?';
 $ec_lang['lpn_ds_head_search_selected']='እነዚህ መገናኛዎች ምን ያህል የፍላጎት ማመጣጠኛ መሸከም ይችላሉ?';
 $ec_lang['lpn_ds_outside_below']='በ{m} የፍላጎት ማመጣጠኛ፣ ከ{pressure} በታች ያሉ ያልተመረጡ መገናኛዎች፦ {n} ({ids})። እነዚህ ይህን መልስ አይገድቡም።';
@@ -4773,7 +4727,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='ፍላጎቶቹ በፍላጎት ማመጣጠ�
 $ec_lang['lpn_ds_col_unscaled']='ያልተመጣጠነ';
 $ec_lang['lpn_ds_col_unscaled_tip']='ፍላጎቶቹ በዚህ የጊዜ ደረጃ በንቁ ሁኔታ ውስጥ እንዳሉ፣ ካርታው የሚያሳየው ተመሳሳይ ዋጋ።';
 $ec_lang['lpn_ds_no_junctions']='ይህ ፕሮጀክት እስካሁን መገናኛዎች የሉትም፣ ስለዚህ የሚመጣጠኑ ፍላጎቶች የሉም።';
-$ec_lang['lpn_ds_no_selection']='ምንም መገናኛ አልተመረጠም። መገናኛዎችን ይምረጡ ወይም ሁሉም መገናኛዎች ይምረጡ።';
 $ec_lang['lpn_ds_skipped']='መገናኛ ያልሆኑ የተመረጡ አካሎች፣ እንዳሉ ተተው፦ {n}።';
 $ec_lang['lpn_ds_bad_multiplier']='ዜሮ ወይም ከዚያ በላይ የሆነ የፍላጎት ማመጣጠኛ ያስገቡ፣ ለምሳሌ 1.5።';
 $ec_lang['lpn_ds_stale']='ስዕሉ ተለውጧል፣ ስለዚህ የፍላጎት ማመጣጠኛ ውጤቶች ጸድተዋል። እንደገና ያስኪዱት።';
@@ -4932,8 +4885,6 @@ $ec_lang['lpn_survey_cancelled']='ምንም አልተፈጠረም ምንም አ�
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='ሰሜናዊ ርቀት';
-$ec_lang['lpn_survey_axis_east']='ምስራቃዊ ርቀት';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='ያ ፋይል ምንም ነገር የለውም።';
 $ec_lang['lpn_survey_err_unreadable']='ያ ፋይል እንደ የተቀየሱ ነጥቦች ዝርዝር ሊነበብ አልቻለም።';

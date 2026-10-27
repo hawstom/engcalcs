@@ -319,7 +319,6 @@ $ec_lang['mhp_main_title']='Kalkulator Tenaga Mikro-Hidro Online Gratis';
 $ec_lang['mhp_main_desc']='Kalkulator Daya Keluaran Mikro-Hidro Aliran Langsung (Tanpa Bendungan)';
 $ec_lang['mhp_gross_head']='Tinggi jatuh bruto, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="Diameter pipa tekanan (pipa suplai)">Diameter pipa tekanan, D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='Panjang, L';
 $ec_lang['mhp_efficiency']='Efisiensi instalasi, η (0–1)';
 $ec_lang['mhp_vel_check']='Pemeriksaan kecepatan';
 $ec_lang['mhp_hl_check']='Pemeriksaan kehilangan tinggi tekan';
@@ -474,13 +473,11 @@ $ec_lang['rc_SD_check']='Pemeriksaan gradasi SD';
 $ec_lang['rc_sg_ok']='sg dalam rentang valid';
 $ec_lang['rc_sg_ok_tip']='2.54–2.82 (Robinson)';
 $ec_lang['rc_sg_low']='sg di bawah rentang Robinson';
-$ec_lang['rc_sg_low_tip']='Rentang valid: 2.54–2.82';
 $ec_lang['rc_sg_high']='sg di atas rentang Robinson';
 $ec_lang['rc_sg_high_tip']='Rentang valid: 2.54–2.82';
 $ec_lang['rc_SD_ok']='SD dalam rentang valid';
 $ec_lang['rc_SD_ok_tip']='1.15–1.47 (Robinson)';
 $ec_lang['rc_SD_low']='SD di bawah rentang Robinson';
-$ec_lang['rc_SD_low_tip']='Rentang valid: 1.15–1.47';
 $ec_lang['rc_SD_high']='SD di atas rentang Robinson';
 $ec_lang['rc_SD_high_tip']='Rentang valid: 1.15–1.47';
 $ec_lang['rc_layer']='Ketebalan lapisan batu (2 × D<sub>50</sub>)';
@@ -589,7 +586,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='Jalur pipa';
-$ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Nama jalur pipa ini. Jalur lain merujuknya pada kolom Hulu.';
 $ec_lang['bpn_upstream']='ID Hulu';
 // Edited by TGH 2026-09-07
@@ -1012,7 +1008,6 @@ $ec_lang['lpn_guide_find_results_term']='Hasil, pilihan, dan Tabel';
 $ec_lang['lpn_guide_find_results_def']='<p>Aset yang cocok didaftar di bawah tombol Cari. Lebih besar dari dan n tertinggi mendaftar nilai tertinggi lebih dahulu, lebih kecil dari dan n terendah nilai terendah lebih dahulu, dan kondisi lain mendaftar menurut nilai yang ditemukan, lalu menurut ID. Kueri dengan DAN atau ATAU mendaftar simpul, lalu penghubung, masing-masing menurut ID. Satu kecocokan langsung ditampilkan pada peta. Pilih sebuah baris untuk memusatkan peta pada aset itu. Jika tidak ada yang dipilih, aset itu juga dipilih; jika ada, aset itu disorot dan pilihan tidak diubah. Shift+klik atau Ctrl+klik sebuah baris untuk menambahkannya ke pilihan atau menghapusnya. Cari tidak memilih semua kecocokan dengan sendirinya.</p><p>Tombol Filter di tabel saat ini menerapkan kueri yang sama pada panel Tabel. Setiap tabel yang terkena kueri hanya menampilkan baris yang cocok, dengan kueri dan jumlah baris di atasnya. Untuk memilih semua kecocokan pada peta, pilih baris-baris itu dan pilih Pilih di peta dari menu klik kanan. Filter tabel tidak disimpan bersama proyek dan berakhir ketika halaman dimuat ulang. Baris yang disunting sehingga tidak lagi cocok tetap berada di tabel, diredupkan dan ditandai dengan tanda peringatan, sampai tombol Filter di tabel saat ini ditekan lagi.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Ganti dan Urungkan';
 $ec_lang['lpn_guide_find_replace_def']='<p>Bagian Ubah yang ditemukan pada kotak ini menuliskan satu properti pada setiap aset yang ditemukan kueri. Pilih properti di daftar Properti yang diubah, masukkan nilai baru di kotak Nilai baru dalam satuan yang ditampilkan, dan tekan tombol Ganti. Kotak kemudian menyatakan berapa banyak aset yang akan berubah, tidak termasuk yang sudah memiliki nilai baru. Tekan tombol Ubah semuanya untuk menerapkan perubahan, atau Batal. Satu Urungkan membalikkan seluruh penggantian.</p><p>Contoh pada Net1: <code>Pipe.Diameter below 10</code> menemukan Pipa 31, 122, 113, dan 121. Pilih Diameter, masukkan 10, dan tekan Ganti; kotak menampilkan "Ubah 4 aset?". Tekan Ubah semuanya untuk mengatur keempat pipa menjadi 10 in. Satu Urungkan mengembalikannya ke 6 dan 8 in.</p><p>Contoh pada Net3: <code>Pipe.ID equal to \'247\'</code> menemukan Pipa 247. Pilih Tertutup, pilih Tertutup lagi di daftar Nilai baru, dan tekan Ganti, lalu Ubah semuanya, untuk menutup pipa bagi contoh konektivitas di atas. Urungkan membukanya lagi.</p><p>Ganti memerlukan satu jenis aset, jadi di bawah Semuanya, pilih dahulu jenis aset di daftar Apa yang dicari. Pada skenario selain Dasar, penggantian disimpan di skenario itu, seperti suntingan yang sama di Properti. Jika elevasi Mapbox tersedia, Elevasi dapat diganti dari DEM Mapbox sebagai pengganti nilai yang diketik.</p>';
-$ec_lang['lpn_guide_find_notes_term']='Hal yang perlu diperhatikan';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Nilai dibandingkan pada presisi penuh dan didaftar hingga empat angka desimal. Sama dengan jarang cocok dengan hasil perhitungan; gunakan lebih besar dari dan lebih kecil dari.</li><li>Tekanan, tinggi tekan, debit, kecepatan, dan hasil lainnya adalah hasil perhitungan terakhir. Dengan pengaturan Hitung ulang otomatis dimatikan, hasil itu menggambarkan jaringan pada Hitung terakhir.</li><li>Lebih besar dari dan lebih kecil dari pada teks memakai urutan kamus, dengan angka dalam urutan numerik: pada Net1, <code>Junction.ID above \'20\'</code> menemukan Simpul 21, 22, 23, 31, dan 32.</li><li>Di bawah Semuanya, hanya ID, Deskripsi, Tag, dan Konektivitas yang ditawarkan. Pilih jenis aset di daftar Apa yang dicari untuk melihat daftar lengkap propertinya.</li><li>Butir Teks tidak memiliki ID. Cari berdasarkan katanya, seperti pada <code>Text.Text contains \'pump\'</code>.</li><li>Empat kondisi Konektivitas untuk simpul adalah tidak ada penghubung di simpul, tidak ada penghubung terbuka di simpul, tidak ada jalur penghubung ke sumber, dan tidak ada jalur terbuka ke sumber. Sumber adalah reservoir atau tangki.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1038,7 +1033,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='Isi tabel';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Skenario</td><td>Nama skenario. Skenario yang terbuka ditandai (sedang dibuka).</td></tr><tr><td>Jml. nilai khusus</td><td>Nilai khusus milik skenario itu sendiri, dihitung seperti dalam daftar Skenario. Opsi perhitungan seperti pengali kebutuhan dihitung satu, dan nilai khusus yang sama dengan nilai warisan tetap dihitung.</td></tr><tr><td>Pengali kebutuhan, Total waktu berjalan, Langkah waktu hidrolik</td><td>Nilai yang digunakan saat skenario diselesaikan, milik skenario itu sendiri atau milik proyek. Skenario keadaan tunak menampilkan tanda hubung untuk langkah waktu.</td></tr><tr><td>Tekanan terendah</td><td>Tekanan terendah pada sebuah simpul, dengan ID-nya dan waktu terjadinya. Reservoir dan tangki tidak disertakan karena masing-masing memiliki tinggi tekan tetap.</td></tr><tr><td>Kecepatan tertinggi</td><td>Kecepatan tertinggi pada sebuah pipa atau katup, dengan ID-nya dan waktu terjadinya. Pompa tidak disertakan.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Skenario keadaan tunak dan periode diperpanjang';
 $ec_lang['lpn_guide_cmp_run_def']='<p>Skenario dengan Total waktu berjalan lebih dari 0 dijalankan selama seluruh periode melalui mesin EPANET. Tekanan terendah dan kecepatan tertingginya adalah nilai ekstrem pada setiap langkah waktu, masing-masing ditampilkan dengan waktunya. Skenario dengan Total waktu berjalan 0 diselesaikan pada satu saat. Total waktu berjalan adalah salah satu opsi yang dapat diberi nilai khusus oleh skenario, sehingga satu tabel dapat memuat kedua jenis.</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='Hal yang perlu diperhatikan';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Skenario yang tidak dapat diselesaikan menampilkan alasannya sebagai pengganti kedua hasilnya, misalnya bahwa sebuah simpul tidak memiliki jalur ke sumber setelah sebuah pipa dinonaktifkan. Skenario lain tetap diselesaikan. Skenario yang tidak konvergen menampilkan hasil terakhirnya dan sebuah pesan.</li><li>Blok di atas tabel, Sama di setiap skenario, menyatakan metode gesekan, satuan, akurasi, dan percobaan maksimum. Pengaturan yang berbeda antarskenario tidak dimasukkan ke dalam blok.</li><li>Tidak ada ambang lulus atau gagal. Bacalah angka-angkanya terhadap kriteria desain sistem yang dimodelkan.</li><li>Contoh pada entri Manajer skenario membandingkan tiga skenario pada Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
@@ -1053,9 +1047,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='Kendali dan aturan dalam sebuah proses';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>Kendali adalah satu pernyataan. Aturan adalah beberapa baris yang diawali dengan RULE. Kata kunci diketik dalam bahasa Inggris apa pun bahasa halamannya, dan angka dalam satuan proyek. Tambah kendali dimulai dari pernyataan yang dibangun dari jaringan, yang kemudian disunting menjadi yang dimaksudkan.</p><p>Kendali dan aturan mengubah hasil hanya dalam simulasi periode diperpanjang, yaitu ketika Total waktu berjalan lebih dari 0. Penyelesaian keadaan tunak tidak diubah oleh keduanya. Aturan hanya diterapkan oleh mesin EPANET. Keduanya disimpan bersama proyek dan ditulis ke berkas EPANET.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Mengimpor pustaka dari proyek lain';
 $ec_lang['lpn_guide_lib_import_def']='<p>Berkas, Impor…, Impor pustaka… membuka berkas proyek lain dan menyalin seluruh pustaka darinya ke proyek ini. Butir yang namanya sudah digunakan di sini dilewati dan didaftar, sehingga tidak ada yang sudah ada di sini yang berubah. Peringatan ditampilkan ketika berkas dan proyek menyatakan suatu besaran dalam satuan yang berbeda, dan butir diimpor sebagaimana tertulis. Jenis pipa yang merujuk pada daftar fitting yang tidak dimiliki proyek ini didaftar; impor pustaka fitting dari berkas yang sama untuk mengatasinya.</p>';
-$ec_lang['lpn_guide_lib_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_lib_example_def']='<p>Buka contoh Net1 dan pilih Air, Pustaka. Pola berisi pola 1, Pola Kebutuhan, dengan 12 pengali berjarak 2:00, mencakup 24:00, ditandai (default). Kurva berisi kurva 1, Kurva Pompa untuk Pompa 9, kurva Tinggi tekan pompa dengan satu titik, 1500 gpm pada 250 ft. Kendali berisi dua pernyataan: yang pertama membuka Penghubung 9 ketika Simpul 2 turun di bawah 110, dan yang kedua menutupnya ketika Simpul 2 naik di atas 140. Aturan berisi dua aturan yang menguji waktu jam dan tinggi muka Tangki 2.</p><p>Pilih Air, Hitung, lalu Air, Laporan, Perubahan status. Pompa L9 sekarang tertutup pada 10:00, sekarang terbuka pada 15:00, dan sekarang tertutup pada 21:00, dan Tangki N2 sekarang mengosong pada 22:00. Di Kendali, ubah 140 menjadi 135 pada kendali kedua dan pilih Air, Hitung lagi. Penutupan terakhir bergeser ke 20:00, dan Tangki N2 sekarang mengosong pada 21:00.</p>';
-$ec_lang['lpn_guide_lib_notes_term']='Hal yang perlu diperhatikan';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>Pola berulang selama proses berlangsung, sehingga tidak perlu mencakup seluruh proses.</li><li>Berkas EPANET tidak memiliki tempat untuk jenis pipa atau daftar fitting. Berkas itu membawa angka yang dibaca setiap pipa, dan ekspor menyebutkan pipa mana yang diratakan.</li><li>Posisi dan ukuran kotak Pustaka disimpan di peramban ini. Butirnya disimpan bersama proyek.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1069,7 +1061,6 @@ $ec_lang['lpn_guide_prop_scn_term']='Dalam skenario';
 $ec_lang['lpn_guide_prop_scn_def']='<p>Dalam skenario selain Dasar, suntingan pada nilai yang dapat diberi nilai khusus oleh skenario disimpan sebagai nilai khusus skenario yang terbuka, dan baris itu ditandai di sebelah kirinya. Entri Manajer skenario menjelaskan tanda-tandanya dan mendaftar apa yang sama di setiap skenario: ID, Deskripsi, dan Tag. Pelanggan tidak memiliki nilai skenario. Berpindah skenario membiarkan Properti tetap terbuka pada aset yang sama, menampilkan nilai skenario yang sekarang terbuka.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Beberapa aset dipilih';
 $ec_lang['lpn_guide_prop_multi_def']='<p>Judulnya berbunyi, misalnya, 2 dipilih. Kotak memiliki satu bagian untuk setiap jenis aset dalam pilihan, diberi judul nama jenis dan jumlah asetnya, seperti pada Pipa (2), dan setiap bagian dapat dilipat. Sebuah bagian mendaftar properti yang menjadi kolom di Tabel dan dapat ditetapkan pada setiap aset di dalamnya. Hasil dan nilai yang dinyatakan jenis pipa tidak didaftar. Sebuah baris menampilkan nilai yang sama pada aset-aset itu, atau Beragam bila berbeda.</p><p>Mengetik nilai ke dalam baris menetapkannya pada setiap aset jenis itu dalam pilihan. Baris yang tidak disentuh tidak menulis apa pun. Sebuah pemberitahuan menyatakan jumlahnya, seperti pada Menetapkan Diameter (in) pada 2., dan satu Urungkan membatalkan seluruh baris. Dalam skenario selain Dasar, nilai disimpan sebagai nilai khusus.</p>';
-$ec_lang['lpn_guide_prop_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_prop_example_def']='<p>Buka contoh Net1 dan klik Pipa 10. Properti mendaftar masukannya, dari Deskripsi sampai Aktif?, lalu hasilnya pada waktu yang ditampilkan: Debit 1866,2 gpm, Kecepatan 2,4 ft/dtk, dan Kehilangan tinggi tekan 19,12 ft H2O.</p><p>Klik Pipa 113 dan Shift-klik Pipa 31. Judulnya berbunyi 2 dipilih, satu-satunya bagian adalah Pipa (2), dan Diameter menampilkan Beragam, karena Pipa 31 berdiameter 6 in. dan Pipa 113 berdiameter 8 in. Masukkan 10 untuk Diameter. Pemberitahuan berbunyi Menetapkan Diameter (in) pada 2., kedua pipa berdiameter 10 in., dan satu Urungkan mengembalikannya ke 6 dan 8 in.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
@@ -1101,7 +1092,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>Huruf setelah Alt+Shift adalah tombol pada 
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='Urungkan dan Ulangi';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z membatalkan perubahan terakhir, dan Ctrl+Y atau Ctrl+Shift+Z mengulanginya. Dalam sel Tabel, tombol-tombol itu milik proyek selama sel hanya dipilih, dan milik teks sel setelah pengetikan dimulai. Halaman menyimpan 20 langkah terakhir, hanya dalam memori, dan berpindah proyek menghapusnya. Satu langkah memulihkan skenario, skenario yang terbuka, dan satuan bersama gambar.</p>';
-$ec_lang['lpn_guide_map_del_term']='Hapus';
 $ec_lang['lpn_guide_map_del_def']='<p>Delete atau Backspace menghapus pilihan, kecuali ketika mengetik di dalam kolom, tempat tombol itu milik kolom. Bila tidak ada yang dipilih, Delete menyatakannya, dan Backspace tidak melakukan apa-apa. Satu Urungkan membatalkan penghapusan beberapa aset. Dalam skenario selain Dasar, Delete tidak menghilangkan aset yang ada di Dasar; entri Manajer skenario menjelaskan apa yang dilakukannya.</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>Esc yang menutup menu, daftar tarik-turun, atau kotak tidak melakukan hal lain. Kotak Properti, Pengaturan, dan Pustaka tertutup hanya ketika fokus berada di dalam kotak dan penunjuk berada di atasnya. Bila tidak ada yang terbuka, Esc mengembalikan alat aktif ke Pilih, dan dalam Pilih, Esc menghapus pilihan. Pipa yang setengah tergambar memerlukan satu Esc untuk dibatalkan dan Esc kedua untuk kembali ke Pilih. Dalam kolom, Esc milik kolom.</p>';
@@ -1128,57 +1118,45 @@ $ec_lang['lpn_guide_ff_result_term']='Membaca hasil';
 $ec_lang['lpn_guide_ff_result_def']='<p>Ringkasan menghitung simpul yang lolos semua pemeriksaan, simpul yang gagal memenuhi debit kebakaran, dan simpul yang memengaruhi sisa sistem. Tabel mendaftar, untuk setiap simpul yang diuji, Tekanan statis sebelum debit kebakaran apa pun diambil, Debit diperlukan, Tekanan pada debit diperlukan, Debit tersedia, Sisa dipertahankan, Dampak terburuk dan Batas desain dari pemeriksaan desain, jumlah Proses, yaitu jumlah penyelesaian seluruh jaringan, dan Modus kegagalan. Sel tanpa angka menampilkan tanda hubung, tidak pernah nol. Simpul yang tidak dapat diselesaikan menampilkan alasannya sebagai pengganti angka. Tabel mencetak paling banyak 200 simpul dan menyatakan berapa yang tidak dicetak.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Cincin, Berhenti, dan satu analisis pada satu waktu';
 $ec_lang['lpn_guide_ff_marks_def']='<p>Setelah proses, lingkaran setiap simpul yang diuji diberi garis tepi di peta sesuai hasilnya, dan garis tepi itu berbeda pada pola garis putus-putus maupun warna. Pilih Simpul terpilih untuk menguji hanya simpul yang dipilih di peta; apa pun yang dipilih selain itu dihitung dan tidak diuji. Berhenti mengakhiri proses dan mempertahankan simpul yang sudah selesai. Hanya satu dari analisis debit kebakaran, kekritisan, dan penskalaan kebutuhan yang berjalan pada satu waktu.</p>';
-$ec_lang['lpn_guide_ff_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>Buka contoh Net1, pilih Air, Analisis, Analisis debit kebakaran…, dan klik Jalankan dengan kotak seperti saat terbuka. Langkah waktunya 0:00, dan proses menyelesaikan seluruh jaringan 135 kali. Delapan dari sembilan simpul lolos semua pemeriksaan. Simpul N32 gagal memenuhi debit kebakaran: tekanan statisnya 111 psi, hanya tersisa 1,19 psi pada 1000 gpm yang diperlukan, dan debit tersedianya 892 gpm. Simpul N31 dapat mengalirkan 1339 gpm, dan Simpul N12 lebih dari 10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='Apa yang dilakukan setiap kasus';
 $ec_lang['lpn_guide_cr_case_def']='<p>Untuk setiap penghubung dalam cakupan, penghubung itu dinonaktifkan pada salinan jaringan, dan salinan itu diselesaikan pada langkah waktu di layar dalam skenario yang terbuka. Satu proses adalah satu penyelesaian untuk setiap penghubung dan satu lagi tanpa yang rusak. Simpul yang tidak memiliki jalur terbuka ke reservoir atau tangki terputus: simpul itu dikeluarkan sebelum penyelesaian, dan kebutuhannya dihitung sebagai Kebutuhan tidak terlayani. Dari simpul yang masih terhubung, Simpul di bawah minimum mendaftar yang tekanannya turun di bawah Tekanan terendah yang diizinkan. Simpul yang sudah berada di bawahnya tanpa ada yang rusak tidak dihitung terhadap penghubung mana pun, dan ringkasan menyatakan jumlahnya. Tekanan terendah yang diizinkan adalah pengaturan yang sama dengan kotak Tekanan terendah yang diizinkan di tempat lain pada Debit kebakaran: analisis.</p>';
 $ec_lang['lpn_guide_cr_dead_term']='Ujung buntu, dan daftarnya';
 $ec_lang['lpn_guide_cr_dead_def']='<p>Penghubung ujung buntu adalah penghubung yang pelepasannya memutus simpul yang hanya dapat dicapai melaluinya. Semua yang ada di baliknya adalah kerugiannya, sehingga dengan Lewati ujung buntu dicentang penghubung itu tidak diselesaikan, dan ringkasan menyatakan berapa yang dilewati. Daftar menampilkan, untuk setiap penghubung, Kebutuhan tidak terlayani, Simpul terputus, dan Simpul di bawah minimum, masing-masing dengan jumlah dan lima ID pertama, dan klik pada sebuah ID menuju ke sana di peta. Penghubung yang merugikan sistem didaftar lebih dahulu sampai judul kolom diklik untuk mengurutkan, dan ringkasan menghitungnya terhadap jumlah penghubung yang diuji. Pilih Penghubung terpilih untuk memutus hanya penghubung yang dipilih di peta.</p>';
-$ec_lang['lpn_guide_cr_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_cr_example_def']='<p>Buka contoh Net1, pilih Air, Analisis, Analisis kekritisan…, masukkan 116 untuk Tekanan terendah yang diizinkan, dan klik Jalankan. Langkah waktunya 0:00, dan proses menyelesaikan seluruh jaringan 14 kali. Empat dari 13 penghubung menurunkan simpul di bawah 116 psi ketika dikeluarkan: L9 (N10, N11, dan N21), L10 (N11 dan N21), L111 (N21 dan N22), dan L112 (N21 dan N22). Dua simpul sudah di bawah 116 psi tanpa ada yang rusak dan tidak dihitung. Karena Net1 berkelok, kehilangan satu penghubung tidak pernah membuat simpul tanpa pasokan.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='Jalankan';
 $ec_lang['lpn_guide_ds_run_def']='<p>Jalankan mengalikan kebutuhan pada simpul yang dipilih dengan Skala kebutuhan, pada salinan jaringan pada langkah waktu di layar dan dalam skenario yang terbuka. Proses ini membuat dua penyelesaian, satu dengan kebutuhan apa adanya dan satu yang diskalakan. Hasilnya mendaftar Tekanan terendah dan Kecepatan tertinggi, masing-masing dengan nilai Diskalakan di samping nilai Tanpa skala, yaitu nilai yang ditampilkan peta. Setiap daftar berisi sepuluh baris, dan kotak menyatakan berapa penghubung yang tidak ditampilkannya. Skala kebutuhan diterapkan di samping pengali kebutuhan skenario yang terbuka, dan tidak pernah disimpan di proyek.</p>';
-$ec_lang['lpn_guide_ds_find_term']='Cari';
 $ec_lang['lpn_guide_ds_find_def']='<p>Cari menelusuri skala kebutuhan dari 0 sampai 20, hingga 0,01 terdekat, untuk skala terbesar yang membuat setiap simpul yang dipilih mempertahankan sedikitnya Tekanan terendah yang diizinkan. Pencarian melaporkan skala itu dan tekanan terendah di sana, serta hal yang sama untuk langkah berikutnya ke atas, tempat tekanan pertama kali turun di bawah batas. Bila kebutuhan sebagaimana dimasukkan sudah membuat sebuah simpul berada di bawah batas, jawabannya ditandai dengan tanda peringatan. Bila setiap simpul mempertahankan batas pada 20, jawabannya menyatakan demikian. Berhenti mengakhiri pencarian tanpa jawaban. Tekanan terendah yang diizinkan adalah pengaturan yang sama dengan kotak Tekanan terendah yang diizinkan di tempat lain pada Debit kebakaran: analisis.</p>';
 $ec_lang['lpn_guide_ds_scope_term']='Simpul, dan langkah waktu';
 $ec_lang['lpn_guide_ds_scope_def']='<p>Dengan Simpul terpilih, hanya simpul yang dipilih di peta yang diskalakan dan diperiksa. Simpul lain dibiarkan apa adanya, dan yang turun di bawah batas didaftar tanpa membatasi jawabannya. Hanya langkah waktu di layar yang diskalakan, dan tinggi muka serta status diambil darinya. Untuk menguji puncak, pindahkan jam ke kebutuhan puncak sebelum menjalankan.</p>';
-$ec_lang['lpn_guide_ds_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_ds_example_def']='<p>Buka contoh Net1 dan pilih Air, Analisis, Penskalaan kebutuhan…. Pada langkah waktu 0:00, klik Cari dengan kotak seperti saat terbuka. Setiap simpul mempertahankan sedikitnya 20 psi hingga skala kebutuhan 5,76, tempat tekanan terendah adalah 20,11 psi pada simpul N32. Pada 5,77 tekanannya 19,8 psi, dan pencarian memakai 13 penyelesaian. Masukkan 3 untuk Skala kebutuhan dan klik Jalankan: Simpul N32 turun dari 111 psi, tanpa skala, menjadi 85,99 psi, dan Penghubung L112 naik dari 0,535 ft/dtk menjadi 3,13 ft/dtk.</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='Membaca laporan';
 $ec_lang['lpn_guide_en_read_def']='<p>Pilih Air, Laporan, Energi pompa. Laporan mengintegrasikan daya setiap pompa selama simulasi periode diperpanjang terakhir, sehingga memerlukan Total waktu berjalan lebih dari 0 dan sebuah perhitungan. Untuk setiap pompa, laporan mendaftar % proses, Efis., kW rerata, kW puncak, kWh, dan Biaya. kW rerata adalah rata-rata selama pompa berjalan, bukan selama periode diam. Di bawah tabel terdapat Energi terpakai, Biaya energi, Penggunaan daya puncak, Biaya beban puncak, dan Biaya total. Jaringan tanpa pompa tidak memiliki apa pun untuk dilaporkan.</p>';
 $ec_lang['lpn_guide_en_set_term']='Apa yang menentukan angkanya';
 $ec_lang['lpn_guide_en_set_def']='<p>Pengaturan, Energi memuat Efisiensi pompa (persen), yang dipakai untuk setiap pompa yang tidak memiliki kurva efisiensi, Harga daya untuk satu kilowatt-jam, Pola harga yang mengalikan harga pada setiap langkah pola, Biaya beban puncak per kW, dan teks Mata uang yang dicetak di samping biaya dan tidak mengonversi biaya. Pompa dapat memiliki harga, pola harga, dan kurva efisiensinya sendiri di Properti. Harga, pola, biaya beban puncak, Efisiensi pompa (persen), dan nilai milik pompa sendiri berada dalam kategori Biaya energi, sehingga skenario dapat memberinya nilai khusus. Bila tidak ada harga yang dinyatakan, atau harganya nol, setiap biaya adalah nol dan laporan menyatakannya. Aplikasi ini tidak menyarankan harga.</p>';
-$ec_lang['lpn_guide_en_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_en_example_def']='<p>Buka contoh Net1, yang memiliki total waktu berjalan 24:00, lalu hitung. Pilih Air, Laporan, Energi pompa. Pompa L9 berjalan selama 65,71% dari proses dengan efisiensi 75%, dan memakai 96,22 kW rata-rata, 96,71 kW pada puncak, dan 1518 kWh. Tidak ada harga yang dinyatakan, sehingga biayanya 0 dan laporan menyatakannya. Masukkan 0,12 untuk Harga daya di Pengaturan, Energi, lalu hitung lagi: biaya L9 adalah 182, yaitu Biaya total.</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='Apa itu plot';
 $ec_lang['lpn_guide_ct_what_def']='<p>Pilih Air, Grafik, Kontur. Baris ini menyalakan plot dalam skenario yang terbuka, sebagai isian halus dengan garis berlabel, memakai tekanan bila simpul belum diwarnai, dan membuka kotak. Plot menyebarkan warna simpul sepanjang pipa dan hingga kelipatan tertentu dari panjang pipa median di sampingnya, memudar di bagian luar. Plot tidak mewarnai melewati pompa, katup, atau penghubung yang tertutup. Baris di bawah legenda warna menyatakan berapa simpul dan pipa yang dipakai plot, jangkauan di samping pipa, dan interval garisnya. Bila simpul terlalu sedikit, baris itu menyatakannya.</p>';
 $ec_lang['lpn_guide_ct_box_term']='Kotak';
 $ec_lang['lpn_guide_ct_box_def']='<p>Tampilkan kontur, bila dihapus centangnya, menyembunyikan isian dan garis serta mempertahankan warna simpul. Kotak juga memuat Warna simpul dan Skema warna, yang merupakan dua pengaturan yang sama dengan di Pengaturan, Visualisasi, Warna simpul, Isian (Tidak ada, Halus, atau Pita, yang mengecat setiap kelas secara rata), Opasitas isian, Garis kontur dengan Interval dan Labelnya, dan Penyangga dalam kelipatan panjang pipa median. Dalam proyek yang ditempatkan di Bumi, kotak juga dapat mengambil permukaan tanah di antara simpul dari Mapbox DEM, setelah pengunjung setuju mengirim nomor ubin area jaringan. Pengaturan ini disimpan bersama proyek dan dapat diberi nilai khusus oleh skenario. Plot hanya mengubah tampilan, bukan jaringan.</p>';
-$ec_lang['lpn_guide_ct_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_ct_example_def']='<p>Buka contoh Net1 dan pilih Air, Grafik, Kontur. Simpul diwarnai menurut tekanan, dan baris di bawah legenda warna menyatakan 9 simpul, 11 pipa, jangkauan 2,5 kali panjang pipa median di sampingnya, dan garis setiap 5 psi. Pompa, Penghubung 9, bukan salah satu dari 11 pipa itu. Ketika Tampilkan kontur dihapus centangnya, simpul tetap diwarnai menurut tekanan.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='Isi laporan';
 $ec_lang['lpn_guide_rr_what_def']='<p>Pilih Air, Laporan, Proses. Laporan adalah teks yang ditulis mesin EPANET untuk simulasi periode diperpanjang terakhir, dalam halaman-halaman. Laporan dimulai dengan spanduk dan nama jaringan, lalu menghitung simpul, reservoir, tangki, pipa, pompa, dan katup, lalu menyatakan opsi analisis, kemudian mendaftar status hidrolik proses beserta peringatannya. Tombol Salin menyalin teksnya.</p>';
-$ec_lang['lpn_guide_rr_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_rr_example_def']='<p>Buka contoh Net1, yang sudah dihitung, dan pilih Air, Laporan, Proses. Ringkasan menghitung 9 simpul, 1 reservoir, 1 tangki, 12 pipa, 1 pompa, dan 0 katup. Rumus kehilangan tinggi tekan adalah Hazen-Williams, langkah waktu hidrolik 1,00 jam, dan total durasi 24,00 jam.</p>';
 $ec_lang['lpn_guide_st_what_term']='Apa yang didaftar';
 $ec_lang['lpn_guide_st_what_def']='<p>Pilih Air, Laporan, Perubahan status. Setiap baris memberi waktu sebuah perubahan dan perubahannya: pompa, katup, atau pipa sekarang terbuka atau sekarang tertutup, atau tangki sekarang terisi, mengosong, penuh, atau kosong. Langkah waktu yang tidak sepenuhnya konvergen juga didaftar. Daftar berurutan menurut waktu dan hanya memuat perubahan, bukan setiap langkah. Daftar dibaca dari proses periode diperpanjang yang sama dengan panel Tabel dan Laporan lengkap.</p>';
-$ec_lang['lpn_guide_st_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_st_example_def']='<p>Buka contoh Net1 dan pilih Air, Laporan, Perubahan status. Tangki N2 sekarang terisi pada 1:00, mengosong pada 11:00, terisi pada 16:00, dan mengosong pada 22:00. Pompa L9 sekarang tertutup pada 10:00, sekarang terbuka pada 15:00, dan sekarang tertutup pada 21:00.</p>';
-$ec_lang['lpn_guide_fr_what_term']='Isi tabel';
 $ec_lang['lpn_guide_fr_what_def']='<p>Pilih Air, Laporan, Lengkap. Tabel memiliki satu baris untuk setiap simpul dan penghubung pada setiap langkah waktu pelaporan, dalam satuan panel Tabel. Kolomnya adalah Jenis, ID, Kebutuhan, Tinggi tekan, Tekanan, Konsentrasi klorin, Debit, Kecepatan, Kehilangan tinggi tekan, Tinggi tekan pompa, dan Status, dan sel dibiarkan kosong bila aset tidak memiliki besaran tersebut. Daftar Langkah waktu memilih langkah yang ditampilkan, dan Unduh CSV serta Cetak laporan membawa setiap langkah. Tanpa simulasi periode diperpanjang, tabel menampilkan solusi saat ini pada satu saat.</p>';
-$ec_lang['lpn_guide_fr_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_fr_example_def']='<p>Buka contoh Net1 dan pilih Air, Laporan, Lengkap. Ke-24 aset didaftar pada 25 langkah pelaporan, 0:00 sampai 24:00, yaitu 600 baris. Pada 0:00, Simpul 11 memiliki kebutuhan 150 gpm, tinggi tekan 985,23 ft H2O, dan tekanan 119,26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='Apa yang dibandingkan laporan';
 $ec_lang['lpn_guide_cal_what_def']='<p>Pilih Air, Laporan, Kalibrasi. Daftar Parameter memilih apa yang diukur berkas: Kebutuhan, Tinggi tekan, Tekanan, Konsentrasi klorin, Debit, atau Kecepatan. Satu berkas disimpan untuk setiap parameter, dan tombol Muat berkas kalibrasi… membuka pemilih berkas. Laporan memiliki tiga halaman. Statistik memberi, untuk setiap lokasi, jumlah observasi, rata-rata observasi, rata-rata hasil hitung, galat rata-rata, dan galat RMS, lalu baris Jaringan untuk semua lokasi bersama-sama dan korelasi antar rata-rata. Plot korelasi menempatkan setiap pengukuran pada nilai observasinya ke samping dan nilai hasil hitungnya ke atas, dengan garis diagonal tempat keduanya sepakat. Perbandingan rata-rata menggambar rata-rata observasi dan hasil hitung sebagai sepasang batang untuk setiap lokasi.</p><p>Nilai hasil hitung dibaca dari proses periode diperpanjang, dan pengukuran di antara dua langkah pelaporan dibandingkan dengan nilai yang diinterpolasi di antaranya. Pengukuran di luar waktu yang dilaporkan proses dilewati dan dihitung. Dengan solusi satu saat, setiap pengukuran dibandingkan dengan satu hasil itu, berapa pun waktu yang diberikan berkas. Laporan terisi setelah jaringan dihitung.</p>';
 $ec_lang['lpn_guide_cal_file_term']='Berkas kalibrasi';
 $ec_lang['lpn_guide_cal_file_def']='<p>Berkas teks dengan ID lokasi, waktu, dan nilai terukur pada setiap barisnya. Waktu diukur dari awal simulasi, dalam jam desimal atau jam:menit. Titik koma memulai komentar. Baris yang hanya berisi waktu dan nilai milik lokasi di atasnya. Nilai dibaca dalam satuan proyek, dan laporan menyebutkan satuannya. Lokasi yang tidak ada di jaringan didaftar dan pengukurannya dihitung sebagai dilewati, baris yang tidak dapat dibaca didaftar menurut nomor barisnya, dan sisa berkas dipakai. Berkas disimpan dalam memori hanya untuk proyek yang terbuka dan pemuatan halaman ini. Berkas tidak disimpan bersama proyek atau di perangkat ini. Bila bagan Deret waktu menampilkan besaran yang sama, nilai terukur digambar di atasnya sebagai cincin.</p>';
-$ec_lang['lpn_guide_cal_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_cal_example_def']='<p>Buka contoh Net1, hitung, dan pilih Air, Laporan, Kalibrasi. Dengan Tekanan dipilih, muat berkas yang memberi Simpul 11 sebesar 118,5 psi pada 0:00 dan 121,0 psi pada 12:00, Simpul 31 sebesar 110,2 psi pada 6:00 dan 108,7 psi pada 18:00, dan Simpul 99 sebesar 50 psi pada 0:00, diikuti satu baris yang bukan data. Laporan menyatakan berkas memiliki 5 pengukuran di 3 lokasi, menyebut Simpul 99 tidak ada di jaringan dengan 1 pengukuran dilewati, dan mendaftar baris yang tidak terbaca. Statistik menampilkan Simpul 11 dengan 2 observasi, rata-rata observasi 119,75 psi, rata-rata hasil hitung 116,53 psi, galat rata-rata 3,98, dan galat RMS 5,12. Simpul 31 memiliki 109,45, 118,71, 9,26, dan 9,79. Baris Jaringan memiliki 4 observasi, galat rata-rata 6,62, dan galat RMS 7,81.</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Menggunakan panduan pengguna';
@@ -1223,7 +1201,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='Ada yang salah di sini?';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='Sembunyikan pesan ini';
 $ec_lang['lpn_msglog_hidden']='Tersembunyi';
 $ec_lang['lpn_msglog_unhide']='Tampilkan';
 $ec_lang['lpn_status_hidden_tip']='Tampilkan lagi pesan tersembunyi pada peta.';
@@ -1358,7 +1335,6 @@ $ec_lang['lpn_result_reaction_rate']='Laju reaksi';
 $ec_lang['lpn_result_status']='Status';
 $ec_lang['lpn_result_status_open']='Terbuka';
 $ec_lang['lpn_result_status_closed']='Tertutup';
-$ec_lang['lpn_result_head']='Tinggi tekan';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Energi potensial air di simpul ini, dinyatakan sebagai ketinggian kolom air. Ini adalah ketinggian mutlak, sedangkan tekanan adalah pengukuran gauge.';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1731,7 +1707,6 @@ $ec_lang['lpn_morph_ok']='Ubah';
 $ec_lang['lpn_morph_other_kind']='Simpul hanya dapat diubah menjadi jenis simpul lain, dan penghubung hanya menjadi jenis penghubung lain. Tidak diubah: {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='Jenis';
 $ec_lang['lpn_field_type_tip']='Jenis aset ini dalam skenario ini, yang ditetapkan oleh Ubah jenis. Hapus nilai khusus untuk memakai jenis skenario induk.';
 $ec_lang['lpn_change_type_lost']='Nilai berikut akan hilang:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -2055,7 +2030,6 @@ $ec_lang['lpn_pgraph_none']='Aset ini tidak memiliki hasil pada proses saat ini.
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='Bagian sumber dari {node}';
-$ec_lang['lpn_result_pump_head']='Tinggi tekan';
 $ec_lang['lpn_result_pump_head_tip']='Tinggi tekan yang ditambahkan pompa dari sisi isap ke sisi tekan, ditampilkan sebagai angka positif. Penyelesai dan berkas EPANET membawanya sebagai kehilangan tinggi tekan negatif.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2145,7 +2119,6 @@ $ec_lang['lpn_file_new']='Proyek baru…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='Proyek baru';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2571,7 +2544,6 @@ $ec_lang['lpn_file_training_permission']='Saat pertama kali Anda menyimpan, pera
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='Lanjutkan';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Pilih berkas itu lagi';
@@ -2683,7 +2655,6 @@ $ec_lang['lpn_notes_engine_def']='Penyelesai EPANET pada halaman ini adalah OWA-
 $ec_lang['lpn_guide_nt_example_term']='Contoh pada Net1: pompa melewati kurvanya';
 $ec_lang['lpn_guide_nt_example_def']='Buka contoh Net1 dan pilih Air, Pustaka. Kurva 1, Kurva Pompa untuk Pompa 9, memiliki satu titik, 1500 gpm pada 250 ft. Tinggi tekan pada debit nol adalah 333,3 ft dan debit tertinggi adalah 3000 gpm. Pada 3500 gpm, yang melewati ujung kurva, kurva memberi tinggi tekan −120,4 ft. Penyelesai EPANET melaporkan tinggi tekan yang sama, kehilangan 120,4 ft melintasi pompa, dan memperingatkan bahwa pompa tidak dapat memberikan debit atau tinggi tekan yang cukup.';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='Contoh pada Net1';
 $ec_lang['lpn_guide_own_example_def']='<p>Buka contoh Net1, tekan Ctrl+K, dan ketik kritis. Menu menampilkan baris Analisis kekritisan… di bawah Air, Analisis. Kotak menampilkan entri yang menyebutnya, di antaranya Cari dan ganti, Debit kebakaran: analisis, dan Kekritisan: analisis, serta entri ini. Memilih baris itu menunjukkan letak Analisis kekritisan… di menu Analisis, dan tidak menjalankannya.</p>';
 $ec_lang['lpn_id_invalid']='Masukkan ID tanpa spasi dan tanpa tanda kutip.';
 $ec_lang['lpn_id_taken']='ID itu sudah digunakan.';
@@ -2756,8 +2727,6 @@ $ec_lang['lpn_link_end_same']='Dari dan Ke harus berupa simpul yang berbeda.';
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='Pisahkan pipa {id} pada simpul ini?';
-$ec_lang['lpn_split_yes']='Ya';
-$ec_lang['lpn_split_no']='Tidak';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}, verteks {n}';
@@ -3015,7 +2984,6 @@ $ec_lang['lpn_labels_col_decimals']='Desimal';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='Tampilkan';
 $ec_lang['lpn_labels_show_tip']='Urutan nilai muncul pada sebuah label. Nilai bernomor 1 muncul lebih dulu: di bagian atas label bertumpuk, dan di awal label satu baris.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3339,7 +3307,6 @@ $ec_lang['lpn_sm_make_current']='Jadikan saat ini';
 $ec_lang['lpn_sm_current_already']='Skenario ini sudah menjadi skenario saat ini.';
 $ec_lang['lpn_sm_none_selected']='Pilih butir di pohon terlebih dahulu.';
 $ec_lang['lpn_sm_base_named']='Dasar sebuah pohon tidak diganti namanya.';
-$ec_lang['lpn_sm_copy']='Salin';
 $ec_lang['lpn_sm_merge_up']='Gabungkan ke atas';
 $ec_lang['lpn_sm_merge_up_tip']='Pindahkan nilai khusus alternatif yang dipilih ke alternatif di atasnya dalam pohon. Alternatif yang dipilih lalu mewarisi nilai-nilai itu.';
 $ec_lang['lpn_sm_merge_up_root']='Alternatif Dasar tidak memiliki apa pun di atasnya untuk digabungkan.';
@@ -3464,10 +3431,8 @@ $ec_lang['lpn_alt_cat_initial']='Pengaturan awal';
 $ec_lang['lpn_alt_cat_constituent']='Konstituen';
 $ec_lang['lpn_alt_cat_fireflow']='Debit kebakaran';
 $ec_lang['lpn_alt_cat_energy']='Biaya energi';
-$ec_lang['lpn_alt_cat_userdata']='Properti khusus';
 $ec_lang['lpn_alt_cat_text']='Teks';
 $ec_lang['lpn_alt_cat_presentation']='Presentasi';
-$ec_lang['lpn_alt_cat_calculation']='Perhitungan';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3814,7 +3779,6 @@ $ec_lang['lpn_settings_runbox']='Tampilkan kotak kemajuan proses';
 $ec_lang['lpn_settings_runbox_tip']='Kotak yang melaporkan kemajuan dan hasil suatu proses. Bila dimatikan, proses yang selesai menyatakan hal yang sama pada baris status selama beberapa detik. Ini adalah pengaturan untuk peramban ini, bukan untuk proyek.';
 $ec_lang['lpn_time_run_failed']='Proses tidak selesai, sehingga tidak ada hasil untuk waktu-waktu berikutnya.';
 $ec_lang['lpn_time_run_report']='Proses: laporan';
-$ec_lang['lpn_time_run_report_copy']='Salin';
 $ec_lang['lpn_time_run_report_copied']='Tersalin';
 $ec_lang['lpn_time_run_report_tip']='Laporan yang ditulis EPANET untuk proses terakhir, apa adanya: apakah konvergen, dan peringatan apa pun. Teks ini dihasilkan oleh penyelesai EPANET, bukan oleh halaman ini.';
 
@@ -3994,7 +3958,6 @@ $ec_lang['lpn_reaction_order_wall']='Orde reaksi dinding';
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='1 berarti reaksi dinding terjadi sesuai dengan koefisien yang diberikan. 0 berarti tidak terjadi. Ini adalah saklar on/off. Nilai default adalah 1.';
-$ec_lang['lpn_reaction_order_unstated']='Tidak dinyatakan';
 $ec_lang['lpn_reaction_order_zero']='0, orde nol';
 $ec_lang['lpn_reaction_order_first']='1, orde pertama';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4070,7 +4033,6 @@ $ec_lang['lpn_energy_col_avg_kw']='kW rerata';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='Rerata daya yang digunakan saat pompa ini menyala. Ini tidak dirata-ratakan terhadap periode diam, sehingga pompa yang diam untuk sebagian besar simulasi periode waktu tetap melaporkan daya yang digunakannya saat menyala.';
 $ec_lang['lpn_energy_col_peak_kw']='kW puncak';
-$ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='Biaya';
 $ec_lang['lpn_energy_total_kwh']='Energi terpakai';
 $ec_lang['lpn_energy_total_energy_cost']='Biaya energi';
@@ -4109,7 +4071,6 @@ $ec_lang['lpn_full_download_csv']='Unduh CSV';
 $ec_lang['lpn_full_print']='Cetak laporan';
 $ec_lang['lpn_full_col_time']='Waktu';
 $ec_lang['lpn_full_col_type']='Jenis';
-$ec_lang['lpn_full_col_id']='ID';
 $ec_lang['lpn_full_row_count']='Baris ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4243,7 +4204,6 @@ $ec_lang['lpn_library_curve_equation_tip']='Kurva yang dicocokkan melalui titik-
 $ec_lang['lpn_library_curve_values_tip']='Pilih satu atau dua kolom pada lembar kerja, salin, lalu tempel pada sel tujuan pertama. Baris ditambahkan sesuai kebutuhan. Baris yang disalin langsung dari berkas EPANET, termasuk nama kurva, juga dapat ditempel.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='Deskripsi';
 $ec_lang['lpn_library_curve_remove_point']='Hapus titik ini';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4444,7 +4404,6 @@ $ec_lang['lpn_field_demand_pattern']='Pola kebutuhan';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Deskripsi';
 $ec_lang['lpn_demand_add']='Tambah kategori kebutuhan';
 $ec_lang['lpn_demand_remove']='Hapus kebutuhan ini';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
@@ -4744,14 +4703,9 @@ $ec_lang['lpn_ds_menu_tip']='Kalikan kebutuhan pada salinan jaringan dan lihat t
 $ec_lang['lpn_ds_title']='Penskalaan kebutuhan';
 $ec_lang['lpn_ds_intro']='Tekan tombol Jalankan untuk mengalikan kebutuhan pada simpul yang dipilih dengan skala kebutuhan dan melihat tekanan serta kecepatannya.\n\nTekan tombol Cari untuk menemukan skala kebutuhan terbesar, hingga {step} terdekat, yang membuat semua simpul ini tetap memenuhi tekanan terendah yang diizinkan; pencarian dilakukan dari 0 sampai {max}.\n\nKeduanya bekerja pada salinan jaringan, diselesaikan pada langkah waktu yang tampil di layar dalam skenario aktif, sehingga tidak ada yang berubah pada proyek. Hanya langkah waktu itu yang diskalakan, dan level serta status diambil darinya; untuk menguji puncak, geser jam ke kebutuhan puncak sebelum menjalankan.';
 $ec_lang['lpn_ds_scope']='Simpul yang diskalakan';
-$ec_lang['lpn_ds_scope_all']='Semua simpul';
-$ec_lang['lpn_ds_scope_selected']='Simpul terpilih';
-$ec_lang['lpn_ds_minpressure']='Tekanan terendah yang diizinkan';
-$ec_lang['lpn_ds_minpressure_tip']='Angka ini sama dengan Tekanan terendah yang diizinkan di bagian lain Debit kebakaran: analisis. Mengubahnya di sini mengubahnya di sana.';
 $ec_lang['lpn_ds_head_scale']='Skalakan kebutuhan';
 $ec_lang['lpn_ds_multiplier']='Skala kebutuhan';
 $ec_lang['lpn_ds_multiplier_tip']='Faktor pengali setiap kebutuhan; 1,5 berarti kenaikan 50%. Faktor ini berlaku di samping pengali kebutuhan skenario aktif, yang sudah ada dalam kebutuhan, dan tidak pernah disimpan dalam proyek.';
-$ec_lang['lpn_ds_run']='Jalankan';
 $ec_lang['lpn_ds_head_search']='Skala kebutuhan berapa yang dapat didukung sistem?';
 $ec_lang['lpn_ds_head_search_selected']='Skala kebutuhan berapa yang dapat didukung simpul-simpul ini?';
 $ec_lang['lpn_ds_outside_below']='Pada skala kebutuhan {m}, simpul yang tidak dipilih dan berada di bawah {pressure}: {n} ({ids}). Simpul ini tidak membatasi jawaban.';
@@ -4773,7 +4727,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='Dengan kebutuhan dikalikan skala kebutuhan.';
 $ec_lang['lpn_ds_col_unscaled']='Tanpa skala';
 $ec_lang['lpn_ds_col_unscaled_tip']='Dengan kebutuhan sebagaimana pada skenario aktif di langkah waktu ini, nilai yang sama dengan yang ditampilkan peta.';
 $ec_lang['lpn_ds_no_junctions']='Proyek ini belum memiliki simpul, sehingga tidak ada kebutuhan yang dapat diskalakan.';
-$ec_lang['lpn_ds_no_selection']='Tidak ada simpul yang dipilih. Pilih simpul atau pilih Semua simpul.';
 $ec_lang['lpn_ds_skipped']='Elemen terpilih yang bukan simpul, dibiarkan apa adanya: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Masukkan skala kebutuhan nol atau lebih, misalnya 1,5.';
 $ec_lang['lpn_ds_stale']='Gambar berubah, sehingga hasil penskalaan kebutuhan dihapus. Jalankan lagi.';
@@ -4932,8 +4885,6 @@ $ec_lang['lpn_survey_cancelled']='Tidak ada yang dibuat dan tidak ada yang berub
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='Utara';
-$ec_lang['lpn_survey_axis_east']='Timur';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='Berkas itu tidak berisi apa pun.';
 $ec_lang['lpn_survey_err_unreadable']='Berkas itu tidak dapat dibaca sebagai daftar titik survei.';

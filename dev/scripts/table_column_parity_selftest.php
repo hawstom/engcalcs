@@ -135,8 +135,8 @@ function ecParityCase(string $name, $got, $want): void
     $fns = ecJsTopLevelFunctions($js);
     $seen = [];
     ecParityCase('a helper\'s label comes from the argument at the call',
-        ecColumnLabels($fns, "paneColNodeResult('head', 'lpn_result_head', paneUnitHead)", [], $seen),
-        ['lpn_result_head']);
+        ecColumnLabels($fns, "paneColNodeResult('head', 'lpn_field_head', paneUnitHead)", [], $seen),
+        ['lpn_field_head']);
 }
 
 // ---- 7. LIVE MUTATION: a popup row with no column, and the same row with one -------------------

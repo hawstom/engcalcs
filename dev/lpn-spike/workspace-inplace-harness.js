@@ -13,6 +13,7 @@
 //      first-visit docks, again equal to a reload.
 //   4. Storage after the import holds exactly the file's keys, and still does after the page settles.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const os = require('os');
@@ -52,7 +53,8 @@ const { clickNode } = require('./dock-boxes.js');
 
 const quiet = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 async function openNet3(browser, name, init) {
-	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 } });
+	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	if (init) { await a.page.addInitScript(init); }
 	return a;

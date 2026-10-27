@@ -36,7 +36,8 @@ function ok(label, cond, detail) {
 	if (!cond) { fails++; }
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (cond || detail === undefined ? '' : '   -- ' + detail));
 }
-const ex = (f) => JSON.parse(fs.readFileSync(ROOT + 'examples/' + f, 'utf8'));
+// The lat/lon originals: GeoJSON is longitude and latitude, and no shipped example is lat/lon (Task 826).
+const ex = (f) => JSON.parse(fs.readFileSync(ROOT + (fs.existsSync(ROOT + 'dev/water-network-examples/latlon-originals/' + f) ? 'dev/water-network-examples/latlon-originals/' : 'examples/') + f, 'utf8'));
 const LETTER = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V' };
 // The page's own custom-property resolver, for a saved document (geoJsonExportOptions()).
 const cpOf = (doc) => (el) => ((doc.settings && doc.settings.customProps) || [])

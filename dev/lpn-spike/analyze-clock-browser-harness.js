@@ -122,7 +122,7 @@ async function main() {
 		console.log('\n--- Demand scaling ---');
 		await goTo(0);
 		await openTool('lpn_ds_menu', 'lpn_ds_box');
-		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_run'));
+		await pressRun('#lpn_ds_controls', await a.lang('lpn_ff_calculate'));
 		await waitDone('#lpn_ds_controls [data-ds="scale"]', 'the Demand scaling Run answer');
 		await pressRun('#lpn_ds_controls', await a.lang('lpn_find_btn'));
 		await waitDone('#lpn_ds_controls [data-ds="search"]', 'the Demand scaling Find answer');
