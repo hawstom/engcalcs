@@ -52293,8 +52293,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
 		if (escapeOwnsBox('lpn_popup')) { closePopup(true); }
-		// The phone's open jump list is inner to the box: Escape closes it first, the box on the next press.
-		if (escapeOwnsBox('lpn_settings_box')) { if (setboxJumpIsOpen()) { setboxJumpOpen(false); } else { closeSettingsBox(); } }
+		if (escapeOwnsBox('lpn_settings_box')) { if (setboxJumpIsOpen()) { setboxJumpOpen(false); } else { closeSettingsBox(); } }   // the phone's open jump list is inner to the box: it closes first
 		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from

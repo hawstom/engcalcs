@@ -109,7 +109,9 @@ console.log('\n-- the box\'s initial width is derived from that new index and th
 	// **PLUS THE OVERRIDE GUTTER** (Task 790; Tom, 2026-10-14): measured in Chromium, the 1.9em gutter
 	// made rows wrap that widening the box by that much gave back, so the box carries it.
 	const gutM = css.match(/#lpn_settings_box\.lpn-ovm-gut \.lpn-set-row, #lpn_settings_box\.lpn-ovm-gut \[data-lpn-setting\] \{[^}]*padding-inline-start:\s*([0-9.]+)em/);
-	ok('the Settings box\'s override gutter is still 1.9em', !!gutM && gutM[1] === '1.9', gutM && gutM[1]);
+	// 2026-10-27 (Tom, Task 835/Q4): the gutter is ONE cell, 1.1em, and the box no longer carries the old 1.9em; two
+	// cells (2.05em) only when a row needs both marks, which is not the box's initial width.
+	ok('the Settings box\'s override gutter is the one-cell 1.1em', !!gutM && gutM[1] === '1.1', gutM && gutM[1]);
 	const expectedBoxPx = newIndexPx + overheadPx + seventyPct + (gutM ? parseFloat(gutM[1]) * 16 : 0);
 	const expectedBoxRem = expectedBoxPx / 16;
 	// 2026-10-25 (Tom: the Order and Drop columns were cut off): the labels rows no longer wrap, so the
