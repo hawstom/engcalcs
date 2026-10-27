@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 199 untranslated keys, of 3169 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 199 untranslated keys, of 3170 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -646,7 +646,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/merge-1026c (`b3d493be3`) — adds no English strings
 
-### feat/box-rows-properties (`5def5d84d`) — adds no English strings
+### feat/box-rows-properties (`81bec0ecc`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -1042,7 +1042,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/bottom-pane-lag-2 (`e9a3e1a3b`) — already merged into chore/merge-1026c; its strings are listed there
 
-### fix/phone-select (`2a27693d9`) — 18 new, 18 to read @@ NEEDS RULING
+### fix/phone-select (`9c284b295`) — 18 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
