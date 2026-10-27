@@ -2841,8 +2841,6 @@ $ec_lang['lpn_curve_none']='Tidak ada kurva yang dipilih';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Kurva';
-$ec_lang['lpn_curve_library_link_tip']='Membuka kotak Pustaka pada bagian Kurva, tempat sebuah kurva ditambahkan, dideskripsikan, diubah, dan dihapus. Setiap elemen menyatakan kurva mana yang digunakannya.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.

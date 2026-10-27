@@ -66985,7 +66985,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The label a type's property carries, in the Library and on the popup alike, so the two cannot
 	// drift. Roughness and the two reaction coefficients already name their own units and follow the
 	// friction method; a diameter names the unit strip's.
-	function pipeTypePropLabel(prop) {
+	function pipeTypePropLabel(prop, short) {
 		var pc = EngCalcs.pageConfig || {};
 		if (prop === 'diameter') {
 			return (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')';
@@ -66999,11 +66999,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return pc.lpn_field_fittings || 'Fittings list';
 		}
 		if (prop === 'bulkCoeff') {
-			return (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
+			return (short ? (pc.lpn_reaction_bulk_short || 'Bulk reaction') : (pc.lpn_reaction_bulk || 'Bulk reaction coefficient'))
 				+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')';
 		}
 		// **FOLLOWS THE WALL REACTION ORDER, LIKE EVERY OTHER READER OF THIS UNIT** (R-324).
-		return (pc.lpn_reaction_wall || 'Wall reaction coefficient') + ' (' + wallCoeffUnitText() + ')';
+		return (short ? (pc.lpn_reaction_wall_short || 'Wall reaction') : (pc.lpn_reaction_wall || 'Wall reaction coefficient'))
+			+ ' (' + wallCoeffUnitText() + ')';
 	}
 	// **A CURVE'S KIND DECIDES WHAT ITS SECOND COLUMN IS**, and therefore its heading and its unit.
 	// One table, so the Library, the popup and the exporter cannot disagree about what a curve of a
@@ -72956,20 +72957,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'bottomElev'); },
 				function (v) { setTankBottom(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				effective(n, 'elev'), pc.lpn_field_tank_base_elev_tip, { el: n, prop: 'bottomElev' });
-			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
+			unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
+				pc.lpn_field_tank_level_short_tip, { el: n, prop: 'level' });
 			// These two name their field themselves for the ⚠ (a depth limit is judged against the
 			// other two depths, valueWarnText()).
-			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel_short || 'Minimum depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'minLevel'); },
 				function (v) { setProp(n, 'minLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_minlevel_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
-			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
+				pc.lpn_field_tank_minlevel_short_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel_short || 'Maximum depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'maxLevel'); },
 				function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_maxlevel_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
+				pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
 			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
@@ -72989,11 +72990,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the mains is an ordinary thing to model. It round-tripped from `[REACTIONS] TANK` and
 			// back with nothing on any screen able to show it until this row existed.
 			if (reactionFieldsShown()) {
-				numberFieldBlank(fields, (pc.lpn_reaction_tank || 'Reaction coefficient')
+				numberFieldBlank(fields, (pc.lpn_reaction_tank_short || 'Reaction')
 					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
 				effective(n, 'tankCoeff'),
 				function (v) { setProp(n, 'tankCoeff', v); refreshPopupIfOpen(); },
-				pc.lpn_reaction_tank_tip, { el: n, prop: 'tankCoeff' });
+				pc.lpn_reaction_tank_short_tip, { el: n, prop: 'tankCoeff' });
 			}
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'),
@@ -73554,9 +73555,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// *"Pump properties has no 'New curve...' button. And it shouldn't unless that's a link to
 		// the Curves library."*). It had one, and it minted curve DATA from inside a pump's
 		// properties -- which is the confusion Task 586's whole paradigm change existed to remove:
-		// an element holds a reference and nothing else. What stands here instead is a link, and it
-		// is real navigation rather than a sentence about where to go: it opens the Libraries box
-		// on its Curves section, where a curve is made, described, edited and deleted.
+		// an element holds a reference and nothing else. What stands here instead is the last
+		// option, "Edit curves…" (Tom, 2026-10-27, as Edit types… is): it opens the Libraries box
+		// on its Curves section, where a curve is made, described, edited and deleted, and the
+		// pull-down goes back to the curve it held.
+		addEditOption(sel, pc.lpn_edit_curves || 'Edit curves…', 'curves');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setProp(l, prop, sel.value || null);
@@ -73566,7 +73569,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(curveLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, prop);
 	}
@@ -73724,19 +73726,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		fields.appendChild(btn);
 		fields.appendChild(document.createElement('br'));
-	}
-	// The link that replaces the maker, on all three choosers -- the pump's head curve, the pump's
-	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
-	function curveLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_curve_library_link || 'Curves', function () {
-				openLibrarySection('curves');
-			}, pc.lpn_curve_library_link_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap. Overwriting className would leave a title nobody on a
-		// touch screen can read, which is the defect link_title_check.php exists for.
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
 	}
 	// Opening the box ON a section. openLibraryBox() rebuilds on its way in, so setting the section
 	// first is the whole of it; an already-open box only has to be rebuilt.
@@ -74103,11 +74092,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is somewhere else's, so there is nothing to type here. Editing the list is how it
 			// moves, and choosing no list is how the box becomes the user's again.
 			if (pipeKIsDerived(l)) {
-				inheritedField(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-					pipeK(l), pc.lpn_field_fittings_tip, 'k');
+				inheritedField(fields, pc.lpn_field_km_short || 'Minor loss, k',
+					pipeK(l), pc.lpn_field_km_fittings_tip, 'k');
 			} else {
-				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, null,
+				numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k', effective(l, 'k') || 0,
+					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_short_tip,
 					{ el: l, prop: 'k' }, kmTableUrl());
 			}
 			lengthField(fields, l);
@@ -74122,13 +74111,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (reactionFieldsShown()) {
 				['bulkCoeff', 'wallCoeff'].forEach(function (prop) {
 					if (pipeTypeOwns(l, prop)) {
-						inheritedField(fields, pipeTypePropLabel(prop), effective(l, prop),
-							pc.lpn_field_pipetype_tip);
+						inheritedField(fields, pipeTypePropLabel(prop, true), effective(l, prop),
+							prop === 'bulkCoeff' ? pc.lpn_reaction_bulk_pipe_tip : pc.lpn_reaction_wall_pipe_tip);
 						return;
 					}
-					numberFieldBlank(fields, pipeTypePropLabel(prop), effective(l, prop),
+					numberFieldBlank(fields, pipeTypePropLabel(prop, true), effective(l, prop),
 						function (v) { setProp(l, prop, v); refreshPopupIfOpen(); },
-						pc.lpn_reaction_pipe_tip, { el: l, prop: prop });
+						prop === 'bulkCoeff' ? pc.lpn_reaction_bulk_pipe_tip : pc.lpn_reaction_wall_pipe_tip, { el: l, prop: prop });
 				});
 			}
 		}
@@ -74202,7 +74191,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/scripts/scenario_seam_check.php guards the seam now.
 	function renderValveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
-		selectFieldPlain(fields, pc.lpn_field_valve_type || 'Valve type', [
+		selectFieldPlain(fields, pc.lpn_full_col_type || 'Type', [
 			['TCV', pc.lpn_valve_type_tcv || 'Throttle (TCV)'],
 			['PRV', pc.lpn_valve_type_prv || 'Pressure reducing (PRV)'],
 			['PSV', pc.lpn_valve_type_psv || 'Pressure sustaining (PSV)'],
@@ -74282,10 +74271,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// whose loss is its setting alone (measured -- see EngCalcs.lpnLinkK). A box here would be
 		// a number the user types and neither engine reads.
 		if (vt !== 'TCV') {
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
+			numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k',
 				effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
-				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' }, kmTableUrl());
+				pc.lpn_field_valve_km_short_tip, { el: l, prop: 'k' }, kmTableUrl());
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
@@ -75255,7 +75244,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			afterPropertyEdit(l);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_field_cv || 'Check valve (CV)', pc.lpn_field_cv_tip);
+		setFieldLabel(text, pc.lpn_field_cv_short || 'Check valve', pc.lpn_field_cv_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -75341,7 +75330,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// Box first, then words, in its own <span> -- setFieldLabel() assigns textContent, which
 		// would wipe a checkbox already appended to the same element. Same order as closedField().
-		setFieldLabel(text, pc.lpn_field_active || 'Is active?', pc.lpn_field_active_tip);
+		setFieldLabel(text, pc.lpn_field_active_short || 'Active', pc.lpn_field_active_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
