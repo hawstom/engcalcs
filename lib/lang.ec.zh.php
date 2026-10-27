@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='方案表，列出覆盖值个数、最低压�
 $ec_lang['lpn_scncmp_running']='正在求解每一个方案…';
 $ec_lang['lpn_scncmp_empty']='尚未绘制任何内容，因此没有可求解的对象。';
 $ec_lang['lpn_scncmp_col_maxvelocity']='最高流速';
-$ec_lang['lpn_scncmp_at']='{id} 处的 {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} 处为 {value}，{time}';
 $ec_lang['lpn_scncmp_same']='在每个方案中都相同';
 $ec_lang['lpn_scncmp_period_note']='方案设有总运行时长时，其最低压力和最高流速是整个管网的极值，出现在所示时刻。';
 $ec_lang['lpn_scncmp_current']='（当前打开）';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='求解次数';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='压力和流速';
 $ec_lang['lpn_ff_atleast']='大于 {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} 降至 {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} 达到 {velocity}';
 $ec_lang['lpn_ff_more']='另有 {n} 个受影响';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

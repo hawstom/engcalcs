@@ -6502,8 +6502,9 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    is no justification for them to vary"). Wide enough for N9999 or J-1234 at the table's own font,
    screen and paper alike, and an id is never broken. Marked by the renderer, `lpn-rpt-id`, on the
    heading and every cell of the column. */
-/* A heading's bracketed unit stays whole: "(m H2O)" never splits across lines. */
-th bdi { white-space: nowrap; }
+/* A heading's unit may split across lines (Tom, 2026-10-27: "splitting would be acceptable"), so a
+   column can be as narrow as its figures; an id and a figure in a cell still never break. */
+.lpn-ff-table th.lpn-ff-grouphead, .lpn-print-grouphead { text-align: center; }
 .lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
 .lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }

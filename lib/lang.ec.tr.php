@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Senaryo değeri sayısı, en düşük basınç 
 $ec_lang['lpn_scncmp_running']='Her senaryo çözülüyor…';
 $ec_lang['lpn_scncmp_empty']='Henüz hiçbir şey çizilmedi, bu yüzden çözülecek bir şey yok.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='En yüksek hız';
-$ec_lang['lpn_scncmp_at']='{id}\'de {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} düğümünde {value}, {time}';
 $ec_lang['lpn_scncmp_same']='Her senaryoda aynı';
 $ec_lang['lpn_scncmp_period_note']='Bir senaryonun toplam çalışma süresi varsa, en düşük basıncı ve en yüksek hızı, gösterilen zamanda tüm şebekenin uç değerleridir.';
 $ec_lang['lpn_scncmp_current']='(şu anda açık)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='Çözümler';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Basınç ve hız';
 $ec_lang['lpn_ff_atleast']='{flow}\'den fazla';
-$ec_lang['lpn_ff_affect_node']='{id} {pressure}\'e düşüyor';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity}\'e ulaşıyor';
 $ec_lang['lpn_ff_more']='ve {n} tane daha etkilendi';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

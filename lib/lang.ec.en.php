@@ -4168,8 +4168,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of overrides, low
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
-$ec_lang['lpn_scncmp_at']='{value} at {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} at {id}, {time}';
 $ec_lang['lpn_scncmp_same']='The same in every scenario';
 $ec_lang['lpn_scncmp_period_note']='Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.';
 $ec_lang['lpn_scncmp_current']='(currently open)';
@@ -4766,12 +4764,13 @@ $ec_lang['lpn_dur_recovery_cut']='The run stopped before its end, so recovery af
 $ec_lang['lpn_dur_col_pressure']='Pressure at the fire junction';
 $ec_lang['lpn_dur_col_nofire']='Pressure without the fire';
 $ec_lang['lpn_dur_col_low']='Lowest level reached';
+$ec_lang['lpn_col_level']='Level';
 $ec_lang['lpn_dur_col_margin']='Above lowest water depth';
 $ec_lang['lpn_dur_col_drop']='Drop from start';
 $ec_lang['lpn_dur_col_end']='Level at end';
 $ec_lang['lpn_dur_col_end_nofire']='Level at end without the fire';
-$ec_lang['lpn_at_time']='{value} at {time}';
 $ec_lang['lpn_crit_col_hours']='Hours below minimum';
+$ec_lang['lpn_crit_col_stopped']='Run stopped at';
 $ec_lang['lpn_crit_col_empty']='Tank empties';
 $ec_lang['lpn_ds_run_note']='Judged over the whole run, at every reporting step.';
 $ec_lang['lpn_ds_limit_at']='Limiting reporting step: {time}.';
@@ -4785,7 +4784,6 @@ $ec_lang['lpn_ff_no_steps']='A tank empties at {time}, before the first reportin
 $ec_lang['lpn_ff_tank_empties']='A tank empties at {time}; steps from then on were not tested.';
 $ec_lang['lpn_crit_col_lowest_tip']='Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
 $ec_lang['lpn_crit_empty_note']='Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.';
-$ec_lang['lpn_crit_stopped_at']='run stopped at {time}';
 $ec_lang['lpn_ff_at_step']='Tested at reporting step {time}.';
 $ec_lang['lpn_ff_at_minp']='Tested at {time}, the reporting step with the lowest pressure among the junctions tested.';
 $ec_lang['lpn_ff_at_all']='Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.';
@@ -4821,6 +4819,7 @@ $ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';
 $ec_lang['lpn_ff_col_atrequired']='Pressure at required flow';
 $ec_lang['lpn_ff_col_affected']='Worst effect';
+$ec_lang['lpn_ff_col_more']='More affected';
 $ec_lang['lpn_ff_col_limit']='Design limit';
 // **THE CELL THAT SAYS THE QUESTION WAS NEVER ASKED.** A junction that cannot deliver the required
 // flow is never checked for what it would pull down, because the design question is not asked at a
@@ -4847,8 +4846,6 @@ $ec_lang['lpn_ff_col_solves']='Runs';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Pressure and velocity';
 $ec_lang['lpn_ff_atleast']='more than {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} drops to {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} reaches {velocity}';
 $ec_lang['lpn_ff_more']='and {n} more affected';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

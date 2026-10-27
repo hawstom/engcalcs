@@ -97,11 +97,18 @@ async function main() {
 			await settle(1000);
 		};
 		const closeBox = (id) => P.evaluate((i) => { const x = document.getElementById(i); if (x) { x.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }, id);
+		// Task 840: Lowest pressure and Highest velocity are compound headings (asset, value, time), so the
+		// head has two rows. The table is returned as the chapter shows it: one heading row of column names
+		// ("Lowest pressure: Pressure (psi)") and rows of cells.
 		const compareTable = async (want) => {
 			await a.menuClickSub(await T('lpn_reports_menu'), await T('lpn_scncmp_title'), 'project');
-			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 1; }, want), 'comparison table', 90000);
+			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 2; }, want), 'comparison table', 90000);
 			await settle(300);
-			const rows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_scncmp_report > .lpn-ff-tablewrap table tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			const rows = await P.evaluate(() => {
+				const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'), hs = Array.from(t.tHead.rows), sec = Array.from(hs[1].cells).map((c) => c.textContent.trim()), head = []; let k = 0;
+				Array.from(hs[0].cells).forEach((th) => { if (th.colSpan > 1) { for (let i = 0; i < th.colSpan; i++) { head.push(th.textContent.trim() + ': ' + sec[k++]); } } else { head.push(th.textContent.trim()); } });
+				return [head].concat(Array.from(t.tBodies[0].rows).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			});
 			await closeBox('lpn_scncmp_close');
 			await settle(300);
 			return rows;
@@ -265,12 +272,15 @@ async function main() {
 		for (const k of colKeys) { wantHead.push(await T(k)); }
 		ok('the chapter\'s example table has the comparison\'s own column names', JSON.stringify(ex[0]) === JSON.stringify(wantHead), JSON.stringify(ex[0]));
 		ok('the comparison has the columns the chapter lists (Total run time, Hydraulic time step among them)', heading.indexOf(await T('lpn_time_duration')) > 0 && heading.indexOf(await T('lpn_time_hyd_step')) > 0, JSON.stringify(heading));
-		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]), p: heading.indexOf(wantHead[3]), v: heading.indexOf(wantHead[4]) };
+		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]),
+			p: heading.findIndex((h) => h.indexOf(wantHead[3] + ': ') === 0), v: heading.findIndex((h) => h.indexOf(wantHead[4] + ': ') === 0) };
+		// The chapter's cell is "108 psi at N32, 14:00": the value and its unit, the asset, the time.
+		const sentence = (row, i) => { const unit = (/\(([^)]+)\)/.exec(heading[i + 1]) || [])[1]; return row[i + 1] + ' ' + unit + ' at ' + row[i] + ', ' + row[i + 2]; };
 		const cur = ' ' + (await T('lpn_scncmp_current'));
 		for (const row of ex.slice(1)) {
 			const got = table.slice(1).filter((t) => t[idx.name].replace(cur, '') === row[0])[0];
 			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '),
-				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && got[idx.p] === row[3] && got[idx.v] === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], got[idx.p], got[idx.v]]));
+				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && sentence(got, idx.p) === row[3] && sentence(got, idx.v) === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], sentence(got, idx.p), sentence(got, idx.v)]));
 		}
 		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day' + cur));
 		ok('the comparison lists exactly the three scenarios of the example', table.length === 4, String(table.length - 1));

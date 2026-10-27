@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='የራስ ዋጋዎች ብዛት፣ ዝቅተ�
 $ec_lang['lpn_scncmp_running']='እያንዳንዱን ሁኔታ በመፍታት ላይ…';
 $ec_lang['lpn_scncmp_empty']='እስካሁን ምንም አልተሳለም፣ ስለዚህ የሚፈታ ምንም ነገር የለም።';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ከፍተኛ ፍጥነት';
-$ec_lang['lpn_scncmp_at']='{value} በ{id}';
-$ec_lang['lpn_scncmp_at_time']='{value} በ{id}፣ {time}';
 $ec_lang['lpn_scncmp_same']='በሁሉም ሁኔታዎች ተመሳሳይ';
 $ec_lang['lpn_scncmp_period_note']='ሁኔታ ጠቅላላ የመሮጫ ጊዜ ባለው ቦታ፣ ዝቅተኛ ግፊቱና ከፍተኛ ፍጥነቱ በሚታየው ጊዜ የመላው መረብ ጽንፎች ናቸው።';
 $ec_lang['lpn_scncmp_current']='(አሁን የተከፈተ)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='ሩጫዎች';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='ግፊትና ፍጥነት';
 $ec_lang['lpn_ff_atleast']='ከ{flow} በላይ';
-$ec_lang['lpn_ff_affect_node']='{id} ወደ {pressure} ይወርዳል';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity} ይደርሳል';
 $ec_lang['lpn_ff_more']='እና {n} ተጨማሪ የተነኩ';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

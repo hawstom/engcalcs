@@ -80086,18 +80086,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// velocity.
 	function ffCriticalText(rec) {
 		var parts = ffCriticalParts(rec);
-		return parts.plain !== undefined ? parts.plain : parts.before + parts.idText + parts.after;
+		return parts.plain !== undefined ? parts.plain : parts.idText;
 	}
-	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
-	// flow analysis, can every node have a hyperlink to go to it?"*).
-	function ffCriticalCell(row, rec, showStep) {
-		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t,
-			tail = (showStep && typeof when === 'number') ? ' (' + dsTimeText(when) + ')' : '';
-		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
-		td = ffCell(row, parts.before);
-		ffGotoLink(td, parts.kind, parts.id, parts.idText);
-		td.appendChild(document.createTextNode(parts.after + tail));
-		return td;
+	// **THE WORST-EFFECT CELL IS SPLIT INTO ITS PARTS** (Task 840; Tom, 2026-10-27: "split the sentence
+	// into two columns with a compound heading"): the asset, its pressure, its velocity, the step it
+	// was read at (only when the report shows every step) and how many more were affected. The asset
+	// is a go-to link (Tom, 2026-09-28: *"In fire flow analysis, can every node have a hyperlink to
+	// go to it?"*). A junction records its pressure, a link its velocity; the other cell is blank.
+	function ffCriticalCells(row, rec, allSteps) {
+		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t;
+		td = ffCell(row, parts.plain !== undefined ? parts.plain : '', 'lpn-rpt-id');
+		if (parts.plain === undefined) { ffGotoLink(td, parts.kind, parts.id, parts.idText); }
+		ffCell(row, parts.plain === undefined && parts.kind === 'node' ? ffQty(parts.value, 'lpn_u_pressure') : '');
+		ffCell(row, parts.plain === undefined && parts.kind === 'link' ? ffQty(parts.value, 'lpn_u_velocity') : '');
+		if (allSteps) { ffCell(row, parts.plain === undefined && typeof when === 'number' ? dsTimeText(when) : ''); }
+		ffCell(row, parts.extra > 0 ? String(parts.extra) : '');
 	}
 	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
 	// a Tables pin (findGoTo(), which never replaces a selection being built). A button dressed as
@@ -80113,7 +80116,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return b;
 	}
 	function ffCriticalParts(rec) {
-		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, tpl, value, at, after, j, e;
+		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', extra, value, j, e;
 		// **NOT CHECKED AND NOTHING FOUND ARE DIFFERENT FACTS AND USED TO DRAW IDENTICALLY.**
 		// (Found 2026-09-02 from Tom's question about which cells a design row should blank.) A
 		// dash here meant *we looked and found nothing*, which is good news, AND *we never looked*,
@@ -80138,20 +80141,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		}
 		if (!worst) { return { plain: FF_DASH }; }
-		// The template is split at {id} so the id can be drawn as a link; the words either side are
-		// exactly the words the plain text has, in whatever order the language puts them.
-		tpl = kind === 'node'
-			? String(pc.lpn_ff_affect_node || '{id} drops to {pressure}')
-				.split('{pressure}').join(ffQty(worst.pressure, 'lpn_u_pressure'))
-			: String(pc.lpn_ff_affect_link || '{id} reaches {velocity}')
-				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
 		value = labelPrefixFor(kind, 'id') + worst.id;
-		at = tpl.indexOf('{id}');
-		total = rec.effects.nodes.length + rec.effects.links.length;
-		extra = total - 1;
-		after = extra > 0 ? ' ' + (pc.lpn_ff_more || 'and {n} more affected').replace('{n}', String(extra)) : '';
-		if (at < 0) { return { plain: tpl + after }; }
-		return { before: tpl.slice(0, at), idText: value, after: tpl.slice(at + 4) + after, kind: kind, id: worst.id };
+		extra = rec.effects.nodes.length + rec.effects.links.length - 1;
+		return { idText: value, kind: kind, id: worst.id, value: kind === 'node' ? worst.pressure : worst.velocity, extra: extra };
 	}
 	// **WHICH CRITERION THE JUNCTION BROKE**, which is as far as we can honestly go towards the
 	// competitor's "Design constraint". Two of their columns have no answer in this result set and
@@ -80189,19 +80181,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// or the largest of anything. `null` is the reading order ffSorted() gives, until a heading is
 	// clicked. Kept for the page load, like the criteria in the boxes above it.
 	var ffSortState = { col: null, dir: 1 };
+	// The columns in the order drawn; the Worst-effect group's Time and the last step column appear
+	// only when the report shows every step (set by rebuildFireFlowReport).
+	var ffColKeys = ['id', 'static', 'required', 'atreq', 'available', 'residual', 'wAsset', 'wPress', 'wVel', 'wMore', 'limit', 'solves', 'modes'];
 	function ffSortKey(rec, col) {
-		switch (col) {
-		case 0: return rec.id;
-		case 1: return rec.staticPressure;
-		case 2: return rec.required;
-		case 3: return rec.pressureAtRequired;
-		case 4: return rec.available;
-		case 5: return rec.residualAt;
-		case 6: return rec.effects ? ffCriticalText(rec) : undefined;
-		case 7: return rec.effects ? ffLimitText(rec) : undefined;
-		case 8: return rec.solves;
-		case 9: return ffModesText(rec);
-		case 10: return rec.t;
+		var w;
+		switch (ffColKeys[col]) {
+		case 'id': return rec.id;
+		case 'static': return rec.staticPressure;
+		case 'required': return rec.required;
+		case 'atreq': return rec.pressureAtRequired;
+		case 'available': return rec.available;
+		case 'residual': return rec.residualAt;
+		case 'wAsset': return rec.effects ? ffCriticalText(rec) : undefined;
+		case 'wPress': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.kind === 'node' ? w.value : undefined;
+		case 'wVel': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.kind === 'link' ? w.value : undefined;
+		case 'wTime': return rec.effects ? (typeof rec.designT === 'number' ? rec.designT : rec.t) : undefined;
+		case 'wMore': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.extra > 0 ? w.extra : undefined;
+		case 'limit': return rec.effects ? ffLimitText(rec) : undefined;
+		case 'solves': return rec.solves;
+		case 'modes': return ffModesText(rec);
+		case 'hour': return rec.t;
 		}
 		return undefined;
 	}
@@ -80241,7 +80241,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			head = ffEl('thead', null, null, table),
-			hr = ffEl('tr', null, null, head);
+			hr = ffEl('tr', null, null, head),
+			hr2 = null, lastGroup = null, lastGth = null;
+		// **A COMPOUND HEADING** (Task 840; Tom, 2026-10-27: "split the sentence into two columns with a
+		// compound heading"). A heading `[text, tip, shown, group]` with a `group` sits in a second
+		// header row under that group's heading, which spans its consecutive columns; every other
+		// heading spans both rows. The columns stay ordinary columns, each sorted from its own heading.
+		if (headings.some(function (h) { return typeof h !== 'string' && h && h[3]; })) { hr2 = ffEl('tr', null, null, head); }
 		// **A HEADING MAY CARRY ITS OWN DEFINITION**, as `[text, tip]`. The pane tables already put
 		// a tip on a `th` this way, so this is that pattern and not a second one. It exists because
 		// Static pressure is a term of art whose reading a person cannot guess: Tom, 2026-09-02,
@@ -80250,8 +80256,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
 			var text = h, tip = null, shown = false, help, glyph, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
-			if (h && h.length >= 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; shown = h[2]; }
-			th = ffEl('th', 'lpn-ff-sortable', text, hr);
+			var group = null, gth, cell = hr;
+			if (h && h.length >= 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; shown = h[2]; group = h[3] || null; }
+			if (group) {
+				if (group !== lastGroup) {
+					gth = lastGth = ffEl('th', 'lpn-ff-grouphead', group, hr);
+					gth.colSpan = 1;
+				} else { lastGth.colSpan += 1; }
+				cell = hr2;
+			}
+			lastGroup = group;
+			th = ffEl('th', 'lpn-ff-sortable', text, cell);
+			if (hr2 && !group) { th.rowSpan = 2; }
 			if (tip) { th.title = tip; }
 			// A third member says the tip must be SEEN: the `?` the labels carry, because a `title`
 			// alone never shows on a touch screen and nothing on the heading says it is there.
@@ -80383,6 +80399,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 
 		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
+		ffColKeys = ['id', 'static', 'required', 'atreq', 'available', 'residual', 'wAsset', 'wPress', 'wVel']
+			.concat(allSteps ? ['wTime'] : []).concat(['wMore', 'limit', 'solves', 'modes']).concat(allSteps ? ['hour'] : []);
 		sorted = ffSortResults(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		// **THE ORDER IS THE ORDER A PERSON READS THE ANSWER IN** (Tom, 2026-09-02, once the
@@ -80395,6 +80413,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// are ONE reading, a flow and the pressure the junction still held while delivering it, and
 		// an available flow with no residual beside it is a number without its condition. Required
 		// and its own pressure are the same kind of pair and now sit the same way.
+		var worstG = pc.lpn_ff_col_affected || 'Worst effect';
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ff_col_static || 'Static pressure',
@@ -80403,11 +80422,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_atrequired || 'Pressure at required flow',
 			pc.lpn_ff_col_available || 'Available flow',
 			pc.lpn_ff_col_residual || 'Residual held',
-			pc.lpn_ff_col_affected || 'Worst effect',
+			[pc.lpn_crit_col_asset || 'Asset', null, false, worstG],
+			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
+			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
+		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time', null, false, worstG]] : []).concat([
+			[pc.lpn_ff_col_more || 'More affected', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
+		]).concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
@@ -80420,7 +80443,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
 			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCriticalCell(tr, rec, allSteps);
+			ffCriticalCells(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
@@ -80915,7 +80938,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			hr = ffEl('tr', null, null, ffEl('thead', null, null, table));
-		headings.forEach(function (h) { ffEl('th', null, h, hr); });
+		// A heading `[text, group]` sits under that group's heading in a second row (see ffTable).
+		var hr2 = headings.some(function (h) { return typeof h !== 'string'; }) ? ffEl('tr', null, null, hr.parentNode) : null, last = null, lastTh = null;
+		headings.forEach(function (h) {
+			var text = typeof h === 'string' ? h : h[0], group = typeof h === 'string' ? null : h[1], g, th;
+			if (group) {
+				if (group !== last) { g = lastTh = ffEl('th', 'lpn-ff-grouphead', group, hr); g.colSpan = 1; } else { lastTh.colSpan += 1; }
+				ffEl('th', null, text, hr2);
+			} else {
+				th = ffEl('th', null, text, hr);
+				if (hr2) { th.rowSpan = 2; }
+			}
+			last = group;
+		});
 		return ffEl('tbody', null, null, table);
 	}
 	function renderDurationFire(host, d) {
@@ -80972,7 +81007,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				: (pc.lpn_dur_recovery_cut || 'The run stopped before its end, so recovery after the fire is not assessed.'));
 		}
 		if (d.tanks.length) {
-			body = durTable(host, [pc.lpn_time_tank || 'Tank', pc.lpn_dur_col_low || 'Lowest level reached',
+			body = durTable(host, [pc.lpn_time_tank || 'Tank', [pc.lpn_col_level || 'Level', pc.lpn_dur_col_low || 'Lowest level reached'],
+				[pc.lpn_full_col_time || 'Time', pc.lpn_dur_col_low || 'Lowest level reached'],
 				pc.lpn_field_tank_minlevel || 'Lowest water depth', pc.lpn_dur_col_margin || 'Above lowest water depth',
 				pc.lpn_dur_col_drop || 'Drop from start',
 				pc.lpn_dur_col_end || 'Level at end', pc.lpn_dur_col_end_nofire || 'Level at end without the fire']);
@@ -80980,8 +81016,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
 				tr = ffEl('tr', null, null, body);
 				ffCell(tr, labelPrefixFor('node', 'id') + t.id, 'lpn-rpt-id');
-				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
-					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
+				ffCell(tr, t.lowest ? lv(t.lowest.level) : FF_DASH);
+				ffCell(tr, t.lowest ? dsTimeText(t.lowest.t) : '');
 				ffCell(tr, lv(t.min));
 				ffCell(tr, lv(t.margin));
 				ffCell(tr, lv(t.drop));
@@ -81150,15 +81186,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return td;
 	}
+	// The columns in the order drawn, named so a sort survives the whole-run columns coming and going.
+	var critColKeys = ['id', 'unserved', 'cutoff', 'below'];
 	function critSortKey(rec, col) {
-		switch (col) {
-		case 0: return rec.id;
-		case 1: return rec.unserved;
-		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
-		case 3: return rec.below ? rec.below.length : undefined;
-		case 4: return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
-		case 5: return rec.run ? rec.run.belowSeconds : undefined;
-		case 6: return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
+		switch (critColKeys[col]) {
+		case 'id': return rec.id;
+		case 'unserved': return rec.unserved;
+		case 'unservedT': return rec.unserved > 0 ? rec.unservedAt : undefined;
+		case 'cutoff': return rec.cutOff ? rec.cutOff.length : undefined;
+		case 'below': return rec.below ? rec.below.length : undefined;
+		case 'lowJ': return rec.run && rec.run.lowest ? rec.run.lowest.id : undefined;
+		case 'lowP': return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
+		case 'lowT': return rec.run && rec.run.lowest ? rec.run.lowest.t : undefined;
+		case 'hours': return rec.run ? rec.run.belowSeconds : undefined;
+		case 'stopped': return rec.run && typeof rec.run.stoppedAt === 'number' ? rec.run.stoppedAt : undefined;
+		case 'emptyN': return rec.run && rec.run.emptyAt ? rec.run.emptyAt.id : undefined;
+		case 'emptyT': return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
 		}
 		return undefined;
 	}
@@ -81216,18 +81259,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
+		// **A VALUE WITH A PLACE OR A TIME IS SPLIT INTO COLUMNS UNDER A COMPOUND HEADING** (Task 840):
+		// "97.01 psi at 4:00" is a Junction, a Pressure and a Time. Whole-run columns only.
+		var gUnserved = pc.lpn_crit_col_unserved_peak || 'Largest demand not served',
+			gLow = pc.bpn_p_min || 'Lowest pressure', gEmpty = pc.lpn_crit_col_empty || 'Tank empties',
+			tTime = pc.lpn_full_col_time || 'Time', anyStop = false, lowTip = pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
+		if (set.wholeRun) {
+			anyStop = set.results.some(function (r) { return r.run && typeof r.run.stoppedAt === 'number'; });
+			critColKeys = ['id', 'unserved', 'unservedT', 'cutoff', 'below', 'lowJ', 'lowP', 'lowT', 'hours']
+				.concat(anyStop ? ['stopped'] : []).concat(['emptyN', 'emptyT']);
+		} else { critColKeys = ['id', 'unserved', 'cutoff', 'below']; }
 		sorted = critSorted(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
-		body = ffTable(host, [
+		body = ffTable(host, (set.wholeRun ? [
 			pc.lpn_crit_col_asset || 'Asset',
-			set.wholeRun ? (pc.lpn_crit_col_unserved_peak || 'Largest demand not served') : (pc.lpn_crit_col_unserved || 'Demand not served'),
+			[pc.lpn_result_flow || 'Flow', null, false, gUnserved],
+			[tTime, null, false, gUnserved],
+			pc.lpn_crit_col_cutoff || 'Junctions cut off',
+			pc.lpn_crit_col_below || 'Junctions below minimum',
+			[pc.lpn_ff_col_junction || 'Junction', null, false, gLow],
+			[pc.lpn_result_pressure || 'Pressure', lowTip, true, gLow],
+			[tTime, null, false, gLow],
+			pc.lpn_crit_col_hours || 'Hours below minimum'
+		].concat(anyStop ? [pc.lpn_crit_col_stopped || 'Run stopped at'] : []).concat([
+			[pc.lpn_time_tank || 'Tank', null, false, gEmpty],
+			[tTime, null, false, gEmpty]
+		]) : [
+			pc.lpn_crit_col_asset || 'Asset',
+			pc.lpn_crit_col_unserved || 'Demand not served',
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
-		].concat(set.wholeRun ? [
-			[pc.bpn_p_min || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
-			pc.lpn_crit_col_hours || 'Hours below minimum',
-			pc.lpn_crit_col_empty || 'Tank empties'
-		] : []), { state: critSortState, by: critSortBy });
+		]), { state: critSortState, by: critSortBy });
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
@@ -81235,11 +81297,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
 			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
-			ffCell(tr, typeof rec.unserved === 'number'
-				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
-					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
-					: ffQty(rec.unserved, 'lpn_u_flow'))
-				: FF_DASH);
+			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			if (set.wholeRun) {
+				ffCell(tr, typeof rec.unserved === 'number' && rec.unserved > 0 && typeof rec.unservedAt === 'number' ? dsTimeText(rec.unservedAt) : '');
+			}
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
 			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
 			// known without a solve and is still printed; only the pressures are missing, so the
@@ -81247,15 +81308,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
 			if (set.wholeRun) {
-				var atT = pc.lpn_at_time || '{value} at {time}', rn = rec.run;
-				ffCell(tr, rn && rn.lowest
-					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
-					: FF_DASH);
-				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) +
-					(typeof rn.stoppedAt === 'number' ? ' (' + (pc.lpn_crit_stopped_at || 'run stopped at {time}').replace('{time}', dsTimeText(rn.stoppedAt)) + ')' : '') : FF_DASH);
-				ffCell(tr, rn && rn.emptyAt
-					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
-					: FF_DASH);
+				var rn = rec.run, lo = rn && rn.lowest;
+				ffCell(tr, lo ? labelPrefixFor('node', 'id') + lo.id : (rn ? '' : FF_DASH), 'lpn-rpt-id');
+				ffCell(tr, lo ? ffQty(lo.pressure, 'lpn_u_pressure') : '');
+				ffCell(tr, lo ? dsTimeText(lo.t) : '');
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) : FF_DASH);
+				if (anyStop) { ffCell(tr, rn && typeof rn.stoppedAt === 'number' ? dsTimeText(rn.stoppedAt) : ''); }
+				ffCell(tr, rn && rn.emptyAt ? labelPrefixFor('node', 'id') + rn.emptyAt.id : '', 'lpn-rpt-id');
+				ffCell(tr, rn && rn.emptyAt ? dsTimeText(rn.emptyAt.t) : '');
 			}
 		});
 		ffMoreLine(host, sorted.length - shown.length, true);
@@ -82329,16 +82389,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.replace('{done}', String(Math.min(scenarioCompareProgress.done + 1, scenarioCompareProgress.total)))
 			.replace('{total}', String(scenarioCompareProgress.total));
 	}
-	// One cell: the number and the element it was found at, in the reader's own units.
-	// `t` is the time step a run found it at, and only a run passes one.
-	function scnCmpAt(si, unitId, id, group, t) {
-		var pc = EngCalcs.pageConfig || {};
-		if (typeof si !== 'number' || !isFinite(si)) { return FF_DASH; }
-		return (t === undefined ? (pc.lpn_scncmp_at || '{value} at {id}')
-			: (pc.lpn_scncmp_at_time || '{value} at {id}, {time}')
-				.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t)))
-			.replace('{value}', ffQty(si, unitId))
-			.replace('{id}', labelPrefixFor(group, 'id') + id);
+	// **THE VALUE, THE ELEMENT IT WAS FOUND AT AND THE TIME ARE THREE COLUMNS** (Task 840), under one
+	// compound heading: "108 psi at N32, 14:00" is a Junction, a Pressure and a Time. `t` is the time
+	// step a run found it at, and only a run passes one; a steady solve leaves the Time cell blank.
+	function scnCmpAt(tr, si, unitId, id, group, t) {
+		var ok = typeof si === 'number' && isFinite(si);
+		ffCell(tr, ok ? labelPrefixFor(group, 'id') + id : FF_DASH, 'lpn-rpt-id');
+		ffCell(tr, ok ? ffQty(si, unitId) : '');
+		ffCell(tr, ok && t !== undefined ? (EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t)) : '');
 	}
 	// **WHAT DOES NOT VARY IS STATED ONCE, ABOVE THE TABLE** (Task 755; Sue: friction method, units,
 	// accuracy and trials never vary silently between compared scenarios). They are project
@@ -82427,8 +82485,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.bpn_demand_mult || 'Demand multiplier',
 			pc.lpn_time_duration || 'Total run time',
 			pc.lpn_time_hyd_step || 'Hydraulic time step',
-			pc.bpn_p_min || 'Lowest pressure',
-			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
+			[pc.lpn_ff_col_junction || 'Junction', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_result_pressure || 'Pressure', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_full_col_time || 'Time', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_ds_col_link || 'Link', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
+			[pc.lpn_result_velocity || 'Velocity', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
+			[pc.lpn_full_col_time || 'Time', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity']
 		]);
 		scenarioCompareRun.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body), name = scenarioDisplayName(r.scn);
@@ -82442,13 +82504,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scnCmpOptionCells(tr, r.opts);
 			if (r.period) { anyPeriod = true; }
 			if (!r.ok) {
-				// One cell across both number columns: the reason is one sentence and splitting it
+				// One cell across all six result columns: the reason is one sentence and splitting it
 				// would print half of it under "Highest velocity".
-				ffCell(tr, r.why).colSpan = 2;
+				ffCell(tr, r.why).colSpan = 6;
 				return;
 			}
-			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node', r.period ? r.minT : undefined));
-			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link', r.period ? r.maxT : undefined));
+			scnCmpAt(tr, r.minPressure, 'lpn_u_pressure', r.minAt, 'node', r.period ? r.minT : undefined);
+			scnCmpAt(tr, r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link', r.period ? r.maxT : undefined);
 			if (!r.converged) {
 				ffCell(tr, pc.lpn_diag_not_converged || 'No solution was found. Check for physically impossible values, such as a diameter of zero.');
 			}
@@ -84978,16 +85040,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reportHeadTemplate().split(/(\{label\}|\{unit\})/).forEach(function (part) {
 			var b;
 			if (part === '{label}') { frag.appendChild(document.createTextNode(label)); }
-			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = reportUnitKept(unit); frag.appendChild(b); }
+			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = unit; frag.appendChild(b); }
 			else if (part) { frag.appendChild(document.createTextNode(part)); }
 		});
 		return frag;
 	}
 	/** A multi-word unit ("m H2O") holds together: no-break spaces. */
-	function reportUnitKept(unit) { return String(unit).replace(/ /g, '\u00A0'); }
 	function reportHeadHtml(label, unit) {
 		return reportHeadTemplate().split(/(\{label\}|\{unit\})/).map(function (part) {
-			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi style="white-space:nowrap;">' + reportEsc(reportUnitKept(unit)) + '</bdi>' : reportEsc(part);
+			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi>' + reportEsc(unit) + '</bdi>' : reportEsc(part);
 		}).join('');
 	}
 	function reportUnitInLabel(label, unit) {
@@ -85022,8 +85083,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		t = n[0].nodeValue.replace(/\s+$/, '');
 		if (t.slice(-unit.length) === unit) { n[0].nodeValue = t.slice(0, -unit.length).replace(/\s+$/, ''); }
 	}
+	/**
+	 * **THE COLUMN HEADINGS OF A TABLE THAT MAY HAVE A COMPOUND HEADING** (Task 840). A two-row head
+	 * has, in its first row, group headings that span several columns (colspan) and plain headings that
+	 * span both rows (rowspan 2); its second row holds the headings of the grouped columns. Returns
+	 * `{ leaf, grp }`: the heading cell of each column in order, and the group heading text above it
+	 * ('' where there is none). A one-row head is its own leaves.
+	 */
+	function reportTableHeads(table) {
+		var rows = table.querySelectorAll('thead tr'), leaf = [], grp = [], c = 0, second, k, i, j, n;
+		if (!rows.length) { return { leaf: leaf, grp: grp }; }
+		if (rows.length === 1) {
+			Array.prototype.forEach.call(rows[0].children, function (th) { leaf.push(th); grp.push(''); });
+			return { leaf: leaf, grp: grp };
+		}
+		second = Array.prototype.slice.call(rows[1].children); k = 0;
+		for (i = 0; i < rows[0].children.length; i++) {
+			var th = rows[0].children[i];
+			n = th.colSpan || 1;
+			if (n === 1 && (th.rowSpan || 1) > 1) { leaf[c] = th; grp[c] = ''; c++; continue; }
+			for (j = 0; j < n; j++) { leaf[c] = second[k++]; grp[c] = reportCellText(th, false); c++; }
+		}
+		return { leaf: leaf, grp: grp };
+	}
 	function reportTableUnits(table) {
-		var ths = table.querySelectorAll('thead th'), trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known;
+		var ths = reportTableHeads(table).leaf, trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known;
 		if (!ths.length || table._ecUh === trs.length) { return; }
 		for (r = 0; r < trs.length; r++) { if (trs[r].children.length !== ths.length) { return; } }
 		table._ecUh = trs.length;
@@ -85080,7 +85164,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				continue;
 			}
 			heads = []; hl = []; hu = []; ids = [];
-			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) {
+			var th2 = reportTableHeads(el), grp = th2.grp;
+			th2.leaf.forEach(function (th) {
 				heads.push(reportCellText(th, false));
 				hl.push(th.getAttribute('data-ec-hl') || ''); hu.push(th.getAttribute('data-ec-hu') || '');
 				ids.push(th.classList.contains('lpn-rpt-id'));
@@ -85093,10 +85178,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				for (k = 0; k < tds.length; k++) {
 					row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true));
 					ur.push(tds[k].getAttribute('data-ec-unit') || '');
+					// A cell that spans columns (one sentence across the result columns) keeps the columns after it in place.
+					for (var sp = 1; sp < (tds[k].colSpan || 1); sp++) { row.push(''); fr.push(''); ur.push(''); }
 				}
 				rows.push(row); frow.push(fr); urow.push(ur);
 			}
-			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow, hl: hl, hu: hu, ids: ids }); }
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow, hl: hl, hu: hu, ids: ids, grp: grp }); }
 		}
 		return out;
 	}
@@ -85196,12 +85283,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return { heads: heads, rows: rows };
 	}
+	/** One header row for a spreadsheet or plain text: a compound heading flattens to "Group: Heading". */
+	function reportFlatHeads(b, heads) {
+		return heads.map(function (h, c) { return b.grp && b.grp[c] ? b.grp[c] + ': ' + h : h; });
+	}
+	/** The compound heading's first-row cells: `{ text, from, n }` for a group, `{ from, n: 1, both: true }` for a heading over both rows; null for a plain one-row head. */
+	function reportHeadRuns(b) {
+		var runs = [], c, last = null;
+		if (!b.grp || !b.grp.some(function (g) { return g; })) { return null; }
+		for (c = 0; c < b.heads.length; c++) {
+			if (!b.grp[c]) { runs.push({ from: c, n: 1, both: true }); last = null; }
+			else if (last && last.text === b.grp[c]) { last.n++; }
+			else { last = { text: b.grp[c], from: c, n: 1 }; runs.push(last); }
+		}
+		return runs;
+	}
 	function reportCsvText(blocks) {
 		var parts = [];
 		blocks.forEach(function (b) {
 			var t;
 			if (!b.heads) { return; }
 			t = reportSheetBlock(b);
+			t.heads = reportFlatHeads(b, t.heads);
 			// The byte-order mark opens the file once, never again at a second table.
 			parts.push(EngCalcs.lpnTableCsv(t.heads, t.rows, { bom: parts.length === 0 }));
 		});
@@ -85229,9 +85332,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return '<col width="' + pct + '" style="width:' + pct + ';">';
 			}).join('');
 			keep = function (t, c) { return (b.ids && b.ids[c]) || String(reportFigureUnitKept(t)).replace(/\u00A0/g, '').length <= 24 && !/ .* /.test(String(reportFigureUnitKept(t))); };
-			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead><tr>' +
-				b.heads.map(function (h, c) { return '<th style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(h)) + '</th>'; }).join('') +
-				'</tr></thead><tbody>' +
+			var headCell = function (c, span) {
+				return '<th' + (span ? ' ' + span : '') + ' style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(b.heads[c])) + '</th>';
+			}, runs = reportHeadRuns(b), thead;
+			// **A COMPOUND HEADING IS A REAL TWO-ROW HEAD** (Task 840): colspan over the group, rowspan 2
+			// on a heading that has no group, so a word processor keeps the structure when it is pasted.
+			if (runs) {
+				thead = '<tr>' + runs.map(function (r) {
+					return r.both ? headCell(r.from, 'rowspan="2"')
+						: '<th colspan="' + r.n + '" style="' + cell + 'background:#eee;text-align:center;">' + reportEsc(r.text) + '</th>';
+				}).join('') + '</tr><tr>' + b.heads.map(function (h, c) { return b.grp[c] ? headCell(c, '') : ''; }).join('') + '</tr>';
+			} else { thead = '<tr>' + b.heads.map(function (h, c) { return headCell(c, ''); }).join('') + '</tr>'; }
+			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead>' + thead +
+				'</thead><tbody>' +
 				b.rows.map(function (r) {
 					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
 				}).join('') + '</tbody></table>');
@@ -85271,7 +85384,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		heads.forEach(function (t, c) {
-			note(c, b.hu && b.hu[c] ? reportHeadText((b.ph && b.ph[c]) || b.hl[c], reportUnitKept(b.hu[c])) : t, true);
+			note(c, b.hu && b.hu[c] ? reportHeadText((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : t, true);
 		});
 		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol && !(b.trunc && b.trunc[c])) { note(c, reportFigureUnitKept(t), false); } }); });
 		// A column that may be cut with an ellipsis asks for the cap and no more.
@@ -85313,13 +85426,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			thead = document.createElement('thead');
 			tr = document.createElement('tr');
 			printHeads = b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
-			b.heads.forEach(function (t, c) {
+			var runs = reportHeadRuns(b), tr2 = null;
+			var mkHead = function (c, row, both) {
 				e = document.createElement('th');
-				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes((b.ph && b.ph[c]) || b.hl[c], b.hu[c])); } else { e.textContent = t; }
+				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes((b.ph && b.ph[c]) || b.hl[c], b.hu[c])); } else { e.textContent = b.heads[c]; }
 				if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
-				tr.appendChild(e);
-			});
+				if (both) { e.rowSpan = 2; }
+				row.appendChild(e);
+			};
+			if (runs) {
+				tr2 = document.createElement('tr');
+				runs.forEach(function (r) {
+					if (r.both) { mkHead(r.from, tr, true); return; }
+					e = document.createElement('th'); e.colSpan = r.n; e.className = 'lpn-print-grouphead'; e.textContent = r.text; tr.appendChild(e);
+					for (var q = r.from; q < r.from + r.n; q++) { mkHead(q, tr2, false); }
+				});
+			} else { b.heads.forEach(function (t, c) { mkHead(c, tr, false); }); }
 			thead.appendChild(tr);
+			if (tr2) { thead.appendChild(tr2); }
 			table.appendChild(thead);
 			tbody = document.createElement('tbody');
 			b.rows.forEach(function (r) {
@@ -85344,7 +85468,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	/** The title line, then each table as tab-separated text: what a plain-text paste gets. */
 	function reportPlainText(spec, blocks) {
 		return reportTitleLine(spec) + '\n' + blocks.filter(function (b) { return b.heads; })
-			.map(function (b) { return EngCalcs.lpnTableTsv(b.heads, b.rows); }).join('\n');
+			.map(function (b) { return EngCalcs.lpnTableTsv(reportFlatHeads(b, b.heads), b.rows); }).join('\n');
 	}
 	function reportCopyHtml(spec, btn) {
 		var blocks = reportBlocksFor(spec), html = reportHtmlText(spec, blocks), pc = EngCalcs.pageConfig || {},

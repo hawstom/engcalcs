@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='د سناریوګانو جدول د ځانګړ�
 $ec_lang['lpn_scncmp_running']='هر سناریو حل کیږي…';
 $ec_lang['lpn_scncmp_empty']='تر اوسه هیڅ شی نه دی رسم شوی، نو دلته د حل کولو لپاره هیڅ شی نشته.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ترټولو لوړ سرعت';
-$ec_lang['lpn_scncmp_at']='{value} په {id} کې';
-$ec_lang['lpn_scncmp_at_time']='{value} په {id} کې، {time}';
 $ec_lang['lpn_scncmp_same']='په هره سناریو کې یو شان';
 $ec_lang['lpn_scncmp_period_note']='چیرته چې یوه سناریو ټول چلولو وخت لري، د هغې ټیټ ترین فشار او لوړ ترینه سرعت د ټولې شبکې انتها ده، په ښودل شوي وخت کې.';
 $ec_lang['lpn_scncmp_current']='(اوس مهال پرانیستل شوی)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='چلونه';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='فشار او سرعت';
 $ec_lang['lpn_ff_atleast']='له {flow} نه زیات';
-$ec_lang['lpn_ff_affect_node']='{id} {pressure} ته راټیټیږي';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity} ته رسیږي';
 $ec_lang['lpn_ff_more']='او {n} نور اغیزمن شوي';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

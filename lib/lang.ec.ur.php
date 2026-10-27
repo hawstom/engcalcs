@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='منظرناموں کا جدول، اپنی ق�
 $ec_lang['lpn_scncmp_running']='ہر منظرنامہ حل کیا جا رہا ہے…';
 $ec_lang['lpn_scncmp_empty']='ابھی تک کچھ نہیں کھینچا گیا، اس لیے حل کرنے کو کچھ نہیں۔';
 $ec_lang['lpn_scncmp_col_maxvelocity']='سب سے زیادہ رفتار';
-$ec_lang['lpn_scncmp_at']='{id} پر {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} پر {value}، {time}';
 $ec_lang['lpn_scncmp_same']='ہر منظرنامے میں یکساں';
 $ec_lang['lpn_scncmp_period_note']='جہاں منظرنامے کا کل رن ٹائم مقرر ہو، وہاں اس کا کم سے کم دباؤ اور زیادہ سے زیادہ رفتار پورے نیٹ ورک کی انتہائی قدریں ہیں، دکھائے گئے وقت پر۔';
 $ec_lang['lpn_scncmp_current']='(فی الحال کھلا ہوا)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='حل';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='دباؤ اور رفتار';
 $ec_lang['lpn_ff_atleast']='{flow} سے زیادہ';
-$ec_lang['lpn_ff_affect_node']='{id}، {pressure} تک گر گیا';
-$ec_lang['lpn_ff_affect_link']='{id}، {velocity} تک پہنچ گیا';
 $ec_lang['lpn_ff_more']='اور {n} مزید متاثر';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

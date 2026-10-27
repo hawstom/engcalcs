@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tablica scenarija s brojem zamjena, najnižim t
 $ec_lang['lpn_scncmp_running']='Rješavanje svakog scenarija…';
 $ec_lang['lpn_scncmp_empty']='Ništa još nije nacrtano, pa nema što riješiti.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Najveća brzina';
-$ec_lang['lpn_scncmp_at']='{value} na {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} na {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Jednako u svakom scenariju';
 $ec_lang['lpn_scncmp_period_note']='Gdje scenarij ima ukupno vrijeme rada, njegov najniži tlak i najveća brzina su ekstremi cijele mreže, u prikazanom trenutku.';
 $ec_lang['lpn_scncmp_current']='(trenutačno otvoren)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='Pokretanja';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Tlak i brzina';
 $ec_lang['lpn_ff_atleast']='više od {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} pada na {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} dosiže {velocity}';
 $ec_lang['lpn_ff_more']='i još {n} pogođenih';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

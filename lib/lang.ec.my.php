@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='ကိုယ်ပိုင်တန်ဖိ�
 $ec_lang['lpn_scncmp_running']='အခြေအနေတိုင်းကို ဖြေရှင်းနေသည်…';
 $ec_lang['lpn_scncmp_empty']='မည်သည့်အရာမျှ မရေးဆွဲထားသေးသောကြောင့်၊ ဖြေရှင်းရန် မည်သည့်အရာမျှ မရှိပါ။';
 $ec_lang['lpn_scncmp_col_maxvelocity']='အမြင့်ဆုံးအလျင်';
-$ec_lang['lpn_scncmp_at']='{id} တွင် {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} တွင် {value}၊ {time}';
 $ec_lang['lpn_scncmp_same']='အခြေအနေတိုင်းတွင် တူညီသည်';
 $ec_lang['lpn_scncmp_period_note']='အခြေအနေတစ်ခုတွင် စုစုပေါင်း လည်ပတ်ချိန် ရှိလျှင် ၎င်း၏ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းသည် ပြထားသောအချိန်တွင် ကွန်ရက်တစ်ခုလုံး၏ အစွန်းတန်ဖိုးများ ဖြစ်သည်။';
 $ec_lang['lpn_scncmp_current']='(ယခုဖွင့်ထားသည်)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='Run အကြိမ်ရေ';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='ဖိအားနှင့် အလျင်';
 $ec_lang['lpn_ff_atleast']='{flow} ထက် ပို၍';
-$ec_lang['lpn_ff_affect_node']='{id} သည် {pressure} သို့ ကျဆင်းသည်';
-$ec_lang['lpn_ff_affect_link']='{id} သည် {velocity} သို့ ရောက်ရှိသည်';
 $ec_lang['lpn_ff_more']='နှင့် ထပ်မံ {n} ခု ထိခိုက်ခဲ့သည်';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

@@ -4016,8 +4016,6 @@ $ec_lang['lpn_scncmp_menu_tip']='טבלת תרחישים עם מספר הערכ�
 $ec_lang['lpn_scncmp_running']='פותר כל תרחיש…';
 $ec_lang['lpn_scncmp_empty']='עוד לא צויר דבר, כך שאין מה לפתור.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='מהירות מרבית';
-$ec_lang['lpn_scncmp_at']='{value} ב-{id}';
-$ec_lang['lpn_scncmp_at_time']='{value} ב-{id}, {time}';
 $ec_lang['lpn_scncmp_same']='זהה בכל התרחישים';
 $ec_lang['lpn_scncmp_period_note']='כאשר לתרחיש יש זמן הרצה כולל, הלחץ הנמוך ביותר והמהירות הגבוהה ביותר שלו הם הקיצוניים של הרשת כולה, בזמן המוצג.';
 $ec_lang['lpn_scncmp_current']='(פתוח כעת)';
@@ -4620,8 +4618,6 @@ $ec_lang['lpn_ff_col_solves']='הרצות';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='לחץ ומהירות';
 $ec_lang['lpn_ff_atleast']='יותר מ-{flow}';
-$ec_lang['lpn_ff_affect_node']='{id} יורד ל-{pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} מגיע ל-{velocity}';
 $ec_lang['lpn_ff_more']='ועוד {n} מושפעים';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
