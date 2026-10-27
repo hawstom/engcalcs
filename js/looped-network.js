@@ -25254,9 +25254,10 @@ var EngCalcs = EngCalcs || {};
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
 				if (w) {
-					var was = host.classList.contains('lpn-gnarrow'), now = w < 18 * px || (window.innerWidth || 9999) < 30 * px;
+					var now = w < 18 * px || (window.innerWidth || 9999) < 30 * px;
 					host.classList.toggle('lpn-gnarrow', now);
-					if (!host.__lpnFitted || was !== now) { host.__lpnFitted = true; gridFitSoon(host); }   // the first time it has a width, and when it stops being stacked
+					host.__lpnFitted = true;
+					gridFitSoon(host);   // the first time it has a width, and whenever the box is resized: the cap on the Label column moves with it
 				}
 			}).observe(host);
 		}
@@ -65699,7 +65700,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var LPN_DOCK_OPTIMAL_REM = {
 		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
 		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 31, lpn_find_popup: 23, lpn_library_box: 27,
-		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 27.5, lpn_hotkeys_popup: 53
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 29, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {

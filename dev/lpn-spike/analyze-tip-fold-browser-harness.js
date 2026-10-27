@@ -65,6 +65,8 @@ async function openLpn(Session, browser, extra, name) {
 	return a;
 }
 // What the box shows: its paragraphs, row labels, headings and buttons, in order.
+// A row's label may carry its unit now ("Required fire flow (gpm)"): it is the expected words, then the unit.
+function sameRows(rows, want) { return rows.length === want.length && rows.every((r, i) => r === want[i] || r.indexOf(want[i] + ' (') === 0); }
 function boxShape(page, controls) {
 	return page.evaluate((sel) => {
 		const host = document.querySelector(sel), clean = (e) => e.textContent.replace(/\?\s*$/, '').trim();
@@ -105,7 +107,7 @@ async function sectionFireFlow(a, lang) {
 	await a.settle(400);
 	const s = await boxShape(page, '#lpn_ff_controls');
 	ok('no paragraph above Run: the box shows controls only', s.paras.length === 0, JSON.stringify(s.paras).slice(0, 160));
-	ok('...the six criteria rows are still there, in order', JSON.stringify(s.rows) === JSON.stringify(lang.ffRows), JSON.stringify(s.rows));
+	ok('...the six criteria rows are still there, in order', sameRows(s.rows, lang.ffRows), JSON.stringify(s.rows));
 	ok('...and Run, Stop and Clear rings', JSON.stringify(s.buttons) === JSON.stringify(lang.ffButtons), JSON.stringify(s.buttons));
 	const t = await openCornerTip(a, 'lpn_ff_box');
 	ok('the corner `?` opens the box\'s entry in the Guide', t.shown);
@@ -147,7 +149,7 @@ async function sectionDemandScale(a, lang) {
 	await a.settle(400);
 	const s = await boxShape(page, '#lpn_ds_controls');
 	ok('no paragraph in the box: controls only', s.paras.length === 0, JSON.stringify(s.paras).slice(0, 160));
-	ok('...the rows are still there, in order', JSON.stringify(s.rows) === JSON.stringify(lang.dsRows), JSON.stringify(s.rows));
+	ok('...the rows are still there, in order', sameRows(s.rows, lang.dsRows), JSON.stringify(s.rows));
 	ok('...the two headings are still there', JSON.stringify(s.heads) === JSON.stringify(lang.dsHeads), JSON.stringify(s.heads));
 	ok('...and Run, Find and Stop', JSON.stringify(s.buttons) === JSON.stringify(lang.dsButtons), JSON.stringify(s.buttons));
 	const t = await openCornerTip(a, 'lpn_ds_box');

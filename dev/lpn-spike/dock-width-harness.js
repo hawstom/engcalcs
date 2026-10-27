@@ -266,7 +266,7 @@ async function main() {
 			const want = Math.round(table[id] * 16), n = nat[id], r = reflow[id];
 			if (id === 'lpn_contour_box') {
 				ok(id + ' docks at the ' + FLOOR + ' px floor (Tom: narrower)', want === FLOOR, want + ' px; its controls first stop scrolling sideways at ' + (n && n.firstClean) + ' px');
-				ok(id + ' does not scroll sideways at ' + want + ' px', !!n && n.firstClean !== null && n.firstClean <= want, 'first clean at ' + (n && n.firstClean));
+				ok(id + ' does not scroll sideways at ' + want + ' px', !!n && n.firstClean !== null && n.firstClean <= want, 'first clean at ' + (n && n.firstClean) + (n && n.lastDirty && n.lastDirty.length ? '; scrolling: ' + n.lastDirty.join(', ') : ''));
 				return;
 			}
 			ok(id + ' docks at no more than ' + REFLOW[id].max + ' rem', table[id] <= REFLOW[id].max, table[id] + ' rem');
