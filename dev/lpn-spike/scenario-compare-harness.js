@@ -169,8 +169,8 @@ let run = null;
 		const bodyRows = [];
 		(function walk(e) { (e.children || []).forEach(function (c) {
 			if (c._tag === 'tr') { bodyRows.push(c); } walk(c); }); })(tables[0]);
-		// One heading row plus one row per scenario.
-		ok('...with one row per scenario under the headings', bodyRows.length === 3, bodyRows.length);
+		// Two heading rows (Lowest pressure and Highest velocity are compound headings, Task 840) plus one row per scenario.
+		ok('...with one row per scenario under the headings', bodyRows.length === 4, bodyRows.length);
 	}
 
 	console.log(fails === 0 ? '\nscenario-compare: ALL PASS' : '\nscenario-compare: ' + fails + ' FAILURE(S)');

@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabel skenario dengan jumlah nilai khusus, teka
 $ec_lang['lpn_scncmp_running']='Menyelesaikan setiap skenario…';
 $ec_lang['lpn_scncmp_empty']='Belum ada yang digambar, sehingga tidak ada yang perlu diselesaikan.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Kecepatan tertinggi';
-$ec_lang['lpn_scncmp_at']='{value} pada {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} di {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Sama di setiap skenario';
 $ec_lang['lpn_scncmp_period_note']='Jika sebuah skenario memiliki total waktu berjalan, tekanan terendah dan kecepatan tertinggi adalah nilai ekstrem seluruh jaringan, pada waktu yang ditampilkan.';
 $ec_lang['lpn_scncmp_current']='(sedang dibuka)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Proses';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Tekanan dan kecepatan';
 $ec_lang['lpn_ff_atleast']='lebih dari {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} turun ke {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} mencapai {velocity}';
 $ec_lang['lpn_ff_more']='dan {n} lainnya terdampak';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

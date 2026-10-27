@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Таблица на сценариите с б�
 $ec_lang['lpn_scncmp_running']='Изчисляват се всички сценарии…';
 $ec_lang['lpn_scncmp_empty']='Все още нищо не е начертано, затова няма какво да се изчисли.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Най-висока скорост';
-$ec_lang['lpn_scncmp_at']='{value} при {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} при {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Еднакво във всеки сценарий';
 $ec_lang['lpn_scncmp_period_note']='Когато сценарият има обща продължителност на изчислението, най-ниското му налягане и най-високата скорост са екстремумите за цялата мрежа, в показания момент.';
 $ec_lang['lpn_scncmp_current']='(отворен в момента)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Изчисления';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Налягане и скорост';
 $ec_lang['lpn_ff_atleast']='повече от {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} пада до {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} достига {velocity}';
 $ec_lang['lpn_ff_more']='и още {n} засегнати';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

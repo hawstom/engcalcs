@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabulka scénářů s počtem specifických hod
 $ec_lang['lpn_scncmp_running']='Počítají se všechny scénáře…';
 $ec_lang['lpn_scncmp_empty']='Zatím nic nebylo nakresleno, takže není co počítat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Nejvyšší rychlost';
-$ec_lang['lpn_scncmp_at']='{value} u {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} v {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Ve všech scénářích stejné';
 $ec_lang['lpn_scncmp_period_note']='Má-li scénář celkovou dobu běhu, jeho nejnižší tlak a nejvyšší rychlost jsou extrémy celé sítě v uvedeném čase.';
 $ec_lang['lpn_scncmp_current']='(právě otevřený)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Výpočty';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Tlak a rychlost';
 $ec_lang['lpn_ff_atleast']='více než {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} klesá na {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} dosahuje {velocity}';
 $ec_lang['lpn_ff_more']='a {n} dalších ovlivněno';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

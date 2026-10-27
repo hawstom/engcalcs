@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Таблиця сценаріїв із кіль
 $ec_lang['lpn_scncmp_running']='Розрахунок кожного сценарію…';
 $ec_lang['lpn_scncmp_empty']='Ще нічого не намальовано, тож нічого розраховувати.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Найвища швидкість';
-$ec_lang['lpn_scncmp_at']='{value} у {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} у {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Однаково в кожному сценарії';
 $ec_lang['lpn_scncmp_period_note']='Якщо сценарій має загальний час роботи, його найнижчий тиск і найбільша швидкість — це екстремуми всієї мережі в показаний момент.';
 $ec_lang['lpn_scncmp_current']='(відкрито зараз)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Розрахунки';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Тиск і швидкість';
 $ec_lang['lpn_ff_atleast']='більше за {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} падає до {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} досягає {velocity}';
 $ec_lang['lpn_ff_more']='і ще {n} постраждалих';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabela de cenários com a contagem de valores i
 $ec_lang['lpn_scncmp_running']='Resolvendo todos os cenários…';
 $ec_lang['lpn_scncmp_empty']='Nada foi desenhado ainda, então não há nada para resolver.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Maior velocidade';
-$ec_lang['lpn_scncmp_at']='{value} em {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} em {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Igual em todos os cenários';
 $ec_lang['lpn_scncmp_period_note']='Onde um cenário tem duração total, sua menor pressão e sua maior velocidade são os extremos da rede inteira, no horário mostrado.';
 $ec_lang['lpn_scncmp_current']='(aberto no momento)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Cálculos';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Pressão e velocidade';
 $ec_lang['lpn_ff_atleast']='mais que {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} cai para {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} atinge {velocity}';
 $ec_lang['lpn_ff_more']='e mais {n} afetados';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

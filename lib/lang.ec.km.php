@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='តារាងសេណារីយ៉ូជ�
 $ec_lang['lpn_scncmp_running']='កំពុងដោះស្រាយសេណារីយ៉ូគ្រប់មួយ…';
 $ec_lang['lpn_scncmp_empty']='គ្មានអ្វីត្រូវបានគូរនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវដោះស្រាយឡើយ។';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ល្បឿនខ្ពស់បំផុត';
-$ec_lang['lpn_scncmp_at']='{value} នៅ {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} នៅ {id}, {time}';
 $ec_lang['lpn_scncmp_same']='ដូចគ្នានៅក្នុងសេណារីយ៉ូគ្រប់មួយ';
 $ec_lang['lpn_scncmp_period_note']='នៅកន្លែងដែលសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុតរបស់វាជាតម្លៃខ្លាំងនៃបណ្ដាញទាំងមូល នៅពេលវេលាដែលបានបង្ហាញ។';
 $ec_lang['lpn_scncmp_current']='(កំពុងបើកឥឡូវនេះ)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='ការដំណើរការ';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='សម្ពាធ និងល្បឿន';
 $ec_lang['lpn_ff_atleast']='ច្រើនជាង {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} ធ្លាក់ចុះដល់ {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} ឈានដល់ {velocity}';
 $ec_lang['lpn_ff_more']='និងមានទៀត {n} ត្រូវបានប៉ះពាល់';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

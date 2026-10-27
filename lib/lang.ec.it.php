@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabella degli scenari con il numero di valori p
 $ec_lang['lpn_scncmp_running']='Calcolo di ogni scenario in corso…';
 $ec_lang['lpn_scncmp_empty']='Non è stato ancora disegnato nulla, quindi non c\'è nulla da calcolare.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Velocità più alta';
-$ec_lang['lpn_scncmp_at']='{value} a {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} a {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Uguale in ogni scenario';
 $ec_lang['lpn_scncmp_period_note']='Dove uno scenario ha una durata totale della simulazione, la sua pressione minima e la sua velocità massima sono gli estremi dell\'intera rete, all\'istante mostrato.';
 $ec_lang['lpn_scncmp_current']='(attualmente aperto)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Calcoli';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Pressione e velocità';
 $ec_lang['lpn_ff_atleast']='più di {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} scende a {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} raggiunge {velocity}';
 $ec_lang['lpn_ff_more']='e altri {n} interessati';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

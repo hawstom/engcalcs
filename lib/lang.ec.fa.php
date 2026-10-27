@@ -4020,8 +4020,6 @@ $ec_lang['lpn_scncmp_menu_tip']='جدول سناریوها با شمار مقا�
 $ec_lang['lpn_scncmp_running']='در حال حل همهٔ سناریوها…';
 $ec_lang['lpn_scncmp_empty']='هنوز چیزی رسم نشده، پس چیزی برای حل کردن نیست.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='بیشترین سرعت';
-$ec_lang['lpn_scncmp_at']='{value} در {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} در {id}، {time}';
 $ec_lang['lpn_scncmp_same']='در همهٔ سناریوها یکسان';
 $ec_lang['lpn_scncmp_period_note']='در سناریویی که کل مدت اجرا دارد، کمترین فشار و بیشترین سرعت آن مقادیر حدی کل شبکه در زمان نشان‌داده‌شده است.';
 $ec_lang['lpn_scncmp_current']='(اکنون باز است)';
@@ -4628,8 +4626,6 @@ $ec_lang['lpn_ff_col_solves']='اجراها';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='فشار و سرعت';
 $ec_lang['lpn_ff_atleast']='بیش از {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} به {pressure} می‌افتد';
-$ec_lang['lpn_ff_affect_link']='{id} به {velocity} می‌رسد';
 $ec_lang['lpn_ff_more']='و {n} تای دیگر اثر گرفتند';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

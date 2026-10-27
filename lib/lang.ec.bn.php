@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='নিজস্ব মানের সংখ্
 $ec_lang['lpn_scncmp_running']='প্রতিটি দৃশ্যকল্প সমাধান করা হচ্ছে…';
 $ec_lang['lpn_scncmp_empty']='এখনও কিছু আঁকা হয়নি, তাই সমাধান করার মতো কিছু নেই।';
 $ec_lang['lpn_scncmp_col_maxvelocity']='সর্বোচ্চ বেগ';
-$ec_lang['lpn_scncmp_at']='{id}-এ {value}';
-$ec_lang['lpn_scncmp_at_time']='{id}-এ {value}, {time}';
 $ec_lang['lpn_scncmp_same']='প্রতিটি দৃশ্যকল্পে একই';
 $ec_lang['lpn_scncmp_period_note']='যেখানে দৃশ্যকল্পের মোট রান সময় আছে, সেখানে তার সর্বনিম্ন চাপ ও সর্বোচ্চ বেগ হলো দেখানো সময়ে সমগ্র নেটওয়ার্কের চরম মান।';
 $ec_lang['lpn_scncmp_current']='(বর্তমানে খোলা)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='রান';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='চাপ ও বেগ';
 $ec_lang['lpn_ff_atleast']='{flow}-এর বেশি';
-$ec_lang['lpn_ff_affect_node']='{id} নেমে {pressure}-এ যায়';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity}-এ পৌঁছায়';
 $ec_lang['lpn_ff_more']='এবং আরও {n}টি প্রভাবিত';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must

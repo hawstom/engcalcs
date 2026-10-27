@@ -70,9 +70,14 @@ function links(el) {
 }
 function click(b) { ((b._listeners && b._listeners.click) || []).forEach((f) => f({})); }
 
+// The sortable headings in COLUMN order. Task 840: Worst effect is a compound heading, so the head has
+// two rows; a group heading (no arrow, colSpan > 1) is replaced by the headings under it.
 function heads(el) {
-	const out = [];
-	(function walk(x) { if (!x) { return; } if (isTag(x, 'th')) { out.push(x); return; } kids(x).forEach(walk); })(el);
+	const trs = [];
+	(function walk(x) { if (!x) { return; } if (isTag(x, 'tr')) { trs.push(x); return; } kids(x).forEach(walk); })(el);
+	const row1 = kids(trs[0]).filter((c) => isTag(c, 'th')), row2 = trs[1] && isTag(trs[1].children && trs[1].children[0] || {}, 'th') ? kids(trs[1]).filter((c) => isTag(c, 'th')) : [];
+	const out = []; let k = 0;
+	row1.forEach((th) => { if ((th.colSpan || 1) > 1) { for (let i = 0; i < th.colSpan; i++) { out.push(row2[k++]); } } else { out.push(th); } });
 	return out;
 }
 function arrowOf(th) { return kids(th).filter((c) => isTag(c, 'button'))[0]; }
@@ -98,7 +103,7 @@ const idOrder = () => rows(byId.lpn_ff_report).map((tds) => links(tds[0])[0].tex
 	const byId2 = {}; set.results.forEach((r) => { byId2[r.id] = r; });
 	L.rebuildFireFlowReport();
 	const hs = heads(byId.lpn_ff_report);
-	ok('every heading carries a sort arrow', hs.length === 10 && hs.every((h) => arrowOf(h) && cls(arrowOf(h)).indexOf('lpn-pane-sortarrow') >= 0), hs.length);
+	ok('every heading carries a sort arrow', hs.length === 13 && hs.every((h) => arrowOf(h) && cls(arrowOf(h)).indexOf('lpn-pane-sortarrow') >= 0), hs.length);
 	ok('...a button, so Tab reaches it', hs.every((h) => arrowOf(h).type === 'button'));
 	ok('no column is marked sorted before one is pressed', hs.every((h) => cls(arrowOf(h)).indexOf('active') < 0));
 
@@ -128,7 +133,7 @@ const idOrder = () => rows(byId.lpn_ff_report).map((tds) => links(tds[0])[0].tex
 	ok('...and the other column\'s arrow is no longer marked', cls(arrowOf(heads(byId.lpn_ff_report)[4])).indexOf('active') < 0);
 
 	console.log('\n--- every column sorts ---');
-	for (let c = 0; c < 10; c++) {
+	for (let c = 0; c < 13; c++) {
 		const before = JSON.stringify(idOrder());
 		press(c); const up = idOrder();
 		press(c); const down = idOrder();

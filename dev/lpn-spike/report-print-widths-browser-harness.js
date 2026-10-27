@@ -99,7 +99,7 @@ async function main() {
 				const r = t.getBoundingClientRect();
 				out.heads = (out.heads || []).concat(Array.from(t.querySelectorAll('thead th')).map((h) => h.textContent.trim()));
 				out.tables.push({ i: ti, width: r.width, right: r.right - area.getBoundingClientRect().left, cols: t.rows[0] ? t.rows[0].cells.length : 0 });
-				const ths = Array.from(t.querySelectorAll('thead th')), trs = Array.from(t.querySelectorAll('tbody tr'));
+				const ths = ((tb) => { const rs = Array.from(tb.querySelectorAll('thead tr')); if (rs.length < 2) { return Array.from(tb.querySelectorAll('thead th')); } const sec = Array.from(rs[1].children), lf = []; let k = 0; Array.from(rs[0].children).forEach((th) => { if (th.colSpan > 1) { for (let i = 0; i < th.colSpan; i++) { lf.push(sec[k++]); } } else { lf.push(th); } }); return lf; })(t), trs = Array.from(t.querySelectorAll('tbody tr'));
 				ths.forEach((th, c) => {
 					const cells = trs.map((tr) => tr.children[c]).filter(Boolean);
 					if (th.classList.contains('lpn-rpt-id')) {
@@ -115,7 +115,6 @@ async function main() {
 					const uniq = Array.from(new Set(us.filter((u) => u)));
 					if (us.every((u) => u !== null) && uniq.length === 1) { out.unitBad.push('table ' + ti + ' col ' + c + ' "' + th.textContent.trim() + '" cells still carry "' + uniq[0] + '"'); }
 				});
-				t.querySelectorAll('th bdi').forEach((bd) => { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.unitBad.push('unit split: ' + bd.textContent); } });
 				t.querySelectorAll('.lpn-rpt-trunc').forEach((sp) => { if (!sp.title) { out.truncBad.push(sp.textContent); } });
 				Array.from(t.querySelectorAll('th, td')).forEach((c) => {
 					const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
@@ -151,7 +150,7 @@ async function main() {
 				const out = { tables: 0, headed: [], leftover: [], noParen: [], idBad: [], mixed: [], ids: 0 };
 				document.querySelectorAll('#' + id + ' table.lpn-ff-table').forEach((t, ti) => {
 					out.tables++;
-					const ths = Array.from(t.querySelectorAll('thead th')), trs = Array.from(t.querySelectorAll('tbody tr'));
+					const ths = ((tb) => { const rs = Array.from(tb.querySelectorAll('thead tr')); if (rs.length < 2) { return Array.from(tb.querySelectorAll('thead th')); } const sec = Array.from(rs[1].children), lf = []; let k = 0; Array.from(rs[0].children).forEach((th) => { if (th.colSpan > 1) { for (let i = 0; i < th.colSpan; i++) { lf.push(sec[k++]); } } else { lf.push(th); } }); return lf; })(t), trs = Array.from(t.querySelectorAll('tbody tr'));
 					ths.forEach((th, c) => {
 						const cells = trs.map((tr) => tr.children[c]).filter(Boolean), hu = th.getAttribute('data-ec-hu');
 						const probe = (el, text) => { const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;'; sp.textContent = text; el.appendChild(sp); const w = sp.getBoundingClientRect().width; el.removeChild(sp); return w; };
@@ -168,7 +167,7 @@ async function main() {
 							if (uniq.length) { out.leftover.push(th.textContent.trim() + ' cells carry ' + uniq.join('/')); }
 							const bd = th.querySelector('bdi');
 							if (!bd) { out.noParen.push('no bdi in ' + th.textContent.trim()); }
-							else { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.noParen.push('unit split: ' + bd.textContent); } }
+							// A heading's unit may split across lines (Tom, 2026-10-27), so its rects are not checked.
 						} else if (us.every((u) => u !== null) && uniq.length === 1) { out.leftover.push('"' + th.textContent.trim() + '" cells carry ' + uniq[0]); }
 						else if (uniq.length > 1) { out.mixed.push(th.textContent.trim() + ' [' + uniq.join(' | ') + ']'); }
 					});
@@ -214,7 +213,6 @@ async function main() {
 								}
 							}
 						});
-						t.querySelectorAll('th bdi').forEach((bd) => { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.broken.push('unit split ' + bd.textContent); } });
 					});
 					return out;
 				});

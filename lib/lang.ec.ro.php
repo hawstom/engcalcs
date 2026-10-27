@@ -4018,8 +4018,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabel de scenarii cu numărul de valori specifi
 $ec_lang['lpn_scncmp_running']='Se rezolvă fiecare scenariu…';
 $ec_lang['lpn_scncmp_empty']='Nu a fost desenat încă nimic, deci nu este nimic de rezolvat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Viteză maximă';
-$ec_lang['lpn_scncmp_at']='{value} la {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} la {id}, {time}';
 $ec_lang['lpn_scncmp_same']='La fel în fiecare scenariu';
 $ec_lang['lpn_scncmp_period_note']='Acolo unde un scenariu are o durată totală de rulare, presiunea sa cea mai mică și viteza cea mai mare sunt extremele întregii rețele, la momentul afișat.';
 $ec_lang['lpn_scncmp_current']='(deschis în prezent)';
@@ -4622,8 +4620,6 @@ $ec_lang['lpn_ff_col_solves']='Rulări';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Presiune și viteză';
 $ec_lang['lpn_ff_atleast']='mai mult de {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} scade la {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} ajunge la {velocity}';
 $ec_lang['lpn_ff_more']='și încă {n} afectate';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
