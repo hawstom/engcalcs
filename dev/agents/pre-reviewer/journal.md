@@ -4656,3 +4656,23 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: leftover units in cells: Criticality whole run "97.01 psi at 4:00" (heading "Lowest pressure" no unit); Scenario comparison "108 psi at N32, 14:00"; Net3 ff "N40 drops to 5.68 psi".
 - OBSERVED: heading units split across lines "(m / H2O)" on screen and print.
 - Method note: Tom's PDF provenance came from strings on the PDF; check metadata first next time.
+
+# Perry, feat/box-rows-properties 9ec48ca4d, 2026-10-26 (Task 828 spreadsheet boxes)
+- OBSERVED: master (c5f2bbbb8, has fix/open-docked) is NOT merged into the branch (merge-base 45e558383). Libraries docked + auto-hidden: choosing "Edit types…" / "Edit fittings…" leaves the box visibility:hidden, class lpn-dock-collapsed. Tom's item 4 reproduced on the new option. Docked-pinned and floating work. Own harness checks display!=none, so it cannot see this.
+- OBSERVED label column (fit to 90th percentile) at 1366: pipe 213 px (widest 200, p75 150, median 74); junction 193 (max 180, p75 128); tank 194; PRV 153 (p75 92); TCV 118. So ~1.07x the p94 label (was 1.5x) but still 1.4 to 1.7x the p75 label.
+- OBSERVED "(ft H2O)" splits across lines on tank (Highest water depth) and TCV (Head loss): bdi wraps.
+- OBSERVED far-right drag of divider: value controls clipped at right (12 controls) and the setting persists for every element type (one lpn_popup width). RTL (ar): header, rows, drag mirrored correctly. "Auto length" untranslated in ar/zh/de; the ", C" comma is ASCII in ar and zh.
+- OBSERVED Convert as is NOT converted (no header, no grid; units are a row of small dropdowns with headings). Claimed converted.
+- OBSERVED header only on first grid of New project and Demand scaling; Full report and Calibration put a Label|Value header over one row. Text and Customer: title and textarea sit between header and grid; grid inset.
+- OBSERVED Settings untouched (no grid classes): no leak. Phone 390: Properties, Fire flow, New project stacked, nothing cut; junction demand-table header "Description" cut at right on phone.
+- OBSERVED branch harnesses: box-spreadsheet 26/26, box-grid 129/129.
+- Shots: /home/haws/webdev/worktrees/_panel/www/img/boxrows-1026/
+- NOT CHECKED: Scenario manager (menu disabled with Net1), Calibration with real data, mutation test of harnesses, Settings pane unchanged on phone.
+
+## Re-check a3afbf6b3, 2026-10-27 (OBSERVED, real Chromium, 1366x768 and 390 phone)
+- (1) Edit types/fittings, docked-left auto-hidden: Libraries visible, on top, section selected. FIXED.
+- (2) Convert as: box 615px tall, body scrolls inside (ok). Opens already scrolled 124px (top cut), OK button inside scroll, below fold. Rounding table left 3-column. FIXED with a small new problem.
+- (3) units/brackets/"?" FIXED (pipe, tank, TCV shots). (4) drag far right/left, en and ar: value col 14.9 rem min, 0 clipped, 0 sideways scroll. FIXED. Width still persists across element types (one pref).
+- (5) header gap 0 above grid in all PC boxes; none on single-row boxes (Full report, Calibration). Junction second run (Demand... Is active) has no header. Phone Description not cut. FIXED.
+- (6) pipe 196px = 1.52x p75 (as claimed), PRV 1.47x. (7) comma proper in ar fa ur ps zh. FIXED.
+- Shots: boxrows-1026/*-v2.png
