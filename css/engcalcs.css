@@ -5124,7 +5124,10 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-docked .lpn-popover-body { max-height: none; }
 /* Auto-hide: a tucked box is still OPEN (its display is untouched, so every isOpen() still says so);
    it is only invisible and untouchable until its tab brings it out. */
-.lpn-dragpanel.lpn-dock-collapsed { visibility: hidden !important; pointer-events: none !important; }
+/* content-visibility: a tucked box's contents are not laid out at all. Settings and the guide popups hold
+   about 2,000 elements, and every forced layout during a project open paid for them: Net3 on a phone
+   with the first-view docks blocked the page 2.2 s against 1.2 s without (4x CPU slowdown, 2026-10-27). */
+.lpn-dragpanel.lpn-dock-collapsed { visibility: hidden !important; pointer-events: none !important; content-visibility: hidden !important; }
 .lpn-dragpanel.lpn-dock-out { box-shadow: 2px 2px 8px var(--ec-a-0-0-0-3) !important; }
 /* The strip an auto-hidden box tucks into, one per side, at the map's outer edge. Empty, it is
    nothing. Each tab is a button reading the box's own title, turned on its side. */
