@@ -65853,17 +65853,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
 	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
-	// ... It's cheap discoverability"*; revised 2026-10-24: Settings is pinned and
-	// Properties, Libraries (right) and the Scenario manager, User manual (left) are auto-hide tabs,
-	// so a visitor meets both ways of working with a box). Named by box and not by label so a
-	// renamed row changes nothing here. `pinned` leaves auto-hide off, on a PC only (a phone auto-hides every
-	// dock). Settings starts pinned on a PC, "as a demonstration of the two states" (Tom, 2026-10-26). Only a browser that holds NO
+	// ... It's cheap discoverability"*; revised 2026-10-27: every box is an auto-hide tab,
+	// Settings, Properties, Libraries on the right and the Scenario manager, User manual on the left;
+	// nothing starts pinned). Named by box and not by label so a
+	// renamed row changes nothing here. `pinned` (unused now) leaves auto-hide off, on a PC only. Only a browser that holds NO
 	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
 	// alone. One list for a PC and a phone (Tom, 2026-10-24: "for PC and phone"). Nothing is stored
 	// until the visitor changes something (boxSaveHeld()).
 	var LPN_DEFAULT_DOCKS = [
 		{ id: 'lpn_popup', side: 'right' },
-		{ id: 'lpn_settings_box', side: 'right', pinned: true },
+		{ id: 'lpn_settings_box', side: 'right' },
 		{ id: 'lpn_library_box', side: 'right' },
 		{ id: 'lpn_sm_box', side: 'left' },
 		{ id: 'lpn_hotkeys_popup', side: 'left' }
@@ -65891,7 +65890,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return true;
 	}
 	function galleryUpNow() {
-		return galleryIsUp() || !doc || !doc.nodes || doc.nodes.length === 0;
+		// **"Start here" IS A FIRST VIEW TOO** (Tom, 2026-10-27: *"I choose Start here ... Nothing is docked at
+		// all"*). Once the empty-map hint has been decided it is the answer: hidden means the visitor is
+		// looking at the map, empty or not. Only before it is decided does an empty, undismissed map count
+		// as the gallery.
+		var hint = document.getElementById('lpn_empty_hint');
+		if (hint && hint.style.display) { return hint.style.display === 'block'; }
+		return !doc || !doc.nodes || (doc.nodes.length === 0 && !galleryDismissedHere());
 	}
 	// Writes the records only; restoreDefaultDocks() opens what they name.
 	function setDefaultDockRecords() {
