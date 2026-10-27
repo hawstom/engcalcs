@@ -159,6 +159,19 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	refuse(J, 'lpn_morph_vertex_demand', '', '3.5j an emitter coefficient is still refused');
 	delete L.nodeById(J)._emitter;
 	L.nodeById(J)._demand = 0;
+	// An initial quality (Net1 gives every junction one) is asked about too, never refused or silently dropped.
+	L.nodeById(J)._initQuality = 0.4; asked = []; answer = true;
+	const beforeQ = JSON.stringify(L.serializeProject());
+	sel(L, [J]);
+	mv = L.morphVertex();
+	ok('3.5k an initial quality alone asks "Clear initial quality ..." and a Yes morphs', mv === 1 && asked.length === 1 && /initial quality 0\.4/i.test(asked[0]) && asked[0].indexOf(J) >= 0, asked[0]);
+	L.undo();
+	ok('3.5l Undo restores the initial quality', JSON.stringify(L.serializeProject()) === beforeQ);
+	L.nodeById(J).elev = 210; asked = []; sel(L, [J]);
+	mv = L.morphVertex();
+	ok('3.5m elevation plus quality: one box naming both', mv === 1 && asked.length === 1 && /elevation 210/i.test(asked[0]) && /initial quality 0\.4/i.test(asked[0]), asked[0]);
+	L.undo();
+	delete L.nodeById(J)._initQuality; delete L.nodeById(J).elev;
 	global.window.confirm = confirmWas[0]; global.confirm = confirmWas[1];
 	// Customers connected to the junction.
 	L.getDoc().customers = [{ id: 'M1', demand: 1, count: 1, node: J, x: 0, y: 0 }];
@@ -174,7 +187,7 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	pipeB._roughness = rWas + 10;
 	refuse(J, 'lpn_morph_vertex_pipes', '', '3.8 two pipes of different roughness are refused');
 	pipeB._roughness = rWas;
-	[['tag', 'zoneA', 'a tag'], ['desc', 'hydrant tee', 'a description'], ['_initQuality', 0.4, 'an initial quality']].forEach((f) => {
+	[['tag', 'zoneA', 'a tag'], ['desc', 'hydrant tee', 'a description']].forEach((f) => {
 		const was = L.nodeById(J)[f[0]];
 		L.nodeById(J)[f[0]] = f[1];
 		refuse(J, 'lpn_morph_vertex_own', '', '3.9 a junction with ' + f[2] + ' is refused');

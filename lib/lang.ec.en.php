@@ -1759,6 +1759,8 @@ $ec_lang['lpn_morph_vertex_own']='{id} was not morphed into a vertex: it has its
 $ec_lang['lpn_morph_vertex_clear_both']='Clear elevation {elev} and demands {demands} on {id}?';
 $ec_lang['lpn_morph_vertex_clear_elev']='Clear elevation {elev} on {id}?';
 $ec_lang['lpn_morph_vertex_clear_demand']='Clear demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_quality']='Clear initial quality {quality} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_also']='Initial quality {quality} is cleared too.';
 $ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
