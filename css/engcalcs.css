@@ -2404,14 +2404,21 @@ html[lang="zh"] .ec-welcome {
    value inherited, a down triangle one the scenarios below override. Placed in the padding the
    container gives up for it, so no row's text moves when a mark comes or goes, and on the right in a
    right-to-left language. Never a tab stop. */
-#lpn_popup_fields.lpn-ovm-gut, #lpn_popup_title.lpn-ovm-gut { position: relative; padding-inline-start: 1.9em; }
-/* Base draws no dot, so its gutter is the triangle's one cell. */
-#lpn_popup_fields.lpn-ovm-gut1, #lpn_popup_title.lpn-ovm-gut1 { position: relative; padding-inline-start: 0.95em; }
-#lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -0.95em; }
-#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.9em; }
-/* A column heading over marked rows gives up the same room, or it sits 1.9em left of its column. */
-#lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.9em / 0.85); }   /* the heading is .85em, the rows 1em */
-.lpn-ovm { position: absolute; margin-inline-start: -1.9em; display: inline-flex; align-items: center; height: 1.3em; }
+/* **THE GUTTER IS ONE CELL, 1.1em** (Tom, 2026-10-27: more air after the dot than line plus dot). It becomes
+   two cells, 2.05em, only on a box where some row needs both marks (`lpn-ovm-gut2`, set where the second
+   mark is drawn), because a per-row width would stagger every control's x (Task 435). No empty filler cell
+   is drawn: a lone mark sits in the first cell. */
+#lpn_popup_fields.lpn-ovm-gut, #lpn_popup_title.lpn-ovm-gut,
+#lpn_popup_fields.lpn-ovm-gut1, #lpn_popup_title.lpn-ovm-gut1 { position: relative; padding-inline-start: 1.1em; }
+#lpn_popup_fields.lpn-ovm-gut2, #lpn_popup_title.lpn-ovm-gut2 { padding-inline-start: 2.05em; }
+#lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -1.1em; }
+#lpn_popup_fields.lpn-ovm-gut2 .lpn-ovm { margin-inline-start: -2.05em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.1em; }
+#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-row, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 [data-lpn-setting] { padding-inline-start: 2.05em; }
+/* A column heading over marked rows gives up the same room, or it sits 1.1em left of its column. */
+#lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.1em / 0.85); }   /* the heading is .85em, the rows 1em */
+#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-colhead { padding-inline-start: calc(2.05em / 0.85); }
+.lpn-ovm { position: absolute; margin-inline-start: -1.1em; display: inline-flex; align-items: center; height: 1.3em; }
 #lpn_settings_box .lpn-ovm { margin-inline-start: 0; inset-inline-start: 0; top: 0.15em; }
 .lpn-ovm-cell { display: inline-flex; align-items: center; justify-content: center; width: 0.95em; height: 1.3em; }
 .lpn-ovm-cell[role="button"] { cursor: pointer; }
@@ -3857,8 +3864,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	display: grid; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
 	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
 }
-#lpn_popup_fields.lpn-gprops.lpn-ovm-gut { --lpn-g-gutw: 1.9em; padding-inline-start: 0; }
-#lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; padding-inline-start: 0; }
+#lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
+#lpn_popup_fields.lpn-gprops.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; padding-inline-start: 0; }
 .lpn-gprops > br { display: none; }
 .lpn-gprops .lpn-grow > * { min-width: 0; }
 .lpn-gprops .lpn-gname .ec-help { display: inline; min-width: 0; }
@@ -3888,8 +3895,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		display: grid; align-content: start; justify-content: start; align-items: start; column-gap: 0; row-gap: 0;
 		grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
 	}
-	.lpn-propbox .lpn-popover-body.lpn-ovm-gut { --lpn-g-gutw: 1.9em; }
-	.lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; }
+	.lpn-propbox .lpn-popover-body.lpn-ovm-gut, .lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; }
+	.lpn-propbox .lpn-popover-body.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; }
 	.lpn-propbox .lpn-popover-body > * { grid-column: 1 / -1; min-width: 0; }
 	.lpn-propbox .lpn-popover-body > #lpn_popup_fields.lpn-gprops,
 	.lpn-propbox .lpn-popover-body > #lpn_popup_title.lpn-gtitle-id,
@@ -3930,6 +3937,25 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
+		/* **THE INPUT IS THE CELL** (Task 837, Tom 2026-10-27): no border, no margin, transparent, it fills the Value
+		   track and starts where the Label cell's text starts (padding 4px 6px), as a Tables cell does; the cell is
+		   marked by the inset accent outline, as there. The Value column reads as one thing, an editable value
+		   beside a computed one, against one left edge. The phone's stacked layout (below) keeps its own. */
+		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id { min-height: 1.75rem; }
+		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
+			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
+			padding: 4px 6px; box-sizing: border-box; align-self: stretch; text-align: start; font-size: .85em;   /* the Label cell's size: 13.6 px text and 8 px of padding, a 28 px row */
+		}
+		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus {
+			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
+		}
+		.lpn-propbox .lpn-gprops .lpn-grow > textarea.lpn-gval { resize: vertical; }
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; }
+		/* A toggle stays a checkbox in the cell, at the cell's start, 18 px in the 28 px row. */
+		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval {
+			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
+		}
+		/* The row is a <label>, so a tap anywhere in its cell (and its name) toggles the box: the whole cell is the touch target. */
 		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
 	}
 }
@@ -5184,6 +5210,8 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-setbox-search { flex: 0 0 auto; padding-bottom: 6px; }
 .lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 4px 8px; border-color: var(--ec-control-border); }
 .lpn-setbox-panes { display: flex; flex: 1 1 auto; min-height: 0; gap: 10px; }
+/* The phone's jump bar (Task 835); shown only in the 640 px block, where it replaces the index pane. */
+.lpn-setbox-jump { display: none; }
 /* The index. Its own scrollbar, because it is as long as the content is and the two do not scroll
    together -- that non-coupling is the whole point of the paradigm.
 
@@ -5981,7 +6009,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(5),
 #lpn_labels_node_fields .lpn-lblgroup > span:nth-child(6),
 #lpn_labels_link_fields .lpn-lblgroup > span:nth-child(6),
-#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(6) { width: 2.34rem !important; }
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(6) { width: 2.2rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns
@@ -6025,7 +6053,11 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    and which is the correct last resort. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
-#lpn_labels_customer_fields { min-width: 15.3rem; }
+#lpn_labels_customer_fields { min-width: 14.88rem; }   /* 15.3rem less the three narrowed columns, 3 x 0.14rem (Tom, 2026-10-27: 0.000, Show and Drop to the heading's width) */
+/* No spinner on the two-digit boxes: its hover arrows covered the digits of a 35 px box. Arrow keys still step. */
+#lpn_labels_node_fields input.lpn-digit,
+#lpn_labels_link_fields input.lpn-digit,
+#lpn_labels_customer_fields input.lpn-digit { -moz-appearance: textfield; appearance: textfield; }
 /* **AND A CEILING ON THE NAME, so the columns stop walking right** (Tom, 2026-08-21: "the Labels
    columns always float right. It seems like there should be something like a maximum width for the
    checkbox and labels column. Map appearance and Time seem to do it right"). They do, and this is
@@ -6741,7 +6773,32 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   The 3.6rem and the 2px are the arithmetic above, already reduced; the 2px is a fifth of
 	   `.lpn-setbox-panes`'s own 10px `gap`, restated because `calc()` cannot ask for it. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 3.8rem; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." */
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 3.8rem; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." (the Libraries box; Settings has no side index here, see 5d) */
+
+	/* 5d. SETTINGS ON A PHONE HAS NO SIDE INDEX: A JUMP BAR REPLACES IT (Task 835, Ida 2026-10-27, Tom
+	   accepted). The 71 px the index and its gap took crushed every row of the box ("Us / e / unit / s");
+	   a full-width bar under the search box names the current heading and opens the same index as a list
+	   over the content. Content 293 px -> 364 px. Chevron drawn in CSS, logical properties throughout, so
+	   no font, no translation and no mirroring rule. The Libraries box keeps its pane. */
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-panes { flex-direction: column; gap: 0; position: relative; }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-jump {
+		display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; width: 100%; box-sizing: border-box;
+		min-height: 2.75rem; padding: 0 .75rem; margin-bottom: 4px; border: 1px solid var(--ec-border-strong);
+		background: var(--ec-chrome-bg); color: inherit; font: inherit; font-weight: 600; text-align: start; cursor: pointer;
+	}
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-jump-chev {
+		flex: 0 0 auto; width: .5rem; height: .5rem; margin-inline-start: .5rem;
+		border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: rotate(45deg);
+	}
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-jump[aria-expanded="true"] .lpn-setbox-jump-chev { transform: rotate(-135deg); }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-index {
+		display: none; position: absolute; inset-inline: 0; top: 2.75rem; z-index: 3; flex: none; max-height: min(60%, 22rem);
+		background: var(--ec-box-bg); border: 1px solid var(--ec-border-strong); box-shadow: var(--ec-box-shadow); padding: 4px;
+	}
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-panes.lpn-jump-open .lpn-setbox-index { display: block; }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-index .lpn-setbox-link { min-height: 2.75rem; display: flex; align-items: center; }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-divider { display: none; }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-content { flex: 1 1 auto; }
 
 	/* 5a. AND THE ONE THING THE NARROWER MAIN PANE NO LONGER FITS. Measured at 360px after the
 	   transfer above: the content pane overflows by exactly 17px, and every pixel of it is the
@@ -6964,6 +7021,34 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
 
+	}
+
+	/* 7c. **IN THE SETTINGS BOX THE PHONE'S SHRUNKEN COLUMNS ARE GIVEN BACK** (Task 835): items 7 and 7a above were
+	   written for the 201-293 px pane the side index left. With the jump bar the pane is the box's whole 364 px
+	   at 390, so the six columns take the PC's widths again (2.2 / 2.2 / 1.85 / 2.2 / 2.2 / 2.2rem, 225.6 px),
+	   every heading on one line but "Use units". Below 341 px the narrow rules above still apply. */
+	@media (min-width: 341px) {
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(1),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(1),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(1),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(6) { width: 2.2rem !important; }
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.85rem !important; }
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields,
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields,
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields { min-width: 14.88rem; }
 	}
 
 	/* **AND BELOW 340px THE COLUMNS NARROW AGAIN** (Task 760): at 320px the pane is 170px, and 11.4rem

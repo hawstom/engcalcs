@@ -682,7 +682,7 @@ const TOUCH = true;
 	// width, and with and without a spinner.
 	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.8rem', 6: '1.8rem', 7: '1.8rem' };
 	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.4rem', 5: '2rem', 6: '2rem', 7: '2rem' };
-	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.34rem', 6: '2.34rem', 7: '2.34rem' };
+	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.2rem', 6: '2.2rem', 7: '2.2rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
 		const h = gH.children[i - 2], b = gF.children[i - 2];
 		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',
@@ -728,9 +728,9 @@ const TOUCH = true;
 		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '11.4rem');
 	ok('...11.4rem on a touch screen too',
 		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '11.4rem');
-	ok('...and 15.3rem on the desktop, whatever the pointer',
-		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '15.3rem' &&
-		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '15.3rem');
+	ok('...and 14.88rem on the desktop, whatever the pointer',
+		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '14.88rem' &&
+		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '14.88rem');
 });
 
 console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---');
@@ -776,9 +776,20 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	}
 	// The three facts that MADE it a strip, each asserted absent, so a revival is a deliberate act
 	// rather than a rule creeping back in.
-	ok('...the panes do not stack',
-		winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction') === null,
+	// **RE-BASELINED 2026-10-27 (Task 835, Tom asked for it, Ida's design): THE SETTINGS BOX'S SIDE INDEX IS GONE ON A
+	// PHONE.** A full-width jump bar names the current heading and opens the same index as a list over the
+	// content, so the content pane is the box's whole width (293 -> 364 px at 390). It is NOT the 2026-08-29
+	// strip that Tom rejected: that one scrolled sideways, this list is one column of whole names. The
+	// Libraries box keeps its side pane (asserted where it is built, below). dev/lpn-spike/
+	// box-polish-browser-harness.js measures the bar itself in a browser.
+	ok('...the Settings panes stack on a phone, under the jump bar, and not on a desktop',
+		winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction') === 'column' &&
+		winning(RULES, panes, WIDE, DOC_IDS, false, 'flex-direction') === null,
 		'got ' + winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction'));
+	ok('...and the side index is not shown on a phone (the bar opens it), but is on a desktop',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'display') === 'none' &&
+		winning(RULES, index, WIDE, DOC_IDS, false, 'display') !== 'none',
+		'got ' + winning(RULES, index, SMALL, DOC_IDS, false, 'display'));
 	// `flex` still resolves to the desktop shorthand `0 0 7.26rem` here -- the phone rule sets
 	// flex-basis alone, which overrides only the basis. What must NOT be true is the strip's own
 	// `0 0 auto`, which is how it sized itself to its content instead of to a column.

@@ -52293,7 +52293,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
 		if (escapeOwnsBox('lpn_popup')) { closePopup(true); }
-		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
+		if (escapeOwnsBox('lpn_settings_box')) { if (setboxJumpIsOpen()) { setboxJumpOpen(false); } else { closeSettingsBox(); } }   // the phone's open jump list is inner to the box: it closes first
 		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
@@ -60571,7 +60571,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and five 4px gaps come to 15.3rem, which fits the 252 px a squeezed pane leaves -- the test
 	// that caught the Settings box scrolling sideways (Tom, 2026-08-19: "It should not"). The Use
 	// units column is as wide as its heading's longer word, so "units" never breaks.
-	var LPN_LABEL_COL_W = '2.34rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
+	var LPN_LABEL_COL_W = '2.2rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
 		LPN_LABEL_UNITS_W = '1.85rem', LPN_LABEL_ROW_GAP = '4px';
 	function labelColumnSpacer(width, isUnits) {
 		var spacer = document.createElement('span');
@@ -64471,6 +64471,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm'), function (n) { n.parentNode.removeChild(n); });
 		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
+		box.classList.remove('lpn-ovm-gut2');
 		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
 			var paths, held;
@@ -64483,6 +64484,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			el.classList.add('lpn-set-held');
 			setboxIndexMarkHeld(el);
 		});
+		// One cell of gutter, two only when some row carries both marks, so every control keeps one x.
+		box.classList.toggle('lpn-ovm-gut2', [].some.call(box.querySelectorAll('.lpn-ovm'), function (g) {
+			return !!g.querySelector('.lpn-ovm-dot') && !!g.querySelector('.lpn-ovm-tri');
+		}));
 		// A search in force keeps each new note with its row.
 		if ((document.getElementById('lpn_setbox_filter') || {}).value) { applySetboxFilter(); }
 		setboxKeepPlace();
@@ -64497,7 +64502,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (held.length) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
 				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { setboxPinRow(el); clearHeldSetboxRows(held, scn); setboxKeepPlaceSoon(); }));
-		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+		}
 		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		kids = childSettingHolders(mine);
 		if (kids.length) {
@@ -64513,7 +64518,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				});
 			}));
 		} else if (!held.length) { return; }
-		else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
 		el.appendChild(g);
 	}
@@ -64746,6 +64750,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			content = document.getElementById('lpn_setbox_content');
 		if (!index || !content) { return; }
 		index.innerHTML = '';
+		wireSetboxJump();
 		function link(target, text, cls) {
 			var b = document.createElement('button');
 			b.type = 'button';
@@ -64758,6 +64763,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// land underneath it, which is what scrollSetboxTo() measures its way out of.
 				scrollSetboxTo(target);
 				setSetboxCurrent(b);
+				setboxJumpOpen(false);
 			});
 			index.appendChild(b);
 			return b;
@@ -64782,10 +64788,61 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function setSetboxCurrent(btn) {
-		var index = document.getElementById('lpn_setbox_index');
+		var index = document.getElementById('lpn_setbox_index'), txt = document.querySelector('#lpn_setbox_jump .lpn-setbox-jump-text');
 		if (!index) { return; }
 		[].forEach.call(index.children, function (b) { b.removeAttribute('aria-current'); });
 		if (btn) { btn.setAttribute('aria-current', 'true'); }
+		// The phone's jump bar names the place the reader is at; the index it opens is this same list.
+		if (btn && txt) { txt.textContent = btn.textContent; }
+	}
+	// ---- THE PHONE'S JUMP BAR (Task 835) -------------------------------------------------------
+	// At 640 px or less the index pane is replaced by a bar under the search box that names the current
+	// heading and opens the index as a list over the content (CSS decides what shows; nothing here
+	// depends on the width). The bar's text follows the content pane's scroll, so it is never stale.
+	function setboxJumpIsOpen() {
+		var panes = document.getElementById('lpn_setbox_panes');
+		return !!panes && panes.classList.contains('lpn-jump-open');
+	}
+	function setboxJumpOpen(open) {
+		var panes = document.getElementById('lpn_setbox_panes'), jump = document.getElementById('lpn_setbox_jump');
+		if (!panes || !jump) { return; }
+		panes.classList.toggle('lpn-jump-open', !!open);
+		jump.setAttribute('aria-expanded', open ? 'true' : 'false');
+	}
+	// The last visible heading at or above the content pane's top edge, plus the sticky heading's room.
+	function setboxSpy() {
+		var content = document.getElementById('lpn_setbox_content'), index = document.getElementById('lpn_setbox_index'),
+			head, limit, best = null;
+		if (!content || !index || !setboxIsOpen()) { return; }
+		head = content.querySelector('.lpn-set-head');
+		limit = content.getBoundingClientRect().top + (head ? head.getBoundingClientRect().height : 0) + 4;
+		[].forEach.call(content.querySelectorAll('.lpn-set-sec, .lpn-set-sub:not(.lpn-set-sub-silent)'), function (el) {
+			var h = el.classList.contains('lpn-set-sec') ? el.querySelector('.lpn-set-head') : el;
+			if (!h || !el.getClientRects().length || el.getBoundingClientRect().top > limit) { return; }
+			best = el;
+		});
+		if (!best) { best = content.querySelector('.lpn-set-sec'); }
+		if (!best) { return; }
+		var b = best.classList.contains('lpn-set-sec')
+			? index.querySelector('[data-sec="' + best.id + '"]') : index.querySelector('[data-sub="' + best.id + '"]');
+		if (b && b.getAttribute('aria-current') !== 'true') { setSetboxCurrent(b); }
+	}
+	var setboxJumpWired = false;
+	function wireSetboxJump() {
+		var jump = document.getElementById('lpn_setbox_jump'), content = document.getElementById('lpn_setbox_content'), queued = false;
+		if (setboxJumpWired || !jump || !content) { return; }
+		setboxJumpWired = true;
+		jump.addEventListener('click', function () { setboxJumpOpen(!setboxJumpIsOpen()); });
+		content.addEventListener('scroll', function () {
+			if (queued) { return; }
+			queued = true;
+			(window.requestAnimationFrame || setTimeout)(function () { queued = false; setboxSpy(); });
+		}, { passive: true });
+		document.addEventListener('pointerdown', function (e) {
+			var t = e.target;
+			if (!setboxJumpIsOpen() || !t || !t.closest) { return; }
+			if (!t.closest('#lpn_setbox_index') && !t.closest('#lpn_setbox_jump')) { setboxJumpOpen(false); }
+		}, true);
 	}
 	// ---- THE SEARCH (Tom: "searches tips as well as titles") ---------------------------------
 	//
@@ -65125,6 +65182,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// would undo the filter of somebody who opened the box, filtered, closed it to look at the
 		// map, and came back. The filter is a view of the box, and the box remembers its view.
 		initTipsIn(box);
+		setboxSpy();
 		if (!setboxLayout.open) { setboxLayout.open = true; saveSetboxLayout(); }
 	}
 	// ---- THE CALCULATE HINT (Tom, 2026-10-21) --------------------------------------------------
@@ -65183,6 +65241,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function closeSettingsBox() {
 		var box = setboxEl();
 		calcHintHide();
+		setboxJumpOpen(false);
 		hidePanel(box);
 		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
 		// whether or not the box is showing, so an unguarded write would put a storage write on a
@@ -70969,7 +71028,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		fields.innerHTML = '';
 		// The ID line's room goes with the Properties box's own rows, not another box's.
-		[fields, fields.id === 'lpn_popup_fields' ? fields.parentNode : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
+		[fields, fields.id === 'lpn_popup_fields' ? fields.parentNode : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1', 'lpn-ovm-gut2'); } });
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
 	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
@@ -71239,7 +71298,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					refreshPopupIfOpen();
 				});
 			}));
-		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+			// A row with a dot and a triangle is the one thing that needs the second cell.
+			if (!baseHere) { ovmGutterOn(fields, 'lpn-ovm-gut2'); }
+		}
 		fields.insertBefore(g, start);
 		if (!o.on || baseHere) { return; }
 		// While it is an override: what Clear restores, and who else the alternative reaches.

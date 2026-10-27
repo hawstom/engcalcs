@@ -1091,6 +1091,8 @@ echoHeader("EngCalcsApp", $html_title,
 		</div>
 		<div id="lpn_setbox_panes" class="lpn-setbox-panes">
 			<?php // Built by buildSettingsIndex(), from the content pane's own headings. ?>
+			<?php // The phone's jump bar (Task 835): visible only at 640 px or less, where it replaces the index pane. No title: it names the place it is. ?>
+			<button type="button" id="lpn_setbox_jump" class="lpn-setbox-jump" aria-expanded="false" aria-controls="lpn_setbox_index"><span class="lpn-setbox-jump-text"></span><span class="lpn-setbox-jump-chev" aria-hidden="true"></span></button>
 			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_tool_settings'])?>"></nav>
 			<?php // ROADMAP Task 576. A separator, not a decoration: it is what the reader grabs to
 			      // give the index more room, and it is focusable so a keyboard can move it too --

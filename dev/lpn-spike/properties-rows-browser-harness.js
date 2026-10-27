@@ -138,7 +138,10 @@ async function main() {
 		if (!scn && m.marks === 0) { ok(tag + 'no marker, no gutter', m.gutterW === 0, String(m.gutterW)); }
 		ok(tag + 'no row has a third (unit) cell', m.thirdCell === 0, String(m.thirdCell));
 		if (name === 'pipe') {
-			ok(tag + 'Minor loss 5 < Diameter 6 < Roughness 7 < Length 8 digits wide', m.w.k < m.w.diameter && m.w.diameter < m.w.roughness && m.w.roughness < m.w.length, JSON.stringify(m.w));
+			// RE-BASELINED 2026-10-27 (Task 837, Tom): on a PC the input IS the cell and fills the Value track, so the
+			// four number boxes are one width, the track's. (A phone's stacked rows keep their own sizes.)
+			if (!phone) { ok(tag + 'the pipe\'s number boxes all fill the Value track: one width', m.w.k === m.w.diameter && m.w.diameter === m.w.roughness && m.w.roughness === m.w.length, JSON.stringify(m.w)); }
+			else { ok(tag + 'Minor loss 5 < Diameter 6 < Roughness 7 < Length 8 digits wide', m.w.k < m.w.diameter && m.w.diameter < m.w.roughness && m.w.roughness < m.w.length, JSON.stringify(m.w)); }
 			ok(tag + 'units stand in the labels, in <bdi> (Diameter (in), Length (ft), ...)', m.bdi >= 2, String(m.bdi));
 		}
 		await a.close();
