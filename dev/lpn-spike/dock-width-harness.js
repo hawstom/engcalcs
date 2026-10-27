@@ -150,7 +150,7 @@ async function main() {
 	try {
 		console.log('\n--- 1. the label columns line up on every row ---');
 		const s = await visit(Session, browser, 'columns', true);
-		// Settings starts pinned open on a PC (Tom, 2026-10-26): nothing to fly out.
+		// Settings starts as an auto-hide tab (Tom, 2026-10-27).
 		await s.settle(500);
 		// Water age as the quality parameter, so every row it adds is drawn and measured.
 		await s.page.evaluate(() => {
