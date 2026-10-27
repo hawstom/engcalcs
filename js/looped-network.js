@@ -13627,6 +13627,19 @@ var EngCalcs = EngCalcs || {};
 		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
 		initTipsIn(body);
 	}
+	// **A WHOLE-DRAWING BUILD MEASURES EVERY NODE LABEL IN ONE READ, AFTER THE LAST ONE IS APPENDED.**
+	// A getBBox() between two appends forces a layout of the half-built drawing, once per node; on a
+	// phone with the first-view docks in place each cost ~7 ms at full speed (Net3: 97 of them, 2.9 s
+	// of a 5 s block at 4x slowdown, 2026-10-27). Read together, they cost one layout.
+	var deferredNodeWidths = [];
+	function measureDeferredNodeWidths() {
+		var ids = deferredNodeWidths; deferredNodeWidths = [];
+		ids.forEach(function (id) {
+			var ne = nodeEls[id];
+			if (!ne) { return; }
+			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
+		});
+	}
 	function buildNodeEls(n) {
 		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
 		// carries the same `data-node`, so selectFromHit(), nodeOutranks() and every other reader of
@@ -13688,6 +13701,7 @@ var EngCalcs = EngCalcs || {};
 		// every label through measureLabelWidths().
 		var tw = 8;
 		if (dataLabelsHidden) { labelWorkSkipped = true; }
+		else if (labelPassDeferred) { deferredNodeWidths.push(n.id); }   // measured once, after the loop (see buildDom)
 		else { try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ } }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, symbolG: symbolG, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
@@ -15942,6 +15956,7 @@ var EngCalcs = EngCalcs || {};
 		// whole question. Off unless the flag is typed.
 		perfDebugTime('  nodes', function () {
 			for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
+			measureDeferredNodeWidths();
 		});
 		perfDebugTime('  links', function () {
 			for (i = 0; i < doc.links.length; i++) {
