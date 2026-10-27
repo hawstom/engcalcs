@@ -95,13 +95,18 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-26 (forty-first session, Opus main, Sonnet agents)
+## STATE — 2026-10-26 late (forty-second session, Opus main, Sonnet agents)
 
-- **Merged 2026-10-25 on his word:** `fix/browser-pass-a`, `fix/dock-widths` (830 closed). Merged 2026-10-26 on green (defect): `fix/bottom-pane-lag` (a shut pane is `lpn-pane-shut`, content-visibility hidden, not display:none). Merged 2026-10-26 on his word: `fix/example-crs` (826 closed), `fix/dup-keys` (49 keys). On green (defects): `fix/open-docked` (`revealBox()`, links fly out a tucked box), `fix/form-restore` (autocomplete off on every Looped-Network control: Chrome's back/forward refill shifted values by position).
-- **Waiting on his browser pass** (previews page): `fix/phone-select` (827, with Basic-mode Scenario manager and first-view docks), `feat/box-rows-properties` (828; supersedes `feat/box-rows`, kill that one when this merges), `feat/report-buttons` (829, print widths fixed), `feat/shape-scenario` (831, on `feat/scenario-io`), `feat/value-source`, `feat/scenario-io`.
-- **His calls 2026-10-25:** word wrap, mid-word included, is fine; a Settings labels row's CONTROLS never reflow onto two lines. Phone map pan dropped. Water menu loses Properties.
-- **Seams at merge:** phone-select vs box-rows-properties (Properties box CSS); box-rows vs report-buttons (Fire flow box).
-- **Trap met:** load flakes in full suites with four running: theme-design, label-pass-economy, geojson-import; each passed alone.
+- **Pushed c5f2bbbb8:** `fix/example-crs` (826 closed) and `fix/dup-keys` (49 keys) on his word; defects `fix/open-docked` (`revealBox()`; Pipe types/Fittings/Curves links fly out a tucked box) and `fix/form-restore` (`js/no-form-restore.js`: Chrome's back/forward refill put stale values in Settings label boxes by position; his "offset" bug, reproduced).
+- **`chore/merge-1026c`** (main checkout, not pushed): `fix/bottom-pane-lag-2` (tooltip disposal of rebuilt controls; growth harness) plus both pane timing harnesses made report-only (load 30 on 24 threads made toggles read 2.8 s). Ida's label study is in `dev/agents/interface-designer/label-study-2026-10-26.md`. Needs a full check_all, then ff master and push.
+- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles, every tab). Owed by him: which tab, and does it follow toggle count or time since load; a Chrome Performance trace.
+- **Waiting on his browser pass:** `fix/phone-select` (827: Settings pinned on PC, labels rows two-line group wrap, morph confirm reachable on Net1 junction 32), `feat/report-buttons` (829: units in headings via `lpn_heading_unit`, ID columns 7.5ch, Copy HTML widths for Google Docs). Both have master merged.
+- **`feat/box-rows-properties`** (828): agent fixing Perry's seven findings (master merge, Convert as, unit wrap, divider cap, header placement, 80th-percentile fit, per-language comma). Do not ask Tom to test until it reports and is re-checked. His open question: left header "Label" or "Property" (Perry and I recommend Property).
+- **For his approval:** "Conc.", "{chemical} conc." (829); "Clear initial quality {quality} on {id}?", "Initial quality {quality} is cleared too." (827); "Auto length", "Edit types…", "Edit fittings…" (828). `lpn_morph_vertex_own` wording is now stale (elevation is asked, not refused).
+- **Next sprint:** tr `lpn_field_km_short` reads "small loss" (Ida).
+- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`.
+- **Trap met:** a merged-to-master fix can leave every feature branch behind; merge master into each live branch the same evening, before asking him to test.
+- **Trap met:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
