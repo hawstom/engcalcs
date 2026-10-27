@@ -803,8 +803,8 @@
 	// an axis is called.
 	function axisWord(axes, which) {
 		if (axes && axes[which]) { return axes[which]; }
-		return which === 'east' ? (PC.lpn_survey_axis_east || 'Easting')
-			: (PC.lpn_survey_axis_north || 'Northing');
+		return which === 'east' ? (PC.lpn_field_easting || 'Easting')
+			: (PC.lpn_field_northing || 'Northing');
 	}
 	function fill(text, detail, axis, line) {
 		return String(text)

@@ -22,6 +22,7 @@
 //   (f) a lat/lon project's coordinates are UTM metres, and both the status line and the read-me
 //       say they are not latitude and longitude.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -231,7 +232,8 @@ async function main() {
 			{ card: 'lpn_ex_net1_title', label: 'Net1 (ar)', geo: false, lang: 'ar' }, { card: 'lpn_ex_net1_title', label: 'Net1 (zh)', geo: false, lang: 'zh' }]) {
 			const q = 'Looped-Network.php?ec_nolog=1' + (c.lang ? '&lang=' + c.lang : '');
 			console.log('\n--- ' + c.label + (BASE ? ' at ' + BASE : '') + ' ---');
-			const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, acceptDownloads: true });
+			const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, acceptDownloads: true, serviceWorkers: 'block' });
+			if (c.geo) { await serveLatLonNet3(a.page); }
 			await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
 			if (BASE) {
 				await a.page.goto(BASE.replace(/\/?$/, '/') + q, { waitUntil: 'load' });

@@ -35,7 +35,7 @@ const QUOTES = {
 		'lpn_curve_kind_head', 'lpn_library_controls', 'lpn_library_rules', 'lpn_time_run', 'lpn_reports_menu', 'lpn_reports_status']
 };
 const TERMS = ['lpn_guide_lib_kinds_term', 'lpn_guide_lib_refs_term', 'lpn_guide_lib_scn_term', 'lpn_guide_lib_ctl_term', 'lpn_guide_lib_import_term',
-	'lpn_guide_lib_example_term', 'lpn_guide_lib_notes_term'];
+	'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
 // The chapter's own sentences about the times, read out of it so a reworded sentence is re-measured.
 function exampleTimes() {
 	const t = plain(enString('lpn_guide_lib_example_def'));

@@ -462,7 +462,7 @@ async function main() {
 	}
 
 	console.log('--- Net3-Novato-CA-World: latitude and longitude, to UTM ---');
-	openExample('Net3-Novato-CA-World.lwn');
+	openExample('latlon-originals/Net3-Novato-CA-World.lwn');
 	{
 		const pl = L.linkPointList(L.getDoc().links.find(l => l.type === 'pipe'));
 		L.addCustomer((pl[0].x + pl[1].x) / 2 + 1e-4, (pl[0].y + pl[1].y) / 2 + 1e-4,

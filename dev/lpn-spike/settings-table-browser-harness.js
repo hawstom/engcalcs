@@ -174,7 +174,7 @@ async function main() {
 				await L('lpn_find_value')]), JSON.stringify(heads));
 		let rows = await H.settingRows();
 		const FM = await L('bpn_method'), DM = await L('bpn_demand_mult'), DUR = await L('lpn_time_duration'),
-			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_alt_cat_calculation'), PRES = await L('lpn_alt_cat_presentation');
+			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_settings_sec_calculation'), PRES = await L('lpn_alt_cat_presentation');
 		const fm = rows.filter((r) => r.cells.st_setting === FM)[0];
 		ok('Friction method is a row, in Calculation, reading Hazen-Williams',
 			fm && fm.cells.st_category === CALC && fm.cells.st_value === await L('bpn_method_hw'), JSON.stringify(fm));

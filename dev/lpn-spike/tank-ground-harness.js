@@ -139,7 +139,7 @@ function tokens(text, section) {
 	ok('head is still base + level (970 ft)', L.nodeFixedHead(t2) === 970, String(L.nodeFixedHead(t2)));
 	// The two drawing exports say the same thing: plain elevation is the ground, the base is named.
 	// (GeoJSON needs a located project, so this uses the shipped Net3 on the world, tank 1.)
-	const world = L.migrateSaved(JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3-Novato-CA-World.lwn'), 'utf8')));
+	const world = L.migrateSaved(JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'latlon-originals', 'Net3-Novato-CA-World.lwn'), 'utf8')));
 	const wt = world.nodes.find((n) => n.id === '1');
 	wt.elev = wt.bottomElev - 20;
 	const gj = JSON.parse(EngCalcs.lpnExportGeoJson(world, {}).text);

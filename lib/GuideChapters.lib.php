@@ -145,7 +145,24 @@ function ecGuideMapDef() {
  * @return string       the language key.
  */
 function ecGuideTermKey($stem) {
-    $alias = array('lpn_guide_cmp_byasset' => 'lpn_scnres_title', 'lpn_guide_ff_dur' => 'lpn_dur_option');
+    $alias = array('lpn_guide_cmp_byasset' => 'lpn_scnres_title', 'lpn_guide_ff_dur' => 'lpn_dur_option',
+        'lpn_guide_ds_find' => 'lpn_find_btn', 'lpn_guide_ds_run' => 'lpn_ff_calculate', 'lpn_guide_map_del' => 'lpn_tool_delete',
+        'lpn_guide_fr_what' => 'lpn_guide_cmp_cols_term',
+        'lpn_guide_cmp_notes' => 'lpn_guide_scn_notes_term',
+        'lpn_guide_find_notes' => 'lpn_guide_scn_notes_term',
+        'lpn_guide_lib_notes' => 'lpn_guide_scn_notes_term',
+        'lpn_guide_cal_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_cr_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_ct_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_ds_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_en_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_ff_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_fr_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_lib_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_own_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_prop_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_rr_example' => 'lpn_guide_scn_example_term',
+        'lpn_guide_st_example' => 'lpn_guide_scn_example_term');
     return isset($alias[$stem]) ? $alias[$stem] : $stem . '_term';
 }
 

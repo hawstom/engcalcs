@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**31 still to read on master**, of 196 untranslated keys, of 3214 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**31 still to read on master**, of 196 untranslated keys, of 3165 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**82 still to read**, of 125 new keys across 17 unmerged branch(es).
+**103 still to read**, of 146 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -635,25 +635,48 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1025 (`905e0e14a`) — adds no English strings
+### chore/merge-1026b (`cd5411edc`) — adds no English strings
 
-### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
+### feat/box-rows-properties (`19d84f3a7`) — 5 new, 5 to read @@ NEEDS RULING
 
-### feat/box-rows-properties (`695348b38`) — adds no English strings
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol_unit`**
+  > {label}, {symbol} ({unit})
+  @@ NEEDS RULING
+- **`lpn_prop_label_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`9bbdbd88a`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/report-buttons (`9c25c0dfc`) — 4 new, 4 to read @@ NEEDS RULING
 
+- **`lpn_heading_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration_short`**
+  > {chemical} conc.
+  @@ NEEDS RULING
 - **`lpn_report_copy_html`**
   > Copy HTML
   @@ NEEDS RULING
+- **`lpn_result_concentration_short`**
+  > Conc.
+  @@ NEEDS RULING
 
-### feat/scenario-io (`24c49ecae`) — already merged into feat/shape-scenario; its strings are listed there
+### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/shape-scenario (`8c0bc5d7a`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/shape-scenario (`8ee873fdd`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
@@ -661,8 +684,32 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dem_scenario`**
   > Elevations written here are overrides in the scenario {scenario}.
   @@ NEEDS RULING
+- **`lpn_export_goes_base`**
+  > Exporting the Base scenario.
+  @@ NEEDS RULING
+- **`lpn_export_goes_scenario`**
+  > Exporting the scenario "{scenario}" to a unique file name.
+  @@ NEEDS RULING
+- **`lpn_guide_scn_move_def`**
+  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_scn_move_term`**
+  > Moving or merging between scenarios
+  @@ NEEDS RULING
 - **`lpn_library_import_every_scenario`**
   > Every scenario can use them.
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_dxf`**
+  > a DXF file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_geojson`**
+  > a GeoJSON file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_inp`**
+  > an EPANET file
+  @@ NEEDS RULING
+- **`lpn_noscn_lead`**
+  > This project has {n} scenarios, but {format} has no scenarios or alternatives.
   @@ NEEDS RULING
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
@@ -833,7 +880,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/value-source (`c2dc804ae`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
   > This override is stored in alternative "{alternative}".
@@ -1000,21 +1047,38 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
+### fix/bottom-pane-lag-2 (`4cda2370a`) — adds no English strings
 
-### fix/browser-pass-a (`f64a03834`) — already merged into chore/merge-1025; its strings are listed there
+### fix/dup-keys (`4cca5839a`) — already merged into chore/merge-1026b; its strings are listed there
 
-### fix/dock-widths (`2474b5d15`) — already merged into chore/merge-1025; its strings are listed there
+### fix/example-crs (`014a92cd7`) — already merged into chore/merge-1026b; its strings are listed there
 
-### fix/example-crs (`1fba54d64`) — adds no English strings
+### fix/form-restore (`b2365d3f8`) — already merged into chore/merge-1026b; its strings are listed there
 
-### fix/phone-select (`415f4a7fb`) — 13 new, 13 to read @@ NEEDS RULING
+### fix/open-docked (`7af58dac7`) — already merged into chore/merge-1026b; its strings are listed there
+
+### fix/phone-select (`17a3496c2`) — 18 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
   @@ NEEDS RULING
 - **`lpn_morph_vertex_base`**
   > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_also`**
+  > Initial quality {quality} is cleared too.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_both`**
+  > Clear elevation {elev} and demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_demand`**
+  > Clear demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_elev`**
+  > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_quality`**
+  > Clear initial quality {quality} on {id}?
   @@ NEEDS RULING
 - **`lpn_morph_vertex_customers`**
   > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
