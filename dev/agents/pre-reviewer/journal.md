@@ -4648,3 +4648,11 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED confirmed: Water menu no Properties (PC/phone, en); vertex morph prompts exact, undo restores; Basic scenario manager works; no phone pan.
 - Shots: /home/haws/webdev/worktrees/_panel/www/img/phone-select-1025/
 - Tom, 2026-10-25, overruled the mid-word findings above: word wrap, mid-word included, is fine; only a labels row's CONTROLS must stay on one line.
+
+# Perry, 2026-10-26, feat/report-buttons 9c25c0dfc (Task 829)
+- OBSERVED: /tmp/report-buttons.pdf metadata: Title "TGH notepad - Google Docs", Producer Skia/PDF, Chrome 155 on Windows. It is a Google Doc printed to PDF (pasted Copy HTML), NOT the Print report sheet. Build agent's "older build than print-width fix" is unsupported: 593bb7817 (Oct 25) print already has wide-fit layout and 3-line title; PDF has single-line bold title = reportTitleLine = Copy HTML.
+- OBSERVED: Copy HTML (reportHtmlText) emits tables with no widths, no nowrap, no-break spaces, full "Chlorine concentration"; so the Docs paste keeps equal-width columns. Units-in-heading helps, word breaks in headings likely persist. UNVERIFIED in Docs.
+- OBSERVED: Print report on Net1-SI, Net1-Scenarios, Net3: fits, no broken words, ids hold N9999, kWh whole, Conc. short only with chemical. Branch harness passes all.
+- OBSERVED: leftover units in cells: Criticality whole run "97.01 psi at 4:00" (heading "Lowest pressure" no unit); Scenario comparison "108 psi at N32, 14:00"; Net3 ff "N40 drops to 5.68 psi".
+- OBSERVED: heading units split across lines "(m / H2O)" on screen and print.
+- Method note: Tom's PDF provenance came from strings on the PDF; check metadata first next time.

@@ -70,3 +70,4 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
     (default = pump-on minus 2 psi). *"We build a pressure tank curve using Boyle's Ideal Gas Law.
     Maybe we add Pressure Tank in our Libraries, shown only if somebody adds one."*
   - *For open-air tank:* the normal tank parameters.
+- *Well icon* (Tom, 2026-10-26): *"I wonder if it would be nice to depict drawdown on a well icon."* Sketch as above.
