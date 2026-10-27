@@ -171,8 +171,14 @@ var EngCalcs = EngCalcs || {};
 	// Not a settings row: a number nobody has wanted to change costs 26 translations, and every
 	// adjustment so far moved a default everybody gets, not a preference one drawing needed.
 	var LPN_LABEL_REPEAT_FRAC = 0.75;
-	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A cap on n is a cap on the
-	// SPACING, so a very long pipe zoomed into would silently stop obeying the rule.
+	// **THE DIVISION IS NEARLY UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A tight cap on n is a
+	// cap on the SPACING, so a long pipe zoomed into would silently stop obeying the rule. For that
+	// reason n may reach LPN_LABEL_STATIONS_MAX, 10000, about 7500 view-widths of one pipe, which no
+	// real zoom reaches (a 40 mile main seen through a 100 ft window is about 2700).
+	// THE CEILING EXISTS FOR ONE CAUSE: a label pass that ran with a STALE view scale (2026-10-27,
+	// before fix/fresh-freeze) computed a spacing near zero and laid 1,045,277 positions on one Net3
+	// pipe. Past the ceiling the pipe gets 10000 evenly spaced stations, never a million.
+	var LPN_LABEL_STATIONS_MAX = 10000;
 	// A LAST-RESORT GUARD, not a rule: a pipe folding back and forth INSIDE the window can
 	// legitimately have thousands of stations in view. An ordinary drawing never reaches it (a
 	// straight pipe crossing the padded window has at most about 13).
@@ -257,7 +263,7 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelStations(l) {
 		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
 		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
-		n = Math.ceil(len / s);
+		n = Math.min(Math.ceil(len / s), LPN_LABEL_STATIONS_MAX);
 		for (i = 0; i < n; i++) { out.push((i + 0.5) / n); }
 		return out;
 	}
