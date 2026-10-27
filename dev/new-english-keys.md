@@ -735,7 +735,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**76 still to read**, of 119 new keys across 16 unmerged branch(es).
+**76 still to read**, of 119 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -746,9 +746,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`8b209e745`) — adds no English strings
-
-### feat/box-polish (`5d43a5dec`) — already merged into box-design; its strings are listed there
+### box-design (`3589f294a`) — adds no English strings
 
 ### feat/box-rows-properties (`2b8b40918`) — already merged into box-design; its strings are listed there
 
@@ -757,8 +755,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
 ### feat/report-buttons (`c4a7535e8`) — already merged into box-design; its strings are listed there
-
-### feat/report-columns (`b38cd7757`) — already merged into box-design; its strings are listed there
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
@@ -803,8 +799,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_this_scenario`**
   > Shapes appear in {scenario} only.
   @@ NEEDS RULING
-
-### feat/short-labels (`6de3f9384`) — already merged into box-design; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -1134,7 +1128,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
-
-### fix/fresh-freeze (`b4bd1f0ed`) — already merged into box-design; its strings are listed there
 
 ### fix/phone-select (`9c284b295`) — already merged into box-design; its strings are listed there
