@@ -116,6 +116,22 @@ async function main() {
 		ok('the Label column is fitted: no wider than the widest label, wider than the median', m.labelCol <= m.widest + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
 		ok('nothing is cut at the right edge', m.cut === 0 && m.scroll <= 1, JSON.stringify({ cut: m.cut, scroll: m.scroll }));
 
+		const glue = await page.evaluate(() => {
+			const out = { names: 0, strayed: [], broken: [] };
+			Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-gname')).filter((n) => n.getBoundingClientRect().width > 0).forEach((n) => {
+				const tip = n.querySelector('.ec-tip'), t = n.textContent.replace(/\s+/g, ' ').trim();
+				out.names++;
+				if (tip) {
+					const r = document.createRange(); r.selectNodeContents(n);
+					const rects = Array.from(r.getClientRects()).filter((x) => x.width > 0), last = Math.max.apply(null, rects.map((x) => x.top)), g = tip.getBoundingClientRect();
+					if (Math.abs(g.top - last) > 6) { out.strayed.push(t); }
+				}
+				n.querySelectorAll('bdi').forEach((b) => { if (Array.from(b.getClientRects()).filter((x) => x.width > 0).length > 1) { out.broken.push(b.textContent); } });
+			});
+			return out;
+		});
+		ok('a "?" stays with its label\'s last line and a unit never breaks inside its brackets', glue.strayed.length === 0 && glue.broken.length === 0 && glue.names > 10, JSON.stringify(glue));
+
 		// The divider: drag, remembered per box, kept across a reload, reset by a double-click.
 		console.log('\n--- the divider ---');
 		const w0 = await headerW(page, '#lpn_popup .lpn-popover-body');

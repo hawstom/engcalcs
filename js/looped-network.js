@@ -48441,6 +48441,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		capPanelToRoomBelow(box, parseFloat(box.style.top));
+		// The rows' headers and fitted Label column arrive a frame later and make the box taller: centre it again.
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 32); })(function () {
+			var h2 = fitPanelToViewport(box);
+			box.style.top = Math.max(chromeFloor(), (window.innerHeight - h2) / 2) + 'px';
+			capPanelToRoomBelow(box, parseFloat(box.style.top));   // what is left under the chrome: the rest scrolls inside the box
+		});
 		initTipsIn(box);
 		var ok = document.getElementById('lpn_convas_ok');
 		if (ok && ok.focus) { ok.focus(); }

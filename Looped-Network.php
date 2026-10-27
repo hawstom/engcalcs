@@ -2818,6 +2818,7 @@ EngCalcs.pageConfig = {
 	      // to the code, so a new property key that is missing here fails there. ?>
 	findEnglishWords: <?=json_encode(ecEnglishStrings(array(
 		'bpn_demand',
+		'lpn_prop_label_symbol',
 		'lpn_energy_price',
 		'lpn_energy_price_pattern',
 		'lpn_ff_required',
