@@ -44,11 +44,6 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
-        "lpn_alt_cat_calculation": {
-            "on": "Calculation",
-            "ruled": "2026-10-16",
-            "answer": "OK."
-        },
         "lpn_alt_cat_constituent": {
             "on": "Constituent",
             "ruled": "2026-10-01",
@@ -97,11 +92,6 @@
         "lpn_alt_cat_topology_tip": {
             "on": "Asset activation",
             "ruled": "2026-10-16",
-            "answer": "OK."
-        },
-        "lpn_alt_cat_userdata": {
-            "on": "Custom properties",
-            "ruled": "2026-10-01",
             "answer": "OK."
         },
         "lpn_alt_note": {
@@ -1571,16 +1561,6 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_ds_minpressure": {
-            "on": "Lowest pressure allowed",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_ds_minpressure_tip": {
-            "on": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
-            "ruled": "2026-10-17",
-            "answer": "Tom, 2026-10-17, choosing the rename to Lowest system pressure allowed: \"I choose (b).\""
-        },
         "lpn_ds_multiplier": {
             "on": "Demand scale",
             "ruled": "2026-10-03",
@@ -1596,11 +1576,6 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_ds_no_selection": {
-            "on": "No junctions are selected. Select junctions or choose All junctions.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
         "lpn_ds_nosolve_at": {
             "on": "At a demand scale of {m}, the network gave no answer. {reason}",
             "ruled": "2026-10-03",
@@ -1608,11 +1583,6 @@
         },
         "lpn_ds_outside_below": {
             "on": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_ds_run": {
-            "on": "Run",
             "ruled": "2026-10-03",
             "answer": "OK."
         },
@@ -1638,16 +1608,6 @@
         },
         "lpn_ds_scope": {
             "on": "Junctions to scale",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_ds_scope_all": {
-            "on": "All junctions",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_ds_scope_selected": {
-            "on": "Selected junctions",
             "ruled": "2026-10-03",
             "answer": "OK."
         },
@@ -1875,10 +1835,6 @@
         },
         "lpn_energy_col_effic": {
             "on": "Effic.",
-            "ruled": "2026-09-04"
-        },
-        "lpn_energy_col_kwh": {
-            "on": "kWh",
             "ruled": "2026-09-04"
         },
         "lpn_energy_col_peak_kw": {
@@ -2477,10 +2433,6 @@
             "ruled": "2026-09-17",
             "answer": "Edited"
         },
-        "lpn_field_demand_category": {
-            "on": "Description",
-            "ruled": "2026-08-29"
-        },
         "lpn_field_desc": {
             "on": "Description",
             "ruled": "2026-09-17",
@@ -2658,11 +2610,6 @@
             "on": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
             "ruled": "2026-09-09",
             "answer": "Edited."
-        },
-        "lpn_field_type": {
-            "on": "Type",
-            "ruled": "2026-10-16",
-            "answer": "OK."
         },
         "lpn_field_type_tip": {
             "on": "The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.",
@@ -3061,11 +3008,6 @@
         "lpn_freq_title": {
             "on": "Distribution of values",
             "ruled": "2026-09-30",
-            "answer": "OK."
-        },
-        "lpn_full_col_id": {
-            "on": "ID",
-            "ruled": "2026-09-26",
             "answer": "OK."
         },
         "lpn_full_col_time": {
@@ -3545,11 +3487,6 @@
             "ruled": "2026-10-17",
             "answer": "His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)."
         },
-        "lpn_guide_cmp_notes_term": {
-            "on": "Points to note",
-            "ruled": "2026-10-17",
-            "answer": "OK."
-        },
         "lpn_guide_cmp_run_def": {
             "on": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>",
             "ruled": "2026-10-17",
@@ -3595,11 +3532,6 @@
             "ruled": "2026-10-17",
             "answer": "OK."
         },
-        "lpn_guide_lib_example_term": {
-            "on": "Example on Net1",
-            "ruled": "2026-10-17",
-            "answer": "His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)."
-        },
         "lpn_guide_lib_import_def": {
             "on": "<p>File, Import…, Import libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.</p>",
             "ruled": "2026-10-17",
@@ -3622,11 +3554,6 @@
         },
         "lpn_guide_lib_notes_def": {
             "on": "<ul><li>A pattern repeats for as long as a run lasts, so it need not cover the whole run.</li><li>An EPANET file has no place for a pipe type or a fittings list. The file carries the numbers each pipe reads, and the export says which pipes were flattened.</li><li>The position and size of the Libraries box are kept in this browser. The items are saved with the project.</li></ul>",
-            "ruled": "2026-10-17",
-            "answer": "OK."
-        },
-        "lpn_guide_lib_notes_term": {
-            "on": "Points to note",
             "ruled": "2026-10-17",
             "answer": "OK."
         },
@@ -3684,11 +3611,6 @@
             "on": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Is active?, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>",
             "ruled": "2026-10-17",
             "answer": "OK."
-        },
-        "lpn_guide_prop_example_term": {
-            "on": "Example on Net1",
-            "ruled": "2026-10-17",
-            "answer": "His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)."
         },
         "lpn_guide_prop_id_def": {
             "on": "<p>The ID is edited in the title bar. It cannot contain a space or a quotation mark, and a node's ID cannot be that of another node, nor a link's that of another link. A node and a link can have the same ID. A refused ID leaves the old one in place and shows a message. Renaming an asset carries its scenario overrides with it.</p>",
@@ -4264,11 +4186,6 @@
             "ruled": "2026-10-20",
             "answer": "OK."
         },
-        "lpn_labels_col_show": {
-            "on": "Show",
-            "ruled": "2026-09-28",
-            "answer": "OK."
-        },
         "lpn_labels_customer_note": {
             "on": "A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.",
             "ruled": "2026-09-23",
@@ -4347,10 +4264,6 @@
             "on": "This curve is used by elements ({count}): {ids}. Assign another curve to them first, then delete this one.",
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
-        },
-        "lpn_library_curve_note_label": {
-            "on": "Description",
-            "ruled": "2026-09-05"
         },
         "lpn_library_curve_remove_point": {
             "on": "Remove this point",
@@ -5098,10 +5011,6 @@
         },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",
-            "ruled": "2026-08-29"
-        },
-        "lpn_new_title": {
-            "on": "New project",
             "ruled": "2026-08-29"
         },
         "lpn_new_units_tip": {
@@ -6074,11 +5983,6 @@
         "lpn_result_pressure": {
             "on": "Pressure",
             "ruled": "2026-09-01"
-        },
-        "lpn_result_pump_head": {
-            "on": "Head",
-            "ruled": "2026-10-03",
-            "answer": "OK."
         },
         "lpn_result_pump_head_tip": {
             "on": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
@@ -7237,11 +7141,6 @@
             "ruled": "2026-10-16",
             "answer": "OK."
         },
-        "lpn_sm_copy": {
-            "on": "Copy",
-            "ruled": "2026-10-16",
-            "answer": "OK."
-        },
         "lpn_sm_current_already": {
             "on": "This scenario is already the current scenario.",
             "ruled": "2026-10-16",
@@ -7538,16 +7437,6 @@
             "on": "The nodes were added to {scenario}. In Base they are inactive.",
             "ruled": "2026-10-18",
             "answer": "I approved all."
-        },
-        "lpn_survey_axis_east": {
-            "on": "Easting",
-            "ruled": "2026-09-23",
-            "answer": "OK."
-        },
-        "lpn_survey_axis_north": {
-            "on": "Northing",
-            "ruled": "2026-09-23",
-            "answer": "OK."
         },
         "lpn_survey_cancelled": {
             "on": "Nothing was created and nothing was changed.",
@@ -8056,10 +7945,6 @@
         },
         "lpn_time_run_report_copied": {
             "on": "Copied",
-            "ruled": "2026-09-04"
-        },
-        "lpn_time_run_report_copy": {
-            "on": "Copy",
             "ruled": "2026-09-04"
         },
         "lpn_time_run_stopped_kept": {

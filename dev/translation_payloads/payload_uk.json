@@ -1,10 +1,10 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 3214,
-        "delta_key_count": 249,
-        "english_changed_key_count": 53,
-        "exempt_key_count": 35,
+        "expected_key_count": 3165,
+        "delta_key_count": 248,
+        "english_changed_key_count": 52,
+        "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -20,7 +20,6 @@
             "bpn_method_hw",
             "bpn_method_dw",
             "bpn_method_manning",
-            "bpn_id",
             "lpn_guide_map_esc_term",
             "lpn_tip_join",
             "lpn_change_type_line",
@@ -37,7 +36,6 @@
             "lpn_settings_row_labels_field",
             "lpn_settings_row_labels_part",
             "lpn_settings_held_base",
-            "lpn_full_col_id",
             "lpn_library_curve_x",
             "lpn_library_curve_y",
             "lpn_library_import_count"
@@ -292,7 +290,6 @@
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
         "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON file…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
@@ -543,7 +540,6 @@
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
         "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON file…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
@@ -725,9 +721,9 @@
                     "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
                 },
                 "next_translated": {
-                    "key": "lpn_guide_cmp_notes_term",
-                    "value": "Що слід урахувати",
-                    "english": "Points to note"
+                    "key": "lpn_guide_cmp_notes_def",
+                    "value": "<ul><li>Сценарій, який не вдається розрахувати, показує причину замість двох результатів, наприклад, що вузол не має шляху до джерела після того, як трубу зроблено неактивною. Решту сценаріїв усе одно розраховано. Сценарій, що не збігся, показує свої останні результати й повідомлення.<\/li><li>Блок над таблицею «Однакове в кожному сценарії» вказує метод тертя, одиниці, точність і максимальну кількість спроб. Налаштування, що різниться між сценаріями, у блок не потрапляє.<\/li><li>Порога «пройшло чи не пройшло» немає. Порівнюйте числа з проєктними критеріями системи, яку моделюють.<\/li><li>Приклад у записі «Сценарії: керування» порівнює три сценарії на Net1.<\/li><\/ul>",
+                    "english": "<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.<\/li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.<\/li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.<\/li><li>The example given in the Scenario manager entry compares three scenarios on Net1.<\/li><\/ul>"
                 }
             }
         },
@@ -757,9 +753,9 @@
                     "english": "Importing libraries from another project"
                 },
                 "next_translated": {
-                    "key": "lpn_guide_lib_example_term",
-                    "value": "Приклад на Net1",
-                    "english": "Example on Net1"
+                    "key": "lpn_guide_lib_example_def",
+                    "value": "<p>Відкрийте приклад Net1 і виберіть Вода, Бібліотеки. Графіки містять графік 1, Demand Pattern, із 12 множниками через 2:00, що охоплюють 24:00, позначений (за замовчуванням). Криві містять криву 1, Pump Curve для насоса 9, криву напору насоса з однією точкою, 1500 gpm за 250 ft. Керування містить два оператори: перший відкриває з’єднання 9, коли тиск у вузлі 2 падає нижче 110, а другий закриває його, коли тиск у вузлі 2 піднімається вище 140. Правила містять два правила, що перевіряють час за годинником і рівень в ємності 2.<\/p><p>Виберіть Вода, Розрахувати, а потім Вода, Звіти, Зміни стану. Насос L9 тепер закрито о 10:00, відкрито о 15:00 і закрито о 21:00, а ємність N2 тепер спорожнюється о 22:00. У Керуванні змініть 140 на 135 у другому операторі й знову виберіть Вода, Розрахувати. Останнє закриття зсувається на 20:00, а ємність N2 тепер спорожнюється о 21:00.<\/p>",
+                    "english": "<p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.<\/p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.<\/p>"
                 }
             }
         },
@@ -821,9 +817,9 @@
                     "english": "<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.<\/p>"
                 },
                 "next_translated": {
-                    "key": "lpn_guide_ff_example_term",
-                    "value": "Приклад на Net1",
-                    "english": "Example on Net1"
+                    "key": "lpn_guide_ff_example_def",
+                    "value": "<p>Відкрийте приклад Net1, виберіть Вода, Аналіз, Аналіз витрати на пожежогасіння… і клацніть «Запустити» з вікном у тому вигляді, в якому воно відкрилося. Крок часу — 0:00, і розрахунок розв’язує всю мережу 135 разів. Вісім із дев’яти вузлів проходять усі перевірки. Вузол N32 не витримує витрати на пожежогасіння: його статичний тиск 111 psi, за потрібних 1000 gpm лишається лише 1.19 psi, а доступна витрата — 892 gpm. Вузол N31 може віддати 1339 gpm, а вузол N12 — понад 10000 gpm.<\/p>",
+                    "english": "<p>Open the Net1 example, choose Water, Analyze, Fire flow analysis…, and click Run with the box as it opens. The time step is 0:00, and the run solves the whole network 135 times. Eight of the nine junctions pass all checks. Junction N32 fails the fire flow: its static pressure is 111 psi, only 1.19 psi remains at the required 1000 gpm, and its available flow is 892 gpm. Junction N31 can deliver 1339 gpm, and Junction N12 more than 10000 gpm.<\/p>"
                 }
             }
         },
@@ -848,9 +844,9 @@
             "current_value": "<p>«Знайти» шукає масштаби споживання від 0 до 20, з точністю до 0.01, найбільший, за якого кожен вибраний вузол зберігає щонайменше Найнижчий допустимий тиск. Вона повідомляє масштаб і найнижчий тиск за нього, а також те саме для наступного кроку вгору, де тиск уперше падає нижче межі. Якщо споживання, як введено, уже залишає вузол нижче межі, відповідь позначається знаком попередження. Якщо кожен вузол зберігає межу за 20, відповідь про це повідомляє. «Зупинити» завершує пошук без відповіді. Найнижчий допустимий тиск — це те саме налаштування, що й поле «Найнижчий допустимий тиск деінде» у вікні «Витрата на пожежогасіння: аналіз».<\/p>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_guide_ds_find_term",
-                    "value": "Знайти",
-                    "english": "Find"
+                    "key": "lpn_guide_ds_run_def",
+                    "value": "<p>«Запустити» множить споживання у вибраних вузлах на Масштаб споживання, на копії мережі в показаний на екрані момент і у відкритому сценарії. Вона робить два розв’язки: один зі споживанням як є й один зі збільшеним масштабом. Результат перелічує Найнижчі тиски й Найбільші швидкості, кожне зі значенням «Масштаб.» поруч зі значенням «Без масшт.», яке показує карта. Кожен список містить десять рядків, а вікно вказує, скільки з’єднань воно не показує. Масштаб споживання застосовується на додачу до множника споживання відкритого сценарію і ніколи не зберігається в проєкті.<\/p>",
+                    "english": "<p>Run multiplies the demands at the chosen junctions by the Demand scale, on a copy of the network at the time step on screen and in the open scenario. It makes two solves, one with the demands as they are and one scaled. The result lists the Lowest pressures and the Highest velocities, each with the Scaled value beside the Unscaled one, which is the value the map shows. Each list holds ten rows, and the box states how many links it does not show. The Demand scale is applied in addition to the demand multiplier of the open scenario, and it is never saved in the project.<\/p>"
                 },
                 "next_translated": {
                     "key": "lpn_guide_ds_scope_term",
@@ -869,9 +865,9 @@
                     "english": "The box"
                 },
                 "next_translated": {
-                    "key": "lpn_guide_ct_example_term",
-                    "value": "Приклад на Net1",
-                    "english": "Example on Net1"
+                    "key": "lpn_guide_ct_example_def",
+                    "value": "<p>Відкрийте приклад Net1 і виберіть Вода, Графіки, Ізолінії. Вузли забарвлено за тиском, а рядок під шкалою кольорів вказує 9 вузлів, 11 труб, охоплення в 2.5 раза більше за медіанну довжину труби поруч з ними та лінії через кожні 5 psi. Насос, з’єднання 9, не входить до 11 труб. Коли «Показати ізолінії» знято, вузли залишаються забарвленими за тиском.<\/p>",
+                    "english": "<p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.<\/p>"
                 }
             }
         },
@@ -981,9 +977,9 @@
                     "english": "Closed"
                 },
                 "next_translated": {
-                    "key": "lpn_result_head",
-                    "value": "Напір",
-                    "english": "Head"
+                    "key": "lpn_result_head_tip",
+                    "value": "Потенціальна енергія води в цьому вузлі, виражена як висота стовпа води. Це абсолютна висота, тоді як тиск — манометричне вимірювання.",
+                    "english": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement."
                 }
             }
         },
@@ -4229,27 +4225,6 @@
                     "value": "Вузли для масштабування",
                     "english": "Junctions to scale"
                 }
-            }
-        },
-        "lpn_ds_minpressure_tip": {
-            "reason": "english_changed",
-            "current_value": "Це те саме число, що й «Найнижчий допустимий тиск» в інших місцях вікна «Витрата на пожежогасіння: аналіз». Зміна тут змінює його й там.",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ds_minpressure",
-                    "value": "Найнижчий допустимий тиск",
-                    "english": "Lowest pressure allowed"
-                },
-                "next_translated": {
-                    "key": "lpn_ds_head_scale",
-                    "value": "Масштабувати споживання",
-                    "english": "Scale the demands"
-                }
-            },
-            "label": {
-                "key": "lpn_ds_minpressure",
-                "english": "Lowest pressure allowed",
-                "value": "Найнижчий допустимий тиск"
             }
         },
         "lpn_file_import_survey": {

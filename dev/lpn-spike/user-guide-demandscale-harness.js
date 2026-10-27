@@ -20,16 +20,16 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, finish 
 const NAME = 'user-guide-demandscale-harness';
 U.takeBrowserLock(NAME, 'EC_UGDS_LOCKED');
 
-const TERMS = ['lpn_guide_ds_run_term', 'lpn_guide_ds_find_term', 'lpn_guide_ds_scope_term', 'lpn_guide_ds_example_term'];
+const TERMS = ['lpn_ff_calculate', 'lpn_find_btn', 'lpn_guide_ds_scope_term', 'lpn_guide_scn_example_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
 	console.log('\n1. Every interface name the chapter quotes is the language file\'s');
 	checkQuotes({
 		lpn_guide_ds_run_def: ['lpn_ds_multiplier', 'lpn_ds_head_lowest', 'lpn_ds_head_velocity', 'lpn_ds_col_scaled', 'lpn_ds_col_unscaled'],
-		lpn_guide_ds_find_def: ['lpn_ds_minpressure', 'lpn_ff_minpressure'],
-		lpn_guide_ds_scope_def: ['lpn_ds_scope_selected'],
-		lpn_guide_ds_example_def: ['lpn_menu_project', 'lpn_analyze_menu', 'lpn_ds_multiplier', 'lpn_ds_run']
+		lpn_guide_ds_find_def: ['lpn_crit_minpressure', 'lpn_ff_minpressure'],
+		lpn_guide_ds_scope_def: ['lpn_ff_selected'],
+		lpn_guide_ds_example_def: ['lpn_menu_project', 'lpn_analyze_menu', 'lpn_ds_multiplier', 'lpn_ff_calculate']
 	});
 	ok('the example names the menu row without its ellipsis', plain(enString('lpn_guide_ds_example_def')).indexOf(enString('lpn_ds_menu').replace(/…$/, '')) >= 0);
 	await env.startServer();
@@ -68,7 +68,7 @@ async function main() {
 		ok('...the lowest pressure at 5.76 is 20.11 psi at N32, and at 5.77 it is 19.8 psi, as the chapter says', f.indexOf(enString('lpn_ds_lowest_at').replace('{m}', '5.76').replace('{pressure}', '20.11 psi').replace('{id}', 'N32')) >= 0 && f.indexOf(enString('lpn_ds_lowest_at').replace('{m}', '5.77').replace('{pressure}', '19.8 psi').replace('{id}', 'N32')) >= 0 && ['5.76', '20.11 psi', 'N32', '5.77', '19.8 psi'].every((w) => ex.indexOf(w) >= 0), f.slice(0, 300));
 		ok('...in 13 solves, at the time step 0:00', f.indexOf(enString('lpn_ff_cost').replace('{solves}', '13')) >= 0 && /Time step: 0:00/.test(f) && ex.indexOf('13 solves') >= 0 && ex.indexOf('0:00') >= 0);
 		await P.evaluate(() => { const i = document.querySelectorAll('#lpn_ds_controls input')[1]; i.value = '3'; i.dispatchEvent(new Event('change', { bubbles: true })); });
-		const r = await press(await T('lpn_ds_run'), 'At a demand scale of 3');
+		const r = await press(await T('lpn_ff_calculate'), 'At a demand scale of 3');
 		ok('Run at 3: every junction keeps 20 psi, in two solves', r.indexOf(enString('lpn_ds_scale_ok').replace('{m}', '3').replace('{pressure}', '20 psi')) >= 0 && r.indexOf(enString('lpn_ff_cost').replace('{solves}', '2')) >= 0, r.slice(0, 200));
 		const tabs = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_ds_box table')).map((t) => Array.from(t.querySelectorAll('tbody tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim()))));
 		const n32 = tabs[0].filter((x) => x[0] === 'N32')[0], l112 = tabs[1].filter((x) => x[0] === 'L112')[0];
@@ -87,8 +87,8 @@ async function main() {
 		await settle(900);
 		await a.menuClickSub(await T('lpn_analyze_menu'), await T('lpn_ds_menu'), 'project');
 		await settle(900);
-		await P.evaluate((t) => { const s = document.querySelector('#lpn_ds_controls select'); s.value = Array.from(s.options).filter((o) => o.textContent === t)[0].value; s.dispatchEvent(new Event('change', { bubbles: true })); }, enString('lpn_ds_scope_selected'));
-		const sRun = await press(await T('lpn_ds_run'), enString('lpn_ds_scaled_selected').split(':')[0]);
+		await P.evaluate((t) => { const s = document.querySelector('#lpn_ds_controls select'); s.value = Array.from(s.options).filter((o) => o.textContent === t)[0].value; s.dispatchEvent(new Event('change', { bubbles: true })); }, enString('lpn_ff_selected'));
+		const sRun = await press(await T('lpn_ff_calculate'), enString('lpn_ds_scaled_selected').split(':')[0]);
 		ok('Selected junctions scales and checks the one selected', sRun.indexOf(enString('lpn_ds_scaled_selected').replace('{n}', '1')) >= 0, sRun.slice(0, 200));
 		ok('no page errors (English)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.context.close().catch(() => {});

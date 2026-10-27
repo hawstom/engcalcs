@@ -43,6 +43,7 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const path = require('path');
 const fs = require('fs');
@@ -106,7 +107,8 @@ async function main() {
 	}
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const a = await Session.open(browser, 'A');
+		const a = await Session.open(browser, 'A', { serviceWorkers: 'block' });
+		await serveLatLonNet3(a.page);
 		const page = a.page;
 		const tiles = { osm: 0, satellite: 0 };
 		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => {

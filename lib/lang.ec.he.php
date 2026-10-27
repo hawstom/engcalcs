@@ -319,7 +319,6 @@ $ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי �
 $ec_lang['mhp_main_desc']='מחשבון הספק הידרו-כוח זעיר עם זרימה טבעית בנהר';
 $ec_lang['mhp_gross_head']='עומד ברוטו, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="קוטר צינור הלחץ (צינור אספקה)">קוטר צינור הלחץ, D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='אורך, L';
 $ec_lang['mhp_efficiency']='יעילות מתקן, η (0–1)';
 $ec_lang['mhp_vel_check']='בדיקת מהירות';
 $ec_lang['mhp_hl_check']='בדיקת אובדן לחץ';
@@ -474,13 +473,11 @@ $ec_lang['rc_SD_check']='בדיקת סטיית דרגות SD';
 $ec_lang['rc_sg_ok']   ='sg בטווח התקף';
 $ec_lang['rc_sg_ok_tip']='2.54–2.82 (Robinson)';
 $ec_lang['rc_sg_low']  ='sg מתחת לטווח Robinson';
-$ec_lang['rc_sg_low_tip']='טווח תקף: 2.54–2.82';
 $ec_lang['rc_sg_high'] ='sg מעל לטווח Robinson';
 $ec_lang['rc_sg_high_tip']='טווח תקף: 2.54–2.82';
 $ec_lang['rc_SD_ok']   ='SD בטווח התקף';
 $ec_lang['rc_SD_ok_tip']='1.15–1.47 (Robinson)';
 $ec_lang['rc_SD_low']  ='SD מתחת לטווח Robinson';
-$ec_lang['rc_SD_low_tip']='טווח תקף: 1.15–1.47';
 $ec_lang['rc_SD_high'] ='SD מעל לטווח Robinson';
 $ec_lang['rc_SD_high_tip']='טווח תקף: 1.15–1.47';
 $ec_lang['rc_layer']='עובי שכבת הסלע (2 × D<sub>50</sub>)';
@@ -589,7 +586,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='קווי צנרת';
-$ec_lang['bpn_id']='מזהה';
 $ec_lang['bpn_id_tip']='שם קו צנרת זה. קווים אחרים מתייחסים אליו בעמודת מזהה במעלה הזרם.';
 $ec_lang['bpn_upstream']='מזהה במעלה הזרם';
 // Edited by TGH 2026-09-07
@@ -1012,7 +1008,6 @@ $ec_lang['lpn_guide_find_results_term']='תוצאות, הבחירה וטבלאו
 $ec_lang['lpn_guide_find_results_def']='<p>הנכסים התואמים מפורטים מתחת לכפתור חפש. התנאים above ו-n highest מפרטים תחילה את הערך הגבוה ביותר, התנאים below ו-n lowest את הנמוך ביותר, ותנאים אחרים לפי הערך שנמצא ולאחר מכן לפי מזהה. שאילתה עם AND או OR מפרטת צמתים ולאחר מכן קישורים, כל אחד לפי מזהה. התאמה בודדת מוצגת במפה מיד. בחרו שורה כדי למרכז את המפה על אותו נכס. אם דבר אינו נבחר, הנכס נבחר גם הוא; אם משהו נבחר, הנכס מודגש והבחירה אינה משתנה. Shift+לחיצה או Ctrl+לחיצה על שורה מוסיפה אותה לבחירה או מסירה אותה. חיפוש אינו בוחר את כל ההתאמות מעצמו.</p><p>הכפתור סינון בטבלה הנוכחית מחיל את אותה שאילתה על החלונית טבלאות. כל טבלה שהשאילתה חלה עליה מציגה רק את השורות התואמות, עם השאילתה ומספר השורות מעליהן. כדי לבחור את כל ההתאמות במפה, בחרו את השורות האלה ובחרו בחירה במפה מתפריט הלחיצה הימנית. מסנן טבלה אינו נשמר עם הפרויקט ומסתיים בטעינה מחדש של העמוד. שורה שנערכה כך שאינה תואמת עוד נשארת בטבלה, עמומה ומסומנת בסימן אזהרה, עד שיילחץ שוב הכפתור סינון בטבלה הנוכחית.</p>';
 $ec_lang['lpn_guide_find_replace_term']='החלפה וביטול';
 $ec_lang['lpn_guide_find_replace_def']='<p>החלק שינוי מה שנמצא בתיבה כותב מאפיין אחד בכל נכס שהשאילתה מצאה. בחרו את המאפיין ברשימה מאפיין לשינוי, הזינו את הערך החדש בתיבה ערך חדש ביחידה המוצגת, ולחצו על הכפתור החלף. התיבה מציינת אז כמה נכסים ישתנו, ללא אלה שכבר יש להם את הערך החדש. לחצו על הכפתור שנה אותם כדי להחיל את השינוי, או על בטל. ביטול אחד מבטל את ההחלפה כולה.</p><p>דוגמה על Net1: <code>Pipe.Diameter below 10</code> מוצאת את צינורות 31, 122, 113 ו-121. בחרו קוטר, הזינו 10 ולחצו על החלף; התיבה מציגה "לשנות 4 נכסים?". לחצו על שנה אותם כדי להגדיר את כל ארבעת הצינורות ל-10 אינץ\'. ביטול אחד מחזיר אותם ל-6 ול-8 אינץ\'.</p><p>דוגמה על Net3: <code>Pipe.ID equal to \'247\'</code> מוצאת את צינור 247. בחרו סגור, בחרו שוב סגור ברשימה ערך חדש, ולחצו על החלף ולאחר מכן על שנה אותם, כדי לסגור את הצינור עבור דוגמת הקישוריות שלמעלה. ביטול פותח אותו שוב.</p><p>החלפה דורשת סוג נכס אחד, ולכן תחת הכול בחרו תחילה סוג נכס ברשימה מה לחפש. בתרחיש שאינו בסיס, החלפה נשמרת בתרחיש זה, כמו אותה עריכה במאפיינים. כשזמינים רומים מ-Mapbox, ניתן להחליף את הרום ב-DEM של Mapbox במקום בערך מוקלד.</p>';
-$ec_lang['lpn_guide_find_notes_term']='נקודות לתשומת לב';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>ערכים מושווים בדיוק מלא ומפורטים בארבע ספרות אחרי הנקודה העשרונית. התנאי שווה ל כמעט אינו תואם תוצאה מחושבת; השתמשו בגדול מ ובקטן מ.</li><li>לחץ, עומד, ספיקה, מהירות ושאר התוצאות הם של החישוב האחרון. כשההגדרה חשב מחדש אוטומטית מנוקה, הם מתארים את הרשת כפי שהייתה בחישוב האחרון.</li><li>גדול מ וקטן מ על טקסט משתמשים בסדר מילוני, כשמספרים בסדר מספרי: ב-Net1, <code>Junction.ID above \'20\'</code> מוצאת את צמתים 21, 22, 23, 31 ו-32.</li><li>תחת הכול מוצעים רק מזהה, תיאור, תגית וקישוריות. בחרו סוג נכס ברשימה מה לחפש כדי לראות את רשימת המאפיינים המלאה שלו.</li><li>לפריט טקסט אין מזהה. חפשו אותו לפי המילים שלו, כמו ב-<code>Text.Text contains \'pump\'</code>.</li><li>ארבעת תנאי הקישוריות לצומת הם אין קישורים בצומת, אין קישורים פתוחים בצומת, אין מסלול קישורים למקור ואין מסלול פתוח למקור. מקור הוא מאגר או מכל.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1038,7 +1033,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='מה מחזיקה הטבלה';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>תרחיש</td><td>שם התרחיש. התרחיש הפתוח מסומן (פתוח כעת).</td></tr><tr><td>מס׳ ערכים מותאמים</td><td>הערכים המותאמים של התרחיש עצמו, נספרים כמו ברשימת התרחישים. אפשרות חישוב כמו מכפיל הדרישה נספרת כאחת, וערך מותאם השווה לערך שעבר בירושה נספר.</td></tr><tr><td>מכפיל דרישה, משך ריצה כולל, צעד זמן הידראולי</td><td>הערכים שבהם התרחיש נפתר, שלו עצמו או של הפרויקט. תרחיש במצב עמיד מציג מקף בצעד הזמן.</td></tr><tr><td>הלחץ הנמוך ביותר</td><td>הלחץ הנמוך ביותר בצומת, עם המזהה שלו והשעה שבה הוא מתרחש. מאגרים ומכלים אינם נכללים כי לכל אחד עומד קבוע.</td></tr><tr><td>המהירות הגבוהה ביותר</td><td>המהירות הגבוהה ביותר בצינור או בשסתום, עם המזהה שלו והשעה שבה היא מתרחשת. משאבות אינן נכללות.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='תרחישים במצב עמיד ותרחישים לתקופה ממושכת';
 $ec_lang['lpn_guide_cmp_run_def']='<p>תרחיש עם משך ריצה כולל גדול מ-0 מורץ על פני כל התקופה דרך מנוע EPANET. הלחץ הנמוך ביותר והמהירות הגבוהה ביותר שלו הם הקיצונים על פני כל צעדי הזמן, כל אחד מוצג עם השעה שלו. תרחיש עם משך ריצה כולל 0 נפתר ברגע אחד. משך הריצה הכולל הוא אחת האפשרויות שתרחיש יכול להתאים, ולכן טבלה אחת יכולה להכיל את שני הסוגים.</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='נקודות לתשומת לב';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>תרחיש שאי אפשר לפתור מציג את הסיבה במקום שתי התוצאות שלו, למשל שלצומת אין נתיב למקור לאחר שצינור הפך ללא פעיל. שאר התרחישים עדיין נפתרים. תרחיש שלא התכנס מציג את התוצאות האחרונות שלו והודעה.</li><li>הבלוק שמעל הטבלה, זהה בכל התרחישים, מציין את שיטת החיכוך, היחידות, הדיוק ומספר הניסיונות המרבי. הגדרה ששונה בין תרחישים אינה נכללת בבלוק.</li><li>אין סף של עובר או נכשל. קראו את המספרים מול קריטריוני התכן של המערכת המודלת.</li><li>הדוגמה שברשומה מנהל התרחישים משווה שלושה תרחישים על Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
@@ -1053,9 +1047,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='בקרות וכללים בריצה';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>בקרה היא הצהרה אחת. כלל הוא כמה שורות שמתחילות ב-RULE. מילות המפתח מוקלדות באנגלית בכל שפה של העמוד, והמספרים ביחידות של הפרויקט. הוספת בקרה מתחילה מהצהרה הבנויה מהרשת, שאחר כך עורכים אותה להצהרה המיועדת.</p><p>בקרות וכללים משנים תוצאה רק בסימולציה לתקופה ממושכת, כלומר כשמשך הריצה הכולל גדול מ-0. פתרון במצב עמיד אינו משתנה באף אחד מהם. כללים מופעלים על ידי מנוע EPANET בלבד. שניהם נשמרים עם הפרויקט ונכתבים לקובץ EPANET.</p>';
 $ec_lang['lpn_guide_lib_import_term']='ייבוא ספריות מפרויקט אחר';
 $ec_lang['lpn_guide_lib_import_def']='<p>קובץ, ייבוא…, ייבוא ספריות… פותח קובץ פרויקט אחר ומעתיק ממנו ספריות שלמות לפרויקט הזה. פריט ששמו כבר בשימוש כאן מדולג ומפורט ברשימה, כך שדבר שכבר כאן אינו משתנה. מוצגת אזהרה כשהקובץ והפרויקט מציינים כמות ביחידות שונות, והפריטים מיובאים כפי שנכתבו. סוגי צינורות שמפנים לרשימת אביזרים שאין בפרויקט הזה מפורטים; ייבאו את ספריית האביזרים מאותו קובץ כדי לפתור אותם.</p>';
-$ec_lang['lpn_guide_lib_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_lib_example_def']='<p>פתחו את הדוגמה Net1 ובחרו מים, ספריות. תבניות מחזיקה את תבנית 1, Demand Pattern, עם 12 מכפילים במרווחים של 2:00, המכסים 24:00, מסומנת (ברירת מחדל). עקומות מחזיקה את עקומה 1, Pump Curve של משאבה 9, עקומת עומד משאבה עם נקודה אחת, 1500 gpm ב-250 ft. בקרות מחזיקה שתי הצהרות: הראשונה פותחת את קישור 9 כשצומת 2 יורד מתחת ל-110, והשנייה סוגרת אותו כשצומת 2 עולה מעל 140. כללים מחזיקה שני כללים הבודקים את שעון הזמן ואת מפלס מכל 2.</p><p>בחרו מים, חשב, ואחר כך מים, דוחות, שינויי מצב. משאבה L9 סגורה עכשיו ב-10:00, פתוחה עכשיו ב-15:00 וסגורה עכשיו ב-21:00, ומכל N2 מתרוקן עכשיו ב-22:00. בבקרות, שנו 140 ל-135 בבקרה השנייה ובחרו שוב מים, חשב. הסגירה האחרונה עוברת ל-20:00, ומכל N2 מתרוקן עכשיו ב-21:00.</p>';
-$ec_lang['lpn_guide_lib_notes_term']='נקודות לתשומת לב';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>תבנית חוזרת כל עוד הריצה נמשכת, ולכן אינה חייבת לכסות את כל הריצה.</li><li>בקובץ EPANET אין מקום לסוג צינור או לרשימת אביזרים. הקובץ נושא את המספרים שכל צינור קורא, והייצוא מציין אילו צינורות שוטחו.</li><li>המיקום והגודל של תיבת הספריות נשמרים בדפדפן הזה. הפריטים נשמרים עם הפרויקט.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1069,7 +1061,6 @@ $ec_lang['lpn_guide_prop_scn_term']='בתרחיש';
 $ec_lang['lpn_guide_prop_scn_def']='<p>בתרחיש שאינו הבסיס, עריכה של ערך שתרחישים יכולים להתאים נשמרת כערך מותאם של התרחיש הפתוח, והשורה מסומנת בצדה. הרשומה מנהל התרחישים מתארת את הסימנים ומפרטת מה זהה בכל תרחיש: המזהה, התיאור והתגית זהים. ללקוח אין ערכים לפי תרחיש. מעבר בין תרחישים משאיר את מאפיינים פתוח על אותו נכס, ומציג את הערכים של התרחיש שפתוח עכשיו.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='כמה נכסים נבחרו';
 $ec_lang['lpn_guide_prop_multi_def']='<p>הכותרת אומרת, למשל, 2 נבחרו. בתיבה יש קטע לכל סוג נכס בבחירה, עם שם הסוג ומספר הנכסים ממנו בכותרת, כמו צינורות (2), וכל קטע ניתן לכיווץ. קטע מפרט את המאפיינים שיש לטבלאות כעמודות ושאפשר להגדיר בכל נכס שבו. תוצאות וערכים שסוג צינור קובע אינם מפורטים. שורה מציגה את הערך שהנכסים חולקים, או משתנה היכן שהם שונים.</p><p>הקלדת ערך בשורה מגדירה אותו בכל נכס מאותו סוג בבחירה. שורה שלא נגעו בה לא כותבת דבר. הודעה מציינת את הספירה, כמו הוגדר קוטר (in) ב-2., וביטול אחד מבטל את השורה כולה. בתרחיש שאינו הבסיס הערכים נשמרים כערכים מותאמים.</p>';
-$ec_lang['lpn_guide_prop_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_prop_example_def']='<p>פתחו את הדוגמה Net1 ולחצו על צינור 10. מאפיינים מפרט את הקלטים שלו, מתיאור עד האם פעיל?, ואחר כך את התוצאות שלו בשעה המוצגת: ספיקה 1866.2 gpm, מהירות 2.4 ft/sec ואובדן עומד 19.12 ft H2O.</p><p>לחצו על צינור 113 ולחצו Shift על צינור 31. הכותרת אומרת 2 נבחרו, הקטע היחיד הוא צינורות (2), והקוטר מציג משתנה, כי צינור 31 הוא 6 אינץ׳ וצינור 113 הוא 8 אינץ׳. הזינו 10 בקוטר. ההודעה אומרת הוגדר קוטר (in) ב-2., שני הצינורות הם 10 אינץ׳, וביטול אחד מחזיר אותם ל-6 ול-8 אינץ׳.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
@@ -1101,7 +1092,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>האותיות אחרי Alt+Shift הן מק
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='ביטול וביצוע חוזר';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z מבטל את השינוי האחרון, ו-Ctrl+Y או Ctrl+Shift+Z מבצע אותו שוב. בתא של טבלאות, המקשים שייכים לפרויקט כל עוד התא רק נבחר, ולטקסט של התא משהחלה ההקלדה. העמוד שומר את 20 הצעדים האחרונים, בזיכרון בלבד, ומעבר בין פרויקטים מנקה אותם. צעד משחזר את התרחישים, את התרחיש הפתוח ואת היחידות יחד עם השרטוט.</p>';
-$ec_lang['lpn_guide_map_del_term']='מחיקה';
 $ec_lang['lpn_guide_map_del_def']='<p>Delete או Backspace מוחקים את הבחירה, חוץ מהקלדה בשדה, שבה המקש שייך לשדה. כשלא נבחר דבר, Delete אומר זאת, ו-Backspace אינו עושה דבר. ביטול אחד מבטל מחיקה של כמה נכסים. בתרחיש שאינו הבסיס, Delete אינו מסיר נכס שקיים בבסיס; הרשומה מנהל התרחישים מתארת מה הוא עושה.</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>Esc שסוגר תפריט, רשימה נפתחת או תיבה אינו עושה דבר אחר. התיבות מאפיינים, הגדרות וספריות נסגרות רק כשהמיקוד בתיבה והמצביע מעליה. כשאף אחת מאלה אינה פתוחה, Esc מחזיר את הכלי הפעיל לבחירה, ובמצב בחירה מנקה את הבחירה. צינור שנשרטט חלקית דורש Esc אחד כדי לנטוש אותו ושני כדי לחזור לבחירה. בשדה, Esc שייך לשדה.</p>';
@@ -1128,57 +1118,45 @@ $ec_lang['lpn_guide_ff_result_term']='קריאת התוצאות';
 $ec_lang['lpn_guide_ff_result_def']='<p>הסיכום סופר את הצמתים שעברו את כל הבדיקות, את הצמתים שנכשלו בספיקת כיבוי האש ואת הצמתים שהשפיעו על שאר המערכת. הטבלה מפרטת, לכל צומת שנבדק, את הלחץ הסטטי לפני שנמשכת ספיקת כיבוי אש, את הספיקה הנדרשת, את הלחץ בספיקה הנדרשת, את הספיקה הזמינה, את השארי המוחזק, את ההשפעה הגרועה ביותר ומגבלת התכן של בדיקת התכן, את מספר ההרצות, שהוא מספר הפתרונות של הרשת כולה, ואת אופני הכשל. תא ללא מספר מציג מקף, אף פעם לא אפס. צומת שלא ניתן היה לפתור מציג את הסיבה במקום מספרים. הטבלה מדפיסה לכל היותר 200 צמתים ומציינת כמה לא הודפסו.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='טבעות, עצירה וניתוח אחד בכל פעם';
 $ec_lang['lpn_guide_ff_marks_def']='<p>לאחר הרצה, העיגול של כל צומת שנבדק מוקף במפה לפי התוצאה שלו, וקווי המתאר נבדלים בדגם הקו ולא רק בצבע. בחרו הצמתים שנבחרו כדי לבדוק רק את הצמתים שנבחרו במפה; כל דבר אחר שנבחר נספר ואינו נבדק. עצירה מסיימת הרצה ושומרת את הצמתים שכבר הסתיימו. רק אחד מניתוח ספיקת כיבוי האש, ניתוח הקריטיות וקנה המידה לדרישות רץ בכל פעם.</p>';
-$ec_lang['lpn_guide_ff_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>פתחו את הדוגמה Net1, בחרו מים, ניתוח, ניתוח ספיקת כיבוי אש… ולחצו הרצה כשהתיבה כפי שנפתחה. צעד הזמן הוא 0:00, והריצה פותרת את הרשת כולה 135 פעמים. שמונה מתשעת הצמתים עוברים את כל הבדיקות. צומת N32 נכשל בספיקת כיבוי האש: הלחץ הסטטי שלו הוא 111 psi, נותרו רק 1.19 psi בספיקה הנדרשת של 1000 gpm, והספיקה הזמינה שלו היא 892 gpm. צומת N31 יכול לספק 1339 gpm, וצומת N12 יותר מ-10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='מה עושה כל מקרה';
 $ec_lang['lpn_guide_cr_case_def']='<p>לכל קישור בתחום, הקישור הופך ללא פעיל על עותק של הרשת, והעותק נפתר בצעד הזמן שעל המסך בתרחיש הפתוח. ריצה היא פתרון אחד לכל קישור ועוד אחד בלי שום דבר שבור. צומת שנשאר ללא נתיב פתוח למאגר או למכל מנותק: הוא מוסר לפני הפתרון, והדרישה שלו נספרת כדרישה שלא סופקה. מבין הצמתים שעדיין מחוברים, צמתים מתחת למזערי מפרט את אלה שהלחץ שלהם יורד מתחת ללחץ הנמוך ביותר המותר. צומת שכבר מתחת לו כשדבר אינו שבור אינו נספר נגד אף קישור, והסיכום מציין כמה כאלה יש. הלחץ הנמוך ביותר המותר הוא אותה הגדרה כמו התיבה הלחץ הנמוך ביותר המותר במקום אחר של "כיבוי אש: ניתוח ספיקה".</p>';
 $ec_lang['lpn_guide_cr_dead_term']='קצוות מתים, והרשימה';
 $ec_lang['lpn_guide_cr_dead_def']='<p>קישור קצה מת הוא קישור שהסרתו מנתקת צמתים שאפשר להגיע אליהם רק דרכו. כל מה שמעבר לו הוא ההפסד שלו, ולכן כשדילוג על קצוות מתים מסומן הקישור אינו נפתר, והסיכום מציין כמה דולגו. הרשימה מציגה לכל קישור את הדרישה שלא סופקה, את הצמתים שנותקו ואת הצמתים מתחת למזערי, כל אחד עם המספר וחמשת המזהים הראשונים, ולחיצה על מזהה מובילה אליו במפה. קישורים שעולים למערכת במשהו מפורטים ראשונים עד שלוחצים על כותרת עמודה כדי למיין, והסיכום סופר אותם מול מספר הקישורים שנבדקו. בחרו הקישורים הנבחרים כדי לשבור רק את הקישורים שנבחרו במפה.</p>';
-$ec_lang['lpn_guide_cr_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_cr_example_def']='<p>פתחו את הדוגמה Net1, בחרו מים, ניתוח, ניתוח קריטיות…, הזינו 116 בלחץ הנמוך ביותר המותר ולחצו הרצה. צעד הזמן הוא 0:00, והריצה פותרת את הרשת כולה 14 פעמים. ארבעה מתוך 13 הקישורים מורידים צומת מתחת ל-116 psi כשהם מחוץ לשירות: L9 (‏N10, N11 ו-N21), ‏L10 (‏N11 ו-N21), ‏L111 (‏N21 ו-N22) ו-L112 (‏N21 ו-N22). שני צמתים כבר מתחת ל-116 psi כשדבר אינו שבור ואינם נספרים. מכיוון ש-Net1 היא רשת סגורה, אובדן קישור אחד לעולם אינו משאיר צומת בלי אספקה.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='הרצה';
 $ec_lang['lpn_guide_ds_run_def']='<p>הרצה מכפילה את הדרישות בצמתים שנבחרו במקדם הדרישה, על עותק של הרשת בצעד הזמן שעל המסך ובתרחיש הפתוח. היא עושה שני פתרונות, אחד עם הדרישות כפי שהן ואחד מוכפל. התוצאה מפרטת את הלחצים הנמוכים ביותר ואת המהירויות הגבוהות ביותר, כל אחד עם הערך המוכפל לצד הערך הלא מוכפל, שהוא הערך שהמפה מציגה. כל רשימה מחזיקה עשר שורות, והתיבה מציינת כמה קישורים אינה מציגה. מקדם הדרישה מוחל בנוסף למכפיל הדרישה של התרחיש הפתוח, ואינו נשמר לעולם בפרויקט.</p>';
-$ec_lang['lpn_guide_ds_find_term']='חיפוש';
 $ec_lang['lpn_guide_ds_find_def']='<p>חפש בודק מקדמי דרישה מ-0 עד 20, בדיוק של 0.01, ומחפש את הגדול שבו כל צומת שנבחר שומר לפחות על הלחץ הנמוך ביותר המותר. הוא מדווח על המקדם ועל הלחץ הנמוך ביותר שם, וכך גם עבור הצעד הבא כלפי מעלה, שבו הלחץ יורד לראשונה מתחת לגבול. אם הדרישות כפי שהוזנו כבר משאירות צומת מתחת לגבול, התשובה מסומנת בסימן אזהרה. אם כל צומת שומר על הגבול ב-20, התשובה אומרת זאת. עצירה מסיימת חיפוש בלי תשובה. הלחץ הנמוך ביותר המותר הוא אותה הגדרה כמו התיבה הלחץ הנמוך ביותר המותר במקום אחר של "כיבוי אש: ניתוח ספיקה".</p>';
 $ec_lang['lpn_guide_ds_scope_term']='צמתים וצעד הזמן';
 $ec_lang['lpn_guide_ds_scope_def']='<p>עם הצמתים שנבחרו, רק הצמתים שנבחרו במפה מוכפלים ונבדקים. צמתים אחרים נשארים כפי שהם, ואלה שיורדים מתחת לגבול מפורטים בלי להגביל את התשובה. רק צעד הזמן שעל המסך מוכפל, ומפלסים ומצבים נלקחים ממנו. כדי לבדוק את השיא, הזיזו את השעון לדרישת השיא לפני ההרצה.</p>';
-$ec_lang['lpn_guide_ds_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_ds_example_def']='<p>פתחו את הדוגמה Net1 ובחרו מים, ניתוח, קנה מידה לדרישות…. בצעד הזמן 0:00, לחצו חפש כשהתיבה כפי שנפתחה. כל צומת שומר על 20 psi לפחות עד מקדם דרישה של 5.76, שבו הלחץ הנמוך ביותר הוא 20.11 psi בצומת N32. ב-5.77 הוא 19.8 psi, והחיפוש נמשך 13 פתרונות. הזינו 3 במקדם הדרישה ולחצו הרצה: צומת N32 יורד מ-111 psi, לא מוכפל, ל-85.99 psi, וקישור L112 עולה מ-0.535 ft/sec ל-3.13 ft/sec.</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='קריאת הדוח';
 $ec_lang['lpn_guide_en_read_def']='<p>בחרו מים, דוחות, אנרגיית משאבות. הדוח מבצע אינטגרציה של ההספק של כל משאבה בסימולציה האחרונה לתקופה ממושכת, ולכן הוא דורש משך ריצה כולל גדול מ-0 וחישוב. לכל משאבה הוא מפרט את % מההרצה, יעילות, קוט״ט ממ׳, קוט״ט שיא, קוט״ש ועלות. קוט״ט ממ׳ הוא הממוצע בזמן שהמשאבה פעלה, לא בתקופות סרק. מתחת לטבלה נמצאים האנרגיה שנוצלה, עלות האנרגיה, השימוש בהספק שיא, עלות שיא הביקוש והעלות הכוללת. לרשת בלי משאבות אין מה לדווח.</p>';
 $ec_lang['lpn_guide_en_set_term']='מה קובע את המספרים';
 $ec_lang['lpn_guide_en_set_def']='<p>הגדרות, אנרגיה מחזיקה את יעילות המשאבה (אחוזים), שמשמשת לכל משאבה שאין לה עקומת יעילות, את מחיר החשמל לקילוואט שעה, תבנית מחיר שמכפילה את המחיר בכל צעד תבנית, את היטל שיא ביקוש לכל קוט״ט וטקסט מטבע שמודפס ליד העלויות ואינו ממיר את העלויות. למשאבה יכולים להיות מחיר, תבנית מחיר ועקומת יעילות משלה במאפיינים. המחירים, התבנית, היטל שיא הביקוש, יעילות המשאבה (אחוזים) והערכים של משאבה עצמה נמצאים בקטגוריית עלות אנרגיה, ולכן תרחיש יכול להתאים אותם. כשלא צוין מחיר, או שהמחיר אפס, כל עלות היא אפס והדוח אומר זאת. היישום אינו מציע מחיר.</p>';
-$ec_lang['lpn_guide_en_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_en_example_def']='<p>פתחו את הדוגמה Net1, שמשך הריצה הכולל שלה הוא 24:00, וחשבו. בחרו מים, דוחות, אנרגיית משאבות. משאבה L9 פועלת 65.71% מהריצה ביעילות של 75%, וצורכת 96.22 קוט״ט בממוצע, 96.71 קוט״ט בשיא ו-1518 קוט״ש. לא צוין מחיר, ולכן העלות היא 0 והדוח אומר זאת. הזינו 0.12 במחיר החשמל בהגדרות, אנרגיה, וחשבו שוב: העלות של L9 היא 182, העלות הכוללת.</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='מהו התרשים';
 $ec_lang['lpn_guide_ct_what_def']='<p>בחרו מים, גרפים, קווי מתאר. השורה מפעילה את התרשים בתרחיש הפתוח, כמילוי חלק עם קווים מתויגים, תוך שימוש בלחץ אם הצמתים עדיין אינם צבועים, ופותחת את התיבה. התרשים פורס את צבעי הצמתים לאורך הצינורות ועד כפולה קבועה של אורך הצינור החציוני לצדם, ומתעמעם בחלק החיצוני. הוא אינו צובע מעבר למשאבות, לשסתומים או לקישורים סגורים. השורה שמתחת למקרא הצבעים מציינת כמה צמתים וצינורות התרשים משתמש בהם, את הטווח לצד הצינורות ואת המרווח בין הקווים. כשיש מעט מדי צמתים, היא אומרת זאת.</p>';
 $ec_lang['lpn_guide_ct_box_term']='התיבה';
 $ec_lang['lpn_guide_ct_box_def']='<p>הצגת קווי גובה, כשהיא מנוקה, מסתירה את המילוי ואת הקווים ושומרת על צבעי הצמתים. התיבה מחזיקה גם את צביעת צמתים לפי ואת ערכת צבעים, שהן אותן שתי הגדרות כמו בהגדרות, הדמיה, צבעי צמתים, את המילוי (ללא, חלק או פסים, שצובע כל מחלקה באופן אחיד), את אטימות המילוי, את קווי המתאר עם המרווח והתוויות שלהם, ואת החיץ בכפולות של אורך הצינור החציוני. בפרויקט שממוקם על כדור הארץ, התיבה יכולה גם לקחת את הקרקע שבין הצמתים מ-Mapbox DEM, לאחר שהמבקר מסכים לשלוח את מספרי האריחים של אזור הרשת. ההגדרות האלה נשמרות עם הפרויקט וניתנות להתאמה על ידי תרחיש. התרשים משנה את התצוגה בלבד, לא את הרשת.</p>';
-$ec_lang['lpn_guide_ct_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_ct_example_def']='<p>פתחו את הדוגמה Net1 ובחרו מים, גרפים, קווי מתאר. הצמתים צבועים לפי לחץ, והשורה שמתחת למקרא הצבעים מציינת 9 צמתים, 11 צינורות, טווח של פי 2.5 מאורך הצינור החציוני לצדם וקווים כל 5 psi. המשאבה, קישור 9, אינה אחד מ-11 הצינורות. כשהצגת קווי גובה מנוקה, הצמתים נשארים צבועים לפי לחץ.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='מה מחזיק הדוח';
 $ec_lang['lpn_guide_rr_what_def']='<p>בחרו מים, דוחות, הרצה. הדוח הוא הטקסט שמנוע EPANET כתב עבור הסימולציה האחרונה לתקופה ממושכת, בעמודים. הוא מתחיל בכותרת ובשם הרשת, אחר כך סופר את הצמתים, המאגרים, המכלים, הצינורות, המשאבות והשסתומים, אחר כך מציין את אפשרויות הניתוח, ואחר כך מפרט את המצב ההידראולי של הריצה עם האזהרות שלה. הכפתור העתק מעתיק את הטקסט.</p>';
-$ec_lang['lpn_guide_rr_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_rr_example_def']='<p>פתחו את הדוגמה Net1, שכבר חושבה, ובחרו מים, דוחות, הרצה. הסיכום סופר 9 צמתים, מאגר אחד, מכל אחד, 12 צינורות, משאבה אחת ו-0 שסתומים. נוסחת אובדן העומד היא Hazen-Williams, צעד הזמן ההידראולי הוא 1.00 שעות, והמשך הכולל הוא 24.00 שעות.</p>';
 $ec_lang['lpn_guide_st_what_term']='מה מפורט';
 $ec_lang['lpn_guide_st_what_def']='<p>בחרו מים, דוחות, שינויי מצב. כל שורה נותנת את השעה של שינוי ואת השינוי: משאבה, שסתום או צינור שנפתחו או נסגרו, או מכל שמתמלא, מתרוקן, מלא או ריק. צעד זמן שלא התכנס במלואו מפורט גם הוא. הרשימה לפי סדר הזמן ומחזיקה שינויים בלבד, לא כל צעד. היא נקראת מאותה ריצה לתקופה ממושכת כמו חלונית הטבלאות והדוח המלא.</p>';
-$ec_lang['lpn_guide_st_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_st_example_def']='<p>פתחו את הדוגמה Net1 ובחרו מים, דוחות, שינויי מצב. מכל N2 מתמלא ב-1:00, מתרוקן ב-11:00, מתמלא ב-16:00 ומתרוקן ב-22:00. משאבה L9 נסגרת ב-10:00, נפתחת ב-15:00 ונסגרת ב-21:00.</p>';
-$ec_lang['lpn_guide_fr_what_term']='מה מחזיקה הטבלה';
 $ec_lang['lpn_guide_fr_what_def']='<p>בחרו מים, דוחות, מלא. בטבלה שורה אחת לכל צומת וקישור בכל צעד זמן דיווח, ביחידות של חלונית הטבלאות. העמודות שלה הן סוג, מזהה, דרישה, עומד, לחץ, ריכוז כלור, ספיקה, מהירות, אובדן עומד, עומד המשאבה ומצב, ותא ריק היכן שלנכס אין כמות כזו. הרשימה צעד זמן בוחרת את הצעד המוצג, והורדת CSV והדפסת דוח כוללות כל צעד. בלי סימולציה לתקופה ממושכת, הטבלה מציגה את הפתרון הנוכחי ברגע אחד.</p>';
-$ec_lang['lpn_guide_fr_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_fr_example_def']='<p>פתחו את הדוגמה Net1 ובחרו מים, דוחות, מלא. 24 הנכסים מפורטים ב-25 צעדי דיווח, מ-0:00 עד 24:00, שהם 600 שורות. ב-0:00 לצומת 11 דרישה של 150 gpm, עומד של 985.23 ft H2O ולחץ של 119.26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='מה משווה הדוח';
 $ec_lang['lpn_guide_cal_what_def']='<p>בחרו מים, דוחות, כיול. הרשימה פרמטר בוחרת מה הקובץ מודד: דרישה, עומד, לחץ, ריכוז כלור, ספיקה או מהירות. נשמר קובץ אחד לכל פרמטר, והכפתור טעינת קובץ כיול… פותח בוחר קבצים. לדוח שלושה עמודים. סטטיסטיקה נותנת, לכל מיקום, את מספר התצפיות, הממוצע הנצפה, הממוצע המחושב, השגיאה הממוצעת ושגיאת ה-RMS, ואחר כך שורת רשת לכל המיקומים יחד ואת המתאם בין הממוצעים. תרשים מתאם מציב כל מדידה בערך הנצפה שלה לרוחב ובערך המחושב שלה כלפי מעלה, עם קו אלכסוני במקום שבו השניים מסכימים. השוואות ממוצעים מצייר את הממוצעים הנצפה והמחושב כזוג עמודות לכל מיקום.</p><p>הערך המחושב נקרא מהריצה לתקופה ממושכת, ומדידה שבין שני צעדי דיווח מושווית לערך שהושלם ביניהם באינטרפולציה. מדידה מחוץ לזמנים שהריצה דיווחה עליהם מדולגת ונספרת. בפתרון ברגע אחד, כל מדידה מושווית לתוצאה האחת, בלי קשר לשעה שהקובץ נותן. הדוח מתמלא לאחר שהרשת חושבה.</p>';
 $ec_lang['lpn_guide_cal_file_term']='קובץ הכיול';
 $ec_lang['lpn_guide_cal_file_def']='<p>קובץ טקסט עם מזהה מיקום, זמן וערך נמדד בכל שורה. הזמן נמדד מתחילת הסימולציה, בשעות עשרוניות או בשעות:דקות. נקודה-פסיק פותחת הערה. שורה עם זמן וערך בלבד שייכת למיקום שמעליה. הערכים נקראים ביחידות של הפרויקט, והדוח אומר איזו יחידה. מיקום שאינו ברשת מפורט והמדידות שלו נספרות כמדולגות, שורה שאי אפשר לקרוא מפורטת לפי מספר שורה, ושאר הקובץ בשימוש. קובץ נשמר בזיכרון עבור הפרויקט הפתוח וטעינת העמוד הזו בלבד. הוא אינו נשמר עם הפרויקט או במכשיר הזה. כשתרשים סדרת הזמן מציג את אותה כמות, הערכים הנמדדים מצוירים עליו כטבעות.</p>';
-$ec_lang['lpn_guide_cal_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_cal_example_def']='<p>פתחו את הדוגמה Net1, חשבו אותה ובחרו מים, דוחות, כיול. כשלחץ נבחר, טענו קובץ שנותן לצומת 11 את הערכים 118.5 psi ב-0:00 ו-121.0 psi ב-12:00, לצומת 31 את הערכים 110.2 psi ב-6:00 ו-108.7 psi ב-18:00, ולצומת 99 את הערך 50 psi ב-0:00, ואחריהם שורה שאינה נתונים. הדוח אומר שבקובץ 5 מדידות ב-3 מיקומים, מציין שצומת 99 אינו ברשת ושמדידה אחת דולגה, ומפרט את השורה שאי אפשר לקרוא. סטטיסטיקה מציגה את צומת 11 עם 2 תצפיות, ממוצע נצפה של 119.75 psi, ממוצע מחושב של 116.53 psi, שגיאה ממוצעת של 3.98 ושגיאת RMS של 5.12. לצומת 31: 109.45, 118.71, 9.26 ו-9.79. בשורת הרשת 4 תצפיות, שגיאה ממוצעת של 6.62 ושגיאת RMS של 7.81.</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='שימוש במדריך';
@@ -1223,7 +1201,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='משהו לא בסדר כאן?';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='הסתרת הודעה זו';
 $ec_lang['lpn_msglog_hidden']='מוסתר';
 $ec_lang['lpn_msglog_unhide']='הצגה';
 $ec_lang['lpn_status_hidden_tip']='הצגה מחדש של ההודעה המוסתרת על המפה.';
@@ -1358,7 +1335,6 @@ $ec_lang['lpn_result_reaction_rate']='קצב תגובה';
 $ec_lang['lpn_result_status']='מצב';
 $ec_lang['lpn_result_status_open']='פתוח';
 $ec_lang['lpn_result_status_closed']='סגור';
-$ec_lang['lpn_result_head']='עומד';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='האנרגיה הפוטנציאלית של המים בצומת זה, מבוטאת כגובה עמוד מים. זהו עומד מוחלט, בעוד שהלחץ הוא מדידת מד.';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1731,7 +1707,6 @@ $ec_lang['lpn_morph_ok']='שינוי';
 $ec_lang['lpn_morph_other_kind']='אפשר לשנות צומת רק לסוג אחר של צומת, וקישור רק לסוג אחר של קישור. לא שונו: {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='סוג';
 $ec_lang['lpn_field_type_tip']='הסוג של הנכס הזה בתרחיש הזה, כפי שנקבע בשינוי סוג. נקו את הערך המותאם כדי להשתמש בסוג של תרחיש האב.';
 $ec_lang['lpn_change_type_lost']='הערכים האלה יאבדו:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -2055,7 +2030,6 @@ $ec_lang['lpn_pgraph_none']='לנכס זה אין תוצאות בהרצה הנו
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='חלק המקור מ-{node}';
-$ec_lang['lpn_result_pump_head']='עומד';
 $ec_lang['lpn_result_pump_head_tip']='העומד שהמשאבה מוסיפה מהיניקה אל הסנקה, מוצג כמספר חיובי. הפותר וקובצי EPANET נושאים אותו כאובדן לחץ שלילי.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2145,7 +2119,6 @@ $ec_lang['lpn_file_new']='פרויקט חדש…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='פרויקט חדש';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2571,7 +2544,6 @@ $ec_lang['lpn_file_training_permission']='בפעם הראשונה שתשמרו, 
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='המשך';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='בחר את הקובץ שוב';
@@ -2683,7 +2655,6 @@ $ec_lang['lpn_notes_engine_def']='פותר EPANET בעמוד זה הוא OWA-EPA
 $ec_lang['lpn_guide_nt_example_term']='דוגמה על Net1: משאבה מעבר לעקומה שלה';
 $ec_lang['lpn_guide_nt_example_def']='פתחו את הדוגמה Net1 ובחרו מים, ספריות. לעקומה 1, Pump Curve של משאבה 9, נקודה אחת, 1500 gpm ב-250 ft. העומד בספיקה אפס הוא 333.3 ft והספיקה הגבוהה ביותר היא 3000 gpm. ב-3500 gpm, שהיא מעבר לסוף העקומה, העקומה נותנת עומד של −120.4 ft. פותר EPANET מדווח על אותו עומד, הפסד של 120.4 ft על פני המשאבה, ומזהיר שמשאבות אינן יכולות לספק ספיקה או עומד מספיקים.';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='דוגמה על Net1';
 $ec_lang['lpn_guide_own_example_def']='<p>פתחו את הדוגמה Net1, לחצו Ctrl+K והקלידו critical. תפריטים מציג את השורה ניתוח קריטיות… תחת מים, ניתוח. תיבות מציג את הרשומות שמזכירות אותה, ביניהן חיפוש והחלפה, "כיבוי אש: ניתוח ספיקה" ו"קריטיות: ניתוח", ואת הרשומה הזו. בחירה בשורה מראה היכן ניתוח קריטיות… נמצא בתפריט ניתוח, ואינה מפעילה אותו.</p>';
 $ec_lang['lpn_id_invalid']='הזינו מזהה ללא רווחים וללא מרכאות.';
 $ec_lang['lpn_id_taken']='מזהה זה כבר בשימוש.';
@@ -2756,8 +2727,6 @@ $ec_lang['lpn_link_end_same']='מ- ואל חייבים להיות צמתים ש�
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='לפצל את צינור {id} בצומת זה?';
-$ec_lang['lpn_split_yes']='כן';
-$ec_lang['lpn_split_no']='לא';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}, נקודת עיקול {n}';
@@ -3015,7 +2984,6 @@ $ec_lang['lpn_labels_col_decimals']='ספרות עשרוניות';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='הצגה';
 $ec_lang['lpn_labels_show_tip']='הסדר שבו ערכים מופיעים בתווית. הערך שמספרו 1 מופיע ראשון: בראש תווית מוערמת, ובתחילת תווית בשורה אחת.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3340,7 +3308,6 @@ $ec_lang['lpn_sm_make_current']='הפיכה לנוכחי';
 $ec_lang['lpn_sm_current_already']='התרחיש הזה כבר התרחיש הנוכחי.';
 $ec_lang['lpn_sm_none_selected']='בחרו קודם פריט בעץ.';
 $ec_lang['lpn_sm_base_named']='אי אפשר לשנות את שם הבסיס של עץ.';
-$ec_lang['lpn_sm_copy']='העתקה';
 $ec_lang['lpn_sm_merge_up']='מיזוג כלפי מעלה';
 $ec_lang['lpn_sm_merge_up_tip']='מעביר את הערכים המותאמים של החלופה שנבחרה אל חלופה שמעליה בעץ. החלופה שנבחרה מקבלת אז את הערכים האלה בירושה.';
 $ec_lang['lpn_sm_merge_up_root']='אין מעל חלופת בסיס דבר שאפשר למזג אליו.';
@@ -3465,10 +3432,8 @@ $ec_lang['lpn_alt_cat_initial']='הגדרות התחלתיות';
 $ec_lang['lpn_alt_cat_constituent']='מרכיב';
 $ec_lang['lpn_alt_cat_fireflow']='ספיקת כיבוי אש';
 $ec_lang['lpn_alt_cat_energy']='עלות אנרגיה';
-$ec_lang['lpn_alt_cat_userdata']='מאפיינים מותאמים אישית';
 $ec_lang['lpn_alt_cat_text']='טקסט';
 $ec_lang['lpn_alt_cat_presentation']='הצגה';
-$ec_lang['lpn_alt_cat_calculation']='חישוב';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3562,7 +3527,7 @@ $ec_lang['lpn_settings_flow_change']='מגבלת שינוי ספיקה';
 $ec_lang['lpn_settings_flow_change_tip']='בדיקה נוספת שהפותר חייב לעבור לפני שהוא עוצר: השינוי המרבי בספיקה של כל צינור בודד מאיטרציה אחת לבאה אחריה. אפס פירושו לא להחיל בדיקה זו. רק פותר EPANET קורא תיבה זו.';
 $ec_lang['lpn_settings_damp_limit']='ריסון מתחיל ב';
 $ec_lang['lpn_settings_damp_limit_tip']='הדיוק שבו הפותר מתחיל לנקוט צעדים קטנים יותר, מה שיכול לעזור לרשת מתנדנדת להתכנס. אפס פירושו שהפותר לעולם אינו מרסן. רק פותר EPANET קורא תיבה זו.';
-$ec_lang['lpn_settings_option_unset']='לא נקבע';
+$ec_lang['lpn_settings_option_unset']='לא צוין';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='מקדם יחיד המוחל בבת אחת על כל הדרישות ברשת. לכל תרחיש יכול להיות ערך נפרד, ולכן אפשר ליצור יום ממוצע, יום מרבי או שעת שיא בשינוי הגדרה זו בלבד.';
 $ec_lang['lpn_settings_engine_native']='השתמש בפותר המובנה במידת האפשר';
@@ -3815,7 +3780,6 @@ $ec_lang['lpn_settings_runbox']='הצג את תיבת התקדמות ההרצה'
 $ec_lang['lpn_settings_runbox_tip']='תיבה המדווחת על ההתקדמות ועל תוצאת הרצה. כשהיא כבויה, הרצה שהסתיימה מציגה את אותו דבר בשורת המצב למשך מספר שניות. זו הגדרה של דפדפן זה, לא של הפרויקט.';
 $ec_lang['lpn_time_run_failed']='ההרצה לא הסתיימה, ולכן אין תוצאות לזמנים המאוחרים יותר.';
 $ec_lang['lpn_time_run_report']='הרצה: דוח';
-$ec_lang['lpn_time_run_report_copy']='העתק';
 $ec_lang['lpn_time_run_report_copied']='הועתק';
 $ec_lang['lpn_time_run_report_tip']='הדוח ש-EPANET כתב עבור ההרצה האחרונה, מילה במילה: האם התכנסה, וכל אזהרה. הטקסט נוצר על ידי פותר EPANET ולא על ידי עמוד זה.';
 
@@ -3995,7 +3959,6 @@ $ec_lang['lpn_reaction_order_wall']='סדר תגובת הדופן';
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='1 פירושו שתגובת הדופן מתרחשת בהתאם למקדם(ים) שניתנו. 0 פירושו שהיא אינה מתרחשת. זהו מתג הפעלה וכיבוי. ערך ברירת המחדל הוא 1.';
-$ec_lang['lpn_reaction_order_unstated']='לא צוין';
 $ec_lang['lpn_reaction_order_zero']='0, סדר אפס';
 $ec_lang['lpn_reaction_order_first']='1, סדר ראשון';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4071,7 +4034,6 @@ $ec_lang['lpn_energy_col_avg_kw']='קוט״ט ממ׳';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='ההספק הממוצע שנעשה בו שימוש כשמשאבה זו פעלה. הוא אינו ממוצע על פני תקופות חוסר פעילות, כך שמשאבה שהייתה כבויה לרוב סימולציית תקופת הזמן עדיין מדווחת על ההספק שהשתמשה בו בזמן שפעלה.';
 $ec_lang['lpn_energy_col_peak_kw']='קוט״ט שיא';
-$ec_lang['lpn_energy_col_kwh']='קוט״ש';
 $ec_lang['lpn_energy_col_cost']='עלות';
 $ec_lang['lpn_energy_total_kwh']='אנרגיה שנוצלה';
 $ec_lang['lpn_energy_total_energy_cost']='עלות האנרגיה';
@@ -4110,7 +4072,6 @@ $ec_lang['lpn_full_download_csv']='הורדת CSV';
 $ec_lang['lpn_full_print']='הדפסת דוח';
 $ec_lang['lpn_full_col_time']='זמן';
 $ec_lang['lpn_full_col_type']='סוג';
-$ec_lang['lpn_full_col_id']='מזהה';
 $ec_lang['lpn_heading_unit']='{label} ({unit})';
 $ec_lang['lpn_result_concentration_short']='ריכוז';
 $ec_lang['lpn_quality_named_concentration_short']='ריכוז {chemical}';
@@ -4247,7 +4208,6 @@ $ec_lang['lpn_library_curve_equation_tip']='העקומה המותאמת דרך �
 $ec_lang['lpn_library_curve_values_tip']='בחרו עמודה אחת או שתיים בגיליון אלקטרוני, העתיקו אותן, והדביקו בתא הראשון שבו תרצו שיונחו. השורות מתווספות לפי הצורך. תוכלו גם להדביק שורות שהועתקו ישירות מקובץ EPANET, כולל שם העקומה.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='תיאור';
 $ec_lang['lpn_library_curve_remove_point']='הסירו נקודה זו';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4448,7 +4408,6 @@ $ec_lang['lpn_field_demand_pattern']='תבנית דרישה';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='תיאור';
 $ec_lang['lpn_demand_add']='הוספת קטגוריית דרישה';
 $ec_lang['lpn_demand_remove']='הסרת דרישה זו';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
@@ -4560,8 +4519,8 @@ $ec_lang['lpn_ff_menu_tip']='בדיקת ספיקת כיבוי אש בכל צומ
 $ec_lang['lpn_ff_title']='כיבוי אש: ניתוח ספיקה';
 $ec_lang['lpn_ff_intro']='כל צומת בתורו שואב ספיקת כיבוי אש בנוסף לדרישה הקיימת שלו. ההרצה משתמשת בעותק של הרשת בצעד הזמן המוצג על המסך, ולכן דבר בפרויקט אינו משתנה.\n\nספיקת כיבוי אש נבדקת בדרך כלל בדרישת יום מרבי, ולכן הגדירו תחילה את הרשת לתנאי זה.\n\nכל צומת שנבדק דורש כ-16 פתרונות של הרשת כולה, ולכן מערכת גדולה נמשכת דקות: בחרו את הצמתים לפני ההרצה, ועצרו בכל עת כדי לשמור את התוצאות החלקיות.';
 $ec_lang['lpn_ff_scope']='צמתים לבדיקה';
-$ec_lang['lpn_ff_all']='כל הצמתים';
-$ec_lang['lpn_ff_selected']='הצמתים שנבחרו';
+$ec_lang['lpn_ff_all']='כל צמתי החיבור';
+$ec_lang['lpn_ff_selected']='צמתי החיבור שנבחרו';
 $ec_lang['lpn_ff_no_junctions']='לפרויקט זה אין עדיין צמתים, כך שאין מה לבדוק.';
 $ec_lang['lpn_ff_no_selection']='אין צמתים נבחרים. בחרו צמתים או בחרו באפשרות כל הצמתים.';
 $ec_lang['lpn_ff_skipped']='{n} האלמנטים הנבחרים אינם צמתים, כך שהם לא נבדקו.';
@@ -4748,14 +4707,9 @@ $ec_lang['lpn_ds_menu_tip']='הכפלת הדרישות בעותק של הרשת 
 $ec_lang['lpn_ds_title']='קנה מידה לדרישות';
 $ec_lang['lpn_ds_intro']='לחצו על הכפתור הרצה כדי להכפיל את הדרישות בצמתי החיבור שנבחרו במקדם הדרישה ולראות את הלחצים והמהירויות.\n\nלחצו על הכפתור חפש כדי למצוא את מקדם הדרישה הגדול ביותר, בקירוב של {step}, שבו כל הצמתים האלה שומרים לפחות על הלחץ הנמוך ביותר המותר; החיפוש נערך מ-0 עד {max}.\n\nשניהם פועלים על עותק של הרשת, הנפתר בצעד הזמן המוצג על המסך בתרחיש הפעיל, כך שדבר בפרויקט אינו משתנה. רק צעד זמן זה מוכפל, ומפלסים ומצבים נלקחים ממנו; כדי לבדוק את השיא, העבירו את השעון לדרישת השיא לפני ההרצה.';
 $ec_lang['lpn_ds_scope']='צמתים לקנה מידה';
-$ec_lang['lpn_ds_scope_all']='כל צמתי החיבור';
-$ec_lang['lpn_ds_scope_selected']='צמתי החיבור שנבחרו';
-$ec_lang['lpn_ds_minpressure']='הלחץ הנמוך ביותר המותר';
-$ec_lang['lpn_ds_minpressure_tip']='זהו אותו מספר כמו הלחץ הנמוך ביותר המותר במקומות אחרים ב"כיבוי אש: ניתוח ספיקה". שינויו כאן משנה אותו גם שם.';
 $ec_lang['lpn_ds_head_scale']='קנה מידה לדרישות';
 $ec_lang['lpn_ds_multiplier']='מקדם דרישה';
 $ec_lang['lpn_ds_multiplier_tip']='הגורם שבו כל דרישה מוכפלת; 1.5 הוא תוספת של 50%. הוא חל בנוסף למכפיל הדרישה של התרחיש הפעיל, שכבר כלול בדרישות, והוא אינו נשמר לעולם בפרויקט.';
-$ec_lang['lpn_ds_run']='הרצה';
 $ec_lang['lpn_ds_head_search']='איזה מקדם דרישה המערכת יכולה לשאת?';
 $ec_lang['lpn_ds_head_search_selected']='איזה מקדם דרישה הצמתים האלה יכולים לשאת?';
 $ec_lang['lpn_ds_outside_below']='במקדם דרישה {m}, צמתים שלא נבחרו שלחצם נמוך מ-{pressure}: {n} ({ids}). הם אינם מגבילים תשובה זו.';
@@ -4777,7 +4731,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='כשהדרישות מוכפלות במקדם 
 $ec_lang['lpn_ds_col_unscaled']='לא מוכפל';
 $ec_lang['lpn_ds_col_unscaled_tip']='כשהדרישות הן כפי שהן בתרחיש הפעיל בצעד זמן זה, אותו ערך שהמפה מציגה.';
 $ec_lang['lpn_ds_no_junctions']='בפרויקט זה עדיין אין צמתים, ולכן אין דרישות להכפיל.';
-$ec_lang['lpn_ds_no_selection']='לא נבחרו צמתים. בחרו צמתים או בחרו כל צמתי החיבור.';
 $ec_lang['lpn_ds_skipped']='אלמנטים שנבחרו ואינם צמתים, ונשארו כפי שהם: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='הזינו מקדם דרישה של אפס או יותר, כגון 1.5.';
 $ec_lang['lpn_ds_stale']='השרטוט השתנה, ולכן תוצאות קנה המידה לדרישות נמחקו. הריצו שוב.';
@@ -4936,8 +4889,6 @@ $ec_lang['lpn_survey_cancelled']='שום דבר לא נוצר ושום דבר ל
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='צפונה';
-$ec_lang['lpn_survey_axis_east']='מזרחה';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='קובץ זה ריק.';
 $ec_lang['lpn_survey_err_unreadable']='לא ניתן היה לקרוא קובץ זה כרשימת נקודות סקר.';

@@ -12,7 +12,7 @@ echoCalculatorForm(
 		Array('name' => 'q',      'type' => 'number', 'default' => Array('us' => '500', 'si' => '30'),   'units' => 'flow_turbine', 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'hgross', 'type' => 'number', 'default' => Array('us' => '160', 'si' => '50'),   'units' => 'distance_site',                  'label' => $ec_lang['mhp_gross_head']),
 		Array('name' => 'd',      'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'),  'units' => 'distance_small',         'label' => $ec_lang['mhp_diameter']),
-		Array('name' => 'l',      'type' => 'number', 'default' => Array('us' => '600', 'si' => '200'),  'units' => 'distance_site',                  'label' => $ec_lang['mhp_length']),
+		Array('name' => 'l',      'type' => 'number', 'default' => Array('us' => '600', 'si' => '200'),  'units' => 'distance_site',                  'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'e',      'type' => 'number', 'default' => Array('us' => '0.00015', 'si' => '0.05'), 'units' => 'roughness',         'label' => ecLinkTipLabel(ecRefUrl('darcy_weisbach_e'), $ec_lang['dw_roughness'], $ec_lang['dw_roughness_tip'])),
 		Array('name' => 'km',     'type' => 'number', 'default' => '2.0',  'units' => NULL,                             'label' => ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		Array('name' => 'nu',     'type' => 'number', 'default' => '1e-6', 'units' => NULL,                             'label' => $ec_lang['dw_kinematic_viscosity']),

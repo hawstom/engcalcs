@@ -121,7 +121,7 @@ async function main() {
 		await openTanks(a);
 		const depthName = await a.lang('lpn_result_depth');
 		const volName = await a.lang('lpn_result_tank_volume');
-		const headName = await a.lang('lpn_result_head');
+		const headName = await a.lang('lpn_field_head');
 		let depthAt = {};
 		for (const t of [0, 3 * 3600, 9 * 3600, 17 * 3600, 24 * 3600]) {
 			await goTo(a, t);
@@ -278,7 +278,7 @@ async function main() {
 		await runDone(c);
 		await openTanks(c);
 		const esDepth = await c.lang('lpn_result_depth'), esVol = await c.lang('lpn_result_tank_volume');
-		const esHead = await c.lang('lpn_result_head');
+		const esHead = await c.lang('lpn_field_head');
 		ok('the page really is Spanish (Head is not the English word)', esHead !== headName, esHead);
 		const esRows = await table(c);
 		const esHeads = Object.keys(esRows[0]);

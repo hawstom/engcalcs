@@ -21,13 +21,13 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, dialogP
 const NAME = 'user-guide-energy-harness';
 U.takeBrowserLock(NAME, 'EC_UGEN_LOCKED');
 
-const TERMS = ['lpn_guide_en_read_term', 'lpn_guide_en_set_term', 'lpn_guide_en_example_term'];
+const TERMS = ['lpn_guide_en_read_term', 'lpn_guide_en_set_term', 'lpn_guide_scn_example_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
 	console.log('\n1. Every interface name the chapter quotes is the language file\'s');
 	checkQuotes({
-		lpn_guide_en_read_def: ['lpn_menu_project', 'lpn_reports_menu', 'lpn_energy_menu', 'lpn_time_duration', 'lpn_energy_col_running', 'lpn_energy_col_effic', 'lpn_energy_col_avg_kw', 'lpn_energy_col_peak_kw', 'lpn_energy_col_kwh', 'lpn_energy_col_cost',
+		lpn_guide_en_read_def: ['lpn_menu_project', 'lpn_reports_menu', 'lpn_energy_menu', 'lpn_time_duration', 'lpn_energy_col_running', 'lpn_energy_col_effic', 'lpn_energy_col_avg_kw', 'lpn_energy_col_peak_kw', 'lpn_energy_kwh', 'lpn_energy_col_cost',
 			'lpn_energy_total_kwh', 'lpn_energy_total_energy_cost', 'lpn_energy_peak_kw', 'lpn_energy_total_demand_charge', 'lpn_energy_total_cost'],
 		lpn_guide_en_set_def: ['lpn_energy_efficiency', 'lpn_energy_price', 'lpn_energy_price_pattern', 'lpn_energy_demand_charge', 'lpn_energy_currency', 'lpn_alt_cat_energy'],
 		lpn_guide_en_example_def: ['lpn_energy_menu', 'lpn_energy_price']
@@ -61,7 +61,7 @@ async function main() {
 		await calc();
 		const r1 = await report();
 		const ex = plain(enString('lpn_guide_en_example_def'));
-		const cols = ['lpn_energy_col_pump', 'lpn_energy_col_running', 'lpn_energy_col_effic', 'lpn_energy_col_avg_kw', 'lpn_energy_col_peak_kw', 'lpn_energy_col_kwh', 'lpn_energy_col_cost'];
+		const cols = ['lpn_energy_col_pump', 'lpn_energy_col_running', 'lpn_energy_col_effic', 'lpn_energy_col_avg_kw', 'lpn_energy_col_peak_kw', 'lpn_energy_kwh', 'lpn_energy_col_cost'];
 		const want = [];
 		for (const k of cols) { want.push(await T(k)); }
 		ok('the columns are Pump and the six the chapter lists, in its order', JSON.stringify(r1.head) === JSON.stringify(want), JSON.stringify(r1.head));

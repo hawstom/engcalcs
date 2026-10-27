@@ -21,7 +21,7 @@ const { U, ok, enString, plain, checkQuotes, openGuide, entry, esEntryCheck, fin
 const NAME = 'user-guide-calibration-harness';
 U.takeBrowserLock(NAME, 'EC_UGCA_LOCKED');
 
-const TERMS = ['lpn_guide_cal_what_term', 'lpn_guide_cal_file_term', 'lpn_guide_cal_example_term'];
+const TERMS = ['lpn_guide_cal_what_term', 'lpn_guide_cal_file_term', 'lpn_guide_scn_example_term'];
 const FILE = ['; Field pressures, psi', '11  0:00   118.5', '    12:00  121.0', '31  6:00   110.2', '    18     108.7', '99  0      50', 'bad line here', ''].join('\n');
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));

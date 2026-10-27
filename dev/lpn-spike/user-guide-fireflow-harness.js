@@ -21,7 +21,7 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, finish 
 const NAME = 'user-guide-fireflow-harness';
 U.takeBrowserLock(NAME, 'EC_UGFF_LOCKED');
 
-const TERMS = ['lpn_guide_ff_asks_term', 'lpn_guide_ff_result_term', 'lpn_guide_ff_marks_term', 'lpn_dur_option', 'lpn_guide_ff_example_term'];
+const TERMS = ['lpn_guide_ff_asks_term', 'lpn_guide_ff_result_term', 'lpn_guide_ff_marks_term', 'lpn_dur_option', 'lpn_guide_scn_example_term'];
 const COLS = ['lpn_ff_col_junction', 'lpn_ff_col_static', 'lpn_ff_col_required', 'lpn_ff_col_atrequired', 'lpn_ff_col_available', 'lpn_ff_col_residual', 'lpn_ff_col_affected', 'lpn_ff_col_limit', 'lpn_ff_col_solves', 'lpn_ff_col_modes'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
