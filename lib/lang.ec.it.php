@@ -319,7 +319,6 @@ $ec_lang['mhp_main_title']='Calcolatore Gratuito di Potenza Micro-Idroelettrica'
 $ec_lang['mhp_main_desc']='Calcolatore di Potenza Micro-Idroelettrica ad Acqua Fluente';
 $ec_lang['mhp_gross_head']='Altezza lorda, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="Diametro della condotta forzata (tubo di alimentazione)">Diametro della condotta forzata, D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='Lunghezza, L';
 $ec_lang['mhp_efficiency']='Rendimento dell\'impianto, η (0–1)';
 $ec_lang['mhp_vel_check']='Verifica della velocità';
 $ec_lang['mhp_hl_check']='Verifica della perdita di carico';
@@ -474,13 +473,11 @@ $ec_lang['rc_SD_check']='Verifica della gradazione SD';
 $ec_lang['rc_sg_ok']   ='sg nell\'intervallo valido';
 $ec_lang['rc_sg_ok_tip']='2,54–2,82 (Robinson)';
 $ec_lang['rc_sg_low']  ='sg al di sotto dell\'intervallo Robinson';
-$ec_lang['rc_sg_low_tip']='Intervallo valido: 2,54–2,82';
 $ec_lang['rc_sg_high'] ='sg al di sopra dell\'intervallo Robinson';
 $ec_lang['rc_sg_high_tip']='Intervallo valido: 2,54–2,82';
 $ec_lang['rc_SD_ok']   ='SD nell\'intervallo valido';
 $ec_lang['rc_SD_ok_tip']='1,15–1,47 (Robinson)';
 $ec_lang['rc_SD_low']  ='SD al di sotto dell\'intervallo Robinson';
-$ec_lang['rc_SD_low_tip']='Intervallo valido: 1,15–1,47';
 $ec_lang['rc_SD_high'] ='SD al di sopra dell\'intervallo Robinson';
 $ec_lang['rc_SD_high_tip']='Intervallo valido: 1,15–1,47';
 $ec_lang['rc_layer']='Spessore dello strato di pietrame (2 × D<sub>50</sub>)';
@@ -589,7 +586,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='Tratti di tubazione';
-$ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Nome di questo tratto di tubazione. Altri tratti lo richiamano nella colonna Monte.';
 $ec_lang['bpn_upstream']='ID a monte';
 // Edited by TGH 2026-09-07
@@ -1012,7 +1008,6 @@ $ec_lang['lpn_guide_find_results_term']='Risultati, selezione e Tabelle';
 $ec_lang['lpn_guide_find_results_def']='<p>Gli elementi corrispondenti sono elencati sotto il pulsante Trova. Maggiore di e n più alti elencano per primo il valore più alto, minore di e n più bassi per primo il valore più basso, e le altre condizioni elencano per valore trovato, poi per ID. Una ricerca con AND (E) o OR (O) elenca prima i nodi, poi i collegamenti, ciascuno per ID. Una singola corrispondenza viene mostrata subito sulla mappa. Seleziona una riga per centrare la mappa su quell\'elemento. Se non è selezionato nulla, l\'elemento viene anche selezionato; se qualcosa è selezionato, l\'elemento viene evidenziato e la selezione non cambia. Maiusc+clic o Ctrl+clic su una riga per aggiungerla alla selezione o rimuoverla. Trova non seleziona da solo tutte le corrispondenze.</p><p>Il pulsante Filtra nella tabella attuale applica la stessa ricerca al pannello Tabelle. Ogni tabella a cui la ricerca si applica mostra solo le righe corrispondenti, con la ricerca e il conteggio delle righe sopra di esse. Per selezionare sulla mappa tutte le corrispondenze, seleziona quelle righe e scegli Seleziona sulla mappa dal menu del tasto destro. Un filtro di tabella non è salvato con il progetto e termina quando la pagina viene ricaricata. Una riga modificata in modo da non corrispondere più resta nella tabella, attenuata e contrassegnata da un segnale di avvertimento, finché non si preme di nuovo il pulsante Filtra nella tabella attuale.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Sostituisci e Annulla';
 $ec_lang['lpn_guide_find_replace_def']='<p>La parte Modifica ciò che è stato trovato del riquadro scrive una proprietà su ogni elemento trovato dalla ricerca. Scegli la proprietà nell\'elenco Proprietà da modificare, inserisci il nuovo valore nel campo Nuovo valore nell\'unità visualizzata e premi il pulsante Sostituisci. Il riquadro indica poi quanti elementi cambierebbero, esclusi quelli che hanno già il nuovo valore. Premi il pulsante Modificali per applicare la modifica, oppure Annulla. Un solo Annulla ripristina l\'intera sostituzione.</p><p>Esempio su Net1: <code>Pipe.Diameter below 10</code> trova le tubazioni 31, 122, 113 e 121. Scegli Diametro, inserisci 10 e premi Sostituisci; il riquadro mostra "Modificare 4 elementi?". Premi Modificali per portare tutte e quattro le tubazioni a 10 in. Un solo Annulla le riporta a 6 e 8 in.</p><p>Esempio su Net3: <code>Pipe.ID equal to \'247\'</code> trova la tubazione 247. Scegli Chiusa, scegli di nuovo Chiusa nell\'elenco Nuovo valore, e premi Sostituisci, poi Modificali, per chiudere la tubazione per l\'esempio di connettività qui sopra. Annulla la riapre.</p><p>Sostituisci richiede un solo tipo di elemento, quindi sotto Tutto scegli prima un tipo di elemento nell\'elenco Cosa cercare. In uno scenario diverso da Base, una sostituzione è memorizzata in quello scenario, come lo sarebbe la stessa modifica in Proprietà. Dove sono disponibili le quote Mapbox, la Quota può essere sostituita dal DEM Mapbox invece che da un valore digitato.</p>';
-$ec_lang['lpn_guide_find_notes_term']='Punti da tenere presenti';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>I valori sono confrontati a piena precisione ed elencati con quattro cifre decimali. Uguale a raramente corrisponde a un risultato calcolato; usa maggiore di e minore di.</li><li>Pressione, carico, portata, velocità e gli altri risultati sono quelli dell\'ultimo calcolo. Con l\'impostazione Ricalcola automaticamente deselezionata, descrivono la rete com\'era all\'ultimo Calcola.</li><li>Maggiore di e minore di sul testo usano l\'ordine alfabetico, con i numeri in ordine numerico: su Net1, <code>Junction.ID above \'20\'</code> trova i nodi 21, 22, 23, 31 e 32.</li><li>Sotto Tutto sono offerti solo ID, Descrizione, Etichetta e Connettività. Scegli un tipo di elemento nell\'elenco Cosa cercare per vedere l\'elenco completo delle sue proprietà.</li><li>Un elemento Testo non ha un ID. Cercalo per le sue parole, come in <code>Text.Text contains \'pump\'</code>.</li><li>Le quattro condizioni di connettività per un nodo sono nessuna tubazione al nodo, nessuna tubazione aperta al nodo, nessun percorso verso una sorgente e nessun percorso aperto verso una sorgente. Una fonte è un serbatoio o una vasca.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1038,7 +1033,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='Cosa contiene la tabella';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>Il nome dello scenario. Lo scenario aperto è contrassegnato (attualmente aperto).</td></tr><tr><td>N. di valori personalizzati</td><td>I valori personalizzati dello scenario stesso, contati come nell\'elenco Scenari. Un\'opzione di calcolo come il moltiplicatore della richiesta conta come uno, e conta anche un valore personalizzato uguale al valore ereditato.</td></tr><tr><td>Moltiplicatore della richiesta, Durata totale della simulazione, Passo temporale idraulico</td><td>I valori con cui lo scenario è stato risolto, propri o del progetto. Uno scenario in regime stazionario mostra un trattino per il passo temporale.</td></tr><tr><td>Pressione minima</td><td>La pressione minima in un nodo, con il suo ID e l\'istante in cui si verifica. Serbatoi e vasche sono esclusi perché ciascuno ha un carico fisso.</td></tr><tr><td>Velocità massima</td><td>La velocità massima in una tubazione o valvola, con il suo ID e l\'istante in cui si verifica. Le pompe sono escluse.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Scenari in regime stazionario e a periodo esteso';
 $ec_lang['lpn_guide_cmp_run_def']='<p>Uno scenario con una Durata totale della simulazione maggiore di 0 viene eseguito sull\'intero periodo con il motore EPANET. La sua pressione minima e la sua velocità massima sono i valori estremi su ogni passo temporale, ciascuno mostrato con il suo istante. Uno scenario con una Durata totale della simulazione di 0 viene risolto in un singolo istante. La durata totale della simulazione è una delle opzioni che uno scenario può personalizzare, quindi una tabella può contenere entrambi i tipi.</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='Punti da notare';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Uno scenario che non può essere risolto mostra il motivo al posto dei suoi due risultati, per esempio che un nodo non ha un percorso verso una sorgente dopo che una tubazione è stata resa inattiva. Gli altri scenari vengono comunque risolti. Uno scenario che non è convergente mostra gli ultimi risultati e un messaggio.</li><li>Il blocco sopra la tabella, Uguale in ogni scenario, indica il metodo di attrito, le unità, la precisione e il numero massimo di tentativi. Un\'impostazione che differisce tra gli scenari è esclusa dal blocco.</li><li>Non esiste una soglia di superamento o di insuccesso. Leggi i numeri rispetto ai criteri di progetto del sistema modellato.</li><li>L\'esempio nella voce Scenari: gestione confronta tre scenari su Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
@@ -1053,9 +1047,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='Controlli e regole in una simulazione';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>Un controllo è un\'istruzione. Una regola è composta da più righe che iniziano con RULE. Le parole chiave si digitano in inglese qualunque sia la lingua della pagina, e i numeri sono nelle unità del progetto. Aggiungi un controllo parte da un\'istruzione costruita dalla rete, che si modifica poi fino a ottenere quella voluta.</p><p>Controlli e regole cambiano un risultato solo in una simulazione estesa nel tempo, cioè quando la Durata totale della simulazione è maggiore di 0. Una soluzione in regime stazionario non è modificata né dagli uni né dalle altre. Le regole sono applicate solo dal motore EPANET. Entrambi sono salvati con il progetto e scritti in un file EPANET.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Importare librerie da un altro progetto';
 $ec_lang['lpn_guide_lib_import_def']='<p>File, Importa…, Importa librerie… apre un altro file di progetto e copia da esso intere librerie in questo progetto. Una voce il cui nome è già usato qui viene saltata ed elencata, quindi nulla di ciò che c\'è già cambia. Compare un avviso quando il file e il progetto esprimono una grandezza in unità diverse, e le voci vengono importate così come sono scritte. I tipi di tubazione che fanno riferimento a un elenco di raccordi che questo progetto non ha vengono elencati; importa la libreria dei raccordi dallo stesso file per risolverli.</p>';
-$ec_lang['lpn_guide_lib_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_lib_example_def']='<p>Apri l\'esempio Net1 e scegli Acqua, Librerie. Modelli contiene il modello 1, Demand Pattern, con 12 moltiplicatori distanziati di 2:00, che coprono 24:00, contrassegnato (predefinito). Curve contiene la curva 1, Pump Curve for Pump 9, una curva del carico della pompa con un punto, 1500 gpm a 250 ft. Controlli contiene due istruzioni: la prima apre il collegamento 9 quando il nodo 2 scende sotto 110, e la seconda lo chiude quando il nodo 2 sale sopra 140. Regole contiene due regole che verificano l\'ora dell\'orologio e il livello della vasca 2.</p><p>Scegli Acqua, Calcola, e poi Acqua, Rapporti, Variazioni di stato. La pompa L9 ora è chiusa alle 10:00, ora è aperta alle 15:00 e ora è chiusa alle 21:00, e la vasca N2 ora si sta svuotando alle 22:00. In Controlli, cambia 140 in 135 nel secondo controllo e scegli di nuovo Acqua, Calcola. L\'ultima chiusura passa alle 20:00, e la vasca N2 ora si sta svuotando alle 21:00.</p>';
-$ec_lang['lpn_guide_lib_notes_term']='Punti da notare';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>Un modello si ripete per tutta la durata di una simulazione, quindi non deve coprirla per intero.</li><li>Un file EPANET non ha posto per un tipo di tubazione o un elenco di raccordi. Il file porta i numeri che ogni tubazione legge, e l\'esportazione indica quali tubazioni sono state appiattite.</li><li>La posizione e le dimensioni del riquadro Librerie sono conservate in questo browser. Le voci sono salvate con il progetto.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1069,7 +1061,6 @@ $ec_lang['lpn_guide_prop_scn_term']='In uno scenario';
 $ec_lang['lpn_guide_prop_scn_def']='<p>In uno scenario diverso da Base, una modifica a un valore che gli scenari possono personalizzare viene memorizzata come valore personalizzato dello scenario aperto, e la riga è contrassegnata alla sua sinistra. La voce Scenari: gestione descrive i contrassegni ed elenca ciò che è uguale in ogni scenario: lo sono l\'ID, la Descrizione e il Tag. Un Cliente non ha valori per scenario. Cambiare scenario lascia Proprietà aperto sullo stesso elemento, mostrando i valori dello scenario che ora è aperto.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Più elementi selezionati';
 $ec_lang['lpn_guide_prop_multi_def']='<p>Il titolo indica, per esempio, 2 selezionati. Il riquadro ha una sezione per ogni tipo di elemento nella selezione, intitolata con il nome del tipo e il numero di elementi di quel tipo, come in Tubazioni (2), e ogni sezione può essere compressa. Una sezione elenca le proprietà che Tabelle ha come colonne e che si possono impostare su ogni elemento di essa. I risultati e i valori indicati da un tipo di tubazione non sono elencati. Una riga mostra il valore comune agli elementi, o Vari dove differiscono.</p><p>Digitare un valore in una riga lo imposta su ogni elemento di quel tipo nella selezione. Una riga non toccata non scrive nulla. Un avviso indica il conteggio, come in Impostato Diametro (in) su 2., e un solo Annulla annulla l\'intera riga. In uno scenario diverso da Base i valori sono memorizzati come valori personalizzati.</p>';
-$ec_lang['lpn_guide_prop_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_prop_example_def']='<p>Apri l\'esempio Net1 e fai clic sulla tubazione 10. Proprietà ne elenca gli input, da Descrizione ad Attivo?, e poi i risultati all\'istante mostrato: Portata 1866,2 gpm, Velocità 2,4 ft/s e Perdita di carico 19,12 ft H2O.</p><p>Fai clic sulla tubazione 113 e Maiusc+clic sulla tubazione 31. Il titolo indica 2 selezionati, l\'unica sezione è Tubazioni (2), e Diametro mostra Vari, perché la tubazione 31 è da 6 in. e la tubazione 113 da 8 in. Inserisci 10 per Diametro. L\'avviso indica Impostato Diametro (in) su 2., entrambe le tubazioni sono da 10 in., e un solo Annulla le riporta a 6 e 8 in.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
@@ -1101,7 +1092,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>Le lettere dopo Alt+Maiusc sono tasti in po
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='Annulla e Ripeti';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z annulla l\'ultima modifica, e Ctrl+Y o Ctrl+Maiusc+Z la ripete. In una cella di Tabelle, i tasti appartengono al progetto finché la cella è solo selezionata, e al testo della cella una volta iniziata la digitazione. La pagina conserva gli ultimi 20 passi, solo in memoria, e cambiare progetto li cancella. Un passo ripristina gli scenari, lo scenario aperto e le unità insieme al disegno.</p>';
-$ec_lang['lpn_guide_map_del_term']='Elimina';
 $ec_lang['lpn_guide_map_del_def']='<p>Canc o Backspace elimina la selezione, tranne mentre si digita in un campo, dove il tasto appartiene al campo. Senza nulla di selezionato, Canc lo dice, e Backspace non fa nulla. Un solo Annulla annulla l\'eliminazione di più elementi. In uno scenario diverso da Base, Elimina non rimuove un elemento che esiste in Base; la voce Scenari: gestione descrive cosa fa.</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>Un Esc che chiude un menu, un elenco a discesa o un riquadro non fa altro. I riquadri Proprietà, Impostazioni e Librerie si chiudono solo quando il focus è nel riquadro e il puntatore è sopra di esso. Se nessuno di questi è aperto, Esc riporta lo strumento attivo a Seleziona, e in Seleziona cancella la selezione. Una tubazione disegnata a metà richiede un Esc per abbandonarla e un secondo per tornare a Seleziona. In un campo, Esc appartiene al campo.</p>';
@@ -1128,57 +1118,45 @@ $ec_lang['lpn_guide_ff_result_term']='Leggere i risultati';
 $ec_lang['lpn_guide_ff_result_def']='<p>Il riepilogo conta i nodi che hanno superato tutte le verifiche, i nodi che non hanno superato la portata antincendio e i nodi che hanno influito sul resto del sistema. La tabella elenca, per ogni nodo verificato, la Pressione statica prima che venga prelevata una portata antincendio, la Portata richiesta, la Pressione alla portata richiesta, la Portata disponibile, la Residua mantenuta, l\'Effetto peggiore e il Limite di progetto del controllo di progetto, il numero di Calcoli, cioè il numero di soluzioni dell\'intera rete, e i Modi di insuccesso. Una cella senza numero mostra un trattino, mai uno zero. Un nodo che non è stato possibile risolvere mostra il motivo al posto dei numeri. La tabella stampa al massimo 200 nodi e indica quanti non ne ha stampati.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Anelli, Ferma e un\'analisi alla volta';
 $ec_lang['lpn_guide_ff_marks_def']='<p>Dopo un calcolo, il cerchio di ogni nodo verificato è delineato sulla mappa in base al suo risultato, e i contorni differiscono per tratteggio oltre che per colore. Scegli Nodi selezionati per verificare solo i nodi selezionati sulla mappa; qualsiasi altra cosa selezionata viene contata e non verificata. Ferma termina un calcolo e conserva i nodi già completati. Solo una delle analisi della portata antincendio, della criticità e della scala della richiesta viene eseguita alla volta.</p>';
-$ec_lang['lpn_guide_ff_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>Apri l\'esempio Net1, scegli Acqua, Analizza, Analisi della portata antincendio… e fai clic su Calcola con il riquadro così com\'è all\'apertura. Il passo temporale è 0:00, e il calcolo risolve l\'intera rete 135 volte. Otto dei nove nodi superano tutte le verifiche. Il nodo N32 non supera la portata antincendio: la sua pressione statica è 111 psi, restano solo 1,19 psi alla portata richiesta di 1000 gpm, e la sua portata disponibile è 892 gpm. Il nodo N31 può erogare 1339 gpm, e il nodo N12 più di 10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='Cosa fa ogni caso';
 $ec_lang['lpn_guide_cr_case_def']='<p>Per ogni collegamento nell\'ambito, il collegamento viene reso inattivo su una copia della rete, e la copia viene risolta al passo temporale sullo schermo nello scenario aperto. Un calcolo è una soluzione per ogni collegamento più una senza nulla di rotto. Un nodo rimasto senza un percorso aperto verso un serbatoio o una vasca è isolato: viene rimosso prima della soluzione, e la sua richiesta è contata come Richiesta non servita. Tra i nodi ancora collegati, Nodi sotto il minimo elenca quelli la cui pressione scende sotto la Pressione minima consentita. Un nodo che è già sotto di essa senza nulla di rotto non viene contato a carico di alcun collegamento, e il riepilogo indica quanti sono. La Pressione minima consentita è la stessa impostazione del riquadro Pressione minima consentita altrove della Portata antincendio: analisi.</p>';
 $ec_lang['lpn_guide_cr_dead_term']='Rami terminali, e l\'elenco';
 $ec_lang['lpn_guide_cr_dead_def']='<p>Un collegamento terminale è uno la cui rimozione isola dei nodi raggiungibili solo attraverso di esso. Tutto ciò che sta oltre è la sua perdita, quindi con Salta i rami terminali selezionato il collegamento non viene risolto, e il riepilogo indica quanti sono stati saltati. L\'elenco mostra, per ogni collegamento, la Richiesta non servita, i Nodi isolati e i Nodi sotto il minimo, ciascuno con il numero e i primi cinque ID, e un clic su un ID porta ad esso sulla mappa. I collegamenti che costano qualcosa al sistema sono elencati per primi finché non si fa clic su un\'intestazione di colonna per ordinare, e il riepilogo li conta rispetto al numero di collegamenti verificati. Scegli Collegamenti selezionati per rompere solo i collegamenti selezionati sulla mappa.</p>';
-$ec_lang['lpn_guide_cr_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_cr_example_def']='<p>Apri l\'esempio Net1, scegli Acqua, Analizza, Analisi di criticità…, inserisci 116 per Pressione minima consentita e fai clic su Calcola. Il passo temporale è 0:00, e il calcolo risolve l\'intera rete 14 volte. Quattro dei 13 collegamenti portano un nodo sotto 116 psi quando sono fuori servizio: L9 (N10, N11 e N21), L10 (N11 e N21), L111 (N21 e N22) e L112 (N21 e N22). Due nodi sono già sotto 116 psi senza nulla di rotto e non vengono contati. Poiché Net1 è a maglie, perdere un collegamento non lascia mai un nodo senza alimentazione.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='Calcolo';
 $ec_lang['lpn_guide_ds_run_def']='<p>Calcola moltiplica le richieste dei nodi scelti per la Scala della richiesta, su una copia della rete al passo temporale sullo schermo e nello scenario aperto. Esegue due soluzioni, una con le richieste così come sono e una scalata. Il risultato elenca le Pressioni minime e le Velocità massime, ciascuna con il valore Scalato accanto a quello Non scalato, che è il valore mostrato dalla mappa. Ogni elenco contiene dieci righe, e il riquadro indica quanti collegamenti non mostra. La Scala della richiesta si applica in aggiunta al moltiplicatore della richiesta dello scenario aperto, e non viene mai salvata nel progetto.</p>';
-$ec_lang['lpn_guide_ds_find_term']='Trova';
 $ec_lang['lpn_guide_ds_find_def']='<p>Trova cerca scale della richiesta da 0 a 20, con approssimazione a 0,01, per la più grande con cui ogni nodo scelto mantiene almeno la Pressione minima consentita. Riporta la scala e la pressione minima lì, e lo stesso per il passo successivo, dove la pressione scende per la prima volta sotto il limite. Se le richieste come inserite lasciano già un nodo sotto il limite, la risposta è contrassegnata con un segnale di avvertimento. Se ogni nodo mantiene il limite a 20, la risposta lo dice. Ferma termina una ricerca senza una risposta. La Pressione minima consentita è la stessa impostazione del riquadro Pressione minima consentita altrove della Portata antincendio: analisi.</p>';
 $ec_lang['lpn_guide_ds_scope_term']='Nodi, e il passo temporale';
 $ec_lang['lpn_guide_ds_scope_def']='<p>Con Nodi selezionati, solo i nodi selezionati sulla mappa vengono scalati e verificati. Gli altri nodi restano come sono, e quelli che scendono sotto il limite sono elencati senza limitare la risposta. Viene scalato solo il passo temporale sullo schermo, e livelli e stati sono presi da esso. Per verificare il picco, sposta l\'orologio sulla richiesta di punta prima di eseguire il calcolo.</p>';
-$ec_lang['lpn_guide_ds_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_ds_example_def']='<p>Apri l\'esempio Net1 e scegli Acqua, Analizza, Scala della richiesta…. Al passo temporale 0:00, fai clic su Trova con il riquadro così com\'è all\'apertura. Ogni nodo mantiene almeno 20 psi fino a una scala della richiesta di 5,76, dove la pressione minima è 20,11 psi al nodo N32. A 5,77 è 19,8 psi, e la ricerca ha richiesto 13 soluzioni. Inserisci 3 per Scala della richiesta e fai clic su Calcola: il nodo N32 scende da 111 psi, non scalato, a 85,99 psi, e il collegamento L112 sale da 0,535 ft/s a 3,13 ft/s.</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='Leggere il rapporto';
 $ec_lang['lpn_guide_en_read_def']='<p>Scegli Acqua, Rapporti, Energia delle pompe. Il rapporto integra la potenza di ogni pompa sull\'ultima simulazione estesa nel tempo, quindi richiede una Durata totale della simulazione maggiore di 0 e un calcolo. Per ogni pompa elenca % di esecuzione, Effic., kW medi, kW di picco, kWh e Costo. I kW medi sono la media mentre la pompa era in funzione, non sui periodi di inattività. Sotto la tabella ci sono l\'Energia usata, il Costo dell\'energia, l\'Utilizzo di potenza di picco, il Costo della domanda di picco e il Costo totale. Una rete senza pompe non ha nulla da riportare.</p>';
 $ec_lang['lpn_guide_en_set_term']='Cosa determina i numeri';
 $ec_lang['lpn_guide_en_set_def']='<p>Impostazioni, Energia contiene l\'Efficienza della pompa (percento), usata per ogni pompa che non ha una curva di efficienza, il Prezzo dell\'energia per un chilowattora, un Modello di prezzo che moltiplica il prezzo a ogni passo del modello, il Costo di picco della domanda per kW e un testo Valuta che viene stampato accanto ai costi e non li converte. Una pompa può avere il proprio prezzo, modello di prezzo e curva di efficienza in Proprietà. I prezzi, il modello, il costo di picco della domanda, l\'Efficienza della pompa (percento) e i valori propri di una pompa si trovano nella categoria Costo energetico, quindi uno scenario può personalizzarli. Quando non è indicato alcun prezzo, o il prezzo è zero, ogni costo è zero e il rapporto lo dice. L\'applicazione non suggerisce alcun prezzo.</p>';
-$ec_lang['lpn_guide_en_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_en_example_def']='<p>Apri l\'esempio Net1, che ha una durata totale della simulazione di 24:00, e calcola. Scegli Acqua, Rapporti, Energia delle pompe. La pompa L9 funziona per il 65,71% della simulazione con un rendimento del 75%, e usa in media 96,22 kW, 96,71 kW al picco e 1518 kWh. Non è indicato alcun prezzo, quindi il costo è 0 e il rapporto lo dice. Inserisci 0,12 per Prezzo dell\'energia in Impostazioni, Energia, e calcola di nuovo: il costo di L9 è 182, il Costo totale.</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='Cos\'è il tracciato';
 $ec_lang['lpn_guide_ct_what_def']='<p>Scegli Acqua, Grafici, Curve di livello. La voce attiva il tracciato nello scenario aperto, come riempimento sfumato con curve etichettate, usando la pressione se i nodi non sono ancora colorati, e apre il riquadro. Il tracciato estende i colori dei nodi lungo le tubazioni e fino a un multiplo stabilito della lunghezza mediana delle tubazioni accanto ad esse, sfumando nella parte esterna. Non colora attraverso pompe, valvole o collegamenti chiusi. La riga sotto la legenda dei colori indica quanti nodi e tubazioni usa il tracciato, la fascia accanto alle tubazioni e l\'intervallo delle curve. Con troppo pochi nodi, lo dice.</p>';
 $ec_lang['lpn_guide_ct_box_term']='Il riquadro';
 $ec_lang['lpn_guide_ct_box_def']='<p>Mostra isolinee, quando è deselezionata, nasconde il riempimento e le curve e conserva i colori dei nodi. Il riquadro contiene anche Colora i nodi in base a e Schema di colori, che sono le stesse due impostazioni di Impostazioni, Visualizzazione, Colori dei nodi, il Riempimento (Nessuno, Sfumato o Bande, che dipinge ogni classe in tinta unita), l\'Opacità del riempimento, le Curve di livello con il loro Intervallo e le loro Etichette, e la Fascia in multipli della lunghezza mediana delle tubazioni. In un progetto collocato sulla Terra, il riquadro può anche prendere il terreno tra i nodi da Mapbox DEM, dopo che il visitatore ha accettato di inviare i numeri di tessera dell\'area della rete. Queste impostazioni sono salvate con il progetto e possono essere personalizzate da uno scenario. Il tracciato cambia solo la visualizzazione, non la rete.</p>';
-$ec_lang['lpn_guide_ct_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_ct_example_def']='<p>Apri l\'esempio Net1 e scegli Acqua, Grafici, Curve di livello. I nodi sono colorati in base alla pressione, e la riga sotto la legenda dei colori indica 9 nodi, 11 tubazioni, una fascia di 2,5 volte la lunghezza mediana delle tubazioni accanto ad esse, e curve ogni 5 psi. La pompa, il collegamento 9, non è una delle 11 tubazioni. Quando Mostra isolinee è deselezionata, i nodi restano colorati in base alla pressione.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='Cosa contiene il rapporto';
 $ec_lang['lpn_guide_rr_what_def']='<p>Scegli Acqua, Rapporti, Calcolo. Il rapporto è il testo che il motore EPANET ha scritto per l\'ultima simulazione estesa nel tempo, in pagine. Inizia con l\'intestazione e il nome della rete, poi conta nodi, serbatoi, vasche, tubazioni, pompe e valvole, poi indica le opzioni di analisi, e poi elenca lo stato idraulico della simulazione con i suoi avvisi. Il pulsante Copia copia il testo.</p>';
-$ec_lang['lpn_guide_rr_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_rr_example_def']='<p>Apri l\'esempio Net1, che è già stato calcolato, e scegli Acqua, Rapporti, Calcolo. Il riepilogo conta 9 nodi, 1 serbatoio, 1 vasca, 12 tubazioni, 1 pompa e 0 valvole. La formula della perdita di carico è Hazen-Williams, il passo temporale idraulico è 1,00 hrs e la durata totale è 24,00 hrs.</p>';
 $ec_lang['lpn_guide_st_what_term']='Cosa viene elencato';
 $ec_lang['lpn_guide_st_what_def']='<p>Scegli Acqua, Rapporti, Variazioni di stato. Ogni riga indica l\'istante di una variazione e la variazione: una pompa, una valvola o una tubazione ora aperta o ora chiusa, oppure una vasca ora in riempimento, in svuotamento, piena o vuota. Viene elencato anche un passo temporale che non è convergente del tutto. L\'elenco è in ordine temporale e contiene solo variazioni, non ogni passo. È letto dalla stessa simulazione estesa nel tempo del pannello Tabelle e del Rapporto completo.</p>';
-$ec_lang['lpn_guide_st_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_st_example_def']='<p>Apri l\'esempio Net1 e scegli Acqua, Rapporti, Variazioni di stato. La vasca N2 ora si sta riempiendo alle 1:00, svuotando alle 11:00, riempiendo alle 16:00 e svuotando alle 22:00. La pompa L9 ora è chiusa alle 10:00, ora è aperta alle 15:00 e ora è chiusa alle 21:00.</p>';
-$ec_lang['lpn_guide_fr_what_term']='Cosa contiene la tabella';
 $ec_lang['lpn_guide_fr_what_def']='<p>Scegli Acqua, Rapporti, Completo. La tabella ha una riga per ogni nodo e collegamento a ogni passo temporale di rapporto, nelle unità del pannello Tabelle. Le sue colonne sono Tipo, ID, Richiesta, Carico, Pressione, Concentrazione di cloro, Portata, Velocità, Perdita di carico, Carico della pompa e Stato, e una cella è vuota dove l\'elemento non ha quella grandezza. L\'elenco Passo temporale sceglie il passo mostrato, e Scarica CSV e Stampa rapporto includono tutti i passi. Senza una simulazione estesa nel tempo, la tabella mostra la soluzione corrente in un singolo istante.</p>';
-$ec_lang['lpn_guide_fr_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_fr_example_def']='<p>Apri l\'esempio Net1 e scegli Acqua, Rapporti, Completo. I 24 elementi sono elencati a 25 passi di rapporto, da 0:00 a 24:00, il che fa 600 righe. A 0:00, il nodo 11 ha una richiesta di 150 gpm, un carico di 985,23 ft H2O e una pressione di 119,26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='Cosa confronta il rapporto';
 $ec_lang['lpn_guide_cal_what_def']='<p>Scegli Acqua, Rapporti, Taratura. L\'elenco Parametro sceglie cosa misura il file: Richiesta, Carico, Pressione, Concentrazione di cloro, Portata o Velocità. Si conserva un file per ogni parametro, e il pulsante Carica file di taratura… apre un selettore di file. Il rapporto ha tre pagine. Statistiche fornisce, per ogni punto, il numero di osservazioni, la media osservata, la media calcolata, l\'errore medio e l\'errore RMS, poi una riga Rete per tutti i punti insieme e la correlazione tra le medie. Grafico di correlazione pone ogni misura al suo valore osservato in orizzontale e al suo valore calcolato in verticale, con una linea diagonale dove i due coincidono. Confronti tra medie disegna le medie osservata e calcolata come una coppia di barre per ogni punto.</p><p>Il valore calcolato è letto dalla simulazione estesa nel tempo, e una misura tra due passi di rapporto viene confrontata con il valore interpolato tra di essi. Una misura fuori dagli istanti riportati dalla simulazione viene saltata e contata. Con una soluzione in un singolo istante, ogni misura viene confrontata con quell\'unico risultato, qualunque istante indichi il file. Il rapporto si compila dopo che la rete è stata calcolata.</p>';
 $ec_lang['lpn_guide_cal_file_term']='Il file di taratura';
 $ec_lang['lpn_guide_cal_file_def']='<p>Un file di testo con un ID del punto, un istante e un valore misurato su ogni riga. L\'istante è misurato dall\'inizio della simulazione, in ore decimali o ore:minuti. Un punto e virgola avvia un commento. Una riga con solo un istante e un valore appartiene al punto sopra di essa. I valori sono letti nelle unità del progetto, e il rapporto indica quale unità. Un punto che non è nella rete viene elencato e le sue misure sono contate come saltate, una riga che non si può leggere viene elencata per numero di riga, e il resto del file viene usato. Un file è conservato in memoria solo per il progetto aperto e per questo caricamento della pagina. Non è salvato con il progetto né su questo dispositivo. Quando il grafico delle serie temporali mostra la stessa grandezza, i valori misurati vi sono disegnati come anelli.</p>';
-$ec_lang['lpn_guide_cal_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_cal_example_def']='<p>Apri l\'esempio Net1, calcolalo e scegli Acqua, Rapporti, Taratura. Con Pressione scelto, carica un file che indica il nodo 11 come 118,5 psi a 0:00 e 121,0 psi a 12:00, il nodo 31 come 110,2 psi a 6:00 e 108,7 psi a 18:00, e il nodo 99 come 50 psi a 0:00, seguiti da una riga che non è un dato. Il rapporto indica che il file ha 5 misure in 3 punti, nomina il nodo 99 come non presente nella rete con 1 misura saltata, ed elenca la riga illeggibile. Statistiche mostra il nodo 11 con 2 osservazioni, una media osservata di 119,75 psi, una media calcolata di 116,53 psi, un errore medio di 3,98 e un errore RMS di 5,12. Il nodo 31 ha 109,45, 118,71, 9,26 e 9,79. La riga Rete ha 4 osservazioni, un errore medio di 6,62 e un errore RMS di 7,81.</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Uso della guida';
@@ -1223,7 +1201,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='Qualcosa non va qui?';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='Nascondi questo messaggio';
 $ec_lang['lpn_msglog_hidden']='Nascosto';
 $ec_lang['lpn_msglog_unhide']='Mostra';
 $ec_lang['lpn_status_hidden_tip']='Mostra di nuovo sulla mappa il messaggio nascosto.';
@@ -1358,7 +1335,6 @@ $ec_lang['lpn_result_reaction_rate']='Tasso di reazione';
 $ec_lang['lpn_result_status']='Stato';
 $ec_lang['lpn_result_status_open']='Aperto';
 $ec_lang['lpn_result_status_closed']='Chiuso';
-$ec_lang['lpn_result_head']='Carico';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Energia potenziale dell\'acqua in questo nodo, espressa come altezza di colonna d\'acqua. È un\'altezza assoluta, mentre la pressione è una misura relativa (manometrica).';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1731,7 +1707,6 @@ $ec_lang['lpn_morph_ok']='Cambia';
 $ec_lang['lpn_morph_other_kind']='Un nodo può essere cambiato solo in un altro tipo di nodo, e un collegamento solo in un altro tipo di collegamento. Non cambiati: {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='Tipo';
 $ec_lang['lpn_field_type_tip']='Il tipo di questo elemento in questo scenario, impostato da Cambia tipo. Cancella il valore personalizzato per usare il tipo dello scenario di livello superiore.';
 $ec_lang['lpn_change_type_lost']='Questi valori andranno persi:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -2055,7 +2030,6 @@ $ec_lang['lpn_pgraph_none']='Questo elemento non ha risultati nella simulazione 
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='Quota della sorgente da {node}';
-$ec_lang['lpn_result_pump_head']='Carico';
 $ec_lang['lpn_result_pump_head_tip']='Il carico che la pompa aggiunge dall\'aspirazione alla mandata, mostrato come numero positivo. Il risolutore e i file EPANET lo riportano come perdita di carico negativa.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2145,7 +2119,6 @@ $ec_lang['lpn_file_new']='Nuovo progetto…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='Nuovo progetto';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2571,7 +2544,6 @@ $ec_lang['lpn_file_training_permission']='La prima volta che salvi, il browser c
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='Continua';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Scegli di nuovo il file';
@@ -2683,7 +2655,6 @@ $ec_lang['lpn_notes_engine_def']='Il risolutore EPANET di questa pagina è OWA-E
 $ec_lang['lpn_guide_nt_example_term']='Esempio su Net1: una pompa oltre la sua curva';
 $ec_lang['lpn_guide_nt_example_def']='Apri l\'esempio Net1 e scegli Acqua, Librerie. La curva 1, Pump Curve for Pump 9, ha un punto, 1500 gpm a 250 ft. Il carico a portata zero è 333,3 ft e la portata massima è 3000 gpm. A 3500 gpm, che è oltre la fine della curva, la curva dà un carico di −120,4 ft. Il risolutore EPANET riporta lo stesso carico, una perdita di 120,4 ft attraverso la pompa, e avvisa che le pompe non possono fornire portata o carico sufficienti.';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='Esempio su Net1';
 $ec_lang['lpn_guide_own_example_def']='<p>Apri l\'esempio Net1, premi Ctrl+K e digita critical. Menu mostra la voce Analisi di criticità… sotto Acqua, Analizza. Riquadri mostra le voci che la menzionano, tra cui Trova e sostituisci, Portata antincendio: analisi e Criticità: analisi, e questa voce. Scegliere la voce mostra dove si trova Analisi di criticità… nel menu Analizza, e non la esegue.</p>';
 $ec_lang['lpn_id_invalid']='Inserisci un ID senza spazi e senza virgolette.';
 $ec_lang['lpn_id_taken']='Quell\'ID è già in uso.';
@@ -2756,8 +2727,6 @@ $ec_lang['lpn_link_end_same']='Da e A devono essere nodi diversi.';
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='Dividere la tubazione {id} in questo nodo?';
-$ec_lang['lpn_split_yes']='Sì';
-$ec_lang['lpn_split_no']='No';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}, vertice {n}';
@@ -3014,7 +2983,6 @@ $ec_lang['lpn_labels_col_decimals']='Decimali';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='Mostra';
 $ec_lang['lpn_labels_show_tip']='L\'ordine in cui i valori compaiono su un\'etichetta. Il valore numerato 1 viene per primo: in cima a un\'etichetta impilata, e all\'inizio di un\'etichetta su una riga sola.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3339,7 +3307,6 @@ $ec_lang['lpn_sm_make_current']='Rendi corrente';
 $ec_lang['lpn_sm_current_already']='Questo scenario è già lo scenario corrente.';
 $ec_lang['lpn_sm_none_selected']='Seleziona prima una voce nell\'albero.';
 $ec_lang['lpn_sm_base_named']='La Base di un albero non viene rinominata.';
-$ec_lang['lpn_sm_copy']='Copia';
 $ec_lang['lpn_sm_merge_up']='Unisci verso l\'alto';
 $ec_lang['lpn_sm_merge_up_tip']='Sposta i valori personalizzati dell\'alternativa selezionata in un\'alternativa sopra di essa nell\'albero. L\'alternativa selezionata allora eredita quei valori.';
 $ec_lang['lpn_sm_merge_up_root']='Un\'alternativa Base non ha nulla sopra di sé in cui unire.';
@@ -3464,10 +3431,8 @@ $ec_lang['lpn_alt_cat_initial']='Impostazioni iniziali';
 $ec_lang['lpn_alt_cat_constituent']='Sostanza';
 $ec_lang['lpn_alt_cat_fireflow']='Portata antincendio';
 $ec_lang['lpn_alt_cat_energy']='Costo dell\'energia';
-$ec_lang['lpn_alt_cat_userdata']='Proprietà personalizzate';
 $ec_lang['lpn_alt_cat_text']='Testo';
 $ec_lang['lpn_alt_cat_presentation']='Presentazione';
-$ec_lang['lpn_alt_cat_calculation']='Calcolo';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3814,7 +3779,6 @@ $ec_lang['lpn_settings_runbox']='Mostra il riquadro di avanzamento dell\'esecuzi
 $ec_lang['lpn_settings_runbox_tip']='Un riquadro che riporta l\'avanzamento e l\'esito di una simulazione. Se disattivato, una simulazione conclusa mostra la stessa informazione nella riga di stato per alcuni secondi. Questa è un\'impostazione di questo browser, non del progetto.';
 $ec_lang['lpn_time_run_failed']='Il calcolo non è terminato, quindi non ci sono risultati per gli orari successivi.';
 $ec_lang['lpn_time_run_report']='Simulazione: rapporto';
-$ec_lang['lpn_time_run_report_copy']='Copia';
 $ec_lang['lpn_time_run_report_copied']='Copiato';
 $ec_lang['lpn_time_run_report_tip']='Il rapporto che EPANET ha scritto per l\'ultima simulazione, testuale: se è convergente, e gli eventuali avvisi. Il testo è prodotto dal risolutore EPANET, non da questa pagina.';
 
@@ -3994,7 +3958,6 @@ $ec_lang['lpn_reaction_order_wall']='Ordine di reazione alla parete';
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='1 significa che la reazione alla parete avviene secondo il coefficiente o i coefficienti indicati. 0 significa che non avviene. È un interruttore acceso/spento. Il valore predefinito è 1.';
-$ec_lang['lpn_reaction_order_unstated']='Non indicato';
 $ec_lang['lpn_reaction_order_zero']='0, ordine zero';
 $ec_lang['lpn_reaction_order_first']='1, primo ordine';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4070,7 +4033,6 @@ $ec_lang['lpn_energy_col_avg_kw']='kW medi';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='La potenza media usata quando questa pompa era in funzione. Non è mediata sui periodi di inattività, quindi una pompa rimasta ferma per gran parte del periodo esteso nel tempo indica comunque la potenza che ha usato mentre funzionava.';
 $ec_lang['lpn_energy_col_peak_kw']='kW di picco';
-$ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='Costo';
 $ec_lang['lpn_energy_total_kwh']='Energia usata';
 $ec_lang['lpn_energy_total_energy_cost']='Costo dell\'energia';
@@ -4109,7 +4071,6 @@ $ec_lang['lpn_full_download_csv']='Scarica CSV';
 $ec_lang['lpn_full_print']='Stampa rapporto';
 $ec_lang['lpn_full_col_time']='Tempo';
 $ec_lang['lpn_full_col_type']='Tipo';
-$ec_lang['lpn_full_col_id']='ID';
 $ec_lang['lpn_full_row_count']='Righe ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4243,7 +4204,6 @@ $ec_lang['lpn_library_curve_equation_tip']='La curva interpolata sui punti, e la
 $ec_lang['lpn_library_curve_values_tip']='Seleziona una o due colonne in un foglio di calcolo, copiale e incollale nella prima cella di destinazione. Le righe vengono aggiunte secondo necessità. Si possono incollare anche righe copiate direttamente da un file EPANET, incluso il nome della curva.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='Descrizione';
 $ec_lang['lpn_library_curve_remove_point']='Rimuovi questo punto';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4444,7 +4404,6 @@ $ec_lang['lpn_field_demand_pattern']='Modello di richiesta';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Descrizione';
 $ec_lang['lpn_demand_add']='Aggiungi categoria di richiesta';
 $ec_lang['lpn_demand_remove']='Rimuovi questa richiesta';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
@@ -4744,14 +4703,9 @@ $ec_lang['lpn_ds_menu_tip']='Moltiplica le richieste su una copia della rete e m
 $ec_lang['lpn_ds_title']='Scala della richiesta';
 $ec_lang['lpn_ds_intro']='Premi il pulsante Calcola per moltiplicare le richieste nei nodi scelti per la scala della richiesta e vedere le pressioni e le velocità.\n\nPremi il pulsante Trova per trovare la massima scala della richiesta, con approssimazione a {step}, alla quale tutti questi nodi mantengono almeno la pressione minima consentita; la ricerca va da 0 a {max}.\n\nEntrambi lavorano su una copia della rete, risolta al passo temporale mostrato sullo schermo nello scenario attivo, quindi nulla nel progetto viene modificato. Solo quel passo temporale è scalato, e livelli e stati sono presi da esso; per verificare il picco, sposta l\'orologio sulla richiesta di punta prima di eseguire.';
 $ec_lang['lpn_ds_scope']='Nodi da scalare';
-$ec_lang['lpn_ds_scope_all']='Tutti i nodi';
-$ec_lang['lpn_ds_scope_selected']='Nodi selezionati';
-$ec_lang['lpn_ds_minpressure']='Pressione minima consentita';
-$ec_lang['lpn_ds_minpressure_tip']='È lo stesso numero di Pressione minima consentita altrove nella Portata antincendio: analisi. Cambiarlo qui lo cambia anche lì.';
 $ec_lang['lpn_ds_head_scale']='Scala le richieste';
 $ec_lang['lpn_ds_multiplier']='Scala della richiesta';
 $ec_lang['lpn_ds_multiplier_tip']='Il fattore per cui ogni richiesta viene moltiplicata; 1,5 è un aumento del 50%. Si applica in aggiunta al moltiplicatore della richiesta dello scenario attivo, già incluso nelle richieste, e non viene mai salvato nel progetto.';
-$ec_lang['lpn_ds_run']='Calcola';
 $ec_lang['lpn_ds_head_search']='Quale scala della richiesta può sostenere il sistema?';
 $ec_lang['lpn_ds_head_search_selected']='Quale scala della richiesta possono sostenere questi nodi?';
 $ec_lang['lpn_ds_outside_below']='A una scala della richiesta di {m}, nodi non selezionati sotto {pressure}: {n} ({ids}). Non limitano questo risultato.';
@@ -4773,7 +4727,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='Con le richieste moltiplicate per la scala de
 $ec_lang['lpn_ds_col_unscaled']='Non scalato';
 $ec_lang['lpn_ds_col_unscaled_tip']='Con le richieste com\'erano nello scenario attivo a questo passo temporale, lo stesso valore mostrato dalla mappa.';
 $ec_lang['lpn_ds_no_junctions']='Questo progetto non ha ancora nodi, quindi non ci sono richieste da scalare.';
-$ec_lang['lpn_ds_no_selection']='Nessun nodo è selezionato. Seleziona dei nodi oppure scegli Tutti i nodi.';
 $ec_lang['lpn_ds_skipped']='Elementi selezionati che non sono nodi, lasciati invariati: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Inserisci una scala della richiesta pari a zero o maggiore, ad esempio 1,5.';
 $ec_lang['lpn_ds_stale']='Il disegno è cambiato, quindi i risultati della scala della richiesta sono stati cancellati. Eseguila di nuovo.';
@@ -4932,8 +4885,6 @@ $ec_lang['lpn_survey_cancelled']='Non è stato creato nulla e non è stato cambi
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='Coordinata Nord';
-$ec_lang['lpn_survey_axis_east']='Coordinata Est';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='Quel file non contiene nulla.';
 $ec_lang['lpn_survey_err_unreadable']='Non è stato possibile leggere quel file come elenco di punti rilevati.';

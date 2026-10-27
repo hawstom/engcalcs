@@ -27,8 +27,8 @@ $sound = [
     $t('hydraulic head (node value)', 'hydraulic-head', 'z + p/gamma at a point.', 'Head'),
     $t('flow', 'flow'),
 ];
-$en = ['lpn_tool_labels' => 'Labels', 'lpn_result_head' => 'Head'];
-$cites = ['lpn_tool_labels' => ['label-sym-sally'], 'lpn_result_head' => ['hydraulic-head']];
+$en = ['lpn_tool_labels' => 'Labels', 'lpn_field_head' => 'Head'];
+$cites = ['lpn_tool_labels' => ['label-sym-sally'], 'lpn_field_head' => ['hydraulic-head']];
 
 $withTerms = static function (array $rows) use ($sound): array { return array_merge($sound, $rows); };
 

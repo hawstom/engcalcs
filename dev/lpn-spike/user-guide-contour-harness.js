@@ -21,7 +21,7 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, dialogP
 const NAME = 'user-guide-contour-harness';
 U.takeBrowserLock(NAME, 'EC_UGCT_LOCKED');
 
-const TERMS = ['lpn_guide_ct_what_term', 'lpn_guide_ct_box_term', 'lpn_guide_ct_example_term'];
+const TERMS = ['lpn_guide_ct_what_term', 'lpn_guide_ct_box_term', 'lpn_guide_scn_example_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));

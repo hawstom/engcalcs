@@ -241,10 +241,10 @@ async function minPsiAt(m) {
 	ok('an earlier All answer is on screen', !!L.scaleRun());
 	await L.runScale();
 	ok('nothing selected: no run, and the All answer no longer stands as if it answered it', L.scaleRun() === null);
-	ok('...and the notice says so', L.notice() === PC.lpn_ds_no_selection, L.notice());
-	ok('...and so does the box, under Run (Tom, 2026-10-02)', text(dsHost('scale')) === PC.lpn_ds_no_selection, text(dsHost('scale')));
+	ok('...and the notice says so', L.notice() === PC.lpn_ff_no_selection, L.notice());
+	ok('...and so does the box, under Run (Tom, 2026-10-02)', text(dsHost('scale')) === PC.lpn_ff_no_selection, text(dsHost('scale')));
 	await L.runFind();
-	ok('...and under Find', L.searchRun() === null && text(dsHost('search')) === PC.lpn_ds_no_selection, text(dsHost('search')).slice(0, 80));
+	ok('...and under Find', L.searchRun() === null && text(dsHost('search')) === PC.lpn_ff_no_selection, text(dsHost('search')).slice(0, 80));
 	L.setSelectionList([{ kind: 'node', id: '32' }, { kind: 'link', id: '31' }]);
 	L.setMult('3');
 	await L.runScale();
@@ -333,7 +333,7 @@ async function minPsiAt(m) {
 	// refusal "No <nouns> are selected. Select <nouns> or choose All <nouns>."
 	const SCOPES = [['lpn_ff_scope', 'lpn_ff_all', 'lpn_ff_selected', 'lpn_ff_no_selection', 'junctions'],
 		['lpn_crit_scope', 'lpn_crit_scope_all', 'lpn_crit_scope_selected', 'lpn_crit_no_selection', 'links'],
-		['lpn_ds_scope', 'lpn_ds_scope_all', 'lpn_ds_scope_selected', 'lpn_ds_no_selection', 'junctions']];
+		['lpn_ds_scope', 'lpn_ff_all', 'lpn_ff_selected', 'lpn_ff_no_selection', 'junctions']];
 	SCOPES.forEach((k) => {
 		const noun = k[4];
 		ok(k[0] + ': label is "' + noun + ' to <verb>"', new RegExp('^' + noun[0].toUpperCase() + noun.slice(1) + ' to [a-z]+$').test(PC[k[0]]), PC[k[0]]);
@@ -348,7 +348,7 @@ async function minPsiAt(m) {
 		kids(x).forEach(walk);
 	})(byId.lpn_ds_controls);
 	ok('the built Demand scaling scope list is the page\'s All / Selected junctions', !!scopeSel &&
-		kids(scopeSel).map((o) => o.textContent).join() === PC.lpn_ds_scope_all + ',' + PC.lpn_ds_scope_selected);
+		kids(scopeSel).map((o) => o.textContent).join() === PC.lpn_ff_all + ',' + PC.lpn_ff_selected);
 	ok('the selected-scope heading has its own key, and the explanation of Find is the box\'s `?`, one for both scopes (Tom)',
 		!!PC.lpn_ds_head_search_selected && PC.lpn_ds_intro.indexOf('{max}') > 0 && !('lpn_ds_search_note' in PC));
 

@@ -28,7 +28,7 @@ const QUOTES = {
 	lpn_guide_prop_example_def: ['lpn_field_desc', 'lpn_field_active', 'lpn_field_diameter', 'lpn_multi_varies']
 };
 const TERMS = ['lpn_guide_prop_open_term', 'lpn_guide_prop_edit_term', 'lpn_guide_prop_id_term', 'lpn_guide_prop_scn_term',
-	'lpn_guide_prop_multi_term', 'lpn_guide_prop_example_term'];
+	'lpn_guide_prop_multi_term', 'lpn_guide_scn_example_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -101,7 +101,7 @@ async function main() {
 		await U.openProperties(ctx, 'node', '11');
 		await settle(500);
 		rows = await popupRows();
-		const head = idx(rows, await T('lpn_result_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
+		const head = idx(rows, await T('lpn_field_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
 		ok('Junction 11: Head and Pressure are read-only rows that sit before its last inputs', head > 0 && pressure > head && initq > pressure && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
 		ok('...and the last row is an input again, Is active?', rows[rows.length - 1].text.indexOf(await T('lpn_field_active')) === 0 && rows[rows.length - 1].input);
 

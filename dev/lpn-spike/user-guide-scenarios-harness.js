@@ -34,10 +34,10 @@ const QUOTES = {
 	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
-		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_alt_cat_userdata', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_alt_cat_calculation',
+		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_settings_custom_props', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_settings_sec_calculation',
 		'lpn_field_desc'],
 	lpn_guide_scn_example_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_new', 'lpn_dialog_ok', 'lpn_field_diameter', 'lpn_scenario_base',
-		'bpn_demand_mult', 'lpn_tool_settings', 'lpn_alt_cat_calculation', 'lpn_settings_hydraulics', 'lpn_reports_menu', 'lpn_scncmp_title',
+		'bpn_demand_mult', 'lpn_tool_settings', 'lpn_settings_sec_calculation', 'lpn_settings_hydraulics', 'lpn_reports_menu', 'lpn_scncmp_title',
 		'lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
 	lpn_guide_scn_notes_def: [['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_same', 'lpn_scenario_basic', 'lpn_sm_title'],
 	lpn_guide_text_scncmp_box: ['lpn_sm_title', 'lpn_menu_project', 'lpn_reports_menu', 'lpn_scncmp_title'],
@@ -45,12 +45,12 @@ const QUOTES = {
 		'lpn_time_hyd_step', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
 	lpn_guide_cmp_run_def: ['lpn_time_duration'],
 	lpn_guide_cmp_notes_def: ['lpn_scncmp_same', 'lpn_sm_title'],
-	lpn_guide_cmp_byasset_def: ['lpn_scnres_title', 'lpn_survey_codes_col_type', 'lpn_time_run_report_copy', 'lpn_full_download_csv']
+	lpn_guide_cmp_byasset_def: ['lpn_scnres_title', 'lpn_survey_codes_col_type', 'points_data_copy', 'lpn_full_download_csv']
 };
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
 	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
-const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_cmp_notes_term'];
+const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_scn_notes_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));

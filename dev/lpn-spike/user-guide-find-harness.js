@@ -195,7 +195,7 @@ async function orderAndKeys(browser, Session) {
 		return e ? { codes: e.querySelectorAll('code').length, dts: Array.from(e.querySelectorAll('dt')).map(d => d.textContent.trim()), paras: e.querySelectorAll(':scope > p').length } : null;
 	});
 	const terms = [];
-	for (const k of ['lpn_guide_find_query_term', 'lpn_guide_find_examples_term', 'lpn_guide_find_results_term', 'lpn_guide_find_replace_term', 'lpn_guide_find_notes_term']) { terms.push(await a.lang(k).catch(() => enString(k))); }
+	for (const k of ['lpn_guide_find_query_term', 'lpn_guide_find_examples_term', 'lpn_guide_find_results_term', 'lpn_guide_find_replace_term', 'lpn_guide_scn_notes_term']) { terms.push(await a.lang(k).catch(() => enString(k))); }
 	ok('the Find and replace entry carries its five terms', !!ch && terms.every(t => ch.dts.indexOf(t) >= 0), JSON.stringify(ch && ch.dts));
 	ok('...its two opening paragraphs and its queries', !!ch && ch.paras === 2 && ch.codes >= exampleQueries().length, JSON.stringify(ch));
 	await page.fill('#lpn_guide_search', 'criticality');

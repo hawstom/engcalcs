@@ -8,6 +8,7 @@
 // the stored placement by the spherical-Mercator inverse written out independently of the page's own
 // code. A grid project's DIMENSIONS stays the plain numbers it always was.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -74,7 +75,8 @@ const latOfMercY = (y) => Math.atan(Math.sinh(y * Math.PI / 180)) * 180 / Math.P
 const near = (x, y) => Math.abs(x - y) <= 1e-9;
 
 async function open(browser) {
-	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
+	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});

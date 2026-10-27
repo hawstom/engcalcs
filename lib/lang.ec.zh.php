@@ -213,7 +213,7 @@ $ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';
 $ec_lang['mphl_main_title']='免费在线曼宁管道水头损失计算器';
 $ec_lang['mphl_main_desc']='在给定满流流量条件下的曼宁公式水头损失';
-$ec_lang['mphl_pipe_length']='管道长度，L';
+$ec_lang['mphl_pipe_length']='长度，L';
 $ec_lang['mphl_area']='面积，A';
 $ec_lang['mphl_total_junction_k']='局部损失系数，k<sub>m</sub>';
 $ec_lang['mphl_total_junction_k_short']='损失系数，k<sub>m</sub>';
@@ -319,7 +319,6 @@ $ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
 $ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
 $ec_lang['mhp_gross_head']='毛水头，H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="压力管道（供水管）直径">压力管道直径，D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='长度，L';
 $ec_lang['mhp_efficiency']='机组效率，η（0–1）';
 $ec_lang['mhp_vel_check']='流速校核';
 $ec_lang['mhp_hl_check']='水头损失校核';
@@ -474,13 +473,11 @@ $ec_lang['rc_SD_check']='级配标准差检验';
 $ec_lang['rc_sg_ok']='sg 在有效范围内';
 $ec_lang['rc_sg_ok_tip']='2.54–2.82（Robinson）';
 $ec_lang['rc_sg_low']='sg 低于 Robinson 有效范围';
-$ec_lang['rc_sg_low_tip']='有效范围：2.54–2.82';
 $ec_lang['rc_sg_high']='sg 高于 Robinson 有效范围';
 $ec_lang['rc_sg_high_tip']='有效范围：2.54–2.82';
 $ec_lang['rc_SD_ok']='SD 在有效范围内';
 $ec_lang['rc_SD_ok_tip']='1.15–1.47（Robinson）';
 $ec_lang['rc_SD_low']='SD 低于 Robinson 有效范围';
-$ec_lang['rc_SD_low_tip']='有效范围：1.15–1.47';
 $ec_lang['rc_SD_high']='SD 高于 Robinson 有效范围';
 $ec_lang['rc_SD_high_tip']='有效范围：1.15–1.47';
 $ec_lang['rc_layer']='护坡厚度（2 × D<sub>50</sub>）';
@@ -589,7 +586,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='管线';
-$ec_lang['bpn_id']='编号';
 $ec_lang['bpn_id_tip']='该管线的名称。其他管线在"上游"列中引用该名称。';
 $ec_lang['bpn_upstream']='上游编号';
 // Edited by TGH 2026-09-07
@@ -1012,7 +1008,6 @@ $ec_lang['lpn_guide_find_results_term']='结果、选择与表格';
 $ec_lang['lpn_guide_find_results_def']='<p>匹配的元件列在“查找”按钮下方。大于和“最高 n 个”先列最高值，小于和“最低 n 个”先列最低值，其他条件按所找到的值排列，再按 ID 排列。含 AND 或 OR 的查询先列节点，再列连接线，各按 ID 排列。只有一个匹配时，立即显示在地图上。选中某一行可使地图居中于该元件。若未选中任何内容，该元件同时被选中；若已有选中内容，则该元件高亮显示，所选内容不变。按住 Shift 点击或按住 Ctrl 点击某一行，可将其加入所选内容或从中移除。“查找”本身不会选中所有匹配项。</p><p>“在当前表格中过滤”按钮将同一查询应用于“表格”窗格。查询所适用的每个表格只显示匹配的行，并在其上方显示查询和行数。要在地图上选中所有匹配项，请选中这些行，并在右键菜单中选择“在地图上选中”。表格过滤不随项目保存，重新加载页面后即结束。某行被编辑后不再匹配时，它仍留在表格中，变灰并带警告标志，直到再次按下“在当前表格中过滤”按钮。</p>';
 $ec_lang['lpn_guide_find_replace_term']='替换与撤销';
 $ec_lang['lpn_guide_find_replace_def']='<p>框中的“更改查找到的内容”部分会在查询找到的每个元件上写入一个属性。在“要更改的属性”列表中选择属性，在“新值”框中按显示单位输入新值，然后按“替换”按钮。随后框中会说明将有多少个元件发生变化，不包括已经是新值的元件。按“更改它们”按钮应用更改，或按“取消”。一次“撤销”即可撤回整个替换。</p><p>Net1 上的示例：<code>Pipe.Diameter below 10</code> 找到管道 31、122、113 和 121。选择“管径”，输入 10，然后按“替换”；框中显示“要更改 4 个元件吗？”。按“更改它们”将这四条管道全部设为 10 in。一次“撤销”使它们恢复为 6 in 和 8 in。</p><p>Net3 上的示例：<code>Pipe.ID equal to \'247\'</code> 找到管道 247。选择“关闭”，在“新值”列表中再次选择“关闭”，然后按“替换”，再按“更改它们”，即可关闭该管道，用于上述连通性示例。“撤销”会重新打开它。</p><p>替换要求只涉及一种元件，因此在“全部”下，请先在“搜索范围”列表中选择一种元件。在基础以外的方案中，替换值存储在该方案中，与在“属性”中进行同样的编辑相同。在有 Mapbox 高程数据的地方，“高程”可以用 Mapbox DEM 替换，而不用键入的值。</p>';
-$ec_lang['lpn_guide_find_notes_term']='注意事项';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>数值按完整精度比较，并列出到四位小数。“等于”很少与计算结果匹配；请使用大于和小于。</li><li>压力、水头、流量、流速和其他结果均来自上一次计算。清除“自动重新计算”设置后，它们描述的是上一次“计算”时的管网。</li><li>文本的大于和小于按字典顺序比较，数字按数值顺序：在 Net1 上，<code>Junction.ID above \'20\'</code> 找到节点 21、22、23、31 和 32。</li><li>在“全部”下，只提供 ID、说明、标记和连通性。在“搜索范围”列表中选择一种元件，可查看其完整的属性列表。</li><li>文字项没有 ID。请按其中的字词搜索，如 <code>Text.Text contains \'pump\'</code>。</li><li>节点的四个“连通性”条件为：节点无连接线、节点无开放连接线、无连接线通往水源、无开放路径通往水源。水源是水库或水箱。</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1038,7 +1033,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='表格内容';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>方案</td><td>方案的名称。打开的方案标有（当前已打开）。</td></tr><tr><td>覆盖值个数</td><td>方案自身的覆盖值，计数方式与“方案”列表相同。需水量倍数之类的计算选项算作一个，与继承值相等的覆盖值也计入。</td></tr><tr><td>需水量倍数、总运行时长、水力时间步长</td><td>方案求解时所用的数值，是方案自身的或项目的数值。稳态方案的时间步长显示为短横线。</td></tr><tr><td>最低压力</td><td>某个节点处的最低压力，并附有其 ID 和出现的时刻。水库和水箱不计入，因为它们各有固定的水头。</td></tr><tr><td>最高流速</td><td>某条管道或阀门中的最高流速，并附有其 ID 和出现的时刻。水泵不计入。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='稳态方案与延时方案';
 $ec_lang['lpn_guide_cmp_run_def']='<p>总运行时长大于 0 的方案，通过 EPANET 引擎在整个时段内运行。其最低压力和最高流速是所有时间步中的极值，每个值都附有其时刻。总运行时长为 0 的方案，则在某一时刻求解。总运行时长是方案可以覆盖的选项之一，因此同一张表可以同时包含这两种方案。</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='注意事项';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>无法求解的方案，会在两项结果的位置显示原因，例如某条管道停用后某个节点没有通往水源的路径。其他方案仍会被求解。未收敛的方案显示其最后的结果和一条消息。</li><li>表格上方的“在每个方案中都相同”区块说明摩阻公式、单位、精度和最大试算次数。各方案之间不同的设置不列入该区块。</li><li>没有合格或不合格的阈值。请对照所建模系统的设计准则解读这些数字。</li><li>“方案管理器”条目中给出的示例在 Net1 上对比了三个方案。</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
@@ -1053,9 +1047,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='运行中的控制规则与规则';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>控制规则是一条语句。规则是以 RULE 开头的若干行。无论页面使用何种语言，关键字都用英文键入，数值采用项目的单位。“添加控制规则”从根据管网生成的一条语句开始，再将其编辑成所需的语句。</p><p>控制规则和规则只在延时模拟中改变结果，即总运行时长大于 0 时。稳态解不受二者影响。规则只由 EPANET 引擎应用。两者都随项目一起保存，并写入 EPANET 文件。</p>';
 $ec_lang['lpn_guide_lib_import_term']='从另一个项目导入库';
 $ec_lang['lpn_guide_lib_import_def']='<p>“文件”、“导入…”、“导入库…”会打开另一个项目文件，并将其中整个库复制到本项目。名称在此处已被使用的项会被跳过并列出，因此此处已有的内容不会改变。当文件与项目用不同的单位表示同一个量时，会显示警告，而各项仍按原样导入。引用了本项目所没有的管件清单的管道类型会被列出；请从同一文件导入管件库来解决。</p>';
-$ec_lang['lpn_guide_lib_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_lib_example_def']='<p>打开 Net1 示例并选择“水务”、“库”。“模式”中有模式 1，即 Demand Pattern，有 12 个倍数，间隔 2:00，覆盖 24:00，标有（默认）。“曲线”中有曲线 1，即水泵 9 的 Pump Curve，是一条只有一个点的水泵水头曲线，点为 250 ft 处 1500 gpm。“控制规则”中有两条语句：第一条在节点 2 降到 110 以下时打开管道 9，第二条在节点 2 升到 140 以上时将其关闭。“规则”中有两条规则，检验时钟时间和水箱 2 的水位。</p><p>选择“水务”、“计算”，然后选择“水务”、“报告”、“状态变化”。水泵 L9 在 10:00 现已关闭，在 15:00 现已打开，在 21:00 现已关闭，水箱 N2 在 22:00 现正在放空。在“控制规则”中，将第二条控制规则中的 140 改为 135，再次选择“水务”、“计算”。最后一次关闭移到 20:00，水箱 N2 在 21:00 现正在放空。</p>';
-$ec_lang['lpn_guide_lib_notes_term']='注意事项';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>模式在运行持续期间重复使用，因此不必覆盖整个运行时段。</li><li>EPANET 文件中没有管道类型或管件清单的位置。文件携带每条管道所读取的数值，导出时会说明哪些管道被展平。</li><li>“库”框的位置和大小保存在本浏览器中。各项随项目一起保存。</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1069,7 +1061,6 @@ $ec_lang['lpn_guide_prop_scn_term']='在方案中';
 $ec_lang['lpn_guide_prop_scn_def']='<p>在“基础”以外的方案中，对方案可覆盖的数值所做的编辑，会保存为打开的方案的覆盖值，该行左侧会有标记。“方案管理器”条目说明了这些标记，并列出在每个方案中都相同的内容：ID、说明和标记即属此类。用户没有方案数值。切换方案时，“属性”仍在同一元件上保持打开，显示现在打开的方案的数值。</p>';
 $ec_lang['lpn_guide_prop_multi_term']='选中多个元件';
 $ec_lang['lpn_guide_prop_multi_def']='<p>标题显示的内容例如“已选 2 个”。所选内容中的每种元件类型在该框中各有一个分区，分区标题是类型名称及该类型元件的数量，例如“管道 (2)”，每个分区都可折叠。分区列出“表格”中作为列的、且可对其中每个元件设置的属性。结果和管道类型已指定的数值不列出。一行显示这些元件共有的数值，若不同则显示“不同”。</p><p>在某一行键入数值，会对所选内容中该类型的每个元件设置该值。未触及的行不会写入任何内容。通知会说明数量，例如“已对 2 个设置 管径 (in)。”，一次“撤销”即可撤销整行的更改。在“基础”以外的方案中，这些数值保存为覆盖值。</p>';
-$ec_lang['lpn_guide_prop_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_prop_example_def']='<p>打开 Net1 示例并点击管道 10。“属性”列出其输入项（从“说明”到“启用？”），然后是所显示时刻的结果：流量 1866.2 gpm，流速 2.4 ft/sec，水头损失 19.12 ft H2O。</p><p>点击管道 113，再按住 Shift 点击管道 31。标题显示“已选 2 个”，仅有的分区是“管道 (2)”，“管径”显示“不同”，因为管道 31 为 6 in.，管道 113 为 8 in.。为“管径”输入 10。通知显示“已对 2 个设置 管径 (in)。”，两条管道均为 10 in.，一次“撤销”使它们恢复为 6 in. 和 8 in.。</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
@@ -1101,7 +1092,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>Alt+Shift 之后的字母是固定位置的
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='撤销与重做';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z 撤销上一次更改，Ctrl+Y 或 Ctrl+Shift+Z 重做。在“表格”单元格中，单元格仅被选中时这些键属于项目，开始键入之后则属于单元格中的文字。页面保留最近 20 步，仅保存在内存中，切换项目会将其清除。每一步会连同图纸一起恢复方案、打开的方案和单位。</p>';
-$ec_lang['lpn_guide_map_del_term']='删除';
 $ec_lang['lpn_guide_map_del_def']='<p>Delete 或 Backspace 删除所选内容，但在字段中键入时除外，此时按键属于该字段。没有所选内容时，Delete 会这样提示，Backspace 则无任何作用。一次“撤销”即可撤销多个元件的删除。在“基础”以外的方案中，“删除”不会移除“基础”中存在的元件；“方案管理器”条目说明了它的作用。</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>关闭菜单、下拉列表或框的 Esc 不会再做其他事。“属性”、“设置”和“库”框仅在焦点位于框内且指针在其上方时才会关闭。这些都未打开时，Esc 使当前工具回到“选择”，在“选择”中则清除所选内容。画到一半的管道，第一次 Esc 放弃绘制，第二次回到“选择”。在字段中，Esc 属于该字段。</p>';
@@ -1128,57 +1118,45 @@ $ec_lang['lpn_guide_ff_result_term']='阅读结果';
 $ec_lang['lpn_guide_ff_result_def']='<p>摘要统计通过所有校核的节点数、消防流量不合格的节点数，以及影响系统其余部分的节点数。表格为每个被测试的节点列出：抽取任何消防流量之前的静态压力、所需流量、所需流量下的压力、可用流量、实际余压、设计校核的最差影响和设计限值、运行次数（即对整个管网的求解次数）以及失效模式。没有数字的单元格显示短横线，绝不显示零。无法求解的节点以原因代替数字。表格最多打印 200 个节点，并说明有多少个未打印。</p>';
 $ec_lang['lpn_guide_ff_marks_term']='圆环、停止，以及一次只做一项分析';
 $ec_lang['lpn_guide_ff_marks_def']='<p>运行之后，每个被测试节点的圆圈会按其结果在地图上勾出轮廓，轮廓除颜色外，虚线样式也不相同。选择“所选节点”只测试在地图上选中的节点；所选的其他任何内容会被计数，但不被测试。“停止”结束运行，并保留已经完成的节点。消防流量、关键性和需水量缩放三项分析一次只能运行一项。</p>';
-$ec_lang['lpn_guide_ff_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_ff_example_def']='<p>打开 Net1 示例，选择“水务”、“分析”、“消防流量分析…”，保持框打开时的原样点击“运行”。时间步为 0:00，该运行对整个管网求解 135 次。九个节点中有八个通过所有校核。节点 N32 的消防流量不合格：其静态压力为 111 psi，在所需的 1000 gpm 时仅剩 1.19 psi，可用流量为 892 gpm。节点 N31 可输出 1339 gpm，节点 N12 可输出超过 10000 gpm。</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='每种情形做什么';
 $ec_lang['lpn_guide_cr_case_def']='<p>对范围内的每条管道，在管网的副本上将该管道停用，并在打开的方案中按屏幕上的时间步求解该副本。一次运行是对每条管道求解一次，再加一次不断开任何管道的求解。没有开放路径通往水库或水箱的节点被视为断供：它在求解前被移除，其需水量计入“未供应的需水量”。在仍然连通的节点中，“低于最低压力的节点”列出压力降到“允许的最低压力”以下的节点。在不断开任何管道时就已经低于该值的节点，不计入任何管道的账上，摘要会说明有多少个。“允许的最低压力”与“消防流量分析”的“其他部位允许的最低压力”框是同一项设置。</p>';
 $ec_lang['lpn_guide_cr_dead_term']='末端管道与列表';
 $ec_lang['lpn_guide_cr_dead_def']='<p>末端管道是指移除后会使只能通过它到达的节点断供的管道。其后的一切都是它的损失，因此选中“跳过末端管道”时，该管道不被求解，摘要会说明跳过了多少条。列表为每条管道显示“未供应的需水量”、“断供的节点”和“低于最低压力的节点”，每项都有数量和前五个 ID，点击某个 ID 即可在地图上找到它。使系统付出代价的管道排在最前，直到点击列标题进行排序，摘要会将它们与被测试的管道数量对照统计。选择“所选管道”只断开在地图上选中的管道。</p>';
-$ec_lang['lpn_guide_cr_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_cr_example_def']='<p>打开 Net1 示例，选择“水务”、“分析”、“关键性分析…”，为“允许的最低压力”输入 116，然后点击“运行”。时间步为 0:00，该运行对整个管网求解 14 次。13 条管道中有四条在停用时会使某个节点降到 116 psi 以下：L9（N10、N11 和 N21）、L10（N11 和 N21）、L111（N21 和 N22）以及 L112（N21 和 N22）。有两个节点在不断开任何管道时就已低于 116 psi，不被计入。由于 Net1 是环状的，失去一条管道绝不会使任何节点失去供水。</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='运行';
 $ec_lang['lpn_guide_ds_run_def']='<p>“运行”在管网的副本上，按屏幕上的时间步并在打开的方案中，将所选节点的需水量乘以“需水量缩放系数”。它进行两次求解，一次按原有需水量，一次按缩放后的需水量。结果列出“最低压力”和“最高流速”，每项都在“缩放前”值旁边给出“缩放后”值，“缩放前”值即地图所显示的值。每个列表有十行，该框会说明有多少条管道未显示。“需水量缩放系数”是在打开的方案的需水量倍数之外另行应用的，并且绝不保存在项目中。</p>';
-$ec_lang['lpn_guide_ds_find_term']='查找';
 $ec_lang['lpn_guide_ds_find_def']='<p>“查找”在 0 到 20 之间按 0.01 的精度搜索需水量缩放系数，找出使每个所选节点至少保持“允许的最低压力”的最大系数。它报告该系数及其对应的最低压力，以及再高一级时的同样结果，即压力首次低于限值之处。如果按输入的需水量已使某个节点低于限值，答案会带有警告标志。如果在 20 时每个节点仍保持限值，答案会这样说明。“停止”会结束搜索而不给出答案。“允许的最低压力”与“消防流量分析”的“其他部位允许的最低压力”框是同一项设置。</p>';
 $ec_lang['lpn_guide_ds_scope_term']='节点与时间步';
 $ec_lang['lpn_guide_ds_scope_def']='<p>选择“所选节点”时，只缩放并校核在地图上选中的节点。其他节点保持原样，其中低于限值的节点会被列出，但不限制答案。只缩放屏幕上的时间步，水位和状态取自该时间步。要测试高峰，请在运行之前将时钟移到需水量高峰时刻。</p>';
-$ec_lang['lpn_guide_ds_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_ds_example_def']='<p>打开 Net1 示例并选择“水务”、“分析”、“需水量缩放…”。在时间步 0:00，保持框打开时的原样点击“查找”。需水量缩放系数最大到 5.76 时每个节点都至少保持 20 psi，此时最低压力是节点 N32 处的 20.11 psi。在 5.77 时为 19.8 psi，搜索共求解 13 次。为“需水量缩放系数”输入 3 并点击“运行”：节点 N32 从未缩放的 111 psi 降到 85.99 psi，管道 L112 从 0.535 ft/sec 升到 3.13 ft/sec。</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='阅读报告';
 $ec_lang['lpn_guide_en_read_def']='<p>选择“水务”、“报告”、“水泵能耗”。该报告对上一次延时模拟中每台水泵的功率进行积分，因此需要总运行时长大于 0 并已完成计算。它为每台水泵列出运行占比、效率、平均 kW、峰值 kW、kWh 和成本。平均 kW 是水泵运行期间的平均值，不含闲置时段。表格下方是用电量、电费、峰值用电量、峰值需量费用和总成本。没有水泵的管网无内容可报告。</p>';
 $ec_lang['lpn_guide_en_set_term']='什么决定这些数字';
 $ec_lang['lpn_guide_en_set_def']='<p>“设置”、“能耗”中包含：“水泵效率（百分比）”，用于每台没有效率曲线的水泵；每千瓦时的“电价”；在每个模式步长上乘以电价的“电价模式”；每 kW 的“峰值需量费用”；以及“货币”文字，它印在成本旁边，并不换算成本。水泵可以在“属性”中有自己的电价、电价模式和效率曲线。电价、模式、峰值需量费用、“水泵效率（百分比）”以及水泵自己的数值都属于“能耗成本”类别，因此方案可以覆盖它们。未给出电价或电价为零时，所有成本均为零，报告会这样说明。本应用不建议任何电价。</p>';
-$ec_lang['lpn_guide_en_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_en_example_def']='<p>打开总运行时长为 24:00 的 Net1 示例并计算。选择“水务”、“报告”、“水泵能耗”。水泵 L9 在运行时段的 65.71% 内运转，效率为 75%，平均用电 96.22 kW，峰值 96.71 kW，共 1518 kWh。未给出电价，因此成本为 0，报告会这样说明。在“设置”、“能耗”中为“电价”输入 0.12 并再次计算：L9 的成本为 182，即总成本。</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='该图是什么';
 $ec_lang['lpn_guide_ct_what_def']='<p>选择“水务”、“图形”、“等值线”。该行在打开的方案中开启该图，以平滑填充加带标注的线条表示，若节点尚未着色则使用压力，并打开该框。该图把节点颜色沿管道铺开，并向管道两侧延伸到中位管道长度的设定倍数，在外侧部分逐渐淡出。它不会跨过水泵、阀门或关闭的管道着色。色标下方的一行说明该图使用了多少个节点和管道、管道两侧的范围以及线条间隔。节点太少时，会这样说明。</p>';
 $ec_lang['lpn_guide_ct_box_term']='该框';
 $ec_lang['lpn_guide_ct_box_def']='<p>清除“显示等值线”会隐藏填充和线条，并保留节点颜色。该框还有：“节点着色依据”和“配色方案”（与“设置”、“可视化”、“节点颜色”中的两项设置相同）；“填充”（无、平滑或分级，分级时每一级平涂）；“填充不透明度”；带有“间隔”和“标签”的“等值线”；以及以中位管道长度倍数表示的“缓冲区”。在放置于地球上的项目中，经访客同意发送管网所在区域的瓦片编号后，该框还可以从 Mapbox DEM 获取节点之间的地面。这些设置随项目保存，并且方案可以覆盖。该图只改变显示，不改变管网。</p>';
-$ec_lang['lpn_guide_ct_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_ct_example_def']='<p>打开 Net1 示例并选择“水务”、“图形”、“等值线”。节点按压力着色，色标下方的一行说明：9 个节点，11 条管道，管道两侧范围为中位管道长度的 2.5 倍，每 5 psi 一条线。水泵（管道 9）不在这 11 条管道之内。清除“显示等值线”后，节点仍按压力着色。</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='报告包含什么';
 $ec_lang['lpn_guide_rr_what_def']='<p>选择“水务”、“报告”、“运行”。该报告是 EPANET 引擎为上一次延时模拟所写的文本，分页显示。它以标题横幅和管网名称开头，接着统计节点、水库、水箱、管道、水泵和阀门的数量，然后说明分析选项，再列出运行的水力状态及其警告。“复制”按钮复制该文本。</p>';
-$ec_lang['lpn_guide_rr_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_rr_example_def']='<p>打开已经计算过的 Net1 示例，并选择“水务”、“报告”、“运行”。摘要统计 9 个节点、1 个水库、1 个水箱、12 条管道、1 台水泵和 0 个阀门。水头损失公式为 Hazen-Williams，水力时间步长为 1.00 hrs，总持续时间为 24.00 hrs。</p>';
 $ec_lang['lpn_guide_st_what_term']='列出什么';
 $ec_lang['lpn_guide_st_what_def']='<p>选择“水务”、“报告”、“状态变化”。每一行给出一次变化的时间和变化内容：水泵、阀门或管道现已打开或现已关闭，或水箱现正在充水、放空、已满或已空。未完全收敛的时间步也会列出。该列表按时间顺序排列，只含变化，而不是每一步。它读取自与“表格”窗格和“完整报告”相同的那次延时运行。</p>';
-$ec_lang['lpn_guide_st_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_st_example_def']='<p>打开 Net1 示例并选择“水务”、“报告”、“状态变化”。水箱 N2 在 1:00 现正在充水，11:00 放空，16:00 充水，22:00 放空。水泵 L9 在 10:00 现已关闭，15:00 现已打开，21:00 现已关闭。</p>';
-$ec_lang['lpn_guide_fr_what_term']='表格包含什么';
 $ec_lang['lpn_guide_fr_what_def']='<p>选择“水务”、“报告”、“完整”。该表在每个报告时间步为每个节点和管道各设一行，采用“表格”窗格的单位。其列为：类型、ID、需水量、水头、压力、氯浓度、流量、流速、水头损失、水泵水头和状态，若元件没有某个量，则该单元格为空白。“时间步”列表选择所显示的时间步，“下载 CSV”和“打印报告”则包含每一个时间步。没有延时模拟时，该表显示某一时刻的当前解。</p>';
-$ec_lang['lpn_guide_fr_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_fr_example_def']='<p>打开 Net1 示例并选择“水务”、“报告”、“完整”。24 个元件在 25 个报告时间步（0:00 到 24:00）列出，共 600 行。在 0:00，节点 11 的需水量为 150 gpm，水头为 985.23 ft H2O，压力为 119.26 psi。</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='报告对比什么';
 $ec_lang['lpn_guide_cal_what_def']='<p>选择“水务”、“报告”、“率定”。“参数”列表选择文件测量的对象：需水量、水头、压力、氯浓度、流量或流速。每个参数保存一个文件，“载入率定文件…”按钮会打开文件选择器。报告共三页。“统计”为每个位置给出观测次数、观测均值、计算均值、平均误差和均方根误差，然后是汇总所有位置的“管网”行以及两组均值之间的相关系数。“相关图”把每次测量按观测值作横坐标、计算值作纵坐标绘出，并带有一条两者一致时的对角线。“均值对比”为每个位置把观测均值和计算均值画成一对柱。</p><p>计算值读取自延时运行，介于两个报告时间步之间的测量值，与二者之间的插值进行比较。落在运行所报告时间之外的测量值会被跳过并计数。对于单一时刻的解，无论文件给出的是什么时间，每次测量都与那一个结果比较。管网计算之后，报告才会填入内容。</p>';
 $ec_lang['lpn_guide_cal_file_term']='率定文件';
 $ec_lang['lpn_guide_cal_file_def']='<p>一个文本文件，每行有位置 ID、时间和测量值。时间从模拟开始算起，以十进制小时或时:分表示。分号开始一条注释。只有时间和数值的行，属于其上方的位置。数值按项目的单位读取，报告会说明是哪个单位。不在管网中的位置会被列出，其测量值计为跳过；无法读取的行按行号列出，文件的其余部分照常使用。文件只在当前打开的项目和本次页面加载期间保存在内存中，不随项目保存，也不保存在本设备上。当“时间序列”图表显示同一个量时，测量值会以圆环绘在图上。</p>';
-$ec_lang['lpn_guide_cal_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_cal_example_def']='<p>打开 Net1 示例，计算，然后选择“水务”、“报告”、“率定”。选择“压力”后，载入一个文件，其中节点 11 在 0:00 为 118.5 psi、在 12:00 为 121.0 psi，节点 31 在 6:00 为 110.2 psi、在 18:00 为 108.7 psi，节点 99 在 0:00 为 50 psi，其后是一行不是数据的内容。报告说明该文件在 3 个位置有 5 次测量，指出节点 99 不在管网中、有 1 次测量被跳过，并列出无法读取的那一行。“统计”显示节点 11 有 2 次观测，观测均值为 119.75 psi，计算均值为 116.53 psi，平均误差为 3.98，均方根误差为 5.12。节点 31 为 109.45、118.71、9.26 和 9.79。“管网”行有 4 次观测，平均误差为 6.62，均方根误差为 7.81。</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='使用用户手册';
@@ -1223,7 +1201,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='这里有问题吗？';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='隐藏此消息';
 $ec_lang['lpn_msglog_hidden']='已隐藏';
 $ec_lang['lpn_msglog_unhide']='显示';
 $ec_lang['lpn_status_hidden_tip']='在地图上再次显示已隐藏的消息。';
@@ -1358,7 +1335,6 @@ $ec_lang['lpn_result_reaction_rate']='反应速率';
 $ec_lang['lpn_result_status']='状态';
 $ec_lang['lpn_result_status_open']='开启';
 $ec_lang['lpn_result_status_closed']='关闭';
-$ec_lang['lpn_result_head']='水头';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='该节点处水的势能，以水柱高度表示。它是绝对高度，而压力是表压测量值。';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1731,7 +1707,6 @@ $ec_lang['lpn_morph_ok']='更改';
 $ec_lang['lpn_morph_other_kind']='节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='类型';
 $ec_lang['lpn_field_type_tip']='此元件在此方案中的类型，由“更改类型”设定。清除覆盖值可使用父方案的类型。';
 $ec_lang['lpn_change_type_lost']='这些数值将会丢失：';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -2055,7 +2030,6 @@ $ec_lang['lpn_pgraph_none']='此元件在当前运行中没有结果。';
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='来自 {node} 的水源占比';
-$ec_lang['lpn_result_pump_head']='水头';
 $ec_lang['lpn_result_pump_head_tip']='水泵从吸水侧到出水侧增加的水头，以正数显示。求解器和 EPANET 文件将其记为负的水头损失。';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2145,7 +2119,6 @@ $ec_lang['lpn_file_new']='新建项目…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='新建项目';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2571,7 +2544,6 @@ $ec_lang['lpn_file_training_permission']='首次保存时，浏览器会询问�
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='继续';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='重新选择该文件';
@@ -2683,7 +2655,6 @@ $ec_lang['lpn_notes_engine_def']='本页面使用的 EPANET 求解器是 OWA-EPA
 $ec_lang['lpn_guide_nt_example_term']='Net1 上的示例：超出曲线范围的水泵';
 $ec_lang['lpn_guide_nt_example_def']='打开 Net1 示例并选择“水务”、“库”。曲线 1，即水泵 9 的 Pump Curve，只有一个点，250 ft 处 1500 gpm。零流量水头为 333.3 ft，最大流量为 3000 gpm。在 3500 gpm（已超出曲线末端）时，曲线给出的水头为 −120.4 ft。EPANET 求解器报告同样的水头，即水泵两端损失 120.4 ft，并警告水泵无法提供足够的流量或水头。';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='Net1 上的示例';
 $ec_lang['lpn_guide_own_example_def']='<p>打开 Net1 示例，按 Ctrl+K，键入 critical。“菜单”显示“水务”、“分析”之下的“关键性分析…”一行。“框”显示提到它的条目，其中有“查找与替换”、“消防流量分析”和“关键性分析”，以及本条目。选择该行会显示“关键性分析…”在“分析”菜单中的位置，不会运行它。</p>';
 $ec_lang['lpn_id_invalid']='请输入不含空格和引号的 ID。';
 $ec_lang['lpn_id_taken']='该 ID 已被使用。';
@@ -2756,8 +2727,6 @@ $ec_lang['lpn_link_end_same']='“起点”和“终点”必须是不同的节�
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='在此节点处分割管道 {id} 吗？';
-$ec_lang['lpn_split_yes']='是';
-$ec_lang['lpn_split_no']='否';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}，折点 {n}';
@@ -3014,7 +2983,6 @@ $ec_lang['lpn_labels_col_decimals']='小数位';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='显示';
 $ec_lang['lpn_labels_show_tip']='数值在标签上出现的顺序。编号为 1 的数值排在最前：在堆叠式标签中位于最上方，在单行标签中位于最前面。';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3339,7 +3307,6 @@ $ec_lang['lpn_sm_make_current']='设为当前';
 $ec_lang['lpn_sm_current_already']='此方案已是当前方案。';
 $ec_lang['lpn_sm_none_selected']='请先在树中选择一项。';
 $ec_lang['lpn_sm_base_named']='树的“基础”不能重命名。';
-$ec_lang['lpn_sm_copy']='复制';
 $ec_lang['lpn_sm_merge_up']='向上合并';
 $ec_lang['lpn_sm_merge_up_tip']='将所选备选方案的覆盖值移入树中位于其上方的备选方案。所选备选方案随后继承这些数值。';
 $ec_lang['lpn_sm_merge_up_root']='“基础”备选方案上方没有可合并的对象。';
@@ -3464,10 +3431,8 @@ $ec_lang['lpn_alt_cat_initial']='初始设置';
 $ec_lang['lpn_alt_cat_constituent']='组分';
 $ec_lang['lpn_alt_cat_fireflow']='消防流量';
 $ec_lang['lpn_alt_cat_energy']='能耗费用';
-$ec_lang['lpn_alt_cat_userdata']='自定义属性';
 $ec_lang['lpn_alt_cat_text']='文字';
 $ec_lang['lpn_alt_cat_presentation']='呈现';
-$ec_lang['lpn_alt_cat_calculation']='计算';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3561,7 +3526,7 @@ $ec_lang['lpn_settings_flow_change']='流量变化限值';
 $ec_lang['lpn_settings_flow_change_tip']='求解器停止前必须通过的附加检验：任意一条管道的流量在相邻两次试算之间的最大变化。设为零表示不进行此项检验。只有 EPANET 求解器会读取此框。';
 $ec_lang['lpn_settings_damp_limit']='阻尼启动精度';
 $ec_lang['lpn_settings_damp_limit_tip']='求解器开始采用更小步长的精度阈值，这有助于振荡的管网收敛。设为零表示求解器永不启用阻尼。只有 EPANET 求解器会读取此框。';
-$ec_lang['lpn_settings_option_unset']='未设置';
+$ec_lang['lpn_settings_option_unset']='未说明';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='同时应用于管网中每项需水量的单一系数。每个方案可以有单独的数值，因此只需更改此设置，即可建立平均日、最大日或高峰小时工况。';
 $ec_lang['lpn_settings_engine_native']='尽可能使用内置求解器';
@@ -3814,7 +3779,6 @@ $ec_lang['lpn_settings_runbox']='显示运行进度框';
 $ec_lang['lpn_settings_runbox_tip']='一个用于报告运行进度及其结果的框。关闭此项后，运行完成时会改为在状态栏中显示相同的信息，持续几秒钟。这是针对本浏览器的设置，而非项目的设置。';
 $ec_lang['lpn_time_run_failed']='运行未能完成，因此没有后续时刻的结果。';
 $ec_lang['lpn_time_run_report']='运行报告';
-$ec_lang['lpn_time_run_report_copy']='复制';
 $ec_lang['lpn_time_run_report_copied']='已复制';
 $ec_lang['lpn_time_run_report_tip']='EPANET 为上一次运行写出的报告原文：是否收敛，以及任何警告。该文本由 EPANET 求解器生成，而非本页面。';
 
@@ -3994,7 +3958,6 @@ $ec_lang['lpn_reaction_order_wall']='管壁反应级数';
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='取 1 表示管壁反应按给定的系数发生；取 0 表示不发生。这是一个开关式设置。默认值为 1。';
-$ec_lang['lpn_reaction_order_unstated']='未说明';
 $ec_lang['lpn_reaction_order_zero']='0，零级';
 $ec_lang['lpn_reaction_order_first']='1，一级';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4070,7 +4033,6 @@ $ec_lang['lpn_energy_col_avg_kw']='平均千瓦';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='此水泵运行期间使用的平均功率。它不按闲置时段平均，因此即使某台水泵在延时模拟的大部分时间里都处于闲置状态，它报告的仍是运行期间实际使用的功率。';
 $ec_lang['lpn_energy_col_peak_kw']='峰值千瓦';
-$ec_lang['lpn_energy_col_kwh']='千瓦时';
 $ec_lang['lpn_energy_col_cost']='费用';
 $ec_lang['lpn_energy_total_kwh']='耗电量';
 $ec_lang['lpn_energy_total_energy_cost']='电费';
@@ -4109,7 +4071,6 @@ $ec_lang['lpn_full_download_csv']='下载 CSV';
 $ec_lang['lpn_full_print']='打印报告';
 $ec_lang['lpn_full_col_time']='时间';
 $ec_lang['lpn_full_col_type']='类型';
-$ec_lang['lpn_full_col_id']='ID';
 $ec_lang['lpn_full_row_count']='行（{n}）。';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4243,7 +4204,6 @@ $ec_lang['lpn_library_curve_equation_tip']='通过各数据点拟合出的曲线
 $ec_lang['lpn_library_curve_values_tip']='在电子表格中选择一列或两列，复制后粘贴到您想要放置数据的第一个单元格中，行会按需自动添加。您也可以直接粘贴从 EPANET 文件中复制的行，包括曲线名称。';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='说明';
 $ec_lang['lpn_library_curve_remove_point']='删除此点';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4444,7 +4404,6 @@ $ec_lang['lpn_field_demand_pattern']='需水模式';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='说明';
 $ec_lang['lpn_demand_add']='添加需水类别';
 $ec_lang['lpn_demand_remove']='删除此项需水量';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
@@ -4744,14 +4703,9 @@ $ec_lang['lpn_ds_menu_tip']='在管网副本上将需水量乘以一个系数并
 $ec_lang['lpn_ds_title']='需水量缩放';
 $ec_lang['lpn_ds_intro']='按“运行”按钮，将所选节点的需水量乘以需水量缩放系数，并查看压力和流速。\n\n按“查找”按钮，求出最大的需水量缩放系数（精确到 {step}），使所有这些节点都至少保持允许的最低压力；搜索范围为 0 至 {max}。\n\n两者都在管网副本上进行，按屏幕上显示的时间步、在当前方案中求解，因此项目中的任何内容都不会改变。仅对该时间步进行缩放，水位和状态均取自该时间步；若要检验高峰，请在运行前将时钟移到高峰需水量时刻。';
 $ec_lang['lpn_ds_scope']='要缩放的节点';
-$ec_lang['lpn_ds_scope_all']='所有节点';
-$ec_lang['lpn_ds_scope_selected']='所选节点';
-$ec_lang['lpn_ds_minpressure']='允许的最低压力';
-$ec_lang['lpn_ds_minpressure_tip']='这与“消防流量分析”中其他位置的“允许的最低压力”是同一个数值。在此处更改，就会在彼处更改。';
 $ec_lang['lpn_ds_head_scale']='缩放需水量';
 $ec_lang['lpn_ds_multiplier']='需水量缩放系数';
 $ec_lang['lpn_ds_multiplier_tip']='每项需水量所乘的系数；1.5 表示增加 50%。它叠加在当前方案的需水量倍数之上（该倍数已包含在需水量中），且绝不会保存到项目中。';
-$ec_lang['lpn_ds_run']='运行';
 $ec_lang['lpn_ds_head_search']='系统能承受多大的需水量缩放系数？';
 $ec_lang['lpn_ds_head_search_selected']='这些节点能承受多大的需水量缩放系数？';
 $ec_lang['lpn_ds_outside_below']='在需水量缩放系数为 {m} 时，未选中的节点中低于 {pressure} 的有：{n} 个（{ids}）。它们不限制本结果。';
@@ -4773,7 +4727,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='需水量已乘以需水量缩放系数。';
 $ec_lang['lpn_ds_col_unscaled']='缩放前';
 $ec_lang['lpn_ds_col_unscaled_tip']='需水量保持当前方案在此时间步的原值，与地图上显示的数值相同。';
 $ec_lang['lpn_ds_no_junctions']='本项目尚无节点，因此没有可缩放的需水量。';
-$ec_lang['lpn_ds_no_selection']='未选中任何节点。请选中节点，或选择“所有节点”。';
 $ec_lang['lpn_ds_skipped']='所选元件中不是节点而保持原样的：{n} 个。';
 $ec_lang['lpn_ds_bad_multiplier']='请输入大于或等于零的需水量缩放系数，例如 1.5。';
 $ec_lang['lpn_ds_stale']='图纸已更改，因此需水量缩放结果已被清除。请重新运行。';
@@ -4932,8 +4885,6 @@ $ec_lang['lpn_survey_cancelled']='未创建任何内容，也未更改任何内�
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='北坐标';
-$ec_lang['lpn_survey_axis_east']='东坐标';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='该文件中没有任何内容。';
 $ec_lang['lpn_survey_err_unreadable']='该文件无法作为测量点列表读取。';

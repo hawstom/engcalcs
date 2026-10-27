@@ -14,6 +14,7 @@
 //     converter that was null until proj4 had loaded, which a latitude-and-longitude project never
 //     does, and the throw read as "damaged". It must import on the first try in a fresh page.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -61,7 +62,8 @@ function shpPoints(n) {
 }
 
 async function open(browser) {
-	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
+	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});

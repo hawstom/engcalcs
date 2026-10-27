@@ -25,6 +25,7 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
@@ -139,7 +140,8 @@ async function drag(page, from, dx, dy, steps) {
 	await page.mouse.up();
 }
 async function open(Session, browser) {
-	const a = await Session.open(browser, NAME);
+	const a = await Session.open(browser, NAME, { serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
