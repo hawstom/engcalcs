@@ -6,7 +6,7 @@
 // a latitude and other fields' prefixes (2026-10-26). Chrome saves each control's value on leaving
 // the page and restores by position on back/forward; a different number of controls then shifts
 // the values. Here the shift is forced (three extra text boxes typed into before leaving, which a
-// later visit would not have), once with js/no-form-restore.js blocked, to prove the browser really
+// later visit would not have), once with the inline js/no-form-restore.js cut out, to prove the browser really
 // does it, and once as shipped, to prove the Settings label boxes come back as the model wrote them.
 // Also: every input, select and textarea on the page, static or script-built, carries
 // autocomplete="off".
@@ -35,16 +35,21 @@ function ok(label, cond, detail) {
 }
 // A Playwright route switches off the browser's form restore, which is the thing under test, so
 // nothing here uses one. The control run goes through a tiny forwarding server that answers 404 for
-// the protection script; tile hosts are made unreachable by a launch flag instead.
+// the protection script cut out of the page; tile hosts are made unreachable by a launch flag instead.
 const http = require('http');
 function proxy(origin, blockFix) {
 	return new Promise((resolve) => {
 		const srv = http.createServer(async (q, res) => {
 			if (q.url.startsWith('/blank')) { res.setHeader('content-type', 'text/html'); return res.end('<p>blank'); }
-			if (blockFix && /no-form-restore\.js/.test(q.url)) { res.statusCode = 404; return res.end(''); }
 			const r = await fetch(origin + q.url);
 			res.statusCode = r.status; res.setHeader('content-type', r.headers.get('content-type') || '');
-			res.end(Buffer.from(await r.arrayBuffer()));
+			let body = Buffer.from(await r.arrayBuffer());
+			if (blockFix && /Looped-Network\.php/.test(q.url)) {
+				const t = body.toString('utf8'), mo = t.indexOf('new MutationObserver(sweep)'), at = t.lastIndexOf('<script>', mo), end = t.indexOf('</script>', mo);
+				if (mo < 0 || at < 0) { throw new Error('protection script not found in the page'); }
+				body = Buffer.from(t.slice(0, at) + t.slice(end + 9));
+			}
+			res.end(body);
 		}).listen(0, () => resolve(srv));
 	});
 }

@@ -36,9 +36,9 @@ function lpnSavedMark($class) {
 		. htmlspecialchars($ec_lang['lpn_saved_' . $class]) . '</span>';
 }
 // The browser's form restore pours stale values into this page's script-built controls by position
-// (js/no-form-restore.js). It must be in <head>, ahead of the body.
+// (js/no-form-restore.js). It must be in <head>, ahead of the body, so it is inlined, not a module.
 echoHeader("EngCalcsApp", $html_title,
-	'<script src="/engcalcs/js/no-form-restore.js?v=' . filemtime(__DIR__ . '/js/no-form-restore.js') . '"></script>', false);
+	'<script>' . file_get_contents(__DIR__ . '/js/no-form-restore.js') . '</script>', false);
 ?>
 <?php // **NO PAGE TITLES HERE ANY MORE** (Task 625). The h2 description, the "Hide these titles"
       // link and the inline visibility script that used to stand here are gone with the suite
