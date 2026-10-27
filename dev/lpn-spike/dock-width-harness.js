@@ -196,6 +196,8 @@ async function main() {
 			await m.settle(700);
 			keep('lpn_popup', await measure(m, 'lpn_popup'), k);
 			await m.page.keyboard.press('Escape');
+			// Escape leaves a floating Properties box standing over the map; close it so the next element can be clicked.
+			await m.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 			await m.settle(300);
 		}
 		for (const id of Object.keys(table)) {
