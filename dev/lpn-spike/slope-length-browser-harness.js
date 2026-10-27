@@ -335,8 +335,8 @@ async function main() {
 			ok(id + ' opens in Properties', await clickEl('#lpn_canvas [data-link="' + id + '"]'));
 			await page.evaluate((t) => {
 				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf(t) === 0)[0];
-				const box = l.querySelector('input[type="checkbox"]');   // Auto sits in the row's last cell (Task 828)
+					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf('Auto length') === 0)[0];
+				const box = l.querySelector('input[type="checkbox"]');   // Auto length is a row of its own above Length (Task 828)
 				box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
 				box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true }));
 			}, esLen);

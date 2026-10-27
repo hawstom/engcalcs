@@ -25135,6 +25135,7 @@ var EngCalcs = EngCalcs || {};
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
 		host.__lpnFitQ = false;
+		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
 		if (id && typeof prefs[id] === 'number') { gcolApply(host); return; }
 		host.style.setProperty('--lpn-g-name', 'max-content');
@@ -25189,7 +25190,7 @@ var EngCalcs = EngCalcs || {};
 		function dirSign() { return window.getComputedStyle(hdr).direction === 'rtl' ? -1 : 1; }
 		split.addEventListener('pointerdown', function (e) {
 			if (e.button !== undefined && e.button !== 0) { return; }
-			dragging = true; startX = e.clientX; startRem = nameRem();
+			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem();
 			try { split.setPointerCapture(e.pointerId); } catch (err) {}
 			e.preventDefault();
 		});
@@ -25203,6 +25204,7 @@ var EngCalcs = EngCalcs || {};
 			try { split.releasePointerCapture(e.pointerId); } catch (err) {}
 			v = parseFloat(host.style.getPropertyValue('--lpn-g-name'));
 			if (isFinite(v)) { setRem(v, true); }
+			host.__lpnDrag = false;
 		}
 		split.addEventListener('pointerup', endDrag);
 		split.addEventListener('pointercancel', endDrag);
@@ -59949,9 +59951,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < kids.length; i++) {
 			if (/(^|\s)lpn-valwarn(\s|$)/.test(kids[i].className || '')) { mark = kids[i]; }
 		}
+		if (!mark && host.querySelector) { mark = host.querySelector('.lpn-gname > .lpn-valwarn'); }   // a Properties row moves it into its label
 		if (!text) {
 			if (mark) {
-				host.removeChild(mark);
+				mark.parentNode.removeChild(mark);
 				sweepOrphanTips();
 			}
 			return null;
@@ -70434,7 +70437,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Only a quantity states a unit; a choice's parenthesis is its own words ("Check valve (CV)").
 			if (ctrl.nodeName !== 'SELECT') { gpTemplateUnit(nameEl); }
 		}
-		label.__gtrail = trail.filter(function (n) { return !(n.nodeType === 3 && !/\S/.test(n.nodeValue)); });
+		// The value warning (a mark after the control) stands at the end of its label; the rest stands under the row.
+		label.__gtrail = trail.filter(function (n) {
+			if (n.nodeType === 3 && !/\S/.test(n.nodeValue)) { return false; }
+			if (n.nodeType === 1 && /(^| )lpn-valwarn( |$)/.test(n.className || '')) { nameEl.appendChild(document.createTextNode(' ')); nameEl.appendChild(n); return false; }
+			return true;
+		});
 		while (label.firstChild) { label.removeChild(label.firstChild); }
 		label.className = (label.className ? label.className + ' ' : '') + 'lpn-grow';
 		label.appendChild(gut);
