@@ -65285,6 +65285,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				d.rec.dockOrd = i;
 				d.open = true;
 				d.byDefault = true;
+				// Its corner row was drawn as a floating box's (registerDockBox() runs first), which
+				// offered no pin and no Float; draw it again as a docked box's.
+				renderDockCorner(d);
 			});
 		});
 		dockDefaultHold = true;
@@ -65575,6 +65578,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockNoteOpen(d, true);
 		if (d.rec.autohide && !dockBooting) { dockFlyout = d; dockSoft = null; }
 		layoutDocks();
+	}
+	// **THE ONE DOOR FOR "SHOW ME THIS BOX" WHEN IT IS ALREADY OPEN.** A box that is open is not run
+	// through its opener again (a link that only changes the section, a toggle that finds it open), so
+	// dockPlaced() never hears of it; and a box docked and auto-hidden is open but invisible, so the
+	// link appeared to do nothing (Tom, 2026-10-26: Properties > Pipe types with Libraries docked and
+	// unpinned). Docked and auto-hidden: it flies out from its tab and takes focus, as a click on the
+	// tab does. Docked and pinned, or floating: raised, and focus moves into it. Every code path that
+	// brings an open box to the reader's attention calls this, whatever the box.
+	function revealBox(box) {
+		var d = box && box.__lpnDock;
+		if (!box || !dockBoxShown({ box: box })) { return; }
+		if (d && dockSideOf(d) && d.rec.autohide) { dockFlyOut(d, true); }
+		else {
+			if (box.__lpnRaise) { box.__lpnRaise(); }
+			if (!box.hasAttribute('tabindex')) { box.setAttribute('tabindex', '-1'); }
+			try { box.focus({ preventScroll: true }); } catch (e) { box.focus(); }
+		}
 	}
 	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
 	function dockLayoutSoon() {
@@ -72776,7 +72796,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// first is the whole of it; an already-open box only has to be rebuilt.
 	function openLibrarySection(id) {
 		libSection = id;
-		if (libBoxIsOpen()) { rebuildLibraryBox(); } else { openLibraryBox(); }
+		if (libBoxIsOpen()) { rebuildLibraryBox(); revealBox(libBoxEl()); } else { openLibraryBox(); }
 	}
 
 	/**
