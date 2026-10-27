@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**98 open tasks.** Next (100): 13 · Soon (75): 14 · Someday (50): 29 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**99 open tasks.** Next (100): 14 · Soon (75): 14 · Someday (50): 29 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
-## 100 — Next (13)
+## 100 — Next (14)
 
 - Task 825 — Audit every dockable box's width, with a checklist.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
@@ -24,6 +24,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 838 — "Edit curves…" as the last option of every curve selector.
 - Task 839 — Ida's short Properties labels, each with a tip that expands it.
 - Task 840 — Report cells that mix a value, place and time become columns.
+- Task 841 — Cap label stations so a stale map scale cannot freeze the page.
 
 ## 95 — Priority 95 (6)
 
@@ -129,5 +130,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-89 of 98 titles are within 4–12 words. `!` marks the rest;
+90 of 99 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
