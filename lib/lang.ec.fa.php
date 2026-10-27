@@ -5000,4 +5000,5 @@ $ec_lang['lpn_snip_tip_redo']='بازگرد (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کپی (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='اندازهٔ تصویر به‌صورت مضربی از ناحیهٔ روی صفحه. مضرب بزرگ‌تر واضح‌تر است و فایل بزرگ‌تری می‌سازد.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
-$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

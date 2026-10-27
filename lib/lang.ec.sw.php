@@ -4991,3 +4991,4 @@ $ec_lang['lpn_snip_tip_copy']='Nakili (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Ukubwa wa picha kama kizidishi cha eneo lililo kwenye skrini. Kikubwa zaidi ni kikali zaidi na hutoa faili kubwa zaidi.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

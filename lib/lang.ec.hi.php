@@ -4991,3 +4991,4 @@ $ec_lang['lpn_snip_tip_copy']='कॉपी करें (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

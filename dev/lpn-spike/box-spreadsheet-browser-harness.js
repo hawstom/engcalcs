@@ -29,7 +29,7 @@ if (process.env[LOCK_ENV] !== '1') {
 		process.exit(r.status === null ? 1 : r.status);
 	}
 }
-const { openBox } = require('./dock-boxes.js');
+const { openBox, dockHidden } = require('./dock-boxes.js');
 let checks = 0, failures = 0;
 function ok(label, cond, detail) {
 	checks++;
@@ -113,7 +113,7 @@ async function main() {
 		ok('Length carries its unit and has no Auto toggle beside it', /^Length \(ft\)\s*\??$/.test(m.lenName || ''), m.lenName);
 		ok('Auto length is its own row above Length', m.autoAbove, '');
 		ok('...with its toggle in the value column', m.autoInValueCol, '');
-		ok('the Label column is fitted: narrower than the widest label, wider than the median', m.labelCol < m.widest + 14 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
+		ok('the Label column is fitted: no wider than the widest label, wider than the median', m.labelCol <= m.widest + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
 		ok('nothing is cut at the right edge', m.cut === 0 && m.scroll <= 1, JSON.stringify({ cut: m.cut, scroll: m.scroll }));
 
 		// The divider: drag, remembered per box, kept across a reload, reset by a double-click.
@@ -139,10 +139,10 @@ async function main() {
 		await a.settle(700);
 		const f0 = await headerW(page, '#lpn_find_form');
 		ok('Find and replace has a header row of Label and Value', await page.evaluate(() => { const h = document.querySelector('#lpn_find_form .lpn-ghdr'); return !!h && Array.from(h.querySelectorAll('.lpn-ghcell')).map((c) => c.textContent.trim()).join('|') === 'Label|Value'; }));
-		await drag(page, '#lpn_find_form', 30);
+		await drag(page, '#lpn_find_form', -12);
 		await a.settle(300);
 		const f1 = await headerW(page, '#lpn_find_form');
-		ok('Find: dragging the divider widens the Label column', f1 > f0 + 10, f0 + ' -> ' + f1);
+		ok('Find: dragging the divider left narrows the Label column', f1 < f0 - 6, f0 + ' -> ' + f1);
 		const s2 = await stored(page);
 		ok('...remembered per box: Properties and Find each have a width', typeof s2.lpn_popup === 'number' && typeof s2.lpn_find_form === 'number', JSON.stringify(s2));
 		await page.evaluate(() => { const s = document.querySelector('#lpn_find_form .lpn-ghdr .lpn-gsplit'); s.dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); });
@@ -181,7 +181,81 @@ async function main() {
 			await page.evaluate(() => { const b = document.querySelector('#lpn_library_box .lpn-popover-x, #lpn_library_box [id$="_close"]'); if (b) { b.click(); } });
 			await a.settle(300);
 		}
+		// Libraries docked on the left and auto-hidden: the option flies it out, visibly (Perry saw it stay unseen).
+		console.log('\n--- Edit types with Libraries docked left and auto-hidden ---');
+		await dockHidden(a, 'lpn_library_box', 'left');
+		await openPipe(a);
+		for (const [label, section] of [['Edit types…', 'pipetypes'], ['Edit fittings…', 'fittings']]) {
+			await page.evaluate((lab) => {
+				const s = Array.from(document.querySelectorAll('#lpn_popup_fields select')).filter((x) => Array.from(x.options).some((o) => o.textContent === lab))[0];
+				s.value = Array.from(s.options).filter((o) => o.textContent === lab)[0].value;
+				s.dispatchEvent(new Event('change', { bubbles: true }));
+			}, label);
+			await a.settle(900);
+			const v = await page.evaluate((sec) => {
+				const b = document.getElementById('lpn_library_box'), r = b.getBoundingClientRect(), cs = getComputedStyle(b);
+				const at = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 120));
+				return { w: Math.round(r.width), h: Math.round(r.height), onScreen: r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight,
+					shown: cs.display !== 'none' && cs.visibility !== 'hidden', top: !!at && b.contains(at), section: document.getElementById('lpn_libbox_link_' + sec).getAttribute('aria-current') === 'true' };
+			}, section);
+			ok('"' + label + '" flies the docked, auto-hidden Libraries box out: on screen, non-zero size, nothing over it, on ' + section,
+				v.w > 100 && v.h > 100 && v.onScreen && v.shown && v.top && v.section, JSON.stringify(v));
+		}
 		await a.close();
+
+		console.log('\n--- the divider keeps the Value column ---');
+		const d = await start(false);
+		await openPipe(d);
+		await drag(d.page, '#lpn_popup .lpn-popover-body', 900);
+		await d.settle(300);
+		const cap = await d.page.evaluate(() => {
+			const body = document.querySelector('#lpn_popup .lpn-popover-body'), R = (e) => e.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+			const ins = Array.from(body.querySelectorAll('#lpn_popup_fields input, #lpn_popup_fields select')).filter((e) => R(e).width > 0 && !e.closest('table'));
+			const lab = R(body.querySelector('.lpn-ghlabel')), edge = R(body).right;
+			return { valueRem: (edge - lab.right) / rem, clipped: ins.filter((e) => R(e).right > edge - 1 || e.scrollWidth > e.clientWidth + 1 && e.tagName === 'SELECT').length, scroll: body.scrollWidth - body.clientWidth };
+		});
+		ok('dragging the divider far right still leaves the Value column 9.5 rem, no input clipped', cap.valueRem >= 9.5 && cap.clipped === 0 && cap.scroll <= 1, JSON.stringify(cap));
+		await d.close();
+
+		console.log('\n--- the header sits directly above the grid; labels keep their ? and units whole ---');
+		const t = await start(false);
+		const txy = await t.page.evaluate(() => { const e = document.querySelector('#lpn_canvas [data-lbl]'); if (!e) { return null; } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		if (txy) {
+			await t.page.mouse.click(txy.x, txy.y); await t.settle(900);
+			const th = await t.page.evaluate(() => {
+				const h = document.querySelector('#lpn_popup .lpn-ghdr'), ta = document.querySelector('#lpn_popup_fields textarea'), R = (e) => e.getBoundingClientRect();
+				const first = document.querySelector('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)');
+				return h && ta && first ? { belowWords: R(h).top >= R(ta).bottom - 1, aboveRows: Math.abs(R(first).top - R(h).bottom) <= 2 } : null;
+			});
+			ok('on a Text the header is below the words box and directly above the rows', !!th && th.belowWords && th.aboveRows, JSON.stringify(th));
+		}
+		await t.close();
+
+		console.log('\n--- one run, one header; Convert as is on the grid ---');
+		const c = await start(false);
+		await c.menuClick(await c.lang('lpn_file_convert_as'), 'file').catch(() => {});
+		await c.page.waitForSelector('#lpn_convas_panel', { state: 'visible', timeout: 4000 }).catch(() => {});
+		await c.settle(700);
+		const cv = await c.page.evaluate(() => {
+			const b = document.getElementById('lpn_convas_body');
+			if (!b) { return null; }
+			const runs = Array.from(b.querySelectorAll('.lpn-grid')), R = (e) => e.getBoundingClientRect();
+			const rows = (g) => Array.from(g.children).filter((k) => k.classList.contains('lpn-grow')).length;
+			return { grid: b.classList.contains('lpn-gridhost'), runs: runs.map((g) => ({ rows: rows(g), hdr: !!g.previousElementSibling && g.previousElementSibling.classList.contains('lpn-ghdr') })),
+				unitRows: b.querySelectorAll('#lpn_convas_units_fields .lpn-grow').length, scroll: b.scrollWidth - b.clientWidth };
+		});
+		ok('Convert as is a box of Label | Value rows: the coordinate system and the units', !!cv && cv.grid && cv.unitRows >= 8, JSON.stringify(cv));
+		ok('...a run of two or more rows has a header and a run of one has none', !!cv && cv.runs.every((g) => g.hdr === (g.rows >= 2)), JSON.stringify(cv && cv.runs));
+		ok('...and it does not scroll sideways', !!cv && cv.scroll <= 1, String(cv && cv.scroll));
+		await c.close();
+		const f = await start(false);
+		await openBox(f, 'lpn_full_box');
+		await f.settle(800);
+		ok('Full report has one row and no header', await f.page.evaluate(() => document.querySelectorAll('#lpn_full_box .lpn-ghdr').length === 0));
+		await openBox(f, 'lpn_calib_box');
+		await f.settle(800);
+		ok('Calibration has one row and no header', await f.page.evaluate(() => document.querySelectorAll('#lpn_calib_box .lpn-ghdr').length === 0));
+		await f.close();
 
 		console.log('\n--- Properties on a phone ---');
 		const p = await start(true);

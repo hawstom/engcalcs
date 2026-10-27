@@ -4990,4 +4990,5 @@ $ec_lang['lpn_snip_tip_redo']='إعادة (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='نسخ (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='حجم الصورة كمضاعف لمنطقة الشاشة. كلما كبر كانت الصورة أوضح وأكبر حجماً.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
-$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

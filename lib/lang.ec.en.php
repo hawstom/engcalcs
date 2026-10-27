@@ -5220,3 +5220,4 @@ $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
 $ec_lang['lpn_field_auto_length']='Auto length';
 $ec_lang['lpn_edit_pipetypes']='Edit types…';
 $ec_lang['lpn_edit_fittings']='Edit fittings…';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

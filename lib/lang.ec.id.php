@@ -4991,3 +4991,4 @@ $ec_lang['lpn_snip_tip_copy']='Salin (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Ukuran gambar sebagai kelipatan area di layar. Kelipatan yang lebih besar lebih tajam dan menghasilkan berkas lebih besar.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

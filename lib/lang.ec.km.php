@@ -4991,3 +4991,4 @@ $ec_lang['lpn_snip_tip_copy']='ចម្លង (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

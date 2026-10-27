@@ -4990,4 +4990,5 @@ $ec_lang['lpn_snip_tip_redo']='بیا کول (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کاپي (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
-$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

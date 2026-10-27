@@ -1714,30 +1714,33 @@ echoHeader("EngCalcsApp", $html_title,
 <div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></legend>
-			<div id="lpn_convas_from"></div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg"> <?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label>
+	<?php // The coordinate system and the units are Label | Value rows of the box's one grid, as in New project
+	      // (Task 828); the rounding table below is its own three-column table and stays one. ?>
+	<div class="lpn-popover-body lpn-gridhost" id="lpn_convas_body">
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></div>
+		<div id="lpn_convas_from" class="lpn-gspan"></div>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_epsg"><?=ecTipLabel($ec_lang['lpn_convas_epsg'], $ec_lang['lpn_convas_epsg_tip'])?></label></span>
+				<span class="lpn-gval lpn-gwrap"><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_epsg" value="epsg">
 				<button type="button" id="lpn_convas_crs_pick" aria-describedby="lpn_convas_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_convas_epsg']))?>">&hellip;</button>
-				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span>
+				<span id="lpn_convas_crs_name" class="lpn-new-crs-name"></span></span>
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed"> <?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_unnamed"><?=ecTipLabel($ec_lang['lpn_convas_unnamed'], $ec_lang['lpn_convas_unnamed_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" name="lpn_convas_kind" id="lpn_convas_kind_unnamed" value="unnamed">
 			</div>
-			<div>
-				<label><input type="radio" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none"> <?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_kind_none"><?=ecTipLabel($ec_lang['lpn_crs_none'], $ec_lang['lpn_convas_none_tip'])?></label></span>
+				<input type="radio" class="lpn-gval" name="lpn_convas_kind" id="lpn_convas_kind_none" value="none">
 			</div>
-		</fieldset>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></legend>
-			<div class="lpn-new-presets">
-				<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
-				<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
-			</div>
-			<div id="lpn_convas_units_fields" class="lpn-units-group"></div>
-		</fieldset>
+		</div>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></div>
+		<div class="lpn-new-presets lpn-gcol2">
+			<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
+			<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
+		</div>
+		<div id="lpn_convas_units_fields" class="lpn-gsub"></div>
 		<?php // Tom's rounding request (Task 688): "Diameter, Depth, Demand and Flow, Head", each a
 		      // selector of nearest 100, 10, 1, 0.1, 0.01, 0.001. The steps are numbers, not words, so
 		      // they are not language keys. "No rounding" is the default: rounding changes a number
@@ -3004,6 +3007,7 @@ EngCalcs.pageConfig = {
 	lpn_field_auto_length: <?=json_encode($ec_lang['lpn_field_auto_length'])?>,
 	lpn_prop_label_unit: <?=json_encode($ec_lang['lpn_prop_label_unit'])?>,
 	lpn_prop_label_symbol_unit: <?=json_encode($ec_lang['lpn_prop_label_symbol_unit'])?>,
+	lpn_prop_label_symbol: <?=json_encode($ec_lang['lpn_prop_label_symbol'])?>,
 	lpn_edit_pipetypes: <?=json_encode($ec_lang['lpn_edit_pipetypes'])?>,
 	lpn_edit_fittings: <?=json_encode($ec_lang['lpn_edit_fittings'])?>,
 	lpn_method_switch_confirm: <?=json_encode($ec_lang['lpn_method_switch_confirm'])?>,

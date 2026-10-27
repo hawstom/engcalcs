@@ -25019,9 +25019,14 @@ var EngCalcs = EngCalcs || {};
 	// comma, full-width brackets). The unit and the symbol are wrapped in <bdi>, so a right-to-left
 	// language does not flip "(mm)". The string this returns holds those `<bdi>` marks; only
 	// lpnRichInto() reads it, and it builds elements, never markup.
+	// "Roughness, C": the same template family, plain text (no <bdi>), for the places a label is only words.
+	function lpnLabelSymbol(label, symbol) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_prop_label_symbol || '{label}, {symbol}').replace(/\{label\}/g, function () { return label; }).replace(/\{symbol\}/g, function () { return symbol; });
+	}
 	function lpnLabelWithUnit(label, unit, symbol) {
 		var pc = EngCalcs.pageConfig || {}, tpl;
-		if (!unit) { return symbol ? label + ', ' + symbol : label; }
+		if (!unit) { return symbol ? lpnLabelSymbol(label, symbol) : label; }
 		tpl = symbol ? (pc.lpn_prop_label_symbol_unit || '{label}, {symbol} ({unit})') : (pc.lpn_prop_label_unit || '{label} ({unit})');
 		return tpl.replace(/\{label\}/g, function () { return label; })
 			.replace(/\{symbol\}/g, function () { return '<bdi>' + symbol + '</bdi>'; })
@@ -25035,7 +25040,7 @@ var EngCalcs = EngCalcs || {};
 			if (!parts[i]) { continue; }
 			if (parts[i].indexOf('<bdi>') === 0) {
 				b = document.createElement('bdi');
-				b.textContent = parts[i].slice(5, -6);
+				b.textContent = parts[i].slice(5, -6).replace(/ /g, '\u00a0');   // a unit never breaks inside its brackets
 				el.appendChild(b);
 			} else { el.appendChild(document.createTextNode(parts[i])); }
 		}
@@ -25070,7 +25075,7 @@ var EngCalcs = EngCalcs || {};
 	// `Label | Value`, two tracks shared by all rows of a grid, under a header row that names them and
 	// carries the divider (Tom, 2026-10-26: "Make it look like a spreadsheet"). A unit stands in its
 	// label ("Diameter (mm)", lpnLabelWithUnit), so there is no third column. The Label track is
-	// FITTED (gridFitNow: the 90th percentile of the labels' natural widths) and a user drag of the
+	// FITTED (gridFitNow: the 80th, with a floor percentile of the labels' natural widths) and a user drag of the
 	// divider overrides it, remembered in `lpn_gcols` (window furniture, browser only, never in
 	// serializeProject(); Tom, 2026-10-24: "lpn_gcols is fine; go ahead.").
 	//
@@ -25080,7 +25085,7 @@ var EngCalcs = EngCalcs || {};
 	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
 	// the next row starts a new one, and both share the host's one width.
 	var LPN_GCOLS_KEY = 'lpn_gcols';
-	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 5, LPN_GSTEP = 0.5;   // rem
+	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 10, LPN_GSTEP = 0.5;   // rem
 	var gcolPrefs = null;
 	function gcolRead() {
 		var raw = null, v;
@@ -25112,10 +25117,10 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE SPREADSHEET HEADER (Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET and
 	// WaterGEMS"): a header row with two cells, Label and Value, and a divider between them the reader
 	// drags. The divider writes --lpn-g-name on the host and remembers it per box in `lpn_gcols`.
-	// With no remembered width the label column is FITTED: wide enough for most labels (the 90th
+	// With no remembered width the label column is FITTED: wide enough for most labels (the 80th
 	// percentile of their natural widths), so one long label wraps instead of widening the whole
 	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
-	var LPN_GFIT_PCT = 0.9;
+	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
 	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
 	// The label column's natural widths, one a label: a range over each name's words, with its track
@@ -25136,6 +25141,7 @@ var EngCalcs = EngCalcs || {};
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
 		host.__lpnFitQ = false;
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
+		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
 		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
 		if (id && typeof prefs[id] === 'number') { gcolApply(host); return; }
 		host.style.setProperty('--lpn-g-name', 'max-content');
@@ -25145,6 +25151,7 @@ var EngCalcs = EngCalcs || {};
 		px = gridRem();
 		names.sort(function (a, b) { return a - b; });
 		w = names[Math.min(names.length - 1, Math.ceil(LPN_GFIT_PCT * names.length) - 1)];
+		w = Math.max(w, Math.min(names[names.length - 1], LPN_GFIT_FLOOR));
 		cs = window.getComputedStyle(host);
 		pad = 14;   // the cell's own padding and the divider line
 		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
@@ -25170,9 +25177,18 @@ var EngCalcs = EngCalcs || {};
 			rem = gridRem();
 			return labelCell.getBoundingClientRect().width / rem;
 		}
-		function room() {
-			// The label column may grow until the value column keeps LPN_GVAL_MIN rem.
-			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - LPN_GVAL_MIN);
+		// The widest value control at its natural width (the Label track at max-content, as the fit reads it).
+		function valNeed() {
+			var had = host.style.getPropertyValue('--lpn-g-name'), w = 0, vals = host.querySelectorAll('.lpn-grow > .lpn-gval'), i;
+			host.style.setProperty('--lpn-g-name', 'max-content');
+			for (i = 0; i < vals.length; i++) { w = Math.max(w, vals[i].getBoundingClientRect().width + 12); }
+			if (had) { host.style.setProperty('--lpn-g-name', had); } else { host.style.removeProperty('--lpn-g-name'); }
+			return w / rem;
+		}
+		function room(fresh) {
+			// The label column may grow until the value column keeps its widest input (and never under LPN_GVAL_MIN rem).
+			if (fresh || host.__lpnValNeed === undefined) { rem = gridRem(); host.__lpnValNeed = valNeed(); }
+			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - Math.max(LPN_GVAL_MIN, host.__lpnValNeed));
 		}
 		function setRem(v, keep) {
 			var id = gcolId(host);
@@ -25190,7 +25206,7 @@ var EngCalcs = EngCalcs || {};
 		function dirSign() { return window.getComputedStyle(hdr).direction === 'rtl' ? -1 : 1; }
 		split.addEventListener('pointerdown', function (e) {
 			if (e.button !== undefined && e.button !== 0) { return; }
-			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem();
+			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem(); host.__lpnValNeed = undefined; room(true);
 			try { split.setPointerCapture(e.pointerId); } catch (err) {}
 			e.preventDefault();
 		});
@@ -25213,34 +25229,48 @@ var EngCalcs = EngCalcs || {};
 			var k = e.key, s = dirSign();
 			if (k === 'ArrowLeft' || k === 'ArrowRight') {
 				e.preventDefault();
+				host.__lpnValNeed = undefined;
 				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
 			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
 		});
 	}
-	// The header row of a host: Label | Value, and the divider. A host is given one once and rebuilt
-	// with its rows (a rebuilt body loses it, so every build asks again).
-	// `before` is the first run of rows, which the header stands above (a box with a note or a table
-	// above its rows keeps them above the header); with none it is the host's first child.
-	function gridHeaderEnsure(host, before) {
-		var pc = EngCalcs.pageConfig || {}, hdr, l, v, at;
-		if (host.classList.contains('lpn-gplain')) { return; }
-		if (host.__lpnHdr && host.contains(host.__lpnHdr)) { return; }
-		before = (host.querySelector && host.querySelector('.lpn-grid')) || before;   // the first run of rows, built or in the markup
-		at = before && before.parentNode ? before.parentNode : host;
-		hdr = document.createElement('div');
+	// The header row: Label | Value, and the divider. One stands above each run of two or more rows (a run of
+	// one row is not a table; a box of several runs has the same header over each, and one width for all);
+	// Properties has one, directly above its rows.
+	function gridHeaderMake(host) {
+		var pc = EngCalcs.pageConfig || {}, hdr = document.createElement('div'), l = document.createElement('div'), v = document.createElement('div');
 		hdr.className = 'lpn-ghdr';
 		hdr.setAttribute('role', 'row');
-		l = document.createElement('div');
 		l.className = 'lpn-ghcell lpn-ghlabel';
 		l.textContent = pc.lpn_cp_label || 'Label';
-		v = document.createElement('div');
 		v.className = 'lpn-ghcell lpn-ghvalue';
 		v.textContent = pc.lpn_find_value || 'Value';
 		hdr.appendChild(l);
 		hdr.appendChild(v);
-		at.insertBefore(hdr, before && before.parentNode ? before : at.firstChild);
-		host.__lpnHdr = hdr;
 		try { gridWireSplit(hdr, host, l); } catch (e) { /* a page without pointer events keeps the header */ }
+		return hdr;
+	}
+	function gridHeadersSync(host) {
+		if (host.classList.contains('lpn-gplain')) { return; }
+		Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) {
+			var rows = 0, i, k, prev = g.previousElementSibling, has = !!prev && prev.classList.contains('lpn-ghdr');
+			for (i = 0; i < g.children.length; i++) {
+				k = g.children[i];
+				if (k.classList.contains('lpn-grow') && !k.classList.contains('lpn-gspan-row')) { rows++; }
+			}
+			if (rows >= 2 && !has) { g.parentNode.insertBefore(gridHeaderMake(host), g); }
+			else if (rows < 2 && has) { prev.parentNode.removeChild(prev); }
+		});
+	}
+	// Properties: the header stands directly above the grid: over the ID row when there is one, else over the first
+	// row (below a Text's title and words, a customer's heading).
+	function propsHeaderPlace(body, fields) {
+		var hdr = body.__lpnPHdr || (body.__lpnPHdr = gridHeaderMake(body)), title = document.getElementById('lpn_popup_title'), first;
+		if (title && title.classList.contains('lpn-gtitle-id')) { body.insertBefore(hdr, title); return; }
+		first = null;
+		Array.prototype.forEach.call(fields.children, function (c) { if (!first && c.classList.contains('lpn-grow') && !c.classList.contains('lpn-fill-row')) { first = c; } });
+		if (first) { fields.insertBefore(hdr, first); }
+		else if (hdr.parentNode) { hdr.parentNode.removeChild(hdr); }
 	}
 	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
 	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
@@ -25281,7 +25311,6 @@ var EngCalcs = EngCalcs || {};
 		grid = document.createElement('div');
 		grid.className = 'lpn-grid';
 		host.appendChild(grid);
-		gridHeaderEnsure(top, grid);
 		gridFitSoon(top);
 		return grid;
 	}
@@ -48387,7 +48416,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (fromEl) {
 			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
 		}
-		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
+		convasUnits = cloneUnitStrip('lpn_convas_units_fields', true);
 		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.
 		convasUnits.forEach(function (u) {
 			if (u.name === 'lpn_u_roughness') { u.item.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
@@ -59783,7 +59812,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// translated word carries the meaning and the untranslated letter carries the identity.
 	function roughnessLabel() {
 		var pc = EngCalcs.pageConfig || {};
-		return (pc.lpn_field_roughness || 'Roughness') + ', ' + roughnessSymbol();
+		return lpnLabelSymbol(pc.lpn_field_roughness || 'Roughness', roughnessSymbol());
 	}
 	// Under Hazen-Williams the page keeps its own HW-specific tip, which is more useful than a
 	// generic one ("about 150 for new plastic, 130 for new steel"). Under the other two it borrows
@@ -70526,7 +70555,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				marked = !!gut;
 				if (marked) { fields.insertBefore(gutterCell(), k); }   // a marker over a table or a list
 				// The demand table starts at the value column and spans it and the unit column.
-				k.className = (k.className ? k.className + ' ' : '') + (c.indexOf(' lpn-demand-table ') >= 0 ? 'lpn-gspan3' : marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
+				k.className = (k.className ? k.className + ' ' : '') + (c.indexOf(' lpn-demand-table ') >= 0 ? 'lpn-gspan2' : marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
 				continue;
 			}
 			// A loose link or word after a row belongs to that row (the library link beside a curve);
@@ -70545,7 +70574,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			nm = fields.parentNode;
 			nm.setAttribute('data-gcols-id', 'lpn_popup');
 			gcolApply(nm);
-			gridHeaderEnsure(nm);
+			propsHeaderPlace(nm, fields);
 			gridFitSoon(nm);
 			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
 				nm.__lpnRO = true;

@@ -83,7 +83,7 @@ async function main() {
 			const rows = Array.from(f.children).filter((c) => c.nodeName === 'LABEL' && c.querySelector('.lpn-gname'));
 			const off = Array.from(f.children).filter((c) => {
 				const cs = getComputedStyle(c), k = c.className || '';
-				return !(cs.display === 'contents' || cs.display === 'none' || (cs.display === 'grid' && /lpn-grow/.test(k)) || /lpn-gspan/.test(k) || /lpn-ggut/.test(k));
+				return !(cs.display === 'contents' || cs.display === 'none' || (cs.display === 'grid' && /lpn-grow|lpn-ghdr/.test(k)) || /lpn-gspan/.test(k) || /lpn-ggut/.test(k));
 			}).map((c) => c.nodeName + '.' + c.className);
 			const first = (sel) => rows.map((r) => r.querySelector(sel)).filter(Boolean);
 			const w = (prop) => { const i = f.querySelector('input[data-gprop="' + prop + '"]'); return i ? Math.round(R(i).width) : null; };
@@ -122,13 +122,13 @@ async function main() {
 		ok(tag + 'X, Y and Elevation are one width', new Set(like.coords).size <= 1, JSON.stringify(like.coords));
 		ok(tag + 'Description and Tag are one width', new Set(like.text).size <= 1, JSON.stringify(like.text));
 		const dem = await page.evaluate(() => {
-			const t = document.querySelector('#lpn_popup_fields table.lpn-demand-table'), g = document.querySelector('#lpn_popup_fields .lpn-gval:not(table)'), b = document.querySelector('#lpn_popup .lpn-popover-body');
+			const t = document.querySelector('#lpn_popup_fields table.lpn-demand-table'), g = document.querySelector('#lpn_popup_fields .lpn-gname'), b = document.querySelector('#lpn_popup .lpn-popover-body');
 			if (!t) { return null; }
 			const cut = Array.from(t.querySelectorAll('input, select, button')).filter((e) => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > b.getBoundingClientRect().right + 1).length;
 			return { left: Math.round(t.getBoundingClientRect().left), val: Math.round(g.getBoundingClientRect().left), cut };
 		});
 		if (dem && !phone) {
-			ok(tag + 'the demand table starts in the value column', Math.abs(dem.left - dem.val) <= 8, JSON.stringify(dem));
+			ok(tag + 'the demand table is in the grid, from the Label column', Math.abs(dem.left - dem.val) <= 4, JSON.stringify(dem));
 			ok(tag + 'no demand control is cut by the box edge', dem.cut === 0, JSON.stringify(dem));
 		}
 		if (process.env.BOXROWS_SHOT && !scn) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-' + name + '.png') }); }

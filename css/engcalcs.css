@@ -3747,7 +3747,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    One grid of two columns, Label | Value, built by lpnGridRow() in js/looped-network.js. A unit is
    part of its Label ("Diameter (mm)"), so there is no third column. A header row names the two
    columns and carries the divider the reader drags (--lpn-g-name on the host, remembered per box in
-   `lpn_gcols`). The Label column is FITTED to the 90th percentile of its labels' natural widths, so
+   `lpn_gcols`). The Label column is FITTED to the 80th percentile of its labels' natural widths, so
    one long label wraps (even mid-word) instead of widening the column for all the rest; the Value
    column takes what is left and its controls hug the Label column's edge. Gridlines are
    --ec-border-strong, the header's fill --ec-chrome-bg. The host is the grid and every run of rows in it
@@ -3789,12 +3789,13 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	}
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-border-strong); }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gval { margin: 2px 6px; align-self: start; }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gw-fill, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-ramp-picker { width: calc(100% - 12px); min-width: calc(8rem - 12px); }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gw-read,
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
 }
 /* A box that wraps its content is no narrower than a Label column and a Value column need. */
-#lpn_new_panel { min-width: min(26rem, 94vw); }
+#lpn_new_panel, #lpn_convas_panel { min-width: min(26rem, 94vw); }
 .lpn-ghdr { display: none; }
 .lpn-ghcell { position: relative; min-width: 0; padding: 3px 6px; }
 .lpn-ghlabel { border-inline-end: 1px solid var(--ec-border-strong); }
@@ -3812,9 +3813,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* A label wraps at a space, and mid-word when a word is longer than the column (Tom, 2026-10-26: wrap,
    even mid-word, is fine). The words and the `?` (the tip's target) stay together. */
 .lpn-gname { min-width: 0; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
-.lpn-gname.ec-help { display: flex; align-items: baseline; gap: .25em; }
+/* The `?` follows the label's last word in the text flow, so a wrapped label never strands it at the far edge; a unit
+   (in <bdi>) never breaks inside its brackets. */
+.lpn-gname.ec-help { display: block; }
 .lpn-gname .lpn-gtext { min-width: 0; }
-.lpn-gname .ec-tip { flex: 0 0 auto; }
+.lpn-gname .ec-tip { margin-inline-start: .25em; }
+.lpn-gname bdi { white-space: nowrap; }
 .lpn-gval, .lpn-grow > :nth-child(2):not(.lpn-gname) { justify-self: start; max-width: var(--lpn-g-valmax, 17rem); }
 /* A control of one Value cell with something beside it: a radio and its button (New project). */
 .lpn-gwrap { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 6px; }
@@ -3842,7 +3846,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 0.95em; padding-inline-start: 0; }
 .lpn-gprops > br { display: none; }
 .lpn-gprops .lpn-grow > * { min-width: 0; }
-.lpn-gprops .lpn-gname .ec-help { display: inline-flex; align-items: baseline; gap: .25em; min-width: 0; max-width: 100%; }
+.lpn-gprops .lpn-gname .ec-help { display: inline; min-width: 0; }
 .lpn-gprops .lpn-gutext { font-size: .85em; opacity: .8; }
 .lpn-gprops .lpn-ggut { display: block; }
 .lpn-gprops .lpn-ggut .lpn-ovm { position: static; margin: 0; }
@@ -3856,7 +3860,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gprops > .lpn-gspan3 { grid-column: 3 / -1; min-width: 0; contain: inline-size; }
 .lpn-gprops .lpn-gbtns button { white-space: normal; text-align: start; }
 .lpn-gprops .lpn-gbtns .lpn-pane-goto { margin-inline-start: 0; line-height: 1.3; color: var(--ec-accent); text-decoration: underline; }
-.lpn-gprops .lpn-gname:has(> a) { display: flex; align-items: baseline; gap: .25em; }
 .lpn-gprops > .lpn-ov-note { margin-inline-start: 0; }
 .lpn-gprops > .lpn-gloose > * + * { margin-inline-start: .4em; }
 .lpn-gprops > .lpn-gbtns { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -3888,8 +3891,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* Spreadsheet look (a box wider than a phone): the header, the ruled rows. */
 @media (min-width: 30.01rem) {
 	@supports (grid-template-columns: subgrid) {
-		.lpn-propbox .lpn-popover-body > .lpn-ghdr {
-			display: grid; grid-template-columns: subgrid; align-items: stretch;
+		.lpn-propbox .lpn-ghdr {
+			grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: stretch;
 			box-shadow: inset 0 0 0 1px var(--ec-border-strong); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
 		}
 		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
@@ -3900,7 +3903,16 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gval { margin: 2px 6px; align-self: start; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
 		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
+		/* The demand categories are a ruled table inside the grid, from the Label column to the right edge. */
+		.lpn-propbox .lpn-gprops > .lpn-demand-table {
+			display: table; width: 100%; margin: 0; border-collapse: collapse;
+			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong);
+		}
+		.lpn-propbox .lpn-gprops > .lpn-demand-table th, .lpn-propbox .lpn-gprops > .lpn-demand-table td { border: 1px solid var(--ec-border-strong); border-inline: 0; padding: 3px 6px; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table th { max-width: none; font-size: .85em; font-weight: 600; background: var(--ec-chrome-bg); }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table th:first-child { min-width: 7.5em; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname { grid-column: 2; }
+		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
 		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
@@ -3913,6 +3925,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
 		.lpn-propbox .lpn-gprops .lpn-gw-fill, .lpn-propbox .lpn-gprops .lpn-grow > select, .lpn-propbox .lpn-gprops .lpn-grow > input[type="text"] { width: 100%; max-width: none; min-width: 6em; }
 		.lpn-propbox .lpn-gprops .lpn-gw-num { min-width: 4em; }
+		/* The demand table fits the phone: three columns that share the width, none cut. */
+		.lpn-propbox .lpn-gprops > .lpn-demand-table { display: table; width: 100%; table-layout: auto; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table th { max-width: none; font-size: .85em; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table input[type="text"], .lpn-propbox .lpn-gprops > .lpn-demand-table select { width: 100%; min-width: 3.5em; max-width: 100%; box-sizing: border-box; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table select { min-width: 5.5em; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table input[type="number"] { width: 100%; min-width: 3.5em; box-sizing: border-box; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { grid-column: 2 / -1; }

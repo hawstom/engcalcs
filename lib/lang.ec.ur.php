@@ -4990,4 +4990,5 @@ $ec_lang['lpn_snip_tip_redo']='دوبارہ کریں (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کاپی کریں (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='تصویر کا سائز اسکرین پر موجود علاقے کے ضرب کے طور پر۔ بڑا ضرب زیادہ صاف تصویر دیتا ہے اور فائل بڑی بناتا ہے۔';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
-$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

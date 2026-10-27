@@ -4991,3 +4991,4 @@ $ec_lang['lpn_snip_tip_copy']='Copia (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='La dimensione dell\'immagine come multiplo dell\'area sullo schermo. Un multiplo maggiore dà un\'immagine più nitida e un file più grande.';
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

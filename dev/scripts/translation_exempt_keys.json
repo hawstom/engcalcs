@@ -29,6 +29,11 @@
             "languages": "*",
             "reason": "{label} ({unit}) -- a punctuation template; English is the neutral form and a language changes it only to use its own comma or brackets."
         },
+        "lpn_prop_label_symbol": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label}, {symbol} -- a punctuation template; see lpn_prop_label_unit."
+        },
         "lpn_prop_label_symbol_unit": {
             "category": "symbol",
             "languages": "*",
