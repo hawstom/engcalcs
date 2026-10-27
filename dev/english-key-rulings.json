@@ -6382,11 +6382,6 @@
             "ruled": "2026-10-20",
             "answer": "OK."
         },
-        "lpn_scnres_copy_tip": {
-            "on": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_scnres_empty": {
             "on": "This project has none of these assets.",
             "ruled": "2026-10-20",

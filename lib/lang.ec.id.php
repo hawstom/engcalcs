@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='Unduh CSV';
 $ec_lang['lpn_full_print']='Cetak laporan';
 $ec_lang['lpn_full_col_time']='Waktu';
 $ec_lang['lpn_full_col_type']='Jenis';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Konsentrasi';
+$ec_lang['lpn_quality_named_concentration_short']='Konsentrasi {chemical}';
 $ec_lang['lpn_full_row_count']='Baris ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

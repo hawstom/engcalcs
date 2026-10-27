@@ -57013,6 +57013,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireScenarioManager();
 		wireFullReportBox();
 		wireCalibBox();
+		reportToolsInit();
 		buildMenuBar();
 		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
@@ -66040,7 +66041,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
+		lpn_energy_box: 33, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
 		lpn_full_box: 52, lpn_settings_box: 42, lpn_popup: 25.5, lpn_find_popup: 23, lpn_library_box: 27,
 		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 29, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
@@ -79473,17 +79474,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A number for a box or a readout. Not the label machinery's fieldDecimals(): these are single
 	// values in a sentence or a narrow column, and a fire-flow number quoted to two decimals of a
 	// gpm would claim a precision the search does not have.
+	// **THE LAST NUMBER FORMATTED, so the cell built right after it can carry the unrounded one**
+	// (`data-ec-full`, and `data-ec-unit` for a quantity): the shared report row writes a CSV from
+	// those, a table as shown is for the eye. ffCell() takes it only when its text is exactly the
+	// text formatted, then forgets it.
+	var ffLastNum = null;
 	function ffNum(v) {
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
-		var a = Math.abs(v);
-		if (a >= 100) { return String(Math.round(v)); }
-		if (a >= 1) { return String(+v.toFixed(2)); }
-		return String(+v.toPrecision(3));
+		var a = Math.abs(v), t;
+		if (a >= 100) { t = String(Math.round(v)); }
+		else if (a >= 1) { t = String(+v.toFixed(2)); }
+		else { t = String(+v.toPrecision(3)); }
+		ffLastNum = { text: t, full: v, unit: '' };
+		return t;
 	}
 	// A quantity with its unit, converted at the boundary and nowhere else. `si` is what the engine
 	// speaks; `unitId` is one of this project's own unit selects.
 	function ffQty(si, unitId) {
-		return ffNum(toDisplay(si, unitId)) + ' ' + unitLabel(unitId);
+		var shown = toDisplay(si, unitId), t = ffNum(shown) + ' ' + unitLabel(unitId);
+		ffLastNum = { text: t, full: shown, unit: unitLabel(unitId) };
+		return t;
 	}
 	// What the boxes open on. Every one is a DISPLAY value in this project's units, because that is
 	// what a person reads and types; the conversion back to SI happens once, at the engine call.
@@ -80175,6 +80185,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function ffCell(row, text, cls) {
 		var td = ffEl('td', cls || null, text, row);
+		if (ffLastNum && ffLastNum.text === text) {
+			td.setAttribute('data-ec-full', String(+ffLastNum.full.toPrecision(12)));
+			if (ffLastNum.unit) { td.setAttribute('data-ec-unit', ffLastNum.unit); }
+		}
+		ffLastNum = null;
 		return td;
 	}
 	// **EVERY COLUMN SORTS FROM ITS HEADING** (Tom, 2026-09-28: *"Sort Fire flow analysis
@@ -80410,7 +80425,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the Settings.Label prefix for Node IDs"*). Every id drawn on the map goes through
 			// labelPrefixFor(), so an id printed here without it is the same element under a second
 			// name -- and this table exists to send somebody to those elements.
-			ffGotoLink(ffCell(tr, ''), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
@@ -80975,7 +80990,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			d.tanks.forEach(function (t) {
 				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
 				tr = ffEl('tr', null, null, body);
-				ffCell(tr, labelPrefixFor('node', 'id') + t.id);
+				ffCell(tr, labelPrefixFor('node', 'id') + t.id, 'lpn-rpt-id');
 				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
 					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
 				ffCell(tr, lv(t.min));
@@ -81230,7 +81245,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
 			ffCell(tr, typeof rec.unserved === 'number'
 				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
 					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
@@ -81711,7 +81726,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
 			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
@@ -81725,7 +81740,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
 		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
 			var tr = ffEl('tr', null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
 		});
@@ -81951,11 +81966,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/** A money figure with the currency the document states, or with none where it states none. */
 	function energyMoney(v) {
-		var money = currencyLabel();
-		return money ? ffNum(v) + ' ' + money : ffNum(v);
+		var money = currencyLabel(), t = money ? ffNum(v) + ' ' + money : ffNum(v);
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = money || ''; }
+		return t;
 	}
 	function energyPercent(fraction) {
-		return ffNum(fraction * 100) + '%';
+		var t = ffNum(fraction * 100) + '%';
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = '%'; }
+		return t;
 	}
 	/**
 	 * **WHAT THE DOCUMENT STATES ABOUT PRICE, WHICH IS NOT WHAT THE ANSWER CAME TO** (Task 581).
@@ -82042,7 +82060,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body), ran = row.onSeconds > 0;
 			// The user's own label prefix, for the reason the fire flow table wears it: an id
 			// printed here without it is the same element under a second name.
-			ffCell(tr, labelPrefixFor('link', 'id') + row.id);
+			ffCell(tr, labelPrefixFor('link', 'id') + row.id, 'lpn-rpt-id');
 			ffCell(tr, energyPercent(row.usage));
 			// **A PUMP THAT NEVER RAN GETS A DASH AND NOT A ZERO.** Its average efficiency is not
 			// 0%, it is nothing at all, and a column of zeros beside a 0% usage factor reads as a
@@ -82598,24 +82616,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scnResFull(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toPrecision(10)) : '';
 	}
-	function scenarioResultsText(t, csv) {
-		var rows = t.rows.map(function (r) {
-			return [r[0]].concat(r.slice(1).map(scnResFull));
-		});
-		return csv ? EngCalcs.lpnTableCsv(t.heads, rows) : EngCalcs.lpnTableTsv(t.heads, rows);
-	}
-	function scenarioResultsFileName(t) {
-		var pc = EngCalcs.pageConfig || {};
-		return paneProjectPrefix() + paneNoSpace(paneSanitizeFileName(pc.lpn_scnres_title || 'Results by asset')) + '-' +
-			paneNoSpace(paneSanitizeFileName(pc[t.kind.label] || t.kind.fb)) + '.csv';
-	}
-	function downloadScenarioResultsCsv() {
-		var pc = EngCalcs.pageConfig || {}, t = scenarioResultsTable(), name = scenarioResultsFileName(t);
-		downloadTextFile(name, scenarioResultsText(t, true), PANE_EXPORT_MIME.csv);
-		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
-	}
 	function buildScenarioResultsSection(host) {
-		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, btns, copy, csv, sorted;
+		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, sorted;
 		if (!scenarioCompareRun || !scenarioCompareRun.some(function (r) { return r.ok; })) { return; }
 		sec = ffEl('div', 'lpn-scnres lpn-gsub', null, host);   // a stretch of the box's one grid
 		sec.id = 'lpn_scnres';
@@ -82661,19 +82663,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_scnres_empty || 'This project has none of these assets.', sec);
 			return;
 		}
-		btns = ffEl('div', 'lpn-ff-buttons', null, sec);
-		copy = ffEl('button', 'lpn-rptbox-copy', pc.points_data_copy || 'Copy', btns);
-		copy.type = 'button';
-		copy.id = 'lpn_scnres_copy';
-		copy.title = pc.lpn_scnres_copy_tip ||
-			'Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
-		copy.addEventListener('click', function () {
-			if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(scenarioResultsText(scenarioResultsTable(), false), copy); }
-		});
-		csv = ffEl('button', 'lpn-rptbox-copy', pc.lpn_full_download_csv || 'Download CSV', btns);
-		csv.type = 'button';
-		csv.id = 'lpn_scnres_csv';
-		csv.addEventListener('click', downloadScenarioResultsCsv);
 		// Sorted on the numbers, never on their text, with a blank last both ways (ffSortResults()).
 		sorted = t.rows.map(function (r, i) { return { r: r, i: i }; });
 		if (scnResState.sort.col !== null) {
@@ -82700,8 +82689,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body);
 			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
 			// lines up against a sheet exported from there.
-			ffCell(tr, x.r[0]);
-			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
+			ffCell(tr, x.r[0], 'lpn-rpt-id');
+			// The CSV carries the full number, the box and the print its rounded one.
+			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num').setAttribute('data-ec-full', scnResFull(x.r[k + 1])); });
 		});
 		if (hasFlow) { ffEl('p', 'lpn-ff-note', flowTip, sec); }
 		t.failed.forEach(function (r) {
@@ -84803,11 +84793,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ key: 'pumphead', group: 'link', field: 'headloss', pump: true },
 		{ key: 'status', group: 'link', field: 'status' }
 	];
+	/**
+	 * A column's heading as its label and its unit, apart, so the unit can be isolated in a
+	 * right-to-left heading. **Only the PRINTED sheet wears the short concentration label**
+	 * ("Chlorine conc."): on twelve columns the long word set the whole table's type size (Tom,
+	 * 2026-10-26: "Conc." is acceptable). The box, the CSV and the User Guide chapter keep the full
+	 * name. Its other modes (age, source share, a species) keep their own names in print too.
+	 */
+	function fullReportColParts(col, short) {
+		var pc = EngCalcs.pageConfig || {}, nm, label;
+		if (col.field === 'status') { return { label: pc.lpn_result_status || 'Status', unit: '' }; }
+		label = col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field);
+		if (short && col.key === 'quality' && qualityMode() === 'chemical') {
+			nm = chemicalName();
+			label = nm ? (pc.lpn_quality_named_concentration_short || '{chemical} conc.').replace('{chemical}', nm)
+				: (pc.lpn_result_concentration_short || 'Conc.');
+		}
+		return { label: label, unit: colorFieldUnitText(col.group, col.field) };
+	}
 	function fullReportColHeading(col) {
-		var pc = EngCalcs.pageConfig || {};
-		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
-		var unit = colorFieldUnitText(col.group, col.field);
-		return (col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
+		var p = fullReportColParts(col);
+		return reportHeadText(p.label, p.unit);
 	}
 	/**
 	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
@@ -84903,70 +84909,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var name = lastRunScenarioName(), pc = EngCalcs.pageConfig || {};
 		return name ? String(pc[key] || fallback).split('{scenario}').join(name) : '';
 	}
-	function fullReportFilename(ext) {
-		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project'),
-			scn = lastRunScenarioName(), id = lastSolveResult && lastSolveResult._scn;
-		// Base keeps the project name alone, as the .inp export does.
-		if (scn && id !== 'base') { name += '-' + sanitizeFilename(scn); }
-		return name + '-Full report.' + ext;
-	}
-	function downloadFullReportCsv() {
-		downloadTextFile(fullReportFilename('csv'), fullReportCsvText(fullReportRows()), 'text/csv');
-	}
-	/** THE SAME STATIC-COPY, ONE-PRINTER APPROACH paneBuildPrintable() uses for the Tables pane
-	 * (`#lpn_print_area`, see css/engcalcs.css): a plain table built from the rows, never the live
-	 * box, so nothing modal or scrolling ends up on the page. */
-	function fullReportPrintable(rows) {
-		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'), h, table, thead, tbody;
-		wrap.id = 'lpn_print_area';
-		h = document.createElement('h1');
-		h.textContent = (typeof project === 'object' && project && project.name) || '';
-		wrap.appendChild(h);
-		h = document.createElement('h2');
-		h.textContent = pc.lpn_full_title || 'Full report';
-		wrap.appendChild(h);
-		if (lastRunScenarioName()) {
-			h = document.createElement('h3');
-			h.textContent = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
-			wrap.appendChild(h);
-		}
-		if (!rows.length) {
-			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
-			wrap.appendChild(h);
-			return wrap;
-		}
-		table = document.createElement('table');
-		table.className = 'lpn-pane-table lpn-print-table';
-		thead = document.createElement('thead');
-		(function () {
-			var tr = document.createElement('tr');
-			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
-				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
-				.forEach(function (text) {
-					var th = document.createElement('th');
-					th.textContent = text;
-					tr.appendChild(th);
-				});
-			thead.appendChild(tr);
-		}());
-		table.appendChild(thead);
-		tbody = document.createElement('tbody');
-		rows.forEach(function (r) {
-			var tr = document.createElement('tr'), td;
-			[EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
-				.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
-				.forEach(function (text) {
-					td = document.createElement('td');
-					td.textContent = text;
-					tr.appendChild(td);
-				});
-			tbody.appendChild(tr);
-		});
-		table.appendChild(tbody);
-		wrap.appendChild(table);
-		return wrap;
-	}
+	// The shared button row (reportToolsInit, below) prints, copies and downloads the Full report
+	// like every other report box; this keeps only what is the Full report's own: all its rows.
 	var fullPrintArea = null;
 	function endFullPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
@@ -84974,13 +84918,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fullPrintArea = null;
 	}
 	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
-	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
-	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
-	// does for the Tables pane; neither function touches the tab at all.
-	function printFullReport() {
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, report title)
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() does for
+	// the Tables pane; this touches the tab not at all.
+	function printReportArea(wrap) {
 		if (!document.body) { return; }
 		endFullPrint();
-		fullPrintArea = fullReportPrintable(fullReportRows());
+		fullPrintArea = wrap;
 		document.body.appendChild(fullPrintArea);
 		document.body.classList.add('lpn-printing-table');
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
@@ -84989,6 +84933,493 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			try { window.print(); } finally { endFullPrint(); }
 		}
+	}
+	/**
+	 * **ONE BUTTON ROW FOR EVERY ANALYSIS AND REPORT BOX** (Tom, 2026-10-24: each
+	 * "Needs printout and/or Copy HTML", the Full report "possibly a good model", and Scenario
+	 * comparison's lone Copy and Download CSV "a little confusing since they appear only in this
+	 * box"). Download CSV, Copy HTML and Print report, in the sticky `.lpn-box-tools` row, acting on
+	 * what the box SHOWS: its headings, notes and tables are read back from the box's own report
+	 * element, so a box that gains a table is covered without a line here. A cell may carry
+	 * `data-ec-full` (the unrounded number) for the CSV only. The Full report alone supplies its
+	 * own blocks, because its box shows one time step and the file carries every one. Disabled while
+	 * the box holds no table (a "press Calculate" note). Nothing is stored on the device.
+	 */
+	var REPORT_TOOL_BOXES = [
+		{ box: 'lpn_ff_box', host: 'lpn_ff_report', title: 'lpn_ff_title', fb: 'Fire flow analysis' },
+		{ box: 'lpn_crit_box', host: 'lpn_crit_report', title: 'lpn_crit_title', fb: 'Criticality analysis' },
+		{ box: 'lpn_ds_box', host: 'lpn_ds_report', title: 'lpn_ds_title', fb: 'Demand scaling' },
+		{ box: 'lpn_energy_box', host: 'lpn_energy_report', title: 'lpn_energy_title', fb: 'Pump energy report' },
+		{ box: 'lpn_scncmp_box', host: 'lpn_scncmp_report', title: 'lpn_scncmp_title', fb: 'Scenario comparison' },
+		{ box: 'lpn_status_box', host: 'lpn_status_report', title: 'lpn_status_title', fb: 'Status changes' },
+		{ box: 'lpn_calib_box', host: 'lpn_calib_report', title: 'lpn_calib_title', fb: 'Calibration report' },
+		{ box: 'lpn_full_box', host: 'lpn_full_report', title: 'lpn_full_title', fb: 'Full report', full: true }
+	];
+	/**
+	 * **A UNIT GOES IN THE COLUMN HEADING, NEVER IN EVERY CELL** (Task 829; Tom, 2026-10-26: "in English
+	 * there is a universal convention for tables and spreadsheets to put units in the heading in
+	 * parentheses instead of in the data cells"). A report table whose figures in one column all
+	 * carry the same unit is rewritten after it is drawn: "Static pressure" over "111", "116",
+	 * not "111 psi". A column that mixes units, or whose cells are sentences ("N5 drops to 14 psi",
+	 * "108 psi at N32, 14:00"), is left exactly as it was drawn. The heading is built from ONE
+	 * localized template, `lpn_heading_unit` ('{label} ({unit})' in English), so a language can
+	 * choose its own brackets or order; the unit is wrapped in a `<bdi>` so a Latin unit inside a
+	 * right-to-left heading keeps its own direction and its brackets do not flip. The unit stays on
+	 * each cell as `data-ec-unit` where the box kept one, and the CSV, copy and print read the heading.
+	 */
+	var REPORT_UNIT_RE = /^((?:[^\d]*\s)?)([-\u2212]?\d[\d.,]*)\s*(%|[A-Za-z\u00b0\u00b5\u03bc][^\s\d.,]*(?: H2O)?)$/;
+	var REPORT_BARE_RE = /^[-\u2212]?\d[\d.,]*$/;
+	// '' for a cell with no unit to move (a word, a dash, a bare number), the unit for a figure with
+	// one, null for a cell that mixes a figure with other text.
+	function reportCellUnit(t) {
+		var m;
+		if (!/\d/.test(t) || REPORT_BARE_RE.test(t)) { return ''; }
+		m = REPORT_UNIT_RE.exec(t);
+		return m ? m[3] : null;
+	}
+	function reportHeadTemplate() {
+		return String((EngCalcs.pageConfig || {}).lpn_heading_unit || '{label} ({unit})');
+	}
+	function reportHeadText(label, unit) {
+		return unit ? reportHeadTemplate().replace('{label}', function () { return label; }).replace('{unit}', function () { return unit; }) : label;
+	}
+	/** The heading as nodes: label as text, unit in a `<bdi>`, the rest of the template as text. */
+	function reportHeadNodes(label, unit) {
+		var frag = document.createDocumentFragment();
+		reportHeadTemplate().split(/(\{label\}|\{unit\})/).forEach(function (part) {
+			var b;
+			if (part === '{label}') { frag.appendChild(document.createTextNode(label)); }
+			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = reportUnitKept(unit); frag.appendChild(b); }
+			else if (part) { frag.appendChild(document.createTextNode(part)); }
+		});
+		return frag;
+	}
+	/** A multi-word unit ("m H2O") holds together: no-break spaces. */
+	function reportUnitKept(unit) { return String(unit).replace(/ /g, '\u00A0'); }
+	function reportHeadHtml(label, unit) {
+		return reportHeadTemplate().split(/(\{label\}|\{unit\})/).map(function (part) {
+			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi style="white-space:nowrap;">' + reportEsc(reportUnitKept(unit)) + '</bdi>' : reportEsc(part);
+		}).join('');
+	}
+	function reportUnitInLabel(label, unit) {
+		var esc = unit.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+		return new RegExp('(^|[\\s(])' + esc + '($|[\\s),])').test(label);
+	}
+	/** Moves `unit` into the heading cell `th`; a heading that already names it is left as it is. */
+	function reportSetHeadUnit(th, unit) {
+		var walker, n, v, label, lead, trail;
+		if (!unit || th.getAttribute('data-ec-hu') !== null) { return; }
+		walker = document.createTreeWalker(th, NodeFilter.SHOW_TEXT);
+		while ((n = walker.nextNode())) {
+			if (n.parentNode.closest && n.parentNode.closest('.ec-tip, .lpn-pane-sortarrow')) { continue; }
+			if (n.nodeValue.trim()) { break; }
+		}
+		if (!n) { return; }
+		v = n.nodeValue; label = v.trim();
+		if (reportUnitInLabel(label, unit)) { return; }
+		lead = v.slice(0, v.indexOf(label)); trail = v.slice(lead.length + label.length);
+		th.setAttribute('data-ec-hl', label); th.setAttribute('data-ec-hu', unit);
+		n.parentNode.replaceChild((function () {
+			var f = document.createDocumentFragment();
+			if (lead) { f.appendChild(document.createTextNode(lead)); }
+			f.appendChild(reportHeadNodes(label, unit));
+			if (trail) { f.appendChild(document.createTextNode(trail)); }
+			return f;
+		})(), n);
+	}
+	function reportStripUnit(td, unit) {
+		var n = td.childNodes, t;
+		if (n.length !== 1 || n[0].nodeType !== 3) { return; }
+		t = n[0].nodeValue.replace(/\s+$/, '');
+		if (t.slice(-unit.length) === unit) { n[0].nodeValue = t.slice(0, -unit.length).replace(/\s+$/, ''); }
+	}
+	function reportTableUnits(table) {
+		var ths = table.querySelectorAll('thead th'), trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known;
+		if (!ths.length || table._ecUh === trs.length) { return; }
+		for (r = 0; r < trs.length; r++) { if (trs[r].children.length !== ths.length) { return; } }
+		table._ecUh = trs.length;
+		for (c = 0; c < ths.length; c++) {
+			if (trs.length && trs[0].children[c].classList.contains('lpn-rpt-id')) {
+				ths[c].classList.add('lpn-rpt-id');
+				for (r = 0; r < trs.length; r++) { trs[r].children[c].classList.add('lpn-rpt-id'); }
+				continue;
+			}
+			known = ths[c].getAttribute('data-ec-hu');
+			unit = known; ok = true; cells = [];
+			for (r = 0; r < trs.length && ok; r++) {
+				td = trs[r].children[c]; t = (td.textContent || '').replace(/\s+/g, ' ').trim();
+				u = reportCellUnit(t);
+				if (u === null) { ok = false; break; }
+				if (u) { if (unit === null) { unit = u; } else if (unit !== u) { ok = false; break; } }
+				cells.push(td);
+			}
+			if (!ok || !unit) { continue; }
+			for (r = 0; r < cells.length; r++) { reportStripUnit(cells[r], unit); }
+			reportSetHeadUnit(ths[c], unit);
+		}
+	}
+	function reportUnitsIntoHeads(root) {
+		if (!root || !root.querySelectorAll) { return; }
+		Array.prototype.forEach.call(root.querySelectorAll('table.lpn-ff-table'), reportTableUnits);
+	}
+	function reportCellText(el, forCsv) {
+		var full = forCsv && el.getAttribute && el.getAttribute('data-ec-full'), inp, c, junk, i;
+		if (full !== null && full !== undefined && full !== false && full !== '') { return full; }
+		inp = el.querySelector && el.querySelector('input, select');
+		if (inp && !(el.textContent || '').trim()) { return String(inp.type === 'checkbox' ? (inp.checked ? '1' : '0') : inp.value); }
+		c = el.cloneNode(true);
+		junk = c.querySelectorAll('.lpn-pane-sortarrow, .ec-tip, input, select');
+		for (i = 0; i < junk.length; i++) { junk[i].parentNode.removeChild(junk[i]); }
+		return (c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	/** The box's report element as blocks: `{text}` for a note or heading, `{heads, rows, full}` for a table. */
+	function reportDomBlocks(hosts) {
+		var out = [];
+		hosts.forEach(function (h) { out = out.concat(reportDomBlocksOf(h)); });
+		return out;
+	}
+	function reportDomBlocksOf(host) {
+		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, urow, heads, hl, hu, ids;
+		if (!host) { return out; }
+		nodes = host.querySelectorAll('table, p, h1, h2, h3, h4, .lpn-ff-head');
+		for (i = 0; i < nodes.length; i++) {
+			el = nodes[i];
+			if (el.tagName !== 'TABLE') {
+				if (el.closest('table')) { continue; }
+				t = reportCellText(el, false);
+				if (t) { out.push({ text: t }); }
+				continue;
+			}
+			heads = []; hl = []; hu = []; ids = [];
+			Array.prototype.forEach.call(el.querySelectorAll('thead th'), function (th) {
+				heads.push(reportCellText(th, false));
+				hl.push(th.getAttribute('data-ec-hl') || ''); hu.push(th.getAttribute('data-ec-hu') || '');
+				ids.push(th.classList.contains('lpn-rpt-id'));
+			});
+			rows = []; frow = []; urow = [];
+			trs = el.querySelectorAll('tbody tr');
+			for (j = 0; j < trs.length; j++) {
+				tds = trs[j].children; row = []; k = 0;
+				var fr = [], ur = [];
+				for (k = 0; k < tds.length; k++) {
+					row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true));
+					ur.push(tds[k].getAttribute('data-ec-unit') || '');
+				}
+				rows.push(row); frow.push(fr); urow.push(ur);
+			}
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow, hl: hl, hu: hu, ids: ids }); }
+		}
+		return out;
+	}
+	function fullReportBlocks() {
+		var pc = EngCalcs.pageConfig || {}, rows = fullReportRows();
+		if (!rows.length) { return []; }
+		var parts = FULL_REPORT_COLS.map(fullReportColParts);
+		return [{
+			heads: [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			hl: ['', '', ''].concat(parts.map(function (p) { return p.label; })),
+			ph: ['', '', ''].concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c, true).label; })),
+			hu: ['', '', ''].concat(parts.map(function (p) { return p.unit; })),
+			ids: [false, false, true].concat(parts.map(function () { return false; })),
+			trunc: [false, true, false].concat(FULL_REPORT_COLS.map(function (c) { return c.field === 'status'; })),
+			rows: rows.map(function (r) {
+				return [EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
+					.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }));
+			})
+		}];
+	}
+	/** The elements a box's report is read from. Demand scaling answers inside its controls (the
+	 * `data-ds` blocks) and lists its tables in the report element. */
+	function reportHostsFor(spec) {
+		var out = [], c;
+		if (spec.box === 'lpn_ds_box') {
+			c = document.getElementById('lpn_ds_controls');
+			if (c) { Array.prototype.forEach.call(c.querySelectorAll('[data-ds]'), function (e) { out.push(e); }); }
+		}
+		out.push(document.getElementById(spec.host));
+		return out;
+	}
+	function reportBlocksFor(spec) {
+		return spec.full ? fullReportBlocks() : reportDomBlocks(reportHostsFor(spec));
+	}
+	function reportScenarioName(spec) {
+		var s;
+		if (spec.full) { return lastRunScenarioName(); }
+		if (scenarios.length < 2) { return ''; }
+		s = activeScenario();
+		return s ? scenarioDisplayName(s) : '';
+	}
+	function reportTitleText(spec) {
+		return (EngCalcs.pageConfig || {})[spec.title] || spec.fb;
+	}
+	function reportDateText() {
+		var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+		return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+	}
+	/** Project, scenario, analysis, date: the one line that says what a pasted or printed table is. */
+	function reportTitleLine(spec) {
+		var proj = (typeof project === 'object' && project && project.name) || '', scn = reportScenarioName(spec);
+		return [proj, scn, reportTitleText(spec), reportDateText()].filter(function (x) { return x; }).join(' - ');
+	}
+	// One part of a file name: no spaces, no runs of underscores, none at either end; letters with
+	// accents stay (Criticidad_análisis).
+	function reportNamePart(t) {
+		return paneNoSpace(paneSanitizeFileName(t)).replace(/_+/g, '_').replace(/^[_-]+|[_-]+$/g, '');
+	}
+	function reportFilename(spec, ext) {
+		var scn = reportScenarioName(spec), id = spec.full && lastSolveResult && lastSolveResult._scn;
+		return [(typeof project === 'object' && project && project.name) || '',
+			(scn && !(spec.full && id === 'base')) ? scn : '', reportTitleText(spec)]
+			.map(reportNamePart).filter(function (x) { return x; }).join('-') + '.' + ext;
+	}
+	/**
+	 * **A SPREADSHEET-READY TABLE**: a column whose figures all share one unit becomes bare numbers
+	 * with the unit in the heading ("Static pressure (psi)"), and a number carries its unrounded
+	 * value where the box kept one (`data-ec-full`). A cell that is not a figure (a dash, a word, a
+	 * time) stays as it is, except that a lone dash is blank. A column with mixed units is left as
+	 * shown. `b.full` holds the per-cell unrounded text and `b.unit` the per-cell unit, from the DOM.
+	 */
+	function reportSheetBlock(b) {
+		var heads = b.heads.slice(), rows = b.rows.map(function (r) { return r.slice(); }), c, r, cells, unit, ok, n, any, m;
+		for (c = 0; c < heads.length; c++) {
+			cells = []; unit = null; ok = true; any = false;
+			for (r = 0; r < rows.length && ok; r++) {
+				var shown = rows[r][c], fullT = b.full && b.full[r] && b.full[r][c], u = b.unit && b.unit[r] && b.unit[r][c];
+				if (shown === undefined || shown === '' || /^[\u2013\u2014-]$/.test(shown)) { cells.push(null); continue; }
+				if (fullT && fullT !== shown && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(fullT)) {
+					n = fullT; m = [null, null, u || ''];
+					if (!u && shown.indexOf(fullT) !== 0) {
+						m = /^-?[\d.]+(?:e[+-]?\d+)?\s*(.*)$/i.exec(shown);
+						m = [null, null, m ? m[1] : ''];
+					}
+				} else {
+					m = /^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(%|[A-Za-z\u00b0\u00b5][^\s\d]{0,11}(?:\/[A-Za-z]+)?|[^\s\d]{1,4})?$/i.exec(shown);
+					if (!m || /^0\d/.test(m[1])) { cells.push({ text: true, v: shown }); continue; }
+					n = m[1];
+				}
+				if (unit === null) { unit = m[2] || ''; } else if (unit !== (m[2] || '')) { ok = false; break; }
+				any = true;
+				cells.push({ v: n });
+			}
+			if (!ok || !any) { continue; }
+			for (r = 0; r < rows.length; r++) { rows[r][c] = cells[r] === null ? '' : cells[r].v; }
+			if (unit && heads[c].indexOf('(' + unit + ')') < 0 && heads[c].indexOf(unit + ')') < 0 && heads[c].indexOf(unit) < 0) { heads[c] += ' (' + unit + ')'; }
+		}
+		return { heads: heads, rows: rows };
+	}
+	function reportCsvText(blocks) {
+		var parts = [];
+		blocks.forEach(function (b) {
+			var t;
+			if (!b.heads) { return; }
+			t = reportSheetBlock(b);
+			// The byte-order mark opens the file once, never again at a second table.
+			parts.push(EngCalcs.lpnTableCsv(t.heads, t.rows, { bom: parts.length === 0 }));
+		});
+		return parts.join('\r\n');
+	}
+	function reportEsc(t) {
+		return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	/** Self-contained: inline styles only, so it pastes into a mail or a document the same everywhere. */
+	function reportHtmlText(spec, blocks) {
+		var out = ['<p><b>' + reportEsc(reportTitleLine(spec)) + '</b></p>'];
+		blocks.forEach(function (b) {
+			var heads, n, pt, cols, cell, keep;
+			if (!b.heads) { out.push('<p>' + reportEsc(b.text) + '</p>'); return; }
+			// **WHAT A WORD PROCESSOR HONOURS** (Tom pasted this into Google Docs and got equal columns
+			// with "Junctio|n" and "153|7"): inline styles only (Docs drops <style>), a width on every
+			// column in proportion to its longest unbreakable word, the same measure the printed sheet
+			// uses, no-wrap on every short cell, and a type size at which the columns fit 6.5 in.
+			heads = reportPrintHeads(b);
+			n = reportColNeeds(Object.assign({}, b, { trunc: null }), heads);
+			pt = Math.max(5, Math.min(10, Math.floor(460 / n.sum * 10) / 10));
+			cell = 'border:1px solid #999;padding:2px 3px;text-align:left;vertical-align:top;font-size:' + pt + 'pt;';
+			cols = n.need.map(function (w) {
+				var pct = (Math.round(w / n.sum * 1000) / 10) + '%';
+				return '<col width="' + pct + '" style="width:' + pct + ';">';
+			}).join('');
+			keep = function (t, c) { return (b.ids && b.ids[c]) || String(reportFigureUnitKept(t)).replace(/\u00A0/g, '').length <= 24 && !/ .* /.test(String(reportFigureUnitKept(t))); };
+			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead><tr>' +
+				b.heads.map(function (h, c) { return '<th style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(h)) + '</th>'; }).join('') +
+				'</tr></thead><tbody>' +
+				b.rows.map(function (r) {
+					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
+				}).join('') + '</tbody></table>');
+		});
+		return out.join('\n');
+	}
+	/**
+	 * **A FIGURE STAYS WITH ITS UNIT ON PAPER** (Task 829, Tom 2026-10-25, printing the reports to PDF:
+	 * "Some of the column widths need tweaking"). A cell that is a number then a unit ("77.81 m H2O",
+	 * "63.09 L/s") is written with no-break spaces in the printed copy only, so a narrow column
+	 * breaks between cells' words and never between a figure and its unit. Prose keeps its spaces.
+	 */
+	function reportFigureUnitKept(text) {
+		var t = String(text === undefined || text === null ? '' : text);
+		return (/^[-\u2212]?[\d.,]+ [^\s\d]+(?: [A-Za-z0-9]+)?$/).test(t) ? t.replace(/ /g, '\u00A0') : t;
+	}
+	/**
+	 * **A REPORT TABLE IS AS WIDE AS ITS CONTENT, NEVER WIDER THAN THE SHEET, AND BREAKS NO WORD.**
+	 * Each column needs the width of its longest unbreakable word (a heading's, a figure with its
+	 * unit's), measured as the pane's tables are and given the same print headroom
+	 * (PANE_PRINT_HEADROOM) plus the print cell's padding. The table's font is then the 9 pt it
+	 * normally has, or, when those needs added together exceed the sheet, exactly the smaller size at
+	 * which they fit. The columns are left to the browser's own table layout, which wraps a heading
+	 * at its spaces and gives a wide column the room it asks for (css/engcalcs.css, `.lpn-print-report`).
+	 */
+	var REPORT_ID_SAMPLE = 'W-9999', REPORT_TRUNC_EM = 5.5;
+	/** The headings as printed (the short concentration label in the Full report), as plain text. */
+	function reportPrintHeads(b) {
+		return b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
+	}
+	/** Each column's width need in em of the table's font, and their sum: the longest unbreakable word. */
+	function reportColNeeds(b, heads) {
+		var ncol = b.heads.length, need = [], sum = 0, j;
+		function note(col, text, head) {
+			String(text).split(/[ \t\n]+/).forEach(function (w) {
+				if (w) { need[col] = Math.max(need[col] || 0, paneMeasureEm(w, head) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); }
+			});
+		}
+		heads.forEach(function (t, c) {
+			note(c, b.hu && b.hu[c] ? reportHeadText((b.ph && b.ph[c]) || b.hl[c], reportUnitKept(b.hu[c])) : t, true);
+		});
+		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol && !(b.trunc && b.trunc[c])) { note(c, reportFigureUnitKept(t), false); } }); });
+		// A column that may be cut with an ellipsis asks for the cap and no more.
+		(b.trunc || []).forEach(function (on, c) { if (on && c < ncol) { need[c] = Math.max(need[c] || 0, REPORT_TRUNC_EM * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); } });
+		// An asset id column asks for the width of a wide five-character id, in every report alike.
+		(b.ids || []).forEach(function (on, c) { if (on && c < ncol) { note(c, REPORT_ID_SAMPLE, false); } });
+		for (j = 0; j < ncol; j++) { need[j] = need[j] || PANE_PRINT_TD_PAD_EM; sum += need[j]; }
+		return { need: need, sum: Math.round(sum * 100) / 100 };
+	}
+	function reportPrintFit(table, b) {
+		var n = reportColNeeds(b, b.heads);
+		if (!(n.sum > 0)) { return; }
+		table.style.fontSize = 'min(12px, calc((100cqw - ' + (b.heads.length + 1) + 'px) / ' + n.sum + '))';
+	}
+	function reportPrintable(spec, blocks) {
+		var wrap = document.createElement('div'), h, line;
+		wrap.id = 'lpn_print_area';
+		// Largest first: the analysis, then the project, then the scenario and the date.
+		h = document.createElement('h1');
+		h.textContent = reportTitleText(spec);
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		line = reportScenarioName(spec);
+		h = document.createElement('h3');
+		h.textContent = (line ? line + ' - ' : '') + reportDateText();
+		wrap.appendChild(h);
+		blocks.forEach(function (b) {
+			var table, thead, tbody, tr, e, printHeads;
+			if (!b.heads) {
+				e = document.createElement('p');
+				e.textContent = b.text;
+				wrap.appendChild(e);
+				return;
+			}
+			table = document.createElement('table');
+			table.className = 'lpn-pane-table lpn-print-table lpn-print-report';
+			thead = document.createElement('thead');
+			tr = document.createElement('tr');
+			printHeads = b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
+			b.heads.forEach(function (t, c) {
+				e = document.createElement('th');
+				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes((b.ph && b.ph[c]) || b.hl[c], b.hu[c])); } else { e.textContent = t; }
+				if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+				tr.appendChild(e);
+			});
+			thead.appendChild(tr);
+			table.appendChild(thead);
+			tbody = document.createElement('tbody');
+			b.rows.forEach(function (r) {
+				tr = document.createElement('tr');
+				r.forEach(function (t, c) {
+					var inner;
+					e = document.createElement('td');
+					if (b.trunc && b.trunc[c] && t) {
+						inner = document.createElement('span'); inner.className = 'lpn-rpt-trunc'; inner.title = t; inner.textContent = t; e.appendChild(inner);
+					} else { e.textContent = reportFigureUnitKept(t); }
+					if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+					tr.appendChild(e);
+				});
+				tbody.appendChild(tr);
+			});
+			table.appendChild(tbody);
+			reportPrintFit(table, Object.assign({}, b, { heads: printHeads }));
+			wrap.appendChild(table);
+		});
+		return wrap;
+	}
+	/** The title line, then each table as tab-separated text: what a plain-text paste gets. */
+	function reportPlainText(spec, blocks) {
+		return reportTitleLine(spec) + '\n' + blocks.filter(function (b) { return b.heads; })
+			.map(function (b) { return EngCalcs.lpnTableTsv(b.heads, b.rows); }).join('\n');
+	}
+	function reportCopyHtml(spec, btn) {
+		var blocks = reportBlocksFor(spec), html = reportHtmlText(spec, blocks), pc = EngCalcs.pageConfig || {},
+			was = btn.textContent, plain = reportPlainText(spec, blocks);
+		function done(okay) {
+			if (!okay) { return; }
+			btn.textContent = pc.lpn_time_run_report_copied || 'Copied';
+			setTimeout(function () { btn.textContent = was; }, 1500);
+		}
+		if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+			navigator.clipboard.write([new ClipboardItem({
+				'text/html': new Blob([html], { type: 'text/html' }),
+				'text/plain': new Blob([plain], { type: 'text/plain' })
+			})]).then(function () { done(true); }, function () {
+				// A refused rich write falls back to the plain tab-separated text, never to raw markup.
+				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(plain, btn); }
+			});
+		} else if (EngCalcs.lpnCopyText) {
+			EngCalcs.lpnCopyText(plain, btn);
+		}
+	}
+	function reportToolsInit() {
+		var pc = EngCalcs.pageConfig || {};
+		REPORT_TOOL_BOXES.forEach(function (spec) {
+			var box = document.getElementById(spec.box), body = box && box.querySelector('.lpn-popover-body'),
+				host = document.getElementById(spec.host), row, csv, html, pr, old;
+			if (!body || !host || body.querySelector('.lpn-report-tools')) { return; }
+			old = body.querySelector('.lpn-box-tools');
+			if (old) { old.parentNode.removeChild(old); }
+			row = document.createElement('div');
+			row.className = 'lpn-box-tools lpn-report-tools';
+			function mk(id, label, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.className = 'lpn-rptbox-copy'; b.id = spec.host.replace(/_report$/, '') + id; b.textContent = label;
+				b.addEventListener('click', function () { fn(b); });
+				row.appendChild(b);
+				return b;
+			}
+			csv = mk('_csv', pc.lpn_full_download_csv || 'Download CSV', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) {
+					downloadTextFile(reportFilename(spec, 'csv'), spec.full ? '\uFEFF' + fullReportCsvText(fullReportRows()) : reportCsvText(blocks), 'text/csv');
+				}
+			});
+			html = mk('_copyhtml', pc.lpn_report_copy_html || 'Copy HTML', function (b) { reportCopyHtml(spec, b); });
+			pr = mk('_print', pc.lpn_full_print || 'Print report', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) { printReportArea(reportPrintable(spec, blocks)); }
+			});
+			body.insertBefore(row, body.firstChild);
+			var obs = null;
+			function sync() {
+				var has = reportHostsFor(spec).some(function (h) { return !!(h && h.querySelector('table')); });
+				[csv, html, pr].forEach(function (b) { b.disabled = !has; });
+				// Units into the headings (reportTableUnits); this pass's own edits are not fed back.
+				reportHostsFor(spec).forEach(reportUnitsIntoHeads);
+				if (obs) { obs.takeRecords(); }
+			}
+			sync();
+			if (typeof MutationObserver !== 'undefined') {
+				obs = new MutationObserver(sync);
+				obs.observe(spec.box === 'lpn_ds_box' ? body : host, { childList: true, subtree: true });
+			}
+		});
 	}
 	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
 	function fullBoxIsOpen() {
@@ -85028,7 +85459,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (lastRunScenarioName()) {
 			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
 		}
-		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
@@ -85049,11 +85480,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
 		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
-			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+			.concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c).label; })));
+		FULL_REPORT_COLS.forEach(function (c, k) {
+			var th = body.parentNode.querySelectorAll('thead th')[k + 2];
+			if (th) { reportSetHeadUnit(th, fullReportColParts(c).unit); }
+		});
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, r.type, 'lpn-ff-fit');
-			ffCell(tr, r.id);
+			ffCell(tr, r.id, 'lpn-rpt-id');
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
 	}
@@ -85079,12 +85514,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
 	}
 	function wireFullReportBox() {
-		var box = fullBoxEl(), x = document.getElementById('lpn_full_close'),
-			csv = document.getElementById('lpn_full_csv'), pr = document.getElementById('lpn_full_print');
+		var box = fullBoxEl(), x = document.getElementById('lpn_full_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeFullReportBox); }
-		if (csv) { csv.addEventListener('click', downloadFullReportCsv); }
-		if (pr) { pr.addEventListener('click', printFullReport); }
 		wireBoxMemory(box, LPN_FULLBOX_KEY, fullboxLayout, saveFullboxLayout, fullBoxIsOpen);
 	}
 	function refreshFullReportBoxIfOpen() {
@@ -85135,7 +85567,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function calibParamLabel(def) {
 		var unit = colorFieldUnitText(def.group, def.field);
-		return colorFieldLabel(def.group, def.field) + (unit ? ' (' + unit + ')' : '');
+		return reportHeadText(colorFieldLabel(def.group, def.field), unit);
 	}
 	// The frames compared against: the extended period run's, or the single solve standing alone
 	// at time 0 -- EPANET's own allowance ("for a single-period analysis all time values can be 0").
@@ -85291,18 +85723,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
 			body = ffEl('tbody', null, null, table), r = res.stats.r;
+		var calibUnit = res.def ? colorFieldUnitText(res.def.group, res.def.field) : '';
 		[[pc.lpn_calib_col_location || 'Location'],
 			[pc.lpn_calib_col_n || 'Num obs'],
-			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
-			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
-			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
-			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip]].forEach(function (h) {
+			[pc.lpn_calib_col_obs_mean || 'Observed mean', null, 1],
+			[pc.lpn_calib_col_sim_mean || 'Computed mean', null, 1],
+			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip, 1],
+			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip, 1]].forEach(function (h) {
 			var th = ffEl('th', null, h[0], hr);
 			if (h[1]) { th.title = h[1]; th.className = 'ec-help'; }
+			// The four means and errors are in the measured parameter's unit, so the heading says so.
+			if (calibUnit && h.length > 2) { reportSetHeadUnit(th, calibUnit); }
 		});
 		function row(name, s, cls) {
 			var tr = ffEl('tr', cls || null, null, body);
-			ffCell(tr, name);
+			ffCell(tr, name, 'lpn-rpt-id');
 			ffCell(tr, String(s.n));
 			ffCell(tr, calibNum(s.obsMean));
 			ffCell(tr, calibNum(s.simMean));

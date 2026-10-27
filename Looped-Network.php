@@ -1520,10 +1520,6 @@ echoHeader("EngCalcsApp", $html_title,
 	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
 	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
-		<div class="lpn-box-tools">
-			<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
-			<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
-		</div>
 		<div id="lpn_full_report" class="lpn-ff-report"></div>
 	</div>
 </div>
@@ -3250,7 +3246,6 @@ EngCalcs.pageConfig = {
 	lpn_scnres_col: <?=json_encode($ec_lang['lpn_scnres_col'])?>,
 	lpn_scnres_none: <?=json_encode($ec_lang['lpn_scnres_none'])?>,
 	lpn_scnres_empty: <?=json_encode($ec_lang['lpn_scnres_empty'])?>,
-	lpn_scnres_copy_tip: <?=json_encode($ec_lang['lpn_scnres_copy_tip'])?>,
 	lpn_scnres_time_note: <?=json_encode($ec_lang['lpn_scnres_time_note'])?>,
 	lpn_scnres_at_time: <?=json_encode($ec_lang['lpn_scnres_at_time'])?>,
 	lpn_scnres_steady: <?=json_encode($ec_lang['lpn_scnres_steady'])?>,
@@ -3282,8 +3277,13 @@ EngCalcs.pageConfig = {
 	lpn_full_note: <?=json_encode($ec_lang['lpn_full_note'])?>,
 	lpn_full_download_csv: <?=json_encode($ec_lang['lpn_full_download_csv'])?>,
 	lpn_full_print: <?=json_encode($ec_lang['lpn_full_print'])?>,
+	lpn_calib_title: <?=json_encode($ec_lang['lpn_calib_title'])?>,
+	lpn_report_copy_html: <?=json_encode($ec_lang['lpn_report_copy_html'])?>,
 	lpn_full_col_time: <?=json_encode($ec_lang['lpn_full_col_time'])?>,
 	lpn_full_col_type: <?=json_encode($ec_lang['lpn_full_col_type'])?>,
+	lpn_heading_unit: <?=json_encode($ec_lang['lpn_heading_unit'])?>,
+	lpn_result_concentration_short: <?=json_encode($ec_lang['lpn_result_concentration_short'])?>,
+	lpn_quality_named_concentration_short: <?=json_encode($ec_lang['lpn_quality_named_concentration_short'])?>,
 	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
 	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
 <?php // The Calibration report (ROADMAP Task 601). ?>

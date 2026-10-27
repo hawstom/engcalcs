@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='Preuzmi CSV';
 $ec_lang['lpn_full_print']='Ispiši izvještaj';
 $ec_lang['lpn_full_col_time']='Vrijeme';
 $ec_lang['lpn_full_col_type']='Vrsta';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Koncentracija';
+$ec_lang['lpn_quality_named_concentration_short']='Koncentracija {chemical}';
 $ec_lang['lpn_full_row_count']='Retci ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

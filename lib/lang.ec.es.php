@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='Descargar CSV';
 $ec_lang['lpn_full_print']='Imprimir informe';
 $ec_lang['lpn_full_col_time']='Tiempo';
 $ec_lang['lpn_full_col_type']='Tipo';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Concentración';
+$ec_lang['lpn_quality_named_concentration_short']='Concentración de {chemical}';
 $ec_lang['lpn_full_row_count']='Filas ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

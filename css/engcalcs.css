@@ -4829,6 +4829,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	body.lpn-printing-table #lpn_print_area { display: block !important; }
 	#lpn_print_area h1 { font-size: 14pt; margin: 0 0 2pt; }
 	#lpn_print_area h2 { font-size: 12pt; margin: 0 0 8pt; font-weight: normal; }
+	#lpn_print_area h3 { font-size: 10pt; margin: 0 0 8pt; font-weight: normal; }
 	/* The heading row repeats on every sheet -- a page 3 of figures with no headings on it is a
 	   page of numbers nobody can read. Not sticky: sticky is a screen idea, and print needs the
 	   table-header-group behaviour a <thead> already has. */
@@ -4899,6 +4900,13 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	   matches the real print pass has no business promising the pixel it measured on SCREEN survives
 	   into that pass unchanged. The column widths are in the TABLE's em, so this moves no column. */
 	#lpn_print_area .lpn-print-table.lpn-print-fixed th, #lpn_print_area .lpn-print-table.lpn-print-fixed td { font-size: .97em; }
+	/* **A REPORT BOX'S PRINTED TABLE** (Task 829; Tom, 2026-10-25: "Some of the column widths need
+	   tweaking"). Not the pane's fixed layout: the browser lays the columns out itself, as wide as
+	   their content and no wider than the sheet, a heading wrapping at its spaces. Its font size is
+	   written by reportPrintFit() (js/looped-network.js) so that the longest word of every column
+	   fits; nothing here may break a word, and a figure's unit is held to it by no-break spaces. */
+	#lpn_print_area .lpn-print-report { width: auto; max-width: 100%; table-layout: auto; margin-bottom: 8pt; }
+	#lpn_print_area .lpn-print-report th, #lpn_print_area .lpn-print-report td { overflow-wrap: normal; word-break: normal; white-space: normal; }
 }
 
 /* ==== The Settings box (ROADMAP Task 441) ====================================================
@@ -6490,6 +6498,15 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    exactly as wide as that word in the current language, never broken: `anywhere` above would let
    auto layout squeeze the column to one letter ("Junctio|n"). Nothing is reserved beyond the word. */
 .lpn-ff-table td.lpn-ff-fit { white-space: nowrap; overflow-wrap: normal; }
+/* **AN ASSET ID COLUMN HAS ONE MINIMUM WIDTH IN EVERY REPORT TABLE** (Task 829; Tom, 2026-10-26: "there
+   is no justification for them to vary"). Wide enough for N9999 or J-1234 at the table's own font,
+   screen and paper alike, and an id is never broken. Marked by the renderer, `lpn-rpt-id`, on the
+   heading and every cell of the column. */
+/* A heading's bracketed unit stays whole: "(m H2O)" never splits across lines. */
+th bdi { white-space: nowrap; }
+.lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
+/* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
+.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
    words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its

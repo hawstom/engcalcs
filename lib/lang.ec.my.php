@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='CSV ဒေါင်းလုတ်ချရ�
 $ec_lang['lpn_full_print']='အစီရင်ခံစာ ပရင့်ထုတ်ရန်';
 $ec_lang['lpn_full_col_time']='အချိန်';
 $ec_lang['lpn_full_col_type']='အမျိုးအစား';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ပါဝင်ပမာဏ';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ပါဝင်ပမာဏ';
 $ec_lang['lpn_full_row_count']='အတန်းများ ({n})။';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

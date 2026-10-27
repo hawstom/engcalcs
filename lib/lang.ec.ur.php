@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='CSV ڈاؤن لوڈ کریں';
 $ec_lang['lpn_full_print']='رپورٹ پرنٹ کریں';
 $ec_lang['lpn_full_col_time']='وقت';
 $ec_lang['lpn_full_col_type']='قسم';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ارتکاز';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ارتکاز';
 $ec_lang['lpn_full_row_count']='قطاریں ({n})۔';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

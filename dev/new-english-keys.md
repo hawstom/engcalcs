@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 199 untranslated keys, of 3170 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**32 still to read on master**, of 196 untranslated keys, of 3168 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (199, 34 to read @@ NEEDS RULING)
+## lpn_  (196, 32 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -172,12 +172,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
-- **`lpn_edit_fittings`**
-  > Edit fittings…
-  @@ NEEDS RULING
-- **`lpn_edit_pipetypes`**
-  > Edit types…
-  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   _Ruled OK 2026-10-20._
@@ -232,9 +226,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
-- **`lpn_field_auto_length`**
-  > Auto length
-  @@ NEEDS RULING
 - **`lpn_field_cv`**
   > Check valve (CV)
   _Ruled 2026-10-22: Approved._
@@ -269,7 +260,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
@@ -484,6 +475,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_quality_msx_species_tip`**
   > The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.
   _Ruled OK 2026-10-20._
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
@@ -507,9 +501,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_scnres_col`**
   > {quantity} ({unit}), {scenario}
-  _Ruled OK 2026-10-20._
-- **`lpn_scnres_copy_tip`**
-  > Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.
   _Ruled OK 2026-10-20._
 - **`lpn_scnres_empty`**
   > This project has none of these assets.
@@ -633,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**98 still to read**, of 141 new keys across 13 unmerged branch(es).
+**99 still to read**, of 142 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -644,28 +635,31 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1026c (`b3d493be3`) — adds no English strings
+### chore/merge-1026c (`80f2a4a72`) — adds no English strings
 
-### feat/box-rows-properties (`81bec0ecc`) — adds no English strings
+### feat/box-rows-properties (`9ec48ca4d`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol_unit`**
+  > {label}, {symbol} ({unit})
+  @@ NEEDS RULING
+- **`lpn_prop_label_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`c4a7535e8`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_heading_unit`**
-  > {label} ({unit})
-  @@ NEEDS RULING
-- **`lpn_quality_named_concentration_short`**
-  > {chemical} conc.
-  @@ NEEDS RULING
-- **`lpn_report_copy_html`**
-  > Copy HTML
-  @@ NEEDS RULING
-- **`lpn_result_concentration_short`**
-  > Conc.
-  @@ NEEDS RULING
+### feat/report-buttons (`bf56f6391`) — adds no English strings
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
@@ -1040,9 +1034,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/bottom-pane-lag-2 (`e9a3e1a3b`) — already merged into chore/merge-1026c; its strings are listed there
+### fix/bottom-pane-lag-2 (`1a2d010dc`) — adds no English strings
 
-### fix/phone-select (`9c284b295`) — 18 new, 18 to read @@ NEEDS RULING
+### fix/phone-select (`2a27693d9`) — 18 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex

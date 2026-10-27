@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='CSV ډاونلوډ کول';
 $ec_lang['lpn_full_print']='راپور چاپول';
 $ec_lang['lpn_full_col_time']='وخت';
 $ec_lang['lpn_full_col_type']='ډول';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='غلظت';
+$ec_lang['lpn_quality_named_concentration_short']='د {chemical} غلظت';
 $ec_lang['lpn_full_row_count']='قطارونه ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------

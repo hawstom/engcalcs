@@ -61,7 +61,7 @@ async function main() {
 		const waitTable = async () => { await a.waitFor(() => P.evaluate(() => !!document.querySelector('#lpn_ff_report table')), 'ff table', 120000); await settle(1200); };
 		await clickRun();
 		await waitTable();
-		const rep = await P.evaluate(() => ({ head: Array.from(document.querySelectorAll('#lpn_ff_report table th')).map((t) => t.textContent.trim()), rows: Array.from(document.querySelectorAll('#lpn_ff_report table tbody tr')).map((r) => Array.from(r.cells).map((c) => c.textContent.trim())), text: document.getElementById('lpn_ff_report').innerText.replace(/\s+/g, ' ') }));
+		const rep = await P.evaluate(() => ({ head: Array.from(document.querySelectorAll('#lpn_ff_report table th')).map((t) => t.textContent.trim().replace(/\s*\([^)]*\)$/, '')), rows: Array.from(document.querySelectorAll('#lpn_ff_report table tbody tr')).map((r) => Array.from(r.cells).map((c) => c.textContent.trim())), text: document.getElementById('lpn_ff_report').innerText.replace(/\s+/g, ' ') }));
 		const ex = plain(enString('lpn_guide_ff_example_def'));
 		const byJ = {}; rep.rows.forEach((r) => { byJ[r[0]] = r; });
 		const idx = {}; for (const k of COLS) { idx[k] = rep.head.indexOf(await T(k)); }
@@ -69,7 +69,7 @@ async function main() {
 		const n32 = byJ.N32, n31 = byJ.N31, n12 = byJ.N12;
 		ok('Junction N32: static ' + n32[idx.lpn_ff_col_static] + ', ' + n32[idx.lpn_ff_col_atrequired] + ' at ' + n32[idx.lpn_ff_col_required] + ', available ' + n32[idx.lpn_ff_col_available] + ', failing the fire flow',
 			[n32[idx.lpn_ff_col_static], n32[idx.lpn_ff_col_atrequired], n32[idx.lpn_ff_col_required], n32[idx.lpn_ff_col_available]].every((v) => ex.indexOf(v) >= 0) && n32[idx.lpn_ff_col_modes] === enString('lpn_ff_mode_fire'), JSON.stringify(n32));
-		ok('Junction N31 delivers ' + n31[idx.lpn_ff_col_available] + ' and N12 ' + n12[idx.lpn_ff_col_available], ex.indexOf(n31[idx.lpn_ff_col_available]) >= 0 && ex.indexOf(n12[idx.lpn_ff_col_available].replace(/^.* (\d+ gpm)$/, '$1')) >= 0 && n12[idx.lpn_ff_col_available].indexOf('10000') >= 0, JSON.stringify([n31, n12]));
+		ok('Junction N31 delivers ' + n31[idx.lpn_ff_col_available] + ' and N12 ' + n12[idx.lpn_ff_col_available], ex.indexOf(n31[idx.lpn_ff_col_available]) >= 0 && ex.indexOf(n12[idx.lpn_ff_col_available].replace(/^.* (\d+)$/, '$1 gpm')) >= 0 && n12[idx.lpn_ff_col_available].indexOf('10000') >= 0, JSON.stringify([n31, n12]));
 		const solves = (enString('lpn_ff_cost').match(/\{solves\}/), (enString('lpn_ff_cost')));
 		ok('the run solves the whole network 135 times, and the chapter says so', rep.text.indexOf(enString('lpn_ff_cost').replace('{solves}', '135')) >= 0 && ex.indexOf('135 times') >= 0, rep.text.slice(0, 200));
 		ok('the summary counts eight passed and one failed, as the chapter says (eight of the nine pass; N32 fails)', rep.text.indexOf(enString('lpn_ff_summary').replace('{clean}', '8').replace('{fire}', '1').replace('{design}', '0')) >= 0 && ex.indexOf('Eight of') >= 0);

@@ -4070,6 +4070,9 @@ $ec_lang['lpn_full_download_csv']='CSV डाउनलोड करें';
 $ec_lang['lpn_full_print']='रिपोर्ट प्रिंट करें';
 $ec_lang['lpn_full_col_time']='समय';
 $ec_lang['lpn_full_col_type']='प्रकार';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='सांद्रता';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} सांद्रता';
 $ec_lang['lpn_full_row_count']='पंक्तियाँ ({n})।';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
