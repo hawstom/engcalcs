@@ -151,6 +151,22 @@ async function main() {
 		got = await strips(a.page);
 		ok('after a reload: every other default tab, in order, and Libraries closed',
 			JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.filter((x) => x !== 'lpn_library_box')]), JSON.stringify(got));
+		console.log('\n--- 2c. pinning a box keeps its tab, shown pressed; pressing the tab unpins ---');
+		const before = JSON.stringify(await strips(a.page));
+		const stab = '#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]';
+		const pressed = () => a.page.getAttribute(stab, 'aria-pressed');
+		ok('before pinning: the Settings tab is not pressed', (await pressed()) === 'false');
+		await a.page.click(stab);
+		await a.settle(500);
+		await a.page.click('#lpn_settings_box [data-dock="autohide"]');
+		await a.settle(600);
+		ok('pinned: the strip has the same tabs in the same order', JSON.stringify(await strips(a.page)) === before, JSON.stringify(await strips(a.page)));
+		ok('...the pinned box\'s tab is pressed', (await pressed()) === 'true');
+		ok('...and the box is open, pinned', (await openBoxes(a)).includes('lpn_settings_box'));
+		await a.page.click(stab);
+		await a.settle(600);
+		ok('pressing its tab unpins: same tabs, same order', JSON.stringify(await strips(a.page)) === before, JSON.stringify(await strips(a.page)));
+		ok('...the tab is no longer pressed and the box is tucked', (await pressed()) === 'false' && !(await openBoxes(a)).includes('lpn_settings_box'), JSON.stringify(await openBoxes(a)));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 

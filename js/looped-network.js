@@ -171,8 +171,14 @@ var EngCalcs = EngCalcs || {};
 	// Not a settings row: a number nobody has wanted to change costs 26 translations, and every
 	// adjustment so far moved a default everybody gets, not a preference one drawing needed.
 	var LPN_LABEL_REPEAT_FRAC = 0.75;
-	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A cap on n is a cap on the
-	// SPACING, so a very long pipe zoomed into would silently stop obeying the rule.
+	// **THE DIVISION IS NEARLY UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A tight cap on n is a
+	// cap on the SPACING, so a long pipe zoomed into would silently stop obeying the rule. For that
+	// reason n may reach LPN_LABEL_STATIONS_MAX, 10000, about 7500 view-widths of one pipe, which no
+	// real zoom reaches (a 40 mile main seen through a 100 ft window is about 2700).
+	// THE CEILING EXISTS FOR ONE CAUSE: a label pass that ran with a STALE view scale (2026-10-27,
+	// before fix/fresh-freeze) computed a spacing near zero and laid 1,045,277 positions on one Net3
+	// pipe. Past the ceiling the pipe gets 10000 evenly spaced stations, never a million.
+	var LPN_LABEL_STATIONS_MAX = 10000;
 	// A LAST-RESORT GUARD, not a rule: a pipe folding back and forth INSIDE the window can
 	// legitimately have thousands of stations in view. An ordinary drawing never reaches it (a
 	// straight pipe crossing the padded window has at most about 13).
@@ -257,7 +263,7 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelStations(l) {
 		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
 		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
-		n = Math.ceil(len / s);
+		n = Math.min(Math.ceil(len / s), LPN_LABEL_STATIONS_MAX);
 		for (i = 0; i < n; i++) { out.push((i + 0.5) / n); }
 		return out;
 	}
@@ -66356,6 +66362,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (d.tab.textContent !== t) { d.tab.textContent = t; }
 			d.tab.title = t;
 			d.tab.setAttribute('aria-expanded', d === dockFlyout ? 'true' : 'false');
+			// A pinned box keeps its tab, shown pressed (Tom, 2026-10-27: "I find it disorienting to have the
+			// tab gone"), so the strip never changes membership on a pin. Pressing it unpins.
+			d.tab.setAttribute('aria-pressed', dockAuto(d) ? 'false' : 'true');
 		});
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
@@ -66466,7 +66475,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var opp = side === 'left' ? 'right' : 'left', strip;
 		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
 		if (col) { strip = col[opp].strip; }
-		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
 		return strip ? LPN_DOCK_STRIP_W : 0;
 	}
 	function layoutDocks() {
@@ -66514,7 +66523,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
 			sides[s].pinned.forEach(function (d) { w = Math.max(w, dockWidthOf(d)); });
-			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
+			col[s] = { strip: (sides[s].auto.length || sides[s].pinned.length) ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
 		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
 		// (Tom, 2026-10-07: the Alternatives box "gets wider, but it's still limited to about 80% of
@@ -66544,7 +66553,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
-			renderDockStrip(s, S.auto, s === 'left' ? outerL : outerR - c.strip, top, h);
+			renderDockStrip(s, S.auto.concat(S.pinned).sort(dockByOrd), s === 'left' ? outerL : outerR - c.strip, top, h);
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
@@ -66723,6 +66732,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.className = 'lpn-dock-tab';
 		tab.setAttribute('aria-controls', d.box.id);
 		tab.addEventListener('pointerenter', function (e) {
+			if (!dockAuto(d)) { return; }
 			if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') { return; }
 			clearTimeout(dockTimer);
 			dockTimer = setTimeout(function () { dockFlyOut(d, false); }, LPN_DOCK_HOVER_MS);
@@ -66733,6 +66743,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.addEventListener('click', function () {
 			// The click that ends a reordering drag is not a request to open the box.
 			if (tab.lpnDragged) { tab.lpnDragged = false; return; }
+			// A pinned box's tab is its pressed button: pressing it unpins, as in JetBrains and VS Code.
+			if (!dockAuto(d)) { dockAct(d, 'autohide'); return; }
 			dockFlyOut(d, true);
 		});
 		tab.lpnDock = d;

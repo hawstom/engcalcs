@@ -1318,6 +1318,7 @@
 :root[data-theme="prairie"] .lpn-dock-strip { background: var(--ec-fence-grain), var(--ec-fence); border-color: var(--ec-fence-edge); border-width: 2px 1px; }
 :root[data-theme="prairie"] .lpn-dock-tab { background: var(--ec-bg); color: var(--ec-ink); border-color: var(--ec-fence-edge); border-radius: 0; }
 :root[data-theme="prairie"] .lpn-dock-tab:hover, :root[data-theme="prairie"] .lpn-dock-tab:focus-visible, :root[data-theme="prairie"] .lpn-dock-tab[aria-expanded="true"] { background: var(--ec-fence-grain), var(--ec-fence-hover); }
+:root[data-theme="prairie"] .lpn-dock-tab[aria-pressed="true"] { background: var(--ec-fence-grain), var(--ec-fence-hover); }
 :root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn):hover:not(:disabled) { background: var(--ec-cloud); border-color: transparent; box-shadow: var(--ec-cloud-shadow); border-radius: 999px; }
 :root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: var(--ec-cloud-pressed); border-color: var(--ec-cloud-pressed-edge); box-shadow: var(--ec-cloud-pressed-shadow); color: var(--ec-accent); border-radius: 999px; }
 :root[data-theme="prairie"] #lpn_toolbar_run .lpn-transport-btn { background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); color: var(--ec-steel-ink); }
@@ -5143,6 +5144,8 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-dock-tab:hover, .lpn-dock-tab:focus-visible, .lpn-dock-tab[aria-expanded="true"] {
 	background: var(--ec-hover-bg); border-color: var(--ec-hover-border);
 }
+/* A pinned box keeps its tab, pressed in: the strip's members never change on a pin. */
+.lpn-dock-tab[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); box-shadow: var(--ec-bevel-in); }
 /* The column's inner edge: drag it to make the docked column wider or narrower. */
 .lpn-dock-grip {
 	position: fixed; z-index: 7; width: 8px; margin-left: -4px; cursor: col-resize; touch-action: none;
