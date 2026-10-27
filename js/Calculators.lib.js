@@ -243,26 +243,7 @@ EngCalcs.tipShowDelay = 500;
 // Arms ONE element with the styled tooltip (an explanation behind its "?", or a name tip). Shared
 // by initTips() and by the delegated listener below, so there is exactly one place that decides
 // trigger, delay, long-press and click-to-hide.
-// **EVERY ELEMENT ARMED WITH A TOOLTIP IS REMEMBERED HERE, SO ONE THAT HAS LEFT THE PAGE CAN BE LET GO.**
-// Bootstrap keeps each instance in a map keyed by its element, so a control that a form rebuild
-// threw away stayed alive with its instance and listeners, once per rebuild (the Time series,
-// Profile and System flow tabs rebuilt their controls on every open and gained ~40 nodes and ~13
-// listeners per open, measured 2026-10-26). An element is disposed only after TWO sweeps have
-// found it detached, so one that is being carried from one box to another keeps its tip.
-var ecTipArmed = [];
-function ecSweepDetachedTips() {
-	var keep = [], i, el, t;
-	for (i = 0; i < ecTipArmed.length; i++) {
-		el = ecTipArmed[i];
-		if (el.isConnected) { el._ecTipGone = 0; keep.push(el); continue; }
-		if (!el._ecTipGone) { el._ecTipGone = 1; keep.push(el); continue; }
-		t = bootstrap.Tooltip.getInstance(el);
-		if (t) { try { t.dispose(); } catch (e) {} }
-	}
-	ecTipArmed = keep;
-}
 function ecWireTipEl(el) {
-		if (!el._ecTipListed) { el._ecTipListed = true; ecTipArmed.push(el); }
 		var canHover = ecCanHover();
 		var control = ecTipIsControl(el);
 		var explainGlyph = ecTipGlyph(el);
@@ -382,7 +363,6 @@ function ecWireTipEl(el) {
 		}
 }
 EngCalcs.initTips = function (root) {
-	if (window.bootstrap && bootstrap.Tooltip) { ecSweepDetachedTips(); }
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(ecWireTipEl);
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });
