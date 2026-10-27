@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copia el escenario abierto y sus valores espe
 $ec_lang['lpn_scenario_copy_off']='Copiar escenario funciona en el Modo básico. Con el Modo básico desmarcado, agregue un escenario y elija sus alternativas en la tabla Escenarios.';
 $ec_lang['lpn_sm_title']='Administrador de escenarios';
 $ec_lang['lpn_sm_menu']='Administrador de escenarios…';
-$ec_lang['lpn_sm_basic_on']='El Administrador de escenarios está deshabilitado cuando el Modo básico está marcado.';
 $ec_lang['lpn_pane_tab_scenarios']='Escenarios';
 $ec_lang['lpn_sm_col_parent']='Superior';
 $ec_lang['lpn_sm_add_child']='Agregar secundario';

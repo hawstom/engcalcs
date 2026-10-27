@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copia o cenário aberto e seus valores indivi
 $ec_lang['lpn_scenario_copy_off']='Copiar cenário funciona no Modo básico. Com o Modo básico desmarcado, adicione um cenário e escolha suas alternativas na tabela Cenários.';
 $ec_lang['lpn_sm_title']='Cenários: gerenciador';
 $ec_lang['lpn_sm_menu']='Gerenciador de cenários…';
-$ec_lang['lpn_sm_basic_on']='O Gerenciador de cenários fica desativado quando o Modo básico está marcado.';
 $ec_lang['lpn_pane_tab_scenarios']='Cenários';
 $ec_lang['lpn_sm_col_parent']='Pai';
 $ec_lang['lpn_sm_add_child']='Adicionar filho';

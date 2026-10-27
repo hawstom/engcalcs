@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='খোলা দৃশ্যকল্প ও 
 $ec_lang['lpn_scenario_copy_off']='দৃশ্যকল্প কপি করুন সাধারণ মোডে কাজ করে। সাধারণ মোড বন্ধ থাকলে, একটি দৃশ্যকল্প যোগ করুন এবং দৃশ্যকল্প সারণিতে তার বিকল্পগুলো বেছে নিন।';
 $ec_lang['lpn_sm_title']='দৃশ্যকল্প ব্যবস্থাপক';
 $ec_lang['lpn_sm_menu']='দৃশ্যকল্প ব্যবস্থাপক…';
-$ec_lang['lpn_sm_basic_on']='সাধারণ মোড চালু থাকলে দৃশ্যকল্প ব্যবস্থাপক নিষ্ক্রিয় থাকে।';
 $ec_lang['lpn_pane_tab_scenarios']='দৃশ্যকল্প';
 $ec_lang['lpn_sm_col_parent']='মূল';
 $ec_lang['lpn_sm_add_child']='অধস্তন যোগ করুন';

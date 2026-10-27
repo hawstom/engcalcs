@@ -486,6 +486,11 @@
      "id": "project/morph_menu/tool_add_valve",
      "label": "Valve",
      "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/morph_vertex",
+     "label": "Vertex",
+     "parent": "Morph"
     }
    ]
   },

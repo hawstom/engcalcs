@@ -75,15 +75,18 @@ const closeBox = (a, id) => a.page.evaluate((i) => {
 	if (x) { x.click(); } else if (b) { b.style.display = 'none'; }
 }, id);
 
-async function visit(Session, browser, label, defaults, seed) {
+async function visit(Session, browser, label, defaults, seed, dockList) {
 	const a = await Session.open(browser, NAME + '-' + label, { viewport: { width: 1600, height: 1000 } });
 	await a.context.addInitScript((v) => { window.EC_DEFAULT_DOCKS = v; }, defaults);
+	if (dockList) { await a.context.addInitScript((l) => { window.EC_DEFAULT_DOCK_LIST = l; }, dockList); }
 	if (seed) { await a.context.addInitScript((kv) => { try { if (localStorage.getItem(kv[0]) === null) { localStorage.setItem(kv[0], kv[1]); } } catch (e) { /* none */ } }, seed); }
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
 	await noConsent(a);
 	await a.settle(1500);
+	// First-view docks arrive when the first project opens (feat/first-view), not over the gallery.
+	if (defaults) { await a.openExampleCard(await a.lang('lpn_ex_net3_title')); await a.settle(2500); }
 	return a;
 }
 async function openSettings(a) {
@@ -106,14 +109,14 @@ const clipped = (a) => a.page.evaluate(() => {
 // Every label-row column's left and right edge, on every row of each group: the spread of each
 // edge down the group, and a row that sits off the others.
 const labelColumns = (a) => a.page.evaluate(() => ['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_customer_fields'].map((gid) => {
-	// The heading and the field rows: seven children each (name, Before, After, Use units, Decimals,
-	// Show, Drop). A whole-list row under them (the customer label-width limit) is not a column row.
-	const g = document.getElementById(gid), rows = g ? Array.from(g.children).filter((r) => r.getBoundingClientRect().height > 0 && r.children.length === 7) : [];
+	// The heading and the field rows: the name (or the heading's lead) and ONE group of six columns (Before,
+	// After, Use units, Decimals, Show, Drop). A whole-list row under them (the customer label-width limit) is not a column row.
+	const g = document.getElementById(gid), rows = g ? Array.from(g.children).filter((r) => r.getBoundingClientRect().height > 0 && r.children.length === 2 && r.children[1].className === 'lpn-lblgroup') : [];
 	const cols = [];
-	for (let c = 1; c <= 6; c++) {
+	for (let c = 0; c < 6; c++) {
 		const ls = [], rs = [];
 		rows.forEach((r) => {
-			const e = r.children[c];
+			const e = r.children[1].children[c];
 			if (!e) { return; }
 			const b = e.getBoundingClientRect();
 			ls.push([b.left, (r.textContent || '').trim().slice(0, 20) || '(heading)']);
@@ -121,14 +124,14 @@ const labelColumns = (a) => a.page.evaluate(() => ['lpn_labels_node_fields', 'lp
 		});
 		const lmin = Math.min.apply(null, ls.map((x) => x[0])), lmax = Math.max.apply(null, ls.map((x) => x[0]));
 		const odd = ls.find((x) => Math.abs(x[0] - lmin) <= 0.5);
-		cols.push({ c: c + 1, n: ls.length, lspread: lmax - lmin, rspread: Math.max.apply(null, rs) - Math.min.apply(null, rs), odd: odd && odd[1] });
+		cols.push({ c: c + 2, n: ls.length, lspread: lmax - lmin, rspread: Math.max.apply(null, rs) - Math.min.apply(null, rs), odd: odd && odd[1] });
 	}
 	return { gid, rows: rows.length, cols };
 }));
 // Each Settings section's two-column rows: the second column's left edge, spread down the section.
 const rowGrids = (a) => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_setbox_content .lpn-set-secbody')).map((sec) => {
 	const xs = Array.from(sec.querySelectorAll('.lpn-set-row')).filter((r) => r.getBoundingClientRect().height > 0 && getComputedStyle(r).display === 'grid' && r.children[1])
-		.map((r) => r.children[1].getBoundingClientRect().left);
+		.map((r) => r.children[1].getBoundingClientRect().left - r.getBoundingClientRect().left);   // relative to the row: a custom property's body is indented 12 px on purpose (.lpn-cp-body)
 	return { sec: (sec.closest('.lpn-set-sec') || sec).id, n: xs.length, spread: xs.length ? Math.max.apply(null, xs) - Math.min.apply(null, xs) : 0 };
 }).filter((s) => s.n > 1));
 
@@ -147,7 +150,7 @@ async function main() {
 	try {
 		console.log('\n--- 1. the label columns line up on every row ---');
 		const s = await visit(Session, browser, 'columns', true);
-		await s.page.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]');
+		// Settings starts pinned open on a PC (Tom, 2026-10-26): nothing to fly out.
 		await s.settle(500);
 		// Water age as the quality parameter, so every row it adds is drawn and measured.
 		await s.page.evaluate(() => {
@@ -256,7 +259,7 @@ async function main() {
 			if (r === 'cap') { justified[id] = want === CAP; ok(id + ' measures past the cap, so it docks at ' + CAP, justified[id], want + ' px'); }
 			else if (r === 'floor') { justified[id] = want === FLOOR; ok(id + ' measures under the floor, so it docks at ' + FLOOR, justified[id], want + ' px'); }
 			else {
-				justified[id] = want >= n.natural - STEP && want <= n.natural + SLACK;
+				justified[id] = want >= n.natural - STEP && want <= n.natural + SLACK + (id === 'lpn_settings_box' ? 128 : 0);   // Settings also holds room for the override column (Tom, 2026-10-25)
 				ok(id + ' docks at its measured width, ' + n.natural + ' px', justified[id],
 					'LPN_DOCK_OPTIMAL_REM says ' + table[id] + ' rem = ' + want + ' px; the measurement says ' + (Math.ceil(n.natural / 8) / 2) + ' rem');
 			}
@@ -287,7 +290,8 @@ async function main() {
 		await m.close();
 
 		console.log('\n--- 3. the first-visit docks fly out at those widths ---');
-		const a = await visit(Session, browser, 'first', true);
+		// The first-view layout is five boxes now (feat/first-view); the fourteen are docked by a list of the harness's own.
+		const a = await visit(Session, browser, 'first', true, null, FIRST.map((id) => ({ id, side: LEFT.includes(id) ? 'left' : 'right' })));
 		const seen = {};
 		for (const id of FIRST) {
 			const side = LEFT.includes(id) ? 'left' : 'right', want = Math.round(table[id] * 16);

@@ -1025,7 +1025,7 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precis
 $ec_lang['lpn_guide_scn_use_term']='What a scenario is for';
 $ec_lang['lpn_guide_scn_use_def']='<p>Scenarios save many designs, views, or situations in the same project, such as average day, maximum day, peak hour, a report presentation figure, a main out of service, or a proposed replacement. The network is drawn once, in the Base scenario. Every other scenario holds only its overrides, the values that differ from the scenario it inherits from, and reads everything else from that scenario. An edit to Base therefore reaches every scenario that has not overridden that value.</p><p>A new project starts with six ready-made scenarios: 1. Flow test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, and 6. Peak hour. They are ordinary scenarios that can be renamed, edited, and deleted. Each starts with one override, its demand multiplier: 1 for the flow tests and Average Day, 2 for Max Day, and 3 for Peak hour. The multipliers are placeholders to be replaced with values for the system being modeled. A project opened from a file, including each example, or imported from an EPANET file has Base alone.</p><p>Fire flow is checked with the Fire flow analysis, which tests every junction or the selected junctions. Max Day is the scenario normally open when it is run.</p>';
 $ec_lang['lpn_guide_scn_open_term']='The open scenario';
-$ec_lang['lpn_guide_scn_open_def']='<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives. It is dimmed while Basic mode is checked.</p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.</p>';
+$ec_lang['lpn_guide_scn_open_def']='<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.</p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Where overrides show';
 $ec_lang['lpn_guide_scn_marks_def']='<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.</p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.</p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Making and clearing overrides';
@@ -1120,7 +1120,7 @@ $ec_lang['lpn_guide_bx_dock_def']='<p>The corner of a box\'s title bar has Dock 
 $ec_lang['lpn_guide_bx_keep_term']='What a box remembers';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Each box keeps in this browser where it floats, its size, whether it is open, its dock side, whether it auto-hides, its docked width, and the place of its tab. Properties, Criticality analysis, Demand scaling, and Calibration keep only their dock side, auto-hide, tab place, and whether they are open; where they float lasts for one page load. A browser with no saved layout starts with some boxes docked as tabs, and nothing is stored until a box is changed.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='On a phone';
-$ec_lang['lpn_guide_bx_phone_def']='<p>At 640 px or narrower, no box docks and every box fills the window. The dock buttons are not offered. A docked layout is kept and returns on a wider window.</p>';
+$ec_lang['lpn_guide_bx_phone_def']='<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.</p>';
 // The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
 $ec_lang['lpn_guide_ff_asks_term']='What is asked of each junction';
 $ec_lang['lpn_guide_ff_asks_def']='<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.</p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.</p>';
@@ -1718,6 +1718,26 @@ $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_morph_menu']='Morph';
 $ec_lang['lpn_morph_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.';
 $ec_lang['lpn_morph_ok']='Morph';
+// Morph, Vertex (Tom, 2026-10-24: "It would be nice to be able to Morph a Junction into a vertex."). {id} is the
+// junction's ID, {n} a count. A vertex lives on exactly one pipe, so only a junction that joins exactly two
+// pipes and holds nothing of its own can become one.
+$ec_lang['lpn_morph_vertex']='Vertex';
+$ec_lang['lpn_morph_vertex_base']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.';
+$ec_lang['lpn_morph_vertex_type']='{id} was not morphed into a vertex: only a junction can become one.';
+$ec_lang['lpn_morph_vertex_links']='{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.';
+$ec_lang['lpn_morph_vertex_kind']='{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.';
+$ec_lang['lpn_morph_vertex_loop']='{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.';
+$ec_lang['lpn_morph_vertex_demand']='{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.';
+$ec_lang['lpn_morph_vertex_customers']='{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.';
+$ec_lang['lpn_morph_vertex_text']='{id} was not morphed into a vertex: a Text is attached to it.';
+$ec_lang['lpn_morph_vertex_pipes']='{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.';
+$ec_lang['lpn_morph_vertex_own']='{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.';
+$ec_lang['lpn_morph_vertex_clear_both']='Clear elevation {elev} and demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_elev']='Clear elevation {elev} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_demand']='Clear demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_quality']='Clear initial quality {quality} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_also']='Initial quality {quality} is cleared too.';
+$ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
 $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
@@ -1954,6 +1974,7 @@ $ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two search
 // says what the section does to the list above it rather than naming a second tool. "Assets" is the
 // word this page already uses for its nodes and pipes.
 $ec_lang['lpn_replace_title']='Change what was found';
+$ec_lang['lpn_replace_selected_only']='Only the selected assets';
 $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
 $ec_lang['lpn_replace_source']='New value source';
@@ -3403,7 +3424,7 @@ $ec_lang['lpn_scenario_only_deleted']='{id} is deleted. It was part of {scenario
 $ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: the Scenario manager and the Scenarios table are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager shows a list of scenarios, and the Scenarios table is not shown. Cleared: the Scenario manager shows its tree and the Scenarios table is shown, and alternatives can be shared among scenarios. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.';
 $ec_lang['lpn_scenario_basic_misfit']='This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.';
 $ec_lang['lpn_scenario_basic_misfit_base']='The Base scenario uses an alternative other than Base.';
 $ec_lang['lpn_scenario_copy']='Copy scenario';
@@ -3411,7 +3432,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copies the open scenario and its overrides, a
 $ec_lang['lpn_scenario_copy_off']='Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.';
 $ec_lang['lpn_sm_title']='Scenario manager';
 $ec_lang['lpn_sm_menu']='Scenario manager…';
-$ec_lang['lpn_sm_basic_on']='Scenario manager is disabled when Basic mode is on.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenarios';
 $ec_lang['lpn_sm_col_parent']='Parent';
 $ec_lang['lpn_sm_add_child']='Add child';

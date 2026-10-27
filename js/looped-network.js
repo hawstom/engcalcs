@@ -8345,12 +8345,11 @@ var EngCalcs = EngCalcs || {};
 		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
-		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
-		// "Scenario manager is disabled when Basic mode is on").
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE AND NEVER GREYED** (Tom, 2026-10-25: Basic mode gets a
+		// face of the box of its own; it was greyed in Basic mode from 2026-10-13 to 2026-10-25).
 		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
 		rows.push({
-			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,
-			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
 			fn: function () { openScenarioManager(); }
 		});
 		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
@@ -22740,6 +22739,18 @@ var EngCalcs = EngCalcs || {};
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
 			'Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.');
 		box.appendChild(line);
+		// **AN EXIT IN THE BUBBLE** (Tom, 2026-10-24, on a phone: the mode could be left only by Esc,
+		// by the Select tool or by an insert tool). It returns to the normal Select mode, with
+		// whatever is selected left as it is. It is not a <div>, so it takes the press the way the
+		// checkbox below does; while a ring is open the whole bubble is inert, so the button cannot
+		// eat the closing click.
+		var exitBtn = document.createElement('button');
+		exitBtn.type = 'button';
+		exitBtn.className = 'lpn-area-hint-exit';
+		exitBtn.id = 'lpn_area_hint_exit';
+		exitBtn.textContent = pc.lpn_fitting_exit || 'Exit';
+		exitBtn.addEventListener('click', function () { setMode('select'); });
+		box.appendChild(exitBtn);
 		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
 		// Checked, always: it is the state you are looking at, and the only act it offers is
 		// turning the bubble off. The way back is Settings, Map and page, Page -- named in the row
@@ -23090,6 +23101,12 @@ var EngCalcs = EngCalcs || {};
 		// something. A ring that caught nothing opens nothing, because there would be nothing in
 		// the box to show.
 		if (selectionCount()) { openMultiProperties(); }
+		// **A RING THAT CAUGHT SOMETHING ENDS THE TOOL** (Tom, 2026-10-24: "select area mode should
+		// exit automatically after a successful area selection of at least one asset"). The caught
+		// things are what the reader wants to work on, and every other tool now needs a deliberate
+		// exit. An empty result stays in the tool, to try again; a Shift ring stays too, because
+		// Shift is the reader saying the selection is still being built.
+		if (found.length && !areaKeep) { setMode('select'); }
 		return found.length;
 	}
 
@@ -25513,7 +25530,7 @@ var EngCalcs = EngCalcs || {};
 	// `source` is 'value' or 'dem' (Task 542). It only ever means anything with Elevation chosen,
 	// and replaceNormalize() puts it back to 'value' the moment the property changes -- a hidden
 	// state that survives a property change is how a Replace writes something nobody asked for.
-	var replaceState = { prop: '', value: '', source: 'value' };
+	var replaceState = { prop: '', value: '', source: 'value', selOnly: false };
 	// The element buildReplaceForm() drew into, so a control that changes WHICH CONTROLS THERE ARE
 	// can redraw them. Only the property and the source do that (Task 542).
 	var replaceBox = null;
@@ -25820,14 +25837,23 @@ var EngCalcs = EngCalcs || {};
 	 * count the user had read and approved. The doc block above already claimed a compound query
 	 * was fine here; this makes it true.
 	 */
-	function replaceFoundSet() {
+	function replaceFoundAll() {
 		var run = findRunQuery();
 		return run.ok ? run.list : [];
+	}
+	function replaceFoundSet() {
+		var run = findRunQuery();
+		if (!run.ok) { return []; }
+		// **ONLY THE SELECTED ASSETS** (Tom, 2026-10-24: *"I would like a way to set all selected
+		// elevations from DEM."*), through the box that already owns the DEM fill, not a third door:
+		// the found set is cut to what is selected on the map when the box says so.
+		if (replaceState.selOnly) { return run.list.filter(function (c) { return isSelected(c.group, c.el.id); }); }
+		return run.list;
 	}
 	function replaceSpecs() {
 		var cands;
 		if (findQueryError) { return []; }
-		if (findQueryAst) { cands = replaceFoundSet(); }
+		if (findQueryAst) { cands = replaceFoundAll(); }   // the list of properties is the whole found set's, not the selection's
 		else {
 			var d = findScopeDef(findState.scope);
 			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
@@ -26161,6 +26187,18 @@ var EngCalcs = EngCalcs || {};
 			renderReplace(null);
 			return;
 		}
+		// The found set cut to the selection. Visible whenever the box can write, so the state is never hidden.
+		var selLbl = document.createElement('label'), selBox = document.createElement('input');
+		selLbl.className = 'lpn-replace-selonly';
+		selBox.type = 'checkbox';
+		selBox.id = 'lpn_replace_selonly';
+		selBox.checked = !!replaceState.selOnly;
+		selBox.addEventListener('change', function () {
+			replaceState.selOnly = selBox.checked; replacePending = null; rebuildReplaceForm();
+		});
+		selLbl.appendChild(selBox);
+		selLbl.appendChild(document.createTextNode(' ' + (pc.lpn_replace_selected_only || 'Only the selected assets')));
+		box.appendChild(selLbl);
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
 				// Same rule as Find's own Property select: switching AWAY from a choice property
@@ -40283,7 +40321,203 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
 			.concat([{ separator: true }])
-			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
+			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }))
+			// **A JUNCTION BECOMES A VERTEX OF ITS PIPE** (Tom, 2026-10-24); see morphJunctionsToVertices().
+			.concat([{ separator: true }, {
+				icon: 'vertices', label: pc.lpn_morph_vertex || 'Vertex',
+				disabled: !nodes.some(function (n) { return n.type === 'junction'; }),
+				fn: function () { closeMenu(); morphJunctionsToVertices(); }
+			}]);
+	}
+	/**
+	 * **MORPH A JUNCTION INTO A VERTEX** (Tom, 2026-10-24: *"It would be nice to be able to Morph a
+	 * Junction into a vertex."*). A vertex lives on exactly one pipe, so the one case that works is a
+	 * junction that joins exactly two pipes: they become ONE pipe whose polyline bends at the
+	 * junction's place. Anything else is refused BY NAME and in plain words (vertexMorphProblem()),
+	 * and what is refused is not partly done.
+	 *
+	 * **THE FIRST OF THE TWO PIPES SURVIVES** (the earlier in the document), with its ID and values.
+	 * The other is deleted; a Customer or a Text attached to it by station is restated along the
+	 * merged line first, so it stays where it was drawn. A typed length of both is added; if either
+	 * is Auto the merged pipe is Auto, because a typed number is only ever the user's own.
+	 *
+	 * **BASE ONLY**: the bends and the ends of a pipe are the same in every scenario. One snapshot
+	 * for the whole command, as every other Morph takes, so one Undo reverses it.
+	 * dev/lpn-spike/morph-vertex-harness.js.
+	 */
+	function vertexMorphProblem(n, info) {
+		var pc = EngCalcs.pageConfig || {}, ids, a, b, demandSpec, demandRows;
+		// Stored as typed, in the unit shown (CLAUDE.md, Unit Sets), so the number is read as it is.
+		function disp(v, unitId) { return String(+(+v).toPrecision(6)) + ' ' + unitLabel(unitId).replace(/\s*H2O$/, ''); }
+		function say(key, dflt, extra) {
+			return String(pc[key] || dflt).replace('{id}', n.id).replace('{n}', String(extra));
+		}
+		if (n.type !== 'junction') { return say('lpn_morph_vertex_type', '{id} was not morphed into a vertex: only a junction can become one.', ''); }
+		ids = (incidentLinks[n.id] || []).slice();
+		if (ids.length !== 2) {
+			return say('lpn_morph_vertex_links', '{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.', ids.length);
+		}
+		a = linkById(ids[0]); b = linkById(ids[1]);
+		if (!a || !b || a.type !== 'pipe' || b.type !== 'pipe') {
+			return say('lpn_morph_vertex_kind', '{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.', '');
+		}
+		if ((a.from === n.id ? a.to : a.from) === (b.from === n.id ? b.to : b.from)) {
+			return say('lpn_morph_vertex_loop', '{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.', '');
+		}
+		// **ELEVATION AND DEMANDS ARE ASKED ABOUT, NOT REFUSED** (Tom, 2026-10-25: "How about 'Clear elevation {}
+		// and demands {}?' But I agree that Morph to vertex was intended to be a very low-power tool."). Only
+		// when nothing else stops the morph; info.ask holds the question's parts. An emitter coefficient, a
+		// tag, a description or any other data is still a refusal.
+		demandSpec = typeOwnedNodeSpecs()[0];
+		demandRows = demandSpec.value(n);
+		if (n._emitter && +n._emitter !== 0) {
+			return say('lpn_morph_vertex_demand', '{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.', '');
+		}
+		if (info) {
+			info.elevShown = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
+			// Net1 and any imported file give every junction an initial quality; it is asked about too, never silently dropped.
+			info.quality = (typeof n._initQuality === 'number' && n._initQuality !== 0) ? String(+(+n._initQuality).toPrecision(6)) + (concentrationUnitText() ? ' ' + concentrationUnitText() : '') : '';
+			info.demands = demandRows ? demandRows.filter(function (v) { return v !== undefined && v !== null && v !== ''; })
+				.map(function (v) { return disp(v, 'lpn_u_flow'); }).join(', ') : '';
+		}
+		if ((doc.customers || []).some(function (c) { return c.node === n.id; })) {
+			return say('lpn_morph_vertex_customers', '{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.', '');
+		}
+		if ((labelsByAnchor[n.id] || []).length) {
+			return say('lpn_morph_vertex_text', '{id} was not morphed into a vertex: a Text is attached to it.', '');
+		}
+		// A simple merge only: the one pipe that survives keeps ONE diameter and ONE roughness, and a
+		// junction's own data (its elevation, tag, description, anything stated on it) would be dropped.
+		if (a._diameter !== b._diameter || a._roughness !== b._roughness) {
+			return say('lpn_morph_vertex_pipes', '{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.', '');
+		}
+		if (Object.keys(n).some(function (k) {
+			var v = n[k];
+			if (k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok' || k === 'lx' || k === 'ly') { return false; }
+			if (k === 'elev' || k === '_initQuality' || demandSpec.keys.indexOf(k) >= 0 || k === 'demandPattern') { return false; }   // asked about, above
+			if (v === undefined || v === null || v === '' || v === 0 || v === false) { return false; }
+			if (typeof v === 'object' && !Object.keys(v).length) { return false; }
+			return true;
+		})) {
+			return say('lpn_morph_vertex_own', '{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.', '');
+		}
+		return '';
+	}
+	function mergeAtJunction(n) {
+		var ids = incidentLinks[n.id].slice(), A = linkById(ids[0]), B = linkById(ids[1]), S, O, lenS, lenO, total,
+			rev = function (v) { return v.slice().reverse(); }, vtx, sameDir, newVerts, farO, bothTyped, typed, i;
+		// The earlier in the document survives.
+		for (i = 0; i < doc.links.length; i++) {
+			if (doc.links[i] === A || doc.links[i] === B) { S = doc.links[i]; break; }
+		}
+		O = S === A ? B : A;
+		lenS = Geom.polylineLength(linkPointList(S)); lenO = Geom.polylineLength(linkPointList(O));
+		total = lenS + lenO;
+		vtx = { x: n.x, y: n.y };
+		if (n.tok && (n.tok.x || n.tok.y)) { vtx.tok = { x: n.tok.x, y: n.tok.y }; }
+		bothTyped = !S.lenAuto && !O.lenAuto;
+		typed = (+S._length || 0) + (+O._length || 0);
+		farO = O.from === n.id ? O.to : O.from;
+		if (S.to === n.id) {
+			// S runs into the junction; the merged line is S, the junction, then O outward.
+			sameDir = O.from === n.id;
+			newVerts = S.verts.concat([vtx], sameDir ? O.verts : rev(O.verts));
+			remapStations(S, O, function (t) { return t * lenS; }, function (t) { return lenS + (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.to] = incidentLinks[S.to].filter(function (x) { return x !== S.id; });
+			S.to = farO;   // base-write: identity -- Base is showing (the command is Base-only), like breakPipeAtPoint()
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		} else {
+			// S runs out of the junction; the merged line is O inward, the junction, then S.
+			sameDir = O.to === n.id;
+			newVerts = (sameDir ? O.verts : rev(O.verts)).concat([vtx], S.verts);
+			remapStations(S, O, function (t) { return lenO + t * lenS; }, function (t) { return (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.from] = incidentLinks[S.from].filter(function (x) { return x !== S.id; });
+			S.from = farO;   // base-write: identity, as above
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		}
+		S.verts = newVerts;   // base-write: identity, as above
+		if (bothTyped) { S._length = typed; if (S.tok) { delete S.tok._length; if (!Object.keys(S.tok).length) { delete S.tok; } } }   // base-write: the sum of two lengths the user typed
+		else { S.lenAuto = true; }
+		eachOverrideMap(function (map) { var ov = map[ovKeyFor('link', S.id)]; if (ov) { delete ov.length; } });
+		deleteLink(O.id);
+		deleteNode(n.id);
+		rebuildLink(S);
+		updateLinkGeometry(S.id);
+		if (nodeEls[S.from]) { layoutNodeLabel(S.from); }
+		if (nodeEls[S.to]) { layoutNodeLabel(S.to); }
+	}
+	// The Customers and Texts attached to O by station move to S, restated along the merged line; those
+	// already on S are restated along it too. `posS` and `posO` give the distance along the merged line.
+	function remapStations(S, O, posS, posO, total) {
+		function go(from, list, get, set, attach) {
+			(list[from.id] || []).slice().forEach(function (id) {
+				var it = get(id), t;
+				if (!it || typeof it.t !== 'number' && typeof it.anchorT !== 'number') { return; }
+				t = from === S ? posS(it.t !== undefined ? it.t : it.anchorT) : posO(it.t !== undefined ? it.t : it.anchorT);
+				set(it, total > 0 ? t / total : 0);
+				if (from === O) { attach(it, id); }
+			});
+		}
+		go(S, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function () {});
+		go(O, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function (c, id) {
+				c.link = S.id;
+				customersByLink[O.id] = customersByLink[O.id].filter(function (x) { return x !== id; });
+				(customersByLink[S.id] = customersByLink[S.id] || []).push(id);
+			});
+		go(S, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function () {});
+		go(O, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function (lb, id) {
+			lb.anchorLink = S.id;
+			labelsByLinkAnchor[O.id] = labelsByLinkAnchor[O.id].filter(function (x) { return x !== id; });
+			(labelsByLinkAnchor[S.id] = labelsByLinkAnchor[S.id] || []).push(id);
+		});
+	}
+	function morphJunctionsToVertices() {
+		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
+		if (!nodes.length) { return 0; }
+		if (!inBaseFor('topology')) { setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.'); return 0; }
+		function finish() {
+			if (done) {
+				buildDom();
+				refreshScenarioMarks();
+				refreshScenarioStatus();
+				refreshPaneIfOpen();
+				refreshPopupIfOpen();
+				scheduleSolve();
+				scheduleSave();
+			}
+			setNotice(problems.slice(0, 5).concat(problems.length > 5 ? ['...'] : [])
+				.concat(done ? [String(pc.lpn_morph_vertex_done || 'Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.').replace('{n}', String(done))] : []).join(' '));
+		}
+		function doMorph(n) {
+			if (!snap) { saveUndoSnapshot(); snap = true; }
+			mergeAtJunction(n);
+			done++;
+		}
+		// One question per junction that has an elevation or demands; the whole command is one Undo.
+		function step(i) {
+			var n, why, info, key, text;
+			for (; i < nodes.length; i++) {
+				n = nodes[i];
+				info = {};
+				why = vertexMorphProblem(n, info);
+				if (why) { problems.push(why); continue; }
+				if (!info.elevShown && !info.demands && !info.quality) { doMorph(n); continue; }
+				key = info.elevShown && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elevShown ? 'lpn_morph_vertex_clear_elev' : (info.demands ? 'lpn_morph_vertex_clear_demand' : 'lpn_morph_vertex_clear_quality'));
+				text = String(pc[key] || (info.elevShown && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
+					: (info.elevShown ? 'Clear elevation {elev} on {id}?' : (info.demands ? 'Clear demands {demands} on {id}?' : 'Clear initial quality {quality} on {id}?'))));
+				if (info.quality && key !== 'lpn_morph_vertex_clear_quality') { text += '\n' + String(pc.lpn_morph_vertex_clear_also || 'Initial quality {quality} is cleared too.'); }
+				text = text.split('{elev}').join(info.elevShown).split('{demands}').join(info.demands).split('{quality}').join(info.quality).split('{id}').join(n.id);
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex', text: text, ok: pc.lpn_dialog_ok || 'OK', cancel: pc.lpn_cancel || 'Cancel' },
+					(function (node, next) { return function (yes) { if (yes) { doMorph(node); } step(next); }; }(n, i + 1)));
+				return;
+			}
+			finish();
+		}
+		step(0);
+		return done;
 	}
 	// ---- MORPH IN A SCENARIO: AN ASSET'S TYPE AS AN OVERRIDE (Task 781) ----------------------------
 	//
@@ -40949,6 +41183,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// on screen never pays for the manifest at all, which is the point of doing this here
 		// rather than at boot.
 		if (show) { loadExamplesManifest(); renderExamplesGallery(); }
+		else if (firstViewPending) { applyFirstViewDocks(); }
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
@@ -55260,6 +55495,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				submenu: insertAssetRows
 			},
 			{ separator: true },
+			// **SETTINGS, THEN LIBRARIES; NO PROPERTIES ROW, on a phone or a PC** (Tom, 2026-10-25:
+			// "Nobody will ever use Properties"). Properties opens on a selection, and its tab and
+			// the box's own button bring it back.
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				fn: function () { toggleSettingsBox(); }
@@ -59931,10 +60169,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `orders` is {show, drop}, each a spinner spec or null.
 	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, orders, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
-			input = document.createElement('input'), span = document.createElement('span'), after;
+			input = document.createElement('input'), span = document.createElement('span'), after, group;
 		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
 		// enough to wrap used to drag its checkbox and its boxes down to the middle of BOTH lines.
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = LPN_LABEL_ROW_GAP;
+		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.flexWrap = 'wrap'; row.style.gap = '2px ' + LPN_LABEL_ROW_GAP;
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
@@ -59946,18 +60184,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
 		// The name takes the slack; css/engcalcs.css lets it shrink below its longest word.
-		label.style.flex = '1 1 auto';
+		// Its width is the stylesheet's (.lpn-lblhead-lead and the label share one basis).
 		row.appendChild(label);
 		if (affixOpt) {
-			row.appendChild(affixBox(affixOpt.prefix));
+			// **THE SIX CONTROLS ARE ONE UNBREAKABLE GROUP** (Tom, 2026-10-26): beside the name when the
+			// box is wide enough, otherwise the whole group wraps below it, never a part of it.
+			group = document.createElement('span');
+			group.className = 'lpn-lblgroup';
+			group.appendChild(affixBox(affixOpt.prefix));
 			after = affixBox(affixOpt.suffix);
-			row.appendChild(after);
-			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
+			group.appendChild(after);
+			group.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
 			// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** Same slots, same
 			// order, on every field row; only field rows participate.
 			[decimals, orders && orders.show, orders && orders.drop].forEach(function (spec) {
-				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
+				group.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
+			row.appendChild(group);
 		}
 		container.appendChild(row);
 		return row;
@@ -60384,11 +60627,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the columns need not widen; each carries its full meaning in its tip, which the search box
 		// matches too.
 		function columnHeadings(box, group) {
-			var row = document.createElement('div'), lead = document.createElement('span');
+			var row = document.createElement('div'), lead = document.createElement('span'), group = document.createElement('span');
 			row.className = 'lpn-set-note lpn-set-colhead';
-			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = LPN_LABEL_ROW_GAP;
-			lead.style.flex = '1 1 auto';
+			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.flexWrap = 'wrap'; row.style.gap = '0 ' + LPN_LABEL_ROW_GAP;
+			lead.className = 'lpn-lblhead-lead';
 			row.appendChild(lead);
+			group.className = 'lpn-lblgroup';
+			row.appendChild(group);
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
@@ -60409,7 +60654,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The numeric columns carry LPN_LABEL_COL_GAP as well as the row's own gap, so their
 				// headings must match or they sit off the box they name.
 				if (i >= 3) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
-				row.appendChild(cell);
+				group.appendChild(cell);
 			});
 			box.appendChild(row);
 		}
@@ -64666,9 +64911,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked, and opens
-		// only while Basic mode is off, the one state in which it is shown at all.
-		if (smboxLayout.open && smboxLayout.dock && !scenarioBasicMode) { openScenarioManager(); }
+		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked.
+		if (smboxLayout.open && smboxLayout.dock) { openScenarioManager(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		restorePaneBoxes();
 		if (findUserOpen) { toggleFindPopup(null, true); }
@@ -65181,10 +65425,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Calibration) keep their docks in one key of their own, `lpn_dockbox` (see
 	// saveDockShared()); where they float still lasts one page load.
 	//
-	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
-	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
-	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
-	// window.
+	// **ON A PHONE TOO.** Below the one breakpoint a box that is not docked fills the window
+	// (placePanelForScreen()); a docked one keeps its column or tab, and an auto-hidden one flies out
+	// over the map. A first visit on a phone gets the same list as a PC (LPN_DEFAULT_DOCKS).
 	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
 	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
@@ -65197,8 +65440,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockMargins = { left: 0, right: 0 }, dockWasSmall = null;
 	function dockSideOf(d) {
 		var s = d && d.rec.dock;
-		return ((s === 'left' || s === 'right') && !smallScreen()) ? s : null;
+		return (s === 'left' || s === 'right') ? s : null;
 	}
+	// **ON A PHONE EVERY DOCKED BOX AUTO-HIDES** (Tom, 2026-10-24: *"There is no auto-hide tab, the pinned
+	// box is unsizeable and very narrow"*). A pinned column on a 390 px window leaves the map its 320 px
+	// floor and the box what remains, about 70 px; no saved record can put one there, whatever it says.
+	function dockAuto(d) { return !!d && (!!d.rec.autohide || smallScreen()); }
 	function boxIsDocked(box) { return !!(box && box.__lpnDock && dockSideOf(box.__lpnDock)); }
 	// A toggle (the gear, a Help row) that finds its box tucked away brings it out instead of closing
 	// a box the reader cannot see.
@@ -65249,17 +65496,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockBoxes.forEach(function (d) { if (d.save && d.rec.dock) { d.save(); } });
 		return false;
 	}
-	// **A FIRST VISIT STARTS WITH TOM'S DOCKS** (Tom, 2026-10-07, card E02: *"I want to give the
-	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
-	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
-	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
-	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
-	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
-	var LPN_DEFAULT_DOCKS = {
-		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
-		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
-			'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
-	};
+	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
+	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
+	// ... It's cheap discoverability"*; revised 2026-10-24: Settings is pinned and
+	// Properties, Libraries (right) and the Scenario manager, User manual (left) are auto-hide tabs,
+	// so a visitor meets both ways of working with a box). Named by box and not by label so a
+	// renamed row changes nothing here. `pinned` leaves auto-hide off, on a PC only (a phone auto-hides every
+	// dock). Settings starts pinned on a PC, "as a demonstration of the two states" (Tom, 2026-10-26). Only a browser that holds NO
+	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
+	// alone. One list for a PC and a phone (Tom, 2026-10-24: "for PC and phone"). Nothing is stored
+	// until the visitor changes something (boxSaveHeld()).
+	var LPN_DEFAULT_DOCKS = [
+		{ id: 'lpn_popup', side: 'right' },
+		{ id: 'lpn_settings_box', side: 'right', pinned: true },
+		{ id: 'lpn_library_box', side: 'right' },
+		{ id: 'lpn_sm_box', side: 'left' },
+		{ id: 'lpn_hotkeys_popup', side: 'left' }
+	];
+	// True while a fresh browser is still looking at the gallery: the layout waits for the project.
+	var firstViewPending = false, dockWired = false;
 	// **A BROWSER DRIVEN BY A TEST HARNESS STARTS WITHOUT THEM** (navigator.webdriver), because two
 	// hundred harnesses were written against a first visit with no docks; a harness that wants them
 	// says so with `window.EC_DEFAULT_DOCKS = true` in an init script (dock-default-harness.js).
@@ -65268,29 +65523,57 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.EC_DEFAULT_DOCKS === false) { return false; }
 		return !(navigator && navigator.webdriver);
 	}
-	function applyDefaultDocks() {
-		var byId = {};
-		if (!defaultDocksWanted() || smallScreen()) { return; }
+	function freshLayoutProfile() {
+		// **A PHONE'S OLD RECORDS DO NOT COUNT UNLESS A BOX WAS DOCKED** (Tom, 2026-10-24, phone: *"Properties
+		// now starts docked at the right and autohidden"* -- he did not see it). Before docking reached a
+		// phone every record there held a floating position, and a box on a phone fills the window, so
+		// none of them is a layout anybody chose; only a stored dock is the visitor's own.
+		if (smallScreen()) { return !dockBoxes.some(function (d) { return !!d.rec.dock; }); }
 		try {
-			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
-			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
-		} catch (e) { return; }
+			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null || localStorage.getItem(LPN_PANEBOXES_KEY) !== null) { return false; }
+			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return false; }
+		} catch (e) { return false; }
+		return true;
+	}
+	function galleryUpNow() {
+		return galleryIsUp() || !doc || !doc.nodes || doc.nodes.length === 0;
+	}
+	// Writes the records only; restoreDefaultDocks() opens what they name.
+	function setDefaultDockRecords() {
+		var byId = {}, ord = { left: 0, right: 0 };
 		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
-		['left', 'right'].forEach(function (side) {
-			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
-				var d = byId[id];
-				if (!d) { return; }
-				d.rec.dock = side;
-				d.rec.autohide = true;
-				d.rec.dockOrd = i;
-				d.open = true;
-				d.byDefault = true;
-				// Its corner row was drawn as a floating box's (registerDockBox() runs first), which
-				// offered no pin and no Float; draw it again as a docked box's.
-				renderDockCorner(d);
-			});
+		// A harness that measures every box docked names its own list (window.EC_DEFAULT_DOCK_LIST).
+		(window.EC_DEFAULT_DOCK_LIST instanceof Array ? window.EC_DEFAULT_DOCK_LIST : LPN_DEFAULT_DOCKS).forEach(function (r) {
+			var d = byId[r.id];
+			if (!d) { return; }
+			d.rec.dock = r.side;
+			if (r.pinned && !smallScreen()) { delete d.rec.autohide; } else { d.rec.autohide = true; }
+			d.rec.dockOrd = ord[r.side]++;
+			d.open = true;
+			d.byDefault = true;
+			// Its corner row was drawn as a floating box's; draw it again as a docked box's.
+			renderDockCorner(d);
 		});
 		dockDefaultHold = true;
+		// Each docked box's corner buttons were drawn while it floated; draw them for the dock it now has.
+		dockBoxes.forEach(function (d) { if (d.byDefault && d.corner) { renderDockCorner(d); } });
+	}
+	function applyDefaultDocks() {
+		firstViewPending = false;
+		if (!defaultDocksWanted() || !freshLayoutProfile()) { return; }
+		if (galleryUpNow()) { firstViewPending = true; return; }
+		setDefaultDockRecords();
+	}
+	// Called when the gallery goes away: the first project is on the map.
+	function applyFirstViewDocks() {
+		if (!firstViewPending || !dockWired || galleryUpNow()) { return; }
+		firstViewPending = false;
+		if (!freshLayoutProfile()) { return; }
+		setDefaultDockRecords();
+		dockBooting = true;
+		try { restoreDefaultDocks(); } finally { dockBooting = false; }
+		dockBoxes.forEach(renderDockCorner);
+		layoutDocks();
 	}
 	function restoreDefaultDocks() {
 		var openers = {
@@ -65300,7 +65583,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
 			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
 			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
-			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox
+			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox,
+			lpn_hotkeys_popup: openHotkeysBox, lpn_sm_box: openScenarioManager,
+			lpn_panebox_junctions: function () { paneBoxPop('junctions', true); }
 		};
 		if (!dockDefaultHold) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
@@ -65376,7 +65661,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
 	function clampDockW(w, room, over) {
 		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
-		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		if (!(w > 0)) { w = smallScreen() ? Math.round((window.innerWidth || 390) * 0.7) : LPN_DOCK_DEFAULT_W; }   // a phone's flyout leaves the left 30% of the map to look at
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
 	}
@@ -65402,7 +65687,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
 		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
-		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_full_box: 52, lpn_settings_box: 42, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
 		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
@@ -65422,7 +65707,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockOptimalCache[id] = { vw: vw, rem: rem, w: w };
 		return w;
 	}
-	function dockWidthOf(d) { return d.rec.dockW || dockOptimalW(d); }
+	// A phone opens a flyout at no more than 70% of the window, so the left or right 30% of the map stays
+	// to look at and to tap away on; a width the visitor dragged to is theirs, up to the whole window.
+	function dockWidthOf(d) {
+		return d.rec.dockW || (smallScreen() ? Math.min(dockOptimalW(d), Math.round((window.innerWidth || 390) * 0.7)) : dockOptimalW(d));
+	}
 	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
 	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
 	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
@@ -65499,8 +65788,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				document.activeElement.getAttribute('data-dock') : null, next;
 		hideTipsIn(row);
 		while (row.firstChild) { row.removeChild(row.firstChild); }
-		if (!smallScreen()) {
-			if (side) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
+		{
+			if (side && !smallScreen()) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
 			if (side !== 'left') { row.appendChild(dockButton(d, 'left', pc.lpn_dock_left || 'Dock at the left of the map')); n++; }
 			if (side !== 'right') { row.appendChild(dockButton(d, 'right', pc.lpn_dock_right || 'Dock at the right of the map')); n++; }
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
@@ -65576,7 +65865,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
 		dockNoteOpen(d, true);
-		if (d.rec.autohide && !dockBooting) { dockFlyout = d; dockSoft = null; }
+		if (dockAuto(d) && !dockBooting) { dockFlyout = d; dockSoft = null; }
 		layoutDocks();
 	}
 	// **THE ONE DOOR FOR "SHOW ME THIS BOX" WHEN IT IS ALREADY OPEN.** A box that is open is not run
@@ -65686,8 +65975,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
-			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
+			var wrap = dockMapWrap(), over = dockAuto(from.list[0]);
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W - dockOppReserve(side, null)) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
@@ -65733,6 +66022,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE ONE PLACE A DOCKED BOX, ITS TAB AND THE MAP'S MARGINS ARE PLACED.** Everything is
 	// measured from the map's OUTER edges -- the wrapper's rect plus the margins this function
 	// last gave it -- so a pass that changes the margins does not move what it has just placed.
+	// The chrome above the map wraps and unwraps (a phone's toolbar, the project tab row on the first
+	// open) without the map's own size changing, so each piece of it is watched from the first layout
+	// that finds it (the tab row is built after the dock is wired).
+	function dockChromeBottom() {
+		var lowest = 0;
+		['lpn_menubar', 'lpn_toolbar', 'lpn_tabs'].forEach(function (id) {
+			var e = document.getElementById(id), b;
+			if (e && !e.__lpnDockWatched && window.ResizeObserver) {
+				e.__lpnDockWatched = true;
+				new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(e, { box: 'border-box' });
+			}
+			if (!e || !e.offsetParent) { return; }
+			b = e.getBoundingClientRect().bottom;
+			if (b > lowest) { lowest = b; }
+		});
+		return Math.round(lowest);
+	}
+	var dockRemeasuring = false;
+	// **ROOM A FLYOUT LEAVES FOR THE OPPOSITE SIDE'S TAB STRIP** (Tom, 2026-10-25, phone: the Settings box "is
+	// not being allowed to extend into the opposite docking area even when it is empty"). A strip with tabs in
+	// it keeps its width; on a phone an EMPTY opposite side (no tab strip drawn there) is room the box may use.
+	function dockOppReserve(side, col) {
+		var opp = side === 'left' ? 'right' : 'left', strip;
+		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
+		if (col) { strip = col[opp].strip; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockAuto(d) && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		return strip ? LPN_DOCK_STRIP_W : 0;
+	}
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
 			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
@@ -65740,10 +66057,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!wrap) { return; }
 		dockBoxes.forEach(function (d) {
 			var side = dockSideOf(d);
-			if (side && dockBoxShown(d)) { (d.rec.autohide ? sides[side].auto : sides[side].pinned).push(d); }
+			if (side && dockBoxShown(d)) { (dockAuto(d) ? sides[side].auto : sides[side].pinned).push(d); }
 			else { dockRelease(d); }
 		});
-		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
+		if (dockFlyout && !(dockAuto(dockFlyout) && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
 		if (dockSoft && dockSoft !== dockFlyout) { dockSoft = null; }
@@ -65755,11 +66072,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
+		// A column wider than the window (a desktop's, on a window narrowed to a phone's) squeezes the map
+		// to nothing and so hides the very measure that would take it back: give the margins up and
+		// measure again.
+		if (!(wr.width > 0) && (dockMargins.left || dockMargins.right) && !dockRemeasuring) {
+			dockMargins = { left: 0, right: 0 };
+			wrap.style.setProperty('--lpn-dock-ml', '0px');
+			wrap.style.setProperty('--lpn-dock-mr', '0px');
+			dockRemeasuring = true;
+			try { layoutDocks(); } finally { dockRemeasuring = false; }
+			return;
+		}
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;
 		outerR = wr.right + dockMargins.right;
-		top = Math.max(0, sr.top);
+		// **NEVER UNDER THE PROJECT CHROME** (Tom, 2026-10-24, phone: *"the top of the Properties tab is
+		// hidden beneath the project chrome. When I open the box the tab repairs its position"*): the
+		// map's own top can lag the chrome above it while that wraps, so the lowest of the two wins.
+		top = Math.max(0, sr.top, dockChromeBottom());
 		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
@@ -65790,7 +66121,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
+				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
@@ -65798,7 +66129,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
+				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true);
 				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
@@ -66064,7 +66395,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_ds_box: openDemandScaleBox,
 			lpn_calib_box: openCalibBox
 		};
-		if (smallScreen()) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
 			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
 		});
@@ -66089,6 +66419,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_calib_box', calibboxLayout, null, null],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockWired = true;
 		applyDefaultDocks();
 		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
@@ -66106,6 +66437,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.ResizeObserver && svg) {
 			new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(svg);
 		}
+		window.addEventListener('scroll', function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }, { passive: true });
 		document.addEventListener('pointerdown', dockOutsidePress, true);
 		// A soft-pinned flyout closes on Escape wherever the keyboard is (the box's own handler covers
 		// the keyboard being inside it).
@@ -71296,7 +71628,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// placed through, so raising here needs no per-opener edit and a seventh box cannot arrive
 		// half-wired -- the same argument that put `touch-action` inside makePanelDraggable().
 		if (box && box.__lpnRaise) { box.__lpnRaise(); }
-		if (smallScreen()) { return fillPanelToScreen(box); }
+		if (smallScreen()) {
+			var fh = fillPanelToScreen(box);
+			if (box && box.__lpnDock) { dockPlaced(box); }
+			return fh;
+		}
 		resetPanelFill(box);
 		place();
 		// A docked box keeps its floating place underneath and is laid into its column (Task 441).
@@ -82256,7 +82592,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setNotice(basicMisfitText());
 		}
 		if (scenarioBasicMode !== was) {
-			if (scenarioBasicMode) { closeScenarioManager(); }
+			smFaceChanged();
 			refreshScenariosTab();
 		}
 	}
@@ -82274,8 +82610,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
 			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
 		} catch (e) {}
-		if (scenarioBasicMode) { closeScenarioManager(); }
+		smFaceChanged();
 		refreshScenariosTab();
+		return true;
+	}
+	// **THE MANAGER'S BOX CHANGES FACE IN PLACE WHEN BASIC MODE IS TICKED OR CLEARED** (Tom, 2026-10-25):
+	// the flat list and the buttons in Basic mode, the tree and the Scenarios table otherwise. It stays
+	// open, docked or floating, where it is; a box that is not open is left closed.
+	function smFaceChanged() {
+		if (!smBoxIsOpen()) { return; }
+		smTableOn = !scenarioBasicMode;
+		smTableSync();
+		rebuildScenarioManager();
+		if (boxIsDocked(smBoxEl())) { layoutDocks(); }
 	}
 	loadScenarioBasicPref();
 	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
@@ -82441,10 +82788,82 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (tree === 'scenarios') { return root ? 'scnbase' : 'scn'; }
 		return root ? 'altbase' : 'alt';
 	}
+	// **THE BASIC FACE OF THE SCENARIO MANAGER** (Tom, 2026-10-25; Ida's design): a flat list of the scenarios
+	// with their numbers of overrides, the current one marked with *, and a click on a row making it current;
+	// the commands the Water > Scenarios menu already has (they are that menu's own rows, so the two cannot
+	// differ); and the Basic mode tick, which when cleared turns this box into the full manager in place.
+	// Hidden here: the category selector, the tree, Add base, Merge and Copy upward, All and All unused.
+	function smBasicFace(host) {
+		var pc = EngCalcs.pageConfig || {}, rows = scenarioMenuRows(), list, head, cur = activeScenario(), tick, lab, tools, scroll = 0, old;
+		old = host.querySelector('.lpn-sm-basic-list');
+		if (old) { scroll = old.scrollTop; }
+		host.innerHTML = '';
+		function menuRow(label) { return rows.filter(function (r) { return r.label === label; })[0]; }
+		head = document.createElement('div');
+		head.className = 'lpn-sm-basic-row lpn-sm-basic-head';
+		['', pc.lpn_scenario_label || 'Scenario', pc.lpn_scenario_overrides || 'No. of overrides'].forEach(function (t) {
+			var c = document.createElement('span');
+			c.textContent = t;
+			head.appendChild(c);
+		});
+		list = document.createElement('div');
+		list.className = 'lpn-sm-basic-list';
+		list.id = 'lpn_sm_basic_list';
+		list.setAttribute('role', 'listbox');
+		list.setAttribute('aria-label', pc.lpn_scenario_label || 'Scenario');
+		scenariosForDisplay().forEach(function (s) {
+			var r = document.createElement('div'), m = document.createElement('span'), n = document.createElement('span'), c = document.createElement('span');
+			r.className = 'lpn-sm-basic-row' + (s.id === cur.id ? ' lpn-sm-sel' : '');
+			r.setAttribute('role', 'option');
+			r.setAttribute('aria-selected', s.id === cur.id ? 'true' : 'false');
+			r.setAttribute('data-scn', s.id);
+			r.tabIndex = 0;
+			m.textContent = s.id === cur.id ? '*' : '';
+			n.textContent = scenarioDisplayName(s);
+			c.textContent = String(overrideCount(s));
+			r.appendChild(m); r.appendChild(n); r.appendChild(c);
+			r.addEventListener('click', function () { if (s.id !== activeScenario().id) { switchScenario(s.id); } rebuildScenarioManager(); });
+			r.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') { if (e.preventDefault) { e.preventDefault(); } r.click(); }
+			});
+			list.appendChild(r);
+		});
+		host.appendChild(head);
+		host.appendChild(list);
+		list.scrollTop = scroll;
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		[[pc.lpn_scenario_new || 'New scenario…', 'new'], [pc.lpn_scenario_copy || 'Copy scenario', 'copy'],
+			[pc.lpn_scenario_rename || 'Rename scenario…', 'rename'], [pc.lpn_scenario_delete || 'Delete scenario', 'delete'],
+			[pc.lpn_sm_list_overrides || 'Override manager…', 'overrides']].forEach(function (d) {
+			var mr = menuRow(d[0]), b;
+			if (!mr) { return; }
+			b = smButton(tools, d[0], mr.tip || null, function () { if (!mr.disabled) { mr.fn(); } });
+			b.id = 'lpn_sm_basic_' + d[1];
+			b.setAttribute('data-sm-cmd', d[1]);
+			if (mr.disabled) { b.setAttribute('aria-disabled', 'true'); }
+		});
+		host.appendChild(tools);
+		lab = document.createElement('label');
+		lab.className = 'lpn-sm-basic-tick';
+		tick = document.createElement('input');
+		tick.type = 'checkbox';
+		tick.id = 'lpn_sm_basic_mode';
+		tick.checked = scenarioBasicMode;
+		tick.addEventListener('change', function () {
+			if (!setScenarioBasicMode(tick.checked)) { tick.checked = scenarioBasicMode; }
+		});
+		lab.appendChild(tick);
+		lab.appendChild(document.createTextNode(' ' + (pc.lpn_scenario_basic || 'Basic mode')));
+		if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
+		host.appendChild(lab);
+		initTipsIn(host);
+	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
 			scroll = 0, old, hadFocus;
 		if (!host) { return; }
+		if (scenarioBasicMode) { smBasicFace(host); return; }
 		old = host.querySelector('.lpn-sm-tree');
 		if (old) { scroll = old.scrollTop; }
 		// A rebuild replaces the tree the keyboard was in; focus goes back to the new one, so F2,
@@ -83288,12 +83707,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = smBoxEl();
 		closeMenu();
 		hideOpenTips();
-		// Disabled while Basic mode is on (Tom, 2026-10-13); the row is greyed, and no door opens it.
-		if (scenarioBasicMode) { return; }
 		if (!box) { return; }
 		box.style.display = 'flex';
-		// The table goes in before the box is placed, so a first open centres the whole box.
-		smTableOn = true;
+		// The table goes in before the box is placed, so a first open centres the whole box. Basic mode
+		// shows the box's own simpler face (smBasicFace()) and no table.
+		smTableOn = !scenarioBasicMode;
 		rebuildScenarioManager();
 		placePanelForScreen(box, function () { placeBoxRemembered(box, smTablePlaceLayout()); });
 		initTipsIn(box);

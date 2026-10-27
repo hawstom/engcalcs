@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='खुले परिदृश्य को 
 $ec_lang['lpn_scenario_copy_off']='परिदृश्य कॉपी करें बेसिक मोड में काम करता है। बेसिक मोड बंद होने पर, परिदृश्य जोड़ें और परिदृश्य तालिका में उसके ऑल्टरनेटिव चुनें।';
 $ec_lang['lpn_sm_title']='परिदृश्य प्रबंधक';
 $ec_lang['lpn_sm_menu']='परिदृश्य प्रबंधक…';
-$ec_lang['lpn_sm_basic_on']='बेसिक मोड चालू होने पर परिदृश्य प्रबंधक अक्षम रहता है।';
 $ec_lang['lpn_pane_tab_scenarios']='परिदृश्य';
 $ec_lang['lpn_sm_col_parent']='पैरेंट';
 $ec_lang['lpn_sm_add_child']='चाइल्ड जोड़ें';

@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copiază scenariul deschis și valorile lui s
 $ec_lang['lpn_scenario_copy_off']='Copiază scenariul funcționează în Mod de bază. Cu Mod de bază dezactivat, adăugați un scenariu și alegeți alternativele lui în tabelul Scenarii.';
 $ec_lang['lpn_sm_title']='Manager de scenarii';
 $ec_lang['lpn_sm_menu']='Manager de scenarii…';
-$ec_lang['lpn_sm_basic_on']='Manager de scenarii este dezactivat când Mod de bază este activ.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenarii';
 $ec_lang['lpn_sm_col_parent']='Părinte';
 $ec_lang['lpn_sm_add_child']='Adaugă copil';

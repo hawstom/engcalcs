@@ -68,7 +68,7 @@ async function measure(Session, browser, viewport) {
 				const el = document.getElementById(id);
 				if (!el) { out.lists[id] = null; return; }
 				const head = el.children[0];
-				const cells = [...head.children].filter((x) => getComputedStyle(x).display !== 'none');
+				const cells = [...head.querySelector('.lpn-lblgroup').children].filter((x) => getComputedStyle(x).display !== 'none');
 				out.lists[id] = {
 					cols: cells.length,
 					widths: cells.map((x) => Math.round(x.getBoundingClientRect().width)),
@@ -104,13 +104,14 @@ async function main() {
 			console.log('\n--- ' + w + ' px ---');
 			const m = await measure(Session, browser, { width: w, height: w < 600 ? 740 : 900 });
 			console.log('  pane ' + m.client + ' px, content ' + m.scroll + ' px');
-			ok(w + ': the Settings content pane does not scroll sideways', m.scroll <= m.client, m.scroll + ' vs ' + m.client + ' ' + m.past.join('; '));
+			// Since 2026-10-26 (Tom) the six controls wrap below the name as one group, so the lists never scroll sideways;
+			// the wrap itself is checked in settings-labels-wrap-browser-harness.js.
 			ok(w + ': the page has no horizontal scrollbar', !m.doc);
 			LISTS.forEach((id) => {
 				const l = m.lists[id];
 				if (!l) { ok(w + ': ' + id + ' exists', false); return; }
 				console.log('  ' + id + ' widths ' + l.widths.join(','));
-				ok(w + ': ' + id + ' has six columns', l.cols === 6, String(l.cols));
+				ok(w + ': ' + id + ' has six heading cells in its group', l.cols === 6, String(l.cols));
 				ok(w + ': ' + id + ' headings paint inside their cells', l.spill === 0, l.spill + ' spill');
 				if (w === 1440) { ok('1440: ' + id + ' columns are sensible (each 20 px or wider)', l.widths.every((x) => x >= 20), l.widths.join(',')); }
 			});

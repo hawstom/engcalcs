@@ -1360,7 +1360,7 @@ body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
 #lpn_canvas { font-family: var(--ec-map-font); font-size: 1rem; text-shadow: none; }
 /* The label columns in Settings are fixed widths (js/looped-network.js, LPN_LABEL_*_W); their text follows
    --ec-field-text-scale (1 in Light) so a wider face does not cut "Init." or break "units" in two. */
-:is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > :nth-child(n+2) { font-size: calc(1em * var(--ec-field-text-scale)); }
+:is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > .lpn-lblgroup > * { font-size: calc(1em * var(--ec-field-text-scale)); }
 .ec-theme-card svg { text-shadow: none; }
 .lpn-popover, #lpn_dialog, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu {
 	border-radius: var(--ec-box-radius); -webkit-backdrop-filter: var(--ec-box-blur); backdrop-filter: var(--ec-box-blur);
@@ -2490,7 +2490,10 @@ html[lang="zh"] .ec-welcome {
 	box-shadow: 0 2px 6px var(--ec-a-0-0-0-3);
 }
 .lpn-area-hint > div { pointer-events: none; }
+.lpn-replace-selonly { display: flex; align-items: center; gap: 4px; margin: 2px 0 4px; }
 .lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
+.lpn-area-hint-exit { margin-top: 5px; padding: 3px 14px; font-size: 12px; cursor: pointer; }
+@media (pointer: coarse) { .lpn-area-hint-exit { min-height: 40px; min-width: 88px; font-size: 14px; } }
 /* The bubble's own "Show this" checkbox (Tom's 2026-09-08 worklist). A <label> rather than a <div>, so the
    rule above does not make it inert -- the checkbox is the one thing in this panel that must take
    a press, and the panel's own drag still works everywhere else. */
@@ -2608,9 +2611,20 @@ html[lang="zh"] .ec-welcome {
    (.lpn-node.lpn-selected above), on the symbol itself.
 
    Two classes, so it outranks the loose white above it while a customer is selected, and that
-   comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
-   which is the half of that signal a reader is looking at anyway. */
+   comes back the moment it is not. A selected customer connected to nothing loses its dashes
+   meanwhile (the halo below is a solid stroke); its blue fill still says it is selected. */
 .lpn-meter.lpn-selected { fill: var(--ec-map-select); stroke: var(--ec-map-select); }
+/* **A SELECTED CUSTOMER WEARS A HALO** (Tom, 2026-10-24: "It's hard for me to see that a Customer is
+   selected on my phone." and, after the first try with a CSS drop-shadow, "I don't see it."). The dot
+   is three to seven pixels across, and a drop-shadow of so small a shape is nearly transparent
+   (measured: no more than a few percent of the paper's colour). So the halo is the dot's OWN stroke,
+   drawn first and wide, in screen pixels (non-scaling, so the same size at every zoom and in every
+   project's units), translucent, with the dot painted over its middle: a disc of selection blue
+   around a solid dot, 12 px across. **ONE RULE FOR EVERY SCREEN** (Tom, 2026-10-24: *"Why treat it any
+   differently on phone?"*): a touch screen used to get 22 px by a media query of its own, which is gone;
+   the phone sees what a PC sees, and a flyout that would cover the selection moves the map instead
+   (dockClearSelection()). dev/lpn-spike/phone-dock-browser-harness.js counts the blue pixels. */
+.lpn-meter.lpn-selected { stroke-width: 12px; vector-effect: non-scaling-stroke; paint-order: stroke; stroke-opacity: 0.45; stroke-dasharray: none; }
 /* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
    above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */
 .lpn-meter.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); stroke: var(--lpn-hover-color); }
@@ -4748,7 +4762,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
    exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(28.865rem, 94vw);
+	width: min(42rem, 94vw);   /* 2026-10-25: wide enough for the labels table and its override column, no column cut off; was 28.865rem */
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -4896,6 +4910,13 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	display: none;
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
+/* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
+/* The finger-wide edge lies wholly INSIDE the box it sizes: a grip reaching over the map swallowed taps on
+   whatever sat beside the flyout (a Customer 14 px away could not be selected). */
+@media (pointer: coarse), (max-width: 700px) {
+	#lpn_dock_grip_right { width: 28px; margin-left: 0; }
+	#lpn_dock_grip_left { width: 28px; margin-left: -28px; }
+}
 .lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
 /* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
    narrows, and every overlay inside the wrapper moves with it. Never on paper. */
@@ -5254,6 +5275,8 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
+.lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
    the row, and under it what Base has with Clear override. The edge is drawn inside the row's own
    box, so nothing beside it moves. */
@@ -5728,39 +5751,39 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
 #lpn_labels_customer_fields { font-size: 1rem; }
-#lpn_labels_node_fields > div > span:nth-child(2),
-#lpn_labels_link_fields > div > span:nth-child(2),
-#lpn_labels_customer_fields > div > span:nth-child(2),
-#lpn_labels_node_fields > div > span:nth-child(3),
-#lpn_labels_link_fields > div > span:nth-child(3),
-#lpn_labels_customer_fields > div > span:nth-child(3) { width: 2.2rem !important; }
-#lpn_labels_node_fields > div > span:nth-child(4),
-#lpn_labels_link_fields > div > span:nth-child(4),
-#lpn_labels_customer_fields > div > span:nth-child(4) { width: 1.85rem !important; }
-#lpn_labels_node_fields > div > span:nth-child(5),
-#lpn_labels_link_fields > div > span:nth-child(5),
-#lpn_labels_customer_fields > div > span:nth-child(5),
-#lpn_labels_node_fields > div > span:nth-child(6),
-#lpn_labels_link_fields > div > span:nth-child(6),
-#lpn_labels_customer_fields > div > span:nth-child(6),
-#lpn_labels_node_fields > div > span:nth-child(7),
-#lpn_labels_link_fields > div > span:nth-child(7),
-#lpn_labels_customer_fields > div > span:nth-child(7) { width: 2.34rem !important; }
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(1),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(1),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(1),
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(2),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(2),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(2) { width: 2.2rem !important; }
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(3),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(3),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(3) { width: 1.85rem !important; }
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(4),
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(5),
+#lpn_labels_node_fields .lpn-lblgroup > span:nth-child(6),
+#lpn_labels_link_fields .lpn-lblgroup > span:nth-child(6),
+#lpn_labels_customer_fields .lpn-lblgroup > span:nth-child(6) { width: 2.34rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns
    were not, so a narrow panel squeezed the boxes and left every heading standing 60 px to their
    right -- the exact defect Task 435 had just finished fixing, re-created by the move. The panel
    scrolls sideways instead: a column that cannot be read is worse than a scrollbar. */
-#lpn_labels_node_fields > div > input,
-#lpn_labels_link_fields > div > input,
-#lpn_labels_customer_fields > div > input { flex-shrink: 0; }
+#lpn_labels_node_fields .lpn-lblgroup > input,
+#lpn_labels_link_fields .lpn-lblgroup > input,
+#lpn_labels_customer_fields .lpn-lblgroup > input { flex-shrink: 0; }
 /* **A HEADING WIDER THAN ITS COLUMN WRAPS INSIDE IT** (the phone's rule 7a, now everywhere): six
    columns at 15.3rem leave headings like "Before" and "Use units" little spare ink, and a longer
    translation must break inside its own column rather than paint over the next one. */
-#lpn_labels_node_fields > div:first-child > span,
-#lpn_labels_link_fields > div:first-child > span,
-#lpn_labels_customer_fields > div:first-child > span { overflow-wrap: anywhere; }
+#lpn_labels_node_fields > .lpn-set-colhead .lpn-lblgroup > span,
+#lpn_labels_link_fields > .lpn-set-colhead .lpn-lblgroup > span,
+#lpn_labels_customer_fields > .lpn-set-colhead .lpn-lblgroup > span { overflow-wrap: anywhere; }
 /* **AND THE NAME MUST BE ABLE TO WRAP ANYWHERE.** A flex item's floor is its MIN-CONTENT width, so
    "Roughness, C" held its row 6 px wider than the list itself -- and a row wider than its container
    puts every one of its four controls 6 px right of the heading that names it, which is the Task
@@ -5808,71 +5831,27 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields > div > span:first-child,
 #lpn_labels_link_fields > div > span:first-child,
 #lpn_labels_customer_fields > div > span:first-child { max-width: 11.5rem; }
-/* **AND WHEN THERE IS NO ROOM, THE FOUR COLUMNS DROP AS A BLOCK -- THE NAME NEVER WRAPS INSTEAD**
-   (Tom, 2026-08-24: "the labels are wrapping when what we want is for the four columns to wrap as a
-   block under the checkbox and label. Like the phone.").
+/* 6. **A LABELS ROW IS ONE OR TWO LINES, AND THE SIX CONTROLS WRAP AS ONE GROUP** (Tom, 2026-10-26: "the
+   Settings labels rows are to appear, for the sake of necessary width savings, as one or two rows each.
+   Sub-row 1 is the label and the display toggle; sub-row 2 has all the input boxes and the units toggle").
+   This replaces the 2026-10-25 rule that kept the row intact and scrolled the pane sideways. The group
+   (Bef., Aft., Use units, 0.000, Show, Drop) is `.lpn-lblgroup`, one unbreakable flex item: beside the name
+   when the list is wide enough, otherwise wholly below it, never a part of it. The name column is a fixed
+   basis (11.5rem, the same on every row and on the heading's lead cell) so every row decides the same way at
+   once and the headings stand over the group in either state; in the wrapped state the heading's lead
+   is empty and has no height, so the headings sit directly over the group at the row's start. */
+#lpn_labels_node_fields > div > label,
+#lpn_labels_link_fields > div > label,
+#lpn_labels_customer_fields > div > label,
+#lpn_labels_node_fields > div > .lpn-lblhead-lead,
+#lpn_labels_link_fields > div > .lpn-lblhead-lead,
+#lpn_labels_customer_fields > div > .lpn-lblhead-lead { flex: 0 0 11.5rem; max-width: 100%; box-sizing: border-box; min-width: 0; }
+.lpn-lblgroup { display: flex; flex: 0 0 auto; align-items: baseline; gap: 4px; }
+#lpn_labels_node_fields > div > label,
+#lpn_labels_link_fields > div > label,
+#lpn_labels_customer_fields > div > label { overflow-wrap: anywhere; }
+.lpn-set-colhead > .lpn-lblgroup { align-items: flex-end; }
 
-   The mid-word break the rules above allow is the LAST resort, and it had become the first: a name
-   is what the reader scans down, and breaking "Roughness, e" across two lines to keep four number
-   boxes on one is the wrong thing to protect. Below the same 24rem where .lpn-set-row gives up its
-   second column, a field row wraps instead -- name on its own line, then its four columns beneath
-   it, in the same order and at the same x as every other row's.
-
-   `flex-basis: 100%` on the name is what forces the break, and it is why the row needs `flex-wrap`
-   at all; the four columns stay direct children (the heading selectors above address them by
-   position, and three separate fixes have gone into keeping headings and boxes on one x), so they
-   move as a block because nothing else can fit beside them, not because they are boxed together.
-   The heading row's lead cell is EMPTY, so it is removed rather than given a blank line of its own:
-   its four headings then sit at the same left edge as the four boxes below them, which is the whole
-   invariant this list is held to.
-
-   The same container query as .lpn-set-row, deliberately -- one width at which this box changes
-   shape, not two. A browser without container queries keeps today's behaviour, which is the safe
-   direction. */
-@container lpnset (max-width: 24rem) {
-	#lpn_labels_node_fields > div,
-	#lpn_labels_link_fields > div,
-	#lpn_labels_customer_fields > div { flex-wrap: wrap; }
-	/* `!important` is not decoration, for the reason stated above the heading widths: labelCheckbox()
-	   sets `flex: 1 1 auto` INLINE on the name, and an inline shorthand carries a flex-basis of
-	   `auto` that a stylesheet longhand cannot outrank. */
-	#lpn_labels_node_fields > div > label,
-	#lpn_labels_link_fields > div > label,
-	#lpn_labels_customer_fields > div > label { flex-basis: 100% !important; max-width: 100%; }
-	#lpn_labels_node_fields > div > span:first-child,
-	#lpn_labels_link_fields > div > span:first-child,
-	#lpn_labels_customer_fields > div > span:first-child { display: none; }
-	/* **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, from a phone:
-	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
-	   gap above them from the row they don't belong with. This would be good to reverse.").
-
-	   Measured in Chromium at 360x740 before the fix: 6.00px between a name and its OWN four
-	   columns, 0.00px between those columns and the NEXT row's name. Once a row wraps, the inline
-	   `gap: 6px` labelCheckbox() writes becomes a row-gap as well as a column-gap, and the rows
-	   themselves carry no margin -- so every pixel of separation in the list was sitting inside a
-	   group and none of it between groups. Proximity then says the checkbox belongs to the boxes
-	   ABOVE it, which is the opposite of what it controls.
-
-	   The 6px is moved rather than added to: row-gap 0 inside the group, 6px margin between rows.
-	   `!important` because the gap is an INLINE shorthand and a stylesheet longhand cannot outrank
-	   one -- the same reason the flex and the widths in this block carry it. `column-gap` is
-	   untouched, so nothing horizontal moves and no column widens.
-
-	   Scoped to the two blocks where the row WRAPS. Where it does not -- the desktop box at its
-	   normal width -- the name shares its line with its columns, there is no row-gap to reverse,
-	   and the layout does not move. Measured at 1280x900 before and after: identical to the pixel.
-
-	   `:not(:first-child)` rather than `div + div`, which is the same set of rows here and would
-	   read better: the sibling combinator is the one selector shape
-	   dev/lpn-spike/small-screen-harness.js cannot parse, so it would land in that file's
-	   blind-spot report and this rule would go unasserted. */
-	#lpn_labels_node_fields > div,
-	#lpn_labels_link_fields > div,
-	#lpn_labels_customer_fields > div { row-gap: 0 !important; }
-	#lpn_labels_node_fields > div:not(:first-child),
-	#lpn_labels_link_fields > div:not(:first-child),
-	#lpn_labels_customer_fields > div:not(:first-child) { margin-top: 6px; }
-}
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a
@@ -6182,6 +6161,15 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-body { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 .lpn-sm-tools { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .lpn-sm-tools select { max-width: 100%; }
+/* The Basic face of the Scenario manager (Tom, 2026-10-25): a flat list, Scenario and No. of overrides. */
+.lpn-sm-basic-list { overflow: auto; border: 1px solid var(--ec-border-strong); min-height: 6em; padding: 2px 0; }
+.lpn-sm-basic-row { display: grid; grid-template-columns: 1.2em minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 2px 6px; min-height: 24px; cursor: default; }
+.lpn-sm-basic-list .lpn-sm-basic-row { cursor: pointer; }
+.lpn-sm-basic-row.lpn-sm-sel { background: var(--ec-select-bg-strong); }
+.lpn-sm-basic-row > :nth-child(2) { overflow-wrap: anywhere; }
+.lpn-sm-basic-row > :nth-child(3) { text-align: end; }
+.lpn-sm-basic-head { font-weight: bold; padding-block: 0; }
+.lpn-sm-basic-tick { display: block; margin-top: 2px; }
 .lpn-sm-tree { overflow: auto; border: 1px solid var(--ec-border-strong); min-height: 8em; padding: 2px 0; }
 .lpn-sm-row { display: flex; align-items: center; gap: 6px; padding: 2px 6px; cursor: default; position: relative; border-top: 2px solid transparent; border-bottom: 2px solid transparent; }
 .lpn-sm-row.lpn-sm-sel { background: var(--ec-select-bg-strong); }
@@ -6536,7 +6524,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   The 3.6rem and the 2px are the arithmetic above, already reduced; the 2px is a fifth of
 	   `.lpn-setbox-panes`'s own 10px `gap`, restated because `calc()` cannot ask for it. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: calc(3.6rem + 20% - 2px); }
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 3.8rem; }   /* Tom, 2026-10-25: "The index pane could be narrower and have more wrapping." */
 
 	/* 5a. AND THE ONE THING THE NARROWER MAIN PANE NO LONGER FITS. Measured at 360px after the
 	   transfer above: the content pane overflows by exactly 17px, and every pixel of it is the
@@ -6617,50 +6605,6 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	}
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 3em; }
 
-	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
-	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox
-	   and label, and this is a better balance of width savings. So for the first row we would have
-	   them wrap gracefully to `checkbox ID\nbefore after decimal drop`"). Idea A -- the label first
-	   and everything else wrapping under it individually -- he weighed and rejected.
-
-	   THE FOUR STAY ONE GROUP because the label takes a whole line to itself (`flex-basis: 100%`)
-	   and nothing else can share it. Wrapping them individually would let a row break between After
-	   and Decimal, and a column that is on line two of one row and line one of the next is not a
-	   column at all.
-
-	   The name's 11.5rem ceiling goes with it: that ceiling exists to stop the four boxes walking
-	   right as the box widens, and there is nothing to walk right of once they are on their own
-	   line. `!important` on the flex for the same reason as the widths below: labelCheckbox() writes
-	   `flex: 1 1 auto` inline, and an inline declaration beats a stylesheet one.
-
-	   THE HEADING ROW'S LEAD CELL GOES, so the headings start at the left edge exactly where the
-	   wrapped group does. `display: none` does not renumber :nth-child, so the width rules below --
-	   and the ones above, which they override -- still count the lead as child 1. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div { flex-wrap: wrap; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > label,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > label,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > label { flex: 1 1 100% !important; max-width: none; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > span:first-child,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > span:first-child,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > span:first-child { display: none; }
-
-	/* 6a. **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, on a phone:
-	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
-	   gap above them from the row they don't belong with. This would be good to reverse.").
-
-	   Stated once beside the container-query copy of item 6 above, which carries the measurement and
-	   the reasoning; it is repeated here for the same reason every other rule in item 6 is -- a
-	   browser without container queries must still get the phone layout. Same declarations, so the
-	   two firing together is idempotent. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div { row-gap: 0 !important; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div:not(:first-child),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div:not(:first-child),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div:not(:first-child) { margin-top: 6px; }
-
 	/* 7. AND THE COLUMNS THEMSELVES SHRINK (Tom: "Let's get brave and use these shrink factors on
 	   the column inputs: Before 0.8, After 0.4, Decimal 0.8"). Against the shipped 2.6rem affix and
 	   3.2rem numeric columns that is 2.08 / 1.04 / 2.56 / 2.56rem. `!important` because
@@ -6671,9 +6615,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	   only on the small screen, and (c) live with the wrapping. Not (b), abbreviations -- four new
 	   English strings and 104 translations for a phone-only cosmetic gain, against a house rule that
 	   already says mid-word wrap in a column heading is acceptable and column width is king. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(2),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(2),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(2) { width: 2.08rem !important; }
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(1),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(1),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(1) { width: 2.08rem !important; }
 	/* **EXCEPT After, WHICH CAME BACK TO 1.6rem** (Tom, 2026-08-23, after using the phone layout:
 	   "After 2.0 (make it like Decimal and Drop)"). The two instructions do not agree and the
 	   PARENTHESIS is the one to follow: 2.0 x 1.04 = 2.08rem would make After the WIDEST of the four
@@ -6685,21 +6629,21 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	   rather than being cut off. At 1.04rem it could not show one. Children 3 and 4 are Use units
 	   and After since R-331; the tick column takes After's width, and its heading wraps inside it
 	   (7a). Children 5-7 are Decimals, Show and Drop. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(3),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(3),
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4) { width: 1.6rem !important; }
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.8rem !important; }
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(2),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(2),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(2),
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(3),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(3),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.6rem !important; }
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(4),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(4),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(4),
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(5),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(5),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(5),
+	html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(6),
+	html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(6),
+	html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(6) { width: 1.8rem !important; }
 	/* **1.8rem, NOT 2.3** (Task 760). With the spinner a number box wants 2.3rem, but the six boxes and
 	   their five 4px gaps then came to 215 px, plus the list's 8px indent, against the 201.6px content
 	   pane a 360px window leaves, so the pane scrolled sideways on every non-touch narrow window (a
@@ -6721,9 +6665,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   THE HEADING ROW ONLY, matched as the list's first child, so the inputs below keep the sizing
 	   they have. */
-	html:has(#lpn_canvas) #lpn_labels_node_fields > div:first-child > span,
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div:first-child > span,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div:first-child > span { overflow-wrap: anywhere; }
+	html:has(#lpn_canvas) #lpn_labels_node_fields > .lpn-set-colhead .lpn-lblgroup > span,
+	html:has(#lpn_canvas) #lpn_labels_link_fields > .lpn-set-colhead .lpn-lblgroup > span,
+	html:has(#lpn_canvas) #lpn_labels_customer_fields > .lpn-set-colhead .lpn-lblgroup > span { overflow-wrap: anywhere; }
 
 	/* The list's own floor comes down with them, or the box would still refuse to narrow past a
 	   width the rows no longer need. 11.4rem is the six boxes (2.08 + 1.6 + 1.6 + 3 x 1.8 = 10.68rem)
@@ -6777,15 +6721,28 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	   On a touch screen these three boxes are plain text boxes with a digit keypad anyway
 	   (labelNumberBox(), R-330), so the spinner rules below only matter to a stray number box. */
 	@media (hover: none) and (pointer: coarse) {
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(6) { width: 1.6rem !important; }
+		/* Tom, 2026-10-25: Use units, Show and Drop "wider than it needs to be". Two digits and a tick fit these. */
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.4rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(6) { width: 2rem !important; }   /* two digits, not clipped (Tom, 2026-10-25: "10" showed "1C") */
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
@@ -6796,24 +6753,24 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	   of columns is 182. Before 1.6, Use units and After 1.2, the three numbers 1.6 = 8.8rem and 20px of
 	   gaps, 161px, 169 with the list's indent, for every pointer type. */
 	@media (max-width: 340px) {
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(2),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(2),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(2) { width: 1.6rem !important; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(3),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(3),
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4) { width: 1.2rem !important; }
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
-		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
-		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(1),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(1),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(1) { width: 1.6rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.2rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_node_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_link_fields .lpn-lblgroup > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(6) { width: 1.6rem !important; }
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 9.6rem; }

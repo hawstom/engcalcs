@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='پرانیستې سناریو او د هغې 
 $ec_lang['lpn_scenario_copy_off']='سناریو کاپي کول په ساده حالت کې کار کوي. کله چې ساده حالت بند وي، سناریو اضافه کړئ او بدیلونه یې د سناریوګانو په جدول کې وټاکئ.';
 $ec_lang['lpn_sm_title']='سناریو: مدیر';
 $ec_lang['lpn_sm_menu']='سناریو: مدیر…';
-$ec_lang['lpn_sm_basic_on']='کله چې ساده حالت فعال وي د سناریو: مدیر غیرفعال دی.';
 $ec_lang['lpn_pane_tab_scenarios']='سناریوګانې';
 $ec_lang['lpn_sm_col_parent']='مور';
 $ec_lang['lpn_sm_add_child']='فرعي اضافه کول';

@@ -3292,7 +3292,6 @@ $ec_lang['lpn_scenario_copy_tip']='Açık senaryoyu ve senaryo değerlerini kopy
 $ec_lang['lpn_scenario_copy_off']='Senaryoyu kopyala, Temel modda çalışır. Temel mod kapalıyken bir senaryo ekleyin ve alternatiflerini Senaryolar tablosunda seçin.';
 $ec_lang['lpn_sm_title']='Senaryo yöneticisi';
 $ec_lang['lpn_sm_menu']='Senaryo yöneticisi…';
-$ec_lang['lpn_sm_basic_on']='Temel mod açıkken Senaryo yöneticisi devre dışıdır.';
 $ec_lang['lpn_pane_tab_scenarios']='Senaryolar';
 $ec_lang['lpn_sm_col_parent']='Üst';
 $ec_lang['lpn_sm_add_child']='Alt öğe ekle';

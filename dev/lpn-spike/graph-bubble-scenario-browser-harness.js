@@ -155,6 +155,9 @@ async function main() {
 
 		console.log('2. Child changes the set');
 		await scenarioMenu('Child');
+		// The Settings box is wider since 2026-10-25 (the labels rows no longer wrap) and now covers the graph: close it for the drag.
+		await page.evaluate(() => { const x = document.querySelector('#lpn_settings_box .lpn-popover-x'); if (x && x.offsetParent) { x.click(); } });
+		await a.settle(300);
 		// a real drag of the 22 graph's header, by its title
 		const t22 = await page.evaluate(() => {
 			const b = Array.from(document.querySelectorAll('.lpn-tsb')).filter((x) => x.querySelector('.lpn-tsb-title').textContent === '22')[0];

@@ -149,7 +149,7 @@ async function main() {
 			await T('lpn_scenario_delete'), await T('lpn_sm_list_overrides')];
 		ok('...above Base the list has the rows the chapter names (Scenario manager, Basic mode, New, Copy, Rename, Delete, and the override list), in any order',
 			wantRows.every((w) => rows.slice(0, 7).some((r) => r.text === w)), JSON.stringify(rows.slice(0, 7).map((r) => r.text)));
-		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === true);
+		ok('...the Scenario manager row is not dimmed while Basic mode is checked (Tom, 2026-10-25)', rows.filter((r) => r.text === wantRows[0])[0].off !== true);
 
 		// ---- 4. the worked example, performed ----------------------------------------------------
 		console.log('\n4. The worked example: Larger main and Max day on Net1');
