@@ -88,7 +88,14 @@ async function clickPipe(a) {
 }
 async function visit(Session, browser, label, init) {
 	const a = await Session.open(browser, NAME + '-' + label, { viewport: { width: 1600, height: 1000 } });
-	await a.context.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
+	await a.context.addInitScript(() => {
+		window.EC_DEFAULT_DOCKS = true;
+		// Every box docked and auto-hidden (the shipped list pins Settings and docks fewer boxes).
+		window.EC_DEFAULT_DOCK_LIST = ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box']
+			.map((id) => ({ id, side: 'left' }))
+			.concat(['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box', 'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
+				.map((id) => ({ id, side: 'right' })));
+	});
 	if (init) { await a.context.addInitScript(init); }
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
