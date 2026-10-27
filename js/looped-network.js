@@ -65399,7 +65399,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
+		lpn_energy_box: 33, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
 		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
 		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
@@ -83743,16 +83743,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	];
 	/**
 	 * A column's heading as its label and its unit, apart, so the unit can be isolated in a
-	 * right-to-left heading. **The concentration column wears the short label** ("Chlorine conc."):
-	 * on a sheet of twelve columns the long word was the one that set the whole table's type size
-	 * (Tom, 2026-10-26: "Conc." is acceptable). Its other modes (age, source share, a species) keep
-	 * their own names.
+	 * right-to-left heading. **Only the PRINTED sheet wears the short concentration label**
+	 * ("Chlorine conc."): on twelve columns the long word set the whole table's type size (Tom,
+	 * 2026-10-26: "Conc." is acceptable). The box, the CSV and the User Guide chapter keep the full
+	 * name. Its other modes (age, source share, a species) keep their own names in print too.
 	 */
-	function fullReportColParts(col) {
+	function fullReportColParts(col, short) {
 		var pc = EngCalcs.pageConfig || {}, nm, label;
 		if (col.field === 'status') { return { label: pc.lpn_result_status || 'Status', unit: '' }; }
 		label = col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field);
-		if (col.key === 'quality' && qualityMode() === 'chemical') {
+		if (short && col.key === 'quality' && qualityMode() === 'chemical') {
 			nm = chemicalName();
 			label = nm ? (pc.lpn_quality_named_concentration_short || '{chemical} conc.').replace('{chemical}', nm)
 				: (pc.lpn_result_concentration_short || 'Conc.');
@@ -84064,6 +84064,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return [{
 			heads: [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
 			hl: ['', '', ''].concat(parts.map(function (p) { return p.label; })),
+			ph: ['', '', ''].concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c, true).label; })),
 			hu: ['', '', ''].concat(parts.map(function (p) { return p.unit; })),
 			ids: [false, false, true].concat(parts.map(function () { return false; })),
 			trunc: [false, true, false].concat(FULL_REPORT_COLS.map(function (c) { return c.field === 'status'; })),
@@ -84233,7 +84234,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.textContent = (line ? line + ' - ' : '') + reportDateText();
 		wrap.appendChild(h);
 		blocks.forEach(function (b) {
-			var table, thead, tbody, tr, e;
+			var table, thead, tbody, tr, e, printHeads;
 			if (!b.heads) {
 				e = document.createElement('p');
 				e.textContent = b.text;
@@ -84244,9 +84245,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			table.className = 'lpn-pane-table lpn-print-table lpn-print-report';
 			thead = document.createElement('thead');
 			tr = document.createElement('tr');
+			printHeads = b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
 			b.heads.forEach(function (t, c) {
 				e = document.createElement('th');
-				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes(b.hl[c], b.hu[c])); } else { e.textContent = t; }
+				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes((b.ph && b.ph[c]) || b.hl[c], b.hu[c])); } else { e.textContent = t; }
 				if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
 				tr.appendChild(e);
 			});
@@ -84267,7 +84269,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tbody.appendChild(tr);
 			});
 			table.appendChild(tbody);
-			reportPrintFit(table, b);
+			reportPrintFit(table, Object.assign({}, b, { heads: printHeads }));
 			wrap.appendChild(table);
 		});
 		return wrap;

@@ -72,7 +72,7 @@ async function main() {
 		ok('Run at 3: every junction keeps 20 psi, in two solves', r.indexOf(enString('lpn_ds_scale_ok').replace('{m}', '3').replace('{pressure}', '20 psi')) >= 0 && r.indexOf(enString('lpn_ff_cost').replace('{solves}', '2')) >= 0, r.slice(0, 200));
 		const tabs = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_ds_box table')).map((t) => Array.from(t.querySelectorAll('tbody tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim()))));
 		const n32 = tabs[0].filter((x) => x[0] === 'N32')[0], l112 = tabs[1].filter((x) => x[0] === 'L112')[0];
-		ok('N32 goes from ' + n32[2] + ' to ' + n32[1] + ', and L112 from ' + l112[2] + ' to ' + l112[1] + ', as the chapter says', n32[1] === '85.99 psi' && n32[2] === '111 psi' && l112[1] === '3.13 ft/sec' && l112[2] === '0.535 ft/sec' && ['111 psi', '85.99 psi', 'L112', '0.535 ft/sec', '3.13 ft/sec'].every((w) => ex.indexOf(w) >= 0), JSON.stringify([n32, l112]));
+		ok('N32 goes from ' + n32[2] + ' to ' + n32[1] + ', and L112 from ' + l112[2] + ' to ' + l112[1] + ', as the chapter says', n32[1] === '85.99' && n32[2] === '111' && l112[1] === '3.13' && l112[2] === '0.535' && ['111 psi', '85.99 psi', 'L112', '0.535 ft/sec', '3.13 ft/sec'].every((w) => ex.indexOf(w) >= 0), JSON.stringify([n32, l112]));
 		ok('each list holds at most ten rows, and the links not shown are counted', tabs[1].length === 10 && r.indexOf(enString('lpn_ff_rows_more_links').replace('{n}', '2')) >= 0, String(tabs[1].length));
 
 		console.log('\n4. The warning, and the selection');

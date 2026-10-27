@@ -97,6 +97,7 @@ async function main() {
 			const cu = (t) => { t = t.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); if (!/\d/.test(t) || BARE.test(t)) { return ''; } const m = UNIT.exec(t); return m ? m[3] : null; };
 			area.querySelectorAll('table').forEach((t, ti) => {
 				const r = t.getBoundingClientRect();
+				out.heads = (out.heads || []).concat(Array.from(t.querySelectorAll('thead th')).map((h) => h.textContent.trim()));
 				out.tables.push({ i: ti, width: r.width, right: r.right - area.getBoundingClientRect().left, cols: t.rows[0] ? t.rows[0].cells.length : 0 });
 				const ths = Array.from(t.querySelectorAll('thead th')), trs = Array.from(t.querySelectorAll('tbody tr'));
 				ths.forEach((th, c) => {
@@ -198,6 +199,7 @@ async function main() {
 				ok(label + ' on ' + paper + ': no figure is parted from its unit', m.parted.length === 0, m.parted.slice(0, 4).join(' ; '));
 				ok(label + ' on ' + paper + ': units are in the headings, not the cells', m.unitBad.length === 0, m.unitBad.slice(0, 4).join(' ; '));
 				ok(label + ' on ' + paper + ': every asset id column holds N9999 on one line (' + m.ids + ' id columns)', m.idBad.length === 0, m.idBad.slice(0, 4).join(' ; '));
+				if (label === 'Full report') { ok(label + ' on ' + paper + ': the printed concentration heading is the short one, with its unit', (m.heads || []).some((h) => /conc\.\s*\(/.test(h)), (m.heads || []).join('|')); }
 				ok(label + ' on ' + paper + ': a cut-off word carries its whole text in its title', m.truncBad.length === 0, m.truncBad.join(','));
 			}
 			if (process.env.RPT_PDF_DIR) { await page.pdf({ path: path.join(process.env.RPT_PDF_DIR, prefix + '.pdf'), format: 'Letter', margin: { top: '1in', bottom: '1in', left: '1in', right: '1in' } }); }
