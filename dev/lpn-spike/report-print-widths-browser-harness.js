@@ -115,6 +115,7 @@ async function main() {
 					const uniq = Array.from(new Set(us.filter((u) => u)));
 					if (us.every((u) => u !== null) && uniq.length === 1) { out.unitBad.push('table ' + ti + ' col ' + c + ' "' + th.textContent.trim() + '" cells still carry "' + uniq[0] + '"'); }
 				});
+				t.querySelectorAll('th bdi').forEach((bd) => { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.unitBad.push('unit split: ' + bd.textContent); } });
 				t.querySelectorAll('.lpn-rpt-trunc').forEach((sp) => { if (!sp.title) { out.truncBad.push(sp.textContent); } });
 				Array.from(t.querySelectorAll('th, td')).forEach((c) => {
 					const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
@@ -163,9 +164,11 @@ async function main() {
 						const us = cells.map((cell) => cu(cell.textContent)), uniq = Array.from(new Set(us.filter((u) => u)));
 						if (hu) {
 							out.headed.push(th.textContent.trim());
-							if (!/\(.+\)/.test(th.textContent) || th.textContent.indexOf(hu) < 0) { out.noParen.push(th.textContent.trim()); }
+							if (!/\(.+\)/.test(th.textContent) || th.textContent.replace(/\u00a0/g, ' ').indexOf(hu) < 0) { out.noParen.push(th.textContent.trim()); }
 							if (uniq.length) { out.leftover.push(th.textContent.trim() + ' cells carry ' + uniq.join('/')); }
-							if (!th.querySelector('bdi')) { out.noParen.push('no bdi in ' + th.textContent.trim()); }
+							const bd = th.querySelector('bdi');
+							if (!bd) { out.noParen.push('no bdi in ' + th.textContent.trim()); }
+							else { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.noParen.push('unit split: ' + bd.textContent); } }
 						} else if (us.every((u) => u !== null) && uniq.length === 1) { out.leftover.push('"' + th.textContent.trim() + '" cells carry ' + uniq[0]); }
 						else if (uniq.length > 1) { out.mixed.push(th.textContent.trim() + ' [' + uniq.join(' | ') + ']'); }
 					});
@@ -179,9 +182,52 @@ async function main() {
 			ok(label + ' (screen): every asset id column holds N9999 (' + r.ids + ' id columns)', r.idBad.length === 0, r.idBad.slice(0, 4).join(' ; '));
 			return r;
 		};
+		// COPY HTML pasted into a word processor (Tom pasted it into Google Docs: equal columns, "Junctio|n").
+		// The copy is loaded in a fresh page, 6.5 in wide, with a FIXED table layout (columns take their
+		// stated widths, as Docs lays them out), and no word of any cell or heading may break across lines.
+		// Real Google Docs and Word pastes are NOT tested here.
+		const checkCopy = async (label, prefix) => {
+			await page.evaluate(() => { window.__clip = null; });
+			await page.click('#' + prefix + '_copyhtml');
+			await a.waitFor(() => page.evaluate(() => !!(window.__clip && window.__clip['text/html'])), 'copied html', 15000);
+			const html = await page.evaluate(() => window.__clip['text/html']);
+			const p2 = await page.context().newPage();
+			const wide = await p2.evaluate(() => 0).then(() => null);
+			for (const layout of ['auto', 'fixed']) {
+				await p2.setViewportSize({ width: 624, height: 900 });
+				await p2.setContent('<!doctype html><html><body style="margin:0"><div id="w" style="width:6.5in"><style>table{table-layout:' + layout + ';}</style>' + html + '</div></body></html>');
+				const r = await p2.evaluate(() => {
+					const out = { broken: [], over: [], tables: 0, noClip: [] };
+					const w = document.getElementById('w').getBoundingClientRect();
+					document.querySelectorAll('table').forEach((t, ti) => {
+						out.tables++;
+						if (t.getBoundingClientRect().right > w.right + 0.5) { out.over.push('table ' + ti); }
+						if (!t.querySelector('colgroup col[width]')) { out.noClip.push('no col widths in table ' + ti); }
+						t.querySelectorAll('th, td').forEach((c) => {
+							const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT); let n;
+							while ((n = tw.nextNode())) {
+								const re = /[^\s\u00a0]+/g; let m;
+								while ((m = re.exec(n.nodeValue))) {
+									const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length);
+									const rs = Array.from(rg.getClientRects()).filter((q) => q.width > 0);
+									if (rs.length && Math.max.apply(null, rs.map((q) => q.top)) - Math.min.apply(null, rs.map((q) => q.top)) > 3) { out.broken.push('"' + m[0] + '"'); }
+								}
+							}
+						});
+						t.querySelectorAll('th bdi').forEach((bd) => { const rr = Array.from(bd.getClientRects()).filter((q) => q.width > 0); if (rr.length > 1 && Math.max.apply(null, rr.map((q) => q.top)) - Math.min.apply(null, rr.map((q) => q.top)) > 3) { out.broken.push('unit split ' + bd.textContent); } });
+					});
+					return out;
+				});
+				ok(label + ' Copy HTML (' + layout + ' layout, 6.5 in): has a table with column widths', r.tables >= 1 && r.noClip.length === 0, r.noClip.join(','));
+				ok(label + ' Copy HTML (' + layout + ' layout, 6.5 in): no word is broken', r.broken.length === 0, r.broken.slice(0, 6).join(' '));
+				ok(label + ' Copy HTML (' + layout + ' layout, 6.5 in): the table is within the page', r.over.length === 0, r.over.join(','));
+			}
+			await p2.close();
+		};
 		const checkPrint = async (label, boxId, prefix) => {
 			console.log('\n--- ' + label + ' ---');
 			await checkScreen(label, boxId);
+			await checkCopy(label, prefix);
 			await page.evaluate(() => { window.__printed = false; });
 			await page.click('#' + prefix + '_print');
 			await a.settle(200);

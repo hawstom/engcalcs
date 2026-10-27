@@ -6315,6 +6315,8 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    is no justification for them to vary"). Wide enough for N9999 or J-1234 at the table's own font,
    screen and paper alike, and an id is never broken. Marked by the renderer, `lpn-rpt-id`, on the
    heading and every cell of the column. */
+/* A heading's bracketed unit stays whole: "(m H2O)" never splits across lines. */
+th bdi { white-space: nowrap; }
 .lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
 .lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }

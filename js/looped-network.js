@@ -83937,14 +83937,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reportHeadTemplate().split(/(\{label\}|\{unit\})/).forEach(function (part) {
 			var b;
 			if (part === '{label}') { frag.appendChild(document.createTextNode(label)); }
-			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = unit; frag.appendChild(b); }
+			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = reportUnitKept(unit); frag.appendChild(b); }
 			else if (part) { frag.appendChild(document.createTextNode(part)); }
 		});
 		return frag;
 	}
+	/** A multi-word unit ("m H2O") holds together: no-break spaces. */
+	function reportUnitKept(unit) { return String(unit).replace(/ /g, '\u00A0'); }
 	function reportHeadHtml(label, unit) {
 		return reportHeadTemplate().split(/(\{label\}|\{unit\})/).map(function (part) {
-			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi>' + reportEsc(unit) + '</bdi>' : reportEsc(part);
+			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi style="white-space:nowrap;">' + reportEsc(reportUnitKept(unit)) + '</bdi>' : reportEsc(part);
 		}).join('');
 	}
 	function reportUnitInLabel(label, unit) {
@@ -84169,14 +84171,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/** Self-contained: inline styles only, so it pastes into a mail or a document the same everywhere. */
 	function reportHtmlText(spec, blocks) {
-		var cell = 'border:1px solid #999;padding:2px 6px;text-align:left;', out = ['<p><b>' + reportEsc(reportTitleLine(spec)) + '</b></p>'];
+		var out = ['<p><b>' + reportEsc(reportTitleLine(spec)) + '</b></p>'];
 		blocks.forEach(function (b) {
+			var heads, n, pt, cols, cell, keep;
 			if (!b.heads) { out.push('<p>' + reportEsc(b.text) + '</p>'); return; }
-			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:10pt;"><thead><tr>' +
-				b.heads.map(function (h, c) { return '<th style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml(b.hl[c], b.hu[c]) : reportEsc(h)) + '</th>'; }).join('') +
+			// **WHAT A WORD PROCESSOR HONOURS** (Tom pasted this into Google Docs and got equal columns
+			// with "Junctio|n" and "153|7"): inline styles only (Docs drops <style>), a width on every
+			// column in proportion to its longest unbreakable word, the same measure the printed sheet
+			// uses, no-wrap on every short cell, and a type size at which the columns fit 6.5 in.
+			heads = reportPrintHeads(b);
+			n = reportColNeeds(Object.assign({}, b, { trunc: null }), heads);
+			pt = Math.max(5, Math.min(10, Math.floor(460 / n.sum * 10) / 10));
+			cell = 'border:1px solid #999;padding:2px 3px;text-align:left;vertical-align:top;font-size:' + pt + 'pt;';
+			cols = n.need.map(function (w) {
+				var pct = (Math.round(w / n.sum * 1000) / 10) + '%';
+				return '<col width="' + pct + '" style="width:' + pct + ';">';
+			}).join('');
+			keep = function (t, c) { return (b.ids && b.ids[c]) || String(reportFigureUnitKept(t)).replace(/\u00A0/g, '').length <= 24 && !/ .* /.test(String(reportFigureUnitKept(t))); };
+			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead><tr>' +
+				b.heads.map(function (h, c) { return '<th style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(h)) + '</th>'; }).join('') +
 				'</tr></thead><tbody>' +
 				b.rows.map(function (r) {
-					return '<tr>' + r.map(function (c) { return '<td style="' + cell + '">' + reportEsc(c) + '</td>'; }).join('') + '</tr>';
+					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
 				}).join('') + '</tbody></table>');
 		});
 		return out.join('\n');
@@ -84201,23 +84217,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * at its spaces and gives a wide column the room it asks for (css/engcalcs.css, `.lpn-print-report`).
 	 */
 	var REPORT_ID_SAMPLE = 'W-9999', REPORT_TRUNC_EM = 5.5;
-	function reportPrintFit(table, b) {
+	/** The headings as printed (the short concentration label in the Full report), as plain text. */
+	function reportPrintHeads(b) {
+		return b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
+	}
+	/** Each column's width need in em of the table's font, and their sum: the longest unbreakable word. */
+	function reportColNeeds(b, heads) {
 		var ncol = b.heads.length, need = [], sum = 0, j;
 		function note(col, text, head) {
-			String(text).split(/\s+/).forEach(function (w) {
+			String(text).split(/[ \t\n]+/).forEach(function (w) {
 				if (w) { need[col] = Math.max(need[col] || 0, paneMeasureEm(w, head) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); }
 			});
 		}
-		b.heads.forEach(function (t, c) { note(c, t, true); });
+		heads.forEach(function (t, c) {
+			note(c, b.hu && b.hu[c] ? reportHeadText((b.ph && b.ph[c]) || b.hl[c], reportUnitKept(b.hu[c])) : t, true);
+		});
 		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol && !(b.trunc && b.trunc[c])) { note(c, reportFigureUnitKept(t), false); } }); });
 		// A column that may be cut with an ellipsis asks for the cap and no more.
 		(b.trunc || []).forEach(function (on, c) { if (on && c < ncol) { need[c] = Math.max(need[c] || 0, REPORT_TRUNC_EM * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); } });
 		// An asset id column asks for the width of a wide five-character id, in every report alike.
 		(b.ids || []).forEach(function (on, c) { if (on && c < ncol) { note(c, REPORT_ID_SAMPLE, false); } });
-		for (j = 0; j < ncol; j++) { sum += need[j] || PANE_PRINT_TD_PAD_EM; }
-		if (!(sum > 0)) { return; }
-		sum = Math.round(sum * 100) / 100;
-		table.style.fontSize = 'min(12px, calc((100cqw - ' + (ncol + 1) + 'px) / ' + sum + '))';
+		for (j = 0; j < ncol; j++) { need[j] = need[j] || PANE_PRINT_TD_PAD_EM; sum += need[j]; }
+		return { need: need, sum: Math.round(sum * 100) / 100 };
+	}
+	function reportPrintFit(table, b) {
+		var n = reportColNeeds(b, b.heads);
+		if (!(n.sum > 0)) { return; }
+		table.style.fontSize = 'min(12px, calc((100cqw - ' + (b.heads.length + 1) + 'px) / ' + n.sum + '))';
 	}
 	function reportPrintable(spec, blocks) {
 		var wrap = document.createElement('div'), h, line;
