@@ -68,6 +68,15 @@ async function main() {
 		await a.page.mouse.click(p.x, p.y);
 		await a.settle(900);
 	}
+	// Does a pull-down show its selected text whole? (the text's width against the room inside the control)
+	const selectShowsText = (page, sel) => page.evaluate((q) => {
+		const e = document.querySelector(q);
+		if (!e) { return { missing: true }; }
+		const cs = getComputedStyle(e), c = document.createElement('canvas').getContext('2d');
+		c.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+		const text = e.options[e.selectedIndex].textContent, need = c.measureText(text).width + 22, have = e.getBoundingClientRect().width;
+		return { text, need: Math.round(need), have: Math.round(have), ok: need <= have };
+	}, sel);
 	const headerW = (page, root) => page.evaluate((sel) => {
 		const h = document.querySelector(sel + ' .lpn-ghdr .lpn-ghlabel');
 		return h ? Math.round(h.getBoundingClientRect().width) : null;
@@ -263,6 +272,15 @@ async function main() {
 		ok('Convert as is a box of Label | Value rows: the coordinate system and the units', !!cv && cv.grid && cv.unitRows >= 8, JSON.stringify(cv));
 		ok('...a run of two or more rows has a header and a run of one has none', !!cv && cv.runs.every((g) => g.hdr === (g.rows >= 2)), JSON.stringify(cv && cv.runs));
 		ok('...and it does not scroll sideways', !!cv && cv.scroll <= 1, String(cv && cv.scroll));
+		const cv2 = await c.page.evaluate(() => {
+			const b = document.getElementById('lpn_convas_body'), ok = document.getElementById('lpn_convas_ok'), R = (e) => e.getBoundingClientRect(), vh = window.innerHeight;
+			return { top: b.scrollTop, okInBody: b.contains(ok), okVisible: R(ok).top >= 0 && R(ok).bottom <= vh, cancelVisible: R(document.getElementById('lpn_convas_cancel')).bottom <= vh,
+				firstVisible: R(document.querySelector('#lpn_convas_body .lpn-grow')).top >= R(b).top - 1 };
+		});
+		ok('Convert as opens at the top, with the georeference choices in view', cv2.top === 0 && cv2.firstVisible, JSON.stringify(cv2));
+		ok('...and OK and Cancel are in a footer outside the scrolling body, always in view', !cv2.okInBody && cv2.okVisible && cv2.cancelVisible, JSON.stringify(cv2));
+		const rd = await selectShowsText(c.page, '#lpn_convas_round_diameter');
+		ok('"No rounding" is whole in its dropdown', rd.ok, JSON.stringify(rd));
 		await c.close();
 		const f = await start(false);
 		await openBox(f, 'lpn_full_box');
@@ -289,6 +307,13 @@ async function main() {
 		});
 		ok('on a phone the header row is not shown', ph.hdr === 'none', ph.hdr);
 		ok('on a phone each label stands above its value', ph.above);
+		await p.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
+		await p.settle(300);
+		const jp = await p.page.evaluate(() => { const el = Array.from(document.querySelectorAll('#lpn_canvas [data-node="11"]')).filter((e) => e.getBoundingClientRect().width > 0)[0]; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		await p.page.mouse.click(jp.x, jp.y);
+		await p.settle(900);
+		const dp = await selectShowsText(p.page, '#lpn_popup_fields table.lpn-demand-table select');
+		ok('on a phone the demand pattern dropdown shows its text whole', !dp.missing && dp.ok, JSON.stringify(dp));
 		ok('on a phone nothing is cut at the right edge', ph.cut === 0 && ph.scroll <= 1, JSON.stringify({ cut: ph.cut, scroll: ph.scroll }));
 		await p.close();
 	} finally { await browser.close(); env.stopServer(); }

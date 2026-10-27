@@ -1787,10 +1787,11 @@ echoHeader("EngCalcsApp", $html_title,
 			<?php } ?>
 		</fieldset>
 		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
-		<div class="lpn-new-actions">
-			<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
-			<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
-		</div>
+	</div>
+	<?php // OK and Cancel stand in a footer outside the scrolling body, so they are always in view. ?>
+	<div class="lpn-new-actions lpn-convas-foot">
+		<button type="button" id="lpn_convas_ok"><?=$ec_lang['lpn_convas_ok']?></button>
+		<button type="button" id="lpn_convas_cancel"><?=$ec_lang['lpn_cancel']?></button>
 	</div>
 </div>
 

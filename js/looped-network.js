@@ -48442,15 +48442,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
 		capPanelToRoomBelow(box, parseFloat(box.style.top));
+		convasFitFooter(box);
 		// The rows' headers and fitted Label column arrive a frame later and make the box taller: centre it again.
 		(window.requestAnimationFrame || function (f) { return setTimeout(f, 32); })(function () {
 			var h2 = fitPanelToViewport(box);
 			box.style.top = Math.max(chromeFloor(), (window.innerHeight - h2) / 2) + 'px';
 			capPanelToRoomBelow(box, parseFloat(box.style.top));   // what is left under the chrome: the rest scrolls inside the box
+			convasFitFooter(box);
 		});
 		initTipsIn(box);
 		var ok = document.getElementById('lpn_convas_ok');
-		if (ok && ok.focus) { ok.focus(); }
+		if (ok && ok.focus) { ok.focus({ preventScroll: true }); }
+		(function (b) { if (b) { b.scrollTop = 0; } }(document.getElementById('lpn_convas_body')));
+	}
+	// OK and Cancel stand in a footer under the scrolling body; the body gives up as much height as the footer
+	// would otherwise hang below the screen.
+	function convasFitFooter(box) {
+		var body = document.getElementById('lpn_convas_body'), foot = box.querySelector('.lpn-convas-foot'), over, mh;
+		if (!body || !foot) { return; }
+		over = foot.getBoundingClientRect().bottom + 12 - ((window.innerHeight || 0) - POPUP_EDGE);
+		if (over > 0) {
+			mh = parseFloat(body.style.maxHeight) || body.getBoundingClientRect().height;
+			body.style.maxHeight = Math.max(80, mh - over) + 'px';
+		}
+		body.scrollTop = 0;
 	}
 	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
 	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
