@@ -134,7 +134,7 @@ EngCalcs.tipHtml = function (text) {
 	var parts = String(text == null ? '' : text).split(/\\n\\n|\r?\n\r?\n/), out = [], i, t;
 	for (i = 0; i < parts.length; i++) {
 		t = parts[i].replace(/^\s+|\s+$/g, '');
-		if (!t) { continue; }
+
 		out.push('<p class="ec-tip-p">' + EngCalcs.escapeAttr(t) + '</p>');
 	}
 	return out.join('');
@@ -234,7 +234,7 @@ function ecTrackTapTip(el, tip) {
 		var i, r;
 		for (i = 0; i < EngCalcs._tapTips.length; i++) {
 			r = EngCalcs._tapTips[i];
-			if (r.el !== e.target && !(r.el.contains && r.el.contains(e.target))) { r.tip.hide(); }
+			if (r.el !== e.target && !(r.el.contains && r.el.contains(e.target))) { ecTipDo(r.el, "hide"); }
 		}
 	}, true);
 }
@@ -250,6 +250,13 @@ EngCalcs.tipShowDelay = 500;
 // listeners per open, measured 2026-10-26). An element is disposed only after TWO sweeps have
 // found it detached, so one that is being carried from one box to another keeps its tip.
 var ecTipArmed = [];
+// A listener wired once must not hold the instance it was wired with: a disposed instance has every
+// field nulled, and an element that is re-attached later is armed again with a NEW one. So the
+// listeners ask for the element's current instance each time.
+function ecTipDo(el, method) {
+	var t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (t) { t[method](); }
+}
 function ecSweepDetachedTips() {
 	var keep = [], i, el, t;
 	for (i = 0; i < ecTipArmed.length; i++) {
@@ -257,7 +264,11 @@ function ecSweepDetachedTips() {
 		if (el.isConnected) { el._ecTipGone = 0; keep.push(el); continue; }
 		if (!el._ecTipGone) { el._ecTipGone = 1; keep.push(el); continue; }
 		t = bootstrap.Tooltip.getInstance(el);
+		// A tip still up, or fading out, has a callback waiting on a transition: disposing now nulls
+		// the instance under it and the callback throws. Wait for the next sweep.
+		if (t && t.tip) { keep.push(el); continue; }
 		if (t) { try { t.dispose(); } catch (e) {} }
+		el._ecTipListed = false; el._ecTipGone = 0;
 	}
 	ecTipArmed = keep;
 }
@@ -324,7 +335,7 @@ function ecWireTipEl(el) {
 		// saying they are done with it.
 		if (control && !el.dataset.ecTipClickWired) {
 			el.dataset.ecTipClickWired = '1';
-			el.addEventListener('click', function () { tip.hide(); });
+			el.addEventListener('click', function () { ecTipDo(el, 'hide'); });
 			// **A TIP THAT WILL NOT LEAVE WHEN THE POINTER DOES** (Tom, 2026-09-12: *"they don't
 			// close immediately when you leave hovering their item. Test case: Water menu"*).
 			//
@@ -344,7 +355,7 @@ function ecWireTipEl(el) {
 			el.addEventListener('mouseleave', function () {
 				var keyboard = true;
 				try { keyboard = !!(el.matches && el.matches(':focus-visible')); } catch (e) {}
-				if (!keyboard) { tip.hide(); }
+				if (!keyboard) { ecTipDo(el, 'hide'); }
 			});
 		}
 		// **A NAME TIP OPENED BY A TAP MUST NOT STICK.** On a device that cannot hover, a titled
@@ -369,7 +380,7 @@ function ecWireTipEl(el) {
 				cancel();
 				// 500 ms is the platform long-press, and it must be longer than a tap or the tip
 				// would open on every press of the button.
-				timer = setTimeout(function () { timer = null; tip.show(); }, 500);
+				timer = setTimeout(function () { timer = null; ecTipDo(el, 'show'); }, 500);
 			}, { passive: true });
 			['touchend', 'touchcancel', 'touchmove'].forEach(function (ev) {
 				el.addEventListener(ev, cancel, { passive: true });
@@ -377,7 +388,7 @@ function ecWireTipEl(el) {
 			// A tip opened by a hold has no pointer to leave, so it needs its own way out: the next
 			// touch anywhere else takes it down.
 			document.addEventListener('touchstart', function (e) {
-				if (e.target !== el && !el.contains(e.target)) { tip.hide(); }
+				if (e.target !== el && !el.contains(e.target)) { ecTipDo(el, 'hide'); }
 			}, { passive: true });
 		}
 }
