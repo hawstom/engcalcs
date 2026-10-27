@@ -40375,6 +40375,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (info) {
 			info.elevShown = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
+			// Net1 and any imported file give every junction an initial quality; it is asked about too, never silently dropped.
+			info.quality = (typeof n._initQuality === 'number' && n._initQuality !== 0) ? String(+(+n._initQuality).toPrecision(6)) + (concentrationUnitText() ? ' ' + concentrationUnitText() : '') : '';
 			info.demands = demandRows ? demandRows.filter(function (v) { return v !== undefined && v !== null && v !== ''; })
 				.map(function (v) { return disp(v, 'lpn_u_flow'); }).join(', ') : '';
 		}
@@ -40392,7 +40394,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (Object.keys(n).some(function (k) {
 			var v = n[k];
 			if (k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok' || k === 'lx' || k === 'ly') { return false; }
-			if (k === 'elev' || demandSpec.keys.indexOf(k) >= 0 || k === 'demandPattern') { return false; }   // asked about, above
+			if (k === 'elev' || k === '_initQuality' || demandSpec.keys.indexOf(k) >= 0 || k === 'demandPattern') { return false; }   // asked about, above
 			if (v === undefined || v === null || v === '' || v === 0 || v === false) { return false; }
 			if (typeof v === 'object' && !Object.keys(v).length) { return false; }
 			return true;
@@ -40502,11 +40504,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				info = {};
 				why = vertexMorphProblem(n, info);
 				if (why) { problems.push(why); continue; }
-				if (!info.elevShown && !info.demands) { doMorph(n); continue; }
-				key = info.elevShown && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elevShown ? 'lpn_morph_vertex_clear_elev' : 'lpn_morph_vertex_clear_demand');
+				if (!info.elevShown && !info.demands && !info.quality) { doMorph(n); continue; }
+				key = info.elevShown && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elevShown ? 'lpn_morph_vertex_clear_elev' : (info.demands ? 'lpn_morph_vertex_clear_demand' : 'lpn_morph_vertex_clear_quality'));
 				text = String(pc[key] || (info.elevShown && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
-					: (info.elevShown ? 'Clear elevation {elev} on {id}?' : 'Clear demands {demands} on {id}?')))
-					.split('{elev}').join(info.elevShown).split('{demands}').join(info.demands).split('{id}').join(n.id);
+					: (info.elevShown ? 'Clear elevation {elev} on {id}?' : (info.demands ? 'Clear demands {demands} on {id}?' : 'Clear initial quality {quality} on {id}?'))));
+				if (info.quality && key !== 'lpn_morph_vertex_clear_quality') { text += '\n' + String(pc.lpn_morph_vertex_clear_also || 'Initial quality {quality} is cleared too.'); }
+				text = text.split('{elev}').join(info.elevShown).split('{demands}').join(info.demands).split('{quality}').join(info.quality).split('{id}').join(n.id);
 				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex', text: text, ok: pc.lpn_dialog_ok || 'OK', cancel: pc.lpn_cancel || 'Cancel' },
 					(function (node, next) { return function (yes) { if (yes) { doMorph(node); } step(next); }; }(n, i + 1)));
 				return;
@@ -60166,10 +60169,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `orders` is {show, drop}, each a spinner spec or null.
 	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, orders, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
-			input = document.createElement('input'), span = document.createElement('span'), after;
+			input = document.createElement('input'), span = document.createElement('span'), after, group;
 		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
 		// enough to wrap used to drag its checkbox and its boxes down to the middle of BOTH lines.
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = LPN_LABEL_ROW_GAP;
+		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.flexWrap = 'wrap'; row.style.gap = '2px ' + LPN_LABEL_ROW_GAP;
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
@@ -60181,18 +60184,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
 		// The name takes the slack; css/engcalcs.css lets it shrink below its longest word.
-		label.style.flex = '1 1 auto';
+		// Its width is the stylesheet's (.lpn-lblhead-lead and the label share one basis).
 		row.appendChild(label);
 		if (affixOpt) {
-			row.appendChild(affixBox(affixOpt.prefix));
+			// **THE SIX CONTROLS ARE ONE UNBREAKABLE GROUP** (Tom, 2026-10-26): beside the name when the
+			// box is wide enough, otherwise the whole group wraps below it, never a part of it.
+			group = document.createElement('span');
+			group.className = 'lpn-lblgroup';
+			group.appendChild(affixBox(affixOpt.prefix));
 			after = affixBox(affixOpt.suffix);
-			row.appendChild(after);
-			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
+			group.appendChild(after);
+			group.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
 			// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** Same slots, same
 			// order, on every field row; only field rows participate.
 			[decimals, orders && orders.show, orders && orders.drop].forEach(function (spec) {
-				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
+				group.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
+			row.appendChild(group);
 		}
 		container.appendChild(row);
 		return row;
@@ -60619,11 +60627,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the columns need not widen; each carries its full meaning in its tip, which the search box
 		// matches too.
 		function columnHeadings(box, group) {
-			var row = document.createElement('div'), lead = document.createElement('span');
+			var row = document.createElement('div'), lead = document.createElement('span'), group = document.createElement('span');
 			row.className = 'lpn-set-note lpn-set-colhead';
-			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = LPN_LABEL_ROW_GAP;
-			lead.style.flex = '1 1 auto';
+			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.flexWrap = 'wrap'; row.style.gap = '0 ' + LPN_LABEL_ROW_GAP;
+			lead.className = 'lpn-lblhead-lead';
 			row.appendChild(lead);
+			group.className = 'lpn-lblgroup';
+			row.appendChild(group);
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
@@ -60644,7 +60654,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The numeric columns carry LPN_LABEL_COL_GAP as well as the row's own gap, so their
 				// headings must match or they sit off the box they name.
 				if (i >= 3) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
-				row.appendChild(cell);
+				group.appendChild(cell);
 			});
 			box.appendChild(row);
 		}
@@ -65488,16 +65498,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
 	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
-	// ... It's cheap discoverability"*; revised 2026-10-24: nothing is pinned, and
-	// Properties, Settings, Libraries (right) and the Scenario manager, User manual (left) are auto-hide tabs,
+	// ... It's cheap discoverability"*; revised 2026-10-24: Settings is pinned and
+	// Properties, Libraries (right) and the Scenario manager, User manual (left) are auto-hide tabs,
 	// so a visitor meets both ways of working with a box). Named by box and not by label so a
-	// renamed row changes nothing here. `pinned` leaves auto-hide off. Only a browser that holds NO
+	// renamed row changes nothing here. `pinned` leaves auto-hide off, on a PC only (a phone auto-hides every
+	// dock). Settings starts pinned on a PC, "as a demonstration of the two states" (Tom, 2026-10-26). Only a browser that holds NO
 	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
 	// alone. One list for a PC and a phone (Tom, 2026-10-24: "for PC and phone"). Nothing is stored
 	// until the visitor changes something (boxSaveHeld()).
 	var LPN_DEFAULT_DOCKS = [
 		{ id: 'lpn_popup', side: 'right' },
-		{ id: 'lpn_settings_box', side: 'right' },
+		{ id: 'lpn_settings_box', side: 'right', pinned: true },
 		{ id: 'lpn_library_box', side: 'right' },
 		{ id: 'lpn_sm_box', side: 'left' },
 		{ id: 'lpn_hotkeys_popup', side: 'left' }
@@ -65536,7 +65547,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var d = byId[r.id];
 			if (!d) { return; }
 			d.rec.dock = r.side;
-			if (r.pinned) { delete d.rec.autohide; } else { d.rec.autohide = true; }
+			if (r.pinned && !smallScreen()) { delete d.rec.autohide; } else { d.rec.autohide = true; }
 			d.rec.dockOrd = ord[r.side]++;
 			d.open = true;
 			d.byDefault = true;

@@ -1,7 +1,8 @@
 // THE SETTINGS LABELS ROWS NEVER WRAP, AND NO COLUMN IS CUT OFF (Tom, 2026-10-25, phone and PC).
 // Real Chromium, Settings > Labels, on a 390 x 844 phone and on a 1366 x 768 PC, in Base and with a
 // scenario override on a label row (the override mark adds a control to the row):
-//   1. every labels row (node, link, Text) keeps all its controls in one horizontal band (text inside a cell may wrap);
+//   1. every labels row (node, link, Text) keeps its six controls (the group Bef. to Drop) in one horizontal band (text inside a cell may wrap;
+//      the group sitting beside or below the name is settings-labels-wrap-browser-harness.js);
 //   2. the Show and Drop columns are fully visible or reachable by scrolling the content pane
 //      sideways, and no ancestor between them and the pane clips them;
 //   3. a two-digit Drop value is not clipped, and the default PC box fits the table with its override column;
@@ -37,7 +38,7 @@ async function measure(page) {
 		const c = document.getElementById('lpn_setbox_content');
 		const out = { rows: 0, wrapped: [], clipped: [], pane: c.clientWidth, scroll: c.scrollWidth, cols: null, index: null };
 		const ix = document.querySelector('.lpn-setbox-index');
-		out.listW = Math.max.apply(null, lists.map((id) => { const e = document.getElementById(id); return e ? Math.max.apply(null, Array.from(e.children).filter((r) => r.children.length >= 4).map((r) => Math.round(r.lastElementChild.getBoundingClientRect().right - r.getBoundingClientRect().left))) : 0; }));
+		out.listW = Math.max.apply(null, lists.map((id) => { const e = document.getElementById(id); return e ? Math.max.apply(null, Array.from(e.children).filter((r) => r.querySelector(':scope > .lpn-lblgroup')).map((r) => Math.round(r.querySelector(':scope > .lpn-lblgroup').getBoundingClientRect().right - r.getBoundingClientRect().left))) : 0; }));
 		out.wide = Array.from(c.querySelectorAll('*')).filter((e) => e.offsetParent && e.getBoundingClientRect().right > c.getBoundingClientRect().left + c.clientWidth + 5).slice(0, 3).map((e) => e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 20));
 		out.dbg = Array.from(document.getElementById(lists[0]).children).slice(0, 3).map((r) => Math.round(r.getBoundingClientRect().width) + ':' + Array.from(r.children).map((k) => Math.round(k.getBoundingClientRect().width)).join(','));
 		out.cut = [];
@@ -47,9 +48,9 @@ async function measure(page) {
 		});
 		// A two-digit Drop value: typed into the Drop box of a row that has one, then read back unclipped.
 		out.dropClip = [];
-		const dropRow = Array.from(document.getElementById(lists[0]).children).filter((r) => r.children.length === 7 && r.children[6].tagName === 'INPUT')[0];
+		const dropRow = Array.from(document.getElementById(lists[0]).children).filter((r) => { const g = r.querySelector(':scope > .lpn-lblgroup'); return g && g.children.length === 6 && g.children[5].tagName === 'INPUT'; })[0];
 		if (dropRow) {
-			const inp = dropRow.children[6], was = inp.value;
+			const inp = dropRow.querySelector('.lpn-lblgroup').children[5], was = inp.value;
 			inp.value = '88';
 			if (inp.scrollWidth > inp.clientWidth + 1) { out.dropClip.push(inp.scrollWidth + '>' + inp.clientWidth); }
 			inp.value = was;
@@ -59,7 +60,7 @@ async function measure(page) {
 			const box = document.getElementById(id);
 			if (!box) { return; }
 			Array.from(box.children).forEach((row, ri) => {
-				if (!row.offsetParent || row.children.length < 4) { return; }
+				if (!row.offsetParent || !row.querySelector(':scope > .lpn-lblgroup')) { return; }
 				out.rows++;
 				const kids = Array.from(row.children).filter((k) => k.getClientRects().length);
 				const tops = kids.map((k) => Math.round(k.getBoundingClientRect().top));
@@ -72,7 +73,7 @@ async function measure(page) {
 				// (a name, a heading) may wrap, mid-word included. So only the controls are compared: every box and tick of
 				// the row sits in one horizontal band.
 				const heads = ri === 0;
-				const ys = Array.from(row.children).map((k) => k.matches('input') ? k : k.querySelector('input')).filter((k) => k && k.offsetParent)
+				const ys = Array.from((row.querySelector(':scope > .lpn-lblgroup') || row).children).map((k) => k.matches('input') ? k : k.querySelector('input')).filter((k) => k && k.offsetParent)
 					.map((k) => { const q = k.getBoundingClientRect(); return q.top + q.height / 2; });
 				if (!heads && ys.length > 1 && Math.max.apply(null, ys) - Math.min.apply(null, ys) > 8) {
 					out.wrapped.push(id + ':' + (nameEl.textContent || '').trim().slice(0, 20) + ' controls span ' + Math.round(Math.max.apply(null, ys) - Math.min.apply(null, ys)) + ' px');
@@ -86,8 +87,8 @@ async function measure(page) {
 			const box = document.getElementById(id);
 			if (!box) { return; }
 			Array.from(box.children).forEach((row) => {
-				if (!row.offsetParent || row.children.length < 4) { return; }
-				const last = row.lastElementChild; last.scrollIntoView({ inline: 'end', block: 'nearest' }); const r = last.getBoundingClientRect();
+				if (!row.offsetParent || !row.querySelector(':scope > .lpn-lblgroup')) { return; }
+				const last = row.querySelector(':scope > .lpn-lblgroup'); last.scrollIntoView({ inline: 'end', block: 'nearest' }); const r = last.getBoundingClientRect();
 				if (r.right > cr.right + 1 || r.left < cr.left - 1) { out.clipped.push(id + ' last cell right ' + Math.round(r.right) + ' > pane ' + Math.round(cr.right)); }
 				for (let e = last.parentElement; e && e !== c; e = e.parentElement) {
 					const o = getComputedStyle(e);
@@ -97,7 +98,7 @@ async function measure(page) {
 		});
 		c.scrollLeft = 0;
 		const head = document.getElementById(lists[0]).children[0];
-		out.cols = Array.from(head.children).map((x) => Math.round(x.getBoundingClientRect().width));
+		out.cols = Array.from(head.querySelector('.lpn-lblgroup').children).map((x) => Math.round(x.getBoundingClientRect().width));
 		return out;
 	}, LISTS);
 }
