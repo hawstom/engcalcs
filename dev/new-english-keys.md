@@ -624,7 +624,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**93 still to read**, of 136 new keys across 15 unmerged branch(es).
+**103 still to read**, of 146 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -635,20 +635,43 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1026b (`fd847c6d3`) — adds no English strings
+### chore/merge-1026b (`cd5411edc`) — adds no English strings
 
-### feat/box-rows (`857eb07c0`) — already merged into feat/box-rows-properties; its strings are listed there
+### feat/box-rows-properties (`19d84f3a7`) — 5 new, 5 to read @@ NEEDS RULING
 
-### feat/box-rows-properties (`deb28912a`) — adds no English strings
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol_unit`**
+  > {label}, {symbol} ({unit})
+  @@ NEEDS RULING
+- **`lpn_prop_label_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-buttons (`593bb7817`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/report-buttons (`9c25c0dfc`) — 4 new, 4 to read @@ NEEDS RULING
 
+- **`lpn_heading_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration_short`**
+  > {chemical} conc.
+  @@ NEEDS RULING
 - **`lpn_report_copy_html`**
   > Copy HTML
+  @@ NEEDS RULING
+- **`lpn_result_concentration_short`**
+  > Conc.
   @@ NEEDS RULING
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
@@ -1024,17 +1047,26 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
+### fix/bottom-pane-lag-2 (`4cda2370a`) — adds no English strings
+
 ### fix/dup-keys (`4cca5839a`) — already merged into chore/merge-1026b; its strings are listed there
 
 ### fix/example-crs (`014a92cd7`) — already merged into chore/merge-1026b; its strings are listed there
 
-### fix/phone-select (`92bd41410`) — 16 new, 16 to read @@ NEEDS RULING
+### fix/form-restore (`b2365d3f8`) — already merged into chore/merge-1026b; its strings are listed there
+
+### fix/open-docked (`7af58dac7`) — already merged into chore/merge-1026b; its strings are listed there
+
+### fix/phone-select (`17a3496c2`) — 18 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_morph_vertex`**
   > Vertex
   @@ NEEDS RULING
 - **`lpn_morph_vertex_base`**
   > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_also`**
+  > Initial quality {quality} is cleared too.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_clear_both`**
   > Clear elevation {elev} and demands {demands} on {id}?
@@ -1044,6 +1076,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_morph_vertex_clear_elev`**
   > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_quality`**
+  > Clear initial quality {quality} on {id}?
   @@ NEEDS RULING
 - **`lpn_morph_vertex_customers`**
   > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.

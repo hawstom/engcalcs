@@ -97,7 +97,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-26 (forty-first session, Opus main, Sonnet agents)
 
-- **Merged 2026-10-25 on his word:** `fix/browser-pass-a`, `fix/dock-widths` (830 closed). Merged 2026-10-26 on green (defect): `fix/bottom-pane-lag` (a shut pane is `lpn-pane-shut`, content-visibility hidden, not display:none). Merged 2026-10-26 on his word: `fix/example-crs` (826 closed), `fix/dup-keys` (49 keys).
+- **Merged 2026-10-25 on his word:** `fix/browser-pass-a`, `fix/dock-widths` (830 closed). Merged 2026-10-26 on green (defect): `fix/bottom-pane-lag` (a shut pane is `lpn-pane-shut`, content-visibility hidden, not display:none). Merged 2026-10-26 on his word: `fix/example-crs` (826 closed), `fix/dup-keys` (49 keys). On green (defects): `fix/open-docked` (`revealBox()`, links fly out a tucked box), `fix/form-restore` (autocomplete off on every Looped-Network control: Chrome's back/forward refill shifted values by position).
 - **Waiting on his browser pass** (previews page): `fix/phone-select` (827, with Basic-mode Scenario manager and first-view docks), `feat/box-rows-properties` (828; supersedes `feat/box-rows`, kill that one when this merges), `feat/report-buttons` (829, print widths fixed), `feat/shape-scenario` (831, on `feat/scenario-io`), `feat/value-source`, `feat/scenario-io`.
 - **His calls 2026-10-25:** word wrap, mid-word included, is fine; a Settings labels row's CONTROLS never reflow onto two lines. Phone map pan dropped. Water menu loses Properties.
 - **Seams at merge:** phone-select vs box-rows-properties (Properties box CSS); box-rows vs report-buttons (Fire flow box).
