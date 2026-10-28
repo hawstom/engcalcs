@@ -232,6 +232,21 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	asked = []; answer = true; sel(L, [J]);
 	L.morphVertex();
 	ok('5.3 the button switches to Base and morphs the junction', L.serializeProject().project.activeScenario !== sc.id && !L.nodeById(J), JSON.stringify(L.serializeProject().project.activeScenario));
+	// 5.4: the junction has an elevation, so Base asks a second question; declining it returns to the scenario.
+	L.undo();
+	ok('5.4a undo restored the junction', !!L.nodeById(J));
+	L.switchScenario(L.baseScenario().id);
+	L.nodeById(J).elev = 210;
+	L.switchScenario(sc.id);
+	sel(L, [J]);
+	let seq = [true, false]; asked = [];
+	global.window.confirm = global.confirm = (t) => { asked.push(t); return seq.shift(); };
+	L.morphVertex();
+	ok('5.4b two questions were asked (the switch, then the clear)', asked.length === 2 && /elevation/i.test(asked[1]), JSON.stringify(asked));
+	ok('5.4c declining the second returns to the scenario they came from, nothing morphed', L.serializeProject().project.activeScenario === sc.id && !!L.nodeById(J), L.serializeProject().project.activeScenario);
+	seq = [true, true]; asked = []; sel(L, [J]);
+	L.morphVertex();
+	ok('5.4d accepting both morphs in Base', L.serializeProject().project.activeScenario !== sc.id && !L.nodeById(J));
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });

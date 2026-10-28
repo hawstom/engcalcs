@@ -40830,7 +40830,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			(labelsByLinkAnchor[S.id] = labelsByLinkAnchor[S.id] || []).push(id);
 		});
 	}
-	function morphJunctionsToVertices() {
+	function morphJunctionsToVertices(backTo) {
 		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
 			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
 		if (!nodes.length) { return 0; }
@@ -40838,16 +40838,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **THE REFUSAL OFFERS THE WAY OUT** (Tom, 2026-10-27: "a dialog that offers the switch"). A
 			// scenario other than Base can switch to Base and morph; Base naming another alternative cannot.
 			if (!activeScenario().isBase) {
+				var was0 = activeScenario().id;
 				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex',
 					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?',
 					ok: pc.lpn_morph_vertex_switch || 'Switch to Base and morph', cancel: pc.lpn_cancel || 'Cancel' },
-				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(); } });
+				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(activeScenario().id === baseScenario().id ? was0 : null); } });
 				return 0;
 			}
 			setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.');
 			return 0;
 		}
 		function finish() {
+			// Came here by "Switch to Base and morph" and the visitor declined the next question (or nothing was
+			// morphed): they go back to the scenario they were working in, not left in Base with nothing done.
+			if (backTo && !done) { switchScenario(backTo); }
 			if (done) {
 				buildDom();
 				refreshScenarioMarks();
