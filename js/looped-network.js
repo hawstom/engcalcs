@@ -40820,7 +40820,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
 			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
 		if (!nodes.length) { return 0; }
-		if (!inBaseFor('topology')) { setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.'); return 0; }
+		if (!inBaseFor('topology')) {
+			// **THE REFUSAL OFFERS THE WAY OUT** (Tom, 2026-10-27: "a dialog that offers the switch"). A
+			// scenario other than Base can switch to Base and morph; Base naming another alternative cannot.
+			if (!activeScenario().isBase) {
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex',
+					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.',
+					ok: pc.lpn_morph_vertex_switch || 'Switch to Base and morph', cancel: pc.lpn_cancel || 'Cancel' },
+				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(); } });
+				return 0;
+			}
+			setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.');
+			return 0;
+		}
 		function finish() {
 			if (done) {
 				buildDom();

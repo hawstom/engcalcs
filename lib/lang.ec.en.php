@@ -1723,6 +1723,8 @@ $ec_lang['lpn_morph_ok']='Morph';
 // pipes and holds nothing of its own can become one.
 $ec_lang['lpn_morph_vertex']='Vertex';
 $ec_lang['lpn_morph_vertex_base']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.';
+$ec_lang['lpn_morph_vertex_base_ask']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?';
+$ec_lang['lpn_morph_vertex_switch']='Switch to Base and morph';
 $ec_lang['lpn_morph_vertex_type']='{id} was not morphed into a vertex: only a junction can become one.';
 $ec_lang['lpn_morph_vertex_links']='{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.';
 $ec_lang['lpn_morph_vertex_kind']='{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.';

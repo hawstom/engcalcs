@@ -219,14 +219,19 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	ok('4b.3 the answer is what the flipped split gave', worst(base0, heads(L)) < 1e-9 || worst(base0, heads(L)) - worst(base0, flipped) < 1e-9, 'merged vs Net1 ' + worst(base0, heads(L)) + ', flipped split vs Net1 ' + worst(base0, flipped));
 	L.undo();
 
-	console.log('\n--- 5. a scenario other than Base refuses ---');
+	console.log('\n--- 5. a scenario other than Base asks, and offers the switch ---');
 	const sc = L.createScenario('Check');
 	L.switchScenario(sc.id);
 	sel(L, [J]);
+	global.window.confirm = global.confirm = (t) => { asked.push(t); return answer; };
 	const bf = JSON.stringify(L.serializeProject());
-	const dn = L.morphVertex();
-	ok('5.1 refused in the scenario, by sentence', dn === 0 && L.lastNotice() === PC.lpn_morph_vertex_base, L.lastNotice());
-	ok('5.2 ...and nothing changed', JSON.stringify(L.serializeProject()) === bf);
+	asked = []; answer = false;
+	let dn = L.morphVertex();
+	ok('5.1 a dialog asks, naming the reason and the switch', dn === 0 && asked.length === 1 && asked[0].indexOf(PC.lpn_morph_vertex_base) === 0 && PC.lpn_morph_vertex_switch === 'Switch to Base and morph', JSON.stringify(asked));
+	ok('5.2 Cancel leaves everything as it was, still in the scenario', JSON.stringify(L.serializeProject()) === bf);
+	asked = []; answer = true; sel(L, [J]);
+	L.morphVertex();
+	ok('5.3 the button switches to Base and morphs the junction', L.serializeProject().project.activeScenario !== sc.id && !L.nodeById(J), JSON.stringify(L.serializeProject().project.activeScenario));
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });
