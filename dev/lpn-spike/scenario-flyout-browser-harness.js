@@ -254,7 +254,9 @@ async function main() {
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(900);
 		const boxD = await rect('#lpn_sm_box'), flyD = await rect('#lpn_sm_table'), mapD2 = await rect('#lpn_canvas');
-		ok('3.5 docked at the right, the table is in the docked box, at its inline end', (await flyShown()) && flyD.r <= boxD.r && flyD.l > boxD.l + 150 && boxD.r >= 1590, JSON.stringify([boxD, flyD]));
+		// A docked box ends at the edge-tab strip, which reserves 24 px (box-design, ffb7735f7 pinned-tab), not at the window edge.
+		const stripD = await rect('#lpn_dock_strip_right');
+		ok('3.5 docked at the right, the table is in the docked box, at its inline end', (await flyShown()) && flyD.r <= boxD.r && flyD.l > boxD.l + 150 && stripD.w > 0 && stripD.w <= 30 && Math.abs(boxD.r - stripD.l) <= 3 && stripD.r >= 1596, JSON.stringify([boxD, flyD, stripD]));
 		ok('3.6 ...and the box is wide enough to be a table', flyD.w >= 280, JSON.stringify(flyD));
 		ok('3.7 ...the map gives up the column', mapD2.r <= boxD.l + 1, JSON.stringify([boxD, mapD2]));
 		m = await divMid();

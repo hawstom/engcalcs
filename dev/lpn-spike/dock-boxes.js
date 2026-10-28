@@ -31,7 +31,7 @@ async function clickNode(a) {
 		const ns = Array.from(document.querySelectorAll('#lpn_canvas .lpn-symbols circle:not(.lpn-node-hit)')).filter((c) => {
 			const r = c.getBoundingClientRect();
 			const e = r.width > 0 ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null;
-			return !!e && !e.closest('.lpn-dock-strip, .lpn-popover');
+			return !!e && !e.closest('.lpn-dock-strip, .lpn-popover, .lpn-color-legend');   // the colour legend (shown while a contour plot is open) also sits over the map and swallows a click
 		});
 		const r = ns[Math.floor(ns.length / 2)].getBoundingClientRect();
 		return { x: r.left + r.width / 2, y: r.top + r.height / 2 };

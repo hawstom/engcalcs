@@ -186,7 +186,7 @@ async function main() {
 		ok('1.20 auto-hidden, its dock tab names the box without the ?', dockTab === await L('lpn_sm_title'), String(dockTab));
 		await dockClick('.lpn-dock-tab[aria-controls=lpn_sm_box]');
 		await dockClick('#lpn_sm_box [data-dock="autohide"]');
-		ok('1.21 pinned again, the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && !document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]')));
+		ok('1.21 pinned again, the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && (document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]') || {getAttribute: () => null}).getAttribute('aria-pressed') === 'true'));   // a pinned docked box keeps its edge tab, pressed (ffb7735f7), no longer removes it
 		await click('#lpn_sm_add');
 		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base']), JSON.stringify(await names()));
 		await page.keyboard.type('Peak');

@@ -130,8 +130,8 @@ async function main() {
 		ok('the residual verdict leads with a check or a warning', report.indexOf(holdsLead) > 0 || report.indexOf(failsLead) > 0);
 		ok('the tank verdict is there', report.indexOf(noEmpty) > 0 || report.indexOf(emptiesLead) > 0);
 		const tables = await a.page.$$eval('#lpn_ff_report table', (ts) => ts.map((t) => [...t.querySelectorAll('tbody tr')].map((tr) => [...tr.children].map((c) => c.textContent.trim()))));
-		ok('a tank table with 7 columns and a 25-step pressure table', tables.length === 2 && tables[0].length === 1 && tables[0][0].length === 7 && tables[1].length === 25, tables.map((t) => t.length).join(',') + ' / ' + (tables[0][0] || []).join(' | '));
-		ok('the tank row gives its minimum (100, the unit is in the heading), margin, and drop from the start', /^100$/.test(tables[0][0][2]) && /^[\d.]+$/.test(tables[0][0][3]) && /^[\d.]+$/.test(tables[0][0][4]), tables[0][0].join(' | '));
+		ok('a tank table with 8 columns (Lowest level reached is split into Level and Time, 6a7bce3ca) and a 25-step pressure table', tables.length === 2 && tables[0].length === 1 && tables[0][0].length === 8 && tables[1].length === 25, tables.map((t) => t.length).join(',') + ' / ' + (tables[0][0] || []).join(' | '));
+		ok('the tank row gives the time of its lowest level, its minimum (100, the unit is in the heading), margin, and drop from the start', /^\d+:\d\d$/.test(tables[0][0][2]) && /^100$/.test(tables[0][0][3]) && /^[\d.]+$/.test(tables[0][0][4]) && /^[\d.]+$/.test(tables[0][0][5]), tables[0][0].join(' | '));
 		const backLead = (await a.lang('lpn_dur_not_back_tank')).split('{id}')[0].replace('{time}', '24:00');
 		ok('the not-recovered verdict reads as information about the tank, with its tolerance', report.indexOf(backLead) > 0 && /tolerance of 0\.3/.test(report), report.slice(report.indexOf(backLead), report.indexOf(backLead) + 200));
 		const series = tables[1];

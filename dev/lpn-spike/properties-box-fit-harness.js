@@ -93,19 +93,22 @@ async function main() {
 			ok('at most 5% of the rows (and at least one) wrap on open', at.wrapped <= allow(at.rows), at.wrapped + '/' + at.rows);
 			if (kind === 'pump') { ok('the pump opens well under the 652 px its prose note needs', o.w < 500, String(o.w)); }
 			if (kind === 'pipe' || kind === 'pump') {
-				// Minimal: a few pixels narrower must wrap more than the 5% allowance (or hit the CSS minimum).
+				// Minimal: the box is as wide as its grid asks for and no wider. On the row grid (Task 828) nothing re-wraps as the
+				// box narrows, and since the borderless-cell change (box-design, 2026-10-27) the value track is no longer
+				// max-content, so 8 px less no longer scrolls the grid sideways. What the open width is held to now: the grid's
+				// own max-content width plus the box's chrome (popupFitWidth), within 4 px (rounding and the 2 px margin
+				// allowance).
 				const min = await page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('lpn_popup')).minWidth));
-				// On the row grid (Task 828) nothing re-wraps as the box narrows: the tracks are as wide
-				// as their contents, so the box is minimal when 8 px less makes its body scroll sideways.
-				const clipped = await page.evaluate((w) => {
-					const popup = document.getElementById('lpn_popup'), body = popup.querySelector('.lpn-popover-body'), keep = popup.style.width;
-					popup.style.width = w + 'px';
-					const over = body.scrollWidth - body.clientWidth;
-					popup.style.width = keep;
-					return over;
-				}, o.w - 8);
-				ok('8 px narrower would scroll the grid sideways (or is below the minimum)',
-					clipped > 0 || o.w - 8 < min, o.w + ' wide; ' + clipped + ' px over at ' + (o.w - 8) + '; min ' + min);
+				const ask = await page.evaluate(() => {
+					const popup = document.getElementById('lpn_popup'), body = popup.querySelector('.lpn-popover-body'), keep = body.style.width;
+					const chrome = popup.getBoundingClientRect().width - body.getBoundingClientRect().width;
+					body.style.width = 'max-content';
+					const w = body.getBoundingClientRect().width;
+					body.style.width = keep;
+					return { asks: Math.round(w + chrome), popup: Math.round(popup.getBoundingClientRect().width) };
+				});
+				ok('the box is as wide as its grid asks for (within 4 px), or at the CSS minimum',
+					Math.abs(ask.popup - ask.asks) <= 4 || ask.popup <= min + 1, JSON.stringify(ask) + '; min ' + min);
 			}
 			// Selecting another element while it is open does not change the width.
 			const other = await page.evaluate(() => {

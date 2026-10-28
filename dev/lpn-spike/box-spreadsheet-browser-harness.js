@@ -233,11 +233,13 @@ async function main() {
 		await openPipe(d);
 		await drag(d.page, '#lpn_popup .lpn-popover-body', 900);
 		await d.settle(300);
+		// Properties cells are borderless and fill the value track (box-rows-properties), so an input's right edge now meets the
+		// box edge exactly; clipped means past it, not touching it.
 		const cap = await d.page.evaluate(() => {
 			const body = document.querySelector('#lpn_popup .lpn-popover-body'), R = (e) => e.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 			const ins = Array.from(body.querySelectorAll('#lpn_popup_fields input, #lpn_popup_fields select')).filter((e) => R(e).width > 0 && !e.closest('table'));
 			const lab = R(body.querySelector('.lpn-ghlabel')), edge = R(body).right;
-			return { valueRem: (edge - lab.right) / rem, clipped: ins.filter((e) => R(e).right > edge - 1 || e.scrollWidth > e.clientWidth + 1 && e.tagName === 'SELECT').length, scroll: body.scrollWidth - body.clientWidth };
+			return { valueRem: (edge - lab.right) / rem, clipped: ins.filter((e) => R(e).right > edge + 1 || e.scrollWidth > e.clientWidth + 1 && e.tagName === 'SELECT').length, scroll: body.scrollWidth - body.clientWidth };
 		});
 		ok('dragging the divider far right still leaves the Value column 9.5 rem, no input clipped', cap.valueRem >= 9.5 && cap.clipped === 0 && cap.scroll <= 1, JSON.stringify(cap));
 		await d.close();
