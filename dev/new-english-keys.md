@@ -227,7 +227,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Step of lowest flow
   _Ruled OK 2026-10-20._
 - **`lpn_ff_col_more`**
-  > More affected
+  > And others
   @@ NEEDS RULING
 - **`lpn_ff_no_steps`**
   > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
@@ -738,7 +738,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**76 still to read**, of 119 new keys across 9 unmerged branch(es).
+**86 still to read**, of 129 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -749,7 +749,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`6ae748b21`) — adds no English strings
+### box-design (`6251d2dc8`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -961,6 +961,33 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
+### feat/starter-example (`54d2059a4`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_ex_extension_desc`**
+  > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_extension_si_desc`**
+  > Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_extension_si_title`**
+  > Fire flow extension, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_extension_title`**
+  > Fire flow extension, gpm (US)
+  @@ NEEDS RULING
+- **`lpn_ex_well_desc`**
+  > Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_well_si_desc`**
+  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 255 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_well_si_title`**
+  > Community well and tank, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_well_title`**
+  > Community well and tank, gpm (US)
+  @@ NEEDS RULING
+
 ### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
@@ -1127,3 +1154,18 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
+
+### fix/box-style (`8f3662b4f`) — already merged into box-design; its strings are listed there
+
+### fix/box-words (`0d4a73575`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_morph_vertex_base_ask`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_switch`**
+  > Switch to Base and morph
+  @@ NEEDS RULING
+
+### fix/report-width (`8f3662b4f`) — already merged into box-design; its strings are listed there
+
+### fix/settings-fit (`8f3662b4f`) — already merged into box-design; its strings are listed there

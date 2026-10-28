@@ -6521,6 +6521,15 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 /* Column width is king (CLAUDE.md): the table is read in a box a reader may have made narrow, so
    the id column wraps rather than pushing the numbers off the edge. */
 .lpn-ff-tablewrap { overflow-x: auto; }
+/* **A REPORT NEVER WIDENS ITS BOX** (Tom, 2026-10-27: "this approach, if not applied with aggressive
+   economy, can result in more wasted width"). The report host is a box grid whose value track is
+   `minmax(max-content, 1fr)`, so the one-line width of a table (or of a long note spanning the
+   box) stretched the whole box: Scenario comparison measured 1213 px in an 814 px box. Here the value
+   track may shrink to nothing, so a table fills the box and its wrap scrolls only past its
+   narrowest layout. */
+@supports (grid-template-columns: subgrid) {
+	.lpn-ff-report.lpn-gridhost { grid-template-columns: var(--lpn-g-name, max-content) minmax(0, 1fr); }
+}
 /* Task 752: the Results by asset table in Scenario comparison. */
 .lpn-scnres { margin-top: .8em; }
 .lpn-scnres-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .3em 1em; margin: .3em 0; }
@@ -6534,16 +6543,18 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-goto { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; text-align: inherit; }
 .lpn-ff-goto:hover, .lpn-ff-goto:focus-visible { color: var(--ec-hue-0b0080); }
 /* EVERY HEADING SORTS (Tom, 2026-09-28: "Sort Fire flow analysis columns."): the Tables pane's own
-   arrow (.lpn-pane-sortarrow, below), in a gutter kept clear for it, shown on the sorted column and
-   on a heading under the pointer or holding keyboard focus. */
-.lpn-ff-table th.lpn-ff-sortable { position: relative; padding-inline-end: 18px; cursor: pointer; }
+   arrow (.lpn-pane-sortarrow, below), laid over the heading's corner at zero layout cost as the
+   pane does (no gutter: 18 px of it on each of 13 columns made Fire flow 156 px wider), shown on the
+   sorted column and on a heading under the pointer or holding keyboard focus. */
+.lpn-ff-table th.lpn-ff-sortable { position: relative; cursor: pointer; }
 .lpn-ff-table th.lpn-ff-sortable .lpn-ff-sortarrow { top: 2px; }
 .lpn-ff-table th.lpn-ff-sortable:hover .lpn-ff-sortarrow,
 .lpn-ff-table th.lpn-ff-sortable:focus-within .lpn-ff-sortarrow { opacity: 1; }
 /* COLUMN WIDTH IS KING, and ten columns in one table is where that stops being a slogan: the
    headings wrap mid-word rather than widening, and only the id and the two sentence-shaped cells
-   are allowed to grow. */
-.lpn-ff-table th { font-weight: bold; white-space: normal; }
+   are allowed to grow. A heading is set at .9em of the table's .9em, because its longest word (Pressure,
+   Available) is what fixes each narrow column's width: Fire flow's 13 columns measured 868 px at 1em. */
+.lpn-ff-table th { font-weight: bold; white-space: normal; font-size: .9em; }
 /* The global `table, th, tr, td { border: 1px solid blue }` (top of this file) is the calculator
    forms' debugging grid; these tables want a hairline under each row and nothing else. */
 .lpn-ff-table, .lpn-ff-table tr { border: 0; }

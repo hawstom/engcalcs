@@ -80518,8 +80518,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[pc.lpn_crit_col_asset || 'Asset', null, false, worstG],
 			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
 			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
-		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time', null, false, worstG]] : []).concat([
-			[pc.lpn_ff_col_more || 'More affected', null, false, worstG],
+		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time (hr)', null, false, worstG]] : []).concat([
+			[pc.lpn_ff_col_more || 'And others', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
@@ -80533,9 +80533,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
-			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
-			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
+			// **ONE SENTENCE SPANS THE THREE COLUMNS IT WOULD OTHERWISE REPEAT** (Tom, 2026-10-27: "Static
+			// failed, so not checked" in three adjacent cells wasted width and height). Each of the three
+			// still counts as a column in a copy and the CSV (reportDomBlocksOf()); the sort reads records.
+			var atReq = ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'), avail = ffAvailableText(rec),
+				resid = ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'), why = pc.lpn_ff_static_failed || 'Static failed, so not checked';
+			if (atReq === why && avail === why && resid === why) { ffCell(tr, why).colSpan = 3; }
+			else { ffCell(tr, atReq); ffCell(tr, avail); ffCell(tr, resid); }
 			ffCriticalCells(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
@@ -81101,7 +81105,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (d.tanks.length) {
 			body = durTable(host, [pc.lpn_time_tank || 'Tank', [pc.lpn_col_level || 'Level', pc.lpn_dur_col_low || 'Lowest level reached'],
-				[pc.lpn_full_col_time || 'Time', pc.lpn_dur_col_low || 'Lowest level reached'],
+				[pc.lpn_full_col_time || 'Time (hr)', pc.lpn_dur_col_low || 'Lowest level reached'],
 				pc.lpn_field_tank_minlevel || 'Lowest water depth', pc.lpn_dur_col_margin || 'Above lowest water depth',
 				pc.lpn_dur_col_drop || 'Drop from start',
 				pc.lpn_dur_col_end || 'Level at end', pc.lpn_dur_col_end_nofire || 'Level at end without the fire']);
@@ -81356,7 +81360,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// "97.01 psi at 4:00" is a Junction, a Pressure and a Time. Whole-run columns only.
 		var gUnserved = pc.lpn_crit_col_unserved_peak || 'Largest demand not served',
 			gLow = pc.bpn_p_min || 'Lowest pressure', gEmpty = pc.lpn_crit_col_empty || 'Tank empties',
-			tTime = pc.lpn_full_col_time || 'Time', anyStop = false, lowTip = pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
+			tTime = pc.lpn_full_col_time || 'Time (hr)', anyStop = false, lowTip = pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
 		if (set.wholeRun) {
 			anyStop = set.results.some(function (r) { return r.run && typeof r.run.stoppedAt === 'number'; });
 			critColKeys = ['id', 'unserved', 'unservedT', 'cutoff', 'below', 'lowJ', 'lowP', 'lowT', 'hours']
@@ -82580,10 +82584,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_time_hyd_step || 'Hydraulic time step',
 			[pc.lpn_ff_col_junction || 'Junction', null, false, pc.bpn_p_min || 'Lowest pressure'],
 			[pc.lpn_result_pressure || 'Pressure', null, false, pc.bpn_p_min || 'Lowest pressure'],
-			[pc.lpn_full_col_time || 'Time', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_full_col_time || 'Time (hr)', null, false, pc.bpn_p_min || 'Lowest pressure'],
 			[pc.lpn_ds_col_link || 'Link', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
 			[pc.lpn_result_velocity || 'Velocity', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
-			[pc.lpn_full_col_time || 'Time', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity']
+			[pc.lpn_full_col_time || 'Time (hr)', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity']
 		]);
 		scenarioCompareRun.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body), name = scenarioDisplayName(r.scn);
@@ -83218,7 +83222,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
 			return;
 		}
-		body = ffTable(host, [pc.lpn_full_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		body = ffTable(host, [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_status_col_event || 'Event']);
 		events.forEach(function (e) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));
@@ -85007,7 +85011,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function fullReportCsvText(rows) {
 		var pc = EngCalcs.pageConfig || {},
-			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
+			headers = [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
 				.concat(FULL_REPORT_COLS.map(fullReportColHeading)),
 			lines = [headers.map(csvField).join(',')];
 		rows.forEach(function (r) {
@@ -85199,21 +85203,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return { leaf: leaf, grp: grp };
 	}
+	/** A row's cell for each column, a cell that spans columns standing at its first and `null` at the rest. */
+	function reportRowCells(tr) {
+		var out = [], i, n, j;
+		for (i = 0; i < tr.children.length; i++) {
+			out.push(tr.children[i]);
+			n = tr.children[i].colSpan || 1;
+			for (j = 1; j < n; j++) { out.push(null); }
+		}
+		return out;
+	}
 	function reportTableUnits(table) {
-		var ths = reportTableHeads(table).leaf, trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known;
+		var ths = reportTableHeads(table).leaf, trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known, rc = [];
 		if (!ths.length || table._ecUh === trs.length) { return; }
-		for (r = 0; r < trs.length; r++) { if (trs[r].children.length !== ths.length) { return; } }
+		for (r = 0; r < trs.length; r++) { rc.push(reportRowCells(trs[r])); if (rc[r].length !== ths.length) { return; } }
 		table._ecUh = trs.length;
 		for (c = 0; c < ths.length; c++) {
-			if (trs.length && trs[0].children[c].classList.contains('lpn-rpt-id')) {
+			if (trs.length && rc[0][c] && rc[0][c].classList.contains('lpn-rpt-id')) {
 				ths[c].classList.add('lpn-rpt-id');
-				for (r = 0; r < trs.length; r++) { trs[r].children[c].classList.add('lpn-rpt-id'); }
+				for (r = 0; r < trs.length; r++) { if (rc[r][c]) { rc[r][c].classList.add('lpn-rpt-id'); } }
 				continue;
 			}
 			known = ths[c].getAttribute('data-ec-hu');
 			unit = known; ok = true; cells = [];
 			for (r = 0; r < trs.length && ok; r++) {
-				td = trs[r].children[c]; t = (td.textContent || '').replace(/\s+/g, ' ').trim();
+				td = rc[r][c];
+				if (!td) { continue; }   // the tail of a cell that spans columns: nothing of its own to read
+				t = (td.textContent || '').replace(/\s+/g, ' ').trim();
 				u = reportCellUnit(t);
 				if (u === null) { ok = false; break; }
 				if (u) { if (unit === null) { unit = u; } else if (unit !== u) { ok = false; break; } }
@@ -85285,7 +85301,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!rows.length) { return []; }
 		var parts = FULL_REPORT_COLS.map(fullReportColParts);
 		return [{
-			heads: [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			heads: [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
 			hl: ['', '', ''].concat(parts.map(function (p) { return p.label; })),
 			ph: ['', '', ''].concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c, true).label; })),
 			hu: ['', '', ''].concat(parts.map(function (p) { return p.unit; })),
@@ -85408,10 +85424,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/** Self-contained: inline styles only, so it pastes into a mail or a document the same everywhere. */
 	function reportHtmlText(spec, blocks) {
-		var out = ['<p><b>' + reportEsc(reportTitleLine(spec)) + '</b></p>'];
+		// **EVERY WEIGHT IS SAID, AND NO <b> IS USED** (Tom pasted this into Google Docs and every
+		// paragraph and body cell came out bold): a document editor that meets a bare <b> at the head of
+		// a fragment may carry it over everything after, and a cell with no weight of its own took the
+		// bold of the table's head. Bold is a style on the title and on each heading, normal is a style
+		// on everything else, and the whole is wrapped in a normal-weight <div>.
+		var NORMAL = 'font-weight:normal;', out = ['<div style="' + NORMAL + '">', '<p style="font-weight:bold;">' + reportEsc(reportTitleLine(spec)) + '</p>'];
 		blocks.forEach(function (b) {
 			var heads, n, pt, cols, cell, keep;
-			if (!b.heads) { out.push('<p>' + reportEsc(b.text) + '</p>'); return; }
+			if (!b.heads) { out.push('<p style="' + NORMAL + '">' + reportEsc(b.text) + '</p>'); return; }
 			// **WHAT A WORD PROCESSOR HONOURS** (Tom pasted this into Google Docs and got equal columns
 			// with "Junctio|n" and "153|7"): inline styles only (Docs drops <style>), a width on every
 			// column in proportion to its longest unbreakable word, the same measure the printed sheet
@@ -85420,28 +85441,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			n = reportColNeeds(Object.assign({}, b, { trunc: null }), heads);
 			pt = Math.max(5, Math.min(10, Math.floor(460 / n.sum * 10) / 10));
 			cell = 'border:1px solid #999;padding:2px 3px;text-align:left;vertical-align:top;font-size:' + pt + 'pt;';
+			var headStyle = cell + 'font-weight:bold;background:#eee;';
 			cols = n.need.map(function (w) {
 				var pct = (Math.round(w / n.sum * 1000) / 10) + '%';
 				return '<col width="' + pct + '" style="width:' + pct + ';">';
 			}).join('');
 			keep = function (t, c) { return (b.ids && b.ids[c]) || String(reportFigureUnitKept(t)).replace(/\u00A0/g, '').length <= 24 && !/ .* /.test(String(reportFigureUnitKept(t))); };
 			var headCell = function (c, span) {
-				return '<th' + (span ? ' ' + span : '') + ' style="' + cell + 'background:#eee;">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(b.heads[c])) + '</th>';
+				return '<th' + (span ? ' ' + span : '') + ' style="' + headStyle + '">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(b.heads[c])) + '</th>';
 			}, runs = reportHeadRuns(b), thead;
 			// **A COMPOUND HEADING IS A REAL TWO-ROW HEAD** (Task 840): colspan over the group, rowspan 2
 			// on a heading that has no group, so a word processor keeps the structure when it is pasted.
 			if (runs) {
 				thead = '<tr>' + runs.map(function (r) {
 					return r.both ? headCell(r.from, 'rowspan="2"')
-						: '<th colspan="' + r.n + '" style="' + cell + 'background:#eee;text-align:center;">' + reportEsc(r.text) + '</th>';
+						: '<th colspan="' + r.n + '" style="' + headStyle + 'text-align:center;">' + reportEsc(r.text) + '</th>';
 				}).join('') + '</tr><tr>' + b.heads.map(function (h, c) { return b.grp[c] ? headCell(c, '') : ''; }).join('') + '</tr>';
 			} else { thead = '<tr>' + b.heads.map(function (h, c) { return headCell(c, ''); }).join('') + '</tr>'; }
-			out.push('<table style="border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead>' + thead +
+			out.push('<table style="' + NORMAL + 'border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead>' + thead +
 				'</thead><tbody>' +
 				b.rows.map(function (r) {
-					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
+					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + NORMAL + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
 				}).join('') + '</tbody></table>');
 		});
+		out.push('</div>');
 		return out.join('\n');
 	}
 	/**
