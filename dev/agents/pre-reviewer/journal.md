@@ -4688,3 +4688,12 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - CITED (arithmetic): well tank 24 ft x 20 ft = 3,384 gal/ft; pump cuts in at 12 ft, min level 2 ft: 33.8k gal below the cut-in; 500 gpm x 2 h = 60k gal; pump adds ~14k. Description claims the water below 12 ft is the fire reserve.
 - OBSERVED: builder's harness 'all passed'; it asserts FH-1 only from the sweep.
 - Shots: _panel/www/img/starter-1027/
+
+# Perry, box-design fb3bf8d14, 2026-10-27 night (settings-fit, box-words, report-width, box-style)
+- OBSERVED (real Chromium, 1366x768 and 390 phone, light and Dark): Settings opens 618 px; at 506 px wrapped rows put the toggle nearer its own inputs than the row above (fix shows); phone dropdown is the heading, no second heading. Net1 Morph vertex in a new scenario: dialog "Switch to Base and morph"/Cancel; Cancel changes nothing; accepting switches to Base, then asks the old "Clear elevation..." confirm, then morphs; undo restores. The switch happens BEFORE the second confirm, so cancelling that one leaves the visitor in Base.
+- OBSERVED: Fire flow (Net3, all junctions) at the 814 px box: no sideways scroll, but body cells "Pressure"/"Design"/"velocity" in Design limit and Failure modes columns break mid-word on every row. Sort arrow is a tiny triangle at the heading's top-right, shown only on the sorted column. Scenario comparison's "same in every scenario" table still carries a Label/Value heading.
+- OBSERVED: Dark and light: every option of every visible select in Properties, Find, Settings, Contour, Fire flow, Criticality, Demand scaling, Full report, Calibration, Scenario comparison readable (contrast >= 4.5, opaque). Computed styles, not the native popup pixels.
+- OBSERVED: Copy HTML pasted into a contenteditable (synthetic paste of the clipboard string): td weight 400, th 700, no b/strong, title paragraph alone bold. Not Google Docs itself.
+- OBSERVED: Properties typing + Tab commits (705 stuck), divider drag narrows name column 154->114. Contour numeric fields fill a 236 px cell, Demand scaling inputs 613 px, as Properties does; phone keeps them narrow.
+- Method: the page's own dialogs are auto-answered by the Session until `delete window.lpnDialogAnswerer`; a test that never deletes it never sees a dialog. Scenario manager menu rows are disabled in the way unless a scenario exists.
+- NOT CHECKED: Google Docs; phone Properties; Tables headings in a browser; mutation of the new harnesses.
