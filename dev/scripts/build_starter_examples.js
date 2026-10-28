@@ -29,6 +29,7 @@ if (!global.EngCalcs.lpnGeorefToLonLat) { require(ROOT + 'js/lpn-georef.js'); }
 const proj4 = require(ROOT + 'js/vendor/proj4.js');
 const DEFS = JSON.parse(fs.readFileSync(ROOT + 'js/data/epsg-proj4.json', 'utf8')).defs;
 
+const PC = global.EngCalcs.pageConfig;   // the page's own preset scenario names, in English
 const FT = 0.3048, GPM_LPS = 1 / 15850.323141488905 * 1000, FTUS = 1200 / 3937;
 const round = (x, d) => Number(x.toFixed(d));
 
@@ -80,10 +81,10 @@ const EXTENSION = {
 	curve: { id: 'SYSTEM', note: 'Existing system from the hydrant flow test: static, mid and max flow', pts: [[0, 143.2], [600, 129.4], [1200, 110.9]] },
 	// Flow tests are scenarios in which every demand is 0 except the flowing hydrant (the page's own preset names).
 	scenarios: [
-		{ name: '1. Flow test: Static', zero: true },
-		{ name: '2. Flow test: Mid', zero: true, flow: ['HYD-F', 600] },
-		{ name: '3. Flow test: Max', zero: true, flow: ['HYD-F', 1200] },
-		{ name: '5. Max Day', mult: 2 }
+		{ name: PC.lpn_scenario_preset_flow_static, zero: true },
+		{ name: PC.lpn_scenario_preset_flow_mid, zero: true, flow: ['HYD-F', 600] },
+		{ name: PC.lpn_scenario_preset_flow_max, zero: true, flow: ['HYD-F', 1200] },
+		{ name: PC.lpn_scenario_preset_max_day, mult: 2 }
 	],
 	texts: (u) => ['Fire flow extension',
 		'SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.',
@@ -126,7 +127,7 @@ const WELL = {
 	pattern: { id: 'DAILY', note: 'Residential diurnal demand', m: [0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1.3, 1.6, 1.4, 1.1, 1.0, 1.1, 1.0, 0.9, 1.0, 1.0, 1.2, 1.5, 1.6, 1.4, 1.1, 1.0, 0.9, 0.6] },
 	controls: ['LINK WP-1 OPEN IF NODE TANK-1 BELOW 12', 'LINK WP-1 CLOSED IF NODE TANK-1 ABOVE 19'],
 	energy: [' Global Efficiency\t65', ' Global Price\t0.12'],
-	scenarios: [{ name: '5. Max Day', mult: 2 }, { name: '6. Peak hour', mult: 3 }],
+	scenarios: [{ name: PC.lpn_scenario_preset_max_day, mult: 2 }, { name: PC.lpn_scenario_preset_peak_hour, mult: 3 }],
 	texts: (u) => ['Community well and tank',
 		'WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.',
 		'Design point: ' + u.q(500) + ' at FH-1 with ' + u.res + ' residual. The 24-hour run switches the pump on tank level.'],

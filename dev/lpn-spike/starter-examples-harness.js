@@ -145,7 +145,7 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		ok('flows agree to 0.5 gpm', wq < 0.5, wq.toFixed(3) + ' gpm');
 
 		console.log('--- normal pressure is 40 to 80 psi');
-		const cond = f.kind === 'ext' ? ['Base', '5. Max Day'] : ['Base', '5. Max Day', '6. Peak hour'];
+		const cond = f.kind === 'ext' ? ['Base', PC.lpn_scenario_preset_max_day] : ['Base', PC.lpn_scenario_preset_max_day, PC.lpn_scenario_preset_peak_hour];
 		for (const name of cond) {
 			const scn = name === 'Base' ? L.getScenarios()[0] : scenarioByName(name);
 			ok('scenario "' + name + '" exists', !!scn);
@@ -180,7 +180,7 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 
 		if (f.kind === 'ext') {
 			console.log('--- the hydrant flow test is reproduced at the pressure hydrant');
-			const want = [['1. Flow test: Static', 62, 0.2], ['2. Flow test: Mid', 56, 0.3], ['3. Flow test: Max', 48, 0.3]];
+			const want = [[PC.lpn_scenario_preset_flow_static, 62, 0.2], [PC.lpn_scenario_preset_flow_mid, 56, 0.3], [PC.lpn_scenario_preset_flow_max, 48, 0.3]];
 			for (const w of want) {
 				const scn = scenarioByName(w[0]);
 				ok('"' + w[0] + '" exists', !!scn);
