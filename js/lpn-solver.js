@@ -1549,6 +1549,13 @@ EngCalcs.lpnSolve = function (model, options) {
 		// bigger network, and it shrinks alongside the change itself when the
 		// solution decays toward zero, which makes the ratio constant and hides
 		// progress entirely. Total demand is fixed, physical, and comparable.
+		//
+		// WITH NO DEMAND ANYWHERE there is no such yardstick; the change is an absolute m3/s. It used
+		// to be read against `tol` (EPANET's Accuracy, 0.001 on the page), so a loop with every
+		// demand at zero stopped once its total change fell under 1 L/s and left 3 gpm circulating
+		// (the Fire flow extension example's Static flow test; EPANET leaves 0.07 gpm). A network
+		// with nothing to deliver is at rest only when the change is a nanolitre per second, so an
+		// absolute change is held to that however loose `tol` is (the convergence test below).
 		maxFlowChange = demandScale > 0 ? sumAbsDq / demandScale : sumAbsDq;
 
 		if (opts.onIteration) { opts.onIteration(iter, maxFlowChange, Q, H); }
@@ -1571,7 +1578,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			}
 		}
 
-		if (maxFlowChange < tol || sumAbsDq < absTol) { done = true; }
+		if (maxFlowChange < (demandScale > 0 ? tol : Math.min(tol, 1e-9)) || sumAbsDq < absTol) { done = true; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
 		// floor of the factorization, then stops improving -- measured on a
