@@ -41265,7 +41265,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		here = names[el.type] || el.type;
-		readonlyField(fields, pc.lpn_full_col_type || 'Type', here, pc.lpn_field_type_tip);
+		readonlyField(fields, pc.lpn_survey_codes_col_type || 'Asset type', here, pc.lpn_field_type_tip);
 		ovmGutter(fields, {
 			el: el, props: ['type'], on: !inBaseFor('topology') && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
