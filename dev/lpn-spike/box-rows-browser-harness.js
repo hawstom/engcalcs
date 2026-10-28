@@ -81,8 +81,8 @@ function facts(page, host) {
 		const rows = Array.from(H.querySelectorAll('.lpn-grow')).filter((r) => r.querySelector('.lpn-gname') && r.querySelector('.lpn-gval'));
 		const box = (e) => { const b = e.getBoundingClientRect(); return { x: Math.round(b.left * 10) / 10, w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10, y: Math.round(b.top) }; };
 		return {
-			rem, host: box(H).w,
-			rows: rows.map((r) => ({ name: box(r.querySelector('.lpn-gname')), val: box(r.querySelector('.lpn-gval')), label: r.querySelector('.lpn-gname').textContent.trim(), id: r.querySelector('.lpn-gval').id || '' }))
+			rem, host: box(H).w, hostRight: Math.round(H.getBoundingClientRect().right),
+			rows: rows.map((r) => ({ name: box(r.querySelector('.lpn-gname')), val: box(r.querySelector('.lpn-gval')), label: r.querySelector('.lpn-gname').textContent.trim(), id: r.querySelector('.lpn-gval').id || '', chk: /^(checkbox|radio)$/.test(r.querySelector('.lpn-gval').type || '') }))
 		};
 	}, host);
 }
@@ -93,13 +93,15 @@ async function sectionAlignment(a, host, label) {
 	const f = await facts(a.page, host);
 	ok(label + ': has rows', f.rows.length >= 4, String(f.rows.length));
 	ok(label + ': every name starts at one x', uniq(f.rows.map((r) => r.name.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.name.x))));
-	ok(label + ': every value starts at one x', uniq(f.rows.map((r) => r.val.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
+	// A toggle stands 6 px in, where the text of the cells beside it starts (the standard sheet style).
+	ok(label + ': every value starts at one x', uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x)).length === 1 && uniq(f.rows.filter((r) => r.chk).map((r) => r.val.x - 6)).every((x) => x === uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x))[0]), JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
 	// A label may wrap (Tom, 2026-10-26); it is never cut.
 	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => n.scrollWidth > n.clientWidth + 1).length, host);
 	ok(label + ': no label is cut', cut === 0, String(cut));
 	ok(label + ': a label wraps in at most three lines', f.rows.every((r) => r.name.h < 4.4 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));
 	const fillers = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gw-fill')).map((e) => e.getBoundingClientRect().width), host);
-	ok(label + ': no control is wider than 17rem', f.rows.every((r) => r.val.w <= 17 * f.rem + 1), JSON.stringify(f.rows.map((r) => r.val.w)));
+	// The standard sheet style: a control fills its Value cell (Tom, 2026-10-27), so the bound is the box's right edge, not 17rem.
+	ok(label + ': no control reaches past the box\'s right edge', f.rows.every((r) => r.val.x + r.val.w <= f.hostRight + 1), JSON.stringify(f.rows.map((r) => r.val.x + r.val.w)) + ' vs ' + f.hostRight);
 	return { f, fillers };
 }
 
@@ -122,8 +124,8 @@ async function main() {
 		const c = await sectionAlignment(a, '#lpn_contour_body', 'contour');
 		const byId = (id) => c.f.rows.filter((r) => r.id === id)[0];
 		const op = byId('lpn_contour_opacity'), iv = byId('lpn_contour_interval');
-		ok('Fill opacity (3 digits) is narrower than Interval (6)', op && iv && op.val.w < iv.val.w, op && iv && (op.val.w + ' < ' + iv.val.w));
-		ok('no row wraps: a value is one line high', c.f.rows.every((r) => r.val.h < 2.2 * c.f.rem), JSON.stringify(c.f.rows.map((r) => r.val.h)));
+		ok('Fill opacity and Interval fill their cells alike (the standard sheet style: no digit-sized boxes)', op && iv && Math.abs(op.val.w - iv.val.w) <= 1, op && iv && (op.val.w + ' vs ' + iv.val.w));
+		ok('no row wraps: a value is one line high, or as high as its wrapped label', c.f.rows.every((r) => r.val.h <= Math.max(2.2 * c.f.rem, r.name.h + 1)), JSON.stringify(c.f.rows.map((r) => [r.val.h, r.name.h])));
 		if (process.env.BOXROWS_SHOT) { await a.page.locator('#lpn_contour_box').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'contour.png') }); }
 		await a.page.evaluate(() => { document.getElementById('lpn_contour_close').click(); });
 

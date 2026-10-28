@@ -78,11 +78,12 @@ async function main() {
 		return { text, need: Math.round(need), have: Math.round(have), ok: need <= have };
 	}, sel);
 	const headerW = (page, root) => page.evaluate((sel) => {
-		const h = document.querySelector(sel + ' .lpn-ghdr .lpn-ghlabel');
+		// No heading row any more (the standard sheet style): the Label column is the width of its first visible cell.
+		const h = Array.from(document.querySelectorAll(sel + ' .lpn-gname')).filter((n) => n.getBoundingClientRect().width > 0)[0];
 		return h ? Math.round(h.getBoundingClientRect().width) : null;
 	}, root);
 	async function drag(page, root, dx) {
-		const b = await page.evaluate((sel) => { const s = document.querySelector(sel + ' .lpn-ghdr .lpn-gsplit'); const r = s.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, root);
+		const b = await page.evaluate((sel) => { const s = document.querySelector(sel + ' .lpn-gsplit'); const r = s.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, root);
 		await page.mouse.move(b.x, b.y);
 		await page.mouse.down();
 		await page.mouse.move(b.x + dx / 2, b.y, { steps: 4 });
@@ -103,7 +104,7 @@ async function main() {
 			const dia = rowOf('Diameter'), len = rowOf('Length'), auto = rowOf('Auto length');
 			const names = Array.from(body.querySelectorAll('.lpn-gname')).filter((e) => R(e).width > 0);
 			const nat = names.map((n) => { const r = document.createRange(); r.selectNodeContents(n); return r.getBoundingClientRect().width; }).sort((x, y) => x - y);
-			const labelCol = hdr ? R(hdr.querySelector('.lpn-ghlabel')).width : 0;
+			const labelCol = R(names[0]).width;
 			const controls = Array.from(body.querySelectorAll('input, select, textarea')).filter((e) => R(e).width > 0 && !e.closest('table'));
 			const bodyR = R(body);
 			return {
@@ -116,7 +117,7 @@ async function main() {
 				cut: controls.filter((e) => R(e).right > bodyR.right + 1).length, scroll: body.scrollWidth - body.clientWidth
 			};
 		});
-		ok('Properties has a header row of Label and Value', JSON.stringify(m.cells) === JSON.stringify(['Label', 'Value']), JSON.stringify(m.cells));
+		ok('Properties has no heading over its Label and Value cells (Tom, 2026-10-27: none, as WaterGEMS)', m.cells.length === 0, JSON.stringify(m.cells));
 		ok('Properties has no third (unit) cell in any row', m.third === 0, String(m.third));
 		ok('a unit stands in its label: "Diameter (in)", the unit in <bdi>', m.diaName === 'Diameter (in)' && m.diaBdi === 1, JSON.stringify({ n: m.diaName, bdi: m.diaBdi }));
 		ok('Length carries its unit and has no Auto toggle beside it', /^Length \(ft\)\s*\??$/.test(m.lenName || ''), m.lenName);
@@ -163,14 +164,14 @@ async function main() {
 		await openBox(a, 'lpn_find_popup');
 		await a.settle(700);
 		const f0 = await headerW(page, '#lpn_find_form');
-		ok('Find and replace has a header row of Label and Value', await page.evaluate(() => { const h = document.querySelector('#lpn_find_form .lpn-ghdr'); return !!h && Array.from(h.querySelectorAll('.lpn-ghcell')).map((c) => c.textContent.trim()).join('|') === 'Label|Value'; }));
+		ok('Find and replace has no heading row, and has the divider', await page.evaluate(() => !document.querySelector('#lpn_find_form .lpn-ghdr') && !!document.querySelector('#lpn_find_form .lpn-gsplit')));
 		await drag(page, '#lpn_find_form', -12);
 		await a.settle(300);
 		const f1 = await headerW(page, '#lpn_find_form');
 		ok('Find: dragging the divider left narrows the Label column', f1 < f0 - 6, f0 + ' -> ' + f1);
 		const s2 = await stored(page);
 		ok('...remembered per box: Properties and Find each have a width', typeof s2.lpn_popup === 'number' && typeof s2.lpn_find_form === 'number', JSON.stringify(s2));
-		await page.evaluate(() => { const s = document.querySelector('#lpn_find_form .lpn-ghdr .lpn-gsplit'); s.dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); });
+		await page.evaluate(() => { const s = document.querySelector('#lpn_find_form .lpn-gsplit'); s.dispatchEvent(new MouseEvent('dblclick', { bubbles: true })); });
 		await a.settle(400);
 		const s3 = await stored(page);
 		ok('a double-click on the divider forgets the Find width and keeps the Properties one', s3.lpn_find_form === undefined && typeof s3.lpn_popup === 'number', JSON.stringify(s3));
@@ -238,13 +239,13 @@ async function main() {
 		const cap = await d.page.evaluate(() => {
 			const body = document.querySelector('#lpn_popup .lpn-popover-body'), R = (e) => e.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
 			const ins = Array.from(body.querySelectorAll('#lpn_popup_fields input, #lpn_popup_fields select')).filter((e) => R(e).width > 0 && !e.closest('table'));
-			const lab = R(body.querySelector('.lpn-ghlabel')), edge = R(body).right;
+			const lab = R(Array.from(body.querySelectorAll('.lpn-gname')).filter((n) => R(n).width > 0)[0]), edge = R(body).right;
 			return { valueRem: (edge - lab.right) / rem, clipped: ins.filter((e) => R(e).right > edge + 1 || e.scrollWidth > e.clientWidth + 1 && e.tagName === 'SELECT').length, scroll: body.scrollWidth - body.clientWidth };
 		});
 		ok('dragging the divider far right still leaves the Value column 9.5 rem, no input clipped', cap.valueRem >= 9.5 && cap.clipped === 0 && cap.scroll <= 1, JSON.stringify(cap));
 		await d.close();
 
-		console.log('\n--- the header sits directly above the grid; labels keep their ? and units whole ---');
+		console.log('\n--- on a Text there is no heading; labels keep their ? and units whole ---');
 		const t = await start(false);
 		const txy = await t.page.evaluate(() => { const e = document.querySelector('#lpn_canvas [data-lbl]'); if (!e) { return null; } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
 		if (txy) {
@@ -252,9 +253,9 @@ async function main() {
 			const th = await t.page.evaluate(() => {
 				const h = document.querySelector('#lpn_popup .lpn-ghdr'), ta = document.querySelector('#lpn_popup_fields textarea'), R = (e) => e.getBoundingClientRect();
 				const first = document.querySelector('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)');
-				return h && ta && first ? { belowWords: R(h).top >= R(ta).bottom - 1, aboveRows: Math.abs(R(first).top - R(h).bottom) <= 2 } : null;
+				return ta && first ? { noHeader: !h, belowWords: R(first).top >= R(ta).bottom - 1 } : null;
 			});
-			ok('on a Text the header is below the words box and directly above the rows', !!th && th.belowWords && th.aboveRows, JSON.stringify(th));
+			ok('on a Text there is no heading, and the rows stand below the words box', !!th && th.noHeader && th.belowWords, JSON.stringify(th));
 		}
 		await t.close();
 

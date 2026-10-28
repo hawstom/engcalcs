@@ -3819,11 +3819,16 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* A box that wraps its content is no narrower than a Label column and a Value column need. */
 #lpn_new_panel, #lpn_convas_panel { min-width: min(26rem, 94vw); }
 .lpn-convas-foot { padding-top: 8px; border-top: 1px solid var(--ec-border-strong); }
+/* THE CHOICES OF EVERY PULL-DOWN HAVE PAPER OF THEIR OWN, IN EVERY THEME (Tom, 2026-10-24 and again 2026-10-27: "The
+   invisibility in Dark mode bug hit again for all selectors ... use global styles"). A pull-down in the standard
+   sheet style, or in a table cell, is transparent and draws on its cell, so its option list inherited a transparent
+   background and the browser's white popup under light ink. An option states both colours, here, once, as tokens;
+   never per select. dev/lpn-spike/select-dark-sheet-browser-harness.js. */
+option, optgroup { background-color: var(--ec-bg); color: var(--ec-ink); }
+option:disabled { color: var(--ec-ink-muted); }
 .lpn-ghdr { display: none; }
 .lpn-ghcell { position: relative; min-width: 0; padding: 3px 6px; }
 .lpn-ghlabel { border-inline-end: 1px solid var(--ec-border-strong); }
-.lpn-propbox .lpn-ghdr > .lpn-ghlabel { grid-column: 2; }
-.lpn-propbox .lpn-ghdr > .lpn-ghvalue { grid-column: 3; }
 .lpn-grid {
 	position: relative; display: grid; align-items: baseline; justify-content: start; margin: 3px 0;
 	grid-template-columns: var(--lpn-g-name, max-content) minmax(0, 1fr);
@@ -3854,7 +3859,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-gspan, .lpn-ghead { grid-column: 1 / -1; min-width: 0; }
 .lpn-ghead { font-weight: bold; margin-top: 10px; }
 /* The divider: the right edge of the Label header cell, six pixels wide so it can be picked up. */
-.lpn-gsplit { position: absolute; top: 0; bottom: 0; inset-inline-end: -3px; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
+.lpn-gsplit { display: none; position: absolute; top: 0; bottom: 0; inset-inline-end: -3px; width: 6px; cursor: col-resize; touch-action: none; z-index: 1; border-radius: var(--ec-radius-s); }
+.lpn-ghlabel > .lpn-gsplit { display: block; }   /* the header row's divider (a box not yet in the standard sheet style) */
 .lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: var(--ec-select); opacity: .35; outline: none; }
 /* ==== THE PROPERTIES BOX'S ROWS (Task 828): the same grid, with a gutter for the override marker.
    `fields` is the grid and each <label> a row of three cells (gutter, label, value), built by
@@ -3914,10 +3920,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* Spreadsheet look (a box wider than a phone): the header, the ruled rows. */
 @media (min-width: 30.01rem) {
 	@supports (grid-template-columns: subgrid) {
-		.lpn-propbox .lpn-ghdr {
-			grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: stretch;
-			box-shadow: inset 0 0 0 1px var(--ec-border-strong); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
-		}
 		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
 			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);   /* a rule, not a border: a border on a subgrid widens the host's tracks */
@@ -3938,37 +3940,46 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
-		/* **THE INPUT IS THE CELL** (Task 837, Tom 2026-10-27): no border, no margin, transparent, it fills the Value
-		   track and starts where the Label cell's text starts (padding 4px 6px), as a Tables cell does; the cell is
-		   marked by the inset accent outline, as there. The Value column reads as one thing, an editable value
-		   beside a computed one, against one left edge. The phone's stacked layout (below) keeps its own. */
-		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id { min-height: 1.75rem; }
-		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
-			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
-			padding: 4px 6px; box-sizing: border-box; align-self: stretch; text-align: start; font-size: .85em;   /* the Label cell's size: 13.6 px text and 8 px of padding, a 28 px row */
-		}
-		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus {
-			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
-		}
-		.lpn-propbox .lpn-gprops .lpn-grow > textarea.lpn-gval { resize: vertical; }
-		/* EDITABLE vs COMPUTED (Perry, 2026-10-27): a computed value is in the muted ink, as a property grid draws a
-		   read-only value; an editable cell takes the hover fill, so the pointer finds it before a click. */
-		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); }
-		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus),
-		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
-		/* The Base demand table's inputs are cells too: no border, transparent, the cell's padding and size. */
+		/* The Base demand table's inputs are cells too (the standard sheet style below): no border, transparent, the cell's padding and size. */
 		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
 			border: 0; border-radius: 0; background: transparent; margin: 0; padding: 4px 6px; font-size: .85em; box-sizing: border-box; width: 100%; max-width: none; min-width: 0;
 		}
+		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
 		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 		.lpn-propbox .lpn-gprops > .lpn-demand-table td { padding: 0; }
-		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; }
-		/* A toggle stays a checkbox in the cell, at the cell's start, 18 px in the 28 px row. */
-		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval {
-			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
-		}
 		/* The row is a <label>, so a tap anywhere in its cell (and its name) toggles the box: the whole cell is the touch target. */
 		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
+	}
+}
+/* ==== THE STANDARD SPREADSHEET STYLE (Tom, 2026-10-27: "I love it! Make this a standard style"). One class, `lpn-sheet`, on
+   the grid of a box (Properties' rows, and any `lpn-gridhost` inside a box marked `lpn-sheetbox`): **THE INPUT IS THE CELL**
+   (Task 837): no border, no margin, transparent, it fills the Value track and starts where the Label cell's text starts
+   (padding 4px 6px), as a Tables cell does; the cell is marked by the inset accent outline. EDITABLE vs COMPUTED (Perry,
+   2026-10-27): a computed value is in the muted ink, as a property grid draws a read-only value; an editable cell takes the
+   hover fill, so the pointer finds it before a click. A toggle stays a checkbox. No column heading (WaterGEMS): the
+   divider (.lpn-gsplit) runs down the Label column's right edge. A phone keeps its own stacked layout. ==== */
+@media (min-width: 30.01rem) {
+	@supports (grid-template-columns: subgrid) {
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow:not(.lpn-gspan-row):not(.lpn-fill-row), #lpn_popup_title.lpn-gtitle-id.lpn-sheet { min-height: 1.75rem; }
+		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
+			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
+			padding: 4px 6px; box-sizing: border-box; align-self: stretch; text-align: start; font-size: .85em;   /* the Label cell's size: 13.6 px text and 8 px of padding, a 28 px row */
+		}
+		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus {
+			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
+		}
+		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
+			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
+		}
+		/* A ramp picker is a cell too: its left edge is the Value column's. */
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 2px 0; width: 100%; min-width: 0; }
+		/* The divider: no header cell to hold it, so it stands in the run's first track, along its whole height. */
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grid > .lpn-gsplit, .lpn-sheet.lpn-gprops > .lpn-gsplit { display: block; grid-column: 1 / 2; grid-row: auto; }
+		.lpn-sheet.lpn-gprops { position: relative; }   /* the divider's containing block */
+		.lpn-sheet.lpn-gprops > .lpn-gsplit { grid-column: 2 / 3; }
 	}
 }
 /* A phone: the name goes above its value (the name track is nothing), as the other boxes' rows do under
@@ -4512,13 +4523,6 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    alternative, re-proposed easily: `max-content` for unset pull-downs only -- it would hold the
    column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
-/* THE CHOICES OF A TABLE PULL-DOWN HAVE PAPER OF THEIR OWN (Tom, 2026-10-24: in Dark, the unselected
-   options of a Settings Value selector looked empty). The select above is transparent and draws on
-   the cell, so its option list inherited a transparent background and the browser's white popup under
-   light ink. An option states both colours. dev/lpn-spike/pane-select-option-colour-browser-harness.js. */
-.lpn-pane-table tbody td select option, .lpn-pane-table tbody td select optgroup {
-	background-color: var(--ec-bg); color: var(--ec-ink);
-}
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should

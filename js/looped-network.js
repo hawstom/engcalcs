@@ -25194,7 +25194,7 @@ var EngCalcs = EngCalcs || {};
 		pad = 14;   // the cell's own padding and the divider line
 		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
 		for (i = 0; i < vals.length; i++) { valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
-		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - 14;
+		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
 		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
 	}
@@ -25203,21 +25203,24 @@ var EngCalcs = EngCalcs || {};
 		host.__lpnFitQ = true;
 		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridFitNow(host); });
 	}
-	function gridWireSplit(hdr, host, labelCell) {
+	function gridWireSplit(host, anchor, labelCell) {
 		var split = document.createElement('div'), startX, startRem, dragging = false, rem = 16;
 		split.className = 'lpn-gsplit';
 		split.setAttribute('role', 'separator');
 		split.setAttribute('aria-orientation', 'vertical');
 		split.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_cp_label || 'Label');
 		split.tabIndex = 0;
-		labelCell.appendChild(split);
 		function nameRem() {
+			var names = anchor.querySelectorAll('.lpn-gname'), i, w = 0;
 			rem = gridRem();
-			return labelCell.getBoundingClientRect().width / rem;
+			if (labelCell) { return labelCell.getBoundingClientRect().width / rem; }
+			for (i = 0; i < names.length && !w; i++) { w = names[i].getBoundingClientRect().width; }   // the Label track's width, read off its first visible cell
+			return w / rem;
 		}
 		// The widest value control at its natural width (the Label track at max-content, as the fit reads it).
 		function valNeed() {
 			var had = host.style.getPropertyValue('--lpn-g-name'), w = 0, vals = host.querySelectorAll('.lpn-grow > .lpn-gval'), i;
+			if (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet')) { return 0; }   // a sheet's input fills its cell: its "need" is only the Value column's floor
 			host.style.setProperty('--lpn-g-name', 'max-content');
 			for (i = 0; i < vals.length; i++) { w = Math.max(w, vals[i].getBoundingClientRect().width + 12); }
 			if (had) { host.style.setProperty('--lpn-g-name', had); } else { host.style.removeProperty('--lpn-g-name'); }
@@ -25241,7 +25244,7 @@ var EngCalcs = EngCalcs || {};
 			host.style.removeProperty('--lpn-g-name');
 			gridFitSoon(host);
 		}
-		function dirSign() { return window.getComputedStyle(hdr).direction === 'rtl' ? -1 : 1; }
+		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
 		split.addEventListener('pointerdown', function (e) {
 			if (e.button !== undefined && e.button !== 0) { return; }
 			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem(); host.__lpnValNeed = undefined; room(true);
@@ -25271,6 +25274,8 @@ var EngCalcs = EngCalcs || {};
 				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
 			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
 		});
+		(labelCell || anchor).appendChild(split);
+		return split;
 	}
 	// The header row: Label | Value, and the divider. One stands above each run of two or more rows (a run of
 	// one row is not a table; a box of several runs has the same header over each, and one width for all);
@@ -25285,10 +25290,11 @@ var EngCalcs = EngCalcs || {};
 		v.textContent = pc.lpn_find_value || 'Value';
 		hdr.appendChild(l);
 		hdr.appendChild(v);
-		try { gridWireSplit(hdr, host, l); } catch (e) { /* a page without pointer events keeps the header */ }
+		try { gridWireSplit(host, hdr, l); } catch (e) { /* a page without pointer events keeps the header */ }
 		return hdr;
 	}
 	function gridHeadersSync(host) {
+		var sheet = host.classList.contains('lpn-sheet');
 		if (host.classList.contains('lpn-gplain')) { return; }
 		Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) {
 			var rows = 0, i, k, prev = g.previousElementSibling, has = !!prev && prev.classList.contains('lpn-ghdr');
@@ -25296,19 +25302,25 @@ var EngCalcs = EngCalcs || {};
 				k = g.children[i];
 				if (k.classList.contains('lpn-grow') && !k.classList.contains('lpn-gspan-row')) { rows++; }
 			}
+			if (sheet) {
+				// THE STANDARD SPREADSHEET STYLE has no column headings (WaterGEMS; Tom, 2026-10-27): a run of two or more
+				// rows carries only the divider, down the Label column's right edge.
+				if (rows >= 2 && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
+				else if (rows < 2 && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
+				return;
+			}
 			if (rows >= 2 && !has) { g.parentNode.insertBefore(gridHeaderMake(host), g); }
 			else if (rows < 2 && has) { prev.parentNode.removeChild(prev); }
 		});
 	}
-	// Properties: the header stands directly above the grid: over the ID row when there is one, else over the first
-	// row (below a Text's title and words, a customer's heading).
+	// Properties: the same style, no heading; the divider runs down the Label column of its rows (the grid's own
+	// second track, after the override gutter). The ID row and the rows are one sheet.
 	function propsHeaderPlace(body, fields) {
-		var hdr = body.__lpnPHdr || (body.__lpnPHdr = gridHeaderMake(body)), title = document.getElementById('lpn_popup_title'), first;
-		if (title && title.classList.contains('lpn-gtitle-id')) { body.insertBefore(hdr, title); return; }
-		first = null;
-		Array.prototype.forEach.call(fields.children, function (c) { if (!first && c.classList.contains('lpn-grow') && !c.classList.contains('lpn-fill-row')) { first = c; } });
-		if (first) { fields.insertBefore(hdr, first); }
-		else if (hdr.parentNode) { hdr.parentNode.removeChild(hdr); }
+		var title = document.getElementById('lpn_popup_title');
+		fields.classList.add('lpn-sheet');
+		if (title && title.classList.contains('lpn-gtitle-id')) { title.classList.add('lpn-sheet'); }
+		if (!fields.__lpnSplit) { try { fields.__lpnSplit = gridWireSplit(body, fields); } catch (e) { /* no pointer events: the rules stay */ } }
+		else { fields.appendChild(fields.__lpnSplit); }   // after a rebuild of the rows, last again
 	}
 	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
 	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
@@ -25316,6 +25328,8 @@ var EngCalcs = EngCalcs || {};
 		if (host.__lpnGridHost) { return host; }
 		host.__lpnGridHost = true;
 		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost' + (opts && opts.plain ? ' lpn-gplain' : '');
+		// A box marked `lpn-sheetbox` in the page takes the standard spreadsheet style (css/engcalcs.css, .lpn-sheet).
+		if (!(opts && opts.plain) && host.closest && host.closest('.lpn-sheetbox')) { host.classList.add('lpn-sheet'); }
 		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
 		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
 		if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth < 30 * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
