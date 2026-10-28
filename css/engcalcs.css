@@ -5013,7 +5013,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
    exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(42rem, 94vw);   /* 2026-10-25: wide enough for the labels table and its override column, no column cut off; was 28.865rem */
+	width: min(38.625rem, 94vw);   /* 2026-10-27: Tom measured 618 px holds the labels table and its override column, no column cut off; was 42rem (672 px) */
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -6119,6 +6119,22 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_link_fields > div > label,
 #lpn_labels_customer_fields > div > label { overflow-wrap: anywhere; }
 .lpn-set-colhead > .lpn-lblgroup { align-items: flex-end; }
+/* 6a. **A WRAPPED LABELS ROW SITS TIGHT ON ITS OWN INPUTS, WITH THE LARGER GAP ABOVE IT** (Tom, 2026-10-27, on the
+   Settings picture: "Wouldn't we want the toggle closer to its own row, not its neighbor?"). Wrapped, the name line
+   was 2 px above its inputs and the previous row's inputs touched it (0 px), so a toggle read as belonging to the row
+   above. The list is a size container so the rule applies only when the group has dropped below the name: that is
+   11.5rem name + 4px + the group's 232 px, 26.4rem; wider, the row is one line and keeps its pitch. */
+#lpn_labels_node_fields,
+#lpn_labels_link_fields,
+#lpn_labels_customer_fields { container-type: inline-size; container-name: lpnlbl; }
+@container lpnlbl (max-width: 26.5rem) {
+	#lpn_labels_node_fields > div:not(.lpn-set-colhead),
+	#lpn_labels_link_fields > div:not(.lpn-set-colhead),
+	#lpn_labels_customer_fields > div:not(.lpn-set-colhead) { margin-top: 10px; row-gap: 0; }
+	#lpn_labels_node_fields > div:not(.lpn-set-colhead):first-child,
+	#lpn_labels_link_fields > div:not(.lpn-set-colhead):first-child,
+	#lpn_labels_customer_fields > div:not(.lpn-set-colhead):first-child { margin-top: 0; }
+}
 
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
@@ -6807,8 +6823,10 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-jump {
 		display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; width: 100%; box-sizing: border-box;
 		min-height: 2.75rem; padding: 0 .75rem; margin-bottom: 4px; border: 1px solid var(--ec-border-strong);
-		background: var(--ec-chrome-bg); color: inherit; font: inherit; font-weight: 600; text-align: start; cursor: pointer;
+		background: var(--ec-chrome-bg); color: inherit; font: inherit; font-size: 1.15rem; font-weight: bold; text-align: start; cursor: pointer;
 	}
+	/* The bar IS the section heading on a phone (Tom, 2026-10-27: "I am wondering if it can function as the heading"): the in-content one is hidden, sub-headings stay. */
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-set-head { display: none; }
 	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-jump-chev {
 		flex: 0 0 auto; width: .5rem; height: .5rem; margin-inline-start: .5rem;
 		border-inline-end: 2px solid currentColor; border-block-end: 2px solid currentColor; transform: rotate(45deg);
