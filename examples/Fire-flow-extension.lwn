@@ -1,0 +1,509 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://librewaternet.org/app/",
+	"v": 13,
+	"project": {
+		"name": "Fire flow extension",
+		"activeScenario": "base",
+		"crs": "EPSG:2277",
+		"gallery": "Fire-flow-extension.lwn"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		},
+		{
+			"id": "s1",
+			"name": "1. Flow test: Static",
+			"overrides": {},
+			"alternatives": {
+				"demand": "a1"
+			}
+		},
+		{
+			"id": "s2",
+			"name": "2. Flow test: Mid",
+			"overrides": {},
+			"alternatives": {
+				"demand": "a2"
+			}
+		},
+		{
+			"id": "s3",
+			"name": "3. Flow test: Max",
+			"overrides": {},
+			"alternatives": {
+				"demand": "a3"
+			}
+		},
+		{
+			"id": "s4",
+			"name": "5. Max Day",
+			"overrides": {},
+			"calc": "c1"
+		}
+	],
+	"nodes": [
+		{
+			"id": "HYD-P",
+			"type": "junction",
+			"x": 200,
+			"y": 0,
+			"elev": 1200,
+			"_demand": 0,
+			"desc": "Test pressure hydrant. Reads the pressure during the hydrant flow test: 62 psi static, 56 psi at 600 gpm, 48 psi at 1,200 gpm."
+		},
+		{
+			"id": "HYD-F",
+			"type": "junction",
+			"x": 600,
+			"y": 0,
+			"elev": 1202,
+			"_demand": 0,
+			"desc": "Test flow hydrant, on the existing 12 inch main. The flow test draws 600 gpm and 1,200 gpm here. The extension ties in at this junction."
+		},
+		{
+			"id": "EXT-1",
+			"type": "junction",
+			"x": 800,
+			"y": 0,
+			"elev": 1205,
+			"_demand": 6,
+			"desc": "First junction of the loop, two houses."
+		},
+		{
+			"id": "EXT-2",
+			"type": "junction",
+			"x": 800,
+			"y": 300,
+			"elev": 1215,
+			"_demand": 12,
+			"desc": "Four houses."
+		},
+		{
+			"id": "FH-1",
+			"type": "junction",
+			"x": 1200,
+			"y": 300,
+			"elev": 1228,
+			"_demand": 0,
+			"desc": "Fire hydrant junction, the high point of the loop and the design point for fire flow: 1,500 gpm with 20 psi residual.",
+			"_fireFlow": 1500
+		},
+		{
+			"id": "EXT-3",
+			"type": "junction",
+			"x": 1200,
+			"y": 0,
+			"elev": 1218,
+			"_demand": 10,
+			"desc": "Three houses."
+		},
+		{
+			"id": "SYS",
+			"type": "reservoir",
+			"x": 0,
+			"y": 0,
+			"_head": 1200,
+			"desc": "System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test."
+		}
+	],
+	"links": [
+		{
+			"id": "MAIN-1",
+			"type": "pipe",
+			"from": "HYD-P",
+			"to": "HYD-F",
+			"verts": [],
+			"_diameter": 12,
+			"_roughness": 130,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Existing 12 inch ductile iron main between the two test hydrants."
+		},
+		{
+			"id": "EXT-A",
+			"type": "pipe",
+			"from": "HYD-F",
+			"to": "EXT-1",
+			"verts": [],
+			"_diameter": 12,
+			"_roughness": 140,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "New 12 inch PVC feeder, sized for the 1,500 gpm fire flow."
+		},
+		{
+			"id": "EXT-B",
+			"type": "pipe",
+			"from": "EXT-1",
+			"to": "EXT-2",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 140,
+			"_length": 300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "New 8 inch PVC main."
+		},
+		{
+			"id": "EXT-C",
+			"type": "pipe",
+			"from": "EXT-2",
+			"to": "FH-1",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 140,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "EXT-D",
+			"type": "pipe",
+			"from": "FH-1",
+			"to": "EXT-3",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 140,
+			"_length": 300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "EXT-E",
+			"type": "pipe",
+			"from": "EXT-3",
+			"to": "EXT-1",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 140,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Closes the loop, so FH-1 is fed from both sides."
+		},
+		{
+			"id": "PMP-1",
+			"type": "pump",
+			"from": "SYS",
+			"to": "HYD-P",
+			"verts": [],
+			"_diameter": 12,
+			"lenAuto": false,
+			"_k": 0,
+			"desc": "Pump that stands for the existing system. Its curve is the hydrant flow test: 143.2 ft (62 psi) at no flow, 129.4 ft (56 psi) at 600 gpm, 110.9 ft (48 psi) at 1,200 gpm.",
+			"_curveId": "SYSTEM"
+		}
+	],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "Fire flow extension",
+			"x": 0,
+			"y": 580,
+			"anchorNode": null,
+			"sizeMult": 3,
+			"allZoom": true
+		},
+		{
+			"id": "X2",
+			"text": "SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.",
+			"x": 0,
+			"y": 500,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"allZoom": false
+		},
+		{
+			"id": "X3",
+			"text": "Design point: 1,500 gpm at FH-1 with 20 psi residual. Scenarios 1 to 3 repeat the flow test.",
+			"x": 0,
+			"y": 450,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"allZoom": false
+		}
+	],
+	"nextId": {
+		"J": 1,
+		"R": 1,
+		"T": 1,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 4,
+		"M": 1,
+		"S": 1
+	},
+	"customers": [],
+	"origin": {
+		"x": 2903000,
+		"y": 10070000
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"prefix": {
+			"node": {
+				"id": ""
+			},
+			"link": {
+				"id": ""
+			}
+		},
+		"separator": " ",
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X",
+			"M": "C",
+			"S": "S"
+		},
+		"customProps": [],
+		"emitterExponent": 0.5,
+		"hydraulics": {},
+		"qualityOptions": {},
+		"quality": {
+			"mode": "none",
+			"traceNode": ""
+		},
+		"fileOptions": {},
+		"engine": "epanet",
+		"autoRun": true,
+		"nodeElevSource": "value",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": true,
+			"mapDisplay": false,
+			"colors": false,
+			"computation": false,
+			"files": false
+		},
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
+		"symbolOpacity": 1,
+		"labelMaxWidth": null,
+		"symbolCapMultiple": 0.25,
+		"symbolCapPercentile": 50,
+		"basemapStyle": "muted",
+		"backdropOpacity": 0.5,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
+		"textHalo": 40,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
+		"legendPosition": "top-left",
+		"colorNodeField": "",
+		"colorLinkField": "",
+		"colorRampNode": "viridis",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 7,
+		"colorClassesLink": 7,
+		"colorReverseNode": false,
+		"colorReverseLink": false,
+		"contourFill": "",
+		"contourLines": false,
+		"contourLabels": true,
+		"contourOpacity": 0.6,
+		"contourInterval": {},
+		"contourBuffer": 2.5,
+		"contourTerrain": false,
+		"colorLegendPosition": "bottom-right",
+		"colorBreaks": {},
+		"colorModes": {},
+		"reactions": {
+			"tank": {}
+		},
+		"energy": {
+			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
+		}
+	},
+	"patterns": [],
+	"defaultPattern": null,
+	"curves": [
+		{
+			"id": "SYSTEM",
+			"kind": "head",
+			"points": [
+				[
+					0,
+					143.2
+				],
+				[
+					600,
+					129.4
+				],
+				[
+					1200,
+					110.9
+				]
+			],
+			"src": [
+				";PUMP: Existing system from the hydrant flow test: static, mid and max flow",
+				" SYSTEM\t0\t143.2",
+				" SYSTEM\t600\t129.4",
+				" SYSTEM\t1200\t110.9"
+			],
+			"note": "Existing system from the hydrant flow test: static, mid and max flow"
+		}
+	],
+	"pipeTypes": [],
+	"fittingSets": [],
+	"profiles": [],
+	"times": {
+		"duration": 0,
+		"hydraulicStep": 3600,
+		"patternStep": 3600,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {
+			"duration": "0"
+		}
+	},
+	"controls": [],
+	"rules": [],
+	"inpSections": {},
+	"view": {
+		"cx": 600,
+		"cy": 290,
+		"s": 0.75
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_diameter": "in",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "ft",
+		"lpn_u_age": "hr"
+	},
+	"alternatives": [
+		{
+			"id": "a1",
+			"category": "demand",
+			"name": "1. Flow test: Static",
+			"parent": null,
+			"values": {
+				"n:EXT-1": {
+					"demand": 0
+				},
+				"n:EXT-2": {
+					"demand": 0
+				},
+				"n:EXT-3": {
+					"demand": 0
+				}
+			}
+		},
+		{
+			"id": "a2",
+			"category": "demand",
+			"name": "2. Flow test: Mid",
+			"parent": null,
+			"values": {
+				"n:EXT-1": {
+					"demand": 0
+				},
+				"n:EXT-2": {
+					"demand": 0
+				},
+				"n:EXT-3": {
+					"demand": 0
+				},
+				"n:HYD-F": {
+					"demand": 600
+				}
+			}
+		},
+		{
+			"id": "a3",
+			"category": "demand",
+			"name": "3. Flow test: Max",
+			"parent": null,
+			"values": {
+				"n:EXT-1": {
+					"demand": 0
+				},
+				"n:EXT-2": {
+					"demand": 0
+				},
+				"n:EXT-3": {
+					"demand": 0
+				},
+				"n:HYD-F": {
+					"demand": 1200
+				}
+			}
+		}
+	],
+	"calcSets": [
+		{
+			"id": "c1",
+			"name": "5. Max Day",
+			"parent": null,
+			"demandMultiplier": 2
+		}
+	]
+}

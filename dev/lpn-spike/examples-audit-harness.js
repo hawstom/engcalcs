@@ -104,6 +104,10 @@ const SOURCE_OF = {
 	'Net1-SI.lwn': null,
 	'Net2-Branford-CT-SI.lwn': null,
 	'Net3-Novato-CA-World-SI.lwn': null,
+	// The four starter examples (Task 823) are authored, not imported: dev/scripts/build_starter_examples.js
+	// writes the .inp text itself, so there is no reference file to be behind. starter-examples-harness.js holds them.
+	'Fire-flow-extension.lwn': null, 'Fire-flow-extension-SI.lwn': null,
+	'Community-well-tank.lwn': null, 'Community-well-tank-SI.lwn': null,
 	// Net3 placed on the world (Task 497's geographic project). Its model is Net3's, so Net3.inp is
 	// its source too and the geographic coordinates are the curation.
 	'Net3-Novato-CA-World.lwn': 'Net3.inp',

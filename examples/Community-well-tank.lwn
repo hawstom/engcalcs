@@ -1,0 +1,569 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://librewaternet.org/app/",
+	"v": 13,
+	"project": {
+		"name": "Community well and tank",
+		"activeScenario": "base",
+		"crs": "EPSG:2276",
+		"gallery": "Community-well-tank.lwn"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		},
+		{
+			"id": "s1",
+			"name": "5. Max Day",
+			"overrides": {},
+			"calc": "c1"
+		},
+		{
+			"id": "s2",
+			"name": "6. Peak hour",
+			"overrides": {},
+			"calc": "c2"
+		}
+	],
+	"nodes": [
+		{
+			"id": "WH-1",
+			"type": "junction",
+			"x": 0,
+			"y": 0,
+			"elev": 1485,
+			"_demand": 0,
+			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "C-1",
+			"type": "junction",
+			"x": 400,
+			"y": 0,
+			"elev": 1480,
+			"_demand": 0,
+			"desc": "Where the well supply enters the loop.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "C-2",
+			"type": "junction",
+			"x": 600,
+			"y": 0,
+			"elev": 1478,
+			"_demand": 6,
+			"desc": "Thirteen houses.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "C-3",
+			"type": "junction",
+			"x": 800,
+			"y": 0,
+			"elev": 1476,
+			"_demand": 5,
+			"desc": "Eleven houses.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "C-4",
+			"type": "junction",
+			"x": 800,
+			"y": 350,
+			"elev": 1474,
+			"_demand": 5,
+			"desc": "Eleven houses. The tank connects here, the only tank connection.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "C-5",
+			"type": "junction",
+			"x": 600,
+			"y": 350,
+			"elev": 1476,
+			"_demand": 4,
+			"desc": "Nine houses.",
+			"demandPattern": "DAILY"
+		},
+		{
+			"id": "FH-1",
+			"type": "junction",
+			"x": 400,
+			"y": 350,
+			"elev": 1478,
+			"_demand": 4,
+			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 500 gpm with 20 psi residual, for two hours from the tank.",
+			"demandPattern": "DAILY",
+			"_fireFlow": 500
+		},
+		{
+			"id": "WELL-1",
+			"type": "reservoir",
+			"x": -400,
+			"y": 0,
+			"_head": 1330,
+			"desc": "Community well, as a fixed head at its pumping water level, 160 ft below the 1,490 ft ground at the wellhead."
+		},
+		{
+			"id": "TANK-1",
+			"type": "tank",
+			"x": 1280,
+			"y": 450,
+			"elev": 1590,
+			"bottomElev": 1590,
+			"_level": 13,
+			"minLevel": 2,
+			"maxLevel": 20,
+			"tankDiameter": 24,
+			"desc": "Ground storage tank on the hill above the community, 24 ft in diameter and 20 ft high, about 67,000 gallons."
+		}
+	],
+	"links": [
+		{
+			"id": "CV-1",
+			"type": "pipe",
+			"from": "WH-1",
+			"to": "C-1",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "cv",
+			"_k": 0,
+			"desc": "Check valve on the well discharge, so the system cannot flow back toward the well. The other check valves of a real installation are assumed, not modeled."
+		},
+		{
+			"id": "L-1",
+			"type": "pipe",
+			"from": "C-1",
+			"to": "C-2",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "L-2",
+			"type": "pipe",
+			"from": "C-2",
+			"to": "C-3",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "L-3",
+			"type": "pipe",
+			"from": "C-3",
+			"to": "C-4",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 350,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "L-4",
+			"type": "pipe",
+			"from": "C-4",
+			"to": "C-5",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "L-5",
+			"type": "pipe",
+			"from": "C-5",
+			"to": "FH-1",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "L-6",
+			"type": "pipe",
+			"from": "FH-1",
+			"to": "C-1",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 140,
+			"_length": 350,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Closes the loop, so the community circulates internally."
+		},
+		{
+			"id": "TL-1",
+			"type": "pipe",
+			"from": "C-4",
+			"to": "TANK-1",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 130,
+			"_length": 490,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Ductile iron tank line. It fills and drains the tank, so it has no check valve."
+		},
+		{
+			"id": "WP-1",
+			"type": "pump",
+			"from": "WELL-1",
+			"to": "WH-1",
+			"verts": [],
+			"_diameter": 6,
+			"lenAuto": false,
+			"_k": 0,
+			"desc": "Submersible well pump, 120 gpm at 275 ft, about 15 hp. Runs when TANK-1 falls below 12 ft and stops above 19 ft, which holds the water below 12 ft in reserve for fire flow.",
+			"_curveId": "WELL"
+		}
+	],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "Community well and tank",
+			"x": -400,
+			"y": 700,
+			"anchorNode": null,
+			"sizeMult": 3,
+			"allZoom": true
+		},
+		{
+			"id": "X2",
+			"text": "WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.",
+			"x": -400,
+			"y": 620,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"allZoom": false
+		},
+		{
+			"id": "X3",
+			"text": "Design point: 500 gpm at FH-1 with 20 psi residual. The 24-hour run switches the pump on tank level.",
+			"x": -400,
+			"y": 570,
+			"anchorNode": null,
+			"sizeMult": 1,
+			"allZoom": false
+		}
+	],
+	"nextId": {
+		"J": 1,
+		"R": 1,
+		"T": 1,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 4,
+		"M": 1,
+		"S": 1
+	},
+	"customers": [],
+	"origin": {
+		"x": 1754000,
+		"y": 7065000
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"prefix": {
+			"node": {
+				"id": ""
+			},
+			"link": {
+				"id": ""
+			}
+		},
+		"separator": " ",
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X",
+			"M": "C",
+			"S": "S"
+		},
+		"customProps": [],
+		"emitterExponent": 0.5,
+		"hydraulics": {},
+		"qualityOptions": {},
+		"quality": {
+			"mode": "none",
+			"traceNode": ""
+		},
+		"fileOptions": {},
+		"engine": "epanet",
+		"autoRun": true,
+		"nodeElevSource": "value",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": true,
+			"mapDisplay": false,
+			"colors": false,
+			"computation": false,
+			"files": false
+		},
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
+		"symbolOpacity": 1,
+		"labelMaxWidth": null,
+		"symbolCapMultiple": 0.25,
+		"symbolCapPercentile": 50,
+		"basemapStyle": "muted",
+		"backdropOpacity": 0.5,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
+		"textHalo": 40,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
+		"legendPosition": "top-left",
+		"colorNodeField": "",
+		"colorLinkField": "",
+		"colorRampNode": "viridis",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 7,
+		"colorClassesLink": 7,
+		"colorReverseNode": false,
+		"colorReverseLink": false,
+		"contourFill": "",
+		"contourLines": false,
+		"contourLabels": true,
+		"contourOpacity": 0.6,
+		"contourInterval": {},
+		"contourBuffer": 2.5,
+		"contourTerrain": false,
+		"colorLegendPosition": "bottom-right",
+		"colorBreaks": {},
+		"colorModes": {},
+		"reactions": {
+			"tank": {}
+		},
+		"energy": {
+			"globalEfficiency": 65,
+			"globalPrice": 0.12,
+			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
+		}
+	},
+	"patterns": [
+		{
+			"id": "DAILY",
+			"multipliers": [
+				0.5,
+				0.5,
+				0.5,
+				0.5,
+				0.5,
+				0.8,
+				1.3,
+				1.6,
+				1.4,
+				1.1,
+				1,
+				1.1,
+				1,
+				0.9,
+				1,
+				1,
+				1.2,
+				1.5,
+				1.6,
+				1.4,
+				1.1,
+				1,
+				0.9,
+				0.6
+			],
+			"note": "Residential diurnal demand"
+		}
+	],
+	"defaultPattern": null,
+	"curves": [
+		{
+			"id": "WELL",
+			"kind": "head",
+			"points": [
+				[
+					0,
+					350
+				],
+				[
+					120,
+					275
+				],
+				[
+					190,
+					185
+				]
+			],
+			"src": [
+				";PUMP: Well pump, three points: shutoff, design, maximum",
+				" WELL\t0\t350",
+				" WELL\t120\t275",
+				" WELL\t190\t185"
+			],
+			"note": "Well pump, three points: shutoff, design, maximum"
+		}
+	],
+	"pipeTypes": [],
+	"fittingSets": [],
+	"profiles": [],
+	"times": {
+		"duration": 86400,
+		"hydraulicStep": 3600,
+		"patternStep": 3600,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {
+			"duration": "24:00",
+			"hydraulicStep": "1:00",
+			"patternStep": "1:00",
+			"patternStart": "0:00",
+			"reportStep": "1:00"
+		}
+	},
+	"controls": [
+		{
+			"link": "WP-1",
+			"raw": "LINK WP-1 OPEN IF NODE TANK-1 BELOW 12",
+			"action": {
+				"status": "open"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "TANK-1",
+				"cmp": "below",
+				"value": 12,
+				"unit": "head"
+			},
+			"text": {
+				"value": "12"
+			}
+		},
+		{
+			"link": "WP-1",
+			"raw": "LINK WP-1 CLOSED IF NODE TANK-1 ABOVE 19",
+			"action": {
+				"status": "closed"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "TANK-1",
+				"cmp": "above",
+				"value": 19,
+				"unit": "head"
+			},
+			"text": {
+				"value": "19"
+			}
+		}
+	],
+	"rules": [],
+	"inpSections": {
+		"ENERGY": [
+			" Global Efficiency\t65",
+			" Global Price\t0.12"
+		]
+	},
+	"view": {
+		"cx": 440,
+		"cy": 350,
+		"s": 0.5357
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_diameter": "in",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "ft",
+		"lpn_u_age": "hr"
+	},
+	"calcSets": [
+		{
+			"id": "c1",
+			"name": "5. Max Day",
+			"parent": null,
+			"demandMultiplier": 2
+		},
+		{
+			"id": "c2",
+			"name": "6. Peak hour",
+			"parent": null,
+			"demandMultiplier": 3
+		}
+	]
+}

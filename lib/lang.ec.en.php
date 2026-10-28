@@ -1263,6 +1263,15 @@ $ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
 $ec_lang['lpn_ex_net1_scn_desc']='Gallons per minute, with feet and inches. EPANET\'s Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.';
 $ec_lang['lpn_ex_valves_title']='Valve types, gpm (US)';
 $ec_lang['lpn_ex_valves_desc']='Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.';
+// Starter examples (Task 823, Tom 2026-10-23). Not translated yet, like the Valves card: the other 26 files fall back to this English.
+$ec_lang['lpn_ex_extension_si_title']='Fire flow extension, L/s (SI)';
+$ec_lang['lpn_ex_extension_si_desc']='Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.';
+$ec_lang['lpn_ex_extension_title']='Fire flow extension, gpm (US)';
+$ec_lang['lpn_ex_extension_desc']='Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.';
+$ec_lang['lpn_ex_well_si_title']='Community well and tank, L/s (SI)';
+$ec_lang['lpn_ex_well_si_desc']='Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 255 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.';
+$ec_lang['lpn_ex_well_title']='Community well and tank, gpm (US)';
+$ec_lang['lpn_ex_well_desc']='Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';

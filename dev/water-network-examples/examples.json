@@ -13,5 +13,9 @@
 	"Net2-Branford-CT.lwn": { "key": "net2", "order": -50 },
 	"Net3-Novato-CA-World-SI.lwn": { "key": "net3_si", "order": -80 },
 	"Net3-Novato-CA-World.lwn": { "key": "net3", "order": -70 },
-	"Elm-Street-Center.lwn": { "key": "elm_street", "order": -30 }
+	"Elm-Street-Center.lwn": { "key": "elm_street", "order": -30 },
+	"Fire-flow-extension-SI.lwn": { "key": "extension_si", "order": -25 },
+	"Fire-flow-extension.lwn": { "key": "extension", "order": -24 },
+	"Community-well-tank-SI.lwn": { "key": "well_si", "order": -23 },
+	"Community-well-tank.lwn": { "key": "well", "order": -22 }
 }
