@@ -1446,7 +1446,7 @@ echoHeader("EngCalcsApp", $html_title,
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
       // does -- one set of box mechanics on this page, not a fifth -- and its table is built in JS
       // (rebuildScenarioCompareReport), because it exists only for as long as the run behind it. ?>
-<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_scncmp_title">
+<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_scncmp_title">
 	<div id="lpn_scncmp_title" class="lpn-setbox-title"><?=$ec_lang['lpn_scncmp_title']?></div>
 	<button type="button" id="lpn_scncmp_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">

@@ -6578,7 +6578,7 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 /* The global `table, th, tr, td { border: 1px solid blue }` (top of this file) is the calculator
    forms' debugging grid; these tables want a hairline under each row and nothing else. */
 .lpn-ff-table, .lpn-ff-table tr { border: 0; }
-.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid var(--ec-border); overflow-wrap: anywhere; }
+.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid var(--ec-border); overflow-wrap: normal; }
 .lpn-ff-table th { overflow-wrap: normal; }
 /* A cell whose text is a short localized noun (the Full report's Type: Junction, Reservoir) is
    exactly as wide as that word in the current language, never broken: `anywhere` above would let

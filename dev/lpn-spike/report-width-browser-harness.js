@@ -99,6 +99,13 @@ async function main() {
 				const spans = Array.from(t.querySelectorAll('tbody tr')).map((tr) => Array.from(tr.children).reduce((n, td) => n + (td.colSpan || 1), 0));
 				const wide = Array.from(t.querySelectorAll('tbody td')).filter((td) => td.colSpan > 1).map((td) => ({ n: td.colSpan, text: td.textContent.trim() }));
 				return { w: Math.round(w), min: Math.round(wmin), body: Math.round(body.clientWidth), scroll: wrap.scrollWidth - wrap.clientWidth,
+					broken: Array.from(t.querySelectorAll('tbody td')).filter((td) => {
+						const cs = getComputedStyle(td), inner = td.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+						const words = (td.textContent || '').split(/\s+/).filter(Boolean); if (!words.length || td.colSpan > 1) { return false; }
+						const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing;
+						document.body.appendChild(sp); let mx = 0; words.forEach((wd) => { sp.textContent = wd; mx = Math.max(mx, sp.getBoundingClientRect().width); }); sp.remove();
+						return mx > inner + 1;
+					}).map((td) => td.textContent.trim().slice(0, 30)),
 					heads: lf.map((th) => th.textContent.replace(/\s+/g, ' ').trim()), nleaf: lf.length, spans, wide };
 			});
 		}, id);
@@ -128,6 +135,7 @@ async function main() {
 		await waitReport('#lpn_crit_report');
 		const crit = await measure('lpn_crit_box');
 		ok('Criticality: the table fits its box with no sideways scroll', crit.length > 0 && crit.every((t) => t.scroll <= 1 && t.w <= MAX_CRIT), crit.map((t) => t.w + '/' + t.body + ' scroll ' + t.scroll).join(', '));
+		ok('Criticality: no body cell breaks a word', crit.every((t) => t.broken.length === 0), crit.map((t) => t.broken.slice(0, 3).join('/')).join(', '));
 		await closeBox('lpn_crit_box');
 
 		// ---- Scenario comparison ----
@@ -137,6 +145,8 @@ async function main() {
 		ok('Scenario comparison: every table fills its box and does not scroll sideways (was 1213 px in 814)', cmp.length > 0 && cmp.every((t) => t.w <= t.body + 1 && t.scroll <= 1), cmp.map((t) => t.w + '/' + t.body + ' scroll ' + t.scroll).join(', '));
 		ok('Scenario comparison: at its narrowest the table is under ' + MAX_CMP_MIN + ' px', cmp.every((t) => t.min <= MAX_CMP_MIN), cmp.map((t) => t.min).join(', '));
 		ok('Scenario comparison: both Time columns read "Time (hr)"', cmp[0].heads.filter((h) => /^Time/.test(h)).length === 2 && cmp[0].heads.filter((h) => /^Time/.test(h)).every((h) => h === 'Time (hr)'), cmp[0].heads.join(' | '));
+		ok('Scenario comparison: no body cell breaks a word', cmp.every((t) => t.broken.length === 0), cmp.map((t) => t.broken.slice(0, 3).join('/')).join(', '));
+		ok('Scenario comparison: "The same in every scenario" has rows but no Label / Value heading row', await page.evaluate(() => { const b = document.getElementById('lpn_scncmp_box'); return b.querySelectorAll('.lpn-ghdr').length === 0 && b.querySelectorAll('.lpn-grow').length >= 2; }));
 		const cc = await copyHtml('lpn_scncmp');
 		ok('Scenario comparison Copy HTML: no <b> or <strong>', !/<(b|strong)[\s>]/i.test(cc.html));
 		ok('Scenario comparison Copy HTML: body cells and paragraphs after the title draw normal, headings bold',
@@ -153,6 +163,8 @@ async function main() {
 		const t0 = ff[0], why = await lg('lpn_ff_static_failed');
 		ok('Fire flow: the table fits its box with no sideways scroll (was 1018 px in 814)', t0.scroll <= 1 && t0.w <= t0.body + 1, t0.w + '/' + t0.body + ' scroll ' + t0.scroll);
 		ok('Fire flow: at its narrowest the table is under ' + MAX_FF_MIN + ' px', t0.min <= MAX_FF_MIN, String(t0.min));
+		ok('Fire flow: no body cell breaks a word', t0.broken.length === 0, t0.broken.slice(0, 4).join(' / '));
+		console.log('  info Fire flow width ' + t0.w + ' px, narrowest ' + t0.min + ' px, box ' + t0.body);
 		ok('Fire flow: the last Worst effect heading reads "And others"', t0.heads.indexOf('And others') > 0, t0.heads.join(' | '));
 		ok('Fire flow: a junction that failed static has the sentence once, across 3 columns', t0.wide.length > 0 && t0.wide.every((x) => x.n === 3 && x.text === why), JSON.stringify(t0.wide.slice(0, 2)));
 		ok('Fire flow: every row still spans as many columns as the head has (' + t0.nleaf + ')', t0.spans.every((n) => n === t0.nleaf), Array.from(new Set(t0.spans)).join(','));
