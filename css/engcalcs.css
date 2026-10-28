@@ -3863,7 +3863,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    cannot stretch the box. */
 .lpn-gprops {
 	display: grid; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
-	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
+	grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(0, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; padding-inline-start: 0; }
@@ -3894,7 +3894,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 @supports (grid-template-columns: subgrid) {
 	.lpn-propbox .lpn-popover-body {
 		display: grid; align-content: start; justify-content: start; align-items: start; column-gap: 0; row-gap: 0;
-		grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(max-content, 1fr);
+		grid-template-columns: var(--lpn-g-gutw, 0px) var(--lpn-g-name, max-content) minmax(0, 1fr);
 	}
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut, .lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; }
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; }
@@ -3951,6 +3951,17 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
 		}
 		.lpn-propbox .lpn-gprops .lpn-grow > textarea.lpn-gval { resize: vertical; }
+		/* EDITABLE vs COMPUTED (Perry, 2026-10-27): a computed value is in the muted ink, as a property grid draws a
+		   read-only value; an editable cell takes the hover fill, so the pointer finds it before a click. */
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); }
+		.lpn-propbox :is(.lpn-gprops .lpn-grow, #lpn_popup_title.lpn-gtitle-id) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus),
+		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
+		/* The Base demand table's inputs are cells too: no border, transparent, the cell's padding and size. */
+		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
+			border: 0; border-radius: 0; background: transparent; margin: 0; padding: 4px 6px; font-size: .85em; box-sizing: border-box; width: 100%; max-width: none; min-width: 0;
+		}
+		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+		.lpn-propbox .lpn-gprops > .lpn-demand-table td { padding: 0; }
 		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; }
 		/* A toggle stays a checkbox in the cell, at the cell's start, 18 px in the 28 px row. */
 		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval {
@@ -5793,6 +5804,12 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_wrong_btn .ec-tip { color: var(--ec-map-help); }
 #lpn_wrong_btn:hover, #lpn_wrong_btn:focus { color: var(--ec-map-text-strong); border-color: var(--ec-map-edge); }
 #lpn_wrong_btn[disabled] { color: var(--ec-map-text-muted); border-color: transparent; }
+/* A phone: the footer's rows are narrow (the dock strips take 48 px) and the tile credit sits bottom right, so
+   the last row, "Something wrong here?" included, ran under it (Perry, 2026-10-27). While the credit shows, the
+   footer stands one credit-line higher, so no cell of it is ever behind the credit. */
+@media (max-width: 640px) {
+	#lpn_map_footer:has(~ #lpn_basemap_credit[style*="display: block"]) { padding-bottom: 18px; }
+}
 /* ---- The box "Something wrong here?" opens (ROADMAP Task 768), drawn in #lpn_dialog ----
    The picks are toggles (aria-pressed), wrapping onto as many rows as the width needs, so a phone in
    tall mode gets a column of them and a desk gets two rows. A pressed pick wears the toolbar's own
