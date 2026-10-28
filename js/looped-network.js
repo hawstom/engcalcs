@@ -28771,7 +28771,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the same setProp() write, so a scenario switching a pipe off in the table is the same
 	// override it would be from the popup. `prop` earns it the completeEdit() redraw.
 	function paneColActive() {
-		return { key: 'active', label: 'lpn_field_active', bool: true, em: 2, prop: 'active',
+		return { key: 'active', label: 'lpn_field_active_short', bool: true, em: 2, prop: 'active',
 			get: function (el) { return effective(el, 'active') !== false; },
 			set: function (el, v) { setProp(el, 'active', !!v); } };
 	}
@@ -28943,7 +28943,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
 	// unticked CV leaves a closed pipe closed.
 	function paneColCheckValve() {
-		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
+		return { key: 'cv', label: 'lpn_field_cv_short', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'cv'; },
 			set: function (l, v) {
 				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
@@ -29555,13 +29555,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						hint: function (n) { var e = effective(n, 'elev'); return typeof e === 'number' ? String(+(+e).toFixed(6)) : ''; },
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
-					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level_short', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead, prop: 'minLevel',
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel',
 						get: function (n) { return effective(n, 'minLevel'); },
 						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead, prop: 'maxLevel',
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel',
 						get: function (n) { return effective(n, 'maxLevel'); },
 						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;

@@ -130,7 +130,7 @@ async function main() {
 			await settle(900);
 			return hit;
 		};
-		const ACTIVE = await L('lpn_field_active');
+		const ACTIVE = await L('lpn_field_active_short');
 
 		console.log('--- 1. Morph in scenario B ---');
 		a.answerPromptWith('B');
