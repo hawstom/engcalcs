@@ -211,8 +211,8 @@
 		{
 			"id": "X1",
 			"text": "Fire flow extension",
-			"x": 0,
-			"y": 580,
+			"x": 600,
+			"y": 480,
 			"anchorNode": null,
 			"sizeMult": 3,
 			"allZoom": true
@@ -220,8 +220,8 @@
 		{
 			"id": "X2",
 			"text": "SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.",
-			"x": 0,
-			"y": 500,
+			"x": 600,
+			"y": 410,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -229,8 +229,8 @@
 		{
 			"id": "X3",
 			"text": "Design point: 1,500 gpm at FH-1 with 20 psi residual. Scenarios 1 to 3 repeat the flow test.",
-			"x": 0,
-			"y": 450,
+			"x": 600,
+			"y": 370,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -425,7 +425,7 @@
 	"inpSections": {},
 	"view": {
 		"cx": 600,
-		"cy": 290,
+		"cy": 240,
 		"s": 0.75
 	},
 	"units": {

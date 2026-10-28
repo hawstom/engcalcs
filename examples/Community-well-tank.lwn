@@ -247,8 +247,8 @@
 		{
 			"id": "X1",
 			"text": "Community well and tank",
-			"x": -400,
-			"y": 700,
+			"x": 440,
+			"y": 650,
 			"anchorNode": null,
 			"sizeMult": 3,
 			"allZoom": true
@@ -256,8 +256,8 @@
 		{
 			"id": "X2",
 			"text": "WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.",
-			"x": -400,
-			"y": 620,
+			"x": 440,
+			"y": 590,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -265,8 +265,8 @@
 		{
 			"id": "X3",
 			"text": "Design point: 500 gpm at FH-1 with 20 psi residual. The 24-hour run switches the pump on tank level.",
-			"x": -400,
-			"y": 570,
+			"x": 440,
+			"y": 555,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -538,7 +538,7 @@
 	},
 	"view": {
 		"cx": 440,
-		"cy": 350,
+		"cy": 325,
 		"s": 0.5357
 	},
 	"units": {

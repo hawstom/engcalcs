@@ -89,7 +89,7 @@ const EXTENSION = {
 	texts: (u) => ['Fire flow extension',
 		'SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.',
 		'Design point: ' + u.q(1500) + ' at FH-1 with ' + u.res + ' residual. Scenarios 1 to 3 repeat the flow test.'],
-	textAt: [[0, 580], [0, 500], [0, 450]]
+	textAt: [[600, 480], [600, 410], [600, 370]]
 };
 
 const WELL = {
@@ -131,7 +131,7 @@ const WELL = {
 	texts: (u) => ['Community well and tank',
 		'WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.',
 		'Design point: ' + u.q(500) + ' at FH-1 with ' + u.res + ' residual. The 24-hour run switches the pump on tank level.'],
-	textAt: [[-400, 700], [-400, 620], [-400, 570]]
+	textAt: [[440, 650], [440, 590], [440, 555]]
 };
 
 // ---------------------------------------------------------------------------------------------
