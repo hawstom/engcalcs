@@ -66156,9 +66156,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 33, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
+		lpn_energy_box: 26, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
 		lpn_full_box: 52, lpn_settings_box: 38.625, lpn_popup: 22.5, lpn_find_popup: 23, lpn_library_box: 27,
-		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 29, lpn_hotkeys_popup: 53
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 26.5, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {

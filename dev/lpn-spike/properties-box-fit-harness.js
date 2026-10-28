@@ -27,6 +27,9 @@ const WRAP = (w) => {
 		const out = []; let start = 0; const k = f.childNodes;
 		function cut(a, b) {
 			if (b <= a) { return; }
+			// The column divider (.lpn-gsplit) runs the whole height of the box: it is not a row, and it grows when any row wraps (box-design, 2026-10-27).
+			let only = true; for (let i = a; i < b; i++) { if (!(k[i].classList && k[i].classList.contains('lpn-gsplit'))) { only = false; } }
+			if (only) { return; }
 			const rg = document.createRange(); rg.setStart(f, a); rg.setEnd(f, b);
 			const r = rg.getBoundingClientRect();
 			if (r.height > 0) { out.push(r.height); }

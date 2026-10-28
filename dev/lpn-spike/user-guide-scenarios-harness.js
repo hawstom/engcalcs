@@ -267,20 +267,23 @@ async function main() {
 		const table = await compareTable(3);
 		const heading = table[0];
 		const ex = (await entryTable(P, 'lpn_sm_box', 1));
+		// The chapter's table has the comparison's own two heading rows (Tom, 2026-10-27: asset, value and time are three columns each,
+		// no sentence cells): group names over Junction/Pressure/Time and Link/Velocity/Time, then the column names, then one row per scenario.
 		const colKeys = ['lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_demand_mult', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'];
 		const wantHead = [];
 		for (const k of colKeys) { wantHead.push(await T(k)); }
-		ok('the chapter\'s example table has the comparison\'s own column names', JSON.stringify(ex[0]) === JSON.stringify(wantHead), JSON.stringify(ex[0]));
-		ok('the comparison has the columns the chapter lists (Total run time, Hydraulic time step among them)', heading.indexOf(await T('lpn_time_duration')) > 0 && heading.indexOf(await T('lpn_time_hyd_step')) > 0, JSON.stringify(heading));
 		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]),
 			p: heading.findIndex((h) => h.indexOf(wantHead[3] + ': ') === 0), v: heading.findIndex((h) => h.indexOf(wantHead[4] + ': ') === 0) };
-		// The chapter's cell is "108 psi at N32, 14:00": the value and its unit, the asset, the time.
-		const sentence = (row, i) => { const unit = (/\(([^)]+)\)/.exec(heading[i + 1]) || [])[1]; return row[i + 1] + ' ' + unit + ' at ' + row[i] + ', ' + row[i + 2]; };
+		const subHead = (h) => h.slice(h.indexOf(': ') + 2);
+		const liveCols = [heading[idx.name], heading[idx.ov], heading[idx.dm]].concat([0, 1, 2].map((i) => subHead(heading[idx.p + i])), [0, 1, 2].map((i) => subHead(heading[idx.v + i])));
+		ok('the chapter\'s example table has the comparison\'s own group headings', JSON.stringify(ex[0]) === JSON.stringify(['', '', '', wantHead[3], wantHead[4]]), JSON.stringify(ex[0]));
+		ok('...and the comparison\'s own column names', JSON.stringify(ex[1]) === JSON.stringify(liveCols), JSON.stringify(ex[1]) + ' vs ' + JSON.stringify(liveCols));
+		ok('the comparison has the columns the chapter lists (Total run time, Hydraulic time step among them)', heading.indexOf(await T('lpn_time_duration')) > 0 && heading.indexOf(await T('lpn_time_hyd_step')) > 0, JSON.stringify(heading));
 		const cur = ' ' + (await T('lpn_scncmp_current'));
-		for (const row of ex.slice(1)) {
+		for (const row of ex.slice(2)) {
 			const got = table.slice(1).filter((t) => t[idx.name].replace(cur, '') === row[0])[0];
-			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '),
-				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && sentence(got, idx.p) === row[3] && sentence(got, idx.v) === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], sentence(got, idx.p), sentence(got, idx.v)]));
+			const live = got && [got[idx.name].replace(cur, ''), got[idx.ov], got[idx.dm]].concat([0, 1, 2].map((i) => got[idx.p + i]), [0, 1, 2].map((i) => got[idx.v + i]));
+			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '), !!live && JSON.stringify(live) === JSON.stringify(row), JSON.stringify(live));
 		}
 		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day' + cur));
 		ok('the comparison lists exactly the three scenarios of the example', table.length === 4, String(table.length - 1));
