@@ -313,7 +313,7 @@ async function main() {
 		const bad = await clipped(a);
 		ok('Settings at its width: no label is cut off and no control runs past the pane', bad.length === 0, bad.slice(0, 4).join(' | '));
 		const nums = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_labels_node_fields input.lpn-digit')).map((i) => i.getBoundingClientRect().width));
-		ok('Decimals, Show and Drop boxes are 90% of their old 2.6 rem', nums.length >= 10 && nums.every((x) => Math.abs(x - 2.34 * 16) <= 0.5),
+		ok('Decimals, Show and Drop boxes are 2.2 rem (Ida, 2026-10-27)', nums.length >= 10 && nums.every((x) => Math.abs(x - 2.2 * 16) <= 0.5),
 			nums.length + ' boxes; widths ' + Array.from(new Set(nums.map((x) => x.toFixed(1)))).join(','));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
