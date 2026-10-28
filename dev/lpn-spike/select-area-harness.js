@@ -528,8 +528,8 @@ console.log('\n--- properties for many ---');
 		kinds.filter((k) => k === 'br').length === kinds.filter((k) => k === 'label').length,
 		'every row in a section is followed by a line break', kinds.join(','));
 	// **THE ACTIVE CHECKBOX IS ON EVERY TYPE** (Tom, 2026-09-08): a row whose control is a checkbox
-	// and whose words are the popup's own "Is active?".
-	const activeRow = rowsOf(sec2).filter((c) => c._tag === 'label' && /Is active\?/.test(c.textContent || ''))[0];
+	// and whose words are the popup's own "Active".
+	const activeRow = rowsOf(sec2).filter((c) => c._tag === 'label' && /^\s*Active\b/.test(c.textContent || ''))[0];
 	report(!!activeRow, 'the junction section carries the Active row');
 	const activeBox = activeRow && activeRow.children.filter((c) => c._tag === 'input')[0];
 	report(!!activeBox && activeBox.type === 'checkbox', '...as a checkbox', activeBox && activeBox.type);
@@ -564,7 +564,7 @@ console.log('\n--- properties for many ---');
 	const textRows = rowsOf(textSec).filter((c) => c._tag === 'label').map((r) => r.textContent || '');
 	report(/Size multiplier/.test(textRows.join('|')) && /Bold text/.test(textRows.join('|')) &&
 		/Horizontal alignment/.test(textRows.join('|')) && /Angle/.test(textRows.join('|')) &&
-		textRows.join('|').indexOf(PC.lpn_field_active) >= 0,
+		textRows.join('|').indexOf(PC.lpn_field_active_short) >= 0,
 		'with the words, size, alignments, Bold, angle and Active as rows', textRows.join(' | '));
 	const boldRow = rowsOf(textSec).filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
 	const boldBox = boldRow.children.filter((c) => c._tag === 'input')[0];

@@ -40825,7 +40825,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// scenario other than Base can switch to Base and morph; Base naming another alternative cannot.
 			if (!activeScenario().isBase) {
 				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex',
-					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.',
+					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?',
 					ok: pc.lpn_morph_vertex_switch || 'Switch to Base and morph', cancel: pc.lpn_cancel || 'Cancel' },
 				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(); } });
 				return 0;

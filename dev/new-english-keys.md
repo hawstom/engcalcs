@@ -245,7 +245,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Auto length
   @@ NEEDS RULING
 - **`lpn_field_auto_length_tip`**
-  > Auto length: when checked, the pipe length is measured along the drawn line, including the slope between the end elevations, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
   @@ NEEDS RULING
 - **`lpn_field_cv`**
   > Check valve (CV)
@@ -257,7 +257,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
   _Ruled 2026-10-22: Approved._
 - **`lpn_field_km_fittings_tip`**
-  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.
+  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list" to type a value.
   @@ NEEDS RULING
 - **`lpn_field_km_short_tip`**
   > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
@@ -744,7 +744,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**76 still to read**, of 119 new keys across 13 unmerged branch(es).
+**84 still to read**, of 127 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -755,7 +755,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`6251d2dc8`) — adds no English strings
+### box-design (`e6bbee6d3`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -967,6 +967,33 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
+### feat/starter-example (`54d2059a4`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_ex_extension_desc`**
+  > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_extension_si_desc`**
+  > Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_extension_si_title`**
+  > Fire flow extension, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_extension_title`**
+  > Fire flow extension, gpm (US)
+  @@ NEEDS RULING
+- **`lpn_ex_well_desc`**
+  > Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_well_si_desc`**
+  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 255 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
+  @@ NEEDS RULING
+- **`lpn_ex_well_si_title`**
+  > Community well and tank, L/s (SI)
+  @@ NEEDS RULING
+- **`lpn_ex_well_title`**
+  > Community well and tank, gpm (US)
+  @@ NEEDS RULING
+
 ### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_alt`**
@@ -1136,8 +1163,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/box-style (`8f3662b4f`) — already merged into box-design; its strings are listed there
 
-### fix/box-words (`66afa5074`) — adds no English strings
+### fix/box-words (`0d4a73575`) — adds no English strings
 
 ### fix/report-width (`8f3662b4f`) — already merged into box-design; its strings are listed there
 
-### fix/settings-fit (`8f3662b4f`) — already merged into box-design; its strings are listed there
+### fix/settings-fit (`17413e4d7`) — already merged into box-design; its strings are listed there

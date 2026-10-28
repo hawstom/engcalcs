@@ -227,7 +227,7 @@ const sel = (L, ids) => L.setSelectionList(ids.map((id) => ({ kind: 'node', id }
 	const bf = JSON.stringify(L.serializeProject());
 	asked = []; answer = false;
 	let dn = L.morphVertex();
-	ok('5.1 a dialog asks, naming the reason and the switch', dn === 0 && asked.length === 1 && asked[0].indexOf(PC.lpn_morph_vertex_base) === 0 && PC.lpn_morph_vertex_switch === 'Switch to Base and morph', JSON.stringify(asked));
+	ok('5.1 a dialog asks, naming the reason and the switch', dn === 0 && asked.length === 1 && asked[0].indexOf(PC.lpn_morph_vertex_base) === 0 && asked[0] === PC.lpn_morph_vertex_base_ask && !!PC.lpn_morph_vertex_switch, JSON.stringify(asked));
 	ok('5.2 Cancel leaves everything as it was, still in the scenario', JSON.stringify(L.serializeProject()) === bf);
 	asked = []; answer = true; sel(L, [J]);
 	L.morphVertex();
