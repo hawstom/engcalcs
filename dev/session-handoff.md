@@ -95,19 +95,25 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-27 1 AM (forty-second session, Opus main, Sonnet agents)
+## STATE — 2026-10-28 12:30 AM (forty-fourth session, Opus main, Sonnet agents)
 
-- **Pushed c5f2bbbb8:** `fix/example-crs` (826 closed) and `fix/dup-keys` (49 keys) on his word; defects `fix/open-docked` (`revealBox()`; Pipe types/Fittings/Curves links fly out a tucked box) and `fix/form-restore` (`js/no-form-restore.js`: Chrome's back/forward refill put stale values in Settings label boxes by position; his "offset" bug, reproduced).
-- **Pushed 3cfe9e042:** `fix/bottom-pane-lag-2` (tooltip disposal of rebuilt controls, `ecTipDo`; growth harness) and both pane timing harnesses report-only (load 30 on 24 threads made toggles read 2.8 s). Ida's label study: `dev/agents/interface-designer/label-study-2026-10-26.md`.
-- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Five concurrent full runs on 10-26 took 50 to 70 min each and failed on load. Agents stop at `--fast`, `--node-only` and their harnesses alone; the orchestrator runs one full suite per merge batch with nothing heavy beside it. Brief template: rule 7 of the session's `brief-common.md`; copy it forward.
-- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles, every tab). Owed by him: which tab, and does it follow toggle count or time since load; a Chrome Performance trace.
-- **Waiting on his browser pass, master merged into each, steps on the previews page:** `fix/phone-select` (827, 9c284b295: Settings pinned on PC, labels rows two-line group wrap, morph confirm reachable on Net1 junction 32), `feat/report-buttons` (829, c4a7535e8: units in headings via `lpn_heading_unit`, ID columns 7.5ch, Copy HTML widths for Google Docs), `feat/box-rows-properties` (828, 2b8b40918: spreadsheet boxes, Perry passed on re-check; Properties docks at 25.5 rem; divider width shared across element types). Each needs a full suite on its merge (payload freshness fails until payloads are regenerated there). His open question: left header "Label" or "Property" (Perry and I recommend Property).
-- **Seams at merge:** all three touch `dev/new-english-keys.md` and lang files; 827 and 828 both touch the dock table (`lpn_popup` width) and `open-docked-browser-harness.js` (827 gave it its own all-docked list; 828 made it use the Edit options).
-- **For his approval:** "Conc.", "{chemical} conc." (829); "Clear initial quality {quality} on {id}?", "Initial quality {quality} is cleared too." (827); "Auto length", "Edit types…", "Edit fittings…" (828). `lpn_morph_vertex_own` wording is now stale (elevation is asked, not refused).
-- **Next sprint:** tr `lpn_field_km_short` reads "small loss" (Ida).
-- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`.
-- **Trap met:** a merged-to-master fix can leave every feature branch behind; merge master into each live branch the same evening, before asking him to test.
-- **Trap met:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
+- **Pushed master 76f41ef3f:** `fix/loop-residual` (Task 847 fix: a no-demand network now converges to a nanolitre per second, not to Accuracy; `native-zero-demand-loop-harness.js`). Close 847 in the roadmap when box-design merges (its block lives on box-design).
+- **`box-design` (port 8103) waits on his browser pass and typed word**: his 10-27 night notes are Tasks 842-846 on it, all built (sheet style on seven boxes with no first-column heading, global dark option colours, Settings 618 px and wrapped-row spacing and phone heading bar, reports fit 814 px with whole words and "And others" and "Time (hr)" and Copy HTML weights, Morph-to-vertex dialog offering Base, Basic tick in both modes, Tables headings use the short Properties keys, "Asset type"). Perry passed it; his three findings fixed. Its full suite reran after five stale harnesses were re-baselined (`fix/box-suite`): result in scratch `orch-boxdesign-full2.log`. On merge: regenerate payloads, close 827-829, 833-846 that he accepts.
+- **`feat/starter-example` (port 8107, Task 823)** waits on his pass: four gallery cards (fire flow extension and community well, US and SI), built by `dev/scripts/build_starter_examples.js`. Perry passed it after fixes. His calls owed: gallery order (recommended US starters first), eight card strings.
+- **His questions are in `~/tom-files/messenger.md`** (2026-10-28): adjustable report column widths (stores widths per browser: needs his word), rotated headings, Settings pinned at first view, two morph strings, a names-policing branch (long names remain in Settings defaults, Find, labels, .inp upload, reports; Tables "Valve type" vs Properties "Type").
+- **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
+- **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
+- **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
+- Seen flaky under load, green alone: `settings-select-lag-harness.js`, `contour-harness.js`, `new-project-pan-harness.js`.
+- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`, Task 825 his audit pass.
+- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch with nothing heavy beside it.
+- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
+- **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
+- **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
+- **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
+- **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
+- **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/50be4610-c6ae-4dbe-a64d-5427205a8e18/scratchpad (brief-common.md for agents).
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
