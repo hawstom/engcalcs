@@ -189,7 +189,7 @@ async function main() {
 		], sentence, 'lpn_crit_title');
 		const li = crit.head.findIndex((h) => new RegExp('^' + L.lowP + ': ' + L.pressure).test(h));
 		ok('Criticality: the pressure column is bare numbers, its unit (psi) in the heading', li > 0 && /\(psi\)/.test(crit.head[li]) && crit.csv.slice(1).every((r) => r[li] === '' || /^-?\d+(\.\d+)?$/.test(r[li])), crit.head[li]);
-		const lj = crit.head.findIndex((h) => new RegExp('^' + L.lowP + ': ' + L.junction).test(h)), lt = crit.head.findIndex((h) => new RegExp('^' + L.lowP + ': ' + L.time).test(h));
+		const lj = crit.head.findIndex((h) => new RegExp('^' + L.lowP + ': ' + L.junction).test(h)), lt = crit.head.findIndex((h) => new RegExp('^' + L.lowP + ': ' + L.time.replace(/[()]/g, '\\$&')).test(h));
 		ok('Criticality: a row with a pressure also names its junction and its time', crit.csv.slice(1).some((r) => r[li] !== '' && r[lj] !== '' && /^\d+:\d\d$/.test(r[lt])), (crit.csv[1] || []).join('|'));
 		await closeBox('lpn_crit_box');
 

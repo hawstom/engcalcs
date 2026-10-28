@@ -227,7 +227,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Step of lowest flow
   _Ruled OK 2026-10-20._
 - **`lpn_ff_col_more`**
-  > More affected
+  > And others
   @@ NEEDS RULING
 - **`lpn_ff_no_steps`**
   > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
@@ -257,7 +257,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
   _Ruled 2026-10-22: Approved._
 - **`lpn_field_km_fittings_tip`**
-  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list" to type a value.
+  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list chosen" to type a value.
   @@ NEEDS RULING
 - **`lpn_field_km_short_tip`**
   > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
@@ -755,7 +755,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`e6bbee6d3`) — adds no English strings
+### box-design (`a7e3222f8`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -967,7 +967,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`54d2059a4`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`0ae74603c`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
@@ -1163,8 +1163,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/box-style (`8f3662b4f`) — already merged into box-design; its strings are listed there
 
-### fix/box-words (`0d4a73575`) — adds no English strings
+### fix/box-words (`82eebd452`) — already merged into box-design; its strings are listed there
 
-### fix/report-width (`8f3662b4f`) — already merged into box-design; its strings are listed there
+### fix/report-width (`040976a3c`) — adds no English strings
 
 ### fix/settings-fit (`17413e4d7`) — already merged into box-design; its strings are listed there
