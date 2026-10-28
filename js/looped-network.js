@@ -83592,20 +83592,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (mr.disabled) { b.setAttribute('aria-disabled', 'true'); }
 		});
 		host.appendChild(tools);
-		lab = document.createElement('label');
+		smBasicTick(host);
+		initTipsIn(host);
+	}
+	// **THE BASIC MODE TICK STAYS IN THE BOX IN BOTH STATES** (Tom, 2026-10-27: "it probably should be
+	// persistent across modes instead of disappearing in Basic-off mode."). Disabled, with the misfit
+	// sentence as its tip, when the project cannot be shown in Basic mode.
+	function smBasicTick(host) {
+		var pc = EngCalcs.pageConfig || {}, lab = document.createElement('label'), tick = document.createElement('input'),
+			misfit = !scenarioBasicMode && !!basicModeMisfit();
 		lab.className = 'lpn-sm-basic-tick';
-		tick = document.createElement('input');
 		tick.type = 'checkbox';
 		tick.id = 'lpn_sm_basic_mode';
 		tick.checked = scenarioBasicMode;
+		tick.disabled = misfit;
 		tick.addEventListener('change', function () {
 			if (!setScenarioBasicMode(tick.checked)) { tick.checked = scenarioBasicMode; }
 		});
 		lab.appendChild(tick);
 		lab.appendChild(document.createTextNode(' ' + (pc.lpn_scenario_basic || 'Basic mode')));
-		if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
+		if (misfit) { lab.title = basicMisfitText(); }
+		else if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
 		host.appendChild(lab);
-		initTipsIn(host);
 	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
@@ -83647,7 +83655,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
 		host.appendChild(tools);
-		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smTableRefresh(); return; }
+		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smBasicTick(host); smTableRefresh(); return; }
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		// The buttons act on the selected item, the right-click menu on the item clicked; both are
@@ -83679,6 +83687,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.scrollTop = scroll;
 		// The gestures and keys are written in the title's "?" (Tom, 2026-10-11: "Move the footer
 		// text to the tip."), so nothing sits under the tree.
+		smBasicTick(host);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }
