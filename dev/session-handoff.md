@@ -95,18 +95,25 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-27 evening (forty-third session, Opus main, Sonnet agents)
+## STATE — 2026-10-28 12:30 AM (forty-fourth session, Opus main, Sonnet agents)
 
-- **`box-design` is the one branch to test** (port 8103, steps on its row): fix/phone-select (827), feat/box-rows-properties (828) and feat/report-buttons (829) merged, plus Tom's 10-27 notes as Tasks 833 to 841, all built. Those three branches and their ports are deleted. It merges to master only on his typed word after his browser pass. His report: `~/tom-files/messenger.md` (nine questions under "Needs your word").
-- Built today on it: first-view docks before the project loads (the 20 s Net3 freeze was ~1M label stations at a stale scale; 841 caps them at 10,000 per pipe); every box auto-hidden at first view, nothing pinned; a pinned box keeps its edge tab, pressed; phone Settings jump bar; Show/Drop 2.2 rem; one-cell override gutter; borderless Properties cells, read-only in muted ink; Ida's short labels with tips; "Edit curves…"; report sentence cells split under compound headings; tucked boxes `content-visibility: hidden` (phone freeze 4.8 s to 1.2 s at 4x); Properties docks at 22.5 rem.
-- **Questions out to him:** Tables headings follow the short Properties labels?; report boxes wider than their tables (Scenario comparison 1423 px in 814)?; "Time" without "(hr)"; Morph to vertex in a scenario as a dialog offering Base?; "Property" vs "Label"; `lpn_morph_vertex_own` wording; new strings and tips listed in messenger.md; may the guide strings `lpn_guide_scn_example_def`, `lpn_guide_cmp_cols_def`, `lpn_guide_ff_result_def` be reworded for the split columns?; two "Type" rows on a valve in a morphed scenario ("Asset type"?).
-- **Deploy:** recommended he pull master (form-restore and defect fixes only).
-- **Trap met:** a worktree has no `dev/browser-pass/node_modules`; `check_all` there fails every browser harness (636 lines, "Cannot find module playwright-core"). `ln -s ~/webdev/hawsedc.com/engcalcs/dev/browser-pass/node_modules dev/browser-pass/node_modules` first; it is ignored by git. Brief agents to do the same.
-- **Trap met:** an automated browser starts with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`; so no harness covers selection flying out a docked, auto-hidden Properties.
-- **Trap met:** a suite started with `nohup` does not show in Tom's shell list, and he took the empty list to mean done. Start long runs with the Bash tool's background mode.
-- `settings-select-lag-harness.js` fails in company most runs and passes alone (30/30).
-- Next sprint: tr `lpn_field_km_short` reads "small loss" (Ida); it now shows in five boxes.
-- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`.
+- **Pushed master 76f41ef3f:** `fix/loop-residual` (Task 847 fix: a no-demand network now converges to a nanolitre per second, not to Accuracy; `native-zero-demand-loop-harness.js`). Close 847 in the roadmap when box-design merges (its block lives on box-design).
+- **`box-design` (port 8103) waits on his browser pass and typed word**: his 10-27 night notes are Tasks 842-846 on it, all built (sheet style on seven boxes with no first-column heading, global dark option colours, Settings 618 px and wrapped-row spacing and phone heading bar, reports fit 814 px with whole words and "And others" and "Time (hr)" and Copy HTML weights, Morph-to-vertex dialog offering Base, Basic tick in both modes, Tables headings use the short Properties keys, "Asset type"). Perry passed it; his three findings fixed. Its full suite reran after five stale harnesses were re-baselined (`fix/box-suite`): result in scratch `orch-boxdesign-full2.log`. On merge: regenerate payloads, close 827-829, 833-846 that he accepts.
+- **`feat/starter-example` (port 8107, Task 823)** waits on his pass: four gallery cards (fire flow extension and community well, US and SI), built by `dev/scripts/build_starter_examples.js`. Perry passed it after fixes. His calls owed: gallery order (recommended US starters first), eight card strings.
+- **His questions are in `~/tom-files/messenger.md`** (2026-10-28): adjustable report column widths (stores widths per browser: needs his word), rotated headings, Settings pinned at first view, two morph strings, a names-policing branch (long names remain in Settings defaults, Find, labels, .inp upload, reports; Tables "Valve type" vs Properties "Type").
+- **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
+- **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
+- **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
+- Seen flaky under load, green alone: `settings-select-lag-harness.js`, `contour-harness.js`, `new-project-pan-harness.js`.
+- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`, Task 825 his audit pass.
+- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch with nothing heavy beside it.
+- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
+- **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
+- **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
+- **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
+- **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
+- **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/50be4610-c6ae-4dbe-a64d-5427205a8e18/scratchpad (brief-common.md for agents).
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
