@@ -71835,7 +71835,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		valueWarnPaint(label, valueWarnText('length', l, effective(l, 'length')));   // dev/value-warning.md
 		// Auto length is its own row above Length, its toggle in the value column (Tom, 2026-10-26: the toggle
 		// beside Length broke the table).
-		setFieldLabel(autoLabel, pc.lpn_field_auto_length || 'Auto length');
+		setFieldLabel(autoLabel, pc.lpn_field_auto_length || 'Auto length', pc.lpn_field_auto_length_tip);
 		autoLabel.appendChild(auto);
 		fields.appendChild(autoLabel);
 		fields.appendChild(document.createElement('br'));

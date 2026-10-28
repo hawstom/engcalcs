@@ -3007,6 +3007,7 @@ EngCalcs.pageConfig = {
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,
 	lpn_field_auto_length: <?=json_encode($ec_lang['lpn_field_auto_length'])?>,
+	lpn_field_auto_length_tip: <?=json_encode($ec_lang['lpn_field_auto_length_tip'])?>,
 	lpn_prop_label_unit: <?=json_encode($ec_lang['lpn_prop_label_unit'])?>,
 	lpn_prop_label_symbol_unit: <?=json_encode($ec_lang['lpn_prop_label_symbol_unit'])?>,
 	lpn_prop_label_symbol: <?=json_encode($ec_lang['lpn_prop_label_symbol'])?>,
