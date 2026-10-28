@@ -47,7 +47,7 @@ function columns(page, root) {
 		return {
 			rows: rows.length,
 			name: Array.from(new Set(rows.map((r) => x(r.querySelector('.lpn-gname'))))),
-			val: Array.from(new Set(rows.filter((r) => vis(r.querySelector('.lpn-gval'))).map((r) => x(r.querySelector('.lpn-gval')))))
+			val: Array.from(new Set(rows.filter((r) => vis(r.querySelector('.lpn-gval'))).map((r) => { const v = r.querySelector('.lpn-gval'); return x(v) - (v.matches('input[type=checkbox],input[type=radio]') && v.closest('.lpn-sheet') ? 6 : 0); })))   /* a toggle in the standard sheet style stands 6 px in, under its text */
 		};
 	}, root);
 }

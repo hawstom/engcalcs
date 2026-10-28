@@ -83,7 +83,7 @@ async function main() {
 			const rows = Array.from(f.children).filter((c) => c.nodeName === 'LABEL' && c.querySelector('.lpn-gname'));
 			const off = Array.from(f.children).filter((c) => {
 				const cs = getComputedStyle(c), k = c.className || '';
-				return !(cs.display === 'contents' || cs.display === 'none' || (cs.display === 'grid' && /lpn-grow|lpn-ghdr/.test(k)) || /lpn-gspan/.test(k) || /lpn-ggut/.test(k));
+				return !(cs.display === 'contents' || cs.display === 'none' || (cs.display === 'grid' && /lpn-grow|lpn-ghdr/.test(k)) || /lpn-gspan/.test(k) || /lpn-ggut/.test(k) || /lpn-gsplit/.test(k));   // the divider is positioned over the Label column, not a row
 			}).map((c) => c.nodeName + '.' + c.className);
 			const first = (sel) => rows.map((r) => r.querySelector(sel)).filter(Boolean);
 			const w = (prop) => { const i = f.querySelector('input[data-gprop="' + prop + '"]'); return i ? Math.round(R(i).width) : null; };

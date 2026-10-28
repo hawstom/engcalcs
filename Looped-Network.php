@@ -1021,7 +1021,7 @@ echoHeader("EngCalcsApp", $html_title,
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
       // the property and condition lists depend on which kind of element you chose. ?>
-<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-findbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
+<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-sheetbox lpn-findbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
 	      // the panel itself there and a child everywhere else, so a drag can never start on a
 	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -1372,7 +1372,7 @@ echoHeader("EngCalcsApp", $html_title,
       // scrolling body -- so there is one set of box mechanics on this page rather than a third.
       // The controls and both reports are built in JS (buildFireFlowBox), because what is in them
       // depends entirely on the document and on what the last run found. ?>
-<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffbox_title">
+<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffbox_title">
 	<div id="lpn_ffbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_title']?></div>
 	<button type="button" id="lpn_ff_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1389,7 +1389,7 @@ echoHeader("EngCalcsApp", $html_title,
       // loses. Fire flow's sibling, on the same box shell; the controls and the report are built in
       // JS (buildCriticalityControls, rebuildCriticalityReport). Its progress uses fire flow's run
       // dialog below, retitled for the run. ?>
-<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_critbox_title">
+<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_critbox_title">
 	<div id="lpn_critbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crit_title']?></div>
 	<button type="button" id="lpn_crit_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1401,7 +1401,7 @@ echoHeader("EngCalcsApp", $html_title,
       // a copy, and the largest multiplier the system holds above a pressure limit. The third
       // sibling on fire flow's box shell; built in JS (buildDemandScaleControls,
       // rebuildDemandScaleReport). ?>
-<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_dsbox_title">
+<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_dsbox_title">
 	<div id="lpn_dsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ds_title']?></div>
 	<button type="button" id="lpn_ds_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1426,7 +1426,7 @@ echoHeader("EngCalcsApp", $html_title,
       // Find box's shell: the drag band holds the title, the body is rows of a name and a control,
       // built in JS by buildContourBox() because every row reads the project's settings. Remembered
       // per browser as `lpn_contourbox`, like every other standing box. ?>
-<div id="lpn_contour_box" class="d-print-none lpn-popover lpn-findbox lpn-contourbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_contour_title">
+<div id="lpn_contour_box" class="d-print-none lpn-popover lpn-sheetbox lpn-findbox lpn-contourbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_contour_title">
 	<div id="lpn_contour_title" class="lpn-setbox-title"><?=$ec_lang['lpn_contour_plot']?></div>
 	<button type="button" id="lpn_contour_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div id="lpn_contour_body" class="lpn-popover-body"></div>
