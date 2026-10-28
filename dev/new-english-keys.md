@@ -755,7 +755,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`a7e3222f8`) — adds no English strings
+### box-design (`6256b8ff3`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -967,7 +967,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`0ae74603c`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`80303ded2`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
@@ -985,7 +985,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 255 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
+  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Community well and tank, L/s (SI)
@@ -1161,10 +1161,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/box-style (`8f3662b4f`) — already merged into box-design; its strings are listed there
+### fix/box-style (`f8ec825ac`) — already merged into box-design; its strings are listed there
 
 ### fix/box-words (`82eebd452`) — already merged into box-design; its strings are listed there
 
-### fix/report-width (`040976a3c`) — adds no English strings
+### fix/report-width (`040976a3c`) — already merged into box-design; its strings are listed there
 
 ### fix/settings-fit (`17413e4d7`) — already merged into box-design; its strings are listed there

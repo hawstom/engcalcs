@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 3201,
-        "delta_key_count": 293,
-        "english_changed_key_count": 59,
+        "expected_key_count": 3203,
+        "delta_key_count": 297,
+        "english_changed_key_count": 61,
         "exempt_key_count": 65,
         "exempt_keys": [
             "calc_units_us",
@@ -108,8 +108,9 @@
         "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_scn_open_def": "<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.<\/p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.<\/p>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">Lowest pressure<\/td><td colspan=\"3\">Highest velocity<\/td><\/tr><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Junction<\/td><td>Pressure (psi)<\/td><td>Time (hr)<\/td><td>Link<\/td><td>Velocity (ft\/sec)<\/td><td>Time (hr)<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2.76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2.87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>N32<\/td><td>15.78<\/td><td>9:00<\/td><td>L10<\/td><td>3.49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, and the Time (hr) column beside it gives when it occurs. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
+        "lpn_guide_cmp_cols_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>The name of the scenario. The open scenario is marked (currently open).<\/td><\/tr><tr><td>No. of overrides<\/td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.<\/td><\/tr><tr><td>Demand multiplier, Total run time, Hydraulic time step<\/td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.<\/td><\/tr><tr><td>Lowest pressure: Junction, Pressure, Time (hr)<\/td><td>The lowest pressure at a junction, in three columns: the ID of the junction, the pressure, and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.<\/td><\/tr><tr><td>Highest velocity: Link, Velocity, Time (hr)<\/td><td>The highest velocity in a pipe or valve, in three columns: the ID of the link, the velocity, and the time it occurs. Pumps are left out.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
@@ -133,6 +134,8 @@
         "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_morph_vertex": "Vertex",
         "lpn_morph_vertex_base": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.",
+        "lpn_morph_vertex_base_ask": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?",
+        "lpn_morph_vertex_switch": "Switch to Base and morph",
         "lpn_morph_vertex_type": "{id} was not morphed into a vertex: only a junction can become one.",
         "lpn_morph_vertex_links": "{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.",
         "lpn_morph_vertex_kind": "{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.",
@@ -286,6 +289,7 @@
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.",
         "lpn_report_copy_html": "Copy HTML",
+        "lpn_full_col_time": "Time (hr)",
         "lpn_library_import": "Libraries…",
         "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -343,7 +347,7 @@
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
-        "lpn_ff_col_more": "More affected",
+        "lpn_ff_col_more": "And others",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -383,7 +387,7 @@
         "lpn_field_active_short": "Active",
         "lpn_field_cv_short": "Check valve",
         "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
-        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.",
+        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose \"No fittings list chosen\" to type a value.",
         "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
         "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
         "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
@@ -391,7 +395,7 @@
         "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
         "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
         "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_auto_length_tip": "Auto length: when checked, the pipe length is measured along the drawn line, including the slope between the end elevations, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
+        "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -403,8 +407,9 @@
         "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_scn_open_def": "<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.<\/p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.<\/p>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">Lowest pressure<\/td><td colspan=\"3\">Highest velocity<\/td><\/tr><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Junction<\/td><td>Pressure (psi)<\/td><td>Time (hr)<\/td><td>Link<\/td><td>Velocity (ft\/sec)<\/td><td>Time (hr)<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2.76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2.87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>N32<\/td><td>15.78<\/td><td>9:00<\/td><td>L10<\/td><td>3.49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, and the Time (hr) column beside it gives when it occurs. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
+        "lpn_guide_cmp_cols_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>The name of the scenario. The open scenario is marked (currently open).<\/td><\/tr><tr><td>No. of overrides<\/td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.<\/td><\/tr><tr><td>Demand multiplier, Total run time, Hydraulic time step<\/td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.<\/td><\/tr><tr><td>Lowest pressure: Junction, Pressure, Time (hr)<\/td><td>The lowest pressure at a junction, in three columns: the ID of the junction, the pressure, and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.<\/td><\/tr><tr><td>Highest velocity: Link, Velocity, Time (hr)<\/td><td>The highest velocity in a pipe or valve, in three columns: the ID of the link, the velocity, and the time it occurs. Pumps are left out.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
@@ -428,6 +433,8 @@
         "lpn_georef_size_prompt": "Approximate project width east to west?",
         "lpn_morph_vertex": "Vertex",
         "lpn_morph_vertex_base": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.",
+        "lpn_morph_vertex_base_ask": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?",
+        "lpn_morph_vertex_switch": "Switch to Base and morph",
         "lpn_morph_vertex_type": "{id} was not morphed into a vertex: only a junction can become one.",
         "lpn_morph_vertex_links": "{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.",
         "lpn_morph_vertex_kind": "{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.",
@@ -581,6 +588,7 @@
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.",
         "lpn_report_copy_html": "Copy HTML",
+        "lpn_full_col_time": "Time (hr)",
         "lpn_library_import": "Libraries…",
         "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -638,7 +646,7 @@
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
-        "lpn_ff_col_more": "More affected",
+        "lpn_ff_col_more": "And others",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -678,7 +686,7 @@
         "lpn_field_active_short": "Active",
         "lpn_field_cv_short": "Check valve",
         "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
-        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose no fittings list to type a value.",
+        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose \"No fittings list chosen\" to type a value.",
         "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
         "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
         "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
@@ -686,7 +694,7 @@
         "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
         "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
         "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_auto_length_tip": "Auto length: when checked, the pipe length is measured along the drawn line, including the slope between the end elevations, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
+        "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
     },
     "key_context": {
         "consent_body": {
@@ -835,7 +843,7 @@
         },
         "lpn_guide_scn_example_def": {
             "reason": "english_changed",
-            "current_value": "<p>Öffnen Sie das Beispiel Net1. Wählen Sie Wasser, Szenarien, Neues Szenario…, geben Sie Larger main ein und klicken Sie auf OK. Wählen Sie Rohr 10 auf der Karte und geben Sie in Eigenschaften 24 als Durchmesser ein; Basis hat 18 in., unter dem Feld angezeigt als Basisszenario: 18. Wählen Sie Basis in der Szenarienliste, wählen Sie erneut Neues Szenario…, geben Sie Max day ein und geben Sie unter Einstellungen, Berechnung, Hydraulik 1,8 als Entnahmefaktor ein. Wählen Sie dann Wasser, Berichte, Szenarienvergleich.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Szenario<\/td><td>Anzahl der Überschreibungen<\/td><td>Entnahmefaktor<\/td><td>Niedrigster Druck<\/td><td>Höchste Geschwindigkeit<\/td><\/tr><tr><td>Basis<\/td><td>0<\/td><td>1<\/td><td>108 psi bei N32, 14:00<\/td><td>2,76 ft\/sec bei L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi bei N32, 14:00<\/td><td>2,87 ft\/sec bei L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1,8<\/td><td>15,78 psi bei N32, 9:00<\/td><td>3,49 ft\/sec bei L10, 9:00<\/td><\/tr><\/tbody><\/table><p>Die Gesamtlaufzeit beträgt in allen drei 24:00, daher ist jeder niedrigste Druck und jede höchste Geschwindigkeit der Extremwert über den Tag, zu der angezeigten Zeit. Die größere Hauptleitung hebt den niedrigsten Druck um etwa 1 psi. Ein Faktor von 1,8 senkt ihn auf 15,78 psi um 9:00, und die höchste Geschwindigkeit wandert zu Rohr 10. Jedes Szenario enthält eine Überschreibung, und Basis behält seine Werte.<\/p>",
+            "current_value": "<p>Öffnen Sie das Beispiel Net1. Wählen Sie Wasser, Szenarien, Neues Szenario…, geben Sie Larger main ein und klicken Sie auf OK. Wählen Sie Rohr 10 auf der Karte und geben Sie in Eigenschaften 24 als Durchmesser ein; Basis hat 18 in., unter dem Feld angezeigt als Basisszenario: 18. Wählen Sie Basis in der Szenarienliste, wählen Sie erneut Neues Szenario…, geben Sie Max day ein und geben Sie unter Einstellungen, Berechnung, Hydraulik 1,8 als Entnahmefaktor ein. Wählen Sie dann Wasser, Berichte, Szenarienvergleich.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">Niedrigster Druck<\/td><td colspan=\"3\">Höchste Geschwindigkeit<\/td><\/tr><tr><td>Szenario<\/td><td>Anzahl der Überschreibungen<\/td><td>Entnahmefaktor<\/td><td>Entnahmeknoten<\/td><td>Druck (psi)<\/td><td>Zeit (hr)<\/td><td>Verbindung<\/td><td>Geschwindigkeit (ft\/sec)<\/td><td>Zeit (hr)<\/td><\/tr><tr><td>Basis<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2,76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2,87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1,8<\/td><td>N32<\/td><td>15,78<\/td><td>9:00<\/td><td>L10<\/td><td>3,49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>Die Gesamtlaufzeit beträgt in allen drei 24:00, daher ist jeder niedrigste Druck und jede höchste Geschwindigkeit der Extremwert über den Tag, zu der angezeigten Zeit. Die größere Hauptleitung hebt den niedrigsten Druck um etwa 1 psi. Ein Faktor von 1,8 senkt ihn auf 15,78 psi um 9:00, und die höchste Geschwindigkeit wandert zu Rohr 10. Jedes Szenario enthält eine Überschreibung, und Basis behält seine Werte.<\/p>",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_guide_scn_example_term",
@@ -862,6 +870,22 @@
                     "key": "lpn_guide_cmp_cols_term",
                     "value": "Was die Tabelle enthält",
                     "english": "What the table holds"
+                }
+            }
+        },
+        "lpn_guide_cmp_cols_def": {
+            "reason": "english_changed",
+            "current_value": "<table class=\"lpn-notes-table\"><tbody><tr><td>Szenario<\/td><td>Der Name des Szenarios. Das geöffnete Szenario ist mit (derzeit geöffnet) markiert.<\/td><\/tr><tr><td>Anzahl der Überschreibungen<\/td><td>Die Überschreibungen des Szenarios selbst, gezählt wie in der Szenarienliste. Eine Berechnungsoption wie der Entnahmefaktor zählt als eine, und eine Überschreibung, die dem geerbten Wert entspricht, zählt mit.<\/td><\/tr><tr><td>Entnahmefaktor, Gesamtlaufzeit, Hydraulischer Zeitschritt<\/td><td>Die Werte, mit denen das Szenario berechnet wurde, seine eigenen oder die des Projekts. Ein stationäres Szenario zeigt beim Zeitschritt einen Strich.<\/td><\/tr><tr><td>Niedrigster Druck<\/td><td>Der niedrigste Druck an einem Entnahmeknoten, mit seiner ID und der Zeit, zu der er auftritt. Reservoire und Tanks sind ausgenommen, weil jedes eine feste Druckhöhe hat.<\/td><\/tr><tr><td>Höchste Geschwindigkeit<\/td><td>Die höchste Geschwindigkeit in einem Rohr oder Ventil, mit seiner ID und der Zeit, zu der sie auftritt. Pumpen sind ausgenommen.<\/td><\/tr><\/tbody><\/table>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_cols_term",
+                    "value": "Was die Tabelle enthält",
+                    "english": "What the table holds"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_run_term",
+                    "value": "Stationäre Szenarien und Szenarien mit erweitertem Zeitraum",
+                    "english": "Steady-state and extended-period scenarios"
                 }
             }
         },
@@ -1218,6 +1242,38 @@
             }
         },
         "lpn_morph_vertex_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_morph_ok",
+                    "value": "Ändern",
+                    "english": "Morph"
+                },
+                "next_translated": {
+                    "key": "lpn_morph_other_kind",
+                    "value": "Ein Knoten kann nur in einen anderen Knotentyp und eine Verbindung nur in einen anderen Verbindungstyp geändert werden. Nicht geändert: {ids}",
+                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
+                }
+            }
+        },
+        "lpn_morph_vertex_base_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_morph_ok",
+                    "value": "Ändern",
+                    "english": "Morph"
+                },
+                "next_translated": {
+                    "key": "lpn_morph_other_kind",
+                    "value": "Ein Knoten kann nur in einen anderen Knotentyp und eine Verbindung nur in einen anderen Verbindungstyp geändert werden. Nicht geändert: {ids}",
+                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
+                }
+            }
+        },
+        "lpn_morph_vertex_switch": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3751,7 +3807,23 @@
                 "next_translated": {
                     "key": "lpn_full_col_time",
                     "value": "Zeit",
-                    "english": "Time"
+                    "english": "Time (hr)"
+                }
+            }
+        },
+        "lpn_full_col_time": {
+            "reason": "english_changed",
+            "current_value": "Zeit",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_print",
+                    "value": "Bericht drucken",
+                    "english": "Print report"
+                },
+                "next_translated": {
+                    "key": "lpn_full_col_type",
+                    "value": "Typ",
+                    "english": "Type"
                 }
             }
         },
@@ -5157,7 +5229,7 @@
             },
             "tip": {
                 "key": "lpn_field_auto_length_tip",
-                "english": "Auto length: when checked, the pipe length is measured along the drawn line, including the slope between the end elevations, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
+                "english": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
             }
         },
         "lpn_edit_pipetypes": {
@@ -5443,6 +5515,14 @@
             }
         ],
         "lpn_guide_scn_notes_def": [
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
+        "lpn_guide_cmp_cols_def": [
             {
                 "concept": "family-tree-inherit",
                 "plain_name": "A family tree inherit-",
