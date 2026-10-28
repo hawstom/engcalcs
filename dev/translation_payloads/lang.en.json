@@ -3200,9 +3200,10 @@
         "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
         "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
         "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.",
+        "lpn_field_auto_length_tip": "Auto length: when checked, the pipe length is measured along the drawn line, including the slope between the end elevations, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.",
         "lpn_prop_label_symbol": "{label}, {symbol}"
     },
-    "count": 3200,
+    "count": 3201,
     "active_prefixes": [
         "about",
         "bpn",
