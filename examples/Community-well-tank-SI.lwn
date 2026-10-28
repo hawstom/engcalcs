@@ -17,13 +17,13 @@
 		},
 		{
 			"id": "s1",
-			"name": "5. Max Day",
+			"name": "1. Max Day",
 			"overrides": {},
 			"calc": "c1"
 		},
 		{
 			"id": "s2",
-			"name": "6. Peak hour",
+			"name": "2. Peak hour",
 			"overrides": {},
 			"calc": "c2"
 		}
@@ -34,17 +34,17 @@
 			"type": "junction",
 			"x": 0,
 			"y": 0,
-			"elev": 452.6,
+			"elev": 454.5,
 			"_demand": 0,
-			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1.",
+			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.",
 			"demandPattern": "DAILY"
 		},
 		{
 			"id": "C-1",
 			"type": "junction",
-			"x": 121.9,
+			"x": 120,
 			"y": 0,
-			"elev": 451.1,
+			"elev": 451,
 			"_demand": 0,
 			"desc": "Where the well supply enters the loop.",
 			"demandPattern": "DAILY"
@@ -52,74 +52,74 @@
 		{
 			"id": "C-2",
 			"type": "junction",
-			"x": 182.9,
+			"x": 180,
 			"y": 0,
 			"elev": 450.5,
-			"_demand": 0.38,
+			"_demand": 0.4,
 			"desc": "Thirteen houses.",
 			"demandPattern": "DAILY"
 		},
 		{
 			"id": "C-3",
 			"type": "junction",
-			"x": 243.8,
+			"x": 240,
 			"y": 0,
-			"elev": 449.9,
-			"_demand": 0.32,
+			"elev": 450,
+			"_demand": 0.3,
 			"desc": "Eleven houses.",
 			"demandPattern": "DAILY"
 		},
 		{
 			"id": "C-4",
 			"type": "junction",
-			"x": 243.8,
-			"y": 106.7,
-			"elev": 449.3,
-			"_demand": 0.32,
+			"x": 240,
+			"y": 105,
+			"elev": 449.5,
+			"_demand": 0.3,
 			"desc": "Eleven houses. The tank connects here, the only tank connection.",
 			"demandPattern": "DAILY"
 		},
 		{
 			"id": "C-5",
 			"type": "junction",
-			"x": 182.9,
-			"y": 106.7,
-			"elev": 449.9,
-			"_demand": 0.25,
+			"x": 180,
+			"y": 105,
+			"elev": 450,
+			"_demand": 0.3,
 			"desc": "Nine houses.",
 			"demandPattern": "DAILY"
 		},
 		{
 			"id": "FH-1",
 			"type": "junction",
-			"x": 121.9,
-			"y": 106.7,
+			"x": 120,
+			"y": 105,
 			"elev": 450.5,
-			"_demand": 0.25,
-			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 31.5 L/s with 14 m residual, for two hours from the tank.",
+			"_demand": 0.3,
+			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 32 L/s with 14 m residual, for two hours from the tank and the pump.",
 			"demandPattern": "DAILY",
 			"_fireFlow": 32
 		},
 		{
 			"id": "WELL-1",
 			"type": "reservoir",
-			"x": -121.9,
+			"x": -120,
 			"y": 0,
-			"_head": 405.4,
-			"desc": "Community well, as a fixed head at its pumping water level, 48.8 m below the 454.2 m ground at the wellhead."
+			"_head": 405.5,
+			"desc": "Community well, as a fixed head at its pumping water level, 49 m below the 454.5 m ground at the wellhead."
 		},
 		{
 			"id": "TANK-1",
 			"type": "tank",
-			"x": 390.1,
-			"y": 137.2,
-			"elev": 484.6,
-			"bottomElev": 484.6,
-			"_level": 4,
+			"x": 385,
+			"y": 135,
+			"elev": 485,
+			"bottomElev": 485,
+			"_level": 5.2,
 			"minLevel": 0.6,
-			"maxLevel": 6.1,
-			"tankDiameter": 7.3,
-			"desc": "Ground storage tank on the hill above the community, 7.3 m in diameter and 6.1 m high, about 255 cubic meters."
+			"maxLevel": 6,
+			"tankDiameter": 7.5,
+			"desc": "Ground storage tank on the hill above the community, 7.5 m in diameter and 6 m high, about 265 cubic meters."
 		}
 	],
 	"links": [
@@ -131,7 +131,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 122,
+			"_length": 120,
 			"lenAuto": false,
 			"_status": "cv",
 			"_k": 0,
@@ -145,7 +145,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 61,
+			"_length": 60,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -158,7 +158,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 61,
+			"_length": 60,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -171,7 +171,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 107,
+			"_length": 105,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -184,7 +184,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 61,
+			"_length": 60,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -197,7 +197,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 61,
+			"_length": 60,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -210,7 +210,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 107,
+			"_length": 105,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -224,7 +224,7 @@
 			"verts": [],
 			"_diameter": 200,
 			"_roughness": 130,
-			"_length": 149,
+			"_length": 148,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -239,7 +239,7 @@
 			"_diameter": 150,
 			"lenAuto": false,
 			"_k": 0,
-			"desc": "Submersible well pump, 7.6 L/s at 83.8 m, about 11 kW. Runs when TANK-1 falls below 3.7 m and stops above 5.8 m, which holds the water below 3.7 m in reserve for fire flow.",
+			"desc": "Submersible well pump, 7.5 L/s at 84 m, about 11 kW. Runs when TANK-1 falls below 4.8 m and stops above 5.8 m. The 4.2 m of tank below 4.8 m holds about 185 cubic meters and the pump adds about 54 cubic meters in two hours, over the 230 cubic meters that 32 L/s needs for two hours.",
 			"_curveId": "WELL"
 		}
 	],
@@ -247,8 +247,8 @@
 		{
 			"id": "X1",
 			"text": "Community well and tank",
-			"x": 134.1,
-			"y": 198.1,
+			"x": 132,
+			"y": 195,
 			"anchorNode": null,
 			"sizeMult": 3,
 			"allZoom": true
@@ -256,17 +256,17 @@
 		{
 			"id": "X2",
 			"text": "WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.",
-			"x": 134.1,
-			"y": 179.8,
+			"x": 132,
+			"y": 177,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
 		},
 		{
 			"id": "X3",
-			"text": "Design point: 31.5 L/s at FH-1 with 14 m residual. The 24-hour run switches the pump on tank level.",
-			"x": 134.1,
-			"y": 169.2,
+			"text": "Design point: 32 L/s at FH-1 with 14 m residual. The 24-hour run switches the pump on tank level.",
+			"x": 132,
+			"y": 166,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -454,22 +454,22 @@
 			"points": [
 				[
 					0,
-					106.7
+					107
 				],
 				[
-					7.6,
-					83.8
+					7.5,
+					84
 				],
 				[
 					12,
-					56.4
+					56
 				]
 			],
 			"src": [
 				";PUMP: Well pump, three points: shutoff, design, maximum",
-				" WELL\t0\t106.7",
-				" WELL\t7.6\t83.8",
-				" WELL\t12\t56.4"
+				" WELL\t0\t107",
+				" WELL\t7.5\t84",
+				" WELL\t12\t56"
 			],
 			"note": "Well pump, three points: shutoff, design, maximum"
 		}
@@ -496,7 +496,7 @@
 	"controls": [
 		{
 			"link": "WP-1",
-			"raw": "LINK WP-1 OPEN IF NODE TANK-1 BELOW 3.7",
+			"raw": "LINK WP-1 OPEN IF NODE TANK-1 BELOW 4.8",
 			"action": {
 				"status": "open"
 			},
@@ -504,11 +504,11 @@
 				"kind": "node",
 				"node": "TANK-1",
 				"cmp": "below",
-				"value": 3.7,
+				"value": 4.8,
 				"unit": "head"
 			},
 			"text": {
-				"value": "3.7"
+				"value": "4.8"
 			}
 		},
 		{
@@ -537,9 +537,9 @@
 		]
 	},
 	"view": {
-		"cx": 134.1,
-		"cy": 99.1,
-		"s": 1.758
+		"cx": 132.5,
+		"cy": 97.5,
+		"s": 1.782
 	},
 	"units": {
 		"lpn_u_length": "m",
@@ -553,13 +553,13 @@
 	"calcSets": [
 		{
 			"id": "c1",
-			"name": "5. Max Day",
+			"name": "1. Max Day",
 			"parent": null,
 			"demandMultiplier": 2
 		},
 		{
 			"id": "c2",
-			"name": "6. Peak hour",
+			"name": "2. Peak hour",
 			"parent": null,
 			"demandMultiplier": 3
 		}

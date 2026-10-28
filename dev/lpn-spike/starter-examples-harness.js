@@ -17,7 +17,7 @@
 //   the well       the tank is the one tank connection; a 24-hour run through EPANET keeps the tank
 //                  inside its levels, the pump switches on tank level, and every junction holds
 //                  40 psi or more at every step.
-//   each pair      the US and SI files behave alike (the SI file is a metric design: nominal pipe sizes).
+//   the SI files  are metric designs in round metric numbers (not conversions), and each passes on its own terms.
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -86,6 +86,8 @@ async function solve(engine) {
 	return L.lastResult();
 }
 function scenarioByName(prefix) { return L.getScenarios().filter((s) => s.name.indexOf(prefix) === 0)[0]; }
+const bare = (key) => PC[key].replace(/^\d+\.\s*/, '');   // 'Max Day' without its number
+function scenarioLike(key) { return L.getScenarios().filter((s) => !s.isBase && s.name.replace(/^\d+\.\s*/, '') === bare(key))[0]; }
 function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   // one connected network
 
 (async function main() {
@@ -125,6 +127,12 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 			doc.nodes.concat(doc.links).every((e) => !e.desc || (f.si ? !/\b(psi|gpm|ft|inch)\b/.test(e.desc) : !/(L\/s|\bmm\b|\b\d+ m\b)/.test(e.desc))));
 		ok('the project states a description as text on the map', (raw.labels || []).filter((t) => !t.anchorNode).length >= 3);
 		ok('IDs read as names (none is a bare number)', doc.nodes.concat(doc.links).every((e) => /[A-Za-z]/.test(e.id)));
+		if (f.si) {
+			const r1 = (x) => Math.abs(x * 10 - Math.round(x * 10)) < 1e-6;
+			ok('SI is a metric design, not a conversion: elevations to 0.1 m, whole-metre pipe lengths, demands to 0.1 L/s', doc.nodes.every((n) => [n.elev, n._head, n._level, n.minLevel, n.maxLevel, n.tankDiameter].every((x) => x === undefined || r1(x)))
+				&& doc.links.filter((l) => l.type === 'pipe').every((l) => Number.isInteger(l._length)) && doc.nodes.every((n) => !n._demand || r1(n._demand)),
+				JSON.stringify(doc.nodes.filter((n) => [n.elev, n._head, n._demand].some((x) => x !== undefined && !r1(x))).map((n) => n.id)));
+		}
 		const pipes = doc.links.filter((l) => l.type === 'pipe');
 		const dias = pipes.map((l) => l._diameter);
 		ok('mains are ' + (f.kind === 'ext' ? '12 and 8 inch (300 and 200 mm)' : '6 inch (150 mm) with an 8 inch (200 mm) tank line'),
@@ -145,16 +153,16 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		ok('flows agree to 0.5 gpm', wq < 0.5, wq.toFixed(3) + ' gpm');
 
 		console.log('--- normal pressure is 40 to 80 psi');
-		const cond = f.kind === 'ext' ? ['Base', PC.lpn_scenario_preset_max_day] : ['Base', PC.lpn_scenario_preset_max_day, PC.lpn_scenario_preset_peak_hour];
+		const cond = f.kind === 'ext' ? ['Base', 'lpn_scenario_preset_max_day'] : ['Base', 'lpn_scenario_preset_max_day', 'lpn_scenario_preset_peak_hour'];
 		for (const name of cond) {
-			const scn = name === 'Base' ? L.getScenarios()[0] : scenarioByName(name);
-			ok('scenario "' + name + '" exists', !!scn);
+			const scn = name === 'Base' ? L.getScenarios()[0] : scenarioLike(name);
+			ok('scenario "' + (scn ? scn.name : name) + '" exists', !!scn);
 			if (!scn) { continue; }
 			L.switchScenario(scn.id);
 			for (const eng of ['native', 'epanet']) {
 				const r = await solve(eng);
 				const ps = doc.nodes.filter((n) => n.type === 'junction').map((n) => psi(r, n.id));
-				ok(name + ' (' + eng + '): every junction 40 to 80 psi', r.converged && Math.min(...ps) >= 40 && Math.max(...ps) <= 80, Math.min(...ps).toFixed(1) + ' to ' + Math.max(...ps).toFixed(1) + ' psi');
+				ok(scn.name + ' (' + eng + '): every junction 40 to 80 psi', r.converged && Math.min(...ps) >= 40 && Math.max(...ps) <= 80, Math.min(...ps).toFixed(1) + ' to ' + Math.max(...ps).toFixed(1) + ' psi');
 			}
 		}
 		L.switchScenario(L.getScenarios()[0].id);
@@ -180,7 +188,9 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 
 		if (f.kind === 'ext') {
 			console.log('--- the hydrant flow test is reproduced at the pressure hydrant');
-			const want = [[PC.lpn_scenario_preset_flow_static, 62, 0.2], [PC.lpn_scenario_preset_flow_mid, 56, 0.3], [PC.lpn_scenario_preset_flow_max, 48, 0.3]];
+			// The test as stated in each file's own units: 62, 56, 48 psi; 43.5, 39.5, 34 m (the SI design's round numbers).
+			const M2PSI = PSI_PER_M, tgt = f.si ? [43.5 * M2PSI, 39.5 * M2PSI, 34 * M2PSI] : [62, 56, 48];
+			const want = [[PC.lpn_scenario_preset_flow_static, tgt[0], 0.2], [PC.lpn_scenario_preset_flow_mid, tgt[1], 0.3], [PC.lpn_scenario_preset_flow_max, tgt[2], 0.3]];
 			for (const w of want) {
 				const scn = scenarioByName(w[0]);
 				ok('"' + w[0] + '" exists', !!scn);
@@ -188,9 +198,9 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 				L.switchScenario(scn.id);
 				for (const eng of ['native', 'epanet']) {
 					const r = await solve(eng);
-					ok(w[0] + ' (' + eng + '): HYD-P reads ' + w[1] + ' psi', Math.abs(psi(r, 'HYD-P') - w[1]) <= w[2], psi(r, 'HYD-P').toFixed(2) + ' psi');
+					ok(w[0] + ' (' + eng + '): HYD-P reads ' + w[1].toFixed(1) + ' psi', Math.abs(psi(r, 'HYD-P') - w[1]) <= w[2], psi(r, 'HYD-P').toFixed(2) + ' psi');
 				}
-				const rn = await solve('native'), testGpm = [0, 600, 1200][want.indexOf(w)];
+				const rn = await solve('native'), testGpm = (f.si ? [0, 38, 76] : [0, 600, 1200])[want.indexOf(w)] * (f.si ? GPM / 1000 : 1);
 				ok(w[0] + ': the pump passes the test flow and none of it reaches the extension (HYD-F is the only draw)',
 					Math.abs(rn.flows['PMP-1'] * GPM - testGpm) <= Math.max(1, testGpm * 0.01) && Math.abs(rn.flows['EXT-A'] * GPM) < 1,
 					(rn.flows['PMP-1'] * GPM).toFixed(1) + ' gpm through PMP-1, ' + (rn.flows['EXT-A'] * GPM).toFixed(2) + ' gpm into the extension');
@@ -202,8 +212,15 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 			console.log('--- one tank connection, and a 24-hour run');
 			const tank = doc.nodes.filter((n) => n.type === 'tank');
 			ok('one tank, on a single link', tank.length === 1 && doc.links.filter((l) => l.from === tank[0].id || l.to === tank[0].id).length === 1);
+			// The Description claims the fire reserve; check the arithmetic: tank below cut-in plus two hours of the pump.
+			const cut = Number((doc.controls.map((c) => c.raw).join(' ').match(/BELOW\s+(\S+)/) || [])[1]);
+			const area = Math.PI / 4 * tank[0].tankDiameter * tank[0].tankDiameter;   // length unit squared
+			const m3 = (f.si ? 1 : Math.pow(FT, 3)) * area * (cut - tank[0].minLevel) * (f.si ? 1 : 1);
+			const fireM3 = (f.si ? FIRE.well.lps / 1000 : FIRE.well.gpm / GPM) * 7200, pumpM3 = curve.points[1][0] * (f.si ? 1 / 1000 : 1 / GPM) * 7200;
+			ok('the fire reserve is real: tank below cut-in plus the pump over two hours covers the fire flow for two hours', m3 + pumpM3 >= fireM3, (m3 + pumpM3).toFixed(1) + ' vs ' + fireM3.toFixed(1) + ' cubic meters');
+			ok('WH-1 says it is not a fire flow point', /not a fire flow point/.test(byId('WH-1').desc));
 			const nr = await solve('native');
-			const dq = nr.flows[pump.id] * GPM, designQ = curve.points[1][0] * (f.si ? 15850.32 / 1000 : 1);
+			const dq = nr.flows[pump.id] * GPM, designQ = curve.points[1][0] * (f.si ? GPM / 1000 : 1);
 			ok('at the start the pump runs near its design flow (' + designQ.toFixed(0) + ' gpm)', Math.abs(dq - designQ) / designQ < 0.15, dq.toFixed(1) + ' gpm');
 			const model = L.assembleModel();
 			const run = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
@@ -247,23 +264,7 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		const r2 = await solve('native');
 		let dp = 0; d2.nodes.forEach((n) => { if (n.type !== 'reservoir') { dp = Math.max(dp, Math.abs(r2.pressures[n.id] - baseP[n.id]) * PSI_PER_M); } });
 		ok('the re-imported network solves to the same pressures (0.01 psi)', r2.converged && dp < 0.01, dp.toExponential(2) + ' psi');
-		solved[f.file] = { rBase, doc: doc.nodes.map((n) => n.id) };
-	}
-
-	console.log('\n=== each US and SI pair behaves alike ===');
-	for (const kind of ['ext', 'well']) {
-		const us = FILES.filter((f) => f.kind === kind && !f.si)[0], si = FILES.filter((f) => f.kind === kind && f.si)[0];
-		const a = solved[us.file], b = solved[si.file];
-		if (!a || !b) { ok(kind + ' pair solved', false); continue; }
-		let dp = 0, at = '';
-		Object.keys(a.rBase.pressures).forEach((id) => {
-			if (b.rBase.pressures[id] === undefined) { return; }
-			const d = Math.abs(a.rBase.pressures[id] - b.rBase.pressures[id]) * PSI_PER_M;
-			if (d > dp) { dp = d; at = id; }
-		});
-		ok(kind + ': every pressure within 1.5 psi of its twin (nominal metric pipe sizes)', dp < 1.5, dp.toFixed(2) + ' psi at ' + at);
-		ok(kind + ': the twins have the same IDs', JSON.stringify(a.doc) === JSON.stringify(b.doc));
-	}
+			}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 	process.exit(fails ? 1 : 0);

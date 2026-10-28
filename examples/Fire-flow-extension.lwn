@@ -41,7 +41,7 @@
 		},
 		{
 			"id": "s4",
-			"name": "5. Max Day",
+			"name": "4. Max Day",
 			"overrides": {},
 			"calc": "c1"
 		}
@@ -63,7 +63,7 @@
 			"y": 0,
 			"elev": 1202,
 			"_demand": 0,
-			"desc": "Test flow hydrant, on the existing 12 inch main. The flow test draws 600 gpm and 1,200 gpm here. The extension ties in at this junction."
+			"desc": "Test flow hydrant, on the existing 12 inch main. The flow test draws 600 and 1,200 gpm here. The extension ties in at this junction."
 		},
 		{
 			"id": "EXT-1",
@@ -501,7 +501,7 @@
 	"calcSets": [
 		{
 			"id": "c1",
-			"name": "5. Max Day",
+			"name": "4. Max Day",
 			"parent": null,
 			"demandMultiplier": 2
 		}

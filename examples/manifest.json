@@ -113,7 +113,7 @@
             "titleKey": "lpn_ex_well_si_title",
             "descKey": "lpn_ex_well_si_desc",
             "title": "Community well and tank, L/s (SI)",
-            "description": "Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 255 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.",
+            "description": "Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.",
             "system": "si",
             "coords": "xy",
             "work": "design",

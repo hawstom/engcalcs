@@ -17,13 +17,13 @@
 		},
 		{
 			"id": "s1",
-			"name": "5. Max Day",
+			"name": "1. Max Day",
 			"overrides": {},
 			"calc": "c1"
 		},
 		{
 			"id": "s2",
-			"name": "6. Peak hour",
+			"name": "2. Peak hour",
 			"overrides": {},
 			"calc": "c2"
 		}
@@ -36,7 +36,7 @@
 			"y": 0,
 			"elev": 1485,
 			"_demand": 0,
-			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1.",
+			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.",
 			"demandPattern": "DAILY"
 		},
 		{
@@ -96,7 +96,7 @@
 			"y": 350,
 			"elev": 1478,
 			"_demand": 4,
-			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 500 gpm with 20 psi residual, for two hours from the tank.",
+			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 500 gpm with 20 psi residual, for two hours from the tank and the pump.",
 			"demandPattern": "DAILY",
 			"_fireFlow": 500
 		},
@@ -115,11 +115,11 @@
 			"y": 450,
 			"elev": 1590,
 			"bottomElev": 1590,
-			"_level": 13,
+			"_level": 17,
 			"minLevel": 2,
 			"maxLevel": 20,
 			"tankDiameter": 24,
-			"desc": "Ground storage tank on the hill above the community, 24 ft in diameter and 20 ft high, about 67,000 gallons."
+			"desc": "Ground storage tank on the hill above the community, 24 ft in diameter and 20 ft high, about 67,000 gal."
 		}
 	],
 	"links": [
@@ -239,7 +239,7 @@
 			"_diameter": 6,
 			"lenAuto": false,
 			"_k": 0,
-			"desc": "Submersible well pump, 120 gpm at 275 ft, about 15 hp. Runs when TANK-1 falls below 12 ft and stops above 19 ft, which holds the water below 12 ft in reserve for fire flow.",
+			"desc": "Submersible well pump, 120 gpm at 275 ft, about 15 hp. Runs when TANK-1 falls below 16 ft and stops above 19 ft. The 14 ft of tank below 16 ft holds about 47,000 gal and the pump adds about 14,000 gal in two hours, over the 60,000 gal that 500 gpm needs for two hours.",
 			"_curveId": "WELL"
 		}
 	],
@@ -496,7 +496,7 @@
 	"controls": [
 		{
 			"link": "WP-1",
-			"raw": "LINK WP-1 OPEN IF NODE TANK-1 BELOW 12",
+			"raw": "LINK WP-1 OPEN IF NODE TANK-1 BELOW 16",
 			"action": {
 				"status": "open"
 			},
@@ -504,11 +504,11 @@
 				"kind": "node",
 				"node": "TANK-1",
 				"cmp": "below",
-				"value": 12,
+				"value": 16,
 				"unit": "head"
 			},
 			"text": {
-				"value": "12"
+				"value": "16"
 			}
 		},
 		{
@@ -555,13 +555,13 @@
 	"calcSets": [
 		{
 			"id": "c1",
-			"name": "5. Max Day",
+			"name": "1. Max Day",
 			"parent": null,
 			"demandMultiplier": 2
 		},
 		{
 			"id": "c2",
-			"name": "6. Peak hour",
+			"name": "2. Peak hour",
 			"parent": null,
 			"demandMultiplier": 3
 		}
