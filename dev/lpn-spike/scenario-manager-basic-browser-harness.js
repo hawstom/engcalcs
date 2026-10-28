@@ -130,6 +130,7 @@ async function main() {
 		await a.settle(1200);
 		i = await info();
 		ok('5.1 the same box now has the selector, the tree and the Scenarios table, and no Basic list', i.shown && i.selector && i.tree && i.rows.length === 0, JSON.stringify([i.shown, i.selector, i.tree, i.rows.length]));
+		ok('5.1b the Basic mode tick stays in the full manager, unchecked and enabled', await page.evaluate(() => { const t = document.getElementById('lpn_sm_basic_mode'); return !!t && !t.checked && !t.disabled && t.offsetParent !== null; }));
 		ok('5.2 Basic mode is stored as off', await page.evaluate(() => localStorage.getItem('lpn_scnbasic') === 'off'));
 		await page.mouse.click(1260, 300);
 		await a.settle(900);

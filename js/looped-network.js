@@ -28771,7 +28771,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the same setProp() write, so a scenario switching a pipe off in the table is the same
 	// override it would be from the popup. `prop` earns it the completeEdit() redraw.
 	function paneColActive() {
-		return { key: 'active', label: 'lpn_field_active', bool: true, em: 2, prop: 'active',
+		return { key: 'active', label: 'lpn_field_active_short', bool: true, em: 2, prop: 'active',
 			get: function (el) { return effective(el, 'active') !== false; },
 			set: function (el, v) { setProp(el, 'active', !!v); } };
 	}
@@ -28943,7 +28943,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
 	// unticked CV leaves a closed pipe closed.
 	function paneColCheckValve() {
-		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
+		return { key: 'cv', label: 'lpn_field_cv_short', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'cv'; },
 			set: function (l, v) {
 				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
@@ -29555,13 +29555,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						hint: function (n) { var e = effective(n, 'elev'); return typeof e === 'number' ? String(+(+e).toFixed(6)) : ''; },
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
-					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level_short', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead, prop: 'minLevel',
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel',
 						get: function (n) { return effective(n, 'minLevel'); },
 						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead, prop: 'maxLevel',
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel',
 						get: function (n) { return effective(n, 'maxLevel'); },
 						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
@@ -40820,7 +40820,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
 			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
 		if (!nodes.length) { return 0; }
-		if (!inBaseFor('topology')) { setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.'); return 0; }
+		if (!inBaseFor('topology')) {
+			// **THE REFUSAL OFFERS THE WAY OUT** (Tom, 2026-10-27: "a dialog that offers the switch"). A
+			// scenario other than Base can switch to Base and morph; Base naming another alternative cannot.
+			if (!activeScenario().isBase) {
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex',
+					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?',
+					ok: pc.lpn_morph_vertex_switch || 'Switch to Base and morph', cancel: pc.lpn_cancel || 'Cancel' },
+				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(); } });
+				return 0;
+			}
+			setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.');
+			return 0;
+		}
 		function finish() {
 			if (done) {
 				buildDom();
@@ -41253,7 +41265,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		here = names[el.type] || el.type;
-		readonlyField(fields, pc.lpn_full_col_type || 'Type', here, pc.lpn_field_type_tip);
+		readonlyField(fields, pc.lpn_survey_codes_col_type || 'Asset type', here, pc.lpn_field_type_tip);
 		ovmGutter(fields, {
 			el: el, props: ['type'], on: !inBaseFor('topology') && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
@@ -83592,20 +83604,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (mr.disabled) { b.setAttribute('aria-disabled', 'true'); }
 		});
 		host.appendChild(tools);
-		lab = document.createElement('label');
+		smBasicTick(host);
+		initTipsIn(host);
+	}
+	// **THE BASIC MODE TICK STAYS IN THE BOX IN BOTH STATES** (Tom, 2026-10-27: "it probably should be
+	// persistent across modes instead of disappearing in Basic-off mode."). Disabled, with the misfit
+	// sentence as its tip, when the project cannot be shown in Basic mode.
+	function smBasicTick(host) {
+		var pc = EngCalcs.pageConfig || {}, lab = document.createElement('label'), tick = document.createElement('input'),
+			misfit = !scenarioBasicMode && !!basicModeMisfit();
 		lab.className = 'lpn-sm-basic-tick';
-		tick = document.createElement('input');
 		tick.type = 'checkbox';
 		tick.id = 'lpn_sm_basic_mode';
 		tick.checked = scenarioBasicMode;
+		tick.disabled = misfit;
 		tick.addEventListener('change', function () {
 			if (!setScenarioBasicMode(tick.checked)) { tick.checked = scenarioBasicMode; }
 		});
 		lab.appendChild(tick);
 		lab.appendChild(document.createTextNode(' ' + (pc.lpn_scenario_basic || 'Basic mode')));
-		if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
+		if (misfit) { lab.title = basicMisfitText(); }
+		else if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
 		host.appendChild(lab);
-		initTipsIn(host);
 	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
@@ -83647,7 +83667,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
 		host.appendChild(tools);
-		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smTableRefresh(); return; }
+		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smBasicTick(host); smTableRefresh(); return; }
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		// The buttons act on the selected item, the right-click menu on the item clicked; both are
@@ -83679,6 +83699,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.scrollTop = scroll;
 		// The gestures and keys are written in the title's "?" (Tom, 2026-10-11: "Move the footer
 		// text to the tip."), so nothing sits under the tree.
+		smBasicTick(host);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }
