@@ -288,6 +288,11 @@ run_check "chrome colour tokens"         blocking php dev/scripts/chrome_colour_
 # 2026-10-29: layout is held by classes, not by pixel harnesses (those are on demand). A RATCHET on literal
 # sizes and colours written into a style by js/*.js and lib/*.php; the fix is a class in css/engcalcs.css.
 run_check "ad hoc inline styles"         blocking php dev/scripts/adhoc_style_check.php
+# Kept 2026-10-29 (their selftests are retired): these guard words a VISITOR reads.
+run_check "struck public claims"         blocking php dev/scripts/public_claim_check.php
+run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
+run_check "select/choose words"          blocking php dev/scripts/selection_word_check.php
+run_check "em dash ratchet"              blocking php dev/scripts/em_dash_ratchet_check.php
 # Task 714 Phase 2. The dark set must stay readable: its two blocks identical, every text token on every
 # surface it sits on at 4.5:1, every UI border 3:1. dev/lpn-spike/theme-browser-harness.js holds the browser half.
 run_check "theme contrast"               blocking node dev/scripts/theme_contrast_check.js
