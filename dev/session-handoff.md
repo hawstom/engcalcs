@@ -95,31 +95,33 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-28 12:30 AM (forty-fourth session, Opus main, Sonnet agents)
+## STATE — 2026-10-29 (forty-fifth and forty-sixth sessions, Opus main, Sonnet agents)
 
-- **Pushed master 76f41ef3f:** `fix/loop-residual` (Task 847 fix: a no-demand network now converges to a nanolitre per second, not to Accuracy; `native-zero-demand-loop-harness.js`). Close 847 in the roadmap when box-design merges (its block lives on box-design).
-- **`box-design` (port 8103) waits on his browser pass and typed word**: his 10-27 night notes are Tasks 842-846 on it, all built (sheet style on seven boxes with no first-column heading, global dark option colours, Settings 618 px and wrapped-row spacing and phone heading bar, reports fit 814 px with whole words and "And others" and "Time (hr)" and Copy HTML weights, Morph-to-vertex dialog offering Base, Basic tick in both modes, Tables headings use the short Properties keys, "Asset type"). Perry passed it; his three findings fixed. Its full suite reran after five stale harnesses were re-baselined (`fix/box-suite`): result in scratch `orch-boxdesign-full2.log`. On merge: regenerate payloads, close 827-829, 833-846 that he accepts.
-- **`feat/starter-example` (port 8107, Task 823)** waits on his pass: four gallery cards (fire flow extension and community well, US and SI), built by one generator script on that branch (dev/scripts there). Perry passed it after fixes. His calls owed: gallery order (recommended US starters first), eight card strings.
-- **His questions are in `~/tom-files/messenger.md`** (2026-10-28): adjustable report column widths (stores widths per browser: needs his word), rotated headings, Settings pinned at first view, two morph strings, a names-policing branch (long names remain in Settings defaults, Find, labels, .inp upload, reports; Tables "Valve type" vs Properties "Type").
+- **The 10-28 night session died at 00:18 on 10-29: jasmine ran out of memory** (76 Node processes, 56 GB of 60) when an agent load-tested a harness with 36 parallel copies and `yes` burners beside four other agents. Every agent died; their commits and uncommitted files survived and were resumed. The agent rule is now: at most 2 harness processes each, no burners, wait for 20 GB free (`brief-common.md` rule 17).
+- **Merged on his word 10-28 night, pushed with this handoff:** `feat/shape-scenario` and `feat/scenario-io` (Task 831 closed; Task 814 partly, the rest in `dev/import-export-scenarios.md`), and `fix/harness-flakes`' first two (contour, settings-select-lag).
+- **`box-design` (port 8103)** now carries `feat/sheet-light` and `feat/value-source` (both retired into it). His 10-28 pass: *"This looks like it was done by a designer; I like that"*; his items 2-10 being built, then Ida's row order (`dev/agents/interface-designer/journal.md` 10-29; From, To, Active after ID, results last). Her faint heading bands are his call (two new keys). On merge: regenerate payloads, close 827-829, 833-847 that he accepts.
+- **`feat/report-widths` (Task 848)**: draggable report columns, kept per browser as `lpn_rptcols` (he was told; no consent change). Built on box-design; Perry passed after fixes. Waits his pass; merge box-design into it again first.
+- **`feat/starter-example` (port 8107, Task 823)**: Perry's six findings being finished, then his pass.
+- **`fix/harness-flakes`**: five more harnesses (scenario-settings-routing, new-project-pan, label-pass-economy-browser, geojson-import-browser, example-open-guard). A tooling track: merges on green.
+- **His question "would it hurt to trim and tighten the test scripts?"** has a three-pass proposal (fix flakes, merge families, demote pixel and timing checks); passes 2 and 3 wait on his word.
+- `feat/settings-pinned` deleted on his word (*"I don't like it"*); first view stays unpinned.
 - **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
 - **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
 - **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
-- Seen flaky under load, green alone: `settings-select-lag-harness.js`, `contour-harness.js`, `new-project-pan-harness.js`.
-- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`, Task 825 his audit pass.
-- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch with nothing heavy beside it.
+- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch.
 - **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
 - **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
 - **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
 - **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
 - **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
 - **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/50be4610-c6ae-4dbe-a64d-5427205a8e18/scratchpad (brief-common.md for agents).
+- Unchanged wait: Task 825, his audit pass.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/21990087-1e73-417c-9690-897fe91291f4/scratchpad (brief-common.md, Ida's and Mary's row-order notes, the test-trim proposal).
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 
 - **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
 - **His interview answers are in `dev/assemblies.md`** (Task 822, still negotiating; his questions are answered in messenger.md). Expert levels: *"Day 1 must be pure joy and fun"*; he wants a coach-marks mockup. WaterGEMS menu name: "Export > .wtg.sqlite file…". **Nag him to write to Bentley** before any public release of the export (his ask).
-- **Waiting on his browser pass:** `feat/value-source` (8105, ffa674794: same-name alternative now silent; Settings item reads "Show: clear restores No, the value in Base."; green but payload freshness); `feat/scenario-io` (8101, f9413e8fb, Task 814: scenario in Tables-export, print and screenshot names, DEM and shapes notices say where they write; Perry passed; four questions for him in messenger.md).
 - **`feat/wtg-page-export`** (no port yet): File > Export > .wtg.sqlite file from the page, built on `feat/wtg-export`; never merges before his word and his letter to Bentley. Its suite was unfinished at /clear: read `git log` in its worktree and the log `feat-wtg-page-export-full*.log` in this session's scratch.
 - Task 812 Step 2 (`fix/label-last-pad`) measured and rejected; what is left is design work, not a port.
 - Tasks 733 slice 7, 737 sprint, 681 wait on his word.
