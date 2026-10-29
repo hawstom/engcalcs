@@ -5158,7 +5158,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	resize: none !important; box-shadow: none !important;
 }
 .lpn-docked > .lpn-resize-grip { display: none !important; }
-.lpn-docked .lpn-popover-body { max-height: none; }
+.lpn-docked .lpn-popover-body { max-height: none !important; }
 /* Auto-hide: a tucked box is still OPEN (its display is untouched, so every isOpen() still says so);
    it is only invisible and untouchable until its tab brings it out. */
 /* content-visibility: a tucked box's contents are not laid out at all. Settings and the guide popups hold
