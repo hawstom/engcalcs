@@ -615,7 +615,7 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 	(function walk(n) { (n.children || []).forEach(function (c) {
 		if (c.tagName === 'INPUT' && c.type === 'number') { boxes.push(c); } walk(c); }); })(L.popupFields());
 	ok('the valve popup renders editable rows', boxes.length > 0, boxes.length + ' number inputs');
-	const settingBox = boxes[0];
+	const settingBox = boxes[boxes.length - 1];   // Diameter and Minor loss come before the setting now (row order, 2026-10-29)
 	settingBox.value = '75';
 	(settingBox._listeners.change || []).forEach(function (fn) { fn({ target: settingBox }); });
 	ok('editing a valve setting in a scenario records an OVERRIDE',

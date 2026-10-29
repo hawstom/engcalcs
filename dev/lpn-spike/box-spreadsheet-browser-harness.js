@@ -252,7 +252,7 @@ async function main() {
 			await t.page.mouse.click(txy.x, txy.y); await t.settle(900);
 			const th = await t.page.evaluate(() => {
 				const h = document.querySelector('#lpn_popup .lpn-ghdr'), ta = document.querySelector('#lpn_popup_fields textarea'), R = (e) => e.getBoundingClientRect();
-				const first = document.querySelector('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)');
+				const first = document.querySelectorAll('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)')[1];   // Active stands above the words, then the other rows (row order, 2026-10-29)
 				return ta && first ? { noHeader: !h, belowWords: R(first).top >= R(ta).bottom - 1 } : null;
 			});
 			ok('on a Text there is no heading, and the rows stand below the words box', !!th && th.noHeader && th.belowWords, JSON.stringify(th));

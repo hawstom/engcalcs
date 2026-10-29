@@ -71119,6 +71119,87 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		extra.forEach(function (d) { label.appendChild(d); });
 		return label;
 	}
+	// THE PROPERTIES BOX'S ROW ORDER (Tom, 2026-10-29: "From and To are topology, and they should be immediately after ID";
+	// "Shouldn't Active be near the top?"; Ida's table, with Mary's outside evidence). Think in categories: what it is and
+	// whether it is in the model, what it is made of, how it starts, then what the solver said. Inputs first, results
+	// always last. A key is a language key whose text starts the row's name; a '#' key is a group the builder tagged by
+	// popRows(); '|' marks where a row this table does not name lands (an input a deployment or a project adds).
+	var PROP_ORDER = {
+		junction: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_emitter',
+			'lpn_field_base_demand', 'lpn_field_demand_pattern', 'lpn_demand_cats', 'bpn_demand', 'lpn_node_customers', 'lpn_ff_required',
+			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
+			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_delivered_demand', 'lpn_result_demand_deficit', '#qresult', '#notes'],
+		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
+			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
+		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
+			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
+			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
+		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
+			'lpn_field_roughness', 'lpn_field_fittings', 'lpn_field_km_short', 'lpn_field_auto_length', 'lpn_field_length', 'lpn_field_closed', 'lpn_field_cv_short',
+			'lpn_reaction_bulk_short', 'lpn_reaction_wall_short', '#custom', '|',
+			'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_gradient', 'lpn_result_status', '#qresult', 'lpn_result_reaction_rate', '#notes'],
+		pump: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_pump_curve_source', 'lpn_pump_effic_curve',
+			'lpn_field_closed', 'lpn_field_pump_speed', 'lpn_field_speed_pattern', 'lpn_energy_price', 'lpn_energy_price_pattern', '#custom', '|',
+			'lpn_result_flow', 'lpn_field_head', 'lpn_result_status', '#qresult', '#notes'],
+		valve: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_diameter', 'lpn_field_km_short',
+			'lpn_field_valve_setting_pressure', 'lpn_field_valve_setting_drop', 'lpn_field_valve_setting_flow', 'lpn_field_valve_setting_loss', 'lpn_gpv_curve_source',
+			'lpn_field_closed', '#custom', '|', 'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_status', '#qresult', '#notes'],
+		customer: ['lpn_field_meter_pipe', 'lpn_field_meter_node', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag',
+			'lpn_field_meter_demand', 'lpn_field_demand_pattern', 'lpn_field_meter_count', 'lpn_field_meter_total', '#custom', '|', '#notes'],
+		text: ['lpn_field_active_short', '#words', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
+			'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', '#custom', '|', '#notes']
+	};
+	// Tag every row a builder adds to `fields` while `fn` runs, for the rows whose name is not one language key.
+	function popRows(fields, key, fn) {
+		var from, i;
+		if (!fields || !fields.childNodes) { fn(); return; }
+		from = fields.childNodes.length;
+		fn();
+		for (i = from; i < fields.childNodes.length; i++) { fields.childNodes[i].__prow = key; }
+	}
+	function propRowName(node) {
+		var c, bad, i;
+		if (!node.cloneNode) { return ''; }
+		c = node.cloneNode(true);
+		bad = c.querySelectorAll ? c.querySelectorAll('input, select, textarea, button, option, .lpn-valwarn') : [];
+		for (i = 0; i < bad.length; i++) { if (bad[i].parentNode) { bad[i].parentNode.removeChild(bad[i]); } }
+		return (c.textContent || '').trim();
+	}
+	// Reorder the rows already built into `fields`: a row is a <label> plus whatever its builder put after it (marks, notes,
+	// buttons) up to the next row, so a row's trail travels with it.
+	function propsReorder(fields, type) {
+		var order = PROP_ORDER[type], pc = EngCalcs.pageConfig || {}, groups = [], cur = null, unk, kids, i, k, node, tag;
+		if (!order || !fields || !fields.childNodes) { return; }
+		unk = order.indexOf('|');
+		function isMark(nd) { return nd.nodeType === 1 && (' ' + (nd.className || '') + ' ').indexOf(' lpn-ovm ') >= 0; }
+		function rankOf(label) {
+			var t = propRowName(label), b = -1, bl = 0, j;
+			for (j = 0; j < order.length; j++) {
+				if (order[j].charAt(0) === '#' || order[j] === '|' || typeof pc[order[j]] !== 'string' || !pc[order[j]]) { continue; }
+				if (t.indexOf(pc[order[j]]) === 0 && pc[order[j]].length > bl) { b = j; bl = pc[order[j]].length; }
+			}
+			return b >= 0 ? b : unk;
+		}
+		kids = Array.prototype.slice.call(fields.childNodes);
+		for (i = 0; i < kids.length; i++) {
+			node = kids[i];
+			tag = node.__prow || '';
+			// An override marker stands in front of the row it marks: it opens that row's group and the label that follows joins it.
+			if (cur && cur.marked && !tag && node.nodeName === 'LABEL') { cur.marked = false; cur.nodes.push(node); cur.rank = rankOf(node); continue; }
+			if (!cur || (tag ? tag !== cur.tag : (node.nodeName === 'LABEL' || isMark(node)))) {
+				cur = { nodes: [], tag: tag, at: groups.length, rank: unk, marked: !tag && isMark(node) };
+				groups.push(cur);
+				if (tag) { k = order.indexOf(tag); cur.rank = k < 0 ? unk : k; }
+				else if (node.nodeName === 'LABEL') { cur.rank = rankOf(node); }
+				else if (!cur.marked) { cur.rank = -1; }
+			}
+			cur.nodes.push(node);
+		}
+		groups.sort(function (a, b) { return a.rank - b.rank || a.at - b.at; });
+		kids.forEach(function (n) { if (n.parentNode) { n.parentNode.removeChild(n); } });
+		groups.forEach(function (g) { g.nodes.forEach(function (n) { fields.appendChild(n); }); });
+	}
 	function lpnPropsGrid(fields) {
 		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null, nm;
 		// What stands after a row's control (a link, a button, a word) goes on a line of its own under the row,
@@ -73225,7 +73306,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// tabbing on; a middle one cannot. He recommended splitting the two surfaces. **That cost
 		// becomes payable the day table columns are customizable (Task 186's neighbourhood), and it
 		// is the first thing to revisit then.** Full reasoning: dev/agents/data-entry-clerk/.
-		nodeCoordFields(fields, n);
+		popRows(fields, '#coords', function () { nodeCoordFields(fields, n); });
 		// **DESCRIPTION AND TAG COMPLETE THE IDENTITY BAND, IN EPANET'S OWN ORDER** (Task 674; Tom,
 		// 2026-09-15: the Description row was missing from the interface entirely and Tag sat at the
 		// bottom *"like we really don't care about it"*). `ID | X | Y | Description | Tag |
@@ -73466,10 +73547,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_quality_initial_tip, { el: n, prop: 'initQuality' });
 			sourceFields(fields, n, cu);
 		}
-		qualityResultRow(fields, n);
-		customPropFields(fields, n);
+		popRows(fields, '#qresult', function () { qualityResultRow(fields, n); });
+		popRows(fields, '#custom', function () { customPropFields(fields, n); });
 		activeField(fields, n);
-		importNotesField(fields, n);
+		popRows(fields, '#notes', function () { importNotesField(fields, n); });
+		propsReorder(fields, n.type);
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
@@ -74620,7 +74702,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
 		if (l.type === 'pipe') { checkValveField(fields, l); }
-		customPropFields(fields, l);
+		popRows(fields, '#custom', function () { customPropFields(fields, l); });
 		activeField(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]), undefined, resultDec('link', 'flow'));
@@ -74651,7 +74733,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
 			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
 			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
-			linkQualityResultRow(fields, l);
+			popRows(fields, '#qresult', function () { linkQualityResultRow(fields, l); });
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -74664,7 +74746,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					rateVal);
 			}
 		}
-		importNotesField(fields, l);
+		popRows(fields, '#notes', function () { importNotesField(fields, l); });
+		propsReorder(fields, l.type);
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
@@ -75208,6 +75291,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		input.rows = 3;
 		input.className = 'lpn-text-words';
 		label.className = 'lpn-text-words-row lpn-fill-row';
+		label.__prow = '#words';
 		input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
 			if (writeTextWords(lb, input.value) === 'deleted') { refreshPopupIfOpen(); }
@@ -75419,8 +75503,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (textIsAnchored(lb)) {
 			attachedTextField(fields, lb);
 		}
-		customPropFields(fields, lb);
-		importNotesField(fields, lb);
+		popRows(fields, '#custom', function () { customPropFields(fields, lb); });
+		popRows(fields, '#notes', function () { importNotesField(fields, lb); });
+		propsReorder(fields, 'text');
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
@@ -75657,6 +75742,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Tom, 2026-09-18). `'customer'` is what tells customPropFields() which letter this object
 		// answers to and that its write is a plain one -- see customPropTypeKey().
 		customPropFields(fields, c, 'customer');
+		propsReorder(fields, 'customer');
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
