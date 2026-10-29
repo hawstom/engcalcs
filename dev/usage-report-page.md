@@ -78,7 +78,7 @@ Every log row ends with a bucket written by `ecLogBucketSuffix()`:
 * `visitor` is a visitor who agreed to being counted once rather than every time. Those rows are
   deduplicated per person per page, so **they count people**.
 * `visit` is everybody else. Nothing may be stored to deduplicate against, so every page load
-  writes a row, and **they count page loads**.
+  writes a row, and **they are the "others" bucket**.
 
 **The page never adds them.** Every table has a people column and a page-loads column and no total
 column; every chart draws one bucket with its own scale, because a shared axis is the visual form

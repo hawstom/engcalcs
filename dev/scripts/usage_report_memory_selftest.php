@@ -162,7 +162,7 @@ if ($newPeak !== null) {
 }
 
 // ---- 5. the counts are still right on a fixture this size --------------------------------------
-ec_urm_expect('the page reports all ' . number_format($ROW_COUNT) . ' reach rows in the "all" window',
+ec_urm_expect('the page reports all ' . number_format($ROW_COUNT) . ' page load rows in the "all" window',
     (bool) preg_match('/(\d+) row\(s\) in this window/', $newHtml, $m) && (int) $m[1] === $ROW_COUNT,
     isset($m[1]) ? $m[1] : '(not found)');
 ec_urm_expect('the page reports the right classified-row count',
@@ -170,11 +170,11 @@ ec_urm_expect('the page reports the right classified-row count',
     isset($m2[1]) ? $m2[1] : '(not found)');
 ec_urm_expect('the two buckets on the page still total to the hand-computed visitor/visit split',
     strpos($newHtml, 'SAID YES: ' . $expectVisitor . ' use(s)') !== false
-    && strpos($newHtml, 'PAGE LOADS: ' . $expectVisit . ' row(s)') !== false,
+    && strpos($newHtml, 'OTHERS: ' . $expectVisit . ' row(s)') !== false,
     "expect visitor=$expectVisitor visit=$expectVisit");
 
 // ---- report, whether or not everything passed ---------------------------------------------------
-echo "\nPeak memory, " . number_format($ROW_COUNT) . " reach rows (" . round($logBytes / 1048576, 1)
+echo "\nPeak memory, " . number_format($ROW_COUNT) . " page load rows (" . round($logBytes / 1048576, 1)
    . " MB log), limit $MEMORY_LIMIT:\n";
 echo '  before (pre-fix) : ' . ($oldPeak !== null ? round($oldPeak / 1048576, 1) . ' MB'
     : ($haveOld ? 'exhausted the limit before it could report its own peak' : 'not run')) . "\n";
