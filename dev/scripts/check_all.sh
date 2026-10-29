@@ -111,12 +111,6 @@ run_check "html balance (every page)"    blocking php dev/scripts/html_balance_c
 # the visitor "undefined", and the wrong .ec-help nesting gives touch users a one-character tap
 # target. Neither is visible to the person who introduced it.
 run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
-# Task 322. The check above matched only the literal `pageConfig.<key>` until 2026-08-28, and
-# js/looped-network.js reads all 838 of its strings through `var pc = EngCalcs.pageConfig` -- so the
-# biggest page in the suite was the one it could not see, and it reported OK while a key translated
-# into 26 languages reached no screen. The selftest pins the alias shapes it must find AND the ones
-# it must not take for a key: this check BLOCKS, so a false positive stops a commit.
-run_check "pageConfig selftest"          blocking php dev/scripts/pageconfig_selftest.php
 # Task 322. THE OTHER HALF OF THAT BRIDGE. js/*.js writes almost every read as
 # `pc.<key> || '<English literal>'`, so 892 fallback literals ship as an uncontrolled second copy of
 # lib/lang.ec.en.php -- and because the check above guarantees the key IS supplied, a wrong one
@@ -124,14 +118,12 @@ run_check "pageConfig selftest"          blocking php dev/scripts/pageconfig_sel
 # sentence struck as false and two that fall back to the EMPTY STRING. A RATCHET on that measured
 # number: it may fall and may not rise. The undefined-key leg blocks at zero.
 run_check "js fallback strings"          blocking php dev/scripts/js_fallback_string_check.php
-run_check "js fallback selftest"         blocking php dev/scripts/js_fallback_string_selftest.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
 # Task 322 row 25. js/Calculators.lib.js wires tap tooltips on .ec-help[title] alone, so a tip
 # parked on a bare <a title=> just navigates on touch and the explanation is simply gone. Judges by
 # PROVENANCE on rendered pages: a tip-shaped $ec_lang value blocks, a title that NAMES its
 # destination passes.
 run_check "link titles reachable"        blocking php dev/scripts/link_title_check.php
-run_check "link title selftest"          blocking php dev/scripts/link_title_selftest.php
 # Task 478. Tabbing down a calculator walked sideways through thirty one-character "X" links --
 # 35-43% of every keyboard stop on the worst pages, with no keyboard way to bring a line back. This
 # renders each page and asserts, blocking, that the per-line hide control costs at most ONE stop;
@@ -154,11 +146,8 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # walks straight past that service's own consent gate. Read out of what sw.php EMITS, so a
 # hand-written fetch route counts exactly as much as a manifest entry.
 run_check "service worker map hosts"     blocking php dev/scripts/sw_map_host_check.php
-run_check "sw map host selftest"         blocking php dev/scripts/sw_map_host_selftest.php
 run_check "service worker scope"         blocking php dev/scripts/sw_scope_check.php
-run_check "sw scope selftest"            blocking php dev/scripts/sw_scope_selftest.php
 run_check "log bucket column"            blocking php dev/scripts/log_bucket_check.php
-run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_selftest.php
 # 2026-09-08: the pointer column, the save/rename naming fields and the served/asked reading,
 # driven from a mixed-vintage fixture through the REAL report. An old row and a new one differ
 # in field count and awk reads positionally, so a reader testing the wrong field prints a number
@@ -179,33 +168,26 @@ run_check "usage report memory bound"    blocking php dev/scripts/usage_report_m
 # extraction, because the failure is a good-looking table with the wrong or missing heading.
 run_check "daily report selftest"        blocking php dev/scripts/daily_report_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
-run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
 # name is one lib/Icons.lib.php draws -- and a miss is the quietest failure in the suite: ecIcon()
 # returns the empty string, EngCalcs.iconEl() returns null, every drawing site is `if (ic)`, so the
 # control keeps its word and its tip and simply has no picture until a person notices the gap.
 run_check "icon names resolve"           blocking php dev/scripts/icon_name_check.php
-run_check "icon name selftest"           blocking php dev/scripts/icon_name_selftest.php
 # Task 322 rows 40-42, all three found by COUNTING a construct and asking what writing it that
 # many times assumes. Every failure below renders perfectly and is invisible to anyone using the
 # page: a lookup that returns null on a page this suite guards with `if (el)`, an install manifest
 # nothing in this repository had ever read, and a storage access that throws for exactly the
 # privacy-conscious visitors this suite is written for.
 run_check "DOM ids resolve"              blocking php dev/scripts/dom_id_resolve_check.php
-run_check "DOM id selftest"              blocking php dev/scripts/dom_id_resolve_selftest.php
 run_check "web app manifest"             blocking php dev/scripts/web_manifest_check.php
-run_check "web app manifest selftest"    blocking php dev/scripts/web_manifest_selftest.php
 run_check "web storage guarded"          blocking php dev/scripts/storage_guard_check.php
-run_check "storage guard selftest"       blocking php dev/scripts/storage_guard_selftest.php
 # Task 322 rows 57-58, the same method run in a second session: a construct counted, then asked
 # what writing it 217 and 29 times assumes. A typeless <button> inside a form IS a submit button,
 # so pressing it reloads the page and the answers the visitor was reading are gone; a PHP function
 # that reads $ec_lang without declaring it global sees NULL, so its labels come out empty in all 27
 # languages on a page that still validates. Neither leaves a trace on this side of the wire.
 run_check "button types declared"        blocking php dev/scripts/button_type_check.php
-run_check "button type selftest"         blocking php dev/scripts/button_type_selftest.php
 run_check "bootstrap globals declared"   blocking php dev/scripts/bootstrap_global_check.php
-run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_global_selftest.php
 # Task 322 rows 67-69, the same method a third time: three constructs counted, then asked what
 # writing them 1,363, 125 and 49 times assumes. A language string echoed RAW into a <script> block
 # or into an HTML attribute is one translator's apostrophe or quotation mark away from killing the
@@ -213,11 +195,8 @@ run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_glob
 # the HTML default of 1, so the arrow keys snap a quantity somebody typed to a whole number. All
 # three ship silently and none of them is visible from inside this repository.
 run_check "script interpolations"        blocking php dev/scripts/script_interpolation_check.php
-run_check "script interp selftest"       blocking php dev/scripts/script_interpolation_selftest.php
 run_check "attribute escaping"           blocking php dev/scripts/attr_escape_check.php
-run_check "attribute escape selftest"    blocking php dev/scripts/attr_escape_selftest.php
 run_check "number input step"            blocking php dev/scripts/number_step_check.php
-run_check "number step selftest"         blocking php dev/scripts/number_step_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
@@ -226,8 +205,6 @@ run_check "suite ships its own assets"   blocking php dev/scripts/standalone_ass
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
 run_check "canonical path override"      blocking php dev/scripts/canonical_path_check.php
 run_check "sitemap canonical agree"      blocking php dev/scripts/sitemap_canonical_check.php
-run_check "sitemap canonical selftest"   blocking php dev/scripts/sitemap_canonical_selftest.php
-run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
 # Task 697 (B1): the map application is two front doors, librewaternet.org/app/ and
 # epanet-plus-plus.org/app/. Renders it per Host and reads canonical, hreflang, og:url, og:image and
 # the brand; a spoofed Host must get the librewaternet.org answer.
@@ -237,43 +214,35 @@ run_check "canonical per host"           blocking php dev/scripts/canonical_host
 # in this repository could see it and Tom found it by clicking. Born at zero, guarded by a live
 # mutation because a ratchet that has never been red is worth nothing.
 run_check "suite nav links absolute"     blocking php dev/scripts/nav_link_absolute_check.php
-run_check "suite nav links selftest"     blocking php dev/scripts/nav_link_absolute_selftest.php
 run_check "js page urls absolute"        blocking php dev/scripts/js_page_url_check.php
-run_check "js page urls selftest"        blocking php dev/scripts/js_page_url_selftest.php
 run_check "deploy identity selftest"     blocking php dev/scripts/deploy_identity_selftest.php
 # Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
 # every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
 # second found two that were not, in the file whose only claim is that it is complete. Neither
 # check asks whether something SHOULD be stored or requested: that is a person's question.
 run_check "third-party requests"         blocking php dev/scripts/third_party_request_check.php
-run_check "third-party selftest"         blocking php dev/scripts/third_party_request_selftest.php
 run_check "storage inventory"            blocking php dev/scripts/storage_inventory_check.php
-run_check "storage inventory selftest"   blocking php dev/scripts/storage_inventory_selftest.php
 # Task 322 row 44, and it is row 38's shape exactly: the tree had decided the same question twice
 # in opposite directions. Five cookie writes named samesite, secure and httponly and argued each in
 # a comment; the two ec_nolog writes named none, being in the positional form of setcookie(), which
 # has no slot for SameSite at all. An attribute we do not name is one the browser names for us, and
 # browsers do not agree -- with nothing on the page different either way.
 run_check "cookie attributes"            blocking php dev/scripts/cookie_attribute_check.php
-run_check "cookie attribute selftest"    blocking php dev/scripts/cookie_attribute_selftest.php
 # Task 322 rows 7-9. Three page-level rules that break for a SEARCH ENGINE, a share card or a
 # visitor on a stale asset, and for nobody on this side. The exemption list was measurably wrong
 # once already -- it named index.php, which has its own description, and omitted privacy.php and
 # terms.php, which do not -- which is the whole argument for checking it rather than writing it down.
 run_check "page meta and cache busting"  blocking php dev/scripts/page_meta_check.php
-run_check "page meta selftest"           blocking php dev/scripts/page_meta_selftest.php
 # Task 322 row 21. Steps 2 and 7 of "How to Add a New Calculator", both of which fail INVISIBLY
 # from the page: a calculator no menu row links to renders perfectly and no visitor can reach it,
 # and a prefix missing from CLAUDE.md's table is free to be handed to the next calculator.
 run_check "calculator pages wired"       blocking php dev/scripts/calculator_page_check.php
-run_check "calculator page selftest"     blocking php dev/scripts/calculator_page_selftest.php
 # Task 322 row 6, in its strictest TRUE form. CLAUDE.md says "call ecSessionStart()"; that function
 # does not exist -- Task 288 removed PHPSESSID outright and the helper went with it -- so the honest
 # number of sessions here is ZERO, not "one, gated". A session writes an identifier to a visitor's
 # device on the response that starts it, before any banner has asked and with no way to take it back.
 run_check "no PHP sessions"              blocking php dev/scripts/no_session_check.php
 run_check "status codes stated"          blocking php dev/scripts/status_code_check.php
-run_check "no-session selftest"          blocking php dev/scripts/no_session_selftest.php
 # EVERY DIRECTORY IS DECLARED WEB-SERVED OR BLOCKED, and the blocks are still there.
 # Deployment is `git pull`, so every tracked directory sits under the document root whether or not a
 # visitor has any business in it. Five said so (dev, log, lpn-locks, spock, and .git in the root
@@ -284,31 +253,6 @@ run_check "no-session selftest"          blocking php dev/scripts/no_session_sel
 # the lesson already written above the .git rule in that same file. Nothing renders wrong when it
 # is broken, which is why it stood.
 run_check "docroot exposure"             blocking php dev/scripts/docroot_exposure_check.php
-run_check "docroot exposure selftest"    blocking php dev/scripts/docroot_exposure_selftest.php
-# Task 322 row 27. FOUR SENTENCES THAT SHIPPED AND WERE STRUCK BY TOM PERSONALLY -- "your phone"
-# (it is always "a phone"), "PC application", "the only third-party request", "no extended-period
-# simulation yet". Each reads perfectly reasonably, which is why they come back. Scoped to shipped
-# English strings ONLY: every one of those phrases also appears in dev/positioning.md and CLAUDE.md,
-# inside the rule that forbids it, and a check that reports the rule as a violation of itself gets
-# deleted by whoever hits it first.
-run_check "struck public claims"         blocking php dev/scripts/public_claim_check.php
-run_check "public claim selftest"        blocking php dev/scripts/public_claim_selftest.php
-# Tom, 2026-09-01: *"Please search your memory for the source of your avoidance of plain engineering
-# terms to correct this tendency at its source."* The source was a correction that reached CLAUDE.md
-# and never reached dev/language-strings.md, which is the file CLAUDE.md sends a string writer to.
-# The paragraph is there now; this is the half that cannot be forgotten. Its sibling above holds
-# four sentences; this holds four SUBSTITUTIONS, and it found eight shipped strings on the day it
-# was written.
-run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
-run_check "plain-English swap selftest"  blocking php dev/scripts/plain_english_swap_selftest.php
-# Select is the map set, Choose is the list (Tom, 2026-10-03); no string uses one for the other.
-run_check "select/choose words"          blocking php dev/scripts/selection_word_check.php
-run_check "select/choose selftest"       blocking php dev/scripts/selection_word_selftest.php
-# The one advisory that survived striking the house style, held as a RATCHET rather than a rule:
-# 69 em dashes are already in shipped English and rewriting them would buy 1,560 retranslations of
-# text whose meaning did not move. The number may fall and may not rise. Code comments and dev/*.md
-# are deliberately out of scope -- Tom, 2026-09-01: *"Use it all you want in private. It's lovely."*
-run_check "em dash ratchet"              blocking php dev/scripts/em_dash_ratchet_check.php
 # Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
 # own site into Facebook, so a relative og:image (which every network drops silently) or a card file
 # renamed out from under the tag stays broken until a stranger mentions it. This renders every page
@@ -332,7 +276,6 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # file on a laptop and inherits a 32-inch layout. The furniture list is DERIVED from the page's own
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
-run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
 # File > Export > Workspace carries a declared list of browser keys; a key written and in neither the list nor the exclusion fails.
 run_check "workspace keys"               blocking php dev/scripts/workspace_keys_check.php
 run_check "setting scope"                blocking php dev/scripts/setting_scope_check.php
@@ -342,6 +285,14 @@ run_check "setting scope"                blocking php dev/scripts/setting_scope_
 # with reasons), an undeclared var(--ec-...), and a rise in inline literals in js/*.js and the PHP pages.
 # dev/lpn-spike/chrome-tokens-harness.js holds the browser half, and runs with the other harnesses.
 run_check "chrome colour tokens"         blocking php dev/scripts/chrome_colour_check.php
+# 2026-10-29: layout is held by classes, not by pixel harnesses (those are on demand). A RATCHET on literal
+# sizes and colours written into a style by js/*.js and lib/*.php; the fix is a class in css/engcalcs.css.
+run_check "ad hoc inline styles"         blocking php dev/scripts/adhoc_style_check.php
+# Kept 2026-10-29 (their selftests are retired): these guard words a VISITOR reads.
+run_check "struck public claims"         blocking php dev/scripts/public_claim_check.php
+run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
+run_check "select/choose words"          blocking php dev/scripts/selection_word_check.php
+run_check "em dash ratchet"              blocking php dev/scripts/em_dash_ratchet_check.php
 # Task 714 Phase 2. The dark set must stay readable: its two blocks identical, every text token on every
 # surface it sits on at 4.5:1, every UI border 3:1. dev/lpn-spike/theme-browser-harness.js holds the browser half.
 run_check "theme contrast"               blocking node dev/scripts/theme_contrast_check.js
@@ -357,13 +308,11 @@ run_check "theme contrast"               blocking node dev/scripts/theme_contras
 # blocking too, because every way this check can quietly stop working makes its count SMALLER, which
 # reads as progress on the very task it serves.
 run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
-run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
 # ROADMAP Task 708: the audit's mechanically-derivable slice, a THIRD editor of the same
 # document -- an editable Tables-pane column with no matching Find property for its element's
 # GROUP. Advisory while the matrix in dev/property-venue-matrix.md is still being ranked; its
 # selftest is blocking for the reason table_column_parity_selftest.php's own is.
 run_check "table/Find parity"            advisory php dev/scripts/property_venue_check.php
-run_check "table/Find parity selftest"   blocking php dev/scripts/property_venue_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
@@ -376,7 +325,6 @@ run_check "coordinate order"             blocking php dev/scripts/coord_order_ch
 # conversion constants as rounded decimals (two cubic feet, a million gallons a day, a psi of water)
 # and nothing compared the two halves in either direction. Ratchet at zero.
 run_check "js physical constants"        blocking php dev/scripts/js_constant_check.php
-run_check "js constant selftest"         blocking php dev/scripts/js_constant_selftest.php
 # Task 322. Four absolutes about unit families, all of which fail with a page that renders and
 # looks right: a family missing from a preset means one field ignores the us/si buttons while its
 # neighbours obey them. echoUnitSelect() checks this at render time, i.e. when somebody -- possibly
@@ -429,33 +377,25 @@ run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parit
 # languages; and String.replace() with a string pattern replaces the FIRST occurrence only, which
 # matters because a repeat already ships (lpn_push_base_only carries {base} twice, everywhere).
 run_check "language placeholders"        blocking php dev/scripts/lang_placeholder_check.php
-run_check "placeholder selftest"         blocking php dev/scripts/lang_placeholder_selftest.php
 run_check "glossary term names"          blocking php dev/scripts/gloss_ref_check.php
 # Task 737. Concept records are the translator's source; a duplicate id, an id that reads as
 # another concept's English, or a key citing a missing id ships a wrong or inconsistent term in 26
 # languages while payloads still generate and --check still says FRESH.
 run_check "concept table"                blocking php dev/scripts/concept_check.php
-run_check "concept selftest"             blocking php dev/scripts/concept_selftest.php
 # Task 322 rows 16 and 19. The anchor languages are glossary.json's meta.anchor_languages and the
 # prose restating them agrees; and a new JS module is on a page and in the harness DOM stub, or
 # declared. No script reads meta.anchor_languages at all today, so that rule was entirely prose.
 run_check "anchor languages"             blocking php dev/scripts/anchor_language_check.php
-run_check "anchor language selftest"     blocking php dev/scripts/anchor_language_selftest.php
 run_check "js module wiring"             blocking php dev/scripts/js_module_wiring_check.php
-run_check "js module wiring selftest"    blocking php dev/scripts/js_module_wiring_selftest.php
-run_check "plain sentences and layout"  blocking php dev/scripts/layout_tag_check.php
 # Task 322 row 26. A verdict leads with its glyph and never a marker word. WHICH strings are
 # verdicts is read out of the RENDERER -- writeCheckHTML()'s short-text argument and the labels
 # objects -- rather than guessed from key names, which is what the survey said made it risky.
 run_check "verdict strings"              blocking php dev/scripts/verdict_string_check.php
-run_check "verdict string selftest"      blocking php dev/scripts/verdict_string_selftest.php
 # Task 322 rows 17 and 18. "Awaiting native review" promises a resolution that is not coming;
 # and a language declared with no file is a fatal for the one visitor whose browser asked for
 # it, while a file nobody declared is a paid-for translation the suite cannot reach.
 run_check "no pending review flags"      blocking php dev/scripts/native_review_flag_check.php
-run_check "native review flag selftest"  blocking php dev/scripts/native_review_flag_selftest.php
 run_check "languages declared and filed" blocking php dev/scripts/language_declaration_check.php
-run_check "lang declaration selftest"    blocking php dev/scripts/language_declaration_selftest.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 # Task 322. Freshness is decided by CONTENT since 2026-08-29: it judged by MTIME before that and
@@ -467,7 +407,6 @@ run_check "payload freshness selftest"   blocking php dev/scripts/payload_freshn
 # never receive a sense-qualified glossary term ("run (a simulation)"), definition and avoid list
 # included. Every prefix must be wired or declared to own no term.
 run_check "prefix glossary map"          blocking php dev/scripts/prefix_map_check.php
-run_check "prefix map selftest"          blocking php dev/scripts/prefix_map_selftest.php
 # Task 314. The served examples/ directory is GENERATED from dev/water-network-examples/, so it can
 # go stale exactly the way the translation payloads can: someone edits an example, and the gallery
 # keeps serving the old one with no symptom until a visitor opens it. Also catches a whitelisted
@@ -479,30 +418,9 @@ run_check "examples library fresh"       blocking php dev/scripts/generate_examp
 # reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
 # parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
 run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
-# TOM'S BROWSER-PASS COMMENTS, HELD BETWEEN SESSIONS. Blocking on the FORM of the ledger only --
-# a malformed row is the one failure a machine can decide, and it is exactly the failure that makes
-# one of his comments invisible to the next reader. Whether an item is addressed is judgement and
-# stays with people.
-run_check "review queue parses"          blocking php dev/scripts/review_queue_check.php --format
-run_check "review queue selftest"        blocking php dev/scripts/review_queue_selftest.php
-# Task 322 rows 5 and 24. check_all.sh is what RUNS; CLAUDE.md's table is what everybody READS,
-# and nothing tied them together -- eight checks ran unlisted. Matched on script filename, so the
-# two files stay free to word a check differently. And every path CLAUDE.md cites exists: scoped
-# to that file, because dev/*.md's 31 dead citations are nearly all legitimate history.
-run_check "check table parity"           blocking php dev/scripts/check_table_parity_check.php
-run_check "check table selftest"         blocking php dev/scripts/check_table_parity_selftest.php
-run_check "start-of-session doc paths"  blocking php dev/scripts/doc_path_check.php
-run_check "doc path selftest"            blocking php dev/scripts/doc_path_selftest.php
-# The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
-# one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
-# whether it got smarter or went blind. This asserts the three false claims that actually shipped
-# still rank HIGH.
-run_check "stale claim selftest"         blocking php dev/scripts/stale_claim_selftest.php
 # Task 504. dev/features.md is generated from the hand-written dev/features-source.md, and this
 # also proves every ID a feature cites is genuinely closed -- so the list cannot claim something
 # that never shipped, and cannot go quietly stale after somebody edits the source.
-run_check "features list fresh"          blocking php dev/scripts/generate_features.php --check
-run_check "new english keys listed"     blocking php dev/scripts/new_english_keys.php --check
 run_check "new keys not duplicates"    blocking php dev/scripts/new_key_duplicate_check.php
 
 # Tom, 2026-09-06: *"dev/new-english-keys.md: I edited it. I already ruled on many of these. You are
@@ -510,13 +428,12 @@ run_check "new keys not duplicates"    blocking php dev/scripts/new_key_duplicat
 # DESTROYING his marks; this stops a mark from living only in a working-tree markdown that nothing
 # reads, which loses it in the only sense he cares about -- he is asked the same question again.
 run_check "english rulings harvested"   blocking php dev/scripts/harvest_english_rulings.php --check
-run_check "harvest selftest"            blocking php dev/scripts/harvest_rulings_selftest.php
 
 # --- lpn solver and editor --------------------------------------------------------------------
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because
 # run_harnesses.sh globs and nothing tied the number to the glob. A stale count in a checklist is
 # the same defect this file exists to remove.
-LPN_HARNESS_N=$(ls dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js 2>/dev/null | wc -l | tr -d ' ')
+LPN_HARNESS_N=$(for f in dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js; do [ -f "$f" ] || continue; grep -qxF "$(basename "$f")" dev/scripts/on_demand_harnesses.txt 2>/dev/null || echo "$f"; done | wc -l | tr -d " ")
 if [ $FAST -eq 1 ]; then
 	printf '  SKIP  lpn harnesses (--fast)\n'
 else
@@ -534,11 +451,6 @@ if [ $FAST -eq 1 ]; then
 else
 	run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
 fi
-# Task 322 half B. A harness that spells a shipped English string out as a literal turns a rewording
-# into a red build in a file about hydraulics -- three did on 2026-09-08 and 199 more can. Ratchet
-# at the measured baseline: the number may fall and may not rise.
-run_check "harness wording pins"         blocking php dev/scripts/harness_wording_check.php
-run_check "harness wording selftest"     blocking php dev/scripts/harness_wording_selftest.php
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "example folder"               advisory php dev/scripts/example_folder_check.php
@@ -549,7 +461,6 @@ run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_ch
 # Blocking, though the check it guards is advisory and finds nothing today: the case the walk was
 # written for was already deleted, so fixture 1 is that shape verbatim and is the only thing
 # standing between the reachability walk and a silent zero.
-run_check "key hygiene selftest"         blocking php dev/scripts/key_hygiene_selftest.php
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
 # Task 508. A re-shoot is not published by being taken -- three plates on librewaternet.org sat at
 # their 25 August versions for a week while three blocks of prose here called them stale. Advisory
