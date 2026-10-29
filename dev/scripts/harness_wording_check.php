@@ -99,13 +99,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
             '(b) a line of EPANET [RULES] grammar in the Net1 fixture. It is EPANET\'s language, '
             . 'not ours; lpn_library_rule_tip quotes a rule of the same shape as an example.',
     ],
-    'dev/lpn-spike/examples-gallery-harness.js' => [
-        'liters per second' =>
-            '(a) the assertion is that the FLOW unit is named before the length units inside the '
-            . 'example description, so the two unit words are the specification being held.',
-        'gallons per minute' =>
-            '(a) the US half of the same ordering.',
-    ],
     'dev/lpn-spike/file-naming-harness.js' => [
         'Elm Street Center' =>
             '(b) the project NAME the harness types in, to watch it become a filename and come '
