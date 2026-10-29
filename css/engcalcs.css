@@ -2915,7 +2915,6 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body .lpn-demand-table input[type="number"] { text-align: end; font-variant-numeric: tabular-nums; }
 #lpn_demands_body .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
 #lpn_demands_body .lpn-demand-table :is(input, select):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
-#lpn_demands_body .lpn-demand-table input:placeholder-shown:not(:focus):not(:hover) { background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x; }
 #lpn_demands_body .lpn-demand-add {
 	display: block; box-sizing: border-box; width: 100%; min-height: 1.75rem; margin: 0; padding: 2px 6px; border: 0; border-bottom: 1px solid var(--ec-hairline); border-radius: 0;
 	background: transparent; font: inherit; font-size: .95em; line-height: 1.2; text-align: center; color: inherit; cursor: pointer;
@@ -3988,6 +3987,9 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
 		/* The row is a <label>, so a tap anywhere in its cell (and its name) toggles the box: the whole cell is the touch target. */
 		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
+		/* What stands under a row (the DEM buttons under Elevation) belongs to that row: the rule goes under the whole group, not between the row and its buttons (Tom, 2026-10-29). */
+		.lpn-propbox .lpn-gprops > .lpn-grow:has(+ :is(.lpn-gtrail, .lpn-elev-dem)), .lpn-propbox .lpn-gprops > .lpn-grow:has(+ br + :is(.lpn-gtrail, .lpn-elev-dem)) { box-shadow: none; }
+		.lpn-propbox .lpn-gprops > :is(.lpn-gtrail, .lpn-elev-dem) { box-shadow: inset 0 -1px 0 0 var(--ec-hairline); }
 	}
 }
 /* ==== THE STANDARD SPREADSHEET STYLE (Tom, 2026-10-27: "I love it! Make this a standard style"). One class, `lpn-sheet`, on
@@ -4010,10 +4012,7 @@ option:disabled { color: var(--ec-ink-muted); }
 			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
 		}
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
-		/* An empty editable cell is still findable: a faint dotted underline, gone while the pointer is on it (the hover fill takes over) or the cursor is in it. */
-		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):placeholder-shown:not(:focus):not(:hover) {
-			background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x;
-		}
+		/* An empty editable cell is plain: the hover fill and the focus outline are what say it can be typed in (Tom, 2026-10-29). */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -4022,10 +4021,26 @@ option:disabled { color: var(--ec-ink-muted); }
 		}
 		/* A ramp picker is a cell too: its left edge is the Value column's. */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 2px 0; width: 100%; min-width: 0; }
+		/* The colour-scheme bar and the Time series pull-down at the foot of Properties are cells too, the same as the sheet's other pull-downs (Tom, 2026-10-29). */
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 0; align-self: stretch; display: flex; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn { flex: 1 1 auto; min-height: 1.75rem; box-sizing: border-box; border: 0; border-radius: 0; background: transparent; padding: 4px 6px; display: flex; align-items: center; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn > .lpn-ramp-strip { width: 100%; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn:hover:not(:focus) { background: var(--ec-hover-bg); }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick {
+			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
+			padding: 4px 6px; box-sizing: border-box; align-self: stretch; font-size: .85em; text-overflow: ellipsis;
+		}
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:hover:not(:focus) { background: var(--ec-hover-bg); }
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 		/* The divider: no header cell to hold it, so it stands in the run's first track, along its whole height. */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grid > .lpn-gsplit, .lpn-sheet.lpn-gprops > .lpn-gsplit { display: block; grid-column: 1 / 2; grid-row: auto; }
-		.lpn-sheet.lpn-gprops { position: relative; }   /* the divider's containing block */
-		.lpn-sheet.lpn-gprops > .lpn-gsplit { grid-column: 2 / 3; }
+		/* Properties: the divider stands in the box's body and runs down the ID row (row 1) and the rows (row 2). */
+		.lpn-propbox .lpn-popover-body { position: relative; }
+		.lpn-propbox .lpn-popover-body > #lpn_popup_title { grid-row: 1; }
+		.lpn-propbox .lpn-popover-body > #lpn_popup_fields { grid-row: 2; }
+		.lpn-propbox .lpn-popover-body > #lpn_popup_graph { grid-row: 3; }
+		.lpn-propbox .lpn-popover-body > .lpn-gsplit { display: block; grid-column: 2 / 3; grid-row: 1 / 3; }
 	}
 }
 /* A phone: the name goes above its value (the name track is nothing), as the other boxes' rows do under
@@ -4046,9 +4061,6 @@ option:disabled { color: var(--ec-ink-muted); }
 		}
 		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
 		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
-		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):placeholder-shown:not(:focus):not(:hover) {
-			background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x;
-		}
 		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px 8px; margin: 0; }
 		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin: 4px 6px 8px; }

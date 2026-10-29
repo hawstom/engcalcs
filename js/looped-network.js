@@ -12441,6 +12441,11 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return scnSetting(group === 'node' ? 'colorNodeField' : 'colorLinkField'); }
+	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
+	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
+	// stay as the user left them, and the colour key shows the plot's field.
+	function contourFieldOf() { return colorFieldOf('node') || 'pressure'; }
+	function contourOrNodeField() { return colorFieldOf('node') || (contourIsOn() ? 'pressure' : ''); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -12943,7 +12948,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
 		['node', 'link'].forEach(function (group) {
-			var field = colorFieldOf(group); if (!field) { return; }
+			var field = group === 'node' ? contourOrNodeField() : colorFieldOf(group); if (!field) { return; }
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
@@ -13100,7 +13105,7 @@ var EngCalcs = EngCalcs || {};
 	// Whether the ground can be subtracted at all: pressure, a project placed on the Earth, a token,
 	// and the terrain module present. The consent is asked by the checkbox, never here.
 	function contourTerrainOffered() {
-		return colorFieldOf('node') === 'pressure' && !!EngCalcs.lpnTerrainGrid &&
+		return contourFieldOf() === 'pressure' && !!EngCalcs.lpnTerrainGrid &&
 			projectLocatable() && !!mapboxToken();
 	}
 	function contourTerrainWanted() {
@@ -13243,7 +13248,7 @@ var EngCalcs = EngCalcs || {};
 			walls: walls.map(function (w) { return w.pts; }) };
 	}
 	function refreshContour() {
-		var C = EngCalcs.lpnContour, field = colorFieldOf('node');
+		var C = EngCalcs.lpnContour, field = contourFieldOf();
 		contourStats = null;
 		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
 		var layer = contourLayerEl();
@@ -13506,12 +13511,11 @@ var EngCalcs = EngCalcs || {};
 		var box = contourBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines, of pressure
-	// if the nodes are not coloured yet), then opens the box where it is tuned or turned off.
+	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines; of pressure
+	// if the nodes are not coloured, and the node colouring is never touched), then opens the box where it is tuned or turned off.
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
-			if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
 			if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		});
@@ -13594,16 +13598,15 @@ var EngCalcs = EngCalcs || {};
 			if (on) {
 				var was = contourShownBefore || { fill: 'smooth', lines: true };
 				settings.contourFill = was.fill; settings.contourLines = was.lines;
-				if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
 			} else {
 				contourShownBefore = { fill: contourFillMode(), lines: !!settings.contourLines };
 				settings.contourFill = ''; settings.contourLines = false;
 			}
 			contourChanged();
 		}), pc.lpn_contour_show_tip);
-		var field = colorFieldOf('node');
+		var field = contourFieldOf();
 		row(pc.lpn_color_node_field || 'Color nodes by',
-			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), field || '', function (v) {
+			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), colorFieldOf('node') || '', function (v) {
 				settings.colorNodeField = v; contourChanged();
 			}));
 		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
@@ -13650,12 +13653,6 @@ var EngCalcs = EngCalcs || {};
 				}
 				settings.contourTerrain = on; contourChanged();
 			}), pc.lpn_contour_dem_tip);
-		}
-		// Every control waits on a coloured field but the field itself.
-		if (!field) {
-			Array.prototype.forEach.call(body.querySelectorAll ? body.querySelectorAll('input, select, button') : [], function (c) {
-				if (c.id !== 'lpn_contour_field') { c.disabled = true; }
-			});
 		}
 		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
 		initTipsIn(body);
@@ -25173,7 +25170,7 @@ var EngCalcs = EngCalcs || {};
 	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
 	// the next row starts a new one, and both share the host's one width.
 	var LPN_GCOLS_KEY = 'lpn_gcols';
-	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 10, LPN_GSTEP = 0.5;   // rem
+	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GSTEP = 0.5;   // rem
 	var gcolPrefs = null;
 	function gcolRead() {
 		var raw = null, v;
@@ -25253,7 +25250,7 @@ var EngCalcs = EngCalcs || {};
 		host.__lpnFitQ = true;
 		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridFitNow(host); });
 	}
-	function gridWireSplit(host, anchor, labelCell) {
+	function gridWireSplit(host, anchor, labelCell, stand) {
 		var split = document.createElement('div'), startX, startRem, dragging = false, rem = 16;
 		split.className = 'lpn-gsplit';
 		split.setAttribute('role', 'separator');
@@ -25279,7 +25276,8 @@ var EngCalcs = EngCalcs || {};
 		function room(fresh) {
 			// The label column may grow until the value column keeps its widest input (and never under LPN_GVAL_MIN rem).
 			if (fresh || host.__lpnValNeed === undefined) { rem = gridRem(); host.__lpnValNeed = valNeed(); }
-			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - Math.max(LPN_GVAL_MIN, host.__lpnValNeed));
+			// A sheet's Value column shrinks to the same few characters the box itself can be sized to (Tom, 2026-10-29), not to a larger floor.
+			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - Math.max((host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet')) ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN, host.__lpnValNeed));
 		}
 		function setRem(v, keep) {
 			var id = gcolId(host);
@@ -25324,7 +25322,7 @@ var EngCalcs = EngCalcs || {};
 				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
 			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
 		});
-		(labelCell || anchor).appendChild(split);
+		(labelCell || stand || anchor).appendChild(split);
 		return split;
 	}
 	// The header row: Label | Value, and the divider. One stands above each run of two or more rows (a run of
@@ -25369,8 +25367,9 @@ var EngCalcs = EngCalcs || {};
 		var title = document.getElementById('lpn_popup_title');
 		fields.classList.add('lpn-sheet');
 		if (title && title.classList.contains('lpn-gtitle-id')) { title.classList.add('lpn-sheet'); }
-		if (!fields.__lpnSplit) { try { fields.__lpnSplit = gridWireSplit(body, fields); } catch (e) { /* no pointer events: the rules stay */ } }
-		else { fields.appendChild(fields.__lpnSplit); }   // after a rebuild of the rows, last again
+		// The divider stands in the box's body, not in the rows, so it runs from the ID row down (Tom, 2026-10-29: it excluded the ID row).
+		if (!fields.__lpnSplit) { try { fields.__lpnSplit = gridWireSplit(body, fields, null, body); } catch (e) { /* no pointer events: the rules stay */ } }
+		else if (fields.__lpnSplit.parentNode !== body) { body.appendChild(fields.__lpnSplit); }
 	}
 	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
 	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
