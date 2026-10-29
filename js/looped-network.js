@@ -15136,7 +15136,7 @@ var EngCalcs = EngCalcs || {};
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
 		// this page stores what the user typed and never crossed them into SI.
-		if (ls.customer.demandActual) { lines.push(affix('customer', 'demandActual', rawLine(customerResolvedFlow(c), null, cd.demandActual))); }
+		if (ls.customer.demandActual) { lines.push(affix('customer', 'demandActual', rawLine(inRunScenario(function () { return customerResolvedFlow(c); }), null, cd.demandActual))); }
 		if (ls.customer.demand) { lines.push(affix('customer', 'demand', rawLine(customerFlow(c), null, cd.demand))); }
 		// The two identity strings, printed as the words they are. An absent one prints NOTHING
 		// rather than an empty slot: a blank where a description would be is a separator with no
@@ -78648,7 +78648,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
-			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof resolvedDemand(n) === 'number') { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), ex.demandActual, nd.demandActual))); }
+			// **THE ACTUAL DEMAND IS A RESULT OF THE KEPT RUN** (Task 820): read it in the scenario that run was solved in, as the Full report does (inRunScenario()).
+			if (!isFixedHeadNode(n) && ls.node.demandActual) { var rd = inRunScenario(function () { return resolvedDemand(n); }); if (typeof rd === 'number') { lines.push(affix('node', 'demandActual', rawLine(rd, ex.demandActual, nd.demandActual))); } }
 			if (!isFixedHeadNode(n) && ls.node.demand && typeof baseDemandTotal(n) === 'number') { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), ex.demand, nd.demand))); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
 			// fixed-head branch because those are declared inputs, the junction branch because the
@@ -78792,7 +78793,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
-			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(resolvedDemand(n), nd.demandActual) : undefined; }),
+			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(inRunScenario(function () { return resolvedDemand(n); }), nd.demandActual) : undefined; }),
 			head: nodeValueMap(function (n) {
 				// Head is DERIVED on a reservoir or tank and SOLVED on a junction, so the two halves
 				// of this one field reach the RESULT unit by different roads -- one across the input

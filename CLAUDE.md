@@ -375,7 +375,7 @@ Full record: `dev/storage-rulings.md`; inventory: `dev/cookie-storage-inventory.
   visitor requested), or is gated on `ecAnalyticsConsented()` / `EngCalcs.analyticsConsented()` and
   deleted on withdrawal. Applies to every storage technology.
 - **A new log writer appends `ecLogBucketSuffix()` last. Never sum the two buckets** — one counts
-  people, the other page loads.
+  browsers that said yes, the other everyone else ("others").
 - **Never restyle one consent button to stand out.** Cookie lifetimes default to one year.
 - **Tell Tom about any change to what is stored on a visitor's device.**
 
