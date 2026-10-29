@@ -53162,13 +53162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
-			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
-			{ separator: true },
-			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
-			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
-			// goes when that question is settled -- putting a throwaway through 26 languages would be
-			// worse than leaving it in English.
-			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
+			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } }
 		];
 	}
 	// The walkthroughs live on Tom's blog, so this is the one menu action in the bar that leaves the
@@ -57007,45 +57001,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
 		// "[dev]" is by definition not that -- it was taking a permanent slot on the one strip where
 		// space is scarcest. See insertAssetRows().
-	}
-
-	// Temporary dev-only stress-test generator (Tom, 2026-07-30: "see how this handles 100
-	// links/pipes"). An 8x8 grid gives 64 nodes and 112 pipes with genuine loops on every interior
-	// cell -- a realistic worst case for the 300ms debounced solve, unlike a tree which the
-	// two-pass bpn_ solver would handle trivially. One corner is a reservoir (the solver's only
-	// fixed-head boundary condition); every other node is a junction with a small demand. Remove
-	// this function and its toolbar button once satisfied with how the debounce/solve holds up.
-	function drawTestGrid() {
-		if (doc.nodes.length > 0) {
-			askDialog({ kind: 'confirm', text: 'This will add to the existing network. Continue?' }, function (yes) { if (yes) { drawTestGridNow(); } });
-			return;
-		}
-		drawTestGridNow();
-	}
-	function drawTestGridNow() {
-		saveUndoSnapshot();
-		var SIZE = 8, SPACING = 20, grid = [], row, col, n, demand = niceDefault('lpn_u_flow', 'gpm', 5, 0.0003);
-		for (row = 0; row < SIZE; row++) {
-			grid.push([]);
-			for (col = 0; col < SIZE; col++) {
-				if (row === 0 && col === 0) {
-					n = addNode('reservoir', 0, 0);
-				} else {
-					n = addNode('junction', col * SPACING, row * SPACING);
-					n._demand = demand;   // base-write: drawTestGrid builds a scratch network in Base
-				}
-				grid[row].push(n);
-			}
-		}
-		for (row = 0; row < SIZE; row++) {
-			for (col = 0; col < SIZE; col++) {
-				if (col < SIZE - 1) { addLink('pipe', grid[row][col].id, grid[row][col + 1].id); }
-				if (row < SIZE - 1) { addLink('pipe', grid[row][col].id, grid[row + 1][col].id); }
-			}
-		}
-		updateEmptyHint();
-		zoomExtent(true);   // automatic: a network drawn in code has no stored view to restore
-		setMode('select');
 	}
 
 	function wirePointerEvents() {

@@ -70,7 +70,7 @@ const files = ['Net1.lwn', 'Net3-Novato-CA-World.lwn', 'Net3-Novato-CA-World-SI.
 	'Basic-example-US-units.lwn', 'Basic-example-SI-units.lwn'];
 files.forEach(function (f) {
 	console.log('--- ' + f + ' ---');
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + f, 'utf8')));
+	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + (/^Basic-/.test(f) ? 'dev/lpn-spike/fixtures/' : 'examples/') + f, 'utf8')));
 	const shipped = L.labels().filter((r) => CODE.test(r.label.split(r.cpKey || '\u0000').join('')));
 	ok(f + ' as shipped: no Setting cell reads as a stored name', shipped.length === 0,
 		JSON.stringify(shipped.slice(0, 12).map((r) => r.label)));

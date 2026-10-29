@@ -35,7 +35,6 @@ ok('the examples folder holds the fifteen shipped examples', files.length === 15
 // What each example's ID labels must say: '' where the IDs already carry a prefix. Elm Street's
 // links are bare numbers, so its link labels keep L.
 const EXPECT = {
-	'Basic-example-US-units.lwn': ['', ''], 'Basic-example-SI-units.lwn': ['', ''],
 	'Elm-Street-Center.lwn': ['', 'L'], 'Valves.lwn': ['', ''],
 	// The starter examples (Task 823) name every asset (SYS, HYD-P, FH-1, WELL-1, L-1), so no prefix.
 	'Fire-flow-extension.lwn': ['', ''], 'Fire-flow-extension-SI.lwn': ['', ''],

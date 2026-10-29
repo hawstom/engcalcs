@@ -111,8 +111,6 @@ const SOURCE_OF = {
 	// Net3 placed on the world (Task 497's geographic project). Its model is Net3's, so Net3.inp is
 	// its source too and the geographic coordinates are the curation.
 	'Net3-Novato-CA-World.lwn': 'Net3.inp',
-	'Basic-example-SI-units.lwn': null,   // authored in metres; there is no public SI `.inp` to import
-	'Basic-example-US-units.lwn': null,   // authored, the teaching starter
 	'Elm-Street-Center.lwn': null         // Tom's own design snapshot, drawn on this page
 };
 

@@ -254,12 +254,8 @@ exports.run = async function ({ browser, report }) {
 		// three pull-downs and ONE box, with the extremes reachable from the condition list rather
 		// than from a second number field.
 		//
-		// The network comes from the dev-only "Draw large test network" row, which is the only way
-		// to get a hundred pipes onto this page without a hundred clicks.
-		// **THE INSERT MENU IS GONE; ITS ROWS ARE A FLY-OUT OF WATER** (Task 543, 2026-08-27). This
-		// line still clicked `#lpn_menu_insert` and had been throwing ever since — the whole section
-		// after it never ran, which is why nothing noticed.
-		await a.menuClickSub('Insert', '[dev] Draw large test network', 'project');
+		// The network is the Net3 example: a hundred pipes without a hundred clicks.
+		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(500);
 		await a.menuClick('Find and replace', 'edit');
 		{
@@ -290,8 +286,8 @@ exports.run = async function ({ browser, report }) {
 			report.ok(listed.ops.indexOf('top') >= 0 && listed.ops.indexOf('bottom') >= 0,
 				'Top n and Bottom n are in the condition list', listed.ops.join(','));
 			report.eq(listed.rows.length, 3, 'Top 3 lists exactly three');
-			// **THE ORDERING IS NOT ASSERTED HERE, and that is deliberate.** Every pipe in the dev
-			// grid is the same length, so "biggest first" would be vacuously true of any order --
+			// **THE ORDERING IS NOT ASSERTED HERE, and that is deliberate.** Ranking is not checked against
+			// a hand count, so "biggest first" would be vacuously true of any order --
 			// the ordering is pinned against a controlled fixture in dev/lpn-spike/find-harness.js
 			// instead. What a browser is needed for is that each row PRINTS the value it was
 			// ranked by, which is what makes a top-n list readable at all.

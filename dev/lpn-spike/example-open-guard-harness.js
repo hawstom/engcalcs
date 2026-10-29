@@ -22,8 +22,8 @@ const {
 const fs = require('fs');
 const path = require('path');
 
-const EXAMPLE_URL = '/engcalcs/examples/Basic-example-US-units.lwn';
-const EXAMPLE_TEXT = fs.readFileSync(path.join(ROOT, 'examples/Basic-example-US-units.lwn'), 'utf8');
+const EXAMPLE_URL = '/engcalcs/examples/Valves.lwn';
+const EXAMPLE_TEXT = fs.readFileSync(path.join(ROOT, 'examples/Valves.lwn'), 'utf8');
 
 let fails = 0, checks = 0;
 function ok(name, cond, extra) {
@@ -85,7 +85,7 @@ function run(label, mutate) {
 	console.log('\n=== ' + label + ' ===');
 	const before = fails;
 	const L = makeL(mutate);
-	const ex = { file: 'Basic-example-US-units.lwn' };
+	const ex = { file: 'Valves.lwn' };
 	// Collect EVERY resolver, not just the last -- so that with the guard removed, resolving all
 	// five in-flight fetches actually proves five imports would have landed, rather than the test
 	// merely happening to only ever settle the one promise a naive mock kept a handle to.

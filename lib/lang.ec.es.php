@@ -1236,10 +1236,6 @@ $ec_lang['lpn_map_unmeasurable']='Esta página no pudo calcular el tamaño del �
 // EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
-$ec_lang['lpn_ex_basic_si_title']='Red básica, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Dos embalses, una bomba y un pequeño lazo. Litros por segundo, con metros y milímetros.';
-$ec_lang['lpn_ex_basic_us_title']='Red básica, gpm (EE. UU.)';
-$ec_lang['lpn_ex_basic_us_desc']='Dos embalses, una bomba y un pequeño lazo. Galones por minuto, con pies y pulgadas.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
