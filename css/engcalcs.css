@@ -6369,6 +6369,8 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg,
 html[dir="rtl"] .lpn-tree-chev[aria-expanded="false"] .lpn-tree-chev-svg { transform: rotate(90deg); }
 @media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg, .lpn-tree-chev-svg { transition: none; } }
+.lpn-guide-hit { background: var(--ec-warn-bg); color: inherit; box-shadow: 0 0 0 1px var(--ec-warn-border); border-radius: 2px; }
+.lpn-guide-hit-current { outline: var(--ec-focus-w) solid var(--ec-accent); }
 .lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }

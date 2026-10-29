@@ -95,16 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-29 (forty-fifth and forty-sixth sessions, Opus main, Sonnet agents)
+## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 
-- **The 10-28 night session died at 00:18 on 10-29: jasmine ran out of memory** (76 Node processes, 56 GB of 60) when an agent load-tested a harness with 36 parallel copies and `yes` burners beside four other agents. Every agent died; their commits and uncommitted files survived and were resumed. The agent rule is now: at most 2 harness processes each, no burners, wait for 20 GB free (`brief-common.md` rule 17).
-- **Merged on his word 10-28 night, pushed with this handoff:** `feat/shape-scenario` and `feat/scenario-io` (Task 831 closed; Task 814 partly, the rest in `dev/import-export-scenarios.md`), and `fix/harness-flakes`' first two (contour, settings-select-lag).
-- **`box-design` (port 8103)** now carries `feat/sheet-light` and `feat/value-source` (both retired into it). His 10-28 pass: *"This looks like it was done by a designer; I like that"*; his items 2-10 being built, then Ida's row order (`dev/agents/interface-designer/journal.md` 10-29; From, To, Active after ID, results last). Her faint heading bands are his call (two new keys). On merge: regenerate payloads, close 827-829, 833-847 that he accepts.
-- **`feat/report-widths` (Task 848)**: draggable report columns, kept per browser as `lpn_rptcols` (he was told; no consent change). Built on box-design; Perry passed after fixes. Waits his pass; merge box-design into it again first.
-- **`feat/starter-example` (port 8107, Task 823)**: Perry's six findings being finished, then his pass.
-- **`fix/harness-flakes`**: five more harnesses (scenario-settings-routing, new-project-pan, label-pass-economy-browser, geojson-import-browser, example-open-guard). A tooling track: merges on green.
-- **His question "would it hurt to trim and tighten the test scripts?"** has a three-pass proposal (fix flakes, merge families, demote pixel and timing checks); passes 2 and 3 wait on his word.
-- `feat/settings-pinned` deleted on his word (*"I don't like it"*); first view stays unpinned.
+- **Merged on green with this handoff:** `fix/manual-search` (User Manual: every hit marked, a chapter result opens on its first hit, heading hits indented under their chapter) and `chore/test-trim` (pass 3: four pixel/timing harnesses on demand via `dev/scripts/on_demand_harnesses.txt`, `run_harnesses.sh --all` runs them; the selftest and doc-bookkeeping check lines retired, scripts kept on disk and listed in `dev/automated-checks.md`; new ratchet `adhoc_style_check.php`, baseline 137 lines, 122 in looped-network.js). The four visitor-string checks (struck public claims, em dash, plain-English swaps, select/choose) stay live.
+- **Test-trim pass 2** (merge harness families: user-guide, pane, scenario, label) is approved by Tom and waits until `box-design` merges: box-design edits those same harnesses.
+- **`box-design` (8103)**: round 3 built (box width scales both columns in proportion; Text's words before Active; clicking any tick row's words ticks it). Phone layout per Ida (`dev/agents/interface-designer/phone-boxes-2026-10-29.md`: two columns, 1 px divider with 24 px touch area, stack below ~16rem) was being built at handoff; read `git log` there. Then his browser pass, PC and phone. Category heading bands: parked by Tom (*"Let's park that idea"*).
+- **`feat/report-widths` (Task 848)**: Tom said *"Very nice. Merge."* It is built on box-design (cherry-picking it alone onto master conflicts in CLAUDE.md, css, the storage inventory), so it merges in the same batch as box-design, after his box-design word.
+- **`feat/starter-example` (8107)**: round 3 built (Johnson City extension; Munday well and tank, the real town's spelling; elevated tank, floor 35.5 m above C-4; "modeled", Tom: American spelling is fine). Waits his pass. The translated descriptions still lead with the units sentence: next sprint.
+- **Tom asked whether A/B testing is worth it** (Task 824, measured numbers added there). Answered in messenger.md: not at this traffic, except perhaps one two-arm test on Manning Pipe Flow; any stored arm is a consent_body change.
 - **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
 - **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
 - **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
@@ -116,7 +114,7 @@ lines rather than appending corrections.
 - **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
 - **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
 - Unchanged wait: Task 825, his audit pass.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/21990087-1e73-417c-9690-897fe91291f4/scratchpad (brief-common.md, Ida's and Mary's row-order notes, the test-trim proposal).
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/4e77bea5-26bf-421e-a279-762cbbbddc50/scratchpad (brief-common.md, ida-phone-boxes.md, test-trim-proposal.md).
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 

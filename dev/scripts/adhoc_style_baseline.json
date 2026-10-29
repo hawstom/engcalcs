@@ -1,0 +1,197 @@
+{
+    "_about": "Lines setting a style with a literal size or colour, per file. A ratchet: may fall, may not rise. See adhoc_style_check.php.",
+    "files": {
+        "js/looped-network.js": {
+            "count": 122,
+            "fp": [
+                "801f4fca",
+                "559702dd",
+                "592c611c",
+                "90c1397d",
+                "3577e458",
+                "fbb6bf9e",
+                "3577e458",
+                "fbb6bf9e",
+                "18353725",
+                "1fad1b77",
+                "7d5ba5ea",
+                "b153903f",
+                "173b3b01",
+                "97f69193",
+                "d3a4a8a1",
+                "514d217c",
+                "aa67b4c2",
+                "18353725",
+                "97f69193",
+                "3ef9a774",
+                "6efb4db1",
+                "a6521860",
+                "d2a04015",
+                "7e932f6a",
+                "7e932f6a",
+                "7e932f6a",
+                "74561862",
+                "7e932f6a",
+                "ebf59875",
+                "d2a04015",
+                "82548f27",
+                "9ad1cd22",
+                "281d602d",
+                "9ad1cd22",
+                "9cd7e522",
+                "5ccf4985",
+                "50a31695",
+                "e6d574da",
+                "8d18c7a7",
+                "0add7f63",
+                "9cd7e522",
+                "1d77dd55",
+                "48b3c97e",
+                "10cef0ce",
+                "91165237",
+                "b431ddd5",
+                "a90ae220",
+                "8d18c7a7",
+                "0add7f63",
+                "e6d574da",
+                "a698cc9d",
+                "8d18c7a7",
+                "c20019a8",
+                "e6d574da",
+                "e6d574da",
+                "9302700c",
+                "ba474aea",
+                "3d5d4b1a",
+                "ea72cb80",
+                "522862f2",
+                "522862f2",
+                "9cd7e522",
+                "d64d132d",
+                "aee40d57",
+                "046ab039",
+                "311e02b8",
+                "78df02b4",
+                "522862f2",
+                "a491cdaa",
+                "3696e613",
+                "cf6660d3",
+                "b3297b4c",
+                "9cd7e522",
+                "48b3c97e",
+                "46e781fa",
+                "a90ae220",
+                "8d18c7a7",
+                "f30a213b",
+                "0add7f63",
+                "3a3a2281",
+                "5cc50d69",
+                "b0731050",
+                "2f5a6ed5",
+                "91fe829e",
+                "652e19d4",
+                "522862f2",
+                "522862f2",
+                "6f085511",
+                "3ef9a774",
+                "b8071ea4",
+                "e3d0e460",
+                "9cd7e522",
+                "3ef9a774",
+                "2d8b247e",
+                "0c4560bc",
+                "d7699f7b",
+                "00ed2e31",
+                "8646e252",
+                "d8ac684d",
+                "93cd60b0",
+                "116e6689",
+                "52d37d69",
+                "2f71fb9d",
+                "359d6321",
+                "1461f183",
+                "d5139fb7",
+                "73f54bc7",
+                "9cd7e522",
+                "c5102cc1",
+                "8d18c7a7",
+                "383a1506",
+                "b4fa7d18",
+                "9cd7e522",
+                "71a2199e",
+                "8d18c7a7",
+                "0add7f63",
+                "f1bb32d7",
+                "92fe5530",
+                "6098a023",
+                "1b11eb01",
+                "76534f23",
+                "bd7c1a08"
+            ]
+        },
+        "js/lpn-time.js": {
+            "count": 3,
+            "fp": [
+                "bdb450c1",
+                "6205ea52",
+                "4660c480"
+            ]
+        },
+        "js/manning-pipe-flow.js": {
+            "count": 1,
+            "fp": [
+                "17c06280"
+            ]
+        },
+        "js/manning-trap.js": {
+            "count": 1,
+            "fp": [
+                "17c06280"
+            ]
+        },
+        "js/micro-hydro-power.js": {
+            "count": 1,
+            "fp": [
+                "4f2722af"
+            ]
+        },
+        "js/orifice-drain-time.js": {
+            "count": 1,
+            "fp": [
+                "ea0d9dfc"
+            ]
+        },
+        "js/orifice.js": {
+            "count": 1,
+            "fp": [
+                "ea0d9dfc"
+            ]
+        },
+        "js/rock-chute.js": {
+            "count": 1,
+            "fp": [
+                "4f2722af"
+            ]
+        },
+        "js/weir-flow-irregular.js": {
+            "count": 1,
+            "fp": [
+                "a2810a38"
+            ]
+        },
+        "lib/Calculators.lib.php": {
+            "count": 2,
+            "fp": [
+                "4dbdbfdf",
+                "f6a9569b"
+            ]
+        },
+        "lib/Menus.lib.php": {
+            "count": 3,
+            "fp": [
+                "9dc7d258",
+                "fef4c8db",
+                "0b07d6ff"
+            ]
+        }
+    }
+}

@@ -3983,3 +3983,7 @@ Report: scratchpad/ida-row-order.md (not committed). Entries, each tagged:
 - OBSERVED: no Properties box for a Shape found in box-design code.
 - CITED (EPANET 2.2 manual ch.6 tables, fetched 2026-10-26) results-last, From/To after ID; on-screen editor order is SPECULATION (recalled). Bentley Active Topology group placement not retrieved.
 - Recommendation: bands Identity, Physical, Demand, Initial, Constituent, Fire/Energy, Results; Results band is the one to ship first.
+
+## 2026-10-29 — box-design on a phone
+
+- Tom asked for a critical eye on box-design at phone width. Findings: `phone-boxes-2026-10-29.md` (two columns on a phone, 1 px divider with a 24 px touch area, stack only below ~16rem).
