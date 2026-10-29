@@ -64815,6 +64815,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				scrollSetboxTo(target);
 				setSetboxCurrent(b);
 				setboxJumpOpen(false);
+				// The row tapped stays the current one until the reader scrolls by hand (see setboxSpy()).
+				setboxSpyPinned = true;
 			});
 			index.appendChild(b);
 			return b;
@@ -64861,10 +64863,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		jump.setAttribute('aria-expanded', open ? 'true' : 'false');
 	}
 	// The last visible heading at or above the content pane's top edge, plus the sticky heading's room.
+	// **A JUMP PINS THE BAR TO THE ROW TAPPED** (Tom, 2026-10-28: tapping Asset put "ID prefixes" in the bar). On a phone the
+	// section heading is hidden, so the section's first sub-heading lands at the very top of the pane beside it, and the
+	// spy, asked which heading is at the top, named the sub-heading a frame after the jump named the section. The scroll
+	// the jump itself makes is therefore not the reader's: the spy stays out of it until a hand scroll (touch, wheel, key).
+	var setboxSpyPinned = false;
 	function setboxSpy() {
 		var content = document.getElementById('lpn_setbox_content'), index = document.getElementById('lpn_setbox_index'),
 			head, limit, best = null;
-		if (!content || !index || !setboxIsOpen()) { return; }
+		if (!content || !index || !setboxIsOpen() || setboxSpyPinned) { return; }
 		head = content.querySelector('.lpn-set-head');
 		limit = content.getBoundingClientRect().top + (head ? head.getBoundingClientRect().height : 0) + 4;
 		[].forEach.call(content.querySelectorAll('.lpn-set-sec, .lpn-set-sub:not(.lpn-set-sub-silent)'), function (el) {
@@ -64884,6 +64891,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (setboxJumpWired || !jump || !content) { return; }
 		setboxJumpWired = true;
 		jump.addEventListener('click', function () { setboxJumpOpen(!setboxJumpIsOpen()); });
+		['touchstart', 'touchmove', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
+			content.addEventListener(ev, function () { setboxSpyPinned = false; }, { passive: true });
+		});
 		content.addEventListener('scroll', function () {
 			if (queued) { return; }
 			queued = true;

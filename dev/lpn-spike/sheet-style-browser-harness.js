@@ -141,6 +141,67 @@ async function main() {
 		});
 		ok('S4 Properties: a computed value is drawn in a different (muted) ink from an editable cell', !!ink.ed && (!ink.ro || ink.ro !== ink.ed), JSON.stringify(ink));
 
+		console.log('\n--- Properties clean-up, 2026-10-28 (A gap, B and C borders, D Value truncates, E the + button) ---');
+		const openNode = async (id) => {
+			const p = await page.evaluate((id) => {
+				const el = Array.from(document.querySelectorAll('#lpn_canvas [data-node="' + id + '"]')).filter((e) => e.getBoundingClientRect().width > 0)[0];
+				const r = el.getBoundingClientRect();
+				return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+			}, id);
+			await page.mouse.click(p.x, p.y);
+			await a.settle(900);
+		};
+		await openNode('11');
+		const j = await page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), R = (e) => e.getBoundingClientRect();
+			const btn = f.querySelector('.lpn-demand-add'), wrap = btn && btn.parentNode, tbl = f.querySelector('.lpn-demand-table');
+			const nextRow = wrap && Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => R(r).top >= R(wrap).bottom - 1 && R(r).height > 0)[0];
+			const th = tbl && tbl.querySelectorAll('thead th');
+			const g = document.querySelector('#lpn_popup_graph .lpn-pgraph-row');
+			const rows = Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => r.querySelector('.lpn-gname') && R(r).height > 0);
+			return {
+				text: btn && btn.textContent, title: btn && btn.title, aria: btn && btn.getAttribute('aria-label'),
+				gapAbove: tbl && wrap ? R(wrap).top - R(tbl).bottom : null, gapBelow: nextRow ? R(nextRow).top - R(wrap).bottom : null, wrapH: wrap ? R(wrap).height : null,
+				wrapRule: wrap ? getComputedStyle(wrap).boxShadow : null, wrapW: wrap ? R(wrap).width : null, rowW: rows[0] ? R(rows[0]).width : null,
+				thDivider: th && th.length > 1 ? getComputedStyle(th[1]).borderInlineStartWidth : null,
+				graphRule: g ? getComputedStyle(g).boxShadow : null, graphLabelEdge: g ? Math.round(R(g.querySelector('label')).right) : null,
+				nameEdge: Math.round(R(rows[0].querySelector('.lpn-gname')).right), graphEdge: g ? Math.round(R(g).left) : null, rowEdge: Math.round(R(rows[0]).left)
+			};
+		});
+		const addWords = await a.lang('lpn_demand_add');
+		ok('E the demand button shows just "+"', j.text === '+', JSON.stringify(j.text));
+		ok('E its old words are its tip and its name', j.title === addWords && j.aria === addWords, j.title);
+		ok('A the add row sits flush under the table and above the next row (no gap)', Math.abs(j.gapAbove) <= 1.5 && Math.abs(j.gapBelow) <= 1.5, JSON.stringify({ above: j.gapAbove, below: j.gapBelow }));
+		ok('A the add row is one row tall, not five', j.wrapH <= 36, String(j.wrapH));
+		ok('B the add row has its left, right and bottom rules and spans the Label and Value columns', /rgb/.test(j.wrapRule || '') && Math.abs(j.wrapW - j.rowW) <= 1.5, JSON.stringify({ rule: j.wrapRule, wrapW: j.wrapW, rowW: j.rowW }));
+		ok('B the demand table has a rule between its columns', j.thDivider === '1px', String(j.thDivider));
+		ok('C the Time series row is ruled and its Label rule stands under the one above', /rgb/.test(j.graphRule || '') && j.graphEdge === j.rowEdge, JSON.stringify({ rule: j.graphRule, graphEdge: j.graphEdge, rowEdge: j.rowEdge }));
+		// D: the box shrinks to its floor; the Value column shrinks with it and cuts with an ellipsis, never wraps, never pushes past the box.
+		await closeBox('lpn_popup'); await a.settle(250);
+		await openPipe();
+		const dm = await page.evaluate(() => {
+			const box = document.querySelector('.lpn-propbox'); box.style.width = '1px';   // the min-width floor decides
+			return new Promise((res) => setTimeout(() => {
+				const body = box.querySelector('.lpn-popover-body'), R = (e) => e.getBoundingClientRect(), br = R(body);
+				const vals = Array.from(body.querySelectorAll('.lpn-grow > .lpn-gval')).filter((e) => R(e).width > 0 && !e.closest('table'));
+				const txt = vals.filter((e) => e.matches('input[type=text], input[type=number], select'));
+				const len = Array.from(body.querySelectorAll('.lpn-grow')).filter((r) => /^Length/.test((r.querySelector('.lpn-gname') || { textContent: '' }).textContent.trim()))[0];
+				const li = len && len.querySelector('input');
+				const ro = vals.filter((e) => e.tagName === 'SPAN');
+				res({
+					boxW: Math.round(R(box).width), floor: parseFloat(getComputedStyle(box).minWidth), sw: body.scrollWidth - body.clientWidth,
+					past: vals.filter((e) => R(e).right > br.right + 1).length, minVal: Math.round(Math.min.apply(null, vals.filter((e) => e.type !== "checkbox").map((e) => R(e).width))),
+					ell: txt.every((e) => getComputedStyle(e).textOverflow === 'ellipsis') && ro.every((e) => getComputedStyle(e).textOverflow === 'ellipsis' && getComputedStyle(e).whiteSpace === 'nowrap'),
+					cut: li ? li.scrollWidth > li.clientWidth : null, n: vals.length
+				});
+			}, 400));
+		});
+		ok('D the Properties box can be made narrow (floor 12 rem)', dm.boxW <= 200, JSON.stringify(dm));
+		ok('D at its floor nothing scrolls sideways and no Value cell passes the right edge', dm.sw <= 1 && dm.past === 0, JSON.stringify({ scroll: dm.sw, past: dm.past }));
+		ok('D the Value column is allowed down to a few characters (at least 30 px, at most 90 px held)', dm.minVal >= 30 && dm.minVal <= 90, String(dm.minVal));
+		ok('D every Value cell is cut with an ellipsis and does not wrap; a number longer than its cell is cut, not widened', dm.ell === true && dm.cut === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
+		await page.evaluate(() => { document.querySelector('.lpn-propbox').style.width = ''; });
+
 		console.log('\n--- Dark and every other theme (D1) ---');
 		await openPipe();
 		for (const id of BOXES) { await openBox(a, id); await a.settle(400); }
