@@ -12,11 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-<<<<<<< HEAD
-**85 still to read on master**, of 247 untranslated keys, of 3212 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
-=======
-**43 still to read on master**, of 208 untranslated keys, of 3177 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
->>>>>>> master
+**97 still to read on master**, of 259 untranslated keys, of 3224 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -33,11 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-<<<<<<< HEAD
-## lpn_  (247, 85 to read @@ NEEDS RULING)
-=======
-## lpn_  (208, 43 to read @@ NEEDS RULING)
->>>>>>> master
+## lpn_  (259, 97 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -72,22 +64,17 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_crit_run_note`**
   > Each outage was run over the whole simulation ({n} reporting steps).
   _Ruled OK 2026-10-20._
-<<<<<<< HEAD
-- **`lpn_demand_cats`**
-  > Demand categories
-  @@ NEEDS RULING
-- **`lpn_demand_total_tip`**
-  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
-=======
-- **`lpn_crit_stopped_at`**
-  > run stopped at {time}
-  _Ruled OK 2026-10-20._
 - **`lpn_dem_base`**
   > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
   @@ NEEDS RULING
 - **`lpn_dem_scenario`**
   > Elevations written here are overrides in the scenario {scenario}.
->>>>>>> master
+  @@ NEEDS RULING
+- **`lpn_demand_cats`**
+  > Demand categories
+  @@ NEEDS RULING
+- **`lpn_demand_total_tip`**
+  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
   @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -731,7 +718,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_zoom`**
   > Zoom
   _Ruled OK 2026-10-20._
-<<<<<<< HEAD
 - **`lpn_settings_held_default`**
   > the default
   @@ NEEDS RULING
@@ -743,13 +729,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_settings_held_none`**
   > no text
-=======
+  @@ NEEDS RULING
 - **`lpn_shapes_every_scenario`**
   > Shapes appear in every scenario.
   @@ NEEDS RULING
 - **`lpn_shapes_this_scenario`**
   > Shapes appear in {scenario} only.
->>>>>>> master
   @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
@@ -828,11 +813,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-<<<<<<< HEAD
-**75 still to read**, of 118 new keys across 13 unmerged branch(es).
-=======
-**122 still to read**, of 165 new keys across 10 unmerged branch(es).
->>>>>>> master
+**62 still to read**, of 105 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -843,254 +824,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-<<<<<<< HEAD
-### box-design (`8237aa2d9`) — adds no English strings
-=======
-### box-design (`3814bf175`) — already merged into feat/report-widths; its strings are listed there
->>>>>>> master
+### box-design (`a785044c8`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-<<<<<<< HEAD
-### feat/report-widths (`8bdda97d6`) — already merged into box-design; its strings are listed there
-
-### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
-
-### feat/settings-pinned (`9e9d54a94`) — adds no English strings
-
-### feat/shape-scenario (`8ee873fdd`) — 13 new, 13 to read @@ NEEDS RULING
-
-- **`lpn_dem_base`**
-  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
-  @@ NEEDS RULING
-- **`lpn_dem_scenario`**
-  > Elevations written here are overrides in the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_export_goes_base`**
-  > Exporting the Base scenario.
-  @@ NEEDS RULING
-- **`lpn_export_goes_scenario`**
-  > Exporting the scenario "{scenario}" to a unique file name.
-  @@ NEEDS RULING
-- **`lpn_guide_scn_move_def`**
-  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_scn_move_term`**
-  > Moving or merging between scenarios
-  @@ NEEDS RULING
-- **`lpn_library_import_every_scenario`**
-  > Every scenario can use them.
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_dxf`**
-  > a DXF file
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_geojson`**
-  > a GeoJSON file
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_inp`**
-  > an EPANET file
-  @@ NEEDS RULING
-- **`lpn_noscn_lead`**
-  > This project has {n} scenarios, but {format} has no scenarios or alternatives.
-  @@ NEEDS RULING
-- **`lpn_shapes_every_scenario`**
-  > Shapes appear in every scenario.
-  @@ NEEDS RULING
-- **`lpn_shapes_this_scenario`**
-  > Shapes appear in {scenario} only.
-  @@ NEEDS RULING
-=======
-### feat/report-widths (`ba774364f`) — 60 new, 60 to read @@ NEEDS RULING
-
-- **`lpn_col_level`**
-  > Level
-  @@ NEEDS RULING
-- **`lpn_crit_col_stopped`**
-  > Run stopped at
-  @@ NEEDS RULING
-- **`lpn_demand_cats`**
-  > Demand categories
-  @@ NEEDS RULING
-- **`lpn_demand_total_tip`**
-  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
-  @@ NEEDS RULING
-- **`lpn_edit_curves`**
-  > Edit curves…
-  @@ NEEDS RULING
-- **`lpn_edit_fittings`**
-  > Edit fittings…
-  @@ NEEDS RULING
-- **`lpn_edit_pipetypes`**
-  > Edit types…
-  @@ NEEDS RULING
-- **`lpn_ff_col_more`**
-  > How many others
-  @@ NEEDS RULING
-- **`lpn_field_active_short`**
-  > Active
-  @@ NEEDS RULING
-- **`lpn_field_auto_length`**
-  > Auto length
-  @@ NEEDS RULING
-- **`lpn_field_auto_length_tip`**
-  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
-  @@ NEEDS RULING
-- **`lpn_field_cv_short`**
-  > Check valve
-  @@ NEEDS RULING
-- **`lpn_field_km_fittings_tip`**
-  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list chosen" to type a value.
-  @@ NEEDS RULING
-- **`lpn_field_km_short_tip`**
-  > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
-  @@ NEEDS RULING
-- **`lpn_field_tank_level_short`**
-  > Initial depth
-  @@ NEEDS RULING
-- **`lpn_field_tank_level_short_tip`**
-  > Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.
-  @@ NEEDS RULING
-- **`lpn_field_tank_maxlevel_short`**
-  > Maximum depth
-  @@ NEEDS RULING
-- **`lpn_field_tank_maxlevel_short_tip`**
-  > Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.
-  @@ NEEDS RULING
-- **`lpn_field_tank_minlevel_short`**
-  > Minimum depth
-  @@ NEEDS RULING
-- **`lpn_field_tank_minlevel_short_tip`**
-  > Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.
-  @@ NEEDS RULING
-- **`lpn_field_valve_km_short_tip`**
-  > Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.
-  @@ NEEDS RULING
-- **`lpn_heading_unit`**
-  > {label} ({unit})
-  @@ NEEDS RULING
-- **`lpn_morph_vertex`**
-  > Vertex
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_base`**
-  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_base_ask`**
-  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_also`**
-  > Initial quality {quality} is cleared too.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_both`**
-  > Clear elevation {elev} and demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_demand`**
-  > Clear demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_elev`**
-  > Clear elevation {elev} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_quality`**
-  > Clear initial quality {quality} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_customers`**
-  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_demand`**
-  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_done`**
-  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_kind`**
-  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_links`**
-  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_loop`**
-  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_own`**
-  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_pipes`**
-  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_switch`**
-  > Switch to Base and morph
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_text`**
-  > {id} was not morphed into a vertex: a Text is attached to it.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_type`**
-  > {id} was not morphed into a vertex: only a junction can become one.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_alt`**
-  > This override is stored in alternative "{alternative}".
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_alt_shared`**
-  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_clear_one`**
-  > Click to clear this override.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_set_from`**
-  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
-- **`lpn_ovm_restores`**
-  > Clear restores {value}, {source}.
-  @@ NEEDS RULING
-- **`lpn_prop_label_symbol`**
-  > {label}, {symbol}
-  @@ NEEDS RULING
-- **`lpn_prop_label_symbol_unit`**
-  > {label}, {symbol} ({unit})
-  @@ NEEDS RULING
-- **`lpn_prop_label_unit`**
-  > {label} ({unit})
-  @@ NEEDS RULING
-- **`lpn_quality_named_concentration_short`**
-  > {chemical} conc.
-  @@ NEEDS RULING
-- **`lpn_reaction_bulk_pipe_tip`**
-  > Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
-  @@ NEEDS RULING
-- **`lpn_reaction_tank_short_tip`**
-  > Reaction coefficient: the rate of reaction in the water held in this tank, in 1/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.
-  @@ NEEDS RULING
-- **`lpn_reaction_wall_pipe_tip`**
-  > Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
-  @@ NEEDS RULING
-- **`lpn_replace_selected_only`**
-  > Only the selected assets
-  @@ NEEDS RULING
-- **`lpn_report_copy_html`**
-  > Copy HTML
-  @@ NEEDS RULING
-- **`lpn_result_concentration_short`**
-  > Conc.
-  @@ NEEDS RULING
-- **`lpn_settings_held_default`**
-  > the default
-  @@ NEEDS RULING
-- **`lpn_settings_held_from`**
-  > the value in {parent}
-  @@ NEEDS RULING
-- **`lpn_settings_held_item`**
-  > {setting}: {restores}
-  @@ NEEDS RULING
-- **`lpn_settings_held_none`**
-  > no text
-  @@ NEEDS RULING
-
-### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
-
-### feat/shape-scenario (`8ee873fdd`) — adds no English strings
->>>>>>> master
-
-### feat/sheet-light (`8237aa2d9`) — already merged into box-design; its strings are listed there
+### feat/report-widths (`644830be6`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -1254,11 +994,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-<<<<<<< HEAD
-### feat/starter-example (`4f1357263`) — 8 new, 8 to read @@ NEEDS RULING
-=======
-### feat/starter-example (`8f00dc78c`) — 8 new, 8 to read @@ NEEDS RULING
->>>>>>> master
+### feat/starter-example (`2a4aabd86`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
@@ -1273,17 +1009,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Fire flow extension, gpm (US)
   @@ NEEDS RULING
 - **`lpn_ex_well_desc`**
-<<<<<<< HEAD
-  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_well_si_desc`**
-  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
-=======
   > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
   > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
->>>>>>> master
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Community well and tank, L/s (SI)
@@ -1291,8 +1020,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ex_well_title`**
   > Community well and tank, gpm (US)
   @@ NEEDS RULING
-
-### feat/value-source (`999e599d8`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
