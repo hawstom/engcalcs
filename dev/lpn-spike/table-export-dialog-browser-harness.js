@@ -500,14 +500,14 @@ async function main() {
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
-		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B__C__Peak\.csv$/.test(r.name), r.name);
+		ok('CSV, current scenario: one file named with the scenario', /A_B__C__Peak-Junctions\.csv$/.test(r.name), r.name);
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
 		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));
 		ok('workbook sheet names keep the scenario (the Scenarios table is one sheet of its own) and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name) || x.name === 'Scenarios') && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
 		r = await runExport('csv', 'all', 'all');
 		f = inspect(r.file, 'zip');
-		const nJ = f.names.filter((n) => /Junctions-/.test(n));
+		const nJ = f.names.filter((n) => /-Junctions\.csv$/.test(n));
 		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8 && f.names.includes('Patterns.csv') && f.names.every((n) => !/[\/\\:*?"<>|]/.test(n)), f.names.join(', '));
 		ok('the table on screen keeps its order, and still shows no scenario column', (await idOrder()) === orderBefore && !(await screen()).heads.includes(await a.lang('lpn_scenario_label')));
 		ok('no page errors', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));

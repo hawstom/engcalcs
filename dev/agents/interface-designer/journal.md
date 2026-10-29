@@ -3960,3 +3960,11 @@ Report: scratchpad/ida-direction.md (not committed). Entries, each tagged:
 - CITED (from memory, not refetched): EPANET Property Editor is a two-column grid; WaterGEMS and Visual Studio Properties use category bands; QGIS forms use group boxes; Figma and epanet-js use hairline rows with borderless inputs.
 - SPECULATION: the cure for "ragged" was the aligned value column, not the cell borders; so the borders can soften without bringing raggedness back. Not tested by render.
 - Recommendation: five rules (two columns, hairlines no box, heading bands, one-line rows, same look on phone); bands without default collapse; Basic as a row subset with Show all; Demand as two rows plus a Demands box; soften the sheet first.
+
+## 2026-10-29 - Order of every Properties row (box-design)
+Report: scratchpad/ida-row-order.md (not committed). Entries, each tagged:
+- OBSERVED (Chromium 1366x900, worktree box-design, Net1 and Valves.lwn; scratchpad/ida-order/rows.json and per-type PNGs): current order. Junction: X, Y, Description, Tag, Elevation, Base demand, Demand pattern, Demand categories, Demand, Required fire flow, Emitter, Head(R), Pressure(R), Initial quality, Source x3, Chlorine(R), Active. Pipe: Description, Tag, Pipe type, Diameter, Roughness, Fittings, Minor loss, Auto length, Length, Bulk, Wall, From, To, Closed, Check valve, Active, results. Pump: efficiency curve after the Price rows. Valve: Setting before Diameter, From/To after Minor loss.
+- OBSERVED (js/looped-network.js:5772-5800, categoryOf): Active, Type, valveType are Active topology; Closed/status and setting are Initial settings; efficiency curve is Physical; From/To are not overridable.
+- OBSERVED: no Properties box for a Shape found in box-design code.
+- CITED (EPANET 2.2 manual ch.6 tables, fetched 2026-10-26) results-last, From/To after ID; on-screen editor order is SPECULATION (recalled). Bentley Active Topology group placement not retrieved.
+- Recommendation: bands Identity, Physical, Demand, Initial, Constituent, Fire/Energy, Results; Results band is the one to ship first.
