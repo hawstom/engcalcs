@@ -84,12 +84,22 @@ const featuresOf = (t) => t.slice(t.indexOf('\n"features":')).replace(RESULT, ''
 function helpers(a) {
 	const P = a.page;
 	const settle = (ms) => a.settle(ms || 300);
+	const readStored = () => P.evaluate(() => {
+		const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+		return { id: idx.openId, count: (idx.projects || []).length, doc: JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') };
+	});
+	// STILL, NOT MERELY WAITED FOR: the page saves on a debounce, which a loaded machine can run late
+	// past any fixed wait. Read until two readings 300 ms apart agree (at most 20 s more).
 	const stored = async () => {
 		await settle(450);
-		return P.evaluate(() => {
-			const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
-			return { id: idx.openId, count: (idx.projects || []).length, doc: JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') };
-		});
+		let v = await readStored();
+		for (let t = 0; t < 66; t++) {
+			await P.waitForTimeout(300);
+			const w = await readStored();
+			if (JSON.stringify(w) === JSON.stringify(v)) { return w; }
+			v = w;
+		}
+		return v;
 	};
 	const importVia = async (file) => {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
