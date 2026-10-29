@@ -38,7 +38,7 @@ Full inventory: `dev/cookie-storage-inventory.md`.
   withdrawal delete it.
 - **A new log writer must call `ecLogBucketSuffix()`** and append it to the line. Consented rows are
   deduplicated and unmarked; everyone else's are marked `visit` and undeduplicated. **Never sum the
-  two buckets** — one counts people, the other counts page loads.
+  two buckets** — one counts browsers that said yes, the other everyone else ("others").
 - **Never restyle one consent button to stand out.** `.ec-consent-btn` styles both answers identically
   on purpose; a coloured Accept beside a grey Reject is the dark pattern this design avoids.
 - **Cookie lifetimes are defensible out loud.** One year is the house default.
@@ -46,7 +46,7 @@ Full inventory: `dev/cookie-storage-inventory.md`.
   *"Go (random code, new consent text)"*). After a yes the browser makes a random code of 16
   characters, derived from nothing about the person or device; every said-yes log row carries it,
   so distinct codes count browsers in any window and rows count uses. A refuser gets no code, and
-  their rows count as page loads, never as browsers. 400 days, renewed on every page view; deleted
+  their rows are "others", never browsers. 400 days, renewed on every page view; deleted
   on Refuse all, on withdrawal and by Start fresh. It is the reason `consent_body` was rewritten and
   `EC_CONSENT_VERSION` went to 2. **It makes said-yes rows pseudonymous personal data** (an online
   identifier), which `privacy.php` now says.

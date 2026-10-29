@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 5 · Soon (75): 14 · Someday (50): 29 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**92 open tasks.** Next (100): 5 · Soon (75): 15 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
 ## 100 — Next (5)
 
@@ -15,7 +15,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 831 — Shapes honour Is active per scenario, in the Presentation category.
+- Task 831 — Shapes honour Is active per scenario.
 
 ## 95 — Priority 95 (6)
 
@@ -26,7 +26,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (14)
+## 75 — Soon (15)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -39,11 +39,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 818 — An MCP server, so an AI agent can run a network.
-- Task 820 — Map labels mix scenarios with Recalculate off.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
 - Task 823 — Starter examples a new user can build from.
+- Task 848 — Report column widths a reader can drag, kept per browser.
+- Task 849 — Every place uses the short Properties name for a field.
 
-## 50 — Someday (29)
+## 50 — Someday (30)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -74,6 +75,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 817 — Sketch a network that arrives without coordinates.
 - Task 832 — Compare Google Docs' Help menu with ours.
+- Task 850 — A master Demands table, one row per demand.
 
 ## 25 — Maybe (17)
 
@@ -121,5 +123,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-82 of 90 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
