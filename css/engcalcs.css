@@ -3324,7 +3324,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    `resize: both` needs a non-visible overflow to be drawn at all, and it costs nothing: the
    scrolling already lives on `.lpn-popover-body`, which takes the height a drag gave the box. The
    floor is a width, as it is on every other box here -- the property rows stop fitting first. */
-.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(12rem, 94vw); }   /* the Value column shrinks and truncates (Tom, 2026-10-28), so the box may be narrow */
+.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
+@media (min-width: 30.01rem) { .lpn-propbox { min-width: 12rem; } }   /* the Value column shrinks and truncates (Tom, 2026-10-28), so the box may be narrow; a phone keeps 17 rem, which its demand table needs */
 .lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 /* A Text's words in Properties fill the box's width and follow it when the box is dragged wider;
    the words box itself drags taller only (R-394). A short number (the Text's Size multiplier) gets

@@ -43,14 +43,14 @@ function auditInPage(spec) {
 	// Every control a person can put a hand on.
 	const ctrls = Array.from(root.querySelectorAll('input, select, textarea, button')).filter(vis).filter((e) => {
 		if (e.type === 'hidden') { return false; }
-		if (e.closest('.lpn-gsplit, table, .lpn-box-tools, .lpn-popover-x, .lpn-ovm, .lpn-corner-btn, .lpn-setbox-title, .lpn-pgraph-chart, canvas, svg')) { return false; }
+		if (e.closest('.lpn-gsplit, table, .lpn-box-tools, .lpn-popover-x, .lpn-ovm, .lpn-corner-btn, .lpn-setbox-title, .lpn-pgraph-chart, canvas, svg, .lpn-demand-add')) { return false; }   // the "+" row spans the whole grid, ruled like a table row (Tom, 2026-10-28)
 		if (skip && e.closest(skip)) { return false; }
 		return true;
 	});
 	// A run of buttons or ticks is ONE thing in the value column: its group starts there, and its
 	// later members follow the first.
 	const GROUPS = '.lpn-gwrap, .lpn-ff-buttons, .lpn-gbtns, .lpn-find-filter, .lpn-new-actions, .lpn-new-presets, .lpn-scnres-controls';
-	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip)));
+	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip))).filter((g) => !g.querySelector('.lpn-demand-add'));
 	const lead = (e) => { const g = e.closest(GROUPS); return g && Array.from(g.querySelectorAll('input, select, textarea, button')).filter(vis)[0] !== e; };
 	// A control that SPANS the grid (a Text's words, which fills the box on Tom's word of 2026-10-15) starts
 	// at the name column instead; it is checked there.

@@ -227,7 +227,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Step of lowest flow
   _Ruled OK 2026-10-20._
 - **`lpn_ff_col_more`**
-  > And others
+  > How many others
   @@ NEEDS RULING
 - **`lpn_ff_no_steps`**
   > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
@@ -744,7 +744,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**84 still to read**, of 127 new keys across 14 unmerged branch(es).
+**84 still to read**, of 127 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -755,7 +755,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`6256b8ff3`) — adds no English strings
+### box-design (`49979b8d6`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -967,7 +967,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`80303ded2`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`938bf6dd9`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
@@ -1161,10 +1161,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/box-style (`f8ec825ac`) — already merged into box-design; its strings are listed there
+### fix/label-snapshot-demand (`cfcc9209e`) — adds no English strings
 
-### fix/box-words (`82eebd452`) — already merged into box-design; its strings are listed there
-
-### fix/report-width (`040976a3c`) — already merged into box-design; its strings are listed there
-
-### fix/settings-fit (`17413e4d7`) — already merged into box-design; its strings are listed there
+### fix/usage-terms (`98031fed8`) — adds no English strings

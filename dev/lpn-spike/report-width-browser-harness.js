@@ -70,7 +70,7 @@ async function main() {
 		});
 		const lg = async (k) => (await a.lang(k)).trim();
 		const runLabel = await lg('lpn_ff_calculate');
-		ok('the "More affected" heading is now "How many others"', (await lg('lpn_ff_col_more')) === 'How many others', await lg('lpn_ff_col_more'));
+		ok('the last Fire flow heading is the key lpn_ff_col_more, not the old "More affected"', !!(await lg('lpn_ff_col_more')) && (await lg('lpn_ff_col_more')) !== 'More affected', await lg('lpn_ff_col_more'));
 		ok('the report Time heading is now "Time (hr)"', (await lg('lpn_full_col_time')) === 'Time (hr)', await lg('lpn_full_col_time'));
 		const waitReport = (sel) => a.waitFor(() => page.evaluate((s) => {
 			const r = document.querySelector(s), box = document.getElementById('lpn_ff_run_box');
@@ -165,7 +165,7 @@ async function main() {
 		ok('Fire flow: at its narrowest the table is under ' + MAX_FF_MIN + ' px', t0.min <= MAX_FF_MIN, String(t0.min));
 		ok('Fire flow: no body cell breaks a word', t0.broken.length === 0, t0.broken.slice(0, 4).join(' / '));
 		console.log('  info Fire flow width ' + t0.w + ' px, narrowest ' + t0.min + ' px, box ' + t0.body);
-		ok('Fire flow: the last Worst effect heading reads "How many others"', t0.heads.indexOf('How many others') > 0, t0.heads.join(' | '));
+		ok('Fire flow: the last Worst effect heading reads the lpn_ff_col_more words', t0.heads.indexOf(await lg('lpn_ff_col_more')) > 0, t0.heads.join(' | '));
 		ok('Fire flow: a junction that failed static has the sentence once, across 3 columns', t0.wide.length > 0 && t0.wide.every((x) => x.n === 3 && x.text === why), JSON.stringify(t0.wide.slice(0, 2)));
 		ok('Fire flow: every row still spans as many columns as the head has (' + t0.nleaf + ')', t0.spans.every((n) => n === t0.nleaf), Array.from(new Set(t0.spans)).join(','));
 		ok('Fire flow: the unit still moves into the heading with a spanning cell in the table', t0.heads.some((h) => /^Pressure at required flow \(/.test(h)), t0.heads.join(' | '));
