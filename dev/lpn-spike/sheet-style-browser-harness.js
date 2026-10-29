@@ -206,7 +206,7 @@ async function main() {
 		ok('D the Properties box can be made narrow (floor 12 rem)', dm.boxW <= 200, JSON.stringify(dm));
 		ok('D at its floor nothing scrolls sideways and no Value cell passes the right edge', dm.sw <= 1 && dm.past === 0, JSON.stringify({ scroll: dm.sw, past: dm.past }));
 		ok('D the Value column is allowed down to a few characters (at least 30 px, at most 90 px held)', dm.minVal >= 30 && dm.minVal <= 90, String(dm.minVal));
-		ok('D every Value cell is cut with an ellipsis and does not wrap; a number longer than its cell is cut, not widened', dm.ell === true && dm.cut === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
+		ok('D every Value cell ellipsizes and does not wrap; at the floor the Value column keeps its share of the width (proportional scaling), so a short number is no longer cut', dm.ell === true && dm.cut === false, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
 		await page.evaluate(() => { document.querySelector('.lpn-propbox').style.width = ''; });
 
 		console.log('\n--- The lighter sheet, 2026-10-28 (L1-L6 at PC width, L7 on a phone) ---');
@@ -264,7 +264,7 @@ async function main() {
 			ok('L5 ...and an outline on focus', !!fo && fo.same && fo.w > 0 && fo.st !== 'none', JSON.stringify(fo));
 			await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
 		}
-		// L7: on a phone the same box keeps the same look, name above value.
+		// L7: on a phone the same box keeps the same look, name beside value (the PC two columns).
 		await closeBox('lpn_popup'); await a.settle(250);
 		await page.setViewportSize({ width: 390, height: 844 });
 		await a.settle(600);
@@ -274,7 +274,7 @@ async function main() {
 			const rows = Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => r.querySelector('.lpn-gname') && R(r).height > 0 && !r.classList.contains('lpn-fill-row'));
 			const ctrls = Array.from(f.querySelectorAll('.lpn-grow > input.lpn-gval, .lpn-grow > select.lpn-gval')).filter((e) => e.type !== 'checkbox' && R(e).width > 0);
 			const ro = Array.from(f.querySelectorAll('.lpn-grow > span.lpn-gval:not(.lpn-gw-num)')).filter((e) => R(e).width > 0);
-			const stacked = rows.filter((r) => { const n = r.querySelector('.lpn-gname'), v = r.querySelector('.lpn-gval'); return v && R(n).bottom <= R(v).top + 1; }).length;
+			const stacked = rows.filter((r) => { const n = r.querySelector('.lpn-gname'), v = r.querySelector('.lpn-gval'); return v && R(v).left >= R(n).right - 1; }).length;
 			return {
 				rows: rows.length, noRule: rows.filter((r) => getComputedStyle(r).boxShadow === 'none').length, stacked,
 				bordered: ctrls.filter((e) => ['Top', 'Right', 'Bottom', 'Left'].some((x) => parseFloat(getComputedStyle(e)['border' + x + 'Width']) > 0)).length, ctrls: ctrls.length,
@@ -282,7 +282,7 @@ async function main() {
 				cats: !!f.querySelector('.lpn-demand-count'), table: !!f.querySelector('table.lpn-demand-table'), sw: document.querySelector('.lpn-propbox .lpn-popover-body').scrollWidth - document.querySelector('.lpn-propbox .lpn-popover-body').clientWidth
 			};
 		});
-		ok('L7 phone: name over value in every row (' + ph.stacked + ' of ' + ph.rows + ')', ph.rows > 3 && ph.stacked === ph.rows, JSON.stringify(ph));
+		ok('L7 phone: name beside value in every row (' + ph.stacked + ' of ' + ph.rows + ')', ph.rows > 3 && ph.stacked === ph.rows, JSON.stringify(ph));
 		ok('L7 phone: a hairline under every row', ph.noRule === 0, String(ph.noRule));
 		ok('L7 phone: no border round any value (' + ph.ctrls + ' boxes and pull-downs), and they start at one x', ph.bordered === 0 && ph.valueX.length === 1, JSON.stringify({ b: ph.bordered, x: ph.valueX }));
 		ok('L7 phone: a computed value is muted', ph.roMuted);

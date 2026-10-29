@@ -140,11 +140,11 @@ async function main() {
 		const p1 = await pm();
 		ok('Properties is open on the Text on the phone', p1.open, JSON.stringify(p1));
 		ok('...the words box is as wide as the fields there', p1.ta !== null && Math.abs(p1.ta - p1.inner) <= 2, JSON.stringify(p1));
-		ok('...and the Size box is short (under 80 px)', p1.size > 0 && p1.size < 80, JSON.stringify(p1));
-		await Q.evaluate(() => { document.getElementById('lpn_popup').style.width = '380px'; });
+		ok('...and the Size box fills its Value cell, within the box (the phone has the PC two columns)', p1.size >= 40 && p1.size <= p1.inner && p1.size < p1.ta, JSON.stringify(p1));
+		await Q.evaluate(() => { document.getElementById('lpn_popup').style.width = '340px'; });
 		await ph.settle(300);
 		const p2 = await pm();
-		ok('...dragged wider on the phone, the words box follows', p2.ta > p1.ta + 50 && Math.abs(p2.ta - p2.inner) <= 2, JSON.stringify(p2));
+		ok('...dragged narrower on the phone (it opens filling the screen), the words box follows', p2.ta < p1.ta - 30 && Math.abs(p2.ta - p2.inner) <= 2, JSON.stringify(p2));
 		ok('no page error on the phone', ph.errors.length === 0, ph.errors.join(' | '));
 		await ph.close();
 	} catch (e) {

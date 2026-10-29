@@ -25237,6 +25237,9 @@ var EngCalcs = EngCalcs || {};
 	// percentile of their natural widths), so one long label wraps instead of widening the whole
 	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
 	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
+	// A host this narrow stacks its names above its values: 16 rem under a finger (a phone's box fills the screen, so it keeps two columns), 18 rem under a mouse
+	// (where the Value column is allowed down to a few characters and a stack is for a true collapse only).
+	function gridNarrowRem() { try { return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 16 : 18; } catch (e) { return 18; } }
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
 	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
 	// The label column's natural widths, one a label: a range over each name's words, with its track
@@ -25253,13 +25256,32 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
+	// so a later change of the box's width can scale both columns by it.
+	function gridNoteFrac(host) {
+		var v = parseFloat(host.style.getPropertyValue('--lpn-g-name')), w = host.getBoundingClientRect().width;
+		if (isFinite(v) && w > 0) { host.__lpnFrac = v * gridRem() / w; host.__lpnW = w; }
+	}
+	// A change of the box's width sizes BOTH columns in proportion (Tom, 2026-10-29: "resizing the box width to size both columns proportionally instead of only the second").
+	function gridResized(host, w, prevW, narrow) {
+		host.__lpnW = w;
+		if (prevW && Math.abs(w - prevW) > 0.5 && host.__lpnFrac && !narrow && !host.__lpnDrag && !host.classList.contains('lpn-gplain')) { host.__lpnScaled = true; gridScaleNow(host); return true; }
+		return false;
+	}
+	function gridScaleNow(host) {
+		var w = host.getBoundingClientRect().width, px = gridRem(), sheet = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet'), v;
+		if (!w || !host.__lpnFrac) { return; }
+		v = Math.max(LPN_GNAME_MIN, Math.min(w / px - (sheet ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN), host.__lpnFrac * w / px));
+		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
+	}
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
 		host.__lpnFitQ = false;
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
-		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
-		if (id && typeof prefs[id] === 'number') { gcolApply(host); return; }
+		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain')) { return; }
+		if (host.__lpnScaled && host.__lpnFrac) { gridScaleNow(host); return; }   // the box has been resized: both columns keep their ratio
+		if (id && typeof prefs[id] === 'number') { gcolApply(host); gridNoteFrac(host); return; }
 		host.style.setProperty('--lpn-g-name', 'max-content');
 		hr = host.getBoundingClientRect();
 		names = gridNaturalNames(host);
@@ -25275,6 +25297,7 @@ var EngCalcs = EngCalcs || {};
 		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
 		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
+		gridNoteFrac(host);
 	}
 	function gridFitSoon(host) {
 		if (host.__lpnFitQ) { return; }
@@ -25314,6 +25337,7 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host);
 			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
 			host.style.setProperty('--lpn-g-name', v + 'rem');
+			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
 		}
@@ -25321,20 +25345,37 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host), prefs = gcolRead();
 			if (id) { delete prefs[id]; gcolSave(); }
 			host.style.removeProperty('--lpn-g-name');
+			host.__lpnScaled = false;
 			gridFitSoon(host);
 		}
 		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
-		split.addEventListener('pointerdown', function (e) {
-			if (e.button !== undefined && e.button !== 0) { return; }
+		// A finger: the 24 px hit area lies over the cell beside the line, so a press only becomes a drag after 4 px of travel, and a tap passes through to the cell under it (Ida, 2026-10-29).
+		var pending = false, pendId = null;
+		function beginDrag(e) {
 			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem(); host.__lpnValNeed = undefined; room(true);
 			try { split.setPointerCapture(e.pointerId); } catch (err) {}
+		}
+		function passThrough(e) {
+			var el, had = split.style.pointerEvents;
+			split.style.pointerEvents = 'none';
+			el = document.elementFromPoint(e.clientX, e.clientY);
+			split.style.pointerEvents = had;
+			if (!el || el === split) { return; }
+			try { if (el.focus) { el.focus(); } if (el.tagName === 'SELECT' && el.showPicker) { el.showPicker(); } else if (el.click) { el.click(); } } catch (err) { /* a picker that needs a gesture of its own stays closed */ }
+		}
+		split.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			if (e.pointerType === 'touch') { host.__lpnTouchAt = Date.now(); pending = true; pendId = e.pointerId; startX = e.clientX; return; }
+			beginDrag(e);
 			e.preventDefault();
 		});
 		split.addEventListener('pointermove', function (e) {
+			if (pending && Math.abs(e.clientX - startX) > 4) { pending = false; beginDrag(e); }
 			if (dragging) { setRem(startRem + dirSign() * (e.clientX - startX) / rem, false); }
 		});
 		function endDrag(e) {
 			var v;
+			if (pending) { pending = false; if (e.type === 'pointerup') { passThrough(e); } return; }
 			if (!dragging) { return; }
 			dragging = false;
 			try { split.releasePointerCapture(e.pointerId); } catch (err) {}
@@ -25342,6 +25383,7 @@ var EngCalcs = EngCalcs || {};
 			if (isFinite(v)) { setRem(v, true); }
 			host.__lpnDrag = false;
 		}
+		split.addEventListener('mousedown', function (e) { if (host.__lpnTouchAt && Date.now() - host.__lpnTouchAt < 1000) { e.preventDefault(); } });   // the compatibility mouse events after a finger must not focus the divider over the cell the tap went to
 		split.addEventListener('pointerup', endDrag);
 		split.addEventListener('pointercancel', endDrag);
 		split.addEventListener('dblclick', function (e) { e.preventDefault(); reset(); });
@@ -25412,15 +25454,17 @@ var EngCalcs = EngCalcs || {};
 		if (!(opts && opts.plain) && host.closest && host.closest('.lpn-sheetbox')) { host.classList.add('lpn-sheet'); }
 		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
 		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
-		if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth < 30 * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
+		// Stacked only when the host itself is narrower than 16 rem (a true collapse): a phone gets the same two columns as a PC (Tom, 2026-10-29).
+		if (typeof window !== 'undefined' && host.getBoundingClientRect && host.getBoundingClientRect().width && host.getBoundingClientRect().width < gridNarrowRem() * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
 		if (typeof ResizeObserver !== 'undefined') {
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
 				if (w) {
-					var now = w < 18 * px || (window.innerWidth || 9999) < 30 * px;
+					var now = w < gridNarrowRem() * px, prevW = host.__lpnW;
 					host.classList.toggle('lpn-gnarrow', now);
 					host.__lpnFitted = true;
+					if (gridResized(host, w, prevW, now)) { return; }
 					gridFitSoon(host);   // the first time it has a width, and whenever the box is resized: the cap on the Label column moves with it
 				}
 			}).observe(host);
@@ -25481,6 +25525,15 @@ var EngCalcs = EngCalcs || {};
 			lpnRichInto(name, labelText);
 		}
 		row.appendChild(name);
+		// Clicking the words of a tick row ticks the box, as a label does (Tom, 2026-10-29: "It's an expected convention"). The "?" keeps its own job, the tip.
+		if (kind === 'check' && c && c.tagName && name.tagName !== 'LABEL') {
+			name.addEventListener('click', function (e) {
+				var t = e.target;
+				if (c.disabled) { return; }
+				while (t && t !== name) { if (t.classList && t.classList.contains('ec-tip')) { return; } t = t.parentNode; }
+				c.click();
+			});
+		}
 		if (c) {
 			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
 			c.className = (c.className ? c.className + ' ' : '') + 'lpn-gval';
@@ -36393,7 +36446,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var body = document.createElement('div');
 			dlgBody.appendChild(body);
 			lpnGridHost(body, { plain: true });   // the whole dialog is one grid; a choice is not a Label and a Value
-			body.style.minWidth = '19rem';   // wide enough that the name stays beside its choice
+			body.classList.add('lpn-gdlg-wide');   // wide enough that the name stays beside its choice
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
 				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
@@ -54506,7 +54559,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (guideShowEl(sec, hit)) { any = true; }
 		});
 		if (none) { none.hidden = any; }
+		guideHighlight(q);
 		guideRebuildNav(q);
+	}
+	// ---- Every hit in the shown text is marked (Tom, 2026-10-29: a result opened and he could not see
+	// the word). Marks are <mark class="lpn-guide-hit"> wrapped round the matching characters of a
+	// text node; the term is never parsed as HTML. They are removed and rebuilt on every change of the
+	// query, so clearing the search leaves the guide's text as it was. A hit that spans two elements
+	// is found by the filter but not marked.
+	function guideClearHits() {
+		var c = guideContentEl(), parents = [];
+		if (!c) { return; }
+		c.querySelectorAll('mark.lpn-guide-hit').forEach(function (m) {
+			var p = m.parentNode;
+			while (m.firstChild) { p.insertBefore(m.firstChild, m); }
+			p.removeChild(m);
+			if (parents.indexOf(p) < 0) { parents.push(p); }
+		});
+		parents.forEach(function (p) { p.normalize(); });
+	}
+	function guideHighlight(q) {
+		var c = guideContentEl(), walker, nodes = [], n;
+		guideClearHits();
+		if (!c || !q) { return; }
+		walker = document.createTreeWalker(c, 4, null, false);
+		while ((n = walker.nextNode())) {
+			if (n.nodeValue && n.parentNode && !/^(SCRIPT|STYLE|TEXTAREA|INPUT|BUTTON|TEMPLATE|SELECT|OPTION)$/.test(n.parentNode.tagName) &&
+				guideVisible(n.parentNode)) { nodes.push(n); }
+		}
+		nodes.forEach(function (node) {
+			var t = node.nodeValue, f = '', map = [], k, m, at, hits = [], r, mk, i, fc;
+			for (k = 0; k < t.length; k++) { fc = guideFoldChar(t.charAt(k)); f += fc; for (m = 0; m < fc.length; m++) { map.push(k); } }
+			at = f.indexOf(q);
+			while (at >= 0) { hits.push(at); at = f.indexOf(q, at + q.length); }
+			for (i = hits.length - 1; i >= 0; i--) {
+				r = document.createRange();
+				r.setStart(node, map[hits[i]]);
+				r.setEnd(node, map[hits[i] + q.length - 1] + 1);
+				mk = document.createElement('mark');
+				mk.className = 'lpn-guide-hit';
+				r.surroundContents(mk);
+			}
+		});
 	}
 	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
 	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
@@ -54656,11 +54750,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			nav.appendChild(row);
 			rows.push(row);
 		}
-		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
-			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
+		// A heading that holds the term (a term in a list, a sub-heading) is a result of its own, listed
+		// as an indented row directly under its chapter. A chapter with such a heading ranks ahead of
+		// one that only mentions the term in its body text; otherwise the order is the guide's.
+		var hitsOf = [], hn = 0, secs = Array.prototype.slice.call(box.querySelectorAll('.lpn-guide-section'));
+		secs.forEach(function (sec, i) {
+			hitsOf[i] = [];
+			if (!q || sec.style.display === 'none') { return; }
+			sec.querySelectorAll('dt, h4').forEach(function (h) {
+				h.removeAttribute('data-guide-hit');
+				if (!guideVisible(h) || guideFold(guideTextOf(h)).indexOf(q) < 0) { return; }
+				hn++;
+				h.setAttribute('data-guide-hit', 'hit-' + hn);
+				hitsOf[i].push({ key: 'hit-' + hn, text: String(h.textContent || '').replace(/\s+/g, ' ').trim() });
+			});
+		});
+		secs = secs.map(function (sec, i) { return { sec: sec, hits: hitsOf[i], i: i }; });
+		if (q) { secs.sort(function (x, y) { return (y.hits.length ? 1 : 0) - (x.hits.length ? 1 : 0) || x.i - y.i; }); }
+		secs.forEach(function (rec) {
+			var sec = rec.sec, h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
 			if (!h || sec.style.display === 'none') { return; }
 			sec.setAttribute('data-guide-key', key);
 			add(key, String(h.textContent || '').trim(), 0, q ? guideSnippet(sec, q) : '');
+			rec.hits.forEach(function (ht) { add(ht.key, ht.text, 1, ''); });
 			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
 			// a box group, a third (the box).
 			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {
@@ -54731,9 +54843,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function guideGoto(key, focusIn) {
 		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
-		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
+		var safe = String(key).replace(/"/g, ''), isHit = /^hit-\d+$/.test(safe), mark = null;
+		el = content.querySelector(isHit ? '[data-guide-hit="' + safe + '"]' : '[data-guide-key="' + safe + '"]');
 		if (!el || el.style.display === 'none') { return false; }
-		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		// With a search active, a chapter opens on its first marked hit, and a heading result on that heading.
+		content.querySelectorAll('mark.lpn-guide-hit-current').forEach(function (m) { m.classList.remove('lpn-guide-hit-current'); });
+		if (!isHit && content.querySelector('mark.lpn-guide-hit')) {
+			mark = el.querySelector('mark.lpn-guide-hit');
+			if (mark) { mark.classList.add('lpn-guide-hit-current'); }
+		}
+		var target = mark || el;
+		content.scrollTop = Math.max(0, target.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop - (mark ? 48 : 0));
+		if (isHit) { guidePinKey = null; guideSetCurrent(key); guidePulse(el); return true; }
 		guidePinKey = null;
 		guideSetCurrent(key);
 		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
@@ -71236,7 +71357,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_field_closed', '#custom', '|', 'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_status', '#qresult', '#notes'],
 		customer: ['lpn_field_meter_pipe', 'lpn_field_meter_node', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag',
 			'lpn_field_meter_demand', 'lpn_field_demand_pattern', 'lpn_field_meter_count', 'lpn_field_meter_total', '#custom', '|', '#notes'],
-		text: ['lpn_field_active_short', '#words', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
+		text: ['#words', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
 			'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', '#custom', '|', '#notes']
 	};
 	// Tag every row a builder adds to `fields` while `fn` runs, for the rows whose name is not one language key.
@@ -71366,7 +71487,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			gridFitSoon(nm);
 			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
 				nm.__lpnRO = true;
-				new ResizeObserver(function () { gridFitSoon(nm); }).observe(nm);
+				new ResizeObserver(function () {
+					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
+					if (w) { nm.classList.toggle('lpn-gnarrow', gridNarrowRem() < 17 && w < 16 * gridRem()); }   // under 16 rem the name stands above its value
+					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
+					gridFitSoon(nm);
+				}).observe(nm);
 			}
 		}
 	}
@@ -71414,7 +71540,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = fields.offsetHeight;
 		fields.style.minHeight = h + 'px';
 		if (!propsKeepSameAct) { propsKeepSameAct = true; setTimeout(function () { propsKeepSameAct = false; }, 450); }
-		Promise.resolve().then(function () { sc.scrollTop = st; });
+		Promise.resolve().then(function () {
+			// A pin taller than the grid track it asks for leaves the rows (and so the Time series chart) drawn over the
+			// fields: once the rebuilt rows are taller than the pin the pin has done its work, so it is dropped (Perry, 2026-10-29).
+			if (fields.offsetHeight > h + 1) { fields.style.minHeight = ''; }
+			sc.scrollTop = st;
+		});
 	}
 	function clearFields(fields) {
 		if (window.bootstrap && bootstrap.Tooltip) {
@@ -72851,6 +72982,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!popupUserSize && !smallScreen()) {
 			popup.style.width = ''; popup.style.left = '0px';
 		}
+		// A phone: the box fills the width less the screen edge (Ida, 2026-10-29), so a Label | Value pair has room and no strip of half a map label stands beside it.
+		if (!popupUserSize && smallScreen()) { popup.style.width = Math.max(0, (window.innerWidth || 0) - 2 * POPUP_EDGE) + 'px'; popup.style.left = POPUP_EDGE + 'px'; }
 		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
 		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
 		// for this box and it is left alone: the properties popup opens per element, dozens of

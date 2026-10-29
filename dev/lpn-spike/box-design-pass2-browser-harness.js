@@ -171,6 +171,86 @@ async function main() {
 		const afterToggle = await settingsNow();
 		ok('P9/P10 toggling never touched node colouring either', nodeField(afterToggle) === '', JSON.stringify(nodeField(afterToggle)));
 
+		console.log('\n--- P9L: clicking the WORDS "Show contours" ticks the box, the plot following ---');
+		const seqL = [];
+		for (let i = 1; i <= 3; i++) {
+			const at = await page.evaluate(() => { const r = document.getElementById('lpn_contour_show').closest('.lpn-grow').querySelector('.lpn-gtext').getBoundingClientRect(); return { x: r.left + Math.min(10, r.width / 2), y: r.top + r.height / 2 }; });
+			await page.mouse.click(at.x, at.y);
+			await a.settle(900);
+			seqL.push({ click: i, tick: (await state()).tick, plot: (await plotParts()) > 0 });
+		}
+		ok('P9L word click 1: unticked and the plot is gone', seqL[0].tick === false && seqL[0].plot === false, JSON.stringify(seqL[0]));
+		ok('P9L word click 2: ticked and the plot is back', seqL[1].tick === true && seqL[1].plot === true, JSON.stringify(seqL[1]));
+		ok('P9L word click 3: unticked and the plot is gone again', seqL[2].tick === false && seqL[2].plot === false, JSON.stringify(seqL[2]));
+		await page.evaluate(() => { document.getElementById('lpn_contour_show').click(); });
+		await a.settle(500);
+		const otherTicks = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_contour_body .lpn-grow > input[type=checkbox]')).map((c) => ({ id: c.id, label: !!c.closest('.lpn-grow').querySelector('.lpn-gname') })));
+		ok('P9L every tick row of the Contour plot box has its words beside it', otherTicks.length >= 2 && otherTicks.every((t) => t.label), JSON.stringify(otherTicks));
+		{
+			const before2 = await page.evaluate(() => document.getElementById('lpn_contour_lines').checked);
+			const at = await page.evaluate(() => { const r = document.getElementById('lpn_contour_lines').closest('.lpn-grow').querySelector('.lpn-gname').getBoundingClientRect(); return { x: r.left + 8, y: r.top + r.height / 2 }; });
+			await page.mouse.click(at.x, at.y);
+			await a.settle(500);
+			ok('P9L clicking the words "Contour lines" flips that tick too', (await page.evaluate(() => document.getElementById('lpn_contour_lines').checked)) === !before2);
+			await page.evaluate(() => { const c = document.getElementById('lpn_contour_lines'); if (!c.checked) { c.click(); } });
+		}
+
+		console.log('\n--- P11: widening or narrowing a box sizes both columns in proportion ---');
+		const cols = (hostSel, boxSel) => page.evaluate((q) => {
+			const h = document.querySelector(q.h), b = document.querySelector(q.b), n = h.querySelector('.lpn-gname');
+			return { box: Math.round(b.getBoundingClientRect().width), host: Math.round(h.getBoundingClientRect().width), name: Math.round(n.getBoundingClientRect().width) };
+		}, { h: hostSel, b: boxSel });
+		const frac = (c) => c.name / c.host;
+		for (const T of [{ nm: 'Contour plot box', h: '#lpn_contour_body', b: '#lpn_contour_box' }, { nm: 'Properties box', h: '#lpn_popup .lpn-popover-body', b: '#lpn_popup' }]) {
+			if (T.b === '#lpn_popup') {
+				await page.evaluate(() => { const c = document.getElementById('lpn_contour_box'); if (c) { c.style.display = 'none'; } });
+				await openNode('22');
+				await openBox(a, 'lpn_popup');
+				await a.settle(500);
+			}
+			await page.evaluate((q) => { document.querySelector(q.b).style.width = '460px'; }, T);
+			await a.settle(500);
+			const s1 = await page.evaluate((q) => { const r = document.querySelector(q.h).querySelector('.lpn-gsplit') || document.querySelector(q.b).querySelector('.lpn-gsplit'); const b = r.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + 60 }; }, T);
+			await page.mouse.move(s1.x, s1.y);
+			await page.mouse.down();
+			await page.mouse.move(s1.x + 25, s1.y, { steps: 4 });
+			await page.mouse.up();
+			await a.settle(400);
+			const c1 = await cols(T.h, T.b);
+			await page.evaluate((q) => { document.querySelector(q.b).style.width = '700px'; }, T);
+			await a.settle(600);
+			const c2 = await cols(T.h, T.b);
+			await page.evaluate((q) => { document.querySelector(q.b).style.width = '340px'; }, T);
+			await a.settle(600);
+			const c3 = await cols(T.h, T.b);
+			ok('P11 ' + T.nm + ': wider box, wider name column', c2.name > c1.name + 20, JSON.stringify({ c1, c2 }));
+			ok('P11 ' + T.nm + ': the name column keeps its share of the width when widened (within 3 points)', Math.abs(frac(c2) - frac(c1)) < 0.03, frac(c1).toFixed(3) + ' -> ' + frac(c2).toFixed(3));
+			ok('P11 ' + T.nm + ': narrower box, narrower name column, share kept', c3.name < c1.name && Math.abs(frac(c3) - frac(c1)) < 0.05, JSON.stringify({ c1, c3 }) + ' ' + frac(c3).toFixed(3));
+			if (T.b === '#lpn_contour_box') { await page.evaluate(() => { document.getElementById('lpn_contour_box').style.width = ''; }); }
+		}
+
+		console.log('\n--- P12: the Time series chart sits below the last field row (Perry, round 3) ---');
+		const chartGap = () => page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), g = document.getElementById('lpn_popup_graph');
+			const last = Array.from(f.querySelectorAll('.lpn-grow')).filter((x) => x.getBoundingClientRect().height > 0).pop();
+			return { chartTop: Math.round(g.getBoundingClientRect().top), lastBottom: Math.round(last.getBoundingClientRect().bottom), rows: getComputedStyle(f.parentNode).gridTemplateRows };
+		});
+		for (const H of [0, 520, 380]) {
+			await page.evaluate(() => { const c = document.getElementById('lpn_contour_box'); if (c) { c.style.display = 'none'; } document.getElementById('lpn_popup').style.height = ''; });
+			await openNode('22');
+			await openBox(a, 'lpn_popup');
+			await a.settle(500);
+			if (H) { await page.evaluate((h) => { document.getElementById('lpn_popup').style.height = h + 'px'; }, H); }
+			// A solve while the box is open rebuilds it with the result rows added: Active toggled twice.
+			for (let k = 0; k < 2; k++) {
+				await page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).find((x) => /^Active/.test(x.textContent.trim())); r.querySelector('.lpn-gname').click(); });
+				await a.settle(300);
+			}
+			await a.settle(2500);
+			const gp = await chartGap();
+			ok('P12 floating Properties' + (H ? ' at height ' + H : '') + ': the chart starts at or below the last field row', gp.chartTop >= gp.lastBottom - 1, JSON.stringify(gp));
+		}
+
 		console.log('\n--- P4: the DEM buttons belong to Elevation (a located project) ---');
 		const novato = fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net3-Novato-CA-World.lwn'), 'utf8');
 		await page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); localStorage.setItem('lpn_hovercard', 'off'); }, novato);
