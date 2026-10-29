@@ -53817,7 +53817,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (guideShowEl(sec, hit)) { any = true; }
 		});
 		if (none) { none.hidden = any; }
+		guideHighlight(q);
 		guideRebuildNav(q);
+	}
+	// ---- Every hit in the shown text is marked (Tom, 2026-10-29: a result opened and he could not see
+	// the word). Marks are <mark class="lpn-guide-hit"> wrapped round the matching characters of a
+	// text node; the term is never parsed as HTML. They are removed and rebuilt on every change of the
+	// query, so clearing the search leaves the guide's text as it was. A hit that spans two elements
+	// is found by the filter but not marked.
+	function guideClearHits() {
+		var c = guideContentEl(), parents = [];
+		if (!c) { return; }
+		c.querySelectorAll('mark.lpn-guide-hit').forEach(function (m) {
+			var p = m.parentNode;
+			while (m.firstChild) { p.insertBefore(m.firstChild, m); }
+			p.removeChild(m);
+			if (parents.indexOf(p) < 0) { parents.push(p); }
+		});
+		parents.forEach(function (p) { p.normalize(); });
+	}
+	function guideHighlight(q) {
+		var c = guideContentEl(), walker, nodes = [], n;
+		guideClearHits();
+		if (!c || !q) { return; }
+		walker = document.createTreeWalker(c, 4, null, false);
+		while ((n = walker.nextNode())) {
+			if (n.nodeValue && n.parentNode && !/^(SCRIPT|STYLE|TEXTAREA|INPUT|BUTTON|TEMPLATE|SELECT|OPTION)$/.test(n.parentNode.tagName) &&
+				guideVisible(n.parentNode)) { nodes.push(n); }
+		}
+		nodes.forEach(function (node) {
+			var t = node.nodeValue, f = '', map = [], k, m, at, hits = [], r, mk, i, fc;
+			for (k = 0; k < t.length; k++) { fc = guideFoldChar(t.charAt(k)); f += fc; for (m = 0; m < fc.length; m++) { map.push(k); } }
+			at = f.indexOf(q);
+			while (at >= 0) { hits.push(at); at = f.indexOf(q, at + q.length); }
+			for (i = hits.length - 1; i >= 0; i--) {
+				r = document.createRange();
+				r.setStart(node, map[hits[i]]);
+				r.setEnd(node, map[hits[i] + q.length - 1] + 1);
+				mk = document.createElement('mark');
+				mk.className = 'lpn-guide-hit';
+				r.surroundContents(mk);
+			}
+		});
 	}
 	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
 	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
@@ -53967,6 +54008,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			nav.appendChild(row);
 			rows.push(row);
 		}
+		// A heading that holds the term (a term in a list, a sub-heading) is a result of its own, listed
+		// ahead of the chapters that only mention it, and opens on that heading.
+		if (q) {
+			var hn = 0;
+			box.querySelectorAll('.lpn-guide-section dt, .lpn-guide-section h4').forEach(function (h) {
+				var sec = h.closest('.lpn-guide-section'), sh = sec && sec.querySelector('h2');
+				h.removeAttribute('data-guide-hit');
+				if (!guideVisible(h) || !sh || guideFold(guideTextOf(h)).indexOf(q) < 0) { return; }
+				hn++;
+				h.setAttribute('data-guide-hit', 'hit-' + hn);
+				add('hit-' + hn, String(h.textContent || '').replace(/\s+/g, ' ').trim(), 0, String(sh.textContent || '').trim());
+			});
+		}
 		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
 			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
 			if (!h || sec.style.display === 'none') { return; }
@@ -54042,9 +54096,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function guideGoto(key, focusIn) {
 		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
-		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
+		var safe = String(key).replace(/"/g, ''), isHit = /^hit-\d+$/.test(safe), mark = null;
+		el = content.querySelector(isHit ? '[data-guide-hit="' + safe + '"]' : '[data-guide-key="' + safe + '"]');
 		if (!el || el.style.display === 'none') { return false; }
-		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		// With a search active, a chapter opens on its first marked hit, and a heading result on that heading.
+		content.querySelectorAll('mark.lpn-guide-hit-current').forEach(function (m) { m.classList.remove('lpn-guide-hit-current'); });
+		if (!isHit && content.querySelector('mark.lpn-guide-hit')) {
+			mark = el.querySelector('mark.lpn-guide-hit');
+			if (mark) { mark.classList.add('lpn-guide-hit-current'); }
+		}
+		var target = mark || el;
+		content.scrollTop = Math.max(0, target.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop - (mark ? 48 : 0));
+		if (isHit) { guidePinKey = null; guideSetCurrent(key); guidePulse(el); return true; }
 		guidePinKey = null;
 		guideSetCurrent(key);
 		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
