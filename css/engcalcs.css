@@ -6614,6 +6614,11 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    column can be as narrow as its figures; an id and a figure in a cell still never break. */
 .lpn-ff-table th.lpn-ff-grouphead, .lpn-print-grouphead { text-align: center; }
 .lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
+/* Report column dividers (Task 848): the Tables pane's grip on each heading. A table with a dragged column
+   is laid out in fixed widths on screen only (Print and Copy HTML are built from text), so a narrowed
+   cell breaks at the character rather than spilling into its neighbour. */
+.lpn-ff-table th.lpn-rpt-gripth { position: relative; }
+.lpn-ff-table.lpn-rpt-sized th, .lpn-ff-table.lpn-rpt-sized td { overflow: hidden; overflow-wrap: anywhere; min-width: 0; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
 .lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above

@@ -41,6 +41,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_rpane` | Width of the right pane (drag its edge) |
 | `lpn_setbox`, `lpn_findbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`, `lpn_statusbox`, `lpn_fullbox`, `lpn_notesbox` (retired 2026-10-09, only swept), `lpn_hotkeysbox`, `lpn_contourbox`, `lpn_smbox` (the Scenario manager) | Position, size and openness of each standing box (drag, resize, close) |
 | `lpn_gcols` | The divider between the Label and the Value column, in the header row of Properties, Find and replace, Contour plot, Fire flow and the other analysis boxes: drag it, press the arrow keys on it, or double-click to reset (Task 828) |
+| `lpn_rptcols` | The divider on each column heading of an analysis report table: drag it, or double-click to reset (Task 848) |
 | `lpn_paneboxes` | Bottom pane > Open in a box (the button beside the pane's X, or a right-click on a tab): which Tables and Graphs tabs are open as boxes, and where each was left, how big, and docked (option branch, Task 799) |
 | `lpn_dockbox` | The dock buttons (Dock left, Dock right, Auto-hide, Float) and the X of Properties, Criticality analysis, Demand scaling, Alternatives and the Calibration report, the boxes with no record of their own: which edge, the order, the docked width, and whether each docked one is open |
 | `lpn_snipbox` | Map > Screenshot: the Screenshot box's position and size (drag, resize), and its Magnification |

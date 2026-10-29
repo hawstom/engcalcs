@@ -85301,6 +85301,158 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!root || !root.querySelectorAll) { return; }
 		Array.prototype.forEach.call(root.querySelectorAll('table.lpn-ff-table'), reportTableUnits);
 	}
+	/**
+	 * **REPORT COLUMNS A READER CAN DRAG** (Task 848). Every report table gets the Tables pane's divider
+	 * on each column heading: drag to set a width, double-click to give the column back to automatic.
+	 * A width is remembered in `lpn_rptcols` (window furniture: this browser, never the project), as
+	 * `{ <report element id>: { "<table number>|<heading>": em } }`, so it follows the report and the
+	 * column and not the project. It is a screen setting only: Print, Copy HTML and the CSV are built
+	 * from the table's text (reportDomBlocks), never from its layout. A table nobody has dragged is
+	 * left to automatic layout, which fits its box (no sideways scroll); once a column is dragged the
+	 * table is laid out in fixed widths (the others as they were drawn) and scrolls inside its wrap.
+	 */
+	var LPN_RPTCOLS_KEY = 'lpn_rptcols';
+	var RPT_COL_FLOOR_EM = 2, rptColPrefs = null;
+	function rptColRead() {
+		var raw = null, v;
+		if (rptColPrefs) { return rptColPrefs; }
+		rptColPrefs = {};
+		try { raw = localStorage.getItem(LPN_RPTCOLS_KEY); } catch (e) { return rptColPrefs; }
+		if (!raw) { return rptColPrefs; }
+		try { v = JSON.parse(raw); } catch (e2) { return rptColPrefs; }
+		if (v && typeof v === 'object') { rptColPrefs = v; }
+		return rptColPrefs;
+	}
+	function rptColSave() {
+		var p = rptColRead(), any = false, k, j;
+		if (furnitureFrozen) { return; }
+		for (k in p) {
+			if (!Object.prototype.hasOwnProperty.call(p, k)) { continue; }
+			any = false;
+			for (j in p[k]) { if (Object.prototype.hasOwnProperty.call(p[k], j)) { any = true; } }
+			if (!any) { delete p[k]; }
+		}
+		any = false;
+		for (k in p) { if (Object.prototype.hasOwnProperty.call(p, k)) { any = true; } }
+		try {
+			if (any) { localStorage.setItem(LPN_RPTCOLS_KEY, JSON.stringify(p)); }
+			else { localStorage.removeItem(LPN_RPTCOLS_KEY); }
+		} catch (e) {}
+	}
+	/** The remembered width (em) of each leaf column of a report table, `0` where nobody dragged it. */
+	function rptColStored(table) {
+		var p = rptColRead()[table._ecRwHost], keys = table._ecRwKeys || [];
+		return keys.map(function (k) {
+			var w = p && p[k];
+			return (typeof w === 'number' && isFinite(w) && w > 0) ? Math.max(w, RPT_COL_FLOOR_EM) : 0;
+		});
+	}
+	function rptColClear(table) {
+		var cg = table.querySelector(':scope > colgroup.lpn-rpt-cg');
+		if (cg) { cg.parentNode.removeChild(cg); }
+		table.style.tableLayout = ''; table.style.width = '';
+		table.classList.remove('lpn-rpt-sized');
+	}
+	function rptColFont(table) { return parseFloat(window.getComputedStyle(table).fontSize) || 14; }
+	/**
+	 * Lays the table out from its remembered widths: each dragged column at its width, every other
+	 * column at the width automatic layout drew it. Nothing remembered: automatic layout, as drawn.
+	 * Does nothing where the table is not laid out yet (a closed box); the ResizeObserver tries again
+	 * when it is.
+	 */
+	function rptColLayout(table, force) {
+		var stored = rptColStored(table), ths, px, cg, sum = 0, fs;
+		rptColClear(table);
+		if (!force && !stored.some(function (w) { return w > 0; })) { return; }
+		ths = reportTableHeads(table).leaf;
+		if (!ths.length || ths.some(function (th) { return !th; }) || !table.getBoundingClientRect().width) { return; }
+		fs = rptColFont(table);
+		px = ths.map(function (th, i) { return stored[i] ? stored[i] * fs : th.getBoundingClientRect().width; });
+		cg = document.createElement('colgroup'); cg.className = 'lpn-rpt-cg';
+		px.forEach(function (w) { var c = document.createElement('col'); c.style.width = w + 'px'; cg.appendChild(c); sum += w; });
+		table.insertBefore(cg, table.firstChild);
+		table.style.tableLayout = 'fixed'; table.style.width = sum + 'px';
+		table.classList.add('lpn-rpt-sized');
+	}
+	function rptColStartDrag(table, i, th, ev) {
+		var startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startW, fs, cols, moved = false, sum0, host = table._ecRwHost, key = table._ecRwKeys[i];
+		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+		if (ev && ev.preventDefault) { ev.preventDefault(); }
+		rptColLayout(table, true);
+		cols = table.querySelectorAll(':scope > colgroup.lpn-rpt-cg > col');
+		if (!cols[i]) { return; }
+		startW = th.getBoundingClientRect().width; fs = rptColFont(table);
+		sum0 = parseFloat(table.style.width) || 0;
+		function widthAt(e2) { return Math.max(RPT_COL_FLOOR_EM * fs, startW + ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX); }
+		function move(e2) {
+			var w = widthAt(e2);
+			if (Math.abs(w - startW) < 3) { return; }
+			moved = true;
+			cols[i].style.width = w + 'px'; table.style.width = (sum0 - startW + w) + 'px';
+		}
+		function up(e2) {
+			var p, w;
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+			move(e2);
+			if (moved) {
+				w = widthAt(e2);
+				p = rptColRead(); if (!p[host]) { p[host] = {}; }
+				p[host][key] = Math.round(w / fs * 100) / 100;
+				rptColSave();
+			}
+			rptColLayout(table);
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+	}
+	function rptColReset(table, i) {
+		var p = rptColRead()[table._ecRwHost];
+		if (p && Object.prototype.hasOwnProperty.call(p, table._ecRwKeys[i])) { delete p[table._ecRwKeys[i]]; rptColSave(); }
+		rptColLayout(table);
+	}
+	/** Dividers on every report table in the host that has none yet, and its remembered widths. */
+	function reportWidthsSync(spec) {
+		var n = 0;
+		reportHostsFor(spec).forEach(function (host) {
+			if (!host || !host.querySelectorAll) { return; }
+			Array.prototype.forEach.call(host.querySelectorAll('table.lpn-ff-table'), function (table) {
+				var heads, seen = {}, tipText;
+				n++;
+				if (table._ecRw === table.rows.length || table.classList.contains('lpn-ovl-table')) { return; }
+				heads = reportTableHeads(table).leaf;
+				if (!heads.length || heads.some(function (th) { return !th; })) { return; }
+				table._ecRw = table.rows.length;
+				table._ecRwHost = spec.host;
+				table._ecRwKeys = heads.map(function (th) {
+					var t = (th.getAttribute('data-ec-hl') || reportCellText(th, false)).toLowerCase();
+					seen[t] = (seen[t] || 0) + 1;
+					return n + '|' + t + (seen[t] > 1 ? '#' + seen[t] : '');
+				});
+				tipText = (EngCalcs.pageConfig || {}).lpn_pane_width_tip;
+				heads.forEach(function (th, i) {
+					var grip;
+					if (th.querySelector(':scope > .lpn-rpt-colgrip')) { return; }
+					grip = document.createElement('span');
+					grip.className = 'lpn-pane-colgrip lpn-rpt-colgrip';
+					grip.setAttribute('aria-hidden', 'true');
+					if (tipText && (typeof ecCanHover !== 'function' || ecCanHover())) { grip.title = tipText; grip.setAttribute('data-ec-tip-delay', '1000'); }
+					grip.addEventListener('mousedown', function (ev) { rptColStartDrag(table, i, th, ev); });
+					grip.addEventListener('dblclick', function (ev) { if (ev.stopPropagation) { ev.stopPropagation(); } rptColReset(table, i); });
+					grip.addEventListener('click', function (ev) { if (ev.stopPropagation) { ev.stopPropagation(); } });
+					th.classList.add('lpn-rpt-gripth');
+					th.appendChild(grip);
+				});
+				rptColLayout(table);
+				if (typeof ResizeObserver !== 'undefined' && !table._ecRwRo) {
+					table._ecRwRo = new ResizeObserver(function () {
+						if (!table.classList.contains('lpn-rpt-sized') && table.getBoundingClientRect().width) { rptColLayout(table); }
+					});
+					table._ecRwRo.observe(table);
+				}
+			});
+		});
+	}
 	function reportCellText(el, forCsv) {
 		var full = forCsv && el.getAttribute && el.getAttribute('data-ec-full'), inp, c, junk, i;
 		if (full !== null && full !== undefined && full !== false && full !== '') { return full; }
@@ -85698,6 +85850,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				[csv, html, pr].forEach(function (b) { b.disabled = !has; });
 				// Units into the headings (reportTableUnits); this pass's own edits are not fed back.
 				reportHostsFor(spec).forEach(reportUnitsIntoHeads);
+				reportWidthsSync(spec);
 				if (obs) { obs.takeRecords(); }
 			}
 			sync();
