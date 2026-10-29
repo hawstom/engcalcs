@@ -581,7 +581,7 @@
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
 			// page has to be one press (Tom, 2026-09-04, having just had to retype one by hand: *"A
 			// copy to clipboard button on the report would be nice."*).
-			reportCopy: pageConfig.lpn_time_run_report_copy || 'Copy',
+			reportCopy: pageConfig.points_data_copy || 'Copy',
 			reportCopied: pageConfig.lpn_time_run_report_copied || 'Copied'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and

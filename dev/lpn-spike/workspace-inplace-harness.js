@@ -13,6 +13,7 @@
 //      first-visit docks, again equal to a reload.
 //   4. Storage after the import holds exactly the file's keys, and still does after the page settles.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const os = require('os');
@@ -52,7 +53,8 @@ const { clickNode } = require('./dock-boxes.js');
 
 const quiet = (a) => a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 async function openNet3(browser, name, init) {
-	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 } });
+	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	if (init) { await a.page.addInitScript(init); }
 	return a;
@@ -104,7 +106,7 @@ const layoutSnapshot = (a, withPopup) => a.page.evaluate((withPopup) => {
 		on: Array.from(document.querySelectorAll('#lpn_pane .lpn-pane-panel.on, #lpn_pane [aria-selected="true"]')).map((e) => e.id).sort() };
 	const rr = rp.getBoundingClientRect();
 	out.rpane = { display: rp.style.display, w: Math.round(rr.width), l: Math.round(rr.left) };
-	out.cols = Array.from(document.querySelectorAll('#lpn_pane table th')).filter((t) => t.getBoundingClientRect().width > 0).slice(0, 4).map((t) => Math.round(t.getBoundingClientRect().width));
+	out.cols = Array.from(document.querySelectorAll('#lpn_pane table th')).filter((t) => !t.closest('.lpn-pane-shut') && t.getBoundingClientRect().width > 0).slice(0, 4).map((t) => Math.round(t.getBoundingClientRect().width));
 	const ix = document.getElementById('lpn_setbox_index');
 	out.ix = ix ? ix.style.flexBasis : null;
 	return out;

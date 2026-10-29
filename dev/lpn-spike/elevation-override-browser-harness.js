@@ -223,7 +223,7 @@ async function runMode(browser, Session, mode) {
 
 	// ---- Tables helpers ----
 	const ensurePane = async () => {
-		const shown = await P.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && getComputedStyle(p).display !== 'none' && p.getBoundingClientRect().height > 40; });
+		const shown = await P.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && getComputedStyle(p).display !== 'none' && !p.classList.contains('lpn-pane-shut') && p.getBoundingClientRect().height > 40; });
 		if (!shown) { await a.toolbarClick(await L('lpn_pane_toggle')); await a.settle(700); }
 	};
 	const tab = async (id) => { await ensurePane(); await P.evaluate((i) => { const t = document.getElementById('lpn_pane_tab_' + i); if (t) { t.click(); } }, id); await a.settle(700); };

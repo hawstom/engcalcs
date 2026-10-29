@@ -95,16 +95,25 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-25 (fortieth session, Opus main, Sonnet agents)
+## STATE — 2026-10-28 12:30 AM (forty-fourth session, Opus main, Sonnet agents)
 
-- **Roadmap:** Tom moved every old 100 to a temporary 95 while fit and finish runs (check allows 95; return them and drop 95 together). New 100s: 825-831.
-- **Waiting on his browser pass** (each on the previews page, each green except payload freshness): `fix/browser-pass-a` (node ID in Connected asset, Text slides), `fix/wording-1024` (Typed value, Demand category description, Buffer label; merged on green this session), `fix/dock-widths` (825, 830 soft-pin), `fix/phone-select` (827; contains `feat/first-view`), `feat/report-buttons` (829), `feat/box-rows` (828, Contour and Fire flow), `feat/shape-scenario` (831, on `feat/scenario-io`; merge that first), `fix/example-crs` (826), plus the older `feat/value-source`, `feat/scenario-io`.
-- **In flight at /clear:** `feat/box-rows-properties` (Properties on the standard grid). Read `git log feat/box-rows..` in its worktree.
-- **Seams at merge:** dock-widths vs phone-select (`layoutDocks`, `dockPlaced`); box-rows vs dock-widths (`.lpn-contourbox` width line); box-rows vs report-buttons (Fire flow box); wording vs box-rows (Buffer unit line). Merge order: dock-widths, phone-select, report-buttons, box-rows.
-- **Asked of him:** Morph to Vertex refuses any junction with an elevation (recommend: allow, report the dropped elevations); Fire flow table scrolls at 560 (recommend leave); Close X removes the Properties tab; the phone map pan (unasked) is his call.
-- **Stored:** `lpn_gcols` (box column split), approved by Tom 2026-10-24. Keys deleted: `lpn_field_meter_at_node`, `lpn_scnres_copy_tip`. Keys added: `lpn_report_copy_html`, `lpn_shapes_this_scenario`.
-- **Trap met:** a 529 overload killed three agents at once; their worktrees kept uncommitted edits, and SendMessage resumed each.
-- **Trap met:** worktrees lack `dev/browser-pass/node_modules`; agents symlink the main checkout's (git-ignored), else ~200 browser harnesses fail.
+- **Pushed master 76f41ef3f:** `fix/loop-residual` (Task 847 fix: a no-demand network now converges to a nanolitre per second, not to Accuracy; `native-zero-demand-loop-harness.js`). Close 847 in the roadmap when box-design merges (its block lives on box-design).
+- **`box-design` (port 8103) waits on his browser pass and typed word**: his 10-27 night notes are Tasks 842-846 on it, all built (sheet style on seven boxes with no first-column heading, global dark option colours, Settings 618 px and wrapped-row spacing and phone heading bar, reports fit 814 px with whole words and "And others" and "Time (hr)" and Copy HTML weights, Morph-to-vertex dialog offering Base, Basic tick in both modes, Tables headings use the short Properties keys, "Asset type"). Perry passed it; his three findings fixed. Its full suite reran after five stale harnesses were re-baselined (`fix/box-suite`): result in scratch `orch-boxdesign-full2.log`. On merge: regenerate payloads, close 827-829, 833-846 that he accepts.
+- **`feat/starter-example` (port 8107, Task 823)** waits on his pass: four gallery cards (fire flow extension and community well, US and SI), built by one generator script on that branch (dev/scripts there). Perry passed it after fixes. His calls owed: gallery order (recommended US starters first), eight card strings.
+- **His questions are in `~/tom-files/messenger.md`** (2026-10-28): adjustable report column widths (stores widths per browser: needs his word), rotated headings, Settings pinned at first view, two morph strings, a names-policing branch (long names remain in Settings defaults, Find, labels, .inp upload, reports; Tables "Valve type" vs Properties "Type").
+- **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
+- **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
+- **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
+- Seen flaky under load, green alone: `settings-select-lag-harness.js`, `contour-harness.js`, `new-project-pan-harness.js`.
+- **Unchanged waits:** `feat/shape-scenario` (831), `feat/value-source`, `feat/scenario-io`, Task 825 his audit pass.
+- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch with nothing heavy beside it.
+- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
+- **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
+- **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
+- **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
+- **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
+- **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/50be4610-c6ae-4dbe-a64d-5427205a8e18/scratchpad (brief-common.md for agents).
 
 ## STATE — 2026-10-24 (thirty-eighth session)
 

@@ -59,7 +59,7 @@ const ROUNDS = [];
 function importText(text, name) { clearDialog(); L.land(text, name, (r) => ROUNDS.push(r)); }
 
 // ---- the file: this page's own export of the geographic Net3, edited -----------------------------
-L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'examples/Net3-Novato-CA-World.lwn', 'utf8'))); L.buildDom();
+L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8'))); L.buildDom();
 const out = global.EngCalcs.lpnExportGeoJson(L.serialize(), L.geoOptions());
 ok('the page writes a GeoJSON network', out.ok);
 const base = JSON.parse(out.text);

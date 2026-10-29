@@ -311,12 +311,12 @@ function ec_ur_code($path) {
     return $out;
 }
 
-ec_ur_expect('pages looked at: Manning-Pipe-Flow is 0 browsers, 2 uses, 1 page load (uses from before codes)',
-    ec_ur_row_in($xp, 'Pages looked at', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '0', '2', '1'),
-    json_encode(ec_ur_row_in($xp, 'Pages looked at', 'Manning-Pipe-Flow')));
-ec_ur_expect('pages looked at: Looped-Network is 0 browsers, 0 uses, 2 page loads',
-    ec_ur_row_in($xp, 'Pages looked at', 'Looped-Network') === array('Looped-Network', '0', '0', '2'),
-    json_encode(ec_ur_row_in($xp, 'Pages looked at', 'Looped-Network')));
+ec_ur_expect('page dwells by page: Manning-Pipe-Flow is 0 browsers, 2 uses, 1 others (uses from before codes)',
+    ec_ur_row_in($xp, 'Page dwells by page', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '0', '2', '1'),
+    json_encode(ec_ur_row_in($xp, 'Page dwells by page', 'Manning-Pipe-Flow')));
+ec_ur_expect('page dwells by page: Looped-Network is 0 browsers, 0 uses, 2 others',
+    ec_ur_row_in($xp, 'Page dwells by page', 'Looped-Network') === array('Looped-Network', '0', '0', '2'),
+    json_encode(ec_ur_row_in($xp, 'Page dwells by page', 'Looped-Network')));
 ec_ur_expect('calculators used: Manning-Pipe-Flow is 2 browsers and 4 uses, 0 page loads',
     ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '4', '0'),
     json_encode(ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow')));
@@ -345,9 +345,9 @@ foreach ($xp->query('//tbody/tr') as $tr) {
     if ($cells > 4) { $wide++; }
 }
 ec_ur_expect('no table row carries more than four cells', $wide === 0, "$wide row(s) do");
-ec_ur_expect('the bucket columns are named browsers (said yes), uses (said yes), page loads (everyone else)',
+ec_ur_expect('the bucket columns are named browsers (said yes), uses (said yes), others',
     isset($heads['browsers (said yes)']) && isset($heads['uses (said yes)'])
-    && isset($heads['page loads (everyone else)']), implode(' | ', array_keys($heads)));
+    && isset($heads['others']), implode(' | ', array_keys($heads)));
 ec_ur_expect('the page states in words that the two are never added',
     strpos($html, 'never added together') !== false);
 ec_ur_expect('the page names its own source files, so every number is re-derivable',

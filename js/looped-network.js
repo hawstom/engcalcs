@@ -7232,7 +7232,7 @@ var EngCalcs = EngCalcs || {};
 		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		t = g === 'label' ? (pc.lpn_tool_add_text || 'Text') : g === 'shape' ? (pc.lpn_tool_add_shape || 'Shape') : ((el ? words[morphBaseOf(el, 'type')] : '') || '');
-		if (LPN_MORPH_PROP[prop]) { label = pc.lpn_field_type || 'Type'; }
+		if (LPN_MORPH_PROP[prop]) { label = pc.lpn_full_col_type || 'Type'; }
 		else if ((d = customPropDefs().length ? customPropDefByKey(prop) : null)) { label = customPropLabel(d); }
 		else {
 			paneTables().forEach(function (spec) {
@@ -14149,7 +14149,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function headlossLabelFor(l) {
 		var pc = EngCalcs.pageConfig || {};
-		return l && l.type === 'pump' ? (pc.lpn_result_pump_head || 'Head') : (pc.lpn_result_headloss || 'Head loss');
+		return l && l.type === 'pump' ? (pc.lpn_field_head || 'Head') : (pc.lpn_result_headloss || 'Head loss');
 	}
 	// ---- A TEXT LABEL'S ATTACHMENT POINT (ROADMAP Task 332) --------------------------------
 	// `lb.x`/`lb.y` is a POINT; `lb.align`/`lb.valign` say which corner or edge of the text that
@@ -15157,7 +15157,7 @@ var EngCalcs = EngCalcs || {};
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
 		// this page stores what the user typed and never crossed them into SI.
-		if (ls.customer.demandActual) { lines.push(affix('customer', 'demandActual', rawLine(customerResolvedFlow(c), null, cd.demandActual))); }
+		if (ls.customer.demandActual) { lines.push(affix('customer', 'demandActual', rawLine(inRunScenario(function () { return customerResolvedFlow(c); }), null, cd.demandActual))); }
 		if (ls.customer.demand) { lines.push(affix('customer', 'demand', rawLine(customerFlow(c), null, cd.demand))); }
 		// The two identity strings, printed as the words they are. An absent one prints NOTHING
 		// rather than an empty slot: a blank where a description would be is a separator with no
@@ -23393,7 +23393,7 @@ var EngCalcs = EngCalcs || {};
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
-			['head', 'lpn_result_head', 'Head'],
+			['head', 'lpn_field_head', 'Head'],
 			['pressure', 'lpn_result_pressure', 'Pressure'],
 			['depth', 'lpn_result_depth', 'Depth'],
 			['volume', 'lpn_result_tank_volume', 'Available volume'],
@@ -26788,7 +26788,15 @@ var EngCalcs = EngCalcs || {};
 		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
 		if (!pane) { return; }
 		pass = pass || 0;
-		pane.style.display = paneState.open ? 'flex' : 'none';
+		// **A CLOSED PANE IS SHUT, NOT `display:none`** (Tom, 2026-10-25: *"Bottom pane is slow to open
+		// and close (about 4-5 seconds baseline) ... w/ Net3"*). `display:none` throws the whole pane's
+		// layout away, so every open re-derived style and layout for ~1,300 form controls in the shown
+		// table (measured ~270 ms on a 4x throttled CPU, against ~10 ms when the layout is kept). The
+		// `lpn-pane-shut` class collapses the pane to nothing with `content-visibility:hidden`, which
+		// skips its contents and KEEPS their last rendering: the same property that keeps a hidden
+		// tab's table. Open or shut is `paneState.open`, or the class; never `style.display`.
+		pane.style.display = 'flex';
+		pane.classList.toggle('lpn-pane-shut', !paneState.open);
 		// **THE STORED HEIGHT IS THE USER'S WISH; THE CLAMP IS APPLIED, NOT WRITTEN BACK.** A window
 		// narrowed to 520 px leaves room for a 168 px pane, and writing that back would mean the
 		// pane you dragged to 400 came back as 168 for good once you widened the window again. The
@@ -29143,7 +29151,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						prop: 'fireFlow', get: function (n) { return fireFlowOwn(n); },
 						set: function (n, v) { setProp(n, 'fireFlow', fireFlowStore(v)); } },
 					paneColEmitter(),
-					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					paneColNodeResult('head', 'lpn_field_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeInitQuality(),
 					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
@@ -29227,7 +29235,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
-					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					paneColNodeResult('head', 'lpn_field_head', paneUnitHead),
 					// Pressure above the GROUND, as at any node (Tom, 2026-10-11).
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					// **DEPTH AND USABLE VOLUME, AS RESULTS** (Task 783): head minus the tank bottom, and
@@ -29313,7 +29321,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_result_pump_head', paneUnitHead),
+					paneColLinkResult('headloss', 'lpn_field_head', paneUnitHead),
 					paneColLinkStatus(),
 					paneColLinkQuality()
 				])
@@ -30759,9 +30767,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'labelSettings.separator': 'lpn_labels_separator',
 		'labelSettings.priority': 'lpn_labels_priority', 'labelSettings.useUnits': 'lpn_labels_use_units',
 		'labelSettings.decimals': 'lpn_labels_col_decimals', 'labelSettings.prefix': 'lpn_labels_col_before',
-		'labelSettings.suffix': 'lpn_labels_col_after', 'labelSettings.show': 'lpn_labels_col_show',
-		'labelSettings.node': 'lpn_labels_col_show', 'labelSettings.link': 'lpn_labels_col_show',
-		'labelSettings.customer': 'lpn_labels_col_show', 'defaultPattern': 'lpn_settings_default_pattern',
+		'labelSettings.suffix': 'lpn_labels_col_after', 'labelSettings.show': 'lpn_pane_manage_cols_show',
+		'labelSettings.node': 'lpn_pane_manage_cols_show', 'labelSettings.link': 'lpn_pane_manage_cols_show',
+		'labelSettings.customer': 'lpn_pane_manage_cols_show', 'defaultPattern': 'lpn_settings_default_pattern',
 		'times.statistic': 'lpn_time_statistic'
 	};
 	(function (members) {
@@ -35787,7 +35795,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//   Rules: one row a line of a rule, so a rule reads down the sheet; ID and Description repeat.
 	function libraryExportSheets() {
 		var pc = EngCalcs.pageConfig || {}, out = [], idH = pc.lpn_field_id || 'ID',
-			descH = pc.lpn_library_curve_note_label || 'Description', libName = pc.lpn_library_curves || 'Curves';
+			descH = pc.lpn_field_desc || 'Description', libName = pc.lpn_library_curves || 'Curves';
 		function txt(v) { return v === undefined || v === null ? '' : String(v); }
 		var pats = libPatternsRead().filter(function (p) { return p && p.id !== undefined && p.id !== null && p.id !== ''; });
 		if (pats.length) {
@@ -38000,7 +38008,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function pgFieldLabel(group, field, e) {
 		var pc = EngCalcs.pageConfig || {}, node;
-		if (pgIsPumpHead(group, e, field)) { return pc.lpn_result_pump_head || 'Head'; }
+		if (pgIsPumpHead(group, e, field)) { return pc.lpn_field_head || 'Head'; }
 		if (field === 'quality' && qualityMode() === 'trace') {
 			node = (scnSetting('quality') || {}).traceNode;
 			if (node) {
@@ -40706,7 +40714,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		here = names[el.type] || el.type;
-		readonlyField(fields, pc.lpn_field_type || 'Type', here, pc.lpn_field_type_tip);
+		readonlyField(fields, pc.lpn_full_col_type || 'Type', here, pc.lpn_field_type_tip);
 		ovmGutter(fields, {
 			el: el, props: ['type'], on: !inBaseFor('topology') && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
@@ -49204,7 +49212,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}, [
 			{
-				label: pc.lpn_file_training_continue || 'Continue',
+				label: pc.lpn_backdrop_continue || 'Continue',
 				fn: function () {
 					// The token is what "mine" means; the name stays empty for as long as this
 					// browser only ever HOLDS locks. Colleagues then read lpn_lock_somebody, which is
@@ -49486,7 +49494,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					body.appendChild(t);
 				});
 			}, [
-				{ label: pc.lpn_file_training_continue || 'Continue', fn: function () { pickUploadFile(); } },
+				{ label: pc.lpn_backdrop_continue || 'Continue', fn: function () { pickUploadFile(); } },
 				{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 			]);
 			return;
@@ -57772,7 +57780,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					breakAt = placeAt && placeAt.link === breakLink ? placeAt : null;
 				askDialog({ kind: 'confirm',
 					text: (breakPc.lpn_split_pipe_ask || 'Split pipe {id} at this node?').replace('{id}', breakLink.id),
-					ok: breakPc.lpn_split_yes || 'Yes', cancel: breakPc.lpn_split_no || 'No' }, function (yes) {
+					ok: breakPc.lpn_settings_table_yes || 'Yes', cancel: breakPc.lpn_settings_table_no || 'No' }, function (yes) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
 					if (yes) { breakPipeAtPoint(breakLink, breakType, px0, py0, breakAt); }
@@ -59087,7 +59095,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
 				pc.lpn_field_tank_level || 'Water depth', pc.lpn_settings_head_error || 'Head error limit',
-				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
+				(pc.lpn_field_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') {
 			return [pc.lpn_field_valve_setting_pressure || 'Pressure setting',
@@ -60203,7 +60211,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **TANK WATER DEPTH** (Task 696). A tank is the one node type that has it, and the node
 			// loop prints it only where one is typed.
 			['level', pc.lpn_field_tank_level || 'Water depth'],
-			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
+			['head', pc.lpn_field_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			// Off by default. No network has it until a run has been made with the analysis switched
 			// on, and its heading follows that switch -- the name comes from qualityLabel(), never a
 			// literal, so a chemical's own name reaches this row the day the resolver gives one.
@@ -60474,7 +60482,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				[pc.lpn_labels_use_units || 'Use units', LPN_LABEL_UNITS_W, pc.lpn_labels_use_units_tip, 'center'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					pc.lpn_labels_col_decimals || 'Decimals', 'center'],
-				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
+				[pc.lpn_pane_manage_cols_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Drop order') + ': ' + (labelDropTip(group) || ''), 'center']
 			].forEach(function (h, i) {
@@ -62568,7 +62576,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var sizeBody = minorGroup(mapBody, pc.lpn_settings_grp_size || 'Size'),
 			angleBody = minorGroup(mapBody, pc.lpn_settings_grp_angle || 'Angle'),
 			zoomBody = minorGroup(mapBody, pc.lpn_settings_grp_zoom || 'Zoom'),
-			showBody = minorGroup(mapBody2, pc.lpn_labels_col_show || 'Show'),
+			showBody = minorGroup(mapBody2, pc.lpn_pane_manage_cols_show || 'Show'),
 			thematicBody = minorGroup(mapBody2, pc.lpn_settings_grp_thematic || 'Thematic'),
 			fadeBody = thematicBody;
 		var sizeInput = document.createElement('input');
@@ -65362,6 +65370,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				d.rec.dockOrd = i;
 				d.open = true;
 				d.byDefault = true;
+				// Its corner row was drawn as a floating box's (registerDockBox() runs first), which
+				// offered no pin and no Float; draw it again as a docked box's.
+				renderDockCorner(d);
 			});
 		});
 		dockDefaultHold = true;
@@ -65652,6 +65663,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockNoteOpen(d, true);
 		if (d.rec.autohide && !dockBooting) { dockFlyout = d; dockSoft = null; }
 		layoutDocks();
+	}
+	// **THE ONE DOOR FOR "SHOW ME THIS BOX" WHEN IT IS ALREADY OPEN.** A box that is open is not run
+	// through its opener again (a link that only changes the section, a toggle that finds it open), so
+	// dockPlaced() never hears of it; and a box docked and auto-hidden is open but invisible, so the
+	// link appeared to do nothing (Tom, 2026-10-26: Properties > Pipe types with Libraries docked and
+	// unpinned). Docked and auto-hidden: it flies out from its tab and takes focus, as a click on the
+	// tab does. Docked and pinned, or floating: raised, and focus moves into it. Every code path that
+	// brings an open box to the reader's attention calls this, whatever the box.
+	function revealBox(box) {
+		var d = box && box.__lpnDock;
+		if (!box || !dockBoxShown({ box: box })) { return; }
+		if (d && dockSideOf(d) && d.rec.autohide) { dockFlyOut(d, true); }
+		else {
+			if (box.__lpnRaise) { box.__lpnRaise(); }
+			if (!box.hasAttribute('tabindex')) { box.setAttribute('tabindex', '-1'); }
+			try { box.focus({ preventScroll: true }); } catch (e) { box.focus(); }
+		}
 	}
 	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
 	function dockLayoutSoon() {
@@ -66387,7 +66415,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (kind === 'head' || kind === 'headloss') {
 			return { x: (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-				y: (kind === 'head' ? (pc.lpn_result_head || 'Head') : (pc.lpn_result_headloss || 'Head loss'))
+				y: (kind === 'head' ? (pc.lpn_field_head || 'Head') : (pc.lpn_result_headloss || 'Head loss'))
 					+ ' (' + unitLabel('lpn_u_elevhead') + ')' };
 		}
 		if (kind === 'volume') {
@@ -67277,7 +67305,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {},
 			field = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			desc = descTextarea(),
-			word = pc.lpn_library_curve_note_label || 'Description';
+			word = pc.lpn_field_desc || 'Description';
 		field.appendChild(libEl('span', 'lpn-lib-fieldname', word));
 		desc.className = 'lpn-lib-wide lpn-lib-desc lpn-desc-ta';
 		desc.value = get();
@@ -67712,7 +67740,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// ours, so it is a chooser and not a number box -- a spinner that accepts 2 would offer a
 		// value the engine refuses. Blank is still the third state and still means "not stated".
 		var wallOrder = document.createElement('select');
-		[['', pc.lpn_reaction_order_unstated || 'Not stated'],
+		[['', pc.lpn_settings_option_unset || 'Not stated'],
 			['0', pc.lpn_reaction_order_zero || '0, zero order'],
 			['1', pc.lpn_reaction_order_first || '1, first order']].forEach(function (o) {
 			var opt = document.createElement('option');
@@ -68236,10 +68264,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// is where a real approved-materials table keeps the material and the pressure class, which
 		// is how such a table is keyed (dev/pipe-library-design.md §2).
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
-			pc.lpn_library_curve_note_label || 'Description'));
+			pc.lpn_field_desc || 'Description'));
 		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = t.note || '';
-		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		desc.setAttribute('aria-label', pc.lpn_field_desc || 'Description');
 		desc.addEventListener('change', function () {
 			var s = EngCalcs.lpnDescText(desc.value);
 			if (s === (t.note || '')) { return; }
@@ -68495,10 +68523,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		idField.appendChild(id);
 		headRow.appendChild(idField);
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
-			pc.lpn_library_curve_note_label || 'Description'));
+			pc.lpn_field_desc || 'Description'));
 		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = set.note || '';
-		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		desc.setAttribute('aria-label', pc.lpn_field_desc || 'Description');
 		desc.addEventListener('change', function () {
 			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (set.note || '')) { return; }
@@ -68623,7 +68651,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!fit || fit.custom || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
 		// The bare quantity names rather than curveAxisLabels(), whose entries carry their unit in
 		// brackets: "Head (ft) = 300 - 0.000196 Flow (gpm)^2" reads as an exponent on the unit.
-		return (pc.lpn_result_head || 'Head') + ' = ' + libEqNum(fit.h0)
+		return (pc.lpn_field_head || 'Head') + ' = ' + libEqNum(fit.h0)
 			+ (fit.a < 0 ? ' + ' : ' - ') + libEqNum(Math.abs(fit.a)) + ' '
 			+ (pc.lpn_result_flow || 'Flow') + '^' + libEqNum(fit.b);
 	}
@@ -68693,10 +68721,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// without ever showing it, so a description could survive a round trip and still be
 		// unreadable by the person who wrote it.
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
-			pc.lpn_library_curve_note_label || 'Description'));
+			pc.lpn_field_desc || 'Description'));
 		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = c.note || '';
-		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		desc.setAttribute('aria-label', pc.lpn_field_desc || 'Description');
 		desc.addEventListener('change', function () {
 			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (c.note || '')) { return; }
@@ -72121,7 +72149,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_reaction_tank_tip, { el: n, prop: 'tankCoeff' });
 			}
 			mixingFields(fields, n);
-			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
+			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip, resultDec('node', 'head'));
 			// The head above the GROUND, as at any node: the reading the Tables pane, the labels and
 			// the colouring take (tankPressureSI()), so it follows the two elevations as they are typed.
@@ -72247,7 +72275,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function (v) { setProp(n, 'emitter', emitterToStore(v)); refreshPopupIfOpen(); },
 				pc.lpn_field_emitter_tip, { el: n, prop: 'emitter' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
-				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
+				readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip, resultDec('node', 'head'));
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId], undefined, resultDec('node', 'pressure'));
 				// **WHAT THIS JUNCTION RECEIVES, UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762). The
@@ -72348,7 +72376,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// label, which is the suite's rule.
 			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
 				[pc.lpn_field_demand_pattern || 'Demand pattern', null],
-				[pc.lpn_field_demand_category || 'Description', null],
+				[pc.lpn_field_desc || 'Description', null],
 				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
 				if (pair[1]) { setFieldLabel(th, pair[0], pair[1]); }
@@ -72574,7 +72602,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		cInput.type = 'text';
 		cInput.value = acc.getCategory() || '';
-		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Description') + ' ' + (index + 1));
+		cInput.setAttribute('aria-label', (pc.lpn_field_desc || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setCategory(cInput.value.trim());
@@ -72870,7 +72898,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// first is the whole of it; an already-open box only has to be rebuilt.
 	function openLibrarySection(id) {
 		libSection = id;
-		if (libBoxIsOpen()) { rebuildLibraryBox(); } else { openLibraryBox(); }
+		if (libBoxIsOpen()) { rebuildLibraryBox(); revealBox(libBoxEl()); } else { openLibraryBox(); }
 	}
 
 	/**
@@ -73278,7 +73306,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
 			if (l.type === 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_pump_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
+				readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
 			} else {
 				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
 			}
@@ -77447,7 +77475,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
-			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof resolvedDemand(n) === 'number') { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), ex.demandActual, nd.demandActual))); }
+			// **THE ACTUAL DEMAND IS A RESULT OF THE KEPT RUN** (Task 820): read it in the scenario that run was solved in, as the Full report does (inRunScenario()).
+			if (!isFixedHeadNode(n) && ls.node.demandActual) { var rd = inRunScenario(function () { return resolvedDemand(n); }); if (typeof rd === 'number') { lines.push(affix('node', 'demandActual', rawLine(rd, ex.demandActual, nd.demandActual))); } }
 			if (!isFixedHeadNode(n) && ls.node.demand && typeof baseDemandTotal(n) === 'number') { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), ex.demand, nd.demand))); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
 			// fixed-head branch because those are declared inputs, the junction branch because the
@@ -77591,7 +77620,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
-			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(resolvedDemand(n), nd.demandActual) : undefined; }),
+			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(inRunScenario(function () { return resolvedDemand(n); }), nd.demandActual) : undefined; }),
 			head: nodeValueMap(function (n) {
 				// Head is DERIVED on a reservoir or tank and SOLVED on a junction, so the two halves
 				// of this one field reach the RESULT unit by different roads -- one across the input
@@ -80578,8 +80607,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
-			['all', pc.lpn_ds_scope_all || 'All junctions'],
-			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
+			['all', pc.lpn_ff_all || 'All junctions'],
+			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
 		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
@@ -80594,7 +80623,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
-		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
+		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
 			minP, unitLabel('lpn_u_pressure'));
 		engine = engineFor(assembleModel());
 		refreshBoxTip('lpn_ds_box', dsBoxTip(engine));
@@ -80612,7 +80641,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		mult.addEventListener('change', function () { dsAsk.multiplier = mult.value; });
 		ffRow(host, pc.lpn_ds_multiplier || 'Demand scale', pc.lpn_ds_multiplier_tip, mult, '');
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
-		run = ffEl('button', 'lpn-ff-run', pc.lpn_ds_run || 'Run', buttons);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
 		run.type = 'button';
 		run.disabled = dsBusy || other;
 		if (other) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
@@ -80908,7 +80937,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (s.kind === 'node' && isJ[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
 			});
 			if (!ids.length) {
-				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions or choose All junctions.');
+				return refuse(pc.lpn_ff_no_selection || 'No junctions are selected. Select junctions or choose All junctions.');
 			}
 			if (skipped) {
 				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
@@ -81164,7 +81193,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[pc.lpn_energy_col_avg_kw || 'Avg. kW',
 				pc.lpn_energy_col_avg_kw_tip || 'The average power used when this pump was running. It is not averaged over idle periods so that a pump that was idle for much of the extended period simulation still reports the power it used while it ran.'],
 			pc.lpn_energy_col_peak_kw || 'Peak kW',
-			pc.lpn_energy_col_kwh || 'kWh',
+			pc.lpn_energy_kwh || 'kWh',
 			pc.lpn_energy_col_cost || 'Cost'
 		]);
 		sum.pumps.forEach(function (row) {
@@ -81605,18 +81634,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE CHOICES LAST FOR THE PAGE LOAD AND ARE STORED NOWHERE**, like the fire flow table's sort.
 	var SCNRES_KINDS = [
 		{ id: 'junctions', group: 'node', type: 'junction', label: 'lpn_pane_tab_junctions', fb: 'Junctions',
-			qs: [['pressure', 'lpn_result_pressure', 'Pressure'], ['head', 'lpn_result_head', 'Head'],
+			qs: [['pressure', 'lpn_result_pressure', 'Pressure'], ['head', 'lpn_field_head', 'Head'],
 				['demandActual', 'bpn_demand', 'Demand']] },
 		{ id: 'reservoirs', group: 'node', type: 'reservoir', label: 'lpn_pane_tab_reservoirs', fb: 'Reservoirs',
-			qs: [['head', 'lpn_result_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure']] },
+			qs: [['head', 'lpn_field_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure']] },
 		{ id: 'tanks', group: 'node', type: 'tank', label: 'lpn_pane_tab_tanks', fb: 'Tanks',
-			qs: [['head', 'lpn_result_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure'],
+			qs: [['head', 'lpn_field_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure'],
 				['depth', 'lpn_result_depth', 'Depth']] },
 		{ id: 'pipes', group: 'link', type: 'pipe', label: 'lpn_pane_tab_pipes', fb: 'Pipes',
 			qs: [['flow', 'lpn_result_flow', 'Flow'], ['velocity', 'lpn_result_velocity', 'Velocity'],
 				['headloss', 'lpn_result_headloss', 'Head loss']] },
 		{ id: 'pumps', group: 'link', type: 'pump', label: 'lpn_pane_tab_pumps', fb: 'Pumps',
-			qs: [['flow', 'lpn_result_flow', 'Flow'], ['headloss', 'lpn_result_pump_head', 'Head']] },
+			qs: [['flow', 'lpn_result_flow', 'Flow'], ['headloss', 'lpn_field_head', 'Head']] },
 		{ id: 'valves', group: 'link', type: 'valve', label: 'lpn_pane_tab_valves', fb: 'Valves',
 			qs: [['flow', 'lpn_result_flow', 'Flow'], ['velocity', 'lpn_result_velocity', 'Velocity'],
 				['headloss', 'lpn_result_headloss', 'Head loss']] }
@@ -81791,7 +81820,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		btns = ffEl('div', 'lpn-ff-buttons', null, sec);
-		copy = ffEl('button', 'lpn-rptbox-copy', pc.lpn_time_run_report_copy || 'Copy', btns);
+		copy = ffEl('button', 'lpn-rptbox-copy', pc.points_data_copy || 'Copy', btns);
 		copy.type = 'button';
 		copy.id = 'lpn_scnres_copy';
 		copy.title = pc.lpn_scnres_copy_tip ||
@@ -82377,10 +82406,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
 			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
 			energy: pc.lpn_alt_cat_energy || 'Energy cost',
-			userdata: pc.lpn_alt_cat_userdata || 'Custom properties',
+			userdata: pc.lpn_settings_custom_props || 'Custom properties',
 			text: pc.lpn_alt_cat_text || 'Text',
 			presentation: pc.lpn_alt_cat_presentation || 'Presentation',
-			calculation: pc.lpn_alt_cat_calculation || 'Calculation'
+			calculation: pc.lpn_settings_sec_calculation || 'Calculation'
 		}[cat] || cat;
 	}
 	// ---- the box -------------------------------------------------------------------------------
@@ -82473,7 +82502,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			fn: function () { smStartRename(key); } });
 		// **ONE "Copy", ACTING ON WHAT IS SELECTED** (Tom, 2026-10-12): a scenario asks Separate edits
 		// or Share edits; an alternative is copied beside itself.
-		out.push({ id: 'copy', label: pc.lpn_sm_copy || 'Copy',
+		out.push({ id: 'copy', label: pc.points_data_copy || 'Copy',
 			off: !valid || isBase || tree === 'scenarios',
 			offTip: tree === 'scenarios' ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : (!valid ? noSel : null),
 			fn: function () { smActCopy(key); } });
@@ -83904,7 +83933,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function fullReportCsvText(rows) {
 		var pc = EngCalcs.pageConfig || {},
-			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
 				.concat(FULL_REPORT_COLS.map(fullReportColHeading)),
 			lines = [headers.map(csvField).join(',')];
 		rows.forEach(function (r) {
@@ -83988,7 +84017,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		thead = document.createElement('thead');
 		(function () {
 			var tr = document.createElement('tr');
-			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
 				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
 				.forEach(function (text) {
 					var th = document.createElement('th');
@@ -84095,7 +84124,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffRow(host, pc.lpn_full_step_label || 'Time step', null, sel, '');
 		}
 		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
-		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_full_col_id || 'ID']
+		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
 			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);

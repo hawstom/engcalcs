@@ -112,25 +112,25 @@ function ec_ft_line($out, $re) { return preg_match($re, $out) === 1; }
 // -- pointer tier --
 ec_ft_expect('device: the section prints',
     ec_ft_line($out, '/DEVICE — coarse pointer/'));
-ec_ft_expect('device: PAGE LOADS counts coarse 1, fine 1, unknown 2 (a blank pointer and a five-field row)',
-    ec_ft_line($out, '/PAGE LOADS — confirmed-human page views: 4\n\s+unknown\s+2\b/')
+ec_ft_expect('device: OTHERS counts coarse 1, fine 1, unknown 2 (a blank pointer and a five-field row)',
+    ec_ft_line($out, '/OTHERS — page dwells: 4\n\s+unknown\s+2\b/')
     && ec_ft_line($out, '/\n\s+coarse\s+1\s+\S+\s+\[/')
     && ec_ft_line($out, '/\n\s+fine\s+1\s+\S+\s+\[/'),
     $out);
 ec_ft_expect('device: SAID YES counts the legacy four-field row as unknown, never as fine',
-    ec_ft_line($out, '/SAID YES — confirmed-human page views: 2\n\s+(unknown\s+1[^\n]*\n\s+coarse\s+1|coarse\s+1[^\n]*\n\s+unknown\s+1)/'));
+    ec_ft_line($out, '/SAID YES — page dwells: 2\n\s+(unknown\s+1[^\n]*\n\s+coarse\s+1|coarse\s+1[^\n]*\n\s+unknown\s+1)/'));
 // Denominators this small print '-' for the ratio and still print the interval, so the
 // patterns below accept any ratio token and anchor on the counts and the bracket.
 ec_ft_expect('device: coarse by page reads known rows only -- Looped-Network 2 known, 1 coarse',
     ec_ft_line($out, '/\n\s+Looped-Network\s+2\s+1\s+\S+\s+\[/'), $out);
-ec_ft_expect('device: calculated by pointer -- coarse 1 shopping, 1 using in the page-load bucket',
+ec_ft_expect('device: calculated by pointer -- coarse 1 dwell, 1 use in the others bucket',
     ec_ft_line($out, '/\n\s+coarse\s+1\s+1\s+\S+\s+\[/'), $out);
 
 // -- naming --
 ec_ft_expect('naming: SAID YES line carries titles 1, subtitles 0, saves 1, renames 1',
     ec_ft_line($out, '/SAID YES\s+titles\s+1\s+subtitles\s+0\s+saves\s+1\s+renames\s+1/'));
-ec_ft_expect('naming: PAGE LOADS line carries the subtitle row',
-    ec_ft_line($out, '/PAGE LOADS\s+titles\s+0\s+subtitles\s+1\s+saves\s+0\s+renames\s+0/'));
+ec_ft_expect('naming: OTHERS line carries the subtitle row',
+    ec_ft_line($out, '/OTHERS\s+titles\s+0\s+subtitles\s+1\s+saves\s+0\s+renames\s+0/'));
 ec_ft_expect('naming: Looped-Network is NAMED by its save and its rename is printed beside it, not n/a',
     ec_ft_line($out, '/\n\s+Looped-Network\s+1\s+1\s+\S+\s+\[[^\]]*\]%?\s+1\n/'), $out);
 ec_ft_expect('naming: Manning-Pipe-Flow is named by its title with no rename',
@@ -151,9 +151,9 @@ ec_ft_expect('naming: with no save or rename in the window the map page reads n/
     ec_ft_line($out2, '/\n\s+Looped-Network\s+1\s+n\/a\s+n\/a\s+no title field/'), $out2);
 
 // -- language: served/asked pair and the region table --
-ec_ft_expect('language: reach rows classify by field count -- 3 page loads, 2 classified, 1 older format',
-    ec_ft_line($out, '/PAGE LOADS — reach rows: 3\s+classified: 2\s+unclassified \(older format\): 1/'));
-ec_ft_expect('language: English by region lists en-gb and bare en in page loads and en-us in said yes',
+ec_ft_expect('language: page load rows classify by field count -- 3 others rows, 2 classified, 1 older format',
+    ec_ft_line($out, '/OTHERS — page load rows: 3\s+classified: 2\s+unclassified \(older format\): 1/'));
+ec_ft_expect('language: English by region lists en-gb and bare en in others and en-us in said yes',
     ec_ft_line($out, '/\n\s+en-gb\s+0\s+1\n/') && ec_ft_line($out, '/\n\s+en\s+0\s+1\n/')
     && ec_ft_line($out, '/\n\s+en-us\s+1\s+0\n/'), $out);
 ec_ft_expect('units: preset clicks by asked tag list the two English rows and exclude the Spanish page',
@@ -194,10 +194,10 @@ foreach ($rows4 as $name => $lines) {
     file_put_contents("$dir4/$name", $lines ? implode("\n", $lines) . "\n" : '');
 }
 $out4 = (string) shell_exec('bash ' . escapeshellarg($script) . ' --archive=' . escapeshellarg($dir4) . ' 2>&1');
-ec_ft_expect('code: the rank table has a browsers column -- Manning-Pipe-Flow 2 browsers, 5 said yes, 1 page load',
-    ec_ft_line($out4, '/rank\s+page\s+browsers\s+said yes\s+page loads/')
+ec_ft_expect('code: the rank table has a browsers column -- Manning-Pipe-Flow 2 browsers, 5 said yes, 1 others',
+    ec_ft_line($out4, '/rank\s+page\s+browsers\s+dwells, said yes\s+dwells, others/')
     && ec_ft_line($out4, '/\n\s+1\s+Manning-Pipe-Flow\s+2\s+5\s+1\n/'), $out4);
-ec_ft_expect('code: Looped-Network is 1 browser, 1 said yes, 2 page loads',
+ec_ft_expect('code: Looped-Network is 1 browser, 1 said yes, 2 others',
     ec_ft_line($out4, '/\n\s+\d+\s+Looped-Network\s+1\s+1\s+2\n/'), $out4);
 ec_ft_expect('code: browsers by page -- Manning-Pipe-Flow looked 2, calculated 1, named 1',
     ec_ft_line($out4, '/BROWSERS BY PAGE[\s\S]*\n\s+Manning-Pipe-Flow\s+2\s+1\s+1\n/'), $out4);
@@ -205,9 +205,9 @@ ec_ft_expect('code: browsers by page -- Looped-Network looked 1, calculated 0, n
     ec_ft_line($out4, '/BROWSERS BY PAGE[\s\S]*\n\s+Looped-Network\s+1\s+0\s+0\n/'), $out4);
 ec_ft_expect('code: 2 different browsers in the window, 8 said-yes rows with no code',
     ec_ft_line($out4, '/any log: 2\n/') && ec_ft_line($out4, '/with no code \(written before 2026-10-08\): 8 /'), $out4);
-ec_ft_expect('code: the pointer is still read from its own column on a coded row -- said-yes views 6, fine 3',
-    ec_ft_line($out4, '/SAID YES — confirmed-human page views: 6\n(\s+\S+\s+\d+[^\n]*\n)*?\s+fine\s+3\b/'), $out4);
-ec_ft_expect('code: the asked tag is still read from its own column on a coded reach row (en-us 2 said yes)',
+ec_ft_expect('code: the pointer is still read from its own column on a coded row -- said-yes dwells 6, fine 3',
+    ec_ft_line($out4, '/SAID YES — page dwells: 6\n(\s+\S+\s+\d+[^\n]*\n)*?\s+fine\s+3\b/'), $out4);
+ec_ft_expect('code: the asked tag is still read from its own column on a coded page load row (en-us 2 said yes)',
     ec_ft_line($out4, '/\n\s+en-us\s+2\s+0\n/'), $out4);
 
 // -- the state file the report writes lands in the fixture, not in log/ --

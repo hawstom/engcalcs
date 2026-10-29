@@ -56,7 +56,7 @@ function echoCalculatorFormAppend() {
 				</th>
 			</tr>
 			<tr>
-				<th><?=ecTipLabel($ec_lang['bpn_id'], $ec_lang['bpn_id_tip'])?></th>
+				<th><?=ecTipLabel($ec_lang['lpn_field_id'], $ec_lang['bpn_id_tip'])?></th>
 				<th><?=ecTipLabel($ec_lang['bpn_upstream'], $ec_lang['bpn_upstream_tip'])?></th>
 				<th>
 					<?=$ec_lang['ip_length']?><br />

@@ -65,6 +65,7 @@ const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootst
  */
 const EC_UNREFERENCED_MODULES = [
     'lpn-native-run.js' => 'Task 733 phase 3, slices 1-2: the built-in solver\'s period loop with simple controls, held to EPANET by dev/lpn-spike/native-eps-harness.js and not yet called by the page (dev/native-eps-plan.md)',
+    'no-form-restore.js' => 'inlined into Looped-Network.php\'s <head> by file_get_contents(), because it must run before the body parses; held by dev/lpn-spike/form-restore-browser-harness.js',
 ];
 
 /**

@@ -15,7 +15,7 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 | `Net1-SI.lwn` | 11 | 13 | L/s | `Net1.lwn` converted to SI (below), rules included. |
 | `Valves.lwn` | 14 | 13 | gpm | One of each valve type (PBV, PRV, PSV, FCV, TCV, GPV), each controlling at the solved state. Built by `dev/scripts/build_valve_example.js` from `dev/scripts/valve_example.inp`; held by `valve-example-harness.js`. |
 | `Net2-Branford-CT.lwn` | 36 | 40 | gpm | EPANET's Net2 placed at Branford, Connecticut on EPSG:2234 (Tom's own saved project, 2026-10-12). No backdrop. |
-| `Net3-Novato-CA-World.lwn` | 97 | 119 | gpm | EPANET's Net3 placed at Novato, California as a lat/lon project, world map behind it. No backdrop. |
+| `Net3-Novato-CA-World.lwn` | 97 | 119 | gpm | EPANET's Net3 placed at Novato, California on NAD83 California zone 3 (EPSG:2227, US survey feet), world map behind it. The SI twin is on the same zone in metres (EPSG:26943). No shipped example is lat/lon (Task 826). No backdrop. |
 | `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The one example with a backdrop (Tom, 2026-10-12). |
 
 **`Net1-SI.lwn`, `Net2-Branford-CT-SI.lwn` and `Net3-Novato-CA-World-SI.lwn` are unit conversions of the files above** (Task 786,
@@ -27,8 +27,7 @@ roughness, minor loss k, patterns, times and the quality sections are carried ac
 switch on the page reinterprets rather than converts, so an SI twin is a separate file. **The drawing
 converts with it** where it is a length: Net2 is drawn in its CRS's feet, so its drawing converts at
 0.3048, its origin shift at the US survey foot, and its CRS becomes the metre twin (EPSG:2234 to
-EPSG:26956); Net1 is a plain local drawing in feet (no CRS, no origin), so its drawing converts at 0.3048 and its two `[RULES]` tank levels round like control depths; Net3 is a lat/lon project, whose degrees are no length, so its drawing and view are
-carried untouched. `dev/lpn-spike/si-example-equivalence-harness.js` checks every rounded number against that rule
+EPSG:26956); Net1 is a plain local drawing in feet (no CRS, no origin), so its drawing converts at 0.3048 and its two `[RULES]` tank levels round like control depths; Net3's SI twin is not a unit conversion of its drawing: it is the same ground on California zone 3 in metres, regenerated from the lat/lon original (`project_example_crs.js`), so the pair is checked by landing every node on the same spot of the Earth. `dev/lpn-spike/si-example-equivalence-harness.js` checks every rounded number against that rule
 and that each pair behaves alike (tank levels within 1 m through the whole EPANET extended-period run) and that both twins place a node on the same spot of the
 Earth. They carry no `.inp` of their own. The converter reads the SHIPPED US file.
 
@@ -138,3 +137,8 @@ file. `Elm-Street-Center.lwn` is JSON inside, as every `.lwn` is; the extension 
 application, not the syntax. The generator publishes whatever name it finds
 (`exampleIsProjectFile()` accepts both), so a `-lpn.json` source dropped in here still works —
 nothing about the format changed, only what the six files are called.
+
+**`latlon-originals/` keeps the two Net3 files as they were when they were lat/lon** (Task 826, Tom, 2026-10-24: a lat/lon project cannot
+take a DXF or shapefile back in, so no example ships that way). `node dev/scripts/project_example_crs.js` projects them to the shipped
+files (`--check` reports a stale one); the harnesses that test genuinely geographic behaviour (GeoJSON, labels at lat/lon scales,
+basemap style) read the originals. `examples-crs-harness.js` fails if a shipped example is lat/lon.

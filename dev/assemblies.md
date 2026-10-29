@@ -29,8 +29,8 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
   "Explode", not "Explode assembly".
 - **Toolbar:** Declan's cycle, assembly first, remembered by the browser; the + marks the assembly
   form (pump plus, valve plus); a second press in a row cycles.
-- **Placing:** a pump on open ground has no pipes and points right; several may be placed, like
-  junctions. The first pipe connected sets direction (pipe's start point away from it); Properties
+- **Placing:** a pump on open ground has no pipes and points rightward; several may be placed, like
+  junctions. The first two pipes connected set the direction, toward the first pipe if it's drawn starting at and going away from the pump, else stay rightward until able to point toward the second pipe; Properties
   has a **Downstream pipe** chooser among its connected pipes. Clicking a pipe splices one in, but is
   probably not the usual way. One click either way.
 - **Node IDs:** settable in the project's ID prefixes from the start; spaces refused as for the other
@@ -70,3 +70,4 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
     (default = pump-on minus 2 psi). *"We build a pressure tank curve using Boyle's Ideal Gas Law.
     Maybe we add Pressure Tank in our Libraries, shown only if somebody adds one."*
   - *For open-air tank:* the normal tank parameters.
+- *Well icon* (Tom, 2026-10-26): *"I wonder if it would be nice to depict drawdown on a well icon."* Sketch as above.

@@ -4638,3 +4638,41 @@ NOT CHECKED: zip receipt in browser (code reads zipName); visual feel of two dia
 OBSERVED (real Chromium, scratch scripts perry-shape-scenario-*): draw in Base/scenario, Is active column, Delete in Base with override (asks, purges), copy scenario, delete scenario, Override manager, merge upward into Base, CSV/XLSX scenario workbook, DXF import receipts Base vs scenario, .inp byte-identical with shapes and after reload, GeoJSON export 2 vs 1 features, build agent's own harness 27/27.
 OBSERVED defects: status-bar override count stays 0 after drawing a Shape in a scenario (menu says 1; refreshes on next edit); deleting a scenario leaves its born-here Shapes inactive in Base, visible only as unticked rows in the Shapes table.
 NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the harness.
+
+2026-10-25 Task 828 review. OBSERVED: 8111 Properties == master (display block, 0 grid classes); 8113 Properties is a grid (names one x, values one x) but ID/Text-title row, buttons off-grid; Demand scaling has two grids with different value x; Scenario comparison unconverted. Settings Drop cut-off identical on master (462 wide) - not this branch. Shots: _panel/www/img/box-rows-1025/.
+2026-10-25 pass2 OBSERVED at 547697584: desktop Properties/boxes mostly one grid; phone 390 Properties inputs collapse (~30px), selects truncated, X value wraps per char; master phone fine; Fire flow phone clips selects/buttons. Junction demand block off-grid. Phone harness checks only no-scroll + name-above. Shots review2-*.png
+
+# Perry, fix/phone-select f6daea31d, 2026-10-25 (OBSERVED, decays)
+- OBSERVED phone 390: Settings Labels column headings break mid-word (Dro/p, Sh/ow, Us/e unit/s); 2-digit Drop numbers clipped. Index breaks mid-word (Nod/e/label/s).
+- OBSERVED PC en override: labels table 481 vs pane 416, Drop clipped until scrolled. German PC headings clipped at top ("Anzei/gen" -> "gen").
+- OBSERVED confirmed: Water menu no Properties (PC/phone, en); vertex morph prompts exact, undo restores; Basic scenario manager works; no phone pan.
+- Shots: /home/haws/webdev/worktrees/_panel/www/img/phone-select-1025/
+- Tom, 2026-10-25, overruled the mid-word findings above: word wrap, mid-word included, is fine; only a labels row's CONTROLS must stay on one line.
+
+# Perry, 2026-10-26, feat/report-buttons 9c25c0dfc (Task 829)
+- OBSERVED: /tmp/report-buttons.pdf metadata: Title "TGH notepad - Google Docs", Producer Skia/PDF, Chrome 155 on Windows. It is a Google Doc printed to PDF (pasted Copy HTML), NOT the Print report sheet. Build agent's "older build than print-width fix" is unsupported: 593bb7817 (Oct 25) print already has wide-fit layout and 3-line title; PDF has single-line bold title = reportTitleLine = Copy HTML.
+- OBSERVED: Copy HTML (reportHtmlText) emits tables with no widths, no nowrap, no-break spaces, full "Chlorine concentration"; so the Docs paste keeps equal-width columns. Units-in-heading helps, word breaks in headings likely persist. UNVERIFIED in Docs.
+- OBSERVED: Print report on Net1-SI, Net1-Scenarios, Net3: fits, no broken words, ids hold N9999, kWh whole, Conc. short only with chemical. Branch harness passes all.
+- OBSERVED: leftover units in cells: Criticality whole run "97.01 psi at 4:00" (heading "Lowest pressure" no unit); Scenario comparison "108 psi at N32, 14:00"; Net3 ff "N40 drops to 5.68 psi".
+- OBSERVED: heading units split across lines "(m / H2O)" on screen and print.
+- Method note: Tom's PDF provenance came from strings on the PDF; check metadata first next time.
+
+# Perry, feat/box-rows-properties 9ec48ca4d, 2026-10-26 (Task 828 spreadsheet boxes)
+- OBSERVED: master (c5f2bbbb8, has fix/open-docked) is NOT merged into the branch (merge-base 45e558383). Libraries docked + auto-hidden: choosing "Edit types…" / "Edit fittings…" leaves the box visibility:hidden, class lpn-dock-collapsed. Tom's item 4 reproduced on the new option. Docked-pinned and floating work. Own harness checks display!=none, so it cannot see this.
+- OBSERVED label column (fit to 90th percentile) at 1366: pipe 213 px (widest 200, p75 150, median 74); junction 193 (max 180, p75 128); tank 194; PRV 153 (p75 92); TCV 118. So ~1.07x the p94 label (was 1.5x) but still 1.4 to 1.7x the p75 label.
+- OBSERVED "(ft H2O)" splits across lines on tank (Highest water depth) and TCV (Head loss): bdi wraps.
+- OBSERVED far-right drag of divider: value controls clipped at right (12 controls) and the setting persists for every element type (one lpn_popup width). RTL (ar): header, rows, drag mirrored correctly. "Auto length" untranslated in ar/zh/de; the ", C" comma is ASCII in ar and zh.
+- OBSERVED Convert as is NOT converted (no header, no grid; units are a row of small dropdowns with headings). Claimed converted.
+- OBSERVED header only on first grid of New project and Demand scaling; Full report and Calibration put a Label|Value header over one row. Text and Customer: title and textarea sit between header and grid; grid inset.
+- OBSERVED Settings untouched (no grid classes): no leak. Phone 390: Properties, Fire flow, New project stacked, nothing cut; junction demand-table header "Description" cut at right on phone.
+- OBSERVED branch harnesses: box-spreadsheet 26/26, box-grid 129/129.
+- Shots: /home/haws/webdev/worktrees/_panel/www/img/boxrows-1026/
+- NOT CHECKED: Scenario manager (menu disabled with Net1), Calibration with real data, mutation test of harnesses, Settings pane unchanged on phone.
+
+## Re-check a3afbf6b3, 2026-10-27 (OBSERVED, real Chromium, 1366x768 and 390 phone)
+- (1) Edit types/fittings, docked-left auto-hidden: Libraries visible, on top, section selected. FIXED.
+- (2) Convert as: box 615px tall, body scrolls inside (ok). Opens already scrolled 124px (top cut), OK button inside scroll, below fold. Rounding table left 3-column. FIXED with a small new problem.
+- (3) units/brackets/"?" FIXED (pipe, tank, TCV shots). (4) drag far right/left, en and ar: value col 14.9 rem min, 0 clipped, 0 sideways scroll. FIXED. Width still persists across element types (one pref).
+- (5) header gap 0 above grid in all PC boxes; none on single-row boxes (Full report, Calibration). Junction second run (Demand... Is active) has no header. Phone Description not cut. FIXED.
+- (6) pipe 196px = 1.52x p75 (as claimed), PRV 1.47x. (7) comma proper in ar fa ur ps zh. FIXED.
+- Shots: boxrows-1026/*-v2.png
