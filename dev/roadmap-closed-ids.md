@@ -750,6 +750,7 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|819| CLOSED 2026-10-21 (merged on Tom's word, `feat/import-export-menu`): Import and Export grouped into Network, Shapes and Tables submenus; libraries in the tables export.
 - 0|821| CLOSED 2026-10-22 (Tom: "Count as EPANET does", `fix/energy-count`): the energy summary counts an open pump and a single instant (one hour) as EPANET does.
 - 0|811| CLOSED 2026-10-23 (merged on Tom's word, `feat/theme-whimsy`): ten colour themes, the better default, Newspaper and Arcade design themes, the dark-paper ramp casing.
+- 0|831| CLOSED 2026-10-29 (merged on Tom's word, `feat/shape-scenario`): a Shape honours Is active per scenario, in the Presentation category, with the override dot; manual entry "Moving or merging between scenarios".
 - 0|830| CLOSED 2026-10-25 (merged on Tom's word, `fix/dock-widths`): a flown-out box soft-pins when a button in it is clicked, until the map, another tab or Escape.
 - 0|826| CLOSED 2026-10-24 (`fix/example-crs`): no shipped example is lat/lon; Net3 US is on EPSG:2227 and Net3 SI on EPSG:26910 (later EPSG:26943, Task 826 follow-up); `examples-crs-harness.js` holds it.
 - 0|820| CLOSED 2026-10-28 (`fix/label-snapshot-demand`): with Recalculate off a map label's Demand (Q) follows the kept run, Base demand (Qb) the open scenario; `label-snapshot-demand-browser-harness.js`.
