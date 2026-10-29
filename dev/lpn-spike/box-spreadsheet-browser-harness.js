@@ -305,11 +305,11 @@ async function main() {
 			return {
 				hdr: hdr ? getComputedStyle(hdr).display : 'none', scroll: body.scrollWidth - body.clientWidth,
 				cut: controls.filter((e) => R(e).right > edge - 1).length,
-				above: R(row.querySelector('.lpn-gval')).top >= R(row.querySelector('.lpn-gname')).bottom - 2
+				above: R(row.querySelector('.lpn-gval')).left >= R(row.querySelector('.lpn-gname')).right - 2
 			};
 		});
 		ok('on a phone the header row is not shown', ph.hdr === 'none', ph.hdr);
-		ok('on a phone each label stands above its value', ph.above);
+		ok('on a phone each label stands beside its value (the PC two columns)', ph.above);
 		await p.page.evaluate(() => { const x = document.getElementById('lpn_popup_close'); if (x) { x.click(); } });
 		await p.settle(300);
 		const jp = await p.page.evaluate(() => { const el = Array.from(document.querySelectorAll('#lpn_canvas [data-node="11"]')).filter((e) => e.getBoundingClientRect().width > 0)[0]; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });

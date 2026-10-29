@@ -3963,8 +3963,8 @@ option:disabled { color: var(--ec-ink-muted); }
 	#lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; justify-self: start; }
 	#lpn_popup_graph > .lpn-pgraph-chart, #lpn_popup_graph > .lpn-profile-say { grid-column: 1 / -1; }
 }
-/* Spreadsheet look (a box wider than a phone): the header, the ruled rows. */
-@media (min-width: 30.01rem) {
+/* Spreadsheet look: the header, the ruled rows. A phone has the same grid as a PC (Tom, 2026-10-29); only a touch pointer changes sizes (below). */
+@media all {
 	@supports (grid-template-columns: subgrid) {
 		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
@@ -3998,8 +3998,8 @@ option:disabled { color: var(--ec-ink-muted); }
    (padding 4px 6px), as a Tables cell does; the cell is marked by the inset accent outline. EDITABLE vs COMPUTED (Perry,
    2026-10-27): a computed value is in the muted ink, as a property grid draws a read-only value; an editable cell takes the
    hover fill, so the pointer finds it before a click. A toggle stays a checkbox. No column heading (WaterGEMS): the
-   divider (.lpn-gsplit) runs down the Label column's right edge. A phone keeps its own stacked layout. ==== */
-@media (min-width: 30.01rem) {
+   divider (.lpn-gsplit) runs down the Label column's right edge. A phone has the same grid; only a touch pointer changes sizes. ==== */
+@media all {
 	@supports (grid-template-columns: subgrid) {
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow:not(.lpn-gspan-row):not(.lpn-fill-row), #lpn_popup_title.lpn-gtitle-id.lpn-sheet { min-height: 1.75rem; }
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
@@ -4043,35 +4043,21 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-popover-body > .lpn-gsplit { display: block; grid-column: 2 / 3; grid-row: 1 / 3; }
 	}
 }
-/* A phone: the name goes above its value (the name track is nothing), as the other boxes' rows do under
-   18rem, so the box is no wider than a phone however long a name is. No header, no divider. */
+/* TOUCH (Ida, 2026-10-29): one structure, two sizes. Rows are a finger tall; the divider is its column gridline (1 px, already
+   drawn by the Label cell's rule) with an invisible 24 px hit area that starts just inside the Label cell's padding, so it
+   never lies over label text, and a tap on it passes through to the cell beneath (js: gridWireSplit). No fat graphic. */
+@media (pointer: coarse) {
+	.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow:not(.lpn-gspan-row):not(.lpn-fill-row), #lpn_popup_title.lpn-gtitle-id.lpn-sheet { min-height: 2.5rem; }
+	.lpn-gsplit, .lpn-propbox .lpn-popover-body > .lpn-gsplit { width: 24px; inset-inline-end: -16px; border-radius: 0; background: transparent; opacity: 1; }
+	.lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: transparent; opacity: 1; }
+	.lpn-gridhost.lpn-sheet .lpn-gname, .lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-end: 8px; }
+	/* An empty editable cell is visibly a cell: no hover fill exists on touch. */
+	.lpn-sheet .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):not(:disabled), .lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):not(:disabled) { box-shadow: inset 0 -1px 0 0 var(--ec-hairline); }
+}
+/* Properties' Time series pull-down and the DEM buttons keep to the Value cell and a full-width row. */
 @media (max-width: 30rem) {
-	@supports (grid-template-columns: subgrid) {
-		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
-		.lpn-propbox .lpn-gprops .lpn-gw-fill, .lpn-propbox .lpn-gprops .lpn-grow > select, .lpn-propbox .lpn-gprops .lpn-grow > input[type="text"] { width: 100%; max-width: none; min-width: 6em; }
-		.lpn-propbox .lpn-gprops .lpn-gw-num { min-width: 4em; }
-		/* The same light sheet, narrowed (sheet-light): a hairline under every row, no box round a value, a computed value muted. */
-		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
-			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch; box-shadow: inset 0 -1px 0 0 var(--ec-hairline);
-		}
-		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px 0; }
-		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]),
-		.lpn-propbox #lpn_popup_title.lpn-gtitle-id > input {
-			width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px 8px; box-sizing: border-box; border: 0; border-radius: 0; background: transparent; text-align: start; font-size: .95em;
-		}
-		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
-		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
-		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
-		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px 8px; margin: 0; }
-		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin: 4px 6px 8px; }
-		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
-		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
-		.lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { grid-column: 2 / -1; }
-		.lpn-propbox #lpn_popup_title.lpn-gtitle-id > input { max-width: 100%; }
-		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2 / -1; margin-inline-end: 0; }
-		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > label { grid-column: 2 / -1; }
-		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; }
-	}
+	.lpn-propbox .lpn-gprops > .lpn-elev-dem { display: flex; gap: 4px; }
+	.lpn-propbox .lpn-gprops > .lpn-elev-dem > button { flex: 1 1 50%; min-height: 40px; }
 }
 #lpn_popup_title.lpn-gtitle-text, #lpn_popup_title .lpn-gtitle-text { font-weight: bold; }
 /* Narrow: the label goes above its value (a container query on the host, as Settings does on its own content). */
@@ -5534,6 +5520,19 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	content: ""; display: block; width: 2px; height: 3rem; margin: 1rem auto 0; background: var(--ec-gray-bbb);
 }
 .lpn-rpane-grip:hover { background: var(--ec-gray-e8e8e8); }
+@media (pointer: coarse) {
+	/* The pane splitters (bottom pane's top edge, right pane's left edge): a 1 px line and an invisible 24 px hit area, no gray bar. */
+	.lpn-pane-grip { position: relative; height: 1px; background: var(--ec-border-strong); border-bottom: 0; }
+	.lpn-pane-grip::after { content: ""; position: absolute; left: 0; right: 0; top: -12px; width: auto; height: 24px; margin: 0; background: transparent; }
+	.lpn-rpane-grip { position: relative; flex: 0 0 1px; background: var(--ec-border-strong); border-right: 0; }
+	.lpn-rpane-grip::after { content: ""; position: absolute; top: 0; bottom: 0; left: -12px; width: 24px; height: auto; margin: 0; background: transparent; }
+	.lpn-pane-grip:hover, .lpn-rpane-grip:hover { background: var(--ec-border-strong); }
+}
+/* TOUCH: Properties narrower than 16 rem stacks the name above its value (the host class is set by the box's own observer). */
+.lpn-propbox .lpn-popover-body.lpn-gnarrow { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
+.lpn-propbox .lpn-popover-body.lpn-gnarrow .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2 / -1; border-inline-end: 0; }
+.lpn-propbox .lpn-popover-body.lpn-gnarrow .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > .lpn-gval, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > input { grid-column: 3; }
+.lpn-propbox .lpn-popover-body.lpn-gnarrow > .lpn-gsplit { display: none; }
 .lpn-rpane { flex-direction: row; }
 .lpn-rpane-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
 .lpn-rpane-head { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--ec-border); }
@@ -6606,7 +6605,7 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
 .lpn-ff-note { margin: .3em 0; font-size: .9em; color: var(--ec-gray-444); }
 .lpn-ff-summary { margin: .4em 0; font-weight: bold; }
-.lpn-ff-buttons { margin: .6em 0; display: flex; gap: .5em; }
+.lpn-ff-buttons { margin: .6em 0; display: flex; flex-wrap: wrap; gap: .5em; }
 /* Column width is king (CLAUDE.md): the table is read in a box a reader may have made narrow, so
    the id column wraps rather than pushing the numbers off the edge. */
 .lpn-ff-tablewrap { overflow-x: auto; }

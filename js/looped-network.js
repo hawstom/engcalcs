@@ -25237,6 +25237,9 @@ var EngCalcs = EngCalcs || {};
 	// percentile of their natural widths), so one long label wraps instead of widening the whole
 	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
 	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
+	// A host this narrow stacks its names above its values: 16 rem under a finger (a phone's box fills the screen, so it keeps two columns), 18 rem under a mouse
+	// (where the Value column is allowed down to a few characters and a stack is for a true collapse only).
+	function gridNarrowRem() { try { return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 16 : 18; } catch (e) { return 18; } }
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
 	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
 	// The label column's natural widths, one a label: a range over each name's words, with its track
@@ -25276,7 +25279,7 @@ var EngCalcs = EngCalcs || {};
 		host.__lpnFitQ = false;
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
-		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
+		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain')) { return; }
 		if (host.__lpnScaled && host.__lpnFrac) { gridScaleNow(host); return; }   // the box has been resized: both columns keep their ratio
 		if (id && typeof prefs[id] === 'number') { gcolApply(host); gridNoteFrac(host); return; }
 		host.style.setProperty('--lpn-g-name', 'max-content');
@@ -25346,17 +25349,33 @@ var EngCalcs = EngCalcs || {};
 			gridFitSoon(host);
 		}
 		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
-		split.addEventListener('pointerdown', function (e) {
-			if (e.button !== undefined && e.button !== 0) { return; }
+		// A finger: the 24 px hit area lies over the cell beside the line, so a press only becomes a drag after 4 px of travel, and a tap passes through to the cell under it (Ida, 2026-10-29).
+		var pending = false, pendId = null;
+		function beginDrag(e) {
 			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem(); host.__lpnValNeed = undefined; room(true);
 			try { split.setPointerCapture(e.pointerId); } catch (err) {}
+		}
+		function passThrough(e) {
+			var el, had = split.style.pointerEvents;
+			split.style.pointerEvents = 'none';
+			el = document.elementFromPoint(e.clientX, e.clientY);
+			split.style.pointerEvents = had;
+			if (!el || el === split) { return; }
+			try { if (el.focus) { el.focus(); } if (el.tagName === 'SELECT' && el.showPicker) { el.showPicker(); } else if (el.click) { el.click(); } } catch (err) { /* a picker that needs a gesture of its own stays closed */ }
+		}
+		split.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			if (e.pointerType === 'touch') { host.__lpnTouchAt = Date.now(); pending = true; pendId = e.pointerId; startX = e.clientX; return; }
+			beginDrag(e);
 			e.preventDefault();
 		});
 		split.addEventListener('pointermove', function (e) {
+			if (pending && Math.abs(e.clientX - startX) > 4) { pending = false; beginDrag(e); }
 			if (dragging) { setRem(startRem + dirSign() * (e.clientX - startX) / rem, false); }
 		});
 		function endDrag(e) {
 			var v;
+			if (pending) { pending = false; if (e.type === 'pointerup') { passThrough(e); } return; }
 			if (!dragging) { return; }
 			dragging = false;
 			try { split.releasePointerCapture(e.pointerId); } catch (err) {}
@@ -25364,6 +25383,7 @@ var EngCalcs = EngCalcs || {};
 			if (isFinite(v)) { setRem(v, true); }
 			host.__lpnDrag = false;
 		}
+		split.addEventListener('mousedown', function (e) { if (host.__lpnTouchAt && Date.now() - host.__lpnTouchAt < 1000) { e.preventDefault(); } });   // the compatibility mouse events after a finger must not focus the divider over the cell the tap went to
 		split.addEventListener('pointerup', endDrag);
 		split.addEventListener('pointercancel', endDrag);
 		split.addEventListener('dblclick', function (e) { e.preventDefault(); reset(); });
@@ -25434,13 +25454,14 @@ var EngCalcs = EngCalcs || {};
 		if (!(opts && opts.plain) && host.closest && host.closest('.lpn-sheetbox')) { host.classList.add('lpn-sheet'); }
 		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
 		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
-		if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth < 30 * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
+		// Stacked only when the host itself is narrower than 16 rem (a true collapse): a phone gets the same two columns as a PC (Tom, 2026-10-29).
+		if (typeof window !== 'undefined' && host.getBoundingClientRect && host.getBoundingClientRect().width && host.getBoundingClientRect().width < gridNarrowRem() * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
 		if (typeof ResizeObserver !== 'undefined') {
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
 				if (w) {
-					var now = w < 18 * px || (window.innerWidth || 9999) < 30 * px, prevW = host.__lpnW;
+					var now = w < gridNarrowRem() * px, prevW = host.__lpnW;
 					host.classList.toggle('lpn-gnarrow', now);
 					host.__lpnFitted = true;
 					if (gridResized(host, w, prevW, now)) { return; }
@@ -71400,6 +71421,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				nm.__lpnRO = true;
 				new ResizeObserver(function () {
 					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
+					if (w) { nm.classList.toggle('lpn-gnarrow', gridNarrowRem() < 17 && w < 16 * gridRem()); }   // under 16 rem the name stands above its value
 					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
 					gridFitSoon(nm);
 				}).observe(nm);
@@ -72887,6 +72909,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!popupUserSize && !smallScreen()) {
 			popup.style.width = ''; popup.style.left = '0px';
 		}
+		// A phone: the box fills the width less the screen edge (Ida, 2026-10-29), so a Label | Value pair has room and no strip of half a map label stands beside it.
+		if (!popupUserSize && smallScreen()) { popup.style.width = Math.max(0, (window.innerWidth || 0) - 2 * POPUP_EDGE) + 'px'; popup.style.left = POPUP_EDGE + 'px'; }
 		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
 		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
 		// for this box and it is left alone: the properties popup opens per element, dozens of

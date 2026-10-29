@@ -100,13 +100,13 @@ async function main() {
 			};
 		});
 		if (phone) {
-			// A phone (390 px): the name goes above its value, and the box is usable (box-grid-audit.js).
+			// A phone (390 px): the name stands beside its value, as on a PC, and the box is usable (box-grid-audit.js).
 			const ph = await page.evaluate(() => {
 				const b = document.querySelector('#lpn_popup .lpn-popover-body'), r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && x.querySelector('input[type=number]'))[0];
 				const n = r.querySelector('.lpn-gname').getBoundingClientRect(), c = r.querySelector('input').getBoundingClientRect();
-				return { scroll: b.scrollWidth - b.clientWidth, above: c.top >= n.bottom - 2 };
+				return { scroll: b.scrollWidth - b.clientWidth, above: c.left >= n.right - 2 };
 			});
-			ok(tag + 'on a phone a name stands above its value', ph.above, JSON.stringify(ph));
+			ok(tag + 'on a phone a name stands beside its value', ph.above, JSON.stringify(ph));
 			await auditPhone(page, { root: '#lpn_popup .lpn-popover-body' }, ok, tag + 'the box');
 			if (process.env.BOXROWS_SHOT) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-phone-' + (scn ? 'scn-' : '') + name + '.png') }); }
 			await a.close();
