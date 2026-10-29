@@ -576,3 +576,10 @@ The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), 
 
 ## Added 2026-10-24 (Task 828)
 - **One grid row for every dockable box** (`lpnGridRow`, `.lpn-grid` family), converting Contour, Fire flow, Properties, Find/Replace, then Settings by alias. Full design: `standard-box-rows-2026-10-24.md`. The Properties conversion is the large one (24 sites, 64 harnesses touch its fields).
+
+## 2026-10-28 additions (box-design)
+- **Soften the sheet style**: hairline row rules, borderless values, no outer frame, kept alignment. Small CSS, every box at once. First.
+- **Demand as two grid rows (Base demand; Demand categories with a three-dot) plus a Demands box.** Medium. Removes the one row that breaks the grid.
+- **Heading bands in Properties, collapse optional and remembered.** Small to medium.
+- **Basic row subset with a Show all row.** Medium; decide first how it relates to the Scenario manager's Basic mode and the expert levels.
+- **Phone shares the hairline and band styling.** Small after the first item.
