@@ -25253,13 +25253,32 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
+	// so a later change of the box's width can scale both columns by it.
+	function gridNoteFrac(host) {
+		var v = parseFloat(host.style.getPropertyValue('--lpn-g-name')), w = host.getBoundingClientRect().width;
+		if (isFinite(v) && w > 0) { host.__lpnFrac = v * gridRem() / w; host.__lpnW = w; }
+	}
+	// A change of the box's width sizes BOTH columns in proportion (Tom, 2026-10-29: "resizing the box width to size both columns proportionally instead of only the second").
+	function gridResized(host, w, prevW, narrow) {
+		host.__lpnW = w;
+		if (prevW && Math.abs(w - prevW) > 0.5 && host.__lpnFrac && !narrow && !host.__lpnDrag && !host.classList.contains('lpn-gplain')) { host.__lpnScaled = true; gridScaleNow(host); return true; }
+		return false;
+	}
+	function gridScaleNow(host) {
+		var w = host.getBoundingClientRect().width, px = gridRem(), sheet = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet'), v;
+		if (!w || !host.__lpnFrac) { return; }
+		v = Math.max(LPN_GNAME_MIN, Math.min(w / px - (sheet ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN), host.__lpnFrac * w / px));
+		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
+	}
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
 		host.__lpnFitQ = false;
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
 		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain') || (window.innerWidth || 9999) < 30 * gridRem()) { return; }
-		if (id && typeof prefs[id] === 'number') { gcolApply(host); return; }
+		if (host.__lpnScaled && host.__lpnFrac) { gridScaleNow(host); return; }   // the box has been resized: both columns keep their ratio
+		if (id && typeof prefs[id] === 'number') { gcolApply(host); gridNoteFrac(host); return; }
 		host.style.setProperty('--lpn-g-name', 'max-content');
 		hr = host.getBoundingClientRect();
 		names = gridNaturalNames(host);
@@ -25275,6 +25294,7 @@ var EngCalcs = EngCalcs || {};
 		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
 		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
+		gridNoteFrac(host);
 	}
 	function gridFitSoon(host) {
 		if (host.__lpnFitQ) { return; }
@@ -25314,6 +25334,7 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host);
 			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
 			host.style.setProperty('--lpn-g-name', v + 'rem');
+			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
 		}
@@ -25321,6 +25342,7 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host), prefs = gcolRead();
 			if (id) { delete prefs[id]; gcolSave(); }
 			host.style.removeProperty('--lpn-g-name');
+			host.__lpnScaled = false;
 			gridFitSoon(host);
 		}
 		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
@@ -25418,9 +25440,10 @@ var EngCalcs = EngCalcs || {};
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
 				if (w) {
-					var now = w < 18 * px || (window.innerWidth || 9999) < 30 * px;
+					var now = w < 18 * px || (window.innerWidth || 9999) < 30 * px, prevW = host.__lpnW;
 					host.classList.toggle('lpn-gnarrow', now);
 					host.__lpnFitted = true;
+					if (gridResized(host, w, prevW, now)) { return; }
 					gridFitSoon(host);   // the first time it has a width, and whenever the box is resized: the cap on the Label column moves with it
 				}
 			}).observe(host);
@@ -25481,6 +25504,15 @@ var EngCalcs = EngCalcs || {};
 			lpnRichInto(name, labelText);
 		}
 		row.appendChild(name);
+		// Clicking the words of a tick row ticks the box, as a label does (Tom, 2026-10-29: "It's an expected convention"). The "?" keeps its own job, the tip.
+		if (kind === 'check' && c && c.tagName && name.tagName !== 'LABEL') {
+			name.addEventListener('click', function (e) {
+				var t = e.target;
+				if (c.disabled) { return; }
+				while (t && t !== name) { if (t.classList && t.classList.contains('ec-tip')) { return; } t = t.parentNode; }
+				c.click();
+			});
+		}
 		if (c) {
 			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
 			c.className = (c.className ? c.className + ' ' : '') + 'lpn-gval';
@@ -71236,7 +71268,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_field_closed', '#custom', '|', 'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_status', '#qresult', '#notes'],
 		customer: ['lpn_field_meter_pipe', 'lpn_field_meter_node', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag',
 			'lpn_field_meter_demand', 'lpn_field_demand_pattern', 'lpn_field_meter_count', 'lpn_field_meter_total', '#custom', '|', '#notes'],
-		text: ['lpn_field_active_short', '#words', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
+		text: ['#words', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
 			'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', '#custom', '|', '#notes']
 	};
 	// Tag every row a builder adds to `fields` while `fn` runs, for the rows whose name is not one language key.
@@ -71366,7 +71398,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			gridFitSoon(nm);
 			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
 				nm.__lpnRO = true;
-				new ResizeObserver(function () { gridFitSoon(nm); }).observe(nm);
+				new ResizeObserver(function () {
+					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
+					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
+					gridFitSoon(nm);
+				}).observe(nm);
 			}
 		}
 	}

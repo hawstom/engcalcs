@@ -41,7 +41,7 @@ const TABLES = {
 	pump: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_pump_curve_source', 'lpn_pump_effic_curve', 'lpn_field_closed', 'lpn_field_pump_speed', 'lpn_field_speed_pattern', 'lpn_energy_price', 'lpn_energy_price_pattern', 'RESULTS', 'lpn_result_flow', 'lpn_field_head', 'lpn_result_status'],
 	valve: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_diameter', 'lpn_field_km_short', 'lpn_field_valve_setting_pressure', 'lpn_field_valve_setting_drop', 'lpn_field_valve_setting_flow', 'lpn_field_valve_setting_loss', 'lpn_gpv_curve_source', 'lpn_field_closed', 'RESULTS', 'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_status'],
 	customer: ['lpn_field_meter_pipe', 'lpn_field_meter_node', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_meter_demand', 'lpn_field_demand_pattern', 'lpn_field_meter_count', 'lpn_field_meter_total', 'RESULTS'],
-	text: ['lpn_field_active_short', '#words', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align', 'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', 'RESULTS']
+	text: ['#words', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align', 'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', 'RESULTS']
 };
 const nd = (i) => '[data-node="' + i + '"]';
 const lk = (i) => '[data-link="' + i + '"]';
@@ -56,7 +56,7 @@ const CASES = [
 	{ type: 'valve', file: 'Valves.lwn', sel: lk('TCV1'), need: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', A, 'lpn_field_diameter', 'lpn_field_valve_setting_loss', 'lpn_field_closed', 'lpn_result_flow'], firsts: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', A] },
 	{ type: 'valve', file: 'Valves.lwn', sel: lk('GPV1'), need: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', 'lpn_gpv_curve_source', 'lpn_field_closed', 'lpn_result_flow'], firsts: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', A] },
 	{ type: 'customer', file: 'Valves.lwn', sel: '[data-cust="M1"].lpn-meter', need: ['lpn_field_meter_pipe', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_meter_demand', 'lpn_field_meter_count', 'lpn_field_meter_total'], firsts: [], mut: (d) => { d.customers = [{ id: 'M1', count: 1, link: 'P1', t: 0.5, x: 130, y: 230 }]; } },
-	{ type: 'text', file: 'Net1.lwn', sel: '[data-lbl="X1"]', need: [A, '#words', 'lpn_field_desc', 'lpn_field_text_size', 'lpn_field_text_bold'], firsts: [A, '#words'] }
+	{ type: 'text', file: 'Net1.lwn', sel: '[data-lbl="X1"]', need: [A, '#words', 'lpn_field_desc', 'lpn_field_text_size', 'lpn_field_text_bold'], firsts: ['#words', A] }
 ];
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
