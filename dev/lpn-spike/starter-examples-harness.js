@@ -107,7 +107,7 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		const wantTitle = (f.kind === 'ext' ? 'Johnson City extension' : 'Munday well and tank') + (f.si ? ', L/s (SI)' : ', gpm (US)');
 		ok('the card title is "' + wantTitle + '"', !!m && m.title === wantTitle, m && m.title);
 		ok('the card description opens as Tom worded it', !!m && (f.kind === 'ext'
-			? m.description.indexOf('A main extension model with test calibration scenarios. The existing system is modelled as a reservoir and a pump based on a hydrant flow test') === 0
+			? m.description.indexOf('A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test') === 0
 			: m.description.indexOf('A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour') === 0), m && m.description);
 		ok('the title block and project name follow', (raw.labels || []).some((t) => t.text === (f.kind === 'ext' ? 'Extension with fire flow' : 'Munday well and tank')) &&
 			raw.project.name.indexOf(f.kind === 'ext' ? 'Extension with fire flow' : 'Munday well and tank') === 0, raw.project.name);
