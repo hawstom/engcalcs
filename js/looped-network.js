@@ -54009,23 +54009,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			rows.push(row);
 		}
 		// A heading that holds the term (a term in a list, a sub-heading) is a result of its own, listed
-		// ahead of the chapters that only mention it, and opens on that heading.
-		if (q) {
-			var hn = 0;
-			box.querySelectorAll('.lpn-guide-section dt, .lpn-guide-section h4').forEach(function (h) {
-				var sec = h.closest('.lpn-guide-section'), sh = sec && sec.querySelector('h2');
+		// as an indented row directly under its chapter. A chapter with such a heading ranks ahead of
+		// one that only mentions the term in its body text; otherwise the order is the guide's.
+		var hitsOf = [], hn = 0, secs = Array.prototype.slice.call(box.querySelectorAll('.lpn-guide-section'));
+		secs.forEach(function (sec, i) {
+			hitsOf[i] = [];
+			if (!q || sec.style.display === 'none') { return; }
+			sec.querySelectorAll('dt, h4').forEach(function (h) {
 				h.removeAttribute('data-guide-hit');
-				if (!guideVisible(h) || !sh || guideFold(guideTextOf(h)).indexOf(q) < 0) { return; }
+				if (!guideVisible(h) || guideFold(guideTextOf(h)).indexOf(q) < 0) { return; }
 				hn++;
 				h.setAttribute('data-guide-hit', 'hit-' + hn);
-				add('hit-' + hn, String(h.textContent || '').replace(/\s+/g, ' ').trim(), 0, String(sh.textContent || '').trim());
+				hitsOf[i].push({ key: 'hit-' + hn, text: String(h.textContent || '').replace(/\s+/g, ' ').trim() });
 			});
-		}
-		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
-			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
+		});
+		secs = secs.map(function (sec, i) { return { sec: sec, hits: hitsOf[i], i: i }; });
+		if (q) { secs.sort(function (x, y) { return (y.hits.length ? 1 : 0) - (x.hits.length ? 1 : 0) || x.i - y.i; }); }
+		secs.forEach(function (rec) {
+			var sec = rec.sec, h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
 			if (!h || sec.style.display === 'none') { return; }
 			sec.setAttribute('data-guide-key', key);
 			add(key, String(h.textContent || '').trim(), 0, q ? guideSnippet(sec, q) : '');
+			rec.hits.forEach(function (ht) { add(ht.key, ht.text, 1, ''); });
 			// Menus, box groups and boxes, in reading order: a second level (a menu, a group) and, under
 			// a box group, a third (the box).
 			sec.querySelectorAll('.lpn-guide-menu, .lpn-guide-group, .lpn-guide-boxentry').forEach(function (el) {

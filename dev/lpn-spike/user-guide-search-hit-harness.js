@@ -3,8 +3,8 @@
 // (takes the browser lock itself; never wrap it in that lock).
 //   1. Searching "Net1" marks every hit in the shown text (<mark class="lpn-guide-hit">).
 //   2. Clicking a chapter's result scrolls the content pane so its first marked hit is on screen.
-//   3. A heading that holds the term ("Example on Net1") is its own result, listed before the chapters,
-//      and clicking it scrolls to that heading.
+//   3. A heading that holds the term ("Example on Net1") is an indented row under its own chapter,
+//      ranked ahead of chapters with body hits only; clicking it scrolls to that heading.
 //   4. A term with markup in it is never parsed as HTML; clearing the search removes every mark.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -64,7 +64,8 @@ async function main() {
 
 		console.log('\n2. A chapter result opens on its first hit');
 		const rows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_nav a[data-guide-link]'))
-			.map(x => ({ key: x.getAttribute('data-guide-link'), text: x.firstChild.textContent.trim() })));
+			.map(x => ({ key: x.getAttribute('data-guide-link'), text: x.firstChild.textContent.trim(),
+				level: +x.parentNode.getAttribute('data-level') })));
 		const chapters = rows.filter(r => !/^hit-/.test(r.key));
 		let tested = 0;
 		for (const r of chapters.slice(0, 6)) {
@@ -85,11 +86,17 @@ async function main() {
 		const boxes = chapters.find(r => /^boxes$/i.test(r.text));
 		ok('Boxes is a result', !!boxes, JSON.stringify(chapters.map(r => r.text)));
 
-		console.log('\n3. "Example on Net1" is its own result, ahead of the chapters');
+		console.log('\n3. "Example on Net1" is a row under its own chapter');
 		const hitRows = rows.filter(r => /^hit-/.test(r.key));
 		const ex = hitRows.find(r => /^Example on Net1/.test(r.text));
-		ok('a heading result "Example on Net1" exists', !!ex, JSON.stringify(hitRows));
-		ok('heading results are listed before the first chapter', hitRows.length > 0 && rows.indexOf(hitRows[hitRows.length - 1]) < rows.indexOf(chapters[0]));
+		ok('a heading row "Example on Net1" exists', !!ex, JSON.stringify(hitRows.length));
+		ok('every heading row is indented and sits under a chapter row', hitRows.length > 0 && hitRows.every(r => {
+			const i = rows.indexOf(r); let j = i - 1; while (j >= 0 && rows[j].level !== 0) { j--; }
+			return r.level === 1 && j >= 0 && !/^hit-/.test(rows[j].key);
+		}));
+		const lastWithHit = Math.max.apply(null, hitRows.map(r => rows.indexOf(r)));
+		const plainBefore = rows.slice(0, lastWithHit).filter((r, i) => r.level === 0 && !(rows[i + 1] && rows[i + 1].key.startsWith('hit-')));
+		ok('chapters with a heading hit rank ahead of those with body hits only', plainBefore.length === 0, plainBefore.map(r => r.text).join(', '));
 		if (ex) {
 			await page.evaluate(() => { document.getElementById('lpn_guide_content').scrollTop = 0; });
 			await page.click('#lpn_guide_nav a[data-guide-link="' + ex.key + '"]');
