@@ -38,7 +38,19 @@ DIR="$(cd "$(dirname "$0")/../lpn-spike" && pwd)"
 # browser harnesses and gives the rest every core. It is a pre-check, never the gate: check_all
 # runs all.
 NODE_ONLY=""
-[ "${1:-}" = "--node-only" ] && NODE_ONLY=1
+# ON-DEMAND HARNESSES (2026-10-29): dev/scripts/on_demand_harnesses.txt lists harnesses that measure
+# pixels or milliseconds. They fail on a loaded machine and not on a defect, so the default run
+# skips them. --all runs them with everything else; --on-demand runs only them.
+ALL=""; ONLY_ON_DEMAND=""
+for _a in "$@"; do
+	[ "$_a" = "--node-only" ] && NODE_ONLY=1
+	[ "$_a" = "--all" ] && ALL=1
+	[ "$_a" = "--on-demand" ] && ONLY_ON_DEMAND=1
+done
+ON_DEMAND_LIST="$(dirname "$0")/on_demand_harnesses.txt"
+is_on_demand() {
+	grep -vE '^[[:space:]]*(#|$)' "$ON_DEMAND_LIST" 2>/dev/null | grep -qxF "$(basename "$1")"
+}
 
 # WHICH HARNESSES DRIVE A REAL BROWSER is DERIVED from the source rather than typed, so a new one
 # cannot be forgotten: a harness that requires playwright or puppeteer, or calls launchBrowser( or
@@ -54,6 +66,7 @@ is_browser() {
 	return 1
 }
 SKIPPED=0
+ON_DEMAND_SKIPPED=0
 # `timeout` is in GNU coreutils and is present everywhere this runs; if it ever is not, run without
 # it rather than skipping the harnesses, because no net is better than no tests.
 if command -v timeout >/dev/null 2>&1; then RUN_ONE="timeout 300"; else RUN_ONE=""; fi
@@ -67,6 +80,11 @@ ASKED=0
 : > "$OUT/node.list"; : > "$OUT/browser.list"; : > "$OUT/all.list"
 for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	[ -f "$f" ] || continue
+	if [ -n "$ONLY_ON_DEMAND" ]; then
+		is_on_demand "$f" || continue
+	elif [ -z "$ALL" ] && is_on_demand "$f"; then
+		ON_DEMAND_SKIPPED=$((ON_DEMAND_SKIPPED + 1)); continue
+	fi
 	if is_browser "$f"; then
 		if [ -n "$NODE_ONLY" ]; then SKIPPED=$((SKIPPED + 1)); continue; fi
 		ASKED=$((ASKED + 1))
@@ -78,6 +96,7 @@ for f in "$DIR"/*harness*.js "$DIR"/validate*.js; do
 	echo "$ASKED $f" >> "$OUT/all.list"
 done
 
+[ "$ON_DEMAND_SKIPPED" -gt 0 ] && echo "$ON_DEMAND_SKIPPED on-demand harness(es) left out (dev/scripts/on_demand_harnesses.txt); --all runs them."
 if [ "$ASKED" -eq 0 ]; then
 	echo "NO HARNESSES FOUND in $DIR"
 	echo "The glob (*harness*.js, validate*.js) matched nothing. Either the directory moved or the"
