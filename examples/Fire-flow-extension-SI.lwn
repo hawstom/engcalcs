@@ -3,7 +3,7 @@
 	"app": "https://librewaternet.org/app/",
 	"v": 13,
 	"project": {
-		"name": "Fire flow extension SI",
+		"name": "Extension with fire flow SI",
 		"activeScenario": "base",
 		"crs": "EPSG:32139",
 		"gallery": "Fire-flow-extension-SI.lwn"
@@ -210,7 +210,7 @@
 	"labels": [
 		{
 			"id": "X1",
-			"text": "Fire flow extension",
+			"text": "Extension with fire flow",
 			"x": 173.5,
 			"y": 361.7,
 			"anchorNode": null,

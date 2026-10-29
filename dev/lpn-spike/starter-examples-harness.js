@@ -104,6 +104,18 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		ok('its card has an English title and description, both without an em dash', !!m && !!PC['lpn_ex_' + f.key + '_title'] && !!PC['lpn_ex_' + f.key + '_desc'] &&
 			!/—/.test(PC['lpn_ex_' + f.key + '_title'] + PC['lpn_ex_' + f.key + '_desc']));
 		ok('the manifest repeats the English card text', !!m && m.title === PC['lpn_ex_' + f.key + '_title'] && m.description === PC['lpn_ex_' + f.key + '_desc']);
+		const wantTitle = (f.kind === 'ext' ? 'Johnson City extension' : 'Munday well and tank') + (f.si ? ', L/s (SI)' : ', gpm (US)');
+		ok('the card title is "' + wantTitle + '"', !!m && m.title === wantTitle, m && m.title);
+		ok('the card description opens as Tom worded it', !!m && (f.kind === 'ext'
+			? m.description.indexOf('A main extension model with test calibration scenarios. The existing system is modelled as a reservoir and a pump based on a hydrant flow test') === 0
+			: m.description.indexOf('A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour') === 0), m && m.description);
+		ok('the title block and project name follow', (raw.labels || []).some((t) => t.text === (f.kind === 'ext' ? 'Extension with fire flow' : 'Munday well and tank')) &&
+			raw.project.name.indexOf(f.kind === 'ext' ? 'Extension with fire flow' : 'Munday well and tank') === 0, raw.project.name);
+		if (f.kind === 'well') {
+			const tk = raw.nodes.find((n) => n.id === 'TANK-1');
+			ok('the tank node is described as elevated, not on a hill', /^Elevated tank/.test(tk.desc) && !/hill|ground storage/i.test(tk.desc), tk.desc);
+			ok('the scenarios are Max Day and Peak hour', raw.scenarios.map((x) => x.name).join('|') === 'Base|1. Max Day|2. Peak hour', JSON.stringify(raw.scenarios.map((x) => x.name)));
+		}
 		ok('the SI file is in SI and the US file in US', !!m && m.system === (f.si ? 'si' : 'us'), m && m.system);
 
 		console.log('--- the coordinate system is projected');

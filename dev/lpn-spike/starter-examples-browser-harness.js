@@ -49,6 +49,8 @@ async function main() {
 			await page.setViewportSize({ width: 1400, height: 900 });
 			await a.goto('Looped-Network.php');
 			const title = await a.lang('lpn_ex_' + c.key + '_title');
+			const wantTitle = (c.key.indexOf('extension') === 0 ? 'Johnson City extension' : 'Munday well and tank') + (/_si$/.test(c.key) ? ', L/s (SI)' : ', gpm (US)');
+			ok(c.file + ': the card is titled "' + wantTitle + '"', title === wantTitle, title);
 			await a.openExampleCard(title);
 			await a.settle(1500);
 			await page.evaluate(() => {

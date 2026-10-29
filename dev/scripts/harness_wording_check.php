@@ -73,6 +73,14 @@ const EC_HARNESS_WORDING_BASELINE = 43;   // 47 -> 43 on 2026-10-07: check label
  * stale exemption is a hole waiting for the next literal that happens to read the same way.
  */
 const EC_HARNESS_WORDING_EXCEPT = [
+    'dev/lpn-spike/starter-examples-browser-harness.js' => [
+        'Johnson City extension' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+        'Munday well and tank' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+    ],
+    'dev/lpn-spike/starter-examples-harness.js' => [
+        'Johnson City extension' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+        'Munday well and tank' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+    ],
     'dev/lpn-spike/backdrop-scale-harness.js' => [
         'Scale by picking' =>
             '(a) this harness exists to hold the two backdrop labels at the English Tom approved '

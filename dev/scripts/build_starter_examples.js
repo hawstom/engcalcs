@@ -100,9 +100,9 @@ function extension(si) {
 		{ id: 'EXT-E', from: 'EXT-3', to: 'EXT-1', dia: small, c: 140, desc: 'Closes the loop, so FH-1 is fed from both sides.' }
 	];
 	return {
-		key: 'Fire-flow-extension', name: 'Fire flow extension', si,
+		key: 'Fire-flow-extension', name: 'Extension with fire flow', si,
 		crsUs: 'EPSG:2277', crsSi: 'EPSG:32139', orgUs,
-		title: 'Fire flow extension', nodes, links,
+		title: 'Extension with fire flow', nodes, links,
 		curve: { id: 'SYSTEM', note: 'Existing system from the hydrant flow test: static, mid and max flow',
 			pts: v([[0, 143.2], [600, 129.4], [1200, 110.9]], [[0, 43.5], [38, 39.5], [76, 34]]) },
 		// Flow tests are scenarios in which every demand is 0 except the flowing hydrant (the page's own preset names).
@@ -112,7 +112,7 @@ function extension(si) {
 			{ name: PC.lpn_scenario_preset_flow_max, zero: true, flow: ['HYD-F', v(1200, 76)] },
 			{ name: scnName('lpn_scenario_preset_max_day', 4), mult: 2 }
 		],
-		texts: ['Fire flow extension',
+		texts: ['Extension with fire flow',
 			'SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.',
 			'Design point: ' + flow(1500, 95) + ' at FH-1 with ' + res + ' residual. Scenarios 1 to 3 repeat the flow test.'],
 		textAt: titleAt(nodes, si)
@@ -135,7 +135,7 @@ function well(si) {
 		{ id: 'FH-1', ll: [-99.6305005, 33.4496572], elev: v(1478, 450.5), demand: v(4, 0.3), fireFlow: v(500, 32),
 			desc: 'Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: ' + flow(500, 32) + ' with ' + res + ' residual, for two hours from the tank and the pump.' },
 		{ id: 'TANK-1', type: 'tank', ll: [-99.630545, 33.45219], elev: v(1590, 485), init: v(17, 5.2), min: v(2, 0.6), max: v(20, 6), dia: v(24, 7.5),
-			desc: 'Ground storage tank on the hill above the community, ' + v('24 ft in diameter and 20 ft high, about 67,000 gal', '7.5 m in diameter and 6 m high, about 265 cubic meters') + '.' }
+			desc: 'Elevated tank, ' + v('24 ft in diameter and 20 ft high, about 67,000 gal', '7.5 m in diameter and 6 m high, about 265 cubic meters') + ', with its floor about ' + v('116 ft', '35.5 m') + ' above C-4, the junction it connects to.' }
 	];
 	const orgUs = locate(nodes, 'EPSG:2276', si);   // Texas North Central, Munday
 	const links = [
@@ -154,15 +154,15 @@ function well(si) {
 		{ id: 'TL-1', from: 'C-4', to: 'TANK-1', dia: v(8, 200), c: 130, desc: 'Ductile iron tank line. It fills and drains the tank, so it has no check valve.' }
 	];
 	return {
-		key: 'Community-well-tank', name: 'Community well and tank', si,
+		key: 'Community-well-tank', name: 'Munday well and tank', si,
 		crsUs: 'EPSG:2276', crsSi: 'EPSG:32138', orgUs,
-		title: 'Community well and tank', nodes, links,
+		title: 'Munday well and tank', nodes, links,
 		curve: { id: 'WELL', note: 'Well pump, three points: shutoff, design, maximum', pts: v([[0, 350], [120, 275], [190, 185]], [[0, 107], [7.5, 84], [12, 56]]) },
 		pattern: { id: 'DAILY', note: 'Residential diurnal demand', m: [0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1.3, 1.6, 1.4, 1.1, 1.0, 1.1, 1.0, 0.9, 1.0, 1.0, 1.2, 1.5, 1.6, 1.4, 1.1, 1.0, 0.9, 0.6] },
 		controls: ['LINK WP-1 OPEN IF NODE TANK-1 BELOW ' + v(16, 4.8), 'LINK WP-1 CLOSED IF NODE TANK-1 ABOVE ' + v(19, 5.8)],
 		energy: [' Global Efficiency\t65', ' Global Price\t0.12'],
 		scenarios: [{ name: scnName('lpn_scenario_preset_max_day', 1), mult: 2 }, { name: scnName('lpn_scenario_preset_peak_hour', 2), mult: 3 }],
-		texts: ['Community well and tank',
+		texts: ['Munday well and tank',
 			'WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.',
 			'Design point: ' + flow(500, 32) + ' at FH-1 with ' + res + ' residual. The 24-hour run switches the pump based on the tank level.'],
 		textAt: titleAt(nodes, si)

@@ -3,7 +3,7 @@
 	"app": "https://librewaternet.org/app/",
 	"v": 13,
 	"project": {
-		"name": "Community well and tank SI",
+		"name": "Munday well and tank SI",
 		"activeScenario": "base",
 		"crs": "EPSG:32138",
 		"gallery": "Community-well-tank-SI.lwn"
@@ -119,7 +119,7 @@
 			"minLevel": 0.6,
 			"maxLevel": 6,
 			"tankDiameter": 7.5,
-			"desc": "Ground storage tank on the hill above the community, 7.5 m in diameter and 6 m high, about 265 cubic meters."
+			"desc": "Elevated tank, 7.5 m in diameter and 6 m high, about 265 cubic meters, with its floor about 35.5 m above C-4, the junction it connects to."
 		}
 	],
 	"links": [
@@ -246,7 +246,7 @@
 	"labels": [
 		{
 			"id": "X1",
-			"text": "Community well and tank",
+			"text": "Munday well and tank",
 			"x": 160.5,
 			"y": 397.1,
 			"anchorNode": null,
