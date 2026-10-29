@@ -1,10 +1,10 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 3203,
-        "delta_key_count": 297,
-        "english_changed_key_count": 61,
-        "exempt_key_count": 25,
+        "expected_key_count": 3177,
+        "delta_key_count": 262,
+        "english_changed_key_count": 54,
+        "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -26,11 +26,9 @@
             "lpn_cp_val_snake",
             "lpn_cp_val_hyphen",
             "lpn_quality_unit_ug",
-            "lpn_heading_unit",
             "lpn_labels_col_decimals_example",
             "lpn_library_curve_x",
-            "lpn_library_curve_y",
-            "lpn_prop_label_unit"
+            "lpn_library_curve_y"
         ],
         "out_of_scope_key_count": 5,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
@@ -57,33 +55,31 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: 流量\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: 流速\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: 水头\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: 水头损失\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: 滴头\n- slope, steepness, grade, or incline, as vertical change divided by horizontal change\n    English: slope (S)\n    Your language: 坡度\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: 管段\n- energy per weight of water from its speed, as an elevation, height, or level\n    English: velocity head (H_v)\n    Your language: 流速水头\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: 局部水头损失\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: 需水量\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: 压力\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: 高程\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: 节点\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: 水库\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: 节点\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- bend, corner, or turning point in a drawn pipe\n    English: vertex\n    Your language: 折点\n- curve, graph, or line telling how the energy per weight of water added by a pump changes as its flow changes\n    English: pump curve\n    Your language: 水泵曲线\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: 默认\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: 求解器\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: 水箱\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: 阀门\n- number, value, or setting that tells how a valve acts, works, or behaves\n    English: valve setting\n    Your language: (no preferred translation yet: use your language's standard term)\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: 自有数值\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short word, name, or tag stuck on a pipe or point\n    English: tag (EPANET)\n    Your language: 标记\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: 用户\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: 关键性\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: 形状\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: 流量\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: 流速\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: 水头\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: 水头损失\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: 管段\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: 局部水头损失\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: 需水量\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: 压力\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: 高程\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: 节点\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: 水库\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: 节点\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- curve, graph, or line telling how the energy per weight of water added by a pump changes as its flow changes\n    English: pump curve\n    Your language: 水泵曲线\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: 默认\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: 求解器\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: 水箱\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: 阀门\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: 自有数值\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- which edge or side the words line up on\n    English: alignment (text)\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short word, name, or tag stuck on a pipe or point\n    English: tag (EPANET)\n    Your language: 标记\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: 用户\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: 关键性\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: 形状\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_page_open": "Open the application",
         "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
-        "lpn_guide_text_full_box": "Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download, copy, or print carries every time step, and the table shows one at a time.",
         "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_guide_scn_open_def": "<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.<\/p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.<\/p>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">Lowest pressure<\/td><td colspan=\"3\">Highest velocity<\/td><\/tr><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Junction<\/td><td>Pressure (psi)<\/td><td>Time (hr)<\/td><td>Link<\/td><td>Velocity (ft\/sec)<\/td><td>Time (hr)<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2.76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2.87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>N32<\/td><td>15.78<\/td><td>9:00<\/td><td>L10<\/td><td>3.49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, and the Time (hr) column beside it gives when it occurs. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
+        "lpn_guide_scn_make_def": "<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.<\/p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. A Shape follows the same rule as an asset. Customers belong to no scenario and are deleted outright.<\/p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.<\/p>",
+        "lpn_guide_scn_move_term": "Moving or merging between scenarios",
+        "lpn_guide_scn_move_def": "<p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.<\/p>",
+        "lpn_guide_scn_scope_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Properties<\/td><td>Every property of a node or link except those listed below, including its position, whether it is active, and its type (Morph). A Text can override its words, position, size, alignment, bold, angle, and whether it is shown. A Shape can override whether it is shown. A custom property can always be overridden. The properties are held in the categories Physical, Demand, Active topology, Initial settings, Constituent, Fire flow, Energy cost, Custom properties, Text, Presentation, and Calculation.<\/td><\/tr><tr><td>Settings<\/td><td>The settings saved with the project, except those listed below: the calculation options (for example the demand multiplier, total run time, hydraulic time step, and friction method), the default demand pattern, the values given to new assets, and the presentation settings (sizes, colors, labels, contours, the map view, and the time series graphs on the map).<\/td><\/tr><tr><td>The same in every scenario<\/td><td>The ID, Description, and Tag of an asset; the end nodes and bends of a link; Customers and the points of a Shape; the units and the coordinate system; and the contents of the Libraries (patterns, curves, pipe types, fittings lists, controls, and rules). An edit to any of these changes every scenario. A scenario can point an asset at a different curve, pipe type, fittings list, or pattern, but cannot change what is in them.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
-        "lpn_guide_cmp_cols_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>The name of the scenario. The open scenario is marked (currently open).<\/td><\/tr><tr><td>No. of overrides<\/td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.<\/td><\/tr><tr><td>Demand multiplier, Total run time, Hydraulic time step<\/td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.<\/td><\/tr><tr><td>Lowest pressure: Junction, Pressure, Time (hr)<\/td><td>The lowest pressure at a junction, in three columns: the ID of the junction, the pressure, and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.<\/td><\/tr><tr><td>Highest velocity: Link, Velocity, Time (hr)<\/td><td>The highest velocity in a pipe or valve, in three columns: the ID of the link, the velocity, and the time it occurs. Pumps are left out.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
-        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
-        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
-        "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
-        "lpn_guide_fr_what_def": "<p>Choose Water, Reports, Full. The table has one row for each node and link at each reporting time step, in the units of the Tables pane. Its columns are Type, ID, Demand, Head, Pressure, Chlorine concentration, Flow, Velocity, Head loss, Pump head, and Status, and a cell is blank where the asset has no such quantity. The Time step list chooses the step shown, and Download CSV, Copy HTML, and Print report carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -92,29 +88,9 @@
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
         "lpn_georef_size_prompt": "Approximate project width east to west?",
-        "lpn_morph_vertex": "Vertex",
-        "lpn_morph_vertex_base": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.",
-        "lpn_morph_vertex_base_ask": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?",
-        "lpn_morph_vertex_switch": "Switch to Base and morph",
-        "lpn_morph_vertex_type": "{id} was not morphed into a vertex: only a junction can become one.",
-        "lpn_morph_vertex_links": "{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.",
-        "lpn_morph_vertex_kind": "{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.",
-        "lpn_morph_vertex_loop": "{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.",
-        "lpn_morph_vertex_demand": "{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.",
-        "lpn_morph_vertex_customers": "{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.",
-        "lpn_morph_vertex_text": "{id} was not morphed into a vertex: a Text is attached to it.",
-        "lpn_morph_vertex_pipes": "{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.",
-        "lpn_morph_vertex_own": "{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.",
-        "lpn_morph_vertex_clear_both": "Clear elevation {elev} and demands {demands} on {id}?",
-        "lpn_morph_vertex_clear_elev": "Clear elevation {elev} on {id}?",
-        "lpn_morph_vertex_clear_demand": "Clear demands {demands} on {id}?",
-        "lpn_morph_vertex_clear_quality": "Clear initial quality {quality} on {id}?",
-        "lpn_morph_vertex_clear_also": "Initial quality {quality} is cleared too.",
-        "lpn_morph_vertex_done": "Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_find_prop_demand_desc": "Demand category description",
-        "lpn_replace_selected_only": "Only the selected assets",
         "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
@@ -142,7 +118,7 @@
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
-        "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_lead": "Choose where to import this EPANET file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_base_note": "Choosing Base doesn't clear any scenario overrides.",
         "lpn_inpup_btn_new": "A new project",
@@ -158,7 +134,7 @@
         "lpn_survey_where_lead": "Each point becomes a node. Choose where the nodes go.",
         "lpn_survey_where_note": "In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.",
         "lpn_inpup_title": "Update from EPANET file",
-        "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_gjup_lead": "Choose where to import this GeoJSON file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_gjup_title": "Update from GeoJSON file",
         "lpn_gjup_h_notes": "Reading the file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
@@ -217,10 +193,11 @@
         "lpn_theme_arcade": "Arcade",
         "lpn_theme_space": "Space",
         "lpn_theme_prairie": "Prairie",
-        "lpn_scenario_basic_tip": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager shows a list of scenarios, and the Scenarios table is not shown. Cleared: the Scenario manager shows its tree and the Scenarios table is shown, and alternatives can be shared among scenarios. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.",
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_dem_scenario": "Elevations written here are overrides in the scenario {scenario}.",
+        "lpn_dem_base": "Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.",
         "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
@@ -238,6 +215,7 @@
         "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
         "lpn_scnres_none": "Check at least one result to show.",
         "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
         "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
         "lpn_scnres_at_time": "({time})",
         "lpn_scnres_steady": "(steady state)",
@@ -247,9 +225,6 @@
         "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
-        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.",
-        "lpn_report_copy_html": "Copy HTML",
-        "lpn_full_col_time": "Time (hr)",
         "lpn_library_import": "Libraries…",
         "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -284,13 +259,12 @@
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
-        "lpn_col_level": "Level",
         "lpn_dur_col_margin": "Above lowest water depth",
         "lpn_dur_col_drop": "Drop from start",
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
+        "lpn_at_time": "{value} at {time}",
         "lpn_crit_col_hours": "Hours below minimum",
-        "lpn_crit_col_stopped": "Run stopped at",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
         "lpn_ds_limit_at": "Limiting reporting step: {time}.",
@@ -304,10 +278,10 @@
         "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
         "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
         "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
+        "lpn_crit_stopped_at": "run stopped at {time}",
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
-        "lpn_ff_col_more": "And others",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -317,6 +291,9 @@
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON file…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_shapes_every_scenario": "Shapes appear in every scenario.",
+        "lpn_shapes_this_scenario": "Shapes appear in {scenario} only.",
+        "lpn_library_import_every_scenario": "Every scenario can use them.",
         "lpn_menu_back": "Back",
         "lpn_file_import_dxf": "DXF file…",
         "lpn_file_import_shp": "Shapefile…",
@@ -333,29 +310,15 @@
         "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
-        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}.",
+        "lpn_noscn_lead": "This project has {n} scenarios, but {format} has no scenarios or alternatives.",
+        "lpn_noscn_fmt_inp": "an EPANET file",
+        "lpn_noscn_fmt_geojson": "a GeoJSON file",
+        "lpn_noscn_fmt_dxf": "a DXF file",
+        "lpn_export_goes_scenario": "Exporting the scenario \"{scenario}\" to a unique file name.",
+        "lpn_export_goes_base": "Exporting the Base scenario.",
         "lpn_export_receipt_heading": "Exported {file} from {scenario} of {project}.",
         "lpn_export_receipt_note": "This is an export, not a save: this project is not connected to the file.",
-        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude.",
-        "lpn_field_auto_length": "Auto length",
-        "lpn_edit_pipetypes": "Edit types…",
-        "lpn_edit_fittings": "Edit fittings…",
-        "lpn_edit_curves": "Edit curves…",
-        "lpn_field_tank_level_short": "Initial depth",
-        "lpn_field_tank_minlevel_short": "Minimum depth",
-        "lpn_field_tank_maxlevel_short": "Maximum depth",
-        "lpn_field_active_short": "Active",
-        "lpn_field_cv_short": "Check valve",
-        "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
-        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose \"No fittings list chosen\" to type a value.",
-        "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
-        "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_reaction_tank_short_tip": "Reaction coefficient: the rate of reaction in the water held in this tank, in 1\/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
-        "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
+        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -363,26 +326,24 @@
         "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
-        "lpn_guide_text_full_box": "Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download, copy, or print carries every time step, and the table shows one at a time.",
         "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_guide_scn_open_def": "<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.<\/p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.<\/p>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">Lowest pressure<\/td><td colspan=\"3\">Highest velocity<\/td><\/tr><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Junction<\/td><td>Pressure (psi)<\/td><td>Time (hr)<\/td><td>Link<\/td><td>Velocity (ft\/sec)<\/td><td>Time (hr)<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2.76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2.87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>N32<\/td><td>15.78<\/td><td>9:00<\/td><td>L10<\/td><td>3.49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, and the Time (hr) column beside it gives when it occurs. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
+        "lpn_guide_scn_make_def": "<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.<\/p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. A Shape follows the same rule as an asset. Customers belong to no scenario and are deleted outright.<\/p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.<\/p>",
+        "lpn_guide_scn_move_term": "Moving or merging between scenarios",
+        "lpn_guide_scn_move_def": "<p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.<\/p>",
+        "lpn_guide_scn_scope_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Properties<\/td><td>Every property of a node or link except those listed below, including its position, whether it is active, and its type (Morph). A Text can override its words, position, size, alignment, bold, angle, and whether it is shown. A Shape can override whether it is shown. A custom property can always be overridden. The properties are held in the categories Physical, Demand, Active topology, Initial settings, Constituent, Fire flow, Energy cost, Custom properties, Text, Presentation, and Calculation.<\/td><\/tr><tr><td>Settings<\/td><td>The settings saved with the project, except those listed below: the calculation options (for example the demand multiplier, total run time, hydraulic time step, and friction method), the default demand pattern, the values given to new assets, and the presentation settings (sizes, colors, labels, contours, the map view, and the time series graphs on the map).<\/td><\/tr><tr><td>The same in every scenario<\/td><td>The ID, Description, and Tag of an asset; the end nodes and bends of a link; Customers and the points of a Shape; the units and the coordinate system; and the contents of the Libraries (patterns, curves, pipe types, fittings lists, controls, and rules). An edit to any of these changes every scenario. A scenario can point an asset at a different curve, pipe type, fittings list, or pattern, but cannot change what is in them.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
-        "lpn_guide_cmp_cols_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>The name of the scenario. The open scenario is marked (currently open).<\/td><\/tr><tr><td>No. of overrides<\/td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.<\/td><\/tr><tr><td>Demand multiplier, Total run time, Hydraulic time step<\/td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.<\/td><\/tr><tr><td>Lowest pressure: Junction, Pressure, Time (hr)<\/td><td>The lowest pressure at a junction, in three columns: the ID of the junction, the pressure, and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.<\/td><\/tr><tr><td>Highest velocity: Link, Velocity, Time (hr)<\/td><td>The highest velocity in a pipe or valve, in three columns: the ID of the link, the velocity, and the time it occurs. Pumps are left out.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Download CSV saves the tables in the box as a file for a spreadsheet: the numbers in full, without the rounding shown in the box, and each unit in its column heading. Copy HTML puts the tables on the clipboard as they are shown, to paste into a report or an e-mail, and Print report prints them alone. The same three buttons are at the top of every other analysis and report box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
-        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
-        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
-        "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ct_box_def": "<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network's area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.<\/p>",
-        "lpn_guide_fr_what_def": "<p>Choose Water, Reports, Full. The table has one row for each node and link at each reporting time step, in the units of the Tables pane. Its columns are Type, ID, Demand, Head, Pressure, Chlorine concentration, Flow, Velocity, Head loss, Pump head, and Status, and a cell is blank where the asset has no such quantity. The Time step list chooses the step shown, and Download CSV, Copy HTML, and Print report carry every step. Without an extended period simulation, the table shows the current solution at one instant.<\/p>",
         "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
         "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -391,29 +352,9 @@
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_result_status_cv": "CV",
         "lpn_georef_size_prompt": "Approximate project width east to west?",
-        "lpn_morph_vertex": "Vertex",
-        "lpn_morph_vertex_base": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.",
-        "lpn_morph_vertex_base_ask": "A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?",
-        "lpn_morph_vertex_switch": "Switch to Base and morph",
-        "lpn_morph_vertex_type": "{id} was not morphed into a vertex: only a junction can become one.",
-        "lpn_morph_vertex_links": "{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.",
-        "lpn_morph_vertex_kind": "{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.",
-        "lpn_morph_vertex_loop": "{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.",
-        "lpn_morph_vertex_demand": "{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.",
-        "lpn_morph_vertex_customers": "{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.",
-        "lpn_morph_vertex_text": "{id} was not morphed into a vertex: a Text is attached to it.",
-        "lpn_morph_vertex_pipes": "{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.",
-        "lpn_morph_vertex_own": "{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.",
-        "lpn_morph_vertex_clear_both": "Clear elevation {elev} and demands {demands} on {id}?",
-        "lpn_morph_vertex_clear_elev": "Clear elevation {elev} on {id}?",
-        "lpn_morph_vertex_clear_demand": "Clear demands {demands} on {id}?",
-        "lpn_morph_vertex_clear_quality": "Clear initial quality {quality} on {id}?",
-        "lpn_morph_vertex_clear_also": "Initial quality {quality} is cleared too.",
-        "lpn_morph_vertex_done": "Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.",
         "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
         "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_find_prop_demand_desc": "Demand category description",
-        "lpn_replace_selected_only": "Only the selected assets",
         "lpn_contour_buffer": "Buffer (× median pipe length)",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
@@ -441,7 +382,7 @@
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_backdrop_attach_tip": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
         "lpn_inpup_ask_title": "Import {file}",
-        "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_lead": "Choose where to import this EPANET file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
         "lpn_inpup_base_note": "Choosing Base doesn't clear any scenario overrides.",
         "lpn_inpup_btn_new": "A new project",
@@ -457,7 +398,7 @@
         "lpn_survey_where_lead": "Each point becomes a node. Choose where the nodes go.",
         "lpn_survey_where_note": "In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.",
         "lpn_inpup_title": "Update from EPANET file",
-        "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_gjup_lead": "Choose where to import this GeoJSON file.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
         "lpn_gjup_title": "Update from GeoJSON file",
         "lpn_gjup_h_notes": "Reading the file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
@@ -516,10 +457,11 @@
         "lpn_theme_arcade": "Arcade",
         "lpn_theme_space": "Space",
         "lpn_theme_prairie": "Prairie",
-        "lpn_scenario_basic_tip": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager shows a list of scenarios, and the Scenarios table is not shown. Cleared: the Scenario manager shows its tree and the Scenarios table is shown, and alternatives can be shared among scenarios. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.",
         "lpn_ovl_clear_same": "Clear overrides equal to inherited",
         "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_dem_scenario": "Elevations written here are overrides in the scenario {scenario}.",
+        "lpn_dem_base": "Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.",
         "lpn_settings_elev_source_typed": "Typed value",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
@@ -537,6 +479,7 @@
         "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
         "lpn_scnres_none": "Check at least one result to show.",
         "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
         "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
         "lpn_scnres_at_time": "({time})",
         "lpn_scnres_steady": "(steady state)",
@@ -546,9 +489,6 @@
         "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
-        "lpn_full_note": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.",
-        "lpn_report_copy_html": "Copy HTML",
-        "lpn_full_col_time": "Time (hr)",
         "lpn_library_import": "Libraries…",
         "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -583,13 +523,12 @@
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
-        "lpn_col_level": "Level",
         "lpn_dur_col_margin": "Above lowest water depth",
         "lpn_dur_col_drop": "Drop from start",
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
+        "lpn_at_time": "{value} at {time}",
         "lpn_crit_col_hours": "Hours below minimum",
-        "lpn_crit_col_stopped": "Run stopped at",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
         "lpn_ds_limit_at": "Limiting reporting step: {time}.",
@@ -603,10 +542,10 @@
         "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
         "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
         "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
+        "lpn_crit_stopped_at": "run stopped at {time}",
         "lpn_ff_at_step": "Tested at reporting step {time}.",
         "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
         "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
-        "lpn_ff_col_more": "And others",
         "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_crit_col_unserved_peak": "Largest demand not served",
@@ -616,6 +555,9 @@
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON file…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_shapes_every_scenario": "Shapes appear in every scenario.",
+        "lpn_shapes_this_scenario": "Shapes appear in {scenario} only.",
+        "lpn_library_import_every_scenario": "Every scenario can use them.",
         "lpn_menu_back": "Back",
         "lpn_file_import_dxf": "DXF file…",
         "lpn_file_import_shp": "Shapefile…",
@@ -632,29 +574,15 @@
         "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
-        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}.",
+        "lpn_noscn_lead": "This project has {n} scenarios, but {format} has no scenarios or alternatives.",
+        "lpn_noscn_fmt_inp": "an EPANET file",
+        "lpn_noscn_fmt_geojson": "a GeoJSON file",
+        "lpn_noscn_fmt_dxf": "a DXF file",
+        "lpn_export_goes_scenario": "Exporting the scenario \"{scenario}\" to a unique file name.",
+        "lpn_export_goes_base": "Exporting the Base scenario.",
         "lpn_export_receipt_heading": "Exported {file} from {scenario} of {project}.",
         "lpn_export_receipt_note": "This is an export, not a save: this project is not connected to the file.",
-        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude.",
-        "lpn_field_auto_length": "Auto length",
-        "lpn_edit_pipetypes": "Edit types…",
-        "lpn_edit_fittings": "Edit fittings…",
-        "lpn_edit_curves": "Edit curves…",
-        "lpn_field_tank_level_short": "Initial depth",
-        "lpn_field_tank_minlevel_short": "Minimum depth",
-        "lpn_field_tank_maxlevel_short": "Maximum depth",
-        "lpn_field_active_short": "Active",
-        "lpn_field_cv_short": "Check valve",
-        "lpn_field_km_short_tip": "Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.",
-        "lpn_field_km_fittings_tip": "Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose \"No fittings list chosen\" to type a value.",
-        "lpn_field_valve_km_short_tip": "Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.",
-        "lpn_reaction_bulk_pipe_tip": "Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_reaction_wall_pipe_tip": "Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_reaction_tank_short_tip": "Reaction coefficient: the rate of reaction in the water held in this tank, in 1\/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_field_tank_level_short_tip": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.",
-        "lpn_field_tank_minlevel_short_tip": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_tank_maxlevel_short_tip": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.",
-        "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
+        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude."
     },
     "key_context": {
         "consent_body": {
@@ -737,22 +665,6 @@
                 }
             }
         },
-        "lpn_guide_text_full_box": {
-            "reason": "english_changed",
-            "current_value": "列出每个报告时间步的每个节点和每条连接线，单位与“表格”窗格中显示的相同。没有延时模拟时，显示单一时刻的当前解。下载或打印包含每个时间步，表格一次显示一个。",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_text_status_box",
-                    "value": "按时间顺序列出上一次延时模拟中的每次变化：水泵、阀门或管道的开启或关闭，水箱开始充水或放水或变满或变空，以及任何未完全收敛的时间步。只列出变化，不列出每个时间步。",
-                    "english": "Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step."
-                },
-                "next_translated": {
-                    "key": "lpn_guide_text_calib_box",
-                    "value": "将现场测量值文件与相同位置和时间的计算结果进行比较，每个参数一个文件。该文件仅在当前会话中保留，不随项目保存。",
-                    "english": "Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project."
-                }
-            }
-        },
         "lpn_guide_find_examples_def": {
             "reason": "english_changed",
             "current_value": "<p>打开示例 Net3 以便对照。压力单位为 psi，流速单位为 ft\/s。<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>节点 60 和管道 60。节点和管道可以有相同的 ID，因此在“全部”下按 ID 搜索可能返回多个元件。<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>节点 10、40、50、20 和 153，压力最低的在前。节点 10 的压力为 -0.6 psi，这是需要复核的负压。<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>管道 60、125、329、123 和 149，流速最高的在前。管道 60 的流速为 9.3 ft\/s。<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>节点 10、20、40 和 50，以及管道 60、125 和 329：低压和高流速列在同一份清单中。<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>节点 10、20、40 和 50，即位于高地的低压节点。两个条件必须指同一种元件：<code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> 没有任何匹配，因为没有元件既是节点又是管道。<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>管道 330，即 Net3 文件中唯一关闭的管道。<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>按文件原样没有结果。若关闭管道 247（见“替换与撤销”），则为节点 215、217、219 和 225：即管道 247 破裂会使其失去供水的节点。对每条管道重复此操作即为关键性分析。<\/td><\/tr><\/tbody><\/table>",
@@ -766,22 +678,6 @@
                     "key": "lpn_guide_find_results_term",
                     "value": "结果、选择与表格",
                     "english": "Results, the selection, and Tables"
-                }
-            }
-        },
-        "lpn_guide_scn_open_def": {
-            "reason": "english_changed",
-            "current_value": "<p>地图下方状态栏中的“方案”按钮会显示打开的方案名称及其覆盖值个数，例如“方案：基础 | 覆盖值个数：0”。点击它，或选择“水务”、“情景”，即可切换方案，或添加、复制、重命名、删除方案。列表中每个方案的括号内显示其覆盖值个数，打开的方案前有对勾标记。“方案管理器”一行会打开方案与备选方案的树。选中“基本模式”时，该行呈灰显。<\/p><p>图纸、标签、属性、表格和结果都属于打开的方案，本页面只求解打开的方案。“方案对比”在其自己的条目中说明，它用副本求解其他方案。打开的方案随项目一起保存。<\/p>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_scn_open_term",
-                    "value": "打开的方案",
-                    "english": "The open scenario"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_scn_marks_term",
-                    "value": "覆盖值在何处显示",
-                    "english": "Where overrides show"
                 }
             }
         },
@@ -801,9 +697,73 @@
                 }
             }
         },
+        "lpn_guide_scn_make_def": {
+            "reason": "english_changed",
+            "current_value": "<p>打开“基础”以外的方案时，对方案可覆盖的数值所做的编辑，无论以何种方式进行，都会作为覆盖值保存在打开的方案中：在“属性”中键入、在“表格”中编辑单元格、“查找与替换”中的“替换”、拖动节点或输入其坐标、“更改类型”（新类型即为覆盖值），或“将属性粘贴到所选”。在“设置”框中键入的设置，若方案可覆盖该设置，也会保存为覆盖值。“基础”不会改变。在“基础”中进行同样的编辑，则会更改管网本身，并传到每个尚未覆盖该数值的方案。<\/p><p>“删除”的行为不同。在方案中，“删除”不会移除“基础”中存在的元件，而是使该元件在打开的方案中停用（若是节点，则连同其管道一并停用），并有消息说明这一点。该元件仍在图纸和其他方案中。在打开某个方案时绘制的元件，在“基础”中是停用的，在该方案中是启用的，在该方案中“删除”会将其移除。在“基础”中删除元件时，也会删除它在每个方案中的覆盖值，并先以提问告知数量。用户和形状不属于任何方案，会被直接删除。<\/p><p>“方案”列表中的“覆盖值管理器”一行会打开一个列表，按类别列出打开的方案的每一个覆盖值，每个覆盖值旁边是它所替换的继承值。该方案在地图上打开、移动或更改过的时间序列图，各占一行。勾选若干行并点击“清除所选覆盖值”，或点击某行中的“清除覆盖值”，或点击“清除全部覆盖值”。每个数值随即恢复为继承值，“撤销”可以恢复。在列表中选择某个 ID 即可在地图上找到该元件。“属性”中的圆点和“表格”单元格菜单中的“清除覆盖值”一行，每次清除一个覆盖值。<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "创建和清除覆盖值",
+                    "english": "Making and clearing overrides"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_scope_term",
+                    "value": "方案可以覆盖什么，不可以覆盖什么",
+                    "english": "What a scenario can and cannot override"
+                }
+            }
+        },
+        "lpn_guide_scn_move_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_make_def",
+                    "value": "<p>打开“基础”以外的方案时，对方案可覆盖的数值所做的编辑，无论以何种方式进行，都会作为覆盖值保存在打开的方案中：在“属性”中键入、在“表格”中编辑单元格、“查找与替换”中的“替换”、拖动节点或输入其坐标、“更改类型”（新类型即为覆盖值），或“将属性粘贴到所选”。在“设置”框中键入的设置，若方案可覆盖该设置，也会保存为覆盖值。“基础”不会改变。在“基础”中进行同样的编辑，则会更改管网本身，并传到每个尚未覆盖该数值的方案。<\/p><p>“删除”的行为不同。在方案中，“删除”不会移除“基础”中存在的元件，而是使该元件在打开的方案中停用（若是节点，则连同其管道一并停用），并有消息说明这一点。该元件仍在图纸和其他方案中。在打开某个方案时绘制的元件，在“基础”中是停用的，在该方案中是启用的，在该方案中“删除”会将其移除。在“基础”中删除元件时，也会删除它在每个方案中的覆盖值，并先以提问告知数量。用户和形状不属于任何方案，会被直接删除。<\/p><p>“方案”列表中的“覆盖值管理器”一行会打开一个列表，按类别列出打开的方案的每一个覆盖值，每个覆盖值旁边是它所替换的继承值。该方案在地图上打开、移动或更改过的时间序列图，各占一行。勾选若干行并点击“清除所选覆盖值”，或点击某行中的“清除覆盖值”，或点击“清除全部覆盖值”。每个数值随即恢复为继承值，“撤销”可以恢复。在列表中选择某个 ID 即可在地图上找到该元件。“属性”中的圆点和“表格”单元格菜单中的“清除覆盖值”一行，每次清除一个覆盖值。<\/p>",
+                    "english": "<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.<\/p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. A Shape follows the same rule as an asset. Customers belong to no scenario and are deleted outright.<\/p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_scope_term",
+                    "value": "方案可以覆盖什么，不可以覆盖什么",
+                    "english": "What a scenario can and cannot override"
+                }
+            }
+        },
+        "lpn_guide_scn_move_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_make_def",
+                    "value": "<p>打开“基础”以外的方案时，对方案可覆盖的数值所做的编辑，无论以何种方式进行，都会作为覆盖值保存在打开的方案中：在“属性”中键入、在“表格”中编辑单元格、“查找与替换”中的“替换”、拖动节点或输入其坐标、“更改类型”（新类型即为覆盖值），或“将属性粘贴到所选”。在“设置”框中键入的设置，若方案可覆盖该设置，也会保存为覆盖值。“基础”不会改变。在“基础”中进行同样的编辑，则会更改管网本身，并传到每个尚未覆盖该数值的方案。<\/p><p>“删除”的行为不同。在方案中，“删除”不会移除“基础”中存在的元件，而是使该元件在打开的方案中停用（若是节点，则连同其管道一并停用），并有消息说明这一点。该元件仍在图纸和其他方案中。在打开某个方案时绘制的元件，在“基础”中是停用的，在该方案中是启用的，在该方案中“删除”会将其移除。在“基础”中删除元件时，也会删除它在每个方案中的覆盖值，并先以提问告知数量。用户和形状不属于任何方案，会被直接删除。<\/p><p>“方案”列表中的“覆盖值管理器”一行会打开一个列表，按类别列出打开的方案的每一个覆盖值，每个覆盖值旁边是它所替换的继承值。该方案在地图上打开、移动或更改过的时间序列图，各占一行。勾选若干行并点击“清除所选覆盖值”，或点击某行中的“清除覆盖值”，或点击“清除全部覆盖值”。每个数值随即恢复为继承值，“撤销”可以恢复。在列表中选择某个 ID 即可在地图上找到该元件。“属性”中的圆点和“表格”单元格菜单中的“清除覆盖值”一行，每次清除一个覆盖值。<\/p>",
+                    "english": "<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.<\/p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. A Shape follows the same rule as an asset. Customers belong to no scenario and are deleted outright.<\/p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_scope_term",
+                    "value": "方案可以覆盖什么，不可以覆盖什么",
+                    "english": "What a scenario can and cannot override"
+                }
+            }
+        },
+        "lpn_guide_scn_scope_def": {
+            "reason": "english_changed",
+            "current_value": "<table class=\"lpn-notes-table\"><tbody><tr><td>属性<\/td><td>节点或管道的每一项属性（下列各项除外），包括其位置、是否启用及其类型（更改类型）。文字可以覆盖其内容、位置、大小、对齐方式、粗体、角度以及是否显示。自定义属性始终可以覆盖。属性分属以下类别：物理、需水量、元件启用、初始设置、组分、消防流量、能耗费用、自定义属性、文字、呈现和计算。<\/td><\/tr><tr><td>设置<\/td><td>随项目保存的设置（下列各项除外）：计算选项（例如需水量倍数、总运行时长、水力时间步长和摩阻公式）、默认需水量模式、给予新元件的数值，以及呈现设置（大小、颜色、标签、等值线、地图视图和地图上的时间序列图）。<\/td><\/tr><tr><td>在每个方案中都相同<\/td><td>元件的 ID、说明和标记；管道的端点和折点；用户和形状；单位和坐标系；以及库的内容（模式、曲线、管道类型、管件清单、控制规则和规则）。对其中任何一项的编辑都会改变每个方案。方案可以让元件指向另一条曲线、管道类型、管件清单或模式，但不能更改它们的内容。<\/td><\/tr><\/tbody><\/table>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_scope_term",
+                    "value": "方案可以覆盖什么，不可以覆盖什么",
+                    "english": "What a scenario can and cannot override"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_example_term",
+                    "value": "Net1 上的示例",
+                    "english": "Example on Net1"
+                }
+            }
+        },
         "lpn_guide_scn_example_def": {
             "reason": "english_changed",
-            "current_value": "<p>打开 Net1 示例。选择“水务”、“情景”、“新建方案…”，键入 Larger main，然后点击“确定”。在地图上选择管道 10，在“属性”中为“管径”输入 24；“基础”中为 18 in.，显示在该字段下方，即“基础情景：18”。在“方案”列表中选择“基础”，再次选择“新建方案…”，键入 Max day，并在“设置”、“计算”、“水力计算”中为“需水量倍数”输入 1.8。然后选择“水务”、“报告”、“方案对比”。<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><\/td><td><\/td><td><\/td><td colspan=\"3\">最低压力<\/td><td colspan=\"3\">最高流速<\/td><\/tr><tr><td>方案<\/td><td>覆盖值个数<\/td><td>需水量倍数<\/td><td>节点<\/td><td>压力 (psi，位于)<\/td><td>时间 (hr)<\/td><td>连接线<\/td><td>流速 (ft\/sec，位于)<\/td><td>时间 (hr)<\/td><\/tr><tr><td>基础<\/td><td>0<\/td><td>1<\/td><td>N32<\/td><td>108<\/td><td>14:00<\/td><td>L11<\/td><td>2.76<\/td><td>16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>N32<\/td><td>109<\/td><td>14:00<\/td><td>L11<\/td><td>2.87<\/td><td>16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>N32<\/td><td>15.78<\/td><td>9:00<\/td><td>L10<\/td><td>3.49<\/td><td>9:00<\/td><\/tr><\/tbody><\/table><p>三个方案的总运行时长均为 24:00，因此每个最低压力和最高流速都是全天的极值，并附有出现的时刻。更大的干管使最低压力提高约 1 psi。倍数 1.8 使其降至 9:00 的 15.78 psi，最高流速则转到管道 10。每个方案各有一个覆盖值，“基础”保持其数值不变。<\/p>",
+            "current_value": "<p>打开 Net1 示例。选择“水务”、“情景”、“新建方案…”，键入 Larger main，然后点击“确定”。在地图上选择管道 10，在“属性”中为“管径”输入 24；“基础”中为 18 in.，显示在该字段下方，即“基础情景：18”。在“方案”列表中选择“基础”，再次选择“新建方案…”，键入 Max day，并在“设置”、“计算”、“水力计算”中为“需水量倍数”输入 1.8。然后选择“水务”、“报告”、“方案对比”。<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>方案<\/td><td>覆盖值个数<\/td><td>需水量倍数<\/td><td>最低压力<\/td><td>最高流速<\/td><\/tr><tr><td>基础<\/td><td>0<\/td><td>1<\/td><td>108 psi，位于 N32，14:00<\/td><td>2.76 ft\/sec，位于 L11，16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi，位于 N32，14:00<\/td><td>2.87 ft\/sec，位于 L11，16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi，位于 N32，9:00<\/td><td>3.49 ft\/sec，位于 L10，9:00<\/td><\/tr><\/tbody><\/table><p>三个方案的总运行时长均为 24:00，因此每个最低压力和最高流速都是全天的极值，并附有出现的时刻。更大的干管使最低压力提高约 1 psi。倍数 1.8 使其降至 9:00 的 15.78 psi，最高流速则转到管道 10。每个方案各有一个覆盖值，“基础”保持其数值不变。<\/p>",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_guide_scn_example_term",
@@ -830,22 +790,6 @@
                     "key": "lpn_guide_cmp_cols_term",
                     "value": "表格内容",
                     "english": "What the table holds"
-                }
-            }
-        },
-        "lpn_guide_cmp_cols_def": {
-            "reason": "english_changed",
-            "current_value": "<table class=\"lpn-notes-table\"><tbody><tr><td>方案<\/td><td>方案的名称。打开的方案标有（当前已打开）。<\/td><\/tr><tr><td>覆盖值个数<\/td><td>方案自身的覆盖值，计数方式与“方案”列表相同。需水量倍数之类的计算选项算作一个，与继承值相等的覆盖值也计入。<\/td><\/tr><tr><td>需水量倍数、总运行时长、水力时间步长<\/td><td>方案求解时所用的数值，是方案自身的或项目的数值。稳态方案的时间步长显示为短横线。<\/td><\/tr><tr><td>最低压力<\/td><td>某个节点处的最低压力，并附有其 ID 和出现的时刻。水库和水箱不计入，因为它们各有固定的水头。<\/td><\/tr><tr><td>最高流速<\/td><td>某条管道或阀门中的最高流速，并附有其 ID 和出现的时刻。水泵不计入。<\/td><\/tr><\/tbody><\/table>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_cmp_cols_term",
-                    "value": "表格内容",
-                    "english": "What the table holds"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_cmp_run_term",
-                    "value": "稳态方案与延时方案",
-                    "english": "Steady-state and extended-period scenarios"
                 }
             }
         },
@@ -897,22 +841,6 @@
                 }
             }
         },
-        "lpn_guide_prop_example_def": {
-            "reason": "english_changed",
-            "current_value": "<p>打开 Net1 示例并点击管道 10。“属性”列出其输入项（从“说明”到“启用？”），然后是所显示时刻的结果：流量 1866.2 gpm，流速 2.4 ft\/sec，水头损失 19.12 ft H2O。<\/p><p>点击管道 113，再按住 Shift 点击管道 31。标题显示“已选 2 个”，仅有的分区是“管道 (2)”，“管径”显示“不同”，因为管道 31 为 6 in.，管道 113 为 8 in.。为“管径”输入 10。通知显示“已对 2 个设置 管径 (in)。”，两条管道均为 10 in.，一次“撤销”使它们恢复为 6 in. 和 8 in.。<\/p>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_prop_multi_def",
-                    "value": "<p>标题显示的内容例如“已选 2 个”。所选内容中的每种元件类型在该框中各有一个分区，分区标题是类型名称及该类型元件的数量，例如“管道 (2)”，每个分区都可折叠。分区列出“表格”中作为列的、且可对其中每个元件设置的属性。结果和管道类型已指定的数值不列出。一行显示这些元件共有的数值，若不同则显示“不同”。<\/p><p>在某一行键入数值，会对所选内容中该类型的每个元件设置该值。未触及的行不会写入任何内容。通知会说明数量，例如“已对 2 个设置 管径 (in)。”，一次“撤销”即可撤销整行的更改。在“基础”以外的方案中，这些数值保存为覆盖值。<\/p>",
-                    "english": "<p>The title reads, for example, 2 selected. The box has one section for each type of asset in the selection, headed by the name of the type and the number of assets of it, as in Pipes (2), and each section can be collapsed. A section lists the properties that Tables has as columns and that can be set on every asset in it. Results and values that a pipe type states are not listed. A row shows the value the assets share, or Various where they differ.<\/p><p>Typing a value into a row sets it on every asset of that type in the selection. A row that is not touched writes nothing. A notice states the count, as in Set Diameter (in) on 2., and one Undo reverses the whole row. In a scenario other than Base the values are stored as overrides.<\/p>"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_set_where_term",
-                    "value": "分区，以及设置保存在何处",
-                    "english": "Sections, and where settings are saved"
-                }
-            }
-        },
         "lpn_guide_set_where_def": {
             "reason": "english_changed",
             "current_value": "<p>该框左侧的列表可跳转到某个分区或小标题。各分区为：可视化（节点标签、节点颜色、管道标签、管道颜色、用户和全部）、地图与页面（外观和页面）、元件（ID 前缀、数值和自定义属性）、计算（单位、时间、水力计算、能耗和水质）以及致谢。每个小标题都说明其设置是“随项目保存”还是“保存在本浏览器中”。除“页面”下的设置和“水力计算”中的一行“显示运行进度框”（该行自己注明保存在本浏览器中）外，一切都随项目保存。<\/p><p>“表格”中的“设置”选项卡将同样的设置列为行，带有“类别”和“数值”，因此在那里也可以查找和核对某项设置。<\/p>",
@@ -942,22 +870,6 @@
                     "key": "lpn_guide_bx_keep_term",
                     "value": "框记住什么",
                     "english": "What a box remembers"
-                }
-            }
-        },
-        "lpn_guide_bx_phone_def": {
-            "reason": "english_changed",
-            "current_value": "<p>宽度为 640 px 或更窄时，任何框都不停靠，每个框都铺满窗口。不提供停靠按钮。停靠的布局会保留，在更宽的窗口中恢复。<\/p>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_bx_phone_term",
-                    "value": "在手机上",
-                    "english": "On a phone"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_ff_asks_term",
-                    "value": "对每个节点提出什么要求",
-                    "english": "What is asked of each junction"
                 }
             }
         },
@@ -1038,22 +950,6 @@
                     "key": "lpn_guide_ct_example_def",
                     "value": "<p>打开 Net1 示例并选择“水务”、“图形”、“等值线”。节点按压力着色，色标下方的一行说明：9 个节点，11 条管道，管道两侧范围为中位管道长度的 2.5 倍，每 5 psi 一条线。水泵（管道 9）不在这 11 条管道之内。清除“显示等值线”后，节点仍按压力着色。<\/p>",
                     "english": "<p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.<\/p>"
-                }
-            }
-        },
-        "lpn_guide_fr_what_def": {
-            "reason": "english_changed",
-            "current_value": "<p>选择“水务”、“报告”、“完整”。该表在每个报告时间步为每个节点和管道各设一行，采用“表格”窗格的单位。其列为：类型、ID、需水量、水头、压力、氯浓度、流量、流速、水头损失、水泵水头和状态，若元件没有某个量，则该单元格为空白。“时间步”列表选择所显示的时间步，“下载 CSV”和“打印报告”则包含每一个时间步。没有延时模拟时，该表显示某一时刻的当前解。<\/p>",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_st_example_def",
-                    "value": "<p>打开 Net1 示例并选择“水务”、“报告”、“状态变化”。水箱 N2 在 1:00 现正在充水，11:00 放空，16:00 充水，22:00 放空。水泵 L9 在 10:00 现已关闭，15:00 现已打开，21:00 现已关闭。<\/p>",
-                    "english": "<p>Open the Net1 example and choose Water, Reports, Status changes. Tank N2 is now filling at 1:00, emptying at 11:00, filling at 16:00, and emptying at 22:00. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00.<\/p>"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_fr_example_def",
-                    "value": "<p>打开 Net1 示例并选择“水务”、“报告”、“完整”。24 个元件在 25 个报告时间步（0:00 到 24:00）列出，共 600 行。在 0:00，节点 11 的需水量为 150 gpm，水头为 985.23 ft H2O，压力为 119.26 psi。<\/p>",
-                    "english": "<p>Open the Net1 example and choose Water, Reports, Full. The 24 assets are listed at 25 reporting steps, 0:00 to 24:00, which is 600 rows. At 0:00, Junction 11 has a demand of 150 gpm, a head of 985.23 ft H2O, and a pressure of 119.26 psi.<\/p>"
                 }
             }
         },
@@ -1185,310 +1081,6 @@
                 }
             }
         },
-        "lpn_morph_vertex": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_base": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_base_ask": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_switch": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_type": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_links": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_kind": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_loop": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_demand": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_customers": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_text": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_pipes": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_own": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_clear_both": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_clear_elev": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_clear_demand": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_clear_quality": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_clear_also": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
-        "lpn_morph_vertex_done": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_morph_ok",
-                    "value": "更改",
-                    "english": "Morph"
-                },
-                "next_translated": {
-                    "key": "lpn_morph_other_kind",
-                    "value": "节点只能更改为另一种节点类型，管道只能更改为另一种管道类型。未更改：{ids}",
-                    "english": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}"
-                }
-            }
-        },
         "lpn_calc_hint": {
             "reason": "missing",
             "current_value": null,
@@ -1534,22 +1126,6 @@
                     "key": "lpn_find_op_conn_unlinked",
                     "value": "节点无连接线",
                     "english": "no links at node"
-                }
-            }
-        },
-        "lpn_replace_selected_only": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "更改查找到的内容",
-                    "english": "Change what was found"
-                },
-                "next_translated": {
-                    "key": "lpn_replace_prop",
-                    "value": "要更改的属性",
-                    "english": "Property to change"
                 }
             }
         },
@@ -3249,27 +2825,6 @@
                 }
             }
         },
-        "lpn_scenario_basic_tip": {
-            "reason": "english_changed",
-            "current_value": "选中时：备选方案被隐藏并自动处理，每个方案将其覆盖值显示为自己的覆盖值，所有新方案都是“基础”方案的子方案；“方案管理器”和“方案”表不显示。清除时：显示“方案管理器”和“方案”表，备选方案可以在各方案之间共享。启用“基本模式”时，“方案管理器”呈禁用状态。当项目含有“基本模式”无法显示的方案与备选方案关系时，“基本模式”呈禁用状态。",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_basic",
-                    "value": "基本模式",
-                    "english": "Basic mode"
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_basic_misfit",
-                    "value": "此项目的方案与备选方案关系与方案“基本模式”不兼容，因此“基本模式”被禁用。",
-                    "english": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled."
-                }
-            },
-            "label": {
-                "key": "lpn_scenario_basic",
-                "english": "Basic mode",
-                "value": "基本模式"
-            }
-        },
         "lpn_ovl_clear_same": {
             "reason": "missing",
             "current_value": null,
@@ -3315,6 +2870,38 @@
                     "key": "lpn_sm_delete_alt_ask",
                     "value": "删除备选方案 {name}？",
                     "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_dem_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_elev_dem_said",
+                    "value": "Mapbox DEM 高程：{v} {u}。",
+                    "english": "Mapbox DEM elevation: {v} {u}."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_elev_source",
+                    "value": "高程来源",
+                    "english": "Elevation source"
+                }
+            }
+        },
+        "lpn_dem_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_elev_dem_said",
+                    "value": "Mapbox DEM 高程：{v} {u}。",
+                    "english": "Mapbox DEM elevation: {v} {u}."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_elev_source",
+                    "value": "高程来源",
+                    "english": "Elevation source"
                 }
             }
         },
@@ -3595,6 +3182,22 @@
                 }
             }
         },
+        "lpn_scnres_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
         "lpn_scnres_time_note": {
             "reason": "missing",
             "current_value": null,
@@ -3735,55 +3338,7 @@
                 "next_translated": {
                     "key": "lpn_full_note",
                     "value": "每个报告时刻下的每个节点或连接线各占一行，单位与“表格”面板中显示的相同。空白单元格表示该量没有此列的数值。下载或打印包含所有时刻；下方表格一次只显示一个时刻。",
-                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time."
-                }
-            }
-        },
-        "lpn_full_note": {
-            "reason": "english_changed",
-            "current_value": "每个报告时刻下的每个节点或连接线各占一行，单位与“表格”面板中显示的相同。空白单元格表示该量没有此列的数值。下载或打印包含所有时刻；下方表格一次只显示一个时刻。",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_needs_run",
-                    "value": "完整报告列出每个报告时刻下的每个节点和每条连接线。请按“计算”，然后打开“水力”、“报告”、“完整报告”。",
-                    "english": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full."
-                },
-                "next_translated": {
-                    "key": "lpn_full_step_label",
-                    "value": "时刻",
-                    "english": "Time step"
-                }
-            }
-        },
-        "lpn_report_copy_html": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_print",
-                    "value": "打印报告",
-                    "english": "Print report"
-                },
-                "next_translated": {
-                    "key": "lpn_full_col_time",
-                    "value": "时间",
-                    "english": "Time (hr)"
-                }
-            }
-        },
-        "lpn_full_col_time": {
-            "reason": "english_changed",
-            "current_value": "时间",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_print",
-                    "value": "打印报告",
-                    "english": "Print report"
-                },
-                "next_translated": {
-                    "key": "lpn_full_col_type",
-                    "value": "类型",
-                    "english": "Type"
+                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time."
                 }
             }
         },
@@ -4349,22 +3904,6 @@
                 }
             }
         },
-        "lpn_col_level": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "正在处理：{total} 个节点中的第 {done} 个。",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "已在 {total} 个节点中完成 {done} 个后停止。下方结果为已完成的部分。",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
         "lpn_dur_col_margin": {
             "reason": "missing",
             "current_value": null,
@@ -4429,7 +3968,7 @@
                 }
             }
         },
-        "lpn_crit_col_hours": {
+        "lpn_at_time": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -4445,7 +3984,7 @@
                 }
             }
         },
-        "lpn_crit_col_stopped": {
+        "lpn_crit_col_hours": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -4669,6 +4208,22 @@
                 }
             }
         },
+        "lpn_crit_stopped_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "正在处理：{total} 个节点中的第 {done} 个。",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "已在 {total} 个节点中完成 {done} 个后停止。下方结果为已完成的部分。",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
         "lpn_ff_at_step": {
             "reason": "missing",
             "current_value": null,
@@ -4714,22 +4269,6 @@
                     "key": "lpn_ff_stopped",
                     "value": "已在 {total} 个节点中完成 {done} 个后停止。下方结果为已完成的部分。",
                     "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
-        "lpn_ff_col_more": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_col_affected",
-                    "value": "最严重影响",
-                    "english": "Worst effect"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_col_limit",
-                    "value": "设计限值",
-                    "english": "Design limit"
                 }
             }
         },
@@ -4902,6 +4441,54 @@
                 }
             }
         },
+        "lpn_shapes_every_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_done_one",
+                    "value": "已从 {file} 导入 1 个形状。",
+                    "english": "One Shape imported from {file}."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_renamed",
+                    "value": "有 {n} 个要素名称不能用作形状 ID。这些形状已被赋予其他 ID，并保留各自的要素名称：{list}。",
+                    "english": "{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}."
+                }
+            }
+        },
+        "lpn_shapes_this_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_done_one",
+                    "value": "已从 {file} 导入 1 个形状。",
+                    "english": "One Shape imported from {file}."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_renamed",
+                    "value": "有 {n} 个要素名称不能用作形状 ID。这些形状已被赋予其他 ID，并保留各自的要素名称：{list}。",
+                    "english": "{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}."
+                }
+            }
+        },
+        "lpn_library_import_every_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_done_one",
+                    "value": "已从 {file} 导入 1 个形状。",
+                    "english": "One Shape imported from {file}."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_renamed",
+                    "value": "有 {n} 个要素名称不能用作形状 ID。这些形状已被赋予其他 ID，并保留各自的要素名称：{list}。",
+                    "english": "{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}."
+                }
+            }
+        },
         "lpn_menu_back": {
             "reason": "missing",
             "current_value": null,
@@ -5017,11 +4604,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_export_holds_base": {
@@ -5033,11 +4616,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_geojson_results_other": {
@@ -5049,11 +4628,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_survey_added_scenario": {
@@ -5065,11 +4640,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_pane_pasted_scenario": {
@@ -5081,11 +4652,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_pane_pasted_overrides": {
@@ -5097,11 +4664,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_run_of_scenario": {
@@ -5113,11 +4676,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_calib_scenario": {
@@ -5129,11 +4688,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_export_leaves_alternatives": {
@@ -5145,11 +4700,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_export_confirm_title": {
@@ -5161,14 +4712,10 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
-        "lpn_export_confirm_lead": {
+        "lpn_noscn_lead": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -5177,11 +4724,67 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
+            }
+        },
+        "lpn_noscn_fmt_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_noscn_fmt_geojson": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_noscn_fmt_dxf": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_goes_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_goes_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
             }
         },
         "lpn_export_receipt_heading": {
@@ -5193,11 +4796,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_export_receipt_note": {
@@ -5209,11 +4808,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
+                "next_translated": null
             }
         },
         "lpn_dxf_exported_geo_tail": {
@@ -5225,357 +4820,7 @@
                     "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
                     "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                }
-            }
-        },
-        "lpn_field_auto_length": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "tip": {
-                "key": "lpn_field_auto_length_tip",
-                "english": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own."
-            }
-        },
-        "lpn_edit_pipetypes": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_edit_fittings": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_edit_curves": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_field_tank_level_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "tip": {
-                "key": "lpn_field_tank_level_short_tip",
-                "english": "Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom."
-            }
-        },
-        "lpn_field_tank_minlevel_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "tip": {
-                "key": "lpn_field_tank_minlevel_short_tip",
-                "english": "Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom."
-            }
-        },
-        "lpn_field_tank_maxlevel_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "tip": {
-                "key": "lpn_field_tank_maxlevel_short_tip",
-                "english": "Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom."
-            }
-        },
-        "lpn_field_active_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_field_cv_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_field_km_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_field_km_short",
-                "english": "Minor loss, k",
-                "value": "局部损失，k"
-            }
-        },
-        "lpn_field_km_fittings_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_field_valve_km_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_reaction_bulk_pipe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_reaction_wall_pipe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            }
-        },
-        "lpn_reaction_tank_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_reaction_tank_short",
-                "english": "Reaction",
-                "value": "反应"
-            }
-        },
-        "lpn_field_tank_level_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_field_tank_level_short",
-                "english": "Initial depth"
-            }
-        },
-        "lpn_field_tank_minlevel_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_field_tank_minlevel_short",
-                "english": "Minimum depth"
-            }
-        },
-        "lpn_field_tank_maxlevel_short_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_field_tank_maxlevel_short",
-                "english": "Maximum depth"
-            }
-        },
-        "lpn_field_auto_length_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_prop_label_symbol_unit",
-                    "value": "{label}，{symbol} ({unit})",
-                    "english": "{label}, {symbol} ({unit})"
-                },
-                "next_translated": {
-                    "key": "lpn_prop_label_symbol",
-                    "value": "{label}，{symbol}",
-                    "english": "{label}, {symbol}"
-                }
-            },
-            "label": {
-                "key": "lpn_field_auto_length",
-                "english": "Auto length"
+                "next_translated": null
             }
         }
     },
@@ -5584,14 +4829,6 @@
     },
     "key_notes": [],
     "key_concepts": {
-        "lpn_guide_scn_open_def": [
-            {
-                "concept": "family-tree",
-                "plain_name": "A family tree",
-                "english_rendering": "tree",
-                "preferred_translation": ""
-            }
-        ],
         "lpn_guide_scn_marks_def": [
             {
                 "concept": "family-tree-parent",
@@ -5606,27 +4843,19 @@
                 "preferred_translation": ""
             }
         ],
+        "lpn_guide_scn_make_def": [
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
         "lpn_guide_scn_notes_def": [
             {
                 "concept": "family-tree-inherit",
                 "plain_name": "A family tree inherit-",
                 "english_rendering": "inherit",
-                "preferred_translation": ""
-            }
-        ],
-        "lpn_guide_cmp_cols_def": [
-            {
-                "concept": "family-tree-inherit",
-                "plain_name": "A family tree inherit-",
-                "english_rendering": "inherit",
-                "preferred_translation": ""
-            }
-        ],
-        "lpn_scenario_basic_tip": [
-            {
-                "concept": "family-tree-child",
-                "plain_name": "A family tree child",
-                "english_rendering": "child",
                 "preferred_translation": ""
             }
         ],

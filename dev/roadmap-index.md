@@ -7,15 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**107 open tasks.** Next (100): 19 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**106 open tasks.** Next (100): 18 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
-## 100 — Next (19)
+## 100 — Next (18)
 
 - Task 825 — Audit every dockable box's width, with a checklist.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 831 — Shapes honour Is active per scenario, in the Presentation category.
 - Task 833 — First open after Fresh: no docks, and Net3 freezes for 20 s.
 - ! Task 834 — Every box docked and auto-hidden on first view; a pinned box keeps its tab.
 - Task 835 — Settings on a phone: a top menu for its sections, narrower columns.
@@ -138,5 +137,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-96 of 107 titles are within 4–12 words. `!` marks the rest;
+95 of 106 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

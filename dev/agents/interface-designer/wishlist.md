@@ -583,3 +583,5 @@ The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), 
 - **Heading bands in Properties, collapse optional and remembered.** Small to medium.
 - **Basic row subset with a Show all row.** Medium; decide first how it relates to the Scenario manager's Basic mode and the expert levels.
 - **Phone shares the hairline and band styling.** Small after the first item.
+
+- (2026-10-29) Results band heading in the Properties box, then the other category bands; reorder rows per scratchpad/ida-row-order.md. Tag: SPECULATION on value ranking, OBSERVED on current mixing of results among inputs.
