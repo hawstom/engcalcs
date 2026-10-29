@@ -312,7 +312,7 @@ console.log('\n--- Basic mode ---');
 // (it would vary by nothing, or by accident); a file changing because the store exists; a
 // scenario's setting leaking into Base, or Base's object being written through the seam.
 console.log('\n--- settings: every stored setting is named, once ---');
-const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8'));
+const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name, 'utf8'));
 const exampleFiles = fs.readdirSync(ROOT + 'examples/').filter(function (f) { return /\.lwn$/.test(f); });
 {
 	const CONTAINERS = ['settings', 'labelSettings', 'project', 'times'];

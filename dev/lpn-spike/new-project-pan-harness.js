@@ -109,7 +109,7 @@ console.log('\n--- File, Open example (importProject(), the gallery\'s own door)
 	L.setViewRaw(-9500, 0, 1);
 	const panned = L.currentView();
 
-	const text = fs.readFileSync(path.join(ROOT, 'examples', 'Basic-example-US-units.lwn'), 'utf8');
+	const text = fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/fixtures', 'Basic-example-US-units.lwn'), 'utf8');
 	const saved = L.acceptImportedText(text);
 	ok('the example file reads as a project', !!saved);
 	const exId = L.importProject(saved);

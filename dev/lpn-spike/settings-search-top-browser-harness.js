@@ -65,7 +65,7 @@ async function walk(Session, browser, extra, tag) {
 		await a.goto('Looped-Network.php');
 		await a.answerTrainingPanel().catch(() => {});
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.openExampleCard(await a.lang('lpn_ex_basic_us_title'));
+		await a.openExampleCard(await a.lang('lpn_ex_valves_title'));
 		await a.settle(800);
 		await a.menuClick('Settings', 'project');
 		await a.settle(700);

@@ -216,12 +216,12 @@ async function main() {
 	try {
 		const probe = await Session.open(browser, 'titles');
 		await probe.goto('Looped-Network.php?ec_nolog=1');
-		const xyTitle = await probe.lang('lpn_ex_basic_us_title');
+		const xyTitle = await probe.lang('lpn_ex_net1_title');
 		const geoTitle = await probe.lang('lpn_ex_net3_title');
 		await probe.close();
 		// The XY example has pipes with two vertices (the first segment of one is clicked). No shipped
 		// geographic example has a vertex, so there the pipe is a two-point one.
-		await section(browser, Session, 'XY project (Basic network, gpm)', xyTitle, 8);
+		await section(browser, Session, 'XY project (Net1, gpm)', xyTitle, 8);
 		await section(browser, Session, 'geographic project (EPANET Net3, Novato)', geoTitle, 4);
 	} finally {
 		await browser.close();

@@ -360,9 +360,9 @@ async function main() {
 		await closePopup();
 
 		// ---- 7 ------------------------------------------------------------------------------------
-		console.log('\n7. THE SHIPPED BASIC EXAMPLES (reported, not asserted)');
+		console.log('\n7. THE SHIPPED NET1 EXAMPLES (reported, not asserted)');
 		const fs = require('fs');
-		for (const [file, key] of [['Basic-example-US-units.lwn', 'lpn_ex_basic_us_title'], ['Basic-example-SI-units.lwn', 'lpn_ex_basic_si_title']]) {
+		for (const [file, key] of [['Net1-Scenarios.lwn', 'lpn_ex_net1_title'], ['Net1-Scenarios-SI.lwn', 'lpn_ex_net1_si_title']]) {
 			const was = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', file), 'utf8'));
 			const b = await Session.open(browser, 'slopelen-ex', { viewport: { width: 1500, height: 950 } });
 			await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());

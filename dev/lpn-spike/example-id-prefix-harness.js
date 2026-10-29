@@ -30,7 +30,7 @@ function ok(name, cond, extra) {
 }
 
 const files = fs.readdirSync(ROOT + 'examples').filter(function (f) { return /\.lwn$/.test(f); });
-ok('the examples folder holds the fifteen shipped examples', files.length === 15, files.length);
+ok('the examples folder holds the twelve shipped examples', files.length === 12, files.length);
 
 // What each example's ID labels must say: '' where the IDs already carry a prefix. Elm Street's
 // links are bare numbers, so its link labels keep L.

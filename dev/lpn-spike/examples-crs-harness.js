@@ -105,7 +105,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(exDir, 'manifest.json'), '
 
 	console.log('--- 2b. each US and SI pair sits on the same place and the same plane family (Task 826) ---');
 	const PLACE = { 'Net2-Branford-CT': [41.28, -72.81, ['EPSG:2234', 'EPSG:26956']], 'Net3-Novato-CA-World': [38.11, -122.57, ['EPSG:2227', 'EPSG:26943']],
-		'Fire-flow-extension': [30.28, -98.41, ['EPSG:2277', 'EPSG:32139']], 'Community-well-tank': [33.05, -99.20, ['EPSG:2276', 'EPSG:32138']] };
+		'Fire-flow-extension': [30.2767, -98.4115, ['EPSG:2277', 'EPSG:32139']], 'Community-well-tank': [33.4492, -99.6313, ['EPSG:2276', 'EPSG:32138']] };
 	Object.keys(PLACE).forEach((base) => {
 		const pl = PLACE[base];
 		[base, base + '-SI'].forEach((nm, i) => {

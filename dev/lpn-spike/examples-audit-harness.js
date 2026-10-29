@@ -83,13 +83,18 @@ const OUT_DIR = path.join(ROOT, 'examples');
 // would pass forever after somebody published an eighth example.
 const PUBLISHED = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'manifest.json'), 'utf8'))
 	.examples.map((e) => e.file);
+// Net1.lwn (rules, no scenarios) is no longer on the wall but is still the importer's reference for Net1 and
+// the base the two scenario cards are built from, so it is audited like a published one, from its authoring folder.
+const NOT_PUBLISHED_BUT_AUDITED = ['Net1.lwn'];
+const pathOf = (f) => NOT_PUBLISHED_BUT_AUDITED.indexOf(f) >= 0 ? path.join(ROOT, 'dev/water-network-examples', f) : path.join(OUT_DIR, f);
+const AUDITED = PUBLISHED.concat(NOT_PUBLISHED_BUT_AUDITED);
 
 // **WHICH `.inp` EACH EXAMPLE CAME FROM, AND WHY AN EXAMPLE HAS NONE.** An entry of `null` is the
 // declaration that this example was AUTHORED rather than imported, so there is no source to be
 // behind. Adding an example forces a line here, which is the point.
 const SOURCE_OF = {
 	'Net1.lwn': 'Net1.inp',
-	// Net1.lwn re-saved by the page with a scenario tree (build_scenario_example.js): derived from a
+	// Net1.lwn (the plain base, kept as a fixture) re-saved by the page with a scenario tree (build_scenario_example.js): derived from a
 	// curated example, not imported, so its reference is scenario-example-harness.js and Net1.lwn.
 	'Net1-Scenarios.lwn': null,
 	// Valves.lwn is imported from dev/scripts/valve_example.inp by build_valve_example.js; its source is
@@ -101,7 +106,8 @@ const SOURCE_OF = {
 	'Net2-Branford-CT.lwn': 'Net2.inp',
 	// The SI twins are CONVERTED from the US files, not imported, so a fresh import of the
 	// `.inp` cannot be their reference; si-example-equivalence-harness.js is.
-	'Net1-SI.lwn': null,
+	// Net1.lwn and Net1-SI.lwn (rules, no scenarios) are no longer published; the scenario cards below are built from them.
+	'Net1-Scenarios-SI.lwn': null,
 	'Net2-Branford-CT-SI.lwn': null,
 	'Net3-Novato-CA-World-SI.lwn': null,
 	// The four starter examples (Task 823) are authored, not imported: dev/scripts/build_starter_examples.js
@@ -198,7 +204,7 @@ function freshImport(inpName) {
 	return JSON.parse(JSON.stringify(L.serialize()));
 }
 function openShipped(file) {
-	const saved = JSON.parse(fs.readFileSync(path.join(OUT_DIR, file), 'utf8'));
+	const saved = JSON.parse(fs.readFileSync(pathOf(file), 'utf8'));
 	L.applySaved(L.migrateSaved(saved));
 	return JSON.parse(JSON.stringify(L.serialize()));
 }
@@ -211,10 +217,10 @@ PUBLISHED.forEach((f) => {
 	ok(f + ' is declared in SOURCE_OF',
 		Object.prototype.hasOwnProperty.call(SOURCE_OF, f),
 		'add a line to SOURCE_OF in this file -- an `.inp` name, or null with the reason it has none');
-	ok(f + ' is shipped', fs.existsSync(path.join(OUT_DIR, f)));
+	ok(f + ' is shipped', fs.existsSync(pathOf(f)));
 });
 Object.keys(SOURCE_OF).forEach((f) => {
-	ok(f + ' is still published', PUBLISHED.indexOf(f) >= 0, 'declared here but not in the manifest');
+	ok(f + ' is still published', AUDITED.indexOf(f) >= 0, 'declared here but not in the manifest');
 });
 ok('at least three examples have a source .inp',
 	Object.keys(SOURCE_OF).filter((f) => SOURCE_OF[f]).length >= 3);
@@ -231,11 +237,11 @@ console.log('\n2. Opening a shipped example gives what importing its source .inp
 // example having drifted, and is nothing of the kind.
 const FRESH = {};
 const PLACED = {};
-PUBLISHED.forEach((f) => { PLACED[f] = !!(JSON.parse(fs.readFileSync(path.join(OUT_DIR, f), 'utf8')).project || {}).crs; });
-PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
+AUDITED.forEach((f) => { PLACED[f] = !!(JSON.parse(fs.readFileSync(pathOf(f), 'utf8')).project || {}).crs; });
+AUDITED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	if (!FRESH[SOURCE_OF[file]]) { FRESH[SOURCE_OF[file]] = freshImport(SOURCE_OF[file]); }
 });
-PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
+AUDITED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	const fresh = FRESH[SOURCE_OF[file]];
 	const open = openShipped(file);
 
@@ -354,7 +360,7 @@ done('nothing a source states is unaccounted for');
 // back as `104`. Section 2 compares documents; this compares the text, which is where the curve
 // loss was actually visible -- a stored curve with no `src` exports a rebuilt row.
 console.log('\n4. A shipped example exports its source\'s own numbers');
-PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
+AUDITED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	openShipped(file);
 	const out = L.export();
 	ok(file + ' exports', out.ok === true, out && out.error);
@@ -417,10 +423,10 @@ const NET1_RULES = [
 ];
 PUBLISHED.forEach((file) => {
 	const open = openShipped(file);
-	const want = (file === 'Net1.lwn' || file === 'Net1-Scenarios.lwn') ? NET1_RULES : file === 'Net1-SI.lwn' ? NET1_RULES_SI : [];
+	const want = (file === 'Net1.lwn' || file === 'Net1-Scenarios.lwn') ? NET1_RULES : file === 'Net1-Scenarios-SI.lwn' ? NET1_RULES_SI : [];
 	ok(file + ' ships exactly the rules declared for it',
 		dump(open.rules || []) === dump(want), dump(open.rules || []).slice(0, 300));
-	if (file !== 'Net1.lwn' && file !== 'Net1-SI.lwn' && file !== 'Net1-Scenarios.lwn') { return; }
+	if (file !== 'Net1.lwn' && file !== 'Net1-Scenarios-SI.lwn' && file !== 'Net1-Scenarios.lwn') { return; }
 	// Every id a rule names is an id the project has -- libReadRule()'s own question, asked of the
 	// shipped file rather than of a box somebody is typing in.
 	const ids = {};

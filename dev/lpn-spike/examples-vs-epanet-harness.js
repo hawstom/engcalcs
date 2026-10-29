@@ -82,7 +82,7 @@ async function rawRun(inpText) {
 }
 
 function openExample(name, edit) {
-	const saved = JSON.parse(fs.readFileSync(ROOT + 'examples/' + name + '.lwn', 'utf8'));
+	const saved = JSON.parse(fs.readFileSync(ROOT + (/^Net1(-SI)?$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name + '.lwn', 'utf8'));
 	if (edit) { edit(saved); }
 	L.applySaved(L.migrateSaved(saved));
 	return saved;

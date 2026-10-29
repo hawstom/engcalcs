@@ -104,7 +104,7 @@ const chance = (p) => R() < p;
 const num = () => Math.round(R() * 1000) / 10 + 1;
 
 function open(name) {
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8')));
+	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name, 'utf8')));
 	L.buildDom();
 }
 
@@ -395,7 +395,7 @@ console.log('\n--- 2. explicit but derivable == derived ---');
 	}
 	files.forEach((f) => {
 		// The scenario example ships a stored tree on purpose (scenario-example-harness.js holds it).
-		if (f === 'Net1-Scenarios.lwn') { return; }
+		if (f === 'Net1-Scenarios.lwn' || f === 'Net1-Scenarios-SI.lwn') { return; }
 		// The four starter examples (Task 823) ship stored scenarios too (flow tests, max day), held by starter-examples-harness.js.
 		if (/^(Fire-flow-extension|Community-well-tank)/.test(f)) { return; }
 		open(f);

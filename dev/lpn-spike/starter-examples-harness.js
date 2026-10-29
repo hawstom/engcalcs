@@ -60,10 +60,10 @@ function ok(name, cond, extra) {
 const PSI_PER_M = 0.4333 / 0.3048, GPM = 15850.32, FT = 0.3048;
 
 const FILES = [
-	{ file: 'Fire-flow-extension.lwn', si: false, kind: 'ext', crs: 'EPSG:2277', place: [30.28, -98.41], key: 'extension' },
-	{ file: 'Fire-flow-extension-SI.lwn', si: true, kind: 'ext', crs: 'EPSG:32139', place: [30.28, -98.41], key: 'extension_si' },
-	{ file: 'Community-well-tank.lwn', si: false, kind: 'well', crs: 'EPSG:2276', place: [33.05, -99.20], key: 'well' },
-	{ file: 'Community-well-tank-SI.lwn', si: true, kind: 'well', crs: 'EPSG:32138', place: [33.05, -99.20], key: 'well_si' }
+	{ file: 'Fire-flow-extension.lwn', si: false, kind: 'ext', crs: 'EPSG:2277', place: [30.2767, -98.4115], key: 'extension' },
+	{ file: 'Fire-flow-extension-SI.lwn', si: true, kind: 'ext', crs: 'EPSG:32139', place: [30.2767, -98.4115], key: 'extension_si' },
+	{ file: 'Community-well-tank.lwn', si: false, kind: 'well', crs: 'EPSG:2276', place: [33.4492, -99.6313], key: 'well' },
+	{ file: 'Community-well-tank-SI.lwn', si: true, kind: 'well', crs: 'EPSG:32138', place: [33.4492, -99.6313], key: 'well_si' }
 ];
 const DESCRIBED = {
 	ext: ['SYS', 'HYD-P', 'HYD-F', 'FH-1', 'PMP-1', 'MAIN-1'],
