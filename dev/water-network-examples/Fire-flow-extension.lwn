@@ -50,8 +50,8 @@
 		{
 			"id": "HYD-P",
 			"type": "junction",
-			"x": 200,
-			"y": 0,
+			"x": 220.1,
+			"y": 619.9,
 			"elev": 1200,
 			"_demand": 0,
 			"desc": "Test pressure hydrant. Reads the pressure during the hydrant flow test: 62 psi static, 56 psi at 600 gpm, 48 psi at 1,200 gpm."
@@ -59,8 +59,8 @@
 		{
 			"id": "HYD-F",
 			"type": "junction",
-			"x": 600,
-			"y": 0,
+			"x": 394.5,
+			"y": 626.2,
 			"elev": 1202,
 			"_demand": 0,
 			"desc": "Test flow hydrant, on the existing 12 inch main. The flow test draws 600 and 1,200 gpm here. The extension ties in at this junction."
@@ -68,8 +68,8 @@
 		{
 			"id": "EXT-1",
 			"type": "junction",
-			"x": 800,
-			"y": 0,
+			"x": 739.9,
+			"y": 639.1,
 			"elev": 1205,
 			"_demand": 6,
 			"desc": "First junction of the loop, two houses."
@@ -77,8 +77,8 @@
 		{
 			"id": "EXT-2",
 			"type": "junction",
-			"x": 800,
-			"y": 300,
+			"x": 727.8,
+			"y": 993.5,
 			"elev": 1215,
 			"_demand": 12,
 			"desc": "Four houses."
@@ -86,8 +86,8 @@
 		{
 			"id": "FH-1",
 			"type": "junction",
-			"x": 1200,
-			"y": 300,
+			"x": 1085.4,
+			"y": 1006.1,
 			"elev": 1228,
 			"_demand": 0,
 			"desc": "Fire hydrant junction, the high point of the loop and the design point for fire flow: 1,500 gpm with 20 psi residual.",
@@ -96,8 +96,8 @@
 		{
 			"id": "EXT-3",
 			"type": "junction",
-			"x": 1200,
-			"y": 0,
+			"x": 1093,
+			"y": 652.1,
 			"elev": 1218,
 			"_demand": 10,
 			"desc": "Three houses."
@@ -105,8 +105,8 @@
 		{
 			"id": "SYS",
 			"type": "reservoir",
-			"x": 0,
-			"y": 0,
+			"x": 45.8,
+			"y": 613.6,
 			"_head": 1200,
 			"desc": "System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test."
 		}
@@ -120,7 +120,7 @@
 			"verts": [],
 			"_diameter": 12,
 			"_roughness": 130,
-			"_length": 400,
+			"_length": 175,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -134,7 +134,7 @@
 			"verts": [],
 			"_diameter": 12,
 			"_roughness": 140,
-			"_length": 200,
+			"_length": 346,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -148,7 +148,7 @@
 			"verts": [],
 			"_diameter": 8,
 			"_roughness": 140,
-			"_length": 300,
+			"_length": 355,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -162,7 +162,7 @@
 			"verts": [],
 			"_diameter": 8,
 			"_roughness": 140,
-			"_length": 400,
+			"_length": 358,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -175,7 +175,7 @@
 			"verts": [],
 			"_diameter": 8,
 			"_roughness": 140,
-			"_length": 300,
+			"_length": 354,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -188,7 +188,7 @@
 			"verts": [],
 			"_diameter": 8,
 			"_roughness": 140,
-			"_length": 400,
+			"_length": 353,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -211,8 +211,8 @@
 		{
 			"id": "X1",
 			"text": "Fire flow extension",
-			"x": 600,
-			"y": 480,
+			"x": 569.4,
+			"y": 1186.1,
 			"anchorNode": null,
 			"sizeMult": 3,
 			"allZoom": true
@@ -220,8 +220,8 @@
 		{
 			"id": "X2",
 			"text": "SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.",
-			"x": 600,
-			"y": 410,
+			"x": 569.4,
+			"y": 1116.1,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -229,8 +229,8 @@
 		{
 			"id": "X3",
 			"text": "Design point: 1,500 gpm at FH-1 with 20 psi residual. Scenarios 1 to 3 repeat the flow test.",
-			"x": 600,
-			"y": 370,
+			"x": 569.4,
+			"y": 1076.1,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -250,7 +250,7 @@
 	"customers": [],
 	"origin": {
 		"x": 2903000,
-		"y": 10070000
+		"y": 10069000
 	},
 	"labelSettings": {
 		"node": {
@@ -424,9 +424,9 @@
 	"rules": [],
 	"inpSections": {},
 	"view": {
-		"cx": 600,
-		"cy": 240,
-		"s": 0.75
+		"cx": 569.4,
+		"cy": 899.8,
+		"s": 0.8594
 	},
 	"units": {
 		"lpn_u_length": "ft",

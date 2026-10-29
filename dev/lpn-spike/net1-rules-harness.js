@@ -58,7 +58,7 @@ function ok(name, cond, extra) {
 	if (!cond) { fails++; }
 }
 
-const NET1 = path.join(ROOT, 'examples', 'Net1.lwn');
+const NET1 = path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn');
 
 /**
  * Opens the SHIPPED example exactly as the gallery does, keeping the rules named in `which`.

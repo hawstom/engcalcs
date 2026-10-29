@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**39 still to read on master**, of 204 untranslated keys, of 3173 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 202 untranslated keys, of 3167 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (204, 39 to read @@ NEEDS RULING)
+## lpn_  (202, 40 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -173,10 +173,10 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_ex_extension_desc`**
-  > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
+  > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_desc`**
-  > Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.
+  > A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_title`**
   > Fire flow extension, L/s (SI)
@@ -184,23 +184,17 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ex_extension_title`**
   > Fire flow extension, gpm (US)
   @@ NEEDS RULING
-- **`lpn_ex_net1_scn_desc`**
-  > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
-  _Ruled OK 2026-10-20._
-- **`lpn_ex_net1_scn_title`**
-  > EPANET Net1 with scenarios, gpm (US)
-  _Ruled OK 2026-10-20._
 - **`lpn_ex_valves_desc`**
-  > Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.
-  _Ruled OK 2026-10-20._
+  > A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state. Gallons per minute, with feet and inches.
+  @@ NEEDS RULING
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
 - **`lpn_ex_well_desc`**
-  > Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.
+  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
+  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Community well and tank, L/s (SI)
@@ -648,7 +642,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**125 still to read**, of 168 new keys across 15 unmerged branch(es).
+**125 still to read**, of 168 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -659,7 +653,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`c769c2118`) — 49 new, 49 to read @@ NEEDS RULING
+### box-design (`49979b8d6`) — 49 new, 49 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -677,7 +671,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Edit types…
   @@ NEEDS RULING
 - **`lpn_ff_col_more`**
-  > And others
+  > How many others
   @@ NEEDS RULING
 - **`lpn_field_active_short`**
   > Active
@@ -1019,7 +1013,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`0ae74603c`) — adds no English strings
+### feat/starter-example (`938bf6dd9`) — adds no English strings
 
 ### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
 
@@ -1188,12 +1182,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/box-style (`8f3662b4f`) — already merged into box-design; its strings are listed there
+### fix/label-snapshot-demand (`cfcc9209e`) — adds no English strings
 
-### fix/box-words (`82eebd452`) — already merged into box-design; its strings are listed there
-
-### fix/loop-residual (`afe312479`) — adds no English strings
-
-### fix/report-width (`040976a3c`) — already merged into box-design; its strings are listed there
-
-### fix/settings-fit (`17413e4d7`) — already merged into box-design; its strings are listed there
+### fix/usage-terms (`98031fed8`) — adds no English strings

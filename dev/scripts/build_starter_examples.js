@@ -13,6 +13,12 @@
 // and saved view are then set through the page's own code, and the file is written by the page's own
 // serializer. The .lwn format is never written by hand. Held by dev/lpn-spike/starter-examples-harness.js.
 //
+// WHERE THEY SIT (Tom, 2026-10-28: "align with the streets"). Each example is drawn on the real
+// streets of a real town, and every junction is a longitude/latitude taken ONCE from OpenStreetMap
+// (Overpass, fetched 2026-10-28, the street centrelines named beside each node) and fixed here as a
+// constant: nothing is fetched when the generator runs or when a visitor opens the page. The project's
+// plane coordinates are those points projected into the project's coordinate system.
+//
 // DESIGN POINT, so the numbers below can be judged: US practice (AWWA M31, NFPA 291) tests fire flow
 // at 20 psi residual; normal pressure is 40 to 80 psi; Hazen-Williams C 130 (ductile iron) to 140 (PVC).
 'use strict';
@@ -41,23 +47,47 @@ const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const scnName = (key, n) => n + '. ' + PC[key].replace(/^\d+\.\s*/, '');
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
+// Project each node's longitude/latitude into the example's coordinate system and set x and y relative to
+// the origin shift (the south-west corner of the nodes, floored to 1000 US survey feet, as a person would
+// set it). The SI twin is the same projection in metres: its plane is the US plane times 1200/3937 exactly.
+function locate(nodes, crsUs, si) {
+	const code = crsUs.replace('EPSG:', '');
+	proj4.defs('U' + code, DEFS[code]);
+	const pts = nodes.map((n) => proj4('EPSG:4326', 'U' + code, n.ll));
+	const org = { x: Math.floor(Math.min(...pts.map((q) => q[0])) / 1000) * 1000, y: Math.floor(Math.min(...pts.map((q) => q[1])) / 1000) * 1000 };
+	nodes.forEach((n, i) => {
+		const x = pts[i][0] - org.x, y = pts[i][1] - org.y;
+		n.x = si ? round(x * FTUS, 2) : round(x, 1);
+		n.y = si ? round(y * FTUS, 2) : round(y, 1);
+	});
+	return org;
+}
+// The title block sits above the drawing, centred on it.
+function titleAt(nodes, si) {
+	const xs = nodes.map((n) => n.x), ys = nodes.map((n) => n.y);
+	const x = round((Math.min(...xs) + Math.max(...xs)) / 2, 1), top = Math.max(...ys);
+	return si ? [[x, round(top + 55, 1)], [x, round(top + 33, 1)], [x, round(top + 21, 1)]]
+		: [[x, round(top + 180, 1)], [x, round(top + 110, 1)], [x, round(top + 70, 1)]];
+}
+
 function extension(si) {
 	const v = (us, m) => si ? m : us;
 	const flow = (us, m) => si ? m + ' L/s' : fmt(us) + ' gpm';
 	const res = v('20 psi', '14 m');
 	const nodes = [
-		{ id: 'SYS', type: 'reservoir', x: 0, y: 0, head: v(1200, 366),
+		{ id: 'SYS', type: 'reservoir', ll: [-98.411993, 30.276713], head: v(1200, 366),
 			desc: 'System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test.' },
-		{ id: 'HYD-P', x: v(200, 60), y: 0, elev: v(1200, 366), demand: 0,
+		{ id: 'HYD-P', ll: [-98.4114405, 30.276722], elev: v(1200, 366), demand: 0,
 			desc: 'Test pressure hydrant. Reads the pressure during the hydrant flow test: ' + v('62 psi static, 56 psi at 600 gpm, 48 psi at 1,200 gpm.', '43.5 m static, 39.5 m at 38 L/s, 34 m at 76 L/s.') },
-		{ id: 'HYD-F', x: v(600, 180), y: 0, elev: v(1202, 366.5), demand: 0,
+		{ id: 'HYD-F', ll: [-98.410888, 30.276731], elev: v(1202, 366.5), demand: 0,
 			desc: 'Test flow hydrant, on the existing ' + v('12 inch', '300 mm') + ' main. The flow test draws ' + v('600 and 1,200 gpm', '38 and 76 L/s') + ' here. The extension ties in at this junction.' },
-		{ id: 'EXT-1', x: v(800, 240), y: 0, elev: v(1205, 367.5), demand: v(6, 0.4), desc: 'First junction of the loop, two houses.' },
-		{ id: 'EXT-2', x: v(800, 240), y: v(300, 90), elev: v(1215, 370.5), demand: v(12, 0.8), desc: 'Four houses.' },
-		{ id: 'FH-1', x: v(1200, 360), y: v(300, 90), elev: v(1228, 374), demand: 0, fireFlow: v(1500, 95),
+		{ id: 'EXT-1', ll: [-98.409793, 30.27675], elev: v(1205, 367.5), demand: v(6, 0.4), desc: 'First junction of the loop, two houses.' },
+		{ id: 'EXT-2', ll: [-98.409812, 30.277725], elev: v(1215, 370.5), demand: v(12, 0.8), desc: 'Four houses.' },
+		{ id: 'FH-1', ll: [-98.4086786, 30.2777426], elev: v(1228, 374), demand: 0, fireFlow: v(1500, 95),
 			desc: 'Fire hydrant junction, the high point of the loop and the design point for fire flow: ' + flow(1500, 95) + ' with ' + res + ' residual.' },
-		{ id: 'EXT-3', x: v(1200, 360), y: 0, elev: v(1218, 371.5), demand: v(10, 0.6), desc: 'Three houses.' }
+		{ id: 'EXT-3', ll: [-98.408674, 30.276769], elev: v(1218, 371.5), demand: v(10, 0.6), desc: 'Three houses.' }
 	];
+	const orgUs = locate(nodes, 'EPSG:2277', si);   // Texas Central, Johnson City
 	const big = v(12, 300), small = v(8, 200);
 	const links = [
 		{ id: 'PMP-1', type: 'pump', from: 'SYS', to: 'HYD-P', curve: 'SYSTEM',
@@ -71,7 +101,7 @@ function extension(si) {
 	];
 	return {
 		key: 'Fire-flow-extension', name: 'Fire flow extension', si,
-		crsUs: 'EPSG:2277', crsSi: 'EPSG:32139', where: [30.28, -98.41],   // Texas Central, near Johnson City
+		crsUs: 'EPSG:2277', crsSi: 'EPSG:32139', orgUs,
 		title: 'Fire flow extension', nodes, links,
 		curve: { id: 'SYSTEM', note: 'Existing system from the hydrant flow test: static, mid and max flow',
 			pts: v([[0, 143.2], [600, 129.4], [1200, 110.9]], [[0, 43.5], [38, 39.5], [76, 34]]) },
@@ -85,7 +115,7 @@ function extension(si) {
 		texts: ['Fire flow extension',
 			'SYS and PMP-1 stand for the existing system, from the hydrant flow test at HYD-P and HYD-F.',
 			'Design point: ' + flow(1500, 95) + ' at FH-1 with ' + res + ' residual. Scenarios 1 to 3 repeat the flow test.'],
-		textAt: v([[600, 480], [600, 410], [600, 370]], [[180, 146], [180, 125], [180, 113]])
+		textAt: titleAt(nodes, si)
 	};
 }
 
@@ -94,19 +124,20 @@ function well(si) {
 	const flow = (us, m) => si ? m + ' L/s' : fmt(us) + ' gpm';
 	const res = v('20 psi', '14 m');
 	const nodes = [
-		{ id: 'WELL-1', type: 'reservoir', x: v(-400, -120), y: 0, head: v(1330, 405.5),
+		{ id: 'WELL-1', type: 'reservoir', ll: [-99.6315968, 33.4492181], head: v(1330, 405.5),
 			desc: 'Community well, as a fixed head at its pumping water level, ' + v('160 ft below the 1,490 ft', '49 m below the 454.5 m') + ' ground at the wellhead.' },
-		{ id: 'WH-1', x: 0, y: 0, elev: v(1485, 454.5), demand: 0, desc: 'Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.' },
-		{ id: 'C-1', x: v(400, 120), y: 0, elev: v(1480, 451), demand: 0, desc: 'Where the well supply enters the loop.' },
-		{ id: 'C-2', x: v(600, 180), y: 0, elev: v(1478, 450.5), demand: v(6, 0.4), desc: 'Thirteen houses.' },
-		{ id: 'C-3', x: v(800, 240), y: 0, elev: v(1476, 450), demand: v(5, 0.3), desc: 'Eleven houses.' },
-		{ id: 'C-4', x: v(800, 240), y: v(350, 105), elev: v(1474, 449.5), demand: v(5, 0.3), desc: 'Eleven houses. The tank connects here, the only tank connection.' },
-		{ id: 'C-5', x: v(600, 180), y: v(350, 105), elev: v(1476, 450), demand: v(4, 0.3), desc: 'Nine houses.' },
-		{ id: 'FH-1', x: v(400, 120), y: v(350, 105), elev: v(1478, 450.5), demand: v(4, 0.3), fireFlow: v(500, 32),
+		{ id: 'WH-1', ll: [-99.6312968, 33.4492181], elev: v(1485, 454.5), demand: 0, desc: 'Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.' },
+		{ id: 'C-1', ll: [-99.6313264, 33.4496383], elev: v(1480, 451), demand: 0, desc: 'Where the well supply enters the loop.' },
+		{ id: 'C-2', ll: [-99.6313548, 33.4503786], elev: v(1478, 450.5), demand: v(6, 0.4), desc: 'Thirteen houses.' },
+		{ id: 'C-3', ll: [-99.631389, 33.4510723], elev: v(1476, 450), demand: v(5, 0.3), desc: 'Eleven houses.' },
+		{ id: 'C-4', ll: [-99.6305304, 33.4510928], elev: v(1474, 449.5), demand: v(5, 0.3), desc: 'Eleven houses. The tank connects here, the only tank connection.' },
+		{ id: 'C-5', ll: [-99.6305159, 33.4503979], elev: v(1476, 450), demand: v(4, 0.3), desc: 'Nine houses.' },
+		{ id: 'FH-1', ll: [-99.6305005, 33.4496572], elev: v(1478, 450.5), demand: v(4, 0.3), fireFlow: v(500, 32),
 			desc: 'Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: ' + flow(500, 32) + ' with ' + res + ' residual, for two hours from the tank and the pump.' },
-		{ id: 'TANK-1', type: 'tank', x: v(1280, 385), y: v(450, 135), elev: v(1590, 485), init: v(17, 5.2), min: v(2, 0.6), max: v(20, 6), dia: v(24, 7.5),
+		{ id: 'TANK-1', type: 'tank', ll: [-99.630545, 33.45219], elev: v(1590, 485), init: v(17, 5.2), min: v(2, 0.6), max: v(20, 6), dia: v(24, 7.5),
 			desc: 'Ground storage tank on the hill above the community, ' + v('24 ft in diameter and 20 ft high, about 67,000 gal', '7.5 m in diameter and 6 m high, about 265 cubic meters') + '.' }
 	];
+	const orgUs = locate(nodes, 'EPSG:2276', si);   // Texas North Central, Munday
 	const links = [
 		{ id: 'WP-1', type: 'pump', from: 'WELL-1', to: 'WH-1', curve: 'WELL',
 			desc: 'Submersible well pump, ' + v('120 gpm at 275 ft, about 15 hp', '7.5 L/s at 84 m, about 11 kW') + '. Runs when TANK-1 falls below ' + v('16 ft', '4.8 m') + ' and stops above ' + v('19 ft', '5.8 m') + '. '
@@ -124,7 +155,7 @@ function well(si) {
 	];
 	return {
 		key: 'Community-well-tank', name: 'Community well and tank', si,
-		crsUs: 'EPSG:2276', crsSi: 'EPSG:32138', where: [33.05, -99.20],   // Texas North Central
+		crsUs: 'EPSG:2276', crsSi: 'EPSG:32138', orgUs,
 		title: 'Community well and tank', nodes, links,
 		curve: { id: 'WELL', note: 'Well pump, three points: shutoff, design, maximum', pts: v([[0, 350], [120, 275], [190, 185]], [[0, 107], [7.5, 84], [12, 56]]) },
 		pattern: { id: 'DAILY', note: 'Residential diurnal demand', m: [0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1.3, 1.6, 1.4, 1.1, 1.0, 1.1, 1.0, 0.9, 1.0, 1.0, 1.2, 1.5, 1.6, 1.4, 1.1, 1.0, 0.9, 0.6] },
@@ -133,20 +164,18 @@ function well(si) {
 		scenarios: [{ name: scnName('lpn_scenario_preset_max_day', 1), mult: 2 }, { name: scnName('lpn_scenario_preset_peak_hour', 2), mult: 3 }],
 		texts: ['Community well and tank',
 			'WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.',
-			'Design point: ' + flow(500, 32) + ' at FH-1 with ' + res + ' residual. The 24-hour run switches the pump on tank level.'],
-		textAt: v([[440, 650], [440, 590], [440, 555]], [[132, 195], [132, 177], [132, 166]])
+			'Design point: ' + flow(500, 32) + ' at FH-1 with ' + res + ' residual. The 24-hour run switches the pump based on the tank level.'],
+		textAt: titleAt(nodes, si)
 	};
 }
 
-// Lengths: the US file draws them to scale; the SI file states round metres.
-const SI_LEN = { 'MAIN-1': 120, 'EXT-A': 60, 'EXT-B': 90, 'EXT-C': 120, 'EXT-D': 90, 'EXT-E': 120,
-	'CV-1': 120, 'L-1': 60, 'L-2': 60, 'L-3': 105, 'L-4': 60, 'L-5': 60, 'L-6': 105, 'TL-1': 148 };
+// Lengths are the drawn distance between the end nodes, to the whole foot (US) or whole metre (SI).
 function convert(spec) {
 	const byId = {};
 	spec.nodes.forEach((n) => { byId[n.id] = n; });
 	const links = spec.links.map((l) => {
 		const o = Object.assign({}, l);
-		if (l.type !== 'pump') { o.len = spec.si ? SI_LEN[l.id] : Math.round(dist(byId[l.from], byId[l.to])); }
+		if (l.type !== 'pump') { o.len = Math.round(dist(byId[l.from], byId[l.to])); }
 		return o;
 	});
 	return { nodes: spec.nodes, links, curve: spec.curve };
@@ -233,10 +262,7 @@ function build(spec) {
 	const f = JSON.parse(L.projectFileText());
 	// Coordinate system and origin: the plane position of the project's south-west corner, floored to 1000.
 	const crs = si ? spec.crsSi : spec.crsUs;
-	const usCode = spec.crsUs.replace('EPSG:', '');
-	proj4.defs('U' + usCode, DEFS[usCode]);
-	const o = proj4('EPSG:4326', 'U' + usCode, [spec.where[1], spec.where[0]]);
-	const orgUs = { x: Math.floor(o[0] / 1000) * 1000, y: Math.floor(o[1] / 1000) * 1000 };
+	const orgUs = spec.orgUs;
 	f.origin = si ? { x: Number((orgUs.x * FTUS).toPrecision(9)), y: Number((orgUs.y * FTUS).toPrecision(9)) } : orgUs;
 	f.project.crs = crs;
 	f.project.gallery = spec.key + (si ? '-SI' : '') + '.lwn';

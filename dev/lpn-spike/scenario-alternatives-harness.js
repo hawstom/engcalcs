@@ -261,7 +261,7 @@ console.log('\n--- no file changes ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- Basic mode ---');
 {
-	const s = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const s = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	L.applySaved(s);
 	L.buildDom();
 	const pk = L.createScenario('Peak Hour');

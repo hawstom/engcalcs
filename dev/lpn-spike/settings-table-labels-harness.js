@@ -91,7 +91,7 @@ files.forEach(function (f) {
 });
 // Tom's own examples, row for row: Node labels.ID.Is active / Show order / Drop order, a label's Before
 // and After stated or not (his "Bef. and Aft."), and a custom property's design owned by its key.
-L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')));
+L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8')));
 L.addCustomProp();
 {
 	const rows = L.labels(), pick = (id) => rows.filter((r) => r.id === JSON.stringify(id))[0];

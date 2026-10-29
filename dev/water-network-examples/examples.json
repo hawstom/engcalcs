@@ -1,19 +1,18 @@
 {
 	"_note": "Per-example metadata for the gallery (ROADMAP Task 314), keyed by file name. Everything a machine CAN derive is derived by dev/scripts/generate_examples.php from the project itself -- node and link counts, unit system, thumbnail -- and is deliberately not repeated here. The card's TITLE and DESCRIPTION are not here either: they live in lib/lang.ec.en.php as lpn_ex_<key>_title and lpn_ex_<key>_desc, because a string outside a lang file is a string no translator will ever see. So this file holds exactly two things a machine cannot work out: which lang keys an example uses, and where it sits on the wall.",
 
-	"_order": "Lower sorts earlier. Omit it (0) to let node+link count decide, which is the normal case: the tail of the wall runs small to large so a visitor grows into Net3 rather than opening on the densest thing we ship. Set it where size cannot express the intent. The head of the wall is set on purpose and is not size-ordered at all -- the Net3 SI and US pair lead, then Net2, then Elm Street Center, and the two basics sit last, after Net1, and are the same size, so without a key their sequence would be whatever the filesystem returned.",
+	"_order": "Lower sorts earlier. Omit it (0) to let node+link count decide. The wall is set on purpose and is not size-ordered: the four starter examples lead (Fire flow extension, then Community well and tank, each SI before US), then the Net3 pair, the Net2 pair, Elm Street Center, the Valves card, and the two Net1 cards last (SI first). Each pair is the same size, so without a key its sequence would be whatever the filesystem returned.",
 
-	"Net1.lwn": { "key": "net1", "order": -1 },
-	"Net1-Scenarios.lwn": { "key": "net1_scn", "order": 0 },
+	"Net1-Scenarios-SI.lwn": { "key": "net1_si", "order": -2 },
+	"Net1-Scenarios.lwn": { "key": "net1", "order": -1 },
 	"Valves.lwn": { "key": "valves", "order": -3 },
-	"Net1-SI.lwn": { "key": "net1_si", "order": -2 },
 	"Net2-Branford-CT-SI.lwn": { "key": "net2_si", "order": -60 },
 	"Net2-Branford-CT.lwn": { "key": "net2", "order": -50 },
 	"Net3-Novato-CA-World-SI.lwn": { "key": "net3_si", "order": -80 },
 	"Net3-Novato-CA-World.lwn": { "key": "net3", "order": -70 },
 	"Elm-Street-Center.lwn": { "key": "elm_street", "order": -30 },
-	"Fire-flow-extension-SI.lwn": { "key": "extension_si", "order": -25 },
-	"Fire-flow-extension.lwn": { "key": "extension", "order": -24 },
-	"Community-well-tank-SI.lwn": { "key": "well_si", "order": -23 },
-	"Community-well-tank.lwn": { "key": "well", "order": -22 }
+	"Fire-flow-extension-SI.lwn": { "key": "extension_si", "order": -104 },
+	"Fire-flow-extension.lwn": { "key": "extension", "order": -103 },
+	"Community-well-tank-SI.lwn": { "key": "well_si", "order": -102 },
+	"Community-well-tank.lwn": { "key": "well", "order": -101 }
 }

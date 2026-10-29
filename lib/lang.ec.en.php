@@ -1250,36 +1250,34 @@ $ec_lang['lpn_map_unmeasurable']='This page could not determine the size of the 
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls, gpm (US)';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 with scenarios and rule-based controls, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
-$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
-$ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
-$ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
-$ec_lang['lpn_ex_net1_scn_desc']='Gallons per minute, with feet and inches. EPANET\'s Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.';
+$ec_lang['lpn_ex_net1_desc']='Four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 with scenarios and rule-based controls, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. A fictional EPANET example, converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 95 L/s.. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_valves_title']='Valve types, gpm (US)';
-$ec_lang['lpn_ex_valves_desc']='Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.';
+$ec_lang['lpn_ex_valves_desc']='A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state. Gallons per minute, with feet and inches.';
 // Starter examples (Task 823, Tom 2026-10-23). Not translated yet, like the Valves card: the other 26 files fall back to this English.
 $ec_lang['lpn_ex_extension_si_title']='Fire flow extension, L/s (SI)';
-$ec_lang['lpn_ex_extension_si_desc']='Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.';
+$ec_lang['lpn_ex_extension_si_desc']='A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_extension_title']='Fire flow extension, gpm (US)';
-$ec_lang['lpn_ex_extension_desc']='Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.';
+$ec_lang['lpn_ex_extension_desc']='A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_well_si_title']='Community well and tank, L/s (SI)';
-$ec_lang['lpn_ex_well_si_desc']='Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.';
+$ec_lang['lpn_ex_well_si_desc']='A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_well_title']='Community well and tank, gpm (US)';
-$ec_lang['lpn_ex_well_desc']='Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.';
+$ec_lang['lpn_ex_well_desc']='A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_si_desc']='An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_desc']='An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_si_desc']='An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_desc']='An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
+$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';

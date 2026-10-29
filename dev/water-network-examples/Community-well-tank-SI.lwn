@@ -32,8 +32,8 @@
 		{
 			"id": "WH-1",
 			"type": "junction",
-			"x": 0,
-			"y": 0,
+			"x": 137.2,
+			"y": 13.29,
 			"elev": 454.5,
 			"_demand": 0,
 			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.",
@@ -42,8 +42,8 @@
 		{
 			"id": "C-1",
 			"type": "junction",
-			"x": 120,
-			"y": 0,
+			"x": 134.95,
+			"y": 59.91,
 			"elev": 451,
 			"_demand": 0,
 			"desc": "Where the well supply enters the loop.",
@@ -52,8 +52,8 @@
 		{
 			"id": "C-2",
 			"type": "junction",
-			"x": 180,
-			"y": 0,
+			"x": 133.2,
+			"y": 142.04,
 			"elev": 450.5,
 			"_demand": 0.4,
 			"desc": "Thirteen houses.",
@@ -62,8 +62,8 @@
 		{
 			"id": "C-3",
 			"type": "junction",
-			"x": 240,
-			"y": 0,
+			"x": 130.84,
+			"y": 219,
 			"elev": 450,
 			"_demand": 0.3,
 			"desc": "Eleven houses.",
@@ -72,8 +72,8 @@
 		{
 			"id": "C-4",
 			"type": "junction",
-			"x": 240,
-			"y": 105,
+			"x": 210.68,
+			"y": 220.41,
 			"elev": 449.5,
 			"_demand": 0.3,
 			"desc": "Eleven houses. The tank connects here, the only tank connection.",
@@ -82,8 +82,8 @@
 		{
 			"id": "C-5",
 			"type": "junction",
-			"x": 180,
-			"y": 105,
+			"x": 211.2,
+			"y": 143.34,
 			"elev": 450,
 			"_demand": 0.3,
 			"desc": "Nine houses.",
@@ -92,8 +92,8 @@
 		{
 			"id": "FH-1",
 			"type": "junction",
-			"x": 120,
-			"y": 105,
+			"x": 211.75,
+			"y": 61.18,
 			"elev": 450.5,
 			"_demand": 0.3,
 			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 32 L/s with 14 m residual, for two hours from the tank and the pump.",
@@ -103,16 +103,16 @@
 		{
 			"id": "WELL-1",
 			"type": "reservoir",
-			"x": -120,
-			"y": 0,
+			"x": 109.31,
+			"y": 13.59,
 			"_head": 405.5,
 			"desc": "Community well, as a fixed head at its pumping water level, 49 m below the 454.5 m ground at the wellhead."
 		},
 		{
 			"id": "TANK-1",
 			"type": "tank",
-			"x": 385,
-			"y": 135,
+			"x": 210.64,
+			"y": 342.1,
 			"elev": 485,
 			"bottomElev": 485,
 			"_level": 5.2,
@@ -131,7 +131,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 120,
+			"_length": 47,
 			"lenAuto": false,
 			"_status": "cv",
 			"_k": 0,
@@ -145,7 +145,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 60,
+			"_length": 82,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -158,7 +158,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 60,
+			"_length": 77,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -171,7 +171,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 105,
+			"_length": 80,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -184,7 +184,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 60,
+			"_length": 77,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -197,7 +197,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 60,
+			"_length": 82,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0
@@ -210,7 +210,7 @@
 			"verts": [],
 			"_diameter": 150,
 			"_roughness": 140,
-			"_length": 105,
+			"_length": 77,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -224,7 +224,7 @@
 			"verts": [],
 			"_diameter": 200,
 			"_roughness": 130,
-			"_length": 148,
+			"_length": 122,
 			"lenAuto": false,
 			"_status": "open",
 			"_k": 0,
@@ -247,8 +247,8 @@
 		{
 			"id": "X1",
 			"text": "Community well and tank",
-			"x": 132,
-			"y": 195,
+			"x": 160.5,
+			"y": 397.1,
 			"anchorNode": null,
 			"sizeMult": 3,
 			"allZoom": true
@@ -256,17 +256,17 @@
 		{
 			"id": "X2",
 			"text": "WELL-1 and WP-1 are the well and its pump. TANK-1 has one connection, TL-1.",
-			"x": 132,
-			"y": 177,
+			"x": 160.5,
+			"y": 375.1,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
 		},
 		{
 			"id": "X3",
-			"text": "Design point: 32 L/s at FH-1 with 14 m residual. The 24-hour run switches the pump on tank level.",
-			"x": 132,
-			"y": 166,
+			"text": "Design point: 32 L/s at FH-1 with 14 m residual. The 24-hour run switches the pump based on the tank level.",
+			"x": 160.5,
+			"y": 363.1,
 			"anchorNode": null,
 			"sizeMult": 1,
 			"allZoom": false
@@ -285,8 +285,8 @@
 	},
 	"customers": [],
 	"origin": {
-		"x": 534620.269,
-		"y": 2153416.31
+		"x": 494691.389,
+		"y": 2198222
 	},
 	"labelSettings": {
 		"node": {
@@ -537,9 +537,9 @@
 		]
 	},
 	"view": {
-		"cx": 132.5,
-		"cy": 97.5,
-		"s": 1.782
+		"cx": 160.5,
+		"cy": 205.2,
+		"s": 1.355
 	},
 	"units": {
 		"lpn_u_length": "m",
