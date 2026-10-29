@@ -15,7 +15,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 831 — Shapes honour Is active per scenario, in the Presentation category.
+- Task 831 — Shapes honour Is active per scenario.
 
 ## 95 — Priority 95 (6)
 

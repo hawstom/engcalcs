@@ -484,6 +484,11 @@
 	// `replacing` is the starting elevation, when this run is the SECOND question -- the one about
 	// nodes that still hold the number a new node is born with. Naming that number is the whole
 	// point of asking separately, so it is never summarised away.
+	// Which scenario the elevations will be written to, said by the page (Task 814); empty in a
+	// project that is Base alone, or when no page has said.
+	function scenarioLine() {
+		return (seam && typeof seam.scenarioSentence === 'function' && seam.scenarioSentence()) || '';
+	}
 	EC.lpnTerrainPlanText = function (want, keep, tileCount, replacing) {
 		var fillCount = (want || []).length, keepCount = (keep || []).length;
 		var s = (replacing === undefined)
@@ -507,6 +512,7 @@
 				+ ' ' + named('lpn_terrain_keep_ids', 'They are: {ids}', keep);
 		}
 		s += '\n\n' + accuracy();
+		if (scenarioLine()) { s += '\n\n' + scenarioLine(); }
 		s += '\n\n' + (window.EngCalcs && EngCalcs.macWords ? EngCalcs.macWords : String)(t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.'));
 		// **THE COUNT IS SUBSTITUTED, NOT CONCATENATED** -- Turkish filed this against sprint 459's
 		// English and was right: `count + ' ' + string` fixes the number to the FRONT of the sentence,
@@ -535,6 +541,7 @@
 	EC.lpnTerrainDoneText = function (filledIds, blankIds, failedTiles) {
 		var parts = [
 			t('lpn_terrain_done', '{n} elevation(s) filled in.').replace('{n}', (filledIds || []).length),
+			scenarioLine(),
 			named('lpn_terrain_filled_ids', 'These nodes were filled in: {ids}', filledIds)
 		];
 		if ((blankIds || []).length) {
@@ -866,7 +873,12 @@
 			// request was in flight -- is named exactly once and named correctly.
 			var blank = want.map(function (p) { return p.id; })
 				.filter(function (id) { return !wrote[id]; });
-			if (!quiet || blank.length || failed) { notice(EC.lpnTerrainDoneText(filled, blank, failed)); }
+			if (!quiet || blank.length || failed) {
+				// With a second scenario the receipt waits for OK (the page's own dialog, which also logs it),
+				// so the line saying where the elevations went cannot vanish with the 8-second notice (Task 814).
+				if (!quiet && filled.length && scenarioLine() && seam.receipt) { seam.receipt(EC.lpnTerrainDoneText(filled, blank, failed)); }
+				else { notice(EC.lpnTerrainDoneText(filled, blank, failed)); }
+			}
 		});
 	}
 

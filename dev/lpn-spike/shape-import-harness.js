@@ -71,6 +71,13 @@ function helpers(a) {
 		});
 	};
 	const shapes = async () => ((await stored()).shapes || []);
+	// A project with a second scenario answers a Shapes import with a dialog that ends "Shapes appear in
+	// every scenario." (Task 814); it is read and closed here, and its text stands for the notice.
+	const takeReceipt = async () => {
+		const d = await a.dialog(), every = (await a.lang('lpn_shapes_every_scenario')).trim();
+		if (d && d.text.indexOf(every) >= 0) { await a.dialogClick((await a.lang('lpn_dialog_ok')).trim()); await settle(300); return d.text; }
+		return a.notice();
+	};
 	// One File > Import row, by the real menu and the real file chooser.
 	const importVia = async (labelKey, files) => {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
@@ -80,7 +87,7 @@ function helpers(a) {
 		]);
 		await chooser.setFiles(files);
 		await settle(1200);
-		return a.notice();
+		return takeReceipt();
 	};
 	const exportVia = async (key) => {
 		const downloads = [];
@@ -119,7 +126,7 @@ function helpers(a) {
 		await P.waitForSelector('#lpn_new_panel', { state: 'hidden' });
 		await a.settle(800);
 	};
-	return { P, settle, stored, shapes, importVia, exportVia, undo, newCrsProject };
+	return { takeReceipt, P, settle, stored, shapes, importVia, exportVia, undo, newCrsProject };
 }
 
 async function main() {
@@ -253,11 +260,11 @@ async function main() {
 		ok('numbers that fit Web Mercator but not degrees are offered as EPSG:3857 by a question with one action button',
 			!!d && d.text.indexOf('EPSG:3857') >= 0 && d.text.indexOf(pick) >= 0 && d.buttons[0] === await L('lpn_shp_import_webmerc_ok'), JSON.stringify(d));
 		await press(1);
-		note = await a.notice();
+		note = await h.takeReceipt();
 		ok('Cancel imports nothing and says what to pick', (await h.shapes()).length === 0 && note.indexOf((await L('lpn_shp_import_refuse_range')).replace('{file}', 'shapes-grid.shp')) === 0 && note.indexOf(pick) >= 0, note);
 		await h.importVia('lpn_file_import_shp', fx('shapes-webmerc-noprj.shp'));
 		await press(0);
-		note = await a.notice(); sh = await h.shapes();
+		note = await h.takeReceipt(); sh = await h.shapes();
 		ok('the offered button imports them converted from EPSG:3857, exactly to the longitude and latitude they stand for',
 			sh.length === 2 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].x + 112.0123) < 1e-8 && Math.abs(sh.find((x) => x.pts.length === 1).pts[0].y - 33.4567) < 1e-8 &&
 			note.indexOf((await L('lpn_shp_import_reprojected')).split('{theirs}')[0]) >= 0 && note.indexOf('EPSG:3857') >= 0, note);

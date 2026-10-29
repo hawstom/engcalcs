@@ -235,9 +235,12 @@ async function main() {
 			ok(row + ': a project with a scenario besides Base asks first', !!r.dlg && r.dlg.buttons.join('|') === exportBtn + '|' + cancelBtn, JSON.stringify(r.dlg));
 			if (r.dlg) {
 				ok(row + ': the box names the file kind', title.indexOf(row.replace(/…$/, '')) >= 0, title);
-				const lead = (await L('lpn_export_confirm_lead')).replace('{format}', row.replace(/…$/, '')).replace('{n}', '2');
-				ok(row + ': it says the file holds one scenario, which one, and that this project has two',
-					r.dlg.text.indexOf(lead) >= 0 && r.dlg.text.indexOf((await L('lpn_export_holds_base')).trim()) >= 0, r.dlg.text);
+				const lead = (await L('lpn_noscn_lead')).replace('{format}', await L('lpn_noscn_fmt_' + key.replace('lpn_file_export_item_', ''))).replace('{n}', '2');
+				ok(row + ': Tom\'s pattern, a notice that this project has 2 scenarios and the file kind has none, then what is exported',
+					r.dlg.text === lead + ' ' + (await L('lpn_export_goes_base')), r.dlg.text);
+				if (key.endsWith('_inp')) {
+					ok('the EPANET file wording is exactly Tom\'s sentence', r.dlg.text.indexOf('This project has 2 scenarios, but an EPANET file has no scenarios or alternatives. ') === 0, r.dlg.text);
+				}
 			}
 			await r.wait;
 			ok(row + ': nothing is written before the answer', !r.got());
@@ -262,7 +265,8 @@ async function main() {
 		await page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.indexOf('Peak hour') >= 0); if (r) { r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 		await a.settle(1200);
 		const rp = await exportDownload(null, 'EPANET file…');
-		ok('with Peak hour open the box names Peak hour', !!rp.dlg && rp.dlg.text.indexOf((await L('lpn_export_holds_scenario')).replace('{scenario}', 'Peak hour')) >= 0, rp.dlg && rp.dlg.text);
+		ok('with Peak hour open the box names Peak hour', !!rp.dlg && rp.dlg.text.indexOf('Exporting the scenario "Peak hour" to a unique file name.') >= 0
+			&& rp.dlg.text === 'This project has 2 scenarios, but an EPANET file has no scenarios or alternatives. Exporting the scenario "Peak hour" to a unique file name.', rp.dlg && rp.dlg.text);
 		if (rp.dlg) { await a.dialogClick(cancelBtn); }
 		await a.closeMenu();
 
