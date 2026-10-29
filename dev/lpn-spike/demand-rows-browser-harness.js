@@ -55,7 +55,7 @@ async function main() {
 				baseInput: !!ed, baseValue: ed ? ed.value : (ro ? ro.textContent.trim() : null), baseMuted: ro ? getComputedStyle(ro).color : null, baseInk: ed ? getComputedStyle(ed).color : null,
 				pattern: !!rp && !!rp.querySelector('select'),
 				count: rc && rc.querySelector('.lpn-demand-count') ? rc.querySelector('.lpn-demand-count').textContent.trim() : null,
-				button: rc && rc.querySelector('button.lpn-demand-more') ? { text: rc.querySelector('button').textContent, vis: vis(rc.querySelector('button')) } : null
+				button: rc && rc.querySelector('button.lpn-demand-more') ? { text: rc.querySelector('button').textContent, vis: vis(rc.querySelector('button')), x: Math.round(rc.querySelector('button').getBoundingClientRect().left), baseX: rb ? Math.round((rb.querySelector('.lpn-gval') || rb).getBoundingClientRect().left) : null } : null
 			};
 		}, [BASE, PAT, CATS]);
 		const box = () => P.evaluate(() => {
@@ -78,7 +78,7 @@ async function main() {
 		ok('R1 Properties draws no demand table and no "+" button', !r.table && !r.add);
 		ok('R1 Base demand is a box to type in, holding 150', r.baseInput && r.baseValue === '150', JSON.stringify(r.baseValue));
 		ok('R1 a Demand pattern row stands beside it (one category)', r.pattern);
-		ok('R1 Demand categories reads 1 beside a "..." button', r.count === '1' && !!r.button && r.button.vis && /^…$/.test(r.button.text), JSON.stringify([r.count, r.button]));
+		ok('R1 Demand categories reads 1 with a "..." at the right of its cell, which starts where Base demand does', r.count === '1' && !!r.button && r.button.vis && /^1\u2026$/.test(r.button.text) && r.button.x === r.button.baseX, JSON.stringify([r.count, r.button]));
 
 		console.log('\n--- the box (R2, R3, R4) ---');
 		ok('R2 the box is closed until asked', !(await box()).shown);
@@ -134,7 +134,8 @@ async function main() {
 		r = await rows();
 		ok('R6 Properties shows 310 in the scenario', r.baseValue === '310', r.baseValue);
 		// Adding a category in the scenario keeps Base alone and the total adds up.
-		await P.click('#lpn_demand_more');
+		// (the box is still open from above and stands over the button, so ask by the button's own click)
+		await P.evaluate(() => { document.getElementById('lpn_demand_more').click(); });
 		await a.settle(500);
 		await P.click('#lpn_demands_body .lpn-demand-add');
 		await a.settle(700);
@@ -144,6 +145,7 @@ async function main() {
 		ok('R6 ...and the scenario row count is 2 with Base demand the total, 310', r.count === '2' && r.baseValue === '310', JSON.stringify([r.count, r.baseValue]));
 
 		console.log('\n--- an open box follows the junction (R7) ---');
+		await P.evaluate(() => { const b = document.getElementById('lpn_demands_box'); b.style.left = '960px'; b.style.top = '180px'; });   // off the junctions to click
 		await U.openProperties(ctx, 'node', '21');
 		b = await box();
 		ok('R7 selecting another junction retitles the open box', b.shown && /\b21\b/.test(b.title), b.title);

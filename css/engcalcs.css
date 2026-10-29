@@ -2892,15 +2892,19 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-add { font: inherit; margin: 2px 0; }
 /* THE DEMAND CATEGORIES BOX (sheet-light). The list Properties no longer draws: the same light sheet as the other boxes (hairline rules, no box
    round a cell, an editable cell filled on hover and outlined on focus, an empty one underlined faintly), as a table of one row per category. */
-.lpn-demandsbox { width: min(27rem, 94vw); height: min(22rem, 92vh); min-width: min(26rem, 94vw); min-height: min(12rem, 92vh); }
+.lpn-demandsbox { width: min(27rem, 94vw); height: min(22rem, 92vh); min-width: min(20rem, 94vw); min-height: min(12rem, 92vh); }
 #lpn_demands_body { overflow: auto; }
-#lpn_demands_body .lpn-demand-table { display: table; width: 100%; margin: 0; border-collapse: collapse; table-layout: auto; }
+#lpn_demands_body .lpn-demand-table { display: table; width: 100%; margin: 0; border-collapse: collapse; }
+#lpn_demands_body > .lpn-demand-table { table-layout: fixed; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(1) { width: 7.5em; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(2) { width: 9em; }
+#lpn_demands_body > .lpn-demand-table th:last-child { width: 2.4em; }
 #lpn_demands_body .lpn-demand-table :is(th, td) { padding: 0; border: 0; border-bottom: 1px solid var(--ec-hairline); font-size: .85em; text-align: start; }
 #lpn_demands_body .lpn-demand-table :is(th, td) + :is(th, td) { border-inline-start: 1px solid var(--ec-hairline); }
 #lpn_demands_body .lpn-demand-table th { padding: 4px 6px; font-weight: 600; opacity: .8; }
-#lpn_demands_body .lpn-demand-table td:last-child { width: 1%; text-align: center; white-space: nowrap; }
+#lpn_demands_body > .lpn-demand-table td:last-child { text-align: center; white-space: nowrap; }
 #lpn_demands_body .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
-	display: block; width: 100%; max-width: none; min-width: 3em; margin: 0; padding: 4px 6px; box-sizing: border-box;
+	display: block; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px; box-sizing: border-box;
 	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em; text-overflow: ellipsis;
 }
 #lpn_demands_body .lpn-demand-table input[type="number"] { text-align: end; font-variant-numeric: tabular-nums; }
@@ -2916,9 +2920,15 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body .lpn-node-customers { margin: 8px 0 0; font-size: .85em; }
 #lpn_demands_body .lpn-node-customers .lpn-demand-table { margin-top: 4px; }
 #lpn_demands_body .lpn-node-customers .lpn-demand-table :is(th, td) { padding: 4px 6px; }
-/* The Demand categories row in Properties: the count, and the button that opens the box. */
-.lpn-demand-cats { display: flex; align-items: center; gap: 8px; }
-.lpn-demand-more { font: inherit; line-height: 1; padding: 1px 8px; cursor: pointer; }
+/* The Demand categories row in Properties: one cell, the count at its left and the "..." at its right, opening the box. */
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval {
+	display: flex; justify-content: space-between; align-items: center; align-self: stretch; box-sizing: border-box; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px;
+	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: .85em; line-height: inherit; text-align: start; color: inherit; cursor: pointer;
+}
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:hover { background: var(--ec-hover-bg); }
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+.lpn-demand-count { color: var(--ec-ink-muted); }
+@media (max-width: 30rem) { .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval { padding: 4px 6px 8px; font-size: .95em; } }
 /* The Elevation field's DEM control in the node popup (Task 542). A button and, once it has been
    asked, one line saying what the terrain service reported — kept together so the sentence reads as
    belonging to the button rather than to the field below it. */

@@ -761,7 +761,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`c1459847c`) — adds no English strings
+### box-design (`c1459847c`) — already merged into feat/settings-pinned; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -769,7 +769,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
 
-### feat/settings-pinned (`c1459847c`) — already merged into box-design; its strings are listed there
+### feat/settings-pinned (`bdbdeb4e8`) — adds no English strings
 
 ### feat/shape-scenario (`8ee873fdd`) — 13 new, 13 to read @@ NEEDS RULING
 
@@ -813,7 +813,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Shapes appear in {scenario} only.
   @@ NEEDS RULING
 
-### feat/sheet-light (`c1459847c`) — already merged into box-design; its strings are listed there
+### feat/sheet-light (`a094c08f4`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -977,7 +977,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`5d26c04e3`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`8e38fb373`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.

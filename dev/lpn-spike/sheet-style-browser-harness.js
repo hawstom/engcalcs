@@ -156,29 +156,32 @@ async function main() {
 			await a.settle(900);
 		};
 		await openNode('11');
+		await page.click('#lpn_demand_more');
+		await a.settle(600);
 		const j = await page.evaluate(() => {
-			const f = document.getElementById('lpn_popup_fields'), R = (e) => e.getBoundingClientRect();
-			const btn = f.querySelector('.lpn-demand-add'), wrap = btn && btn.parentNode, tbl = f.querySelector('.lpn-demand-table');
-			const nextRow = wrap && Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => R(r).top >= R(wrap).bottom - 1 && R(r).height > 0)[0];
+			const f = document.getElementById('lpn_popup_fields'), body = document.getElementById('lpn_demands_body'), R = (e) => e.getBoundingClientRect();
+			const btn = body.querySelector('.lpn-demand-add'), tbl = body.querySelector('.lpn-demand-table');
 			const th = tbl && tbl.querySelectorAll('thead th');
 			const g = document.querySelector('#lpn_popup_graph .lpn-pgraph-row');
 			const rows = Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => r.querySelector('.lpn-gname') && R(r).height > 0);
 			return {
 				text: btn && btn.textContent, title: btn && btn.title, aria: btn && btn.getAttribute('aria-label'),
-				gapAbove: tbl && wrap ? R(wrap).top - R(tbl).bottom : null, gapBelow: nextRow ? R(nextRow).top - R(wrap).bottom : null, wrapH: wrap ? R(wrap).height : null,
-				wrapRule: wrap ? getComputedStyle(wrap).boxShadow : null, wrapW: wrap ? R(wrap).width : null, rowW: rows[0] ? R(rows[0]).width : null,
+				gapAbove: tbl && btn ? R(btn).top - R(tbl).bottom : null, btnH: btn ? R(btn).height : null, btnW: btn ? R(btn).width : null, tblW: tbl ? R(tbl).width : null,
+				btnRule: btn ? getComputedStyle(btn).borderBottomWidth : null, inProps: !!f.querySelector('.lpn-demand-add, .lpn-demand-table'),
 				thDivider: th && th.length > 1 ? getComputedStyle(th[1]).borderInlineStartWidth : null,
 				graphRule: g ? getComputedStyle(g).boxShadow : null, graphLabelEdge: g ? Math.round(R(g.querySelector('label')).right) : null,
 				nameEdge: Math.round(R(rows[0].querySelector('.lpn-gname')).right), graphEdge: g ? Math.round(R(g).left) : null, rowEdge: Math.round(R(rows[0]).left)
 			};
 		});
 		const addWords = await a.lang('lpn_demand_add');
-		ok('E the demand button shows just "+"', j.text === '+', JSON.stringify(j.text));
+		ok('E the demand button (in the Demand categories box) shows just "+"', j.text === '+', JSON.stringify(j.text));
 		ok('E its old words are its tip and its name', j.title === addWords && j.aria === addWords, j.title);
-		ok('A the add row sits flush under the table and above the next row (no gap)', Math.abs(j.gapAbove) <= 1.5 && Math.abs(j.gapBelow) <= 1.5, JSON.stringify({ above: j.gapAbove, below: j.gapBelow }));
-		ok('A the add row is one row tall, not five', j.wrapH <= 36, String(j.wrapH));
-		ok('B the add row has its left, right and bottom rules and spans the Label and Value columns', /rgb/.test(j.wrapRule || '') && Math.abs(j.wrapW - j.rowW) <= 1.5, JSON.stringify({ rule: j.wrapRule, wrapW: j.wrapW, rowW: j.rowW }));
+		ok('A the add row sits flush under the table (no gap) and is one row tall', Math.abs(j.gapAbove) <= 1.5 && j.btnH <= 36, JSON.stringify({ above: j.gapAbove, h: j.btnH }));
+		ok('B the add row has its hairline under it and is as wide as the table', j.btnRule === '1px' && Math.abs(j.btnW - j.tblW) <= 1.5, JSON.stringify({ rule: j.btnRule, btnW: j.btnW, tblW: j.tblW }));
 		ok('B the demand table has a rule between its columns', j.thDivider === '1px', String(j.thDivider));
+		ok('E Properties itself holds neither the table nor the "+" button', !j.inProps);
+		await page.evaluate(() => { document.getElementById('lpn_demands_close').click(); });
+		await a.settle(250);
 		ok('C the Time series row is ruled and its Label rule stands under the one above', /rgb/.test(j.graphRule || '') && j.graphEdge === j.rowEdge, JSON.stringify({ rule: j.graphRule, graphEdge: j.graphEdge, rowEdge: j.rowEdge }));
 		// D: the box shrinks to its floor; the Value column shrinks with it and cuts with an ellipsis, never wraps, never pushes past the box.
 		await closeBox('lpn_popup'); await a.settle(250);
@@ -215,8 +218,9 @@ async function main() {
 			rows.forEach((r) => {
 				const sh = getComputedStyle(r).boxShadow;
 				if (sh === 'none') { out.noRule++; } else {
-					if ((sh.match(/inset/g) || []).length > 1) { out.sided.push(r.id || r.querySelector('.lpn-gname').textContent.trim().slice(0, 14)); }
-					out.ruleColor = (sh.match(/rgba?\([^)]*\)/) || [null])[0];
+					// a shadow with a sideways offset is a rule at the row's side (a rule above or below has none)
+					sh.split(/,(?![^(]*\))/).forEach((one) => { const nums = one.replace(/(?:rgba?|color)\([^)]*\)/, '').replace('inset', '').trim().split(/\s+/).map(parseFloat); if (nums[0] !== 0) { out.sided.push(r.id || r.querySelector('.lpn-gname').textContent.trim().slice(0, 14)); } });
+					out.ruleColor = (sh.match(/(?:rgba?|color)\([^)]*\)/) || [null])[0];
 				}
 				const v = r.querySelector(':scope > .lpn-gval');
 				if (v && v.type !== 'checkbox' && v.type !== 'radio' && R(v).width > 0) {
@@ -305,11 +309,15 @@ async function main() {
 			}
 			ok('D1 theme ' + th + (dark ? ' (dark)' : '') + ': ' + n + ' options and their pull-downs read at 3 : 1 or better', n > 0 && bad.length === 0, JSON.stringify(bad.slice(0, 3)));
 			const hl = await page.evaluate(() => {
-				const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((e) => e.getBoundingClientRect().height > 0 && getComputedStyle(e).display !== 'contents')[0];
-				const sh = r ? getComputedStyle(r).boxShadow : '', c = (sh.match(/rgba?\([^)]*\)/) || [null])[0], paper = getComputedStyle(document.getElementById('lpn_popup')).backgroundColor;
-				return { rule: c, paper: paper };
+				const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((e) => e.querySelector('.lpn-gname') && !e.classList.contains('lpn-fill-row') && e.getBoundingClientRect().height > 0 && getComputedStyle(e).display !== 'contents')[0];
+				const sh = r ? getComputedStyle(r).boxShadow : '', c = (sh.match(/(?:rgba?|color)\([^)]*\)/) || [null])[0], paper = getComputedStyle(document.getElementById('lpn_popup')).backgroundColor;
+				const px = (col) => { const k = document.createElement('canvas'); k.width = k.height = 1; const x = k.getContext('2d'); x.fillStyle = '#000'; x.fillStyle = col; x.fillRect(0, 0, 1, 1); return Array.from(x.getImageData(0, 0, 1, 1).data); };
+				const lum = (a) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(a[0]) + 0.7152 * f(a[1]) + 0.0722 * f(a[2]); };
+				if (!c) { return { rule: null, paper }; }
+				const a = lum(px(c)), b = lum(px(paper)), ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+				return { rule: c, paper, ratio: Math.round(ratio * 100) / 100 };
 			});
-			ok('L8 theme ' + th + ': the row hairline is a visible colour of its own, not the paper', !!hl.rule && hl.rule !== hl.paper, JSON.stringify(hl));
+			ok('L8 theme ' + th + ': the row hairline shows against the paper (contrast at least 1.1 : 1)', !!hl.rule && hl.ratio >= 1.1, JSON.stringify(hl));
 		}
 		ok('D1 the list holds at least one dark theme', darkSeen >= 1, String(darkSeen));
 		ok('D2 no page errors', errors.length === 0, errors.join(' | '));

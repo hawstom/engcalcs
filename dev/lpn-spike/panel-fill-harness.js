@@ -165,6 +165,8 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Calibration report (Task 601): a six-column statistics table and two charts, the
 		// same report-box family as Status and Full, so a phone wants the whole window for it.
 		['openCalibBox', 'the calibration report box'],
+		// The junction demands box (sheet-light): Properties' Demand categories row opens it, on the Calibration box's shell.
+		['openDemandsBox', 'the junction demands box'],
 		// The Contour plot box (Task 600): the Find box's shell and the same rule as Find -- a
 		// column of controls that is unreadable at a third of a phone's width.
 		['openContourBox', 'the contour plot box'],
