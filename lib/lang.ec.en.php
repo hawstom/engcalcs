@@ -4576,6 +4576,9 @@ $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_demand_add']='Add demand category';
 $ec_lang['lpn_demand_remove']='Remove this demand';
+// sheet-light: Properties shows a junction's demand as Base demand plus a count of categories; the box behind the "..." button is titled with this.
+$ec_lang['lpn_demand_cats']='Demand categories';
+$ec_lang['lpn_demand_total_tip']='The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='Head pattern';

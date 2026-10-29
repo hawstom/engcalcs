@@ -51,7 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tgetScenarios: function () { return scenarios; }, activeScenario: activeScenario,\n" +
 	"\t\tresolvedDemand: resolvedDemand,\n" +
-	"\t\trenderNodeFields: renderNodeFields,\n" +
+	"\t\trenderNodeFields: renderNodeFields, demandsFor: function (id) { demandsBoxNode = id; rebuildDemandsBox(); return document.getElementById('lpn_demands_body'); }, \n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -75,10 +75,11 @@ const J = (id) => L.getDoc().nodes.find(n => n.id === id);
 const baseNodes = () => JSON.stringify(L.getDoc().nodes);
 const BASE0 = baseNodes();
 
+// The popup's rows, then the Demand categories box's (the table, its + button, the customers).
 function popupFor(id) {
 	byId.lpn_popup_fields.children.length = 0;
 	L.renderNodeFields(id);
-	return byId.lpn_popup_fields.children;
+	return byId.lpn_popup_fields.children.concat(L.demandsFor(id).children);
 }
 function findAll(kids, tag) {
 	const out = [];

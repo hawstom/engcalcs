@@ -1538,6 +1538,16 @@ echoHeader("EngCalcsApp", $html_title,
 		<div id="lpn_calib_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE DEMAND CATEGORIES BOX (sheet-light branch). Properties shows a junction's Base demand and a count; this is where the
+      // categories are added, changed and removed, and where the customers lumped at the junction are listed. Built in JS
+      // (rebuildDemandsBox), titled for the junction it shows. ?>
+<div id="lpn_demands_box" class="d-print-none lpn-popover lpn-setbox lpn-demandsbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_demands_title">
+	<div id="lpn_demands_title" class="lpn-setbox-title"><?=$ec_lang['lpn_demand_cats']?></div>
+	<button type="button" id="lpn_demands_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_demands_body"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -2780,6 +2790,8 @@ EngCalcs.pageConfig = {
 	lpn_field_demand_pattern: <?=json_encode($ec_lang['lpn_field_demand_pattern'])?>,
 	lpn_demand_add: <?=json_encode($ec_lang['lpn_demand_add'])?>,
 	lpn_demand_remove: <?=json_encode($ec_lang['lpn_demand_remove'])?>,
+	lpn_demand_cats: <?=json_encode($ec_lang['lpn_demand_cats'])?>,
+	lpn_demand_total_tip: <?=json_encode($ec_lang['lpn_demand_total_tip'])?>,
 	lpn_field_head_pattern: <?=json_encode($ec_lang['lpn_field_head_pattern'])?>,
 	lpn_field_head_pattern_tip: <?=json_encode($ec_lang['lpn_field_head_pattern_tip'])?>,
 	lpn_field_pump_speed: <?=json_encode($ec_lang['lpn_field_pump_speed'])?>,

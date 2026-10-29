@@ -25404,6 +25404,7 @@ var EngCalcs = EngCalcs || {};
 		if (c) {
 			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
 			c.className = (c.className ? c.className + ' ' : '') + 'lpn-gval';
+			lpnEmptyMark(c);
 			if (kind === 'num') {
 				c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-num';
 				if (c.style && c.style.setProperty) { c.style.setProperty('--d', String(d || 7)); }
@@ -53318,7 +53319,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
-			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
+			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox, lpn_demands_box: closeDemandsBox,
 			'lpn_hotkeys_popup': closeHotkeysBox
 		};
 		Object.keys(paneBoxes).forEach(function (id) { c['lpn_panebox_' + id] = function () { paneBoxReturn(id); }; });
@@ -57064,6 +57065,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireScenarioManager();
 		wireFullReportBox();
 		wireCalibBox();
+		wireDemandsBox();
 		reportToolsInit();
 		buildMenuBar();
 		wireGuide();   // after the menu bar: the guide names each menu by its button
@@ -66059,7 +66061,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var openers = {
 			lpn_energy_box: openEnergyBox, lpn_scncmp_box: openScenarioCompareBox,
 			lpn_rptbox: function () { openRunReportBox(true); }, lpn_status_box: openStatusReportBox,
-			lpn_calib_box: openCalibBox, lpn_full_box: openFullReportBox,
+			lpn_calib_box: openCalibBox, lpn_demands_box: function () { openDemandsBox(); }, lpn_full_box: openFullReportBox,
 			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
 			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
 			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
@@ -66166,7 +66168,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 26, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
+		lpn_energy_box: 26, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20, lpn_demands_box: 27,
 		lpn_full_box: 52, lpn_settings_box: 38.625, lpn_popup: 22.5, lpn_find_popup: 23, lpn_library_box: 27,
 		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 26.5, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
@@ -66879,7 +66881,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_popup: openPopupEmpty,
 			lpn_crit_box: openCriticalityBox,
 			lpn_ds_box: openDemandScaleBox,
-			lpn_calib_box: openCalibBox
+			lpn_calib_box: openCalibBox,
+			lpn_demands_box: function () { openDemandsBox(); }
 		};
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
 			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
@@ -66903,6 +66906,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_sm_box', smboxLayout, saveSmboxLayout, LPN_SMBOX_KEY, 'lpn_sm_help'],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
+			['lpn_demands_box', demandsLayout, null, null],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
 		dockWired = true;
@@ -70928,8 +70932,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (p && LPN_GP_DIGITS[p]) { return LPN_GP_DIGITS[p]; }
 		return 12;   // a coordinate, an elevation, an id: the one width every like box shares
 	}
+	// An empty editable cell still shows a faint underline (sheet-light): the style keys on :placeholder-shown, and a
+	// cell with no placeholder of its own is given a blank one so it matches while it is empty.
+	function lpnEmptyMark(c) {
+		if (c && c.nodeName === 'INPUT' && (c.type === 'text' || c.type === 'number') && !c.getAttribute('placeholder')) { c.setAttribute('placeholder', ' '); }
+	}
 	function gpSizeControl(ctrl, kind) {
 		var cls = ctrl.className ? ctrl.className + ' ' : '';
+		lpnEmptyMark(ctrl);
 		ctrl.className = cls + 'lpn-gval';
 		if (ctrl.nodeName === 'SELECT') { ctrl.className += ' lpn-gw-fill'; }
 		else if (ctrl.nodeName === 'INPUT' && (ctrl.type === 'number' || (ctrl.type === 'text' && ctrl.getAttribute('data-gd')))) {
@@ -73214,10 +73224,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// conversion of an input -- the very thing CLAUDE.md's unit rule bans.
 			// **AND WHO IS DRAWING IT** (Task 468). The demand above is row 0 of a LIST; these are
 			// the rest of it, and this is the only place a person adds, names or removes one.
-			demandCategoryFields(fields, n, nodeId);
-			// **AND WHAT THE METERS AROUND IT ADD** (Task 247; Tom, 2026-09-17). Between the rows
-			// the user typed and the total they add up to, which is the order the sum is made in.
-			nodeCustomerFields(fields, n);
+			// **TWO ROWS IN THE SHEET, THE LIST IN ITS OWN BOX** (sheet-light; Tom, 2026-10-28: "The Demands area
+			// presented as a hole in our design."). Base demand (and its pattern) and the count of categories stand
+			// in the grid; the table of categories and the customers lumped here are in the Demand categories box.
+			demandRows(fields, n, nodeId);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
 			// **THIS JUNCTION'S OWN REQUIRED FIRE FLOW** (Task 530), blank-capable because blank is
@@ -73334,6 +73344,119 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **NO REORDER CONTROL**, deliberately: the order is the file's own and nothing reads it -- the
 	// totals are additive (Tom, 2026-08-24) and the exporter writes the rows as they stand. A pair
 	// of arrows per row would be four more tap targets in a floating popup to permute a sum.
+	// **THE JUNCTION'S DEMAND IN PROPERTIES: TWO ROWS** (sheet-light; Ida's rule 4: a row is one line high, and anything
+	// taller is a different widget). "Base demand" is the inline number: row 0's base when the junction has one demand
+	// category (the ordinary junction, and its pattern gets a row of its own), and the read-only total of all of them
+	// when it has more (Sue: the count is the toggle, so there is no "Basic demand" switch). "Demand categories" is the
+	// count and a "..." button that opens the box where the list is edited. The data is unchanged: row 0 is still
+	// `_demand`/`demandPattern`/`demandCategory` and the rest `extraDemands`; row 0's base still goes through
+	// setProp(n, 'demand'), so a scenario that retypes only it keeps its single `demand` override.
+	var demandsBoxNode = null, demandsBoxKeep = false;
+	function demandsBoxEl() { return document.getElementById('lpn_demands_box'); }
+	function demandsBoxIsOpen() {
+		var box = demandsBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function demandRows(fields, n, nodeId) {
+		var pc = EngCalcs.pageConfig || {}, rows = ownDemandRows(n), one = rows.length < 2,
+			label, input, v0, total = 0, span, count, btn, unit = unitLabel('lpn_u_flow');
+		if (one) {
+			label = document.createElement('label');
+			input = document.createElement('input');
+			input.type = 'number'; input.step = 'any';
+			input.setAttribute('data-gprop', 'demand');
+			v0 = effective(n, 'demand');
+			input.value = (typeof v0 === 'number') ? String(+v0.toFixed(6)) : '';
+			// One snapshot per commit, taken before the write, as every other field here does.
+			input.addEventListener('change', function () {
+				saveUndoSnapshot();
+				setProp(n, 'demand', +input.value);
+				afterPropertyEdit(n);
+				demandsBoxRebuildIfOpen();
+			});
+			setFieldLabel(label, (pc.lpn_field_base_demand || 'Base demand') + ' (' + unit + ')', pc.lpn_demand_tip);
+			label.appendChild(input);
+			valueWarnPaint(label, valueWarnText('demand', n, v0));
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+			demandOverrideMarker(fields, n);
+			patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
+				function () { return rows[0].pattern; },
+				function (v) {
+					editDemandRows(n, function (r) { r[0].pattern = v || null; });
+					afterPropertyEdit(n);
+					demandsBoxRebuildIfOpen();
+				}, null, lpnBlankIsDemandDefault());
+		} else {
+			rows.forEach(function (d) { if (typeof d.base === 'number' && isFinite(d.base)) { total += d.base; } });
+			readonlyField(fields, (pc.lpn_field_base_demand || 'Base demand') + ' (' + unit + ')', String(+total.toFixed(6)), pc.lpn_demand_total_tip);
+			demandOverrideMarker(fields, n);
+		}
+		label = document.createElement('label');
+		setFieldLabel(label, pc.lpn_demand_cats || 'Demand categories', null);
+		span = document.createElement('span');
+		span.className = 'lpn-demand-cats';
+		count = document.createElement('span');
+		count.className = 'lpn-demand-count';
+		count.textContent = String(rows.length);
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-demand-more';
+		btn.id = 'lpn_demand_more';
+		btn.textContent = '…';
+		btn.title = pc.lpn_demand_cats || 'Demand categories';
+		btn.setAttribute('aria-label', btn.title);
+		btn.addEventListener('click', function () { openDemandsBox(nodeId); });
+		span.appendChild(count);
+		span.appendChild(btn);
+		label.appendChild(span);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		// A box already open follows the junction on screen.
+		if (demandsBoxIsOpen() && !demandsBoxKeep) { demandsBoxNode = nodeId; rebuildDemandsBox(); }
+	}
+	var demandsLayout = newBoxLayout();
+	function openDemandsBox(nodeId) {
+		var box = demandsBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (nodeId !== undefined) { demandsBoxNode = nodeId; }
+		box.style.display = 'flex';
+		rebuildDemandsBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, demandsLayout); });
+		initTipsIn(box);
+	}
+	function closeDemandsBox() { if (demandsBoxIsOpen()) { hidePanel(demandsBoxEl()); } }
+	function wireDemandsBox() {
+		var box = demandsBoxEl(), x = document.getElementById('lpn_demands_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeDemandsBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			demandsLayout.left = pos.left;
+			demandsLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
+	}
+	function demandsBoxRebuildIfOpen() { if (demandsBoxIsOpen()) { rebuildDemandsBox(); } }
+	// The box's own edits redraw Properties (its Base demand, count and total) but not themselves, so
+	// a Tab from one cell to the next is not cut off by a rebuild.
+	function demandsBoxEdited(n) {
+		demandsBoxKeep = true;
+		try { afterPropertyEdit(n); refreshPopupIfOpen(); } finally { demandsBoxKeep = false; }
+	}
+	function rebuildDemandsBox() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_demands_body'),
+			title = document.getElementById('lpn_demands_title'), n = demandsBoxNode !== null ? nodeById(demandsBoxNode) : null,
+			base = pc.lpn_demand_cats || 'Demand categories';
+		if (!host) { return; }
+		if (!n || n.type === 'tank' || n.type === 'reservoir') { closeDemandsBox(); return; }
+		clearFields(host);
+		if (title) { title.textContent = base + ' (' + n.id + ')'; }
+		demandCategoryFields(host, n, n.id);
+		nodeCustomerFields(host, n);
+	}
 	function demandCategoryFields(fields, n, nodeId) {
 		// **READ ONCE, AS THE SCENARIO ON SCREEN SEES IT** (R-369), and never written through: every
 		// edit below goes through editDemandRows(), which re-reads the list and writes it back
@@ -73414,7 +73537,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// demand field carried its own marker through unitNumberField()'s `{el, prop}`. That field
 		// is gone. Left as it was, a scenario override on the commonest junction in any network
 		// would have had nowhere to show itself.
-		demandOverrideMarker(fields, n);
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
@@ -73431,9 +73553,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			editDemandRows(n, function (r) { r.push({ base: 0, pattern: null, category: null }); });
 			afterPropertyEdit(n);
 			refreshPopupIfOpen();
+			demandsBoxRebuildIfOpen();
 		});
 		fields.appendChild(addBtn);
-		fields.appendChild(document.createElement('br'));
 	}
 	/**
 	 * **THE CUSTOMERS THIS JUNCTION IS CARRYING, IN ITS OWN PROPERTY BOX** (Tom, 2026-09-17: *"The
@@ -73576,22 +73698,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		bInput.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setBase(+bInput.value);
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDemandDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setPattern(sel.value);
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		cInput.type = 'text';
 		cInput.value = acc.getCategory() || '';
+		lpnEmptyMark(cInput);
 		cInput.setAttribute('aria-label', (pc.lpn_field_desc || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setCategory(cInput.value.trim());
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		// **THE LAST REMAINING DEMAND HAS NO × AT ALL** (Task 553; Tom, 2026-08-28: *"There is still
 		// an x for Remove on the top Demands row. But it can't be removed, so there should be no
@@ -73615,6 +73738,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				acc.remove();
 				afterPropertyEdit(n);
 				refreshPopupIfOpen();
+				demandsBoxRebuildIfOpen();
 			});
 			xCell.appendChild(del);
 		}

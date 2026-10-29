@@ -50,7 +50,7 @@ const L = loadLoopedNetwork(
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tgetScenarios: function () { return scenarios; }, activeScenario: activeScenario,\n" +
 	"\t\tresolvedDemand: resolvedDemand, baseDemandTotal: baseDemandTotal,\n" +
-	"\t\trenderNodeFields: renderNodeFields, paneTables: paneTables, pushSpecs: pushSpecList,\n" +
+	"\t\trenderNodeFields: renderNodeFields, demandsFor: function (id) { demandsBoxNode = id; rebuildDemandsBox(); return document.getElementById('lpn_demands_body'); },  paneTables: paneTables, pushSpecs: pushSpecList,\n" +
 	"\t\tclearOverride: clearOverride, labelSettings: function () { return labelSettings; },\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libPatterns: libPatterns,\n" +
@@ -83,10 +83,11 @@ const BASE0 = baseNodes();
 const J1_BASE = 50 * 0.6 + 20 * 0.2 + 12.5 * 0.6;
 const J4_BASE = 33 * 0.2;
 
+// The popup's rows, then the Demand categories box's (the table, its + button, the customers).
 function popupFor(id) {
 	byId.lpn_popup_fields.children.length = 0;
 	L.renderNodeFields(id);
-	return byId.lpn_popup_fields.children;
+	return byId.lpn_popup_fields.children.concat(L.demandsFor(id).children);
 }
 function findAll(kids, tag) {
 	const out = [];
@@ -108,11 +109,11 @@ function table(id) {
 		sels: findAll([t], 'SELECT'),
 		dels: findAll([t], 'BUTTON').filter(b => b.textContent === '×'),
 		add: findAll(kids, 'BUTTON').filter(b => b.className === 'lpn-demand-add')[0],
-		// The table's own marker (Task 790's gutter) sits right before the block that holds it: the
-		// identity band above carries the coordinates' markers, a different override entirely. Its
-		// note, while it is an override, is the first one after the table.
+		// The demand's one marker (Task 790's gutter) sits right before the Base demand row (sheet-light: Properties
+		// no longer carries the table); the identity band above carries the coordinates' markers, a different override
+		// entirely. Its note, while it is an override, is the first one after that row.
 		marker: (function () {
-			const blk = kids.filter((k) => k === t || findAll([k], 'TABLE').indexOf(t) >= 0)[0], i = kids.indexOf(blk);
+			const i = kids.findIndex((k) => k.tagName === 'LABEL' && /^Base demand/.test(k.textContent));
 			const g = i > 0 && String(kids[i - 1].className) === 'lpn-ovm' ? kids[i - 1] : null;
 			if (!g) { return null; }
 			const dot = g.children.filter((c) => /lpn-ovm-(dot|hollow)/.test(c.className))[0];

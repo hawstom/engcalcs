@@ -56,7 +56,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetScenarios: function () { return scenarios; },\n" +
 	"\t\tresolvedDemand: resolvedDemand, baseDemandTotal: baseDemandTotal,\n" +
 	"\t\tcolorNodeValue: colorNodeValue, paneTables: paneTables,\n" +
-	"\t\trenderNodeFields: renderNodeFields,\n" +
+	"\t\trenderNodeFields: renderNodeFields, demandsFor: function (id) { demandsBoxNode = id; rebuildDemandsBox(); return document.getElementById('lpn_demands_body'); }, \n" +
 	"\t\tlibRenamePattern: libRenamePattern, libPatterns: libPatterns,\n" +
 	"\t\tpushSpecs: pushSpecList,\n" +
 	// The Find panel, driven the way its three pull-downs drive it.
@@ -317,10 +317,11 @@ console.log('\n--- export: itemized, and byte-identical ---');
 // 4. THE PROPERTY POPUP: add, edit, remove.
 // ---------------------------------------------------------------------------
 console.log('\n--- the property popup ---');
+// The popup's rows, then the Demand categories box's (the table, its + button, the customers).
 function popupFor(id) {
 	byId.lpn_popup_fields.children.length = 0;
 	L.renderNodeFields(id);
-	return byId.lpn_popup_fields.children;
+	return byId.lpn_popup_fields.children.concat(L.demandsFor(id).children);
 }
 function findAll(kids, tag) {
 	const out = [];
@@ -338,10 +339,16 @@ function findAll(kids, tag) {
 	// **ROW 0 IS IN THE TABLE, SO IT IS NOT A FIELD** (Tom, 2026-08-26: of the two shown together,
 	// *"I think this is a mistake"*). The popup must NOT carry a standalone Base demand, Demand
 	// pattern or Category label once a breakdown exists -- that duplicated heading is the defect.
-	ok('a junction with categories has NO standalone Base demand field',
-		!labels.some(t => /^Base demand/.test(t)), labels.join(' | '));
-	ok('...nor a standalone Demand pattern field',
-		!labels.some(t => /^Demand pattern/.test(t)), labels.join(' | '));
+	// sheet-light (Tom, 2026-10-28): Properties shows TWO rows for the demand, Base demand and Demand categories. With
+	// more than one category the Base demand row is the read-only TOTAL (a span, no box), there is no Demand pattern
+	// row, and the Demand categories row states the count beside a button that opens the box holding the table.
+	const baseRow = kids.filter(c => c.tagName === 'LABEL' && /^Base demand/.test(c.textContent))[0];
+	ok('a junction with categories shows Base demand as a total, with no box to type in',
+		!!baseRow && findAll([baseRow], 'INPUT').length === 0 && /82\.5$/.test(baseRow.textContent.trim()),
+		labels.join(' | '));
+	ok('...no Demand pattern row', !labels.some(t => /^Demand pattern/.test(t)), labels.join(' | '));
+	ok('...and a Demand categories row that counts them',
+		labels.some(t => /^Demand categories\s*3/.test(t)), labels.join(' | '));
 	// **THE CATEGORY FIELD IS GONE TOO, AND SINCE TASK 674 IT CANNOT BE FOUND BY ITS WORDS.** The
 	// element's own Description row is in the identity band at the top of the popup now, and
 	// `lpn_field_desc` is the same English word -- so this is asked STRUCTURALLY instead:
@@ -379,12 +386,12 @@ function findAll(kids, tag) {
 	// junction in Net1, Net2 and Net3 is one.
 	const plain = popupFor('J4');
 	const ptable = plain.filter(c => c.tagName === 'TABLE')[0];
-	ok('a one-demand junction gets the SAME table', !!ptable);
+	ok('a one-demand junction gets the SAME table (in the Demand categories box)', !!ptable);
 	ok('...holding exactly one demand row', !!ptable && findAll(ptable.children, 'TR').length === 2,
 		'header + 1');
 	const plabels = plain.filter(c => c.tagName === 'LABEL').map(c => c.textContent);
-	ok('...and no standalone Base demand or Demand pattern field beside it',
-		!plabels.some(t => /^Base demand/.test(t)) && !plabels.some(t => /^Demand pattern/.test(t)),
+	ok('...and, with one category, Base demand and Demand pattern rows of their own (Demand categories reads 1)',
+		plabels.some(t => /^Base demand/.test(t)) && plabels.some(t => /^Demand pattern/.test(t)) && plabels.some(t => /^Demand categories\s*1/.test(t)),
 		plabels.join(' | '));
 	// **THE LAST DEMAND HAS NO × AT ALL** (Tom, 2026-08-28: *"it can't be removed, so there should
 	// be no x"*). It was drawn DISABLED first; he overruled that, and he is right — a junction

@@ -127,10 +127,8 @@ async function main() {
 			const cut = Array.from(t.querySelectorAll('input, select, button')).filter((e) => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > b.getBoundingClientRect().right + 1).length;
 			return { left: Math.round(t.getBoundingClientRect().left), val: Math.round(g.getBoundingClientRect().left), cut };
 		});
-		if (dem && !phone) {
-			ok(tag + 'the demand table is in the grid, from the Label column', Math.abs(dem.left - dem.val) <= 4, JSON.stringify(dem));
-			ok(tag + 'no demand control is cut by the box edge', dem.cut === 0, JSON.stringify(dem));
-		}
+		// sheet-light: the demand list is in the Demand categories box, not in Properties.
+		ok(tag + 'Properties holds no demand table', !dem, JSON.stringify(dem));
 		if (process.env.BOXROWS_SHOT && !scn) { await page.locator('#lpn_popup').screenshot({ path: path.join(process.env.BOXROWS_SHOT, 'after-' + name + '.png') }); }
 		ok(tag + 'nothing is left off the grid', m.off.length === 0, JSON.stringify(m.off));
 		ok(tag + 'the box does not scroll sideways', m.scroll <= 1, String(m.scroll));

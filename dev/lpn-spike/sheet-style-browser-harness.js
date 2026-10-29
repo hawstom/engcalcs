@@ -14,6 +14,10 @@
 //       ink contrasting at least 3 : 1, and so does the pull-down itself against what it stands on;
 //   D2  no page errors.
 //
+//   L1-L8 THE LIGHTER SHEET (sheet-light): a hairline under each row and none at its sides, no box or shadow round a value,
+//       one x for every value, computed values in the muted ink, an editable cell filled on hover and outlined on focus, an
+//       empty one underlined faintly; the same on a phone (name over value); the hairline shows in every theme.
+//
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
@@ -202,6 +206,86 @@ async function main() {
 		ok('D every Value cell is cut with an ellipsis and does not wrap; a number longer than its cell is cut, not widened', dm.ell === true && dm.cut === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
 		await page.evaluate(() => { document.querySelector('.lpn-propbox').style.width = ''; });
 
+		console.log('\n--- The lighter sheet, 2026-10-28 (L1-L6 at PC width, L7 on a phone) ---');
+		// What a box's rows look like: the rule under each, a rule at the sides, a box round a value, where the values start.
+		const light = (rootSel) => page.evaluate((sel) => {
+			const root = document.querySelector(sel), R = (e) => e.getBoundingClientRect();
+			const rows = Array.from(root.querySelectorAll('.lpn-grow')).filter((r) => !r.classList.contains('lpn-gspan-row') && !r.classList.contains('lpn-fill-row') && r.querySelector('.lpn-gname') && R(r).height > 0 && getComputedStyle(r).display !== 'contents');
+			const out = { rows: rows.length, sided: [], noRule: 0, boxedVal: [], valueX: [], bg: getComputedStyle(root).backgroundColor, ruleColor: null };
+			rows.forEach((r) => {
+				const sh = getComputedStyle(r).boxShadow;
+				if (sh === 'none') { out.noRule++; } else {
+					if ((sh.match(/inset/g) || []).length > 1) { out.sided.push(r.id || r.querySelector('.lpn-gname').textContent.trim().slice(0, 14)); }
+					out.ruleColor = (sh.match(/rgba?\([^)]*\)/) || [null])[0];
+				}
+				const v = r.querySelector(':scope > .lpn-gval');
+				if (v && v.type !== 'checkbox' && v.type !== 'radio' && R(v).width > 0) {
+					const cs = getComputedStyle(v);
+					if (cs.boxShadow !== 'none' || ['Top', 'Right', 'Bottom', 'Left'].some((x) => parseFloat(cs['border' + x + 'Width']) > 0)) { out.boxedVal.push(v.id || v.tagName); }
+					out.valueX.push(Math.round(R(v).left));
+				}
+			});
+			return out;
+		}, rootSel);
+		await openPipe();
+		for (const [id, label] of all) {
+			if (id !== 'lpn_popup') { await openBox(a, id); await a.settle(600); }
+			const m = await light('#' + id);
+			ok('L1 ' + label + ': every row is ruled by one hairline underneath and none at its sides (' + m.rows + ' rows)', m.rows >= 1 && m.noRule === 0 && m.sided.length === 0, JSON.stringify({ noRule: m.noRule, sided: m.sided.slice(0, 3), rule: m.ruleColor }));
+			ok('L2 ' + label + ': no box or shadow round any value', m.boxedVal.length === 0, JSON.stringify(m.boxedVal.slice(0, 3)));
+			ok('L3 ' + label + ': every value starts at one x (the column is aligned)', new Set(m.valueX).size <= 1, JSON.stringify(Array.from(new Set(m.valueX))));
+			if (id !== 'lpn_popup') { await closeBox(id); await a.settle(250); }
+		}
+		// L4 a computed value is the muted ink exactly; L5 an editable cell fills on hover and outlines on focus; L6 an empty one is underlined.
+		const probe = await page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), muted = (() => { const t = document.createElement('span'); t.style.color = 'var(--ec-ink-muted)'; document.body.appendChild(t); const c = getComputedStyle(t).color; t.remove(); return c; })();
+			const cells = Array.from(f.querySelectorAll('.lpn-grow > input.lpn-gval[type="number"], .lpn-grow > input.lpn-gval[type="text"]')).filter((e) => e.getBoundingClientRect().width > 0 && !e.disabled);
+			const ro = Array.from(f.querySelectorAll('.lpn-grow > span.lpn-gval:not(.lpn-gw-num)')).filter((e) => e.getBoundingClientRect().width > 0);
+			const empty = cells.filter((e) => e.value === '')[0];
+			const full = cells.filter((e) => e.value !== '' && e.id !== 'lpn_popup_id_input')[0];
+			const at = (e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+			return { muted, roInk: ro.map((e) => getComputedStyle(e).color), empty: empty ? { at: at(empty), img: getComputedStyle(empty).backgroundImage, id: empty.id || empty.getAttribute('data-gprop') } : null, full: full ? { at: at(full), bg0: getComputedStyle(full).backgroundColor, id: full.id || full.getAttribute('data-gprop') } : null };
+		});
+		ok('L4 every computed value is drawn in the muted ink', probe.roInk.length >= 1 && probe.roInk.every((c) => c === probe.muted), JSON.stringify({ want: probe.muted, got: Array.from(new Set(probe.roInk)) }));
+		ok('L6 an empty editable cell still shows a faint underline', !!probe.empty && /gradient/.test(probe.empty.img), JSON.stringify(probe.empty));
+		if (probe.full) {
+			await page.mouse.move(probe.full.at.x, probe.full.at.y);
+			await a.settle(200);
+			const hov = await page.evaluate(() => { const e = document.elementFromPoint(arguments[0] || 0, 0); return null; }).catch(() => null);
+			const bgHover = await page.evaluate((at) => { const e = document.elementFromPoint(at.x, at.y); return e ? getComputedStyle(e).backgroundColor : null; }, probe.full.at);
+			ok('L5 an editable cell takes a fill under the pointer', !!bgHover && bgHover !== probe.full.bg0 && bgHover !== 'rgba(0, 0, 0, 0)', JSON.stringify({ before: probe.full.bg0, hover: bgHover }));
+			await page.mouse.click(probe.full.at.x, probe.full.at.y);
+			await a.settle(200);
+			const fo = await page.evaluate((at) => { const e = document.elementFromPoint(at.x, at.y); const cs = e ? getComputedStyle(e) : null; return cs ? { w: parseFloat(cs.outlineWidth), st: cs.outlineStyle, same: document.activeElement === e } : null; }, probe.full.at);
+			ok('L5 ...and an outline on focus', !!fo && fo.same && fo.w > 0 && fo.st !== 'none', JSON.stringify(fo));
+			await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		}
+		// L7: on a phone the same box keeps the same look, name above value.
+		await closeBox('lpn_popup'); await a.settle(250);
+		await page.setViewportSize({ width: 390, height: 844 });
+		await a.settle(600);
+		await openNode('11');
+		const ph = await page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), R = (e) => e.getBoundingClientRect(), muted = (() => { const t = document.createElement('span'); t.style.color = 'var(--ec-ink-muted)'; document.body.appendChild(t); const c = getComputedStyle(t).color; t.remove(); return c; })();
+			const rows = Array.from(f.querySelectorAll('.lpn-grow')).filter((r) => r.querySelector('.lpn-gname') && R(r).height > 0 && !r.classList.contains('lpn-fill-row'));
+			const ctrls = Array.from(f.querySelectorAll('.lpn-grow > input.lpn-gval, .lpn-grow > select.lpn-gval')).filter((e) => e.type !== 'checkbox' && R(e).width > 0);
+			const ro = Array.from(f.querySelectorAll('.lpn-grow > span.lpn-gval:not(.lpn-gw-num)')).filter((e) => R(e).width > 0);
+			const stacked = rows.filter((r) => { const n = r.querySelector('.lpn-gname'), v = r.querySelector('.lpn-gval'); return v && R(n).bottom <= R(v).top + 1; }).length;
+			return {
+				rows: rows.length, noRule: rows.filter((r) => getComputedStyle(r).boxShadow === 'none').length, stacked,
+				bordered: ctrls.filter((e) => ['Top', 'Right', 'Bottom', 'Left'].some((x) => parseFloat(getComputedStyle(e)['border' + x + 'Width']) > 0)).length, ctrls: ctrls.length,
+				roMuted: ro.length > 0 && ro.every((e) => getComputedStyle(e).color === muted), valueX: Array.from(new Set(ctrls.map((e) => Math.round(R(e).left)))),
+				cats: !!f.querySelector('.lpn-demand-count'), table: !!f.querySelector('table.lpn-demand-table'), sw: document.querySelector('.lpn-propbox .lpn-popover-body').scrollWidth - document.querySelector('.lpn-propbox .lpn-popover-body').clientWidth
+			};
+		});
+		ok('L7 phone: name over value in every row (' + ph.stacked + ' of ' + ph.rows + ')', ph.rows > 3 && ph.stacked === ph.rows, JSON.stringify(ph));
+		ok('L7 phone: a hairline under every row', ph.noRule === 0, String(ph.noRule));
+		ok('L7 phone: no border round any value (' + ph.ctrls + ' boxes and pull-downs), and they start at one x', ph.bordered === 0 && ph.valueX.length === 1, JSON.stringify({ b: ph.bordered, x: ph.valueX }));
+		ok('L7 phone: a computed value is muted', ph.roMuted);
+		ok('L7 phone: the two demand rows (no table), nothing wider than the box', ph.cats && !ph.table && ph.sw <= 1, JSON.stringify({ cats: ph.cats, table: ph.table, sw: ph.sw }));
+		await page.setViewportSize({ width: 1366, height: 768 });
+		await a.settle(500);
+
 		console.log('\n--- Dark and every other theme (D1) ---');
 		await openPipe();
 		for (const id of BOXES) { await openBox(a, id); await a.settle(400); }
@@ -220,6 +304,12 @@ async function main() {
 				n += r.options; bad = bad.concat(r.bad);
 			}
 			ok('D1 theme ' + th + (dark ? ' (dark)' : '') + ': ' + n + ' options and their pull-downs read at 3 : 1 or better', n > 0 && bad.length === 0, JSON.stringify(bad.slice(0, 3)));
+			const hl = await page.evaluate(() => {
+				const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((e) => e.getBoundingClientRect().height > 0 && getComputedStyle(e).display !== 'contents')[0];
+				const sh = r ? getComputedStyle(r).boxShadow : '', c = (sh.match(/rgba?\([^)]*\)/) || [null])[0], paper = getComputedStyle(document.getElementById('lpn_popup')).backgroundColor;
+				return { rule: c, paper: paper };
+			});
+			ok('L8 theme ' + th + ': the row hairline is a visible colour of its own, not the paper', !!hl.rule && hl.rule !== hl.paper, JSON.stringify(hl));
 		}
 		ok('D1 the list holds at least one dark theme', darkSeen >= 1, String(darkSeen));
 		ok('D2 no page errors', errors.length === 0, errors.join(' | '));
