@@ -4697,3 +4697,14 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: Properties typing + Tab commits (705 stuck), divider drag narrows name column 154->114. Contour numeric fields fill a 236 px cell, Demand scaling inputs 613 px, as Properties does; phone keeps them narrow.
 - Method: the page's own dialogs are auto-answered by the Session until `delete window.lpnDialogAnswerer`; a test that never deletes it never sees a dialog. Scenario manager menu rows are disabled in the way unless a scenario exists.
 - NOT CHECKED: Google Docs; phone Properties; Tables headings in a browser; mutation of the new harnesses.
+
+# Perry, feat/sheet-light b53d074ab, 2026-10-28 night (light sheet, Demand as rows)
+- OBSERVED (real Chromium, 1366x768 and 390 touch, light and dark): hairline sheet is consistent across Properties (junction, pipe, tank, pump, PRV), Find, Contour, Fire flow, Criticality, Demand scaling, Scenario comparison, floating and docked. No sideways scroll anywhere.
+- OBSERVED: the Demand categories box opens 618x615 (CSS asks 432x352): `.lpn-setbox` is declared later in the file than `.lpn-demandsbox` and wins. Docked it is 618 wide.
+- OBSERVED: typing a value in a Demand categories cell and pressing Tab drops focus to the page body; on c1459847c the same keystrokes land on the next cell.
+- OBSERVED: a junction with customers shows no trace of them in Properties (Base demand 150, Demand 155.00, "Demand categories 1"); the "5 gpm from Customers (2)" line now lives only behind "...".
+- OBSERVED: editable vs computed is black vs #555 (light), white vs #b7bbc1 (dark); numeric inputs have no other cue until hover.
+- OBSERVED, inherited from box-design (identical on c1459847c, master differs): Valves.lwn with docks on, docked Properties body is 38-39 px tall for every element.
+- Scenario: edit in the box is an override (alternatives values n:11 demands), Base node unchanged, undo clears. Tables Junctions shows 210 after a 60 category. Builder's demand-rows harness 23/23, but it asserts neither the box size nor Tab.
+- Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
+- NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.
