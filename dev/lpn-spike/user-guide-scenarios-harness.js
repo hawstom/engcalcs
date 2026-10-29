@@ -64,7 +64,7 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const ctx = await U.openNet1(browser, NAME);
+		const ctx = await U.openNet1(browser, NAME, { shipped: true });
 		const { a, P } = ctx;
 		// pageConfig carries what the script needs; a heading written in the PHP is read from the English file (this page is English).
 		const T = async (k) => { try { return await U.lang(ctx, k); } catch (e) { return enString(k); } };
@@ -144,12 +144,13 @@ async function main() {
 		ok('the strip reads "' + baseStrip + '"', (await stripText()) === baseStrip, await stripText());
 		ok('...and the chapter quotes that line', plain(enString('lpn_guide_scn_open_def')).indexOf(baseStrip) >= 0);
 		let rows = await listRows();
-		ok('the list holds Base alone (an opened example has no ready-made scenarios)', rows.filter((r) => /\(\d+\)$/.test(r.text)).length === 0 && rows.some((r) => r.text === 'Base' && r.on), JSON.stringify(rows.map((r) => r.text)));
+		ok('the list holds Base and the card\'s own four scenarios (Max day, Peak hour, and their main break children)', rows.filter((r) => /\(\d+\)$/.test(r.text)).length === 4 && rows.some((r) => r.text === 'Base' && r.on), JSON.stringify(rows.map((r) => r.text)));
 		const wantRows = [await T('lpn_sm_menu'), await T('lpn_scenario_basic'), NEW, await T('lpn_scenario_copy'), await T('lpn_scenario_rename'),
 			await T('lpn_scenario_delete'), await T('lpn_sm_list_overrides')];
 		ok('...above Base the list has the rows the chapter names (Scenario manager, Basic mode, New, Copy, Rename, Delete, and the override list), in any order',
 			wantRows.every((w) => rows.slice(0, 7).some((r) => r.text === w)), JSON.stringify(rows.slice(0, 7).map((r) => r.text)));
-		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === true);
+		// A project that holds scenarios opens with Basic mode off, so the row is dimmed exactly when Basic mode is checked.
+		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === !!rows.filter((r) => r.text === wantRows[1])[0].on);
 
 		// ---- 4. the worked example, performed ----------------------------------------------------
 		console.log('\n4. The worked example: Larger main and Max day on Net1');
@@ -238,7 +239,7 @@ async function main() {
 
 		// Max day: the multiplier, typed in Settings.
 		await chooseScenario(await T('lpn_scenario_base'));
-		await newScenario('Max day');
+		await newScenario('Max day 1.8');
 		await a.menuClick(await T('lpn_tool_settings'), 'project');
 		await settle(900);
 		const dmName = await T('bpn_demand_mult');
@@ -254,7 +255,7 @@ async function main() {
 		await closeBox('lpn_setbox_close');
 		await settle(300);
 		const doc = await U.storedProject(ctx);
-		ok('Max day holds the multiplier 1.8 and the project\'s own stays 1', JSON.stringify(doc.calcSets.map((c) => c.demandMultiplier)) === '[1.8]' && doc.settings.hydraulics.demandMultiplier === 1, JSON.stringify(doc.calcSets));
+		ok('Max day 1.8 holds the multiplier 1.8 (after the example own 1.5 and 2.25) and the project\'s own stays 1', JSON.stringify(doc.calcSets.map((c) => c.demandMultiplier)) === '[1.5,2.25,1.8]' && doc.settings.hydraulics.demandMultiplier === 1, JSON.stringify(doc.calcSets));
 
 		// The comparison, cell for cell against the chapter's table.
 		const table = await compareTable(3);
@@ -272,8 +273,8 @@ async function main() {
 			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '),
 				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && got[idx.p] === row[3] && got[idx.v] === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], got[idx.p], got[idx.v]]));
 		}
-		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day' + cur));
-		ok('the comparison lists exactly the three scenarios of the example', table.length === 4, String(table.length - 1));
+		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day 1.8' + cur));
+		ok('the comparison lists the three scenarios of the example and the card\'s own four others', table.length === 8, String(table.length - 1));
 		const durCol = heading.indexOf(await T('lpn_time_duration'));
 		ok('the chapter says the total run time is 24:00 in all three', table.slice(1).every((t) => t[durCol] === '24:00') && plain(enString('lpn_guide_scn_example_def')).indexOf('24:00') >= 0);
 
@@ -283,10 +284,10 @@ async function main() {
 		await P.keyboard.press('Delete');
 		await settle(1300);
 		const base = await T('lpn_scenario_base');
-		const wantNotice = (await T('lpn_scenario_deactivated')).replace('{id}', '22').replace('{scenario}', 'Max day') + ' ' + (await T('lpn_scenario_delete_in_base')).split('{base}').join(base);
+		const wantNotice = (await T('lpn_scenario_deactivated')).replace('{id}', '22').replace('{scenario}', 'Max day 1.8') + ' ' + (await T('lpn_scenario_delete_in_base')).split('{base}').join(base);
 		ok('Delete on Junction 22 in Max day says what it did', (await a.notice()) === wantNotice, await a.notice());
 		const doc2 = await U.storedProject(ctx);
-		const topo = (doc2.alternatives || []).filter((x) => x.category === 'topology')[0];
+		const topo = (doc2.alternatives || []).filter((x) => x.category === 'topology' && x.values['n:22'])[0];
 		ok('...it made the node and its four pipes inactive in Max day (five overrides), and Base still has them',
 			!!topo && Object.keys(topo.values).sort().join() === ['l:112', 'l:122', 'l:21', 'l:22', 'n:22'].sort().join() && topo.values['n:22'].active === false && doc2.nodes.some((x) => String(x.id) === '22'),
 			topo && Object.keys(topo.values).join());

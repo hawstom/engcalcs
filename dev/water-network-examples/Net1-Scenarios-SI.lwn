@@ -5,7 +5,7 @@
 	"project": {
 		"name": "Net1 with scenarios SI",
 		"activeScenario": "base",
-		"docId": "dms31RsRJUKuMSk3m",
+		"docId": "dms4ZF3mWBpeQLxl9",
 		"gallery": "Net1-Scenarios-SI.lwn"
 	},
 	"scenarios": [
@@ -156,7 +156,7 @@
 			"maxLevel": 45.72,
 			"tankDiameter": 15.392,
 			"_initQuality": 1,
-			"bottomElev": 850
+			"bottomElev": 259.08
 		}
 	],
 	"links": [

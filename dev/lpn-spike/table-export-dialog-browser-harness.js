@@ -211,7 +211,7 @@ async function main() {
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
-		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.openNet1Plain(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1500);
 		await page.click('#lpn_pane_btn');
 		await a.settle(500);
