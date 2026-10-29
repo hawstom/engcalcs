@@ -11,7 +11,11 @@
 //   R4  removing the added row returns Base demand to a box;
 //   R5  with one category, typing Base demand changes that category (the box's first row shows it) and Undo puts it back;
 //   R6  in a scenario the same edit is an override and Base is untouched;
-//   R7  a box left open follows another junction, and no page errors.
+//   R7  a box left open follows another junction, and no page errors;
+//   R8  the box opens at its own size (one row is not 618 x 615) and beside Properties, never over it;
+//   R9  real mouse and keyboard: click the 2nd row's demand cell, type 75, press Tab, and focus moves on to that row's pattern;
+//   R10 in a scenario the box carries the orange override dot; in Base it does not;
+//   R11 a junction with Customers shows the customers line, muted, under Demand categories in Properties.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -87,6 +91,10 @@ async function main() {
 		let b = await box();
 		ok('R2 the button opens the box, titled for junction 11, with one row and the "+" button', b.shown && b.title.indexOf(CATS) === 0 && /\b11\b/.test(b.title) && b.rows === 1 && b.add, JSON.stringify(b));
 		ok('R2 its first row shows 150', b.first === '150', b.first);
+		const geo = await P.evaluate(() => { const R = (e) => e.getBoundingClientRect(), bx = R(document.getElementById('lpn_demands_box')), pr = R(document.getElementById('lpn_popup')); return { w: Math.round(bx.width), h: Math.round(bx.height), overlap: bx.left < pr.right && bx.right > pr.left && bx.top < pr.bottom && bx.bottom > pr.top, cue: !!document.querySelector('#lpn_demands_body .lpn-demands-ov'), inView: bx.left >= 0 && bx.right <= innerWidth }; });
+		ok('R8 the box opens at its own size, not the 618 x 615 of a general box (one row)', geo.w >= 320 && geo.w <= 340 && geo.h <= 330, JSON.stringify(geo));
+		ok('R8 floating, it stands beside Properties, not over it, and on the screen', !geo.overlap && geo.inView, JSON.stringify(geo));
+		ok('R10 in Base the box shows no override dot', !geo.cue);
 		await P.click('#lpn_demands_body .lpn-demand-add');
 		await a.settle(600);
 		b = await box(); r = await rows();
@@ -95,10 +103,20 @@ async function main() {
 		ok('R3 Base demand is now the total, 150, in a muted read-out with no box', !r.baseInput && r.baseValue === '150' && !!r.baseMuted, JSON.stringify([r.baseInput, r.baseValue, r.baseMuted]));
 		ok('R3 and the Demand pattern row is gone', !r.pattern);
 		const was = await P.evaluate(() => document.querySelector('#lpn_demands_body tbody tr:nth-child(2) input[type=number]').value);
-		await P.evaluate(() => { const i = document.querySelector('#lpn_demands_body tbody tr:nth-child(2) input[type=number]'); i.focus(); i.value = '25'; i.dispatchEvent(new Event('change', { bubbles: true })); });
+		// R9: a real mouse and keyboard. Click the cell, type 75, press Tab: the value is kept and focus goes on to the next cell.
+		await P.click('#lpn_demands_body tbody tr:nth-child(2) input[type=number]');
+		await P.keyboard.press('Control+a');
+		await P.keyboard.type('75');
+		await P.keyboard.press('Tab');
 		await a.settle(500);
 		r = await rows();
-		ok('R3 typing 25 into the new row makes the total 175', r.baseValue === '175' && was === '0', JSON.stringify([was, r.baseValue]));
+		const fo = await P.evaluate(() => { const e = document.activeElement; return { tag: e.tagName, inRow2: !!e.closest('#lpn_demands_body tbody tr:nth-child(2)'), inBody: !!e.closest('#lpn_demands_body') }; });
+		ok('R9 typing 75 in the 2nd row and pressing Tab makes the total 225', r.baseValue === '225' && was === '0', JSON.stringify([was, r.baseValue]));
+		ok('R9 ...and focus has moved on to the next cell of that row (the pattern), not to the page background', fo.tag === 'SELECT' && fo.inRow2, JSON.stringify(fo));
+		await P.keyboard.press('Tab');
+		await a.settle(300);
+		const fo2 = await P.evaluate(() => { const e = document.activeElement; return { tag: e.tagName, inRow2: !!e.closest('#lpn_demands_body tbody tr:nth-child(2)') }; });
+		ok('R9 ...and a second Tab reaches the Description cell', fo2.tag === 'INPUT' && fo2.inRow2, JSON.stringify(fo2));
 		await P.evaluate(() => { document.querySelector('#lpn_demands_body tbody tr:nth-child(2) .lpn-demand-del').click(); });
 		await a.settle(600);
 		b = await box(); r = await rows();
@@ -133,6 +151,8 @@ async function main() {
 		ok('R6 Base junction 11 still holds 150', st.base && (st.base.demand === 150 || st.base._demand === 150), JSON.stringify(st.base));
 		r = await rows();
 		ok('R6 Properties shows 310 in the scenario', r.baseValue === '310', r.baseValue);
+		const cue = await P.evaluate(() => { const c = document.querySelector('#lpn_demands_body .lpn-demands-ov'); return c ? { dot: !!c.querySelector('.lpn-ovm-dot'), text: c.textContent.trim() } : null; });
+		ok('R10 in the scenario the box carries the override dot and says which scenario', !!cue && cue.dot && /Scenario/.test(cue.text), JSON.stringify(cue));
 		// Adding a category in the scenario keeps Base alone and the total adds up.
 		// (the box is still open from above and stands over the button, so ask by the button's own click)
 		await P.evaluate(() => { document.getElementById('lpn_demand_more').click(); });
@@ -149,8 +169,39 @@ async function main() {
 		await U.openProperties(ctx, 'node', '21');
 		b = await box();
 		ok('R7 selecting another junction retitles the open box', b.shown && /\b21\b/.test(b.title), b.title);
+		await P.click('#lpn_demands_box .lpn-corner-btn[data-dock="right"]');
+		await a.settle(600);
+		const dw = await P.evaluate(() => { const bx = document.getElementById('lpn_demands_box'); return { w: Math.round(bx.getBoundingClientRect().width), floor: parseFloat(getComputedStyle(document.documentElement).fontSize) * 20.5 }; });
+		ok('R8 docked, it takes its own optimal width (20.5 rem), not 618', Math.abs(dw.w - dw.floor) <= 3, JSON.stringify(dw));
 		ok('R7 no page errors', errors.length === 0, errors.join(' | '));
 		await a.close();
+
+		console.log('\n--- a junction with Customers (R11) ---');
+		const fs = require('fs');
+		const { Session } = require(path.join(U.REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
+		const net1 = JSON.parse(fs.readFileSync(path.join(U.REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+		net1.customers = [{ id: 'M1', demand: 5, count: 1, link: '10', t: 0.95, x: 0, y: 30 }];
+		const c2 = await Session.open(browser, NAME + '-cust', { serviceWorkers: 'block' });
+		await c2.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		await c2.goto('Looped-Network.php?ec_nolog=1');
+		await c2.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); localStorage.setItem('lpn_hovercard', 'off'); }, JSON.stringify(net1));
+		await c2.reload();
+		await c2.answerTrainingPanel().catch(() => {});
+		await c2.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await c2.page.setViewportSize({ width: 1366, height: 768 });
+		await c2.settle(2500);
+		await U.openProperties({ a: c2, P: c2.page }, 'node', '11');
+		const cu = await c2.page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), R = (e) => e.getBoundingClientRect();
+			const rs = Array.from(f.querySelectorAll('.lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && R(x).height > 0);
+			const at = (re) => rs.findIndex((x) => re.test(x.querySelector('.lpn-gname').textContent.trim()));
+			const ic = at(/^Demand categories/), iu = at(/^Customer demands/), v = iu >= 0 ? rs[iu].querySelector('span.lpn-gval') : null;
+			return { ic, iu, text: v ? v.textContent.trim() : null, muted: v ? getComputedStyle(v).color : null, ink: getComputedStyle(f).color, demand: (rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0] || { querySelector: () => null }).querySelector('span.lpn-gval') && rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0].querySelector('span.lpn-gval').textContent.trim() };
+		});
+		ok('R11 Properties shows the customers line directly under Demand categories', cu.iu === cu.ic + 1 && cu.ic >= 0, JSON.stringify(cu));
+		ok('R11 ...saying 5 gpm from Customers (1), in muted ink', /^5 gpm from Customers \(1\)$/.test(cu.text || '') && cu.muted !== cu.ink, JSON.stringify(cu));
+		ok('R11 ...which explains the Demand of 155', /^155/.test(cu.demand || ''), JSON.stringify(cu.demand));
+		await c2.close();
 	} finally {
 		await browser.close();
 		env.stopServer();

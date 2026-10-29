@@ -2892,7 +2892,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-add { font: inherit; margin: 2px 0; }
 /* THE DEMAND CATEGORIES BOX (sheet-light). The list Properties no longer draws: the same light sheet as the other boxes (hairline rules, no box
    round a cell, an editable cell filled on hover and outlined on focus, an empty one underlined faintly), as a table of one row per category. */
-.lpn-demandsbox { width: min(27rem, 94vw); height: min(22rem, 92vh); min-width: min(20rem, 94vw); min-height: min(12rem, 92vh); }
+.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: min(20rem, 94vw); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
+.lpn-demands-ov { display: flex; align-items: center; gap: 4px; padding: 4px 6px; font-size: .85em; color: var(--ec-ink-muted); border-bottom: 1px solid var(--ec-hairline); }
+.lpn-demands-ov .lpn-ovm-cell { position: static; margin: 0; }
 #lpn_demands_body { overflow: auto; }
 #lpn_demands_body .lpn-demand-table { display: table; width: 100%; margin: 0; border-collapse: collapse; }
 #lpn_demands_body > .lpn-demand-table { table-layout: fixed; }

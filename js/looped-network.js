@@ -73359,7 +73359,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function demandRows(fields, n, nodeId) {
 		var pc = EngCalcs.pageConfig || {}, rows = ownDemandRows(n), one = rows.length < 2,
-			label, input, v0, total = 0, span, count, btn, unit = unitLabel('lpn_u_flow');
+			label, input, v0, total = 0, span, count, btn, custs, unit = unitLabel('lpn_u_flow');
 		if (one) {
 			label = document.createElement('label');
 			input = document.createElement('input');
@@ -73413,6 +73413,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(btn);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		// What the meters around this junction add, as a muted line under the count (the list itself is in the box).
+		custs = customersAtNode(n.id);
+		if (custs.length) { readonlyField(fields, pc.lpn_node_customers || 'Customer demands', customersLineText(custs), pc.lpn_node_customers_tip); }
 		// A box already open follows the junction on screen.
 		if (demandsBoxIsOpen() && !demandsBoxKeep) { demandsBoxNode = nodeId; rebuildDemandsBox(); }
 	}
@@ -73425,8 +73428,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (nodeId !== undefined) { demandsBoxNode = nodeId; }
 		box.style.display = 'flex';
 		rebuildDemandsBox();
-		placePanelForScreen(box, function () { placeBoxRemembered(box, demandsLayout); });
+		placePanelForScreen(box, function () {
+			placeBoxRemembered(box, demandsLayout);
+			if (demandsLayout.left === null || demandsLayout.top === null) { placeBesideProperties(box); }
+		});
 		initTipsIn(box);
+	}
+	// A floating box opens beside the Properties box it was asked from, on the side with room, never over it.
+	function placeBesideProperties(box) {
+		var pop = document.getElementById('lpn_popup'), pr, r, gap = 8, left, top;
+		if (!pop || pop.style.display === 'none') { return; }
+		pr = pop.getBoundingClientRect();
+		r = box.getBoundingClientRect();
+		if (!(pr.width > 0)) { return; }
+		if (pr.right + gap + r.width <= window.innerWidth) { left = pr.right + gap; }
+		else if (pr.left - gap - r.width >= 0) { left = pr.left - gap - r.width; }
+		else { return; }
+		top = Math.max(chromeFloor(), pr.top);
+		box.style.left = left + 'px';
+		box.style.top = top + 'px';
+		capPanelToRoomBelow(box, top);
 	}
 	function closeDemandsBox() { if (demandsBoxIsOpen()) { hidePanel(demandsBoxEl()); } }
 	function wireDemandsBox() {
@@ -73447,16 +73468,51 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		demandsBoxKeep = true;
 		try { afterPropertyEdit(n); refreshPopupIfOpen(); } finally { demandsBoxKeep = false; }
 	}
+	// In a scenario that overrides this junction's demands: the same orange dot Properties draws, with the words it carries,
+	// above the table. Pressing it clears the override, as the dot in Properties does.
+	function demandsBoxOverrideCue(host, n) {
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), row, dot, text;
+		if (scenarios.length < 2 || !isOverridable(n, 'demand') || inBaseFor('demand') || !(hasOverride(n, 'demand') || hasOverride(n, 'demands'))) { return; }
+		text = (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn));
+		row = document.createElement('div');
+		row.className = 'lpn-demands-ov';
+		dot = ovmCell('lpn-ovm-dot', text + ' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			saveUndoSnapshot();
+			clearOverride(n, 'demands');
+			clearOverride(n, 'demand');
+			afterPropertyEdit(n);
+			refreshPopupIfOpen();
+			demandsBoxRebuildIfOpen();
+		});
+		row.appendChild(dot);
+		text = document.createTextNode(text);
+		row.appendChild(text);
+		host.appendChild(row);
+	}
 	function rebuildDemandsBox() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_demands_body'),
-			title = document.getElementById('lpn_demands_title'), n = demandsBoxNode !== null ? nodeById(demandsBoxNode) : null,
+			title = document.getElementById('lpn_demands_title'), at, n = demandsBoxNode !== null ? nodeById(demandsBoxNode) : null,
 			base = pc.lpn_demand_cats || 'Demand categories';
 		if (!host) { return; }
 		if (!n || n.type === 'tank' || n.type === 'reservoir') { closeDemandsBox(); return; }
+		// Focus is kept across the redraw: a cell being typed in (or Tabbed out of) when a solve or an edit redraws the box
+		// is found again by its row and column, so the keyboard carries on to the next cell.
+		at = demandsFocusAt(host);
 		clearFields(host);
 		if (title) { title.textContent = base + ' (' + n.id + ')'; }
+		demandsBoxOverrideCue(host, n);
 		demandCategoryFields(host, n, n.id);
 		nodeCustomerFields(host, n);
+		if (at) { demandsFocusBack(host, at); }
+	}
+	function demandsFocusAt(host) {
+		var e = document.activeElement, td = e && e.closest ? e.closest('td') : null, tr = td && td.parentNode;
+		if (!td || !host.contains(e)) { return null; }
+		return { row: Array.prototype.indexOf.call(tr.parentNode.children, tr), col: Array.prototype.indexOf.call(tr.children, td), tag: e.tagName };
+	}
+	function demandsFocusBack(host, at) {
+		var tr = host.querySelectorAll('.lpn-demand-table > tbody > tr')[at.row], td = tr && tr.children[at.col], e = td && td.querySelector(at.tag.toLowerCase());
+		if (e && e.focus) { e.focus(); }
 	}
 	function demandCategoryFields(fields, n, nodeId) {
 		// **READ ONCE, AS THE SCENARIO ON SCREEN SEES IT** (R-369), and never written through: every
@@ -73590,14 +73646,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// are sitting at -- so it is NOT in serializeProject() and NOT in localStorage; it is the same
 	// answer, for the same reason, that cpOpenKeys gives for a custom property.
 	var nodeCustomersOpen = {};
-	function nodeCustomerFields(fields, n) {
-		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
-			box, sum, count, total = 0, table, thead, hrow, tbody;
-		if (!list.length) { return; }
+	function customersTotal(list) {
+		var total = 0;
 		list.forEach(function (c) {
 			var f = customerFlow(c);
 			if (typeof f === 'number' && isFinite(f)) { total += f; }
 		});
+		return total;
+	}
+	// "5 gpm from Customers (2)": the line that says where the part of a junction's Demand it did not type comes from.
+	function customersLineText(list) {
+		return (( EngCalcs.pageConfig || {}).lpn_node_customers_sum || '{total} {unit} from Customers ({n})')
+			.split('{n}').join(String(list.length))
+			.split('{total}').join(String(+customersTotal(list).toFixed(6)))
+			.split('{unit}').join(unitLabel('lpn_u_flow'));
+	}
+	function nodeCustomerFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
+			box, sum, count, total = 0, table, thead, hrow, tbody;
+		if (!list.length) { return; }
+		total = customersTotal(list);
 		// **`<details>` RATHER THAN A BUTTON AND A HIDDEN DIV**, which is the idiom this page
 		// already uses twice (multiSection() and the custom-property rows): the disclosure pattern
 		// for free, and every row built eagerly, so a shut list is still found by the browser's own
