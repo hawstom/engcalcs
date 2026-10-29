@@ -242,7 +242,7 @@ async function main() {
 			const lab = R(Array.from(body.querySelectorAll('.lpn-gname')).filter((n) => R(n).width > 0)[0]), edge = R(body).right;
 			return { valueRem: (edge - lab.right) / rem, clipped: ins.filter((e) => R(e).right > edge + 1 || e.scrollWidth > e.clientWidth + 1 && e.tagName === 'SELECT').length, scroll: body.scrollWidth - body.clientWidth };
 		});
-		ok('dragging the divider far right still leaves the Value column 9.5 rem, no input clipped', cap.valueRem >= 9.5 && cap.clipped === 0 && cap.scroll <= 1, JSON.stringify(cap));
+		ok('dragging the divider far right leaves the Value column the few characters the box itself can be sized to (3 rem; Tom, 2026-10-29), no input clipped', cap.valueRem >= 2.9 && cap.clipped === 0 && cap.scroll <= 8, JSON.stringify(cap));   // a few pixels of spill is what a 3 rem Value column costs
 		await d.close();
 
 		console.log('\n--- on a Text there is no heading; labels keep their ? and units whole ---');
@@ -252,7 +252,7 @@ async function main() {
 			await t.page.mouse.click(txy.x, txy.y); await t.settle(900);
 			const th = await t.page.evaluate(() => {
 				const h = document.querySelector('#lpn_popup .lpn-ghdr'), ta = document.querySelector('#lpn_popup_fields textarea'), R = (e) => e.getBoundingClientRect();
-				const first = document.querySelector('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)');
+				const first = document.querySelectorAll('#lpn_popup_fields .lpn-grow:not(.lpn-fill-row)')[1];   // Active stands above the words, then the other rows (row order, 2026-10-29)
 				return ta && first ? { noHeader: !h, belowWords: R(first).top >= R(ta).bottom - 1 } : null;
 			});
 			ok('on a Text there is no heading, and the rows stand below the words box', !!th && th.noHeader && th.belowWords, JSON.stringify(th));

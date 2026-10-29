@@ -16,7 +16,7 @@
 //
 //   L1-L8 THE LIGHTER SHEET (sheet-light): a hairline under each row and none at its sides, no box or shadow round a value,
 //       one x for every value, computed values in the muted ink, an editable cell filled on hover and outlined on focus, an
-//       empty one underlined faintly; the same on a phone (name over value); the hairline shows in every theme.
+//       empty one plain (no dotted underline); the same on a phone (name over value); the hairline shows in every theme.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -251,7 +251,7 @@ async function main() {
 			return { muted, roInk: ro.map((e) => getComputedStyle(e).color), empty: empty ? { at: at(empty), img: getComputedStyle(empty).backgroundImage, id: empty.id || empty.getAttribute('data-gprop') } : null, full: full ? { at: at(full), bg0: getComputedStyle(full).backgroundColor, id: full.id || full.getAttribute('data-gprop') } : null };
 		});
 		ok('L4 every computed value is drawn in the muted ink', probe.roInk.length >= 1 && probe.roInk.every((c) => c === probe.muted), JSON.stringify({ want: probe.muted, got: Array.from(new Set(probe.roInk)) }));
-		ok('L6 an empty editable cell still shows a faint underline', !!probe.empty && /gradient/.test(probe.empty.img), JSON.stringify(probe.empty));
+		ok('L6 an empty editable cell is plain: no dotted or dashed underline, no background image', !!probe.empty && !/gradient|url/.test(probe.empty.img), JSON.stringify(probe.empty));
 		if (probe.full) {
 			await page.mouse.move(probe.full.at.x, probe.full.at.y);
 			await a.settle(200);
