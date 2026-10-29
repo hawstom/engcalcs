@@ -34,9 +34,9 @@
 # THE LOGS IT READS. All tab-separated, all beginning with an ISO-8601 UTC timestamp. See
 # lib/config.inc.php for the authoritative field lists.
 #
-#   engcalcs-lang.log         reach     ts lang source page [served asked] [bucket]
-#   engcalcs-human-view.log   shopping  ts page lang browser_lang [pointer] [bucket]
-#   engcalcs-calc-usage.log   using     ts page lang browser_lang [pointer] [bucket]
+#   engcalcs-lang.log         page load ts lang source page [served asked] [bucket]
+#   engcalcs-human-view.log   dwell     ts page lang browser_lang [pointer] [bucket]
+#   engcalcs-calc-usage.log   use       ts page lang browser_lang [pointer] [bucket]
 #   engcalcs-title.log        naming    ts page lang browser_lang field [bucket]
 #                                       field: title|subtitle (forms), save|rename (Looped-Network)
 #   engcalcs-signal.log       behaviour ts page lang browser_lang event detail [bucket]
@@ -148,7 +148,7 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT INT TERM
 
 # ---- the small-n floor and the interval, in one place ----------------------------------------
-# 40 is the floor dev/usage-data-log.md already uses for %using. Below it a ratio is not a verdict;
+# 40 is the floor dev/usage-data-log.md already uses for %use. Below it a ratio is not a verdict;
 # below MIN_N it is not printed at all.
 FLOOR_N=40
 MIN_N=5
@@ -156,11 +156,11 @@ MIN_N=5
 # Injected into every awk program that prints a ratio. wilson() returns "lo-hi" as whole percents;
 # rate() returns the point estimate with a '~' when the denominator is under the floor and "-" when
 # it is under MIN_N.
-# BOTH FUNCTIONS ARE TOTAL, and they have to be: k CAN EXCEED n here. %using is using/shopping,
+# BOTH FUNCTIONS ARE TOTAL, and they have to be: k CAN EXCEED n here. %use is uses/dwells,
 # and the two beacons are independently gated -- maybeLogHumanView fires once the browser has been
 # around >=10s, maybeLogCalcUsage fires on a user-triggered recalculation >=10s after LOAD, and the
 # two de-duplicate on different keys. So a person can be recorded calculating without ever being
-# recorded shopping, and a k/n over 1 is a real reading of two real counts, not a corrupt log.
+# recorded dwelling, and a k/n over 1 is a real reading of two real counts, not a corrupt log.
 # The first version of this file computed sqrt() of a negative variance in exactly that case: awk
 # printed a warning and the interval read "[-nan-100]%" on the production run of 2026-08-21.
 # Neither count is clamped and no row is dropped -- the ratio is printed as ">100%" and its
@@ -318,23 +318,24 @@ echo ""
 echo "-------------------------------------------------------------------------------"
 echo " DEFINITIONS — the four tiers, narrowest last"
 echo "-------------------------------------------------------------------------------"
-echo "   reach     a page load recorded in engcalcs-lang.log. INCLUDES CRAWLERS. High reach with"
-echo "             ~0% shopping is a bot signature, not an audience."
-echo "   shopping  a confirmed-human page view: the beacon fires once this browser has been"
-echo "             around >=10s, whether or not anybody calculates. Window shopping."
-echo "   using     a confirmed calculation: a user-triggered recalculation >=10s after load. It"
-echo "             means 'typed their own numbers', not 'looked at the default answer'."
-echo "   naming    a Printable Title or Subtitle was typed — they mean to show it to somebody."
-echo "             On Looped-Network, a project saved to a file or a tab renamed (since 2026-09-08)."
-echo "   device    the pointer on a shopping or using row: coarse (a finger) or fine (a mouse)."
-echo "             Its own tier, never folded into the three above (Task 285, since 2026-09-08)."
+echo "   page load  a page load recorded in engcalcs-lang.log. INCLUDES CRAWLERS. Many page loads"
+echo "              with ~0% dwell is a bot signature, not an audience."
+echo "   dwell      a page dwell: the beacon is written at least 10 seconds after the page load,"
+echo "              whether or not anybody calculates. Presumed human."
+echo "   use        a confirmed calculation: a user-triggered recalculation >=10s after load. It"
+echo "              means 'typed their own numbers', not 'looked at the default answer'."
+echo "   naming     a Printable Title or Subtitle was typed — they mean to show it to somebody."
+echo "              On Looped-Network, a project saved to a file or a tab renamed (since 2026-09-08)."
+echo "   device     the pointer on a dwell or use row: coarse (a finger) or fine (a mouse)."
+echo "              Its own tier, never folded into the three above (Task 285, since 2026-09-08)."
+echo "   browsers   different browsers that said yes, counted by their random code."
 echo ""
-echo "   %shopping = shopping/reach. A LOWER BOUND on human reach, never an estimate of it."
-echo "   %using    = using/shopping. A RATIO OF TWO INDEPENDENTLY GATED BEACONS, and it can exceed"
-echo "               100%. The shopping beacon needs the browser to have been around >=10s; the"
-echo "               using beacon needs a user-triggered recalculation >=10s after LOAD, and the"
+echo "   %dwell    = dwells/page loads. A LOWER BOUND on human page loads, never an estimate of it."
+echo "   %use      = uses/dwells. A RATIO OF TWO INDEPENDENTLY GATED BEACONS, and it can exceed"
+echo "               100%. The dwell beacon needs the browser to have been around >=10s; the"
+echo "               use beacon needs a user-triggered recalculation >=10s after LOAD, and the"
 echo "               two de-duplicate on different keys — so somebody can be recorded calculating"
-echo "               and never recorded shopping. Read it as a rough conversion indicator, NOT as"
+echo "               and never recorded dwelling. Read it as a rough conversion indicator, NOT as"
 echo "               a share of a population. Over 100% it prints '>100%' with no interval; both"
 echo "               counts are printed beside it and neither is ever clamped or dropped."
 echo "   ~         the denominator is under $FLOOR_N. The number is printed, but it is not a verdict."
@@ -350,15 +351,15 @@ echo "               row also carries the browser's random code (Tom's call F01)
 echo "               columns count DIFFERENT BROWSERS: one browser back on ten days is ten rows and"
 echo "               one browser. A said-yes row from before then has no code: a use, never a"
 echo "               browser. Browsers is a count INSIDE the said-yes bucket, never added to anything."
-echo "   page loads  rows from everybody else — refused, or has not answered the banner. Nothing"
-echo "               is stored on their device, so nothing tells their second load from their"
-echo "               first. ONE ROW IS ONE PAGE LOAD."
+echo "   others      rows from everybody else — refused, or has not answered the banner. Nothing"
+echo "               is stored on their device, so nothing tells their second dwell from their"
+echo "               first. ONE ROW IS ONE PAGE LOAD OR DWELL, whichever the log records."
 echo ""
 echo "   These are different UNITS. Adding them produces a number with no meaning, and a page"
 echo "   whose non-consenting visitors reload a lot would simply look more popular. There is no"
 echo "   total row anywhere in this report, on purpose."
 echo ""
-printf "   %-38s %10s %12s\n" "log" "said yes" "page loads"
+printf "   %-38s %10s %12s\n" "log" "said yes" "others"
 for pair in "engcalcs-lang.log:lang" "engcalcs-human-view.log:view" "engcalcs-calc-usage.log:calc" "engcalcs-title.log:title" "engcalcs-signal.log:signal"; do
     printf "   %-38s %10s %12s\n" "${pair%%:*}" "$(n_of "$TMP/p-${pair##*:}")" "$(n_of "$TMP/l-${pair##*:}")"
 done
@@ -368,7 +369,7 @@ printf "   %-38s %10s %12s\n" "engcalcs-contact-send.log" \
 echo ""
 LANG_ALL=$(n_of "$TMP/lang")
 if [ "$LANG_ALL" -gt 0 ]; then
-    echo "   Consent share of reach rows: $(awk -v p="$(n_of "$TMP/p-lang")" -v t="$LANG_ALL" 'BEGIN{printf "%.1f%%", 100*p/t}')"
+    echo "   Consent share of page-load rows: $(awk -v p="$(n_of "$TMP/p-lang")" -v t="$LANG_ALL" 'BEGIN{printf "%.1f%%", 100*p/t}')"
     echo "   THIS IS A RATE OF ROWS, NOT OF HUMANS, and it is the only bridge between the two"
     echo "   buckets. Rows written before the consent banner shipped (2026-08-11) are all said-yes"
     echo "   rows by definition, so the share is understated while any of them remain in the"
@@ -389,18 +390,18 @@ ec_funnel_pages() {
         END {
             for (p in seen) printf "%d\t%d\t%d\t%s\n", (p in s?s[p]:0), (p in u?u[p]:0), (p in r?r[p]:0), p
         }' | sort -t$'\t' -k1,1rn -k2,2rn -k3,3rn | awk -F'\t' "$AWK_LIB"'
-        BEGIN { printf "   %-26s %9s %9s %9s %10s %-11s %9s %-11s\n", "page", "reach", "shopping", "using", "%shopping", "95% CI", "%using", "95% CI" }
-        { printf "   %-26s %9d %9d %9d %10s %-11s %9s %-11s\n", $4, $3, $1, $2,
+        BEGIN { printf "   %-26s %10s %9s %9s %10s %-11s %9s %-11s\n", "page", "page loads", "dwells", "uses", "%dwell", "95% CI", "%use", "95% CI" }
+        { printf "   %-26s %10d %9d %9d %10s %-11s %9s %-11s\n", $4, $3, $1, $2,
                  rate($1,$3), ($3>0?wilson($1,$3):""), rate($2,$1), ($1>0?wilson($2,$1):"") }'
     echo ""
     echo "   Units: every count in this table is ${unit}."
-    echo "   A '>100%' in %using is not corruption: shopping and using are separately gated beacons"
-    echo "   with different de-duplication keys, so a row can record a calculation with no view."
+    echo "   A '>100%' in %use is not corruption: dwells and uses are separately gated beacons"
+    echo "   with different de-duplication keys, so a row can record a calculation with no dwell."
 }
 
 echo ""
 echo "==============================================================================="
-echo " RANK BY SHOPPING — the statistic that survives a window change"
+echo " RANK BY DWELLS — the statistic that survives a window change"
 echo "==============================================================================="
 echo "   dev/usage-data-log.md establishes rank as the robust number here: counts move with the"
 echo "   window and the consent share, ratios move with n, rank moves with the audience. Read"
@@ -408,7 +409,7 @@ echo "   this table first, and read the ratio tables below only for within-windo
 echo ""
 echo "   STANDING RULE: rank the complicated calculators against EACH OTHER — Looped-Network,"
 echo "   Irrigation-Pressure, Branched-Network, Manning-Irregular, Weir-Flow-Irregular — never"
-echo "   against Manning-Pipe-Flow or Manning-Trap. 'Using' fires after one keystroke on a"
+echo "   against Manning-Pipe-Flow or Manning-Trap. 'Use' fires after one keystroke on a"
 echo "   three-field form and after drawing a network on the map, so the ratio is not portable"
 echo "   across complexity classes."
 echo ""
@@ -419,12 +420,12 @@ echo ""
     $1 != "" { if ($2=="p") { p[$1]++; if ($3 != "") { if (!(($1 SUBSEP $3) in bc)) b[$1]++; bc[$1 SUBSEP $3]=1 } } else l[$1]++; seen[$1]=1 }
     END { for (k in seen) printf "%d\t%d\t%s\t%d\n", (k in p?p[k]:0), (k in l?l[k]:0), k, (k in b?b[k]:0) }' \
 | sort -t$'\t' -k1,1rn -k2,2rn | awk -F'\t' '
-    BEGIN { printf "   %-6s %-28s %10s %10s %12s\n", "rank", "page", "browsers", "said yes", "page loads" }
-    { n++; printf "   %-6d %-28s %10d %10d %12d\n", n, $3, $4, $1, $2 }'
+    BEGIN { printf "   %-6s %-28s %10s %16s %14s\n", "rank", "page", "browsers", "dwells, said yes", "dwells, others" }
+    { n++; printf "   %-6d %-28s %10d %16d %14d\n", n, $3, $4, $1, $2 }'
 echo ""
-echo "   browsers = different said-yes browsers that looked at the page (distinct codes, since"
-echo "   2026-10-08); said yes = their views, once per visit; page loads = everybody else."
-echo "   Rank is by the said-yes bucket, with the page-load bucket printed beside it so a"
+echo "   browsers = different said-yes browsers that dwelled on the page (distinct codes, since"
+echo "   2026-10-08); dwells, said yes = their dwells, once per visit; dwells, others = everybody else."
+echo "   Rank is by the said-yes bucket, with the others bucket printed beside it so a"
 echo "   disagreement between the two is visible. They are different units; the ranks are"
 echo "   comparable, the counts are not."
 
@@ -432,7 +433,7 @@ echo ""
 echo "==============================================================================="
 echo " FUNNEL BY PAGE — SAID YES (consented, de-duplicated: one row = one visit's use of a page)"
 echo "==============================================================================="
-ec_funnel_pages p "SAID-YES ROWS (uses)"
+ec_funnel_pages p "SAID-YES ROWS"
 
 echo ""
 echo "==============================================================================="
@@ -440,7 +441,7 @@ echo " BROWSERS BY PAGE — said yes, distinct random codes (Tom's call F01, 202
 echo "==============================================================================="
 echo "   How many DIFFERENT browsers did each thing on each page in this window. The rows above"
 echo "   count uses; this counts the browsers behind them. Only browsers that said yes carry a"
-echo "   code, so this is a count inside the said-yes bucket and is never added to page loads."
+echo "   code, so this is a count inside the said-yes bucket and is never added to the others bucket."
 echo ""
 {
     awk -F'\t' "$AWK_CODE"'{ c = ec_code(); if (c != "") print $2"\tlooked\t"c }'     "$TMP/p-view"
@@ -461,12 +462,12 @@ echo "   Said-yes rows with no code (written before 2026-10-08): $UNCODED — us
 
 echo ""
 echo "==============================================================================="
-echo " FUNNEL BY PAGE — PAGE LOADS (everybody else: one row = one page load)"
+echo " FUNNEL BY PAGE — OTHERS (everybody else: one row = one page load or dwell)"
 echo "==============================================================================="
 echo "   Not a smaller or larger version of the table above. A different unit, and for most"
 echo "   windows the larger population. Do not divide one table by the other."
 echo ""
-ec_funnel_pages l "PAGE LOADS"
+ec_funnel_pages l "OTHERS ROWS"
 echo ""
 echo "   NEITHER FUNNEL TABLE CARRIES A RANK COLUMN. Rank is stated once, in its own section"
 echo "   above. A row's position here moves with the sort, and a position read as a rank — or a"
@@ -481,7 +482,7 @@ echo "==========================================================================
 echo "   Pages that returned almost nothing in this window, both buckets pooled purely to decide"
 echo "   membership of this list (no count is printed, because a pooled count would be a sum)."
 echo ""
-echo "   THIS IS NOT AN ARGUMENT FOR CUTTING THEM. Zero reach is a discovery/SEO gap, not a"
+echo "   THIS IS NOT AN ARGUMENT FOR CUTTING THEM. Zero page loads is a discovery/SEO gap, not a"
 echo "   value signal, and it never has been one here. It is stated once per run so that the"
 echo "   choice to carry the suite's breadth stays deliberate rather than unnoticed."
 echo ""
@@ -494,10 +495,10 @@ echo ""
     END {
         n = 0
         for (k in seen) if ((k in s ? s[k] : 0) < 5 && (k in u ? u[k] : 0) <= 1) { print "   " k; n++ }
-        if (n == 0) print "   (none — every page seen in this window returned at least 5 shoppers)"
+        if (n == 0) print "   (none — every page seen in this window returned at least 5 dwells)"
     }' | sort
 echo ""
-echo "   The page list comes from the REACH log, so a page with traffic and no shoppers appears"
+echo "   The page list comes from the PAGE LOAD log, so a page with traffic and no dwells appears"
 echo "   here. A page absent from every log in this window does not — it has no rows to be"
 echo "   counted by. Cross-check against the calculator list before concluding anything about a"
 echo "   page you cannot see."
@@ -515,16 +516,16 @@ echo "     ASKED FOR the browser's first Accept-Language tag (column 4). This is
 echo "               wanted one', and it is true even of visitors who were served English."
 echo ""
 for b in p l; do
-    if [ "$b" = "p" ]; then label="SAID YES"; else label="PAGE LOADS"; fi
+    if [ "$b" = "p" ]; then label="SAID YES"; else label="OTHERS"; fi
     tot=$(n_of "$TMP/$b-view")
     if [ "$tot" -eq 0 ]; then
-        echo "   $label — no confirmed-human page views in this window."
+        echo "   $label — no page dwells in this window."
         echo ""
         continue
     fi
     nonen=$(awk -F'\t' '{split($3,a,"-"); if (a[1] != "en" && a[1] != "") n++} END{print n+0}' "$TMP/$b-view")
     wantnon=$(awk -F'\t' '{split($4,a,"-"); if (a[1] != "en" && a[1] != "") n++} END{print n+0}' "$TMP/$b-view")
-    echo "   $label — confirmed-human page views: $tot"
+    echo "   $label — page dwells: $tot"
     printf "     %-46s %6d  %s\n" "served a language other than en" "$nonen" \
         "$(awk "$AWK_LIB"'BEGIN{printf "%s %s", rate('"$nonen"','"$tot"'), wilson('"$nonen"','"$tot"')}')"
     printf "     %-46s %6d  %s\n" "browser asked for a language other than en" "$wantnon" \
@@ -535,7 +536,7 @@ echo "   THE GAP BETWEEN THOSE TWO LINES IS THE FINDING. 'Asked for' well above 
 echo "   people who wanted a translation did not get one — a detection or discovery defect, not"
 echo "   a translation-quality one, and a completely different fix."
 echo ""
-echo "--- Language x calculator, confirmed humans, non-English served (SAID YES) ---"
+echo "--- Language x calculator, presumed humans, non-English served (SAID YES) ---"
 echo "    Every row is a real person: bots essentially never reach either beacon. This is the"
 echo "    sprint-sequencing view — is anyone showing up on a calculator in a language we"
 echo "    translated, and do they get as far as computing?"
@@ -550,11 +551,11 @@ echo ""
         for (k in seen) { printf "%d\t%d\t%s\n", (k in s?s[k]:0), (k in u?u[k]:0), k; n++ }
         if (n == 0) print "NONE"
     }' | sort -rn | awk -F'\t' "$AWK_LIB"'
-    /^NONE/ { print "    (no confirmed non-English person has reached any calculator in this window)"; next }
-    !hdr { printf "    %-8s %-26s %10s %10s %9s %-11s\n", "lang", "calculator", "shopping", "using", "%using", "95% CI"; hdr=1 }
+    /^NONE/ { print "    (no presumed-human non-English visitor has reached any calculator in this window)"; next }
+    !hdr { printf "    %-8s %-26s %10s %10s %9s %-11s\n", "lang", "calculator", "dwells", "uses", "%use", "95% CI"; hdr=1 }
     { printf "    %-8s %-26s %10d %10d %9s %-11s\n", $3, $4, $1, $2, rate($2,$1), ($1>0?wilson($2,$1):"") }'
 echo ""
-echo "--- What the reach log SERVED, and what it was ASKED for (both buckets) ---"
+echo "--- What the page load log SERVED, and what it was ASKED for (both buckets) ---"
 echo "    Column 2 of engcalcs-lang.log means different things on different rows -- the served"
 echo "    language on 'get'/'cookie'/'view' rows, the raw Accept-Language tag on 'browser'/'anon'"
 echo "    ones -- so it could never answer 'what did we serve?' for the anon majority, which is"
@@ -563,10 +564,10 @@ echo "    written as a pair before the bucket suffix. Rows written before that c
 echo "    neither and are counted as UNCLASSIFIED here rather than folded in."
 echo ""
 for b in p l; do
-    if [ "$b" = "p" ]; then label="SAID YES"; else label="PAGE LOADS"; fi
+    if [ "$b" = "p" ]; then label="SAID YES"; else label="OTHERS"; fi
     tot=$(n_of "$TMP/$b-lang")
     if [ "$tot" -eq 0 ]; then
-        echo "    $label — no reach rows in this window."
+        echo "    $label — no page load rows in this window."
         echo ""
         continue
     fi
@@ -574,7 +575,7 @@ for b in p l; do
     # [bucket], four or five fields, and the pair is written together or not at all.
     class=$(awk -F'\t' 'NF>=6' "$TMP/$b-lang" | wc -l | tr -d ' ')
     unclass=$((tot - class))
-    echo "    $label — reach rows: $tot   classified: $class   unclassified (older format): $unclass"
+    echo "    $label — page load rows: $tot   classified: $class   unclassified (older format): $unclass"
     if [ "$class" -gt 0 ]; then
         awk -F'\t' "$AWK_LIB"'
             NF>=6 {
@@ -591,15 +592,15 @@ for b in p l; do
     fi
     echo ""
 done
-echo "    Read this beside the confirmed-human figures above: this one covers every page load,"
+echo "    Read this beside the page-dwell figures above: this one covers every page load,"
 echo "    crawlers included, so it is the wider and the dirtier of the two measurements."
 echo ""
-echo "--- Language demand from the reach log (both buckets, kept apart) ---"
+echo "--- Language demand from the page load log (both buckets, kept apart) ---"
 echo "    'get' rows are an explicit ?lang=XX choice; 'browser'/'anon' rows carry the raw"
 echo "    Accept-Language tag; 'cookie' rows are a returning visitor on a saved preference."
 echo "    'view' rows are excluded from demand — they would double-count the visit's language."
 echo ""
-printf "    %-10s %10s %12s\n" "language" "said yes" "page loads"
+printf "    %-10s %10s %12s\n" "language" "said yes" "others"
 {
     awk -F'\t' '$3!="view" {split($2,a,"-"); if (a[1]!="") print a[1]"\tp"}' "$TMP/p-lang"
     awk -F'\t' '$3!="view" {split($2,a,"-"); if (a[1]!="") print a[1]"\tl"}' "$TMP/l-lang"
@@ -608,13 +609,13 @@ printf "    %-10s %10s %12s\n" "language" "said yes" "page loads"
     END { for (k in seen) printf "%d\t%d\t%s\n", (k in p?p[k]:0), (k in l?l[k]:0), k }' \
 | sort -t$'\t' -k1,1rn -k2,2rn | awk -F'\t' '{ printf "    %-10s %10d %12d\n", $3, $1, $2 }'
 echo ""
-echo "--- English by REGION asked for (reach rows carrying the asked column, both buckets) ---"
+echo "--- English by REGION asked for (page load rows carrying the asked column, both buckets) ---"
 echo "    The region subtag decides the unit preset since 2026-09-08: an English page in a"
 echo "    browser asking for en-us opens on US customary, any other tag on SI, and a bare 'en'"
 echo "    on SI (Tom: 'I lean toward SI when it's ambiguous'). This table is that rule's"
 echo "    denominator, and it is the one place a bare 'en' can be seen to matter or not."
 echo ""
-printf "    %-10s %10s %12s\n" "asked" "said yes" "page loads"
+printf "    %-10s %10s %12s\n" "asked" "said yes" "others"
 {
     awk -F'\t' 'NF>=6 && $6 ~ /^en(-|$)/ {print $6"\tp"}' "$TMP/p-lang"
     awk -F'\t' 'NF>=6 && $6 ~ /^en(-|$)/ {print $6"\tl"}' "$TMP/l-lang"
@@ -623,12 +624,12 @@ printf "    %-10s %10s %12s\n" "asked" "said yes" "page loads"
     END { n=0; for (k in seen) { printf "%d\t%d\t%s\n", (k in p?p[k]:0), (k in l?l[k]:0), k; n++ }
           if (n==0) print "NONE" }' \
 | sort -t$'\t' -k1,1rn -k2,2rn | head -15 | awk -F'\t' '
-    /^NONE/ { print "    (no reach row carries the asked column in this window)"; next }
+    /^NONE/ { print "    (no page load row carries the asked column in this window)"; next }
     { printf "    %-10s %10d %12d\n", $3, $1, $2 }'
 echo ""
 echo "--- Arrival pattern for non-English humans (bot-dwell check) ---"
-echo "    A crawler that dwells >=10s trips the shopping beacon and never calculates, which is"
-echo "    exactly the signature of a language with high shopping and near-zero using. Humans"
+echo "    A crawler that dwells >=10s trips the dwell beacon and never calculates, which is"
+echo "    exactly the signature of a language with high dwells and near-zero uses. Humans"
 echo "    spread out. 12 views on 1 day with a burst of 8 is a crawler; 12 over 9 days, burst 1,"
 echo "    is 12 people."
 echo ""
@@ -656,7 +657,7 @@ echo "   not do, because a first visit writes one before the visitor touches any
 echo ""
 echo "   ONE STRUCTURAL UNDERCOUNT, not a defect: CONSENTING VISITORS ONLY. Reading exempt"
 echo "   storage for an analytics purpose is still an analytics access. Treat it as a sample,"
-echo "   never as a total, and never divide it by a count that includes the page-load bucket."
+echo "   never as a total, and never divide it by a count that includes the others bucket."
 echo ""
 if [ -s "$TMP/p-signal" ]; then
     {
@@ -666,8 +667,8 @@ if [ -s "$TMP/p-signal" ]; then
         { if ($2=="repeat") r[$1]++; else s[$1]++; seen[$1]=1 }
         END { for (k in seen) if (k in r) printf "%d\t%s\t%d\n", (k in s?s[k]:0), k, r[k] }' \
     | sort -rn | awk -F'\t' "$AWK_LIB"'
-        !hdr { printf "   %-28s %12s %10s %9s %-11s\n", "page", "said-yes shop", "returned", "%repeat", "95% CI"; hdr=1 }
-        { printf "   %-28s %12d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }
+        !hdr { printf "   %-28s %15s %10s %9s %-11s\n", "page", "said-yes dwells", "returned", "%repeat", "95% CI"; hdr=1 }
+        { printf "   %-28s %15d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }
         END { if (!hdr) print "   (no repeat rows in this window)" }'
 else
     echo "   (no signal log rows in this window)"
@@ -688,7 +689,7 @@ echo "   two are logged in the same file since 2026-09-08 and are printed beside
 echo "   added to them: a title and a save are the same act on two different kinds of page."
 echo ""
 for b in p l; do
-    if [ "$b" = "p" ]; then label="SAID YES"; else label="PAGE LOADS"; fi
+    if [ "$b" = "p" ]; then label="SAID YES"; else label="OTHERS"; fi
     [ -s "$TMP/$b-title" ] || continue
     t=$(awk -F'\t' '$5=="title"' "$TMP/$b-title" | wc -l | tr -d ' ')
     s=$(awk -F'\t' '$5=="subtitle"' "$TMP/$b-title" | wc -l | tr -d ' ')
@@ -745,7 +746,7 @@ else
 fi
 
 # ---- device: the pointer tier (Task 285) -------------------------------------------------------
-# Its own tier, per Task 285 -- never folded into reach, shopping or using. The column is the
+# Its own tier, per Task 285 -- never folded into page loads, dwells or uses. The column is the
 # fifth field of the two confirmed-human logs, present only on rows written since 2026-09-08, so
 # a row with five fields or fewer is UNKNOWN, printed as such, and never assumed fine.
 echo ""
@@ -762,19 +763,19 @@ ec_pointer_of() {  # $1 = file. Prints coarse|fine|unknown per row, from the fie
     awk -F'\t' '{ p = (NF >= 6 ? $5 : ""); print (p == "coarse" || p == "fine") ? p : "unknown" }' "$1"
 }
 for b in p l; do
-    if [ "$b" = "p" ]; then label="SAID YES"; else label="PAGE LOADS"; fi
+    if [ "$b" = "p" ]; then label="SAID YES"; else label="OTHERS"; fi
     tot=$(n_of "$TMP/$b-view")
     if [ "$tot" -eq 0 ]; then
-        echo "   $label — no confirmed-human page views in this window."
+        echo "   $label — no page dwells in this window."
         echo ""
         continue
     fi
-    echo "   $label — confirmed-human page views: $tot"
+    echo "   $label — page dwells: $tot"
     ec_pointer_of "$TMP/$b-view" | sort | uniq -c | sort -rn | awk -v tot="$tot" "$AWK_LIB"'
         { printf "     %-10s %8d  %s %s\n", $2, $1, rate($1, tot), wilson($1, tot) }'
     echo ""
 done
-echo "--- Coarse pointer by page (PAGE LOADS, where both sides are page loads) ---"
+echo "--- Coarse pointer by page (OTHERS) ---"
 echo "    Rows whose pointer is known only. The Looped-Network row is the one Task 285 asked for."
 echo ""
 {
@@ -783,12 +784,12 @@ echo ""
     { if ($2 == "coarse") c[$1]++; k[$1]++ }
     END { n = 0; for (p in k) { printf "%d\t%s\t%d\n", k[p], p, (p in c ? c[p] : 0); n++ }
           if (n == 0) print "NONE" }' | sort -rn | awk -F'\t' "$AWK_LIB"'
-    /^NONE/ { print "    (no page-load row carries a pointer yet — the column began 2026-09-08)"; next }
+    /^NONE/ { print "    (no others row carries a pointer yet — the column began 2026-09-08)"; next }
     !hdr { printf "    %-26s %11s %10s %9s %-11s\n", "page", "known", "coarse", "%coarse", "95% CI"; hdr=1 }
     { printf "    %-26s %11d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
 echo ""
-echo "--- Calculated, by pointer (PAGE LOADS): does a finger get as far as a mouse? ---"
-echo "    using/shopping within each pointer class, the same ratio as the funnel and with the"
+echo "--- Calculated, by pointer (OTHERS): does a finger get as far as a mouse? ---"
+echo "    uses/dwells within each pointer class, the same ratio as the funnel and with the"
 echo "    same caveat: two independently gated beacons, so it can exceed 100%."
 echo ""
 {
@@ -798,7 +799,7 @@ echo ""
     { if ($2 == "shop") s[$1]++; else u[$1]++; seen[$1] = 1 }
     END { for (p in seen) printf "%d\t%s\t%d\n", (p in s ? s[p] : 0), p, (p in u ? u[p] : 0) }' \
 | sort -rn | awk -F'\t' "$AWK_LIB"'
-    !hdr { printf "    %-10s %10s %10s %9s %-11s\n", "pointer", "shopping", "using", "%using", "95% CI"; hdr=1 }
+    !hdr { printf "    %-10s %10s %10s %9s %-11s\n", "pointer", "dwells", "uses", "%use", "95% CI"; hdr=1 }
     { printf "    %-10s %10d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
 
 # ---- contact funnel ---------------------------------------------------------------------------
@@ -806,7 +807,7 @@ echo ""
 echo "==============================================================================="
 echo " CONTACT FUNNEL — invitation clicks -> messages actually sent"
 echo "==============================================================================="
-echo "   clicks = confirmed-human views of contact.php. sends = messages formmail.php actually"
+echo "   clicks = page dwells on contact.php. sends = messages formmail.php actually"
 echo "   mailed, logged server-side in its success branch and NOT de-duplicated, because one"
 echo "   person writing twice is two messages. formmail.php now appends the same bucket column"
 echo "   every other writer appends, so a send can finally be matched to the bucket its click"
@@ -821,10 +822,10 @@ SENDS_P=$(awk -F'\t' 'NF>=5 && $NF=="visitor"' "$TMP/send" | wc -l | tr -d ' ')
 SENDS_L=$(awk -F'\t' 'NF>=5 && $NF=="visit"'   "$TMP/send" | wc -l | tr -d ' ')
 SENDS_U=$(awk -F'\t' 'NF<5'                    "$TMP/send" | wc -l | tr -d ' ')
 printf "   %-32s %8d\n" "invitation clicks (said yes)" "$CLICKS_P"
-printf "   %-32s %8d\n" "invitation clicks (page loads)" "$CLICKS_L"
+printf "   %-32s %8d\n" "invitation clicks (others)" "$CLICKS_L"
 printf "   %-32s %8d\n" "messages sent" "$SENDS"
 printf "   %-32s %8d\n" "  of those, said-yes bucket" "$SENDS_P"
-printf "   %-32s %8d\n" "  of those, page-load bucket" "$SENDS_L"
+printf "   %-32s %8d\n" "  of those, others bucket" "$SENDS_L"
 printf "   %-32s %8d\n" "  of those, no bucket column" "$SENDS_U"
 echo ""
 echo "   The two causes of a contact drought call for OPPOSITE fixes: few clicks means the"
@@ -843,15 +844,15 @@ echo ""
 echo "   ONE CAUTION FOR THE WHOLE SECTION: these rows de-duplicate per PAGE LOAD, in the"
 echo "   page's own memory, while views and calculations de-duplicate per VISIT against the"
 echo "   ec_seen cookie, whose five bits are full. So a signal count and a said-yes view"
-echo "   count are different units. The only place a rate is honest is the PAGE-LOAD bucket,"
-echo "   where nothing is stored and therefore both sides are page loads. That is why the"
+echo "   count are different units. The only place a rate is honest is the OTHERS bucket,"
+echo "   where nothing is stored and therefore both sides are counted per page load. That is why the"
 echo "   rates below come from that bucket and the said-yes bucket shows raw counts."
 echo ""
 if [ ! -s "$TMP/signal" ]; then
     echo "   (no signal rows in this window)"
 else
 echo "--- Signal rows by event ---"
-printf "    %-12s %10s %12s\n" "event" "said yes" "page loads"
+printf "    %-12s %10s %12s\n" "event" "said yes" "others"
 {
     awk -F'\t' '$5!="" {print $5"\tp"}' "$TMP/p-signal"
     awk -F'\t' '$5!="" {print $5"\tl"}' "$TMP/l-signal"
@@ -875,7 +876,7 @@ echo ""
 echo "=== Did they touch anything? (Task 200) ==="
 echo "    A view with no calculation splits two ways and the two call for opposite fixes:"
 echo "    somebody who never touched an input could not understand the page; somebody who"
-echo "    touched it and left tried it and did not want it. Rate from the page-load bucket."
+echo "    touched it and left tried it and did not want it. Rate from the others bucket."
 echo ""
 if [ -s "$TMP/l-view" ]; then
     {
@@ -885,10 +886,10 @@ if [ -s "$TMP/l-view" ]; then
         { if ($2=="touch") t[$1]++; else v[$1]++; seen[$1]=1 }
         END { for (p in seen) printf "%d\t%s\t%d\n", (p in v?v[p]:0), p, (p in t?t[p]:0) }' \
     | sort -rn | awk -F'\t' "$AWK_LIB"'
-        !hdr { printf "    %-26s %11s %10s %9s %-11s\n", "page", "page loads", "touched", "%touched", "95% CI"; hdr=1 }
+        !hdr { printf "    %-26s %11s %10s %9s %-11s\n", "page", "dwells", "touched", "%touched", "95% CI"; hdr=1 }
         { printf "    %-26s %11d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
 else
-    echo "    (no page-load-bucket views, so no honest denominator; raw touch counts follow)"
+    echo "    (no others-bucket dwells, so no honest denominator; raw touch counts follow)"
     awk -F'\t' '$5=="touch" {print $2}' "$TMP/signal" | sort | uniq -c | sort -rn
 fi
 
@@ -928,7 +929,7 @@ LPN_VIEWS=$(awk -F'\t' '$2=="Looped-Network"' "$TMP/l-view" | wc -l | tr -d ' ')
 LPN_FIRST=$(awk -F'\t' '$5=="lpn" && $6 ~ /^first:/' "$TMP/l-signal" | wc -l | tr -d ' ')
 if [ "$LPN_VIEWS" -gt 0 ]; then
     echo ""
-    printf "    %-30s %8d\n" "page loads (page-load bucket)" "$LPN_VIEWS"
+    printf "    %-30s %8d\n" "dwells (others bucket)" "$LPN_VIEWS"
     printf "    %-30s %8d\n" "  of those, did something" "$LPN_FIRST"
     printf "    %-30s %8d\n" "  of those, did NOTHING" "$((LPN_VIEWS - LPN_FIRST))"
     echo "    'Nothing' is a residual, not a logged event, so it also absorbs anyone who left"
@@ -943,7 +944,7 @@ echo "=== Looped-Network: map commands used (Task 815) ==="
 echo "    One row per command per page load, taken when a menu command or a toolbar button is"
 echo "    chosen: id is <menu>/<command>, or <menu>/<submenu>/<command>, or tb/<button>. Which"
 echo "    command only, never what it was given. Browsers and uses are the said-yes bucket"
-echo "    (distinct codes, then rows); page loads is everybody else. They are never added."
+echo "    (distinct codes, then rows); others is everybody else. They are never added."
 echo "    Commands nobody used are listed with zeros, from lib/lpn-commands.json."
 echo ""
 CMD_CAT="$(dirname "$0")/../lib/lpn-commands.json"
@@ -959,7 +960,7 @@ CMD_CAT="$(dirname "$0")/../lib/lpn-commands.json"
     { seen[$1]=1 }
     END { for (k in seen) printf "%d\t%d\t%d\t%s\n", (k in u?u[k]:0), (k in nb?nb[k]:0), (k in l?l[k]:0), k }' \
 | sort -t"$(printf '\t')" -k1,1nr -k3,3nr -k4,4 | awk -F'\t' '
-    !hdr { printf "    %-52s %9s %10s %12s\n", "command id", "browsers", "uses", "page loads"; hdr=1 }
+    !hdr { printf "    %-52s %9s %10s %12s\n", "command id", "browsers", "uses", "others"; hdr=1 }
     { printf "    %-52s %9d %10d %12d\n", $4, $2, $1, $3 }'
 
 echo ""
@@ -993,8 +994,8 @@ echo ""
 echo "==============================================================================="
 echo " COVERAGE — each tier began logging on a DIFFERENT date"
 echo "==============================================================================="
-echo "   If the calculation log started after the page-view log, %using is understated for"
-echo "   every row above: some counted shoppers arrived before a calculation could be recorded"
+echo "   If the calculation log started after the page-view log, %use is understated for"
+echo "   every row above: some counted dwellers arrived before a calculation could be recorded"
 echo "   at all. Check these dates before treating any conversion rate as real."
 echo ""
 printf "   %-32s %8s  %-21s %-21s\n" "log" "rows" "first in window" "last in window"
