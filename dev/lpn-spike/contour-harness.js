@@ -27,6 +27,22 @@
 //  11. A LARGER NETWORK: a generated 40 x 40 grid, for the timing.
 
 const fs = require('fs');
+
+// **WAIT FOR A CONDITION, NOT FOR A CLOCK.** A fixed number of polls at a fixed interval (2 s for
+// the ground read) failed on a busy machine; this waits up to a minute for the thing itself.
+async function waitFor(cond, limitMs) {
+	const end = Date.now() + (limitMs || 60000);
+	while (!cond() && Date.now() < end) { await new Promise((r) => setTimeout(r, 10)); }
+}
+// **A TIME BUDGET SCALES WITH THE MACHINE.** The two timing checks below keep their budgets as
+// measured on an idle machine and multiply them by how much slower a fixed reference loop runs in
+// this very process (never less than 1), so load stretches the budget and a slower algorithm still
+// breaks it. 55 ms is the loop's best of 20 on an idle machine (2026-10-29).
+const SPEED = (function () {
+	let best = Infinity;
+	for (let k = 0; k < 20; k++) { const t0 = Date.now(); let s = 0; for (let i = 0; i < 3e7; i++) { s += Math.sqrt(i) * 0.5; } best = Math.min(best, Date.now() - t0 + (s < 0 ? 1 : 0)); }
+	return Math.max(1, best / 55);
+}());
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const C = require(ROOT + 'js/lpn-contour.js');
 const PC = global.EngCalcs.pageConfig;
@@ -407,7 +423,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	d.settings.autoRun = false;
 	check(!d.settings.contourFill && !d.settings.contourLines, 'a project opens with no contour plot');
 	L.runSolve();
-	for (let i = 0; i < 400 && !L.lastResult(); i++) { await new Promise((r) => setTimeout(r, 25)); }
+	await waitFor(() => L.lastResult());
 	check(!!L.lastResult(), 'Net3 solved');
 	d.settings.colorNodeField = 'pressure';
 	L.refreshValueColors();
@@ -542,7 +558,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	for (let i = 0; i < 5; i++) { L.refreshValueColors(); warm = Math.min(warm, L.contourStats().ms); }
 	d.settings.contourBuffer = 2.5; L.refreshValueColors();
 	console.log(`         Net3: ${L.contourStats().cells} cells; field, fill and lines ${cold.toFixed(1)} ms (the field ${L.contourStats().fieldMs.toFixed(1)} ms), cached redraw ${warm.toFixed(1)} ms`);
-	check(cold < 1500 && warm < cold, `Net3 builds in ${cold.toFixed(0)} ms and a cached redraw takes ${warm.toFixed(0)} ms`);
+	check(cold < 1500 * SPEED && warm < cold, `Net3 builds in ${cold.toFixed(0)} ms and a cached redraw takes ${warm.toFixed(0)} ms`);
 	check(JSON.parse(JSON.stringify(L.serialize())).settings.contourFill === 'smooth', 'the contour settings ride in the project');
 
 	head('7. THE BOX');
@@ -582,7 +598,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	await new Promise((r) => setTimeout(r, 400));
 	check(allD() === before && before.length > 0, 'an edit with Recalculate off leaves the plot exactly as it was');
 	L.runSolve();
-	for (let i = 0; i < 400 && allD() === before; i++) { await new Promise((r) => setTimeout(r, 25)); }
+	await waitFor(() => allD() !== before);
 	check(allD() !== before, 'Calculate redraws it');
 
 	head('8b. NET3 WITH PUMP 335 OFF AND ITS BYPASS OPEN (Tom, 2026-10-03)');
@@ -594,7 +610,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 		const lk = (id) => d.links.find((l) => l.id === id);
 		lk('335')._status = 'closed'; lk('330')._status = 'open';
 		L.setResult(null); L.runSolve();
-		for (let i = 0; i < 400 && !L.lastResult(); i++) { await new Promise((r) => setTimeout(r, 25)); }
+		await waitFor(() => L.lastResult());
 		L.refreshValueColors();
 		const res = L.lastResult(), cfo = L.contourField(), g = cfo.grid, Rr = +cfo.key.split('|')[2];
 		const statusOf = (l) => (res.statuses && res.statuses[l.id]) || l._status || 'open';
@@ -705,7 +721,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	S2.contourTerrain = true;
 	jar.value = 'ec_terrain=1.' + Math.floor(Date.now() / 1000) + '.' + (PC.lpn_terrain_version || '1');
 	L.refreshValueColors();
-	for (let i = 0; i < 200 && !(L.contourStats() && L.contourStats().dem); i++) { await new Promise((r) => setTimeout(r, 10)); }
+	await waitFor(() => L.contourStats() && L.contourStats().dem);
 	const G = L.contourStats();
 	check(tileCalls > 0 && G && G.dem > 0, `with the yes, the ground is read (${tileCalls} tile(s)) at about ${G && G.dem && G.dem.toFixed(0)} m`);
 	const nodeP = ids.map((id) => L.colorNodeValue(L.nodeById(id), 'pressure'));
@@ -782,7 +798,7 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	let big = Infinity;
 	for (let i = 0; i < 3; i++) { S4.contourBuffer = 2.5 + (i + 1) * 1e-9; L.refreshValueColors(); big = Math.min(big, L.contourStats().ms); }
 	console.log(`         ${N * N} junctions, ${L.getDoc().links.length} pipes: ${L.contourStats().cells} cells, ${big.toFixed(1)} ms (the field ${L.contourStats().fieldMs.toFixed(1)} ms, ${L.contourStats().levels} lines, ${L.contourStats().labels} labels)`);
-	check(big < 4000, `a ${N * N}-junction network builds in ${big.toFixed(0)} ms`);
+	check(big < 4000 * SPEED, `a ${N * N}-junction network builds in ${big.toFixed(0)} ms`);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);
