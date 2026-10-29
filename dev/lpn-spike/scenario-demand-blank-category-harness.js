@@ -96,7 +96,7 @@ function table(id) {
 	return {
 		nums: findAll([t], 'INPUT').filter(i => i.type === 'number'),
 		texts: findAll([t], 'INPUT').filter(i => i.type === 'text'),
-		add: findAll(kids, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0]
+		add: findAll(kids, 'BUTTON').filter(b => b.className === 'lpn-demand-add')[0]
 	};
 }
 function type(input, v) { input.value = v; input._listeners.change[0](); }

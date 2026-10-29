@@ -398,7 +398,7 @@ function findAll(kids, tag) {
 	ok('...though its cell is still built, so the columns line up',
 		!!prow && findAll([prow], 'TD').length === 4,
 		prow ? findAll([prow], 'TD').length : 'no row');
-	ok('...but can still start a second', findAll(plain, 'BUTTON').some(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0));
+	ok('...but can still start a second', findAll(plain, 'BUTTON').some(b => b.className === 'lpn-demand-add'));
 	// The heading is Tom's word as of Task 553, and the Find property answers to it too.
 	ok('the third column is headed Description, not Category',
 		findAll([ptable], 'TH').some(th => /^Description/.test(th.textContent)),
@@ -419,7 +419,7 @@ console.log('\n--- editing, undo-safe and write-safe ---');
 {
 	const before = JSON.stringify(L.serialize());
 	const plain = popupFor('J4');
-	const add = findAll(plain, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0];
+	const add = findAll(plain, 'BUTTON').filter(b => b.className === 'lpn-demand-add')[0];
 	add._listeners.click[0]();
 	ok('Add gives the junction a second demand', (J('J4').extraDemands || []).length === 1,
 		JSON.stringify(J('J4').extraDemands));

@@ -73408,7 +73408,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
-		addBtn.textContent = pc.lpn_demand_add || 'Add demand category';
+		// Just a "+" (Tom, 2026-10-28); the old words are its tip and its accessible name.
+		addBtn.textContent = '+';
+		addBtn.title = pc.lpn_demand_add || 'Add demand category';
+		addBtn.setAttribute('aria-label', addBtn.title);
 		addBtn.addEventListener('click', function () {
 			saveUndoSnapshot();
 			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
@@ -80549,7 +80552,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
 			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
 		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time (hr)', null, false, worstG]] : []).concat([
-			[pc.lpn_ff_col_more || 'And others', null, false, worstG],
+			[pc.lpn_ff_col_more || 'How many others', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'

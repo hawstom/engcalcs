@@ -4821,7 +4821,7 @@ $ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';
 $ec_lang['lpn_ff_col_atrequired']='Pressure at required flow';
 $ec_lang['lpn_ff_col_affected']='Worst effect';
-$ec_lang['lpn_ff_col_more']='And others';
+$ec_lang['lpn_ff_col_more']='How many others';
 $ec_lang['lpn_ff_col_limit']='Design limit';
 // **THE CELL THAT SAYS THE QUESTION WAS NEVER ASKED.** A junction that cannot deliver the required
 // flow is never checked for what it would pull down, because the design question is not asked at a

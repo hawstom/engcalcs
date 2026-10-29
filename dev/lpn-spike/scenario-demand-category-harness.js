@@ -107,7 +107,7 @@ function table(id) {
 		texts: findAll([t], 'INPUT').filter(i => i.type === 'text'),
 		sels: findAll([t], 'SELECT'),
 		dels: findAll([t], 'BUTTON').filter(b => b.textContent === '×'),
-		add: findAll(kids, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0],
+		add: findAll(kids, 'BUTTON').filter(b => b.className === 'lpn-demand-add')[0],
 		// The table's own marker (Task 790's gutter) sits right before the block that holds it: the
 		// identity band above carries the coordinates' markers, a different override entirely. Its
 		// note, while it is an override, is the first one after the table.
