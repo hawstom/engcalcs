@@ -51,6 +51,11 @@ function ok(name, cond, extra) {
 
 async function openExample(browser, Session, match) {
 	const a = await Session.open(browser, 'zoomsel');
+	// No published XY example has a pipe with vertices now, so the XY section is handed the Basic-network fixture in place of the Net1 card's file.
+	if (/Net1/.test(match)) {
+		const body = require('fs').readFileSync(path.join(__dirname, 'fixtures', 'Basic-example-US-units.lwn'), 'utf8');
+		await a.page.route(/examples\/Net1-Scenarios\.lwn/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body }));
+	}
 	await a.goto('Looped-Network.php?ec_nolog=1');
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.menuClick(await a.lang('lpn_examples_menu'), 'file');
