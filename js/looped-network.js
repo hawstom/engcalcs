@@ -64817,6 +64817,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setboxJumpOpen(false);
 				// The row tapped stays the current one until the reader scrolls by hand (see setboxSpy()).
 				setboxSpyPinned = true;
+				setboxSpyPinTop = (document.getElementById('lpn_setbox_content') || {}).scrollTop;
 			});
 			index.appendChild(b);
 			return b;
@@ -64867,11 +64868,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// section heading is hidden, so the section's first sub-heading lands at the very top of the pane beside it, and the
 	// spy, asked which heading is at the top, named the sub-heading a frame after the jump named the section. The scroll
 	// the jump itself makes is therefore not the reader's: the spy stays out of it until a hand scroll (touch, wheel, key).
-	var setboxSpyPinned = false;
+	// A scrollbar drag fires no touch, wheel or key event, so the pin also lets go when the pane has moved off the place the jump left it.
+	var setboxSpyPinned = false, setboxSpyPinTop = 0;
 	function setboxSpy() {
 		var content = document.getElementById('lpn_setbox_content'), index = document.getElementById('lpn_setbox_index'),
 			head, limit, best = null;
-		if (!content || !index || !setboxIsOpen() || setboxSpyPinned) { return; }
+		if (!content || !index || !setboxIsOpen()) { return; }
+		if (setboxSpyPinned && Math.abs(content.scrollTop - setboxSpyPinTop) > 3) { setboxSpyPinned = false; }
+		if (setboxSpyPinned) { return; }
 		head = content.querySelector('.lpn-set-head');
 		limit = content.getBoundingClientRect().top + (head ? head.getBoundingClientRect().height : 0) + 4;
 		[].forEach.call(content.querySelectorAll('.lpn-set-sec, .lpn-set-sub:not(.lpn-set-sub-silent)'), function (el) {
@@ -66167,8 +66171,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
 		lpn_energy_box: 26, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20,
-		lpn_full_box: 52, lpn_settings_box: 38.625, lpn_popup: 22.5, lpn_find_popup: 23, lpn_library_box: 27,
-		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 26.5, lpn_hotkeys_popup: 53
+		lpn_full_box: 52, lpn_settings_box: 38.625, lpn_popup: 20, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 20.5, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {
