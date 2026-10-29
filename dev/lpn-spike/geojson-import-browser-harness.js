@@ -364,6 +364,10 @@ async function main() {
 		console.log('\n--- 7. a 6,589-feature layer: the working notice, and the time it takes ---');
 		{
 			const e = await open(browser), he = helpers(e), Pe = he.P;
+			// The click that starts this import waits while the page parses 6,589 features; on a busy
+			// machine that outlasted Playwright's 30 s default (2026-10-29). The timing check below is
+			// the guard; the click only needs to land.
+			e.page.setDefaultTimeout(180000);
 			await e.newProject('si'); await e.dismissGallery().catch(() => {}); await he.settle(400);
 			await he.importVia({ name: 'grid.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(bigGrid()) });
 			await e.waitDialog(10000);
