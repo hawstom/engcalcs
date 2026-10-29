@@ -336,7 +336,7 @@
 			counts[lk.type]++;
 		}
 
-		// ---- Shapes (Task 779): map annotation, in no scenario ----
+		// ---- Shapes (Task 779): map annotation; the caller passes only the open scenario's active ones ----
 		(doc.shapes || []).forEach(function (sh) {
 			var pts = sh.pts || [], ring = [], k, g, sp, area = 0, c;
 			for (k = 0; k < pts.length; k++) {

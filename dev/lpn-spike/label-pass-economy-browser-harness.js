@@ -130,7 +130,19 @@ async function layOut(Session, browser, file, skipOn) {
 		const views = [];
 		for (const n of STEPS) {
 			await a.page.mouse.move(r.x, r.y);
-			for (let k = 0; k < Math.abs(n); k++) { await a.page.mouse.wheel(0, n < 0 ? -100 : 100); await a.page.waitForTimeout(60); }
+			// **ONE BURST, WHATEVER THE LOAD.** The page lays labels out again 120 ms after the last
+			// notch, and what it draws depends on which passes ran in between. Notches sent one at a
+			// time from here can straddle that timer on a busy machine (a gap over 120 ms), so the
+			// shipped and reference runs would see different pass histories. Dispatching the burst
+			// inside the page in one task gives both runs the same one.
+			if (n) {
+				await a.page.evaluate(([notches, dy, x, y]) => {
+					const svg = document.getElementById('lpn_canvas');
+					for (let k = 0; k < notches; k++) {
+						svg.dispatchEvent(new WheelEvent('wheel', { deltaY: dy, clientX: x, clientY: y, bubbles: true, cancelable: true }));
+					}
+				}, [Math.abs(n), n < 0 ? -100 : 100, r.x, r.y]);
+			}
 			await a.settle(2000);
 			// **STILL, NOT MERELY WAITED FOR.** Under a loaded machine a pass can land after a fixed
 			// wait, so the drawing is read until two readings 400 ms apart agree (at most 8 s more).

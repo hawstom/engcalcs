@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**85 still to read on master**, of 247 untranslated keys, of 3212 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**97 still to read on master**, of 259 untranslated keys, of 3224 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (247, 85 to read @@ NEEDS RULING)
+## lpn_  (259, 97 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -64,6 +64,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_crit_run_note`**
   > Each outage was run over the whole simulation ({n} reporting steps).
   _Ruled OK 2026-10-20._
+- **`lpn_dem_base`**
+  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
+  @@ NEEDS RULING
+- **`lpn_dem_scenario`**
+  > Elevations written here are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_demand_cats`**
   > Demand categories
   @@ NEEDS RULING
@@ -199,11 +205,14 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
-- **`lpn_export_confirm_lead`**
-  > The {format} holds one scenario, and this project has {n}.
-  @@ NEEDS RULING
 - **`lpn_export_confirm_title`**
   > Export {format}
+  @@ NEEDS RULING
+- **`lpn_export_goes_base`**
+  > Exporting the Base scenario.
+  @@ NEEDS RULING
+- **`lpn_export_goes_scenario`**
+  > Exporting the scenario "{scenario}" to a unique file name.
   @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
@@ -308,7 +317,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  > Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
@@ -334,6 +343,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_guide_page_what`**
   > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
   _Ruled OK 2026-10-20._
+- **`lpn_guide_scn_move_def`**
+  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_scn_move_term`**
+  > Moving or merging between scenarios
+  @@ NEEDS RULING
 - **`lpn_inpup_ask_title`**
   > Import {file}
   _Ruled OK 2026-10-20._
@@ -407,7 +422,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > Choose where to import this file. Note that EPANET files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  > Choose where to import this EPANET file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
@@ -478,6 +493,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_unit_row`**
   > {family}: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
+- **`lpn_library_import_every_scenario`**
+  > Every scenario can use them.
+  @@ NEEDS RULING
 - **`lpn_menu_back`**
   > Back
   @@ NEEDS RULING
@@ -565,6 +583,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_noscn_fmt_dxf`**
+  > a DXF file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_geojson`**
+  > a GeoJSON file
+  @@ NEEDS RULING
+- **`lpn_noscn_fmt_inp`**
+  > an EPANET file
+  @@ NEEDS RULING
+- **`lpn_noscn_lead`**
+  > This project has {n} scenarios, but {format} has no scenarios or alternatives.
+  @@ NEEDS RULING
 - **`lpn_ovl_clear_same`**
   > Clear overrides equal to inherited
   @@ NEEDS RULING
@@ -700,6 +730,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_held_none`**
   > no text
   @@ NEEDS RULING
+- **`lpn_shapes_every_scenario`**
+  > Shapes appear in every scenario.
+  @@ NEEDS RULING
+- **`lpn_shapes_this_scenario`**
+  > Shapes appear in {scenario} only.
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -777,7 +813,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**75 still to read**, of 118 new keys across 13 unmerged branch(es).
+**62 still to read**, of 105 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -788,61 +824,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`8237aa2d9`) — adds no English strings
+### box-design (`a785044c8`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
-### feat/report-widths (`8bdda97d6`) — already merged into box-design; its strings are listed there
-
-### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
-
-### feat/settings-pinned (`9e9d54a94`) — adds no English strings
-
-### feat/shape-scenario (`8ee873fdd`) — 13 new, 13 to read @@ NEEDS RULING
-
-- **`lpn_dem_base`**
-  > Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.
-  @@ NEEDS RULING
-- **`lpn_dem_scenario`**
-  > Elevations written here are overrides in the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_export_goes_base`**
-  > Exporting the Base scenario.
-  @@ NEEDS RULING
-- **`lpn_export_goes_scenario`**
-  > Exporting the scenario "{scenario}" to a unique file name.
-  @@ NEEDS RULING
-- **`lpn_guide_scn_move_def`**
-  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_scn_move_term`**
-  > Moving or merging between scenarios
-  @@ NEEDS RULING
-- **`lpn_library_import_every_scenario`**
-  > Every scenario can use them.
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_dxf`**
-  > a DXF file
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_geojson`**
-  > a GeoJSON file
-  @@ NEEDS RULING
-- **`lpn_noscn_fmt_inp`**
-  > an EPANET file
-  @@ NEEDS RULING
-- **`lpn_noscn_lead`**
-  > This project has {n} scenarios, but {format} has no scenarios or alternatives.
-  @@ NEEDS RULING
-- **`lpn_shapes_every_scenario`**
-  > Shapes appear in every scenario.
-  @@ NEEDS RULING
-- **`lpn_shapes_this_scenario`**
-  > Shapes appear in {scenario} only.
-  @@ NEEDS RULING
-
-### feat/sheet-light (`8237aa2d9`) — already merged into box-design; its strings are listed there
+### feat/report-widths (`644830be6`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -1006,7 +994,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`4f1357263`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`2a4aabd86`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
   > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
@@ -1021,10 +1009,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Fire flow extension, gpm (US)
   @@ NEEDS RULING
 - **`lpn_ex_well_desc`**
-  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
+  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
+  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Community well and tank, L/s (SI)
@@ -1032,8 +1020,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ex_well_title`**
   > Community well and tank, gpm (US)
   @@ NEEDS RULING
-
-### feat/value-source (`999e599d8`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 

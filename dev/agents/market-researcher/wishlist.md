@@ -632,3 +632,6 @@ The icon artwork (down arrow, its pending state, the lock) and whether WaterGEMS
 Per-pipe user length override and a 3D (x,y,z) length exist in WaterGEMS (docs.bentley.com SS6 Pipe Attributes); no project-wide factor found anywhere I could reach. Wish: someone with a WaterGEMS/InfoWater/KYPipe licence confirm in the product, and read Walski's Advanced Water Distribution Modeling and AWWA M32 on length from maps. Cost: an hour with the books.
 
 (Addition to wishlist, rank near top) Ask Tom for 2-3 engineers who already use Claude/ChatGPT on models and read their actual prompts: the one gap my searches could not fill (Task 818). Also measure one EPANET solve's CPU time in a Worker before any hosting cost is quoted.
+
+## 2026-10-29 note
+Wish: get one licensed WaterGEMS screenshot of the Properties grid for a pipe (category order), the only gap in the row-order comparison. (SPECULATION: low cost, high value; a person with a licence is Tom.)
