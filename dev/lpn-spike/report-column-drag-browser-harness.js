@@ -130,13 +130,19 @@ async function main() {
 		const s0 = await ffState();
 		ok('Fire flow: every column has a divider', s0.grips === s0.nleaf && s0.nleaf > 5, s0.grips + '/' + s0.nleaf);
 		ok('Fire flow at automatic widths: no sideways scroll, no fixed layout, nothing stored', s0.scroll <= 1 && !s0.colgroup && !s0.sized && s0.stored === null, 'scroll ' + s0.scroll + ' stored ' + s0.stored);
+		const arrowHit = await page.evaluate(() => {
+			const arrows = Array.from(document.querySelectorAll('#lpn_ff_report th .lpn-ff-sortarrow')); let clear = 0;
+			arrows.forEach((a) => { const r = a.getBoundingClientRect(); const e = document.elementFromPoint(r.right - 1.5, r.top + r.height / 2); if (e === a) { clear++; } });
+			return { n: arrows.length, clear };
+		});
+		ok('the whole sort arrow of every heading is clickable (the divider does not cover its right half)', arrowHit.n > 5 && arrowHit.clear === arrowHit.n, JSON.stringify(arrowHit));
 		const copy0 = await copyHtml(), print0 = await printHtml();
 
 		// ---- a real drag ----
 		await dragBy(COL, 90);
 		const s1 = await ffState();
 		ok('drag: the column grew by about the drag', Math.abs((s1.widths[COL] - s0.widths[COL]) - 90) <= 4, s0.widths[COL] + ' -> ' + s1.widths[COL]);
-		ok('drag: the other columns keep the widths they were drawn at', s1.widths.every((w, i) => i === COL || Math.abs(w - s0.widths[i]) <= 1.5), s1.widths.join(','));
+		ok('drag: the table still fills its box (undragged columns refit around the dragged one)', s1.tableW >= s1.boxW - 2 && s1.tableW <= s1.boxW + 120 && s1.sized, s1.tableW + '/' + s1.boxW + ' scroll ' + s1.scroll);
 		ok('drag: the width is stored under lpn_rptcols, in the report\'s own key', !!s1.stored && /lpn_ff_report/.test(s1.stored), String(s1.stored));
 		const copy1 = await copyHtml(), print1 = await printHtml();
 		ok('drag: Copy HTML is exactly what it was before the drag, with no screen widths', copy1 === copy0 && !/lpn-rpt-(sized|colgrip|gripth|cg)/.test(copy1) && !/px;?["']?\s*>?\s*<col /.test(copy1), copy1.length + ' vs ' + copy0.length);
@@ -167,13 +173,51 @@ async function main() {
 		await page.mouse.dblclick(g.x, g.y);
 		await a.settle(300);
 		const s5 = await ffState();
-		ok('double-click: that column is back to its automatic width', Math.abs(s5.widths[COL] - s0.widths[COL]) <= 3, s5.widths[COL] + ' vs ' + s0.widths[COL]);
+		ok('double-click: that column is back to its automatic width', Math.abs(s5.widths[COL] - s0.widths[COL]) <= 12 && s5.widths[COL] < s2.widths[COL] - 50, s5.widths[COL] + ' vs ' + s0.widths[COL]);
 		ok('double-click: the other dragged column keeps its width', Math.abs(s5.widths[COL + 2] - s2.widths[COL + 2]) <= 3, s5.widths[COL + 2] + ' vs ' + s2.widths[COL + 2]);
 		g = await gripBox(COL + 2);
 		await page.mouse.dblclick(g.x, g.y);
 		await a.settle(300);
 		const s6 = await ffState();
 		ok('both reset: automatic layout again, fitting the box, nothing stored', !s6.colgroup && !s6.sized && s6.scroll <= 1 && s6.stored === null && s6.widths.every((w, i) => Math.abs(w - s0.widths[i]) <= 1.5), 'scroll ' + s6.scroll + ' stored ' + s6.stored);
+
+		// ---- sideways scroll survives pressing, dragging and resetting a divider; undragged columns refit ----
+		const wrapState = () => page.evaluate(() => { const w = document.querySelector('#lpn_ff_report .lpn-ff-tablewrap'); return { sl: Math.round(w.scrollLeft), max: w.scrollWidth - w.clientWidth }; });
+		await dragBy(COL, 900);
+		await page.evaluate((idx) => {
+			const t = document.querySelector('#lpn_ff_report table.lpn-ff-table'), w = t.closest('.lpn-ff-tablewrap'), th = t.querySelector('.lpn-rpt-colgrip').closest('tr').children[idx];
+			w.scrollLeft = Math.max(1, th.offsetLeft + th.offsetWidth - w.clientWidth + 120);
+		}, COL + 2);
+		const w0 = await wrapState();
+		ok('widened past the box: the report scrolls sideways inside itself', w0.max > 100 && w0.sl > 0, JSON.stringify(w0));
+		g = await gripBox(COL + 2);
+		await page.mouse.move(g.x, g.y); await page.mouse.down(); await page.mouse.up(); await a.settle(200);
+		const w1 = await wrapState();
+		ok('pressing a divider keeps the scroll', Math.abs(w1.sl - w0.sl) <= 1, w0.sl + ' -> ' + w1.sl);
+		const b0 = (await ffState()).widths[COL + 2];
+		g = await gripBox(COL + 2);
+		await page.mouse.move(g.x, g.y); await page.mouse.down(); await page.mouse.move(g.x + 25, g.y, { steps: 3 });
+		const wMid = await wrapState();
+		await page.mouse.move(g.x + 50, g.y, { steps: 3 }); await page.mouse.up(); await a.settle(200);
+		const w2 = await wrapState(), b1 = (await ffState()).widths[COL + 2];
+		ok('dragging a divider far to the right does not jump the scroll', Math.abs(wMid.sl - w0.sl) <= 1 && Math.abs(w2.sl - w0.sl) <= 1 && Math.abs((b1 - b0) - 50) <= 4, w0.sl + ' -> ' + wMid.sl + ' -> ' + w2.sl + '; width ' + b0 + ' -> ' + b1);
+		g = await gripBox(COL + 2);
+		await page.mouse.dblclick(g.x, g.y); await a.settle(300);
+		const w3 = await wrapState(), s7 = await ffState();
+		ok('double-click on a divider reached by scrolling resets that column and keeps the scroll', Math.abs(w3.sl - w0.sl) <= 1 && !/\|pressure at required flow\W/.test('') && s7.stored && JSON.parse(s7.stored).lpn_ff_report && Object.keys(JSON.parse(s7.stored).lpn_ff_report).length === 1, w0.sl + ' -> ' + w3.sl + ' stored ' + s7.stored);
+		// Resize the box: undragged columns follow it, larger and smaller (COL is dragged wide; the table now fills the box).
+		await dragBy(COL, -880);
+		const r0 = await page.evaluate(() => { const b = document.getElementById('lpn_ff_box'); const t = document.querySelector('#lpn_ff_report table.lpn-ff-table'); return { box: b.getBoundingClientRect().width, t: t.getBoundingClientRect().width, body: t.closest('.lpn-ff-tablewrap').clientWidth }; });
+		const sizeBox = (dw) => page.evaluate((d) => {
+			const b = document.getElementById('lpn_ff_box'); b.style.width = (b.getBoundingClientRect().width + d) + 'px';
+			const t = document.querySelector('#lpn_ff_report table.lpn-ff-table'), w = t.closest('.lpn-ff-tablewrap'), ths = Array.from(t.querySelector('thead tr').children);
+			return new Promise((res) => setTimeout(() => res({ t: Math.round(t.getBoundingClientRect().width), body: w.clientWidth, scroll: w.scrollWidth - w.clientWidth, other: Math.round(ths.filter((th) => !th.classList.contains('lpn-rpt-dc')).reduce((n, th) => n + th.getBoundingClientRect().width, 0)) }), 200));
+		}, dw);
+		const big = await sizeBox(300), small = await sizeBox(-300);
+		ok('box made larger: the table fills it and the undragged columns took the room', big.body > r0.body + 200 && Math.abs(big.t - big.body) <= 2 && big.other > small.other + 200, JSON.stringify({ r0, big, small }));
+		ok('box made smaller again: the table follows, no blank space', Math.abs(small.t - small.body) <= 2 || small.scroll > 0, JSON.stringify(small));
+		g = await gripBox(COL); await page.mouse.dblclick(g.x, g.y); await a.settle(300);
+		ok('everything reset at the end: automatic layout, nothing stored', (await ffState()).stored === null);
 		await closeBox('lpn_ff_box');
 
 		// ---- other reports carry dividers and fit at automatic widths ----

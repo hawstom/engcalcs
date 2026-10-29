@@ -85352,43 +85352,53 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (cg) { cg.parentNode.removeChild(cg); }
 		table.style.tableLayout = ''; table.style.width = '';
 		table.classList.remove('lpn-rpt-sized');
+		Array.prototype.forEach.call(table.querySelectorAll('.lpn-rpt-dc'), function (el) {
+			el.classList.remove('lpn-rpt-dc'); el.style.width = ''; el.style.minWidth = ''; el.style.maxWidth = '';
+		});
 	}
 	function rptColFont(table) { return parseFloat(window.getComputedStyle(table).fontSize) || 14; }
 	/**
-	 * Lays the table out from its remembered widths: each dragged column at its width, every other
-	 * column at the width automatic layout drew it. Nothing remembered: automatic layout, as drawn.
-	 * Does nothing where the table is not laid out yet (a closed box); the ResizeObserver tries again
-	 * when it is.
+	 * Lays the table out from its remembered widths. Only a dragged column is fixed (its heading is given
+	 * the width, and its cells may break at the character); every other column stays under automatic
+	 * layout, so the table still fills its box and refits when the box is resized. Nothing remembered:
+	 * automatic layout, as drawn. `hold` is `{ i, px }`, a column being dragged right now. The table's
+	 * sideways scroll is kept through a re-layout. Does nothing where the table is not laid out yet (a
+	 * closed box); the ResizeObserver tries again when it is.
 	 */
-	function rptColLayout(table, force) {
-		var stored = rptColStored(table), ths, px, cg, sum = 0, fs;
+	function rptColLayout(table, hold) {
+		var stored = rptColStored(table), ths, fs, wrap = table.parentNode, sl = wrap ? wrap.scrollLeft : 0, rows, any = false;
+		if (hold) { stored[hold.i] = hold.px / rptColFont(table); }
 		rptColClear(table);
-		if (!force && !stored.some(function (w) { return w > 0; })) { return; }
+		if (!stored.some(function (w) { return w > 0; })) { if (wrap) { wrap.scrollLeft = sl; } return; }
 		ths = reportTableHeads(table).leaf;
 		if (!ths.length || ths.some(function (th) { return !th; }) || !table.getBoundingClientRect().width) { return; }
 		fs = rptColFont(table);
-		px = ths.map(function (th, i) { return stored[i] ? stored[i] * fs : th.getBoundingClientRect().width; });
-		cg = document.createElement('colgroup'); cg.className = 'lpn-rpt-cg';
-		px.forEach(function (w) { var c = document.createElement('col'); c.style.width = w + 'px'; cg.appendChild(c); sum += w; });
-		table.insertBefore(cg, table.firstChild);
-		table.style.tableLayout = 'fixed'; table.style.width = sum + 'px';
-		table.classList.add('lpn-rpt-sized');
+		rows = table.querySelectorAll('tbody tr');
+		stored.forEach(function (w, i) {
+			var px, r, cells;
+			if (!w) { return; }
+			any = true; px = w * fs;
+			ths[i].classList.add('lpn-rpt-dc');
+			ths[i].style.width = ths[i].style.minWidth = ths[i].style.maxWidth = px + 'px';
+			for (r = 0; r < rows.length; r++) {
+				cells = rows[r].children;
+				if (cells.length === ths.length && cells[i]) { cells[i].classList.add('lpn-rpt-dc'); }
+			}
+		});
+		if (any) { table.classList.add('lpn-rpt-sized'); }
+		if (wrap) { wrap.scrollLeft = sl; }
 	}
 	function rptColStartDrag(table, i, th, ev) {
-		var startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startW, fs, cols, moved = false, sum0, host = table._ecRwHost, key = table._ecRwKeys[i];
+		var startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startW, fs, moved = false, host = table._ecRwHost, key = table._ecRwKeys[i];
 		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
 		if (ev && ev.preventDefault) { ev.preventDefault(); }
-		rptColLayout(table, true);
-		cols = table.querySelectorAll(':scope > colgroup.lpn-rpt-cg > col');
-		if (!cols[i]) { return; }
 		startW = th.getBoundingClientRect().width; fs = rptColFont(table);
-		sum0 = parseFloat(table.style.width) || 0;
 		function widthAt(e2) { return Math.max(RPT_COL_FLOOR_EM * fs, startW + ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX); }
 		function move(e2) {
 			var w = widthAt(e2);
-			if (Math.abs(w - startW) < 3) { return; }
+			if (!moved && Math.abs(w - startW) < 3) { return; }
 			moved = true;
-			cols[i].style.width = w + 'px'; table.style.width = (sum0 - startW + w) + 'px';
+			rptColLayout(table, { i: i, px: w });
 		}
 		function up(e2) {
 			var p, w;
@@ -85446,7 +85456,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				rptColLayout(table);
 				if (typeof ResizeObserver !== 'undefined' && !table._ecRwRo) {
 					table._ecRwRo = new ResizeObserver(function () {
-						if (!table.classList.contains('lpn-rpt-sized') && table.getBoundingClientRect().width) { rptColLayout(table); }
+						if (!table.classList.contains('lpn-rpt-sized') && table.getBoundingClientRect().width && rptColStored(table).some(function (w) { return w > 0; })) { rptColLayout(table); }
 					});
 					table._ecRwRo.observe(table);
 				}
