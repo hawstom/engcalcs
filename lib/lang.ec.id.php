@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Skenario {name} tidak dapat dihapu
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Skenario Dasar: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} dikecualikan dari jaringan pada {scenario}. Aset tetap ada di gambar dan di skenario lain.';
 $ec_lang['lpn_scenario_delete_in_base']='Untuk menghapusnya dari gambar, hapus di skenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} dihapus. Elemen ini hanya bagian dari {scenario}.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Aset baru: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (default)';
 $ec_lang['lpn_settings_row_view_value']='Pusat {x}, {y}; skala {s}';
 $ec_lang['lpn_settings_held_in']='Nilai khusus di {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Pusat peta';
 $ec_lang['lpn_settings_view_scale']='Skala peta';
 $ec_lang['lpn_settings_view_scale_tip']='Skala di pusat peta, sebagai 1:N. Ketik 1:2000, atau cukup 2000, untuk memperbesar ke skala itu.';

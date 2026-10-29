@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Scénář {name} nelze smazat, pro
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Základní scénář: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je ve scénáři {scenario} vyloučen ze sítě. Zůstává ve výkresu a v ostatních scénářích.';
 $ec_lang['lpn_scenario_delete_in_base']='Chcete-li prvek odstranit z výkresu, smažte jej ve scénáři {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je smazán. Byl součástí pouze scénáře {scenario}.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Nové prvky: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (výchozí)';
 $ec_lang['lpn_settings_row_view_value']='Střed {x}, {y}; měřítko {s}';
 $ec_lang['lpn_settings_held_in']='Specifická hodnota ve scénáři {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Střed mapy';
 $ec_lang['lpn_settings_view_scale']='Měřítko mapy';
 $ec_lang['lpn_settings_view_scale_tip']='Měřítko ve středu mapy ve tvaru 1:N. Zadáním 1:2000 nebo jen 2000 se přiblíží na toto měřítko.';

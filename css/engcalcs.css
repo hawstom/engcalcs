@@ -224,6 +224,8 @@
 	--ec-ink-strong: #222;
 	--ec-ink-muted: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 83.3333%);
 	--ec-ink-subtle: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 75%);
+	/* The light sheet's row rule and column divider (sheet-light): a hairline, fainter than a border. */
+	--ec-hairline: color-mix(in srgb, var(--ec-bg), var(--ec-border-strong) 60%);
 	--ec-neutral-ink: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 62.2549%);
 	/* The grey ladder: each light grey is (255 - v) / 204 of the way from paper (#fff) to ink (#333) */
 	--ec-border: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 16.6667%);
@@ -2429,6 +2431,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
+/* Settings box: the overridden settings of a multi-setting row, one dot each, under the row. */
+.lpn-set-heldlist { display: flex; flex-wrap: wrap; column-gap: 1em; margin: 0 0 0.2em; margin-inline-start: 1.9em; width: auto; font-size: 0.85em; color: var(--ec-ink-subtle); }
+.lpn-set-helditem { display: inline-flex; align-items: center; }
 /* The override list (Task 800): an override equal to the value it replaces, still counted. */
 .lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
 /* Manage overrides: a box to select each row, Clear override at its end, the two bulk clears above. */
@@ -2888,6 +2893,47 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-demand-del:hover { background: var(--ec-hue-fdd); border-color: var(--ec-hue-d99); }
 .lpn-demand-add { font: inherit; margin: 2px 0; }
+/* THE DEMAND CATEGORIES BOX (sheet-light). The list Properties no longer draws: the same light sheet as the other boxes (hairline rules, no box
+   round a cell, an editable cell filled on hover and outlined on focus, an empty one underlined faintly), as a table of one row per category. */
+.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: min(20rem, 94vw); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
+.lpn-demands-ov { display: flex; align-items: center; gap: 4px; padding: 4px 6px; font-size: .85em; color: var(--ec-ink-muted); border-bottom: 1px solid var(--ec-hairline); }
+.lpn-demands-ov .lpn-ovm-cell { position: static; margin: 0; }
+#lpn_demands_body { overflow: auto; }
+#lpn_demands_body .lpn-demand-table { display: table; width: 100%; margin: 0; border-collapse: collapse; }
+#lpn_demands_body > .lpn-demand-table { table-layout: fixed; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(1) { width: 7.5em; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(2) { width: 9em; }
+#lpn_demands_body > .lpn-demand-table th:last-child { width: 2.4em; }
+#lpn_demands_body .lpn-demand-table :is(th, td) { padding: 0; border: 0; border-bottom: 1px solid var(--ec-hairline); font-size: .85em; text-align: start; }
+#lpn_demands_body .lpn-demand-table :is(th, td) + :is(th, td) { border-inline-start: 1px solid var(--ec-hairline); }
+#lpn_demands_body .lpn-demand-table th { padding: 4px 6px; font-weight: 600; opacity: .8; }
+#lpn_demands_body > .lpn-demand-table td:last-child { text-align: center; white-space: nowrap; }
+#lpn_demands_body .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
+	display: block; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px; box-sizing: border-box;
+	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em; text-overflow: ellipsis;
+}
+#lpn_demands_body .lpn-demand-table input[type="number"] { text-align: end; font-variant-numeric: tabular-nums; }
+#lpn_demands_body .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
+#lpn_demands_body .lpn-demand-table :is(input, select):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+#lpn_demands_body .lpn-demand-table input:placeholder-shown:not(:focus):not(:hover) { background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x; }
+#lpn_demands_body .lpn-demand-add {
+	display: block; box-sizing: border-box; width: 100%; min-height: 1.75rem; margin: 0; padding: 2px 6px; border: 0; border-bottom: 1px solid var(--ec-hairline); border-radius: 0;
+	background: transparent; font: inherit; font-size: .95em; line-height: 1.2; text-align: center; color: inherit; cursor: pointer;
+}
+#lpn_demands_body .lpn-demand-add:hover { background: var(--ec-hover-bg); }
+#lpn_demands_body .lpn-demand-add:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+#lpn_demands_body .lpn-node-customers { margin: 8px 0 0; font-size: .85em; }
+#lpn_demands_body .lpn-node-customers .lpn-demand-table { margin-top: 4px; }
+#lpn_demands_body .lpn-node-customers .lpn-demand-table :is(th, td) { padding: 4px 6px; }
+/* The Demand categories row in Properties: one cell, the count at its left and the "..." at its right, opening the box. */
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval {
+	display: flex; justify-content: space-between; align-items: center; align-self: stretch; box-sizing: border-box; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px;
+	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: .85em; line-height: inherit; text-align: start; color: inherit; cursor: pointer;
+}
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:hover { background: var(--ec-hover-bg); }
+.lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+.lpn-demand-count { color: var(--ec-ink-muted); }
+@media (max-width: 30rem) { .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval { padding: 4px 6px 8px; font-size: .95em; } }
 /* The Elevation field's DEM control in the node popup (Task 542). A button and, once it has been
    asked, one line saying what the terrain service reported — kept together so the sentence reads as
    belonging to the button rather than to the field below it. */
@@ -3798,19 +3844,19 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	/* The header row. */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-ghdr {
 		display: grid; grid-template-columns: subgrid; align-items: stretch;
-		box-shadow: inset 0 0 0 1px var(--ec-border-strong); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
+		box-shadow: inset 0 -1px 0 0 var(--ec-hairline); background: var(--ec-chrome-bg); font-size: .85em; font-weight: 600;
 	}
 	/* A row: a subgrid of the host's two tracks, ruled below and at both sides. */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow:not(.lpn-gspan-row) {
 		display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
-		box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);   /* a rule, not a border: a border on a subgrid widens the host's tracks */
+		box-shadow: inset 0 -1px 0 0 var(--ec-hairline);   /* a hairline, not a border: a border on a subgrid widens the host's tracks; no rule at the sides (sheet-light) */
 	}
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grid { margin: 0; gap: 0; }
 	/* A run of rows with no header above it (a second run in the box) is ruled along its top. */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grid:not(.lpn-ghdr + .lpn-grid) > .lpn-grow:not(.lpn-gspan-row):first-child {
-		box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong), inset 0 1px 0 0 var(--ec-border-strong);
+		box-shadow: inset 0 -1px 0 0 var(--ec-hairline), inset 0 1px 0 0 var(--ec-hairline);
 	}
-	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-border-strong); }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-hairline); }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gval { margin: 2px 6px; align-self: start; }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-gw-fill, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > .lpn-ramp-picker { width: calc(100% - 12px); min-width: calc(8rem - 12px); }
@@ -3829,7 +3875,7 @@ option, optgroup { background-color: var(--ec-bg); color: var(--ec-ink); }
 option:disabled { color: var(--ec-ink-muted); }
 .lpn-ghdr { display: none; }
 .lpn-ghcell { position: relative; min-width: 0; padding: 3px 6px; }
-.lpn-ghlabel { border-inline-end: 1px solid var(--ec-border-strong); }
+.lpn-ghlabel { border-inline-end: 1px solid var(--ec-hairline); }
 .lpn-grid {
 	position: relative; display: grid; align-items: baseline; justify-content: start; margin: 3px 0;
 	grid-template-columns: var(--lpn-g-name, max-content) minmax(0, 1fr);
@@ -3869,7 +3915,7 @@ option:disabled { color: var(--ec-ink-muted); }
    note, a list) spans the grid; a spanning block asks for no width of its own, so a long sentence
    cannot stretch the box. */
 .lpn-gprops {
-	display: grid; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
+	display: grid; align-content: start; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
 	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
@@ -3923,50 +3969,23 @@ option:disabled { color: var(--ec-ink-muted); }
 	@supports (grid-template-columns: subgrid) {
 		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch;
-			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);   /* a rule, not a border: a border on a subgrid widens the host's tracks */
+			box-shadow: inset 0 -1px 0 0 var(--ec-hairline);   /* a hairline, not a border: a border on a subgrid widens the host's tracks (sheet-light) */
 		}
-		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-border-strong); }
+		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-hairline); }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gval { margin: 2px 6px; align-self: start; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
 		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
-		/* The demand categories are a ruled table inside the grid, from the Label column to the right edge. */
-		.lpn-propbox .lpn-gprops > .lpn-demand-table {
-			display: table; width: 100%; margin: 0; border-collapse: collapse;
-			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong);
-		}
-		.lpn-propbox .lpn-gprops > .lpn-demand-table th, .lpn-propbox .lpn-gprops > .lpn-demand-table td { border: 1px solid var(--ec-border-strong); border-inline: 0; padding: 3px 6px; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(th, td) + :is(th, td) { border-inline-start: 1px solid var(--ec-border-strong); }   /* a rule between the columns, as between Label and Value */
-		/* The add button is a one-line cell of its own, ruled like a row: no gap in the table (Tom, 2026-10-28, A). */
-		.lpn-propbox .lpn-gprops > .lpn-gbtns:has(> .lpn-demand-add) {
-			display: block; grid-column: 1 / -1; padding: 0; contain: none;
-			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);
-		}
-		.lpn-propbox .lpn-gprops .lpn-demand-add {
-			display: block; box-sizing: border-box; width: 100%; min-height: 1.75rem; margin: 0; padding: 2px 6px; border: 0; border-radius: 0; background: transparent;
-			font: inherit; font-size: .95em; line-height: 1.2; text-align: center; color: inherit; cursor: pointer;
-		}
-		.lpn-propbox .lpn-gprops .lpn-demand-add:hover { background: var(--ec-hover-bg); }
-		.lpn-propbox .lpn-gprops .lpn-demand-add:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 		/* The Time series row is ruled like the rows above it (B, C). */
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; column-gap: 0; align-items: center; min-height: 1.75rem;
-			box-shadow: inset 1px 0 0 0 var(--ec-border-strong), inset -1px 0 0 0 var(--ec-border-strong), inset 0 -1px 0 0 var(--ec-border-strong);
+			box-shadow: inset 0 -1px 0 0 var(--ec-hairline);
 		}
-		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > label { padding: 4px 6px; margin: 0; border-inline-end: 1px solid var(--ec-border-strong); align-self: stretch; display: flex; align-items: center; opacity: 1; }
+		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > label { padding: 4px 6px; margin: 0; border-inline-end: 1px solid var(--ec-hairline); align-self: stretch; display: flex; align-items: center; opacity: 1; }
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select { margin: 0 6px; min-width: 0; max-width: calc(100% - 12px); }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table th { max-width: none; font-size: .85em; font-weight: 600; background: var(--ec-chrome-bg); }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table th:first-child { min-width: 7.5em; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gname { grid-column: 2; }
 		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin-block: 6px 2px; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
-		/* The Base demand table's inputs are cells too (the standard sheet style below): no border, transparent, the cell's padding and size. */
-		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
-			border: 0; border-radius: 0; background: transparent; margin: 0; padding: 4px 6px; font-size: .85em; box-sizing: border-box; width: 100%; max-width: none; min-width: 0;
-		}
-		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table :is(input, select):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table td { padding: 0; }
 		/* The row is a <label>, so a tap anywhere in its cell (and its name) toggles the box: the whole cell is the touch target. */
 		.lpn-propbox .lpn-gprops > .lpn-gtrail, .lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { padding: 3px 6px; }
 	}
@@ -3991,6 +4010,11 @@ option:disabled { color: var(--ec-ink-muted); }
 			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
 		}
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
+		/* An empty editable cell is still findable: a faint dotted underline, gone while the pointer is on it (the hover fill takes over) or the cursor is in it. */
+		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):placeholder-shown:not(:focus):not(:hover) {
+			background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x;
+		}
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
@@ -4011,13 +4035,23 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-popover-body { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
 		.lpn-propbox .lpn-gprops .lpn-gw-fill, .lpn-propbox .lpn-gprops .lpn-grow > select, .lpn-propbox .lpn-gprops .lpn-grow > input[type="text"] { width: 100%; max-width: none; min-width: 6em; }
 		.lpn-propbox .lpn-gprops .lpn-gw-num { min-width: 4em; }
-		/* The demand table fits the phone: three columns that share the width, none cut. */
-		.lpn-propbox .lpn-gprops > .lpn-demand-table { display: table; width: 100%; table-layout: auto; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table th { max-width: none; font-size: .85em; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table input[type="text"], .lpn-propbox .lpn-gprops > .lpn-demand-table select { width: 100%; min-width: 2.5em; max-width: 100%; box-sizing: border-box; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table select { min-width: 6.5em; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table th, .lpn-propbox .lpn-gprops > .lpn-demand-table td { padding-inline: 2px; }
-		.lpn-propbox .lpn-gprops > .lpn-demand-table input[type="number"] { width: 100%; min-width: 3em; box-sizing: border-box; }
+		/* The same light sheet, narrowed (sheet-light): a hairline under every row, no box round a value, a computed value muted. */
+		.lpn-propbox .lpn-gprops .lpn-grow:not(.lpn-fill-row), .lpn-propbox #lpn_popup_title.lpn-gtitle-id {
+			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: stretch; box-shadow: inset 0 -1px 0 0 var(--ec-hairline);
+		}
+		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px 0; }
+		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]),
+		.lpn-propbox #lpn_popup_title.lpn-gtitle-id > input {
+			width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px 8px; box-sizing: border-box; border: 0; border-radius: 0; background: transparent; text-align: start; font-size: .95em;
+		}
+		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):hover:not(:focus) { background: var(--ec-hover-bg); }
+		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):placeholder-shown:not(:focus):not(:hover) {
+			background: linear-gradient(to right, var(--ec-border-strong) 50%, transparent 0) 0 calc(100% - 4px) / 4px 1px repeat-x;
+		}
+		.lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px 8px; margin: 0; }
+		.lpn-propbox .lpn-gprops .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-propbox .lpn-gprops .lpn-grow > input[type="radio"].lpn-gval { margin: 4px 6px 8px; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-ggut { grid-column: 1; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval { grid-column: 3; }
 		.lpn-propbox .lpn-gprops > .lpn-gspan3, .lpn-propbox .lpn-gprops > .lpn-gspan2 { grid-column: 2 / -1; }
@@ -5283,6 +5317,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
    the one under the pointer, and the content jumped hundreds of pixels. setboxKeepPlace() holds the
    control in the hand instead. */
 .lpn-setbox-content { overflow-anchor: none; }
+.lpn-popover-body { overflow-anchor: none; }
 /* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
    to let the user drag the divider between the settings panes."*). A grab strip, not a line: the
    visible rule stays on .lpn-setbox-index's own border-right, so the drawing does not change and

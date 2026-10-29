@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**74 still to read on master**, of 236 untranslated keys, of 3203 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**85 still to read on master**, of 247 untranslated keys, of 3212 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (236, 74 to read @@ NEEDS RULING)
+## lpn_  (247, 85 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -64,6 +64,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_crit_run_note`**
   > Each outage was run over the whole simulation ({n} reporting steps).
   _Ruled OK 2026-10-20._
+- **`lpn_demand_cats`**
+  > Demand categories
+  @@ NEEDS RULING
+- **`lpn_demand_total_tip`**
+  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
+  @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   _Ruled OK 2026-10-20._
@@ -565,6 +571,21 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ovl_clear_same_ask`**
   > Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.
   @@ NEEDS RULING
+- **`lpn_ovm_dot_alt`**
+  > This override is stored in alternative "{alternative}".
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt_shared`**
+  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear_one`**
+  > Click to clear this override.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_overrides`**
   > New overrides ({n}).
   @@ NEEDS RULING
@@ -667,6 +688,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_zoom`**
   > Zoom
   _Ruled OK 2026-10-20._
+- **`lpn_settings_held_default`**
+  > the default
+  @@ NEEDS RULING
+- **`lpn_settings_held_from`**
+  > the value in {parent}
+  @@ NEEDS RULING
+- **`lpn_settings_held_item`**
+  > {setting}: {restores}
+  @@ NEEDS RULING
+- **`lpn_settings_held_none`**
+  > no text
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -744,7 +777,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**84 still to read**, of 127 new keys across 12 unmerged branch(es).
+**75 still to read**, of 118 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -755,13 +788,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`49979b8d6`) — adds no English strings
+### box-design (`8237aa2d9`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/first-view (`20ee39a5d`) — adds no English strings
 
+### feat/report-widths (`8bdda97d6`) — already merged into box-design; its strings are listed there
+
 ### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
+
+### feat/settings-pinned (`9e9d54a94`) — adds no English strings
 
 ### feat/shape-scenario (`8ee873fdd`) — 13 new, 13 to read @@ NEEDS RULING
 
@@ -804,6 +841,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_shapes_this_scenario`**
   > Shapes appear in {scenario} only.
   @@ NEEDS RULING
+
+### feat/sheet-light (`8237aa2d9`) — already merged into box-design; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -967,13 +1006,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`938bf6dd9`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`4f1357263`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
-  > Gallons per minute, with feet and inches. A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure.
+  > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_desc`**
-  > Liters per second, with meters and millimeters. A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test. A fire hydrant junction passes 95 L/s with 14 m of residual pressure.
+  > A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_title`**
   > Fire flow extension, L/s (SI)
@@ -982,10 +1021,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Fire flow extension, gpm (US)
   @@ NEEDS RULING
 - **`lpn_ex_well_desc`**
-  > Gallons per minute, with feet and inches. A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure.
+  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > Liters per second, with meters and millimeters. A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation. A fire hydrant junction passes 32 L/s with 14 m of residual pressure.
+  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, at the edge of Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Community well and tank, L/s (SI)
@@ -994,35 +1033,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Community well and tank, gpm (US)
   @@ NEEDS RULING
 
-### feat/value-source (`999e599d8`) — 9 new, 9 to read @@ NEEDS RULING
-
-- **`lpn_ovm_dot_alt`**
-  > This override is stored in alternative "{alternative}".
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_alt_shared`**
-  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_clear_one`**
-  > Click to clear this override.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_set_from`**
-  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
-- **`lpn_ovm_restores`**
-  > Clear restores {value}, {source}.
-  @@ NEEDS RULING
-- **`lpn_settings_held_default`**
-  > the default
-  @@ NEEDS RULING
-- **`lpn_settings_held_from`**
-  > the value in {parent}
-  @@ NEEDS RULING
-- **`lpn_settings_held_item`**
-  > {setting}: {restores}
-  @@ NEEDS RULING
-- **`lpn_settings_held_none`**
-  > no text
-  @@ NEEDS RULING
+### feat/value-source (`999e599d8`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
@@ -1160,7 +1171,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
-
-### fix/label-snapshot-demand (`cfcc9209e`) — adds no English strings
-
-### fix/usage-terms (`98031fed8`) — adds no English strings

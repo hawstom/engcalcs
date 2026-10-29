@@ -4705,3 +4705,14 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: the 7 px divider covers the right half of the 15 px sort arrow; a click on it neither sorts nor resizes. Click on heading body and arrow centre sort; a sorted table keeps its dragged widths. Touch: no touch handler on the divider (mouse only). Phone 390: Fire flow, Full report, Scenario comparison scroll sideways at automatic widths, identical on 4650ca130^ (pre-existing).
 - OBSERVED: Copy HTML, Copy text, Print and CSV byte-identical before and after a drag on all seven reports. lpn_rptcols is in the inventory and the furniture/storage checks pass.
 - Method: ad-hoc Playwright scripts in the session scratchpad; the box title buttons relabel to "Copied" after a click.
+
+# Perry, feat/sheet-light b53d074ab, 2026-10-28 night (light sheet, Demand as rows)
+- OBSERVED (real Chromium, 1366x768 and 390 touch, light and dark): hairline sheet is consistent across Properties (junction, pipe, tank, pump, PRV), Find, Contour, Fire flow, Criticality, Demand scaling, Scenario comparison, floating and docked. No sideways scroll anywhere.
+- OBSERVED: the Demand categories box opens 618x615 (CSS asks 432x352): `.lpn-setbox` is declared later in the file than `.lpn-demandsbox` and wins. Docked it is 618 wide.
+- OBSERVED: typing a value in a Demand categories cell and pressing Tab drops focus to the page body; on c1459847c the same keystrokes land on the next cell.
+- OBSERVED: a junction with customers shows no trace of them in Properties (Base demand 150, Demand 155.00, "Demand categories 1"); the "5 gpm from Customers (2)" line now lives only behind "...".
+- OBSERVED: editable vs computed is black vs #555 (light), white vs #b7bbc1 (dark); numeric inputs have no other cue until hover.
+- OBSERVED, inherited from box-design (identical on c1459847c, master differs): Valves.lwn with docks on, docked Properties body is 38-39 px tall for every element.
+- Scenario: edit in the box is an override (alternatives values n:11 demands), Base node unchanged, undo clears. Tables Junctions shows 210 after a 60 category. Builder's demand-rows harness 23/23, but it asserts neither the box size nor Tab.
+- Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
+- NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.

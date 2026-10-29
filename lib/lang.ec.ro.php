@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Scenariul {name} nu poate fi șter
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}. Rămâne pe desen și în celelalte scenarii.';
 $ec_lang['lpn_scenario_delete_in_base']='Pentru a-l elimina din desen, ștergeți-l în scenariul {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} este șters. Făcea parte numai din {scenario}.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Elemente noi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (implicit)';
 $ec_lang['lpn_settings_row_view_value']='Centru {x}, {y}; scară {s}';
 $ec_lang['lpn_settings_held_in']='Valoare specifică în {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centrul hărții';
 $ec_lang['lpn_settings_view_scale']='Scara hărții';
 $ec_lang['lpn_settings_view_scale_tip']='Scara în centrul hărții, ca 1:N. Tastați 1:2000, sau doar 2000, pentru a mări la acea scară.';

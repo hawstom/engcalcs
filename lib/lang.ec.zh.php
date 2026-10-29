@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='方案 {name} 无法删除，因�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='基础情景：{value}';
 $ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网之外。它仍保留在图纸和其他方案中。';
 $ec_lang['lpn_scenario_delete_in_base']='要将其从图纸中移除，请在{base}方案中删除。';
 $ec_lang['lpn_scenario_only_deleted']='{id} 已删除。它仅属于 {scenario}。';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='新元件：{setting}';
 $ec_lang['lpn_settings_row_default']='{value}（默认）';
 $ec_lang['lpn_settings_row_view_value']='中心 {x}，{y}；比例尺 {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} 中的覆盖值。';
-$ec_lang['lpn_settings_held_base']='{base}：{value}';
 $ec_lang['lpn_settings_view_center']='地图中心';
 $ec_lang['lpn_settings_view_scale']='地图比例尺';
 $ec_lang['lpn_settings_view_scale_tip']='地图中心处的比例尺，格式为 1:N。键入 1:2000 或直接键入 2000，即可缩放到该比例尺。';

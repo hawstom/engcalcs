@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='ሁኔታ {name} ልጆች ስላ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='መሠረት፦ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} በ{scenario} ውስጥ ከመረቡ ውጭ ነው። በስዕሉ እና በሌሎች ሁኔታዎች ውስጥ ይቀራል።';
 $ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';
 $ec_lang['lpn_scenario_only_deleted']='{id} ተሰርዟል። የ{scenario} ክፍል ብቻ ነበር።';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='አዲስ አካሎች፦ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ነባሪ)';
 $ec_lang['lpn_settings_row_view_value']='መሃል {x}፣ {y}፤ መጠን {s}';
 $ec_lang['lpn_settings_held_in']='በ{scenario} ውስጥ የራስ ዋጋ።';
-$ec_lang['lpn_settings_held_base']='{base}፦ {value}';
 $ec_lang['lpn_settings_view_center']='የካርታ መሃል';
 $ec_lang['lpn_settings_view_scale']='የካርታ መጠን';
 $ec_lang['lpn_settings_view_scale_tip']='በካርታው መሃል ያለው መጠን፣ እንደ 1:N። ወደዚያ መጠን ለማጉላት 1:2000፣ ወይም ዝም ብሎ 2000 ይተይቡ።';

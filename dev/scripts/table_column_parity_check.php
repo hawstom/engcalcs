@@ -133,10 +133,11 @@ const EC_TABLE_PARITY_EXEMPT = [
     'valve/lpn_result_reaction_rate' => 'e. a pipe-only row in the shared link popup; never shown on a valve',
     'text/lpn_field_text_attached' => 'b. an attached Text takes its alignment from its leader; the '
         . 'align and valign columns state that rule in the cell through plainWord/plainTip',
+    'junction/lpn_node_customers' => 'e. a roll-up of the Customers table\'s own rows, not a junction property',
+    'junction/lpn_demand_cats' => 'e. the count of a junction\'s demand categories, opened in the Demand categories box; the Junctions table\'s Base demand column carries their total',
     // (e) not this element's property at all. A junction's Customers line is a ROLL-UP of other
     // elements -- the meters attached to it -- and those have a table of their own, with a row per
     // customer. A column here would be a count in a cell that nothing can edit.
-    'junction/lpn_node_customers' => 'e. a roll-up of the Customers table\'s own rows, not a junction property',
     // (f) the table IS the type (Morph, Task 781). Each table holds one type, so a Type column would
     // say the same word on every row; with Show scenarios a morphed asset's scenario row sits in the
     // table of the type it is in that scenario, which is how the table states it.

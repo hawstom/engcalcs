@@ -285,20 +285,18 @@ console.log('\n--- label display, Tables pane, Properties editor ---');
 	const labels = byId.lpn_popup_fields.children
 		.filter(c => c.tagName === 'LABEL')
 		.map(c => c.textContent);
-	// **BASE DEMAND IS A COLUMN HEADING NOW, NOT A LABEL** (Task 553). It used to be a standalone
-	// field on any junction with one demand; the table is unconditional since Tom asked for the
-	// special first row to go. The claim this assertion is making is unchanged -- the popup offers
-	// the TYPED number, editable, distinct from the resolved one -- so it is read off the table.
-	const ptable = byId.lpn_popup_fields.children.filter(c => c.tagName === 'TABLE')[0];
+	// **BASE DEMAND IS A ROW OF PROPERTIES AGAIN, THE LIST OF CATEGORIES IS IN ITS OWN BOX** (sheet-light, Tom 2026-10-28).
+	// The popup offers the TYPED number as Base demand, editable, distinct from the resolved one, as the row
+	// of a one-category junction (the table of categories is in the Demand categories box).
+	const baseLabel = byId.lpn_popup_fields.children.filter(c => c.tagName === 'LABEL' && /^Base demand/.test(c.textContent))[0];
 	function deep(n, tag, out) {
 		(n.children || []).forEach(function (c) { if (c.tagName === tag) { out.push(c); } deep(c, tag, out); });
 		return out;
 	}
-	ok('the Properties editor offers the typed number as Base demand',
-		!!ptable && deep(ptable, 'TH', []).some(th => /Base demand/.test(th.textContent)),
-		ptable ? deep(ptable, 'TH', []).map(th => th.textContent.trim()).join(' | ') : 'no table');
-	ok('...as an editable number in the row beneath it',
-		!!ptable && deep(ptable, 'INPUT', []).filter(i => i.type === 'number').length === 1);
+	ok('the Properties editor offers the typed number as Base demand', !!baseLabel,
+		labels.join(' | '));
+	ok('...as an editable number in its row',
+		!!baseLabel && deep(baseLabel, 'INPUT', []).filter(i => i.type === 'number').length === 1);
 	ok('...and the resolved one as Demand, where a pattern acts',
 		labels.some(t => /^Demand \(/.test(t)) &&
 		L.demandPatternActs(doc.nodes.find(n => n.id === '101')) === true);

@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='សេណារីយ៉ូ {name}
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='សេណារីយ៉ូមូលដ្ឋាន៖ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ត្រូវបានដកចេញពីបណ្ដាញក្នុង {scenario}។ វានៅតែស្ថិតក្នុងគំនូរ និងក្នុងសេណារីយ៉ូផ្សេងទៀត។';
 $ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
 $ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='ធាតុថ្មី៖ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (លំនាំដើម)';
 $ec_lang['lpn_settings_row_view_value']='ចំណុចកណ្ដាល {x}, {y}; មាត្រដ្ឋាន {s}';
 $ec_lang['lpn_settings_held_in']='តម្លៃផ្ទាល់ខ្លួនក្នុង {scenario}។';
-$ec_lang['lpn_settings_held_base']='{base}៖ {value}';
 $ec_lang['lpn_settings_view_center']='ចំណុចកណ្ដាលផែនទី';
 $ec_lang['lpn_settings_view_scale']='មាត្រដ្ឋានផែនទី';
 $ec_lang['lpn_settings_view_scale_tip']='មាត្រដ្ឋាននៅចំណុចកណ្ដាលនៃផែនទី ជា 1:N។ វាយ 1:2000 ឬគ្រាន់តែ 2000 ដើម្បីពង្រីកទៅមាត្រដ្ឋាននោះ។';

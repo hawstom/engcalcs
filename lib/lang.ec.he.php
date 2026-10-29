@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='אי אפשר למחוק את הת
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='תרחיש בסיס: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} אינו כלול ברשת ב-{scenario}. הוא נשאר בשרטוט ובתרחישים האחרים.';
 $ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} נמחק. הוא היה חלק מ-{scenario} בלבד.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='נכסים חדשים: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ברירת מחדל)';
 $ec_lang['lpn_settings_row_view_value']='מרכז {x}, {y}; קנה מידה {s}';
 $ec_lang['lpn_settings_held_in']='ערך מותאם ב-{scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='מרכז המפה';
 $ec_lang['lpn_settings_view_scale']='קנה מידה של המפה';
 $ec_lang['lpn_settings_view_scale_tip']='קנה המידה במרכז המפה, בצורת 1:N. הקלידו 1:2000, או רק 2000, כדי להתקרב לקנה מידה זה.';

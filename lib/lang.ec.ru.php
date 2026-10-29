@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарий {name} нельз
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Базовый сценарий: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} исключён из сети в сценарии {scenario}. Он остаётся на чертеже и в других сценариях.';
 $ec_lang['lpn_scenario_delete_in_base']='Чтобы удалить его из чертежа, удалите его в сценарии «{base}».';
 $ec_lang['lpn_scenario_only_deleted']='{id} удалён. Он входил только в сценарий «{scenario}».';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Новые элементы: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (по умолчанию)';
 $ec_lang['lpn_settings_row_view_value']='Центр {x}, {y}; масштаб {s}';
 $ec_lang['lpn_settings_held_in']='Переопределено в {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Центр карты';
 $ec_lang['lpn_settings_view_scale']='Масштаб карты';
 $ec_lang['lpn_settings_view_scale_tip']='Масштаб в центре карты в виде 1:N. Введите 1:2000 или просто 2000, чтобы приблизить до этого масштаба.';

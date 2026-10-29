@@ -182,7 +182,7 @@ async function main() {
 				const f = document.getElementById('lpn_popup_fields'), vis = (e) => e && e.getClientRects().length;
 				const ro = Array.from(f.querySelectorAll('.lpn-grow > span.lpn-gval:not(.lpn-gw-num)')).filter(vis)[0];
 				const ed = Array.from(f.querySelectorAll('.lpn-grow > input.lpn-gval[type=number]')).filter(vis)[0];
-				const tb = f.querySelector('.lpn-demand-table'), ti = tb && Array.from(tb.querySelectorAll('input')).filter(vis)[0];
+				const ti = Array.from(f.querySelectorAll('.lpn-grow > input.lpn-gval[data-gprop="demand"]')).filter(vis)[0];   // sheet-light: the Base demand box (the table is in the Demand categories box)
 				ed.__x = 1;
 				const r = ed.getBoundingClientRect();
 				return { ro: ro ? getComputedStyle(ro).color : null, roText: ro ? ro.textContent : null, ed: getComputedStyle(ed).color, bg: getComputedStyle(ed).backgroundColor, x: r.left + r.width / 2, y: r.top + r.height / 2,
@@ -192,7 +192,7 @@ async function main() {
 			await page.mouse.move(c.x, c.y); await a.settle(300);
 			const h = await page.evaluate(() => getComputedStyle(Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow > input.lpn-gval[type=number]')).filter((e) => e.getClientRects().length)[0]).backgroundColor);
 			ok('cells: an editable cell changes its fill under the pointer', h !== c.bg, c.bg + ' -> ' + h);
-			ok('cells: the Base demand table\'s inputs have no border and no fill', c.tbl !== null && /^0px (rgba\(0, 0, 0, 0\)|transparent)/.test(c.tbl), c.tbl);
+			ok('cells: the Base demand box has no border and no fill', c.tbl !== null && /^0px (rgba\(0, 0, 0, 0\)|transparent)/.test(c.tbl), c.tbl);
 			ok('cells: pipe 10 selected', await select(a, '#lpn_canvas [data-link="10"]', '10'));
 			const t = await page.evaluate(() => {
 				const rows = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((r) => /Auto length/.test(r.textContent));

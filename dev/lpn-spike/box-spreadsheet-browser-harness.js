@@ -315,7 +315,9 @@ async function main() {
 		const jp = await p.page.evaluate(() => { const el = Array.from(document.querySelectorAll('#lpn_canvas [data-node="11"]')).filter((e) => e.getBoundingClientRect().width > 0)[0]; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
 		await p.page.mouse.click(jp.x, jp.y);
 		await p.settle(900);
-		const dp = await selectShowsText(p.page, '#lpn_popup_fields table.lpn-demand-table select');
+		// sheet-light: the pattern is a row of its own in Properties (the table is in the Demand categories box).
+		await p.page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && /^Demand pattern/.test(x.querySelector('.lpn-gname').textContent.trim()))[0]; if (r) { r.querySelector('select').setAttribute('data-dp', '1'); } });
+		const dp = await selectShowsText(p.page, '#lpn_popup_fields select[data-dp]');
 		ok('on a phone the demand pattern dropdown shows its text whole', !dp.missing && dp.ok, JSON.stringify(dp));
 		ok('on a phone nothing is cut at the right edge', ph.cut === 0 && ph.scroll <= 1, JSON.stringify({ cut: ph.cut, scroll: ph.scroll }));
 		await p.close();

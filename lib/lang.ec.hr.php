@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Scenarij {name} ne može se izbris
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Bazni scenarij: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je isključen iz mreže u scenariju {scenario}. Ostaje u crtežu i u drugim scenarijima.';
 $ec_lang['lpn_scenario_delete_in_base']='Da biste ga uklonili iz crteža, izbrišite ga u scenariju {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je izbrisan. Bio je dio samo scenarija {scenario}.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Novi elementi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (zadano)';
 $ec_lang['lpn_settings_row_view_value']='Središte {x}, {y}; mjerilo {s}';
 $ec_lang['lpn_settings_held_in']='Zamjena u {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Središte karte';
 $ec_lang['lpn_settings_view_scale']='Mjerilo karte';
 $ec_lang['lpn_settings_view_scale_tip']='Mjerilo u središtu karte, kao 1:N. Upišite 1:2000 ili samo 2000 da zumirate na to mjerilo.';
