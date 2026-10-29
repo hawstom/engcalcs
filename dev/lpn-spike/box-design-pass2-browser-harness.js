@@ -229,6 +229,28 @@ async function main() {
 			if (T.b === '#lpn_contour_box') { await page.evaluate(() => { document.getElementById('lpn_contour_box').style.width = ''; }); }
 		}
 
+		console.log('\n--- P12: the Time series chart sits below the last field row (Perry, round 3) ---');
+		const chartGap = () => page.evaluate(() => {
+			const f = document.getElementById('lpn_popup_fields'), g = document.getElementById('lpn_popup_graph');
+			const last = Array.from(f.querySelectorAll('.lpn-grow')).filter((x) => x.getBoundingClientRect().height > 0).pop();
+			return { chartTop: Math.round(g.getBoundingClientRect().top), lastBottom: Math.round(last.getBoundingClientRect().bottom), rows: getComputedStyle(f.parentNode).gridTemplateRows };
+		});
+		for (const H of [0, 520, 380]) {
+			await page.evaluate(() => { const c = document.getElementById('lpn_contour_box'); if (c) { c.style.display = 'none'; } document.getElementById('lpn_popup').style.height = ''; });
+			await openNode('22');
+			await openBox(a, 'lpn_popup');
+			await a.settle(500);
+			if (H) { await page.evaluate((h) => { document.getElementById('lpn_popup').style.height = h + 'px'; }, H); }
+			// A solve while the box is open rebuilds it with the result rows added: Active toggled twice.
+			for (let k = 0; k < 2; k++) {
+				await page.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).find((x) => /^Active/.test(x.textContent.trim())); r.querySelector('.lpn-gname').click(); });
+				await a.settle(300);
+			}
+			await a.settle(2500);
+			const gp = await chartGap();
+			ok('P12 floating Properties' + (H ? ' at height ' + H : '') + ': the chart starts at or below the last field row', gp.chartTop >= gp.lastBottom - 1, JSON.stringify(gp));
+		}
+
 		console.log('\n--- P4: the DEM buttons belong to Elevation (a located project) ---');
 		const novato = fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net3-Novato-CA-World.lwn'), 'utf8');
 		await page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); localStorage.setItem('lpn_hovercard', 'off'); }, novato);

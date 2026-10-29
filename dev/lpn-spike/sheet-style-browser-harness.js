@@ -206,7 +206,7 @@ async function main() {
 		ok('D the Properties box can be made narrow (floor 12 rem)', dm.boxW <= 200, JSON.stringify(dm));
 		ok('D at its floor nothing scrolls sideways and no Value cell passes the right edge', dm.sw <= 1 && dm.past === 0, JSON.stringify({ scroll: dm.sw, past: dm.past }));
 		ok('D the Value column is allowed down to a few characters (at least 30 px, at most 90 px held)', dm.minVal >= 30 && dm.minVal <= 90, String(dm.minVal));
-		ok('D every Value cell is cut with an ellipsis and does not wrap; a number longer than its cell is cut, not widened', dm.ell === true && dm.cut === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
+		ok('D every Value cell ellipsizes and does not wrap; at the floor the Value column keeps its share of the width (proportional scaling), so a short number is no longer cut', dm.ell === true && dm.cut === false, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
 		await page.evaluate(() => { document.querySelector('.lpn-propbox').style.width = ''; });
 
 		console.log('\n--- The lighter sheet, 2026-10-28 (L1-L6 at PC width, L7 on a phone) ---');

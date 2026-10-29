@@ -4061,6 +4061,7 @@ option:disabled { color: var(--ec-ink-muted); }
 }
 #lpn_popup_title.lpn-gtitle-text, #lpn_popup_title .lpn-gtitle-text { font-weight: bold; }
 /* Narrow: the label goes above its value (a container query on the host, as Settings does on its own content). */
+.lpn-gdlg-wide { min-width: 19rem; }
 .lpn-gridhost.lpn-gnarrow, .lpn-contourbox .lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 .lpn-gnarrow .lpn-gw-fill { max-width: none; }
 .lpn-gnarrow .lpn-gcol2, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }

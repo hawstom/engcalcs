@@ -36446,7 +36446,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var body = document.createElement('div');
 			dlgBody.appendChild(body);
 			lpnGridHost(body, { plain: true });   // the whole dialog is one grid; a choice is not a Label and a Value
-			body.style.minWidth = '19rem';   // wide enough that the name stays beside its choice
+			body.classList.add('lpn-gdlg-wide');   // wide enough that the name stays beside its choice
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
 				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
@@ -71540,7 +71540,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = fields.offsetHeight;
 		fields.style.minHeight = h + 'px';
 		if (!propsKeepSameAct) { propsKeepSameAct = true; setTimeout(function () { propsKeepSameAct = false; }, 450); }
-		Promise.resolve().then(function () { sc.scrollTop = st; });
+		Promise.resolve().then(function () {
+			// A pin taller than the grid track it asks for leaves the rows (and so the Time series chart) drawn over the
+			// fields: once the rebuilt rows are taller than the pin the pin has done its work, so it is dropped (Perry, 2026-10-29).
+			if (fields.offsetHeight > h + 1) { fields.style.minHeight = ''; }
+			sc.scrollTop = st;
+		});
 	}
 	function clearFields(fields) {
 		if (window.bootstrap && bootstrap.Tooltip) {
