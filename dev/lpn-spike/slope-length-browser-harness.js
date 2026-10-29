@@ -381,9 +381,7 @@ async function main() {
 				if (Math.abs(pct) > Math.abs(worst.pct)) { worst = { id: l.id, pct }; }
 			});
 			console.log('       largest: ' + worst.id + ' ' + worst.pct.toFixed(2) + '%');
-			// L6 runs from R2 (200) to J4 (60): 140 ft or m of rise over 420 of drawing.
-			ok(file + ' is brought to slope distance on open: L6 = sqrt(420^2 + 140^2 or 42^2)',
-				near(now.L6.len, slope(420, file.indexOf('US') >= 0 ? 140 : 42), 1e-6), now.L6.len);
+			ok(file + ' opens with every pipe at its stored length (no auto length is re-derived)', worst.pct === 0 || Math.abs(worst.pct) < 1e-9, worst.pct.toFixed(4) + '%');
 			ok('...and stamped as the current version', bDoc.v >= 13, String(bDoc.v));
 			ok(file + ' opens with no unsaved-work mark', !(await b.currentTabDirty()));
 			await b.close();

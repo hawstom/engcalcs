@@ -526,7 +526,12 @@ class Session {
 	async openNet1Plain(title) {
 		const fs = require('fs'), path = require('path');
 		const body = fs.readFileSync(path.join(__dirname, '..', '..', 'water-network-examples', 'Net1.lwn'), 'utf8');
-		await this.page.route(/examples\/Net1-Scenarios\.lwn/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body }));
+		await this.page.evaluate((text) => {
+			const real = window.fetch;
+			window.fetch = function (url, opts) {
+				return /examples\/Net1-Scenarios\.lwn/.test(String(url)) ? Promise.resolve(new Response(text, { status: 200 })) : real.call(window, url, opts);
+			};
+		}, body);
 		return this.openExampleCard(title);
 	}
 	// File ▸ New project… — which opens the NEW-PROJECT BOX.
