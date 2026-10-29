@@ -11,9 +11,9 @@ Three counters, each a strictly narrower funnel stage. See `lib/config.inc.php` 
 
 | Tier | Source | What it means |
 |------|--------|---------------|
-| **reach** | `LANG_LOG` | Raw page views. **Includes crawlers** — a high reach with ~0% human is a bot signature, not an audience. |
-| **human** | `log-human-view.php` | Confirmed-human view ("window shopping"). Fires after the *session* is 10s old. |
-| **used** | `log-calc-event.php` | Confirmed calculator use. Requires a **user-triggered recalculation ≥10s after load** — so it means "typed their own numbers," not "looked at the default results." |
+| **page load** (was *reach*) | `LANG_LOG` | Raw page loads. **Includes crawlers** — many page loads with ~0% dwell is a bot signature, not an audience. |
+| **page dwell** (was *shopping*) | `log-human-view.php` | A page dwell: the log is written at least 10 seconds after the page load. Presumed human. |
+| **use** (was *using*) | `log-calc-event.php` | Confirmed calculator use. Requires a **user-triggered recalculation ≥10s after load** — so it means "typed their own numbers," not "looked at the default results." |
 
 Instrumentation lives in the shared `js/Calculators.lib.js` (`maybeLogHumanView` /
 `maybeLogCalcUsage`) and fires identically on every calculator page, so **cross-page comparisons are
@@ -1580,3 +1580,23 @@ it as the field just before the bucket**. Page-load (`visit`) rows carry none.
   asked again, so expect the said-yes share of rows to dip after deploy and recover as they answer.
   "Allow all" and "Refuse all" are not asked again. Compare no said-yes count across this date
   without saying so.
+
+## 2026-10-28 — the reports change their words (no data changed)
+
+Tom: *"We need to clarify the usage reporting."* The report words changed; the log files, the beacon
+and what is stored on a visitor's device did not. Every older section above keeps the words it was
+written in; read them through this table.
+
+| Was | Now | Meaning |
+|-----|-----|---------|
+| reach | **page load** | Every logged page load, crawlers included. The denominator for language and %dwell. |
+| shopping | **dwell** (a *page dwell*) | The log row is written at least 10 seconds after the page load. Presumed human. |
+| using | **use** | Unchanged in meaning. |
+| browsers | browsers | Unchanged. |
+| %shopping | **%dwell** | dwells / page loads |
+| %using | **%use** | uses / dwells |
+| bucket "page loads" | **others** | Everybody who did not say yes. Its columns read "dwells, others". It was never page loads: it held dwell rows. |
+
+The said-yes bucket keeps its name ("dwells, said yes"). The daily mail reads production's
+`lang-log-stats.sh`, which lags master, so it recognises the old header ("RANK BY SHOPPING", "said yes
+/ page loads") as well as the new ("RANK BY DWELLS", "dwells, said yes / dwells, others").

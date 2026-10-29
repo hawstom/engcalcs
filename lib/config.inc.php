@@ -348,7 +348,7 @@ unset($ec_canonical_host, $ec_colon, $ec_canonical_dev_alias, $ec_canonical_dev_
 // (everybody else, one row per page load). Always written, always last -- see ecLogBucketSuffix()
 // below for why it is not the optional marker it used to be. Rows written before 2026-08-21 carry
 // 'visit' or no column at all, and a last field holding neither token is a legacy 'visitor' row.
-// THE TWO ARE NEVER SUMMED: one counts people, the other counts page loads.
+// THE TWO ARE NEVER SUMMED: one counts browsers that said yes, the other everyone else ("others").
 // THE BROWSER CODE (Tom, 2026-10-08, call F01). Since then a 'visitor' row also carries this
 // browser's random code (EC_CODE_COOKIE below) as the field just before the bucket, so the report
 // can count distinct browsers. Rows before that date have no code; a code is recognised only on a
@@ -721,7 +721,7 @@ define('EC_SEEN_DEMAND', 1);
 //             write: every renewal is this file's Set-Cookie, because Safari caps a cookie written
 //             by script at 7 days (WebKit ITP) and would otherwise make the 400 days false.
 //
-// Visitors who refuse get no code; their rows still count as page loads, never as browsers.
+// Visitors who refuse get no code; their rows are "others", never browsers.
 define('EC_CODE_COOKIE', 'ec_code');
 define('EC_CODE_DAYS', 400);
 

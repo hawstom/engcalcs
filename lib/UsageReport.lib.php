@@ -16,7 +16,7 @@
  *              so DISTINCT CODES count BROWSERS. Rows from before then have no code: they count as
  *              uses and never as browsers.
  *   'visit'    everybody else. Nothing may be stored to deduplicate against, so every page load
- *              writes a row. Those rows count PAGE LOADS, and carry no code.
+ *              writes a row. Those rows are the others bucket, and carry no code.
  *
  * THE TWO ARE NEVER SUMMED. A total would have a denominator in two units and a numerator in
  * neither -- the symptom formmail.php's own comment records. So every aggregate here returns the
@@ -584,8 +584,8 @@ function ecUsageCommandRows(array $series, array $catalog)
 
 /**
  * The commands used in the window, flat and most used first, as plain-words rows: path
- * ("Water, Analyze, Fire flow analysis..."), id, browsers, uses and page loads. Ordered by browsers
- * (said yes), then page loads, then uses, then path; the two buckets are columns, never added.
+ * ("Water, Analyze, Fire flow analysis..."), id, browsers, uses and others. Ordered by browsers
+ * (said yes), then others, then uses, then path; the two buckets are columns, never added.
  * $groups is ecUsageCommandRows()'s result.
  */
 function ecUsageCommandUsed(array $groups)
