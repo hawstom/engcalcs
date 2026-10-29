@@ -2431,6 +2431,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
+/* Settings box: the overridden settings of a multi-setting row, one dot each, under the row. */
+.lpn-set-heldlist { display: flex; flex-wrap: wrap; column-gap: 1em; margin: 0 0 0.2em; margin-inline-start: 1.9em; width: auto; font-size: 0.85em; color: var(--ec-ink-subtle); }
+.lpn-set-helditem { display: inline-flex; align-items: center; }
 /* The override list (Task 800): an override equal to the value it replaces, still counted. */
 .lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
 /* Manage overrides: a box to select each row, Clear override at its end, the two bulk clears above. */
@@ -3912,7 +3915,7 @@ option:disabled { color: var(--ec-ink-muted); }
    note, a list) spans the grid; a spanning block asks for no width of its own, so a long sentence
    cannot stretch the box. */
 .lpn-gprops {
-	display: grid; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
+	display: grid; align-content: start; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
 	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
@@ -5314,6 +5317,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
    the one under the pointer, and the content jumped hundreds of pixels. setboxKeepPlace() holds the
    control in the hand instead. */
 .lpn-setbox-content { overflow-anchor: none; }
+.lpn-popover-body { overflow-anchor: none; }
 /* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
    to let the user drag the divider between the settings panes."*). A grab strip, not a line: the
    visible rule stays on .lpn-setbox-index's own border-right, so the drawing does not change and

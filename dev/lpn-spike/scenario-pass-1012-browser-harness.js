@@ -15,7 +15,7 @@
 //       a paste in another scenario writes there (Base unchanged) and names the alternative it made;
 //   M2  in Basic mode a new scenario is a child of Base, even made while Fig 5 is current;
 //   F7  the menu's New and Rename refuse a name already used;
-//   F8  "Shared with" names a scenario that names the alternative, not a child that inherits it.
+//   F8  the line names (as "also used by") a scenario that names the alternative, not a child that inherits it.
 //   Q2  the line beside an override says what Clear override restores, named by where it comes from
 //       (the parent scenario, or Base);
 //   Q3  an .inp export from Fig 5 writes Fig 5's Text position, as it writes its node values.
@@ -218,7 +218,7 @@ async function main() {
 		await page.waitForSelector('#lpn_settings_box', { state: 'visible' });
 		await a.settle(800);
 		const L_clear = await L('lpn_ovm_dot_clear');
-		const dots = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-ovm-dot')).map((n) => n.getAttribute('aria-label')));
+		const dots = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-ovm .lpn-ovm-dot')).map((n) => n.getAttribute('aria-label')));
 		const wantIn = (await L('lpn_settings_held_in')).replace('{scenario}', 'Fig 5');
 		ok('B1 a held row is marked with a dot in Fig 5', dots.length >= 1, JSON.stringify(dots));
 		ok('B1 every dot names Fig 5, the scenario holding the override, and says Click to clear it', dots.length > 0 && dots.every((n) => n === wantIn + ' ' + (L_clear)), JSON.stringify(dots));
@@ -435,6 +435,7 @@ async function main() {
 		}, true);
 		await clickNode('10');
 		const shared = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-shared')).map((e) => e.textContent.trim()));
+		// The alternative is named like its scenario, so the line stays silent about it and keeps only who shares it.
 		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
 		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
 			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
@@ -447,14 +448,15 @@ async function main() {
 		});
 		await clickNode('10');
 		let lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const HB = await L('lpn_settings_held_base'), await0bv = await L('lpn_scenario_base_value');
-		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === HB.replace('{base}', 'Fig 4').replace('{value}', '720')), JSON.stringify(lines));
+		const RS = await L('lpn_ovm_restores'), FR = await L('lpn_settings_held_from'), sayFrom = (nm, v) => RS.replace('{value}', v).replace('{source}', FR.replace('{parent}', nm));
+		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === sayFrom('Fig 4', '720 ft H2O') || t === sayFrom('Fig 4', '720')), JSON.stringify(lines));
 		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
 		await scenarioMenu('Fig 4');
 		await clickNode('10');
 		lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
 		const baseElev = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
-		ok('Q2 in Fig 4, a child of Base, it reads Base scenario: ' + baseElev, lines.some((t) => t === (await0bv).replace('{value}', baseElev)), JSON.stringify(lines));
+		const base4Name = await L('lpn_scenario_base');
+		ok('Q2 in Fig 4, a child of Base, it reads Clear restores ' + baseElev + ', the value in Base: ' + baseElev, lines.some((t) => t === sayFrom(base4Name, baseElev + ' ft H2O') || t === sayFrom(base4Name, baseElev)), JSON.stringify(lines));
 
 		// ---- q01: what Basic mode can show; Copy scenario ----
 		console.log('\n--- q01. a project Basic mode cannot show turns it off; Copy scenario in Basic mode ---');

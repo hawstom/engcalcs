@@ -36,7 +36,7 @@
 
 const { ROOT, setUnitSet, loadLoopedNetwork, ensure } = require('./lpn-dom-stub.js');
 // Read from the real lib/lang.ec.en.php the stub loads, for the same reason the note below gives
-// about lpn_scenario_base_value (dev/scripts/harness_wording_check.php).
+// about lpn_ovm_restores (dev/scripts/harness_wording_check.php).
 const PC = global.EngCalcs.pageConfig;
 const fs = require('fs');
 const path = require('path');
@@ -284,12 +284,12 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 	ok('an overridden row wears the filled dot (Task 790)', marks('lpn-ovm-dot').length === 1, String(marks('lpn-ovm-dot').length));
 	ok('...and every other overridable row the hollow dot', marks('lpn-ovm-hollow').length > 3, String(marks('lpn-ovm-hollow').length));
 	// Built from the LIVE lang string, never a hardcoded 'Base: '. That literal broke on 2026-08-14
-	// when lpn_scenario_base_value became 'Base scenario: {value}' -- and it would have broken
+	// when the note line's wording changed -- and it would have broken
 	// identically in all 26 translations, which is the tell that the assertion was testing the
 	// wording rather than the behaviour. What matters here is that BASE'S NUMBER is shown beside the
 	// scenario's, not which words surround it.
-	const baseShown = ((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_scenario_base_value) || 'Base: {value}')
-		.replace('{value}', '100');
+	const restoresHead = EngCalcs.pageConfig.lpn_ovm_restores.split('{value}')[0];
+	const baseShown = restoresHead + '100';
 	ok('...and shows Base\'s value beside the scenario\'s', txt.indexOf(baseShown) !== -1, txt);
 
 	const marker = marks('lpn-ovm-dot')[0];
@@ -298,8 +298,7 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 	ok('clicking the dot in the popup returns the value to Base', L.effective(j2, 'demand') === 100);
 	L.renderNodeFields(j2.id);
 	ok('...and Base\'s value is no longer shown, because nothing is diverging',
-		fieldsText().indexOf(((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_scenario_base_value) || 'Base: {value}')
-			.replace('{value}', '')) === -1);
+		fieldsText().indexOf(restoresHead) === -1);
 
 	L.undo();
 	ok('undo restores the override -- the scenarios ride with the document',

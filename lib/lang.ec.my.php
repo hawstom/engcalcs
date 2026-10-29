@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='အခြေအနေ {name} တ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='အခြေခံ အခြေအနေ - {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ကို {scenario} တွင် ကွန်ရက်မှ ဖယ်ထားသည်။ ၎င်းသည် ပုံဆွဲမှုတွင်နှင့် အခြားအခြေအနေများတွင် ဆက်ရှိသည်။';
 $ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
 $ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='အစိတ်အပိုင်းအ�
 $ec_lang['lpn_settings_row_default']='{value} (မူလ)';
 $ec_lang['lpn_settings_row_view_value']='ဗဟို {x}၊ {y}၊ စကေး {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} တွင် ကိုယ်ပိုင်တန်ဖိုး။';
-$ec_lang['lpn_settings_held_base']='{base} - {value}';
 $ec_lang['lpn_settings_view_center']='မြေပုံဗဟို';
 $ec_lang['lpn_settings_view_scale']='မြေပုံစကေး';
 $ec_lang['lpn_settings_view_scale_tip']='မြေပုံ၏ ဗဟိုရှိ စကေးကို 1:N အဖြစ် ဖော်ပြသည်။ ထိုစကေးသို့ ဇူးမ်လုပ်ရန် 1:2000 သို့မဟုတ် 2000 ဟု ရိုက်ပါ။';

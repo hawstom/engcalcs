@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} senaryosu silinemez, çünk
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Temel senaryo: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}, {scenario} içinde şebeke dışında. Hâlâ çizimde ve diğer senaryolarınızda bulunuyor.';
 $ec_lang['lpn_scenario_delete_in_base']='Çizimden kaldırmak için {base} senaryosunda silin.';
 $ec_lang['lpn_scenario_only_deleted']='{id} silindi. Yalnızca {scenario} senaryosunun parçasıydı.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Yeni varlıklar: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (varsayılan)';
 $ec_lang['lpn_settings_row_view_value']='Merkez {x}, {y}; ölçek {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} içinde senaryo değeri.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Harita merkezi';
 $ec_lang['lpn_settings_view_scale']='Harita ölçeği';
 $ec_lang['lpn_settings_view_scale_tip']='Haritanın merkezindeki ölçek, 1:N olarak. O ölçeğe yakınlaştırmak için 1:2000 veya yalnızca 2000 yazın.';

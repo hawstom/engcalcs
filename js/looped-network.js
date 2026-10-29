@@ -5479,6 +5479,20 @@ var EngCalcs = EngCalcs || {};
 		var ov = localOverrideMap(activeScenario(), categoryOf(prop, elGroup(el)))[ovKey(el)];
 		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
 	}
+	// **WHERE AN INHERITED VALUE COMES FROM, BY NAME**: the nearest layer of the chain the open
+	// scenario resolves through (treeLayers()) that states any of `props` for this element, else
+	// Base. A scenario's layer is named for the scenario, a stored alternative's for itself. Read for
+	// the hollow dot's tip, so it only runs when a row's marker is built.
+	function inheritedSourceName(el, props) {
+		var cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), layers = treeLayers(activeScenario(), cat), i, held;
+		for (i = 0; i < layers.length; i++) {
+			held = (layerValuesByCategory(layers[i])[cat] || {})[key] || [];
+			if (held.some(function (pv) { return props.indexOf(pv[0]) >= 0; })) {
+				return layers[i].kind === 'scn' ? scenarioDisplayName(layers[i].obj) : String(layers[i].obj.name || '');
+			}
+		}
+		return scenarioDisplayName(baseScenario());
+	}
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
 	// popup shows beside an overridden field, and what clearing a marker returns the field to.
 	function baseValue(el, prop) {
@@ -7498,12 +7512,13 @@ var EngCalcs = EngCalcs || {};
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
 	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
-	function smSharedText(cats) {
-		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
-		if (!scn || plainBase(scn)) { return ''; }
+	function smStoredIn(cats) {
+		var scn = activeScenario(), names = [], seen = {}, alt = null;
+		if (!scn || plainBase(scn)) { return null; }
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
+			if (alt === null) { alt = String(t.obj.name || ''); }
 			// **ONLY SCENARIOS THAT NAME IT** (Sue, 2026-10-12): a child that inherits it is
 			// inheritance, the point of a child, not the sharing "Share edits" sets up.
 			storedUsers(t.kind === 'calc' ? 'calc' : 'alt', t.obj.id).scenarios.forEach(function (id) {
@@ -7511,7 +7526,25 @@ var EngCalcs = EngCalcs || {};
 				if (u && u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
 			});
 		});
-		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
+		return alt === null ? null : { alt: alt, users: names };
+	}
+	function smSharedText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = smStoredIn(cats);
+		return st && st.users.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', st.users.join(', ')) : '';
+	}
+	// **THE LINE UNDER AN OVERRIDDEN ROW, WITH BASIC MODE OFF, SAYS WHERE THE OVERRIDE IS STORED**
+	// (Tom, 2026-10-23, after the tip-only try: *we need to use additional lines to document and
+	// manage overrides*). A tip cannot be read from a keyboard or a phone. With Basic mode on,
+	// alternatives are hidden, so the line stays the shared-with note alone.
+	function ovmStoredText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = scenarioBasicMode ? null : smStoredIn(cats);
+		// An alternative named exactly as the open scenario (what a new scenario's own alternative is)
+		// would only repeat the name the reader is already in: silent, shared-with note aside.
+		if (st && st.alt === scenarioDisplayName(activeScenario())) { st = null; }
+		if (!st) { return smSharedText(cats); }
+		return st.users.length
+			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
+			: (pc.lpn_ovm_dot_alt || 'This override is stored in alternative "{alternative}".').split('{alternative}').join(st.alt);
 	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
 	// stored, every scenario, so an old file behaves as before.
@@ -22346,7 +22379,7 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) {}
 		if (!on) { hoverCardHide(); }
 	}
-	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	var hoverCard = { muteKey: null, timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
 	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
 	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
 	if (typeof document !== 'undefined' && document.addEventListener) {
@@ -22372,9 +22405,26 @@ var EngCalcs = EngCalcs || {};
 		hoverCard.x = x; hoverCard.y = y;
 		hoverCardRetarget(hoverCard.sel);
 	}
+	// **THE RING'S TIP OUTRANKS THE CARD ON THE SAME ASSET** (Tom, 2026-10-25: *"the tip for the dashed
+	// gray junction was hard to read because the label-on-hover opened over it"*). Both open at the
+	// pointer after the same rest, so the card covered the sentence that says why the ring is there.
+	// The ring's tip is the narrower and rarer message, so while it is showing for the asset under the
+	// pointer the card stays shut, until the pointer moves to another asset or off the map.
+	// dev/lpn-spike/value-source-tip-browser-harness.js.
+	function hoverCardKey(sel) { return sel ? sel.kind + '\u0000' + sel.id : null; }
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('show.bs.tooltip', function (e) {
+			var t = e.target;
+			if (!hoverCard.sel || !t || !t.closest || !t.closest('#lpn_canvas')) { return; }
+			hoverCard.muteKey = hoverCardKey(hoverCard.sel);
+			hoverCardHide();
+		}, true);
+	}
 	function hoverCardRetarget(sel) {
 		hoverCardHide();
 		hoverCard.sel = (sel && sel.kind !== 'label' && !sel.viaLabel) ? sel : null;
+		if (hoverCard.muteKey && hoverCard.muteKey !== hoverCardKey(hoverCard.sel)) { hoverCard.muteKey = null; }
+		if (hoverCard.muteKey) { return; }
 		if (!hoverCard.sel || !hoverCardOn()) { return; }
 		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
 		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
@@ -64522,7 +64572,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
 		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
-		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm'), function (n) { n.parentNode.removeChild(n); });
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm, .lpn-set-heldlist'), function (n) { n.parentNode.removeChild(n); });
 		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
 		box.classList.remove('lpn-ovm-gut2');
 		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
@@ -64534,6 +64584,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			held = setboxHeldRowsOf(paths, scn, rows);
 			setboxMarks(el, paths, held, scn, rows);
 			if (!held.length) { return; }
+			setboxHeldList(el, paths, held, scn, rows);
 			el.classList.add('lpn-set-held');
 			setboxIndexMarkHeld(el);
 		});
@@ -64573,6 +64624,71 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else if (!held.length) { return; }
 		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
 		el.appendChild(g);
+	}
+	// **A ROW THAT EDITS SEVERAL SETTINGS LISTS THE OVERRIDDEN ONES, EACH WITH ITS OWN DOT** (Tom,
+	// 2026-10-23: *Is it completely unfeasible to show these individually?*). A Labels row edits
+	// its show tick, decimals, before, after, units tick and priority: six Settings table rows,
+	// one dot, one group clear. Each of those is already a table row with its own clear
+	// (settingRowClear()), so the line under the row names each one that the open scenario holds,
+	// what Clear restores and where from, and clears just that one. A row that edits one setting
+	// needs no list: its dot is that one.
+	// The name of one setting under its own row: the row's name is already above it.
+	function setboxHeldItemName(p) {
+		var pc = EngCalcs.pageConfig || {}, partKey = LPN_SETTAB_LABEL_PARTS[p[1]];
+		if (p[0] === 'labelSettings' && p.length === 4 && partKey && pc[partKey]) { return pc[partKey]; }
+		// The label's tick is the Labels list's Show column: "Show", not "Link labels: Length" (Tom, 2026-10-23).
+		if (p[0] === 'labelSettings' && p.length === 3 && (p[1] === 'node' || p[1] === 'link' || p[1] === 'customer')) { return pc.lpn_pane_manage_cols_show || 'Show'; }
+		return settingTableLabelBare(p);
+	}
+	// What Clear restores, in words, and where it comes from: the parent scenario's stated value, or
+	// the default when nothing up the chain states one. Blank text reads as no text, never as "".
+	function setboxHeldRestores(r, par) {
+		var pc = EngCalcs.pageConfig || {}, stated = settingRowValue(r, par) !== undefined, t = settingRowText(r, par), tail;
+		if (!stated) {
+			tail = String(pc.lpn_settings_row_default || '{value} (default)').split('{value}')[1];
+			if (tail && t.slice(-tail.length) === tail) { t = t.slice(0, -tail.length); }
+		}
+		if (t === '' || t === '""') { t = pc.lpn_settings_held_none || 'no text'; }
+		return { value: t, parent: stated ? scenarioDisplayName(par) : null };
+	}
+	// "Show: clear restores No, ...": the sentence follows its setting's name mid-line.
+	function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+	function setboxHeldList(el, paths, held, scn, rows) {
+		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
+		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
+		if (!all.length || !el.parentNode) { return; }
+		// A row that edits one setting: its dot is that one, so the line is the sentence alone.
+		if (all.length < 2) {
+			line = document.createElement('p');
+			line.className = 'lpn-set-heldlist';
+			line.setAttribute('data-lpn-noseam', '1');
+			held.forEach(function (r) {
+				var v = setboxHeldRestores(r, par), text = document.createElement('span');
+				text.textContent = clearRestoresText(v.value, v.parent);
+				line.appendChild(text);
+			});
+			el.parentNode.insertBefore(line, el.nextSibling);
+			return;
+		}
+		// Not a div and not a span: the Labels lists style every div child by position and hide a
+		// row's first span, which hid the first item and squeezed the rest.
+		line = document.createElement('p');
+		line.className = 'lpn-set-heldlist';
+		line.setAttribute('data-lpn-noseam', '1');
+		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
+			var item = document.createElement('span'), text = document.createElement('span'), v = setboxHeldRestores(r, par);
+			item.className = 'lpn-set-helditem';
+			text.textContent = (pc.lpn_settings_held_item || '{setting}: {restores}')
+				.split('{setting}').join(setboxHeldItemName(r.path)).split('{restores}').join(lowerFirst(clearRestoresText(v.value, v.parent)));
+			item.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
+				setboxPinRow(el);
+				clearHeldSetboxRows([r], scn);
+				setboxKeepPlaceSoon();
+			}));
+			item.appendChild(text);
+			line.appendChild(item);
+		});
+		el.parentNode.insertBefore(line, el.nextSibling);
 	}
 	// The box's left index marks a sub-heading that holds an override, so a held value can be found.
 	function setboxIndexMarkHeld(el) {
@@ -64992,6 +65108,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
 			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			// A row's list of its overridden settings goes with its row.
+			if (kid.classList.contains('lpn-set-heldlist')) { setboxShow(kid, lastShown); return; }
 			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			setboxShow(kid, m);
 			lastShown = m;
@@ -71100,6 +71218,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// attached tooltip instances to. A tooltip that is OPEN at that moment lives in document.body,
 	// not in the popup, so wiping innerHTML would strand it on screen with nothing to close it.
 	// Dispose first, then clear.
+	// **THE PROPERTIES PANE DOES NOT JUMP WHEN A NOTE LINE COMES OR GOES** (Tom, 2026-10-23: *we
+	// need to use additional lines to document and manage overrides*, *as long as we manage
+	// properly the vertical position of the pane scrolling*). An edit rebuilds the rows. The box
+	// is emptied and refilled, and any layout read in between (the gutter's, the width pass)
+	// clamps scrollTop to the emptied box, so the pane came back scrolled elsewhere. For the same
+	// asset in the same scenario this pins the box to the height it had and puts scrollTop back
+	// once the rebuild ends (a microtask, before paint). The pin stays, so a note that goes away
+	// leaves its line blank instead of pulling the row you just cleared down the screen; it is
+	// dropped when a different asset or scenario is shown. dev/lpn-spike/value-source-browser-harness.js.
+	var propsScrollKey = null, propsKeepSameAct = false, propsActScroll = 0;
+	function propsScrollKeep(fields) {
+		var sc = fields.parentElement, scn = activeScenario(),
+			key = currentPopup ? currentPopup.kind + ':' + currentPopup.id + ':' + (scn ? scn.id : '') : null,
+			st, h;
+		if (!sc || key === null || key !== propsScrollKey) { propsScrollKey = key; fields.style.minHeight = ''; return; }
+		st = sc.scrollTop;
+		// The first rebuild of an act may be clamped by a box that is shorter for a moment (a note line
+		// not yet drawn), so a later rebuild of the same act puts back the scroll the act began with.
+		if (propsKeepSameAct) { st = Math.max(st, propsActScroll); } else { propsActScroll = st; }
+		// **ONE USER ACT MAY REBUILD THE BOX TWICE** (the edit, then the solve's refresh), so within
+		// one act the pin is the height the box is showing. A NEW act pins the box's own height,
+		// without the blank an earlier Clear kept: the blank is the one line the act in hand
+		// removes, never the sum of several Clears.
+		if (!propsKeepSameAct) { fields.style.minHeight = ''; }
+		h = fields.offsetHeight;
+		fields.style.minHeight = h + 'px';
+		if (!propsKeepSameAct) { propsKeepSameAct = true; setTimeout(function () { propsKeepSameAct = false; }, 450); }
+		Promise.resolve().then(function () { sc.scrollTop = st; });
+	}
 	function clearFields(fields) {
 		if (window.bootstrap && bootstrap.Tooltip) {
 			Array.prototype.forEach.call(fields.querySelectorAll('.ec-help'), function (el) {
@@ -71107,6 +71254,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (t) { t.dispose(); }
 			});
 		}
+		if (fields.id === 'lpn_popup_fields') { propsScrollKeep(fields); }
 		fields.innerHTML = '';
 		// The ID line's room goes with the Properties box's own rows, not another box's.
 		[fields, fields.id === 'lpn_popup_fields' ? fields.parentNode : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1', 'lpn-ovm-gut2'); } });
@@ -71119,10 +71267,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// one confusing case the delta model leaves, needing no change-tracking bookkeeping.
 	function formatPropValue(v) {
 		if (v === undefined || v === null || v === '') { return ''; }
-		// A boolean reads as a MARK, not as a word: "Base: ✓" beside a checkbox is exactly the box's
-		// own vocabulary, it is language-free and RTL-safe (the same reason the suite's verdict
-		// strings lead with a glyph), and it costs no key in 27 languages to say Yes and No.
-		if (typeof v === 'boolean') { return v ? '✓' : '—'; }
+		// A boolean reads in words, Yes and No, as the Settings table does (Tom, 2026-10-24: a check
+		// mark under "Is active" told him nothing about what Clear restores).
+		if (typeof v === 'boolean') { return v ? settingTableYes() : settingTableNo(); }
 		return (typeof v === 'number') ? String(+v.toFixed(6)) : String(v);
 	}
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
@@ -71197,18 +71344,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE LINE BESIDE AN OVERRIDE SAYS WHAT CLEAR OVERRIDE WOULD RESTORE, AND FROM WHERE** (Tom,
 	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
 	// The category of the marker whose line is being written, for Base (ovmGutter()).
-	var inheritedLineCat = null;
+	var inheritedLineCat = null, inheritedLineUnit = '';
+	// **ONE SENTENCE FOR WHAT CLEAR RESTORES, EVERYWHERE** (Tom, 2026-10-24: *"Clear restores Yes, the
+	// value in Base."*): Properties' note line, a Settings row's held list and a single Settings row
+	// all say it through here. `value` is in words (Yes, No), with its unit; `parentName` is the
+	// scenario it comes from, or null for the default.
+	function clearRestoresText(value, parentName) {
+		var pc = EngCalcs.pageConfig || {}, source = parentName === null
+			? (pc.lpn_settings_held_default || 'the default')
+			: (pc.lpn_settings_held_from || 'the value in {parent}').split('{parent}').join(parentName);
+		if (value === '') { value = pc.lpn_settings_held_none || 'no text'; }
+		return (pc.lpn_ovm_restores || 'Clear restores {value}, {source}.').split('{value}').join(value).split('{source}').join(source);
+	}
 	function inheritedLine(fn) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), par = parentScenarioOf(scn), v;
+		var scn = activeScenario(), par = parentScenarioOf(scn), v;
 		// Base naming an alternative: what Clear restores is that alternative's parent's value, so the
 		// line reads Base with the alternative's parent named in its place, for that moment.
 		if (scn.isBase && inheritedLineCat !== null && basePick(scn, inheritedLineCat) !== undefined) {
 			v = withBasePick(scn, inheritedLineCat, (writeTargetFor(scn, inheritedLineCat).obj || {}).parent, fn);
-			return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v);
+			par = baseScenario();
+		} else {
+			v = paneInScenario(par, fn);
+			if (!par) { par = baseScenario(); }
 		}
-		v = paneInScenario(par, fn);
-		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
-		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
+		if (inheritedLineUnit && /^-?[\d.]+( \+ -?[\d.]+)*$/.test(v)) { v += ' ' + inheritedLineUnit; }
+		return clearRestoresText(v, scenarioDisplayName(par));
 	}
 	// ---- THE OVERRIDE MARKER: A DOT AND A DOWN TRIANGLE (Task 790) ----
 	//
@@ -71355,15 +71515,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.className = 'lpn-ovm';
 		if (baseHere) { /* the triangle alone */ }
 		else if (o.on) {
-			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			g.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
 				saveUndoSnapshot();
 				o.clear();
 				afterPropertyEdit(o.el);
 				refreshPopupIfOpen();
 			}));
 		} else {
-			g.appendChild(ovmCell('lpn-ovm-hollow', pc.lpn_ovm_dot_set || 'Inherited. Click to make it an override in this scenario, holding the value shown.', function () {
+			g.appendChild(ovmCell('lpn-ovm-hollow', (pc.lpn_ovm_dot_set_from || 'Inherited from {name}. Click to make it an override in this scenario, holding the value shown.').split('{name}').join(inheritedSourceName(o.el, o.props)), function () {
 				saveUndoSnapshot();
 				o.set();
 				afterPropertyEdit(o.el);
@@ -71390,9 +71549,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		base = document.createElement('span');
 		base.className = 'lpn-ov-base';
 		inheritedLineCat = o.cats[0];
-		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
+		// The unit the row's own label states, "Length (ft)": a number's note keeps it.
+		inheritedLineUnit = ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || '';
+		try { base.textContent = o.line(); } finally { inheritedLineCat = null; inheritedLineUnit = ''; }
 		note.appendChild(base);
-		shared = smSharedText(o.cats);
+		shared = ovmStoredText(o.cats);
 		if (shared) {
 			base = document.createElement('span');
 			base.className = 'lpn-ov-base lpn-ov-shared';
@@ -79094,6 +79255,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// under the spike harnesses' DOM as well as in a browser.
 		for (i = 0; i < el.childNodes.length; i++) {
 			if (el.childNodes[i].nodeName === 'title') { t = el.childNodes[i]; break; }
+		}
+		// **ONCE THE POINTER HAS REACHED THE RING, THE TIP LAYER OWNS ITS TEXT** (Tom, 2026-10-25: the
+		// dashed gray junction's tip kept opening after the parent's override was cleared). Arming
+		// (wireTipDelegation) removes the <title> child and caches its text in an attribute, so the
+		// child is gone and only writing the attribute changes or silences what the reader is shown.
+		if (typeof el.hasAttribute === 'function' && (el.hasAttribute('data-bs-original-title') || el.hasAttribute('title'))) {
+			if (t) { el.removeChild(t); }
+			el.setAttribute('title', marked ? overrideMarkText(inherited) : '');
+			if (!marked && window.bootstrap && bootstrap.Tooltip) {
+				t = bootstrap.Tooltip.getInstance(el);
+				if (t) { t.hide(); }
+			}
+			return;
 		}
 		if (!marked) { if (t) { el.removeChild(t); } return; }
 		if (!t) {

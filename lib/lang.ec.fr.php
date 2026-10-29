@@ -3274,7 +3274,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Le scénario {name} ne peut pas ê
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Scénario de base : {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} est exclu du réseau dans {scenario}. Il reste dans le dessin et dans les autres scénarios.';
 $ec_lang['lpn_scenario_delete_in_base']='Pour le retirer du dessin, supprimez-le dans le scénario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} est supprimé. Il faisait partie de {scenario} seulement.';
@@ -3407,7 +3406,6 @@ $ec_lang['lpn_settings_row_new_asset']='Nouveaux éléments : {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (par défaut)';
 $ec_lang['lpn_settings_row_view_value']='Centre {x}, {y} ; échelle {s}';
 $ec_lang['lpn_settings_held_in']='Valeur personnalisée dans {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base} : {value}';
 $ec_lang['lpn_settings_view_center']='Centre de la carte';
 $ec_lang['lpn_settings_view_scale']='Échelle de la carte';
 $ec_lang['lpn_settings_view_scale_tip']='L\'échelle au centre de la carte, sous la forme 1:N. Saisissez 1:2000, ou simplement 2000, pour zoomer à cette échelle.';
