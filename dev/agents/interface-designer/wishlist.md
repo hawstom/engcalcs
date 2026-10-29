@@ -585,3 +585,4 @@ The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), 
 - **Phone shares the hairline and band styling.** Small after the first item.
 
 - (2026-10-29) Results band heading in the Properties box, then the other category bands; reorder rows per scratchpad/ida-row-order.md. Tag: SPECULATION on value ranking, OBSERVED on current mixing of results among inputs.
+- (2026-10-29) One `pointer:coarse` token block (row height, hit areas) so no box re-decides its phone sizes. Tag: SPECULATION.
