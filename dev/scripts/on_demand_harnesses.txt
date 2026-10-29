@@ -1,0 +1,8 @@
+# Harnesses that mainly MEASURE pixels or milliseconds, run only on request (2026-10-29): they fail
+# on a loaded machine, not on a defect. Run them with `sh dev/scripts/run_harnesses.sh --on-demand`
+# (only these) or `--all` (everything). Layout is held instead by dev/scripts/adhoc_style_check.php.
+# One basename per line.
+dock-title-band-harness.js
+dock-width-harness.js
+tip-width-browser-harness.js
+bottom-pane-toggle-lag-harness.js
