@@ -175,7 +175,7 @@ async function importDxf(a, name, buffer) {
 	]);
 	await chooser.setFiles({ name: name, mimeType: 'application/dxf', buffer: buffer });
 	const d = await a.waitDialog(8000).catch(() => null);
-	const items = d ? await a.page.$$eval('#lpn_dxfnet_report li', (ls) => ls.map((li) => ({ code: li.getAttribute('data-code'), text: li.textContent }))) : [];
+	const items = d ? await a.page.$$eval('#lpn_dxfnet_report > li', (ls) => ls.map((li) => ({ code: li.getAttribute('data-code'), text: li.textContent }))) : [];
 	return { dialog: d, items: items };
 }
 const stored = (a) => a.page.evaluate(() => {
@@ -198,7 +198,8 @@ function everythingProject() {
 }
 
 // The same list of things the receipt must always name: the page's own sentence.
-async function notHeldText(a) { return a.page.evaluate(() => (window.EngCalcs.pageConfig || {}).lpn_dxfnet_note_not_held); }
+async function pcOf(a, k) { return a.page.evaluate((key) => (window.EngCalcs.pageConfig || {})[key], k); }
+const HELD = ['patterns', 'curves', 'controls', 'times', 'status', 'minor', 'demand', 'quality', 'custom', 'text'];
 
 async function roundTrip(browser, label, how) {
 	console.log('\n--- ' + label + ' ---');
@@ -217,19 +218,30 @@ async function roundTrip(browser, label, how) {
 	ok(label + ': the page exports an .inp and a DXF', !!inpA && inpA.length > 100 && !!dxf && dxf.length > 1000);
 	const imp = await importDxf(a, 'roundtrip.dxf', dxf);
 	ok(label + ': the receipt opens, headed with the file name', !!imp.dialog && imp.dialog.text.indexOf((await a.lang('lpn_inp_report_heading')).replace('{file}', 'roundtrip.dxf')) === 0, imp.dialog && imp.dialog.text.slice(0, 100));
-	const held = await notHeldText(a);
 	const codes = imp.items.map((i) => i.code);
-	ok(label + ': the receipt lists what a DXF cannot carry (patterns, curves, controls, options), by the page\'s own sentence',
-		imp.items.some((i) => i.code === 'not-in-dxf' && i.text === held) && /patterns, curves, controls, rules, time settings, EPANET options/.test(held), JSON.stringify(codes));
+	// The standing list: a lead, then one item per line (patterns, curves, ... map Text items and label positions).
+	const lead = await pcOf(a, 'lpn_dxfnet_note_not_held'), heldLi = imp.items.find((i) => i.code === 'not-in-dxf');
+	const heldWords = [];
+	for (const k of HELD) { heldWords.push(await pcOf(a, 'lpn_dxfnet_held_' + k)); }
+	ok(label + ': the receipt lists what a DXF cannot carry: a lead, then each of ten items on its own line',
+		!!heldLi && heldLi.text.indexOf(lead) === 0 && heldWords.every((w) => heldLi.text.indexOf(w) > 0) &&
+		(await a.page.$$eval('#lpn_dxfnet_report > li[data-code="not-in-dxf"] > ul > li', (l) => l.length)) === 10, heldLi && heldLi.text.slice(0, 200));
+	ok(label + ': ...including initial quality, custom properties, and map Text items and label positions',
+		/initial quality/.test(heldLi.text) && /custom properties/.test(heldLi.text) && /map Text items and hand-placed label positions/.test(heldLi.text) && /patterns/.test(heldLi.text) && /curves/.test(heldLi.text));
+	const meth = imp.items.find((i) => i.code === 'method');
+	ok(label + ': a separate line says Hazen-Williams was assumed and roughness read as C', !!meth && meth.text === (await pcOf(a, 'lpn_dxfnet_note_method')) && /Hazen-Williams C\.$/.test(meth.text), meth && meth.text);
+	ok(label + ': the counts omit a kind with none (no "0 customers")', imp.dialog.text.indexOf('0 customers') < 0 && (how.customers ? /3 customers\./.test(imp.dialog.text) : !/customers\./.test(imp.dialog.text.split('\n')[1] || imp.dialog.text.slice(0, 300))), imp.dialog.text.slice(0, 200));
+	ok(label + ': a grid or projected export gets no "from a latitude and longitude project" line', codes.indexOf('geo-export') < 0);
 	const pumps = (before.doc.links || []).filter((l) => l.type === 'pump').map((l) => l.id);
 	ok(label + ': and nothing else is reported for the page\'s own file, except the pumps, which have no curve in a DXF file',
-		codes.every((c) => c === 'not-in-dxf' || c === 'pump-no-curve') && (codes.indexOf('pump-no-curve') >= 0) === (pumps.length > 0), JSON.stringify(imp.items.map((i) => i.text.slice(0, 120))));
+		codes.every((c) => c === 'not-in-dxf' || c === 'method' || c === 'pump-no-curve') && (codes.indexOf('pump-no-curve') >= 0) === (pumps.length > 0), JSON.stringify(imp.items.map((i) => i.text.slice(0, 120))));
 	if (pumps.length) {
 		const pc = imp.items.find((i) => i.code === 'pump-no-curve');
-		ok(label + ': ...naming each pump (' + pumps.join(', ') + ')', !!pc && pumps.every((id) => pc.text.indexOf(id) > 0), pc && pc.text);
+		ok(label + ': ...naming each pump (' + pumps.join(', ') + ')', !!pc && pumps.every((id) => pc.text.indexOf(id) > 0) && pc.text === (await pcOf(a, 'lpn_dxfnet_note_pump_no_curve')) + ' (' + pumps.join(', ') + ')', pc && pc.text);
 	}
 	if (imp.dialog) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 	const after = await stored(a);
+	ok(label + ': the new project\'s head loss formula is Hazen-Williams, as the receipt says', after.doc.settings.method === 'hw', String(after.doc.settings.method));
 	ok(label + ': a NEW project, named after the file, is the open one', after.count === before.count + 1 && after.id !== before.id && after.doc.project.name === 'roundtrip', JSON.stringify(after.doc && after.doc.project));
 	const tabs = await a.tabs();
 	ok(label + ': its tab is the current one', tabs.some((t) => t.current && t.label.indexOf('roundtrip') >= 0), JSON.stringify(tabs.map((t) => t.label)));
@@ -292,6 +304,9 @@ async function main() {
 			const code = (/EPSG:(\d+)/.exec(dxf.toString('latin1')) || [])[1];
 			ok('the export states its coordinate system in the read-me (a WGS 84 UTM zone)', /^326\d\d$/.test(code || ''), String(code));
 			const imp = await importDxf(a, 'utm.dxf', dxf);
+			const ge = imp.items.find((i) => i.code === 'geo-export');
+			ok('one line says the drawing came from a latitude and longitude project and opens in the UTM zone, in meters, at the same place',
+				!!ge && ge.text === (await pcOf(a, 'lpn_dxfnet_note_geo_export')).replace('{crs}', ge.text.replace(/^.*opens in (.*), in meters.*$/, '$1')) && /\(EPSG:\d+\), in meters, at the same place on the map\.$/.test(ge.text), ge && ge.text);
 			ok('the receipt does not mention a coordinate-unit mismatch or an unknown system', !imp.items.some((i) => i.code === 'coord-unit' || i.code === 'crs-unknown'), JSON.stringify(imp.items.map((i) => i.code)));
 			if (imp.dialog) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 			const after = await stored(a);
@@ -342,7 +357,7 @@ async function main() {
 			const layer = /C-WATR-MODL-[A-Z]{4}-BASE/.exec(t.slice(t.indexOf('\r\nENTITIES\r\n')))[0];
 			t = t.slice(0, seq) + '  0\r\nATTRIB\r\n  5\r\nFFF1\r\n330\r\n20\r\n100\r\nAcDbEntity\r\n  8\r\n' + layer + '\r\n100\r\nAcDbText\r\n 10\r\n0.0\r\n 20\r\n0.0\r\n 30\r\n0.0\r\n 40\r\n1.0\r\n  1\r\nxyz\r\n100\r\nAcDbAttribute\r\n  2\r\nFOO_BAR\r\n 70\r\n0\r\n' + t.slice(seq);
 			const imp = await importDxf(a, 'stranger.dxf', Buffer.from(t, 'latin1'));
-			const codes = imp.items.map((i) => i.code).filter((c) => c !== 'not-in-dxf' && c !== 'pump-no-curve').sort();
+			const codes = imp.items.map((i) => i.code).filter((c) => c !== 'not-in-dxf' && c !== 'method' && c !== 'pump-no-curve').sort();
 			ok('exactly two lines besides the standing one: the foreign layer and the unknown tag', codes.join() === 'layer-foreign,tag-unknown', JSON.stringify(imp.items.map((i) => i.code + ': ' + i.text)));
 			const lf = imp.items.find((i) => i.code === 'layer-foreign'), tu = imp.items.find((i) => i.code === 'tag-unknown');
 			ok('the foreign layer line names the layer and its one LINE', !!lf && lf.text.indexOf('WALLS (1 LINE)') > 0, lf && lf.text);

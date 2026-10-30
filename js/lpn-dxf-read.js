@@ -111,7 +111,7 @@
 			tagKeys = {}, unitText = {}, items = [], wanted = [], nodes = [], links = [], customers = [],
 			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, customer: 0 },
 			nodeIds = {}, linkIds = {}, custIds = {}, nodesByPos = {}, ambiguous = {}, paper = 0,
-			foreign = {}, kinds = {}, alts = {}, shapes = {}, unread = {}, crsCode = '', readme, blockOf, typeOfBlock = {};
+			foreign = {}, kinds = {}, alts = {}, shapes = {}, unread = {}, crsCode = '', readmeText = '', readme, blockOf, typeOfBlock = {};
 		if (!R) { return { ok: false, detail: 'reader' }; }
 		rd = R.entities(text, true);
 		if (!rd.ok) { return rd; }
@@ -179,7 +179,9 @@
 			if (up === readme) {
 				if (it.type !== 'MTEXT') { tally(unread, it.layer, it.type); return; }
 				// The read-me is the one place the export states a coordinate system, as "(EPSG:32610)".
-				var said = /EPSG:(\d+)/i.exec(it.g.filter(function (q) { return q[0] === 3 || q[0] === 1; }).map(function (q) { return unesc(q[1]); }).join(''));
+				var said, rt = it.g.filter(function (q) { return q[0] === 3 || q[0] === 1; }).map(function (q) { return unesc(q[1]); }).join('');
+				readmeText += rt;
+				said = /EPSG:(\d+)/i.exec(rt);
 				if (said && !crsCode) { crsCode = 'EPSG:' + said[1]; }
 				return;
 			}
@@ -358,7 +360,7 @@
 
 		return {
 			ok: true, nodes: nodes, links: links, customers: customers, insunits: rd.insunits,
-			coordUnit: INSUNITS_NAME[rd.insunits] || '', crsCode: crsCode, unitText: unitText, notes: N.list, counts: counts
+			coordUnit: INSUNITS_NAME[rd.insunits] || '', crsCode: crsCode, readmeText: readmeText, unitText: unitText, notes: N.list, counts: counts
 		};
 	}
 

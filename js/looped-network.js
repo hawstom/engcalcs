@@ -44823,22 +44823,42 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'end-ambiguous': ['lpn_dxfnet_note_end_ambiguous', 'These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.'],
 			'end-no-node': ['lpn_dxfnet_note_end_no_node', 'These links have an end where there is no node, and were not imported.'],
 			'end-loop': ['lpn_dxfnet_note_end_loop', 'These links start and end at the same node, and were not imported.'],
-			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'A DXF file does not hold pump curves. These pumps have none, and are written to an EPANET file as pipes until each is given a curve.'],
+			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'A DXF file does not hold pump curves. These pumps have none, so Calculate will not give the original results until each is given a curve.'],
 			'crs-unknown': ['lpn_dxfnet_note_crs_unknown', 'The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.'],
 			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
 			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
 			'customer-loose': ['lpn_dxfnet_note_customer_loose', 'The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.'],
-			'not-in-dxf': ['lpn_dxfnet_note_not_held', 'A DXF file does not hold patterns, curves, controls, rules, time settings, EPANET options, the head loss formula, the pressure and velocity units, pipe status, minor loss coefficients, or the demand categories of a junction (only their sum), so none of these was imported. Hazen-Williams was assumed, and the pressure and velocity units follow the elevation unit.']
+			'not-in-dxf': ['lpn_dxfnet_note_not_held', 'A DXF file does not hold these, so none was imported:'],
+			'method': ['lpn_dxfnet_note_method', 'The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.'],
+			'geo-export': ['lpn_dxfnet_note_geo_export', 'This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.'],
 		}, t = T[note.code] || [null, note.code], s = String((t[0] && pc[t[0]]) || t[1]);
 		return s.split('{prefix}').join(prefix).split('{n}').join(String(note.detail))
 			.split('{coord}').join(String((note.detail || {}).coord || '')).split('{length}').join(String((note.detail || {}).length || ''));
+	}
+	// What a DXF file cannot hold, one item per line under the standing lead (the key, then its English).
+	var LPN_DXFNET_HELD = [
+		['lpn_dxfnet_held_patterns', 'patterns'],
+		['lpn_dxfnet_held_curves', 'curves'],
+		['lpn_dxfnet_held_controls', 'controls and rules'],
+		['lpn_dxfnet_held_times', 'time settings and EPANET options'],
+		['lpn_dxfnet_held_status', 'pipe and pump status (every link opens Open)'],
+		['lpn_dxfnet_held_minor', 'minor loss coefficients'],
+		['lpn_dxfnet_held_demand', 'demand categories (only a junction\'s total)'],
+		['lpn_dxfnet_held_quality', 'initial quality'],
+		['lpn_dxfnet_held_custom', 'custom properties'],
+		['lpn_dxfnet_held_text', 'map Text items and hand-placed label positions']
+	];
+	function dxfNetHeldItems() {
+		var pc = EngCalcs.pageConfig || {};
+		return LPN_DXFNET_HELD.map(function (x) { return String(pc[x[0]] || x[1]); });
 	}
 	function dxfNetReportLines(r) {
 		var CAP = 50;
 		return r.notes.map(function (n) {
 			var ids = n.ids.slice(0, CAP).join(', ');
 			if (n.ids.length > CAP) { ids += ' ' + ((EngCalcs.pageConfig || {}).lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
-			return { code: n.code, text: dxfNetNoteText(n) + (n.ids.length ? ' (' + ids + ')' : '') };
+			return { code: n.code, text: n.code === 'geo-export' ? dxfNetNoteText(n).split('{crs}').join(String(n.detail)) : dxfNetNoteText(n) + (n.ids.length ? ' (' + ids + ')' : ''),
+				items: n.code === 'not-in-dxf' ? dxfNetHeldItems() : null };
 		});
 	}
 	function showDxfNetReport(r, fileName, empty) {
@@ -44854,8 +44874,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (empty) { p((pc.lpn_dxfnet_none || 'Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.').replace('{file}', fileName).replace('{prefix}', EngCalcs.lpnDxfModelPrefix), true); }
 			else {
 				p((pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName), true);
-				p((pc.lpn_dxfnet_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, and {customers} customers.')
-					.replace('{nodes}', c.junction + c.reservoir + c.tank).replace('{links}', c.pipe + c.pump + c.valve).replace('{customers}', c.customer));
+				// A kind with none in the file is not counted ("0 customers" says nothing).
+				p([[c.junction + c.reservoir + c.tank, 'lpn_dxfnet_count_nodes', '{n} junctions, reservoirs and tanks.'],
+					[c.pipe + c.pump + c.valve, 'lpn_dxfnet_count_links', '{n} pipes, pumps and valves.'],
+					[c.customer, 'lpn_dxfnet_count_customers', '{n} customers.']].filter(function (x) { return x[0] > 0; })
+					.map(function (x) { return String(pc[x[1]] || x[2]).replace('{n}', x[0]); }).join(' '));
 			}
 			p(pc.lpn_dxfnet_report_lead || 'What was not read, and each change made during import, is listed below with the layer, block or ID concerned:');
 			ul.id = 'lpn_dxfnet_report';
@@ -44864,6 +44887,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var li = document.createElement('li');
 				li.setAttribute('data-code', row.code);
 				li.textContent = row.text;
+				if (row.items) {
+					var sub = document.createElement('ul');
+					sub.className = 'lpn-dxfnet-sub';
+					row.items.forEach(function (t) { var si = document.createElement('li'); si.textContent = t; sub.appendChild(si); });
+					li.appendChild(sub);
+				}
 				ul.appendChild(li);
 			});
 			body.appendChild(ul);
@@ -44959,11 +44988,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			EngCalcs.lpnCrsLoad(function () {
 				var known = EngCalcs.lpnCrsHas(r.crsCode);
 				if (!known) { r.notes.push({ code: 'crs-unknown', ids: [r.crsCode], detail: '' }); }
+				if (known && dxfReadmeSaysGeo(r.readmeText)) { r.notes.push({ code: 'geo-export', ids: [], detail: dxfCrsName(r.crsCode) }); }
 				finishDxfNetwork(r, fileName, done, known ? r.crsCode : '');
 			});
 			return;
 		}
 		finishDxfNetwork(r, fileName, done, '');
+	}
+	// The export's own read-me words for a latitude-and-longitude project ("..., in meters, not latitude
+	// and longitude."), in capitals as the export writes them; found in the page's language.
+	function dxfReadmeSaysGeo(text) {
+		var pc = EngCalcs.pageConfig || {}, tail = String(pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude.').split('{crs}')[1] || '',
+			first = tail.split('.')[0].trim();
+		return !!first && String(text).toUpperCase().indexOf(first.toUpperCase()) >= 0;
 	}
 	function finishDxfNetwork(r, fileName, done, crs) {
 		var units, before, changed, defaults, name, id, loose;
@@ -44983,6 +45020,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		loose = placeDxfCustomers(r.customers);
 		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }
 		r.notes.push({ code: 'not-in-dxf', ids: [], detail: '' });
+		r.notes.push({ code: 'method', ids: [], detail: '' });
 		clearUndo();
 		saveToStorage();
 		stampProjectSaved(id);
