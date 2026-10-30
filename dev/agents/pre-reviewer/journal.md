@@ -4685,3 +4685,8 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: ezdxf (AC1015) add LINE on WALLS, save: exactly one extra receipt line, "(WALLS (1 LINE))", Net1 and Net3. Phone 390x844: File > Import > Network > DXF file reachable, receipt scrolls inside, OK visible, no sideways scroll.
 - OBSERVED: only lang.ec.en.php carries the 28 new keys (other 26 files none); German page still worked in branch harness (fallback).
 - Scratch scripts: scratchpad pv/ (lib.js, run1.js, run3.js).
+
+## 2026-10-30 feat/dxf-import round 2 (commits through 1670095ec)
+- OBSERVED: real Chrome, unstripped examples, export then import DXF. Net1 and Net1 DW and a scenario that closes pipe 111 give identical Calculate results (diff <1e-12). Net1-Scenarios s2 and s1 import as networks, receipt "The drawing has no BASE alternative. The alternative MAX_DAY_WITH_MAIN_BREAK was read." Harness dxf-roundtrip-calc 66/66.
+- OBSERVED: Net2/Net3 raw (with patterns) and Net1-Scenarios s1/s2 (scenario demand multiplier 1.5) come back with DIFFERENT results; receipt lists patterns but never a scenario demand multiplier. Harness strips patterns and calcSets first, so it cannot see this.
+- Not run: mutation of the reader fix.
