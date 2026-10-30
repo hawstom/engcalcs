@@ -4686,3 +4686,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: no reference to the removed cards in sw.php, sitemap, or the three landing sites (librewaternet editorial-review.md only mentions the two Basic examples in prose). Translated Net1/Net2/Net3/Elm/Valves descriptions still carry the old order (units first) and the old Net1 title.
 - Shots: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/3f74533f-715d-4c2a-a95d-24464ab34423/scratchpad/perry-starter/
 - OBSERVED full run_harnesses.sh on 490a07194: 614/620 pass. FAIL alone and pass on master: settings-table-browser, settings-table-owner-browser, table-export-dialog-browser, menu-mnemonic, theme-design-browser (amber/green "Calcul-ation" cut, section 12 Scenario manager on Net1), node-size-cap-browser (ENOENT examples/Net1.lwn). All open the Net1 card and assume the old plain file. zoomfurniture 1 fail (bootstrap tooltip page error) also fails on master. find, zoomfitlabels pass.
+
+## 2026-10-30 Perry: feat/native-quality (d9bf806c3), Task 733 quality phase
+
+- OBSERVED: truth is the vendored EPANET 2.3.5 WASM (lpnEpanetRun for the reference; saved .hyd read back for the OVER path), independent of js/lpn-native-run.js. 106/106 pass.
+- OBSERVED: 14 deliberate mutations of the quality code (wall, bulk, FIFO/LIFO swap, 2COMP, zero source, MASS /60, SETPOINT, CONCEN junction, qstep +1, age step, tank bulk rate, stagnant threshold, source pattern, initial tank quality) were each caught (2 to 87 failures). One mutation target was not unique and was skipped. File restored with git checkout.
+- OBSERVED: worst quality-over-EPANET-hydraulics gap 1.4e-9 (tol 1e-8); tightest end-to-end is Net3 trace at 0.94 of its tolerance.
+- OBSERVED: diff vs master is js/lpn-native-run.js plus dev/ only; nothing outside it calls lpnNativeRun or passes quality:true. native-eps-harness 126/126.
