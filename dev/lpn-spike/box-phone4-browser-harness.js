@@ -4,7 +4,8 @@
 //   B. a finger tap on a map Text opens Properties;
 //   C. the pane edges are a hairline with a finger-sized grab area, no grey bar (screenshot box4-pane-edges-phone.png);
 //   D. a floating box's left-edge resize handle does not lie over the first label's text;
-//   E. Settings keeps its corner resize grip on a phone.
+//   E. Settings keeps its corner resize grip on a phone;
+//   F. a flyout resized with a finger stays open after release (until a tap elsewhere); a mouse flyout still tucks away.
 // EC_SHOTS=<dir> saves box4-phone-props.png, box4-phone-contour.png and box4-pane-edges-phone.png there.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -182,6 +183,54 @@ async function main() {
 			ok(dev.n + ': the handle lies over no label or control text', !!gv && gv.overText === 0, JSON.stringify(gv));
 			ok(dev.n + ': the label text starts at or past the handle\'s inner edge', !!gv && gv.firstText >= gv.gripR - 0.5, JSON.stringify(gv));
 			ok(dev.n + ': the handle is wide enough to take (>= 16 px for a finger, >= 8 px for a pointer)', !!gv && gv.gripW >= (dev.touch ? 16 : 8), JSON.stringify(gv));
+			await S.close();
+		}
+
+		console.log('\n--- F. a finger or mouse release after sizing a flyout (a phone flyout starts at its narrowest, so the finger widens it) ---');
+		for (const dev of [{ n: 'phone 390', w: 390, h: 844, touch: true }, { n: 'phone 360', w: 360, h: 740, touch: true }, { n: 'PC mouse', w: 1200, h: 800, touch: false }]) {
+			const S = await Session.open(browser, NAME + '-f', { viewport: { width: dev.w, height: dev.h }, hasTouch: dev.touch, isMobile: dev.touch });
+			await S.page.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
+			await S.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (r) => r.abort());
+			await S.goto('Looped-Network.php?ec_nolog=1');
+			await S.page.evaluate((t) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', t); localStorage.setItem('lpn_hovercard', 'off'); }, net1);
+			await S.reload();
+			await S.answerTrainingPanel().catch(() => {});
+			await S.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await S.settle(2500);
+			// Properties opens from a tap (phone) or a click (PC) on junction 22, docked as a flyout.
+			const boxId = 'lpn_popup';
+			const at = await S.page.evaluate(() => { const c = Array.from(document.querySelectorAll('#lpn_canvas [data-node="22"]')).filter((e) => e.getBoundingClientRect().width > 0)[0]; const r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+			if (dev.touch) { await S.page.touchscreen.tap(at.x, at.y); } else { await S.page.mouse.click(at.x, at.y); }
+			await S.settle(900);
+			const out = () => S.page.evaluate((id) => { const b = document.getElementById(id); return !!b && b.classList.contains('lpn-dock-out'); }, boxId);
+			const gp = await S.page.evaluate(() => { const g = ['right', 'left'].map((k) => document.getElementById('lpn_dock_grip_' + k)).filter((e) => e && getComputedStyle(e).display !== 'none')[0]; const r = g.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, side: g.id }; });
+			console.log('  grip', JSON.stringify(gp));
+			ok(dev.n + ': the flyout is out before the drag', await out());
+			const w0 = await S.page.evaluate((id) => document.getElementById(id).getBoundingClientRect().width, boxId);
+			if (dev.touch) {
+				const cdp = await S.page.context().newCDPSession(S.page);
+				const tp = (type, x) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y: gp.y, id: 1 }] });
+				await tp('touchStart', gp.x);
+				for (let i = 1; i <= 6; i++) { await tp('touchMove', gp.x - i * 8); await S.settle(30); }
+				await tp('touchEnd', 0);
+			} else {
+				await S.page.mouse.move(gp.x, gp.y); await S.page.mouse.down();
+				await S.page.mouse.move(gp.x + 60, gp.y, { steps: 6 }); await S.page.mouse.up();
+			}
+			const w1 = await S.page.evaluate((id) => document.getElementById(id).getBoundingClientRect().width, boxId);
+			ok(dev.n + ': the drag resized the flyout', Math.abs(w1 - w0) > 20, w0 + ' -> ' + w1);
+			if (dev.touch) {
+				await S.settle(3000);
+				ok(dev.n + ': the flyout is still open 3 s after the finger lifts', await out());
+				const mp = { x: 12, y: dev.h * 0.5 };
+				await S.page.touchscreen.tap(mp.x, mp.y);
+				await S.settle(1200);
+				ok(dev.n + ': a tap on the map still tucks it away', !(await out()));
+			} else {
+				await S.page.mouse.move(gp.x - 500, gp.y - 100, { steps: 4 });
+				await S.settle(2500);
+				ok(dev.n + ': after the mouse leaves, the flyout tucks away', !(await out()));
+			}
 			await S.close();
 		}
 

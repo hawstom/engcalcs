@@ -4716,3 +4716,11 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - Scenario: edit in the box is an override (alternatives values n:11 demands), Base node unchanged, undo clears. Tables Junctions shows 210 after a 60 category. Builder's demand-rows harness 23/23, but it asserts neither the box size nor Tab.
 - Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
 - NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.
+
+# Perry, box-design 7de287871 (round 4), 2026-10-29 evening
+- OBSERVED (real Chromium; 1400x900 mouse, 390x844 and 360x740 touch; Net1): Properties on node 22 opens two columns at all three sizes, 19 rows, no name over its value, no stacking; a docked Properties has a 240 px floor and holds two columns there. Contour plot, Fire flow, Criticality, Find and replace, Settings are two columns on the phone with no overlap and no text past the box edge; Contour's first row reads "Show plot".
+- OBSERVED: Settings corner grip on the phone is 28 px at the box corner and a real touch drag shrinks the box (352x620 to 292x540). A first attempt failed only because my script had clicked every section header and opened the theme picker.
+- OBSERVED: the flyout's left-edge handle (19 px phone, 8 px PC) overlaps no text or control; text starts 2 px (Properties, 360) to 4 px (Contour, 390) clear of it.
+- OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
+- OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
+- Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
