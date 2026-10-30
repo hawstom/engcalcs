@@ -112,7 +112,8 @@ async function main() {
 		const dockBtns = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-box-corner [data-dock]')).map((b) => b.getAttribute('data-dock')));
 		ok('b.4 a phone offers no pin button (nothing there can be pinned)', !dockBtns.includes('autohide') && dockBtns.includes('float'), JSON.stringify(dockBtns));
 		const grip = await rect(a.page, '.lpn-dock-grip.lpn-dock-grip-live');
-		ok('b.5 the box edge is a finger wide (at least 24 px)', grip && grip.w >= 24, JSON.stringify(grip));
+		const gripPill = await a.page.evaluate(() => { const g = document.querySelector('.lpn-dock-grip.lpn-dock-grip-live'), af = getComputedStyle(g, '::after'); return { w: parseFloat(af.width), h: parseFloat(af.height), bg: getComputedStyle(g).backgroundColor }; });
+		ok('b.5 the box edge has a touch strip at least 16 px wide, a transparent one, whose visible pill is at most 6 px wide', grip && grip.w >= 16 && gripPill.w <= 6 && gripPill.w > 0 && /rgba\(0, 0, 0, 0\)|transparent/.test(gripPill.bg), JSON.stringify({ grip, gripPill }));
 		if (grip) {
 			const y = grip.t + grip.h / 2, x0 = grip.l + grip.w / 2;
 			await touch(cdp, 'touchStart', [{ x: x0, y, id: 1 }]);
@@ -185,9 +186,19 @@ async function main() {
 		const tapOut = async () => { await tapXY(a, cdpE, 62, 790); await a.settle(400); };
 		const meterAt = async () => { const r = await rect(a.page, '.lpn-meter[data-cust="M1"]'); return r && r.l; };
 		const gripR = await rect(a.page, '.lpn-dock-grip.lpn-dock-grip-live');
-		ok('e.1 the flyout\'s edge grip lies inside the box (it does not reach over the map)', gripR && gripR.l >= pFly.l - 1, JSON.stringify({ grip: gripR, flyout: pFly.l }));
-		const hit = await a.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.id || e.className.toString()) : null; }, [pFly.l - 5, pFly.t + 300]);
-		ok('e.2 a point 5 px beside the flyout is the map, not the grip', !/grip/.test(String(hit)), String(hit));
+		const overText = await a.page.evaluate(() => {
+			const g = document.querySelector('.lpn-dock-grip.lpn-dock-grip-live').getBoundingClientRect(), box = document.getElementById('lpn_popup');
+			let n = 0;
+			Array.from(box.querySelectorAll('.lpn-gname, label, input, select, button')).forEach((e) => {
+				if (!e.getBoundingClientRect().width) { return; }
+				const rg = document.createRange(); rg.selectNodeContents(e);
+				Array.from(rg.getClientRects()).forEach((q) => { if (q.width > 0 && q.right > g.left && q.left < g.right && q.bottom > g.top && q.top < g.bottom) { n++; } });
+			});
+			return n;
+		});
+		ok('e.1 the flyout\'s edge grip reaches no further than the finger strip beyond the box, and covers no label text', gripR && gripR.l >= pFly.l - 14 && overText === 0, JSON.stringify({ grip: gripR, flyout: pFly.l, overText }));
+		const hit = await a.page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.id || e.className.toString()) : null; }, [gripR.l - 5, pFly.t + 300]);
+		ok('e.2 a point 5 px beyond the grip strip is the map, not the grip', !/grip/.test(String(hit)), String(hit));
 		const afterSel = await meterAt();
 		ok('e.3 selecting a Customer under the flyout does not pan the map', Math.abs(afterSel - pMeter0) <= 1, JSON.stringify([afterSel, pMeter0]));
 		await tapOut();
