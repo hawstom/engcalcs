@@ -106,6 +106,7 @@ function onePipe(q) {
 // reversal: qualroute.c reversesegs()). JD hangs off J2 on a dead-end pipe with no demand (no flow:
 // noflowqual()).
 function twoSources(q, extra) {
+	q = q || { mode: 'age' };
 	const m = constructed({
 		nodes: [reservoir('R1', 100), reservoir('R2', 100, 'RH'), jn('J1', 20, 15, 'D'), jn('J2', 20, 10, 'D'),
 			jn('J3', 22, 12, 'D'), jn('JD', 18, 0)],
@@ -257,6 +258,87 @@ const TRACE_CASES = [
 	{ name: 'trace: the reservoir behind a check-valve pipe, with a pumped tank and a PRV', model: pumpedTank(trace('R2'), { model: '2COMP', fraction: 0.4 }), tol: 0.01, spread: true }
 ];
 
+// ---- Q3: ONE CHEMICAL ---------------------------------------------------------------------------------
+// The model carries what js/lpn-epanet.js writes for a chemical: `quality` {mode, chemical, tolerance,
+// diffusivity}, a node's `initQuality` and `source` {type, quality, pattern}, a tank's `mixing`, and
+// `reactions` (the globals, and per pipe `bulk`/`wall` and per tank `tank`, in 1/day and m/day).
+const CHEM = (extra) => Object.assign({ mode: 'chemical', chemical: 'Chlorine mg/L' }, extra || {});
+function chem(m, o) {
+	m.quality = CHEM(o.quality);
+	m.reactions = Object.assign({ bulk: {}, wall: {}, tank: {} }, o.reactions || {});
+	(m.nodes || []).forEach((n) => { if (o.init && o.init[n.id] !== undefined) { n.initQuality = o.init[n.id]; } });
+	Object.keys(o.sources || {}).forEach((id) => { m.nodes.find((n) => n.id === id).source = o.sources[id]; });
+	if (o.patterns) { m.time.patterns.push(...o.patterns); }
+	return m;
+}
+// twoSources with a junction JI drawing a NEGATIVE demand (an inflow of 6 L/s, the only place EPANET
+// lets a CONCEN source act at a junction), joined to J3.
+function twoSourcesWithInflow() {
+	const m = twoSources(null);
+	m.nodes.push(jn('JI', 22, -6));
+	m.links.push(pipe('PI', 'JI', 'J3', 400, 0.1));
+	return m;
+}
+const INIT1 = { R1: 1.0, R2: 0.6, J1: 0.5, J2: 0.5, J3: 0.5, JD: 0.5 };
+const DECAY = { orderBulk: 1, orderWall: 1, globalBulk: -0.5, globalWall: -0.3 };
+const SRCPAT = pat('SP', [1, 1.5, 0.5, 2, 1, 0.8]);
+// The highest and lowest concentration EPANET reports anywhere, for the `check`s below.
+const span = (e) => { let hi = -Infinity, lo = Infinity; e.frames.forEach((f) => Object.values(f.qualities).forEach((v) => { hi = Math.max(hi, v); lo = Math.min(lo, v); })); return { hi, lo }; };
+const atNode = (id, h, want, tol) => (e) => { const f = e.frames.find((x) => x.t === h * H), v = f && f.qualities[id];
+	return { ok: Math.abs(v - want) <= tol, why: `${id} at ${h} h ${v === undefined ? '-' : v.toFixed(4)} (expected about ${want})` }; };
+// PD, the dead end of twoSources, carries EPANET's numerical-noise flow (see the header): its average
+// moves by up to 2.1e-4 mg/L over two days, hence `linkTol: DEAD_END` on those cases.
+const DEAD_END = 5e-4;
+const CHEM_CASES = [
+	{ name: 'chemical: initial quality only, no reaction (a conservative tracer of the start)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1 }), check: (e) => { const r = span(e); return { ok: r.hi <= 1 + 1e-9 && r.lo >= 0.5 - 1e-9 && r.lo < 0.6, why: `range ${r.lo.toFixed(3)} to ${r.hi.toFixed(3)}` }; } },
+	{ name: 'chemical: first-order bulk decay only (-0.5/day)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, reactions: { globalBulk: -0.5 } }), falls: 0.35 },
+	{ name: 'chemical: first-order wall decay only (-0.3 m/day), mass-transfer limited (diffusivity stated 1.0)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, quality: { diffusivity: 1.0 }, reactions: { globalWall: -0.3 } }), falls: 0.45 },
+	{ name: 'chemical: bulk and wall together, per-pipe coefficients on PM and P3 (the rest global)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, reactions: Object.assign({}, DECAY, { bulk: { PM: -2 }, wall: { P3: -1.2 } }) }), falls: 0.3 },
+	{ name: 'chemical: wall coefficient from the roughness correlation (F = -40, Hazen-Williams)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, reactions: { globalBulk: -0.2, roughnessCorrelation: -40 } }), falls: 0.35 },
+	{ name: 'chemical: growth to a limiting potential (bulk +0.8/day, limit 2.0)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, reactions: { globalBulk: 0.8, limitingPotential: 2.0 } }), reaches: 1.05 },
+	{ name: 'chemical: zero-order wall (-0.05 mg/m2/day), second-order bulk (-0.4)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, reactions: { orderBulk: 2, orderWall: 0, globalBulk: -0.4, globalWall: -0.05 } }), falls: 0.45 },
+	{ name: 'chemical: diffusivity 0 (no mass-transfer limit, Sc = 0) and tolerance 0.001', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, quality: { diffusivity: 0, tolerance: 0.001 }, reactions: DECAY }), falls: 0.3 },
+	// THE FOUR SOURCE TYPES (quality.c findsourcequal()), each on a network that otherwise starts at 0.
+	{ name: 'chemical: CONCEN source at reservoir R1 (1.2 on a pattern), with decay', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { sources: { R1: { type: 'CONCEN', quality: 1.2, pattern: 'SP' } }, patterns: [SRCPAT], reactions: DECAY }), reaches: 1.0 },
+	{ name: 'chemical: CONCEN source at a junction drawing a negative demand (JI, 2.0)', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSourcesWithInflow(), { sources: { JI: { type: 'CONCEN', quality: 2.0 } } }),
+		check: (e) => { const v = Math.max(...e.frames.map((f) => f.qualities.J3)); return { ok: v > 0.1 && v < 2, why: `J3 peaks at ${v.toFixed(3)}` }; } },
+	{ name: 'chemical: CONCEN at a junction with a positive demand adds nothing (J1)', tol: 1e-9,
+		model: chem(twoSources(null), { sources: { J1: { type: 'CONCEN', quality: 2.0 } } }),
+		check: (e) => { const r = span(e); return { ok: r.hi === 0, why: `highest ${r.hi}` }; } },
+	{ name: 'chemical: MASS booster at J1 (60 mg/min on a pattern), with decay', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { sources: { J1: { type: 'MASS', quality: 60, pattern: 'SP' } }, patterns: [SRCPAT], reactions: DECAY }), reaches: 0.05 },
+	{ name: 'chemical: SETPOINT booster at J3 (0.8) on decaying water', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, sources: { J3: { type: 'SETPOINT', quality: 0.8 } }, reactions: DECAY }), reaches: 0.79 },
+	{ name: 'chemical: FLOWPACED booster at J2 (+0.3 on a pattern) on decaying water', tol: 1e-4, linkTol: DEAD_END,
+		model: chem(twoSources(null), { init: INIT1, sources: { J2: { type: 'FLOWPACED', quality: 0.3, pattern: 'SP' } }, patterns: [SRCPAT], reactions: DECAY }), reaches: 0.9 },
+	// TANKS: the four mixing models with a tank coefficient, the tank filling and draining (rHead 66).
+	...[['MIXED'], ['2COMP', 0.3], ['FIFO'], ['LIFO']].map(([mx, fr]) => ({
+		name: `chemical: a tank that fills and drains, ${mx}${fr ? ' ' + fr : ''}, tank coefficient -1.5/day, a CONCEN source at the reservoir`, tol: 1e-4,
+		model: chem(lineWithTank({ rHead: 66, mixing: fr ? { model: mx, fraction: fr } : { model: mx } }),
+			{ init: { T: 0.2, J: 0.2 }, sources: { R: { type: 'CONCEN', quality: 1.0 } }, reactions: { globalBulk: -0.3, globalWall: -0.2, tank: { T: -1.5 } } }),
+		check: (e) => { const v = e.frames.map((f) => f.qualities.T); return { ok: Math.max(...v) - Math.min(...v) > 0.1, why: `tank from ${Math.min(...v).toFixed(3)} to ${Math.max(...v).toFixed(3)}` }; } })),
+	{ name: 'chemical: a source AT the tank (SETPOINT 0.9) on its outflow, two compartments', tol: 1e-4,
+		model: chem(lineWithTank({ rHead: 66, mixing: { model: '2COMP', fraction: 0.5 } }), { init: { R: 0.4 }, sources: { T: { type: 'SETPOINT', quality: 0.9 } }, reactions: { globalBulk: -0.5 } }),
+		reaches: 0.55 },
+	// An emitter's discharge is part of the junction's NodeDemand in the hydraulics file, so it is an
+	// outflow the quality pass carries water out by.
+	{ name: 'chemical: an emitter at J3 (0.0005 m3/s per m^0.5) with decay', tol: 1e-4, linkTol: DEAD_END,
+		model: (() => { const m = chem(twoSources(null), { init: INIT1, reactions: DECAY }); m.nodes.find((n) => n.id === 'J3').emitter = 0.0005; return m; })(),
+		falls: 0.3 },
+	{ name: 'chemical: pumped tank with level controls, a check-valve pipe, a PRV, two reservoirs at different strengths', tol: 1e-4,
+		model: chem(pumpedTank(null, { model: 'FIFO' }), { init: { R: 1.0, R2: 0.3, T: 0.5 }, reactions: DECAY }), falls: 0.35 }
+];
+
 async function run() {
 	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
 
@@ -301,6 +383,36 @@ async function run() {
 		['Net1.inp', '9', 0.01, 0.01], ['Net1.inp', '2', 0.01, 0.01]]) {
 		const m = loadEpa(file).model; m.quality = trace(node);
 		await compare({ name: `trace: ${file} from ${node}`, model: m, tol, linkTol, spread: true });
+	}
+
+	console.log('-- Q3: one chemical, constructed networks');
+	for (const c of CHEM_CASES) { await compare(c); }
+
+	console.log('-- Q3: one chemical, EPA\'s examples');
+	await compare({ name: 'chemical: Net1 as shipped (chlorine, bulk -0.5/day, wall -1 ft/day, initial 0.5 and 1.0)', model: epaChemical('Net1.inp'), tol: 1e-4, falls: 0.3 });
+	// Net2 at 0.005 mg/L, half its own merge tolerance. Its source pattern steps the fluoride by exactly
+	// 0.01 mg/L, which IS the Tolerance it states, so whether evalnodeoutflow() merges the new water
+	// into the last segment (|0.09 - 0.08| < 0.01) is decided in the last bit of a double. At 31:00
+	// pipe 1's upstream segment reads 0.09000000000000001 in one run and 0.08999999999999998 in the
+	// other, one merges and one does not, and pipe 1 and node 2 differ by 0.0028 mg/L from 32:00.
+	// Measured by swapping single built-in hydraulic records into the EPANET-hydraulics pass: the one at
+	// 18:00 (pipe 1 stagnant, 5e-8 against -1e-6 cfs of numerical noise), or at 20:00 or 23:00 (flows
+	// 1e-7 apart), each alone flips that merge.
+	await compare({ name: 'chemical: Net2 as shipped (fluoride, a CONCEN source at junction 1 on pattern 3, no reaction)', model: epaChemical('Net2.inp'), tol: 5e-3,
+		check: (e) => { const r = span(e); return { ok: r.lo < 0.5 && r.hi > 0.99, why: `range ${r.lo.toFixed(3)} to ${r.hi.toFixed(3)}` }; } });
+	{
+		// Net3 with chlorine at both sources (Lake 1.0, River 0.8 as initial quality), first-order decay.
+		const { model: m } = loadEpa('Net3.inp');
+		chem(m, { init: { Lake: 1.0, River: 0.8 }, reactions: { globalBulk: -0.3, globalWall: -0.15 } });
+		await compare({ name: 'chemical: Net3 with chlorine at Lake (1.0) and River (0.8), bulk -0.3/day, wall -0.15 m/day', model: m, tol: 1e-3, linkTol: 1e-3, reaches: 0.7 });
+	}
+
+	console.log('-- Q3: refusals');
+	{
+		const a = chem(twoSources(null), { sources: { J1: { type: 'BOOST', quality: 1 } } });
+		ok('a source type EPANET does not know is refused by name (error 213)', EngCalcs.lpnNativeRunRefusals(a, { quality: true }).some((r) => r.ids.indexOf('J1') >= 0));
+		const b = chem(twoSources(null), { sources: { J1: { type: 'MASS', quality: 1, pattern: 'NOPE' } } });
+		ok('a source on a pattern the model lacks is refused by name (error 205)', EngCalcs.lpnNativeRunRefusals(b, { quality: true }).some((r) => r.ids.indexOf('J1') >= 0));
 	}
 
 	console.log(`\n${pass} passed, ${fail} failed`);
