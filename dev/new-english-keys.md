@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**62 still to read on master**, of 224 untranslated keys, of 3189 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**63 still to read on master**, of 225 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (224, 62 to read @@ NEEDS RULING)
+## lpn_  (225, 63 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -231,6 +231,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_export_receipt_note`**
   > This is an export, not a save: this project is not connected to the file.
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_keeps`**
+  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
   @@ NEEDS RULING
 - **`lpn_ff_at_all`**
   > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
@@ -708,7 +711,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**302 still to read**, of 345 new keys across 10 unmerged branch(es).
+**295 still to read**, of 338 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -904,7 +907,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`733cdf128`) — 48 new, 48 to read @@ NEEDS RULING
+### feat/dxf-import (`a970103df`) — 41 new, 41 to read @@ NEEDS RULING
 
 - **`lpn_dxf_curve_points`**
   > Pump head curve points (flow, head)
@@ -924,38 +927,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dxfnet_count_nodes`**
   > {n} junctions, reservoirs and tanks.
   @@ NEEDS RULING
-- **`lpn_dxfnet_held_calc`**
-  > the scenario's calculation settings (demand multiplier and other options)
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_controls`**
-  > controls and rules
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_curves`**
-  > curves other than pump head curves
-  @@ NEEDS RULING
 - **`lpn_dxfnet_held_custom`**
   > custom properties
   @@ NEEDS RULING
-- **`lpn_dxfnet_held_demand`**
-  > demand categories (each junction's demands are summed into one base demand)
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_emitter`**
-  > emitter coefficients
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_energy`**
-  > pump efficiency and energy settings
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_patterns`**
-  > patterns
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_quality`**
-  > reaction coefficients, sources and mixing
-  @@ NEEDS RULING
 - **`lpn_dxfnet_held_text`**
   > map Text items and hand-placed label positions
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_times`**
-  > time settings and EPANET options
   @@ NEEDS RULING
 - **`lpn_dxfnet_none`**
   > Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.
@@ -1032,6 +1008,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_dxfnet_note_pump_no_curve`**
   > These pumps state no head curve, so Calculate will not give the original results until each is given a curve.
   @@ NEEDS RULING
+- **`lpn_dxfnet_note_sections_read`**
+  > The EPANET sections embedded in the drawing were read: {sections}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_sections_unread`**
+  > The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.
+  @@ NEEDS RULING
 - **`lpn_dxfnet_note_shapes`**
   > These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.
   @@ NEEDS RULING
@@ -1051,7 +1033,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
   @@ NEEDS RULING
 
-### feat/gis-background (`236c4ef85`) — 80 new, 80 to read @@ NEEDS RULING
+### feat/gis-background (`67cdd77b9`) — 80 new, 80 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -1294,7 +1276,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/native-quality (`88f3ccf0d`) — adds no English strings
+### feat/import-alternative (`3bd2c9f65`) — adds no English strings
+
+### feat/native-quality (`0cc61c8ec`) — adds no English strings
 
 ### feat/report-widths (`c8b40e477`) — 60 new, 60 to read @@ NEEDS RULING
 
@@ -1641,7 +1625,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-of-day (`018a25c3e`) — adds no English strings
+### feat/theme-of-day (`ffc86361e`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 

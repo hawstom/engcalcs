@@ -35961,7 +35961,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (withScn) {
 				var note = document.createElement('div');
 				note.id = 'lpn_export_scn_note';
-				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
+				// What All holds and what it leaves out (Task 814, rows 24-26): the file is flat copies, not the tree.
+				var noteText = (pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.') + ' ' +
+					(pc.lpn_export_table_scn_keeps || 'All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.');
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
 			}
