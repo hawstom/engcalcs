@@ -170,7 +170,7 @@ ec_urm_expect('the page reports the right classified-row count',
     isset($m2[1]) ? $m2[1] : '(not found)');
 ec_urm_expect('the two buckets on the page still total to the hand-computed visitor/visit split',
     strpos($newHtml, 'SAID YES: ' . $expectVisitor . ' use(s)') !== false
-    && strpos($newHtml, 'OTHERS: ' . $expectVisit . ' row(s)') !== false,
+    && strpos($newHtml, 'OTHERS: ' . $expectVisit . ' use(s)') !== false,
     "expect visitor=$expectVisitor visit=$expectVisit");
 
 // ---- report, whether or not everything passed ---------------------------------------------------
