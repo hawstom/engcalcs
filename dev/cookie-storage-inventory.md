@@ -249,7 +249,7 @@ asserts this and fails if the probe is widened to `lpn_`.
 check whether something exempt already answers the question.** The expensive part of storing
 something is never the bytes — it is the sentence in the banner it makes false.
 
-**No third-party STORAGE, and exactly four third-party requests, all on one page and all under the
+**No third-party STORAGE, and exactly five third-party requests (the fifth a GIS server the user names, Task 720), all on one page and all under the
 visitor's control.** No analytics vendor, no tag manager, no ad network, no CDN fonts, and no CDN
 (Task 287: Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the
 visitor's IP and user-agent on every page load; it is now served from this origin alongside

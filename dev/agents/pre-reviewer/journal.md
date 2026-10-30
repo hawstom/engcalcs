@@ -4723,3 +4723,8 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
 - OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
 - Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
+
+## 2026-10-30 feat/gis-background round 2 (Task 720), HEAD 82be219db
+- OBSERVED: builder's harness 81/81 passes on this tree. My own run against real Esri World Imagery and terrestris OSM-WMS, PC 1400x900 and phone 390x844: Map > Add layer... opens Settings at the layer controls, focus in Kind of server, option reads "ArcGIS REST (MapServer)"; both layers draw; reopen asks first and sends 0 requests before answer; Draw them redraws; Remove then pan sends 0. No layout overflow after box-design merge. Screenshots perry-gis2-*.png.
+- OBSERVED: privacy.php says five features, but dev docs/UsageReport comment/third_party_request_check still say four (non-visitor). Summary says "other four ask first", detail says "three ask first" (layer starts on add): reads consistent enough.
+- Not checked: disabled Add layer... row on an unplaced project (explanation?), how it looks to the eye beyond screenshots.

@@ -484,7 +484,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
 
 /**
  * One bar chart as inline SVG. Server-side, self-contained, no script and no external library:
- * the suite makes exactly four third-party requests, all on the map page and all opt-in, and this
+ * the suite makes exactly five third-party requests, all on the map page and all opt-in, and this
  * page makes a fifth of nothing.
  *
  * ONE CHART DRAWS ONE BUCKET. The caller draws two charts where there are two buckets, each with
