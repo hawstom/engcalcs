@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='គ្មានខ្សែកោងត្រូវ�
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='ខ្សែកោង';
-$ec_lang['lpn_curve_library_link_tip']='បើកប្រអប់ បណ្ណាល័យ លើផ្នែក ខ្សែកោង ជាកន្លែងខ្សែកោងមួយត្រូវបានបន្ថែម ពិពណ៌នា កែសម្រួល និងលុប។ ធាតុមួយបញ្ជាក់ខ្សែកោងដែលវាប្រើ។';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='របៀប៖ បន្ថែមរូបគ�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='ប្រើរបៀបនេះដើម្បីផ្លាស់ប្ដូរ ផ្លាស់ទី និងអូសធាតុ និងអត្ថបទលើផែនទី ឬរំកិលផែនទី។ នេះជារបៀបលំនាំដើមសម្រាប់ផែនទី។ ការចុច Esc ជាលើកទីពីរសម្អាតការជ្រើសរើស។';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='ស្វ័យប្រវត្តិ';
 $ec_lang['lpn_method_switch_confirm']='ការប្ដូរវិធីសាស្ត្រកកិតមិនផ្លាស់ប្ដូរលេខភាពក្រញ៉ោងដែលបានវាយបញ្ចូលរួចលើបំពង់របស់អ្នកទេ ហើយភាពក្រញ៉ោងសម្រាប់វិធីសាស្ត្រមួយគ្មានន័យសម្រាប់វិធីសាស្ត្រមួយទៀតឡើយ។ សូមត្រួតពិនិត្យបំពង់ទាំងអស់បន្ទាប់ពីនេះ។ ប្ដូរវាទោះជាយ៉ាងណា?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='សេណារីយ៉ូ {name}
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='សេណារីយ៉ូមូលដ្ឋាន៖ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ត្រូវបានដកចេញពីបណ្ដាញក្នុង {scenario}។ វានៅតែស្ថិតក្នុងគំនូរ និងក្នុងសេណារីយ៉ូផ្សេងទៀត។';
 $ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
 $ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='ចម្លងសេណារីយ៉ូដ
 $ec_lang['lpn_scenario_copy_off']='ចម្លងសេណារីយ៉ូ ដំណើរការក្នុងរបៀបមូលដ្ឋាន។ ពេលបិទរបៀបមូលដ្ឋាន សូមបន្ថែមសេណារីយ៉ូមួយ ហើយជ្រើសរើសជម្រើសជំនួសរបស់វាក្នុងតារាងសេណារីយ៉ូ។';
 $ec_lang['lpn_sm_title']='កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ';
 $ec_lang['lpn_sm_menu']='កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ…';
-$ec_lang['lpn_sm_basic_on']='កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ត្រូវបានបិទពេលបើក របៀបមូលដ្ឋាន។';
 $ec_lang['lpn_pane_tab_scenarios']='សេណារីយ៉ូ';
 $ec_lang['lpn_sm_col_parent']='មេ';
 $ec_lang['lpn_sm_add_child']='បន្ថែមកូន';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='ធាតុថ្មី៖ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (លំនាំដើម)';
 $ec_lang['lpn_settings_row_view_value']='ចំណុចកណ្ដាល {x}, {y}; មាត្រដ្ឋាន {s}';
 $ec_lang['lpn_settings_held_in']='តម្លៃផ្ទាល់ខ្លួនក្នុង {scenario}។';
-$ec_lang['lpn_settings_held_base']='{base}៖ {value}';
 $ec_lang['lpn_settings_view_center']='ចំណុចកណ្ដាលផែនទី';
 $ec_lang['lpn_settings_view_scale']='មាត្រដ្ឋានផែនទី';
 $ec_lang['lpn_settings_view_scale_tip']='មាត្រដ្ឋាននៅចំណុចកណ្ដាលនៃផែនទី ជា 1:N។ វាយ 1:2000 ឬគ្រាន់តែ 2000 ដើម្បីពង្រីកទៅមាត្រដ្ឋាននោះ។';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='តារាងសេណារីយ៉ូជ�
 $ec_lang['lpn_scncmp_running']='កំពុងដោះស្រាយសេណារីយ៉ូគ្រប់មួយ…';
 $ec_lang['lpn_scncmp_empty']='គ្មានអ្វីត្រូវបានគូរនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវដោះស្រាយឡើយ។';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ល្បឿនខ្ពស់បំផុត';
-$ec_lang['lpn_scncmp_at']='{value} នៅ {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} នៅ {id}, {time}';
 $ec_lang['lpn_scncmp_same']='ដូចគ្នានៅក្នុងសេណារីយ៉ូគ្រប់មួយ';
 $ec_lang['lpn_scncmp_period_note']='នៅកន្លែងដែលសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុតរបស់វាជាតម្លៃខ្លាំងនៃបណ្ដាញទាំងមូល នៅពេលវេលាដែលបានបង្ហាញ។';
 $ec_lang['lpn_scncmp_current']='(កំពុងបើកឥឡូវនេះ)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='ទាញយក CSV';
 $ec_lang['lpn_full_print']='បោះពុម្ពរបាយការណ៍';
 $ec_lang['lpn_full_col_time']='ពេលវេលា';
 $ec_lang['lpn_full_col_type']='ប្រភេទ';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='កំហាប់';
+$ec_lang['lpn_quality_named_concentration_short']='កំហាប់ {chemical}';
 $ec_lang['lpn_full_row_count']='ជួរដេក ({n})។';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='ការដំណើរការ';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='សម្ពាធ និងល្បឿន';
 $ec_lang['lpn_ff_atleast']='ច្រើនជាង {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} ធ្លាក់ចុះដល់ {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} ឈានដល់ {velocity}';
 $ec_lang['lpn_ff_more']='និងមានទៀត {n} ត្រូវបានប៉ះពាល់';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='ត្រឡប់ក្រោយ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ធ្វើឡើងវិញ (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ចម្លង (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

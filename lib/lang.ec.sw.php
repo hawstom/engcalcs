@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Hakuna mkondo uliochaguliwa';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Mikondo';
-$ec_lang['lpn_curve_library_link_tip']='Fungua kisanduku cha Maktaba kwenye sehemu yake ya Mikondo, ambako mkondo huongezwa, huelezwa, hubadilishwa na kufutwa. Kipengele hutaja mkondo kinaotumia.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Hali: Ongeza Kielelezo. Bainisha kila nukta. Bai
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Tumia hali hii kubadilisha, kuhamisha na kuburuta vipengele na maandishi kwenye ramani, au kusogeza ramani. Hii ndiyo hali chaguo-msingi ya ramani. Kubonyeza Esc mara ya pili huondoa uteuzi.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Kubadilisha njia ya msuguano hakubadilishi namba za usuguo zilizokwisha kuandikwa kwenye mabomba yako, na usuguo wa njia moja hauna maana kwa njia nyingine. Kagua kila bomba baada ya hili. Ubadilishe hata hivyo?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Senario {name} haiwezi kufutwa kwa
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Senario ya Msingi: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} imetengwa na mtandao katika {scenario}. Inabaki kwenye mchoro na katika senario nyingine.';
 $ec_lang['lpn_scenario_delete_in_base']='Ili kukiondoa kwenye mchoro, kifute kwenye senario ya {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} kimefutwa. Kilikuwa sehemu ya {scenario} pekee.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Hunakili senario iliyo wazi na thamani zake m
 $ec_lang['lpn_scenario_copy_off']='Nakili senario hufanya kazi katika Hali ya msingi. Hali ya msingi ikizimwa, ongeza senario na uchague mbadala zake katika jedwali la Senario.';
 $ec_lang['lpn_sm_title']='Senario: msimamizi';
 $ec_lang['lpn_sm_menu']='Msimamizi wa senario…';
-$ec_lang['lpn_sm_basic_on']='Msimamizi wa senario umezimwa wakati Hali ya msingi imewashwa.';
 $ec_lang['lpn_pane_tab_scenarios']='Senario';
 $ec_lang['lpn_sm_col_parent']='Mzazi';
 $ec_lang['lpn_sm_add_child']='Ongeza mtoto';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Vipengele vipya: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (chaguo-msingi)';
 $ec_lang['lpn_settings_row_view_value']='Kituo {x}, {y}; kipimo {s}';
 $ec_lang['lpn_settings_held_in']='Thamani maalum katika {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Kituo cha ramani';
 $ec_lang['lpn_settings_view_scale']='Kipimo cha ramani';
 $ec_lang['lpn_settings_view_scale_tip']='Kipimo katika kituo cha ramani, kama 1:N. Andika 1:2000, au 2000 tu, ili kukuza hadi kipimo hicho.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Jedwali la senario lenye idadi ya thamani maalu
 $ec_lang['lpn_scncmp_running']='Inakokotoa kila senario…';
 $ec_lang['lpn_scncmp_empty']='Hakuna kilichochorwa bado, hivyo hakuna cha kukokotoa.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Kasi ya juu kabisa';
-$ec_lang['lpn_scncmp_at']='{value} kwenye {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} katika {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Sawa katika kila senario';
 $ec_lang['lpn_scncmp_period_note']='Senario ikiwa na muda wote wa uendeshaji, shinikizo lake la chini kabisa na kasi yake ya juu kabisa ni viwango vikali vya mtandao mzima, kwa wakati ulioonyeshwa.';
 $ec_lang['lpn_scncmp_current']='(iliyofunguliwa sasa)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Pakua CSV';
 $ec_lang['lpn_full_print']='Chapisha taarifa';
 $ec_lang['lpn_full_col_time']='Muda';
 $ec_lang['lpn_full_col_type']='Aina';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Mkusanyiko';
+$ec_lang['lpn_quality_named_concentration_short']='Mkusanyiko wa {chemical}';
 $ec_lang['lpn_full_row_count']='Safu mlalo ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Utatuzi';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Shinikizo na kasi';
 $ec_lang['lpn_ff_atleast']='zaidi ya {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} inashuka hadi {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} inafika {velocity}';
 $ec_lang['lpn_ff_more']='na {n} zaidi zilizoathirika';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Tengua (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Rudia (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Nakili (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Ukubwa wa picha kama kizidishi cha eneo lililo kwenye skrini. Kikubwa zaidi ni kikali zaidi na hutoa faili kubwa zaidi.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

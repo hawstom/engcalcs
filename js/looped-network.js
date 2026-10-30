@@ -171,8 +171,14 @@ var EngCalcs = EngCalcs || {};
 	// Not a settings row: a number nobody has wanted to change costs 26 translations, and every
 	// adjustment so far moved a default everybody gets, not a preference one drawing needed.
 	var LPN_LABEL_REPEAT_FRAC = 0.75;
-	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A cap on n is a cap on the
-	// SPACING, so a very long pipe zoomed into would silently stop obeying the rule.
+	// **THE DIVISION IS NEARLY UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A tight cap on n is a
+	// cap on the SPACING, so a long pipe zoomed into would silently stop obeying the rule. For that
+	// reason n may reach LPN_LABEL_STATIONS_MAX, 10000, about 7500 view-widths of one pipe, which no
+	// real zoom reaches (a 40 mile main seen through a 100 ft window is about 2700).
+	// THE CEILING EXISTS FOR ONE CAUSE: a label pass that ran with a STALE view scale (2026-10-27,
+	// before fix/fresh-freeze) computed a spacing near zero and laid 1,045,277 positions on one Net3
+	// pipe. Past the ceiling the pipe gets 10000 evenly spaced stations, never a million.
+	var LPN_LABEL_STATIONS_MAX = 10000;
 	// A LAST-RESORT GUARD, not a rule: a pipe folding back and forth INSIDE the window can
 	// legitimately have thousands of stations in view. An ordinary drawing never reaches it (a
 	// straight pipe crossing the padded window has at most about 13).
@@ -257,7 +263,7 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelStations(l) {
 		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
 		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
-		n = Math.ceil(len / s);
+		n = Math.min(Math.ceil(len / s), LPN_LABEL_STATIONS_MAX);
 		for (i = 0; i < n; i++) { out.push((i + 0.5) / n); }
 		return out;
 	}
@@ -3915,6 +3921,7 @@ var EngCalcs = EngCalcs || {};
 			d += 'M' + rx + ',' + ry + 'h' + rw + 'v' + lh + 'h' + (-rw) + 'Z';
 		}
 		hit.setAttribute('d', d);
+		hit.style.setProperty('--lpn-lhit', LPN_TEXT_TOUCH_PX / s);   // a finger's reach round a Text's words (css/engcalcs.css, .lpn-lbl-hit[data-lbl])
 		// A rotated label (an aligned link label, a turned Text) is turned about the same point by
 		// the same transform: copied rather than recomputed, so there is one rotation and not two.
 		tr = textEl.getAttribute('transform');
@@ -5474,6 +5481,20 @@ var EngCalcs = EngCalcs || {};
 	function hasOverride(el, prop) {
 		var ov = localOverrideMap(activeScenario(), categoryOf(prop, elGroup(el)))[ovKey(el)];
 		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
+	}
+	// **WHERE AN INHERITED VALUE COMES FROM, BY NAME**: the nearest layer of the chain the open
+	// scenario resolves through (treeLayers()) that states any of `props` for this element, else
+	// Base. A scenario's layer is named for the scenario, a stored alternative's for itself. Read for
+	// the hollow dot's tip, so it only runs when a row's marker is built.
+	function inheritedSourceName(el, props) {
+		var cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), layers = treeLayers(activeScenario(), cat), i, held;
+		for (i = 0; i < layers.length; i++) {
+			held = (layerValuesByCategory(layers[i])[cat] || {})[key] || [];
+			if (held.some(function (pv) { return props.indexOf(pv[0]) >= 0; })) {
+				return layers[i].kind === 'scn' ? scenarioDisplayName(layers[i].obj) : String(layers[i].obj.name || '');
+			}
+		}
+		return scenarioDisplayName(baseScenario());
 	}
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
 	// popup shows beside an overridden field, and what clearing a marker returns the field to.
@@ -7502,12 +7523,13 @@ var EngCalcs = EngCalcs || {};
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
 	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
-	function smSharedText(cats) {
-		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
-		if (!scn || plainBase(scn)) { return ''; }
+	function smStoredIn(cats) {
+		var scn = activeScenario(), names = [], seen = {}, alt = null;
+		if (!scn || plainBase(scn)) { return null; }
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
+			if (alt === null) { alt = String(t.obj.name || ''); }
 			// **ONLY SCENARIOS THAT NAME IT** (Sue, 2026-10-12): a child that inherits it is
 			// inheritance, the point of a child, not the sharing "Share edits" sets up.
 			storedUsers(t.kind === 'calc' ? 'calc' : 'alt', t.obj.id).scenarios.forEach(function (id) {
@@ -7515,7 +7537,25 @@ var EngCalcs = EngCalcs || {};
 				if (u && u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
 			});
 		});
-		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
+		return alt === null ? null : { alt: alt, users: names };
+	}
+	function smSharedText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = smStoredIn(cats);
+		return st && st.users.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', st.users.join(', ')) : '';
+	}
+	// **THE LINE UNDER AN OVERRIDDEN ROW, WITH BASIC MODE OFF, SAYS WHERE THE OVERRIDE IS STORED**
+	// (Tom, 2026-10-23, after the tip-only try: *we need to use additional lines to document and
+	// manage overrides*). A tip cannot be read from a keyboard or a phone. With Basic mode on,
+	// alternatives are hidden, so the line stays the shared-with note alone.
+	function ovmStoredText(cats) {
+		var pc = EngCalcs.pageConfig || {}, st = scenarioBasicMode ? null : smStoredIn(cats);
+		// An alternative named exactly as the open scenario (what a new scenario's own alternative is)
+		// would only repeat the name the reader is already in: silent, shared-with note aside.
+		if (st && st.alt === scenarioDisplayName(activeScenario())) { st = null; }
+		if (!st) { return smSharedText(cats); }
+		return st.users.length
+			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
+			: (pc.lpn_ovm_dot_alt || 'This override is stored in alternative "{alternative}".').split('{alternative}').join(st.alt);
 	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
 	// stored, every scenario, so an old file behaves as before.
@@ -8355,12 +8395,11 @@ var EngCalcs = EngCalcs || {};
 		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
-		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
-		// "Scenario manager is disabled when Basic mode is on").
+		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE AND NEVER GREYED** (Tom, 2026-10-25: Basic mode gets a
+		// face of the box of its own; it was greyed in Basic mode from 2026-10-13 to 2026-10-25).
 		// **BASIC MODE** (Tom, 2026-09-30), ticked by default: see setScenarioBasicMode().
 		rows.push({
-			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,
-			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
+			icon: 'scenarios', label: pc.lpn_sm_menu || 'Scenario manager…',
 			fn: function () { openScenarioManager(); }
 		});
 		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
@@ -9881,6 +9920,9 @@ var EngCalcs = EngCalcs || {};
 	// still mean this node" and is used by the finders AFTER a hit; this is the width of an
 	// invisible mark on the drawing, and giving it 14 would swallow every pipe end.
 	var LPN_NODE_HIT_PX = 12;
+	// A Text's grab shape is its words' row boxes (a 12 px strip at 12 px type), which a fingertip misses. On a coarse pointer the shape gains this many
+	// screen pixels all round (Tom, 2026-10-29: "on phone, tapping on the text doesn't even open Properties"); a node still outranks it (touchNodeOver).
+	var LPN_TEXT_TOUCH_PX = 16;
 	// **A PUMP AND A VALVE ARE BIG, SO THEIR GRAB SHAPE IS NEARLY BARE INK** (Task 618, Tom:
 	// *"everything would have a hit area that exactly matches what you see aka WYSIWYG"*, with a
 	// forgiving margin only where a target is small or thin). A volute is drawn 20-35 screen pixels
@@ -12433,6 +12475,11 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return scnSetting(group === 'node' ? 'colorNodeField' : 'colorLinkField'); }
+	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
+	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
+	// stay as the user left them, and the colour key shows the plot's field.
+	function contourFieldOf() { return colorFieldOf('node') || 'pressure'; }
+	function contourOrNodeField() { return colorFieldOf('node') || (contourIsOn() ? 'pressure' : ''); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -12935,7 +12982,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
 		['node', 'link'].forEach(function (group) {
-			var field = colorFieldOf(group); if (!field) { return; }
+			var field = group === 'node' ? contourOrNodeField() : colorFieldOf(group); if (!field) { return; }
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
@@ -13092,7 +13139,7 @@ var EngCalcs = EngCalcs || {};
 	// Whether the ground can be subtracted at all: pressure, a project placed on the Earth, a token,
 	// and the terrain module present. The consent is asked by the checkbox, never here.
 	function contourTerrainOffered() {
-		return colorFieldOf('node') === 'pressure' && !!EngCalcs.lpnTerrainGrid &&
+		return contourFieldOf() === 'pressure' && !!EngCalcs.lpnTerrainGrid &&
 			projectLocatable() && !!mapboxToken();
 	}
 	function contourTerrainWanted() {
@@ -13235,7 +13282,7 @@ var EngCalcs = EngCalcs || {};
 			walls: walls.map(function (w) { return w.pts; }) };
 	}
 	function refreshContour() {
-		var C = EngCalcs.lpnContour, field = colorFieldOf('node');
+		var C = EngCalcs.lpnContour, field = contourFieldOf();
 		contourStats = null;
 		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
 		var layer = contourLayerEl();
@@ -13498,12 +13545,11 @@ var EngCalcs = EngCalcs || {};
 		var box = contourBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines, of pressure
-	// if the nodes are not coloured yet), then opens the box where it is tuned or turned off.
+	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines; of pressure
+	// if the nodes are not coloured, and the node colouring is never touched), then opens the box where it is tuned or turned off.
 	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
 		throughSettingSeam(function () {
-			if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
 			if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		});
@@ -13547,17 +13593,8 @@ var EngCalcs = EngCalcs || {};
 		if (!body) { return; }
 		var focusedId = document.activeElement && body.contains && body.contains(document.activeElement) ? document.activeElement.id : '';
 		body.innerHTML = '';
-		function row(label, control, tip, suffix) {
-			var r = document.createElement('div'), lab = document.createElement('span'), cell = document.createElement('span');
-			r.className = 'lpn-set-row';
-			lab.textContent = label;
-			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
-			cell.className = 'lpn-contour-ctl';
-			cell.appendChild(control);
-			if (suffix) { var u = document.createElement('span'); u.className = 'lpn-contour-unit'; u.textContent = suffix; cell.appendChild(u); }
-			r.appendChild(lab); r.appendChild(cell);
-			body.appendChild(r);
-			return r;
+		function row(label, control, tip, suffix, digits) {
+			return lpnGridRow(body, { label: label, tip: tip, control: control, unit: suffix, digits: digits });
 		}
 		function select(id, opts, cur, onPick) {
 			var sel = document.createElement('select');
@@ -13580,7 +13617,6 @@ var EngCalcs = EngCalcs || {};
 		function number(id, v, min, step, onPick) {
 			var n = document.createElement('input');
 			n.type = 'number'; n.id = id; n.value = String(v); n.min = String(min); n.step = String(step);
-			n.className = 'lpn-contour-num';
 			n.addEventListener('change', function () {
 				var x = parseFloat(n.value);
 				if (isFinite(x) && x > 0) { onPick(x); } else { n.value = String(v); }
@@ -13592,20 +13628,19 @@ var EngCalcs = EngCalcs || {};
 		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
 		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
 		// brings back the plot as it was; the node colouring is the dots' and is left alone.
-		row(pc.lpn_contour_show || 'Show contours', check('lpn_contour_show', contourIsOn(), function (on) {
+		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
 			if (on) {
 				var was = contourShownBefore || { fill: 'smooth', lines: true };
 				settings.contourFill = was.fill; settings.contourLines = was.lines;
-				if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
 			} else {
 				contourShownBefore = { fill: contourFillMode(), lines: !!settings.contourLines };
 				settings.contourFill = ''; settings.contourLines = false;
 			}
 			contourChanged();
 		}), pc.lpn_contour_show_tip);
-		var field = colorFieldOf('node');
+		var field = contourFieldOf();
 		row(pc.lpn_color_node_field || 'Color nodes by',
-			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), field || '', function (v) {
+			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), colorFieldOf('node') || '', function (v) {
 				settings.colorNodeField = v; contourChanged();
 			}));
 		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
@@ -13617,7 +13652,7 @@ var EngCalcs = EngCalcs || {};
 		}), pc.lpn_contour_fill_tip);
 		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
 			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
-		}), null, '%');
+		}), null, '%', 3);
 		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
 			settings.contourLines = on; contourChanged();
 		}));
@@ -13626,13 +13661,13 @@ var EngCalcs = EngCalcs || {};
 			if (!field) { return; }
 			settings.contourInterval = settings.contourInterval || {};
 			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
-		}), null, field ? colorFieldUnitText('node', field) : '');
+		}), null, field ? colorFieldUnitText('node', field) : '', 6);
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
 		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
-		}), pc.lpn_contour_buffer_tip);
+		}), pc.lpn_contour_buffer_tip, '', 4);
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -13653,14 +13688,21 @@ var EngCalcs = EngCalcs || {};
 				settings.contourTerrain = on; contourChanged();
 			}), pc.lpn_contour_dem_tip);
 		}
-		// Every control waits on a coloured field but the field itself.
-		if (!field) {
-			Array.prototype.forEach.call(body.querySelectorAll ? body.querySelectorAll('input, select, button') : [], function (c) {
-				if (c.id !== 'lpn_contour_field') { c.disabled = true; }
-			});
-		}
 		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
 		initTipsIn(body);
+	}
+	// **A WHOLE-DRAWING BUILD MEASURES EVERY NODE LABEL IN ONE READ, AFTER THE LAST ONE IS APPENDED.**
+	// A getBBox() between two appends forces a layout of the half-built drawing, once per node; on a
+	// phone with the first-view docks in place each cost ~7 ms at full speed (Net3: 97 of them, 2.9 s
+	// of a 5 s block at 4x slowdown, 2026-10-27). Read together, they cost one layout.
+	var deferredNodeWidths = [];
+	function measureDeferredNodeWidths() {
+		var ids = deferredNodeWidths; deferredNodeWidths = [];
+		ids.forEach(function (id) {
+			var ne = nodeEls[id];
+			if (!ne) { return; }
+			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
+		});
 	}
 	function buildNodeEls(n) {
 		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
@@ -13723,6 +13765,7 @@ var EngCalcs = EngCalcs || {};
 		// every label through measureLabelWidths().
 		var tw = 8;
 		if (dataLabelsHidden) { labelWorkSkipped = true; }
+		else if (labelPassDeferred) { deferredNodeWidths.push(n.id); }   // measured once, after the loop (see buildDom)
 		else { try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ } }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, symbolG: symbolG, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
@@ -15977,6 +16020,7 @@ var EngCalcs = EngCalcs || {};
 		// whole question. Off unless the flag is typed.
 		perfDebugTime('  nodes', function () {
 			for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
+			measureDeferredNodeWidths();
 		});
 		perfDebugTime('  links', function () {
 			for (i = 0; i < doc.links.length; i++) {
@@ -17813,24 +17857,26 @@ var EngCalcs = EngCalcs || {};
 	// the level whose native resolution is nearest what is on screen. Chosen on the longitude axis
 	// on purpose: that axis is drawn 1:1, and the latitude axis is the compressed one, so matching
 	// longitude means the raster is never magnified beyond its own pixels.
-	function tileZoomFor(scale) {
-		if (!(scale > 0)) { return 0; }
-		return Math.max(0, Math.min(tileSource().maxZ,
+	// `src`, where given, is a GIS background layer's own tile source ({id, minZ, maxZ, url(z, x, y)}).
+	function tileZoomFor(scale, src) {
+		var lo = src && src.minZ > 0 ? src.minZ : 0;
+		if (!(scale > 0)) { return lo; }
+		return Math.max(lo, Math.min(src ? src.maxZ : tileSource().maxZ,
 			Math.round(Math.log(scale * 360 / LPN_TILE_PX) / Math.LN2)));
 	}
 	// PURE, and the whole of the tile mathematics: a lon/lat window plus a scale in, the list of
 	// tiles and where each one goes out. No DOM, so dev/lpn-spike/basemap-harness.js can check every
 	// number in it. Positions come back in INTERNAL coordinates (origin-shifted, Y-down), which is
 	// what the world layer draws in.
-	function basemapTileList(lonMin, latMin, lonMax, latMax, scale) {
-		var z = tileZoomFor(scale), n, x0, x1, y0, y1, out, x, y, lonL, lonR, latT, latB, yT;
+	function basemapTileList(lonMin, latMin, lonMax, latMax, scale, src) {
+		var z = tileZoomFor(scale, src), n, x0, x1, y0, y1, out, x, y, lonL, lonR, latT, latB, yT;
 		for (;;) {
 			n = Math.pow(2, z);
 			x0 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMin, z))));
 			x1 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMax, z))));
 			y0 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMax, z))));
 			y1 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMin, z))));
-			if (z === 0 || (x1 - x0 + 1) * (y1 - y0 + 1) <= LPN_TILE_BUDGET) { break; }
+			if (z <= (src && src.minZ > 0 ? src.minZ : 0) || (x1 - x0 + 1) * (y1 - y0 + 1) <= LPN_TILE_BUDGET) { break; }
 			z--;
 		}
 		out = [];
@@ -17845,8 +17891,8 @@ var EngCalcs = EngCalcs || {};
 					// changed and kept the OLD <image>: switching the street map to satellite left
 					// OpenStreetMap tiles on screen -- under the Mapbox credit -- until a pan or a
 					// zoom happened to ask for different tile numbers.
-					key: basemapSource() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
-					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
+					key: (src ? src.id : basemapSource()) + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
+					url: src ? src.url(z, x, y) : tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
 					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT,
 					// The tile's own corner of the Earth, carried so a PROJECTED project can ask
 					// where this square lands in its plane. The geographic path ignores these:
@@ -18072,10 +18118,17 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapCredit() {
 		var c = document.getElementById('lpn_basemap_credit'), which;
 		if (!c) { return; }
-		c.style.display = basemapOn() ? 'block' : 'none';
+		var gisSpan = c.querySelector('[data-gis-credit]'), gisText = '';
+		// **A GIS server's own statement goes in the same line** (Task 720): what the service says, or
+		// its host; text only, never markup. Shown whether or not the basemap is.
+		if (gisSpan && gisCredits.length) {
+			gisText = gisCredits.filter(function (t, n, a) { return t && a.indexOf(t) === n; }).join(' | ');
+		}
+		if (gisSpan) { gisSpan.textContent = gisText; gisSpan.title = gisText; gisSpan.style.display = gisText ? 'inline-block' : 'none'; }
+		c.style.display = (basemapOn() || gisText) ? 'block' : 'none';
 		which = basemapOn() ? basemapSource() : 'osm';
 		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
-			el2.style.display = (el2.getAttribute('data-basemap-credit') === which)
+			el2.style.display = (basemapOn() && el2.getAttribute('data-basemap-credit') === which)
 				? 'inline' : 'none';
 		});
 	}
@@ -18097,7 +18150,80 @@ var EngCalcs = EngCalcs || {};
 	// credit hangs off the painter, so no caller can paint tiles without it.
 	function refreshBasemap() {
 		paintBasemapTiles();
+		paintGisLayers();
 		refreshBasemapChrome();
+	}
+	// **WHERE ONE TILE GOES IN THE DRAWING, for any layer of tiles** (the basemap, and the GIS background
+	// layers beside it). Lifted out of paintBasemapTiles() unchanged so the two cannot place the same
+	// ground differently. Null for a tile that is degenerate at the pole.
+	function tilePlace(t, proj, xg) {
+		var place;
+		if (proj) {
+			// **ONE AFFINE PER TILE, WHICH IS THE WHOLE ACCURACY DECISION.** A Mercator tile
+			// is a curved quadrilateral in a projected plane and an SVG image can only be
+			// given an affine, so the curvature is absorbed tile by tile: pinned once for the
+			// whole view the error reaches 2,338 m across this suite's 300 km scope, and
+			// pinned per tile it is far under the width of the line a pipe is drawn with.
+			var cn = EngCalcs.lpnCrsTileCorners(projectCrsCode(), t.lonW, t.latN, t.lonE, t.latS);
+			if (!cn) { return null; }   // degenerate at the pole; one tile missing beats a smear
+			// Into the drawing frame at the page's own seam, which subtracts the local origin
+			// and NEGATES y -- without that a northing draws the world upside down.
+			var ax = inwardX(cn.tl.x), ay = inwardY(cn.tl.y);
+			place = {
+				x: 0, y: 0, width: 1, height: 1,
+				transform: 'matrix(' + [
+					inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
+					inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
+				].join(' ') + ')'
+			};
+		} else if (xg) {
+			// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
+			// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
+			// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
+			// while this frame is linear in latitude, which over one tile is far under the
+			// width of the line a pipe is drawn with.
+			// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
+			// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
+			// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
+			// nearer, independently -- so the tile holding the ANTIPODE of the transform's
+			// origin got its east edge wrapped a whole world away from its west edge. At the
+			// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
+			// the world-zoom view always contains it: measured, the offending tile's placement
+			// width came out **-1,750 where it should be +250**, and a negative width draws
+			// the raster BACKWARDS, stretched across the whole screen over every other tile.
+			// Tom saw it as reversed, upside-down place names.
+			//
+			// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
+			// the two latitude cuts are -- and there is no branch to choose in a difference,
+			// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
+			// corner-plus-edge is exactly the corner the old expression meant, everywhere the
+			// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
+			var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
+			if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return null; }
+			var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
+				dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
+			// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
+			// census asks of every site here: three corners go through the same door rather
+			// than each spelling the boundary out again.
+			var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
+			var gtl = inw(ptl.x, ptl.y),
+				gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
+				gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
+			place = {
+				x: 0, y: 0, width: 1, height: 1,
+				transform: 'matrix(' + [
+					gtr.x - gtl.x, gtr.y - gtl.y,
+					gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
+				].join(' ') + ')'
+			};
+		} else {
+			// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
+			// keeps its own proportions and needs no matrix at all. This said "NOT square in
+			// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
+			// the frame as it was before Task 145.
+			place = { x: t.px, y: t.py, width: t.pw, height: t.ph };
+		}
+		return place;
 	}
 	function paintBasemapTiles() {
 		if (!basemapLayer) { return; }
@@ -18244,72 +18370,8 @@ var EngCalcs = EngCalcs || {};
 			// would be two places to remember crossorigin, the class and the aspect rule, and
 			// dev/lpn-spike/basemap-harness.js counts the creation sites for exactly that reason.
 			// So the branch computes a box and hands it over.
-			var place;
-			if (proj) {
-				// **ONE AFFINE PER TILE, WHICH IS THE WHOLE ACCURACY DECISION.** A Mercator tile
-				// is a curved quadrilateral in a projected plane and an SVG image can only be
-				// given an affine, so the curvature is absorbed tile by tile: pinned once for the
-				// whole view the error reaches 2,338 m across this suite's 300 km scope, and
-				// pinned per tile it is far under the width of the line a pipe is drawn with.
-				var cn = EngCalcs.lpnCrsTileCorners(projectCrsCode(), t.lonW, t.latN, t.lonE, t.latS);
-				if (!cn) { return; }   // degenerate at the pole; one tile missing beats a smear
-				// Into the drawing frame at the page's own seam, which subtracts the local origin
-				// and NEGATES y -- without that a northing draws the world upside down.
-				var ax = inwardX(cn.tl.x), ay = inwardY(cn.tl.y);
-				place = {
-					x: 0, y: 0, width: 1, height: 1,
-					transform: 'matrix(' + [
-						inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
-						inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
-					].join(' ') + ')'
-				};
-			} else if (xg) {
-				// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
-				// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
-				// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
-				// while this frame is linear in latitude, which over one tile is far under the
-				// width of the line a pipe is drawn with.
-				// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
-				// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
-				// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
-				// nearer, independently -- so the tile holding the ANTIPODE of the transform's
-				// origin got its east edge wrapped a whole world away from its west edge. At the
-				// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
-				// the world-zoom view always contains it: measured, the offending tile's placement
-				// width came out **-1,750 where it should be +250**, and a negative width draws
-				// the raster BACKWARDS, stretched across the whole screen over every other tile.
-				// Tom saw it as reversed, upside-down place names.
-				//
-				// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
-				// the two latitude cuts are -- and there is no branch to choose in a difference,
-				// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
-				// corner-plus-edge is exactly the corner the old expression meant, everywhere the
-				// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
-				var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
-				if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return; }
-				var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
-					dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
-				// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
-				// census asks of every site here: three corners go through the same door rather
-				// than each spelling the boundary out again.
-				var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
-				var gtl = inw(ptl.x, ptl.y),
-					gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
-					gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
-				place = {
-					x: 0, y: 0, width: 1, height: 1,
-					transform: 'matrix(' + [
-						gtr.x - gtl.x, gtr.y - gtl.y,
-						gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
-					].join(' ') + ')'
-				};
-			} else {
-				// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
-				// keeps its own proportions and needs no matrix at all. This said "NOT square in
-				// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
-				// the frame as it was before Task 145.
-				place = { x: t.px, y: t.py, width: t.pw, height: t.ph };
-			}
+			var place = tilePlace(t, proj, xg);
+			if (!place) { return; }
 			// crossorigin=anonymous: no cookies and no credentials travel to the tile server, which
 			// is the cheapest privacy win available here. OSM's tile servers send
 			// Access-Control-Allow-Origin: *, so it costs nothing. The Referer is deliberately left
@@ -18403,6 +18465,173 @@ var EngCalcs = EngCalcs || {};
 			basemapDropCarried();
 		}
 		tileDebugRender();
+	}
+
+	// ---- BACKGROUND LAYERS FROM A GIS SERVER (ROADMAP Task 720) ---------------------------------
+	// Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server
+	// offering."* The visitor names a server (XYZ tile URL, OGC WMS, ArcGIS MapServer); its pictures
+	// are drawn under the network, above the street map, in the same tile grid and through the same
+	// tilePlace() as the basemap. js/lpn-gis.js builds the URLs; this paints them.
+	//
+	// **STORED IN THE PROJECT, as `project.gisLayers`, only when there is one**, so a project without
+	// layers serializes byte for byte as it did. **NEVER CACHED**: no service worker entry (the worker
+	// ignores other origins), no precache, no Cache API; the <image> elements die with the page.
+	//
+	// **NO crossorigin ATTRIBUTE, ON PURPOSE.** The basemap asks for CORS because OSM and Mapbox answer
+	// it. A utility's server often does not, and with crossorigin set such a server's tiles would not
+	// draw at all. Without it they draw; the one thing they cannot do is be read back into a canvas,
+	// which only the screenshot does, and snipInlineImage() already drops a tile it cannot read and the
+	// screenshot says so (`droppedGis`).
+	var gisLayerEl = null, gisGroups = [], gisEls = {}, gisInfo = {}, gisStat = {}, gisPaintedSig = '',
+		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null;
+	// A project that holds background layers draws them when it opens, as QGIS and ArcGIS Pro do (Tom, 2026-10-30).
+	function gisPermitted(l) { return l.on !== false; }
+	function gisPlainKey(l) { return l.url + '|' + (l.layers || ''); }
+	function gisLayers() { return (project && project.gisLayers) || []; }
+	function gisUsable() { return !!(EngCalcs.lpnGis && projectLocatable()); }
+	function gisSignature() {
+		return JSON.stringify(gisLayers().map(function (l) { return [l.kind, l.url, l.layers || '', gisPermitted(l) ? 1 : 0, l.opacity]; }));
+	}
+	function gisLayerKey(i, l) { return gisPlainKey(l); }
+	function gisEmpty() {
+		var k;
+		for (k in gisEls) { if (gisEls.hasOwnProperty(k) && gisEls[k].remove) { gisEls[k].remove(); } }
+		gisEls = {}; gisWant = {};
+		gisGroups.forEach(function (g) { if (g && g.remove) { g.remove(); } });
+		gisGroups = [];
+		gisCredits = [];
+	}
+	// Writes the list through the Settings seam (one undo step), repaints, and saves. An empty list
+	// removes the key so the project is as it was before any layer was added.
+	function gisSetLayers(list) {
+		throughSettingSeam(function () {
+			if (list && list.length) { project.gisLayers = list; } else { delete project.gisLayers; }
+			refreshBasemap();
+			saveToStorage();
+		});
+	}
+	function gisHost(l) { return EngCalcs.lpnGis.hostOf(l.url) || l.url; }
+	// Said once per layer and session, naming the server, when nothing it was asked for came back.
+	function gisReportFailure(i, l) {
+		var st = gisStat[gisLayerKey(i, l)], pc = EngCalcs.pageConfig || {};
+		if (!st || st.ok > 0 || st.told) { return; }
+		st.told = true;
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-gis-bad'), function (e) {
+			if (e.getAttribute('data-gis-key') === gisLayerKey(i, l)) { e.textContent = ' (' + (pc.lpn_gis_unreachable || 'not reachable') + ')'; }
+		});
+		setNotice((pc.lpn_gis_failed || '{host} did not return a map image. Its layer is not drawn.')
+			.replace('{host}', gisHost(l)));
+	}
+	function gisFetchInfo(l, again) {
+		var root = l.url;
+		if (gisInfo[root]) { return; }
+		gisInfo[root] = { pending: true };
+		var done = function (json) {
+			gisInfo[root] = EngCalcs.lpnGis.arcgisInfo(json);
+			gisInfo[root].known = !!json;
+			again();
+		};
+		try {
+			// Credentials omitted: the server learns the visitor's address and the area, and nothing else.
+			fetch(root + '?f=json', { credentials: 'omit' }).then(function (r) { return r.ok ? r.json() : null; })
+				.then(done, function () { done(null); });
+		} catch (err) { done(null); }
+	}
+	function paintGisLayers() {
+		var list = gisLayers(), sig = gisSignature(), r, tl, br, bnds = null, xg, proj, scale, wpx, degPerPx,
+			i, want = {}, credits = [], anyPending = false;
+		if (!gisLayerEl) { return; }
+		if (!list.length || !gisUsable() || !svg || !mapSized) {
+			if (!list.length || !gisUsable()) { gisEmpty(); }
+			gisPaintedSig = sig;
+			return;
+		}
+		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			return;   // refreshBasemap() asks again when the transform has loaded
+		}
+		// A layer added, removed or edited rebuilds the pile; opacity and on/off change only below.
+		var structure = JSON.stringify(list.map(function (l) { return [l.kind, l.url, l.layers || '']; }));
+		if (structure !== gisStructSig) { gisEmpty(); gisStructSig = structure; }
+		gisPaintedSig = sig;
+		r = svg.getBoundingClientRect();
+		tl = screenToWorld(r.left, r.top);
+		br = screenToWorld(r.right, r.bottom);
+		proj = projectedBasemapOk();
+		// One crossing per axis for both branches: the corners in the frame the file is written in.
+		var ox0 = outwardX(tl.x), oy0 = outwardY(tl.y), ox1 = outwardX(br.x), oy1 = outwardY(br.y);
+		if (proj) {
+			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(), ox0, oy0, ox1, oy1);
+			if (!bnds) { return; }
+			wpx = Math.max(1, r.right - r.left);
+			degPerPx = (bnds.east - bnds.west) / wpx;
+			scale = degPerPx > 0 ? 1 / degPerPx : state.s;
+		} else {
+			bnds = { west: ox0, south: oy1, east: ox1, north: oy0 };
+			scale = state.s;
+		}
+		// The tile boxes depend on the ground (frame, origin, coordinate system), as the basemap's do.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '');
+		if (gisPlaceSig !== null && gisPlaceSig !== placeSig) { gisEmpty(); gisStructSig = structure; }
+		gisPlaceSig = placeSig;
+		list.forEach(function (l, idx) {
+			var g = gisGroups[idx], key = gisLayerKey(idx, l), info = null, src, tiles, st;
+			if (!g) { g = gisGroups[idx] = el('g', { 'class': 'lpn-gis-layer' }, gisLayerEl); }
+			g.setAttribute('opacity', String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1));
+			g.style.display = gisPermitted(l) ? '' : 'none';
+			if (!gisPermitted(l)) { return; }
+			if (l.kind === 'arcgis') {
+				gisFetchInfo(l, function () { refreshBasemap(); });
+				info = gisInfo[l.url];
+				if (info && info.pending) { anyPending = true; return; }
+			}
+			if (!gisStat[key]) { gisStat[key] = { ok: 0, fail: 0, told: false }; }
+			credits.push(EngCalcs.lpnGis.creditOf(l, info));
+			src = EngCalcs.lpnGis.source(l, idx, info);
+			tiles = basemapTileList(bnds.west, bnds.south, bnds.east, bnds.north, scale, src).tiles;
+			st = gisStat[key];
+			tiles.forEach(function (t) {
+				want[t.key] = true;
+				if (gisEls[t.key]) { return; }
+				var place = tilePlace(t, proj, null), img;
+				if (!place) { return; }
+				img = el('image', Object.assign({
+					href: t.url, preserveAspectRatio: 'none', 'class': 'lpn-gis-tile'
+				}, place), g);
+				img._lpnLayerIdx = idx;
+				img.addEventListener('load', function () {
+					st.ok++;
+					img._lpnSettled = true;
+					gisSweep();
+				});
+				img.addEventListener('error', function () {
+					st.fail++;
+					img._lpnSettled = true;
+					// A failed tile is forgotten, so the next paint asks again; the blank is not kept.
+					if (gisEls[t.key] === img) { delete gisEls[t.key]; }
+					if (img.remove) { img.remove(); }
+					setTimeout(function () { gisReportFailure(idx, l); }, 1500);
+					gisSweep();
+				});
+				gisEls[t.key] = img;
+			});
+		});
+		gisWant = want;
+		gisCredits = credits;
+		gisSweep();
+		gisPaintedSig = sig;
+	}
+	// Tiles the view no longer wants leave once everything asked for has settled, so a zoom does not
+	// blank the layer while the new pictures come down the wire. One generation is ever kept.
+	function gisSweep() {
+		var k, pending = false;
+		for (k in gisEls) {
+			if (gisEls.hasOwnProperty(k) && gisWant[k] && !gisEls[k]._lpnSettled) { pending = true; break; }
+		}
+		if (pending) { return; }
+		for (k in gisEls) {
+			if (gisEls.hasOwnProperty(k) && !gisWant[k]) { if (gisEls[k].remove) { gisEls[k].remove(); } delete gisEls[k]; }
+		}
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -22367,7 +22596,7 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) {}
 		if (!on) { hoverCardHide(); }
 	}
-	var hoverCard = { timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
+	var hoverCard = { muteKey: null, timer: null, anchor: null, tip: null, shown: false, x: 0, y: 0, nx: 0, ny: 0, sel: null };
 	// Esc, Ctrl+Z and Ctrl+Y can change what the card describes; any label-text change dismisses it
 	// too (refreshLabelText(), refreshOneLabelInPlace()), so it never shows stale text.
 	if (typeof document !== 'undefined' && document.addEventListener) {
@@ -22393,9 +22622,26 @@ var EngCalcs = EngCalcs || {};
 		hoverCard.x = x; hoverCard.y = y;
 		hoverCardRetarget(hoverCard.sel);
 	}
+	// **THE RING'S TIP OUTRANKS THE CARD ON THE SAME ASSET** (Tom, 2026-10-25: *"the tip for the dashed
+	// gray junction was hard to read because the label-on-hover opened over it"*). Both open at the
+	// pointer after the same rest, so the card covered the sentence that says why the ring is there.
+	// The ring's tip is the narrower and rarer message, so while it is showing for the asset under the
+	// pointer the card stays shut, until the pointer moves to another asset or off the map.
+	// dev/lpn-spike/value-source-tip-browser-harness.js.
+	function hoverCardKey(sel) { return sel ? sel.kind + '\u0000' + sel.id : null; }
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('show.bs.tooltip', function (e) {
+			var t = e.target;
+			if (!hoverCard.sel || !t || !t.closest || !t.closest('#lpn_canvas')) { return; }
+			hoverCard.muteKey = hoverCardKey(hoverCard.sel);
+			hoverCardHide();
+		}, true);
+	}
 	function hoverCardRetarget(sel) {
 		hoverCardHide();
 		hoverCard.sel = (sel && sel.kind !== 'label' && !sel.viaLabel) ? sel : null;
+		if (hoverCard.muteKey && hoverCard.muteKey !== hoverCardKey(hoverCard.sel)) { hoverCard.muteKey = null; }
+		if (hoverCard.muteKey) { return; }
 		if (!hoverCard.sel || !hoverCardOn()) { return; }
 		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
 		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
@@ -22771,6 +23017,18 @@ var EngCalcs = EngCalcs || {};
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
 			'Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.');
 		box.appendChild(line);
+		// **AN EXIT IN THE BUBBLE** (Tom, 2026-10-24, on a phone: the mode could be left only by Esc,
+		// by the Select tool or by an insert tool). It returns to the normal Select mode, with
+		// whatever is selected left as it is. It is not a <div>, so it takes the press the way the
+		// checkbox below does; while a ring is open the whole bubble is inert, so the button cannot
+		// eat the closing click.
+		var exitBtn = document.createElement('button');
+		exitBtn.type = 'button';
+		exitBtn.className = 'lpn-area-hint-exit';
+		exitBtn.id = 'lpn_area_hint_exit';
+		exitBtn.textContent = pc.lpn_fitting_exit || 'Exit';
+		exitBtn.addEventListener('click', function () { setMode('select'); });
+		box.appendChild(exitBtn);
 		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
 		// Checked, always: it is the state you are looking at, and the only act it offers is
 		// turning the bubble off. The way back is Settings, Map and page, Page -- named in the row
@@ -23121,6 +23379,12 @@ var EngCalcs = EngCalcs || {};
 		// something. A ring that caught nothing opens nothing, because there would be nothing in
 		// the box to show.
 		if (selectionCount()) { openMultiProperties(); }
+		// **A RING THAT CAUGHT SOMETHING ENDS THE TOOL** (Tom, 2026-10-24: "select area mode should
+		// exit automatically after a successful area selection of at least one asset"). The caught
+		// things are what the reader wants to work on, and every other tool now needs a deliberate
+		// exit. An empty result stays in the tool, to try again; a Shift ring stays too, because
+		// Shift is the reader saying the selection is still being built.
+		if (found.length && !areaKeep) { setMode('select'); }
 		return found.length;
 	}
 
@@ -24443,6 +24707,18 @@ var EngCalcs = EngCalcs || {};
 	function findSelect(parent, labelText, options, value, onChange, hideLabel) {
 		var wrap = document.createElement('div'), lab = document.createElement('label'),
 			sel = document.createElement('select');
+		if (!hideLabel) {
+			// A row of the box's one grid: the name in the name track, the pull-down in the value track.
+			options.forEach(function (o) {
+				var opt = document.createElement('option');
+				opt.value = o[0]; opt.textContent = o[1];
+				if (o[0] === value) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () { onChange(sel.value); });
+			lpnGridRow(parent, { label: labelText, control: sel, kind: 'select' });
+			return sel;
+		}
 		wrap.style.margin = '4px 0';
 		lab.textContent = labelText;
 		if (hideLabel) {
@@ -24947,7 +25223,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
-		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input, pair;
+		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input;
 		if (!box) { return; }
 		box.innerHTML = '';
 		if (!findControlsShown()) {
@@ -24958,6 +25234,7 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(note);
 			back = document.createElement('button');
 			back.type = 'button';
+			back.className = 'lpn-gcol2';
 			back.textContent = pc.lpn_find_q_restore || 'Use the controls instead';
 			back.addEventListener('click', function () {
 				// findState still holds the last query the controls DID express, so this is a
@@ -24982,10 +25259,7 @@ var EngCalcs = EngCalcs || {};
 		// wide at every size, so the pair fits everywhere and one layout is one thing to keep right.
 		// A long condition ellipsizes rather than wrapping the box, and the query line under it
 		// spells the whole thing out in words either way.
-		pair = document.createElement('div');
-		pair.className = 'lpn-find-pair';
-		box.appendChild(pair);
-		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+		findSelect(box, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
 			var wasChoice = findPropIsChoice(findState.prop);
 			findState.prop = v;
 			findNormalize();
@@ -25010,7 +25284,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			rebuildFindForm(); renderFindResults(null);
 		});
-		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
+		findSelect(box, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
 		// **A CHOICE PROPERTY GETS A PICKLIST, NOT A BOX TO TYPE INTO** (pre-review fix, Task 708).
@@ -25034,23 +25308,47 @@ var EngCalcs = EngCalcs || {};
 			});
 			return;
 		}
-		valWrap = document.createElement('div');
-		valWrap.style.margin = '4px 0';
-		valLab = document.createElement('label');
-		valLab.textContent = pc.lpn_find_value || 'Value';
-		valLab.style.display = 'block';
 		input = document.createElement('input');
 		input.type = 'text';
 		input.value = findState.value;
-		input.style.width = '100%';
 		input.addEventListener('input', function () { findState.value = input.value; updateFindQuery(); });
 		// Enter is what a person presses in a search box, and this panel has no other use for it.
 		input.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
 		});
-		valLab.appendChild(input);
-		valWrap.appendChild(valLab);
-		box.appendChild(valWrap);
+		lpnGridRow(box, { label: pc.lpn_find_value || 'Value', control: input, kind: 'text' });
+	}
+	// ---- A UNIT STANDS IN ITS LABEL (Tom, 2026-10-26: "Diameter, D (mm)"). ONE template key says how:
+	// `lpn_prop_label_unit` ('{label} ({unit})') and, with a symbol, `lpn_prop_label_symbol_unit`
+	// ('{label}, {symbol} ({unit})'), so a language can change the punctuation (a Chinese or Arabic
+	// comma, full-width brackets). The unit and the symbol are wrapped in <bdi>, so a right-to-left
+	// language does not flip "(mm)". The string this returns holds those `<bdi>` marks; only
+	// lpnRichInto() reads it, and it builds elements, never markup.
+	// "Roughness, C": the same template family, plain text (no <bdi>), for the places a label is only words.
+	function lpnLabelSymbol(label, symbol) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_prop_label_symbol || '{label}, {symbol}').replace(/\{label\}/g, function () { return label; }).replace(/\{symbol\}/g, function () { return symbol; });
+	}
+	function lpnLabelWithUnit(label, unit, symbol) {
+		var pc = EngCalcs.pageConfig || {}, tpl;
+		if (!unit) { return symbol ? lpnLabelSymbol(label, symbol) : label; }
+		tpl = symbol ? (pc.lpn_prop_label_symbol_unit || '{label}, {symbol} ({unit})') : (pc.lpn_prop_label_unit || '{label} ({unit})');
+		return tpl.replace(/\{label\}/g, function () { return label; })
+			.replace(/\{symbol\}/g, function () { return '<bdi>' + symbol + '</bdi>'; })
+			.replace(/\{unit\}/g, function () { return '<bdi>' + unit + '</bdi>'; });
+	}
+	function lpnRichInto(el, text) {
+		var parts, i, b;
+		if (String(text).indexOf('<bdi>') < 0) { el.appendChild(document.createTextNode(text)); return; }
+		parts = String(text).split(/(<bdi>[\s\S]*?<\/bdi>)/);
+		for (i = 0; i < parts.length; i++) {
+			if (!parts[i]) { continue; }
+			if (parts[i].indexOf('<bdi>') === 0) {
+				b = document.createElement('bdi');
+				b.textContent = parts[i].slice(5, -6).replace(/ /g, '\u00a0');   // a unit never breaks inside its brackets
+				el.appendChild(b);
+			} else { el.appendChild(document.createTextNode(parts[i])); }
+		}
 	}
 	/**
 	 * A label carrying a tip, as `.ec-help` wrapping the text and a `.ec-tip` "?" glyph.
@@ -25060,29 +25358,399 @@ var EngCalcs = EngCalcs || {};
 	 * whole label, not one character), and only the glyph gets `.ec-tip`. `EngCalcs.initTips()`
 	 * wires `.ec-help[title]` and nothing else, so a title put anywhere else is dead on touch.
 	 */
-	function findHelpLabel(text, tip) {
-		var help = document.createElement('span'), glyph = document.createElement('span');
+	function findHelpLabel(text, tip, clip) {
+		var help = document.createElement('span'), glyph = document.createElement('span'), words;
 		help.className = 'ec-help';
 		help.title = tip;
-		help.appendChild(document.createTextNode(text + ' '));
+		if (clip) {
+			// The standard box row clips the words and keeps the `?` (lpnGridRow).
+			words = document.createElement('span');
+			words.className = 'lpn-gtext';
+			lpnRichInto(words, text);
+			help.appendChild(words);
+		} else { lpnRichInto(help, text + ' '); }
 		glyph.className = 'ec-tip';
 		glyph.textContent = '?';
 		help.appendChild(glyph);
 		return help;
+	}
+	// ---- THE STANDARD BOX ROW (Task 828, Ida's design: dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
+	//
+	// One function builds every label=control row of a box that has been converted to the standard:
+	// `Label | Value`, two tracks shared by all rows of a grid, under a header row that names them and
+	// carries the divider (Tom, 2026-10-26: "Make it look like a spreadsheet"). A unit stands in its
+	// label ("Diameter (mm)", lpnLabelWithUnit), so there is no third column. The Label track is
+	// FITTED (gridFitNow: the 80th, with a floor percentile of the labels' natural widths) and a user drag of the
+	// divider overrides it, remembered in `lpn_gcols` (window furniture, browser only, never in
+	// serializeProject(); Tom, 2026-10-24: "lpn_gcols is fine; go ahead.").
+	//
+	// THE HOST (`parent`) is the container the phone rule queries; the GRID is a child of it. A row is
+	// `display: contents` on a phone and a subgrid with its rules elsewhere, with exactly two children
+	// (label, control), the control being the caller's own element so a caller's reference to it stays
+	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
+	// the next row starts a new one, and both share the host's one width.
+	var LPN_GCOLS_KEY = 'lpn_gcols';
+	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GSTEP = 0.5;   // rem
+	var gcolPrefs = null;
+	function gcolRead() {
+		var raw = null, v;
+		if (gcolPrefs) { return gcolPrefs; }
+		gcolPrefs = {};
+		try { raw = localStorage.getItem(LPN_GCOLS_KEY); } catch (e) { return gcolPrefs; }
+		if (!raw) { return gcolPrefs; }
+		try { v = JSON.parse(raw); } catch (e2) { return gcolPrefs; }
+		if (v && typeof v === 'object') { gcolPrefs = v; }
+		return gcolPrefs;
+	}
+	function gcolSave() {
+		var k, any = false;
+		if (furnitureFrozen) { return; }
+		for (k in gcolPrefs) { if (Object.prototype.hasOwnProperty.call(gcolPrefs, k)) { any = true; } }
+		try {
+			if (any) { localStorage.setItem(LPN_GCOLS_KEY, JSON.stringify(gcolPrefs)); }
+			else { localStorage.removeItem(LPN_GCOLS_KEY); }
+		} catch (e) {}
+	}
+	function gcolId(host) { return host ? (host.getAttribute && host.getAttribute('data-gcols-id')) || host.id || '' : ''; }
+	function gcolApply(host) {
+		var id = gcolId(host), w = id ? gcolRead()[id] : 0;
+		if (host && host.style && host.style.setProperty) {
+			if (typeof w === 'number' && isFinite(w) && w >= LPN_GNAME_MIN) { host.style.setProperty('--lpn-g-name', w + 'rem'); }
+			else { host.style.removeProperty('--lpn-g-name'); }
+		}
+	}
+	// ---- THE SPREADSHEET HEADER (Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET and
+	// WaterGEMS"): a header row with two cells, Label and Value, and a divider between them the reader
+	// drags. The divider writes --lpn-g-name on the host and remembers it per box in `lpn_gcols`.
+	// With no remembered width the label column is FITTED: wide enough for most labels (the 80th
+	// percentile of their natural widths), so one long label wraps instead of widening the whole
+	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
+	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
+	// A host NEVER stacks its names above its values (Tom, 2026-10-29: "TOM REJECTS THE STACKED LAYOUT"): the name column shrinks and wraps, the value column keeps a floor.
+	function gridNarrowRem() { return 0; }
+	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
+	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
+	// The label column's natural widths, one a label: a range over each name's words, with its track
+	// left at max-content so nothing has wrapped.
+	function gridNaturalNames(host) {
+		var out = [];
+		if (typeof document.createRange !== 'function') { return out; }
+		Array.prototype.forEach.call(host.querySelectorAll('.lpn-gname'), function (n) {
+			var r = document.createRange(), w;
+			if (!n.getBoundingClientRect().width) { return; }
+			r.selectNodeContents(n);
+			w = r.getBoundingClientRect().width;
+			if (w > 0) { out.push(w); }
+		});
+		return out;
+	}
+	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
+	// so a later change of the box's width can scale both columns by it.
+	function gridNoteFrac(host) {
+		var v = parseFloat(host.style.getPropertyValue('--lpn-g-name')), w = host.getBoundingClientRect().width;
+		if (isFinite(v) && w > 0) { host.__lpnFrac = v * gridRem() / w; host.__lpnW = w; }
+	}
+	// A change of the box's width sizes BOTH columns in proportion (Tom, 2026-10-29: "resizing the box width to size both columns proportionally instead of only the second").
+	function gridResized(host, w, prevW, narrow) {
+		host.__lpnW = w;
+		if (prevW && Math.abs(w - prevW) > 0.5 && host.__lpnFrac && !narrow && !host.__lpnDrag && !host.classList.contains('lpn-gplain')) { host.__lpnScaled = true; gridScaleNow(host); return true; }
+		return false;
+	}
+	function gridScaleNow(host) {
+		var w = host.getBoundingClientRect().width, px = gridRem(), sheet = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet'), v;
+		if (!w || !host.__lpnFrac) { return; }
+		v = Math.max(LPN_GNAME_MIN, Math.min(w / px - (sheet ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN), host.__lpnFrac * w / px));
+		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
+	}
+	function gridFitNow(host) {
+		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
+		host.__lpnFitQ = false;
+		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
+		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
+		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain')) { return; }
+		if (host.__lpnScaled && host.__lpnFrac) { gridScaleNow(host); return; }   // the box has been resized: both columns keep their ratio
+		if (id && typeof prefs[id] === 'number') { gcolApply(host); gridNoteFrac(host); return; }
+		host.style.setProperty('--lpn-g-name', 'max-content');
+		hr = host.getBoundingClientRect();
+		names = gridNaturalNames(host);
+		if (!hr.width || !names.length) { host.style.removeProperty('--lpn-g-name'); return; }
+		px = gridRem();
+		names.sort(function (a, b) { return a - b; });
+		w = names[Math.min(names.length - 1, Math.ceil(LPN_GFIT_PCT * names.length) - 1)];
+		w = Math.max(w, Math.min(names[names.length - 1], LPN_GFIT_FLOOR));
+		cs = window.getComputedStyle(host);
+		pad = 14;   // the cell's own padding and the divider line
+		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
+		for (i = 0; i < vals.length; i++) { valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
+		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
+		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
+		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
+		gridNoteFrac(host);
+	}
+	function gridFitSoon(host) {
+		if (host.__lpnFitQ) { return; }
+		host.__lpnFitQ = true;
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridFitNow(host); });
+	}
+	function gridWireSplit(host, anchor, labelCell, stand) {
+		var split = document.createElement('div'), startX, startRem, dragging = false, rem = 16;
+		split.className = 'lpn-gsplit';
+		split.setAttribute('role', 'separator');
+		split.setAttribute('aria-orientation', 'vertical');
+		split.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_cp_label || 'Label');
+		split.tabIndex = 0;
+		function nameRem() {
+			var names = anchor.querySelectorAll('.lpn-gname'), i, w = 0;
+			rem = gridRem();
+			if (labelCell) { return labelCell.getBoundingClientRect().width / rem; }
+			for (i = 0; i < names.length && !w; i++) { w = names[i].getBoundingClientRect().width; }   // the Label track's width, read off its first visible cell
+			return w / rem;
+		}
+		// The widest value control at its natural width (the Label track at max-content, as the fit reads it).
+		function valNeed() {
+			var had = host.style.getPropertyValue('--lpn-g-name'), w = 0, vals = host.querySelectorAll('.lpn-grow > .lpn-gval'), i;
+			if (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet')) { return 0; }   // a sheet's input fills its cell: its "need" is only the Value column's floor
+			host.style.setProperty('--lpn-g-name', 'max-content');
+			for (i = 0; i < vals.length; i++) { w = Math.max(w, vals[i].getBoundingClientRect().width + 12); }
+			if (had) { host.style.setProperty('--lpn-g-name', had); } else { host.style.removeProperty('--lpn-g-name'); }
+			return w / rem;
+		}
+		function room(fresh) {
+			// The label column may grow until the value column keeps its widest input (and never under LPN_GVAL_MIN rem).
+			if (fresh || host.__lpnValNeed === undefined) { rem = gridRem(); host.__lpnValNeed = valNeed(); }
+			// A sheet's Value column shrinks to the same few characters the box itself can be sized to (Tom, 2026-10-29), not to a larger floor.
+			return Math.max(LPN_GNAME_MIN, host.getBoundingClientRect().width / rem - Math.max((host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet')) ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN, host.__lpnValNeed));
+		}
+		function setRem(v, keep) {
+			var id = gcolId(host);
+			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
+			host.style.setProperty('--lpn-g-name', v + 'rem');
+			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
+			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
+			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
+		}
+		function reset() {
+			var id = gcolId(host), prefs = gcolRead();
+			if (id) { delete prefs[id]; gcolSave(); }
+			host.style.removeProperty('--lpn-g-name');
+			host.__lpnScaled = false;
+			gridFitSoon(host);
+		}
+		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
+		// A finger: the 24 px hit area lies over the cell beside the line, so a press only becomes a drag after 4 px of travel, and a tap passes through to the cell under it (Ida, 2026-10-29).
+		var pending = false, pendId = null;
+		function beginDrag(e) {
+			dragging = true; host.__lpnDrag = true; startX = e.clientX; startRem = nameRem(); host.__lpnValNeed = undefined; room(true);
+			try { split.setPointerCapture(e.pointerId); } catch (err) {}
+		}
+		function passThrough(e) {
+			var el, had = split.style.pointerEvents;
+			split.style.pointerEvents = 'none';
+			el = document.elementFromPoint(e.clientX, e.clientY);
+			split.style.pointerEvents = had;
+			if (!el || el === split) { return; }
+			try { if (el.focus) { el.focus(); } if (el.tagName === 'SELECT' && el.showPicker) { el.showPicker(); } else if (el.click) { el.click(); } } catch (err) { /* a picker that needs a gesture of its own stays closed */ }
+		}
+		split.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			if (e.pointerType === 'touch') { host.__lpnTouchAt = Date.now(); pending = true; pendId = e.pointerId; startX = e.clientX; return; }
+			beginDrag(e);
+			e.preventDefault();
+		});
+		split.addEventListener('pointermove', function (e) {
+			if (pending && Math.abs(e.clientX - startX) > 4) { pending = false; beginDrag(e); }
+			if (dragging) { setRem(startRem + dirSign() * (e.clientX - startX) / rem, false); }
+		});
+		function endDrag(e) {
+			var v;
+			if (pending) { pending = false; if (e.type === 'pointerup') { passThrough(e); } return; }
+			if (!dragging) { return; }
+			dragging = false;
+			try { split.releasePointerCapture(e.pointerId); } catch (err) {}
+			v = parseFloat(host.style.getPropertyValue('--lpn-g-name'));
+			if (isFinite(v)) { setRem(v, true); }
+			host.__lpnDrag = false;
+		}
+		split.addEventListener('mousedown', function (e) { if (host.__lpnTouchAt && Date.now() - host.__lpnTouchAt < 1000) { e.preventDefault(); } });   // the compatibility mouse events after a finger must not focus the divider over the cell the tap went to
+		split.addEventListener('pointerup', endDrag);
+		split.addEventListener('pointercancel', endDrag);
+		split.addEventListener('dblclick', function (e) { e.preventDefault(); reset(); });
+		split.addEventListener('keydown', function (e) {
+			var k = e.key, s = dirSign();
+			if (k === 'ArrowLeft' || k === 'ArrowRight') {
+				e.preventDefault();
+				host.__lpnValNeed = undefined;
+				setRem(nameRem() + (k === 'ArrowRight' ? s : -s) * LPN_GSTEP, true);
+			} else if (k === 'Home' || k === 'Escape') { e.preventDefault(); reset(); }
+		});
+		(labelCell || stand || anchor).appendChild(split);
+		return split;
+	}
+	// The header row: Label | Value, and the divider. One stands above each run of two or more rows (a run of
+	// one row is not a table; a box of several runs has the same header over each, and one width for all);
+	// Properties has one, directly above its rows.
+	function gridHeaderMake(host) {
+		var pc = EngCalcs.pageConfig || {}, hdr = document.createElement('div'), l = document.createElement('div'), v = document.createElement('div');
+		hdr.className = 'lpn-ghdr';
+		hdr.setAttribute('role', 'row');
+		l.className = 'lpn-ghcell lpn-ghlabel';
+		l.textContent = pc.lpn_cp_label || 'Label';
+		v.className = 'lpn-ghcell lpn-ghvalue';
+		v.textContent = pc.lpn_find_value || 'Value';
+		hdr.appendChild(l);
+		hdr.appendChild(v);
+		try { gridWireSplit(host, hdr, l); } catch (e) { /* a page without pointer events keeps the header */ }
+		return hdr;
+	}
+	function gridHeadersSync(host) {
+		var sheet = host.classList.contains('lpn-sheet');
+		if (host.classList.contains('lpn-gplain')) { return; }
+		Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) {
+			var rows = 0, i, k, prev = g.previousElementSibling, has = !!prev && prev.classList.contains('lpn-ghdr');
+			for (i = 0; i < g.children.length; i++) {
+				k = g.children[i];
+				if (k.classList.contains('lpn-grow') && !k.classList.contains('lpn-gspan-row')) { rows++; }
+			}
+			if (sheet) {
+				// THE STANDARD SPREADSHEET STYLE has no column headings (WaterGEMS; Tom, 2026-10-27): a run of two or more
+				// rows carries only the divider, down the Label column's right edge.
+				if (rows >= 2 && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
+				else if (rows < 2 && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
+				return;
+			}
+			if (rows >= 2 && !has) { g.parentNode.insertBefore(gridHeaderMake(host), g); }
+			else if (rows < 2 && has) { prev.parentNode.removeChild(prev); }
+		});
+	}
+	// Properties: the same style, no heading; the divider runs down the Label column of its rows (the grid's own
+	// second track, after the override gutter). The ID row and the rows are one sheet.
+	function propsHeaderPlace(body, fields) {
+		var title = document.getElementById('lpn_popup_title');
+		fields.classList.add('lpn-sheet');
+		if (title && title.classList.contains('lpn-gtitle-id')) { title.classList.add('lpn-sheet'); }
+		// The divider stands in the box's body, not in the rows, so it runs from the ID row down (Tom, 2026-10-29: it excluded the ID row).
+		if (!fields.__lpnSplit) { try { fields.__lpnSplit = gridWireSplit(body, fields, null, body); } catch (e) { /* no pointer events: the rules stay */ } }
+		else if (fields.__lpnSplit.parentNode !== body) { body.appendChild(fields.__lpnSplit); }
+	}
+	// A box's body becomes THE grid of the box: the tracks live here and every run of rows in it is a
+	// subgrid of it (css/engcalcs.css, .lpn-gridhost).
+	function lpnGridHost(host, opts) {
+		if (host.__lpnGridHost) { return host; }
+		host.__lpnGridHost = true;
+		host.className = (host.className ? host.className + ' ' : '') + 'lpn-gridhost' + (opts && opts.plain ? ' lpn-gplain' : '');
+		// A box marked `lpn-sheetbox` in the page takes the standard spreadsheet style (css/engcalcs.css, .lpn-sheet).
+		if (!(opts && opts.plain) && host.closest && host.closest('.lpn-sheetbox')) { host.classList.add('lpn-sheet'); }
+		// Narrower than 18rem the name goes above its value (the host cannot query its own width); so does any
+		// box on a phone. Said at once, so the box is fitted to the screen at its stacked height.
+		// Stacked only when the host itself is narrower than 16 rem (a true collapse): a phone gets the same two columns as a PC (Tom, 2026-10-29).
+		if (typeof window !== 'undefined' && host.getBoundingClientRect && host.getBoundingClientRect().width && host.getBoundingClientRect().width < gridNarrowRem() * (parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16)) { host.classList.add('lpn-gnarrow'); }
+		if (typeof ResizeObserver !== 'undefined') {
+			new ResizeObserver(function () {
+				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
+				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
+				if (w) {
+					var now = w < gridNarrowRem() * px, prevW = host.__lpnW;
+					host.classList.toggle('lpn-gnarrow', now);
+					host.__lpnFitted = true;
+					if (gridResized(host, w, prevW, now)) { return; }
+					gridFitSoon(host);   // the first time it has a width, and whenever the box is resized: the cap on the Label column moves with it
+				}
+			}).observe(host);
+		}
+		return host;
+	}
+	// The grid the next row goes into: the host's last child when that is a grid, else a new one.
+	function gridFor(host) {
+		var last = host.lastChild, grid;
+		if (last && last.className && String(last.className).indexOf('lpn-grid') >= 0) { return last; }
+		if (!host.__lpnGridHost && (' ' + host.className + ' ').indexOf(' lpn-gsub ') >= 0) { host.__lpnGridHost = true; }   // a stretch of its parent's grid
+		var top = host, sub = (' ' + host.className + ' ').indexOf(' lpn-gsub ') >= 0;
+		if (sub) {
+			// A stretch of its parent's grid: the tracks, and so the split, are the parent host's.
+			while (top.parentNode && (' ' + top.className + ' ').indexOf(' lpn-gridhost ') < 0) { top = top.parentNode; }
+			if (!top.parentNode && (' ' + top.className + ' ').indexOf(' lpn-gridhost ') < 0) { top = host; }
+		}
+		lpnGridHost(top);
+		gcolApply(top);
+		grid = document.createElement('div');
+		grid.className = 'lpn-grid';
+		host.appendChild(grid);
+		gridFitSoon(top);
+		return grid;
+	}
+	// spec = {label, tip, control, unit, kind, digits, max, cls}. kind: 'num' | 'text' | 'select' |
+	// 'check' | 'button' | 'readout' | 'head' | 'span'; absent, it is read off the control.
+	function lpnGridRow(parent, spec) {
+		var grid = gridFor(parent), row = document.createElement('div'), name, labelText, c = spec.control, kind = spec.kind, d, tag, type;
+		if (!kind) {
+			tag = c && c.tagName ? String(c.tagName).toLowerCase() : '';
+			type = c && c.type ? String(c.type) : '';
+			kind = tag === 'select' ? 'select'
+				: tag === 'button' ? 'button'
+				: tag === 'input' ? (type === 'checkbox' || type === 'radio' ? 'check' : (type === 'number' ? 'num' : 'text'))
+				: 'readout';
+		}
+		row.className = 'lpn-grow' + (spec.cls ? ' ' + spec.cls : '');
+		row.setAttribute('role', 'group');
+		if (kind === 'head' || kind === 'span') {
+			row.className += ' lpn-gspan-row';
+			c = c || document.createElement('span');
+			c.className = (c.className ? c.className + ' ' : '') + (kind === 'head' ? 'lpn-ghead' : 'lpn-gspan');
+			if (spec.label && !spec.control) { c.textContent = spec.label; }
+			row.appendChild(c);
+			grid.appendChild(row);
+			return row;
+		}
+		// The unit stands in the name, by the one template (lpnLabelWithUnit); the row has two cells.
+		labelText = lpnLabelWithUnit(spec.label || '', spec.unit || '');
+		if (spec.tip) {
+			name = findHelpLabel(labelText, spec.tip, true);
+			name.className += ' lpn-gname';
+		} else {
+			name = document.createElement(spec.forId ? 'label' : 'span');
+			name.className = 'lpn-gname';
+			if (spec.forId) { name.htmlFor = spec.forId; }
+			lpnRichInto(name, labelText);
+		}
+		row.appendChild(name);
+		// Clicking the words of a tick row ticks the box, as a label does (Tom, 2026-10-29: "It's an expected convention"). The "?" keeps its own job, the tip.
+		if (kind === 'check' && c && c.tagName && name.tagName !== 'LABEL') {
+			name.addEventListener('click', function (e) {
+				var t = e.target;
+				if (c.disabled) { return; }
+				while (t && t !== name) { if (t.classList && t.classList.contains('ec-tip')) { return; } t = t.parentNode; }
+				c.click();
+			});
+		}
+		if (c) {
+			d = spec.digits || (spec.max !== undefined && spec.max !== null ? String(spec.max).length : 0);
+			c.className = (c.className ? c.className + ' ' : '') + 'lpn-gval';
+			lpnEmptyMark(c);
+			if (kind === 'num') {
+				c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-num';
+				if (c.style && c.style.setProperty) { c.style.setProperty('--d', String(d || 7)); }
+			} else if (kind === 'select') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-fill'; }
+			else if (kind === 'text') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-fill'; }
+			else if (kind === 'readout') { c.className = (c.className ? c.className + ' ' : '') + 'lpn-gw-read'; }
+			row.appendChild(c);
+		}
+		grid.appendChild(row);
+		return row;
 	}
 	function rebuildFindForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
 			qLab, hint, btn;
 		if (!box) { return; }
 		box.innerHTML = '';
+		lpnGridHost(box);   // the whole form is one grid; its runs of rows are stretches of it
 		findControlsBox = document.createElement('div');
+		findControlsBox.className = 'lpn-gsub';
 		box.appendChild(findControlsBox);
 		findQueryAst = null; findQueryError = null;
 		renderFindControls();
 		// Right above the button, which is where Tom asked for it: the last thing read before the
 		// search is pressed -- and now the thing that can be edited instead.
-		qLab = document.createElement('label');
-		qLab.style.display = 'block';
+		qLab = null;
 		// **THE TIP GOES ON A "?" GLYPH, NOT ON THE INPUT** (Tom, 2026-09-02: *"Find one-line query
 		// tip: Not showing. And there is no ? glyph."*). It was set as `title` on the text field,
 		// which is invisible to EngCalcs.initTips() -- that wires `.ec-help[title]` and nothing else
@@ -25092,8 +25760,6 @@ var EngCalcs = EngCalcs || {};
 		// Built as the same three-part shape ecTipLabel() emits in PHP: `.ec-help` carrying the
 		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
 		// label rather than one character. CLAUDE.md's rule for a label with no link.
-		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
-			pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
@@ -25101,15 +25767,16 @@ var EngCalcs = EngCalcs || {};
 		findQueryInput.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
 		});
-		qLab.appendChild(findQueryInput);
-		box.appendChild(qLab);
+		lpnGridRow(box, { label: pc.lpn_find_query_label || 'Query',
+			tip: pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.',
+			control: findQueryInput, kind: 'text' });
 		// Tom's own line, and "expandable" is his word: it says the grammar will grow.
 		hint = document.createElement('div');
-		hint.className = 'lpn-find-hint';
+		hint.className = 'lpn-find-hint lpn-gcol2';
 		hint.textContent = pc.lpn_find_query_hint || 'Combine conditions with AND, OR and ()';
 		box.appendChild(hint);
 		findQueryMsgEl = document.createElement('div');
-		findQueryMsgEl.className = 'lpn-find-msg';
+		findQueryMsgEl.className = 'lpn-find-msg lpn-gcol2';
 		box.appendChild(findQueryMsgEl);
 		findQueryInput.value = findQueryString();
 		renderFindMessage();
@@ -25143,6 +25810,7 @@ var EngCalcs = EngCalcs || {};
 		// select appear, choosing the DEM takes the value box away -- and a rebuild that cleared
 		// `box` would take the three Find pull-downs with it. `find-harness.js` caught it.
 		var rbox = document.createElement('div');
+		rbox.className = 'lpn-gsub';
 		box.appendChild(rbox);
 		buildReplaceForm(rbox);
 	}
@@ -25304,7 +25972,7 @@ var EngCalcs = EngCalcs || {};
 	// is exactly one Find button and exactly one place that wires its click.
 	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
-		row.className = 'lpn-find-filter';
+		row.className = 'lpn-find-filter lpn-gcol2';
 		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
@@ -25544,7 +26212,7 @@ var EngCalcs = EngCalcs || {};
 	// `source` is 'value' or 'dem' (Task 542). It only ever means anything with Elevation chosen,
 	// and replaceNormalize() puts it back to 'value' the moment the property changes -- a hidden
 	// state that survives a property change is how a Replace writes something nobody asked for.
-	var replaceState = { prop: '', value: '', source: 'value' };
+	var replaceState = { prop: '', value: '', source: 'value', selOnly: false };
 	// The element buildReplaceForm() drew into, so a control that changes WHICH CONTROLS THERE ARE
 	// can redraw them. Only the property and the source do that (Task 542).
 	var replaceBox = null;
@@ -25851,14 +26519,23 @@ var EngCalcs = EngCalcs || {};
 	 * count the user had read and approved. The doc block above already claimed a compound query
 	 * was fine here; this makes it true.
 	 */
-	function replaceFoundSet() {
+	function replaceFoundAll() {
 		var run = findRunQuery();
 		return run.ok ? run.list : [];
+	}
+	function replaceFoundSet() {
+		var run = findRunQuery();
+		if (!run.ok) { return []; }
+		// **ONLY THE SELECTED ASSETS** (Tom, 2026-10-24: *"I would like a way to set all selected
+		// elevations from DEM."*), through the box that already owns the DEM fill, not a third door:
+		// the found set is cut to what is selected on the map when the box says so.
+		if (replaceState.selOnly) { return run.list.filter(function (c) { return isSelected(c.group, c.el.id); }); }
+		return run.list;
 	}
 	function replaceSpecs() {
 		var cands;
 		if (findQueryError) { return []; }
-		if (findQueryAst) { cands = replaceFoundSet(); }
+		if (findQueryAst) { cands = replaceFoundAll(); }   // the list of properties is the whole found set's, not the selection's
 		else {
 			var d = findScopeDef(findState.scope);
 			// **"Everything" IS STILL OUT**, for the reason findPropDefs() gives at `id`: no
@@ -26192,6 +26869,18 @@ var EngCalcs = EngCalcs || {};
 			renderReplace(null);
 			return;
 		}
+		// The found set cut to the selection. Visible whenever the box can write, so the state is never hidden.
+		var selLbl = document.createElement('label'), selBox = document.createElement('input');
+		selLbl.className = 'lpn-replace-selonly';
+		selBox.type = 'checkbox';
+		selBox.id = 'lpn_replace_selonly';
+		selBox.checked = !!replaceState.selOnly;
+		selBox.addEventListener('change', function () {
+			replaceState.selOnly = selBox.checked; replacePending = null; rebuildReplaceForm();
+		});
+		selLbl.appendChild(selBox);
+		selLbl.appendChild(document.createTextNode(' ' + (pc.lpn_replace_selected_only || 'Only the selected assets')));
+		box.appendChild(selLbl);
 		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
 				// Same rule as Find's own Property select: switching AWAY from a choice property
@@ -26223,6 +26912,7 @@ var EngCalcs = EngCalcs || {};
 		if (replaceIsDem()) {
 			btn = document.createElement('button');
 			btn.type = 'button';
+			btn.className = 'lpn-gcol2';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
@@ -26247,21 +26937,16 @@ var EngCalcs = EngCalcs || {};
 			});
 			btn = document.createElement('button');
 			btn.type = 'button';
+			btn.className = 'lpn-gcol2';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
 			box.appendChild(msg);
 			return;
 		}
-		valWrap = document.createElement('div');
-		valWrap.style.margin = '4px 0';
-		valLab = document.createElement('label');
-		valLab.textContent = pc.lpn_replace_value || 'New value';
-		valLab.style.display = 'block';
 		input = document.createElement('input');
 		input.type = 'text';
 		input.value = replaceState.value;
-		input.style.width = '100%';
 		// A typed value drops the pending count: a number on screen about a value the box no longer
 		// holds is the one way a preview can lie.
 		input.addEventListener('input', function () {
@@ -26270,11 +26955,10 @@ var EngCalcs = EngCalcs || {};
 		input.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runReplacePreview(); }
 		});
-		valLab.appendChild(input);
-		valWrap.appendChild(valLab);
-		box.appendChild(valWrap);
+		lpnGridRow(box, { label: pc.lpn_replace_value || 'New value', control: input, kind: 'text' });
 		btn = document.createElement('button');
 		btn.type = 'button';
+		btn.className = 'lpn-gcol2';
 		setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 		btn.addEventListener('click', runReplacePreview);
 		box.appendChild(btn);
@@ -26336,6 +27020,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.dock) { v.dock = findDockRec.dock; }
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
+		if (findDockRec.dockH) { v.dockH = findDockRec.dockH; }
 		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
@@ -26889,7 +27574,7 @@ var EngCalcs = EngCalcs || {};
 	// STRIP.**
 	//
 	// **FURNITURE, one browser key, `lpn_paneboxes`:** {tab id: {open, left, top, w, h, userSized,
-	// dock, autohide, dockW, dockOrd}}, the fields every other box record holds, one entry per tab
+	// dock, autohide, dockW, dockH, dockOrd}}, the fields every other box record holds, one entry per tab
 	// that was ever floated, docked or opened. Never in the project file. Not offered on a phone,
 	// where every box fills the window and there is no column to dock into.
 	var LPN_PANEBOXES_KEY = 'lpn_paneboxes';
@@ -26920,6 +27605,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.dock) { o.dock = r.dock; }
 			if (r.autohide) { o.autohide = true; }
 			if (r.dockW) { o.dockW = r.dockW; }
+			if (r.dockH) { o.dockH = r.dockH; }
 			if (r.dockOrd !== undefined) { o.dockOrd = r.dockOrd; }
 			if (Object.keys(o).length) { v[id] = o; n++; }
 		});
@@ -28423,7 +29109,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the same setProp() write, so a scenario switching a pipe off in the table is the same
 	// override it would be from the popup. `prop` earns it the completeEdit() redraw.
 	function paneColActive() {
-		return { key: 'active', label: 'lpn_field_active', bool: true, em: 2, prop: 'active',
+		return { key: 'active', label: 'lpn_field_active_short', bool: true, em: 2, prop: 'active',
 			get: function (el) { return effective(el, 'active') !== false; },
 			set: function (el, v) { setProp(el, 'active', !!v); } };
 	}
@@ -28595,7 +29281,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
 	// unticked CV leaves a closed pipe closed.
 	function paneColCheckValve() {
-		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
+		return { key: 'cv', label: 'lpn_field_cv_short', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'cv'; },
 			set: function (l, v) {
 				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
@@ -29210,13 +29896,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						hint: function (n) { var e = effective(n, 'elev'); return typeof e === 'number' ? String(+(+e).toFixed(6)) : ''; },
 						get: function (n) { var b = effective(n, 'bottomElev'); return b === null ? undefined : b; },
 						set: function (n, v) { setTankBottom(n, v); updateNode(n.id, true); } },
-					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level_short', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead, prop: 'minLevel',
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel_short', unit: paneUnitElevHead, prop: 'minLevel',
 						get: function (n) { return effective(n, 'minLevel'); },
 						set: function (n, v) { setProp(n, 'minLevel', v); updateNode(n.id, true); } },
-					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead, prop: 'maxLevel',
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel_short', unit: paneUnitElevHead, prop: 'maxLevel',
 						get: function (n) { return effective(n, 'maxLevel'); },
 						set: function (n, v) { setProp(n, 'maxLevel', v); updateNode(n.id, true); } },
 					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
@@ -35925,22 +36611,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeMenu();
 		function radioGroup(body, key, label, options) {
 			var wrap = document.createElement('div'), head = document.createElement('div');
-			wrap.className = 'lpn-export-group';
-			head.style.fontWeight = 'bold';
+			wrap.className = 'lpn-export-group lpn-gsub';
+			head.className = 'lpn-ghead';
 			head.textContent = label;
 			wrap.appendChild(head);
 			options.forEach(function (o, i) {
-				var lab = document.createElement('label'), inp = document.createElement('input');
-				lab.style.display = 'block';
+				var inp = document.createElement('input');
 				inp.type = 'radio';
 				inp.name = 'lpn_export_' + key;
 				inp.value = o[0];
 				inp.id = 'lpn_export_' + key + '_' + o[0];
 				inp.checked = i === 0 || !!o[2];
 				if (o[2] === 'off') { inp.disabled = true; inp.checked = false; }
-				lab.appendChild(inp);
-				lab.appendChild(document.createTextNode(' ' + o[1]));
-				wrap.appendChild(lab);
+				lpnGridRow(wrap, { label: o[1], control: inp, kind: 'check', forId: inp.id });
 			});
 			body.appendChild(wrap);
 			groups[key] = wrap;
@@ -35949,7 +36632,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var el = groups[key] && groups[key].querySelector('input:checked');
 			return el ? el.value : '';
 		}
-		openDialog(function (body) {
+		openDialog(function (dlgBody) {
+			var body = document.createElement('div');
+			dlgBody.appendChild(body);
+			lpnGridHost(body, { plain: true });   // the whole dialog is one grid; a choice is not a Label and a Value
+			body.classList.add('lpn-gdlg-wide');   // wide enough that the name stays beside its choice
 			radioGroup(body, 'tables', pc.lpn_tables_menu || 'Tables', cur
 				? [['current', pc.lpn_export_table_current || 'Current'], ['all', pc.lpn_export_table_all || 'All']]
 				: [['current', pc.lpn_export_table_current || 'Current', 'off'], ['all', pc.lpn_export_table_all || 'All', 'on']]);
@@ -35961,6 +36648,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (withScn) {
 				var note = document.createElement('div');
 				note.id = 'lpn_export_scn_note';
+				note.className = 'lpn-gcol2';
 				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
@@ -40321,7 +41009,219 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
 			.concat([{ separator: true }])
-			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
+			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }))
+			// **A JUNCTION BECOMES A VERTEX OF ITS PIPE** (Tom, 2026-10-24); see morphJunctionsToVertices().
+			.concat([{ separator: true }, {
+				icon: 'vertices', label: pc.lpn_morph_vertex || 'Vertex',
+				disabled: !nodes.some(function (n) { return n.type === 'junction'; }),
+				fn: function () { closeMenu(); morphJunctionsToVertices(); }
+			}]);
+	}
+	/**
+	 * **MORPH A JUNCTION INTO A VERTEX** (Tom, 2026-10-24: *"It would be nice to be able to Morph a
+	 * Junction into a vertex."*). A vertex lives on exactly one pipe, so the one case that works is a
+	 * junction that joins exactly two pipes: they become ONE pipe whose polyline bends at the
+	 * junction's place. Anything else is refused BY NAME and in plain words (vertexMorphProblem()),
+	 * and what is refused is not partly done.
+	 *
+	 * **THE FIRST OF THE TWO PIPES SURVIVES** (the earlier in the document), with its ID and values.
+	 * The other is deleted; a Customer or a Text attached to it by station is restated along the
+	 * merged line first, so it stays where it was drawn. A typed length of both is added; if either
+	 * is Auto the merged pipe is Auto, because a typed number is only ever the user's own.
+	 *
+	 * **BASE ONLY**: the bends and the ends of a pipe are the same in every scenario. One snapshot
+	 * for the whole command, as every other Morph takes, so one Undo reverses it.
+	 * dev/lpn-spike/morph-vertex-harness.js.
+	 */
+	function vertexMorphProblem(n, info) {
+		var pc = EngCalcs.pageConfig || {}, ids, a, b, demandSpec, demandRows;
+		// Stored as typed, in the unit shown (CLAUDE.md, Unit Sets), so the number is read as it is.
+		function disp(v, unitId) { return String(+(+v).toPrecision(6)) + ' ' + unitLabel(unitId).replace(/\s*H2O$/, ''); }
+		function say(key, dflt, extra) {
+			return String(pc[key] || dflt).replace('{id}', n.id).replace('{n}', String(extra));
+		}
+		if (n.type !== 'junction') { return say('lpn_morph_vertex_type', '{id} was not morphed into a vertex: only a junction can become one.', ''); }
+		ids = (incidentLinks[n.id] || []).slice();
+		if (ids.length !== 2) {
+			return say('lpn_morph_vertex_links', '{id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.', ids.length);
+		}
+		a = linkById(ids[0]); b = linkById(ids[1]);
+		if (!a || !b || a.type !== 'pipe' || b.type !== 'pipe') {
+			return say('lpn_morph_vertex_kind', '{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.', '');
+		}
+		if ((a.from === n.id ? a.to : a.from) === (b.from === n.id ? b.to : b.from)) {
+			return say('lpn_morph_vertex_loop', '{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.', '');
+		}
+		// **ELEVATION AND DEMANDS ARE ASKED ABOUT, NOT REFUSED** (Tom, 2026-10-25: "How about 'Clear elevation {}
+		// and demands {}?' But I agree that Morph to vertex was intended to be a very low-power tool."). Only
+		// when nothing else stops the morph; info.ask holds the question's parts. An emitter coefficient, a
+		// tag, a description or any other data is still a refusal.
+		demandSpec = typeOwnedNodeSpecs()[0];
+		demandRows = demandSpec.value(n);
+		if (n._emitter && +n._emitter !== 0) {
+			return say('lpn_morph_vertex_demand', '{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.', '');
+		}
+		if (info) {
+			info.elevShown = (typeof n.elev === 'number' && n.elev !== 0) ? disp(n.elev, 'lpn_u_elevhead') : '';
+			// Net1 and any imported file give every junction an initial quality; it is asked about too, never silently dropped.
+			info.quality = (typeof n._initQuality === 'number' && n._initQuality !== 0) ? String(+(+n._initQuality).toPrecision(6)) + (concentrationUnitText() ? ' ' + concentrationUnitText() : '') : '';
+			info.demands = demandRows ? demandRows.filter(function (v) { return v !== undefined && v !== null && v !== ''; })
+				.map(function (v) { return disp(v, 'lpn_u_flow'); }).join(', ') : '';
+		}
+		if ((doc.customers || []).some(function (c) { return c.node === n.id; })) {
+			return say('lpn_morph_vertex_customers', '{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.', '');
+		}
+		if ((labelsByAnchor[n.id] || []).length) {
+			return say('lpn_morph_vertex_text', '{id} was not morphed into a vertex: a Text is attached to it.', '');
+		}
+		// A simple merge only: the one pipe that survives keeps ONE diameter and ONE roughness, and a
+		// junction's own data (its elevation, tag, description, anything stated on it) would be dropped.
+		if (a._diameter !== b._diameter || a._roughness !== b._roughness) {
+			return say('lpn_morph_vertex_pipes', '{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.', '');
+		}
+		if (Object.keys(n).some(function (k) {
+			var v = n[k];
+			if (k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok' || k === 'lx' || k === 'ly') { return false; }
+			if (k === 'elev' || k === '_initQuality' || demandSpec.keys.indexOf(k) >= 0 || k === 'demandPattern') { return false; }   // asked about, above
+			if (v === undefined || v === null || v === '' || v === 0 || v === false) { return false; }
+			if (typeof v === 'object' && !Object.keys(v).length) { return false; }
+			return true;
+		})) {
+			return say('lpn_morph_vertex_own', '{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.', '');
+		}
+		return '';
+	}
+	function mergeAtJunction(n) {
+		var ids = incidentLinks[n.id].slice(), A = linkById(ids[0]), B = linkById(ids[1]), S, O, lenS, lenO, total,
+			rev = function (v) { return v.slice().reverse(); }, vtx, sameDir, newVerts, farO, bothTyped, typed, i;
+		// The earlier in the document survives.
+		for (i = 0; i < doc.links.length; i++) {
+			if (doc.links[i] === A || doc.links[i] === B) { S = doc.links[i]; break; }
+		}
+		O = S === A ? B : A;
+		lenS = Geom.polylineLength(linkPointList(S)); lenO = Geom.polylineLength(linkPointList(O));
+		total = lenS + lenO;
+		vtx = { x: n.x, y: n.y };
+		if (n.tok && (n.tok.x || n.tok.y)) { vtx.tok = { x: n.tok.x, y: n.tok.y }; }
+		bothTyped = !S.lenAuto && !O.lenAuto;
+		typed = (+S._length || 0) + (+O._length || 0);
+		farO = O.from === n.id ? O.to : O.from;
+		if (S.to === n.id) {
+			// S runs into the junction; the merged line is S, the junction, then O outward.
+			sameDir = O.from === n.id;
+			newVerts = S.verts.concat([vtx], sameDir ? O.verts : rev(O.verts));
+			remapStations(S, O, function (t) { return t * lenS; }, function (t) { return lenS + (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.to] = incidentLinks[S.to].filter(function (x) { return x !== S.id; });
+			S.to = farO;   // base-write: identity -- Base is showing (the command is Base-only), like breakPipeAtPoint()
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		} else {
+			// S runs out of the junction; the merged line is O inward, the junction, then S.
+			sameDir = O.to === n.id;
+			newVerts = (sameDir ? O.verts : rev(O.verts)).concat([vtx], S.verts);
+			remapStations(S, O, function (t) { return lenO + t * lenS; }, function (t) { return (sameDir ? t : 1 - t) * lenO; }, total);
+			incidentLinks[S.from] = incidentLinks[S.from].filter(function (x) { return x !== S.id; });
+			S.from = farO;   // base-write: identity, as above
+			(incidentLinks[farO] = incidentLinks[farO] || []).push(S.id);
+		}
+		S.verts = newVerts;   // base-write: identity, as above
+		if (bothTyped) { S._length = typed; if (S.tok) { delete S.tok._length; if (!Object.keys(S.tok).length) { delete S.tok; } } }   // base-write: the sum of two lengths the user typed
+		else { S.lenAuto = true; }
+		eachOverrideMap(function (map) { var ov = map[ovKeyFor('link', S.id)]; if (ov) { delete ov.length; } });
+		deleteLink(O.id);
+		deleteNode(n.id);
+		rebuildLink(S);
+		updateLinkGeometry(S.id);
+		if (nodeEls[S.from]) { layoutNodeLabel(S.from); }
+		if (nodeEls[S.to]) { layoutNodeLabel(S.to); }
+	}
+	// The Customers and Texts attached to O by station move to S, restated along the merged line; those
+	// already on S are restated along it too. `posS` and `posO` give the distance along the merged line.
+	function remapStations(S, O, posS, posO, total) {
+		function go(from, list, get, set, attach) {
+			(list[from.id] || []).slice().forEach(function (id) {
+				var it = get(id), t;
+				if (!it || typeof it.t !== 'number' && typeof it.anchorT !== 'number') { return; }
+				t = from === S ? posS(it.t !== undefined ? it.t : it.anchorT) : posO(it.t !== undefined ? it.t : it.anchorT);
+				set(it, total > 0 ? t / total : 0);
+				if (from === O) { attach(it, id); }
+			});
+		}
+		go(S, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function () {});
+		go(O, customersByLink, function (id) { return (doc.customers || []).filter(function (x) { return x.id === id; })[0]; },
+			function (c, t) { c.t = t; }, function (c, id) {
+				c.link = S.id;
+				customersByLink[O.id] = customersByLink[O.id].filter(function (x) { return x !== id; });
+				(customersByLink[S.id] = customersByLink[S.id] || []).push(id);
+			});
+		go(S, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function () {});
+		go(O, labelsByLinkAnchor, labelById, function (lb, t) { lb.anchorT = t; }, function (lb, id) {
+			lb.anchorLink = S.id;
+			labelsByLinkAnchor[O.id] = labelsByLinkAnchor[O.id].filter(function (x) { return x !== id; });
+			(labelsByLinkAnchor[S.id] = labelsByLinkAnchor[S.id] || []).push(id);
+		});
+	}
+	function morphJunctionsToVertices(backTo) {
+		var pc = EngCalcs.pageConfig || {}, nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+			.map(function (s) { return nodeById(s.id); }).filter(Boolean), problems = [], done = 0, snap = false;
+		if (!nodes.length) { return 0; }
+		if (!inBaseFor('topology')) {
+			// **THE REFUSAL OFFERS THE WAY OUT** (Tom, 2026-10-27: "a dialog that offers the switch"). A
+			// scenario other than Base can switch to Base and morph; Base naming another alternative cannot.
+			if (!activeScenario().isBase) {
+				var was0 = activeScenario().id;
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex',
+					text: pc.lpn_morph_vertex_base_ask || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?',
+					ok: pc.lpn_morph_vertex_switch || 'Switch to Base and morph', cancel: pc.lpn_cancel || 'Cancel' },
+				function (yes) { if (yes) { switchScenario(baseScenario().id); morphJunctionsToVertices(activeScenario().id === baseScenario().id ? was0 : null); } });
+				return 0;
+			}
+			setNotice(pc.lpn_morph_vertex_base || 'A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.');
+			return 0;
+		}
+		function finish() {
+			// Came here by "Switch to Base and morph" and the visitor declined the next question (or nothing was
+			// morphed): they go back to the scenario they were working in, not left in Base with nothing done.
+			if (backTo && !done) { switchScenario(backTo); }
+			if (done) {
+				buildDom();
+				refreshScenarioMarks();
+				refreshScenarioStatus();
+				refreshPaneIfOpen();
+				refreshPopupIfOpen();
+				scheduleSolve();
+				scheduleSave();
+			}
+			setNotice(problems.slice(0, 5).concat(problems.length > 5 ? ['...'] : [])
+				.concat(done ? [String(pc.lpn_morph_vertex_done || 'Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.').replace('{n}', String(done))] : []).join(' '));
+		}
+		function doMorph(n) {
+			if (!snap) { saveUndoSnapshot(); snap = true; }
+			mergeAtJunction(n);
+			done++;
+		}
+		// One question per junction that has an elevation or demands; the whole command is one Undo.
+		function step(i) {
+			var n, why, info, key, text;
+			for (; i < nodes.length; i++) {
+				n = nodes[i];
+				info = {};
+				why = vertexMorphProblem(n, info);
+				if (why) { problems.push(why); continue; }
+				if (!info.elevShown && !info.demands && !info.quality) { doMorph(n); continue; }
+				key = info.elevShown && info.demands ? 'lpn_morph_vertex_clear_both' : (info.elevShown ? 'lpn_morph_vertex_clear_elev' : (info.demands ? 'lpn_morph_vertex_clear_demand' : 'lpn_morph_vertex_clear_quality'));
+				text = String(pc[key] || (info.elevShown && info.demands ? 'Clear elevation {elev} and demands {demands} on {id}?'
+					: (info.elevShown ? 'Clear elevation {elev} on {id}?' : (info.demands ? 'Clear demands {demands} on {id}?' : 'Clear initial quality {quality} on {id}?'))));
+				if (info.quality && key !== 'lpn_morph_vertex_clear_quality') { text += '\n' + String(pc.lpn_morph_vertex_clear_also || 'Initial quality {quality} is cleared too.'); }
+				text = text.split('{elev}').join(info.elevShown).split('{demands}').join(info.demands).split('{quality}').join(info.quality).split('{id}').join(n.id);
+				askDialog({ kind: 'confirm', title: pc.lpn_morph_vertex || 'Vertex', text: text, ok: pc.lpn_dialog_ok || 'OK', cancel: pc.lpn_cancel || 'Cancel' },
+					(function (node, next) { return function (yes) { if (yes) { doMorph(node); } step(next); }; }(n, i + 1)));
+				return;
+			}
+			finish();
+		}
+		step(0);
+		return done;
 	}
 	// ---- MORPH IN A SCENARIO: AN ASSET'S TYPE AS AN OVERRIDE (Task 781) ----------------------------
 	//
@@ -40714,7 +41614,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		names = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
 			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		here = names[el.type] || el.type;
-		readonlyField(fields, pc.lpn_full_col_type || 'Type', here, pc.lpn_field_type_tip);
+		readonlyField(fields, pc.lpn_survey_codes_col_type || 'Asset type', here, pc.lpn_field_type_tip);
 		ovmGutter(fields, {
 			el: el, props: ['type'], on: !inBaseFor('topology') && hasOverride(el, 'type'), cats: ['topology'],
 			set: function () { setOverride(el, 'type', el.type); if (el.type === 'valve') { setOverride(el, 'valveType', el.valveType); } },
@@ -40987,6 +41887,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// on screen never pays for the manifest at all, which is the point of doing this here
 		// rather than at boot.
 		if (show) { loadExamplesManifest(); renderExamplesGallery(); }
+		else if (firstViewPending) { applyFirstViewDocks(); }
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
@@ -41462,7 +42363,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
-			LPN_PANEBOXES_KEY,
+			LPN_PANEBOXES_KEY, LPN_GCOLS_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
@@ -41501,7 +42402,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			doomed.forEach(function (k) { localStorage.removeItem(k); });
 		} catch (err) { /* private mode -- nothing to remove */ }
 		// Read again from the (now empty) store, so a wipe without a reload is not still clean.
-		cleanMapState = null; overrideMarksPref = null;
+		cleanMapState = null; overrideMarksPref = null; gcolPrefs = null;
 		// ALSO expire the suite unit cookie, or the promise this button makes is not kept.
 		// Looped-Network.php calls echoCookieScript() and echoUnitSelect() hardcodes
 		// onchange="EngCalcs.submitForm()", so the unit dropdowns ARE saved to a cookie and ARE
@@ -48176,7 +49077,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (fromEl) {
 			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
 		}
-		convasUnits = cloneUnitStrip('lpn_convas_units_fields');
+		convasUnits = cloneUnitStrip('lpn_convas_units_fields', true);
 		// Roughness is a length only under Darcy-Weisbach, exactly as on the strip.
 		convasUnits.forEach(function (u) {
 			if (u.name === 'lpn_u_roughness') { u.item.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
@@ -48201,9 +49102,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		capPanelToRoomBelow(box, parseFloat(box.style.top));
+		convasFitFooter(box);
+		// The rows' headers and fitted Label column arrive a frame later and make the box taller: centre it again.
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 32); })(function () {
+			var h2 = fitPanelToViewport(box);
+			box.style.top = Math.max(chromeFloor(), (window.innerHeight - h2) / 2) + 'px';
+			capPanelToRoomBelow(box, parseFloat(box.style.top));   // what is left under the chrome: the rest scrolls inside the box
+			convasFitFooter(box);
+		});
 		initTipsIn(box);
 		var ok = document.getElementById('lpn_convas_ok');
-		if (ok && ok.focus) { ok.focus(); }
+		if (ok && ok.focus) { ok.focus({ preventScroll: true }); }
+		(function (b) { if (b) { b.scrollTop = 0; } }(document.getElementById('lpn_convas_body')));
+	}
+	// OK and Cancel stand in a footer under the scrolling body; the body gives up as much height as the footer
+	// would otherwise hang below the screen.
+	function convasFitFooter(box) {
+		var body = document.getElementById('lpn_convas_body'), foot = box.querySelector('.lpn-convas-foot'), over, mh;
+		if (!body || !foot) { return; }
+		over = foot.getBoundingClientRect().bottom + 12 - ((window.innerHeight || 0) - POPUP_EDGE);
+		if (over > 0) {
+			mh = parseFloat(body.style.maxHeight) || body.getBoundingClientRect().height;
+			body.style.maxHeight = Math.max(80, mh - over) + 'px';
+		}
+		body.scrollTop = 0;
 	}
 	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
 	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
@@ -51796,7 +52719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
 		if (escapeOwnsBox('lpn_popup')) { closePopup(true); }
-		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
+		if (escapeOwnsBox('lpn_settings_box')) { if (setboxJumpIsOpen()) { setboxJumpOpen(false); } else { closeSettingsBox(); } }   // the phone's open jump list is inner to the box: it closes first
 		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
@@ -51943,12 +52866,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return null;
 	}
 	// Shared with the File, Convert as box (Task 696), which asks the same units question of a copy.
-	function cloneUnitStrip(hostId) {
+	function cloneUnitStrip(hostId, asRows) {
 		var host = document.getElementById(hostId), out = [];
 		if (!host) { return out; }
 		host.innerHTML = '';
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var live = unitEl(name), item = unitStripItem(live), copy, sel;
+			var live = unitEl(name), item = unitStripItem(live), copy, sel, nm;
 			if (!item) { return; }
 			copy = item.cloneNode(true);
 			copy.removeAttribute('id');   // #lpn_u_roughness_row is the strip's, not ours
@@ -51957,13 +52880,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			sel.removeAttribute('name');
 			sel.removeAttribute('id');   // Task 685 gave each select its name as an id; a copy must not repeat it
 			sel.value = live.value;
+			if (asRows) {
+				// A row of the box's one grid: the unit's name in the name track, its select in the value track.
+				nm = copy.querySelector('.lpn-units-name');
+				copy = lpnGridRow(host, { label: nm ? nm.textContent : '', control: sel, kind: 'select' });
+				out.push({ name: name, sel: sel, item: copy });
+				return;
+			}
 			host.appendChild(copy);
 			out.push({ name: name, sel: sel, item: copy });
 		});
 		return out;
 	}
 	function buildNewBoxUnits() {
-		newBoxUnits = cloneUnitStrip('lpn_new_units_fields');
+		newBoxUnits = cloneUnitStrip('lpn_new_units_fields', true);
 	}
 	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
 	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
@@ -52272,6 +53202,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		// A box taller than the room under the chrome (a phone) scrolls inside, so Create stays reachable.
+		capPanelToRoomBelow(box, parseFloat(box.style.top));
 		initTipsIn(box);
 		var create = document.getElementById('lpn_new_create');
 		if (create && create.focus) { create.focus(); }
@@ -52761,7 +53693,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
 			lpn_scncmp_box: closeScenarioCompareBox, lpn_rptbox: closeRunReportBox, lpn_status_box: closeStatusReportBox,
-			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
+			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox, lpn_demands_box: closeDemandsBox,
 			'lpn_hotkeys_popup': closeHotkeysBox
 		};
 		Object.keys(paneBoxes).forEach(function (id) { c['lpn_panebox_' + id] = function () { paneBoxReturn(id); }; });
@@ -52769,7 +53701,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// A record as it is before any storage has been read.
 	function workspaceResetRecord(rec) {
-		['dock', 'autohide', 'dockW', 'dockOrd'].forEach(function (k) { delete rec[k]; });
+		['dock', 'autohide', 'dockW', 'dockH', 'dockOrd'].forEach(function (k) { delete rec[k]; });
 		['left', 'top', 'w', 'h', 'ix'].forEach(function (k) { if (rec.hasOwnProperty(k)) { rec[k] = null; } });
 		if (rec.hasOwnProperty('open')) { rec.open = false; }
 		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
@@ -54636,6 +55568,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_map_attach_menu || 'World map…',
 				tip: pc.lpn_map_attach_tip,
 				submenu: function () { return mapgeoRows(); } },
+			// Add layer... (Task 720; Tom, 2026-10-29: *"I think it needs to be under Map, Add layer. I
+			// couldn't find it on my own in Settings."*). A door, not a second form: it opens Settings at
+			// the one set of background-layer controls and puts the cursor in the first of them.
+			{ icon: 'globe', hidden: !EngCalcs.lpnGis, disabled: !gisUsable(),
+				label: pc.lpn_gis_menu || 'Add layer…',
+				fn: function () {
+					openSettingsBox('gis');
+					var k = document.getElementById('lpn_gis_kind');
+					if (k && k.focus) { k.focus(); }
+				} },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -55107,11 +56049,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			c.setAttribute('style', st.join(';'));
 			if (o.tagName === 'image') {
 				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
-				var isTile = o.classList.contains('lpn-basemap-tile');
+				var isTile = o.classList.contains('lpn-basemap-tile'), isGis = o.classList.contains('lpn-gis-tile');
 				pending.push(snipInlineImage(href).then(function (data) {
 					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
 					else {
 						if (isTile) { out.droppedBasemap = true; }
+						if (isGis) { out.droppedGis = true; }
 						if (c.parentNode) { c.parentNode.removeChild(c); }
 					}
 				}));
@@ -55247,6 +56190,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return renderScreenshot(r, poly).then(function (out) {
 			openSnipEditor(out);
 			if (out.droppedBasemap) { setNotice(pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+			else if (out.droppedGis) { setNotice(pc.lpn_screenshot_no_gis || 'A background layer from a GIS server could not be included.'); }
 		}).catch(function () {
 			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
 		});
@@ -55481,6 +56425,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				submenu: insertAssetRows
 			},
 			{ separator: true },
+			// **SETTINGS, THEN LIBRARIES; NO PROPERTIES ROW, on a phone or a PC** (Tom, 2026-10-25:
+			// "Nobody will ever use Properties"). Properties opens on a selection, and its tab and
+			// the box's own button bring it back.
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				fn: function () { toggleSettingsBox(); }
@@ -56425,6 +57372,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// BELOW the user's own backdrop image: a registered plan sheet is the thing the person put
 		// there on purpose, and a street map is context behind it.
 		basemapLayer = el('g', { 'class': 'lpn-basemap' }, world);
+		// Background layers from a GIS server (Task 720): above the street map, below the user's backdrop.
+		gisLayerEl = el('g', { 'class': 'lpn-gis' }, world);
 		backdropLayer = el('g', { 'class': 'lpn-backdrop' }, world);
 		gridLayer = el('g', {}, world);
 		// **THE DRAWING'S OWN GROUP, so it can be held STILL while the map moves under it** (Task
@@ -56643,6 +57592,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireScenarioManager();
 		wireFullReportBox();
 		wireCalibBox();
+		wireDemandsBox();
+		reportToolsInit();
 		buildMenuBar();
 		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
@@ -59666,7 +60617,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// translated word carries the meaning and the untranslated letter carries the identity.
 	function roughnessLabel() {
 		var pc = EngCalcs.pageConfig || {};
-		return (pc.lpn_field_roughness || 'Roughness') + ', ' + roughnessSymbol();
+		return lpnLabelSymbol(pc.lpn_field_roughness || 'Roughness', roughnessSymbol());
 	}
 	// Under Hazen-Williams the page keeps its own HW-specific tip, which is more useful than a
 	// generic one ("about 150 for new plastic, 130 for new steel"). Under the other two it borrows
@@ -59834,9 +60785,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < kids.length; i++) {
 			if (/(^|\s)lpn-valwarn(\s|$)/.test(kids[i].className || '')) { mark = kids[i]; }
 		}
+		if (!mark && host.querySelector) { mark = host.querySelector('.lpn-gname > .lpn-valwarn'); }   // a Properties row moves it into its label
 		if (!text) {
 			if (mark) {
-				host.removeChild(mark);
+				mark.parentNode.removeChild(mark);
 				sweepOrphanTips();
 			}
 			return null;
@@ -60116,10 +61068,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `orders` is {show, drop}, each a spinner spec or null.
 	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, orders, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
-			input = document.createElement('input'), span = document.createElement('span'), after;
+			input = document.createElement('input'), span = document.createElement('span'), after, group;
 		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
 		// enough to wrap used to drag its checkbox and its boxes down to the middle of BOTH lines.
-		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = LPN_LABEL_ROW_GAP;
+		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.flexWrap = 'wrap'; row.style.gap = '2px ' + LPN_LABEL_ROW_GAP;
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); requestLabelRefresh(); });
 		span.textContent = labelText;
@@ -60131,18 +61083,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
 		// The name takes the slack; css/engcalcs.css lets it shrink below its longest word.
-		label.style.flex = '1 1 auto';
+		// Its width is the stylesheet's (.lpn-lblhead-lead and the label share one basis).
 		row.appendChild(label);
 		if (affixOpt) {
-			row.appendChild(affixBox(affixOpt.prefix));
+			// **THE SIX CONTROLS ARE ONE UNBREAKABLE GROUP** (Tom, 2026-10-26): beside the name when the
+			// box is wide enough, otherwise the whole group wraps below it, never a part of it.
+			group = document.createElement('span');
+			group.className = 'lpn-lblgroup';
+			group.appendChild(affixBox(affixOpt.prefix));
 			after = affixBox(affixOpt.suffix);
-			row.appendChild(after);
-			row.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
+			group.appendChild(after);
+			group.appendChild(affixOpt.units ? labelUnitsBox(affixOpt.units, after) : labelColumnSpacer(LPN_LABEL_UNITS_W, true));
 			// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** Same slots, same
 			// order, on every field row; only field rows participate.
 			[decimals, orders && orders.show, orders && orders.drop].forEach(function (spec) {
-				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
+				group.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
+			row.appendChild(group);
 		}
 		container.appendChild(row);
 		return row;
@@ -60158,7 +61115,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and five 4px gaps come to 15.3rem, which fits the 252 px a squeezed pane leaves -- the test
 	// that caught the Settings box scrolling sideways (Tom, 2026-08-19: "It should not"). The Use
 	// units column is as wide as its heading's longer word, so "units" never breaks.
-	var LPN_LABEL_COL_W = '2.34rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
+	var LPN_LABEL_COL_W = '2.2rem', LPN_LABEL_COL_GAP = '0px', LPN_LABEL_AFFIX_W = '2.2rem',
 		LPN_LABEL_UNITS_W = '1.85rem', LPN_LABEL_ROW_GAP = '4px';
 	function labelColumnSpacer(width, isUnits) {
 		var spacer = document.createElement('span');
@@ -60569,11 +61526,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the columns need not widen; each carries its full meaning in its tip, which the search box
 		// matches too.
 		function columnHeadings(box, group) {
-			var row = document.createElement('div'), lead = document.createElement('span');
+			var row = document.createElement('div'), lead = document.createElement('span'), group = document.createElement('span');
 			row.className = 'lpn-set-note lpn-set-colhead';
-			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = LPN_LABEL_ROW_GAP;
-			lead.style.flex = '1 1 auto';
+			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.flexWrap = 'wrap'; row.style.gap = '0 ' + LPN_LABEL_ROW_GAP;
+			lead.className = 'lpn-lblhead-lead';
 			row.appendChild(lead);
+			group.className = 'lpn-lblgroup';
+			row.appendChild(group);
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
@@ -60594,7 +61553,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The numeric columns carry LPN_LABEL_COL_GAP as well as the row's own gap, so their
 				// headings must match or they sit off the box they name.
 				if (i >= 3) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
-				row.appendChild(cell);
+				group.appendChild(cell);
 			});
 			box.appendChild(row);
 		}
@@ -62912,6 +63871,100 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
 		setboxTag(row(thematicBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect), [['settings', 'basemapStyle']]);
+		// ---- Background layers from a GIS server (Task 720). Beside the basemap style, because they are
+		// the same kind of thing: pictures behind the network. A row per layer (draw, opacity, remove) and
+		// one small form to add another. Stored in the project; see paintGisLayers().
+		(function () {
+			var gisBody = minorGroup(mapBody2, pc.lpn_gis_title || 'Background layers from a GIS server');
+			gisBody.id = 'lpn_set_sub_gis';
+			if (!EngCalcs.lpnGis) { return; }
+			if (!gisUsable()) {
+				note(gisBody, pc.lpn_gis_unlocatable || 'Background layers need a project that is placed on the earth.');
+				return;
+			}
+			var kindNames = {
+				xyz: pc.lpn_gis_kind_xyz || 'Tile URL',
+				wms: pc.lpn_gis_kind_wms || 'WMS',
+				arcgis: pc.lpn_gis_kind_arcgis || 'ArcGIS REST (MapServer)'
+			};
+			// One block per layer: its kind and host in plain sight (and a mark when the server did not
+			// answer this session), then Draw, Opacity and Remove with their words beside them.
+			gisLayers().forEach(function (l, idx) {
+				var item = document.createElement('div'), name = document.createElement('div'),
+					bad = document.createElement('span'), grp = document.createElement('div'),
+					onL = document.createElement('label'), on = document.createElement('input'),
+					opL = document.createElement('label'), op = document.createElement('input'),
+					rm = document.createElement('button'), st = gisStat[gisLayerKey(idx, l)];
+				item.className = 'lpn-gis-item';
+				name.className = 'lpn-gis-name';
+				name.textContent = kindNames[l.kind] + ': ' + gisHost(l) + (l.layers ? ' (' + l.layers + ')' : '');
+				bad.className = 'lpn-gis-bad';
+				bad.setAttribute('data-gis-key', gisLayerKey(idx, l));
+				bad.textContent = (st && st.told && st.ok === 0) ? ' (' + (pc.lpn_gis_unreachable || 'not reachable') + ')' : '';
+				name.appendChild(bad);
+				grp.className = 'lpn-gis-controls';
+				on.type = 'checkbox'; on.className = 'lpn-gis-on'; on.checked = gisPermitted(l);
+				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Draw')));
+				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
+				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
+				op.setAttribute('inputmode', 'decimal');
+				opL.appendChild(document.createTextNode((pc.lpn_gis_opacity || 'Opacity') + ' ')); opL.appendChild(op);
+				rm.type = 'button'; rm.className = 'lpn-gis-remove'; rm.textContent = pc.lpn_fitting_remove || 'Remove';
+				on.addEventListener('change', function () {
+					var next = JSON.parse(JSON.stringify(gisLayers()));
+					next[idx].on = !!on.checked;
+					gisSetLayers(next);
+				});
+				op.addEventListener('change', function () {
+					var v = +op.value, next = JSON.parse(JSON.stringify(gisLayers()));
+					if (!(v > 0 && v <= 1)) { op.value = String(l.opacity || 1); return; }
+					next[idx].opacity = v;
+					gisSetLayers(next);
+				});
+				rm.addEventListener('click', function (e) {
+					var next = JSON.parse(JSON.stringify(gisLayers()));
+					if (e && e.preventDefault) { e.preventDefault(); }
+					next.splice(idx, 1);
+					gisSetLayers(next);
+					rebuildSettingsFields();
+				});
+				grp.appendChild(onL); grp.appendChild(opL); grp.appendChild(rm);
+				item.appendChild(name); item.appendChild(grp);
+				gisBody.appendChild(item);
+			});
+			var kindSel = document.createElement('select'), urlIn = document.createElement('input'),
+				layersIn = document.createElement('input'), addBtn = document.createElement('button');
+			EngCalcs.lpnGis.KINDS.forEach(function (k) {
+				var opt = document.createElement('option');
+				opt.value = k; opt.textContent = kindNames[k]; kindSel.appendChild(opt);
+			});
+			kindSel.id = 'lpn_gis_kind'; kindSel.className = 'lpn-gis-wide';
+			urlIn.type = 'text'; urlIn.id = 'lpn_gis_url'; urlIn.className = 'lpn-gis-wide';
+			urlIn.setAttribute('autocomplete', 'off'); urlIn.setAttribute('spellcheck', 'false');
+			layersIn.type = 'text'; layersIn.id = 'lpn_gis_layers'; layersIn.className = 'lpn-gis-wide'; layersIn.setAttribute('autocomplete', 'off');
+			addBtn.type = 'button'; addBtn.id = 'lpn_gis_add'; addBtn.className = 'lpn-gis-addbtn'; addBtn.textContent = pc.lpn_gis_add || 'Add layer';
+			row(gisBody, pc.lpn_gis_kind || 'Kind of server', kindSel);
+			row(gisBody, pc.lpn_gis_url || 'Server address', urlIn);
+			var layersRow = row(gisBody, pc.lpn_gis_wms_layers || 'WMS layer names (comma separated)', layersIn);
+			function showLayersRow() { layersRow.style.display = kindSel.value === 'wms' ? '' : 'none'; }
+			kindSel.addEventListener('change', showLayersRow);
+			showLayersRow();
+			gisBody.appendChild(addBtn);
+			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Opening a project that holds a layer sends them again.');
+			addBtn.addEventListener('click', function (e) {
+				var res = EngCalcs.lpnGis.normalise({ kind: kindSel.value, url: urlIn.value, layers: layersIn.value });
+				if (e && e.preventDefault) { e.preventDefault(); }
+				if (!res.ok) {
+					setNotice(res.why === 'template' ? (pc.lpn_gis_err_template || 'A tile URL must contain {z}, {x} and {y}.')
+						: res.why === 'layers' ? (pc.lpn_gis_err_layers || 'Enter at least one WMS layer name.')
+						: res.why === 'mapserver' ? (pc.lpn_gis_err_mapserver || 'An ArcGIS address must end with /MapServer.')
+						: (pc.lpn_gis_err_address || 'The server address must start with https://.'));
+					return;
+				}
+				gisSetLayers(gisLayers().concat([res.layer]));
+				rebuildSettingsFields();
+			});
+		}());
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -63505,7 +64558,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		time: 'lpn_set_sub_time',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
-		page: 'lpn_set_sec_page'
+		page: 'lpn_set_sec_page',
+		gis: 'lpn_set_sub_gis'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//
@@ -64054,8 +65108,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
 		Array.prototype.forEach.call(box.querySelectorAll('.lpn-setbox-link-held'), function (el) { el.classList.remove('lpn-setbox-link-held'); });
 		// The dot and the down triangle (Task 790; ovmGutter() says what they mean), drawn afresh.
-		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm'), function (n) { n.parentNode.removeChild(n); });
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-ovm, .lpn-set-heldlist'), function (n) { n.parentNode.removeChild(n); });
 		box.classList.toggle('lpn-ovm-gut', !!scn && scenarios.length > 1);
+		box.classList.remove('lpn-ovm-gut2');
 		if (!scn || scenarios.length < 2) { setboxKeepPlace(); return; }
 		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
 			var paths, held;
@@ -64065,9 +65120,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			held = setboxHeldRowsOf(paths, scn, rows);
 			setboxMarks(el, paths, held, scn, rows);
 			if (!held.length) { return; }
+			setboxHeldList(el, paths, held, scn, rows);
 			el.classList.add('lpn-set-held');
 			setboxIndexMarkHeld(el);
 		});
+		// One cell of gutter, two only when some row carries both marks, so every control keeps one x.
+		box.classList.toggle('lpn-ovm-gut2', [].some.call(box.querySelectorAll('.lpn-ovm'), function (g) {
+			return !!g.querySelector('.lpn-ovm-dot') && !!g.querySelector('.lpn-ovm-tri');
+		}));
 		// A search in force keeps each new note with its row.
 		if ((document.getElementById('lpn_setbox_filter') || {}).value) { applySetboxFilter(); }
 		setboxKeepPlace();
@@ -64082,7 +65142,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (held.length) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
 				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { setboxPinRow(el); clearHeldSetboxRows(held, scn); setboxKeepPlaceSoon(); }));
-		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+		}
 		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		kids = childSettingHolders(mine);
 		if (kids.length) {
@@ -64098,9 +65158,73 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				});
 			}));
 		} else if (!held.length) { return; }
-		else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		// Last, so the row's grid keeps its own first and second child; CSS places it at the start.
 		el.appendChild(g);
+	}
+	// **A ROW THAT EDITS SEVERAL SETTINGS LISTS THE OVERRIDDEN ONES, EACH WITH ITS OWN DOT** (Tom,
+	// 2026-10-23: *Is it completely unfeasible to show these individually?*). A Labels row edits
+	// its show tick, decimals, before, after, units tick and priority: six Settings table rows,
+	// one dot, one group clear. Each of those is already a table row with its own clear
+	// (settingRowClear()), so the line under the row names each one that the open scenario holds,
+	// what Clear restores and where from, and clears just that one. A row that edits one setting
+	// needs no list: its dot is that one.
+	// The name of one setting under its own row: the row's name is already above it.
+	function setboxHeldItemName(p) {
+		var pc = EngCalcs.pageConfig || {}, partKey = LPN_SETTAB_LABEL_PARTS[p[1]];
+		if (p[0] === 'labelSettings' && p.length === 4 && partKey && pc[partKey]) { return pc[partKey]; }
+		// The label's tick is the Labels list's Show column: "Show", not "Link labels: Length" (Tom, 2026-10-23).
+		if (p[0] === 'labelSettings' && p.length === 3 && (p[1] === 'node' || p[1] === 'link' || p[1] === 'customer')) { return pc.lpn_pane_manage_cols_show || 'Show'; }
+		return settingTableLabelBare(p);
+	}
+	// What Clear restores, in words, and where it comes from: the parent scenario's stated value, or
+	// the default when nothing up the chain states one. Blank text reads as no text, never as "".
+	function setboxHeldRestores(r, par) {
+		var pc = EngCalcs.pageConfig || {}, stated = settingRowValue(r, par) !== undefined, t = settingRowText(r, par), tail;
+		if (!stated) {
+			tail = String(pc.lpn_settings_row_default || '{value} (default)').split('{value}')[1];
+			if (tail && t.slice(-tail.length) === tail) { t = t.slice(0, -tail.length); }
+		}
+		if (t === '' || t === '""') { t = pc.lpn_settings_held_none || 'no text'; }
+		return { value: t, parent: stated ? scenarioDisplayName(par) : null };
+	}
+	// "Show: clear restores No, ...": the sentence follows its setting's name mid-line.
+	function lowerFirst(t) { return t.charAt(0).toLowerCase() + t.slice(1); }
+	function setboxHeldList(el, paths, held, scn, rows) {
+		var pc = EngCalcs.pageConfig || {}, par = parentScenarioOf(scn) || baseScenario(), line, all;
+		all = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
+		if (!all.length || !el.parentNode) { return; }
+		// A row that edits one setting: its dot is that one, so the line is the sentence alone.
+		if (all.length < 2) {
+			line = document.createElement('p');
+			line.className = 'lpn-set-heldlist';
+			line.setAttribute('data-lpn-noseam', '1');
+			held.forEach(function (r) {
+				var v = setboxHeldRestores(r, par), text = document.createElement('span');
+				text.textContent = clearRestoresText(v.value, v.parent);
+				line.appendChild(text);
+			});
+			el.parentNode.insertBefore(line, el.nextSibling);
+			return;
+		}
+		// Not a div and not a span: the Labels lists style every div child by position and hide a
+		// row's first span, which hid the first item and squeezed the rest.
+		line = document.createElement('p');
+		line.className = 'lpn-set-heldlist';
+		line.setAttribute('data-lpn-noseam', '1');
+		held.slice().sort(function (x, y) { return x.order - y.order; }).forEach(function (r) {
+			var item = document.createElement('span'), text = document.createElement('span'), v = setboxHeldRestores(r, par);
+			item.className = 'lpn-set-helditem';
+			text.textContent = (pc.lpn_settings_held_item || '{setting}: {restores}')
+				.split('{setting}').join(setboxHeldItemName(r.path)).split('{restores}').join(lowerFirst(clearRestoresText(v.value, v.parent)));
+			item.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
+				setboxPinRow(el);
+				clearHeldSetboxRows([r], scn);
+				setboxKeepPlaceSoon();
+			}));
+			item.appendChild(text);
+			line.appendChild(item);
+		});
+		el.parentNode.insertBefore(line, el.nextSibling);
 	}
 	// The box's left index marks a sub-heading that holds an override, so a held value can be found.
 	function setboxIndexMarkHeld(el) {
@@ -64331,6 +65455,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			content = document.getElementById('lpn_setbox_content');
 		if (!index || !content) { return; }
 		index.innerHTML = '';
+		wireSetboxJump();
 		function link(target, text, cls) {
 			var b = document.createElement('button');
 			b.type = 'button';
@@ -64343,6 +65468,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// land underneath it, which is what scrollSetboxTo() measures its way out of.
 				scrollSetboxTo(target);
 				setSetboxCurrent(b);
+				setboxJumpOpen(false);
+				// The row tapped stays the current one until the reader scrolls by hand (see setboxSpy()).
+				setboxSpyPinned = true;
+				setboxSpyPinTop = (document.getElementById('lpn_setbox_content') || {}).scrollTop;
 			});
 			index.appendChild(b);
 			return b;
@@ -64367,10 +65496,72 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function setSetboxCurrent(btn) {
-		var index = document.getElementById('lpn_setbox_index');
+		var index = document.getElementById('lpn_setbox_index'), txt = document.querySelector('#lpn_setbox_jump .lpn-setbox-jump-text');
 		if (!index) { return; }
 		[].forEach.call(index.children, function (b) { b.removeAttribute('aria-current'); });
 		if (btn) { btn.setAttribute('aria-current', 'true'); }
+		// The phone's jump bar names the place the reader is at; the index it opens is this same list.
+		if (btn && txt) { txt.textContent = btn.textContent; }
+	}
+	// ---- THE PHONE'S JUMP BAR (Task 835) -------------------------------------------------------
+	// At 640 px or less the index pane is replaced by a bar under the search box that names the current
+	// heading and opens the index as a list over the content (CSS decides what shows; nothing here
+	// depends on the width). The bar's text follows the content pane's scroll, so it is never stale.
+	function setboxJumpIsOpen() {
+		var panes = document.getElementById('lpn_setbox_panes');
+		return !!panes && panes.classList.contains('lpn-jump-open');
+	}
+	function setboxJumpOpen(open) {
+		var panes = document.getElementById('lpn_setbox_panes'), jump = document.getElementById('lpn_setbox_jump');
+		if (!panes || !jump) { return; }
+		panes.classList.toggle('lpn-jump-open', !!open);
+		jump.setAttribute('aria-expanded', open ? 'true' : 'false');
+	}
+	// The last visible heading at or above the content pane's top edge, plus the sticky heading's room.
+	// **A JUMP PINS THE BAR TO THE ROW TAPPED** (Tom, 2026-10-28: tapping Asset put "ID prefixes" in the bar). On a phone the
+	// section heading is hidden, so the section's first sub-heading lands at the very top of the pane beside it, and the
+	// spy, asked which heading is at the top, named the sub-heading a frame after the jump named the section. The scroll
+	// the jump itself makes is therefore not the reader's: the spy stays out of it until a hand scroll (touch, wheel, key).
+	// A scrollbar drag fires no touch, wheel or key event, so the pin also lets go when the pane has moved off the place the jump left it.
+	var setboxSpyPinned = false, setboxSpyPinTop = 0;
+	function setboxSpy() {
+		var content = document.getElementById('lpn_setbox_content'), index = document.getElementById('lpn_setbox_index'),
+			head, limit, best = null;
+		if (!content || !index || !setboxIsOpen()) { return; }
+		if (setboxSpyPinned && Math.abs(content.scrollTop - setboxSpyPinTop) > 3) { setboxSpyPinned = false; }
+		if (setboxSpyPinned) { return; }
+		head = content.querySelector('.lpn-set-head');
+		limit = content.getBoundingClientRect().top + (head ? head.getBoundingClientRect().height : 0) + 4;
+		[].forEach.call(content.querySelectorAll('.lpn-set-sec, .lpn-set-sub:not(.lpn-set-sub-silent)'), function (el) {
+			var h = el.classList.contains('lpn-set-sec') ? el.querySelector('.lpn-set-head') : el;
+			if (!h || !el.getClientRects().length || el.getBoundingClientRect().top > limit) { return; }
+			best = el;
+		});
+		if (!best) { best = content.querySelector('.lpn-set-sec'); }
+		if (!best) { return; }
+		var b = best.classList.contains('lpn-set-sec')
+			? index.querySelector('[data-sec="' + best.id + '"]') : index.querySelector('[data-sub="' + best.id + '"]');
+		if (b && b.getAttribute('aria-current') !== 'true') { setSetboxCurrent(b); }
+	}
+	var setboxJumpWired = false;
+	function wireSetboxJump() {
+		var jump = document.getElementById('lpn_setbox_jump'), content = document.getElementById('lpn_setbox_content'), queued = false;
+		if (setboxJumpWired || !jump || !content) { return; }
+		setboxJumpWired = true;
+		jump.addEventListener('click', function () { setboxJumpOpen(!setboxJumpIsOpen()); });
+		['touchstart', 'touchmove', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
+			content.addEventListener(ev, function () { setboxSpyPinned = false; }, { passive: true });
+		});
+		content.addEventListener('scroll', function () {
+			if (queued) { return; }
+			queued = true;
+			(window.requestAnimationFrame || setTimeout)(function () { queued = false; setboxSpy(); });
+		}, { passive: true });
+		document.addEventListener('pointerdown', function (e) {
+			var t = e.target;
+			if (!setboxJumpIsOpen() || !t || !t.closest) { return; }
+			if (!t.closest('#lpn_setbox_index') && !t.closest('#lpn_setbox_jump')) { setboxJumpOpen(false); }
+		}, true);
 	}
 	// ---- THE SEARCH (Tom: "searches tips as well as titles") ---------------------------------
 	//
@@ -64453,6 +65644,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
 			if (kid.classList.contains('lpn-set-group')) { kid.style.display = words.length ? 'none' : ''; return; }
+			// A row's list of its overridden settings goes with its row.
+			if (kid.classList.contains('lpn-set-heldlist')) { setboxShow(kid, lastShown); return; }
 			var m = !words.length || setboxWordsMatch(setboxUnitText(kid), words);
 			setboxShow(kid, m);
 			lastShown = m;
@@ -64710,6 +65903,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// would undo the filter of somebody who opened the box, filtered, closed it to look at the
 		// map, and came back. The filter is a view of the box, and the box remembers its view.
 		initTipsIn(box);
+		setboxSpy();
 		if (!setboxLayout.open) { setboxLayout.open = true; saveSetboxLayout(); }
 	}
 	// ---- THE CALCULATE HINT (Tom, 2026-10-21) --------------------------------------------------
@@ -64768,6 +65962,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function closeSettingsBox() {
 		var box = setboxEl();
 		calcHintHide();
+		setboxJumpOpen(false);
 		hidePanel(box);
 		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
 		// whether or not the box is showing, so an unguarded write would put a storage write on a
@@ -64851,9 +66046,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// 2026-10-07: *"All the docks I make need to be remembered."*).
 		if (statusboxLayout.open) { openStatusReportBox(); }
 		if (fullboxLayout.open) { openFullReportBox(); }
-		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked, and opens
-		// only while Basic mode is off, the one state in which it is shown at all.
-		if (smboxLayout.open && smboxLayout.dock && !scenarioBasicMode) { openScenarioManager(); }
+		// The Scenario manager keeps `open` on its own record (lpn_smbox) only while docked.
+		if (smboxLayout.open && smboxLayout.dock) { openScenarioManager(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		restorePaneBoxes();
 		if (findUserOpen) { toggleFindPopup(null, true); }
@@ -65366,24 +66560,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Calibration) keep their docks in one key of their own, `lpn_dockbox` (see
 	// saveDockShared()); where they float still lasts one page load.
 	//
-	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
-	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
-	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
-	// window.
+	// **ON A PHONE TOO.** Below the one breakpoint a box that is not docked fills the window
+	// (placePanelForScreen()); a docked one keeps its column or tab, and an auto-hidden one flies out
+	// over the map. A first visit on a phone gets the same list as a PC (LPN_DEFAULT_DOCKS).
 	// **NO SHARE OF THE WINDOW CAPS A DOCKED BOX; ONLY THE MAP'S OWN MINIMUM DOES** (Tom, 2026-10-07,
 	// on the Alternatives preview stopping at about 860 px: *"Is there any reason not to give the user
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
 	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
 	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockSoft = null, dockTimer = null, dockBooting = false, dockQueued = false,
 		dockMargins = { left: 0, right: 0 }, dockWasSmall = null;
 	function dockSideOf(d) {
 		var s = d && d.rec.dock;
-		return ((s === 'left' || s === 'right') && !smallScreen()) ? s : null;
+		return (s === 'left' || s === 'right') ? s : null;
 	}
+	// **ON A PHONE EVERY DOCKED BOX AUTO-HIDES** (Tom, 2026-10-24: *"There is no auto-hide tab, the pinned
+	// box is unsizeable and very narrow"*). A pinned column on a 390 px window leaves the map its 320 px
+	// floor and the box what remains, about 70 px; no saved record can put one there, whatever it says.
+	function dockAuto(d) { return !!d && (!!d.rec.autohide || smallScreen()); }
 	function boxIsDocked(box) { return !!(box && box.__lpnDock && dockSideOf(box.__lpnDock)); }
 	// A toggle (the gear, a Help row) that finds its box tucked away brings it out instead of closing
 	// a box the reader cannot see.
@@ -65404,6 +66601,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
+		// The height of a phone flyout, set by dragging its bottom pill (Tom, 2026-10-30: "Why not saved?").
+		if (typeof v.dockH === 'number' && isFinite(v.dockH) && v.dockH > 0) { rec.dockH = Math.round(v.dockH); }
 		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
 	}
@@ -65434,17 +66633,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockBoxes.forEach(function (d) { if (d.save && d.rec.dock) { d.save(); } });
 		return false;
 	}
-	// **A FIRST VISIT STARTS WITH TOM'S DOCKS** (Tom, 2026-10-07, card E02: *"I want to give the
-	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
-	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
-	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
-	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
-	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
-	var LPN_DEFAULT_DOCKS = {
-		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
-		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
-			'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
-	};
+	// **A FIRST VISIT GETS TOM'S LAYOUT WHEN THE FIRST PROJECT OPENS, NOT OVER THE GALLERY**
+	// (Tom, 2026-10-07, card E02: *"I want to give the initial user default my auto-hidden docks
+	// ... It's cheap discoverability"*; revised 2026-10-27: every box is an auto-hide tab,
+	// Settings, Properties, Libraries on the right and the Scenario manager, User manual on the left;
+	// nothing starts pinned). Named by box and not by label so a
+	// renamed row changes nothing here. `pinned` (unused now) leaves auto-hide off, on a PC only. Only a browser that holds NO
+	// box record and no `lpn_dockbox` gets them; any saved layout is the visitor's own and is left
+	// alone. One list for a PC and a phone (Tom, 2026-10-24: "for PC and phone"). Nothing is stored
+	// until the visitor changes something (boxSaveHeld()).
+	var LPN_DEFAULT_DOCKS = [
+		{ id: 'lpn_popup', side: 'right' },
+		{ id: 'lpn_settings_box', side: 'right' },
+		{ id: 'lpn_library_box', side: 'right' },
+		{ id: 'lpn_sm_box', side: 'left' },
+		{ id: 'lpn_hotkeys_popup', side: 'left' }
+	];
+	// True while a fresh browser is still looking at the gallery: the layout waits for the project.
+	var firstViewPending = false, dockWired = false;
 	// **A BROWSER DRIVEN BY A TEST HARNESS STARTS WITHOUT THEM** (navigator.webdriver), because two
 	// hundred harnesses were written against a first visit with no docks; a harness that wants them
 	// says so with `window.EC_DEFAULT_DOCKS = true` in an init script (dock-default-harness.js).
@@ -65453,39 +66659,75 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.EC_DEFAULT_DOCKS === false) { return false; }
 		return !(navigator && navigator.webdriver);
 	}
-	function applyDefaultDocks() {
-		var byId = {};
-		if (!defaultDocksWanted() || smallScreen()) { return; }
+	function freshLayoutProfile() {
+		// **A PHONE'S OLD RECORDS DO NOT COUNT UNLESS A BOX WAS DOCKED** (Tom, 2026-10-24, phone: *"Properties
+		// now starts docked at the right and autohidden"* -- he did not see it). Before docking reached a
+		// phone every record there held a floating position, and a box on a phone fills the window, so
+		// none of them is a layout anybody chose; only a stored dock is the visitor's own.
+		if (smallScreen()) { return !dockBoxes.some(function (d) { return !!d.rec.dock; }); }
 		try {
-			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
-			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
-		} catch (e) { return; }
+			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null || localStorage.getItem(LPN_PANEBOXES_KEY) !== null) { return false; }
+			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return false; }
+		} catch (e) { return false; }
+		return true;
+	}
+	function galleryUpNow() {
+		// **"Start here" IS A FIRST VIEW TOO** (Tom, 2026-10-27: *"I choose Start here ... Nothing is docked at
+		// all"*). Once the empty-map hint has been decided it is the answer: hidden means the visitor is
+		// looking at the map, empty or not. Only before it is decided does an empty, undismissed map count
+		// as the gallery.
+		var hint = document.getElementById('lpn_empty_hint');
+		if (hint && hint.style.display) { return hint.style.display === 'block'; }
+		return !doc || !doc.nodes || (doc.nodes.length === 0 && !galleryDismissedHere());
+	}
+	// Writes the records only; restoreDefaultDocks() opens what they name.
+	function setDefaultDockRecords() {
+		var byId = {}, ord = { left: 0, right: 0 };
 		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
-		['left', 'right'].forEach(function (side) {
-			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
-				var d = byId[id];
-				if (!d) { return; }
-				d.rec.dock = side;
-				d.rec.autohide = true;
-				d.rec.dockOrd = i;
-				d.open = true;
-				d.byDefault = true;
-				// Its corner row was drawn as a floating box's (registerDockBox() runs first), which
-				// offered no pin and no Float; draw it again as a docked box's.
-				renderDockCorner(d);
-			});
+		// A harness that measures every box docked names its own list (window.EC_DEFAULT_DOCK_LIST).
+		(window.EC_DEFAULT_DOCK_LIST instanceof Array ? window.EC_DEFAULT_DOCK_LIST : LPN_DEFAULT_DOCKS).forEach(function (r) {
+			var d = byId[r.id];
+			if (!d) { return; }
+			d.rec.dock = r.side;
+			if (r.pinned && !smallScreen()) { delete d.rec.autohide; } else { d.rec.autohide = true; }
+			d.rec.dockOrd = ord[r.side]++;
+			d.open = true;
+			d.byDefault = true;
+			// Its corner row was drawn as a floating box's; draw it again as a docked box's.
+			renderDockCorner(d);
 		});
 		dockDefaultHold = true;
+		// Each docked box's corner buttons were drawn while it floated; draw them for the dock it now has.
+		dockBoxes.forEach(function (d) { if (d.byDefault && d.corner) { renderDockCorner(d); } });
+	}
+	function applyDefaultDocks() {
+		firstViewPending = false;
+		if (!defaultDocksWanted() || !freshLayoutProfile()) { return; }
+		if (galleryUpNow()) { firstViewPending = true; return; }
+		setDefaultDockRecords();
+	}
+	// Called when the gallery goes away: the first project is on the map.
+	function applyFirstViewDocks() {
+		if (!firstViewPending || !dockWired || galleryUpNow()) { return; }
+		firstViewPending = false;
+		if (!freshLayoutProfile()) { return; }
+		setDefaultDockRecords();
+		dockBooting = true;
+		try { restoreDefaultDocks(); } finally { dockBooting = false; }
+		dockBoxes.forEach(renderDockCorner);
+		layoutDocks();
 	}
 	function restoreDefaultDocks() {
 		var openers = {
 			lpn_energy_box: openEnergyBox, lpn_scncmp_box: openScenarioCompareBox,
 			lpn_rptbox: function () { openRunReportBox(true); }, lpn_status_box: openStatusReportBox,
-			lpn_calib_box: openCalibBox, lpn_full_box: openFullReportBox,
+			lpn_calib_box: openCalibBox, lpn_demands_box: function () { openDemandsBox(); }, lpn_full_box: openFullReportBox,
 			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
 			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
 			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
-			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox
+			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox,
+			lpn_hotkeys_popup: openHotkeysBox, lpn_sm_box: openScenarioManager,
+			lpn_panebox_junctions: function () { paneBoxPop('junctions', true); }
 		};
 		if (!dockDefaultHold) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
@@ -65511,6 +66753,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			r = { dock: d.rec.dock, open: !!d.open };
 			if (d.rec.autohide) { r.autohide = true; }
 			if (d.rec.dockW) { r.dockW = d.rec.dockW; }
+			if (d.rec.dockH) { r.dockH = d.rec.dockH; }
 			if (d.rec.dockOrd !== undefined) { r.dockOrd = d.rec.dockOrd; }
 			v[d.box.id] = r;
 			n++;
@@ -65561,7 +66804,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
 	function clampDockW(w, room, over) {
 		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
-		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		if (!(w > 0)) { w = smallScreen() ? Math.round((window.innerWidth || 390) * 0.7) : LPN_DOCK_DEFAULT_W; }   // a phone's flyout leaves the left 30% of the map to look at
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
 	}
@@ -65586,9 +66829,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// has the measurements. A width the visitor has set (`dockW`, or a floating size they dragged) is
 	// theirs and wins. A box missing here (a pane tab popped out) docks at its floating CSS width.
 	var LPN_DOCK_OPTIMAL_REM = {
-		lpn_energy_box: 31, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 31,
-		lpn_full_box: 52, lpn_settings_box: 34.5, lpn_popup: 26, lpn_find_popup: 23, lpn_library_box: 27,
-		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 24, lpn_hotkeys_popup: 53
+		lpn_energy_box: 26, lpn_scncmp_box: 52, lpn_rptbox: 34, lpn_status_box: 20, lpn_calib_box: 20, lpn_demands_box: 20.5,
+		lpn_full_box: 52, lpn_settings_box: 38.625, lpn_popup: 20, lpn_find_popup: 23, lpn_library_box: 27,
+		lpn_contour_box: 20, lpn_ff_box: 35, lpn_crit_box: 33, lpn_ds_box: 20.5, lpn_hotkeys_popup: 53
 	}, dockOptimalCache = {};
 	EngCalcs.lpnDockOptimalRem = function () { return JSON.parse(JSON.stringify(LPN_DOCK_OPTIMAL_REM)); };
 	function dockOptimalW(d) {
@@ -65607,7 +66850,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dockOptimalCache[id] = { vw: vw, rem: rem, w: w };
 		return w;
 	}
-	function dockWidthOf(d) { return d.rec.dockW || dockOptimalW(d); }
+	// A phone opens a flyout at no more than 70% of the window, so the left or right 30% of the map stays
+	// to look at and to tap away on; a width the visitor dragged to is theirs, up to the whole window.
+	function dockWidthOf(d) {
+		return d.rec.dockW || (smallScreen() ? Math.min(dockOptimalW(d), Math.round((window.innerWidth || 390) * 0.7)) : dockOptimalW(d));
+	}
 	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
 	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
 	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
@@ -65684,8 +66931,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				document.activeElement.getAttribute('data-dock') : null, next;
 		hideTipsIn(row);
 		while (row.firstChild) { row.removeChild(row.firstChild); }
-		if (!smallScreen()) {
-			if (side) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
+		{
+			if (side && !smallScreen()) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
 			if (side !== 'left') { row.appendChild(dockButton(d, 'left', pc.lpn_dock_left || 'Dock at the left of the map')); n++; }
 			if (side !== 'right') { row.appendChild(dockButton(d, 'right', pc.lpn_dock_right || 'Dock at the right of the map')); n++; }
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
@@ -65761,7 +67008,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var d = box && box.__lpnDock;
 		if (!d || !dockSideOf(d)) { return; }
 		dockNoteOpen(d, true);
-		if (d.rec.autohide && !dockBooting) { dockFlyout = d; dockSoft = null; }
+		if (dockAuto(d) && !dockBooting) { dockFlyout = d; dockSoft = null; }
 		layoutDocks();
 	}
 	// **THE ONE DOOR FOR "SHOW ME THIS BOX" WHEN IT IS ALREADY OPEN.** A box that is open is not run
@@ -65833,6 +67080,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (d.tab.textContent !== t) { d.tab.textContent = t; }
 			d.tab.title = t;
 			d.tab.setAttribute('aria-expanded', d === dockFlyout ? 'true' : 'false');
+			// A pinned box keeps its tab, shown pressed (Tom, 2026-10-27: "I find it disorienting to have the
+			// tab gone"), so the strip never changes membership on a pin. Pressing it unpins.
+			d.tab.setAttribute('aria-pressed', dockAuto(d) ? 'false' : 'true');
 		});
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
@@ -65853,36 +67103,125 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
 	}
+	// **A FINGER ON A GRIP DRAGS IT, WHATEVER CHROMIUM TARGETS** (Perry, 2026-10-30). A grip with :hover/:active styling made Chromium
+	// snap a touch to it from up to 10 px away, so a tap beside the strip never reached the map; the styling is gone for touch, and
+	// Chromium now picks a label or input of the box within a finger's reach over a grip that is not a tap target. So a touch whose own
+	// coordinates fall inside the strip starts the drag here, from the document, and takes the press from whatever was targeted.
+	function dockGripTouchFallback(el, down) {
+		function inside(x, y) {
+			var r;
+			if (!el.classList.contains('lpn-dock-grip-live') || getComputedStyle(el).display === 'none') { return false; }
+			r = el.getBoundingClientRect();
+			return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+		}
+		document.addEventListener('pointerdown', function (e) {
+			if (e.pointerType !== 'touch' || e.target === el || el.lpnDragging || !inside(e.clientX, e.clientY)) { return; }
+			e.stopPropagation();
+			down(e);
+		}, true);
+		// Without this the browser has already decided, from the label it targeted, that the touch is a pan.
+		document.addEventListener('touchstart', function (e) {
+			var t = e.touches && e.touches[0];
+			if (t && e.target !== el && inside(t.clientX, t.clientY) && e.cancelable) { e.preventDefault(); }
+		}, { capture: true, passive: false });
+	}
 	// Dragging the column's inner edge sets the width of every box docked in it, together.
 	function wireDockGrip(el, side) {
 		var from = null;
 		el.addEventListener('pointerenter', function () { if (dockFlyout) { clearTimeout(dockTimer); } });
-		el.addEventListener('pointerleave', function () { if (dockFlyout && !el.lpnDragging) { dockTuckLater(dockFlyout); } });
-		el.addEventListener('pointerdown', function (e) {
+		// A finger never hovers, so its lifting is not a pointer leaving: a flyout sized by touch stays out
+		// until a press elsewhere or its own close/tab, as before the drag.
+		el.addEventListener('pointerleave', function (e) { if (dockFlyout && !el.lpnDragging && e.pointerType !== 'touch') { dockTuckLater(dockFlyout); } });
+		function down(e) {
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
 			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
 			dockGripLastSide = side;
 			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
-		});
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
 		el.addEventListener('pointermove', function (e) {
 			var w;
 			if (!from) { return; }
 			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
-			var wrap = dockMapWrap(), over = !!from.list[0].rec.autohide;
-			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W * 2) : 0, over);
+			var wrap = dockMapWrap(), over = dockAuto(from.list[0]);
+			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W - dockOppReserve(side, null)) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });
 			layoutDocks();
 		});
 		['pointerup', 'pointercancel'].forEach(function (evt) {
-			el.addEventListener(evt, function () {
+			el.addEventListener(evt, function (e) {
 				if (!from) { return; }
 				from.list.forEach(function (d) { if (d.save) { d.save(); } });
 				from = null;
 				el.lpnDragging = false;
-				if (dockFlyout) { dockTuckLater(dockFlyout); }
+				el.classList.remove('lpn-dock-grip-held');
+				if (dockFlyout && !(e && (e.pointerType === 'touch' || e.pointerType === 'pen'))) { dockTuckLater(dockFlyout); }
+			});
+		});
+	}
+	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT ABOUT HALF THE SCREEN'S HEIGHT** (Tom, 2026-10-29: "Don't cap the size. Just
+	// make the initial size reasonable"), so the map stays visible and tappable. Not a cap: its bottom edge carries a handle
+	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept across reloads with the box's other dock fields), up to the whole column.
+	function dockFlyShort() {
+		return smallScreen() && (window.innerHeight || 0) > (window.innerWidth || 0);
+	}
+	function dockFlyHeight(d, h) {
+		if (!dockFlyShort()) { return h; }
+		return Math.min(h, Math.max(LPN_DOCK_FLY_MIN_H, d.rec.dockH || Math.round((window.innerHeight || 844) * 0.5)));
+	}
+	function dockHGripEl() {
+		var el = document.getElementById('lpn_dock_hgrip');
+		if (!el) {
+			el = document.createElement('div');
+			el.id = 'lpn_dock_hgrip';
+			el.className = 'd-print-none lpn-dock-grip lpn-dock-hgrip';
+			el.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(el);
+			wireDockHGrip(el);
+		}
+		return el;
+	}
+	function placeDockHGrip(x, y, w, d, colH) {
+		var el = dockHGripEl();
+		el.lpnDock = x === null ? null : d;
+		el.lpnColH = colH;
+		el.classList.toggle('lpn-dock-grip-live', x !== null);
+		if (x === null) { return; }
+		el.style.zIndex = d.box.style.zIndex ? String(Number(d.box.style.zIndex) + 1) : '';
+		el.style.left = Math.round(x) + 'px';
+		el.style.top = Math.round(y) + 'px';
+		el.style.width = Math.round(w) + 'px';
+	}
+	function wireDockHGrip(el) {
+		var from = null;
+		function down(e) {
+			var d = el.lpnDock;
+			if (!d) { return; }
+			from = { y: e.clientY, h: d.box.getBoundingClientRect().height, d: d };
+			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
+			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
+			e.preventDefault();
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
+		el.addEventListener('pointermove', function (e) {
+			if (!from) { return; }
+			from.d.rec.dockH = Math.round(Math.max(LPN_DOCK_FLY_MIN_H, Math.min(el.lpnColH || 9999, from.h + e.clientY - from.y)));
+			layoutDocks();
+		});
+		['pointerup', 'pointercancel'].forEach(function (evt) {
+			el.addEventListener(evt, function () {
+				var d = from && from.d;
+				from = null;
+				el.lpnDragging = false;
+				el.classList.remove('lpn-dock-grip-held');
+				if (d && d.save) { d.save(); }
 			});
 		});
 	}
@@ -65918,17 +67257,45 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE ONE PLACE A DOCKED BOX, ITS TAB AND THE MAP'S MARGINS ARE PLACED.** Everything is
 	// measured from the map's OUTER edges -- the wrapper's rect plus the margins this function
 	// last gave it -- so a pass that changes the margins does not move what it has just placed.
+	// The chrome above the map wraps and unwraps (a phone's toolbar, the project tab row on the first
+	// open) without the map's own size changing, so each piece of it is watched from the first layout
+	// that finds it (the tab row is built after the dock is wired).
+	function dockChromeBottom() {
+		var lowest = 0;
+		['lpn_menubar', 'lpn_toolbar', 'lpn_tabs'].forEach(function (id) {
+			var e = document.getElementById(id), b;
+			if (e && !e.__lpnDockWatched && window.ResizeObserver) {
+				e.__lpnDockWatched = true;
+				new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(e, { box: 'border-box' });
+			}
+			if (!e || !e.offsetParent) { return; }
+			b = e.getBoundingClientRect().bottom;
+			if (b > lowest) { lowest = b; }
+		});
+		return Math.round(lowest);
+	}
+	var dockRemeasuring = false;
+	// **ROOM A FLYOUT LEAVES FOR THE OPPOSITE SIDE'S TAB STRIP** (Tom, 2026-10-25, phone: the Settings box "is
+	// not being allowed to extend into the opposite docking area even when it is empty"). A strip with tabs in
+	// it keeps its width; on a phone an EMPTY opposite side (no tab strip drawn there) is room the box may use.
+	function dockOppReserve(side, col) {
+		var opp = side === 'left' ? 'right' : 'left', strip;
+		if (!smallScreen()) { return LPN_DOCK_STRIP_W; }
+		if (col) { strip = col[opp].strip; }
+		else { strip = dockBoxes.filter(function (d) { return dockSideOf(d) === opp && dockBoxShown(d); }).length ? LPN_DOCK_STRIP_W : 0; }
+		return strip ? LPN_DOCK_STRIP_W : 0;
+	}
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
-			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
+			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n, hgrip = false;
 		dockQueued = false;
 		if (!wrap) { return; }
 		dockBoxes.forEach(function (d) {
 			var side = dockSideOf(d);
-			if (side && dockBoxShown(d)) { (d.rec.autohide ? sides[side].auto : sides[side].pinned).push(d); }
+			if (side && dockBoxShown(d)) { (dockAuto(d) ? sides[side].auto : sides[side].pinned).push(d); }
 			else { dockRelease(d); }
 		});
-		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
+		if (dockFlyout && !(dockAuto(dockFlyout) && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
 		if (dockSoft && dockSoft !== dockFlyout) { dockSoft = null; }
@@ -65940,16 +67307,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
+		// A column wider than the window (a desktop's, on a window narrowed to a phone's) squeezes the map
+		// to nothing and so hides the very measure that would take it back: give the margins up and
+		// measure again.
+		if (!(wr.width > 0) && (dockMargins.left || dockMargins.right) && !dockRemeasuring) {
+			dockMargins = { left: 0, right: 0 };
+			wrap.style.setProperty('--lpn-dock-ml', '0px');
+			wrap.style.setProperty('--lpn-dock-mr', '0px');
+			dockRemeasuring = true;
+			try { layoutDocks(); } finally { dockRemeasuring = false; }
+			return;
+		}
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
 		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
 		outerL = wr.left - dockMargins.left;
 		outerR = wr.right + dockMargins.right;
-		top = Math.max(0, sr.top);
+		// **NEVER UNDER THE PROJECT CHROME** (Tom, 2026-10-24, phone: *"the top of the Properties tab is
+		// hidden beneath the project chrome. When I open the box the tab repairs its position"*): the
+		// map's own top can lag the chrome above it while that wraps, so the lowest of the two wins.
+		top = Math.max(0, sr.top, dockChromeBottom());
 		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
 		['left', 'right'].forEach(function (s) {
 			var w = 0;
 			sides[s].pinned.forEach(function (d) { w = Math.max(w, dockWidthOf(d)); });
-			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
+			col[s] = { strip: (sides[s].auto.length || sides[s].pinned.length) ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
 		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
 		// (Tom, 2026-10-07: the Alternatives box "gets wider, but it's still limited to about 80% of
@@ -65975,20 +67356,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
 			});
 			S.auto.forEach(function (d) {
-				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true),
+				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
-				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
+				dockPlace(d, ax, top, w, d === dockFlyout ? dockFlyHeight(d, h) : h, d === dockFlyout ? 'out' : 'tucked');
 			});
-			renderDockStrip(s, S.auto, s === 'left' ? outerL : outerR - c.strip, top, h);
+			renderDockStrip(s, S.auto.concat(S.pinned).sort(dockByOrd), s === 'left' ? outerL : outerR - c.strip, top, h);
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
-				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W), true);
-				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
+				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true);
+				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, dockFlyHeight(dockFlyout, h), [dockFlyout]);
+				if (dockFlyShort()) { placeDockHGrip(s === 'left' ? outerL + c.strip : outerR - c.strip - w, top + dockFlyHeight(dockFlyout, h), w, dockFlyout, h); hgrip = true; }
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
 			}
 		});
+		if (!hgrip) { placeDockHGrip(null); }
 		if (want.left !== dockMargins.left || want.right !== dockMargins.right) {
 			dockMargins = want;
 			wrap.style.setProperty('--lpn-dock-ml', want.left + 'px');
@@ -66003,8 +67386,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!g || g.lpnDockList !== undefined && g.lpnDockList[0] !== d) { return false; }
 		return !!g.lpnDragging || g.matches(':hover');
 	}
+	function dockHGripHeld() {
+		var g = document.getElementById('lpn_dock_hgrip');
+		return !!g && (!!g.lpnDragging || g.matches(':hover'));
+	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d); } catch (e) { return false; }
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockHGripHeld() || dockOwnMenuHovered(d); } catch (e) { return false; }
 	}
 	// **A RIGHT-CLICK MENU A BOX OPENED IS PART OF THAT BOX** (Tom, 2026-10-12: *"In Scenario Manager,
 	// any right-click action hides the box. (F2 does not.)"*). The menu is drawn on the page's body,
@@ -66158,6 +67545,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.className = 'lpn-dock-tab';
 		tab.setAttribute('aria-controls', d.box.id);
 		tab.addEventListener('pointerenter', function (e) {
+			if (!dockAuto(d)) { return; }
 			if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') { return; }
 			clearTimeout(dockTimer);
 			dockTimer = setTimeout(function () { dockFlyOut(d, false); }, LPN_DOCK_HOVER_MS);
@@ -66168,6 +67556,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tab.addEventListener('click', function () {
 			// The click that ends a reordering drag is not a request to open the box.
 			if (tab.lpnDragged) { tab.lpnDragged = false; return; }
+			// A pinned box's tab is its pressed button: pressing it unpins, as in JetBrains and VS Code.
+			if (!dockAuto(d)) { dockAct(d, 'autohide'); return; }
 			dockFlyOut(d, true);
 		});
 		tab.lpnDock = d;
@@ -66247,9 +67637,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_popup: openPopupEmpty,
 			lpn_crit_box: openCriticalityBox,
 			lpn_ds_box: openDemandScaleBox,
-			lpn_calib_box: openCalibBox
+			lpn_calib_box: openCalibBox,
+			lpn_demands_box: function () { openDemandsBox(); }
 		};
-		if (smallScreen()) { return; }
 		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
 			if (d.shared && d.rec.dock && d.open && openers[d.box.id] && !dockBoxShown(d)) { openers[d.box.id](); }
 		});
@@ -66272,8 +67662,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_sm_box', smboxLayout, saveSmboxLayout, LPN_SMBOX_KEY, 'lpn_sm_help'],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
+			['lpn_demands_box', demandsLayout, null, null],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockWired = true;
 		applyDefaultDocks();
 		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
@@ -66291,6 +67683,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (window.ResizeObserver && svg) {
 			new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(svg);
 		}
+		window.addEventListener('scroll', function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }, { passive: true });
 		document.addEventListener('pointerdown', dockOutsidePress, true);
 		// A soft-pinned flyout closes on Escape wherever the keyboard is (the box's own handler covers
 		// the keyboard being inside it).
@@ -66483,7 +67876,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The label a type's property carries, in the Library and on the popup alike, so the two cannot
 	// drift. Roughness and the two reaction coefficients already name their own units and follow the
 	// friction method; a diameter names the unit strip's.
-	function pipeTypePropLabel(prop) {
+	function pipeTypePropLabel(prop, short) {
 		var pc = EngCalcs.pageConfig || {};
 		if (prop === 'diameter') {
 			return (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')';
@@ -66497,11 +67890,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return pc.lpn_field_fittings || 'Fittings list';
 		}
 		if (prop === 'bulkCoeff') {
-			return (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
+			return (short ? (pc.lpn_reaction_bulk_short || 'Bulk reaction') : (pc.lpn_reaction_bulk || 'Bulk reaction coefficient'))
 				+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')';
 		}
 		// **FOLLOWS THE WALL REACTION ORDER, LIKE EVERY OTHER READER OF THIS UNIT** (R-324).
-		return (pc.lpn_reaction_wall || 'Wall reaction coefficient') + ' (' + wallCoeffUnitText() + ')';
+		return (short ? (pc.lpn_reaction_wall_short || 'Wall reaction') : (pc.lpn_reaction_wall || 'Wall reaction coefficient'))
+			+ ' (' + wallCoeffUnitText() + ')';
 	}
 	// **A CURVE'S KIND DECIDES WHAT ITS SECOND COLUMN IS**, and therefore its heading and its unit.
 	// One table, so the Library, the popup and the exporter cannot disagree about what a curve of a
@@ -69775,7 +71169,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			title = document.getElementById('lpn_popup_title'), fields = document.getElementById('lpn_popup_fields'), p;
 		hideTipsIn(popup);
 		currentPopup = null;
-		title.textContent = '';
+		popupTitleSet('');
 		clearFields(fields);
 		p = document.createElement('p');
 		p.className = 'lpn-popup-none';
@@ -70238,6 +71632,299 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(help);
 		label.appendChild(document.createTextNode(' '));
 	}
+	// ---- THE STANDARD ROW, IN THE PROPERTIES BOX (Task 828, Ida's design; the Contour and Fire flow
+	// boxes build theirs with lpnGridRow() directly) ----
+	//
+	// The Properties popup is built by about fifty call sites that each append a `<label>` (name,
+	// then control) and a `<br>`, and the override marker and the value warning find their row by
+	// that shape (ovmRowStart(), valueWarnPaint()). So the shape stays, and ONE pass over the
+	// finished box puts every row on the grid: `[gutter] | name | value | unit`, `fields` itself the
+	// grid, each `<label>` a `display: contents` row of four cells. Nothing in the box is left out:
+	// a block (table, note, list, buttons) spans the grid; a run of loose controls is wrapped.
+	// A browser-only pass: the test stub has no ranges and no mixed text, so it keeps the flow shape.
+	var LPN_GP_DIGITS = { k: 5, diameter: 6, roughness: 7, length: 8 };   // Tom's own limits for the number boxes
+	var LPN_GP_BLOCK = /^(DIV|TABLE|FIELDSET|P|H\d|UL|OL|DETAILS|SECTION|HR|DATALIST)$/;
+	var LPN_GP_CONTROL = /^(INPUT|SELECT|TEXTAREA|BUTTON)$/;
+	function gpCell(tag, cls) { var e = document.createElement(tag); e.className = cls; return e; }
+	function gpIsName(n) {
+		var c;
+		if (n.nodeType === 3) { return true; }
+		if (n.nodeType !== 1) { return false; }
+		if (n.nodeName === 'A') { return true; }
+		c = ' ' + (n.className || '') + ' ';
+		return c.indexOf(' ec-help ') >= 0 && c.indexOf(' lpn-valwarn ') < 0;
+	}
+	// A name that ends in "(unit)" is said again by the one template (lpnLabelWithUnit): the unit and the
+	// symbol in <bdi>, the punctuation the language's own. A short symbol after a comma ("Roughness, e")
+	// is the template's {symbol}.
+	function gpTemplateUnit(nameEl) {
+		var leaf = null, m, sy, frag;
+		(function walk(n) {
+			var i, k;
+			for (i = 0; i < n.childNodes.length; i++) {
+				k = n.childNodes[i];
+				if (k.nodeType === 3) { if (/\S/.test(k.nodeValue)) { leaf = k; } }
+				else if (k.nodeType === 1 && !/(^| )ec-tip( |$)/.test(k.className || '')) { walk(k); }
+			}
+		}(nameEl));
+		if (!leaf) { return; }
+		m = /^([\s\S]*?\S)\s*\(([^()]+)\)\s*$/.exec(leaf.nodeValue);
+		if (!m) { return; }
+		sy = /^([\s\S]*?\S)\s*[,\uFF0C\u060C]\s*(\S{1,3})$/.exec(m[1]);
+		frag = document.createDocumentFragment();
+		lpnRichInto(frag, sy ? lpnLabelWithUnit(sy[1], m[2], sy[2]) : lpnLabelWithUnit(m[1], m[2]));
+		leaf.parentNode.replaceChild(frag, leaf);
+	}
+	// The words of every `?` name are clipped; the `?` itself never is.
+	function gpClipWords(nameEl) {
+		Array.prototype.slice.call(nameEl.querySelectorAll('.ec-help')).forEach(function (h) {
+			var t = h.firstChild, w;
+			if (t && t.nodeType === 3) {
+				w = gpCell('span', 'lpn-gtext');
+				w.textContent = t.nodeValue.replace(/\s+$/, '');
+				h.replaceChild(w, t);
+			}
+		});
+	}
+	function gpDigits(ctrl) {
+		var d = ctrl.getAttribute('data-gd'), p = ctrl.getAttribute('data-gprop');
+		if (d) { return +d; }
+		if (p && LPN_GP_DIGITS[p]) { return LPN_GP_DIGITS[p]; }
+		return 12;   // a coordinate, an elevation, an id: the one width every like box shares
+	}
+	// An empty editable cell still shows a faint underline (sheet-light): the style keys on :placeholder-shown, and a
+	// cell with no placeholder of its own is given a blank one so it matches while it is empty.
+	function lpnEmptyMark(c) {
+		if (c && c.nodeName === 'INPUT' && (c.type === 'text' || c.type === 'number') && !c.getAttribute('placeholder')) { c.setAttribute('placeholder', ' '); }
+	}
+	function gpSizeControl(ctrl, kind) {
+		var cls = ctrl.className ? ctrl.className + ' ' : '';
+		lpnEmptyMark(ctrl);
+		ctrl.className = cls + 'lpn-gval';
+		if (ctrl.nodeName === 'SELECT') { ctrl.className += ' lpn-gw-fill'; }
+		else if (ctrl.nodeName === 'INPUT' && (ctrl.type === 'number' || (ctrl.type === 'text' && ctrl.getAttribute('data-gd')))) {
+			// A number is right-aligned, a run of characters (an id, a custom property) starts at the left.
+			ctrl.className += ctrl.type === 'number' ? ' lpn-gw-num' : ' lpn-gw-num lpn-gw-chars';
+			ctrl.style.setProperty('--d', String(gpDigits(ctrl)));
+		} else if (ctrl.nodeName === 'INPUT' && ctrl.type === 'text') { ctrl.className += ' lpn-gw-fill'; }
+		else if (ctrl.nodeName === 'TEXTAREA') { ctrl.className += ' lpn-gw-fill'; }
+		else if (kind === 'read') { ctrl.className += ' lpn-gw-read'; }
+	}
+	// One `<label>` into four cells: gutter, name, value, unit (and whatever trailed it).
+	function gpRow(label, gut) {
+		var kids = Array.prototype.slice.call(label.childNodes), i, k, ctrl = null, ctrlAt = -1, nameNodes = [], trail = [],
+			value, nameEl, boxFirst, extra = [], kind = 'control', firstName = -1;
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k.nodeType === 1 && k.nodeName === 'DATALIST') { extra.push(k); continue; }
+			if (firstName < 0 && gpIsName(k) && !(k.nodeType === 3 && !/\S/.test(k.nodeValue))) { firstName = i; }
+			if (!ctrl && k.nodeType === 1 && LPN_GP_CONTROL.test(k.nodeName)) { ctrl = k; ctrlAt = i; }
+		}
+		boxFirst = !!ctrl && /^(checkbox|radio)$/.test(ctrl.type || '') && (firstName < 0 || ctrlAt < firstName);
+		if (!ctrl) {
+			// A read-only result: the first plain span after the words is the value.
+			kind = 'read';
+			for (i = 0; i < kids.length; i++) {
+				k = kids[i];
+				if (k.nodeType === 1 && !gpIsName(k) && !/(^| )lpn-valwarn( |$)/.test(k.className || '') && k.nodeName !== 'DATALIST') { ctrl = k; ctrlAt = i; break; }
+			}
+		}
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k === ctrl || extra.indexOf(k) >= 0) { continue; }
+			if (boxFirst) { nameNodes.push(k); }
+			else if (ctrl && i > ctrlAt) { trail.push(k); }
+			else { nameNodes.push(k); }
+		}
+		nameEl = gpCell('span', 'lpn-gname');
+		nameNodes.forEach(function (n) { nameEl.appendChild(n); });
+		gpClipWords(nameEl);
+		if (ctrl && !boxFirst && (kind === 'read' || ctrl.type === 'number' || ctrl.type === 'text' || ctrl.nodeName === 'SELECT')) {
+			// Only a quantity states a unit; a choice's parenthesis is its own words ("Check valve (CV)").
+			if (ctrl.nodeName !== 'SELECT') { gpTemplateUnit(nameEl); }
+		}
+		// The value warning (a mark after the control) stands at the end of its label; the rest stands under the row.
+		label.__gtrail = trail.filter(function (n) {
+			if (n.nodeType === 3 && !/\S/.test(n.nodeValue)) { return false; }
+			if (n.nodeType === 1 && /(^| )lpn-valwarn( |$)/.test(n.className || '')) { nameEl.appendChild(document.createTextNode(' ')); nameEl.appendChild(n); return false; }
+			return true;
+		});
+		while (label.firstChild) { label.removeChild(label.firstChild); }
+		label.className = (label.className ? label.className + ' ' : '') + 'lpn-grow';
+		label.appendChild(gut);
+		label.appendChild(nameEl);
+		if (ctrl) { gpSizeControl(ctrl, kind); label.appendChild(ctrl); }
+		else { label.appendChild(gpCell('span', 'lpn-gval')); }
+		extra.forEach(function (d) { label.appendChild(d); });
+		return label;
+	}
+	// THE PROPERTIES BOX'S ROW ORDER (Tom, 2026-10-29: "From and To are topology, and they should be immediately after ID";
+	// "Shouldn't Active be near the top?"; Ida's table, with Mary's outside evidence). Think in categories: what it is and
+	// whether it is in the model, what it is made of, how it starts, then what the solver said. Inputs first, results
+	// always last. A key is a language key whose text starts the row's name; a '#' key is a group the builder tagged by
+	// popRows(); '|' marks where a row this table does not name lands (an input a deployment or a project adds).
+	var PROP_ORDER = {
+		junction: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_emitter',
+			'lpn_field_base_demand', 'lpn_field_demand_pattern', 'lpn_demand_cats', 'bpn_demand', 'lpn_node_customers', 'lpn_ff_required',
+			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
+			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_delivered_demand', 'lpn_result_demand_deficit', '#qresult', '#notes'],
+		reservoir: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', '#coords', 'lpn_field_head', 'lpn_field_head_pattern',
+			'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|', '#qresult', '#notes'],
+		tank: ['lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_elev', 'lpn_field_tank_base_elev', 'lpn_field_tank_diameter',
+			'lpn_field_tank_minlevel_short', 'lpn_field_tank_maxlevel_short', '#coords', 'lpn_field_tank_level_short', 'lpn_reaction_tank_short',
+			'lpn_mixing_model', 'lpn_mixing_fraction', 'lpn_quality_initial', 'lpn_source_type', 'lpn_source_quality', 'lpn_source_pattern', '#custom', '|',
+			'lpn_field_head', 'lpn_result_pressure', 'lpn_result_depth', 'lpn_result_tank_volume', '#qresult', '#notes'],
+		pipe: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_pipetype', 'lpn_field_diameter',
+			'lpn_field_roughness', 'lpn_field_fittings', 'lpn_field_km_short', 'lpn_field_auto_length', 'lpn_field_length', 'lpn_field_closed', 'lpn_field_cv_short',
+			'lpn_reaction_bulk_short', 'lpn_reaction_wall_short', '#custom', '|',
+			'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_gradient', 'lpn_result_status', '#qresult', 'lpn_result_reaction_rate', '#notes'],
+		pump: ['lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_pump_curve_source', 'lpn_pump_effic_curve',
+			'lpn_field_closed', 'lpn_field_pump_speed', 'lpn_field_speed_pattern', 'lpn_energy_price', 'lpn_energy_price_pattern', '#custom', '|',
+			'lpn_result_flow', 'lpn_field_head', 'lpn_result_status', '#qresult', '#notes'],
+		valve: ['lpn_full_col_type', 'lpn_field_from', 'lpn_field_to', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_tag', 'lpn_field_diameter', 'lpn_field_km_short',
+			'lpn_field_valve_setting_pressure', 'lpn_field_valve_setting_drop', 'lpn_field_valve_setting_flow', 'lpn_field_valve_setting_loss', 'lpn_gpv_curve_source',
+			'lpn_field_closed', '#custom', '|', 'lpn_result_flow', 'lpn_result_velocity', 'lpn_result_headloss', 'lpn_result_status', '#qresult', '#notes'],
+		customer: ['lpn_field_meter_pipe', 'lpn_field_meter_node', 'lpn_field_meter_station', 'lpn_field_meter_offset', 'lpn_field_meter_lumped', 'lpn_field_desc', 'lpn_field_tag',
+			'lpn_field_meter_demand', 'lpn_field_demand_pattern', 'lpn_field_meter_count', 'lpn_field_meter_total', '#custom', '|', '#notes'],
+		text: ['#words', 'lpn_field_active_short', 'lpn_field_desc', 'lpn_field_x', 'lpn_field_y', 'lpn_field_text_size', 'lpn_field_text_bold', 'lpn_field_text_align',
+			'lpn_field_text_valign', 'lpn_field_text_rotation', 'lpn_field_text_all_zoom', '#custom', '|', '#notes']
+	};
+	// Tag every row a builder adds to `fields` while `fn` runs, for the rows whose name is not one language key.
+	function popRows(fields, key, fn) {
+		var from, i;
+		if (!fields || !fields.childNodes) { fn(); return; }
+		from = fields.childNodes.length;
+		fn();
+		for (i = from; i < fields.childNodes.length; i++) { fields.childNodes[i].__prow = key; }
+	}
+	function propRowName(node) {
+		var c, bad, i;
+		if (!node.cloneNode) { return ''; }
+		c = node.cloneNode(true);
+		bad = c.querySelectorAll ? c.querySelectorAll('input, select, textarea, button, option, .lpn-valwarn') : [];
+		for (i = 0; i < bad.length; i++) { if (bad[i].parentNode) { bad[i].parentNode.removeChild(bad[i]); } }
+		return (c.textContent || '').trim();
+	}
+	// Reorder the rows already built into `fields`: a row is a <label> plus whatever its builder put after it (marks, notes,
+	// buttons) up to the next row, so a row's trail travels with it.
+	function propsReorder(fields, type) {
+		var order = PROP_ORDER[type], pc = EngCalcs.pageConfig || {}, groups = [], cur = null, unk, kids, i, k, node, tag;
+		if (!order || !fields || !fields.childNodes) { return; }
+		unk = order.indexOf('|');
+		function isMark(nd) { return nd.nodeType === 1 && (' ' + (nd.className || '') + ' ').indexOf(' lpn-ovm ') >= 0; }
+		function rankOf(label) {
+			var t = propRowName(label), b = -1, bl = 0, j;
+			for (j = 0; j < order.length; j++) {
+				if (order[j].charAt(0) === '#' || order[j] === '|' || typeof pc[order[j]] !== 'string' || !pc[order[j]]) { continue; }
+				if (t.indexOf(pc[order[j]]) === 0 && pc[order[j]].length > bl) { b = j; bl = pc[order[j]].length; }
+			}
+			return b >= 0 ? b : unk;
+		}
+		kids = Array.prototype.slice.call(fields.childNodes);
+		for (i = 0; i < kids.length; i++) {
+			node = kids[i];
+			tag = node.__prow || '';
+			// An override marker stands in front of the row it marks: it opens that row's group and the label that follows joins it.
+			if (cur && cur.marked && !tag && node.nodeName === 'LABEL') { cur.marked = false; cur.nodes.push(node); cur.rank = rankOf(node); continue; }
+			if (!cur || (tag ? tag !== cur.tag : (node.nodeName === 'LABEL' || isMark(node)))) {
+				cur = { nodes: [], tag: tag, at: groups.length, rank: unk, marked: !tag && isMark(node) };
+				groups.push(cur);
+				if (tag) { k = order.indexOf(tag); cur.rank = k < 0 ? unk : k; }
+				else if (node.nodeName === 'LABEL') { cur.rank = rankOf(node); }
+				else if (!cur.marked) { cur.rank = -1; }
+			}
+			cur.nodes.push(node);
+		}
+		groups.sort(function (a, b) { return a.rank - b.rank || a.at - b.at; });
+		kids.forEach(function (n) { if (n.parentNode) { n.parentNode.removeChild(n); } });
+		groups.forEach(function (g) { g.nodes.forEach(function (n) { fields.appendChild(n); }); });
+	}
+	function lpnPropsGrid(fields) {
+		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null, nm;
+		// What stands after a row's control (a link, a button, a word) goes on a line of its own under the row,
+		// from the value column: the row has a label and a value and no third cell.
+		function trailOf(row) {
+			if (!row.__gtrailBlock) {
+				row.__gtrailBlock = gpCell('div', 'lpn-gspan3 lpn-gbtns lpn-gtrail');
+				fields.insertBefore(row.__gtrailBlock, row.nextSibling);
+			}
+			return row.__gtrailBlock;
+		}
+		if (!fields || typeof document === 'undefined' || typeof document.createRange !== 'function') { return; }
+		if ((' ' + fields.className + ' ').indexOf(' lpn-gprops ') < 0) { fields.className = (fields.className ? fields.className + ' ' : '') + 'lpn-gprops'; }
+		kids = Array.prototype.slice.call(fields.childNodes);
+		function endLoose() { loose = null; }
+		function gutterCell() {
+			var g = gut || gpCell('span', 'lpn-ggut');
+			gut = null;
+			if (g.className.indexOf('lpn-ggut') < 0) {
+				cell = gpCell('span', 'lpn-ggut');
+				cell.appendChild(g);
+				g = cell;
+			}
+			return g;
+		}
+		for (i = 0; i < kids.length; i++) {
+			k = kids[i];
+			if (k.nodeType === 3) {
+				if (!/\S/.test(k.nodeValue)) { fields.removeChild(k); continue; }
+			}
+			if (k.nodeType === 1 && k.nodeName === 'BR') { last = null; btns = null; endLoose(); continue; }
+			c = ' ' + (k.className || '') + ' ';
+			if (k.nodeType === 1 && c.indexOf(' lpn-ovm ') >= 0) { gut = k; fields.removeChild(k); continue; }
+			if (k.nodeType === 1 && k.nodeName === 'LABEL') {
+				endLoose();
+				if (c.indexOf(' lpn-fill-row ') >= 0) {
+					// The Text's words: the box's own title above says what it is, and the box spans the
+					// grid after the gutter (Tom, 2026-10-15: it fills the Properties box and follows it).
+					k.insertBefore(gutterCell(), k.firstChild);
+					k.className += ' lpn-grow';
+					Array.prototype.forEach.call(k.childNodes, function (x) { if (x.nodeType === 1 && x.nodeName === 'TEXTAREA') { x.className += ' lpn-gspan2'; } });
+					last = null;
+					continue;
+				}
+				gpRow(k, gutterCell());
+				last = k;
+				if (k.__gtrail && k.__gtrail.length) { k.__gtrail.forEach(function (n) { trailOf(k).appendChild(n); }); }
+				continue;
+			}
+			if (k.nodeType === 1 && LPN_GP_BLOCK.test(k.nodeName)) {
+				endLoose(); last = null;
+				marked = !!gut;
+				if (marked) { fields.insertBefore(gutterCell(), k); }   // a marker over a table or a list
+				// The demand table starts at the value column and spans it and the unit column.
+				k.className = (k.className ? k.className + ' ' : '') + (c.indexOf(' lpn-demand-table ') >= 0 ? 'lpn-gspan2' : marked || c.indexOf(' lpn-ov-note ') >= 0 ? 'lpn-gspan2' : 'lpn-gspan');
+				continue;
+			}
+			// A loose link or word after a row belongs to that row (the library link beside a curve);
+			// a button goes on a line of its own under it, so two long button words cannot stretch the box.
+			if (last) { trailOf(last).appendChild(k); continue; }
+			if (!loose) {
+				// Buttons stand in the value track, as a button does in every row; words span the grid.
+				loose = gpCell('div', k.nodeType === 1 && k.nodeName === 'BUTTON' ? 'lpn-gspan3 lpn-gbtns lpn-gloose' : 'lpn-gspan lpn-gloose');
+				fields.insertBefore(loose, k);
+			}
+			loose.appendChild(k);
+		}
+		if (gut) { gut = null; }
+		if (fields.id === 'lpn_popup_fields' && fields.parentNode) {
+			// The box's body owns the tracks: it gets the Label | Value header and the remembered or fitted width.
+			nm = fields.parentNode;
+			nm.setAttribute('data-gcols-id', 'lpn_popup');
+			gcolApply(nm);
+			propsHeaderPlace(nm, fields);
+			gridFitSoon(nm);
+			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
+				nm.__lpnRO = true;
+				new ResizeObserver(function () {
+					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
+					if (w) { nm.classList.remove('lpn-gnarrow'); }   // Properties is two columns at every width
+					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
+					gridFitSoon(nm);
+				}).observe(nm);
+			}
+		}
+	}
 	function tipsIn(root) {
 		initTipsIn(root);
 	}
@@ -70255,6 +71942,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// attached tooltip instances to. A tooltip that is OPEN at that moment lives in document.body,
 	// not in the popup, so wiping innerHTML would strand it on screen with nothing to close it.
 	// Dispose first, then clear.
+	// **THE PROPERTIES PANE DOES NOT JUMP WHEN A NOTE LINE COMES OR GOES** (Tom, 2026-10-23: *we
+	// need to use additional lines to document and manage overrides*, *as long as we manage
+	// properly the vertical position of the pane scrolling*). An edit rebuilds the rows. The box
+	// is emptied and refilled, and any layout read in between (the gutter's, the width pass)
+	// clamps scrollTop to the emptied box, so the pane came back scrolled elsewhere. For the same
+	// asset in the same scenario this pins the box to the height it had and puts scrollTop back
+	// once the rebuild ends (a microtask, before paint). The pin stays, so a note that goes away
+	// leaves its line blank instead of pulling the row you just cleared down the screen; it is
+	// dropped when a different asset or scenario is shown. dev/lpn-spike/value-source-browser-harness.js.
+	var propsScrollKey = null, propsKeepSameAct = false, propsActScroll = 0;
+	function propsScrollKeep(fields) {
+		var sc = fields.parentElement, scn = activeScenario(),
+			key = currentPopup ? currentPopup.kind + ':' + currentPopup.id + ':' + (scn ? scn.id : '') : null,
+			st, h;
+		if (!sc || key === null || key !== propsScrollKey) { propsScrollKey = key; fields.style.minHeight = ''; return; }
+		st = sc.scrollTop;
+		// The first rebuild of an act may be clamped by a box that is shorter for a moment (a note line
+		// not yet drawn), so a later rebuild of the same act puts back the scroll the act began with.
+		if (propsKeepSameAct) { st = Math.max(st, propsActScroll); } else { propsActScroll = st; }
+		// **ONE USER ACT MAY REBUILD THE BOX TWICE** (the edit, then the solve's refresh), so within
+		// one act the pin is the height the box is showing. A NEW act pins the box's own height,
+		// without the blank an earlier Clear kept: the blank is the one line the act in hand
+		// removes, never the sum of several Clears.
+		if (!propsKeepSameAct) { fields.style.minHeight = ''; }
+		h = fields.offsetHeight;
+		fields.style.minHeight = h + 'px';
+		if (!propsKeepSameAct) { propsKeepSameAct = true; setTimeout(function () { propsKeepSameAct = false; }, 450); }
+		Promise.resolve().then(function () {
+			// A pin taller than the grid track it asks for leaves the rows (and so the Time series chart) drawn over the
+			// fields: once the rebuilt rows are taller than the pin the pin has done its work, so it is dropped (Perry, 2026-10-29).
+			if (fields.offsetHeight > h + 1) { fields.style.minHeight = ''; }
+			sc.scrollTop = st;
+		});
+	}
 	function clearFields(fields) {
 		if (window.bootstrap && bootstrap.Tooltip) {
 			Array.prototype.forEach.call(fields.querySelectorAll('.ec-help'), function (el) {
@@ -70262,9 +71983,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (t) { t.dispose(); }
 			});
 		}
+		if (fields.id === 'lpn_popup_fields') { propsScrollKeep(fields); }
 		fields.innerHTML = '';
 		// The ID line's room goes with the Properties box's own rows, not another box's.
-		[fields, fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1'); } });
+		[fields, fields.id === 'lpn_popup_fields' ? fields.parentNode : null].forEach(function (e) { if (e && e.classList) { e.classList.remove('lpn-ovm-gut', 'lpn-ovm-gut1', 'lpn-ovm-gut2'); } });
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
 	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
@@ -70274,10 +71996,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// one confusing case the delta model leaves, needing no change-tracking bookkeeping.
 	function formatPropValue(v) {
 		if (v === undefined || v === null || v === '') { return ''; }
-		// A boolean reads as a MARK, not as a word: "Base: ✓" beside a checkbox is exactly the box's
-		// own vocabulary, it is language-free and RTL-safe (the same reason the suite's verdict
-		// strings lead with a glyph), and it costs no key in 27 languages to say Yes and No.
-		if (typeof v === 'boolean') { return v ? '✓' : '—'; }
+		// A boolean reads in words, Yes and No, as the Settings table does (Tom, 2026-10-24: a check
+		// mark under "Is active" told him nothing about what Clear restores).
+		if (typeof v === 'boolean') { return v ? settingTableYes() : settingTableNo(); }
 		return (typeof v === 'number') ? String(+v.toFixed(6)) : String(v);
 	}
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
@@ -70354,18 +72075,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE LINE BESIDE AN OVERRIDE SAYS WHAT CLEAR OVERRIDE WOULD RESTORE, AND FROM WHERE** (Tom,
 	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
 	// The category of the marker whose line is being written, for Base (ovmGutter()).
-	var inheritedLineCat = null;
+	var inheritedLineCat = null, inheritedLineUnit = '';
+	// **ONE SENTENCE FOR WHAT CLEAR RESTORES, EVERYWHERE** (Tom, 2026-10-24: *"Clear restores Yes, the
+	// value in Base."*): Properties' note line, a Settings row's held list and a single Settings row
+	// all say it through here. `value` is in words (Yes, No), with its unit; `parentName` is the
+	// scenario it comes from, or null for the default.
+	function clearRestoresText(value, parentName) {
+		var pc = EngCalcs.pageConfig || {}, source = parentName === null
+			? (pc.lpn_settings_held_default || 'the default')
+			: (pc.lpn_settings_held_from || 'the value in {parent}').split('{parent}').join(parentName);
+		if (value === '') { value = pc.lpn_settings_held_none || 'no text'; }
+		return (pc.lpn_ovm_restores || 'Clear restores {value}, {source}.').split('{value}').join(value).split('{source}').join(source);
+	}
 	function inheritedLine(fn) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), par = parentScenarioOf(scn), v;
+		var scn = activeScenario(), par = parentScenarioOf(scn), v;
 		// Base naming an alternative: what Clear restores is that alternative's parent's value, so the
 		// line reads Base with the alternative's parent named in its place, for that moment.
 		if (scn.isBase && inheritedLineCat !== null && basePick(scn, inheritedLineCat) !== undefined) {
 			v = withBasePick(scn, inheritedLineCat, (writeTargetFor(scn, inheritedLineCat).obj || {}).parent, fn);
-			return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v);
+			par = baseScenario();
+		} else {
+			v = paneInScenario(par, fn);
+			if (!par) { par = baseScenario(); }
 		}
-		v = paneInScenario(par, fn);
-		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
-		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
+		if (inheritedLineUnit && /^-?[\d.]+( \+ -?[\d.]+)*$/.test(v)) { v += ' ' + inheritedLineUnit; }
+		return clearRestoresText(v, scenarioDisplayName(par));
 	}
 	// ---- THE OVERRIDE MARKER: A DOT AND A DOWN TRIANGLE (Task 790) ----
 	//
@@ -70491,12 +72225,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The gutter's room, given to the rows and to the ID line above them (#lpn_popup_title), so
 	// every line of the box starts at one x.
 	function ovmGutterOn(fields, cls) {
-		var t = fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null;
 		// A section of the multi-properties box is not yet in the popup, whose own fields hold the room.
-		if (fields.className === 'lpn-multi-section') {
-			t = document.getElementById('lpn_popup_title');
+		if (fields.className === 'lpn-multi-section' || (fields.parentNode && fields.parentNode.className === 'lpn-multi-section')) {
 			fields = document.getElementById('lpn_popup_fields') || fields;
 		}
+		var t = fields.id === 'lpn_popup_fields' ? fields.parentNode : null;   // the body, which owns the tracks
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
@@ -70517,15 +72250,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.className = 'lpn-ovm';
 		if (baseHere) { /* the triangle alone */ }
 		else if (o.on) {
-			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			g.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
 				saveUndoSnapshot();
 				o.clear();
 				afterPropertyEdit(o.el);
 				refreshPopupIfOpen();
 			}));
 		} else {
-			g.appendChild(ovmCell('lpn-ovm-hollow', pc.lpn_ovm_dot_set || 'Inherited. Click to make it an override in this scenario, holding the value shown.', function () {
+			g.appendChild(ovmCell('lpn-ovm-hollow', (pc.lpn_ovm_dot_set_from || 'Inherited from {name}. Click to make it an override in this scenario, holding the value shown.').split('{name}').join(inheritedSourceName(o.el, o.props)), function () {
 				saveUndoSnapshot();
 				o.set();
 				afterPropertyEdit(o.el);
@@ -70541,7 +72273,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					refreshPopupIfOpen();
 				});
 			}));
-		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
+			// A row with a dot and a triangle is the one thing that needs the second cell.
+			if (!baseHere) { ovmGutterOn(fields, 'lpn-ovm-gut2'); }
+		}
 		fields.insertBefore(g, start);
 		if (!o.on || baseHere) { return; }
 		// While it is an override: what Clear restores, and who else the alternative reaches.
@@ -70550,9 +72284,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		base = document.createElement('span');
 		base.className = 'lpn-ov-base';
 		inheritedLineCat = o.cats[0];
-		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
+		// The unit the row's own label states, "Length (ft)": a number's note keeps it.
+		inheritedLineUnit = ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || '';
+		try { base.textContent = o.line(); } finally { inheritedLineCat = null; inheritedLineUnit = ''; }
 		note.appendChild(base);
-		shared = smSharedText(o.cats);
+		shared = ovmStoredText(o.cats);
 		if (shared) {
 			base = document.createElement('span');
 			base.className = 'lpn-ov-base lpn-ov-shared';
@@ -70620,6 +72356,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function unitNumberField(fields, labelText, unitId, get, set, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
 		// value was the result of a division and 4 places was a reasonable guess at it; now it is the
 		// number the user typed, and showing "8" back as "8.0000" makes their own input look computed.
@@ -70652,6 +72389,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var label = document.createElement('label'), input = document.createElement('input'),
 			v = get();
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
 		// A BLANK PLACEHOLDER STAYS BLANK. `+('')` is 0, so formatting unconditionally would print a
 		// fallback of zero into a field whose fallback is simply not known yet.
@@ -70697,11 +72435,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// also switches the read and the write onto the plain pair and drops the override marker, which
 	// is not a special case so much as the absence of one: there is no override to mark.
 	function customPropFields(fields, el, group) {
-		var plain = group === 'customer';
+		var plain = group === 'customer', lim;
 		customPropsFor(el, group).forEach(function (def) {
 			var label = document.createElement('label'), input = document.createElement('input'),
 				v = plain ? customerCustomValue(el, def) : customPropValue(el, def);
 			input.type = 'text';
+			// As wide as the longest value the design allows: its character limit, else its upper limit.
+			// A property with neither fills the value column.
+			lim = Number(def.maxLength);
+			if (!(lim > 0) && def.high !== '' && def.high !== null && def.high !== undefined) { lim = String(def.high).length; }
+			if (lim > 0) { input.setAttribute('data-gd', String(Math.min(40, lim))); }
 			input.value = (v === undefined || v === null) ? '' : String(v);
 			customPropPaintFlag(input, def, input.value);
 			input.addEventListener('change', function () {
@@ -71027,7 +72770,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
-		input.type = 'number'; input.step = 'any'; input.value = effective(l, 'length').toFixed(2);
+		input.type = 'number'; input.step = 'any'; input.setAttribute('data-gprop', 'length'); input.value = effective(l, 'length').toFixed(2);
 		input.addEventListener('change', function () {
 			setProp(l, 'length', +input.value);
 			// lenAuto IS BASE-OWNED and a scenario must not touch it -- geometry is shared, because a
@@ -71061,9 +72804,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')', pc.lpn_field_length_slope_tip);
 		label.appendChild(input);
 		valueWarnPaint(label, valueWarnText('length', l, effective(l, 'length')));   // dev/value-warning.md
+		// Auto length is its own row above Length, its toggle in the value column (Tom, 2026-10-26: the toggle
+		// beside Length broke the table).
+		setFieldLabel(autoLabel, pc.lpn_field_auto_length || 'Auto length', pc.lpn_field_auto_length_tip);
 		autoLabel.appendChild(auto);
-		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
-		fields.appendChild(label); fields.appendChild(autoLabel);
+		fields.appendChild(autoLabel);
+		fields.appendChild(document.createElement('br'));
+		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'length');
 	}
@@ -71498,7 +73245,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// placed through, so raising here needs no per-opener edit and a seventh box cannot arrive
 		// half-wired -- the same argument that put `touch-action` inside makePanelDraggable().
 		if (box && box.__lpnRaise) { box.__lpnRaise(); }
-		if (smallScreen()) { return fillPanelToScreen(box); }
+		if (smallScreen()) {
+			var fh = fillPanelToScreen(box);
+			if (box && box.__lpnDock) { dockPlaced(box); }
+			return fh;
+		}
 		resetPanelFill(box);
 		place();
 		// A docked box keeps its floating place underneath and is laid into its column (Task 441).
@@ -71573,6 +73324,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var fields = document.getElementById('lpn_popup_fields'), widths = [], cur = [], i, k, n,
 			left, cs, minW, chrome, w;
 		if (!fields) { return popup.getBoundingClientRect().width; }
+		if (fields.classList.contains('lpn-gprops')) {
+			// The standard rows: the grid at its natural width (its spanning blocks ask for nothing),
+			// or the widest table, whichever is wider.
+			var body = fields.parentNode, own = body.classList.contains('lpn-popover-body') && window.getComputedStyle(fields).display === 'grid' &&
+				window.getComputedStyle(body).display === 'grid',
+				host = own ? body : fields, prevW = host.style.width, tabs = fields.querySelectorAll('table'), tw;
+			// With the shared tracks the BODY is the grid (its title, rows and graph are subgrids of it).
+			host.style.width = 'max-content';
+			w = host.getBoundingClientRect().width;
+			host.style.width = prevW;
+			Array.prototype.forEach.call(tabs, function (t) {
+				var pw = t.style.width, off = Math.max(0, t.getBoundingClientRect().left - host.getBoundingClientRect().left);
+				t.style.contain = 'none'; t.style.width = 'max-content'; tw = t.getBoundingClientRect().width; t.style.width = pw; t.style.contain = '';
+				w = Math.max(w, tw + off);
+			});
+			cs = window.getComputedStyle(popup);
+			chrome = popup.getBoundingClientRect().width - host.getBoundingClientRect().width;
+			minW = parseFloat(cs.minWidth) || 0;
+			// A phone: the box takes the width of the screen, so a value control has a whole row to itself.
+			if ((window.innerWidth || 9999) < 480) { w = Math.max(w, window.innerWidth - 2 * POPUP_EDGE - chrome - 2); }
+			return Math.max(minW, Math.ceil(w + chrome + 2 + (popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
+		}
 		left = fields.getBoundingClientRect().left;
 		function flush() {
 			var right = 0, j, el, rr, rg;
@@ -71638,6 +73411,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!popupUserSize && !smallScreen()) {
 			popup.style.width = ''; popup.style.left = '0px';
 		}
+		// A phone: the box fills the width less the screen edge (Ida, 2026-10-29), so a Label | Value pair has room and no strip of half a map label stands beside it.
+		if (!popupUserSize && smallScreen()) { popup.style.width = Math.max(0, (window.innerWidth || 0) - 2 * POPUP_EDGE) + 'px'; popup.style.left = POPUP_EDGE + 'px'; }
 		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
 		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
 		// for this box and it is left alone: the properties popup opens per element, dozens of
@@ -71732,16 +73507,40 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
+	// The line under the box's own title: a heading that spans the grid (a customer, a selection, a
+	// Text) or, for an element with an id, the ID row (idField). `cls` is the title's class, so a
+	// leftover from the last element never stays.
+	function popupTitleSet(text, cls) {
+		var t = document.getElementById('lpn_popup_title'), w;
+		if (!t) { return; }
+		t.className = cls || 'lpn-gtitle';
+		t.textContent = '';
+		if (text) {
+			w = document.createElement('span');
+			w.className = 'lpn-gtitle-text';
+			w.textContent = text;
+			t.appendChild(w);
+		}
+	}
 	// A text input in place of the static title -- shared by both popups since the validation/
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
 	function idField(currentId, onRename, group) {
 		var pc = EngCalcs.pageConfig || {},
-			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
+			title = document.getElementById('lpn_popup_title'), input = document.createElement('input'), nameEl;
 		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
 		// it?"*). It sits in the popup's title bar, where a bare text box holding "J12" reads as a
 		// heading somebody made editable rather than as the element's name.
-		title.textContent = (pc.lpn_field_id || 'ID') + ' ';
+		// ON THE ROW GRID (Task 828): the name in the name track, the box in the value track, as every
+		// row below it (the box's body shares the tracks with the title, graph and fields).
+		popupTitleSet('', 'lpn-gtitle lpn-gtitle-id');
+		nameEl = document.createElement('span');
+		nameEl.className = 'lpn-gname';
+		nameEl.textContent = pc.lpn_field_id || 'ID';
+		title.appendChild(nameEl);
+		title.appendChild(document.createTextNode(' '));
 		input.type = 'text'; input.value = currentId;
+		input.className = 'lpn-gval lpn-gw-num lpn-gw-chars';
+		input.style.setProperty('--d', '12');
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
 			var newId = input.value, result = validateNewId(newId, currentId, group);
@@ -72170,7 +73969,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// tabbing on; a middle one cannot. He recommended splitting the two surfaces. **That cost
 		// becomes payable the day table columns are customizable (Task 186's neighbourhood), and it
 		// is the first thing to revisit then.** Full reasoning: dev/agents/data-entry-clerk/.
-		nodeCoordFields(fields, n);
+		popRows(fields, '#coords', function () { nodeCoordFields(fields, n); });
 		// **DESCRIPTION AND TAG COMPLETE THE IDENTITY BAND, IN EPANET'S OWN ORDER** (Task 674; Tom,
 		// 2026-09-15: the Description row was missing from the interface entirely and Tag sat at the
 		// bottom *"like we really don't care about it"*). `ID | X | Y | Description | Tag |
@@ -72209,20 +74008,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				function () { return effective(n, 'bottomElev'); },
 				function (v) { setTankBottom(n, v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				effective(n, 'elev'), pc.lpn_field_tank_base_elev_tip, { el: n, prop: 'bottomElev' });
-			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
+			unitNumberField(fields, pc.lpn_field_tank_level_short || 'Initial depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
+				pc.lpn_field_tank_level_short_tip, { el: n, prop: 'level' });
 			// These two name their field themselves for the ⚠ (a depth limit is judged against the
 			// other two depths, valueWarnText()).
-			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel_short || 'Minimum depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'minLevel'); },
 				function (v) { setProp(n, 'minLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_minlevel_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
-			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
+				pc.lpn_field_tank_minlevel_short_tip, { el: n, prop: 'minLevel' }), valueWarnText('minLevel', n, effective(n, 'minLevel')));
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel_short || 'Maximum depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'maxLevel'); },
 				function (v) { setProp(n, 'maxLevel', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_maxlevel_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
+				pc.lpn_field_tank_maxlevel_short_tip, { el: n, prop: 'maxLevel' }), valueWarnText('maxLevel', n, effective(n, 'maxLevel')));
 			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
@@ -72242,11 +74041,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the mains is an ordinary thing to model. It round-tripped from `[REACTIONS] TANK` and
 			// back with nothing on any screen able to show it until this row existed.
 			if (reactionFieldsShown()) {
-				numberFieldBlank(fields, (pc.lpn_reaction_tank || 'Reaction coefficient')
+				numberFieldBlank(fields, (pc.lpn_reaction_tank_short || 'Reaction')
 					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
 				effective(n, 'tankCoeff'),
 				function (v) { setProp(n, 'tankCoeff', v); refreshPopupIfOpen(); },
-				pc.lpn_reaction_tank_tip, { el: n, prop: 'tankCoeff' });
+				pc.lpn_reaction_tank_short_tip, { el: n, prop: 'tankCoeff' });
 			}
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'),
@@ -72333,10 +74132,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// conversion of an input -- the very thing CLAUDE.md's unit rule bans.
 			// **AND WHO IS DRAWING IT** (Task 468). The demand above is row 0 of a LIST; these are
 			// the rest of it, and this is the only place a person adds, names or removes one.
-			demandCategoryFields(fields, n, nodeId);
-			// **AND WHAT THE METERS AROUND IT ADD** (Task 247; Tom, 2026-09-17). Between the rows
-			// the user typed and the total they add up to, which is the order the sum is made in.
-			nodeCustomerFields(fields, n);
+			// **TWO ROWS IN THE SHEET, THE LIST IN ITS OWN BOX** (sheet-light; Tom, 2026-10-28: "The Demands area
+			// presented as a hole in our design."). Base demand (and its pattern) and the count of categories stand
+			// in the grid; the table of categories and the customers lumped here are in the Demand categories box.
+			demandRows(fields, n, nodeId);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
 			// **THIS JUNCTION'S OWN REQUIRED FIRE FLOW** (Task 530), blank-capable because blank is
@@ -72411,10 +74210,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_quality_initial_tip, { el: n, prop: 'initQuality' });
 			sourceFields(fields, n, cu);
 		}
-		qualityResultRow(fields, n);
-		customPropFields(fields, n);
+		popRows(fields, '#qresult', function () { qualityResultRow(fields, n); });
+		popRows(fields, '#custom', function () { customPropFields(fields, n); });
 		activeField(fields, n);
-		importNotesField(fields, n);
+		popRows(fields, '#notes', function () { importNotesField(fields, n); });
+		propsReorder(fields, n.type);
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// **THE DEMAND CATEGORIES EDITOR** (ROADMAP Task 468).
@@ -72452,6 +74253,176 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **NO REORDER CONTROL**, deliberately: the order is the file's own and nothing reads it -- the
 	// totals are additive (Tom, 2026-08-24) and the exporter writes the rows as they stand. A pair
 	// of arrows per row would be four more tap targets in a floating popup to permute a sum.
+	// **THE JUNCTION'S DEMAND IN PROPERTIES: TWO ROWS** (sheet-light; Ida's rule 4: a row is one line high, and anything
+	// taller is a different widget). "Base demand" is the inline number: row 0's base when the junction has one demand
+	// category (the ordinary junction, and its pattern gets a row of its own), and the read-only total of all of them
+	// when it has more (Sue: the count is the toggle, so there is no "Basic demand" switch). "Demand categories" is the
+	// count and a "..." button that opens the box where the list is edited. The data is unchanged: row 0 is still
+	// `_demand`/`demandPattern`/`demandCategory` and the rest `extraDemands`; row 0's base still goes through
+	// setProp(n, 'demand'), so a scenario that retypes only it keeps its single `demand` override.
+	var demandsBoxNode = null, demandsBoxKeep = false;
+	function demandsBoxEl() { return document.getElementById('lpn_demands_box'); }
+	function demandsBoxIsOpen() {
+		var box = demandsBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function demandRows(fields, n, nodeId) {
+		var pc = EngCalcs.pageConfig || {}, rows = ownDemandRows(n), one = rows.length < 2,
+			label, input, v0, total = 0, span, count, btn, custs, unit = unitLabel('lpn_u_flow');
+		if (one) {
+			label = document.createElement('label');
+			input = document.createElement('input');
+			input.type = 'number'; input.step = 'any';
+			input.setAttribute('data-gprop', 'demand');
+			v0 = effective(n, 'demand');
+			input.value = (typeof v0 === 'number') ? String(+v0.toFixed(6)) : '';
+			// One snapshot per commit, taken before the write, as every other field here does.
+			input.addEventListener('change', function () {
+				saveUndoSnapshot();
+				setProp(n, 'demand', +input.value);
+				afterPropertyEdit(n);
+				demandsBoxRebuildIfOpen();
+			});
+			setFieldLabel(label, (pc.lpn_field_base_demand || 'Base demand') + ' (' + unit + ')', pc.lpn_demand_tip);
+			label.appendChild(input);
+			valueWarnPaint(label, valueWarnText('demand', n, v0));
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+			demandOverrideMarker(fields, n);
+			patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
+				function () { return rows[0].pattern; },
+				function (v) {
+					editDemandRows(n, function (r) { r[0].pattern = v || null; });
+					afterPropertyEdit(n);
+					demandsBoxRebuildIfOpen();
+				}, null, lpnBlankIsDemandDefault());
+		} else {
+			rows.forEach(function (d) { if (typeof d.base === 'number' && isFinite(d.base)) { total += d.base; } });
+			readonlyField(fields, (pc.lpn_field_base_demand || 'Base demand') + ' (' + unit + ')', String(+total.toFixed(6)), pc.lpn_demand_total_tip);
+			demandOverrideMarker(fields, n);
+		}
+		label = document.createElement('label');
+		setFieldLabel(label, pc.lpn_demand_cats || 'Demand categories', null);
+		// The value cell is one button: the count at its left and the "..." at its right edge, as a property grid draws a
+		// drill-in cell; it starts where every other value starts.
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-demand-more';
+		btn.id = 'lpn_demand_more';
+		count = document.createElement('span');
+		count.className = 'lpn-demand-count';
+		count.textContent = String(rows.length);
+		span = document.createElement('span');
+		span.textContent = '\u2026';
+		btn.appendChild(count);
+		btn.appendChild(span);
+		btn.title = pc.lpn_demand_cats || 'Demand categories';
+		btn.setAttribute('aria-label', btn.title);
+		btn.addEventListener('click', function () { openDemandsBox(nodeId); });
+		label.appendChild(btn);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		// What the meters around this junction add, as a muted line under the count (the list itself is in the box).
+		custs = customersAtNode(n.id);
+		if (custs.length) { readonlyField(fields, pc.lpn_node_customers || 'Customer demands', customersLineText(custs), pc.lpn_node_customers_tip); }
+		// A box already open follows the junction on screen.
+		if (demandsBoxIsOpen() && !demandsBoxKeep) { demandsBoxNode = nodeId; rebuildDemandsBox(); }
+	}
+	var demandsLayout = newBoxLayout();
+	function openDemandsBox(nodeId) {
+		var box = demandsBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (nodeId !== undefined) { demandsBoxNode = nodeId; }
+		box.style.display = 'flex';
+		rebuildDemandsBox();
+		placePanelForScreen(box, function () {
+			placeBoxRemembered(box, demandsLayout);
+			if (demandsLayout.left === null || demandsLayout.top === null) { placeBesideProperties(box); }
+		});
+		initTipsIn(box);
+	}
+	// A floating box opens beside the Properties box it was asked from, on the side with room, never over it.
+	function placeBesideProperties(box) {
+		var pop = document.getElementById('lpn_popup'), pr, r, gap = 8, left, top;
+		if (!pop || pop.style.display === 'none') { return; }
+		pr = pop.getBoundingClientRect();
+		r = box.getBoundingClientRect();
+		if (!(pr.width > 0)) { return; }
+		if (pr.right + gap + r.width <= window.innerWidth) { left = pr.right + gap; }
+		else if (pr.left - gap - r.width >= 0) { left = pr.left - gap - r.width; }
+		else { return; }
+		top = Math.max(chromeFloor(), pr.top);
+		box.style.left = left + 'px';
+		box.style.top = top + 'px';
+		capPanelToRoomBelow(box, top);
+	}
+	function closeDemandsBox() { if (demandsBoxIsOpen()) { hidePanel(demandsBoxEl()); } }
+	function wireDemandsBox() {
+		var box = demandsBoxEl(), x = document.getElementById('lpn_demands_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeDemandsBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			demandsLayout.left = pos.left;
+			demandsLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
+	}
+	function demandsBoxRebuildIfOpen() { if (demandsBoxIsOpen()) { rebuildDemandsBox(); } }
+	// The box's own edits redraw Properties (its Base demand, count and total) but not themselves, so
+	// a Tab from one cell to the next is not cut off by a rebuild.
+	function demandsBoxEdited(n) {
+		demandsBoxKeep = true;
+		try { afterPropertyEdit(n); refreshPopupIfOpen(); } finally { demandsBoxKeep = false; }
+	}
+	// In a scenario that overrides this junction's demands: the same orange dot Properties draws, with the words it carries,
+	// above the table. Pressing it clears the override, as the dot in Properties does.
+	function demandsBoxOverrideCue(host, n) {
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), row, dot, text;
+		if (scenarios.length < 2 || !isOverridable(n, 'demand') || inBaseFor('demand') || !(hasOverride(n, 'demand') || hasOverride(n, 'demands'))) { return; }
+		text = (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn));
+		row = document.createElement('div');
+		row.className = 'lpn-demands-ov';
+		dot = ovmCell('lpn-ovm-dot', text + ' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			saveUndoSnapshot();
+			clearOverride(n, 'demands');
+			clearOverride(n, 'demand');
+			afterPropertyEdit(n);
+			refreshPopupIfOpen();
+			demandsBoxRebuildIfOpen();
+		});
+		row.appendChild(dot);
+		text = document.createTextNode(text);
+		row.appendChild(text);
+		host.appendChild(row);
+	}
+	function rebuildDemandsBox() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_demands_body'),
+			title = document.getElementById('lpn_demands_title'), at, n = demandsBoxNode !== null ? nodeById(demandsBoxNode) : null,
+			base = pc.lpn_demand_cats || 'Demand categories';
+		if (!host) { return; }
+		if (!n || n.type === 'tank' || n.type === 'reservoir') { closeDemandsBox(); return; }
+		// Focus is kept across the redraw: a cell being typed in (or Tabbed out of) when a solve or an edit redraws the box
+		// is found again by its row and column, so the keyboard carries on to the next cell.
+		at = demandsFocusAt(host);
+		clearFields(host);
+		if (title) { title.textContent = base + ' (' + n.id + ')'; }
+		demandsBoxOverrideCue(host, n);
+		demandCategoryFields(host, n, n.id);
+		nodeCustomerFields(host, n);
+		if (at) { demandsFocusBack(host, at); }
+	}
+	function demandsFocusAt(host) {
+		var e = document.activeElement, td = e && e.closest ? e.closest('td') : null, tr = td && td.parentNode;
+		if (!td || !host.contains(e)) { return null; }
+		return { row: Array.prototype.indexOf.call(tr.parentNode.children, tr), col: Array.prototype.indexOf.call(tr.children, td), tag: e.tagName };
+	}
+	function demandsFocusBack(host, at) {
+		var tr = host.querySelectorAll('.lpn-demand-table > tbody > tr')[at.row], td = tr && tr.children[at.col], e = td && td.querySelector(at.tag.toLowerCase());
+		if (e && e.focus) { e.focus(); }
+	}
 	function demandCategoryFields(fields, n, nodeId) {
 		// **READ ONCE, AS THE SCENARIO ON SCREEN SEES IT** (R-369), and never written through: every
 		// edit below goes through editDemandRows(), which re-reads the list and writes it back
@@ -72532,11 +74503,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// demand field carried its own marker through unitNumberField()'s `{el, prop}`. That field
 		// is gone. Left as it was, a scenario override on the commonest junction in any network
 		// would have had nowhere to show itself.
-		demandOverrideMarker(fields, n);
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
-		addBtn.textContent = pc.lpn_demand_add || 'Add demand category';
+		// Just a "+" (Tom, 2026-10-28); the old words are its tip and its accessible name.
+		addBtn.textContent = '+';
+		addBtn.title = pc.lpn_demand_add || 'Add demand category';
+		addBtn.setAttribute('aria-label', addBtn.title);
 		addBtn.addEventListener('click', function () {
 			saveUndoSnapshot();
 			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
@@ -72546,9 +74519,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			editDemandRows(n, function (r) { r.push({ base: 0, pattern: null, category: null }); });
 			afterPropertyEdit(n);
 			refreshPopupIfOpen();
+			demandsBoxRebuildIfOpen();
 		});
 		fields.appendChild(addBtn);
-		fields.appendChild(document.createElement('br'));
 	}
 	/**
 	 * **THE CUSTOMERS THIS JUNCTION IS CARRYING, IN ITS OWN PROPERTY BOX** (Tom, 2026-09-17: *"The
@@ -72582,14 +74555,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// are sitting at -- so it is NOT in serializeProject() and NOT in localStorage; it is the same
 	// answer, for the same reason, that cpOpenKeys gives for a custom property.
 	var nodeCustomersOpen = {};
-	function nodeCustomerFields(fields, n) {
-		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
-			box, sum, count, total = 0, table, thead, hrow, tbody;
-		if (!list.length) { return; }
+	function customersTotal(list) {
+		var total = 0;
 		list.forEach(function (c) {
 			var f = customerFlow(c);
 			if (typeof f === 'number' && isFinite(f)) { total += f; }
 		});
+		return total;
+	}
+	// "5 gpm from Customers (2)": the line that says where the part of a junction's Demand it did not type comes from.
+	function customersLineText(list) {
+		return (( EngCalcs.pageConfig || {}).lpn_node_customers_sum || '{total} {unit} from Customers ({n})')
+			.split('{n}').join(String(list.length))
+			.split('{total}').join(String(+customersTotal(list).toFixed(6)))
+			.split('{unit}').join(unitLabel('lpn_u_flow'));
+	}
+	function nodeCustomerFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
+			box, sum, count, total = 0, table, thead, hrow, tbody;
+		if (!list.length) { return; }
+		total = customersTotal(list);
 		// **`<details>` RATHER THAN A BUTTON AND A HIDDEN DIV**, which is the idiom this page
 		// already uses twice (multiSection() and the custom-property rows): the disclosure pattern
 		// for free, and every row built eagerly, so a shut list is still found by the browser's own
@@ -72691,22 +74676,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		bInput.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setBase(+bInput.value);
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDemandDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setPattern(sel.value);
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		cInput.type = 'text';
 		cInput.value = acc.getCategory() || '';
+		lpnEmptyMark(cInput);
 		cInput.setAttribute('aria-label', (pc.lpn_field_desc || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
 			saveUndoSnapshot();
 			acc.setCategory(cInput.value.trim());
-			afterPropertyEdit(n);
+			demandsBoxEdited(n);
 		});
 		// **THE LAST REMAINING DEMAND HAS NO × AT ALL** (Task 553; Tom, 2026-08-28: *"There is still
 		// an x for Remove on the top Demands row. But it can't be removed, so there should be no
@@ -72730,6 +74716,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				acc.remove();
 				afterPropertyEdit(n);
 				refreshPopupIfOpen();
+				demandsBoxRebuildIfOpen();
 			});
 			xCell.appendChild(del);
 		}
@@ -72806,9 +74793,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// *"Pump properties has no 'New curve...' button. And it shouldn't unless that's a link to
 		// the Curves library."*). It had one, and it minted curve DATA from inside a pump's
 		// properties -- which is the confusion Task 586's whole paradigm change existed to remove:
-		// an element holds a reference and nothing else. What stands here instead is a link, and it
-		// is real navigation rather than a sentence about where to go: it opens the Libraries box
-		// on its Curves section, where a curve is made, described, edited and deleted.
+		// an element holds a reference and nothing else. What stands here instead is the last
+		// option, "Edit curves…" (Tom, 2026-10-27, as Edit types… is): it opens the Libraries box
+		// on its Curves section, where a curve is made, described, edited and deleted, and the
+		// pull-down goes back to the curve it held.
+		addEditOption(sel, pc.lpn_edit_curves || 'Edit curves…', 'curves');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setProp(l, prop, sel.value || null);
@@ -72818,7 +74807,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(curveLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, prop);
 	}
@@ -72839,9 +74827,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * that quietly detached one property in one scenario would be a second detach mechanism nobody
 	 * could find again.
 	 */
-	function inheritedField(fields, labelText, value, tip) {
+	function inheritedField(fields, labelText, value, tip, prop) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any';
+		if (prop) { input.setAttribute('data-gprop', prop); }
 		input.disabled = true;
 		input.value = (value === undefined || value === null || value === '')
 			? '' : String(+(+value).toFixed(6));
@@ -72889,6 +74878,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			missing.selected = true;
 			sel.appendChild(missing);
 		}
+		addEditOption(sel, pc.lpn_edit_pipetypes || 'Edit types…', 'pipetypes');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setPipeType(l, sel.value || null);
@@ -72899,7 +74889,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, pc.lpn_field_pipetype || 'Pipe type', pc.lpn_field_pipetype_tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(pipeTypeLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'typeId');
 		if (elementPipeType(l)) { pipeTypeDetachButton(fields, l); }
@@ -72927,6 +74916,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			fields.appendChild(document.createElement('br'));
 			return;
 		}
+		addEditOption(sel, pc.lpn_edit_fittings || 'Edit fittings…', 'fittings');
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			setProp(l, 'fittingsId', sel.value || null);
@@ -72937,30 +74927,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setFieldLabel(label, pc.lpn_field_fittings || 'Fittings list', pc.lpn_field_fittings_tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
-		fields.appendChild(fittingsLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, 'fittingsId');
 	}
-	function fittingsLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_library_fittings || 'Fittings', function () {
-				openLibrarySection('fittings');
-			}, pc.lpn_library_fittings_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap -- see curveLibraryLink().
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
-	}
-	function pipeTypeLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_library_pipetypes || 'Pipe types', function () {
-				openLibrarySection('pipetypes');
-			}, pc.lpn_library_pipetypes_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap -- see curveLibraryLink(), where the same line is the
-		// difference between a readable tip and one no touch screen can get at.
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
+	// The last option of a Library chooser opens the Libraries box on its section, and the pull-down
+	// goes back to what it held (Tom, 2026-10-26: it replaces the "Pipe types" and "Fittings" links).
+	// Registered BEFORE the chooser's own change handler, which it stops for this one value.
+	function addEditOption(sel, text, section) {
+		var o = document.createElement('option'), prev = sel.value;
+		o.value = '__edit__';
+		o.textContent = text;
+		sel.appendChild(o);
+		sel.addEventListener('change', function (e) {
+			if (sel.value !== '__edit__') { prev = sel.value; return; }
+			if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); }
+			sel.value = prev;
+			openLibrarySection(section);
+		});
+		return o;
 	}
 	// **DETACH, AND IT IS A BUTTON RATHER THAN A BLANK OPTION IN THE SELECTOR.** Choosing "No pipe
 	// type" and detaching are two different actions and only one of them keeps the numbers: the
@@ -72980,19 +74964,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		fields.appendChild(btn);
 		fields.appendChild(document.createElement('br'));
-	}
-	// The link that replaces the maker, on all three choosers -- the pump's head curve, the pump's
-	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
-	function curveLibraryLink() {
-		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_curve_library_link || 'Curves', function () {
-				openLibrarySection('curves');
-			}, pc.lpn_curve_library_link_tip);
-		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
-		// makes the tip reachable by tap. Overwriting className would leave a title nobody on a
-		// touch screen can read, which is the defect link_title_check.php exists for.
-		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
-		return b;
 	}
 	// Opening the box ON a section. openLibraryBox() rebuilds on its way in, so setting the section
 	// first is the whole of it; an already-open box only has to be rebuilt.
@@ -73286,6 +75257,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input');
 		input.type = 'text';
+		input.setAttribute('data-gd', '12');   // a node id: as wide as every other box of characters
 		input.value = l[end];
 		input.addEventListener('change', function () {
 			var newId = String(input.value).trim(), why;
@@ -73328,7 +75300,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pipeTypeChooser(fields, l);
 			if (pipeTypeOwns(l, 'diameter')) {
 				valueWarnPaint(inheritedField(fields, (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')',
-					effective(l, 'diameter'), pc.lpn_field_pipetype_tip), valueWarnText('diameter', l, effective(l, 'diameter')));
+					effective(l, 'diameter'), pc.lpn_field_pipetype_tip, 'diameter'), valueWarnText('diameter', l, effective(l, 'diameter')));
 			} else {
 				unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 					function () { return effective(l, 'diameter'); },
@@ -73339,7 +75311,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// unit is named too, because e is a length and the bare number would be ambiguous.
 			if (pipeTypeOwns(l, 'roughness')) {
 				valueWarnPaint(inheritedField(fields, pipeTypePropLabel('roughness'), effective(l, 'roughness'),
-					pc.lpn_field_pipetype_tip), valueWarnText('roughness', l, effective(l, 'roughness')));
+					pc.lpn_field_pipetype_tip, 'roughness'), valueWarnText('roughness', l, effective(l, 'roughness')));
 			} else {
 				numberFieldPlain(fields,
 					roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
@@ -73358,11 +75330,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is somewhere else's, so there is nothing to type here. Editing the list is how it
 			// moves, and choosing no list is how the box becomes the user's again.
 			if (pipeKIsDerived(l)) {
-				inheritedField(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-					pipeK(l), pc.lpn_field_fittings_tip);
+				inheritedField(fields, pc.lpn_field_km_short || 'Minor loss, k',
+					pipeK(l), pc.lpn_field_km_fittings_tip, 'k');
 			} else {
-				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, null,
+				numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k', effective(l, 'k') || 0,
+					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_short_tip,
 					{ el: l, prop: 'k' }, kmTableUrl());
 			}
 			lengthField(fields, l);
@@ -73377,13 +75349,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (reactionFieldsShown()) {
 				['bulkCoeff', 'wallCoeff'].forEach(function (prop) {
 					if (pipeTypeOwns(l, prop)) {
-						inheritedField(fields, pipeTypePropLabel(prop), effective(l, prop),
-							pc.lpn_field_pipetype_tip);
+						inheritedField(fields, pipeTypePropLabel(prop, true), effective(l, prop),
+							prop === 'bulkCoeff' ? pc.lpn_reaction_bulk_pipe_tip : pc.lpn_reaction_wall_pipe_tip);
 						return;
 					}
-					numberFieldBlank(fields, pipeTypePropLabel(prop), effective(l, prop),
+					numberFieldBlank(fields, pipeTypePropLabel(prop, true), effective(l, prop),
 						function (v) { setProp(l, prop, v); refreshPopupIfOpen(); },
-						pc.lpn_reaction_pipe_tip, { el: l, prop: prop });
+						prop === 'bulkCoeff' ? pc.lpn_reaction_bulk_pipe_tip : pc.lpn_reaction_wall_pipe_tip, { el: l, prop: prop });
 				});
 			}
 		}
@@ -73393,7 +75365,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
 		if (l.type === 'pipe') { checkValveField(fields, l); }
-		customPropFields(fields, l);
+		popRows(fields, '#custom', function () { customPropFields(fields, l); });
 		activeField(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]), undefined, resultDec('link', 'flow'));
@@ -73424,7 +75396,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
 			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
 			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
-			linkQualityResultRow(fields, l);
+			popRows(fields, '#qresult', function () { linkQualityResultRow(fields, l); });
 			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
 			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
 			// valve, or any other analysis, simply has none and the row does not appear. No unit
@@ -73437,7 +75409,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					rateVal);
 			}
 		}
-		importNotesField(fields, l);
+		popRows(fields, '#notes', function () { importNotesField(fields, l); });
+		propsReorder(fields, l.type);
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// THE VALVE POPUP. Its shape changes with the type, and that is the point rather than an
@@ -73456,7 +75430,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/scripts/scenario_seam_check.php guards the seam now.
 	function renderValveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
-		selectFieldPlain(fields, pc.lpn_field_valve_type || 'Valve type', [
+		selectFieldPlain(fields, pc.lpn_full_col_type || 'Type', [
 			['TCV', pc.lpn_valve_type_tcv || 'Throttle (TCV)'],
 			['PRV', pc.lpn_valve_type_prv || 'Pressure reducing (PRV)'],
 			['PSV', pc.lpn_valve_type_psv || 'Pressure sustaining (PSV)'],
@@ -73536,10 +75510,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// whose loss is its setting alone (measured -- see EngCalcs.lpnLinkK). A box here would be
 		// a number the user types and neither engine reads.
 		if (vt !== 'TCV') {
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
+			numberFieldPlain(fields, pc.lpn_field_km_short || 'Minor loss, k',
 				effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
-				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' }, kmTableUrl());
+				pc.lpn_field_valve_km_short_tip, { el: l, prop: 'k' }, kmTableUrl());
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
@@ -73682,7 +75656,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {},
 			box = document.createElement('details'),
 			head = document.createElement('summary'),
-			name = group.spec ? (pc[group.spec.label] || group.spec.id) : (group.type || '');
+			name = group.spec ? (pc[group.spec.label] || group.spec.id) : (group.type || ''), rowsHost;
 		// **OPEN, ALL OF THEM.** Tom's own words are that a mixed selection shows both and NEITHER
 		// IS HIDDEN, so collapsing is something the reader does, never the default.
 		box.open = true;
@@ -73695,6 +75669,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			host.appendChild(box);
 			return;
 		}
+		rowsHost = document.createElement('div');
+		box.appendChild(rowsHost);
 		paneCols(group.spec).forEach(function (c) {
 			// A result and an identity are not editable one at a time and are not editable forty at
 			// a time either. `plainFor` is asked PER ELEMENT, so a property that is read-only on any
@@ -73702,11 +75678,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// only one that cannot write a number where a type or a fittings list owns it.
 			if (c.result || !c.set || c.noMulti) { return; }
 			if (group.els.some(function (el) { return paneCellIsPlain(c, el); })) { return; }
-			multiRow(box, c, group.els);
+			multiRow(rowsHost, c, group.els);
 			// A Shape alone in this box shows its override marker as a junction's field does (Tom,
 			// 2026-10-25: *"No orange dot(s)"*). Several selected elements share one row, so none.
-			if (group.els.length === 1 && c.prop) { overrideMarker(box, group.els[0], c.prop); }
+			if (group.els.length === 1 && c.prop) { overrideMarker(rowsHost, group.els[0], c.prop); }
 		});
+		lpnPropsGrid(rowsHost);
 		host.appendChild(box);
 	}
 	/**
@@ -73733,8 +75710,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		groups = multiGroups();
 		currentPopup = { kind: 'multi', id: null };
 		clearFields(fields);
-		title.textContent = String(pc.lpn_multi_title || '{n} selected')
-			.replace('{n}', String(selectionCount()));
+		popupTitleSet(String(pc.lpn_multi_title || '{n} selected')
+			.replace('{n}', String(selectionCount())));
 		groups.forEach(function (g) { multiSection(fields, g); });
 		// **BESIDE THE SELECTION, NOT IN THE MIDDLE OF THE SCREEN** (Tom, 2026-09-08: *"Open it
 		// immediately next to the extent of the selection"*, his preference and subject to change).
@@ -73964,7 +75941,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			label = document.createElement('label'), input = document.createElement('textarea');
-		title.textContent = pc.lpn_tool_add_text || 'Text';
+		popupTitleSet(pc.lpn_tool_add_text || 'Text');
 		clearFields(fields);
 		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
 		// writes through setProp(). Writing lb._text here edits Base from inside a scenario, under
@@ -73980,6 +75957,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		input.rows = 3;
 		input.className = 'lpn-text-words';
 		label.className = 'lpn-text-words-row lpn-fill-row';
+		label.__prow = '#words';
 		input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
 			if (writeTextWords(lb, input.value) === 'deleted') { refreshPopupIfOpen(); }
@@ -74008,6 +75986,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A multiplier is a short number (1, 1.5, 2): a short box (Tom, 2026-10-15: *"5 times longer
 		// than it ever needs to be"*).
 		sizeInput.className = 'lpn-num-short';
+		sizeInput.setAttribute('data-gprop', 'sizeMult'); sizeInput.setAttribute('data-gd', '4');
 		sizeInput.value = textSizeMult(lb);
 		sizeInput.addEventListener('change', function () {
 			var v = +sizeInput.value;
@@ -74160,7 +76139,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (a === null) { return; }   // no pipes drawn: nothing to match, and nothing to say
 			setRotation(a);
 		});
-		fields.appendChild(matchBtn);
+		// The two buttons stand in a full-width row of their own under the Angle row, as the DEM buttons stand under Elevation
+		// (Tom, 2026-10-29: "Can we manage their layout like the DEM buttons?").
+		var rotBtns = document.createElement('div');
+		rotBtns.className = 'lpn-elev-dem lpn-rot-btns';
+		rotBtns.appendChild(matchBtn);
+		fields.appendChild(rotBtns);
 		// +180 and nothing else. It exists because the readable normalisation in readableAngle()
 		// picks the half-turn that reads left to right, and on a near-vertical pipe either choice
 		// is defensible -- so the user gets the other one on request, rather than an automatic rule
@@ -74169,7 +76153,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		flipBtn.type = 'button';
 		flipBtn.textContent = pc.lpn_field_text_flip || 'Turn 180°';
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
-		fields.appendChild(flipBtn);
+		rotBtns.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, lb, 'rot');
 		var here = textLabelPoint(lb);
@@ -74190,8 +76174,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (textIsAnchored(lb)) {
 			attachedTextField(fields, lb);
 		}
-		customPropFields(fields, lb);
-		importNotesField(fields, lb);
+		popRows(fields, '#custom', function () { customPropFields(fields, lb); });
+		popRows(fields, '#notes', function () { importNotesField(fields, lb); });
+		propsReorder(fields, 'text');
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	// ---- THE CUSTOMER'S OWN PROPERTY BOX (ROADMAP Task 247) ------------------------------------
@@ -74224,7 +76210,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
 			stLabel, stInput, offLabel, offInput, warn;
 		if (!c) { return; }
-		title.textContent = String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id);
+		popupTitleSet(String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id));
 		clearFields(fields);
 
 		// **THE SAME TWO IDENTITY FIELDS EVERY NODE AND LINK CARRIES**, built by the same two
@@ -74427,6 +76413,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Tom, 2026-09-18). `'customer'` is what tells customPropFields() which letter this object
 		// answers to and that its write is a plain one -- see customPropTypeKey().
 		customPropFields(fields, c, 'customer');
+		propsReorder(fields, 'customer');
+		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
 	function openCustomerPopup(custId, sx, sy) {
@@ -74506,7 +76494,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			afterPropertyEdit(l);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_field_cv || 'Check valve (CV)', pc.lpn_field_cv_tip);
+		setFieldLabel(text, pc.lpn_field_cv_short || 'Check valve', pc.lpn_field_cv_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -74546,6 +76534,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function numberFieldBlank(fields, labelText, value, onChange, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); }
 		input.value = (value === undefined || value === null || value === '') ? '' : String(value);
 		input.addEventListener('change', function () {
 			saveUndoSnapshot();   // same seam unitNumberField() takes -- see its comment
@@ -74561,7 +76550,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.step = 'any'; input.value = value;
+		input.type = 'number'; input.step = 'any';
+		if (ov && ov.prop) { input.setAttribute('data-gprop', ov.prop); } input.value = value;
 		input.addEventListener('change', function () { saveUndoSnapshot(); onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
@@ -74590,7 +76580,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// Box first, then words, in its own <span> -- setFieldLabel() assigns textContent, which
 		// would wipe a checkbox already appended to the same element. Same order as closedField().
-		setFieldLabel(text, pc.lpn_field_active || 'Is active?', pc.lpn_field_active_tip);
+		setFieldLabel(text, pc.lpn_field_active_short || 'Active', pc.lpn_field_active_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -74834,7 +76824,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
 		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
-		if (coordsChanged || basemapChanged) {
+		if (coordsChanged || basemapChanged || gisSignature() !== gisPaintedSig) {
 			refreshBasemap();
 			refreshMapStatus();
 		}
@@ -78022,6 +80012,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (i = 0; i < el.childNodes.length; i++) {
 			if (el.childNodes[i].nodeName === 'title') { t = el.childNodes[i]; break; }
 		}
+		// **ONCE THE POINTER HAS REACHED THE RING, THE TIP LAYER OWNS ITS TEXT** (Tom, 2026-10-25: the
+		// dashed gray junction's tip kept opening after the parent's override was cleared). Arming
+		// (wireTipDelegation) removes the <title> child and caches its text in an attribute, so the
+		// child is gone and only writing the attribute changes or silences what the reader is shown.
+		if (typeof el.hasAttribute === 'function' && (el.hasAttribute('data-bs-original-title') || el.hasAttribute('title'))) {
+			if (t) { el.removeChild(t); }
+			el.setAttribute('title', marked ? overrideMarkText(inherited) : '');
+			if (!marked && window.bootstrap && bootstrap.Tooltip) {
+				t = bootstrap.Tooltip.getInstance(el);
+				if (t) { t.hide(); }
+			}
+			return;
+		}
 		if (!marked) { if (t) { el.removeChild(t); } return; }
 		if (!t) {
 			t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
@@ -78726,17 +80729,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A number for a box or a readout. Not the label machinery's fieldDecimals(): these are single
 	// values in a sentence or a narrow column, and a fire-flow number quoted to two decimals of a
 	// gpm would claim a precision the search does not have.
+	// **THE LAST NUMBER FORMATTED, so the cell built right after it can carry the unrounded one**
+	// (`data-ec-full`, and `data-ec-unit` for a quantity): the shared report row writes a CSV from
+	// those, a table as shown is for the eye. ffCell() takes it only when its text is exactly the
+	// text formatted, then forgets it.
+	var ffLastNum = null;
 	function ffNum(v) {
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
-		var a = Math.abs(v);
-		if (a >= 100) { return String(Math.round(v)); }
-		if (a >= 1) { return String(+v.toFixed(2)); }
-		return String(+v.toPrecision(3));
+		var a = Math.abs(v), t;
+		if (a >= 100) { t = String(Math.round(v)); }
+		else if (a >= 1) { t = String(+v.toFixed(2)); }
+		else { t = String(+v.toPrecision(3)); }
+		ffLastNum = { text: t, full: v, unit: '' };
+		return t;
 	}
 	// A quantity with its unit, converted at the boundary and nowhere else. `si` is what the engine
 	// speaks; `unitId` is one of this project's own unit selects.
 	function ffQty(si, unitId) {
-		return ffNum(toDisplay(si, unitId)) + ' ' + unitLabel(unitId);
+		var shown = toDisplay(si, unitId), t = ffNum(shown) + ' ' + unitLabel(unitId);
+		ffLastNum = { text: t, full: shown, unit: unitLabel(unitId) };
+		return t;
 	}
 	// What the boxes open on. Every one is a DISPLAY value in this project's units, because that is
 	// what a person reads and types; the conversion back to SI happens once, at the engine call.
@@ -79025,12 +81037,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// One labelled row. A tip is an explanation, so it carries the `?` that every explanation does
 	// and opens from that glyph (Task 759: a tip with no glyph was the one-?-per-label defect).
 	function ffRow(parent, labelText, tip, control, unitText) {
-		var row = ffEl('div', 'lpn-ff-row', null, parent), name;
-		if (tip) { name = findHelpLabel(labelText || '', tip); row.appendChild(name); }
-		else { ffEl('span', null, labelText || '', row); }
-		row.appendChild(control);
-		ffEl('span', 'lpn-ff-unit', unitText || '', row);
-		return row;
+		// A text box in these boxes holds a number or a time ("2:00"): it is sized as one.
+		var isText = control && control.tagName && String(control.tagName).toLowerCase() === 'input' && control.type === 'text';
+		return lpnGridRow(parent, { label: labelText || '', tip: tip, control: control, unit: unitText || '', cls: 'lpn-ff-row', kind: isText ? 'num' : undefined, digits: 7 });
 	}
 	function ffInput(value) {
 		var i = document.createElement('input');
@@ -79117,8 +81126,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['all', pc.lpn_when_all || 'Every reporting step, worst case']
 			].concat(EngCalcs.lpnDurFireModel
 				? [['dur', pc.lpn_dur_option || 'A fire for a stated duration']] : []), ask.when || 'now');
-			// Wide enough for its longest choice rather than the 8rem the other selects share.
-			boxes.when.className = 'lpn-ff-wide';
 			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
 			boxes.when.addEventListener('change', function () {
 				ask.when = boxes.when.value;
@@ -79345,18 +81352,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// velocity.
 	function ffCriticalText(rec) {
 		var parts = ffCriticalParts(rec);
-		return parts.plain !== undefined ? parts.plain : parts.before + parts.idText + parts.after;
+		return parts.plain !== undefined ? parts.plain : parts.idText;
 	}
-	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
-	// flow analysis, can every node have a hyperlink to go to it?"*).
-	function ffCriticalCell(row, rec, showStep) {
-		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t,
-			tail = (showStep && typeof when === 'number') ? ' (' + dsTimeText(when) + ')' : '';
-		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
-		td = ffCell(row, parts.before);
-		ffGotoLink(td, parts.kind, parts.id, parts.idText);
-		td.appendChild(document.createTextNode(parts.after + tail));
-		return td;
+	// **THE WORST-EFFECT CELL IS SPLIT INTO ITS PARTS** (Task 840; Tom, 2026-10-27: "split the sentence
+	// into two columns with a compound heading"): the asset, its pressure, its velocity, the step it
+	// was read at (only when the report shows every step) and how many more were affected. The asset
+	// is a go-to link (Tom, 2026-09-28: *"In fire flow analysis, can every node have a hyperlink to
+	// go to it?"*). A junction records its pressure, a link its velocity; the other cell is blank.
+	function ffCriticalCells(row, rec, allSteps) {
+		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t;
+		td = ffCell(row, parts.plain !== undefined ? parts.plain : '', 'lpn-rpt-id');
+		if (parts.plain === undefined) { ffGotoLink(td, parts.kind, parts.id, parts.idText); }
+		ffCell(row, parts.plain === undefined && parts.kind === 'node' ? ffQty(parts.value, 'lpn_u_pressure') : '');
+		ffCell(row, parts.plain === undefined && parts.kind === 'link' ? ffQty(parts.value, 'lpn_u_velocity') : '');
+		if (allSteps) { ffCell(row, parts.plain === undefined && typeof when === 'number' ? dsTimeText(when) : ''); }
+		ffCell(row, parts.extra > 0 ? String(parts.extra) : '');
 	}
 	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
 	// a Tables pin (findGoTo(), which never replaces a selection being built). A button dressed as
@@ -79372,7 +81382,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return b;
 	}
 	function ffCriticalParts(rec) {
-		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, tpl, value, at, after, j, e;
+		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', extra, value, j, e;
 		// **NOT CHECKED AND NOTHING FOUND ARE DIFFERENT FACTS AND USED TO DRAW IDENTICALLY.**
 		// (Found 2026-09-02 from Tom's question about which cells a design row should blank.) A
 		// dash here meant *we looked and found nothing*, which is good news, AND *we never looked*,
@@ -79397,20 +81407,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		}
 		if (!worst) { return { plain: FF_DASH }; }
-		// The template is split at {id} so the id can be drawn as a link; the words either side are
-		// exactly the words the plain text has, in whatever order the language puts them.
-		tpl = kind === 'node'
-			? String(pc.lpn_ff_affect_node || '{id} drops to {pressure}')
-				.split('{pressure}').join(ffQty(worst.pressure, 'lpn_u_pressure'))
-			: String(pc.lpn_ff_affect_link || '{id} reaches {velocity}')
-				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
 		value = labelPrefixFor(kind, 'id') + worst.id;
-		at = tpl.indexOf('{id}');
-		total = rec.effects.nodes.length + rec.effects.links.length;
-		extra = total - 1;
-		after = extra > 0 ? ' ' + (pc.lpn_ff_more || 'and {n} more affected').replace('{n}', String(extra)) : '';
-		if (at < 0) { return { plain: tpl + after }; }
-		return { before: tpl.slice(0, at), idText: value, after: tpl.slice(at + 4) + after, kind: kind, id: worst.id };
+		extra = rec.effects.nodes.length + rec.effects.links.length - 1;
+		return { idText: value, kind: kind, id: worst.id, value: kind === 'node' ? worst.pressure : worst.velocity, extra: extra };
 	}
 	// **WHICH CRITERION THE JUNCTION BROKE**, which is as far as we can honestly go towards the
 	// competitor's "Design constraint". Two of their columns have no answer in this result set and
@@ -79433,6 +81432,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function ffCell(row, text, cls) {
 		var td = ffEl('td', cls || null, text, row);
+		if (ffLastNum && ffLastNum.text === text) {
+			td.setAttribute('data-ec-full', String(+ffLastNum.full.toPrecision(12)));
+			if (ffLastNum.unit) { td.setAttribute('data-ec-unit', ffLastNum.unit); }
+		}
+		ffLastNum = null;
 		return td;
 	}
 	// **EVERY COLUMN SORTS FROM ITS HEADING** (Tom, 2026-09-28: *"Sort Fire flow analysis
@@ -79443,19 +81447,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// or the largest of anything. `null` is the reading order ffSorted() gives, until a heading is
 	// clicked. Kept for the page load, like the criteria in the boxes above it.
 	var ffSortState = { col: null, dir: 1 };
+	// The columns in the order drawn; the Worst-effect group's Time and the last step column appear
+	// only when the report shows every step (set by rebuildFireFlowReport).
+	var ffColKeys = ['id', 'static', 'required', 'atreq', 'available', 'residual', 'wAsset', 'wPress', 'wVel', 'wMore', 'limit', 'solves', 'modes'];
 	function ffSortKey(rec, col) {
-		switch (col) {
-		case 0: return rec.id;
-		case 1: return rec.staticPressure;
-		case 2: return rec.required;
-		case 3: return rec.pressureAtRequired;
-		case 4: return rec.available;
-		case 5: return rec.residualAt;
-		case 6: return rec.effects ? ffCriticalText(rec) : undefined;
-		case 7: return rec.effects ? ffLimitText(rec) : undefined;
-		case 8: return rec.solves;
-		case 9: return ffModesText(rec);
-		case 10: return rec.t;
+		var w;
+		switch (ffColKeys[col]) {
+		case 'id': return rec.id;
+		case 'static': return rec.staticPressure;
+		case 'required': return rec.required;
+		case 'atreq': return rec.pressureAtRequired;
+		case 'available': return rec.available;
+		case 'residual': return rec.residualAt;
+		case 'wAsset': return rec.effects ? ffCriticalText(rec) : undefined;
+		case 'wPress': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.kind === 'node' ? w.value : undefined;
+		case 'wVel': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.kind === 'link' ? w.value : undefined;
+		case 'wTime': return rec.effects ? (typeof rec.designT === 'number' ? rec.designT : rec.t) : undefined;
+		case 'wMore': w = rec.effects ? ffCriticalParts(rec) : null; return w && w.extra > 0 ? w.extra : undefined;
+		case 'limit': return rec.effects ? ffLimitText(rec) : undefined;
+		case 'solves': return rec.solves;
+		case 'modes': return ffModesText(rec);
+		case 'hour': return rec.t;
 		}
 		return undefined;
 	}
@@ -79495,7 +81507,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			head = ffEl('thead', null, null, table),
-			hr = ffEl('tr', null, null, head);
+			hr = ffEl('tr', null, null, head),
+			hr2 = null, lastGroup = null, lastGth = null;
+		// **A COMPOUND HEADING** (Task 840; Tom, 2026-10-27: "split the sentence into two columns with a
+		// compound heading"). A heading `[text, tip, shown, group]` with a `group` sits in a second
+		// header row under that group's heading, which spans its consecutive columns; every other
+		// heading spans both rows. The columns stay ordinary columns, each sorted from its own heading.
+		if (headings.some(function (h) { return typeof h !== 'string' && h && h[3]; })) { hr2 = ffEl('tr', null, null, head); }
 		// **A HEADING MAY CARRY ITS OWN DEFINITION**, as `[text, tip]`. The pane tables already put
 		// a tip on a `th` this way, so this is that pattern and not a second one. It exists because
 		// Static pressure is a term of art whose reading a person cannot guess: Tom, 2026-09-02,
@@ -79504,8 +81522,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
 			var text = h, tip = null, shown = false, help, glyph, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
-			if (h && h.length >= 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; shown = h[2]; }
-			th = ffEl('th', 'lpn-ff-sortable', text, hr);
+			var group = null, gth, cell = hr;
+			if (h && h.length >= 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; shown = h[2]; group = h[3] || null; }
+			if (group) {
+				if (group !== lastGroup) {
+					gth = lastGth = ffEl('th', 'lpn-ff-grouphead', group, hr);
+					gth.colSpan = 1;
+				} else { lastGth.colSpan += 1; }
+				cell = hr2;
+			}
+			lastGroup = group;
+			th = ffEl('th', 'lpn-ff-sortable', text, cell);
+			if (hr2 && !group) { th.rowSpan = 2; }
 			if (tip) { th.title = tip; }
 			// A third member says the tip must be SEEN: the `?` the labels carry, because a `title`
 			// alone never shows on a touch screen and nothing on the heading says it is there.
@@ -79637,6 +81665,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 
 		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
+		ffColKeys = ['id', 'static', 'required', 'atreq', 'available', 'residual', 'wAsset', 'wPress', 'wVel']
+			.concat(allSteps ? ['wTime'] : []).concat(['wMore', 'limit', 'solves', 'modes']).concat(allSteps ? ['hour'] : []);
 		sorted = ffSortResults(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		// **THE ORDER IS THE ORDER A PERSON READS THE ANSWER IN** (Tom, 2026-09-02, once the
@@ -79649,6 +81679,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// are ONE reading, a flow and the pressure the junction still held while delivering it, and
 		// an available flow with no residual beside it is a number without its condition. Required
 		// and its own pressure are the same kind of pair and now sit the same way.
+		var worstG = pc.lpn_ff_col_affected || 'Worst effect';
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ff_col_static || 'Static pressure',
@@ -79657,24 +81688,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_atrequired || 'Pressure at required flow',
 			pc.lpn_ff_col_available || 'Available flow',
 			pc.lpn_ff_col_residual || 'Residual held',
-			pc.lpn_ff_col_affected || 'Worst effect',
+			[pc.lpn_crit_col_asset || 'Asset', null, false, worstG],
+			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
+			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
+		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time (hr)', null, false, worstG]] : []).concat([
+			[pc.lpn_ff_col_more || 'How many others', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
+		]).concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
 			// the Settings.Label prefix for Node IDs"*). Every id drawn on the map goes through
 			// labelPrefixFor(), so an id printed here without it is the same element under a second
 			// name -- and this table exists to send somebody to those elements.
-			ffGotoLink(ffCell(tr, ''), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', rec.id, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
-			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
-			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCriticalCell(tr, rec, allSteps);
+			// **ONE SENTENCE SPANS THE THREE COLUMNS IT WOULD OTHERWISE REPEAT** (Tom, 2026-10-27: "Static
+			// failed, so not checked" in three adjacent cells wasted width and height). Each of the three
+			// still counts as a column in a copy and the CSV (reportDomBlocksOf()); the sort reads records.
+			var atReq = ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'), avail = ffAvailableText(rec),
+				resid = ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'), why = pc.lpn_ff_static_failed || 'Static failed, so not checked';
+			if (atReq === why && avail === why && resid === why) { ffCell(tr, why).colSpan = 3; }
+			else { ffCell(tr, atReq); ffCell(tr, avail); ffCell(tr, resid); }
+			ffCriticalCells(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
@@ -80169,7 +82208,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			hr = ffEl('tr', null, null, ffEl('thead', null, null, table));
-		headings.forEach(function (h) { ffEl('th', null, h, hr); });
+		// A heading `[text, group]` sits under that group's heading in a second row (see ffTable).
+		var hr2 = headings.some(function (h) { return typeof h !== 'string'; }) ? ffEl('tr', null, null, hr.parentNode) : null, last = null, lastTh = null;
+		headings.forEach(function (h) {
+			var text = typeof h === 'string' ? h : h[0], group = typeof h === 'string' ? null : h[1], g, th;
+			if (group) {
+				if (group !== last) { g = lastTh = ffEl('th', 'lpn-ff-grouphead', group, hr); g.colSpan = 1; } else { lastTh.colSpan += 1; }
+				ffEl('th', null, text, hr2);
+			} else {
+				th = ffEl('th', null, text, hr);
+				if (hr2) { th.rowSpan = 2; }
+			}
+			last = group;
+		});
 		return ffEl('tbody', null, null, table);
 	}
 	function renderDurationFire(host, d) {
@@ -80226,16 +82277,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				: (pc.lpn_dur_recovery_cut || 'The run stopped before its end, so recovery after the fire is not assessed.'));
 		}
 		if (d.tanks.length) {
-			body = durTable(host, [pc.lpn_time_tank || 'Tank', pc.lpn_dur_col_low || 'Lowest level reached',
+			body = durTable(host, [pc.lpn_time_tank || 'Tank', [pc.lpn_col_level || 'Level', pc.lpn_dur_col_low || 'Lowest level reached'],
+				[pc.lpn_full_col_time || 'Time (hr)', pc.lpn_dur_col_low || 'Lowest level reached'],
 				pc.lpn_field_tank_minlevel || 'Lowest water depth', pc.lpn_dur_col_margin || 'Above lowest water depth',
 				pc.lpn_dur_col_drop || 'Drop from start',
 				pc.lpn_dur_col_end || 'Level at end', pc.lpn_dur_col_end_nofire || 'Level at end without the fire']);
 			d.tanks.forEach(function (t) {
 				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
 				tr = ffEl('tr', null, null, body);
-				ffCell(tr, labelPrefixFor('node', 'id') + t.id);
-				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
-					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
+				ffCell(tr, labelPrefixFor('node', 'id') + t.id, 'lpn-rpt-id');
+				ffCell(tr, t.lowest ? lv(t.lowest.level) : FF_DASH);
+				ffCell(tr, t.lowest ? dsTimeText(t.lowest.t) : '');
 				ffCell(tr, lv(t.min));
 				ffCell(tr, lv(t.margin));
 				ffCell(tr, lv(t.drop));
@@ -80404,15 +82456,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return td;
 	}
+	// The columns in the order drawn, named so a sort survives the whole-run columns coming and going.
+	var critColKeys = ['id', 'unserved', 'cutoff', 'below'];
 	function critSortKey(rec, col) {
-		switch (col) {
-		case 0: return rec.id;
-		case 1: return rec.unserved;
-		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
-		case 3: return rec.below ? rec.below.length : undefined;
-		case 4: return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
-		case 5: return rec.run ? rec.run.belowSeconds : undefined;
-		case 6: return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
+		switch (critColKeys[col]) {
+		case 'id': return rec.id;
+		case 'unserved': return rec.unserved;
+		case 'unservedT': return rec.unserved > 0 ? rec.unservedAt : undefined;
+		case 'cutoff': return rec.cutOff ? rec.cutOff.length : undefined;
+		case 'below': return rec.below ? rec.below.length : undefined;
+		case 'lowJ': return rec.run && rec.run.lowest ? rec.run.lowest.id : undefined;
+		case 'lowP': return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
+		case 'lowT': return rec.run && rec.run.lowest ? rec.run.lowest.t : undefined;
+		case 'hours': return rec.run ? rec.run.belowSeconds : undefined;
+		case 'stopped': return rec.run && typeof rec.run.stoppedAt === 'number' ? rec.run.stoppedAt : undefined;
+		case 'emptyN': return rec.run && rec.run.emptyAt ? rec.run.emptyAt.id : undefined;
+		case 'emptyT': return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
 		}
 		return undefined;
 	}
@@ -80470,30 +82529,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
+		// **A VALUE WITH A PLACE OR A TIME IS SPLIT INTO COLUMNS UNDER A COMPOUND HEADING** (Task 840):
+		// "97.01 psi at 4:00" is a Junction, a Pressure and a Time. Whole-run columns only.
+		var gUnserved = pc.lpn_crit_col_unserved_peak || 'Largest demand not served',
+			gLow = pc.bpn_p_min || 'Lowest pressure', gEmpty = pc.lpn_crit_col_empty || 'Tank empties',
+			tTime = pc.lpn_full_col_time || 'Time (hr)', anyStop = false, lowTip = pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
+		if (set.wholeRun) {
+			anyStop = set.results.some(function (r) { return r.run && typeof r.run.stoppedAt === 'number'; });
+			critColKeys = ['id', 'unserved', 'unservedT', 'cutoff', 'below', 'lowJ', 'lowP', 'lowT', 'hours']
+				.concat(anyStop ? ['stopped'] : []).concat(['emptyN', 'emptyT']);
+		} else { critColKeys = ['id', 'unserved', 'cutoff', 'below']; }
 		sorted = critSorted(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
-		body = ffTable(host, [
+		body = ffTable(host, (set.wholeRun ? [
 			pc.lpn_crit_col_asset || 'Asset',
-			set.wholeRun ? (pc.lpn_crit_col_unserved_peak || 'Largest demand not served') : (pc.lpn_crit_col_unserved || 'Demand not served'),
+			[pc.lpn_result_flow || 'Flow', null, false, gUnserved],
+			[tTime, null, false, gUnserved],
+			pc.lpn_crit_col_cutoff || 'Junctions cut off',
+			pc.lpn_crit_col_below || 'Junctions below minimum',
+			[pc.lpn_ff_col_junction || 'Junction', null, false, gLow],
+			[pc.lpn_result_pressure || 'Pressure', lowTip, true, gLow],
+			[tTime, null, false, gLow],
+			pc.lpn_crit_col_hours || 'Hours below minimum'
+		].concat(anyStop ? [pc.lpn_crit_col_stopped || 'Run stopped at'] : []).concat([
+			[pc.lpn_time_tank || 'Tank', null, false, gEmpty],
+			[tTime, null, false, gEmpty]
+		]) : [
+			pc.lpn_crit_col_asset || 'Asset',
+			pc.lpn_crit_col_unserved || 'Demand not served',
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
-		].concat(set.wholeRun ? [
-			[pc.bpn_p_min || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
-			pc.lpn_crit_col_hours || 'Hours below minimum',
-			pc.lpn_crit_col_empty || 'Tank empties'
-		] : []), { state: critSortState, by: critSortBy });
+		]), { state: critSortState, by: critSortBy });
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
 			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
-			ffCell(tr, typeof rec.unserved === 'number'
-				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
-					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
-					: ffQty(rec.unserved, 'lpn_u_flow'))
-				: FF_DASH);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			if (set.wholeRun) {
+				ffCell(tr, typeof rec.unserved === 'number' && rec.unserved > 0 && typeof rec.unservedAt === 'number' ? dsTimeText(rec.unservedAt) : '');
+			}
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
 			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
 			// known without a solve and is still printed; only the pressures are missing, so the
@@ -80501,15 +82578,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
 			if (set.wholeRun) {
-				var atT = pc.lpn_at_time || '{value} at {time}', rn = rec.run;
-				ffCell(tr, rn && rn.lowest
-					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
-					: FF_DASH);
-				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) +
-					(typeof rn.stoppedAt === 'number' ? ' (' + (pc.lpn_crit_stopped_at || 'run stopped at {time}').replace('{time}', dsTimeText(rn.stoppedAt)) + ')' : '') : FF_DASH);
-				ffCell(tr, rn && rn.emptyAt
-					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
-					: FF_DASH);
+				var rn = rec.run, lo = rn && rn.lowest;
+				ffCell(tr, lo ? labelPrefixFor('node', 'id') + lo.id : (rn ? '' : FF_DASH), 'lpn-rpt-id');
+				ffCell(tr, lo ? ffQty(lo.pressure, 'lpn_u_pressure') : '');
+				ffCell(tr, lo ? dsTimeText(lo.t) : '');
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) : FF_DASH);
+				if (anyStop) { ffCell(tr, rn && typeof rn.stoppedAt === 'number' ? dsTimeText(rn.stoppedAt) : ''); }
+				ffCell(tr, rn && rn.emptyAt ? labelPrefixFor('node', 'id') + rn.emptyAt.id : '', 'lpn-rpt-id');
+				ffCell(tr, rn && rn.emptyAt ? dsTimeText(rn.emptyAt.t) : '');
 			}
 		});
 		ffMoreLine(host, sorted.length - shown.length, true);
@@ -80969,7 +83045,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
 			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
@@ -80983,7 +83059,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
 		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
 			var tr = ffEl('tr', null, null, body);
-			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
+			ffGotoLink(ffCell(tr, '', 'lpn-rpt-id'), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
 		});
@@ -81209,11 +83285,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/** A money figure with the currency the document states, or with none where it states none. */
 	function energyMoney(v) {
-		var money = currencyLabel();
-		return money ? ffNum(v) + ' ' + money : ffNum(v);
+		var money = currencyLabel(), t = money ? ffNum(v) + ' ' + money : ffNum(v);
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = money || ''; }
+		return t;
 	}
 	function energyPercent(fraction) {
-		return ffNum(fraction * 100) + '%';
+		var t = ffNum(fraction * 100) + '%';
+		if (ffLastNum) { ffLastNum.text = t; ffLastNum.unit = '%'; }
+		return t;
 	}
 	/**
 	 * **WHAT THE DOCUMENT STATES ABOUT PRICE, WHICH IS NOT WHAT THE ANSWER CAME TO** (Task 581).
@@ -81300,7 +83379,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body), ran = row.onSeconds > 0;
 			// The user's own label prefix, for the reason the fire flow table wears it: an id
 			// printed here without it is the same element under a second name.
-			ffCell(tr, labelPrefixFor('link', 'id') + row.id);
+			ffCell(tr, labelPrefixFor('link', 'id') + row.id, 'lpn-rpt-id');
 			ffCell(tr, energyPercent(row.usage));
 			// **A PUMP THAT NEVER RAN GETS A DASH AND NOT A ZERO.** Its average efficiency is not
 			// 0%, it is nothing at all, and a column of zeros beside a 0% usage factor reads as a
@@ -81580,16 +83659,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.replace('{done}', String(Math.min(scenarioCompareProgress.done + 1, scenarioCompareProgress.total)))
 			.replace('{total}', String(scenarioCompareProgress.total));
 	}
-	// One cell: the number and the element it was found at, in the reader's own units.
-	// `t` is the time step a run found it at, and only a run passes one.
-	function scnCmpAt(si, unitId, id, group, t) {
-		var pc = EngCalcs.pageConfig || {};
-		if (typeof si !== 'number' || !isFinite(si)) { return FF_DASH; }
-		return (t === undefined ? (pc.lpn_scncmp_at || '{value} at {id}')
-			: (pc.lpn_scncmp_at_time || '{value} at {id}, {time}')
-				.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t)))
-			.replace('{value}', ffQty(si, unitId))
-			.replace('{id}', labelPrefixFor(group, 'id') + id);
+	// **THE VALUE, THE ELEMENT IT WAS FOUND AT AND THE TIME ARE THREE COLUMNS** (Task 840), under one
+	// compound heading: "108 psi at N32, 14:00" is a Junction, a Pressure and a Time. `t` is the time
+	// step a run found it at, and only a run passes one; a steady solve leaves the Time cell blank.
+	function scnCmpAt(tr, si, unitId, id, group, t) {
+		var ok = typeof si === 'number' && isFinite(si);
+		ffCell(tr, ok ? labelPrefixFor(group, 'id') + id : FF_DASH, 'lpn-rpt-id');
+		ffCell(tr, ok ? ffQty(si, unitId) : '');
+		ffCell(tr, ok && t !== undefined ? (EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t)) : '');
 	}
 	// **WHAT DOES NOT VARY IS STATED ONCE, ABOVE THE TABLE** (Task 755; Sue: friction method, units,
 	// accuracy and trials never vary silently between compared scenarios). They are project
@@ -81627,6 +83704,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		].filter(Boolean).forEach(function (pair) {
 			ffRow(host, pair[0], null, ffEl('span', null, pair[1], null), '');
 		});
+		// A table or a note after the rows would otherwise be the next row's neighbour; it spans.
 	}
 	// The three option cells of one row. A steady run has no time step to state, so it says so
 	// with a dash rather than a number nothing used.
@@ -81677,8 +83755,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.bpn_demand_mult || 'Demand multiplier',
 			pc.lpn_time_duration || 'Total run time',
 			pc.lpn_time_hyd_step || 'Hydraulic time step',
-			pc.bpn_p_min || 'Lowest pressure',
-			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
+			[pc.lpn_ff_col_junction || 'Junction', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_result_pressure || 'Pressure', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_full_col_time || 'Time (hr)', null, false, pc.bpn_p_min || 'Lowest pressure'],
+			[pc.lpn_ds_col_link || 'Link', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
+			[pc.lpn_result_velocity || 'Velocity', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'],
+			[pc.lpn_full_col_time || 'Time (hr)', null, false, pc.lpn_scncmp_col_maxvelocity || 'Highest velocity']
 		]);
 		scenarioCompareRun.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body), name = scenarioDisplayName(r.scn);
@@ -81692,13 +83774,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scnCmpOptionCells(tr, r.opts);
 			if (r.period) { anyPeriod = true; }
 			if (!r.ok) {
-				// One cell across both number columns: the reason is one sentence and splitting it
+				// One cell across all six result columns: the reason is one sentence and splitting it
 				// would print half of it under "Highest velocity".
-				ffCell(tr, r.why).colSpan = 2;
+				ffCell(tr, r.why).colSpan = 6;
 				return;
 			}
-			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node', r.period ? r.minT : undefined));
-			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link', r.period ? r.maxT : undefined));
+			scnCmpAt(tr, r.minPressure, 'lpn_u_pressure', r.minAt, 'node', r.period ? r.minT : undefined);
+			scnCmpAt(tr, r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link', r.period ? r.maxT : undefined);
 			if (!r.converged) {
 				ffCell(tr, pc.lpn_diag_not_converged || 'No solution was found. Check for physically impossible values, such as a diameter of zero.');
 			}
@@ -81855,33 +83937,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scnResFull(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toPrecision(10)) : '';
 	}
-	function scenarioResultsText(t, csv) {
-		var rows = t.rows.map(function (r) {
-			return [r[0]].concat(r.slice(1).map(scnResFull));
-		});
-		return csv ? EngCalcs.lpnTableCsv(t.heads, rows) : EngCalcs.lpnTableTsv(t.heads, rows);
-	}
-	function scenarioResultsFileName(t) {
-		var pc = EngCalcs.pageConfig || {};
-		return paneProjectPrefix() + paneNoSpace(paneSanitizeFileName(pc.lpn_scnres_title || 'Results by asset')) + '-' +
-			paneNoSpace(paneSanitizeFileName(pc[t.kind.label] || t.kind.fb)) + '.csv';
-	}
-	function downloadScenarioResultsCsv() {
-		var pc = EngCalcs.pageConfig || {}, t = scenarioResultsTable(), name = scenarioResultsFileName(t);
-		downloadTextFile(name, scenarioResultsText(t, true), PANE_EXPORT_MIME.csv);
-		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
-	}
 	function buildScenarioResultsSection(host) {
-		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, btns, copy, csv, sorted;
+		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, sorted;
 		if (!scenarioCompareRun || !scenarioCompareRun.some(function (r) { return r.ok; })) { return; }
-		sec = ffEl('div', 'lpn-scnres', null, host);
+		sec = ffEl('div', 'lpn-scnres lpn-gsub', null, host);   // a stretch of the box's one grid
 		sec.id = 'lpn_scnres';
 		ffEl('p', 'lpn-ff-summary', pc.lpn_scnres_title || 'Results by asset', sec);
-		ctl = ffEl('div', 'lpn-scnres-controls', null, sec);
-		var lab = ffEl('label', null, null, ctl);
-		ffEl('span', null, (pc.lpn_survey_codes_col_type || 'Asset type') + ' ', lab);
-		sel = ffEl('select', null, null, lab);
+		sel = ffEl('select', null, null, null);
 		sel.id = 'lpn_scnres_kind';
+		ffRow(sec, pc.lpn_survey_codes_col_type || 'Asset type', null, sel, '');
+		ctl = ffEl('div', 'lpn-scnres-controls lpn-gcol2', null, sec);
 		SCNRES_KINDS.forEach(function (k) {
 			var o = ffEl('option', null, pc[k.label] || k.fb, sel);
 			o.value = k.id;
@@ -81919,19 +83984,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_scnres_empty || 'This project has none of these assets.', sec);
 			return;
 		}
-		btns = ffEl('div', 'lpn-ff-buttons', null, sec);
-		copy = ffEl('button', 'lpn-rptbox-copy', pc.points_data_copy || 'Copy', btns);
-		copy.type = 'button';
-		copy.id = 'lpn_scnres_copy';
-		copy.title = pc.lpn_scnres_copy_tip ||
-			'Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
-		copy.addEventListener('click', function () {
-			if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(scenarioResultsText(scenarioResultsTable(), false), copy); }
-		});
-		csv = ffEl('button', 'lpn-rptbox-copy', pc.lpn_full_download_csv || 'Download CSV', btns);
-		csv.type = 'button';
-		csv.id = 'lpn_scnres_csv';
-		csv.addEventListener('click', downloadScenarioResultsCsv);
 		// Sorted on the numbers, never on their text, with a blank last both ways (ffSortResults()).
 		sorted = t.rows.map(function (r, i) { return { r: r, i: i }; });
 		if (scnResState.sort.col !== null) {
@@ -81958,8 +84010,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var tr = ffEl('tr', null, null, body);
 			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
 			// lines up against a sheet exported from there.
-			ffCell(tr, x.r[0]);
-			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
+			ffCell(tr, x.r[0], 'lpn-rpt-id');
+			// The CSV carries the full number, the box and the print its rounded one.
+			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num').setAttribute('data-ec-full', scnResFull(x.r[k + 1])); });
 		});
 		if (hasFlow) { ffEl('p', 'lpn-ff-note', flowTip, sec); }
 		t.failed.forEach(function (r) {
@@ -82342,7 +84395,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
 			return;
 		}
-		body = ffTable(host, [pc.lpn_full_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		body = ffTable(host, [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_status_col_event || 'Event']);
 		events.forEach(function (e) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));
@@ -82464,7 +84517,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setNotice(basicMisfitText());
 		}
 		if (scenarioBasicMode !== was) {
-			if (scenarioBasicMode) { closeScenarioManager(); }
+			smFaceChanged();
 			refreshScenariosTab();
 		}
 	}
@@ -82482,8 +84535,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
 			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
 		} catch (e) {}
-		if (scenarioBasicMode) { closeScenarioManager(); }
+		smFaceChanged();
 		refreshScenariosTab();
+		return true;
+	}
+	// **THE MANAGER'S BOX CHANGES FACE IN PLACE WHEN BASIC MODE IS TICKED OR CLEARED** (Tom, 2026-10-25):
+	// the flat list and the buttons in Basic mode, the tree and the Scenarios table otherwise. It stays
+	// open, docked or floating, where it is; a box that is not open is left closed.
+	function smFaceChanged() {
+		if (!smBoxIsOpen()) { return; }
+		smTableOn = !scenarioBasicMode;
+		smTableSync();
+		rebuildScenarioManager();
+		if (boxIsDocked(smBoxEl())) { layoutDocks(); }
 	}
 	loadScenarioBasicPref();
 	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
@@ -82649,10 +84713,90 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (tree === 'scenarios') { return root ? 'scnbase' : 'scn'; }
 		return root ? 'altbase' : 'alt';
 	}
+	// **THE BASIC FACE OF THE SCENARIO MANAGER** (Tom, 2026-10-25; Ida's design): a flat list of the scenarios
+	// with their numbers of overrides, the current one marked with *, and a click on a row making it current;
+	// the commands the Water > Scenarios menu already has (they are that menu's own rows, so the two cannot
+	// differ); and the Basic mode tick, which when cleared turns this box into the full manager in place.
+	// Hidden here: the category selector, the tree, Add base, Merge and Copy upward, All and All unused.
+	function smBasicFace(host) {
+		var pc = EngCalcs.pageConfig || {}, rows = scenarioMenuRows(), list, head, cur = activeScenario(), tick, lab, tools, scroll = 0, old;
+		old = host.querySelector('.lpn-sm-basic-list');
+		if (old) { scroll = old.scrollTop; }
+		host.innerHTML = '';
+		function menuRow(label) { return rows.filter(function (r) { return r.label === label; })[0]; }
+		head = document.createElement('div');
+		head.className = 'lpn-sm-basic-row lpn-sm-basic-head';
+		['', pc.lpn_scenario_label || 'Scenario', pc.lpn_scenario_overrides || 'No. of overrides'].forEach(function (t) {
+			var c = document.createElement('span');
+			c.textContent = t;
+			head.appendChild(c);
+		});
+		list = document.createElement('div');
+		list.className = 'lpn-sm-basic-list';
+		list.id = 'lpn_sm_basic_list';
+		list.setAttribute('role', 'listbox');
+		list.setAttribute('aria-label', pc.lpn_scenario_label || 'Scenario');
+		scenariosForDisplay().forEach(function (s) {
+			var r = document.createElement('div'), m = document.createElement('span'), n = document.createElement('span'), c = document.createElement('span');
+			r.className = 'lpn-sm-basic-row' + (s.id === cur.id ? ' lpn-sm-sel' : '');
+			r.setAttribute('role', 'option');
+			r.setAttribute('aria-selected', s.id === cur.id ? 'true' : 'false');
+			r.setAttribute('data-scn', s.id);
+			r.tabIndex = 0;
+			m.textContent = s.id === cur.id ? '*' : '';
+			n.textContent = scenarioDisplayName(s);
+			c.textContent = String(overrideCount(s));
+			r.appendChild(m); r.appendChild(n); r.appendChild(c);
+			r.addEventListener('click', function () { if (s.id !== activeScenario().id) { switchScenario(s.id); } rebuildScenarioManager(); });
+			r.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') { if (e.preventDefault) { e.preventDefault(); } r.click(); }
+			});
+			list.appendChild(r);
+		});
+		host.appendChild(head);
+		host.appendChild(list);
+		list.scrollTop = scroll;
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		[[pc.lpn_scenario_new || 'New scenario…', 'new'], [pc.lpn_scenario_copy || 'Copy scenario', 'copy'],
+			[pc.lpn_scenario_rename || 'Rename scenario…', 'rename'], [pc.lpn_scenario_delete || 'Delete scenario', 'delete'],
+			[pc.lpn_sm_list_overrides || 'Override manager…', 'overrides']].forEach(function (d) {
+			var mr = menuRow(d[0]), b;
+			if (!mr) { return; }
+			b = smButton(tools, d[0], mr.tip || null, function () { if (!mr.disabled) { mr.fn(); } });
+			b.id = 'lpn_sm_basic_' + d[1];
+			b.setAttribute('data-sm-cmd', d[1]);
+			if (mr.disabled) { b.setAttribute('aria-disabled', 'true'); }
+		});
+		host.appendChild(tools);
+		smBasicTick(host);
+		initTipsIn(host);
+	}
+	// **THE BASIC MODE TICK STAYS IN THE BOX IN BOTH STATES** (Tom, 2026-10-27: "it probably should be
+	// persistent across modes instead of disappearing in Basic-off mode."). Disabled, with the misfit
+	// sentence as its tip, when the project cannot be shown in Basic mode.
+	function smBasicTick(host) {
+		var pc = EngCalcs.pageConfig || {}, lab = document.createElement('label'), tick = document.createElement('input'),
+			misfit = !scenarioBasicMode && !!basicModeMisfit();
+		lab.className = 'lpn-sm-basic-tick';
+		tick.type = 'checkbox';
+		tick.id = 'lpn_sm_basic_mode';
+		tick.checked = scenarioBasicMode;
+		tick.disabled = misfit;
+		tick.addEventListener('change', function () {
+			if (!setScenarioBasicMode(tick.checked)) { tick.checked = scenarioBasicMode; }
+		});
+		lab.appendChild(tick);
+		lab.appendChild(document.createTextNode(' ' + (pc.lpn_scenario_basic || 'Basic mode')));
+		if (misfit) { lab.title = basicMisfitText(); }
+		else if (pc.lpn_scenario_basic_tip) { lab.title = pc.lpn_scenario_basic_tip; }
+		host.appendChild(lab);
+	}
 	function rebuildScenarioManager() {
 		var host = document.getElementById('lpn_sm_body'), pc = EngCalcs.pageConfig || {}, tools, sel, tree, head,
 			scroll = 0, old, hadFocus;
 		if (!host) { return; }
+		if (scenarioBasicMode) { smBasicFace(host); return; }
 		old = host.querySelector('.lpn-sm-tree');
 		if (old) { scroll = old.scrollTop; }
 		// A rebuild replaces the tree the keyboard was in; focus goes back to the new one, so F2,
@@ -82688,7 +84832,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
 		host.appendChild(tools);
-		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smTableRefresh(); return; }
+		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smBasicTick(host); smTableRefresh(); return; }
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		// The buttons act on the selected item, the right-click menu on the item clicked; both are
@@ -82720,6 +84864,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tree.scrollTop = scroll;
 		// The gestures and keys are written in the title's "?" (Tom, 2026-10-11: "Move the footer
 		// text to the tip."), so nothing sits under the tree.
+		smBasicTick(host);
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }
@@ -83496,12 +85641,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = smBoxEl();
 		closeMenu();
 		hideOpenTips();
-		// Disabled while Basic mode is on (Tom, 2026-10-13); the row is greyed, and no door opens it.
-		if (scenarioBasicMode) { return; }
 		if (!box) { return; }
 		box.style.display = 'flex';
-		// The table goes in before the box is placed, so a first open centres the whole box.
-		smTableOn = true;
+		// The table goes in before the box is placed, so a first open centres the whole box. Basic mode
+		// shows the box's own simpler face (smBasicFace()) and no table.
+		smTableOn = !scenarioBasicMode;
 		rebuildScenarioManager();
 		placePanelForScreen(box, function () { placeBoxRemembered(box, smTablePlaceLayout()); });
 		initTipsIn(box);
@@ -83979,11 +86123,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ key: 'pumphead', group: 'link', field: 'headloss', pump: true },
 		{ key: 'status', group: 'link', field: 'status' }
 	];
+	/**
+	 * A column's heading as its label and its unit, apart, so the unit can be isolated in a
+	 * right-to-left heading. **Only the PRINTED sheet wears the short concentration label**
+	 * ("Chlorine conc."): on twelve columns the long word set the whole table's type size (Tom,
+	 * 2026-10-26: "Conc." is acceptable). The box, the CSV and the User Guide chapter keep the full
+	 * name. Its other modes (age, source share, a species) keep their own names in print too.
+	 */
+	function fullReportColParts(col, short) {
+		var pc = EngCalcs.pageConfig || {}, nm, label;
+		if (col.field === 'status') { return { label: pc.lpn_result_status || 'Status', unit: '' }; }
+		label = col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field);
+		if (short && col.key === 'quality' && qualityMode() === 'chemical') {
+			nm = chemicalName();
+			label = nm ? (pc.lpn_quality_named_concentration_short || '{chemical} conc.').replace('{chemical}', nm)
+				: (pc.lpn_result_concentration_short || 'Conc.');
+		}
+		return { label: label, unit: colorFieldUnitText(col.group, col.field) };
+	}
 	function fullReportColHeading(col) {
-		var pc = EngCalcs.pageConfig || {};
-		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
-		var unit = colorFieldUnitText(col.group, col.field);
-		return (col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
+		var p = fullReportColParts(col);
+		return reportHeadText(p.label, p.unit);
 	}
 	/**
 	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
@@ -84033,7 +86193,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function fullReportCsvText(rows) {
 		var pc = EngCalcs.pageConfig || {},
-			headers = [pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
+			headers = [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
 				.concat(FULL_REPORT_COLS.map(fullReportColHeading)),
 			lines = [headers.map(csvField).join(',')];
 		rows.forEach(function (r) {
@@ -84079,70 +86239,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var name = lastRunScenarioName(), pc = EngCalcs.pageConfig || {};
 		return name ? String(pc[key] || fallback).split('{scenario}').join(name) : '';
 	}
-	function fullReportFilename(ext) {
-		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project'),
-			scn = lastRunScenarioName(), id = lastSolveResult && lastSolveResult._scn;
-		// Base keeps the project name alone, as the .inp export does.
-		if (scn && id !== 'base') { name += '-' + sanitizeFilename(scn); }
-		return name + '-Full report.' + ext;
-	}
-	function downloadFullReportCsv() {
-		downloadTextFile(fullReportFilename('csv'), fullReportCsvText(fullReportRows()), 'text/csv');
-	}
-	/** THE SAME STATIC-COPY, ONE-PRINTER APPROACH paneBuildPrintable() uses for the Tables pane
-	 * (`#lpn_print_area`, see css/engcalcs.css): a plain table built from the rows, never the live
-	 * box, so nothing modal or scrolling ends up on the page. */
-	function fullReportPrintable(rows) {
-		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'), h, table, thead, tbody;
-		wrap.id = 'lpn_print_area';
-		h = document.createElement('h1');
-		h.textContent = (typeof project === 'object' && project && project.name) || '';
-		wrap.appendChild(h);
-		h = document.createElement('h2');
-		h.textContent = pc.lpn_full_title || 'Full report';
-		wrap.appendChild(h);
-		if (lastRunScenarioName()) {
-			h = document.createElement('h3');
-			h.textContent = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
-			wrap.appendChild(h);
-		}
-		if (!rows.length) {
-			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
-			wrap.appendChild(h);
-			return wrap;
-		}
-		table = document.createElement('table');
-		table.className = 'lpn-pane-table lpn-print-table';
-		thead = document.createElement('thead');
-		(function () {
-			var tr = document.createElement('tr');
-			[pc.lpn_full_col_time || 'Time', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
-				.concat(FULL_REPORT_COLS.map(fullReportColHeading))
-				.forEach(function (text) {
-					var th = document.createElement('th');
-					th.textContent = text;
-					tr.appendChild(th);
-				});
-			thead.appendChild(tr);
-		}());
-		table.appendChild(thead);
-		tbody = document.createElement('tbody');
-		rows.forEach(function (r) {
-			var tr = document.createElement('tr'), td;
-			[EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
-				.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }))
-				.forEach(function (text) {
-					td = document.createElement('td');
-					td.textContent = text;
-					tr.appendChild(td);
-				});
-			tbody.appendChild(tr);
-		});
-		table.appendChild(tbody);
-		wrap.appendChild(table);
-		return wrap;
-	}
+	// The shared button row (reportToolsInit, below) prints, copies and downloads the Full report
+	// like every other report box; this keeps only what is the Full report's own: all its rows.
 	var fullPrintArea = null;
 	function endFullPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
@@ -84150,13 +86248,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fullPrintArea = null;
 	}
 	// **NEVER WRITE THE BROWSER TAB** -- example-network-harness.js guards "nothing writes it any
-	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, "Full report")
-	// is the only place this page states what a saved PDF is, exactly as printPaneTable() already
-	// does for the Tables pane; neither function touches the tab at all.
-	function printFullReport() {
+	// more" as a standing rule, so the printed sheet's own `h1`/`h2` (project name, report title)
+	// is the only place this page states what a saved PDF is, exactly as printPaneTable() does for
+	// the Tables pane; this touches the tab not at all.
+	function printReportArea(wrap) {
 		if (!document.body) { return; }
 		endFullPrint();
-		fullPrintArea = fullReportPrintable(fullReportRows());
+		fullPrintArea = wrap;
 		document.body.appendChild(fullPrintArea);
 		document.body.classList.add('lpn-printing-table');
 		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
@@ -84165,6 +86263,574 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			try { window.print(); } finally { endFullPrint(); }
 		}
+	}
+	/**
+	 * **ONE BUTTON ROW FOR EVERY ANALYSIS AND REPORT BOX** (Tom, 2026-10-24: each
+	 * "Needs printout and/or Copy HTML", the Full report "possibly a good model", and Scenario
+	 * comparison's lone Copy and Download CSV "a little confusing since they appear only in this
+	 * box"). Download CSV, Copy HTML and Print report, in the sticky `.lpn-box-tools` row, acting on
+	 * what the box SHOWS: its headings, notes and tables are read back from the box's own report
+	 * element, so a box that gains a table is covered without a line here. A cell may carry
+	 * `data-ec-full` (the unrounded number) for the CSV only. The Full report alone supplies its
+	 * own blocks, because its box shows one time step and the file carries every one. Disabled while
+	 * the box holds no table (a "press Calculate" note). Nothing is stored on the device.
+	 */
+	var REPORT_TOOL_BOXES = [
+		{ box: 'lpn_ff_box', host: 'lpn_ff_report', title: 'lpn_ff_title', fb: 'Fire flow analysis' },
+		{ box: 'lpn_crit_box', host: 'lpn_crit_report', title: 'lpn_crit_title', fb: 'Criticality analysis' },
+		{ box: 'lpn_ds_box', host: 'lpn_ds_report', title: 'lpn_ds_title', fb: 'Demand scaling' },
+		{ box: 'lpn_energy_box', host: 'lpn_energy_report', title: 'lpn_energy_title', fb: 'Pump energy report' },
+		{ box: 'lpn_scncmp_box', host: 'lpn_scncmp_report', title: 'lpn_scncmp_title', fb: 'Scenario comparison' },
+		{ box: 'lpn_status_box', host: 'lpn_status_report', title: 'lpn_status_title', fb: 'Status changes' },
+		{ box: 'lpn_calib_box', host: 'lpn_calib_report', title: 'lpn_calib_title', fb: 'Calibration report' },
+		{ box: 'lpn_full_box', host: 'lpn_full_report', title: 'lpn_full_title', fb: 'Full report', full: true }
+	];
+	/**
+	 * **A UNIT GOES IN THE COLUMN HEADING, NEVER IN EVERY CELL** (Task 829; Tom, 2026-10-26: "in English
+	 * there is a universal convention for tables and spreadsheets to put units in the heading in
+	 * parentheses instead of in the data cells"). A report table whose figures in one column all
+	 * carry the same unit is rewritten after it is drawn: "Static pressure" over "111", "116",
+	 * not "111 psi". A column that mixes units, or whose cells are sentences ("N5 drops to 14 psi",
+	 * "108 psi at N32, 14:00"), is left exactly as it was drawn. The heading is built from ONE
+	 * localized template, `lpn_heading_unit` ('{label} ({unit})' in English), so a language can
+	 * choose its own brackets or order; the unit is wrapped in a `<bdi>` so a Latin unit inside a
+	 * right-to-left heading keeps its own direction and its brackets do not flip. The unit stays on
+	 * each cell as `data-ec-unit` where the box kept one, and the CSV, copy and print read the heading.
+	 */
+	var REPORT_UNIT_RE = /^((?:[^\d]*\s)?)([-\u2212]?\d[\d.,]*)\s*(%|[A-Za-z\u00b0\u00b5\u03bc][^\s\d.,]*(?: H2O)?)$/;
+	var REPORT_BARE_RE = /^[-\u2212]?\d[\d.,]*$/;
+	// '' for a cell with no unit to move (a word, a dash, a bare number), the unit for a figure with
+	// one, null for a cell that mixes a figure with other text.
+	function reportCellUnit(t) {
+		var m;
+		if (!/\d/.test(t) || REPORT_BARE_RE.test(t)) { return ''; }
+		m = REPORT_UNIT_RE.exec(t);
+		return m ? m[3] : null;
+	}
+	function reportHeadTemplate() {
+		return String((EngCalcs.pageConfig || {}).lpn_heading_unit || '{label} ({unit})');
+	}
+	function reportHeadText(label, unit) {
+		return unit ? reportHeadTemplate().replace('{label}', function () { return label; }).replace('{unit}', function () { return unit; }) : label;
+	}
+	/** The heading as nodes: label as text, unit in a `<bdi>`, the rest of the template as text. */
+	function reportHeadNodes(label, unit) {
+		var frag = document.createDocumentFragment();
+		reportHeadTemplate().split(/(\{label\}|\{unit\})/).forEach(function (part) {
+			var b;
+			if (part === '{label}') { frag.appendChild(document.createTextNode(label)); }
+			else if (part === '{unit}') { b = document.createElement('bdi'); b.textContent = unit; frag.appendChild(b); }
+			else if (part) { frag.appendChild(document.createTextNode(part)); }
+		});
+		return frag;
+	}
+	/** A multi-word unit ("m H2O") holds together: no-break spaces. */
+	function reportHeadHtml(label, unit) {
+		return reportHeadTemplate().split(/(\{label\}|\{unit\})/).map(function (part) {
+			return part === '{label}' ? reportEsc(label) : part === '{unit}' ? '<bdi>' + reportEsc(unit) + '</bdi>' : reportEsc(part);
+		}).join('');
+	}
+	function reportUnitInLabel(label, unit) {
+		var esc = unit.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+		return new RegExp('(^|[\\s(])' + esc + '($|[\\s),])').test(label);
+	}
+	/** Moves `unit` into the heading cell `th`; a heading that already names it is left as it is. */
+	function reportSetHeadUnit(th, unit) {
+		var walker, n, v, label, lead, trail;
+		if (!unit || th.getAttribute('data-ec-hu') !== null) { return; }
+		walker = document.createTreeWalker(th, NodeFilter.SHOW_TEXT);
+		while ((n = walker.nextNode())) {
+			if (n.parentNode.closest && n.parentNode.closest('.ec-tip, .lpn-pane-sortarrow')) { continue; }
+			if (n.nodeValue.trim()) { break; }
+		}
+		if (!n) { return; }
+		v = n.nodeValue; label = v.trim();
+		if (reportUnitInLabel(label, unit)) { return; }
+		lead = v.slice(0, v.indexOf(label)); trail = v.slice(lead.length + label.length);
+		th.setAttribute('data-ec-hl', label); th.setAttribute('data-ec-hu', unit);
+		n.parentNode.replaceChild((function () {
+			var f = document.createDocumentFragment();
+			if (lead) { f.appendChild(document.createTextNode(lead)); }
+			f.appendChild(reportHeadNodes(label, unit));
+			if (trail) { f.appendChild(document.createTextNode(trail)); }
+			return f;
+		})(), n);
+	}
+	function reportStripUnit(td, unit) {
+		var n = td.childNodes, t;
+		if (n.length !== 1 || n[0].nodeType !== 3) { return; }
+		t = n[0].nodeValue.replace(/\s+$/, '');
+		if (t.slice(-unit.length) === unit) { n[0].nodeValue = t.slice(0, -unit.length).replace(/\s+$/, ''); }
+	}
+	/**
+	 * **THE COLUMN HEADINGS OF A TABLE THAT MAY HAVE A COMPOUND HEADING** (Task 840). A two-row head
+	 * has, in its first row, group headings that span several columns (colspan) and plain headings that
+	 * span both rows (rowspan 2); its second row holds the headings of the grouped columns. Returns
+	 * `{ leaf, grp }`: the heading cell of each column in order, and the group heading text above it
+	 * ('' where there is none). A one-row head is its own leaves.
+	 */
+	function reportTableHeads(table) {
+		var rows = table.querySelectorAll('thead tr'), leaf = [], grp = [], c = 0, second, k, i, j, n;
+		if (!rows.length) { return { leaf: leaf, grp: grp }; }
+		if (rows.length === 1) {
+			Array.prototype.forEach.call(rows[0].children, function (th) { leaf.push(th); grp.push(''); });
+			return { leaf: leaf, grp: grp };
+		}
+		second = Array.prototype.slice.call(rows[1].children); k = 0;
+		for (i = 0; i < rows[0].children.length; i++) {
+			var th = rows[0].children[i];
+			n = th.colSpan || 1;
+			if (n === 1 && (th.rowSpan || 1) > 1) { leaf[c] = th; grp[c] = ''; c++; continue; }
+			for (j = 0; j < n; j++) { leaf[c] = second[k++]; grp[c] = reportCellText(th, false); c++; }
+		}
+		return { leaf: leaf, grp: grp };
+	}
+	/** A row's cell for each column, a cell that spans columns standing at its first and `null` at the rest. */
+	function reportRowCells(tr) {
+		var out = [], i, n, j;
+		for (i = 0; i < tr.children.length; i++) {
+			out.push(tr.children[i]);
+			n = tr.children[i].colSpan || 1;
+			for (j = 1; j < n; j++) { out.push(null); }
+		}
+		return out;
+	}
+	function reportTableUnits(table) {
+		var ths = reportTableHeads(table).leaf, trs = table.querySelectorAll('tbody tr'), c, r, unit, ok, td, u, t, cells, known, rc = [];
+		if (!ths.length || table._ecUh === trs.length) { return; }
+		for (r = 0; r < trs.length; r++) { rc.push(reportRowCells(trs[r])); if (rc[r].length !== ths.length) { return; } }
+		table._ecUh = trs.length;
+		for (c = 0; c < ths.length; c++) {
+			if (trs.length && rc[0][c] && rc[0][c].classList.contains('lpn-rpt-id')) {
+				ths[c].classList.add('lpn-rpt-id');
+				for (r = 0; r < trs.length; r++) { if (rc[r][c]) { rc[r][c].classList.add('lpn-rpt-id'); } }
+				continue;
+			}
+			known = ths[c].getAttribute('data-ec-hu');
+			unit = known; ok = true; cells = [];
+			for (r = 0; r < trs.length && ok; r++) {
+				td = rc[r][c];
+				if (!td) { continue; }   // the tail of a cell that spans columns: nothing of its own to read
+				t = (td.textContent || '').replace(/\s+/g, ' ').trim();
+				u = reportCellUnit(t);
+				if (u === null) { ok = false; break; }
+				if (u) { if (unit === null) { unit = u; } else if (unit !== u) { ok = false; break; } }
+				cells.push(td);
+			}
+			if (!ok || !unit) { continue; }
+			for (r = 0; r < cells.length; r++) { reportStripUnit(cells[r], unit); }
+			reportSetHeadUnit(ths[c], unit);
+		}
+	}
+	function reportUnitsIntoHeads(root) {
+		if (!root || !root.querySelectorAll) { return; }
+		Array.prototype.forEach.call(root.querySelectorAll('table.lpn-ff-table'), reportTableUnits);
+	}
+	function reportCellText(el, forCsv) {
+		var full = forCsv && el.getAttribute && el.getAttribute('data-ec-full'), inp, c, junk, i;
+		if (full !== null && full !== undefined && full !== false && full !== '') { return full; }
+		inp = el.querySelector && el.querySelector('input, select');
+		if (inp && !(el.textContent || '').trim()) { return String(inp.type === 'checkbox' ? (inp.checked ? '1' : '0') : inp.value); }
+		c = el.cloneNode(true);
+		junk = c.querySelectorAll('.lpn-pane-sortarrow, .ec-tip, input, select');
+		for (i = 0; i < junk.length; i++) { junk[i].parentNode.removeChild(junk[i]); }
+		return (c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	/** The box's report element as blocks: `{text}` for a note or heading, `{heads, rows, full}` for a table. */
+	function reportDomBlocks(hosts) {
+		var out = [];
+		hosts.forEach(function (h) { out = out.concat(reportDomBlocksOf(h)); });
+		return out;
+	}
+	function reportDomBlocksOf(host) {
+		var out = [], nodes, i, el, t, rows, trs, j, tds, k, row, frow, urow, heads, hl, hu, ids;
+		if (!host) { return out; }
+		nodes = host.querySelectorAll('table, p, h1, h2, h3, h4, .lpn-ff-head');
+		for (i = 0; i < nodes.length; i++) {
+			el = nodes[i];
+			if (el.tagName !== 'TABLE') {
+				if (el.closest('table')) { continue; }
+				t = reportCellText(el, false);
+				if (t) { out.push({ text: t }); }
+				continue;
+			}
+			heads = []; hl = []; hu = []; ids = [];
+			var th2 = reportTableHeads(el), grp = th2.grp;
+			th2.leaf.forEach(function (th) {
+				heads.push(reportCellText(th, false));
+				hl.push(th.getAttribute('data-ec-hl') || ''); hu.push(th.getAttribute('data-ec-hu') || '');
+				ids.push(th.classList.contains('lpn-rpt-id'));
+			});
+			rows = []; frow = []; urow = [];
+			trs = el.querySelectorAll('tbody tr');
+			for (j = 0; j < trs.length; j++) {
+				tds = trs[j].children; row = []; k = 0;
+				var fr = [], ur = [];
+				for (k = 0; k < tds.length; k++) {
+					row.push(reportCellText(tds[k], false)); fr.push(reportCellText(tds[k], true));
+					ur.push(tds[k].getAttribute('data-ec-unit') || '');
+					// A cell that spans columns (one sentence across the result columns) keeps the columns after it in place.
+					for (var sp = 1; sp < (tds[k].colSpan || 1); sp++) { row.push(''); fr.push(''); ur.push(''); }
+				}
+				rows.push(row); frow.push(fr); urow.push(ur);
+			}
+			if (heads.length || rows.length) { out.push({ heads: heads, rows: rows, full: frow, unit: urow, hl: hl, hu: hu, ids: ids, grp: grp }); }
+		}
+		return out;
+	}
+	function fullReportBlocks() {
+		var pc = EngCalcs.pageConfig || {}, rows = fullReportRows();
+		if (!rows.length) { return []; }
+		var parts = FULL_REPORT_COLS.map(fullReportColParts);
+		return [{
+			heads: [pc.lpn_full_col_time || 'Time (hr)', pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID'].concat(FULL_REPORT_COLS.map(fullReportColHeading)),
+			hl: ['', '', ''].concat(parts.map(function (p) { return p.label; })),
+			ph: ['', '', ''].concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c, true).label; })),
+			hu: ['', '', ''].concat(parts.map(function (p) { return p.unit; })),
+			ids: [false, false, true].concat(parts.map(function () { return false; })),
+			trunc: [false, true, false].concat(FULL_REPORT_COLS.map(function (c) { return c.field === 'status'; })),
+			rows: rows.map(function (r) {
+				return [EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(r.t) : String(r.t), r.type, r.id]
+					.concat(FULL_REPORT_COLS.map(function (c) { return fullReportCellText(r, c.key); }));
+			})
+		}];
+	}
+	/** The elements a box's report is read from. Demand scaling answers inside its controls (the
+	 * `data-ds` blocks) and lists its tables in the report element. */
+	function reportHostsFor(spec) {
+		var out = [], c;
+		if (spec.box === 'lpn_ds_box') {
+			c = document.getElementById('lpn_ds_controls');
+			if (c) { Array.prototype.forEach.call(c.querySelectorAll('[data-ds]'), function (e) { out.push(e); }); }
+		}
+		out.push(document.getElementById(spec.host));
+		return out;
+	}
+	function reportBlocksFor(spec) {
+		return spec.full ? fullReportBlocks() : reportDomBlocks(reportHostsFor(spec));
+	}
+	function reportScenarioName(spec) {
+		var s;
+		if (spec.full) { return lastRunScenarioName(); }
+		if (scenarios.length < 2) { return ''; }
+		s = activeScenario();
+		return s ? scenarioDisplayName(s) : '';
+	}
+	function reportTitleText(spec) {
+		return (EngCalcs.pageConfig || {})[spec.title] || spec.fb;
+	}
+	function reportDateText() {
+		var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
+		return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+	}
+	/** Project, scenario, analysis, date: the one line that says what a pasted or printed table is. */
+	function reportTitleLine(spec) {
+		var proj = (typeof project === 'object' && project && project.name) || '', scn = reportScenarioName(spec);
+		return [proj, scn, reportTitleText(spec), reportDateText()].filter(function (x) { return x; }).join(' - ');
+	}
+	// One part of a file name: no spaces, no runs of underscores, none at either end; letters with
+	// accents stay (Criticidad_análisis).
+	function reportNamePart(t) {
+		return paneNoSpace(paneSanitizeFileName(t)).replace(/_+/g, '_').replace(/^[_-]+|[_-]+$/g, '');
+	}
+	function reportFilename(spec, ext) {
+		var scn = reportScenarioName(spec), id = spec.full && lastSolveResult && lastSolveResult._scn;
+		return [(typeof project === 'object' && project && project.name) || '',
+			(scn && !(spec.full && id === 'base')) ? scn : '', reportTitleText(spec)]
+			.map(reportNamePart).filter(function (x) { return x; }).join('-') + '.' + ext;
+	}
+	/**
+	 * **A SPREADSHEET-READY TABLE**: a column whose figures all share one unit becomes bare numbers
+	 * with the unit in the heading ("Static pressure (psi)"), and a number carries its unrounded
+	 * value where the box kept one (`data-ec-full`). A cell that is not a figure (a dash, a word, a
+	 * time) stays as it is, except that a lone dash is blank. A column with mixed units is left as
+	 * shown. `b.full` holds the per-cell unrounded text and `b.unit` the per-cell unit, from the DOM.
+	 */
+	function reportSheetBlock(b) {
+		var heads = b.heads.slice(), rows = b.rows.map(function (r) { return r.slice(); }), c, r, cells, unit, ok, n, any, m;
+		for (c = 0; c < heads.length; c++) {
+			cells = []; unit = null; ok = true; any = false;
+			for (r = 0; r < rows.length && ok; r++) {
+				var shown = rows[r][c], fullT = b.full && b.full[r] && b.full[r][c], u = b.unit && b.unit[r] && b.unit[r][c];
+				if (shown === undefined || shown === '' || /^[\u2013\u2014-]$/.test(shown)) { cells.push(null); continue; }
+				if (fullT && fullT !== shown && /^-?\d+(\.\d+)?(e[+-]?\d+)?$/i.test(fullT)) {
+					n = fullT; m = [null, null, u || ''];
+					if (!u && shown.indexOf(fullT) !== 0) {
+						m = /^-?[\d.]+(?:e[+-]?\d+)?\s*(.*)$/i.exec(shown);
+						m = [null, null, m ? m[1] : ''];
+					}
+				} else {
+					m = /^(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)\s*(%|[A-Za-z\u00b0\u00b5][^\s\d]{0,11}(?:\/[A-Za-z]+)?|[^\s\d]{1,4})?$/i.exec(shown);
+					if (!m || /^0\d/.test(m[1])) { cells.push({ text: true, v: shown }); continue; }
+					n = m[1];
+				}
+				if (unit === null) { unit = m[2] || ''; } else if (unit !== (m[2] || '')) { ok = false; break; }
+				any = true;
+				cells.push({ v: n });
+			}
+			if (!ok || !any) { continue; }
+			for (r = 0; r < rows.length; r++) { rows[r][c] = cells[r] === null ? '' : cells[r].v; }
+			if (unit && heads[c].indexOf('(' + unit + ')') < 0 && heads[c].indexOf(unit + ')') < 0 && heads[c].indexOf(unit) < 0) { heads[c] += ' (' + unit + ')'; }
+		}
+		return { heads: heads, rows: rows };
+	}
+	/** One header row for a spreadsheet or plain text: a compound heading flattens to "Group: Heading". */
+	function reportFlatHeads(b, heads) {
+		return heads.map(function (h, c) { return b.grp && b.grp[c] ? b.grp[c] + ': ' + h : h; });
+	}
+	/** The compound heading's first-row cells: `{ text, from, n }` for a group, `{ from, n: 1, both: true }` for a heading over both rows; null for a plain one-row head. */
+	function reportHeadRuns(b) {
+		var runs = [], c, last = null;
+		if (!b.grp || !b.grp.some(function (g) { return g; })) { return null; }
+		for (c = 0; c < b.heads.length; c++) {
+			if (!b.grp[c]) { runs.push({ from: c, n: 1, both: true }); last = null; }
+			else if (last && last.text === b.grp[c]) { last.n++; }
+			else { last = { text: b.grp[c], from: c, n: 1 }; runs.push(last); }
+		}
+		return runs;
+	}
+	function reportCsvText(blocks) {
+		var parts = [];
+		blocks.forEach(function (b) {
+			var t;
+			if (!b.heads) { return; }
+			t = reportSheetBlock(b);
+			t.heads = reportFlatHeads(b, t.heads);
+			// The byte-order mark opens the file once, never again at a second table.
+			parts.push(EngCalcs.lpnTableCsv(t.heads, t.rows, { bom: parts.length === 0 }));
+		});
+		return parts.join('\r\n');
+	}
+	function reportEsc(t) {
+		return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	/** Self-contained: inline styles only, so it pastes into a mail or a document the same everywhere. */
+	function reportHtmlText(spec, blocks) {
+		// **EVERY WEIGHT IS SAID, AND NO <b> IS USED** (Tom pasted this into Google Docs and every
+		// paragraph and body cell came out bold): a document editor that meets a bare <b> at the head of
+		// a fragment may carry it over everything after, and a cell with no weight of its own took the
+		// bold of the table's head. Bold is a style on the title and on each heading, normal is a style
+		// on everything else, and the whole is wrapped in a normal-weight <div>.
+		var NORMAL = 'font-weight:normal;', out = ['<div style="' + NORMAL + '">', '<p style="font-weight:bold;">' + reportEsc(reportTitleLine(spec)) + '</p>'];
+		blocks.forEach(function (b) {
+			var heads, n, pt, cols, cell, keep;
+			if (!b.heads) { out.push('<p style="' + NORMAL + '">' + reportEsc(b.text) + '</p>'); return; }
+			// **WHAT A WORD PROCESSOR HONOURS** (Tom pasted this into Google Docs and got equal columns
+			// with "Junctio|n" and "153|7"): inline styles only (Docs drops <style>), a width on every
+			// column in proportion to its longest unbreakable word, the same measure the printed sheet
+			// uses, no-wrap on every short cell, and a type size at which the columns fit 6.5 in.
+			heads = reportPrintHeads(b);
+			n = reportColNeeds(Object.assign({}, b, { trunc: null }), heads);
+			pt = Math.max(5, Math.min(10, Math.floor(460 / n.sum * 10) / 10));
+			cell = 'border:1px solid #999;padding:2px 3px;text-align:left;vertical-align:top;font-size:' + pt + 'pt;';
+			var headStyle = cell + 'font-weight:bold;background:#eee;';
+			cols = n.need.map(function (w) {
+				var pct = (Math.round(w / n.sum * 1000) / 10) + '%';
+				return '<col width="' + pct + '" style="width:' + pct + ';">';
+			}).join('');
+			keep = function (t, c) { return (b.ids && b.ids[c]) || String(reportFigureUnitKept(t)).replace(/\u00A0/g, '').length <= 24 && !/ .* /.test(String(reportFigureUnitKept(t))); };
+			var headCell = function (c, span) {
+				return '<th' + (span ? ' ' + span : '') + ' style="' + headStyle + '">' + (b.hu && b.hu[c] ? reportHeadHtml((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : reportEsc(b.heads[c])) + '</th>';
+			}, runs = reportHeadRuns(b), thead;
+			// **A COMPOUND HEADING IS A REAL TWO-ROW HEAD** (Task 840): colspan over the group, rowspan 2
+			// on a heading that has no group, so a word processor keeps the structure when it is pasted.
+			if (runs) {
+				thead = '<tr>' + runs.map(function (r) {
+					return r.both ? headCell(r.from, 'rowspan="2"')
+						: '<th colspan="' + r.n + '" style="' + headStyle + 'text-align:center;">' + reportEsc(r.text) + '</th>';
+				}).join('') + '</tr><tr>' + b.heads.map(function (h, c) { return b.grp[c] ? headCell(c, '') : ''; }).join('') + '</tr>';
+			} else { thead = '<tr>' + b.heads.map(function (h, c) { return headCell(c, ''); }).join('') + '</tr>'; }
+			out.push('<table style="' + NORMAL + 'border-collapse:collapse;font-family:sans-serif;font-size:' + pt + 'pt;width:100%;"><colgroup>' + cols + '</colgroup><thead>' + thead +
+				'</thead><tbody>' +
+				b.rows.map(function (r) {
+					return '<tr>' + r.map(function (c, k) { return '<td style="' + cell + NORMAL + (keep(c, k) ? 'white-space:nowrap;' : '') + '">' + reportEsc(reportFigureUnitKept(c)) + '</td>'; }).join('') + '</tr>';
+				}).join('') + '</tbody></table>');
+		});
+		out.push('</div>');
+		return out.join('\n');
+	}
+	/**
+	 * **A FIGURE STAYS WITH ITS UNIT ON PAPER** (Task 829, Tom 2026-10-25, printing the reports to PDF:
+	 * "Some of the column widths need tweaking"). A cell that is a number then a unit ("77.81 m H2O",
+	 * "63.09 L/s") is written with no-break spaces in the printed copy only, so a narrow column
+	 * breaks between cells' words and never between a figure and its unit. Prose keeps its spaces.
+	 */
+	function reportFigureUnitKept(text) {
+		var t = String(text === undefined || text === null ? '' : text);
+		return (/^[-\u2212]?[\d.,]+ [^\s\d]+(?: [A-Za-z0-9]+)?$/).test(t) ? t.replace(/ /g, '\u00A0') : t;
+	}
+	/**
+	 * **A REPORT TABLE IS AS WIDE AS ITS CONTENT, NEVER WIDER THAN THE SHEET, AND BREAKS NO WORD.**
+	 * Each column needs the width of its longest unbreakable word (a heading's, a figure with its
+	 * unit's), measured as the pane's tables are and given the same print headroom
+	 * (PANE_PRINT_HEADROOM) plus the print cell's padding. The table's font is then the 9 pt it
+	 * normally has, or, when those needs added together exceed the sheet, exactly the smaller size at
+	 * which they fit. The columns are left to the browser's own table layout, which wraps a heading
+	 * at its spaces and gives a wide column the room it asks for (css/engcalcs.css, `.lpn-print-report`).
+	 */
+	var REPORT_ID_SAMPLE = 'W-9999', REPORT_TRUNC_EM = 5.5;
+	/** The headings as printed (the short concentration label in the Full report), as plain text. */
+	function reportPrintHeads(b) {
+		return b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
+	}
+	/** Each column's width need in em of the table's font, and their sum: the longest unbreakable word. */
+	function reportColNeeds(b, heads) {
+		var ncol = b.heads.length, need = [], sum = 0, j;
+		function note(col, text, head) {
+			String(text).split(/[ \t\n]+/).forEach(function (w) {
+				if (w) { need[col] = Math.max(need[col] || 0, paneMeasureEm(w, head) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); }
+			});
+		}
+		heads.forEach(function (t, c) {
+			note(c, b.hu && b.hu[c] ? reportHeadText((b.ph && b.ph[c]) || b.hl[c], b.hu[c]) : t, true);
+		});
+		b.rows.forEach(function (r) { r.forEach(function (t, c) { if (c < ncol && !(b.trunc && b.trunc[c])) { note(c, reportFigureUnitKept(t), false); } }); });
+		// A column that may be cut with an ellipsis asks for the cap and no more.
+		(b.trunc || []).forEach(function (on, c) { if (on && c < ncol) { need[c] = Math.max(need[c] || 0, REPORT_TRUNC_EM * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM); } });
+		// An asset id column asks for the width of a wide five-character id, in every report alike.
+		(b.ids || []).forEach(function (on, c) { if (on && c < ncol) { note(c, REPORT_ID_SAMPLE, false); } });
+		for (j = 0; j < ncol; j++) { need[j] = need[j] || PANE_PRINT_TD_PAD_EM; sum += need[j]; }
+		return { need: need, sum: Math.round(sum * 100) / 100 };
+	}
+	function reportPrintFit(table, b) {
+		var n = reportColNeeds(b, b.heads);
+		if (!(n.sum > 0)) { return; }
+		table.style.fontSize = 'min(12px, calc((100cqw - ' + (b.heads.length + 1) + 'px) / ' + n.sum + '))';
+	}
+	function reportPrintable(spec, blocks) {
+		var wrap = document.createElement('div'), h, line;
+		wrap.id = 'lpn_print_area';
+		// Largest first: the analysis, then the project, then the scenario and the date.
+		h = document.createElement('h1');
+		h.textContent = reportTitleText(spec);
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		line = reportScenarioName(spec);
+		h = document.createElement('h3');
+		h.textContent = (line ? line + ' - ' : '') + reportDateText();
+		wrap.appendChild(h);
+		blocks.forEach(function (b) {
+			var table, thead, tbody, tr, e, printHeads;
+			if (!b.heads) {
+				e = document.createElement('p');
+				e.textContent = b.text;
+				wrap.appendChild(e);
+				return;
+			}
+			table = document.createElement('table');
+			table.className = 'lpn-pane-table lpn-print-table lpn-print-report';
+			thead = document.createElement('thead');
+			tr = document.createElement('tr');
+			printHeads = b.heads.map(function (t, c) { return b.ph && b.ph[c] ? reportHeadText(b.ph[c], b.hu && b.hu[c]) : t; });
+			var runs = reportHeadRuns(b), tr2 = null;
+			var mkHead = function (c, row, both) {
+				e = document.createElement('th');
+				if (b.hu && b.hu[c]) { e.appendChild(reportHeadNodes((b.ph && b.ph[c]) || b.hl[c], b.hu[c])); } else { e.textContent = b.heads[c]; }
+				if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+				if (both) { e.rowSpan = 2; }
+				row.appendChild(e);
+			};
+			if (runs) {
+				tr2 = document.createElement('tr');
+				runs.forEach(function (r) {
+					if (r.both) { mkHead(r.from, tr, true); return; }
+					e = document.createElement('th'); e.colSpan = r.n; e.className = 'lpn-print-grouphead'; e.textContent = r.text; tr.appendChild(e);
+					for (var q = r.from; q < r.from + r.n; q++) { mkHead(q, tr2, false); }
+				});
+			} else { b.heads.forEach(function (t, c) { mkHead(c, tr, false); }); }
+			thead.appendChild(tr);
+			if (tr2) { thead.appendChild(tr2); }
+			table.appendChild(thead);
+			tbody = document.createElement('tbody');
+			b.rows.forEach(function (r) {
+				tr = document.createElement('tr');
+				r.forEach(function (t, c) {
+					var inner;
+					e = document.createElement('td');
+					if (b.trunc && b.trunc[c] && t) {
+						inner = document.createElement('span'); inner.className = 'lpn-rpt-trunc'; inner.title = t; inner.textContent = t; e.appendChild(inner);
+					} else { e.textContent = reportFigureUnitKept(t); }
+					if (b.ids && b.ids[c]) { e.className = 'lpn-rpt-id'; }
+					tr.appendChild(e);
+				});
+				tbody.appendChild(tr);
+			});
+			table.appendChild(tbody);
+			reportPrintFit(table, Object.assign({}, b, { heads: printHeads }));
+			wrap.appendChild(table);
+		});
+		return wrap;
+	}
+	/** The title line, then each table as tab-separated text: what a plain-text paste gets. */
+	function reportPlainText(spec, blocks) {
+		return reportTitleLine(spec) + '\n' + blocks.filter(function (b) { return b.heads; })
+			.map(function (b) { return EngCalcs.lpnTableTsv(reportFlatHeads(b, b.heads), b.rows); }).join('\n');
+	}
+	function reportCopyHtml(spec, btn) {
+		var blocks = reportBlocksFor(spec), html = reportHtmlText(spec, blocks), pc = EngCalcs.pageConfig || {},
+			was = btn.textContent, plain = reportPlainText(spec, blocks);
+		function done(okay) {
+			if (!okay) { return; }
+			btn.textContent = pc.lpn_time_run_report_copied || 'Copied';
+			setTimeout(function () { btn.textContent = was; }, 1500);
+		}
+		if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+			navigator.clipboard.write([new ClipboardItem({
+				'text/html': new Blob([html], { type: 'text/html' }),
+				'text/plain': new Blob([plain], { type: 'text/plain' })
+			})]).then(function () { done(true); }, function () {
+				// A refused rich write falls back to the plain tab-separated text, never to raw markup.
+				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(plain, btn); }
+			});
+		} else if (EngCalcs.lpnCopyText) {
+			EngCalcs.lpnCopyText(plain, btn);
+		}
+	}
+	function reportToolsInit() {
+		var pc = EngCalcs.pageConfig || {};
+		REPORT_TOOL_BOXES.forEach(function (spec) {
+			var box = document.getElementById(spec.box), body = box && box.querySelector('.lpn-popover-body'),
+				host = document.getElementById(spec.host), row, csv, html, pr, old;
+			if (!body || !host || body.querySelector('.lpn-report-tools')) { return; }
+			old = body.querySelector('.lpn-box-tools');
+			if (old) { old.parentNode.removeChild(old); }
+			row = document.createElement('div');
+			row.className = 'lpn-box-tools lpn-report-tools';
+			function mk(id, label, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.className = 'lpn-rptbox-copy'; b.id = spec.host.replace(/_report$/, '') + id; b.textContent = label;
+				b.addEventListener('click', function () { fn(b); });
+				row.appendChild(b);
+				return b;
+			}
+			csv = mk('_csv', pc.lpn_full_download_csv || 'Download CSV', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) {
+					downloadTextFile(reportFilename(spec, 'csv'), spec.full ? '\uFEFF' + fullReportCsvText(fullReportRows()) : reportCsvText(blocks), 'text/csv');
+				}
+			});
+			html = mk('_copyhtml', pc.lpn_report_copy_html || 'Copy HTML', function (b) { reportCopyHtml(spec, b); });
+			pr = mk('_print', pc.lpn_full_print || 'Print report', function () {
+				var blocks = reportBlocksFor(spec);
+				if (blocks.some(function (b) { return b.heads; })) { printReportArea(reportPrintable(spec, blocks)); }
+			});
+			body.insertBefore(row, body.firstChild);
+			var obs = null;
+			function sync() {
+				var has = reportHostsFor(spec).some(function (h) { return !!(h && h.querySelector('table')); });
+				[csv, html, pr].forEach(function (b) { b.disabled = !has; });
+				// Units into the headings (reportTableUnits); this pass's own edits are not fed back.
+				reportHostsFor(spec).forEach(reportUnitsIntoHeads);
+				if (obs) { obs.takeRecords(); }
+			}
+			sync();
+			if (typeof MutationObserver !== 'undefined') {
+				obs = new MutationObserver(sync);
+				obs.observe(spec.box === 'lpn_ds_box' ? body : host, { childList: true, subtree: true });
+			}
+		});
 	}
 	function fullBoxEl() { return document.getElementById('lpn_full_box'); }
 	function fullBoxIsOpen() {
@@ -84204,7 +86870,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (lastRunScenarioName()) {
 			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
 		}
-		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
@@ -84225,11 +86891,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		stepRows = rows.filter(function (r) { return r.t === frames[fullReportStepIndex].t; });
 		body = ffTable(host, [pc.lpn_full_col_type || 'Type', pc.lpn_field_id || 'ID']
-			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
+			.concat(FULL_REPORT_COLS.map(function (c) { return fullReportColParts(c).label; })));
+		FULL_REPORT_COLS.forEach(function (c, k) {
+			var th = body.parentNode.querySelectorAll('thead th')[k + 2];
+			if (th) { reportSetHeadUnit(th, fullReportColParts(c).unit); }
+		});
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, r.type, 'lpn-ff-fit');
-			ffCell(tr, r.id);
+			ffCell(tr, r.id, 'lpn-rpt-id');
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
 	}
@@ -84255,12 +86925,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
 	}
 	function wireFullReportBox() {
-		var box = fullBoxEl(), x = document.getElementById('lpn_full_close'),
-			csv = document.getElementById('lpn_full_csv'), pr = document.getElementById('lpn_full_print');
+		var box = fullBoxEl(), x = document.getElementById('lpn_full_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeFullReportBox); }
-		if (csv) { csv.addEventListener('click', downloadFullReportCsv); }
-		if (pr) { pr.addEventListener('click', printFullReport); }
 		wireBoxMemory(box, LPN_FULLBOX_KEY, fullboxLayout, saveFullboxLayout, fullBoxIsOpen);
 	}
 	function refreshFullReportBoxIfOpen() {
@@ -84311,7 +86978,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function calibParamLabel(def) {
 		var unit = colorFieldUnitText(def.group, def.field);
-		return colorFieldLabel(def.group, def.field) + (unit ? ' (' + unit + ')' : '');
+		return reportHeadText(colorFieldLabel(def.group, def.field), unit);
 	}
 	// The frames compared against: the extended period run's, or the single solve standing alone
 	// at time 0 -- EPANET's own allowance ("for a single-period analysis all time values can be 0").
@@ -84377,7 +87044,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		if (!C) { return; }
 		def = calibParamDef(calibParam);
-		controls = ffEl('div', 'lpn-calib-controls', null, host);
+		controls = host;   // one grid: the Parameter row and the Load button are on the box's own grid
 		sel = ffSelect(C.PARAMS.map(function (p) { return [p.key, colorFieldLabel(p.group, p.field)]; }), def.key);
 		sel.id = 'lpn_calib_param';
 		sel.addEventListener('change', function () { calibParam = sel.value; rebuildCalibReport(); });
@@ -84385,6 +87052,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
 		btn.type = 'button';
 		btn.id = 'lpn_calib_load';
+		btn.className += ' lpn-gcol2';
 		if (pc.lpn_calib_load_tip) { btn.title = pc.lpn_calib_load_tip; }
 		btn.addEventListener('click', function () {
 			var input = document.getElementById('lpn_calib_file');
@@ -84466,18 +87134,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
 			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
 			body = ffEl('tbody', null, null, table), r = res.stats.r;
+		var calibUnit = res.def ? colorFieldUnitText(res.def.group, res.def.field) : '';
 		[[pc.lpn_calib_col_location || 'Location'],
 			[pc.lpn_calib_col_n || 'Num obs'],
-			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
-			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
-			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
-			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip]].forEach(function (h) {
+			[pc.lpn_calib_col_obs_mean || 'Observed mean', null, 1],
+			[pc.lpn_calib_col_sim_mean || 'Computed mean', null, 1],
+			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip, 1],
+			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip, 1]].forEach(function (h) {
 			var th = ffEl('th', null, h[0], hr);
 			if (h[1]) { th.title = h[1]; th.className = 'ec-help'; }
+			// The four means and errors are in the measured parameter's unit, so the heading says so.
+			if (calibUnit && h.length > 2) { reportSetHeadUnit(th, calibUnit); }
 		});
 		function row(name, s, cls) {
 			var tr = ffEl('tr', cls || null, null, body);
-			ffCell(tr, name);
+			ffCell(tr, name, 'lpn-rpt-id');
 			ffCell(tr, String(s.n));
 			ffCell(tr, calibNum(s.obsMean));
 			ffCell(tr, calibNum(s.simMean));

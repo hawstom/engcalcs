@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='कोई कर्व चयनित नहीं'
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='कर्व';
-$ec_lang['lpn_curve_library_link_tip']='Libraries बॉक्स को उसके Curves सेक्शन पर खोलता है, जहाँ कोई कर्व जोड़ा, वर्णित, संपादित और हटाया जाता है। एक तत्व बताता है कि वह कौन-सा कर्व उपयोग करता है।';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='मोड: आकृति जोड़ें।
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='मानचित्र पर तत्वों और टेक्स्ट को बदलने, ले जाने और खींचने, या मानचित्र को पैन करने के लिए इस मोड का उपयोग करें। यह मानचित्र का डिफ़ॉल्ट मोड है। दूसरी बार Esc दबाने से चयन साफ़ हो जाता है।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='स्वचालित';
 $ec_lang['lpn_method_switch_confirm']='घर्षण विधि बदलने से आपके पाइपों पर पहले से टाइप किए गए खुरदरापन अंक नहीं बदलते, और एक विधि के लिए खुरदरापन दूसरी विधि के लिए अर्थहीन है। इसके बाद हर पाइप जाँच लें। फिर भी बदलें?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='परिदृश्य {name} �
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='आधार परिदृश्य: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} को {scenario} में नेटवर्क से बाहर रखा गया है। यह ड्राइंग में और अन्य परिदृश्यों में बना रहता है।';
 $ec_lang['lpn_scenario_delete_in_base']='इसे ड्रॉइंग से हटाने के लिए, इसे {base} परिदृश्य में हटाएँ।';
 $ec_lang['lpn_scenario_only_deleted']='{id} हटा दिया गया। यह केवल {scenario} का भाग था।';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='खुले परिदृश्य को 
 $ec_lang['lpn_scenario_copy_off']='परिदृश्य कॉपी करें बेसिक मोड में काम करता है। बेसिक मोड बंद होने पर, परिदृश्य जोड़ें और परिदृश्य तालिका में उसके ऑल्टरनेटिव चुनें।';
 $ec_lang['lpn_sm_title']='परिदृश्य प्रबंधक';
 $ec_lang['lpn_sm_menu']='परिदृश्य प्रबंधक…';
-$ec_lang['lpn_sm_basic_on']='बेसिक मोड चालू होने पर परिदृश्य प्रबंधक अक्षम रहता है।';
 $ec_lang['lpn_pane_tab_scenarios']='परिदृश्य';
 $ec_lang['lpn_sm_col_parent']='पैरेंट';
 $ec_lang['lpn_sm_add_child']='चाइल्ड जोड़ें';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='नए तत्व: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (डिफ़ॉल्ट)';
 $ec_lang['lpn_settings_row_view_value']='केंद्र {x}, {y}; स्केल {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} में अपना मान।';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='मानचित्र केंद्र';
 $ec_lang['lpn_settings_view_scale']='मानचित्र स्केल';
 $ec_lang['lpn_settings_view_scale_tip']='मानचित्र के केंद्र पर स्केल, 1:N के रूप में। उस स्केल पर ज़ूम करने के लिए 1:2000, या केवल 2000, टाइप करें।';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='परिदृश्यों की ताल
 $ec_lang['lpn_scncmp_running']='हर परिदृश्य हल किया जा रहा है…';
 $ec_lang['lpn_scncmp_empty']='अभी तक कुछ नहीं खींचा गया है, इसलिए हल करने के लिए कुछ नहीं है।';
 $ec_lang['lpn_scncmp_col_maxvelocity']='अधिकतम वेग';
-$ec_lang['lpn_scncmp_at']='{id} पर {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} पर {value}, {time}';
 $ec_lang['lpn_scncmp_same']='हर परिदृश्य में समान';
 $ec_lang['lpn_scncmp_period_note']='जहाँ किसी परिदृश्य का कुल चलने का समय है, वहाँ उसका न्यूनतम दाब और अधिकतम वेग दिखाए गए समय पर पूरे नेटवर्क के चरम मान हैं।';
 $ec_lang['lpn_scncmp_current']='(अभी खुला हुआ)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV डाउनलोड करें';
 $ec_lang['lpn_full_print']='रिपोर्ट प्रिंट करें';
 $ec_lang['lpn_full_col_time']='समय';
 $ec_lang['lpn_full_col_type']='प्रकार';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='सांद्रता';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} सांद्रता';
 $ec_lang['lpn_full_row_count']='पंक्तियाँ ({n})।';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='रन';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='दाब और वेग';
 $ec_lang['lpn_ff_atleast']='{flow} से अधिक';
-$ec_lang['lpn_ff_affect_node']='{id} घटकर {pressure} हो गया';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity} तक पहुँचा';
 $ec_lang['lpn_ff_more']='और {n} और प्रभावित';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='पूर्ववत करें (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='फिर से करें (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='कॉपी करें (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

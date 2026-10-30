@@ -279,7 +279,8 @@ async function runMode(browser, Session, mode) {
 		await a.settle(700);
 		// "Property to change", then (for Elevation on a locatable project) "New value source".
 		const pick = (labelText, val) => P.evaluate(([t, v]) => {
-			const l = Array.from(document.querySelectorAll('#lpn_find_popup label')).find((x) => x.textContent.trim().indexOf(t) === 0 && x.querySelector('select'));
+			// A row of the box's grid (Task 828): its name, then its pull-down.
+			const l = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow')).find((x) => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(t) === 0 && x.querySelector('select'));
 			const s = l && l.querySelector('select');
 			if (!s || !Array.from(s.options).some((o) => o.value === v)) { return false; }
 			s.value = v; s.dispatchEvent(new Event('change', { bubbles: true }));
@@ -292,7 +293,7 @@ async function runMode(browser, Session, mode) {
 		if (value !== undefined) {
 			const vl = await L('lpn_replace_value');
 			await P.evaluate(([t, v]) => {
-				const l = Array.from(document.querySelectorAll('#lpn_find_popup label')).find((x) => x.textContent.trim().indexOf(t) === 0 && x.querySelector('input'));
+				const l = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow')).find((x) => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(t) === 0 && x.querySelector('input'));
 				const i = l.querySelector('input'); i.value = v; i.dispatchEvent(new Event('input', { bubbles: true }));
 			}, [vl, String(value)]);
 		}

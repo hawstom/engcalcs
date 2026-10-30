@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='কোনো কার্ভ বেছে নেও�
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='কার্ভ';
-$ec_lang['lpn_curve_library_link_tip']='লাইব্রেরি বাক্সটি তার কার্ভ বিভাগে খুলুন, যেখানে একটি কার্ভ যোগ, বর্ণনা, সম্পাদনা ও মুছে ফেলা হয়। একটি উপাদান নির্দিষ্ট করে সে কোন কার্ভ ব্যবহার করে।';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='মোড: চিত্র যোগ করু�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='মানচিত্রের উপাদান পরিবর্তন, সরানো ও টেনে আনতে অথবা মানচিত্র প্যান করতে এই মোড ব্যবহার করুন। এটি মানচিত্রের ডিফল্ট মোড। Esc দ্বিতীয়বার চাপলে যা নির্বাচিত আছে তা নির্বাচনমুক্ত হয়।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='স্বয়ংক্রিয়';
 $ec_lang['lpn_method_switch_confirm']='ঘর্ষণ পদ্ধতি বদলালে পাইপে ইতিমধ্যে লেখা রাফনেস সংখ্যা বদলায় না, এবং এক পদ্ধতির রাফনেস অন্য পদ্ধতির জন্য অর্থহীন। এরপর প্রতিটি পাইপ পরীক্ষা করুন। তবুও বদলাবেন?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} দৃশ্যকল্প
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='ভিত্তি দৃশ্যকল্প: {value}';
 $ec_lang['lpn_scenario_deactivated']='{scenario}-এ {id} নেটওয়ার্ক থেকে বাদ দেওয়া হয়েছে। এটি অঙ্কনে এবং অন্য দৃশ্যকল্পগুলোতে থাকে।';
 $ec_lang['lpn_scenario_delete_in_base']='অঙ্কন থেকে সরাতে {base} দৃশ্যকল্পে এটি মুছুন।';
 $ec_lang['lpn_scenario_only_deleted']='{id} মুছে ফেলা হয়েছে। এটি শুধু {scenario}-এর অংশ ছিল।';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='খোলা দৃশ্যকল্প ও 
 $ec_lang['lpn_scenario_copy_off']='দৃশ্যকল্প কপি করুন সাধারণ মোডে কাজ করে। সাধারণ মোড বন্ধ থাকলে, একটি দৃশ্যকল্প যোগ করুন এবং দৃশ্যকল্প সারণিতে তার বিকল্পগুলো বেছে নিন।';
 $ec_lang['lpn_sm_title']='দৃশ্যকল্প ব্যবস্থাপক';
 $ec_lang['lpn_sm_menu']='দৃশ্যকল্প ব্যবস্থাপক…';
-$ec_lang['lpn_sm_basic_on']='সাধারণ মোড চালু থাকলে দৃশ্যকল্প ব্যবস্থাপক নিষ্ক্রিয় থাকে।';
 $ec_lang['lpn_pane_tab_scenarios']='দৃশ্যকল্প';
 $ec_lang['lpn_sm_col_parent']='মূল';
 $ec_lang['lpn_sm_add_child']='অধস্তন যোগ করুন';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='নতুন অ্যাসেট: {set
 $ec_lang['lpn_settings_row_default']='{value} (ডিফল্ট)';
 $ec_lang['lpn_settings_row_view_value']='কেন্দ্র {x}, {y}; স্কেল {s}';
 $ec_lang['lpn_settings_held_in']='{scenario}-এ নিজস্ব মান।';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='মানচিত্রের কেন্দ্র';
 $ec_lang['lpn_settings_view_scale']='মানচিত্রের স্কেল';
 $ec_lang['lpn_settings_view_scale_tip']='মানচিত্রের কেন্দ্রে স্কেল, 1:N হিসেবে। সেই স্কেলে জুম করতে 1:2000 টাইপ করুন, অথবা শুধু 2000।';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='নিজস্ব মানের সংখ্
 $ec_lang['lpn_scncmp_running']='প্রতিটি দৃশ্যকল্প সমাধান করা হচ্ছে…';
 $ec_lang['lpn_scncmp_empty']='এখনও কিছু আঁকা হয়নি, তাই সমাধান করার মতো কিছু নেই।';
 $ec_lang['lpn_scncmp_col_maxvelocity']='সর্বোচ্চ বেগ';
-$ec_lang['lpn_scncmp_at']='{id}-এ {value}';
-$ec_lang['lpn_scncmp_at_time']='{id}-এ {value}, {time}';
 $ec_lang['lpn_scncmp_same']='প্রতিটি দৃশ্যকল্পে একই';
 $ec_lang['lpn_scncmp_period_note']='যেখানে দৃশ্যকল্পের মোট রান সময় আছে, সেখানে তার সর্বনিম্ন চাপ ও সর্বোচ্চ বেগ হলো দেখানো সময়ে সমগ্র নেটওয়ার্কের চরম মান।';
 $ec_lang['lpn_scncmp_current']='(বর্তমানে খোলা)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV ডাউনলোড করুন';
 $ec_lang['lpn_full_print']='প্রতিবেদন প্রিন্ট করুন';
 $ec_lang['lpn_full_col_time']='সময়';
 $ec_lang['lpn_full_col_type']='ধরন';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ঘনমাত্রা';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ঘনমাত্রা';
 $ec_lang['lpn_full_row_count']='সারি ({n})।';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='রান';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='চাপ ও বেগ';
 $ec_lang['lpn_ff_atleast']='{flow}-এর বেশি';
-$ec_lang['lpn_ff_affect_node']='{id} নেমে {pressure}-এ যায়';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity}-এ পৌঁছায়';
 $ec_lang['lpn_ff_more']='এবং আরও {n}টি প্রভাবিত';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='পূর্বাবস্থায় ফির
 $ec_lang['lpn_snip_tip_redo']='পুনরায় করুন (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='কপি করুন (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

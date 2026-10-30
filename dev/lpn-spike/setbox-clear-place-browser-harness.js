@@ -16,7 +16,7 @@
 //   3. Properties, a junction's demand: its dot clears it and removes the line under it, and the
 //      demand field stays put (it did before the fix too; held here as a guard).
 //   4. Tom's own case, in Spanish with the box docked at the right: as a first visit docks it
-//      (auto-hidden, EC_DEFAULT_DOCKS), pinned, and auto-hidden. The dot is HOVERED until its tip
+//      (auto-hide, EC_DEFAULT_DOCKS), pinned, and auto-hidden. The dot is HOVERED until its tip
 //      shows, then clicked. Before the fix this threw the content 561 px: something read layout
 //      half way through the rebuild (only with a tip showing), when the content was shorter than
 //      the scroll position, and the browser clamped scrollTop there.
@@ -178,9 +178,9 @@ async function main() {
 		});
 		await page.mouse.click(at.x, at.y);
 		await a.settle(900);
-		const demIn = () => page.evaluateHandle(() => document.querySelector('#lpn_popup_fields .lpn-demand-table input'));
+		const demIn = () => page.evaluateHandle(() => document.querySelector('#lpn_popup_fields input[data-gprop="demand"]'));
 		const pw = () => page.evaluate(() => {
-			const i = document.querySelector('#lpn_popup_fields .lpn-demand-table input');
+			const i = document.querySelector('#lpn_popup_fields input[data-gprop="demand"]');
 			const dot = document.querySelector('#lpn_popup_fields .lpn-ovm-dot');
 			const sc = i && i.closest('.lpn-popover-body');
 			const d = dot ? dot.getBoundingClientRect() : null;
@@ -193,7 +193,7 @@ async function main() {
 		await page.keyboard.type('333');
 		await page.keyboard.press('Tab');
 		await a.settle(1000);
-		await page.evaluate(() => { const i = document.querySelector('#lpn_popup_fields .lpn-demand-table input'); const sc = i.closest('.lpn-popover-body'); const r = i.getBoundingClientRect(), b = sc.getBoundingClientRect(); sc.scrollTop += (r.top - b.top) - sc.clientHeight / 2; });
+		await page.evaluate(() => { const i = document.querySelector('#lpn_popup_fields input[data-gprop="demand"]'); const sc = i.closest('.lpn-popover-body'); const r = i.getBoundingClientRect(), b = sc.getBoundingClientRect(); sc.scrollTop += (r.top - b.top) - sc.clientHeight / 2; });
 		await a.settle(200);
 		const pa = await pw();
 		ok('Properties: 333 typed in the scenario makes the demand an override, with its dot and the line under it', !!pa && !!pa.dot && pa.notes === 1, JSON.stringify(pa));
@@ -229,7 +229,9 @@ async function main() {
 				if ((await r.textContent()).trim().replace(/^✓\s*/, '') === newRow.trim()) { await r.click(); break; }
 			}
 			await b.settle(1500);
-			await b.toolbarClick(await b.lang('lpn_tool_settings'));
+			// A first visit with a project open has Settings as an auto-hide tab at the right (Tom, 2026-10-27).
+			if (mode === 'defaults') { await P.click('#lpn_dock_strip_right .lpn-dock-tab[aria-controls="lpn_settings_box"]'); }
+			else { await b.toolbarClick(await b.lang('lpn_tool_settings')); }
 			await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
 			await b.settle(600);
 			if (mode !== 'defaults') { await P.click('#lpn_settings_box .lpn-corner-btn[data-dock="right"]'); await b.settle(800); }

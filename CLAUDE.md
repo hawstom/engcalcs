@@ -200,11 +200,13 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   gated on `EC_MAPBOX_TOKEN`. Never cached, never precached, attribution required, stored as
   `project.basemap`. Elevation fill has exactly two doors — `Settings > New assets > Elevation
   source` and `From Mapbox DEM` in Find and replace. **Do not add a third.**
-- **Four third-party requests, all on this page:** OSM tiles, Mapbox satellite, Nominatim search
-  (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`). OSM tiles show
-  behind the first, empty project (Tom, 2026-09-25); the other three are opt-in.
-  Never write "the only third-party request". A fifth service is a new paragraph in `privacy.php`,
-  not a `consent_body` change.
+- **Five third-party requests, all on this page:** OSM tiles, Mapbox satellite, Nominatim search
+  (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`), and a GIS background
+  layer from a server the visitor names (`js/lpn-gis.js`, Task 720: XYZ, WMS or ArcGIS MapServer,
+  stored as `project.gisLayers`, never cached, requests only to a server whose address was typed in, with no prompt: a project that
+  holds a layer draws it on opening, Tom 2026-10-30). OSM tiles show behind the first, empty project (Tom,
+  2026-09-25); the other four are opt-in. Never write "the only third-party request". A sixth service
+  is a new paragraph in `privacy.php`, not a `consent_body` change.
 - **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** A lat/lon
   project never stores its Mercator drawing numbers; **EPSG:3857 chosen on purpose is a projected
   project in metres**, its lengths measured on the ground (`isWebMercProject()`). EPSG:4326 is the
@@ -353,7 +355,7 @@ Full record: `dev/unit-rulings.md` and `dev/unit-families.md`.
 - **`lpn_` settings belong to the PROJECT or the BROWSER, never both.** Modelling data (units,
   friction method, defaults, prefixes, colouring, labels) rides in `serializeProject()`; window
   furniture (`lpn_pane`, `lpn_rpane`, `lpn_setbox`, `lpn_findbox`, `lpn_ffbox`, `lpn_energybox`,
-  `lpn_cmpbox`, `lpn_reportbox`, `lpn_contourbox`, `lpn_smbox`) is `localStorage` only. **A new project follows the one it was
+  `lpn_cmpbox`, `lpn_reportbox`, `lpn_contourbox`, `lpn_smbox`, `lpn_gcols`) is `localStorage` only. **A new project follows the one it was
   opened from as much as it can** (R-342): if the New Project wizard's units match the open
   project's, the new one copies its whole modelling settings, labels included; if a unit differs,
   only what is calibrated to that changed unit (a "Use units" tick, a typed `defaults` number, the

@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Není zvolena žádná křivka';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Křivky';
-$ec_lang['lpn_curve_library_link_tip']='Otevře okno Knihovny v části Křivky, kde se křivka přidává, popisuje, upravuje a maže. Prvek uvádí, kterou křivku používá.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Režim: Přidat útvar. Zadejte každý bod. Dok
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Tento režim použijte ke změně, přesunu a přetahování prvků a textu na mapě nebo k posouvání mapy. Je to výchozí režim mapy. Druhým stisknutím klávesy Esc se výběr zruší.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automaticky';
 $ec_lang['lpn_method_switch_confirm']='Změna metody tření nemění čísla drsnosti již zadaná u potrubí a drsnost pro jednu metodu je pro jinou bezvýznamná. Poté zkontrolujte každé potrubí. Přesto změnit?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Scénář {name} nelze smazat, pro
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Základní scénář: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je ve scénáři {scenario} vyloučen ze sítě. Zůstává ve výkresu a v ostatních scénářích.';
 $ec_lang['lpn_scenario_delete_in_base']='Chcete-li prvek odstranit z výkresu, smažte jej ve scénáři {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je smazán. Byl součástí pouze scénáře {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Zkopíruje otevřený scénář s jeho specif
 $ec_lang['lpn_scenario_copy_off']='Kopírovat scénář funguje v Základním režimu. Při vypnutém Základním režimu přidejte scénář a zvolte jeho alternativy v tabulce Scénáře.';
 $ec_lang['lpn_sm_title']='Správce scénářů';
 $ec_lang['lpn_sm_menu']='Správce scénářů…';
-$ec_lang['lpn_sm_basic_on']='Správce scénářů je zakázán, dokud je Základní režim zapnut.';
 $ec_lang['lpn_pane_tab_scenarios']='Scénáře';
 $ec_lang['lpn_sm_col_parent']='Nadřazený';
 $ec_lang['lpn_sm_add_child']='Přidat potomka';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Nové prvky: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (výchozí)';
 $ec_lang['lpn_settings_row_view_value']='Střed {x}, {y}; měřítko {s}';
 $ec_lang['lpn_settings_held_in']='Specifická hodnota ve scénáři {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Střed mapy';
 $ec_lang['lpn_settings_view_scale']='Měřítko mapy';
 $ec_lang['lpn_settings_view_scale_tip']='Měřítko ve středu mapy ve tvaru 1:N. Zadáním 1:2000 nebo jen 2000 se přiblíží na toto měřítko.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabulka scénářů s počtem specifických hod
 $ec_lang['lpn_scncmp_running']='Počítají se všechny scénáře…';
 $ec_lang['lpn_scncmp_empty']='Zatím nic nebylo nakresleno, takže není co počítat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Nejvyšší rychlost';
-$ec_lang['lpn_scncmp_at']='{value} u {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} v {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Ve všech scénářích stejné';
 $ec_lang['lpn_scncmp_period_note']='Má-li scénář celkovou dobu běhu, jeho nejnižší tlak a nejvyšší rychlost jsou extrémy celé sítě v uvedeném čase.';
 $ec_lang['lpn_scncmp_current']='(právě otevřený)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Stáhnout CSV';
 $ec_lang['lpn_full_print']='Vytisknout sestavu';
 $ec_lang['lpn_full_col_time']='Čas';
 $ec_lang['lpn_full_col_type']='Typ';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Koncentrace';
+$ec_lang['lpn_quality_named_concentration_short']='Koncentrace {chemical}';
 $ec_lang['lpn_full_row_count']='Řádky ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Výpočty';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Tlak a rychlost';
 $ec_lang['lpn_ff_atleast']='více než {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} klesá na {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} dosahuje {velocity}';
 $ec_lang['lpn_ff_more']='a {n} dalších ovlivněno';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Zpět (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Znovu (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopírovat (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

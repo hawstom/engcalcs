@@ -49,7 +49,7 @@ function ok(label, cond, detail) {
 function view(page) {
 	return page.evaluate(() => {
 		const c = document.getElementById('lpn_setbox_content'), cr = c.getBoundingClientRect();
-		const rows = [...c.querySelectorAll('.lpn-set-row')].filter((e) => {
+		const rows = [...c.querySelectorAll('.lpn-set-row, [data-lpn-setting]')].filter((e) => {
 			if (!e.offsetParent) { return false; }
 			const b = e.getBoundingClientRect();
 			return b.height > 0 && b.bottom > cr.top + 2 && b.top < cr.bottom - 2;

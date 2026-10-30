@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='未选择曲线';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='曲线';
-$ec_lang['lpn_curve_library_link_tip']='打开“库”框的“曲线”部分，可在此添加、描述、编辑和删除曲线。元件本身只说明它使用哪条曲线。';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='模式：添加形状。依次指定各点。再
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图上的元件和文字，或平移地图。这是地图的默认模式。再按一次 Esc 将清除所选内容。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_method_switch_confirm']='更改摩擦计算方法不会改变您已在管道中输入的糙率数值，而某一方法下的糙率对另一方法而言没有意义。更改后请检查每条管道。仍要更改吗？';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='方案 {name} 无法删除，因�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='基础情景：{value}';
 $ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网之外。它仍保留在图纸和其他方案中。';
 $ec_lang['lpn_scenario_delete_in_base']='要将其从图纸中移除，请在{base}方案中删除。';
 $ec_lang['lpn_scenario_only_deleted']='{id} 已删除。它仅属于 {scenario}。';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='复制打开的方案及其覆盖值，并打
 $ec_lang['lpn_scenario_copy_off']='“复制方案”在“基本模式”下可用。关闭“基本模式”后，请添加方案，并在“方案”表中选择其备选方案。';
 $ec_lang['lpn_sm_title']='方案管理器';
 $ec_lang['lpn_sm_menu']='方案管理器…';
-$ec_lang['lpn_sm_basic_on']='启用“基本模式”时，“方案管理器”呈禁用状态。';
 $ec_lang['lpn_pane_tab_scenarios']='方案';
 $ec_lang['lpn_sm_col_parent']='父级';
 $ec_lang['lpn_sm_add_child']='添加子级';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='新元件：{setting}';
 $ec_lang['lpn_settings_row_default']='{value}（默认）';
 $ec_lang['lpn_settings_row_view_value']='中心 {x}，{y}；比例尺 {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} 中的覆盖值。';
-$ec_lang['lpn_settings_held_base']='{base}：{value}';
 $ec_lang['lpn_settings_view_center']='地图中心';
 $ec_lang['lpn_settings_view_scale']='地图比例尺';
 $ec_lang['lpn_settings_view_scale_tip']='地图中心处的比例尺，格式为 1:N。键入 1:2000 或直接键入 2000，即可缩放到该比例尺。';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='方案表，列出覆盖值个数、最低压�
 $ec_lang['lpn_scncmp_running']='正在求解每一个方案…';
 $ec_lang['lpn_scncmp_empty']='尚未绘制任何内容，因此没有可求解的对象。';
 $ec_lang['lpn_scncmp_col_maxvelocity']='最高流速';
-$ec_lang['lpn_scncmp_at']='{id} 处的 {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} 处为 {value}，{time}';
 $ec_lang['lpn_scncmp_same']='在每个方案中都相同';
 $ec_lang['lpn_scncmp_period_note']='方案设有总运行时长时，其最低压力和最高流速是整个管网的极值，出现在所示时刻。';
 $ec_lang['lpn_scncmp_current']='（当前打开）';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='下载 CSV';
 $ec_lang['lpn_full_print']='打印报告';
 $ec_lang['lpn_full_col_time']='时间';
 $ec_lang['lpn_full_col_type']='类型';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='浓度';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} 浓度';
 $ec_lang['lpn_full_row_count']='行（{n}）。';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='求解次数';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='压力和流速';
 $ec_lang['lpn_ff_atleast']='大于 {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} 降至 {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} 达到 {velocity}';
 $ec_lang['lpn_ff_more']='另有 {n} 个受影响';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='撤销 (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='重做 (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='复制 (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}，{symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}，{symbol}';

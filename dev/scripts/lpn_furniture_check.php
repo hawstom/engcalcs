@@ -121,6 +121,7 @@ const EC_LPN_FURNITURE = [
     'lpn_panecols'    => 'how wide each table column was dragged and what order the reader put the '
         . 'columns in -- a fact about the screen and about this afternoon\'s job, not about the '
         . 'network (Task 690, Tom\'s spreadsheet points (d) and (e))',
+    'lpn_gcols'       => 'how wide the reader dragged the name column of each standard box row grid (Task 828, Tom 2026-10-24)',
     'lpn_energybox'   => 'position, size and openness of the Pump energy report',
     'lpn_cmpbox'      => 'position, size and openness of the Scenario comparison box',
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',

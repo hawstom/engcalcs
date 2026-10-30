@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 2989,
+    "count": 2983,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6614,8 +6614,6 @@
         "lpn_curve_kind_head": "191aad36553c2ec0c08ef3626a1fd1a7d9fcb204",
         "lpn_curve_kind_headloss": "ff763caf7e8f51b6815d8eefafda570e2ec96199",
         "lpn_curve_kind_volume": "22b2b224f2a5aef6c3f70f5babd1f73e16a05afa",
-        "lpn_curve_library_link": "07c83b93abf0b3e27a0cdff87660d5bd4d44c60e",
-        "lpn_curve_library_link_tip": "af73ed0a799bfd73685fccbea9cfee9ded7a63e7",
         "lpn_curve_none": "10fcfce86c18b233accee7a232e7bbfc22c478d3",
         "lpn_curve_volume_col": "3b18e8e332500f3dfedb21b0aed686cfa9832cfe",
         "lpn_customer_detached": "5906b3bd115e1670f96b5afc4b8cc5e4acd737ed",
@@ -6804,8 +6802,6 @@
         "lpn_fb_sending": "cf765512cc6dcf8d2870b8038ce0ffc6cbaa817d",
         "lpn_fb_sends": "3479284f4ec1de75ce3ca2cabd8be152a8b727a5",
         "lpn_ff_accounting": "f526dcdfcab9c22abfb322c008d251e56452e99c",
-        "lpn_ff_affect_link": "86a3e78138eae43ef14ad5fe3c1335a39ba4d200",
-        "lpn_ff_affect_node": "3c2b59a873244d27193e77d64a31dcb0964f3316",
         "lpn_ff_all": "a591dccf41b5f4185ba953ffce169665585f22b2",
         "lpn_ff_atleast": "66d8fb7180913c0fbd06d8060e9022e28b68780b",
         "lpn_ff_calculate": "b1b392607deaf29a7e81453e069b7c07a32a6b18",
@@ -8072,8 +8068,6 @@
         "lpn_scenario_push_values": "f679d1aafc918ab2ce8afca529a696a277ee8963",
         "lpn_scenario_rename": "7e5528377133d56e10d2add5502a3879d1b3715e",
         "lpn_scenario_tip": "a1b3cc93de198afb68169fa9e3a5b118ae034fd5",
-        "lpn_scncmp_at": "6330e9ee2e886a93d5af212b8eb28bf8d7bc0522",
-        "lpn_scncmp_at_time": "60fc18efb99ff9eb8c027be772cfc8c5db320e07",
         "lpn_scncmp_col_maxvelocity": "02da1da5bdbb1f9f0e5d9be0309680ceceb99a72",
         "lpn_scncmp_current": "afe40a1a95b6d116d49736d917e021144b77217e",
         "lpn_scncmp_empty": "fba5e453e4aa57a12142074b5a07d3bb823f1af2",
@@ -11273,14 +11267,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_curve_library_link": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_curve_library_link_tip": {
-            "words": 24,
-            "ends_sentence": true
-        },
         "lpn_curve_none": {
             "words": 3,
             "ends_sentence": false
@@ -12032,14 +12018,6 @@
         "lpn_ff_accounting": {
             "words": 33,
             "ends_sentence": true
-        },
-        "lpn_ff_affect_link": {
-            "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_ff_affect_node": {
-            "words": 4,
-            "ends_sentence": false
         },
         "lpn_ff_all": {
             "words": 2,
@@ -17104,14 +17082,6 @@
         "lpn_scenario_tip": {
             "words": 26,
             "ends_sentence": true
-        },
-        "lpn_scncmp_at": {
-            "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_scncmp_at_time": {
-            "words": 4,
-            "ends_sentence": false
         },
         "lpn_scncmp_col_maxvelocity": {
             "words": 2,

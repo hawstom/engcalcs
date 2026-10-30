@@ -7,14 +7,28 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**92 open tasks.** Next (100): 4 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**107 open tasks.** Next (100): 18 · Soon (75): 17 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
-## 100 — Next (4)
+## 100 — Next (18)
 
 - Task 825 — Audit every dockable box's width, with a checklist.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
+- Task 833 — First open after Fresh: no docks, and Net3 freezes for 20 s.
+- ! Task 834 — Every box docked and auto-hidden on first view; a pinned box keeps its tab.
+- Task 835 — Settings on a phone: a top menu for its sections, narrower columns.
+- Task 836 — Morph to vertex in a scenario refuses instead of asking.
+- Task 837 — Spreadsheet cells: the input is the cell, and toggles follow 2026 practice.
+- Task 838 — "Edit curves…" as the last option of every curve selector.
+- Task 839 — Ida's short Properties labels, each with a tip that expands it.
+- Task 840 — Report cells that mix a value, place and time become columns.
+- Task 841 — Cap label stations so a stale map scale cannot freeze the page.
+- Task 842 — One spreadsheet style for every box's rows, no first-column heading.
+- Task 843 — Pull-down options readable in Dark mode, by one global style.
+- ! Task 844 — Settings: 618 px, the tick tight on its own row, the phone bar as heading.
+- Task 845 — Report tables: economical width, adjustable columns, "And others", "Time (hr)".
+- ! Task 846 — The Basic mode toggle stays in the Scenario manager when Basic is off.
 
 ## 95 — Priority 95 (6)
 
@@ -25,7 +39,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (16)
+## 75 — Soon (17)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -40,6 +54,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 818 — An MCP server, so an AI agent can run a network.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
 - Task 823 — Starter examples a new user can build from.
+- Task 847 — The built-in solver leaves flow circulating in a loop with no demand.
 - Task 848 — Report column widths a reader can drag, kept per browser.
 - Task 849 — Every place uses the short Properties name for a field.
 - Task 851 — Net1's legend box covers the Tank label on a phone.
@@ -123,5 +138,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-84 of 92 titles are within 4–12 words. `!` marks the rest;
+96 of 107 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

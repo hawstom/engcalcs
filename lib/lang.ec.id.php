@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Tidak ada kurva yang dipilih';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Kurva';
-$ec_lang['lpn_curve_library_link_tip']='Membuka kotak Pustaka pada bagian Kurva, tempat sebuah kurva ditambahkan, dideskripsikan, diubah, dan dihapus. Setiap elemen menyatakan kurva mana yang digunakannya.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Mode: Tambah Bentuk. Tentukan setiap titik. Tent
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Gunakan mode ini untuk mengubah, memindahkan, dan menyeret aset serta teks pada peta, atau untuk menggeser peta. Ini adalah mode default untuk peta. Menekan Esc kedua kalinya membatalkan pilihan.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Otomatis';
 $ec_lang['lpn_method_switch_confirm']='Mengganti metode gesekan tidak mengubah angka kekasaran yang sudah dimasukkan pada pipa Anda, dan kekasaran untuk satu metode tidak bermakna untuk metode lain. Periksa setiap pipa setelah ini. Tetap ganti?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Skenario {name} tidak dapat dihapu
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Skenario Dasar: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} dikecualikan dari jaringan pada {scenario}. Aset tetap ada di gambar dan di skenario lain.';
 $ec_lang['lpn_scenario_delete_in_base']='Untuk menghapusnya dari gambar, hapus di skenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} dihapus. Elemen ini hanya bagian dari {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Menyalin skenario yang terbuka beserta nilai 
 $ec_lang['lpn_scenario_copy_off']='Salin skenario berfungsi dalam Mode dasar. Dengan Mode dasar mati, tambahkan skenario dan pilih alternatifnya di tabel Skenario.';
 $ec_lang['lpn_sm_title']='Manajer skenario';
 $ec_lang['lpn_sm_menu']='Manajer skenario…';
-$ec_lang['lpn_sm_basic_on']='Manajer skenario dinonaktifkan ketika Mode dasar menyala.';
 $ec_lang['lpn_pane_tab_scenarios']='Skenario';
 $ec_lang['lpn_sm_col_parent']='Induk';
 $ec_lang['lpn_sm_add_child']='Tambah anak';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Aset baru: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (default)';
 $ec_lang['lpn_settings_row_view_value']='Pusat {x}, {y}; skala {s}';
 $ec_lang['lpn_settings_held_in']='Nilai khusus di {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Pusat peta';
 $ec_lang['lpn_settings_view_scale']='Skala peta';
 $ec_lang['lpn_settings_view_scale_tip']='Skala di pusat peta, sebagai 1:N. Ketik 1:2000, atau cukup 2000, untuk memperbesar ke skala itu.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabel skenario dengan jumlah nilai khusus, teka
 $ec_lang['lpn_scncmp_running']='Menyelesaikan setiap skenario…';
 $ec_lang['lpn_scncmp_empty']='Belum ada yang digambar, sehingga tidak ada yang perlu diselesaikan.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Kecepatan tertinggi';
-$ec_lang['lpn_scncmp_at']='{value} pada {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} di {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Sama di setiap skenario';
 $ec_lang['lpn_scncmp_period_note']='Jika sebuah skenario memiliki total waktu berjalan, tekanan terendah dan kecepatan tertinggi adalah nilai ekstrem seluruh jaringan, pada waktu yang ditampilkan.';
 $ec_lang['lpn_scncmp_current']='(sedang dibuka)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Unduh CSV';
 $ec_lang['lpn_full_print']='Cetak laporan';
 $ec_lang['lpn_full_col_time']='Waktu';
 $ec_lang['lpn_full_col_type']='Jenis';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Konsentrasi';
+$ec_lang['lpn_quality_named_concentration_short']='Konsentrasi {chemical}';
 $ec_lang['lpn_full_row_count']='Baris ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Proses';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Tekanan dan kecepatan';
 $ec_lang['lpn_ff_atleast']='lebih dari {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} turun ke {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} mencapai {velocity}';
 $ec_lang['lpn_ff_more']='dan {n} lainnya terdampak';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Urungkan (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ulangi (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Salin (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Ukuran gambar sebagai kelipatan area di layar. Kelipatan yang lebih besar lebih tajam dan menghasilkan berkas lebih besar.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='ምንም ኩርባ አልተመረጠም';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='ኩርባዎች';
-$ec_lang['lpn_curve_library_link_tip']='የቤተመዛግብት ሳጥኑን በኩርባዎች ክፍሉ ላይ ክፈት፣ ኩርባ የሚጨመርበት፣ የሚገለጽበት፣ የሚስተካከልበትና የሚሰረዝበት። ንብረት የሚጠቀምበትን ኩርባ ይገልጻል።';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='ሁነታ፦ ስዕል ጨምር። እያንዳ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='የካርታ ንጥረ ነገሮችን ለመቀየር፣ ለማንቀሳቀስ እና ለመጎተት፣ ወይም ካርታውን ለማንቀሳቀስ ይህን ሁነታ ይጠቀሙ። ይህ የካርታው ነባሪ ሁነታ ነው። Esc ን ለሁለተኛ ጊዜ መጫን የተመረጠውን ሁሉ ምርጫ ያነሳል።';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='ራስ-ሰር';
 $ec_lang['lpn_method_switch_confirm']='የግጭት ዘዴውን መቀየር በቧንቧዎችዎ ላይ የገቡትን የሻካሪነት ቁጥሮች አይቀይርም፣ ለአንድ ዘዴ የተዘጋጀ ሻካሪነትም ለሌላው ትርጉም የለውም። ከዚህ በኋላ እያንዳንዱን ቧንቧ ያረጋግጡ። ያም ሆኖ ይቀየር?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='ሁኔታ {name} ልጆች ስላ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='መሠረት፦ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} በ{scenario} ውስጥ ከመረቡ ውጭ ነው። በስዕሉ እና በሌሎች ሁኔታዎች ውስጥ ይቀራል።';
 $ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';
 $ec_lang['lpn_scenario_only_deleted']='{id} ተሰርዟል። የ{scenario} ክፍል ብቻ ነበር።';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='የተከፈተውን ሁኔታ እና የራ
 $ec_lang['lpn_scenario_copy_off']='ሁኔታ ቅዳ በመሰረታዊ ሁነታ ይሠራል። መሰረታዊ ሁነታ ጠፍቶ፣ ሁኔታ ይጨምሩ እና አማራጮቹን በሁኔታዎች ሠንጠረዥ ውስጥ ይምረጡ።';
 $ec_lang['lpn_sm_title']='ሁኔታዎች አስተዳዳሪ';
 $ec_lang['lpn_sm_menu']='ሁኔታዎች አስተዳዳሪ…';
-$ec_lang['lpn_sm_basic_on']='መሰረታዊ ሁነታ ሲበራ የሁኔታዎች አስተዳዳሪ ተሰናክሏል።';
 $ec_lang['lpn_pane_tab_scenarios']='ሁኔታዎች';
 $ec_lang['lpn_sm_col_parent']='ወላጅ';
 $ec_lang['lpn_sm_add_child']='ልጅ ጨምር';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='አዲስ አካሎች፦ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ነባሪ)';
 $ec_lang['lpn_settings_row_view_value']='መሃል {x}፣ {y}፤ መጠን {s}';
 $ec_lang['lpn_settings_held_in']='በ{scenario} ውስጥ የራስ ዋጋ።';
-$ec_lang['lpn_settings_held_base']='{base}፦ {value}';
 $ec_lang['lpn_settings_view_center']='የካርታ መሃል';
 $ec_lang['lpn_settings_view_scale']='የካርታ መጠን';
 $ec_lang['lpn_settings_view_scale_tip']='በካርታው መሃል ያለው መጠን፣ እንደ 1:N። ወደዚያ መጠን ለማጉላት 1:2000፣ ወይም ዝም ብሎ 2000 ይተይቡ።';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='የራስ ዋጋዎች ብዛት፣ ዝቅተ�
 $ec_lang['lpn_scncmp_running']='እያንዳንዱን ሁኔታ በመፍታት ላይ…';
 $ec_lang['lpn_scncmp_empty']='እስካሁን ምንም አልተሳለም፣ ስለዚህ የሚፈታ ምንም ነገር የለም።';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ከፍተኛ ፍጥነት';
-$ec_lang['lpn_scncmp_at']='{value} በ{id}';
-$ec_lang['lpn_scncmp_at_time']='{value} በ{id}፣ {time}';
 $ec_lang['lpn_scncmp_same']='በሁሉም ሁኔታዎች ተመሳሳይ';
 $ec_lang['lpn_scncmp_period_note']='ሁኔታ ጠቅላላ የመሮጫ ጊዜ ባለው ቦታ፣ ዝቅተኛ ግፊቱና ከፍተኛ ፍጥነቱ በሚታየው ጊዜ የመላው መረብ ጽንፎች ናቸው።';
 $ec_lang['lpn_scncmp_current']='(አሁን የተከፈተ)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV አውርድ';
 $ec_lang['lpn_full_print']='ሪፖርት አትም';
 $ec_lang['lpn_full_col_time']='ጊዜ';
 $ec_lang['lpn_full_col_type']='ዓይነት';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ክምችት';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ክምችት';
 $ec_lang['lpn_full_row_count']='ረድፎች ({n})።';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='ሩጫዎች';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='ግፊትና ፍጥነት';
 $ec_lang['lpn_ff_atleast']='ከ{flow} በላይ';
-$ec_lang['lpn_ff_affect_node']='{id} ወደ {pressure} ይወርዳል';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity} ይደርሳል';
 $ec_lang['lpn_ff_more']='እና {n} ተጨማሪ የተነኩ';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='ቀልብስ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ድገም (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ቅዳ (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

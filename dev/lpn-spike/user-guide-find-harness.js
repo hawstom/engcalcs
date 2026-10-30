@@ -121,9 +121,10 @@ const sameSet = (a, b) => a.length === b.length && a.slice().sort().join('|') ==
 async function replaceControl(a, labelKey, tag) {
 	const label = await a.lang(labelKey);
 	return a.page.evaluateHandle(([l, t]) => {
-		const labs = Array.from(document.querySelectorAll('#lpn_find_popup label'));
-		const lab = labs.filter(x => x.textContent.trim().indexOf(l) === 0 && x.querySelector(t)).pop();
-		return lab ? lab.querySelector(t) : null;
+		// A row of the box's grid (Task 828): its name, then its control.
+		const rows = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow'));
+		const row = rows.filter(x => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(l) === 0 && x.querySelector(t)).pop();
+		return row ? row.querySelector(t) : null;
 	}, [label, tag]);
 }
 async function pressButton(a, key) {
@@ -346,8 +347,9 @@ async function choiceControls(browser, Session) {
 	const pick = async (labelKey, value) => {
 		const label = await a.lang(labelKey);
 		const sel = await a.page.evaluateHandle((l) => {
-			const lab = Array.from(document.querySelectorAll('#lpn_find_popup label')).filter(x => x.textContent.trim().indexOf(l) === 0 && x.querySelector('select'))[0];
-			return lab ? lab.querySelector('select') : null;
+			// A row of the box's grid (Task 828): its name, then its pull-down.
+			const row = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow')).filter(x => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(l) === 0 && x.querySelector('select'))[0];
+			return row ? row.querySelector('select') : null;
 		}, label);
 		await sel.asElement().selectOption(value);
 		await a.settle(200);

@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='ကွေးမျဉ်း မရွေးချယ
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='ကွေးမျဉ်းများ';
-$ec_lang['lpn_curve_library_link_tip']='ကွေးမျဉ်းတစ်ခုကို ထည့်ခြင်း၊ ဖော်ပြခြင်း၊ တည်းဖြတ်ခြင်းနှင့် ဖျက်ခြင်း ပြုလုပ်သည့် ကွေးမျဉ်းများ အပိုင်းတွင် စာရင်းများ ဘောက်စ်ကို ဖွင့်ပါ။ အစိတ်အပိုင်းတစ်ခုသည် မည်သည့်ကွေးမျဉ်းကို သုံးကြောင်း ဖော်ပြသည်။';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='မုဒ် - ရေးဆွဲပုံ ထ�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='မြေပုံပေါ်ရှိ အစိတ်အပိုင်းများနှင့် စာသားကို ပြောင်းရန်၊ ရွှေ့ရန်၊ ဆွဲရန် သို့မဟုတ် မြေပုံကို ရွှေ့ရန် ဤမုဒ်ကို သုံးပါ။ ၎င်းသည် မြေပုံ၏ မူလမုဒ်ဖြစ်သည်။ Esc ကို ဒုတိယအကြိမ် နှိပ်လျှင် ရွေးချယ်မှုကို ရှင်းသည်။';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='အလိုအလျောက်';
 $ec_lang['lpn_method_switch_confirm']='ပွတ်တိုက်မှုနည်းလမ်း ပြောင်းခြင်းသည် သင့်ပိုက်လိုင်းများတွင် ထည့်ထားပြီးသော ကြမ်းတမ်းမှုဂဏန်းများကို မပြောင်းလဲပါ၊ နည်းလမ်းတစ်ခုအတွက် ကြမ်းတမ်းမှုသည် အခြားနည်းလမ်းအတွက် အဓိပ္ပာယ်မရှိပါ။ ဤနောက် ပိုက်လိုင်းတိုင်းကို စစ်ဆေးပါ။ ဤသို့ဖြစ်စေ ပြောင်းမလား။';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='အခြေအနေ {name} တ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='အခြေခံ အခြေအနေ - {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ကို {scenario} တွင် ကွန်ရက်မှ ဖယ်ထားသည်။ ၎င်းသည် ပုံဆွဲမှုတွင်နှင့် အခြားအခြေအနေများတွင် ဆက်ရှိသည်။';
 $ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
 $ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='ဖွင့်ထားသော အခြ�
 $ec_lang['lpn_scenario_copy_off']='အခြေအနေ ကူးယူရန် သည် အခြေခံ မုဒ်တွင် အလုပ်လုပ်သည်။ အခြေခံ မုဒ်ကို ပိတ်ထားလျှင် အခြေအနေတစ်ခု ထည့်ပြီး ၎င်း၏ အစားထိုးရွေးချယ်မှုများကို အခြေအနေများ ဇယားတွင် ရွေးချယ်ပါ။';
 $ec_lang['lpn_sm_title']='အခြေအနေ စီမံခန့်ခွဲမှု';
 $ec_lang['lpn_sm_menu']='အခြေအနေ စီမံခန့်ခွဲမှု…';
-$ec_lang['lpn_sm_basic_on']='အခြေခံ မုဒ်ကို ဖွင့်ထားစဉ် အခြေအနေ စီမံခန့်ခွဲမှုကို ပိတ်ထားသည်။';
 $ec_lang['lpn_pane_tab_scenarios']='အခြေအနေများ';
 $ec_lang['lpn_sm_col_parent']='မိဘ';
 $ec_lang['lpn_sm_add_child']='ကလေး ထည့်ရန်';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='အစိတ်အပိုင်းအ�
 $ec_lang['lpn_settings_row_default']='{value} (မူလ)';
 $ec_lang['lpn_settings_row_view_value']='ဗဟို {x}၊ {y}၊ စကေး {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} တွင် ကိုယ်ပိုင်တန်ဖိုး။';
-$ec_lang['lpn_settings_held_base']='{base} - {value}';
 $ec_lang['lpn_settings_view_center']='မြေပုံဗဟို';
 $ec_lang['lpn_settings_view_scale']='မြေပုံစကေး';
 $ec_lang['lpn_settings_view_scale_tip']='မြေပုံ၏ ဗဟိုရှိ စကေးကို 1:N အဖြစ် ဖော်ပြသည်။ ထိုစကေးသို့ ဇူးမ်လုပ်ရန် 1:2000 သို့မဟုတ် 2000 ဟု ရိုက်ပါ။';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='ကိုယ်ပိုင်တန်ဖိ�
 $ec_lang['lpn_scncmp_running']='အခြေအနေတိုင်းကို ဖြေရှင်းနေသည်…';
 $ec_lang['lpn_scncmp_empty']='မည်သည့်အရာမျှ မရေးဆွဲထားသေးသောကြောင့်၊ ဖြေရှင်းရန် မည်သည့်အရာမျှ မရှိပါ။';
 $ec_lang['lpn_scncmp_col_maxvelocity']='အမြင့်ဆုံးအလျင်';
-$ec_lang['lpn_scncmp_at']='{id} တွင် {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} တွင် {value}၊ {time}';
 $ec_lang['lpn_scncmp_same']='အခြေအနေတိုင်းတွင် တူညီသည်';
 $ec_lang['lpn_scncmp_period_note']='အခြေအနေတစ်ခုတွင် စုစုပေါင်း လည်ပတ်ချိန် ရှိလျှင် ၎င်း၏ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းသည် ပြထားသောအချိန်တွင် ကွန်ရက်တစ်ခုလုံး၏ အစွန်းတန်ဖိုးများ ဖြစ်သည်။';
 $ec_lang['lpn_scncmp_current']='(ယခုဖွင့်ထားသည်)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV ဒေါင်းလုတ်ချရ�
 $ec_lang['lpn_full_print']='အစီရင်ခံစာ ပရင့်ထုတ်ရန်';
 $ec_lang['lpn_full_col_time']='အချိန်';
 $ec_lang['lpn_full_col_type']='အမျိုးအစား';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ပါဝင်ပမာဏ';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} ပါဝင်ပမာဏ';
 $ec_lang['lpn_full_row_count']='အတန်းများ ({n})။';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Run အကြိမ်ရေ';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='ဖိအားနှင့် အလျင်';
 $ec_lang['lpn_ff_atleast']='{flow} ထက် ပို၍';
-$ec_lang['lpn_ff_affect_node']='{id} သည် {pressure} သို့ ကျဆင်းသည်';
-$ec_lang['lpn_ff_affect_link']='{id} သည် {velocity} သို့ ရောက်ရှိသည်';
 $ec_lang['lpn_ff_more']='နှင့် ထပ်မံ {n} ခု ထိခိုက်ခဲ့သည်';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='ပြန်ဖျက်ရန် (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ပြန်လုပ်ရန် (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ကူးယူရန် (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

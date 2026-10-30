@@ -4677,6 +4677,65 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - (6) pipe 196px = 1.52x p75 (as claimed), PRV 1.47x. (7) comma proper in ar fa ur ps zh. FIXED.
 - Shots: boxrows-1026/*-v2.png
 
+- 2026-10-27 box-design pre-review. OBSERVED: first-view docks and Start here dock correctly on PC and phone; the PC Net3 block is 126 ms (4x: ~540 ms), the phone block is 1.2 s (4x: 4.8 s) with docks vs 1.4 s at 4x without. OBSERVED: the Properties box clips note paragraphs (487 px content in a 390 px body) because the grid value track is minmax(max-content,1fr); master has no clip. OBSERVED: Tables and Properties differ on Active/Is active?, Check valve/(CV), tank depth names. OBSERVED: Scenario comparison and Fire flow tables exceed the default box and scroll inside it. SPECULATION: borderless editable cells are not distinguishable from read-only ones to a first-time user. Method note: a headless browser starts with no docks unless window.EC_DEFAULT_DOCKS=true is set before load; a reviewer who forgets it will report "nothing docked" falsely (I did, once, and caught it in the source). Timing under load is noisy; repeat three times before reporting a number.
+# Perry, feat/starter-example 0ae74603c, 2026-10-27 (Task 823)
+- OBSERVED (real Chromium 1366x768, fresh profile, each card opened from the gallery): all four open with no page error, no dialog; map, title text, labels legible. Only console line: epanet-js Warning 4 "Pumps cannot deliver" on EVERY solve of the US extension (open, Base, all scenarios), absent in SI twin and both wells; never shown in the page (no body text, Run report empty). Console only.
+- OBSERVED: gallery order puts Net3/Net2/Elm first; extension SI is 6th card, the well cards sit on the second row below the fold; first card a new user meets is "EPANET Net3, L/s (SI)".
+- OBSERVED: SI twin is metric only in pipe sizes. Lengths 122/61/91 m, elevations 365.8..374.3, demands 0.38/0.76/0.63 L/s, tank 7.3 m x 6.1 m, pump 7.6 L/s at 83.8 m are feet converted; map labels print 3 decimals (P=39.000).
+- OBSERVED: SI extension text says static 43.7 m at HYD-P; solved reading 43.600. Well FH-1: _fireFlow 32 L/s but map text and node Description say 31.5.
+- OBSERVED: scenarios are numbered 1,2,3,5 (extension) and 5,6 (well) with no 4.
+- OBSERVED: all-junction fire flow sweep at default 1000 gpm: WH-1 fails (179 gpm available), both engines identical; every other junction passes. Static: native circulates 3.18 gpm round the loop with zero demand (both unit sets), EPANET 0.07 gpm.
+- CITED (arithmetic): well tank 24 ft x 20 ft = 3,384 gal/ft; pump cuts in at 12 ft, min level 2 ft: 33.8k gal below the cut-in; 500 gpm x 2 h = 60k gal; pump adds ~14k. Description claims the water below 12 ft is the fire reserve.
+- OBSERVED: builder's harness 'all passed'; it asserts FH-1 only from the sweep.
+- Shots: _panel/www/img/starter-1027/
+
+# Perry, box-design fb3bf8d14, 2026-10-27 night (settings-fit, box-words, report-width, box-style)
+- OBSERVED (real Chromium, 1366x768 and 390 phone, light and Dark): Settings opens 618 px; at 506 px wrapped rows put the toggle nearer its own inputs than the row above (fix shows); phone dropdown is the heading, no second heading. Net1 Morph vertex in a new scenario: dialog "Switch to Base and morph"/Cancel; Cancel changes nothing; accepting switches to Base, then asks the old "Clear elevation..." confirm, then morphs; undo restores. The switch happens BEFORE the second confirm, so cancelling that one leaves the visitor in Base.
+- OBSERVED: Fire flow (Net3, all junctions) at the 814 px box: no sideways scroll, but body cells "Pressure"/"Design"/"velocity" in Design limit and Failure modes columns break mid-word on every row. Sort arrow is a tiny triangle at the heading's top-right, shown only on the sorted column. Scenario comparison's "same in every scenario" table still carries a Label/Value heading.
+- OBSERVED: Dark and light: every option of every visible select in Properties, Find, Settings, Contour, Fire flow, Criticality, Demand scaling, Full report, Calibration, Scenario comparison readable (contrast >= 4.5, opaque). Computed styles, not the native popup pixels.
+- OBSERVED: Copy HTML pasted into a contenteditable (synthetic paste of the clipboard string): td weight 400, th 700, no b/strong, title paragraph alone bold. Not Google Docs itself.
+- OBSERVED: Properties typing + Tab commits (705 stuck), divider drag narrows name column 154->114. Contour numeric fields fill a 236 px cell, Demand scaling inputs 613 px, as Properties does; phone keeps them narrow.
+- Method: the page's own dialogs are auto-answered by the Session until `delete window.lpnDialogAnswerer`; a test that never deletes it never sees a dialog. Scenario manager menu rows are disabled in the way unless a scenario exists.
+- NOT CHECKED: Google Docs; phone Properties; Tables headings in a browser; mutation of the new harnesses.
+
+# Perry, feat/sheet-light b53d074ab, 2026-10-28 night (light sheet, Demand as rows)
+- OBSERVED (real Chromium, 1366x768 and 390 touch, light and dark): hairline sheet is consistent across Properties (junction, pipe, tank, pump, PRV), Find, Contour, Fire flow, Criticality, Demand scaling, Scenario comparison, floating and docked. No sideways scroll anywhere.
+- OBSERVED: the Demand categories box opens 618x615 (CSS asks 432x352): `.lpn-setbox` is declared later in the file than `.lpn-demandsbox` and wins. Docked it is 618 wide.
+- OBSERVED: typing a value in a Demand categories cell and pressing Tab drops focus to the page body; on c1459847c the same keystrokes land on the next cell.
+- OBSERVED: a junction with customers shows no trace of them in Properties (Base demand 150, Demand 155.00, "Demand categories 1"); the "5 gpm from Customers (2)" line now lives only behind "...".
+- OBSERVED: editable vs computed is black vs #555 (light), white vs #b7bbc1 (dark); numeric inputs have no other cue until hover.
+- OBSERVED, inherited from box-design (identical on c1459847c, master differs): Valves.lwn with docks on, docked Properties body is 38-39 px tall for every element.
+- Scenario: edit in the box is an override (alternatives values n:11 demands), Base node unchanged, undo clears. Tables Junctions shows 210 after a 60 category. Builder's demand-rows harness 23/23, but it asserts neither the box size nor Tab.
+- Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
+- NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.
+
+# Perry, feat/gis-background f682e400c, 2026-10-29 night (Task 720 GIS background layers)
+- OBSERVED (real Chromium, 1400x900 and 390x844 touch, Fotobi as a lat/lon file, real servers): World_Imagery MapServer (tiled, /tile/18/...), terrestris WMS (OSM-WMS, GetMap EPSG:3857) and an XYZ OSM layer each draw (12 tiles PC, 8 phone); opacity 0.3 and Draw off reach the layer; Remove empties tiles and credit; reload restores all (also the off one and the opacity); five bad addresses each give a plain message, a dead host is named once. Builder's harness 63/63 here. No page errors.
+- OBSERVED: credit line runs together ("© OpenStreetMap contributorsSource: Esri...") with no separator, and with three layers it grows over the status bar's Longitude cell on PC.
+- OBSERVED: Server address box is about 72 px wide (PC and phone), the kind dropdown cuts "Tile URL ({z}/{x}/{"; the layer rows show a tick, a number and Remove with no visible words for Draw/Opacity (aria-label only).
+- OBSERVED: opening a project holding a layer sends requests to its server at once (reload test), so "Nothing is sent before you add one" (Settings note) is not true for an opened file; the privacy paragraph and CLAUDE.md say so honestly.
+- NOT CHECKED: mutation of the harness; WMS registration by eye (harness measures tile boxes against the street tiles); unlocatable project message; Dark theme; a CORS-less real server.
+
+# Perry, box-design 7de287871 (round 4), 2026-10-29 evening
+- OBSERVED (real Chromium; 1400x900 mouse, 390x844 and 360x740 touch; Net1): Properties on node 22 opens two columns at all three sizes, 19 rows, no name over its value, no stacking; a docked Properties has a 240 px floor and holds two columns there. Contour plot, Fire flow, Criticality, Find and replace, Settings are two columns on the phone with no overlap and no text past the box edge; Contour's first row reads "Show plot".
+- OBSERVED: Settings corner grip on the phone is 28 px at the box corner and a real touch drag shrinks the box (352x620 to 292x540). A first attempt failed only because my script had clicked every section header and opened the theme picker.
+- OBSERVED: the flyout's left-edge handle (19 px phone, 8 px PC) overlaps no text or control; text starts 2 px (Properties, 360) to 4 px (Contour, 390) clear of it.
+- OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
+- OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
+- Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
+
+## 2026-10-30 feat/gis-background round 2 (Task 720), HEAD 82be219db
+- OBSERVED: builder's harness 81/81 passes on this tree. My own run against real Esri World Imagery and terrestris OSM-WMS, PC 1400x900 and phone 390x844: Map > Add layer... opens Settings at the layer controls, focus in Kind of server, option reads "ArcGIS REST (MapServer)"; both layers draw; reopen asks first and sends 0 requests before answer; Draw them redraws; Remove then pan sends 0. No layout overflow after box-design merge. Screenshots perry-gis2-*.png.
+- OBSERVED: privacy.php says five features, but dev docs/UsageReport comment/third_party_request_check still say four (non-visitor). Summary says "other four ask first", detail says "three ask first" (layer starts on add): reads consistent enough.
+- Not checked: disabled Add layer... row on an unplaced project (explanation?), how it looks to the eye beyond screenshots.
+## 2026-10-30 -- box-design round 5 (b1c19252c, 36fa47163)
+OBSERVED (re-verify before citing): builder's box-phone5 harness passes 54/54 in this worktree. My own touch-event runs
+(390x844, 360x740, PC 1200x800; CDP touch drags) agree: rotate row full width under Angle, pill 4x32 on transparent 19px(phone)/8px(PC)
+strip, half-height flyout (422/370 px = 50%), bottom pill drag +200 -> taller and stays open 3.5 s, side drag stays open 4 s, no :hover stuck.
+Harness blind spot: part A (Text) runs WITHOUT EC_DEFAULT_DOCKS, so it measures a floating popup, not the docked half-height flyout.
+With docks on, Text flyout is 50% high, rotate row fine, bottom pill overlaps body by ~1px only.
+Tapping empty map tucks the flyout (existing behaviour). Node 31 (Net1, y~774 at 390x844) would not select by touch, tucks flyout; cause not found, not shown to be this branch.
+Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
 # Perry, feat/starter-example 490a07194, 2026-10-28 (Task 823)
 - OBSERVED (real Chromium, OSM on, US and SI): every pipe of Fire flow extension (Johnson City: W Main St/US 290, N Ave F, N Ave E, E Pecan Dr) and Community well and tank (Munday: N 10th and 9th Ave, W D and W B St) sits on a street. Pipes hidden to compare with the bare map. TANK-1 is mid-block between W E and W F St.
 - OBSERVED MISSED: examples/Net1-Scenarios-SI.lwn tank N2 has bottomElev 850 (ft number, unconverted) beside elev 259.08 m. Page shows P=674.8 m at N23 (US file: ~85 psi), head 885 m. The scenario browser harness only compares ordering; si-example-equivalence-harness was repointed to the plain dev Net1 pair, so the shipped scenarios pair is unchecked.
@@ -4700,3 +4759,16 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: menu-button-harness fails 28 checks under lpn_theme=rounded on this branch AND on master archive: Rounded draws the menu buttons as pills (999px radius) in a brighter blue (11,87,208). The harness asserts the Light-theme style. Intended Rounded look, not a visitor defect; the clock pin hides a harness assumption, not a bug.
 - OBSERVED: Net1 legend overlaps the Tank label on a 390px phone in every theme (not theme related).
 - SPECULATION: visitors who earlier chose System had the key removed, so they now see the day theme until they pick again.
+
+## 2026-10-30 feat/gis-background round 3 (Task 720), HEAD 236c4ef85
+- OBSERVED (real Chromium, 1400x900 and 390x844; real Esri World_Imagery MapServer + terrestris OSM-WMS): add draws (12/8 tiles per layer); reload of the saved project draws both with no dialog (only the browser's own beforeunload), no console error; a .lwn holding a layer opened by File > Open draws at once, no dialog; Remove both layers then pan/zoom and reload: 0 GIS requests; projects with no layer: 0 GIS requests. Add-layer form does not overflow on the phone.
+- OBSERVED: privacy.php and lpn_gis_note no longer say "asks"/"agree"; but "only at an address that was typed in" and "the server whose address you typed" are untrue of a file someone else made (File > Open of a foreign .lwn contacts its server at once, measured).
+- OBSERVED: Settings box reopens on the last section (Symbology) when Add layer... is not used; not a regression.
+- NOT CHECKED: Dark theme, mutation of the harness, other languages (key text changed in English only, other files hold the English), CORS-less server.
+## 2026-10-30 -- box-design round 6 (f5f92ff72, vs round 5 36fa47163)
+OBSERVED (re-verify before citing; real Chromium touch emulation, Net1; 390x844, 360x740, PC 1400x900): Properties rows visible without scrolling
+junction 8 -> 12 (390), 6 -> 11 (360); pipe 8 -> 13, 7 -> 11. Median pitch 41 -> 27 px (not 24: some rows are 28, wrapped labels 45), so "half as high" is about a third less. Inputs 24 px,
+a finger tap at centre and +-9 px focuses the input, typed value takes (verified by reselecting the node). No clipped text, overlap or misaligned label in Properties, Find, Fire flow, Criticality.
+OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
+OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
+Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".

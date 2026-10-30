@@ -130,7 +130,7 @@ async function main() {
 		await a.page.setViewportSize({ width: 390, height: 844 });
 		await reload(a);
 		got = await strips(a.page);
-		ok('on a 390 px phone no tab is shown', got[0].length + got[1].length === 0, JSON.stringify(got));
+		ok('on a 390 px phone every docked box is a tab, as saved', JSON.stringify(got) === JSON.stringify([LEFT, RIGHT.concat('lpn_hotkeys_popup')]), JSON.stringify(got));
 		await a.page.setViewportSize({ width: 1600, height: 1000 });
 		await reload(a);
 		got = await strips(a.page);

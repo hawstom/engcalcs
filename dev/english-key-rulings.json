@@ -184,11 +184,6 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
-        "lpn_at_time": {
-            "on": "{value} at {time}",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_basemap_hide": {
             "on": "Hide street map",
             "ruled": "2026-09-25",
@@ -570,7 +565,7 @@
             "answer": "OK."
         },
         "lpn_contour_show": {
-            "on": "Show contours",
+            "on": "Show plot",
             "ruled": "2026-10-05",
             "answer": "OK."
         },
@@ -1189,11 +1184,6 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
-        "lpn_crit_stopped_at": {
-            "on": "run stopped at {time}",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_crit_summary": {
             "on": "Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).",
             "ruled": "2026-10-15",
@@ -1324,15 +1314,6 @@
         "lpn_curve_kind_volume": {
             "on": "Tank volume",
             "ruled": "2026-09-05"
-        },
-        "lpn_curve_library_link": {
-            "on": "Curves",
-            "ruled": "2026-09-06",
-            "answer": "OK."
-        },
-        "lpn_curve_library_link_tip": {
-            "on": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
-            "ruled": "2026-09-06"
         },
         "lpn_curve_long_note": {
             "on": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
@@ -2044,14 +2025,6 @@
         },
         "lpn_ff_accounting": {
             "on": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
-            "ruled": "2026-09-01"
-        },
-        "lpn_ff_affect_link": {
-            "on": "{id} at {velocity}",
-            "ruled": "2026-09-01"
-        },
-        "lpn_ff_affect_node": {
-            "on": "{id} down to {pressure}",
             "ruled": "2026-09-01"
         },
         "lpn_ff_all": {
@@ -6304,15 +6277,6 @@
             "ruled": "2026-10-17",
             "answer": "Deprecated, I think."
         },
-        "lpn_scncmp_at": {
-            "on": "{value} at {id}",
-            "ruled": "2026-09-04"
-        },
-        "lpn_scncmp_at_time": {
-            "on": "{value} at {id}, {time}",
-            "ruled": "2026-10-05",
-            "answer": "OK."
-        },
         "lpn_scncmp_col_maxvelocity": {
             "on": "Highest velocity",
             "ruled": "2026-09-04"
@@ -6379,11 +6343,6 @@
         },
         "lpn_scnres_col": {
             "on": "{quantity} ({unit}), {scenario}",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
-        "lpn_scnres_copy_tip": {
-            "on": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
             "ruled": "2026-10-20",
             "answer": "OK."
         },
@@ -6592,11 +6551,6 @@
         "lpn_settings_head_error_tip": {
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
-        },
-        "lpn_settings_held_base": {
-            "on": "{base}: {value}",
-            "ruled": "2026-10-16",
-            "answer": "OK."
         },
         "lpn_settings_held_in": {
             "on": "Override in {scenario}.",

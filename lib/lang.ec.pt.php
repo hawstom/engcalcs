@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Nenhuma curva escolhida';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curvas';
-$ec_lang['lpn_curve_library_link_tip']='Abre a caixa Bibliotecas na sua seção Curvas, onde uma curva é adicionada, descrita, editada e excluída. Um elemento indica qual curva usa.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Modo: Adicionar Figura. Indique cada ponto. Indi
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use este modo para alterar, mover e arrastar elementos e textos no mapa, ou para deslocar o mapa. Este é o modo padrão do mapa. Pressionar Esc uma segunda vez limpa a seleção.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automático';
 $ec_lang['lpn_method_switch_confirm']='Mudar o método de atrito não altera os números de rugosidade já digitados nos seus tubos, e uma rugosidade de um método não tem sentido para outro. Verifique cada tubo depois disso. Mudar mesmo assim?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='O cenário {name} não pode ser ex
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Cenário base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluído da rede em {scenario}. Permanece no desenho e nos outros cenários.';
 $ec_lang['lpn_scenario_delete_in_base']='Para removê-lo do desenho, exclua-o no cenário {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} foi excluído. Fazia parte somente de {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copia o cenário aberto e seus valores indivi
 $ec_lang['lpn_scenario_copy_off']='Copiar cenário funciona no Modo básico. Com o Modo básico desmarcado, adicione um cenário e escolha suas alternativas na tabela Cenários.';
 $ec_lang['lpn_sm_title']='Cenários: gerenciador';
 $ec_lang['lpn_sm_menu']='Gerenciador de cenários…';
-$ec_lang['lpn_sm_basic_on']='O Gerenciador de cenários fica desativado quando o Modo básico está marcado.';
 $ec_lang['lpn_pane_tab_scenarios']='Cenários';
 $ec_lang['lpn_sm_col_parent']='Pai';
 $ec_lang['lpn_sm_add_child']='Adicionar filho';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Novos elementos: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (predefinido)';
 $ec_lang['lpn_settings_row_view_value']='Centro {x}, {y}; escala {s}';
 $ec_lang['lpn_settings_held_in']='Valor individual em {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centro do mapa';
 $ec_lang['lpn_settings_view_scale']='Escala do mapa';
 $ec_lang['lpn_settings_view_scale_tip']='A escala no centro do mapa, no formato 1:N. Digite 1:2000, ou apenas 2000, para dar zoom nessa escala.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabela de cenários com a contagem de valores i
 $ec_lang['lpn_scncmp_running']='Resolvendo todos os cenários…';
 $ec_lang['lpn_scncmp_empty']='Nada foi desenhado ainda, então não há nada para resolver.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Maior velocidade';
-$ec_lang['lpn_scncmp_at']='{value} em {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} em {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Igual em todos os cenários';
 $ec_lang['lpn_scncmp_period_note']='Onde um cenário tem duração total, sua menor pressão e sua maior velocidade são os extremos da rede inteira, no horário mostrado.';
 $ec_lang['lpn_scncmp_current']='(aberto no momento)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Baixar CSV';
 $ec_lang['lpn_full_print']='Imprimir relatório';
 $ec_lang['lpn_full_col_time']='Tempo';
 $ec_lang['lpn_full_col_type']='Tipo';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Concentração';
+$ec_lang['lpn_quality_named_concentration_short']='Concentração de {chemical}';
 $ec_lang['lpn_full_row_count']='Linhas ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Cálculos';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Pressão e velocidade';
 $ec_lang['lpn_ff_atleast']='mais que {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} cai para {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} atinge {velocity}';
 $ec_lang['lpn_ff_more']='e mais {n} afetados';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Desfazer (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refazer (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiar (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='O tamanho da imagem como múltiplo da área na tela. Um múltiplo maior é mais nítido e gera um arquivo maior.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

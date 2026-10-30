@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='لم يُختر منحنى';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='المنحنيات';
-$ec_lang['lpn_curve_library_link_tip']='يفتح مربع المكتبات عند قسم المنحنيات، حيث يُضاف المنحنى ويُوصف ويُعدَّل ويُحذف. يذكر كل عنصر أي منحنى يستخدمه.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='الوضع: إضافة شكل. حدّد كل ن�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='استخدم هذا الوضع لتغيير عناصر الخريطة ونصوصها وتحريكها وسحبها، أو لتحريك الخريطة. هذا هو الوضع الافتراضي للخريطة. الضغط على Esc مرة ثانية يلغي التحديد.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='تلقائي';
 $ec_lang['lpn_method_switch_confirm']='لا يغيّر تغيير طريقة الاحتكاك أرقام الخشونة المدخلة أصلاً على أنابيبك، وخشونة طريقة ما لا معنى لها في طريقة أخرى. تحقق من كل أنبوب بعد ذلك. هل تريد التغيير على أي حال؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='لا يمكن حذف السينا�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='سيناريو الأساس: {value}';
 $ec_lang['lpn_scenario_deactivated']='يُستثنى {id} من الشبكة في {scenario}. يبقى في الرسم وفي السيناريوهات الأخرى.';
 $ec_lang['lpn_scenario_delete_in_base']='لإزالته من الرسم، احذفه في السيناريو {base}.';
 $ec_lang['lpn_scenario_only_deleted']='حُذف {id}. كان جزءاً من {scenario} فقط.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='ينسخ السيناريو المفتوح و
 $ec_lang['lpn_scenario_copy_off']='يعمل نسخ السيناريو في الوضع الأساسي. ومع إيقاف الوضع الأساسي، أضف سيناريو واختر بدائله في جدول السيناريوهات.';
 $ec_lang['lpn_sm_title']='مدير السيناريوهات';
 $ec_lang['lpn_sm_menu']='مدير السيناريوهات…';
-$ec_lang['lpn_sm_basic_on']='مدير السيناريوهات معطَّل حين يكون الوضع الأساسي مشغَّلاً.';
 $ec_lang['lpn_pane_tab_scenarios']='السيناريوهات';
 $ec_lang['lpn_sm_col_parent']='الأصل';
 $ec_lang['lpn_sm_add_child']='إضافة عنصر فرعي';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='العناصر الجديدة: {setting}
 $ec_lang['lpn_settings_row_default']='{value} (افتراضي)';
 $ec_lang['lpn_settings_row_view_value']='المركز {x}، {y}؛ المقياس {s}';
 $ec_lang['lpn_settings_held_in']='تجاوز في {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='مركز الخريطة';
 $ec_lang['lpn_settings_view_scale']='مقياس الخريطة';
 $ec_lang['lpn_settings_view_scale_tip']='المقياس عند مركز الخريطة، بصيغة 1:N. اكتب 1:2000، أو 2000 فقط، للتكبير إلى ذلك المقياس.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='جدول السيناريوهات مع عدد �
 $ec_lang['lpn_scncmp_running']='جارٍ حل كل سيناريو…';
 $ec_lang['lpn_scncmp_empty']='لم يُرسم شيء بعد، فلا شيء ليُحل.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='أعلى سرعة';
-$ec_lang['lpn_scncmp_at']='{value} عند {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} عند {id}، {time}';
 $ec_lang['lpn_scncmp_same']='متطابق في كل سيناريو';
 $ec_lang['lpn_scncmp_period_note']='حيث يكون للسيناريو مدة تشغيل كلية، فإن أدنى ضغط وأعلى سرعة فيه هما القيمتان القصويان للشبكة كلها، عند الزمن المعروض.';
 $ec_lang['lpn_scncmp_current']='(مفتوح حالياً)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='تنزيل CSV';
 $ec_lang['lpn_full_print']='طباعة التقرير';
 $ec_lang['lpn_full_col_time']='الزمن';
 $ec_lang['lpn_full_col_type']='النوع';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='التركيز';
+$ec_lang['lpn_quality_named_concentration_short']='تركيز {chemical}';
 $ec_lang['lpn_full_row_count']='الصفوف ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='الحلول';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='الضغط والسرعة';
 $ec_lang['lpn_ff_atleast']='أكثر من {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} ينخفض إلى {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} يصل إلى {velocity}';
 $ec_lang['lpn_ff_more']='و{n} أخرى متأثرة';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='تراجع (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='إعادة (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='نسخ (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='حجم الصورة كمضاعف لمنطقة الشاشة. كلما كبر كانت الصورة أوضح وأكبر حجماً.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

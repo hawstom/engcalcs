@@ -482,6 +482,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_crit_box', 'lpn_crit_close', 'lpn_crit_controls', 'lpn_crit_report', 'lpn_ffrun_title',
   // The demand scaling box (Task 754), the third sibling on the same shell.
   'lpn_ds_box', 'lpn_ds_close', 'lpn_ds_controls', 'lpn_ds_report',
+  // The demand categories box (sheet-light): Properties' Demand categories row opens it.
+  'lpn_demands_box', 'lpn_demands_close', 'lpn_demands_title', 'lpn_demands_body',
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
   'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
@@ -1062,6 +1064,8 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 require(ROOT + 'js/lpn-ramps.js');
 // The contour plot's pure half (Task 600); installs EngCalcs.lpnContour as its <script> tag does.
 require(ROOT + 'js/lpn-contour.js');
+// Background layers from a GIS server (Task 720); installs EngCalcs.lpnGis as its <script> tag does.
+require(ROOT + 'js/lpn-gis.js');
 // The fire flow sweep (ROADMAP Task 530). Same argument as lpn-ramps.js above: it installs itself
 // on globalThis.EngCalcs exactly as its <script> tag does, and without it every fire-flow path in
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a

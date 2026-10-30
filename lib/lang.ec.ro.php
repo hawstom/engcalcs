@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Nicio curbă aleasă';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curbe';
-$ec_lang['lpn_curve_library_link_tip']='Deschide caseta Biblioteci la secțiunea Curbe, unde o curbă este adăugată, descrisă, editată și ștearsă. Un element precizează ce curbă folosește.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Mod: Adăugare Figură. Specificați fiecare pun
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Folosiți acest mod pentru a modifica, muta și trage elemente și text pe hartă sau pentru a deplasa harta. Acesta este modul implicit al hărții. Apăsarea tastei Esc a doua oară anulează selecția.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Automat';
 $ec_lang['lpn_method_switch_confirm']='Schimbarea metodei de frecare nu modifică numerele de rugozitate deja introduse pe conductele dvs., iar o rugozitate pentru o metodă nu are sens pentru alta. Verificați fiecare conductă după aceasta. Schimbați oricum?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Scenariul {name} nu poate fi șter
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}. Rămâne pe desen și în celelalte scenarii.';
 $ec_lang['lpn_scenario_delete_in_base']='Pentru a-l elimina din desen, ștergeți-l în scenariul {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} este șters. Făcea parte numai din {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copiază scenariul deschis și valorile lui s
 $ec_lang['lpn_scenario_copy_off']='Copiază scenariul funcționează în Mod de bază. Cu Mod de bază dezactivat, adăugați un scenariu și alegeți alternativele lui în tabelul Scenarii.';
 $ec_lang['lpn_sm_title']='Manager de scenarii';
 $ec_lang['lpn_sm_menu']='Manager de scenarii…';
-$ec_lang['lpn_sm_basic_on']='Manager de scenarii este dezactivat când Mod de bază este activ.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenarii';
 $ec_lang['lpn_sm_col_parent']='Părinte';
 $ec_lang['lpn_sm_add_child']='Adaugă copil';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Elemente noi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (implicit)';
 $ec_lang['lpn_settings_row_view_value']='Centru {x}, {y}; scară {s}';
 $ec_lang['lpn_settings_held_in']='Valoare specifică în {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centrul hărții';
 $ec_lang['lpn_settings_view_scale']='Scara hărții';
 $ec_lang['lpn_settings_view_scale_tip']='Scara în centrul hărții, ca 1:N. Tastați 1:2000, sau doar 2000, pentru a mări la acea scară.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabel de scenarii cu numărul de valori specifi
 $ec_lang['lpn_scncmp_running']='Se rezolvă fiecare scenariu…';
 $ec_lang['lpn_scncmp_empty']='Nu a fost desenat încă nimic, deci nu este nimic de rezolvat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Viteză maximă';
-$ec_lang['lpn_scncmp_at']='{value} la {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} la {id}, {time}';
 $ec_lang['lpn_scncmp_same']='La fel în fiecare scenariu';
 $ec_lang['lpn_scncmp_period_note']='Acolo unde un scenariu are o durată totală de rulare, presiunea sa cea mai mică și viteza cea mai mare sunt extremele întregii rețele, la momentul afișat.';
 $ec_lang['lpn_scncmp_current']='(deschis în prezent)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Descarcă CSV';
 $ec_lang['lpn_full_print']='Tipărește raportul';
 $ec_lang['lpn_full_col_time']='Timp';
 $ec_lang['lpn_full_col_type']='Tip';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Concentrație';
+$ec_lang['lpn_quality_named_concentration_short']='Concentrație {chemical}';
 $ec_lang['lpn_full_row_count']='Rânduri ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Rulări';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Presiune și viteză';
 $ec_lang['lpn_ff_atleast']='mai mult de {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} scade la {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} ajunge la {velocity}';
 $ec_lang['lpn_ff_more']='și încă {n} afectate';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Anulare (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refacere (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiază (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

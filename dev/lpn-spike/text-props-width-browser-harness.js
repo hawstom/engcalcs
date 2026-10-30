@@ -7,8 +7,8 @@
 //   2. dragging the Properties box wider (an inline width, which is what the corner drag writes)
 //      widens the words box with it, and narrower again narrows it;
 //   3. the words box drags taller only;
-//   4. the Size multiplier box is short: under a third of the Description box beside it, and
-//      under 80 px;
+//   4. the Size multiplier box is one cell of the value column, as wide as the Description box (it
+//      was short, under a third of it, before the spreadsheet rows);
 //   5. on a phone (412 px, touch), Properties opened by a tap on the Text: the words box fills the
 //      box there too, and the Size box is still short.
 //
@@ -93,8 +93,11 @@ async function main() {
 		const mid = await m();
 		ok('...and narrower again, it follows back', mid.ta < wide.ta && Math.abs(mid.ta - mid.inner) <= 2, JSON.stringify(mid));
 		ok('3. the words box drags taller only', r.resize === 'vertical', r.resize);
-		ok('4. the Size multiplier box is short, under a third of the Description box and under 80 px',
-			r.size > 0 && r.size * 3 < r.desc && r.size >= 40 && r.size < 80, JSON.stringify(r));
+		// Since the spreadsheet Properties (feat/box-rows-properties, 828) every input fills the value track, so the Size
+		// multiplier is exactly as wide as the Description cell. What stays true of Tom's 10-15 ruling is that it is never
+		// wider than the other cells and that the box beside the words is not stretched to the window.
+		ok('4. the Size multiplier box is one cell of the value column: as wide as the Description box, and within the box',
+			r.size > 0 && Math.abs(r.size - r.desc) <= 2 && r.size >= 40 && r.size <= r.inner, JSON.stringify(r));
 		ok('no page error', a.errors.length === 0, a.errors.join(' | '));
 		await a.close();
 
@@ -137,11 +140,11 @@ async function main() {
 		const p1 = await pm();
 		ok('Properties is open on the Text on the phone', p1.open, JSON.stringify(p1));
 		ok('...the words box is as wide as the fields there', p1.ta !== null && Math.abs(p1.ta - p1.inner) <= 2, JSON.stringify(p1));
-		ok('...and the Size box is short (under 80 px)', p1.size > 0 && p1.size < 80, JSON.stringify(p1));
-		await Q.evaluate(() => { document.getElementById('lpn_popup').style.width = '380px'; });
+		ok('...and the Size box fills its Value cell, within the box (the phone has the PC two columns)', p1.size >= 40 && p1.size <= p1.inner && p1.size < p1.ta, JSON.stringify(p1));
+		await Q.evaluate(() => { document.getElementById('lpn_popup').style.width = '340px'; });
 		await ph.settle(300);
 		const p2 = await pm();
-		ok('...dragged wider on the phone, the words box follows', p2.ta > p1.ta + 50 && Math.abs(p2.ta - p2.inner) <= 2, JSON.stringify(p2));
+		ok('...dragged narrower on the phone (it opens filling the screen), the words box follows', p2.ta < p1.ta - 30 && Math.abs(p2.ta - p2.inner) <= 2, JSON.stringify(p2));
 		ok('no page error on the phone', ph.errors.length === 0, ph.errors.join(' | '));
 		await ph.close();
 	} catch (e) {

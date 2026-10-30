@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='לא נבחרה עקומה';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='עקומות';
-$ec_lang['lpn_curve_library_link_tip']='פותח את תיבת הספריות בקטע העקומות שלה, שבו עקומה נוספת, מתוארת, נערכת ונמחקת. נכס מציין באיזו עקומה הוא משתמש.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='מצב: הוספת צורה. ציינו כל נ�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='השתמשו במצב זה כדי לשנות, להזיז ולגרור נכסים וטקסט על המפה, או להזיז את המפה. זהו מצב ברירת המחדל של המפה. הקשה שנייה על Esc מבטלת את הבחירה.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='אוטומטי';
 $ec_lang['lpn_method_switch_confirm']='שינוי שיטת החיכוך אינו משנה את מספרי החספוס שכבר הוזנו בצינורות, וחספוס של שיטה אחת חסר משמעות בשיטה אחרת. בדקו כל צינור לאחר מכן. לשנות בכל זאת?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='אי אפשר למחוק את הת
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='תרחיש בסיס: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} אינו כלול ברשת ב-{scenario}. הוא נשאר בשרטוט ובתרחישים האחרים.';
 $ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} נמחק. הוא היה חלק מ-{scenario} בלבד.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='מעתיקה את התרחיש הפתוח ו�
 $ec_lang['lpn_scenario_copy_off']='העתקת תרחיש פועלת במצב בסיסי. כשמצב בסיסי כבוי, הוסיפו תרחיש ובחרו את החלופות שלו בטבלת התרחישים.';
 $ec_lang['lpn_sm_title']='מנהל תרחישים';
 $ec_lang['lpn_sm_menu']='מנהל תרחישים…';
-$ec_lang['lpn_sm_basic_on']='מנהל התרחישים מושבת כשמצב בסיסי פועל.';
 $ec_lang['lpn_pane_tab_scenarios']='תרחישים';
 $ec_lang['lpn_sm_col_parent']='הורה';
 $ec_lang['lpn_sm_add_child']='הוספת צאצא';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='נכסים חדשים: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ברירת מחדל)';
 $ec_lang['lpn_settings_row_view_value']='מרכז {x}, {y}; קנה מידה {s}';
 $ec_lang['lpn_settings_held_in']='ערך מותאם ב-{scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='מרכז המפה';
 $ec_lang['lpn_settings_view_scale']='קנה מידה של המפה';
 $ec_lang['lpn_settings_view_scale_tip']='קנה המידה במרכז המפה, בצורת 1:N. הקלידו 1:2000, או רק 2000, כדי להתקרב לקנה מידה זה.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='טבלת תרחישים עם מספר הערכ�
 $ec_lang['lpn_scncmp_running']='פותר כל תרחיש…';
 $ec_lang['lpn_scncmp_empty']='עוד לא צויר דבר, כך שאין מה לפתור.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='מהירות מרבית';
-$ec_lang['lpn_scncmp_at']='{value} ב-{id}';
-$ec_lang['lpn_scncmp_at_time']='{value} ב-{id}, {time}';
 $ec_lang['lpn_scncmp_same']='זהה בכל התרחישים';
 $ec_lang['lpn_scncmp_period_note']='כאשר לתרחיש יש זמן הרצה כולל, הלחץ הנמוך ביותר והמהירות הגבוהה ביותר שלו הם הקיצוניים של הרשת כולה, בזמן המוצג.';
 $ec_lang['lpn_scncmp_current']='(פתוח כעת)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='הורדת CSV';
 $ec_lang['lpn_full_print']='הדפסת דוח';
 $ec_lang['lpn_full_col_time']='זמן';
 $ec_lang['lpn_full_col_type']='סוג';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='ריכוז';
+$ec_lang['lpn_quality_named_concentration_short']='ריכוז {chemical}';
 $ec_lang['lpn_full_row_count']='שורות ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='הרצות';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='לחץ ומהירות';
 $ec_lang['lpn_ff_atleast']='יותר מ-{flow}';
-$ec_lang['lpn_ff_affect_node']='{id} יורד ל-{pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} מגיע ל-{velocity}';
 $ec_lang['lpn_ff_more']='ועוד {n} מושפעים';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='ביטול (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ביצוע חוזר (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='העתקה (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='גודל התמונה כמכפלה של האזור שעל המסך. גדול יותר חד יותר ויוצר קובץ גדול יותר.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

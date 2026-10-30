@@ -323,8 +323,9 @@ function run(mutate, quiet) {
 		const all = L.changeTypeRows(), rows = all.slice(0, 3);
 		ok('7.1 three node rows, a divider, three link rows, each in the Insert order', all.map(r => r.separator ? '-' : r.label).join('|') ===
 			[PC.lpn_tool_add_junction, PC.lpn_tool_add_reservoir, PC.lpn_tool_add_tank, '-',
-				PC.lpn_tool_add_pipe, PC.lpn_tool_add_pump, PC.lpn_tool_add_valve].join('|'), all.map(r => r.label).join('|'));
-		ok('7.1b a node selection leaves every link row disabled', all.slice(4).every(r => r.disabled));
+				PC.lpn_tool_add_pipe, PC.lpn_tool_add_pump, PC.lpn_tool_add_valve, '-', PC.lpn_morph_vertex].join('|'), all.map(r => r.label).join('|'));
+		ok('7.1b a node selection leaves every link row disabled', all.slice(4, 7).every(r => r.disabled));
+		ok('7.1c ...and the Vertex row, last, is enabled for a junction', all[all.length - 1].disabled === false);
 		ok('7.2 the type it already is, is disabled; the others are not',
 			rows[0].disabled && !rows[1].disabled && !rows[2].disabled);
 		L.setSelectionList([]);

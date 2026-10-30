@@ -15,6 +15,9 @@
 // lists through rebuildLabelsFields() and then computes, for every row, where each trailing column
 // starts as an offset from the row's RIGHT edge -- the one quantity alignment actually is.
 //
+// Since 2026-10-26 the six columns are ONE group (`.lpn-lblgroup`) beside or below the name; the model below measures
+// each column from the GROUP's right edge, and settings-labels-wrap-browser-harness.js holds the wrap itself in Chromium.
+//
 // It is a small layout model rather than a browser, and it is worth being explicit about what it
 // therefore holds constant: every row is the same width (they are block-level siblings), the flex
 // `gap` is the same on every row, and no column shrinks. Each of those is ASSERTED below rather
@@ -61,19 +64,22 @@ console.log('\n--- the column widths are absolute lengths, not relative ones ---
 // The inline widths are overridden by `!important` rules keyed on the COLUMN INDEX. Read them out
 // of the stylesheet rather than retyping them, so this harness cannot disagree with the shipped CSS.
 function importantWidths() {
+	// Rules keyed on a column's place in the group: `.lpn-lblgroup > span:nth-child(3)` or `(n+4)`.
 	const out = {};
-	const re = /((?:#lpn_labels_(?:node|link|customer)_fields > div > span:nth-child\(\d\),?\s*)+)\{\s*width:\s*([0-9.]+rem)\s*!important;\s*\}/g;
+	const re = /((?:#lpn_labels_(?:node|link|customer)_fields \.lpn-lblgroup > span:nth-child\((?:\d|n\+\d)\),?\s*)+)\{\s*width:\s*([0-9.]+rem)\s*!important;\s*\}/g;
 	let m;
 	while ((m = re.exec(css))) {
-		[...m[1].matchAll(/nth-child\((\d)\)/g)].forEach((c) => { out[+c[1]] = m[2]; });
+		[...m[1].matchAll(/nth-child\((\d|n\+\d)\)/g)].forEach((c) => {
+			out[+c[1]] = m[2];
+		});
 	}
 	return out;
 }
 const IMPORTANT = importantWidths();
 console.log('\n--- the stylesheet claims six columns, by index ---');
 // Before, After, Use units, Decimals, Show, Drop (R-326..R-331, reordered R-346).
-ok('columns 2-7 all carry an !important width',
-	[2, 3, 4, 5, 6, 7].every((i) => IMPORTANT[i]),
+ok('the six columns of the group all carry an !important width',
+	[1, 2, 3, 4, 5, 6].every((i) => IMPORTANT[i]),
 	JSON.stringify(IMPORTANT));
 
 // ---- 2. build the real lists -------------------------------------------------------------------
@@ -87,7 +93,7 @@ function px(v) {
 }
 // The width a browser would give this child: the `!important` rule when it matches (a SPAN in one
 // of the four column positions), otherwise the inline declaration.
-function childWidth(child, idx) {
+function childWidth(child, idx) {   // idx: 1-based place in the group
 	const ruled = child.tagName === 'SPAN' && IMPORTANT[idx];
 	return px(ruled || child.style.width);
 }
@@ -95,10 +101,10 @@ function childWidth(child, idx) {
 // list: two rows line up exactly when their lists are equal.
 const GAP = px(L.rowGap());   // the rows' own gap, asserted equal for every row below
 function columnEdges(row) {
-	const kids = row.children;
+	const kids = row.children[1].children;   // the group
 	const edges = [];
 	let x = 0;
-	for (let i = kids.length - 1; i >= 1; i--) {
+	for (let i = kids.length - 1; i >= 0; i--) {
 		const w = childWidth(kids[i], i + 1);
 		edges.unshift({ right: x, left: x + w });
 		x += w + px(kids[i].style.marginLeft) + GAP;
@@ -124,22 +130,20 @@ function describe(edges) {
 	// THE THINGS THE MODEL HOLDS CONSTANT, ASSERTED. Every one of these is a way two rows could
 	// disagree without any width being wrong.
 	rows.forEach(function (r, i) {
-		ok('row ' + i + ' is a flex row with the same ' + L.rowGap() + ' gap', r.style.display === 'flex' && r.style.gap === L.rowGap(),
-			r.style.display + ' / ' + r.style.gap);
-		ok('...with the same number of children as the heading row',
-			r.children.length === rows[0].children.length,
-			r.children.length + ' vs ' + rows[0].children.length);
-		ok('...whose first child takes the slack, so the columns hang off the RIGHT edge',
-			r.children[0].style.flex === '1 1 auto', r.children[0].style.flex);
-		r.children.slice(1).forEach(function (c, j) {
-			ok('...and column ' + (j + 1) + ' cannot shrink or grow', c.style.flex === '0 0 auto', c.style.flex);
+		ok('row ' + i + ' is a wrapping flex row, columns ' + L.rowGap() + ' apart', r.style.display === 'flex' && r.style.flexWrap === 'wrap' && /\b4px$/.test(r.style.gap),
+			r.style.display + ' / ' + r.style.flexWrap + ' / ' + r.style.gap);
+		ok('...with the name (or the heading\'s lead) and ONE group of six controls',
+			r.children.length === 2 && r.children[1].className === 'lpn-lblgroup' && r.children[1].children.length === 6,
+			r.children.length + ' children');
+		r.children[1].children.forEach(function (c, j) {
+			ok('...and column ' + (j + 1) + ' of the group cannot shrink or grow', c.style.flex === '0 0 auto', c.style.flex);
 		});
 	});
-	// AND NOTHING IN A ROW MAY SHRINK EVEN WHEN THE PANEL IS DRAGGED NARROW: the inputs carry no
-	// inline flex-shrink, so the stylesheet has to say it. Without it a narrow panel squeezes the
-	// boxes and leaves every heading standing to their right -- Task 435's defect by another route.
+	ok('the name and the heading lead share one basis, so every row wraps together',
+		/#lpn_labels_node_fields > div > \.lpn-lblhead-lead,[^{]*\{ flex: 0 0 11\.5rem;/.test(css));
+	ok('the group is one unbreakable flex item with the same 4px gap', /\.lpn-lblgroup \{ display: flex; flex: 0 0 auto;[^}]*gap: 4px;/.test(css));
 	ok('the stylesheet pins the inputs against shrinking too',
-		/#lpn_labels_node_fields > div > input,\s*\n?#lpn_labels_link_fields > div > input,\s*\n?#lpn_labels_customer_fields > div > input \{ flex-shrink: 0; \}/.test(css));
+		/#lpn_labels_node_fields \.lpn-lblgroup > input,\s*\n?#lpn_labels_link_fields \.lpn-lblgroup > input,\s*\n?#lpn_labels_customer_fields \.lpn-lblgroup > input \{ flex-shrink: 0; \}/.test(css));
 
 	// **THE ASSERTION THE WHOLE FILE IS FOR.**
 	const want = columnEdges(rows[0]);
@@ -155,18 +159,18 @@ function describe(edges) {
 	// (css/engcalcs.css) is that a spinner centres its digit and a text box keeps its natural start
 	// alignment, so the affix headings start and the two numeric ones centre.
 	{
-		const head = rows[0].children;
+		const head = rows[0].children[1].children;
 		ok('the Before/After headings start where their text boxes start',
-			head[1].style.textAlign === 'start' && head[2].style.textAlign === 'start',
-			head[1].style.textAlign + ',' + head[2].style.textAlign);
+			head[0].style.textAlign === 'start' && head[1].style.textAlign === 'start',
+			head[0].style.textAlign + ',' + head[1].style.textAlign);
 		ok('...the Use units heading is centred over its tick',
-			head[3].style.textAlign === 'center', head[3].style.textAlign);
+			head[2].style.textAlign === 'center', head[2].style.textAlign);
 		ok('...and the three spinner headings are centred, like the digit under them',
-			[4, 5, 6].every((k) => head[k].style.textAlign === 'center'),
-			[4, 5, 6].map((k) => head[k].style.textAlign).join(','));
+			[3, 4, 5].every((k) => head[k].style.textAlign === 'center'),
+			[3, 4, 5].map((k) => head[k].style.textAlign).join(','));
 		ok('...with the spinners themselves centred by the stylesheet',
 			/#lpn_settings_box \.lpn-set-secbody input\.lpn-digit \{ text-align: center; \}/.test(css));
-		const affix = rows[1].children[1];
+		const affix = rows[1].children[1].children[0];
 		ok('...and the text boxes carrying no alignment of their own',
 			!affix.style.textAlign, affix.style.textAlign || '(none)');
 	}
@@ -179,9 +183,9 @@ function describe(edges) {
 	{
 		const idRow = rows.filter((r) => /ID/.test(r.children[0].textContent || ''))[0];
 		ok('the ' + group + ' ID row is present and reserves Use units and Decimals with spacers',
-			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[3].children.length === 0 &&
-			idRow.children[4].tagName === 'SPAN',
-			idRow ? idRow.children.map((c) => c.tagName).join(',') : 'missing');
+			!!idRow && idRow.children[1].children[2].tagName === 'SPAN' && idRow.children[1].children[2].children.length === 0 &&
+			idRow.children[1].children[3].tagName === 'SPAN',
+			idRow ? idRow.children[1].children.map((c) => c.tagName).join(',') : 'missing');
 	}
 });
 

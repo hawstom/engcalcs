@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Криву не вибрано';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Криві';
-$ec_lang['lpn_curve_library_link_tip']='Відкриває «Бібліотеки» на розділі «Криві», де криву можна додати, описати, відредагувати чи видалити. Елемент вказує, яку криву він використовує.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Режим: Додавання фігури. У�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Використовуйте цей режим, щоб змінювати, пересувати й перетягувати елементи карти або панорамувати карту. Це типовий режим карти. Повторне натискання Esc знімає виділення з усього, що вибрано.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Авто';
 $ec_lang['lpn_method_switch_confirm']='Зміна методу тертя не змінює числа шорсткості, вже введені на ваших трубах, а шорсткість для одного методу не має сенсу для іншого. Перевірте кожну трубу після цього. Усе одно змінити?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарій {name} не мо�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Базовий сценарій: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} виключено з мережі в {scenario}. Він залишається на кресленні та в інших сценаріях.';
 $ec_lang['lpn_scenario_delete_in_base']='Щоб вилучити його з креслення, видаліть його в сценарії «{base}».';
 $ec_lang['lpn_scenario_only_deleted']='{id} видалено. Він належав лише сценарію {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Копіює відкритий сценар�
 $ec_lang['lpn_scenario_copy_off']='«Копіювати сценарій» працює в Базовому режимі. Коли Базовий режим вимкнено, додайте сценарій і виберіть його альтернативи в таблиці «Сценарії».';
 $ec_lang['lpn_sm_title']='Сценарії: керування';
 $ec_lang['lpn_sm_menu']='Сценарії: керування…';
-$ec_lang['lpn_sm_basic_on']='«Сценарії: керування» вимкнено, коли вибрано «Базовий режим».';
 $ec_lang['lpn_pane_tab_scenarios']='Сценарії';
 $ec_lang['lpn_sm_col_parent']='Батьківський';
 $ec_lang['lpn_sm_add_child']='Додати дочірній';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Нові елементи: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (за замовчуванням)';
 $ec_lang['lpn_settings_row_view_value']='Центр {x}, {y}; масштаб {s}';
 $ec_lang['lpn_settings_held_in']='Перевизначення в {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Центр карти';
 $ec_lang['lpn_settings_view_scale']='Масштаб карти';
 $ec_lang['lpn_settings_view_scale_tip']='Масштаб у центрі карти, у вигляді 1:N. Введіть 1:2000 або просто 2000, щоб змінити масштаб на цей.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Таблиця сценаріїв із кіль
 $ec_lang['lpn_scncmp_running']='Розрахунок кожного сценарію…';
 $ec_lang['lpn_scncmp_empty']='Ще нічого не намальовано, тож нічого розраховувати.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Найвища швидкість';
-$ec_lang['lpn_scncmp_at']='{value} у {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} у {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Однаково в кожному сценарії';
 $ec_lang['lpn_scncmp_period_note']='Якщо сценарій має загальний час роботи, його найнижчий тиск і найбільша швидкість — це екстремуми всієї мережі в показаний момент.';
 $ec_lang['lpn_scncmp_current']='(відкрито зараз)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Завантажити CSV';
 $ec_lang['lpn_full_print']='Надрукувати звіт';
 $ec_lang['lpn_full_col_time']='Час';
 $ec_lang['lpn_full_col_type']='Тип';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Концентрація';
+$ec_lang['lpn_quality_named_concentration_short']='Концентрація {chemical}';
 $ec_lang['lpn_full_row_count']='Рядки ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Розрахунки';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Тиск і швидкість';
 $ec_lang['lpn_ff_atleast']='більше за {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} падає до {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} досягає {velocity}';
 $ec_lang['lpn_ff_more']='і ще {n} постраждалих';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Скасувати (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Повторити (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Копіювати (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Розмір зображення як кратне області на екрані. Більший масштаб дає чіткіше зображення і більший файл.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

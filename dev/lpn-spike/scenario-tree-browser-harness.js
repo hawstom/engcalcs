@@ -138,7 +138,8 @@ async function main() {
 		const iconColours = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-icon')).map((i) => getComputedStyle(i).color));
 		ok('1.6 the Base icon is drawn in a different token colour from a child\'s', iconColours[0] !== iconColours[1], JSON.stringify(iconColours));
 		// **THE FOOTER MOVED INTO THE "?"** (Tom, 2026-10-11: "Move the footer text to the tip.").
-		ok('1.7 nothing sits under the tree any more (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'); return !t.nextElementSibling; })));
+		// Tom, 2026-10-27: the Basic mode tick stays in the box in both modes ("persistent across modes"), so under the tree sits that one tick and nothing else (still no footer hint).
+		ok('1.7 under the tree sits only the Basic mode tick (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'), n = t.nextElementSibling; return !!n && n.className === 'lpn-sm-basic-tick' && !n.nextElementSibling; })));
 		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
 		// Tom's draft of 2026-10-11, finished: his two headings, his model, his example named after its scenario.
 		ok('1.8 the tip is in two parts, each under a heading line of its own', tipParas.filter((t) => /:$/.test(t)).length === 2 && /:$/.test(tipParas[0]), JSON.stringify(tipParas));

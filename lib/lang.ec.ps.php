@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='هیڅ منحنۍ نه ده ټاکل شوې';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='منحنۍ';
-$ec_lang['lpn_curve_library_link_tip']='د کتابتونونو بکس د منحنیو په برخه کې پرانیزئ، چیرته چې یوه منحنۍ اضافه کیږي، تشریح کیږي، سمونه کیږي او ړنګیږي. یوه شتمنۍ بیانوي چې کومه منحنۍ کاروي.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='حالت: شکل اضافه کول. هر ټکی 
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='دا حالت د نقشې شتمنیو او متن د بدلولو، خوځولو، او راکاږلو، یا د نقشې د پین کولو لپاره وکاروئ. دا د نقشې ډیفالټ حالت دی. د Esc دویم ځل فشار ټاکنه پاکوي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='اوتو';
 $ec_lang['lpn_method_switch_confirm']='د اصطکاک میتود بدلول ستاسو په پایپونو لیکل شوي د خشونت شمېرې نه بدلوي، او د یو میتود لپاره خشونت د بل میتود لپاره بې مانا دی. له دې وروسته هر پایپ وګورئ. بیا هم یې بدلوم؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='سناریو {name} نشي ړنګ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='د اساس سناریو: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} په {scenario} کې د شبکې نه بهر دی. دا لاهم په انځور کې دی، او ستاسو په نورو سناریوګانو کې هم.';
 $ec_lang['lpn_scenario_delete_in_base']='له انځور څخه یې لرې کولو لپاره، یې په {base} سناریو کې ړنګ کړئ.';
 $ec_lang['lpn_scenario_only_deleted']='{id} ړنګ شو. دا یوازې د {scenario} برخه وه.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='پرانیستې سناریو او د هغې 
 $ec_lang['lpn_scenario_copy_off']='سناریو کاپي کول په ساده حالت کې کار کوي. کله چې ساده حالت بند وي، سناریو اضافه کړئ او بدیلونه یې د سناریوګانو په جدول کې وټاکئ.';
 $ec_lang['lpn_sm_title']='سناریو: مدیر';
 $ec_lang['lpn_sm_menu']='سناریو: مدیر…';
-$ec_lang['lpn_sm_basic_on']='کله چې ساده حالت فعال وي د سناریو: مدیر غیرفعال دی.';
 $ec_lang['lpn_pane_tab_scenarios']='سناریوګانې';
 $ec_lang['lpn_sm_col_parent']='مور';
 $ec_lang['lpn_sm_add_child']='فرعي اضافه کول';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='نوې شتمنۍ: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ډیفالټ)';
 $ec_lang['lpn_settings_row_view_value']='مرکز {x}، {y}؛ پیمانه {s}';
 $ec_lang['lpn_settings_held_in']='په {scenario} کې ځانګړی ارزښت.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='د نقشې مرکز';
 $ec_lang['lpn_settings_view_scale']='د نقشې پیمانه';
 $ec_lang['lpn_settings_view_scale_tip']='د نقشې په مرکز کې پیمانه، لکه 1:N. 1:2000، یا یوازې 2000 ولیکئ، ترڅو هغه پیمانې ته زوم شي.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='د سناریوګانو جدول د ځانګړ�
 $ec_lang['lpn_scncmp_running']='هر سناریو حل کیږي…';
 $ec_lang['lpn_scncmp_empty']='تر اوسه هیڅ شی نه دی رسم شوی، نو دلته د حل کولو لپاره هیڅ شی نشته.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ترټولو لوړ سرعت';
-$ec_lang['lpn_scncmp_at']='{value} په {id} کې';
-$ec_lang['lpn_scncmp_at_time']='{value} په {id} کې، {time}';
 $ec_lang['lpn_scncmp_same']='په هره سناریو کې یو شان';
 $ec_lang['lpn_scncmp_period_note']='چیرته چې یوه سناریو ټول چلولو وخت لري، د هغې ټیټ ترین فشار او لوړ ترینه سرعت د ټولې شبکې انتها ده، په ښودل شوي وخت کې.';
 $ec_lang['lpn_scncmp_current']='(اوس مهال پرانیستل شوی)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV ډاونلوډ کول';
 $ec_lang['lpn_full_print']='راپور چاپول';
 $ec_lang['lpn_full_col_time']='وخت';
 $ec_lang['lpn_full_col_type']='ډول';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='غلظت';
+$ec_lang['lpn_quality_named_concentration_short']='د {chemical} غلظت';
 $ec_lang['lpn_full_row_count']='قطارونه ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='چلونه';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='فشار او سرعت';
 $ec_lang['lpn_ff_atleast']='له {flow} نه زیات';
-$ec_lang['lpn_ff_affect_node']='{id} {pressure} ته راټیټیږي';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity} ته رسیږي';
 $ec_lang['lpn_ff_more']='او {n} نور اغیزمن شوي';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='بېرته کول (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='بیا کول (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کاپي (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}، {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}، {symbol}';

@@ -132,11 +132,12 @@ async function main() {
 		const props = await page.evaluate((t) => {
 			const labels = Array.from(document.querySelectorAll('#lpn_popup_fields label'));
 			const row = labels.filter((l) => l.textContent.trim().indexOf(t) === 0)[0];
-			const g = row && row.previousElementSibling;
+			const g = row && row.querySelector('.lpn-ovm');   // the marker is the row's first cell (Task 828)
 			return { rows: labels.map((l) => l.textContent.trim().slice(0, 24)), type: row ? row.textContent : null,
 				dot: !!(g && g.classList.contains('lpn-ovm') && g.querySelector('.lpn-ovm-dot')) };
-		}, await L('lpn_full_col_type'));
+		}, await L('lpn_survey_codes_col_type'));
 		ok('2.1 a Type row says Tank', props.type !== null && props.type.indexOf(await L('lpn_tool_add_tank')) >= 0, props.type);
+		ok('2.1b the row is called Asset type', (await L('lpn_survey_codes_col_type')) === 'Asset type' && props.type.indexOf('Asset type') === 0, props.type);
 		ok('2.2 ...marked as an override in this scenario', props.dot);
 		const tankDia = await L('lpn_field_tank_diameter');
 		ok('2.3 the tank\'s own rows are shown (Tank diameter)', props.rows.some((r) => r.indexOf(tankDia.slice(0, 20)) === 0), JSON.stringify(props.rows));
@@ -179,14 +180,14 @@ async function main() {
 		await s.clickNode('22');
 		const hit = await page.evaluate((t) => {
 			const row = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((l) => l.textContent.trim().indexOf(t) === 0)[0];
-			const dot = row && row.previousElementSibling && row.previousElementSibling.querySelector('.lpn-ovm-dot');
+			const dot = row && row.querySelector('.lpn-ovm-dot');
 			if (dot) { dot.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
 			return !!dot;
-		}, await L('lpn_full_col_type'));
+		}, await L('lpn_survey_codes_col_type'));
 		await a.settle(1200);
 		ok('6.1 the dot is clicked: 22 is a junction in the scenario, with no override left on it',
 			hit && /lpn-node-junction/.test(await s.nodeClass('22') || '') && !/lpn-override/.test(await s.nodeClass('22') || ''), await s.nodeClass('22'));
-		const after = await page.evaluate((t) => Array.from(document.querySelectorAll('#lpn_popup_fields label')).some((l) => l.textContent.trim().indexOf(t) === 0), await L('lpn_full_col_type'));
+		const after = await page.evaluate((t) => Array.from(document.querySelectorAll('#lpn_popup_fields label')).some((l) => l.textContent.trim().indexOf(t) === 0), await L('lpn_survey_codes_col_type'));
 		ok('6.2 ...and Properties has no Type row', !after);
 		await page.keyboard.press('Escape');
 		await page.keyboard.press('Control+z');

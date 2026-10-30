@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Eğri seçilmedi';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Eğriler';
-$ec_lang['lpn_curve_library_link_tip']='Kitaplıklar kutusunu Eğriler bölümünde açar; burada bir eğri eklenir, tanımlanır, düzenlenir ve silinir. Bir öğe hangi eğriyi kullandığını belirtir.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Mod: Figür Ekle. Her noktayı belirtin. Bitirme
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Harita öğelerini değiştirmek, taşımak ve sürüklemek ya da haritayı kaydırmak için bu modu kullanın. Bu, harita için varsayılan moddur. Esc tuşuna ikinci kez basmak, seçili olan her şeyin seçimini kaldırır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Otomatik';
 $ec_lang['lpn_method_switch_confirm']='Sürtünme yöntemini değiştirmek, borularınıza zaten yazılmış olan pürüzlülük sayılarını değiştirmez, ve bir yöntem için pürüzlülük diğeri için anlamsızdır. Bundan sonra her boruyu kontrol edin. Yine de değiştirilsin mi?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} senaryosu silinemez, çünk
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Temel senaryo: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}, {scenario} içinde şebeke dışında. Hâlâ çizimde ve diğer senaryolarınızda bulunuyor.';
 $ec_lang['lpn_scenario_delete_in_base']='Çizimden kaldırmak için {base} senaryosunda silin.';
 $ec_lang['lpn_scenario_only_deleted']='{id} silindi. Yalnızca {scenario} senaryosunun parçasıydı.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Açık senaryoyu ve senaryo değerlerini kopy
 $ec_lang['lpn_scenario_copy_off']='Senaryoyu kopyala, Temel modda çalışır. Temel mod kapalıyken bir senaryo ekleyin ve alternatiflerini Senaryolar tablosunda seçin.';
 $ec_lang['lpn_sm_title']='Senaryo yöneticisi';
 $ec_lang['lpn_sm_menu']='Senaryo yöneticisi…';
-$ec_lang['lpn_sm_basic_on']='Temel mod açıkken Senaryo yöneticisi devre dışıdır.';
 $ec_lang['lpn_pane_tab_scenarios']='Senaryolar';
 $ec_lang['lpn_sm_col_parent']='Üst';
 $ec_lang['lpn_sm_add_child']='Alt öğe ekle';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Yeni varlıklar: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (varsayılan)';
 $ec_lang['lpn_settings_row_view_value']='Merkez {x}, {y}; ölçek {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} içinde senaryo değeri.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Harita merkezi';
 $ec_lang['lpn_settings_view_scale']='Harita ölçeği';
 $ec_lang['lpn_settings_view_scale_tip']='Haritanın merkezindeki ölçek, 1:N olarak. O ölçeğe yakınlaştırmak için 1:2000 veya yalnızca 2000 yazın.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Senaryo değeri sayısı, en düşük basınç 
 $ec_lang['lpn_scncmp_running']='Her senaryo çözülüyor…';
 $ec_lang['lpn_scncmp_empty']='Henüz hiçbir şey çizilmedi, bu yüzden çözülecek bir şey yok.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='En yüksek hız';
-$ec_lang['lpn_scncmp_at']='{id}\'de {value}';
-$ec_lang['lpn_scncmp_at_time']='{id} düğümünde {value}, {time}';
 $ec_lang['lpn_scncmp_same']='Her senaryoda aynı';
 $ec_lang['lpn_scncmp_period_note']='Bir senaryonun toplam çalışma süresi varsa, en düşük basıncı ve en yüksek hızı, gösterilen zamanda tüm şebekenin uç değerleridir.';
 $ec_lang['lpn_scncmp_current']='(şu anda açık)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='CSV indir';
 $ec_lang['lpn_full_print']='Raporu yazdır';
 $ec_lang['lpn_full_col_time']='Zaman';
 $ec_lang['lpn_full_col_type']='Tür';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Derişim';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} derişimi';
 $ec_lang['lpn_full_row_count']='Satırlar ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Çözümler';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Basınç ve hız';
 $ec_lang['lpn_ff_atleast']='{flow}\'den fazla';
-$ec_lang['lpn_ff_affect_node']='{id} {pressure}\'e düşüyor';
-$ec_lang['lpn_ff_affect_link']='{id} {velocity}\'e ulaşıyor';
 $ec_lang['lpn_ff_more']='ve {n} tane daha etkilendi';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Geri al (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Yinele (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopyala (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

@@ -98,11 +98,18 @@ async function main() {
 			await settle(1000);
 		};
 		const closeBox = (id) => P.evaluate((i) => { const x = document.getElementById(i); if (x) { x.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }, id);
+		// Task 840: Lowest pressure and Highest velocity are compound headings (asset, value, time), so the
+		// head has two rows. The table is returned as the chapter shows it: one heading row of column names
+		// ("Lowest pressure: Pressure (psi)") and rows of cells.
 		const compareTable = async (want) => {
 			await a.menuClickSub(await T('lpn_reports_menu'), await T('lpn_scncmp_title'), 'project');
-			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 1; }, want), 'comparison table', 90000);
+			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 2; }, want), 'comparison table', 90000);
 			await settle(300);
-			const rows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_scncmp_report > .lpn-ff-tablewrap table tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			const rows = await P.evaluate(() => {
+				const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'), hs = Array.from(t.tHead.rows), sec = Array.from(hs[1].cells).map((c) => c.textContent.trim()), head = []; let k = 0;
+				Array.from(hs[0].cells).forEach((th) => { if (th.colSpan > 1) { for (let i = 0; i < th.colSpan; i++) { head.push(th.textContent.trim() + ': ' + sec[k++]); } } else { head.push(th.textContent.trim()); } });
+				return [head].concat(Array.from(t.tBodies[0].rows).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			});
 			await closeBox('lpn_scncmp_close');
 			await settle(300);
 			return rows;
@@ -169,10 +176,13 @@ async function main() {
 				notes: Array.from(f.querySelectorAll('.lpn-ov-base')).map((n) => n.textContent.trim()) };
 		});
 		ok('Properties marks the overridden Diameter with one solid dot, and the other rows with hollow dots', marks.dots === 1 && marks.hollow > 3, JSON.stringify({ d: marks.dots, h: marks.hollow }));
-		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_settings_held_in')).replace('{scenario}', 'Larger main') + ' ' + (await T('lpn_ovm_dot_clear')), marks.dotTip);
-		ok('...the hollow dot says what clicking it does', marks.hollowTip === await T('lpn_ovm_dot_set'), marks.hollowTip);
-		const baseLine = (await T('lpn_scenario_base_value')).replace('{value}', '18');
-		ok('...the inherited value shows beneath the row, as the chapter quotes it: ' + baseLine, marks.notes.indexOf(baseLine) >= 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(baseLine) >= 0, JSON.stringify(marks.notes));
+		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_ovm_dot_clear_one')), marks.dotTip);
+		// feat/value-source: the hollow dot also names where the inherited value comes from.
+		const fromTip = (await T('lpn_ovm_dot_set_from')).split('{name}');
+		ok('...the hollow dot says where the value comes from and what clicking it does', !!marks.hollowTip && marks.hollowTip.startsWith(fromTip[0]) && marks.hollowTip.endsWith(fromTip[1])
+			&& marks.hollowTip.length > fromTip[0].length + fromTip[1].length, marks.hollowTip);
+		const baseLine = (await T('lpn_ovm_restores')).replace('{value}', '18 in').replace('{source}', (await T('lpn_settings_held_from')).replace('{parent}', await T('lpn_scenario_base')));
+		ok('...what Clear restores shows beneath the row, as the chapter quotes it: ' + baseLine, marks.notes.indexOf(baseLine) >= 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(baseLine) >= 0, JSON.stringify(marks.notes));
 		await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 		await settle(300);
 		const rings = () => P.evaluate(() => ({ amber: document.querySelectorAll('#lpn_canvas .lpn-override').length, gray: document.querySelectorAll('#lpn_canvas .lpn-override-inh').length }));
@@ -262,17 +272,23 @@ async function main() {
 		const table = await compareTable(3);
 		const heading = table[0];
 		const ex = (await entryTable(P, 'lpn_sm_box', 1));
+		// The chapter's table has the comparison's own two heading rows (Tom, 2026-10-27: asset, value and time are three columns each,
+		// no sentence cells): group names over Junction/Pressure/Time and Link/Velocity/Time, then the column names, then one row per scenario.
 		const colKeys = ['lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_demand_mult', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'];
 		const wantHead = [];
 		for (const k of colKeys) { wantHead.push(await T(k)); }
-		ok('the chapter\'s example table has the comparison\'s own column names', JSON.stringify(ex[0]) === JSON.stringify(wantHead), JSON.stringify(ex[0]));
+		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]),
+			p: heading.findIndex((h) => h.indexOf(wantHead[3] + ': ') === 0), v: heading.findIndex((h) => h.indexOf(wantHead[4] + ': ') === 0) };
+		const subHead = (h) => h.slice(h.indexOf(': ') + 2);
+		const liveCols = [heading[idx.name], heading[idx.ov], heading[idx.dm]].concat([0, 1, 2].map((i) => subHead(heading[idx.p + i])), [0, 1, 2].map((i) => subHead(heading[idx.v + i])));
+		ok('the chapter\'s example table has the comparison\'s own group headings', JSON.stringify(ex[0]) === JSON.stringify(['', '', '', wantHead[3], wantHead[4]]), JSON.stringify(ex[0]));
+		ok('...and the comparison\'s own column names', JSON.stringify(ex[1]) === JSON.stringify(liveCols), JSON.stringify(ex[1]) + ' vs ' + JSON.stringify(liveCols));
 		ok('the comparison has the columns the chapter lists (Total run time, Hydraulic time step among them)', heading.indexOf(await T('lpn_time_duration')) > 0 && heading.indexOf(await T('lpn_time_hyd_step')) > 0, JSON.stringify(heading));
-		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]), p: heading.indexOf(wantHead[3]), v: heading.indexOf(wantHead[4]) };
 		const cur = ' ' + (await T('lpn_scncmp_current'));
-		for (const row of ex.slice(1)) {
+		for (const row of ex.slice(2)) {
 			const got = table.slice(1).filter((t) => t[idx.name].replace(cur, '') === row[0])[0];
-			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '),
-				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && got[idx.p] === row[3] && got[idx.v] === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], got[idx.p], got[idx.v]]));
+			const live = got && [got[idx.name].replace(cur, ''), got[idx.ov], got[idx.dm]].concat([0, 1, 2].map((i) => got[idx.p + i]), [0, 1, 2].map((i) => got[idx.v + i]));
+			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '), !!live && JSON.stringify(live) === JSON.stringify(row), JSON.stringify(live));
 		}
 		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day 1.8' + cur));
 		ok('the comparison lists the three scenarios of the example and the card\'s own four others', table.length === 8, String(table.length - 1));

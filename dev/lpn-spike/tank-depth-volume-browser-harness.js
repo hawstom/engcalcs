@@ -122,6 +122,8 @@ async function main() {
 		const depthName = await a.lang('lpn_result_depth');
 		const volName = await a.lang('lpn_result_tank_volume');
 		const headName = await a.lang('lpn_field_head');
+		// The Tanks table heads its input columns with the Properties short names (box-design, 2026-10-27): "Minimum depth" is the Lowest water depth input, "Initial depth" the starting level (an input); the result column stays "Depth".
+		const minName = await a.lang('lpn_field_tank_minlevel_short');
 		let depthAt = {};
 		for (const t of [0, 3 * 3600, 9 * 3600, 17 * 3600, 24 * 3600]) {
 			await goTo(a, t);
@@ -133,7 +135,7 @@ async function main() {
 			ok('t=' + t + ': the run has a frame for this time', !!frame);
 			if (!frame) { continue; }
 			for (const r of rows) {
-				const id = r.ID, elev = parseFloat(col(r, 'Elevation')), min = parseFloat(col(r, 'Lowest')), dia = parseFloat(col(r, 'Tank diameter'));
+				const id = r.ID, elev = parseFloat(col(r, 'Elevation')), min = parseFloat(col(r, minName)), dia = parseFloat(col(r, 'Tank diameter'));
 				const head = parseFloat(col(r, headName)), dep = parseFloat(col(r, depthName)), vol = parseFloat(col(r, volName));
 				const depFrame = frame.levels[id] / FT;
 				ok('t=' + t + ' tank ' + id + ': Depth is head minus the tank bottom (' + dep + ' vs ' + (head - elev).toFixed(2) + ')',
@@ -164,7 +166,7 @@ async function main() {
 		const snap = async () => {
 			const r = (await table(a))[0];
 			return { head: parseFloat(col(r, headName)), dep: parseFloat(col(r, depthName)), vol: parseFloat(col(r, volName)),
-				elev: parseFloat(col(r, 'Elevation')), min: parseFloat(col(r, 'Lowest')) };
+				elev: parseFloat(col(r, 'Elevation')), min: parseFloat(col(r, minName)) };
 		};
 		const before = await snap();
 		// Turn Recalculate automatically OFF through the Settings box, the way a reader does.
@@ -188,7 +190,7 @@ async function main() {
 		ok('Head stays stale (' + before.head + ' -> ' + after.head + ')', near(after.head, before.head, 0.01));
 		ok('Depth stays with the stale Head (' + before.dep + ' -> ' + after.dep + ')', near(after.dep, before.dep, 0.01));
 		ok('Available volume stays (' + before.vol + ' -> ' + after.vol + ')', near(after.vol, before.vol, Math.max(1, before.vol * 1e-4)));
-		await edit(0, 'Lowest', before.min + 3);
+		await edit(0, minName, before.min + 3);
 		await a.settle(600);
 		after = await snap();
 		ok('the Lowest water depth edit took (' + after.min + ')', near(after.min, before.min + 3, 0.01));
@@ -237,7 +239,7 @@ async function main() {
 		for (const t of [0, 2 * 3600, 5 * 3600]) {
 			await goTo(b, t);
 			const r = (await table(b))[0];
-			const dep = parseFloat(col(r, depthName)), vol = parseFloat(col(r, volName)), min = parseFloat(col(r, 'Lowest'));
+			const dep = parseFloat(col(r, depthName)), vol = parseFloat(col(r, volName)), min = parseFloat(col(r, minName));
 			const want = curveVol(dep) - curveVol(min);
 			const cyl = Math.PI / 4 * 100 * (dep - min);
 			ok('curve tank t=' + t + ': depth ' + dep + ', usable volume ' + vol + ' = curve(depth) - curve(lowest) = ' + want.toFixed(1),

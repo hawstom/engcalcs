@@ -53,7 +53,7 @@ async function main() {
 		const report = async () => {
 			await a.menuClickSub(await T('lpn_reports_menu'), await T('lpn_energy_menu'), 'project');
 			await settle(1500);
-			const r = await P.evaluate(() => ({ head: Array.from(document.querySelectorAll('#lpn_energy_report table th')).map((t) => t.textContent.trim()), rows: Array.from(document.querySelectorAll('#lpn_energy_report table tbody tr')).map((r) => Array.from(r.cells).map((c) => c.textContent.trim())), text: document.getElementById('lpn_energy_report').innerText.replace(/\s+/g, ' ') }));
+			const r = await P.evaluate(() => ({ head: Array.from(document.querySelectorAll('#lpn_energy_report table th')).map((t) => t.textContent.trim().replace(/\s*\([^)]*\)$/, '')), rows: Array.from(document.querySelectorAll('#lpn_energy_report table tbody tr')).map((r) => Array.from(r.cells).map((c) => c.textContent.trim())), text: document.getElementById('lpn_energy_report').innerText.replace(/\s+/g, ' ') }));
 			await P.evaluate(() => document.getElementById('lpn_energy_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 			await settle(300);
 			return r;
@@ -67,7 +67,7 @@ async function main() {
 		ok('the columns are Pump and the six the chapter lists, in its order', JSON.stringify(r1.head) === JSON.stringify(want), JSON.stringify(r1.head));
 		const l9 = r1.rows.filter((r) => r[0] === 'L9')[0];
 		ok('L9: ' + l9[1] + ' running, efficiency ' + l9[2] + ', ' + l9[3] + ' kW on average, ' + l9[4] + ' at the peak, ' + l9[5] + ' kWh, as the chapter says',
-			['65.71%', '75%', '96.22 kW', '96.71 kW', '1518 kWh'].every((w) => ex.indexOf(w) >= 0) && l9[1] === '65.71%' && l9[2] === '75%' && l9[3] === '96.22' && l9[4] === '96.71' && l9[5] === '1518', JSON.stringify(l9));
+			['65.71%', '75%', '96.22 kW', '96.71 kW', '1518 kWh'].every((w) => ex.indexOf(w) >= 0) && l9[1] === '65.71' && l9[2] === '75' && l9[3] === '96.22' && l9[4] === '96.71' && l9[5] === '1518', JSON.stringify(l9));
 		ok('with no price stated every cost is zero and the report says so', l9[6] === '0' && r1.text.indexOf(enString('lpn_energy_price_zero')) >= 0 && ex.indexOf('the cost is 0') >= 0, r1.text.slice(-160));
 		ok('...the totals are listed below the table in the order the chapter gives', ['lpn_energy_total_kwh', 'lpn_energy_total_energy_cost', 'lpn_energy_peak_kw', 'lpn_energy_total_demand_charge', 'lpn_energy_total_cost'].map((k) => r1.text.indexOf(enString(k))).every((v, i, arr) => v >= 0 && (i === 0 || v > arr[i - 1])), r1.text.slice(60, 250));
 		await a.menuClick(await T('lpn_tool_settings'), 'project');

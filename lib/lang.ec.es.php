@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Ninguna curva elegida';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curvas';
-$ec_lang['lpn_curve_library_link_tip']='Abre el cuadro Bibliotecas en su sección Curvas, donde una curva se agrega, se describe, se edita y se elimina. Un elemento indica cuál curva usa.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Modo: Agregar figura. Especifique cada punto. Es
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use este modo para cambiar, mover y arrastrar elementos y texto en el mapa, o para desplazar el mapa. Es el modo predeterminado del mapa. Presionar Esc una segunda vez borra la selección.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Cambiar el método de fricción no cambia los números de rugosidad ya ingresados en las tuberías, y una rugosidad para un método no tiene sentido para otro. Revise cada tubería después. ¿Cambiarlo de todos modos?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='El escenario {name} no se puede el
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Escenario base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} está excluido de la red en {scenario}. Permanece en el dibujo y en los demás escenarios.';
 $ec_lang['lpn_scenario_delete_in_base']='Para quitarlo del dibujo, elimínelo en el escenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} se eliminó. Formaba parte solo de {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copia el escenario abierto y sus valores espe
 $ec_lang['lpn_scenario_copy_off']='Copiar escenario funciona en el Modo básico. Con el Modo básico desmarcado, agregue un escenario y elija sus alternativas en la tabla Escenarios.';
 $ec_lang['lpn_sm_title']='Administrador de escenarios';
 $ec_lang['lpn_sm_menu']='Administrador de escenarios…';
-$ec_lang['lpn_sm_basic_on']='El Administrador de escenarios está deshabilitado cuando el Modo básico está marcado.';
 $ec_lang['lpn_pane_tab_scenarios']='Escenarios';
 $ec_lang['lpn_sm_col_parent']='Superior';
 $ec_lang['lpn_sm_add_child']='Agregar secundario';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Elementos nuevos: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (predeterminado)';
 $ec_lang['lpn_settings_row_view_value']='Centro {x}, {y}; escala {s}';
 $ec_lang['lpn_settings_held_in']='Valor específico en {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centro del mapa';
 $ec_lang['lpn_settings_view_scale']='Escala del mapa';
 $ec_lang['lpn_settings_view_scale_tip']='La escala en el centro del mapa, como 1:N. Escriba 1:2000, o solo 2000, para acercar a esa escala.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Tabla de escenarios con el número de valores e
 $ec_lang['lpn_scncmp_running']='Resolviendo todos los escenarios…';
 $ec_lang['lpn_scncmp_empty']='Todavía no se ha dibujado nada, así que no hay nada que resolver.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Velocidad más alta';
-$ec_lang['lpn_scncmp_at']='{value} en {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} en {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Igual en todos los escenarios';
 $ec_lang['lpn_scncmp_period_note']='Cuando un escenario tiene un tiempo total de simulación, su presión más baja y su velocidad más alta son los extremos de toda la red, en el momento mostrado.';
 $ec_lang['lpn_scncmp_current']='(abierto actualmente)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Descargar CSV';
 $ec_lang['lpn_full_print']='Imprimir informe';
 $ec_lang['lpn_full_col_time']='Tiempo';
 $ec_lang['lpn_full_col_type']='Tipo';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Concentración';
+$ec_lang['lpn_quality_named_concentration_short']='Concentración de {chemical}';
 $ec_lang['lpn_full_row_count']='Filas ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Cálculos';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Presión y velocidad';
 $ec_lang['lpn_ff_atleast']='más de {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} cae a {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} alcanza {velocity}';
 $ec_lang['lpn_ff_more']='y {n} más afectados';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Deshacer (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Rehacer (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiar (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='El tamaño de la imagen como múltiplo del área en pantalla. Una escala mayor es más nítida y produce un archivo más grande.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

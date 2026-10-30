@@ -21,6 +21,8 @@
 // is against that function directly, because it is the one piece with a right answer that can be
 // computed by hand.
 
+// A section's rows live in the one div after its heading (Task 828: that div is the rows' grid).
+const rowsOf = (sec) => (sec.children.filter((c) => c._tag === 'div')[0] || { children: [] }).children;
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -422,7 +424,34 @@ console.log('\n--- the bubble ---');
 	L.setAreaShape('window');
 	L.setRing([{ x: 5, y: -5 }, { x: 25, y: 5 }]);
 	L.commitArea(false);
-	report(/3 selected/.test(L.hintText()), 'after a commit the bubble carries what the ring caught', L.hintText());
+	// **A RING THAT CAUGHT SOMETHING ENDS THE TOOL** (Tom, 2026-10-24); the count rides in the notice.
+	report(L.mode() === 'select' && L.selectionCount() === 3,
+		'a ring that caught something returns to the normal Select mode, selection kept', L.mode() + ' / ' + L.selectionCount());
+	L.setAreaShape('window');
+	L.clearSelection();
+	L.setRing([{ x: 5000, y: 5000 }, { x: 5010, y: 5010 }]);
+	L.commitArea(false);
+	report(L.mode() === 'select-area', 'an empty ring stays in the tool, to try again', L.mode());
+	L.setRing([{ x: 5, y: -5 }, { x: 25, y: 5 }]);
+	L.commitArea(true);
+	report(L.mode() === 'select-area' && L.selectionCount() === 3,
+		'a Shift ring stays in the tool, because the selection is still being built', L.mode());
+	// The Exit control in the bubble.
+	function findExit(n) {
+		if (!n) { return null; }
+		if (n.id === 'lpn_area_hint_exit' || (n.className === 'lpn-area-hint-exit')) { return n; }
+		const kids = n.children || n.childNodes || [];
+		for (let i = 0; i < kids.length; i++) { const r = findExit(kids[i]); if (r) { return r; } }
+		return null;
+	}
+	L.setAreaShape('lasso');
+	const exitBtn = findExit(L.hintBox());
+	report(!!exitBtn, 'the bubble carries an Exit control', exitBtn ? exitBtn.textContent : '');
+	if (exitBtn) {
+		fire(exitBtn, 'click');
+		report(L.mode() === 'select', 'pressing Exit returns to the normal Select mode', L.mode());
+	}
+	L.setAreaShape('window');
 	// A finger's window or lasso is press-drag-lift, and the bubble says so.
 	L.setLastPointer('touch');
 	L.setAreaShape('lasso');
@@ -462,7 +491,7 @@ console.log('\n--- properties for many ---');
 
 	// Editing a row writes to every element of that type, through setProp().
 	const junctionSec = secs[0];
-	const rows = junctionSec.children.filter((c) => c._tag === 'label');
+	const rows = rowsOf(junctionSec).filter((c) => c._tag === 'label');
 	report(rows.length > 0, 'the junction section has editable rows', String(rows.length));
 	const elevRow = rows.filter((r) => (r.textContent || '').indexOf('Elev') >= 0)[0]
 		|| rows[0];
@@ -494,13 +523,13 @@ console.log('\n--- properties for many ---');
 	L.toggleInSelection('node', j[1].id);
 	L.openMulti();
 	const sec2 = L.popupSections()[0];
-	const kinds = sec2.children.map((c) => c._tag);
+	const kinds = rowsOf(sec2).map((c) => c._tag);
 	report(kinds.filter((k) => k === 'label').length > 0 &&
 		kinds.filter((k) => k === 'br').length === kinds.filter((k) => k === 'label').length,
 		'every row in a section is followed by a line break', kinds.join(','));
 	// **THE ACTIVE CHECKBOX IS ON EVERY TYPE** (Tom, 2026-09-08): a row whose control is a checkbox
-	// and whose words are the popup's own "Is active?".
-	const activeRow = sec2.children.filter((c) => c._tag === 'label' && /Is active\?/.test(c.textContent || ''))[0];
+	// and whose words are the popup's own "Active".
+	const activeRow = rowsOf(sec2).filter((c) => c._tag === 'label' && /^\s*Active\b/.test(c.textContent || ''))[0];
 	report(!!activeRow, 'the junction section carries the Active row');
 	const activeBox = activeRow && activeRow.children.filter((c) => c._tag === 'input')[0];
 	report(!!activeBox && activeBox.type === 'checkbox', '...as a checkbox', activeBox && activeBox.type);
@@ -532,17 +561,17 @@ console.log('\n--- properties for many ---');
 	report(heads.every((h) => h.indexOf('undefined') < 0), 'no heading says undefined', heads.join(' / '));
 	report(heads.some((h) => /^Text \(2\)/.test(h)), 'the Text section is named and counted', heads.join(' / '));
 	const textSec = L.popupSections().filter((d) => /^Text/.test(d.children[0].textContent))[0];
-	const textRows = textSec.children.filter((c) => c._tag === 'label').map((r) => r.textContent || '');
+	const textRows = rowsOf(textSec).filter((c) => c._tag === 'label').map((r) => r.textContent || '');
 	report(/Size multiplier/.test(textRows.join('|')) && /Bold text/.test(textRows.join('|')) &&
 		/Horizontal alignment/.test(textRows.join('|')) && /Angle/.test(textRows.join('|')) &&
-		textRows.join('|').indexOf(PC.lpn_field_active) >= 0,
+		textRows.join('|').indexOf(PC.lpn_field_active_short) >= 0,
 		'with the words, size, alignments, Bold, angle and Active as rows', textRows.join(' | '));
-	const boldRow = textSec.children.filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
+	const boldRow = rowsOf(textSec).filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
 	const boldBox = boldRow.children.filter((c) => c._tag === 'input')[0];
 	boldBox.checked = true;
 	fire(boldBox, 'change', {});
 	report(tx.every((lb) => lb.bold === true), 'ticking Bold sets it on both Texts', tx.map((lb) => lb.bold).join(','));
-	const alignRow = textSec.children.filter((c) => c._tag === 'label' && /Horizontal alignment/.test(c.textContent || ''))[0];
+	const alignRow = rowsOf(textSec).filter((c) => c._tag === 'label' && /Horizontal alignment/.test(c.textContent || ''))[0];
 	const alignSel = alignRow.children.filter((c) => c._tag === 'select')[0];
 	report(!!alignSel, 'an alignment is a select, not a number box');
 	alignSel.value = 'left';
@@ -932,6 +961,7 @@ console.log('\n--- a press-drag-release ends the ring, and nothing outlives the 
 	// still a click and still does its work on the way DOWN, so the ring it opens survives the
 	// release and waits for the second click.
 	L.clearSelection(); L.closePopup();
+	L.setAreaShape('window');   // the drag above caught something, which ended the tool
 	fireSvg('pointerdown', at(A.cx, A.cy));
 	fireSvg('pointerup', at(A.cx, A.cy));
 	report(L.drawing(), 'a click with no travel still OPENS a ring that survives the release');
@@ -944,6 +974,7 @@ console.log('\n--- a press-drag-release ends the ring, and nothing outlives the 
 	// A CANCELLED POINTER SELECTS NOTHING. The browser took the gesture away, so the release never
 	// says where the user meant to stop, and a ring committed at wherever the pointer happened to
 	// be is the unasked-for selection this whole section is about.
+	L.setAreaShape('window');
 	drag(A, B, 'pointercancel');
 	report(!L.drawing(), 'a pointercancel mid-drag ends the ring');
 	report(L.selectionCount() === 0, '...without selecting anything', String(L.selectionCount()));

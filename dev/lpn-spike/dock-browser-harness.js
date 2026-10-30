@@ -19,8 +19,7 @@
 //   4. Q5. Fire flow, Criticality and Demand scaling carry one `?` in the row, focusable, whose tip
 //      is the tool's whole explanation (its intro, then its scope tip); no other box carries one.
 //      Enter on the `?` opens it (Task 759: one door) and a click on the title bar closes it.
-//   5. A PHONE (390 x 844). No dock buttons, and a box stored as docked opens filling the screen with
-//      the map at full width.
+//   5. A PHONE (390 x 844). A box stored as docked is an auto-hide tab, never a pinned column, and the map keeps its width.
 //
 //   node dev/lpn-spike/dock-browser-harness.js        (takes the browser lock itself)
 // DOCK_SHOT=<dir> also writes a screenshot of each view there, for a person to look at.
@@ -166,10 +165,11 @@ async function sectionDock(Session, browser) {
 		let g = await geom(a.page, 'lpn_settings_box');
 		await shot(a.page, 'dock-right');
 		ok('Dock right: the box is docked', g.docked && g.open);
-		ok('...flush with the right edge of the window the map spans', Math.abs(g.box.r - (g.wrap.r + g.box.w)) <= 1.5 && g.box.r <= g.vw + 0.5,
+		// A pinned box keeps its tab (2026-10-27), so its column sits inside the 24 px strip at the edge.
+		ok('...flush with the tab strip at the right edge of the window the map spans', Math.abs(g.box.r - (g.wrap.r + g.box.w)) <= 1.5 && g.box.r + 24 <= g.vw + 0.5,
 			JSON.stringify({ box: g.box, wrap: g.wrap }));
 		ok('...the map gives up exactly the column, so nothing of the drawing is under the box',
-			g.svg.r <= g.box.l + 1 && Math.abs((fullW - g.svg.w) - g.box.w) <= 2, JSON.stringify({ full: fullW, now: g.svg.w, box: g.box.w }));
+			g.svg.r <= g.box.l + 1 && Math.abs((fullW - g.svg.w) - g.box.w - 24) <= 2, JSON.stringify({ full: fullW, now: g.svg.w, box: g.box.w }));
 		ok('...top to bottom of the map', Math.abs(g.box.t - g.svg.t) <= 1.5 && Math.abs(g.box.b - Math.min(g.svg.b, g.vh)) <= 1.5,
 			JSON.stringify({ box: g.box, svg: g.svg }));
 		// At the width it floated at (Tom, 2026-10-24: "your undocked width should dock"; dock-width-harness.js).
@@ -217,7 +217,7 @@ async function sectionDock(Session, browser) {
 		console.log('\n--- 2d. a drag on a docked box floats it; a click does not ---');
 		await corner(a, 'lpn_settings_box', 'left');
 		g = await geom(a.page, 'lpn_settings_box');
-		ok('Dock left: the box sits at the map\'s left, and the map starts after it', g.docked && g.box.l <= 2 && g.svg.l >= g.box.r - 1,
+		ok('Dock left: the box sits at the map\'s left (after its 24 px tab strip), and the map starts after it', g.docked && g.box.l <= 26 && g.svg.l >= g.box.r - 1,
 			JSON.stringify({ box: g.box, svg: g.svg }));
 		const bandX = g.box.l + 30, bandY = g.box.t + 4;
 		await a.page.mouse.click(bandX, bandY);
@@ -259,11 +259,11 @@ async function sectionProperties(Session, browser) {
 		ok('a click on a junction opens Properties', g.open);
 		await corner(a, 'lpn_popup', 'left');
 		g = await geom(a.page, 'lpn_popup');
-		ok('Dock left: Properties takes the left column', g.docked && g.box.l <= 2 && g.svg.l >= g.box.r - 1, JSON.stringify({ box: g.box, svg: g.svg }));
+		ok('Dock left: Properties takes the left column', g.docked && g.box.l <= 26 && g.svg.l >= g.box.r - 1, JSON.stringify({ box: g.box, svg: g.svg }));
 		await clickNode(20);
 		g = await geom(a.page, 'lpn_popup');
 		await shot(a.page, 'dock-properties');
-		ok('...and the next junction clicked opens in the column, not beside the junction', g.open && g.docked && g.box.l <= 2);
+		ok('...and the next junction clicked opens in the column, not beside the junction', g.open && g.docked && g.box.l <= 26);
 		// Properties keeps no record of its own; its dock alone is kept in `lpn_dockbox` (Tom, 2026-10-07:
 		// "All the docks I make need to be remembered."), and nothing else is written for it.
 		const added = (await storageKeys(a.page)).filter((k) => keysBefore.indexOf(k) < 0 && !/^lpn_(project_|index)/.test(k));
@@ -373,7 +373,7 @@ async function sectionAutohide(Session, browser) {
 		await corner(a, 'lpn_settings_box', 'autohide');
 		g = await geom(a.page, 'lpn_settings_box');
 		st = await strip();
-		ok('the pin puts it back in its column, and the strip goes', g.visible && g.docked && !st.shown && g.svg.r <= g.box.l + 1, JSON.stringify(st));
+		ok('the pin puts it back in its column, and its tab stays, pressed', g.visible && g.docked && st.shown && st.tabs.length === 1 && g.svg.r <= g.box.l + 1, JSON.stringify(st));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();
@@ -431,9 +431,11 @@ async function sectionPhone(Session, browser) {
 		const g = await geom(a.page, 'lpn_settings_box');
 		await shot(a.page, 'dock-phone');
 		ok('a box stored as docked opens on a phone', g.open);
-		ok('...filling the screen, not docked', !g.docked && g.box.l >= -0.5 && g.box.r <= g.vw + 0.5, JSON.stringify(g.box));
-		ok('...with the map at full width', Math.abs(g.svg.r - g.wrap.r) <= 1 && g.wrap.l <= 2 && g.wrap.r >= g.vw - 3, JSON.stringify(g.wrap));
-		ok('...and no dock buttons offered', g.acts.length === 0, g.acts.join());
+		// A phone cannot hold a pinned column (it would leave the map 320 px and the box about 70), so a
+		// docked box there is always an auto-hide tab (Tom, 2026-10-24).
+		ok('...as an auto-hide tab, tucked away: docked, and not hiding the map', g.docked && !g.visible, JSON.stringify(g.box));
+		ok('...the map keeps the whole width but the 24 px strip', g.wrap.l <= 2 + 24 && g.wrap.r >= g.vw - 3 - 24, JSON.stringify(g.wrap));
+		ok('...and no pin button is offered', !g.acts.includes('autohide'), g.acts.join());
 		const rec = await stored(a.page, 'lpn_setbox');
 		ok('...while the docking is kept for a wider window', rec && rec.dock === 'right', JSON.stringify(rec));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

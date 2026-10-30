@@ -300,8 +300,8 @@ console.log('\n--- Basic mode ---');
 		L.deleteScenario(ownMult.id); L.deleteScenario(seeded.id);
 	}
 	basicRow().fn();
-	ok('ticking it again removes the stored key and closes the box',
-		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.smBoxIsOpen());
+	ok('ticking it again removes the stored key (the box stays, in its Basic face)',
+		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null);
 }
 
 // ---------------------------------------------------------------------------

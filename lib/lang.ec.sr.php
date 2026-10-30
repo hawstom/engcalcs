@@ -2837,8 +2837,6 @@ $ec_lang['lpn_curve_none']='Није изабрана ниједна крива'
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Криве';
-$ec_lang['lpn_curve_library_link_tip']='Отвара оквир Библиотеке на одељку Криве, где се крива додаје, описује, мења и брише. Елемент наводи коју криву користи.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2898,7 +2896,6 @@ $ec_lang['lpn_mode_add_shape']='Режим: Додавање Фигуре. Од�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Користите овај режим за измену, померање и превлачење елемената и текста на мапи, или за померање саме мапе. Ово је подразумевани режим мапе. Други притисак на Esc поништава избор.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Аутоматски';
 $ec_lang['lpn_method_switch_confirm']='Промена методе трења не мења бројеве храпавости који су већ уписани на вашим цевима, а храпавост за једну методу је бесмислена за другу. Проверите сваку цев након ове промене. Да ли ипак желите да је промените?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3273,7 +3270,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарио {name} не мо�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Основни сценарио: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.';
 $ec_lang['lpn_scenario_delete_in_base']='Да бисте га уклонили са цртежа, обришите га у сценарију {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} је обрисан. Био је део само сценарија {scenario}.';
@@ -3288,7 +3284,6 @@ $ec_lang['lpn_scenario_copy_tip']='Копира отворени сценари�
 $ec_lang['lpn_scenario_copy_off']='Копирај сценарио ради у Основном режиму. Када је Основни режим искључен, додајте сценарио и изаберите његове алтернативе у табели Сценарији.';
 $ec_lang['lpn_sm_title']='Менаџер сценарија';
 $ec_lang['lpn_sm_menu']='Менаџер сценарија…';
-$ec_lang['lpn_sm_basic_on']='Менаџер сценарија је онемогућен када је Основни режим укључен.';
 $ec_lang['lpn_pane_tab_scenarios']='Сценарији';
 $ec_lang['lpn_sm_col_parent']='Родитељ';
 $ec_lang['lpn_sm_add_child']='Додај подређени';
@@ -3407,7 +3402,6 @@ $ec_lang['lpn_settings_row_new_asset']='Нови елементи: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (подразумевано)';
 $ec_lang['lpn_settings_row_view_value']='Центар {x}, {y}; размера {s}';
 $ec_lang['lpn_settings_held_in']='Сопствена вредност у {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Центар мапе';
 $ec_lang['lpn_settings_view_scale']='Размера мапе';
 $ec_lang['lpn_settings_view_scale_tip']='Размера у центру мапе, као 1:N. Упишите 1:2000, или само 2000, да зумирате на ту размеру.';
@@ -4016,8 +4010,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Табела сценарија са броје
 $ec_lang['lpn_scncmp_running']='Решавање сваког сценарија…';
 $ec_lang['lpn_scncmp_empty']='Још ништа није нацртано, па нема шта да се реши.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Највећа брзина';
-$ec_lang['lpn_scncmp_at']='{value} код {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} у {id}, {time}';
 $ec_lang['lpn_scncmp_same']='Исто у сваком сценарију';
 $ec_lang['lpn_scncmp_period_note']='Где сценарио има укупно време рада, његов најнижи притисак и највећа брзина су екстреми целе мреже, у приказаном тренутку.';
 $ec_lang['lpn_scncmp_current']='(тренутно отворен)';
@@ -4068,6 +4060,9 @@ $ec_lang['lpn_full_download_csv']='Преузми CSV';
 $ec_lang['lpn_full_print']='Одштампај извештај';
 $ec_lang['lpn_full_col_time']='Време';
 $ec_lang['lpn_full_col_type']='Тип';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Концентрација';
+$ec_lang['lpn_quality_named_concentration_short']='Концентрација {chemical}';
 $ec_lang['lpn_full_row_count']='Редови ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4617,8 +4612,6 @@ $ec_lang['lpn_ff_col_solves']='Прорачуни';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Притисак и брзина';
 $ec_lang['lpn_ff_atleast']='више од {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} пада на {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} достиже {velocity}';
 $ec_lang['lpn_ff_more']='и још {n} погођених';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4986,3 +4979,6 @@ $ec_lang['lpn_snip_tip_undo']='Поништи (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Понови (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Копирај (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';
