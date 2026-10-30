@@ -95,6 +95,16 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-10-29 evening (forty-eighth session, Opus main, Sonnet agents)
+
+- **Merged on green with this handoff:** `fix/manual-search-speed` (marks laid lazily, chapter on screen first; a heading that is its chapter's first hit gets no row; a heading repeated within a chapter shows its parent, "Fire flow analysis: Example on Net1").
+- **Waiting his browser pass (all on Branch previews):** `box-design` round 4 (8103; carries Tasks 827, 828, 829); `feat/report-widths` (8110; his "Merge" stands, same batch as box-design); `feat/starter-example` (8107; he OK'd all three round-3 items but gave no merge word); `feat/dxf-import` (8101, Task 772 slice 1); `feat/gis-background` (8105, Task 720, built on box-design).
+- **`fix/usage-report-wording`** (no port; spock.php): his Looking/Calculating/Uses (others) wording with three precision fixes; waits his word.
+- **Asked of him in messenger.md:** the GIS privacy paragraph; whether the DXF export should carry status, initial quality and the head loss formula; Properties covering 86% of a phone (why a Text under it cannot be tapped); whether the grey bar he saw was the bottom pane's 5-row tab strip; the random theme show design.
+- **Rebase chain:** report-widths and gis-background each merge box-design; after any box-design commit, merge it into both.
+- **Trap met:** a finished agent kept re-sending its hand-back on every background tick; TaskStop it once its tree is clean.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/ee9f2ae0-dd3a-4b13-9207-529e957c3a18/scratchpad (brief-*.md, perry/).
+
 ## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 
 - **Merged on green with this handoff:** `fix/manual-search` (User Manual: every hit marked, a chapter result opens on its first hit, heading hits indented under their chapter) and `chore/test-trim` (pass 3: four pixel/timing harnesses on demand via `dev/scripts/on_demand_harnesses.txt`, `run_harnesses.sh --all` runs them; the selftest and doc-bookkeeping check lines retired, scripts kept on disk and listed in `dev/automated-checks.md`; new ratchet `adhoc_style_check.php`, baseline 137 lines, 122 in looped-network.js). The four visitor-string checks (struck public claims, em dash, plain-English swaps, select/choose) stay live.
