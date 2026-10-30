@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**70 still to read on master**, of 235 untranslated keys, of 3204 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**71 still to read on master**, of 236 untranslated keys, of 3205 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (235, 70 to read @@ NEEDS RULING)
+## lpn_  (236, 71 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -198,6 +198,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_coord_unit`**
   > The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_crs_unknown`**
+  > The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_customer_loose`**
   > The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.
@@ -937,9 +940,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`febda3449`) — adds no English strings
+### feat/dxf-import (`1be1d31d1`) — adds no English strings
 
-### feat/gis-background (`f682e400c`) — 78 new, 78 to read @@ NEEDS RULING
+### feat/gis-background (`2b53b2642`) — 78 new, 78 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level

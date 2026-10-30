@@ -5054,6 +5054,7 @@ $ec_lang['lpn_dxfnet_note_end_ambiguous']='These links have an end where two nod
 $ec_lang['lpn_dxfnet_note_end_no_node']='These links have an end where there is no node, and were not imported.';
 $ec_lang['lpn_dxfnet_note_end_loop']='These links start and end at the same node, and were not imported.';
 $ec_lang['lpn_dxfnet_note_pump_no_curve']='A DXF file does not hold pump curves. These pumps have none, and are written to an EPANET file as pipes until each is given a curve.';
+$ec_lang['lpn_dxfnet_note_crs_unknown']='The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.';
 $ec_lang['lpn_dxfnet_note_unit_unknown']='The drawing states these units, which this page does not know. The units in use were kept for them.';
 $ec_lang['lpn_dxfnet_note_coord_unit']='The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.';
 $ec_lang['lpn_dxfnet_note_customer_loose']='The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.';

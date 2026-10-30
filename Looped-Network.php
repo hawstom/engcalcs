@@ -4581,6 +4581,7 @@ EngCalcs.pageConfig = {
 	lpn_dxfnet_note_end_no_node: <?=json_encode($ec_lang['lpn_dxfnet_note_end_no_node'])?>,
 	lpn_dxfnet_note_end_loop: <?=json_encode($ec_lang['lpn_dxfnet_note_end_loop'])?>,
 	lpn_dxfnet_note_pump_no_curve: <?=json_encode($ec_lang['lpn_dxfnet_note_pump_no_curve'])?>,
+	lpn_dxfnet_note_crs_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_crs_unknown'])?>,
 	lpn_dxfnet_note_unit_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_unit_unknown'])?>,
 	lpn_dxfnet_note_coord_unit: <?=json_encode($ec_lang['lpn_dxfnet_note_coord_unit'])?>,
 	lpn_dxfnet_note_customer_loose: <?=json_encode($ec_lang['lpn_dxfnet_note_customer_loose'])?>,

@@ -283,17 +283,50 @@ async function main() {
 		await roundTrip(browser, 'Net3', { card: 'lpn_ex_net3_title' });
 		await roundTrip(browser, 'Net1 with a PRV and customers', { custom: true, customers: true });
 
-		console.log('\n--- a latitude-and-longitude project: the drawing is in UTM metres ---');
+		console.log('\n--- a latitude-and-longitude project: UTM metres, opened as a projected project ---');
 		{
 			const a = await open(browser, null, true);
 			await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+			const inpA = (await exportVia(a, 'lpn_file_export_item_inp')).toString('utf8');
 			const dxf = await exportVia(a, 'lpn_file_export_item_dxf');
+			const code = (/EPSG:(\d+)/.exec(dxf.toString('latin1')) || [])[1];
+			ok('the export states its coordinate system in the read-me (a WGS 84 UTM zone)', /^326\d\d$/.test(code || ''), String(code));
 			const imp = await importDxf(a, 'utm.dxf', dxf);
-			const cu = imp.items.find((i) => i.code === 'coord-unit');
-			ok('the receipt says the coordinates are in m and the lengths in ft, and how the coordinates were read', !!cu && cu.text === (await a.page.evaluate(() => EngCalcs.pageConfig.lpn_dxfnet_note_coord_unit)).replace('{coord}', 'm').split('{length}').join('ft'), cu && cu.text);
+			ok('the receipt does not mention a coordinate-unit mismatch or an unknown system', !imp.items.some((i) => i.code === 'coord-unit' || i.code === 'crs-unknown'), JSON.stringify(imp.items.map((i) => i.code)));
 			if (imp.dialog) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 			const after = await stored(a);
-			ok('every node and link is there (Net3: 97 nodes, 119 links), as a grid project, not on the Earth', after.doc.nodes.length === 97 && after.doc.links.length === 119 && after.doc.project.coords !== 'geo', after.doc.nodes.length + ' / ' + after.doc.links.length);
+			ok('every node and link is there (Net3: 97 nodes, 119 links)', after.doc.nodes.length === 97 && after.doc.links.length === 119, after.doc.nodes.length + ' / ' + after.doc.links.length);
+			ok('it is a projected project in that system, not a grid and not on the Earth', after.doc.project.crs === 'EPSG:' + code && after.doc.project.coords !== 'geo', JSON.stringify(after.doc.project));
+			const inpB = (await exportVia(a, 'lpn_file_export_item_inp')).toString('utf8');
+			const A = parseInp(inpA), B = parseInp(inpB);
+			const res = await a.page.evaluate(([code, ca, cb, va, vb, pa, pb]) => {
+				const C = 'EPSG:' + code, E = window.EngCalcs, fwd = (r) => E.lpnCrsForward(C, { lon: +r[1], lat: +r[2] });
+				const R = 6371008.8, rad = Math.PI / 180;
+				const hav = (p, q) => { const dl = (q.lat - p.lat) * rad, dn = (q.lon - p.lon) * rad, h = Math.sin(dl / 2) ** 2 + Math.cos(p.lat * rad) * Math.cos(q.lat * rad) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+				return new Promise((resolve) => E.lpnCrsLoad(() => {
+					const B = {}; cb.forEach((r) => { B[r[0]] = r; });
+					let worst = 0, missing = 0;
+					const LA = {}, LB = {};
+					ca.forEach((r) => { const f = fwd(r), q = B[r[0]]; if (!q) { missing++; return; } worst = Math.max(worst, Math.hypot(f.x - +q[1], f.y - +q[2])); LA[r[0]] = { lon: +r[1], lat: +r[2] }; const ll = E.lpnCrsInverse(C, { x: +q[1], y: +q[2] }); LB[r[0]] = ll; });
+					// geodesic length of each pipe along its end nodes and bends, from the original positions and from the imported ones
+					const vertsA = {}, vertsB = {};
+					va.forEach((r) => { (vertsA[r[0]] = vertsA[r[0]] || []).push({ lon: +r[1], lat: +r[2] }); });
+					vb.forEach((r) => { (vertsB[r[0]] = vertsB[r[0]] || []).push(E.lpnCrsInverse(C, { x: +r[1], y: +r[2] })); });
+					let worstLen = 0, n = 0;
+					pa.forEach((p) => {
+						const q = pb.find((x) => x[0] === p[0]); if (!q) { return; }
+						const la = [LA[p[1]]].concat(vertsA[p[0]] || [], [LA[p[2]]]), lb = [LB[q[1]]].concat(vertsB[p[0]] || [], [LB[q[2]]]);
+						let da = 0, db = 0; for (let i = 0; i + 1 < la.length; i++) { da += hav(la[i], la[i + 1]); db += hav(lb[i], lb[i + 1]); }
+						worstLen = Math.max(worstLen, Math.abs(da - db)); n++;
+					});
+					resolve({ worst: worst, missing: missing, worstLen: worstLen, pipes: n });
+				}));
+			}, [code, A.COORDINATES, B.COORDINATES, A.VERTICES || [], B.VERTICES || [], A.PIPES, B.PIPES]);
+			ok('every node lands within 0.01 m of its original position projected to the same UTM zone (worst ' + res.worst.toFixed(5) + ' m)', res.missing === 0 && res.worst < 0.01, JSON.stringify(res));
+			ok('the geodesic length of every pipe matches the original (' + res.pipes + ' pipes, worst difference ' + res.worstLen.toFixed(5) + ' m)', res.pipes === 117 && res.worstLen < 0.01, JSON.stringify(res));
+			const bad = compareInp(A, B).filter((x) => x.indexOf('COORDINATES') !== 0 && x.indexOf('VERTICES') !== 0);
+			ok('everything else the DXF carries is the same too', bad.length === 0, bad.slice(0, 5).join('; '));
+			ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 			await a.close();
 		}
 

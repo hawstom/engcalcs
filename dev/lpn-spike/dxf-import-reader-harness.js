@@ -97,6 +97,13 @@ console.log('\n1. a file of ours');
 	ok('as BYTES in Windows-1252, decoded by the file\'s own code page, the same values', r2.ok && r2.nodes[0].desc === ' 100%% \\ Ωmega é  ', JSON.stringify(r2.nodes[0] && r2.nodes[0].desc));
 }
 
+console.log('\n1b. the coordinate system the read-me states');
+{
+	const r = read(E.lpnDxfWrite(model({ readme: ['A project', 'Coordinates: WGS 84 / UTM zone 10N (EPSG:32610), in meters, not latitude and longitude.'] })));
+	ok('EPSG:32610 is read out of the read-me', r.crsCode === 'EPSG:32610', r.crsCode);
+	ok('a read-me that states none leaves it empty (a grid)', read(E.lpnDxfWrite(model())).crsCode === '');
+}
+
 // ---- 2. a language this page is not in: the file's own block definitions name the properties ------------
 console.log('\n2. tags in another language');
 {

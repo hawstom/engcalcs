@@ -44824,6 +44824,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'end-no-node': ['lpn_dxfnet_note_end_no_node', 'These links have an end where there is no node, and were not imported.'],
 			'end-loop': ['lpn_dxfnet_note_end_loop', 'These links start and end at the same node, and were not imported.'],
 			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'A DXF file does not hold pump curves. These pumps have none, and are written to an EPANET file as pipes until each is given a curve.'],
+			'crs-unknown': ['lpn_dxfnet_note_crs_unknown', 'The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.'],
 			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
 			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
 			'customer-loose': ['lpn_dxfnet_note_customer_loose', 'The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.'],
@@ -44873,7 +44874,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * project in the file's own X and Y. Settings are the open project's with what the file states
 	 * written onto them (nothing of EPANET's options, which a DXF file does not hold).
 	 */
-	function docFromDxfNet(r, name, defaults) {
+	function docFromDxfNet(r, name, defaults, crs) {
 		var next = newNextId(), s = JSON.parse(JSON.stringify(settings));
 		s.method = 'hw';
 		s.defaults = defaults || s.defaults;
@@ -44894,7 +44895,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r.customers.forEach(function (c) { claim(c.id, 'M'); });
 		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
-			project: { name: name, activeScenario: 'base' },
+			// A stated coordinate system makes a projected project, its X and Y in that system's own unit.
+			project: crs ? { name: name, activeScenario: 'base', crs: crs } : { name: name, activeScenario: 'base' },
 			scenarios: defaultScenarios(),
 			nodes: r.nodes, links: r.links, labels: [], nextId: next,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
@@ -44930,7 +44932,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The bytes of a DXF file, to a new project. `done(result)` is called once; a harness drives this half.
 	function landDxfNetwork(buffer, fileName, done) {
-		var pc = EngCalcs.pageConfig || {}, r, units, before, changed, defaults, name, id, loose, text;
+		var pc = EngCalcs.pageConfig || {}, r, text;
 		logLpnFirstAction('import');
 		function refuse(key, fallback, why) {
 			var msg = String(pc[key] || fallback).replace('{file}', fileName);
@@ -44949,9 +44951,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (done) { done({ ok: false, error: 'empty', net: r }); }
 			return;
 		}
+		// **A COORDINATE SYSTEM THE READ-ME STATES IS THE PROJECT'S** (a latitude-and-longitude project
+		// is drawn in UTM metres, and read as a grid in feet it would land at the wrong scale). It
+		// opens as a projected project in that system, so the network lands where it was; a code
+		// this page does not know is named and the drawing opens as a grid.
+		if (r.crsCode && !crsIsLatLonCode(r.crsCode) && EngCalcs.lpnCrsLoad) {
+			EngCalcs.lpnCrsLoad(function () {
+				var known = EngCalcs.lpnCrsHas(r.crsCode);
+				if (!known) { r.notes.push({ code: 'crs-unknown', ids: [r.crsCode], detail: '' }); }
+				finishDxfNetwork(r, fileName, done, known ? r.crsCode : '');
+			});
+			return;
+		}
+		finishDxfNetwork(r, fileName, done, '');
+	}
+	function finishDxfNetwork(r, fileName, done, crs) {
+		var units, before, changed, defaults, name, id, loose;
 		before = readUnitSelections();
 		units = dxfNetUnits(r, r.notes);
-		if (r.coordUnit && r.coordUnit !== units.lpn_u_length) {
+		if (!crs && r.coordUnit && r.coordUnit !== units.lpn_u_length) {
 			r.notes.push({ code: 'coord-unit', ids: [], detail: { coord: r.coordUnit, length: units.lpn_u_length } });
 		}
 		// The project being left is saved BEFORE the strip moves, as for an `.inp` (R-415).
@@ -44960,7 +44978,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
 		defaults = geoJsonNetDefaults(changed);
 		name = String(fileName).replace(/\.dxf$/i, '') || String(fileName);
-		id = importProject(docFromDxfNet(r, name, defaults), true);
+		id = importProject(docFromDxfNet(r, name, defaults, crs), true);
 		if (!id) { applyUnitSelections(before); refreshMapStatus(); if (done) { done({ ok: false, error: 'storage' }); } return; }
 		loose = placeDxfCustomers(r.customers);
 		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }

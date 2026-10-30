@@ -105,6 +105,10 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
 - **Units are in the ATTDEF prompts** ("ELEVATION (FT)"): head, flow, diameter and length. Pressure and
   velocity are not in the file and follow the head unit. The symbols are the exporting page's language, so a
   unit this page cannot match keeps the strip as it was and the receipt names it.
+- **A coordinate system the read-me states** (`(EPSG:32610)`, written for a latitude-and-longitude project and
+  for a projected one) opens the import as a projected project in that system, so the network lands where it was;
+  a drawing whose read-me states none is a grid in the length unit. A code this page does not know is named and
+  the drawing opens as a grid.
 - **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives other than
   BASE (Task 721 owns them), Shape layers, entities of a kind not read, paper space, unknown attribute tags,
   non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
