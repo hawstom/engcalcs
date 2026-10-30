@@ -60,8 +60,11 @@ the block.
 ## 100 — Next.
 
 - 100|827| **Phones dock and autohide Properties by default; first-time view layout.** Tom, 2026-10-24: only Settings pinned, Properties/Libraries/Junctions autohidden (Properties unfurls itself), Scenario Manager and User Manual stay edge tabs; open them when the first project opens, not over the gallery. Water menu order Properties, Settings, Libraries to be discussed. Ida: `dev/agents/interface-designer/first-time-view-2026-10-24.md`.
+  **BUILT on `box-design`** (the first-view commits rode in with it); waits his pass on that branch.
 - 100|828| **One standard two-column style for every box's label and value rows.** Tom, 2026-10-24: *"all the other software I have seen uses clean columns like our Settings box instead of ragtag lines... We need a standard answer with standard styling so that tweaks apply across all these boxes."* Properties, Find and replace, Contour plot, Fire flow and Criticality first; Fire flow's is the best design so far. Input widths sized to their content (Km never wider than 00.00; Diameter, Roughness, Length, From, To, Date installed). WTG and EPANET truncate rather than wrap, and let the label and value columns be sized separately. Ida's design first: her hopper.
+  **BUILT on `box-design`**, round 4 2026-10-29: two columns at every width, phone included (Tom: no stacked layout). Waits his pass.
 - 100|829| **Every analysis box gets Download CSV, Copy HTML and Print report.** Tom, 2026-10-24, of Fire flow, Criticality, Demand scaling, Pump energy, Scenario comparison, Status changes and Calibration: *"Needs printout and/or Copy HTML."* Full report is the model. Scenario comparison's lone Copy and Download CSV become the same standard set.
+  **BUILT on `box-design`** (`1a1d219be`, one Download CSV, Copy HTML, Print report row on every report box). Waits his pass.
 
 ## 95 — Next, held behind fit and finish (temporary, Tom 2026-10-24).
 
@@ -330,6 +333,7 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 - 75|720| **Background layers from a GIS server.**
+  **BUILT 2026-10-29 on `feat/gis-background`** (XYZ, WMS, ArcGIS MapServer; stored in the project; asks before a reopened project reaches its servers; privacy.php paragraph). Rides on box-design; waits his pass and his word on the privacy text.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
@@ -342,6 +346,7 @@ the block.
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
+  **DXF import slice 1 BUILT 2026-10-29 on `feat/dxf-import`**: reads what our export writes, round trip on Net1-3 and a lat/lon project. Slice 2 (a stranger's drawing, the Interface Manager table) not started. Waits his pass.
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
   Tom, 2026-10-06: **DXF export first** (plain AutoCAD cannot read a shapefile); stable, venerable,
