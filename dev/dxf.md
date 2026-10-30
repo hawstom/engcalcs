@@ -83,9 +83,33 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 
 ## Not in this cut
 
-DXF import (the Interface Manager's other half); a layer-prefix control; overrides-only alternative
+a layer-prefix control; reading a stranger's drawing (slice 2 of the import: tag matching and the Interface Manager's editable translation table); overrides-only alternative
 layers (Task 721); the menu move to File > Export… (`feat/geojson`'s `exportMenuRows()`, which
 renames this row's key to `lpn_file_export_item_dxf` at its merge); XDATA.
+
+## Import (Task 772, slice 1)
+
+File > Import > Network > DXF file… reads **only what this export writes**, as a new project, with a receipt
+dialog like the `.inp` import's. Reader: `js/lpn-dxf-read.js` (pure), on the Shape import's first pass
+(`EngCalcs.lpnDxfRead` in `js/lpn-gisread.js`); page half: `landDxfNetwork()` in `js/looped-network.js`.
+Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-import-roundtrip-harness.js`
+(Net1, Net2, Net3 and a project with a pump, a PRV, a tank and customers: export .inp and DXF, import, export
+.inp again, compare).
+
+- **What is read:** layers `C-WATR-MODL-<ASSET>-BASE`; a link is its LWPOLYLINE, its ID and properties are
+  the block at the polyline's mid-run (matched by position); a node is its block; a customer is its block and
+  the two-point service line ending on it. A link's ends are the nodes at its end vertices, by exact position.
+- **Properties are found by the file's own block definitions** (the ATTDEFs run in the writer's fixed order), so
+  a drawing exported in another language reads in this one. Values are taken as typed, with their own
+  characters kept (`4530.` stays `4530.`); the DXF string escapes are undone.
+- **Units are in the ATTDEF prompts** ("ELEVATION (FT)"): head, flow, diameter and length. Pressure and
+  velocity are not in the file and follow the head unit. The symbols are the exporting page's language, so a
+  unit this page cannot match keeps the strip as it was and the receipt names it.
+- **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives other than
+  BASE (Task 721 owns them), Shape layers, entities of a kind not read, paper space, unknown attribute tags,
+  non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
+  what a DXF cannot hold (patterns, curves, controls, rules, times, options, head loss formula, pipe status,
+  minor loss, demand categories). A pump arrives with no curve and says so.
 
 ## Validation
 
