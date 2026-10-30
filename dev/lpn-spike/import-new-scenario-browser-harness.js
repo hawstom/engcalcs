@@ -299,7 +299,7 @@ async function main() {
 		};
 		const open = (await L('lpn_inpup_btn_scenario')).replace('{scenario}', 'Peak hour');
 		// With Basic mode off the open scenario then asks question 3 (which alternative); the default is answered here.
-		const answerAlt = async () => { const q = await a.dialog(); if (q && q.buttons.indexOf(await L('lpn_inpalt_go')) >= 0) { await a.dialogClick(await L('lpn_inpalt_go')); await a.settle(600); } };
+		const answerAlt = async () => { const q = await a.dialog(); if (q && q.buttons.indexOf(await L('lpn_library_import_go')) >= 0) { await a.dialogClick(await L('lpn_library_import_go')); await a.settle(600); } };
 		const countNodes = async () => (await state()).nodes.length;
 		const n0 = await countNodes();
 		await survey();
