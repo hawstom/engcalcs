@@ -50,9 +50,9 @@ and what else reaches us, and it gives the legal details the law requires.</p>
 		the random code; if you say no, they carry no identifier of any kind.</li>
 	<li>The web server keeps an ordinary access log, and that log does record IP addresses. The
 		access log and the usage counts are kept apart, and we never join them.</li>
-	<li>Four optional features on one page can fetch something from OpenStreetMap or Mapbox. The
-		street map shows on the first, empty project that page opens, and you can hide it. The other
-		three ask first.</li>
+	<li>Five optional features on one page make third-party requests: four to OpenStreetMap or
+		Mapbox, and one to a GIS server you name. The street map shows on the first, empty project that
+		page opens, and you can hide it. The other four ask first.</li>
 </ul>
 
 <h2>Who we are</h2>
