@@ -95,14 +95,20 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-10-29 evening (forty-eighth session, Opus main, Sonnet agents)
+
+- **Merged on green with this handoff:** `fix/manual-search-speed` (marks laid lazily, chapter on screen first; a heading that is its chapter's first hit gets no row; a heading repeated within a chapter shows its parent, "Fire flow analysis: Example on Net1").
+- **Waiting his browser pass (all on Branch previews):** `box-design` round 4 (8103; carries Tasks 827, 828, 829); `feat/report-widths` (8110; his "Merge" stands, same batch as box-design); `feat/starter-example` (8107; he OK'd all three round-3 items but gave no merge word); `feat/dxf-import` (8101, Task 772 slice 1); `feat/gis-background` (8105, Task 720, built on box-design).
+- **`fix/usage-report-wording`** (no port; spock.php): his Looking/Calculating/Uses (others) wording with three precision fixes; waits his word.
+- **Asked of him in messenger.md:** the GIS privacy paragraph; whether the DXF export should carry status, initial quality and the head loss formula; Properties covering 86% of a phone (why a Text under it cannot be tapped); whether the grey bar he saw was the bottom pane's 5-row tab strip; the random theme show design.
+- **Rebase chain:** report-widths and gis-background each merge box-design; after any box-design commit, merge it into both.
+- **Trap met:** a finished agent kept re-sending its hand-back on every background tick; TaskStop it once its tree is clean.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/ee9f2ae0-dd3a-4b13-9207-529e957c3a18/scratchpad (brief-*.md, perry/).
+
 ## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 
 - **Merged on green with this handoff:** `fix/manual-search` (User Manual: every hit marked, a chapter result opens on its first hit, heading hits indented under their chapter) and `chore/test-trim` (pass 3: four pixel/timing harnesses on demand via `dev/scripts/on_demand_harnesses.txt`, `run_harnesses.sh --all` runs them; the selftest and doc-bookkeeping check lines retired, scripts kept on disk and listed in `dev/automated-checks.md`; new ratchet `adhoc_style_check.php`, baseline 137 lines, 122 in looped-network.js). The four visitor-string checks (struck public claims, em dash, plain-English swaps, select/choose) stay live.
 - **Test-trim pass 2** (merge harness families: user-guide, pane, scenario, label) is approved by Tom and waits until `box-design` merges: box-design edits those same harnesses.
-- **`box-design` (8103)**: round 3 built (box width scales both columns in proportion; Text's words before Active; clicking any tick row's words ticks it). Phone layout per Ida (`dev/agents/interface-designer/phone-boxes-2026-10-29.md`: two columns, 1 px divider with 24 px touch area, stack below ~16rem) was being built at handoff; read `git log` there. Then his browser pass, PC and phone. Category heading bands: parked by Tom (*"Let's park that idea"*).
-- **`feat/report-widths` (Task 848)**: Tom said *"Very nice. Merge."* It is built on box-design (cherry-picking it alone onto master conflicts in CLAUDE.md, css, the storage inventory), so it merges in the same batch as box-design, after his box-design word.
-- **`feat/starter-example` (8107)**: round 3 built (Johnson City extension; Munday well and tank, the real town's spelling; elevated tank, floor 35.5 m above C-4; "modeled", Tom: American spelling is fine). Waits his pass. The translated descriptions still lead with the units sentence: next sprint.
-- **Tom asked whether A/B testing is worth it** (Task 824, measured numbers added there). Answered in messenger.md: not at this traffic, except perhaps one two-arm test on Manning Pipe Flow; any stored arm is a consent_body change.
 - **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
 - **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
 - **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.

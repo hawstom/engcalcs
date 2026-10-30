@@ -54781,40 +54781,91 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// text node; the term is never parsed as HTML. They are removed and rebuilt on every change of the
 	// query, so clearing the search leaves the guide's text as it was. A hit that spans two elements
 	// is found by the filter but not marked.
+	// The marks are laid lazily (Tom, 2026-10-29: typing Net1 stalled 5 to 6 seconds, because every
+	// keystroke marked every hit in every chapter). The list of chapters updates at once; the marks are
+	// queued per chapter, the chapter on screen first, and laid in slices of a few milliseconds so a
+	// keystroke is never kept waiting. A new query drops the queue. Opening a chapter marks it first.
+	var guideMarkGen = 0, guideMarkQueue = [], guideMarkQ = '', guideMarkTimer = null;
 	function guideClearHits() {
 		var c = guideContentEl(), parents = [];
+		clearTimeout(guideMarkTimer); guideMarkTimer = null; guideMarkQueue = [];
 		if (!c) { return; }
 		c.querySelectorAll('mark.lpn-guide-hit').forEach(function (m) {
 			var p = m.parentNode;
-			while (m.firstChild) { p.insertBefore(m.firstChild, m); }
-			p.removeChild(m);
+			p.replaceChild(document.createTextNode(m.textContent), m);
 			if (parents.indexOf(p) < 0) { parents.push(p); }
 		});
 		parents.forEach(function (p) { p.normalize(); });
 	}
-	function guideHighlight(q) {
-		var c = guideContentEl(), walker, nodes = [], n;
-		guideClearHits();
-		if (!c || !q) { return; }
-		walker = document.createTreeWalker(c, 4, null, false);
-		while ((n = walker.nextNode())) {
-			if (n.nodeValue && n.parentNode && !/^(SCRIPT|STYLE|TEXTAREA|INPUT|BUTTON|TEMPLATE|SELECT|OPTION)$/.test(n.parentNode.tagName) &&
-				guideVisible(n.parentNode)) { nodes.push(n); }
+	function guideMarkNode(node, q) {
+		var t = node.nodeValue, f = '', map = [], k, m, at, hits = [], i, mid, mk;
+		for (k = 0; k < t.length; k++) { var fc = guideFoldChar(t.charAt(k)); f += fc; for (m = 0; m < fc.length; m++) { map.push(k); } }
+		at = f.indexOf(q);
+		while (at >= 0) { hits.push(at); at = f.indexOf(q, at + q.length); }
+		for (i = hits.length - 1; i >= 0; i--) {
+			mid = node.splitText(map[hits[i]]);
+			mid.splitText(map[hits[i] + q.length - 1] + 1 - map[hits[i]]);
+			mk = document.createElement('mark');
+			mk.className = 'lpn-guide-hit';
+			mid.parentNode.insertBefore(mk, mid);
+			mk.appendChild(mid);
 		}
-		nodes.forEach(function (node) {
-			var t = node.nodeValue, f = '', map = [], k, m, at, hits = [], r, mk, i, fc;
-			for (k = 0; k < t.length; k++) { fc = guideFoldChar(t.charAt(k)); f += fc; for (m = 0; m < fc.length; m++) { map.push(k); } }
-			at = f.indexOf(q);
-			while (at >= 0) { hits.push(at); at = f.indexOf(q, at + q.length); }
-			for (i = hits.length - 1; i >= 0; i--) {
-				r = document.createRange();
-				r.setStart(node, map[hits[i]]);
-				r.setEnd(node, map[hits[i] + q.length - 1] + 1);
-				mk = document.createElement('mark');
-				mk.className = 'lpn-guide-hit';
-				r.surroundContents(mk);
+	}
+	function guideMarkEntry(en, budget) {
+		var t0 = performance.now();
+		while (en.nodes.length && (!budget || performance.now() - t0 < budget)) {
+			var n = en.nodes.shift();
+			if (n.parentNode) { guideMarkNode(n, guideMarkQ); }
+		}
+		return !en.nodes.length;
+	}
+	function guideMarkSection(sec) {
+		guideMarkQueue.forEach(function (en) { if (en.sec === sec) { guideMarkEntry(en, 0); } });
+		guideMarkQueue = guideMarkQueue.filter(function (en) { return en.nodes.length; });
+	}
+	function guideMarkTick(gen) {
+		var t0 = performance.now(), en;
+		guideMarkTimer = null;
+		if (gen !== guideMarkGen) { return; }
+		while (guideMarkQueue.length && performance.now() - t0 < 12) {
+			en = guideMarkQueue[0];
+			if (guideMarkEntry(en, 12)) { guideMarkQueue.shift(); }
+		}
+		if (guideMarkQueue.length) { guideMarkTimer = setTimeout(function () { guideMarkTick(gen); }, 0); }
+	}
+	function guideTextNodes(sec) {
+		var walker = document.createTreeWalker(sec, 4, null, false), n, out = [], seen = [], ok = [], j;
+		while ((n = walker.nextNode())) {
+			var pe = n.parentNode;
+			if (!n.nodeValue || !pe) { continue; }
+			j = seen.indexOf(pe);
+			if (j < 0) {
+				seen.push(pe);
+				ok.push(!/^(SCRIPT|STYLE|TEXTAREA|INPUT|BUTTON|TEMPLATE|SELECT|OPTION)$/.test(pe.tagName) && guideVisible(pe));
+				j = seen.length - 1;
 			}
-		});
+			if (ok[j]) { out.push(n); }
+		}
+		return out;
+	}
+	function guideHighlight(q) {
+		var c = guideContentEl(), secs, top, first = 0, i;
+		guideClearHits();
+		guideMarkGen++;
+		guideMarkQ = q;
+		if (!c || !q) { return; }
+		secs = Array.prototype.slice.call(c.querySelectorAll('.lpn-guide-section')).filter(function (s) { return s.style.display !== 'none'; });
+		top = c.getBoundingClientRect().top;
+		for (i = 0; i < secs.length; i++) { if (secs[i].getBoundingClientRect().bottom > top + 1) { first = i; break; } }
+		secs = secs.slice(first).concat(secs.slice(0, first));
+		guideMarkQueue = secs.map(function (s) { return { sec: s, nodes: guideTextNodes(s) }; });
+		guideMarkTimer = setTimeout((function (g) { return function () { guideMarkTick(g); }; })(guideMarkGen), 0);
+	}
+	// The first text in a chapter that holds the term, or null: where "open the chapter" lands.
+	function guideFirstHitNode(sec, q) {
+		var nodes = guideTextNodes(sec), i;
+		for (i = 0; i < nodes.length; i++) { if (guideFold(nodes[i].nodeValue).indexOf(q) >= 0) { return nodes[i]; } }
+		return null;
 	}
 	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
 	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
@@ -54967,7 +55018,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A heading that holds the term (a term in a list, a sub-heading) is a result of its own, listed
 		// as an indented row directly under its chapter. A chapter with such a heading ranks ahead of
 		// one that only mentions the term in its body text; otherwise the order is the guide's.
-		var hitsOf = [], hn = 0, secs = Array.prototype.slice.call(box.querySelectorAll('.lpn-guide-section'));
+		var hitsOf = [], rankedFirst = [], hn = 0, secs = Array.prototype.slice.call(box.querySelectorAll('.lpn-guide-section'));
+		box.querySelectorAll('[data-guide-hit]').forEach(function (h) { h.removeAttribute('data-guide-hit'); });
 		secs.forEach(function (sec, i) {
 			hitsOf[i] = [];
 			if (!q || sec.style.display === 'none') { return; }
@@ -54978,9 +55030,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				h.setAttribute('data-guide-hit', 'hit-' + hn);
 				hitsOf[i].push({ key: 'hit-' + hn, text: String(h.textContent || '').replace(/\s+/g, ' ').trim() });
 			});
+			// A heading that is the chapter's first hit takes the reader nowhere the chapter row does not
+			// (the chapter row opens on its first hit), so it gets no row of its own.
+			rankedFirst[i] = hitsOf[i].length > 0;
+			if (hitsOf[i].length) {
+				var fh = guideFirstHitNode(sec, q), hd = fh && fh.parentNode;
+				while (hd && hd !== sec && !(hd.getAttribute && hd.getAttribute('data-guide-hit'))) { hd = hd.parentNode; }
+				if (hd && hd !== sec && hd.getAttribute) {
+					hitsOf[i] = hitsOf[i].filter(function (x) { return x.key !== hd.getAttribute('data-guide-hit'); });
+					hd.removeAttribute('data-guide-hit');
+				}
+			}
 		});
-		secs = secs.map(function (sec, i) { return { sec: sec, hits: hitsOf[i], i: i }; });
-		if (q) { secs.sort(function (x, y) { return (y.hits.length ? 1 : 0) - (x.hits.length ? 1 : 0) || x.i - y.i; }); }
+		// A heading row whose text is repeated within its chapter names the heading it sits under
+		// ("Fire flow analysis: Example on Net1"), so the rows say where they go.
+		hitsOf.forEach(function (list, i) {
+			list.forEach(function (ht) {
+				var el = secs[i].querySelector('[data-guide-hit="' + ht.key + '"]'), en = el && el.closest ? el.closest('.lpn-guide-boxentry, .lpn-guide-menu') : null,
+					ph = en && en.querySelector('h3, h4');
+				ht.parent = ph && ph !== el ? String(ph.textContent || '').replace(/\s+/g, ' ').trim() : '';
+			});
+			list.forEach(function (ht) {
+				var dup = list.filter(function (o) { return o.text === ht.text; }).length > 1;
+				if (dup && ht.parent) { ht.text = ht.parent + ': ' + ht.text; }
+			});
+		});
+		secs = secs.map(function (sec, i) { return { sec: sec, hits: hitsOf[i], i: i, ranked: !!rankedFirst[i] }; });
+		if (q) { secs.sort(function (x, y) { return (y.ranked ? 1 : 0) - (x.ranked ? 1 : 0) || x.i - y.i; }); }
 		secs.forEach(function (rec) {
 			var sec = rec.sec, h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
 			if (!h || sec.style.display === 'none') { return; }
@@ -55062,6 +55138,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!el || el.style.display === 'none') { return false; }
 		// With a search active, a chapter opens on its first marked hit, and a heading result on that heading.
 		content.querySelectorAll('mark.lpn-guide-hit-current').forEach(function (m) { m.classList.remove('lpn-guide-hit-current'); });
+		if (!isHit && guideMarkQ) { var msec = el.closest ? el.closest('.lpn-guide-section') : null; if (msec) { guideMarkSection(msec); } }
 		if (!isHit && content.querySelector('mark.lpn-guide-hit')) {
 			mark = el.querySelector('mark.lpn-guide-hit');
 			if (mark) { mark.classList.add('lpn-guide-hit-current'); }

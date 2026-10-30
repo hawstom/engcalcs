@@ -60,23 +60,11 @@ the block.
 ## 100 — Next.
 
 - 100|827| **Phones dock and autohide Properties by default; first-time view layout.** Tom, 2026-10-24: only Settings pinned, Properties/Libraries/Junctions autohidden (Properties unfurls itself), Scenario Manager and User Manual stay edge tabs; open them when the first project opens, not over the gallery. Water menu order Properties, Settings, Libraries to be discussed. Ida: `dev/agents/interface-designer/first-time-view-2026-10-24.md`.
+  **BUILT on `box-design`** (the first-view commits rode in with it); waits his pass on that branch.
 - 100|828| **One standard two-column style for every box's label and value rows.** Tom, 2026-10-24: *"all the other software I have seen uses clean columns like our Settings box instead of ragtag lines... We need a standard answer with standard styling so that tweaks apply across all these boxes."* Properties, Find and replace, Contour plot, Fire flow and Criticality first; Fire flow's is the best design so far. Input widths sized to their content (Km never wider than 00.00; Diameter, Roughness, Length, From, To, Date installed). WTG and EPANET truncate rather than wrap, and let the label and value columns be sized separately. Ida's design first: her hopper.
+  **BUILT on `box-design`**, round 4 2026-10-29: two columns at every width, phone included (Tom: no stacked layout). Waits his pass.
 - 100|829| **Every analysis box gets Download CSV, Copy HTML and Print report.** Tom, 2026-10-24, of Fire flow, Criticality, Demand scaling, Pump energy, Scenario comparison, Status changes and Calibration: *"Needs printout and/or Copy HTML."* Full report is the model. Scenario comparison's lone Copy and Download CSV become the same standard set.
-- 100|833| **First open after Fresh: no docks, and Net3 freezes for 20 s.** Tom, 2026-10-27, on `fix/phone-select`: Fresh, Start here, *"Nothing is docked at all"*; Fresh then Net3 US, *"a 20-second delay"*, once with Chrome's unresponsive-page message. Being measured on `fix/fresh-freeze`.
-- 100|834| **Every box docked and auto-hidden on first view; a pinned box keeps its tab.** Tom, 2026-10-27, reversing Settings pinned: *"I think all will be better docked and unpinned."* Of a pinned box's tab vanishing: *"I find it disorienting to have the tab gone."* Pinning Properties at first view is his call once 833 is fixed.
-- 100|835| **Settings on a phone: a top menu for its sections, narrower columns.** Tom, 2026-10-27: Settings is too narrow on a phone; a collapsible nav at the top (hamburger?) in place of the side headings; rotated label column headings?; Show and Drop order inputs still too wide; the overrides margin has gratuitous space after its orange dots (PC too). Ida: `dev/agents/interface-designer/settings-phone-and-cells-2026-10-27.md`.
-- 100|836| **Morph to vertex in a scenario refuses instead of asking.** Tom, 2026-10-27, Net3 with a scenario open: *"I got a messenger instead of an alert."*
-- 100|837| **Spreadsheet cells: the input is the cell, and toggles follow 2026 practice.** Tom, 2026-10-27, of `feat/box-rows-properties`: *"Make the input identical with the table cell like a real spreadsheet"*; toggles: *"WTG converted them to Yes/No selectors, but toggles are faster."* Ida's file as in 835.
-- 100|838| **"Edit curves…" as the last option of every curve selector.** Tom, 2026-10-27: Curves links *"should follow the new convention"* of Edit types… and Edit fittings….
-- 100|839| **Ida's short Properties labels, each with a tip that expands it.** Tom, 2026-10-27, approving all of `dev/agents/interface-designer/label-study-2026-10-26.md` (Minor loss, k; Bulk reaction; Wall reaction; Reaction; Maximum/Minimum/Initial depth; Active; Type; Check valve) *"as long as there are tips, possibly ? glyphs, for every short label."*
-- 100|840| **Report cells that mix a value, place and time become columns.** Tom, 2026-10-27, of Criticality's "97.01 psi at 4:00", Scenario comparison's "108 psi at N32, 14:00", Fire flow's "N40 drops to 5.68 psi": split into columns under a compound heading (Lowest pressure over Junc. | Press. (psi) | Time (hr)), *"a cleaner data table."*
-- 100|841| **Cap label stations so a stale map scale cannot freeze the page.** `fix/fresh-freeze` found `linkLabelStations` laying about a million positions on one Net3 pipe when labels ran before the view was fitted (a 4 s freeze, 14 s at 4x CPU). The order is fixed there; nothing yet stops another path doing the same.
-- 100|842| **One spreadsheet style for every box's rows, no first-column heading.** Tom, 2026-10-27 night, of Properties: *"Make this a standard style and apply it to Find and Replace, Contour Plot, Fire flow analysis, Criticality analysis, and Demand analysis."* Heading: *"Property, Label, or none (my preference)"*: none. Building on `fix/box-style`.
-- 100|843| **Pull-down options readable in Dark mode, by one global style.** Tom, 2026-10-27 night: *"The invisibility in Dark mode bug hit again for all selectors. Be sure to use global styles to avoid isolated hacks that cause regressions. DRY."* `fix/box-style`.
-- 100|844| **Settings: 618 px, the tick tight on its own row, the phone bar as heading.** Tom, 2026-10-27 night: 672 px could be 618; the label-row gaps *"seem backwards"*; on a phone the section bar and heading are redundant, *"wondering if it can function as the heading."* `fix/settings-fit`.
-- 100|845| **Report tables: economical width, adjustable columns, "And others", "Time (hr)".** Tom, 2026-10-27 night: split columns *"if not applied with aggressive economy, can result in more wasted width"*; debug what made them wider; his Google Doc paste set every cell bold. Rotated headings for narrow columns on long tables: his ideal, not yet built. `fix/report-width`.
-- 100|846| **The Basic mode toggle stays in the Scenario manager when Basic is off.** Tom, 2026-10-27 night: *"it probably should be persistent across modes instead of disappearing in Basic-off mode."* `fix/box-words`, with Tables headings following the short Properties names (*"we need to police everything like this"*), Morph-to-vertex offering Base, and "Asset type".
-- 75|847| **The built-in solver leaves flow circulating in a loop with no demand.** Perry, 2026-10-27, on the starter extension's Static scenario: 3.18 gpm round a closed loop with zero demand (EPANET 0.07 gpm). Likely a convergence tolerance; a loop with no source or sink must carry zero.
+  **BUILT on `box-design`** (`1a1d219be`, one Download CSV, Copy HTML, Print report row on every report box). Waits his pass.
 
 ## 95 — Next, held behind fit and finish (temporary, Tom 2026-10-24).
 
@@ -345,6 +333,7 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 - 75|720| **Background layers from a GIS server.**
+  **BUILT 2026-10-29 on `feat/gis-background`** (XYZ, WMS, ArcGIS MapServer; stored in the project; asks before a reopened project reaches its servers; privacy.php paragraph). Rides on box-design; waits his pass and his word on the privacy text.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
@@ -357,6 +346,7 @@ the block.
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
+  **DXF import slice 1 BUILT 2026-10-29 on `feat/dxf-import`**: reads what our export writes, round trip on Net1-3 and a lat/lon project. Slice 2 (a stranger's drawing, the Interface Manager table) not started. Waits his pass.
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
   Tom, 2026-10-06: **DXF export first** (plain AutoCAD cannot read a shapefile); stable, venerable,
