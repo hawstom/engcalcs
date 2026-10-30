@@ -119,9 +119,10 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
   page's own export of a scenario has only that scenario's layers), with a line saying which was read. Layers of any
   other alternative are named and not read (Task 721 owns reading several).
 - **The .inp sections a block cannot hold ride in the drawing as text** (Tom, 2026-10-30: asked whether to
-  hide them, *"Why hidden? User can freeze."*): MTEXT on the ordinary, visible layer `C-WATR-EPANET-INP`
-  (white, not plotted, outside the model prefix), to the right of the network, pieces of at most 2000 characters
-  in columns, each led by a marker line `;EPANET-INP PART n OF m` so the import puts them in order whatever order
+  hide them, *"Why hidden? User can freeze."*): MTEXT on the ordinary, visible layer `C-WATR-MODL-EPAN`
+  (white, not plotted, outside the model prefix), to the right of the network and of the read-me's real width, pieces of at most 2000 characters
+  and no more lines than the network is tall, in one row of columns (so the block is about as tall as the network and
+  zoom-extents keeps the network in view), each led by a marker line `;EPANET-INP PART n OF m` so the import puts them in order whatever order
   a CAD program writes them in. The text is the .inp export's own sections for the scenario on screen, as typed,
   not capitalized: PATTERNS, CURVES, CONTROLS, RULES, TIMES, OPTIONS (a scenario's Demand Multiplier among them),
   ENERGY, REACTIONS, QUALITY, SOURCES, MIXING, REPORT, DEMANDS (several categories; customers excluded, the import

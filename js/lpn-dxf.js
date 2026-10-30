@@ -72,7 +72,7 @@
 	// **THE .INP SECTIONS A BLOCK ATTRIBUTE CANNOT CARRY** (patterns, controls, rules, times, options...)
 	// ride as MTEXT on this ordinary, visible layer, outside the model prefix so an import never
 	// reads them as an asset (Tom, 2026-10-30: *"Why hidden? User can freeze."*). Not plotted.
-	var SECTIONS_LAYER = 'C-WATR-EPANET-INP';
+	var SECTIONS_LAYER = 'C-WATR-MODL-EPAN';
 	var SECTIONS_MARK = 'EPANET-INP';
 	var SECTIONS_PIECE = 2000;    // escaped characters in one MTEXT, under the Reference's 2049
 	/**
@@ -256,23 +256,25 @@
 		// The read-me's top-left corner sits above the top-left of the network, 3 units up and clear
 		// of its own height: a line of MTEXT is 5/3 of the text height from the next (the Reference's
 		// default line spacing factor of 1).
+		var netH = Math.max(ext.y1 - ext.y0, 1), netTop = ext.y1, readmeW = 0;
+		readme.forEach(function (ln) { readmeW = Math.max(readmeW, ln.length); });
 		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + (5 / 3) * readme.length };
 		if (readme.length) { grow(readmeAt.x, readmeAt.y); }
-		// The embedded text sits to the right of the network, clear of it: columns of pieces, eight
-		// to a row, rows going down from the top of the network. A character is about 0.9 wide at
-		// text height 1, so a column is as wide as its longest line.
-		var pieces = sectionPieces(model.sections), secAt = [];
+		var netRight = ext.x1, readmeRight = readme.length ? readmeAt.x + readmeW * 0.9 : ext.x1;
+		// The embedded text sits to the right of the network AND of the read-me's real width (its
+		// longest line at text height 1, about 0.9 per character), in one row of columns whose height
+		// stays near the network's: each piece holds about 1.8 times as many lines as the network is tall (at least 24), so the
+		// block does not make zoom-extents shrink the network into a corner.
+		var perPiece = Math.max(24, Math.floor(1.8 * netH / (5 / 3))), pieces = sectionPieces(model.sections, perPiece), secAt = [];
 		if (pieces.length) {
-			var colW = 0, rowH = 0, per = 8, n0;
+			var cx = Math.max(netRight, readmeRight) + 10;
 			pieces.forEach(function (pc) {
-				pc.lines.forEach(function (ln) { colW = Math.max(colW, ln.length); });
-				rowH = Math.max(rowH, pc.lines.length);
-			});
-			colW = colW * 0.9 + 4; rowH = rowH * (5 / 3) + 3;
-			pieces.forEach(function (pc, k) {
-				n0 = { x: ext.x1 + 10 + (k % per) * colW, y: ext.y1 - Math.floor(k / per) * rowH };
-				secAt.push(n0);
-				grow(n0.x + colW, n0.y - rowH);
+				var w = 0;
+				pc.lines.forEach(function (ln) { w = Math.max(w, ln.length); });
+				w = w * 0.9 + 4;
+				secAt.push({ x: cx, y: netTop });
+				cx += w;
+				grow(cx, netTop - pc.lines.length * (5 / 3));
 			});
 		}
 		ext.x0 -= 2; ext.y0 -= 2; ext.x1 += 2; ext.y1 += 2;
@@ -383,8 +385,8 @@
 		// where it can, each led by a marker line that gives its place (`;EPANET-INP PART 2 OF 5`), so an
 		// import puts them back in order whatever order a CAD program writes them in. A piece is joined
 		// to the one before it by plain concatenation, so a line longer than a piece may be cut inside.
-		function sectionPieces(text) {
-			var t = String(text === undefined || text === null ? '' : text).replace(/\r\n?/g, '\n'), out = [], rest = t, mark = 40, take, j, cut;
+		function sectionPieces(text, maxLines) {
+			var t = String(text === undefined || text === null ? '' : text).replace(/\r\n?/g, '\n'), out = [], rest = t, mark = 40, take, j, k, cut;
 			if (!t) { return out; }
 			function escLen(v) {
 				return v.split('\n').map(function (ln) { return mtextParts(ln).reduce(function (a, q) { return a + q.length; }, 0); })
@@ -394,7 +396,11 @@
 				take = Math.min(rest.length, SECTIONS_PIECE);
 				while (take > 1 && escLen(rest.slice(0, take)) > SECTIONS_PIECE - mark) { take = Math.floor(take * 0.9); }
 				cut = rest.slice(0, take);
-				if (take < rest.length) {
+				// no more lines than the caller allows (the marker line is one of them)
+				j = -1;
+				for (k = 0; k < (maxLines || 1e9) - 1; k++) { j = rest.indexOf('\n', j + 1); if (j < 0) { break; } }
+				if (j >= 0 && j + 1 < take) { take = j + 1; cut = rest.slice(0, take); }
+				if (take < rest.length && cut.charAt(cut.length - 1) !== '\n') {
 					j = cut.lastIndexOf('\n');
 					if (j > 0) { take = j + 1; cut = rest.slice(0, take); }
 				}

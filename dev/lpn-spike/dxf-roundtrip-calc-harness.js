@@ -7,7 +7,7 @@
 // Net2 and Net3, a Darcy-Weisbach project, a project with a closed pipe and a closed pump, and a
 // scenario that is not Base: open it, let it solve, export the DXF, import the DXF as a new project,
 // let that solve, and compare every head and every flow. Round 3 (Tom, 2026-10-30): the patterns,
-// controls, rules, clock, options and the rest ride in the DXF as text on the layer C-WATR-EPANET-INP
+// controls, rules, clock, options and the rest ride in the DXF as text on the layer C-WATR-MODL-EPAN
 // ("Why hidden? User can freeze."), so NOTHING is taken away first. Net2 and Net3 are also run through
 // the EPANET engine over time and compared at several time steps, and a scenario's demand multiplier
 // (1.5, Max day) comes back in [OPTIONS].
@@ -171,7 +171,7 @@ async function runCase(browser, c) {
 		ok(label + ': the receipt lists only custom properties and map Text as not carried (no patterns, curves, controls, options)', !!held && /custom properties/.test(held.text) && !/patterns|curves|controls|calculation settings/.test(held.text), held && held.text);
 		const sr = imp.items.find((i) => i.code === 'sections-read');
 		ok(label + ': the receipt says the embedded EPANET sections were read, naming OPTIONS', !!sr && /OPTIONS/.test(sr.text), sr && sr.text);
-		ok(label + ': the file has the embedded layer C-WATR-EPANET-INP, visible (not frozen), with the text in MTEXT', /\n\s*8\r?\nC-WATR-EPANET-INP\r?\n/.test(txt) && /\n\s*2\r?\nC-WATR-EPANET-INP\r?\n\s*70\r?\n\s*0\r?\n/.test(txt) && /\[OPTIONS\]/.test(txt.replace(/\\P/g, '\n')));
+		ok(label + ': the file has the embedded layer C-WATR-MODL-EPAN, visible (not frozen), with the text in MTEXT', /\n\s*8\r?\nC-WATR-MODL-EPAN\r?\n/.test(txt) && /\n\s*2\r?\nC-WATR-MODL-EPAN\r?\n\s*70\r?\n\s*0\r?\n/.test(txt) && /\[OPTIONS\]/.test(txt.replace(/\\P/g, '\n')));
 	}
 	if (c.scenario) {
 		const alt = imp.items.find((i) => i.code === 'alt-read');

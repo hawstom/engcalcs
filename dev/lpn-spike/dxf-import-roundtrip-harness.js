@@ -12,7 +12,7 @@
 // and every property the DXF carries must come back in the characters it was written in. What the
 // DXF cannot carry (custom properties, map Text) must be LISTED by the receipt, never
 // dropped in silence, and the harness asserts the receipt says so. The patterns, curves, controls and
-// options ride in the file as text on C-WATR-EPANET-INP (dxf-roundtrip-calc-harness.js proves them).
+// options ride in the file as text on C-WATR-MODL-EPAN (dxf-roundtrip-calc-harness.js proves them).
 //
 // Also: one foreign layer and one unknown attribute tag produce exactly those two lines (besides the
 // receipt's standing "not held" line); an alternative other than BASE is reported and not read; a

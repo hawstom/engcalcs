@@ -201,7 +201,7 @@ function specChecks(d, label) {
 	const layers = tables.filter(e => e.type === 'LAYER');
 	const names = layers.map(e => g(e, 2));
 	ok(label + ': every layer but 0 is C-WATR-MODL-XXXX-ALT, the read-me layer or the embedded-sections layer',
-		names.every(n => n === '0' || n === 'C-WATR-RDME' || n === 'C-WATR-EPANET-INP' || /^C-WATR-MODL-[A-Z0-9_]{4}-[A-Z0-9_]+$/.test(n)), names.join(' '));
+		names.every(n => n === '0' || n === 'C-WATR-RDME' || n === 'C-WATR-MODL-EPAN' || /^C-WATR-MODL-[A-Z0-9_]{4}-[A-Z0-9_]+$/.test(n)), names.join(' '));
 	const rd = layers.find(e => g(e, 2) === 'C-WATR-RDME');
 	ok(label + ': the read-me layer is white (62 = 7) and does not plot (290 = 0)', rd && g(rd, 62).trim() === '7' && g(rd, 290).trim() === '0');
 	const brNames = tables.filter(e => e.type === 'BLOCK_RECORD').map(e => g(e, 2)).filter(n => n[0] !== '*');
@@ -227,7 +227,24 @@ function specChecks(d, label) {
 		!d.pairs.some(p => /arial/i.test(p[1] || '')), styles.map(s => g(s, 2) + '/' + g(s, 3)).join(','));
 	const mts = ents.filter(e => e.type === 'MTEXT' && g(e, 8) === 'C-WATR-RDME'), mt = mts[0];
 	{
-		const sl = layers.find(e => g(e, 2) === 'C-WATR-EPANET-INP'), sm = ents.filter(e => e.type === 'MTEXT' && g(e, 8) === 'C-WATR-EPANET-INP');
+		const sl = layers.find(e => g(e, 2) === 'C-WATR-MODL-EPAN'), sm = ents.filter(e => e.type === 'MTEXT' && g(e, 8) === 'C-WATR-MODL-EPAN');
+		// LAYOUT (Perry, round 3): the embedded columns clear the network and the read-me's real extent, and the block is no taller than ~2x the network.
+		{
+			const lines = (e) => gAll(e, 3).concat(gAll(e, 1)).join('').split('\\P');
+			const box = (e) => { const L = lines(e), x = +g(e, 10), y = +g(e, 20); return { x0: x, x1: x + 0.8 * Math.max.apply(null, L.map((q) => q.length)), y1: y, y0: y - (5 / 3) * L.length }; };
+			const pts = [];
+			ents.forEach((e) => { if (e.type === 'INSERT') { pts.push([+g(e, 10), +g(e, 20)]); } });
+			const ls = ents.filter((e) => e.type === 'LWPOLYLINE');
+			ls.forEach((e) => { const xs = gAll(e, 10), ys = gAll(e, 20); xs.forEach((x, i) => pts.push([+x, +ys[i]])); });
+			const net = { x0: Math.min.apply(null, pts.map((p) => p[0])), x1: Math.max.apply(null, pts.map((p) => p[0])), y0: Math.min.apply(null, pts.map((p) => p[1])), y1: Math.max.apply(null, pts.map((p) => p[1])) };
+			const rb = box(mts[0]), boxes = sm.map(box);
+			const hit = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+			const hits = (t) => boxes.filter((b) => hit(b, t)).length;
+			const all = { x0: Math.min.apply(null, boxes.map((b) => b.x0)), x1: Math.max.apply(null, boxes.map((b) => b.x1)), y0: Math.min.apply(null, boxes.map((b) => b.y0)), y1: Math.max.apply(null, boxes.map((b) => b.y1)) };
+			const netH = Math.max(net.y1 - net.y0, 1);
+			ok(label + ': no embedded column overlaps the read-me (' + hits(rb) + ') or the network (' + hits(net) + ')', hits(rb) === 0 && hits(net) === 0);
+			ok(label + ': the embedded block is at most 2x the network\'s height (' + (all.y1 - all.y0).toFixed(1) + ' against ' + netH.toFixed(1) + ')', all.y1 - all.y0 <= 2 * netH + 12, String(all.y1 - all.y0));
+		}
 		ok(label + ': the embedded .inp sections are MTEXT on an ordinary visible layer (not frozen, white, not plotted), led by a part marker', !!sl && (+g(sl, 70) & 1) === 0 && g(sl, 62).trim() === '7' && g(sl, 290).trim() === '0' && sm.length >= 1 && /^;EPANET-INP PART 1 OF \d+/.test(gAll(sm[0], 3).concat(gAll(sm[0], 1)).join('')), String(sm.length));
 	}
 	const readme = mt ? gAll(mt, 3).concat(gAll(mt, 1)).join('').split('\\P') : [];
@@ -463,6 +480,16 @@ async function main() {
 		ok('no string in the file is longer than 2049 characters',
 			readDxf(out.text).pairs.every(p => p[1] === undefined || p[1].length <= 2049));
 		delete n._tag; delete n._desc;
+	}
+
+	for (const ex of ['Net2', 'Net3']) {
+		console.log('--- ' + ex + ': layout of the embedded text ---');
+		openExample(ex + '.lwn');
+		const o = await exportNow();
+		ok(ex + ' exports', o && o.ok);
+		fs.writeFileSync(path.join(tmp, ex + '.dxf'), Buffer.from(global.EngCalcs.lpnDxfBytes(o.text)));
+		if (process.env.EC_DXF_COPY_DIR) { fs.writeFileSync(path.join(process.env.EC_DXF_COPY_DIR, ex + '.dxf'), Buffer.from(global.EngCalcs.lpnDxfBytes(o.text))); }
+		specChecks(readDxf(o.text), ex);
 	}
 
 	console.log('--- Net3-Novato-CA-World: latitude and longitude, to UTM ---');
