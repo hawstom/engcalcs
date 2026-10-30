@@ -4,7 +4,7 @@
 //   2. the divider is a gridline, not a bar: no painted width over 2 px, a hit area of at least 24 px;
 //   3. the hit area never lies over label text, and a tap on it passes through to the cell under it;
 //   4. a finger drag on it moves the Label column;
-//   5. the stacked layout (name above value) appears only when the box is narrower than 16 rem;
+//   5. the box is never stacked (Tom, 2026-10-29): two columns at 300 px and at 200 px;
 //   6. the pane splitters are a 1 px line with a 24 px hit area (no gray bar).
 // EC_SHOTS=<dir> saves box-design-phone-props.png and box-design-phone-settings.png there.
 //
@@ -126,7 +126,7 @@ async function main() {
 		const s2 = await sp();
 		ok('the hit area still lies clear of label text after the drag', !!s2 && s2.overlap === 0, String(s2 && s2.overlap));
 
-		console.log('\n--- 5. stacked only under 16 rem ---');
+		console.log('\n--- 5. never stacked ---');
 		const stackState = (wpx) => P.evaluate((w) => {
 			document.getElementById('lpn_popup').style.minWidth = '0'; document.getElementById('lpn_popup').style.width = w + 'px';
 			return new Promise((res) => setTimeout(() => {
@@ -138,7 +138,7 @@ async function main() {
 		const st300 = await stackState(300);
 		ok('at 300 px (18.75 rem) the box is still two columns', !st300.stacked, JSON.stringify(st300));
 		const st200 = await stackState(200);
-		ok('at 200 px (12.5 rem) the name stands above its value', st200.stacked, JSON.stringify(st200));
+		ok('at 200 px (12.5 rem) it is still two columns (Tom rejects the stacked layout)', !st200.stacked, JSON.stringify(st200));
 		await P.evaluate(() => { document.getElementById('lpn_popup').style.width = ''; });
 
 		console.log('\n--- 6. the pane splitters ---');
