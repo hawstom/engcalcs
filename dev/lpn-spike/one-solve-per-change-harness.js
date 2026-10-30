@@ -209,7 +209,7 @@ async function change(L, value) {
 
 	// ---- 5. A STEADY-ONLY PROJECT ---------------------------------------------------------------
 	console.log('\n--- 5. a project with no clock: still one steady solve ---');
-	const basic = await openPage('examples/Basic-example-US-units.lwn');
+	const basic = await openPage('dev/lpn-spike/fixtures/Basic-example-US-units.lwn');
 	ok('the Basic example states no duration', !EC.lpnTimeIsExtended(basic.getDoc().times));
 	const st = await change(basic, 'age');
 	ok('a change applies exactly ONE result, and it is the steady solve',

@@ -51,8 +51,16 @@ function ok(name, cond, extra) {
 
 async function openExample(browser, Session, match) {
 	const a = await Session.open(browser, 'zoomsel');
+	// No published XY example has a pipe with vertices now, so the XY section is handed the Basic-network fixture in place of the Net1 card's file.
 	await a.goto('Looped-Network.php?ec_nolog=1');
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	if (/Net1/.test(match)) {
+		const body = require('fs').readFileSync(path.join(__dirname, 'fixtures', 'Basic-example-US-units.lwn'), 'utf8');
+		await a.page.evaluate((text) => {
+			const real = window.fetch;
+			window.fetch = function (url, opts) { return /examples\/Net1-Scenarios\.lwn/.test(String(url)) ? Promise.resolve(new Response(text, { status: 200 })) : real.call(window, url, opts); };
+		}, body);
+	}
 	await a.menuClick(await a.lang('lpn_examples_menu'), 'file');
 	await a.settle(600);
 	await a.page.waitForSelector('button.lpn-example-card', { timeout: 30000 });
@@ -216,12 +224,12 @@ async function main() {
 	try {
 		const probe = await Session.open(browser, 'titles');
 		await probe.goto('Looped-Network.php?ec_nolog=1');
-		const xyTitle = await probe.lang('lpn_ex_basic_us_title');
+		const xyTitle = await probe.lang('lpn_ex_net1_title');
 		const geoTitle = await probe.lang('lpn_ex_net3_title');
 		await probe.close();
 		// The XY example has pipes with two vertices (the first segment of one is clicked). No shipped
 		// geographic example has a vertex, so there the pipe is a two-point one.
-		await section(browser, Session, 'XY project (Basic network, gpm)', xyTitle, 8);
+		await section(browser, Session, 'XY project (Net1, gpm)', xyTitle, 8);
 		await section(browser, Session, 'geographic project (EPANET Net3, Novato)', geoTitle, 4);
 	} finally {
 		await browser.close();

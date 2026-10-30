@@ -1040,7 +1040,12 @@ function ecLogBucketSuffix($withCode = true) {
     // writer that writes a said-yes row carries it without a second call to forget. A said-yes
     // browser whose code is not made yet writes the row without one; it still counts as a use.
     $code = $withCode ? ecCountCode() : '';
-    return ($code !== '' ? "\t" . $code : '') . "\tvisitor";
+    // The 'every' marker (Tom, 2026-10-29: "A use is a use") sits before the code and says this row
+    // was written by a request that is never de-duplicated. Rows without it were de-duplicated per
+    // (visit, page), so the report finds its cutover in the data: the first marked row.
+    // A tester row (no code asked for) is not a counted row and carries no marker.
+    $mark = $withCode ? "\tevery" : '';
+    return $mark . ($code !== '' ? "\t" . $code : '') . "\tvisitor";
 }
 
 // A visitor who has withdrawn consent, or refused it, must not keep carrying the storage it

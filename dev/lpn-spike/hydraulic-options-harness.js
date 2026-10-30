@@ -555,7 +555,7 @@ function optModel(hyd) {
 	// silently regenerated without this would be the gap reopening exactly as it did before.
 	console.log('\n--- and the shipped gallery states its own source\'s options ---');
 	{
-		const shipped = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8'));
+		const shipped = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
 		const hyd = (shipped.settings || {}).hydraulics || {};
 		const want = {
 			specificGravity: 1, viscosity: 1, trials: 40, accuracy: 0.001, checkFreq: 2,

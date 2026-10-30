@@ -54,7 +54,7 @@ function ok(name, cond, extra) {
 
 function open(file, unitSet) {
 	setUnitSet(unitSet);
-	L.applySaved(L.migrateSaved(JSON.parse(fs.readFileSync(ROOT + (/^Net[23]\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'))));
+	L.applySaved(L.migrateSaved(JSON.parse(fs.readFileSync(ROOT + (/^Basic-/.test(file) ? 'dev/lpn-spike/fixtures/' : /^Net[123]\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'))));
 }
 
 // The absolute floor is in the run's own SI units: 1e-6 m3/s is 0.016 gpm, 1e-6 m/s a micron a
