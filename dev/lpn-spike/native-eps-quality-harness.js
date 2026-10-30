@@ -84,7 +84,7 @@ const T48 = { duration: 48 * H, hydraulicStep: H, patternStep: H, reportStep: H 
 // R (80 m) -> P1 -> J (30 L/s on a pattern) -> P2 -> T: the tank fills on light demand and drains on heavy.
 function lineWithTank(o) {
 	const m = constructed({
-		nodes: [reservoir('R', 80), jn('J', 10, o.q || 30, 'D'), tank('T', 60, o.level || 4, 0.5, o.max || 12, o.dia || 18)],
+		nodes: [reservoir('R', o.rHead || 80), jn('J', 10, o.q || 30, 'D'), tank('T', 60, o.level || 4, 0.5, o.max || 12, o.dia || 18)],
 		links: [pipe('P1', 'R', 'J', 1200, 0.3), pipe('P2', 'J', 'T', 800, 0.25)],
 		patterns: [pat('D', DAY)],
 		times: o.times || T48, quality: o.quality
@@ -243,6 +243,20 @@ const AGE_CASES = [
 		m.time.times.hydraulicStep = H / 2; return m; })(), tol: 1, reaches: 20 * H }
 ];
 
+// ---- Q2: SOURCE TRACE ---------------------------------------------------------------------------------
+const trace = (node) => ({ mode: 'trace', traceNode: node });
+const TRACE_CASES = [
+	// linkTol: PD is the dead end (measured 0.02 percentage points at 48 h).
+	{ name: 'trace: the share of reservoir R1 in a loop fed from two, the middle pipe reversing', model: twoSources(trace('R1')), tol: 0.01, linkTol: 0.05, spread: true },
+	{ name: 'trace: from a junction (J1), which is held at 100 % whatever reaches it', model: twoSources(trace('J1')), tol: 0.01, linkTol: 0.05, spread: true },
+	// The reservoir at 66 m against a tank standing at 64 m: the tank fills at night and drains into J
+	// at the morning and evening peaks, so J takes a mix of the two.
+	{ name: 'trace: from a tank that fills and drains, completely mixed', model: lineWithTank({ quality: trace('T'), rHead: 66 }), tol: 0.01, spread: true },
+	{ name: 'trace: from a tank that fills and drains, first in first out', model: lineWithTank({ quality: trace('T'), rHead: 66, mixing: { model: 'FIFO' } }), tol: 0.01, spread: true },
+	{ name: 'trace: the reservoir feeding a tank that fills and drains, last in first out', model: lineWithTank({ quality: trace('R'), rHead: 66, mixing: { model: 'LIFO' } }), tol: 0.01, spread: true },
+	{ name: 'trace: the reservoir behind a check-valve pipe, with a pumped tank and a PRV', model: pumpedTank(trace('R2'), { model: '2COMP', fraction: 0.4 }), tol: 0.01, spread: true }
+];
+
 async function run() {
 	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
 
@@ -274,6 +288,19 @@ async function run() {
 	for (const [file, tol, linkTol, reaches] of [['Net1.inp', 1, 1, 20 * H], ['Net2.inp', 3, 3, 40 * H], ['Net3.inp', 25, 100, 20 * H]]) {
 		const m = loadEpa(file).model; m.quality = AGE;
 		await compare({ name: `age: ${file}`, model: m, tol, linkTol, reaches });
+	}
+
+	console.log('-- Q2: source trace, constructed networks');
+	for (const c of TRACE_CASES) { await compare(c); }
+
+	console.log('-- Q2: source trace, EPA\'s examples');
+	// Net3 at 0.1 percentage point: the same one-second control time as its age case above (pipe 133,
+	// just reversed, 0.094 at 22:00), and node 273 at 14:00 (0.070), where the front of Lake water is
+	// arriving through pipe 319 at 1.2 L/s at that hour and meets 11 percent water from pipe 235.
+	for (const [file, node, tol, linkTol] of [['Net3.inp', 'Lake', 0.1, 0.1], ['Net3.inp', 'River', 0.1, 0.1], ['Net2.inp', '1', 0.01, 0.01],
+		['Net1.inp', '9', 0.01, 0.01], ['Net1.inp', '2', 0.01, 0.01]]) {
+		const m = loadEpa(file).model; m.quality = trace(node);
+		await compare({ name: `trace: ${file} from ${node}`, model: m, tol, linkTol, spread: true });
 	}
 
 	console.log(`\n${pass} passed, ${fail} failed`);
