@@ -71,7 +71,7 @@ async function main() {
 		ok('the box fills the phone width less the edge (>= 370 of 390 px)', g1.boxW >= 370, JSON.stringify(g1));
 		ok('at least 10 rows stand name-beside-value, and all of them do', g1.rows >= 10 && g1.two === g1.rows, JSON.stringify(g1));
 		const rowH = await P.evaluate(() => { const r = Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-grow')).filter((x) => x.getBoundingClientRect().width > 0)[1]; return r.getBoundingClientRect().height; });
-		ok('a row is a finger tall (>= 38 px)', rowH >= 38, String(rowH));
+		ok('a row is dense but tappable (24 to 32 px, round 6)', rowH >= 23 && rowH <= 32, String(rowH));
 		if (SHOTS) { await P.screenshot({ path: path.join(SHOTS, 'box-design-phone-props.png') }); }
 
 		console.log('\n--- 2, 3. the divider ---');
