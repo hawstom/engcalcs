@@ -51,9 +51,9 @@ and what else reaches us, and it gives the legal details the law requires.</p>
 	<li>The web server keeps an ordinary access log, and that log does record IP addresses. The
 		access log and the usage counts are kept apart, and we never join them.</li>
 	<li>Five optional features on one page make third-party requests: four to OpenStreetMap or
-		Mapbox, and one to a GIS server you name. The street map shows on the first, empty project that
+		Mapbox, and one to a GIS server named in the project. The street map shows on the first, empty project that
 		page opens, and you can hide it. Of the other four, three ask first, and the GIS server is
-		contacted only at an address that was typed in.</li>
+		contacted only at an address saved in the project.</li>
 </ul>
 
 <h2>Who we are</h2>
@@ -174,7 +174,7 @@ site.</p>
 <p>Five features on the Looped Pipe Network map make third-party requests. The street map shows on
 the first, empty project the page opens, and Map, World map, Detach hides it. The other four wait
 for you. Three of them ask first and separately, because each sends something different; a
-background layer makes requests only to a server whose address was typed in, and a project that holds
+background layer makes requests only to a server whose address is saved in the project, and a project that holds
 one requests from it each time the project is opened. No other page in the suite uses any of them.</p>
 
 <table class="ec-legal-table">
@@ -183,7 +183,7 @@ one requests from it each time the project is opened. No other page in the suite
 	<tr><td>Satellite and topo map imagery</td><td>Which tiles are in view, and the IP address</td><td><a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>, for the satellite and topo map images</td></tr>
 	<tr><td>Search for a place by name</td><td>The words typed into the search, and the IP address</td><td>OpenStreetMap&rsquo;s <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim</a></td></tr>
 	<tr><td>Ground elevations</td><td>The latitude and longitude of the network&rsquo;s nodes, and the IP address</td><td>Mapbox</td></tr>
-	<tr><td>Background layer from a GIS server</td><td>Which map tiles are in view, and the IP address</td><td>The server whose address you typed</td></tr>
+	<tr><td>Background layer from a GIS server</td><td>Which map tiles are in view, and the IP address</td><td>The server whose address is saved in the project</td></tr>
 </table>
 
 <p>A map tile says where the map is <em>looking</em>; a search says what was <em>typed</em>; node
@@ -199,9 +199,10 @@ and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener
 <p>A background layer works differently from the other four, because we do not choose the server.
 When you add a layer, the page sends tile requests to the server whose address you typed, for the area
 on screen, and again as you pan and zoom. That server sees your IP address, the area you are
-looking at, and that the request came from this site. Nothing is sent to it until you add a layer,
+looking at, and that the request came from this site. Nothing is sent to it until you add a layer or open a project that holds one,
 and removing the layer ends the requests. A layer is saved in your project file, so when you open
-that project later the page makes requests to the server again. What the server does with the request is governed by its own
+that project later the page makes requests to the server again. A project file someone else made
+works the same way: opening it makes requests to the server it names. What the server does with the request is governed by its own
 privacy policy.</p>
 
 <h2>Where it goes</h2>
