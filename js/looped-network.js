@@ -44991,10 +44991,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		assign.forEach(function (a) {
 			var kind = a[0].toUpperCase(), el = (kind === 'SPEED' ? dx.links : dx.nodes).filter(function (e) { return String(e.id) === a[1]; })[0];
 			if (!el) { return; }
-			if (kind === 'DEMAND' && el.type === 'junction' && !el.demandPattern) { el.demandPattern = a[2]; }
-			else if (kind === 'HEAD' && el.type === 'reservoir' && !el.headPattern) { el.headPattern = a[2]; }
-			else if (kind === 'SPEED' && el.type === 'pump' && !el.speedPattern) { el.speedPattern = a[2]; }
-			else if (kind === 'VOLUME' && el.type === 'tank' && !el.volCurve) { el.volCurve = a[2]; }
+			if (kind === 'DEMAND' && el.type === 'junction' && !el.demandPattern) { el.demandPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'HEAD' && el.type === 'reservoir' && !el.headPattern) { el.headPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'SPEED' && el.type === 'pump' && !el.speedPattern) { el.speedPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'VOLUME' && el.type === 'tank' && !el.volCurve) { el.volCurve = a[2]; }   // base-write: import builds Base
 		});
 		return names;
 	}
