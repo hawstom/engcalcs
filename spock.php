@@ -125,8 +125,8 @@ function ur_charts($series, $range, $caption, $source)
        . ($series['uncoded'] ? ' plus ' . $series['uncoded'] . ' use(s) with no code' : '')
        . '</figcaption>'
        . ecUsageBarsSvg($daily['visitor'], 'uses (said yes)', 'var(--people)') . '</figure>';
-    echo '<figure><figcaption>OTHERS: ' . $tot['visit'] . ' row(s)</figcaption>'
-       . ecUsageBarsSvg($daily['visit'], 'others', 'var(--loads)') . '</figure>';
+    echo '<figure><figcaption>OTHERS: ' . $tot['visit'] . ' use(s)</figcaption>'
+       . ecUsageBarsSvg($daily['visit'], 'uses (others)', 'var(--loads)') . '</figure>';
     echo '</div>';
 }
 
@@ -148,8 +148,8 @@ function ur_table($series, $field, $caption, $source, $limit = 40)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     if (!$keys) { echo '<p class="none">No rows in this window.</p>'; return; }
-    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
-       . '<th>others</th></tr></thead><tbody>';
+    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>Browsers (said yes)</th><th>Uses (said yes)</th>'
+       . '<th>Uses (others)</th></tr></thead><tbody>';
     $n = 0;
     foreach ($keys as $k) {
         if ($limit && $n++ >= $limit) { echo '<tr><td colspan="4" class="none">'
@@ -222,23 +222,22 @@ p.unused { color: #777; font-size: .85rem; margin: .2rem 0 .8rem; }
 </p>
 
 <div class="banner">
-<strong>The two columns are two different things and are never added together.</strong>
-<br><strong>SAID YES</strong> is the rows marked <code>visitor</code>, from browsers that agreed to
-the counting question. <strong>Uses</strong> counts those rows, once per page per visit.
-<strong>Browsers</strong> counts the different random codes among them, so one browser back on ten
-days is ten uses and one browser. Codes began on 2026-10-08; a said-yes row from before then is a
-use and never a browser.
-<br><strong>OTHERS</strong> counts rows marked <code>visit</code>: everybody else. Nothing may
-be stored to deduplicate against, so every page load or dwell writes a row.
-<br><strong>Robots.</strong> Nothing here reads the browser's user-agent, so no robot is filtered by
-name. What keeps most of them out is a time gate, and it applies to some sections only. Under
-<em>Dwells</em> and <em>Uses</em>, a row is written by the page's script once the visit is at
-least 10 seconds old (and, for Uses, only after a real calculation), so a <code>visit</code>
-row there is most likely another human. Under <em>Page loads by language</em>, a row is written by the server
-on every page load with no wait, so its <code>visit</code> rows include robots. The gate trusts the
-visitor's own clock, so it is a best-effort filter and not a security boundary.
-<br>A sum of the two would have a denominator in two units and a numerator in neither. There is no
-total column on this page for that reason.
+<strong>Key to the three columns from 2026-10-08 forward:</strong>
+<br><strong>Browsers (said yes)</strong> is the de-duplicated count of browsers doing the action.
+It's intended to be close to a count of how many <strong>users</strong> did the action.
+<br><strong>Uses (said yes)</strong> is uses of the action by the same users as above, counted once
+per page per browser session. A said-yes row from before 2026-10-08 carries no code, so it counts
+here as a use and never as a browser.
+<br><strong>Uses (others)</strong> is uses of the action by browsers that did not say yes. Nothing
+may be stored to de-duplicate them, so every page load counts.
+<br>The two Uses columns are never added together: one counts once per page per browser session,
+the other every page load, so a sum would be in neither unit.
+<br><strong>Looking and Calculating:</strong> Under <em>Looking</em> and <em>Calculating</em>, a row
+is written by the page's script once the visit is at least 10 seconds old (and, for Calculating,
+only after a real calculation), so an others row there is most likely a human. Under <em>Page loads
+by language</em>, a row is written by the server on every page load with no wait, so its others
+rows include robots. The gate trusts the visitor's own clock, so it is a best-effort filter and not
+a security boundary.
 </div>
 
 <h2>Where the rows came from</h2>
@@ -251,11 +250,11 @@ total column on this page for that reason.
 <?php endif; ?>
 </tbody></table>
 
-<h2>Dwells</h2>
+<h2>Looking</h2>
 <?php
-ur_charts($view, $range, 'Page dwells per day',
+ur_charts($view, $range, 'Looking per day',
     'log/engcalcs-human-view.log, field 1 (timestamp), bucketed on the last field');
-ur_table($view, 'page', 'Page dwells by page',
+ur_table($view, 'page', 'Looking, by page',
     'log/engcalcs-human-view.log, field 2 (page basename)');
 ur_table($view, 'lang', 'Language the page was served in',
     'log/engcalcs-human-view.log, field 3 (served language)');
@@ -264,11 +263,11 @@ ur_table($view, 'pointer', 'Device pointer',
   . 'column (2026-09-08) and reads as (none), never as fine.');
 ?>
 
-<h2>Uses</h2>
+<h2>Calculating</h2>
 <?php
-ur_charts($calc, $range, 'Uses per day',
+ur_charts($calc, $range, 'Calculating per day',
     'log/engcalcs-calc-usage.log, field 1 (timestamp)');
-ur_table($calc, 'page', 'Calculators actually used',
+ur_table($calc, 'page', 'Calculating, by page',
     'log/engcalcs-calc-usage.log, field 2 (page basename)');
 ?>
 
@@ -335,8 +334,8 @@ echo '<h3>Used in this window, most used first</h3>';
 if (!$cmdUsed) {
     echo '<p class="none">No command was used in this window.</p>';
 } else {
-    echo '<table><thead><tr><th>command</th><th>browsers (said yes)</th>'
-       . '<th>others</th></tr></thead><tbody>';
+    echo '<table><thead><tr><th>command</th><th>Browsers (said yes)</th>'
+       . '<th>Uses (others)</th></tr></thead><tbody>';
     foreach ($cmdUsed as $r) {
         echo '<tr><td title="' . ur_h($r['id']) . '">' . ur_h($r['path']) . '</td><td>' . $r['browsers']
            . '</td><td>' . $r['loads'] . '</td></tr>';
@@ -349,8 +348,8 @@ foreach ($cmdGroups as $g) {
     foreach ($g['rows'] as $r) { if ($r['uses'] || $r['loads']) { $used[] = $r; } else { $unused[] = $r; } }
     echo '<h4>' . ur_h($g['label']) . '</h4>';
     if ($used) {
-        echo '<table><thead><tr><th>command</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
-           . '<th>others</th></tr></thead><tbody>';
+        echo '<table><thead><tr><th>command</th><th>Browsers (said yes)</th><th>Uses (said yes)</th>'
+           . '<th>Uses (others)</th></tr></thead><tbody>';
         foreach ($used as $r) {
             echo '<tr><td title="' . ur_h($r['id']) . '">' . ($r['parent'] !== '' ? ur_h($r['parent']) . ', ' : '')
                . ur_h($r['label']) . ($r['listed'] ? '' : ' <em>(not in the command list)</em>')
@@ -379,7 +378,7 @@ ur_charts($contactViews, $range, 'Contact page viewed per day',
 ur_charts($send, $range, 'Messages sent per day',
     'log/engcalcs-contact-send.log, field 1 (timestamp)');
 ?>
-<table><thead><tr><th>step</th><th>browsers (said yes)</th><th>uses (said yes)</th><th>others</th></tr></thead><tbody>
+<table><thead><tr><th>step</th><th>Browsers (said yes)</th><th>Uses (said yes)</th><th>Uses (others)</th></tr></thead><tbody>
 <tr><td>contact page viewed</td><td><?= ecUsageSeriesBrowsers($contactViews) ?></td><td><?= $contactTot['visitor'] ?></td><td><?= $contactTot['visit'] ?></td></tr>
 <tr><td>message sent</td><td><?= ecUsageSeriesBrowsers($send) ?></td><td><?= $sends['visitor'] ?></td><td><?= $sends['visit'] ?></td></tr>
 </tbody></table>

@@ -18,8 +18,9 @@
  *   'visit'    everybody else. Nothing may be stored to deduplicate against, so every page load
  *              writes a row. Those rows are the others bucket, and carry no code.
  *
- * THE TWO ARE NEVER SUMMED. A total would have a denominator in two units and a numerator in
- * neither -- the symptom formmail.php's own comment records. So every aggregate here returns the
+ * THE TWO ARE NEVER SUMMED. A said-yes use counts once per (visit, page); an others use counts every
+ * page load. A sum is in neither unit, and a ratio across them (formmail.php's old contact-funnel
+ * defect) means nothing. So every aggregate here returns the
  * two buckets as two separate series, keyed 'visitor' and 'visit', and nothing in this file adds
  * them together.
  *
