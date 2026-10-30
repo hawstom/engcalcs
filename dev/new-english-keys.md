@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**62 still to read on master**, of 224 untranslated keys, of 3189 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**64 still to read on master**, of 226 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (224, 62 to read @@ NEEDS RULING)
+## lpn_  (226, 64 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -328,6 +328,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpalt_lead`**
   > This file changes values in the categories below. Choose the alternative that receives the values of each.
   @@ NEEDS RULING
+- **`lpn_inpalt_more`**
+  > and {n} others
+  @@ NEEDS RULING
 - **`lpn_inpalt_name`**
   > Name of the new alternative
   @@ NEEDS RULING
@@ -339,6 +342,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_inpalt_receipt`**
   > Alternatives that received the values: {list}
+  @@ NEEDS RULING
+- **`lpn_inpalt_shared`**
+  > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 - **`lpn_inpup_ask_title`**
   > Import {file}
@@ -904,7 +910,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`a970103df`) — 41 new, 41 to read @@ NEEDS RULING
+### feat/dxf-import (`c5be13fb7`) — 41 new, 41 to read @@ NEEDS RULING
 
 - **`lpn_dxf_curve_points`**
   > Pump head curve points (flow, head)
@@ -1273,7 +1279,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/import-alternative (`fcd504f14`) — adds no English strings
+### feat/import-alternative (`0751e441a`) — adds no English strings
 
 ### feat/native-quality (`0cc61c8ec`) — adds no English strings
 
@@ -1622,7 +1628,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-of-day (`ffc86361e`) — adds no English strings
+### feat/theme-of-day (`24665fe63`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 

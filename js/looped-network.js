@@ -46825,6 +46825,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return altCategoryLabel(cat) + ': ' + name;
 		});
 	}
+	// The default choice's label. A stored alternative the scenario names and other scenarios use too is
+	// named with its users, because writing into it changes them as well; otherwise it is the scenario's own.
+	function importAltOwnLabel(scn, cat) {
+		var pc = EngCalcs.pageConfig || {}, id = storedChoiceOf(scn, cat), others, names;
+		if (id !== undefined && id !== LPN_BASE_CHOICE) {
+			others = smUsedBy(cat, id).filter(function (x) { return x !== scn; });
+			if (others.length) {
+				names = others.slice(0, 3).map(scenarioDisplayName).join(', ');
+				if (others.length > 3) { names += ' ' + (pc.lpn_inpalt_more || 'and {n} others').replace('{n}', String(others.length - 3)); }
+				return (pc.lpn_inpalt_shared || '{alternative}, also used by {scenarios}').replace('{alternative}', smName(cat, id)).replace('{scenarios}', names);
+			}
+		}
+		return (pc.lpn_inpalt_own || '{scenario}\'s own alternative').replace('{scenario}', scenarioDisplayName(scn));
+	}
 	// The question. `go(route)` applies; `cancel()` leaves everything as it was. A headless harness answers
 	// through window.lpnInpAlternative ('own', 'new', 'base', or {category: {mode, name}}); the DOM stub
 	// that answers the destination alone gets 'own', which is what every write did before the question.
@@ -46860,7 +46874,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes them all.');
 			cats.forEach(function (cat) {
 				var parent = importAltParent(scn, cat), pr = prior && prior[cat], wrap = document.createElement('div'),
-					opts = [['own', (pc.lpn_inpalt_own || '{scenario}\'s own alternative').replace('{scenario}', scenarioDisplayName(scn))],
+					opts = [['own', importAltOwnLabel(scn, cat)],
 						['new', (pc.lpn_inpalt_new || 'A new alternative, child of {parent}').replace('{parent}', parent.name)],
 						['base', pc.lpn_inpalt_base || 'The Base alternative']], radios = [], nameInp = document.createElement('input');
 				wrap.className = 'lpn-dlg-group';
@@ -46877,6 +46891,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					lab.appendChild(document.createTextNode(' ' + o[1]));
 					wrap.appendChild(lab);
 					radios.push(inp);
+					if (o[0] === 'new') { wrap.appendChild(nameInp); }   // the name belongs to the second choice
 				});
 				nameInp.type = 'text';
 				nameInp.id = 'lpn_inpalt_' + cat + '_name';
@@ -46885,7 +46900,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				nameInp.setAttribute('aria-label', pc.lpn_inpalt_name || 'Name of the new alternative');
 				nameInp.className = 'lpn-dlg-indent';
 				nameInp.addEventListener('input', function () { radios[1].checked = true; });
-				wrap.appendChild(nameInp);
 				body.appendChild(wrap);
 				ctrl[cat] = { radios: radios, name: nameInp };
 			});
