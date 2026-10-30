@@ -46833,7 +46833,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			others = smUsedBy(cat, id).filter(function (x) { return x !== scn; });
 			if (others.length) {
 				names = others.slice(0, 3).map(scenarioDisplayName).join(', ');
-				if (others.length > 3) { names += ' ' + (pc.lpn_inpalt_more || 'and {n} others').replace('{n}', String(others.length - 3)); }
+				if (others.length > 3) { names += ' ' + (pc.lpn_inpalt_more || 'and others ({n})').replace('{n}', String(others.length - 3)); }
 				return (pc.lpn_inpalt_shared || '{alternative}, also used by {scenarios}').replace('{alternative}', smName(cat, id)).replace('{scenarios}', names);
 			}
 		}

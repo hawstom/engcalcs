@@ -2432,7 +2432,7 @@ $ec_lang['lpn_inpalt_own']='{scenario}\'s own alternative';
 // {alternative} is an alternative name and {scenarios} the other scenarios that use it, such as "Off peak, Fire flow".
 $ec_lang['lpn_inpalt_shared']='{alternative}, also used by {scenarios}';
 // {n} is a count of further scenarios.
-$ec_lang['lpn_inpalt_more']='and {n} others';
+$ec_lang['lpn_inpalt_more']='and others ({n})';
 $ec_lang['lpn_inpalt_new']='A new alternative, child of {parent}';
 $ec_lang['lpn_inpalt_name']='Name of the new alternative';
 $ec_lang['lpn_inpalt_base']='The Base alternative';

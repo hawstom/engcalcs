@@ -329,7 +329,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > This file changes values in the categories below. Choose the alternative that receives the values of each.
   @@ NEEDS RULING
 - **`lpn_inpalt_more`**
-  > and {n} others
+  > and others ({n})
   @@ NEEDS RULING
 - **`lpn_inpalt_name`**
   > Name of the new alternative
@@ -910,7 +910,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`c5be13fb7`) — 41 new, 41 to read @@ NEEDS RULING
+### feat/dxf-import (`3dbae68e1`) — 41 new, 41 to read @@ NEEDS RULING
 
 - **`lpn_dxf_curve_points`**
   > Pump head curve points (flow, head)
@@ -1279,7 +1279,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/import-alternative (`0751e441a`) — adds no English strings
+### feat/import-alternative (`a9ce8be42`) — adds no English strings
 
 ### feat/native-quality (`0cc61c8ec`) — adds no English strings
 
