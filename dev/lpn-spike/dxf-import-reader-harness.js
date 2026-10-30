@@ -187,5 +187,68 @@ const base = E.lpnDxfWrite(model());
 	ok('a drawing of ours with no model on it reads as empty, not as an error', empty.ok && empty.nodes.length === 0 && codes(empty).length === 0, JSON.stringify(empty.notes));
 }
 
+// ---- 7. round 2: everything the block scheme can hold, and the alternative that is read -----------
+console.log('\n7. status, minor loss, initial quality, active, pump curve and speed, head loss formula, alternatives');
+{
+	const K2 = JSON.parse(JSON.stringify(KEYS)), T2 = JSON.parse(JSON.stringify(TAGS));
+	const add = (type, keys, tags) => { const at = K2[type].indexOf('TAG'); K2[type].splice(at, 0, ...keys); T2[type].splice(at, 0, ...tags); };
+	add('junction', ['INITQUALITY', 'ACTIVE'], ['INITIAL_QUALITY', 'IS_ACTIVE']);
+	add('reservoir', ['INITQUALITY', 'ACTIVE'], ['INITIAL_QUALITY', 'IS_ACTIVE']);
+	add('tank', ['INITQUALITY', 'ACTIVE'], ['INITIAL_QUALITY', 'IS_ACTIVE']);
+	add('pipe', ['MINORLOSS', 'STATUS', 'ACTIVE'], ['MINOR_LOSS', 'STATUS', 'IS_ACTIVE']);
+	add('valve', ['MINORLOSS', 'STATUS', 'ACTIVE'], ['MINOR_LOSS', 'STATUS', 'IS_ACTIVE']);
+	add('pump', ['STATUS', 'SPEED', 'CURVE', 'CURVEPOINTS', 'ACTIVE'], ['STATUS', 'RELATIVE_SPEED', 'PUMP_HEAD_CURVE', 'PUMP_HEAD_CURVE_POINTS', 'IS_ACTIVE']);
+	const P2 = {};
+	Object.keys(T2).forEach((t) => { T2[t].forEach((g) => { P2[t + '.' + g] = g.replace(/_/g, ' '); }); });
+	P2['pipe.ROUGHNESS'] = 'ROUGHNESS (MM)'; P2['pipe.DIAMETER'] = 'DIAMETER (IN)'; P2['pipe.LENGTH'] = 'LENGTH (FT)'; P2['junction.ELEVATION'] = 'ELEVATION (FT)'; P2['junction.BASE_DEMAND'] = 'BASE DEMAND (GPM)';
+	const at2 = (type, vals) => K2[type].map((k, i) => ({ tag: T2[type][i], value: vals[k] === undefined ? '' : vals[k] }));
+	const m = model({ tags: T2, prompts: P2, readme: ['Plant (HW)', 'Head loss formula: DARCY-WEISBACH (DW).'] });
+	m.nodes[0].attrs = at2('junction', { ID: 'J1', ELEV: '710.0', DEMAND: '4530.', INITQUALITY: '0.5', ACTIVE: 'YES' });
+	m.nodes[1].attrs = at2('junction', { ID: 'J2', ELEV: '700', DEMAND: '10', ACTIVE: 'NO' });
+	m.nodes[2].attrs = at2('junction', { ID: 'J3', ELEV: '690', DEMAND: '0' });
+	m.nodes[3].attrs = at2('reservoir', { ID: 'R1', HEAD: '167.0', INITQUALITY: '1.25' });
+	m.nodes[4].attrs = at2('tank', { ID: 'T1', ELEV: '129', BASEELEV: '129', LEVEL: '29', MINLEVEL: '4', MAXLEVEL: '35', DIAMETER: '164', INITQUALITY: '0' });
+	m.links[0].attrs = at2('pipe', { ID: 'P1', DIAMETER: '12', LENGTH: '2400', ROUGHNESS: '0.25', MINORLOSS: '7.50', STATUS: 'CLOSED' });
+	m.links[1].attrs = at2('pipe', { ID: 'P2', DIAMETER: '8', LENGTH: '1500', ROUGHNESS: '0.3', MINORLOSS: '0', STATUS: 'CV' });
+	m.links[2].attrs = at2('pump', { ID: 'PU1', STATUS: 'OPEN', SPEED: '1.1', CURVE: 'C7', CURVEPOINTS: '0,104. 2000,92 4000,63' });
+	m.links[3].attrs = at2('valve', { ID: 'V1', VALVETYPE: 'PRV', DIAMETER: '6', SETTING: '45', MINORLOSS: '2', STATUS: 'BOGUS', ACTIVE: 'NO' });
+	const r = E.lpnDxfNetRead(E.lpnDxfWrite(m), { keys: K2, tags: T2 });
+	const N = {}, L = {};
+	r.nodes.forEach((n) => { N[n.id] = n; });
+	r.links.forEach((l) => { L[l.id] = l; });
+	ok('initial quality is read, as typed, on a junction, a reservoir and a tank', N.J1._initQuality === 0.5 && N.R1._initQuality === 1.25 && N.T1._initQuality === 0 && N.J1.tok._initQuality === '0.5', JSON.stringify([N.J1, N.R1, N.T1].map((n) => n._initQuality)));
+	ok('ACTIVE NO makes an element inactive; YES and blank leave it active', N.J2._active === false && N.J1._active === undefined && N.J3._active === undefined && L.V1._active === false);
+	ok('a pipe\'s status and minor loss: CLOSED, CV, and 7.50 as typed', L.P1._status === 'closed' && L.P2._status === 'cv' && L.P1._k === 7.5 && L.P1.tok._k === '7.50' && L.P2._k === 0, JSON.stringify([L.P1, L.P2]));
+	ok('a status that is not OPEN, CLOSED or CV (a valve cannot be CV) is named and the link stays open', L.V1._status === 'open' && note(r, 'value-unread') && note(r, 'value-unread').ids.some((t) => /V1 STATUS: BOGUS/.test(t)), JSON.stringify(note(r, 'value-unread')));
+	ok('a valve\'s minor loss', L.V1._k === 2);
+	ok('a pump: status, speed, curve reference, and the curve with its points and their own text', L.PU1._status === 'open' && L.PU1.speed === 1.1 && L.PU1._curveId === 'C7' &&
+		r.curves.length === 1 && r.curves[0].id === 'C7' && r.curves[0].kind === 'head' && JSON.stringify(r.curves[0].points) === '[[0,104],[2000,92],[4000,63]]' && r.curves[0].tok['0y'] === '104.' && r.curves[0].tok['1x'] === undefined, JSON.stringify([L.PU1, r.curves]));
+	ok('a pump that states a curve gets no "no curve" note', !note(r, 'pump-no-curve'));
+	ok('the head loss formula is the read-me\'s last code in brackets (the project name\'s (HW) is not it)', r.method === 'dw', r.method);
+	ok('a Darcy-Weisbach roughness takes its unit from the prompt: ROUGHNESS (MM)', r.unitText.lpn_u_roughness === 'MM', JSON.stringify(r.unitText));
+	ok('a read-me with no code gives no method (the page then says Hazen-Williams was assumed)', E.lpnDxfNetRead(E.lpnDxfWrite(model()), OPTS).method === '');
+	// a second pump with the same curve ID and different points: first kept, named
+	const m2 = model({ tags: T2, prompts: P2 });
+	m2.nodes.push({ id: 'J7', type: 'junction', x: 300, y: 0, attrs: at2('junction', { ID: 'J7', ELEV: '1', DEMAND: '1' }) });
+	m2.links[2].attrs = at2('pump', { ID: 'PU1', CURVE: 'C7', CURVEPOINTS: '0,100 1000,50' });
+	m2.links.push({ id: 'PU2', type: 'pump', pts: [{ x: 200, y: 100 }, { x: 300, y: 0 }], attrs: at2('pump', { ID: 'PU2', CURVE: 'C7', CURVEPOINTS: '0,100 1000,60' }) });
+	const r2 = E.lpnDxfNetRead(E.lpnDxfWrite(m2), { keys: K2, tags: T2 });
+	ok('a curve ID reused with different points: one curve kept, the second pump named', r2.curves.length === 1 && note(r2, 'curve-differs') && note(r2, 'curve-differs').ids.join() === 'C7 (PU2)', JSON.stringify(note(r2, 'curve-differs')));
+}
+{
+	// which alternative is read
+	const base = (alt) => E.lpnDxfWrite(model({ alternative: alt }));
+	const shift = (t, from, to) => t.split(from).join(to);
+	const only = read(base('MAX_DAY'));
+	ok('a drawing with only one alternative, not BASE, is read as a network: the whole of it', only.nodes.length === 5 && only.links.length === 4 && only.customers.length === 1 && only.alternative === 'MAX_DAY', JSON.stringify([only.nodes.length, only.links.length, only.alternative]));
+	ok('...and says so (alt-read), with nothing reported as unread', note(only, 'alt-read') && note(only, 'alt-read').detail === 'MAX_DAY' && !note(only, 'alternative'), JSON.stringify(only.notes.map((n) => n.code)));
+	const two = shift(base('BASE'), 'C-WATR-MODL-TANK-BASE', 'C-WATR-MODL-TANK-FIRE');
+	const r = read(two);
+	ok('BASE and another alternative: BASE is read, the other named, no alt-read line', r.alternative === 'BASE' && note(r, 'alternative') && note(r, 'alternative').detail === 'BASE' && !note(r, 'alt-read'), JSON.stringify(r.notes.map((n) => n.code)));
+	const three = shift(shift(base('A_ONE'), 'C-WATR-MODL-TANK-A_ONE', 'C-WATR-MODL-TANK-B_TWO'), 'C-WATR-MODL-VALV-A_ONE', 'C-WATR-MODL-VALV-B_TWO');
+	const r3 = read(three);
+	ok('two alternatives and no BASE: the first in the file is read, the other named', r3.alternative === 'A_ONE' && note(r3, 'alternative') && note(r3, 'alternative').ids.some((t) => /TANK-B_TWO/.test(t)) && note(r3, 'alt-read') && note(r3, 'alt-read').detail === 'A_ONE', JSON.stringify(r3.notes.map((n) => n.code + ':' + n.detail)));
+}
+
 console.log('\ndxf-import-reader-harness: ' + (checks - fails) + '/' + checks + ' checks passed');
 process.exit(fails ? 1 : 0);

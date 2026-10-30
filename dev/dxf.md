@@ -24,7 +24,8 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
     CUST (customer; our choice, Tom named none).
   - The alternative is `BASE` on Base; on another scenario it is that scenario's name in capitals
     (page locale), letters and digits of any script kept, every other run made `_`, and the whole
-    network as that scenario has it is written. A character Windows-1252 lacks goes out as
+    network as that scenario has it is written, and ONLY that alternative's layers, so a scenario's
+    export has no BASE layers (an element a scenario takes out of the network is written IS_ACTIVE NO). A character Windows-1252 lacks goes out as
     `\U+XXXX` (ezdxf, "DXF File Encoding": the R2000-R2004 schema, which the R2000 extended symbol
     names take; AutoCAD EXTNAMES = 1 allows any character "not used by Microsoft Windows and AutoCAD
     for other purposes"). Every scenario is coded in project order, so two names that encode alike
@@ -41,7 +42,11 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   refuses spaces and `!` in a tag): ELEVATION (the ground, a tank's too), BASE_ELEVATION (a tank's
   bottom, EPANET's tank Elevation; Tom, 2026-10-11), BASE_DEMAND, HEAD, WATER_DEPTH, LOWEST_WATER_DEPTH,
   HIGHEST_WATER_DEPTH, TANK_DIAMETER, DIAMETER, LENGTH, ROUGHNESS, VALVE_TYPE, SETTING,
-  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. A clash within one block gets `_2`. The visible
+  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. Round 2 added what a solve needs and a block can hold:
+  INITIAL_QUALITY (every node), MINOR_LOSS and STATUS (pipes and valves; STATUS is the EPANET word OPEN,
+  CLOSED or CV, in any language), IS_ACTIVE (YES or NO, every element), and on a pump STATUS, RELATIVE_SPEED,
+  PUMP_HEAD_CURVE (the curve ID) and PUMP_HEAD_CURVE_POINTS (`flow,head` pairs, space separated, as typed).
+  A Darcy-Weisbach project's ROUGHNESS prompt states its length unit; C and n state none. A clash within one block gets `_2`. The visible
   ID attribute is found by property, never by the text "ID", which a translation changes. The prompt is
   the label with its unit. No solve results (an import has no property for them).
 - **Values verbatim** in the project's display units, as typed: `EngCalcs.lpnNumText()` hands back
@@ -61,7 +66,8 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   block."*; R2000 groups 100 AcDbMText, 10/20/30, 40 height 1, 71 top left, 72, 3 and 1 text in
   chunks of 250, 7 Standard), one paragraph per line: project name; the
   coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 note; and, if any, how many values
-  were shortened, and how many junctions have more than one demand category. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
+  were shortened, how many junctions have more than one demand category, and the head loss formula as
+  `Head loss formula: <name> (HW)`, `(DW)` or `(MANNING)` (the code in brackets is what the import reads). Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
 - **Text style Standard on `txt`** (group 3, the STYLE record's primary font file). It was blank,
   and AutoCAD showed the text in Arial while editing (Tom, 2026-10-07, TEDIT); `txt` is what
   AutoCAD writes for Standard. Only the read-me MTEXT names a style (group 7, Standard).
@@ -109,11 +115,22 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
   for a projected one) opens the import as a projected project in that system, so the network lands where it was;
   a drawing whose read-me states none is a grid in the length unit. A code this page does not know is named and
   the drawing opens as a grid.
-- **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives other than
-  BASE (Task 721 owns them), Shape layers, entities of a kind not read, paper space, unknown attribute tags,
+- **Which alternative is read:** BASE where the file has it; otherwise the first alternative in the file (this
+  page's own export of a scenario has only that scenario's layers), with a line saying which was read. Layers of any
+  other alternative are named and not read (Task 721 owns reading several).
+- **Round trip (`dxf-roundtrip-calc-harness.js`):** Net1, Net2, Net3, Net1 with a closed pipe and a minor loss,
+  Net1 as Darcy-Weisbach, and Net1-Scenarios with a scenario on screen export to DXF and import back with the same
+  heads (1e-6) and flows (1 percent of the largest) from Calculate, once the patterns, clock, controls, rules and a
+  scenario's calculation set (its demand multiplier) are taken away, because the file cannot hold those.
+- **Cannot round-trip, and why:** patterns and every pattern reference (a pattern is a list, not an attribute);
+  efficiency, volume and head loss curves (only a pump's head curve is carried); controls and rules; the clock and
+  EPANET options (viscosity, accuracy, demand multiplier: project settings, not element properties); several demand
+  categories (only the total); emitter coefficients (stored in SI per pressure to an exponent the file does not state);
+  reaction coefficients, sources, mixing and pump energy settings; pipe types and fitting lists (the minor loss sum is
+  written instead); custom properties; map Text and hand-placed label positions; a scenario's calculation set.
+- **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives not read, Shape layers, entities of a kind not read, paper space, unknown attribute tags,
   non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
-  what a DXF cannot hold (patterns, curves, controls, rules, times, options, head loss formula, pipe status,
-  minor loss, demand categories). A pump arrives with no curve and says so.
+  what a DXF cannot hold (the list above). A pump that states no head curve is named.
 
 ## Validation
 

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**85 still to read on master**, of 250 untranslated keys, of 3219 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**89 still to read on master**, of 254 untranslated keys, of 3223 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (250, 85 to read @@ NEEDS RULING)
+## lpn_  (254, 89 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -175,8 +175,14 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_start`**
   > Fire starts at
   _Ruled OK 2026-10-20._
+- **`lpn_dxf_curve_points`**
+  > Pump head curve points (flow, head)
+  @@ NEEDS RULING
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_headloss`**
+  > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
   @@ NEEDS RULING
 - **`lpn_dxfnet_count_customers`**
   > {n} customers.
@@ -191,7 +197,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > controls and rules
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_curves`**
-  > curves
+  > curves other than pump head curves
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_custom`**
   > custom properties
@@ -199,17 +205,17 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxfnet_held_demand`**
   > demand categories (only a junction's total)
   @@ NEEDS RULING
-- **`lpn_dxfnet_held_minor`**
-  > minor loss coefficients
+- **`lpn_dxfnet_held_emitter`**
+  > emitter coefficients
+  @@ NEEDS RULING
+- **`lpn_dxfnet_held_energy`**
+  > pump efficiency and energy settings
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_patterns`**
   > patterns
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_quality`**
-  > initial quality
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_status`**
-  > pipe and pump status (every link opens Open)
+  > reaction coefficients, sources and mixing
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_text`**
   > map Text items and hand-placed label positions
@@ -220,8 +226,11 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxfnet_none`**
   > Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.
   @@ NEEDS RULING
+- **`lpn_dxfnet_note_alt_read`**
+  > The drawing has no BASE alternative. The alternative {alt} was read.
+  @@ NEEDS RULING
 - **`lpn_dxfnet_note_alternative`**
-  > These layers state an alternative other than BASE. Only the BASE alternative is read, so nothing on them was read.
+  > These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_bad_id`**
   > These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.
@@ -237,6 +246,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_crs_unknown`**
   > The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_curve_differs`**
+  > These pumps state a curve ID that another pump uses with different points. The first curve was kept.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_customer_loose`**
   > The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.
@@ -284,7 +296,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Entities in paper space were not read: {n}.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_pump_no_curve`**
-  > A DXF file does not hold pump curves. These pumps have none, so Calculate will not give the original results until each is given a curve.
+  > These pumps state no head curve, so Calculate will not give the original results until each is given a curve.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_shapes`**
   > These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.
@@ -786,7 +798,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**200 still to read**, of 243 new keys across 11 unmerged branch(es).
+**197 still to read**, of 240 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -797,13 +809,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`7de287871`) — already merged into feat/report-widths; its strings are listed there
+### box-design (`36fa47163`) — already merged into feat/gis-background; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`d0f002eeb`) — adds no English strings
+### feat/dxf-import (`097ec0339`) — adds no English strings
 
-### feat/gis-background (`2b53b2642`) — 78 new, 78 to read @@ NEEDS RULING
+### feat/gis-background (`82be219db`) — 83 new, 83 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -871,6 +883,15 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gis_add`**
   > Add layer
   @@ NEEDS RULING
+- **`lpn_gis_ask`**
+  > This project requests background layers from: {hosts}. Drawing them sends the area on screen and your IP address to those servers. Draw them?
+  @@ NEEDS RULING
+- **`lpn_gis_ask_no`**
+  > Not now
+  @@ NEEDS RULING
+- **`lpn_gis_ask_yes`**
+  > Draw them
+  @@ NEEDS RULING
 - **`lpn_gis_draw`**
   > Draw
   @@ NEEDS RULING
@@ -884,7 +905,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > An ArcGIS address must end with /MapServer.
   @@ NEEDS RULING
 - **`lpn_gis_err_template`**
-  > A tile address must contain {z}, {x} and {y}.
+  > A tile URL must contain {z}, {x} and {y}.
   @@ NEEDS RULING
 - **`lpn_gis_failed`**
   > {host} did not return a map image. Its layer is not drawn.
@@ -893,25 +914,31 @@ build for that would be a gate nobody keeps. Refresh it with
   > Kind of server
   @@ NEEDS RULING
 - **`lpn_gis_kind_arcgis`**
-  > ArcGIS MapServer
+  > ArcGIS REST (MapServer)
   @@ NEEDS RULING
 - **`lpn_gis_kind_wms`**
-  > WMS server
+  > WMS
   @@ NEEDS RULING
 - **`lpn_gis_kind_xyz`**
-  > Tile URL ({z}/{x}/{y})
+  > Tile URL
+  @@ NEEDS RULING
+- **`lpn_gis_menu`**
+  > Add layer…
   @@ NEEDS RULING
 - **`lpn_gis_note`**
-  > Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent before you add one.
+  > Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent until you add a layer, or agree to draw the layers of a project you open.
   @@ NEEDS RULING
 - **`lpn_gis_opacity`**
-  > Opacity (0 to 1)
+  > Opacity
   @@ NEEDS RULING
 - **`lpn_gis_title`**
   > Background layers from a GIS server
   @@ NEEDS RULING
 - **`lpn_gis_unlocatable`**
   > Background layers need a project that is placed on the earth.
+  @@ NEEDS RULING
+- **`lpn_gis_unreachable`**
+  > not reachable
   @@ NEEDS RULING
 - **`lpn_gis_url`**
   > Server address
@@ -1040,7 +1067,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/report-widths (`563b359ec`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/report-widths (`c8b40e477`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -1385,33 +1412,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`f771b5cad`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_ex_extension_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_extension_si_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
-  @@ NEEDS RULING
-- **`lpn_ex_extension_si_title`**
-  > Johnson City extension, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_extension_title`**
-  > Johnson City extension, gpm (US)
-  @@ NEEDS RULING
-- **`lpn_ex_well_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_well_si_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
-  @@ NEEDS RULING
-- **`lpn_ex_well_si_title`**
-  > Munday well and tank, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_well_title`**
-  > Munday well and tank, gpm (US)
-  @@ NEEDS RULING
-
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
 ### feat/wtg-page-export (`ad86a1b96`) — 44 new, 44 to read @@ NEEDS RULING
@@ -1548,7 +1548,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
-
-### fix/manual-search-speed (`c37d5b7ae`) — adds no English strings
-
-### fix/usage-report-wording (`425485aa4`) — adds no English strings

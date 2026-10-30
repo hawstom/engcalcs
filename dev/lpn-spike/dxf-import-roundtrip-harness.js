@@ -199,7 +199,7 @@ function everythingProject() {
 
 // The same list of things the receipt must always name: the page's own sentence.
 async function pcOf(a, k) { return a.page.evaluate((key) => (window.EngCalcs.pageConfig || {})[key], k); }
-const HELD = ['patterns', 'curves', 'controls', 'times', 'status', 'minor', 'demand', 'quality', 'custom', 'text'];
+const HELD = ['patterns', 'curves', 'controls', 'times', 'emitter', 'energy', 'demand', 'quality', 'custom', 'text'];
 
 async function roundTrip(browser, label, how) {
 	console.log('\n--- ' + label + ' ---');
@@ -226,22 +226,16 @@ async function roundTrip(browser, label, how) {
 	ok(label + ': the receipt lists what a DXF cannot carry: a lead, then each of ten items on its own line',
 		!!heldLi && heldLi.text.indexOf(lead) === 0 && heldWords.every((w) => heldLi.text.indexOf(w) > 0) &&
 		(await a.page.$$eval('#lpn_dxfnet_report > li[data-code="not-in-dxf"] > ul > li', (l) => l.length)) === 10, heldLi && heldLi.text.slice(0, 200));
-	ok(label + ': ...including initial quality, custom properties, and map Text items and label positions',
-		/initial quality/.test(heldLi.text) && /custom properties/.test(heldLi.text) && /map Text items and hand-placed label positions/.test(heldLi.text) && /patterns/.test(heldLi.text) && /curves/.test(heldLi.text));
-	const meth = imp.items.find((i) => i.code === 'method');
-	ok(label + ': a separate line says Hazen-Williams was assumed and roughness read as C', !!meth && meth.text === (await pcOf(a, 'lpn_dxfnet_note_method')) && /Hazen-Williams C\.$/.test(meth.text), meth && meth.text);
+	ok(label + ': ...including custom properties, and map Text items and label positions; and no longer status, minor loss or initial quality, which the file now carries',
+		/custom properties/.test(heldLi.text) && /map Text items and hand-placed label positions/.test(heldLi.text) && /patterns/.test(heldLi.text) && /curves other than pump head curves/.test(heldLi.text) &&
+		!/status|minor loss|initial quality/.test(heldLi.text), heldLi.text);
+	ok(label + ': no "Hazen-Williams was assumed" line, because the read-me states the head loss formula', !imp.items.some((i) => i.code === 'method'));
 	ok(label + ': the counts omit a kind with none (no "0 customers")', imp.dialog.text.indexOf('0 customers') < 0 && (how.customers ? /3 customers\./.test(imp.dialog.text) : !/customers\./.test(imp.dialog.text.split('\n')[1] || imp.dialog.text.slice(0, 300))), imp.dialog.text.slice(0, 200));
 	ok(label + ': a grid or projected export gets no "from a latitude and longitude project" line', codes.indexOf('geo-export') < 0);
-	const pumps = (before.doc.links || []).filter((l) => l.type === 'pump').map((l) => l.id);
-	ok(label + ': and nothing else is reported for the page\'s own file, except the pumps, which have no curve in a DXF file',
-		codes.every((c) => c === 'not-in-dxf' || c === 'method' || c === 'pump-no-curve') && (codes.indexOf('pump-no-curve') >= 0) === (pumps.length > 0), JSON.stringify(imp.items.map((i) => i.text.slice(0, 120))));
-	if (pumps.length) {
-		const pc = imp.items.find((i) => i.code === 'pump-no-curve');
-		ok(label + ': ...naming each pump (' + pumps.join(', ') + ')', !!pc && pumps.every((id) => pc.text.indexOf(id) > 0) && pc.text === (await pcOf(a, 'lpn_dxfnet_note_pump_no_curve')) + ' (' + pumps.join(', ') + ')', pc && pc.text);
-	}
+	ok(label + ': and nothing else is reported for the page\'s own file (its pumps carry their curves)', codes.length === 1 && codes[0] === 'not-in-dxf', JSON.stringify(imp.items.map((i) => i.text.slice(0, 120))));
 	if (imp.dialog) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 	const after = await stored(a);
-	ok(label + ': the new project\'s head loss formula is Hazen-Williams, as the receipt says', after.doc.settings.method === 'hw', String(after.doc.settings.method));
+	ok(label + ': the new project\'s head loss formula is Hazen-Williams, as the read-me states', after.doc.settings.method === 'hw', String(after.doc.settings.method));
 	ok(label + ': a NEW project, named after the file, is the open one', after.count === before.count + 1 && after.id !== before.id && after.doc.project.name === 'roundtrip', JSON.stringify(after.doc && after.doc.project));
 	const tabs = await a.tabs();
 	ok(label + ': its tab is the current one', tabs.some((t) => t.current && t.label.indexOf('roundtrip') >= 0), JSON.stringify(tabs.map((t) => t.label)));
@@ -357,7 +351,7 @@ async function main() {
 			const layer = /C-WATR-MODL-[A-Z]{4}-BASE/.exec(t.slice(t.indexOf('\r\nENTITIES\r\n')))[0];
 			t = t.slice(0, seq) + '  0\r\nATTRIB\r\n  5\r\nFFF1\r\n330\r\n20\r\n100\r\nAcDbEntity\r\n  8\r\n' + layer + '\r\n100\r\nAcDbText\r\n 10\r\n0.0\r\n 20\r\n0.0\r\n 30\r\n0.0\r\n 40\r\n1.0\r\n  1\r\nxyz\r\n100\r\nAcDbAttribute\r\n  2\r\nFOO_BAR\r\n 70\r\n0\r\n' + t.slice(seq);
 			const imp = await importDxf(a, 'stranger.dxf', Buffer.from(t, 'latin1'));
-			const codes = imp.items.map((i) => i.code).filter((c) => c !== 'not-in-dxf' && c !== 'method' && c !== 'pump-no-curve').sort();
+			const codes = imp.items.map((i) => i.code).filter((c) => c !== 'not-in-dxf').sort();
 			ok('exactly two lines besides the standing one: the foreign layer and the unknown tag', codes.join() === 'layer-foreign,tag-unknown', JSON.stringify(imp.items.map((i) => i.code + ': ' + i.text)));
 			const lf = imp.items.find((i) => i.code === 'layer-foreign'), tu = imp.items.find((i) => i.code === 'tag-unknown');
 			ok('the foreign layer line names the layer and its one LINE', !!lf && lf.text.indexOf('WALLS (1 LINE)') > 0, lf && lf.text);

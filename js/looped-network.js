@@ -44807,7 +44807,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, prefix = EngCalcs.lpnDxfModelPrefix, T = {
 			'layer-foreign': ['lpn_dxfnet_note_layer_foreign', 'These layers do not begin with {prefix}, so nothing on them was read.'],
 			'layer-unknown': ['lpn_dxfnet_note_layer_unknown', 'These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.'],
-			'alternative': ['lpn_dxfnet_note_alternative', 'These layers state an alternative other than BASE. Only the BASE alternative is read, so nothing on them was read.'],
+			'alternative': ['lpn_dxfnet_note_alternative', 'These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.'],
+			'alt-read': ['lpn_dxfnet_note_alt_read', 'The drawing has no BASE alternative. The alternative {alt} was read.'],
+			'curve-differs': ['lpn_dxfnet_note_curve_differs', 'These pumps state a curve ID already used by another pump with different points. The first curve was kept.'],
 			'shapes': ['lpn_dxfnet_note_shapes', 'These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.'],
 			'entity-unread': ['lpn_dxfnet_note_entity_unread', 'These entities are not a kind this import reads on their layer, and were not imported.'],
 			'paper-space': ['lpn_dxfnet_note_paper_space', 'Entities in paper space were not read: {n}.'],
@@ -44823,7 +44825,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'end-ambiguous': ['lpn_dxfnet_note_end_ambiguous', 'These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.'],
 			'end-no-node': ['lpn_dxfnet_note_end_no_node', 'These links have an end where there is no node, and were not imported.'],
 			'end-loop': ['lpn_dxfnet_note_end_loop', 'These links start and end at the same node, and were not imported.'],
-			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'A DXF file does not hold pump curves. These pumps have none, so Calculate will not give the original results until each is given a curve.'],
+			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'These pumps state no head curve, so Calculate will not give the original results until each is given a curve.'],
 			'crs-unknown': ['lpn_dxfnet_note_crs_unknown', 'The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.'],
 			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
 			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
@@ -44833,18 +44835,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'geo-export': ['lpn_dxfnet_note_geo_export', 'This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.'],
 		}, t = T[note.code] || [null, note.code], s = String((t[0] && pc[t[0]]) || t[1]);
 		return s.split('{prefix}').join(prefix).split('{n}').join(String(note.detail))
+			.split('{alt}').join(String(note.detail))
 			.split('{coord}').join(String((note.detail || {}).coord || '')).split('{length}').join(String((note.detail || {}).length || ''));
 	}
 	// What a DXF file cannot hold, one item per line under the standing lead (the key, then its English).
 	var LPN_DXFNET_HELD = [
 		['lpn_dxfnet_held_patterns', 'patterns'],
-		['lpn_dxfnet_held_curves', 'curves'],
+		['lpn_dxfnet_held_curves', 'curves other than pump head curves'],
 		['lpn_dxfnet_held_controls', 'controls and rules'],
 		['lpn_dxfnet_held_times', 'time settings and EPANET options'],
-		['lpn_dxfnet_held_status', 'pipe and pump status (every link opens Open)'],
-		['lpn_dxfnet_held_minor', 'minor loss coefficients'],
 		['lpn_dxfnet_held_demand', 'demand categories (only a junction\'s total)'],
-		['lpn_dxfnet_held_quality', 'initial quality'],
+		['lpn_dxfnet_held_emitter', 'emitter coefficients'],
+		['lpn_dxfnet_held_quality', 'reaction coefficients, sources and mixing'],
+		['lpn_dxfnet_held_energy', 'pump efficiency and energy settings'],
 		['lpn_dxfnet_held_custom', 'custom properties'],
 		['lpn_dxfnet_held_text', 'map Text items and hand-placed label positions']
 	];
@@ -44905,7 +44908,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 */
 	function docFromDxfNet(r, name, defaults, crs) {
 		var next = newNextId(), s = JSON.parse(JSON.stringify(settings));
-		s.method = 'hw';
+		s.method = r.method === 'dw' || r.method === 'manning' ? r.method : 'hw';
 		s.defaults = defaults || s.defaults;
 		s.hydraulics = {}; s.qualityOptions = {}; s.fileOptions = {};
 		s.quality = { mode: 'none', traceNode: '' };
@@ -44931,7 +44934,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
 			backdrop: null,
 			settings: s,
-			patterns: [], curves: [], defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
+			patterns: [], curves: r.curves || [], defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
 			units: readUnitSelections()
 		});
 	}
@@ -45020,7 +45023,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		loose = placeDxfCustomers(r.customers);
 		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }
 		r.notes.push({ code: 'not-in-dxf', ids: [], detail: '' });
-		r.notes.push({ code: 'method', ids: [], detail: '' });
+		if (!r.method) { r.notes.push({ code: 'method', ids: [], detail: '' }); }
 		clearUndo();
 		saveToStorage();
 		stampProjectSaved(id);
@@ -45131,12 +45134,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The properties each block carries, by internal key. Data only: no solve results, which an
 	// import would have no property to put back into.
 	var LPN_DXF_KEYS = {
-		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
-		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
-		tank: ['ID', 'ELEV', 'BASEELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
-		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
-		pump: ['ID', 'TAG', 'DESC'],
-		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
+		junction: ['ID', 'ELEV', 'DEMAND', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		reservoir: ['ID', 'HEAD', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'BASEELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'MINORLOSS', 'STATUS', 'ACTIVE', 'TAG', 'DESC'],
+		pump: ['ID', 'STATUS', 'SPEED', 'CURVE', 'CURVEPOINTS', 'ACTIVE', 'TAG', 'DESC'],
+		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'MINORLOSS', 'STATUS', 'ACTIVE', 'TAG', 'DESC'],
 		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
 	};
 	// **A TAG IS THE PROPERTY'S LABEL** in the page's language (dev/dxf-interface.md: *"attributes
@@ -45157,7 +45160,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			DIAMETER: [pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'],
 			'tank.DIAMETER': [pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'],
 			LENGTH: [pc.lpn_field_length || 'Length', 'lpn_u_length'],
-			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'],
+			// Darcy-Weisbach roughness is a length, so its prompt states the unit; C and n have none.
+			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'].concat(frictionMethod() === 'dw' ? ['lpn_u_roughness'] : []),
+			MINORLOSS: [pc.lpn_field_km_short || 'Minor loss, k'],
+			STATUS: [pc.lpn_result_status || 'Status'],
+			INITQUALITY: [pc.lpn_quality_initial || 'Initial quality'],
+			ACTIVE: [pc.lpn_field_active || 'Is active?'],
+			SPEED: [pc.lpn_field_pump_speed || 'Relative speed'],
+			CURVE: [pc.lpn_pump_curve_source || 'Pump head curve'],
+			CURVEPOINTS: [pc.lpn_dxf_curve_points || 'Pump head curve points (flow, head)'],
 			VALVETYPE: [pc.lpn_field_valve_type || 'Valve type'],
 			SETTING: [pc.lpn_field_valve_setting || 'Setting'],
 			COUNT: [pc.lpn_field_meter_count || 'Number of services'],
@@ -45198,18 +45209,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
 				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
 		}
+		a.push(['INITQUALITY', dxfVal(n, 'initQuality')], ['ACTIVE', isActive(n) ? 'YES' : 'NO']);
 		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
 		return a;
+	}
+	// A pump's head curve as the points it holds, "flow,head" pairs in the project units and as typed
+	// (the curve's own coordinate text where it keeps one), blank where the pump has no curve.
+	function dxfCurvePoints(id) {
+		var c = (doc.curves || []).filter(function (q) { return q.id === id && q.kind === 'head'; })[0];
+		if (!c || !(c.points || []).length) { return ''; }
+		return c.points.map(function (pt, k) {
+			var t = c.tok || {};
+			return (t[k + 'x'] !== undefined ? t[k + 'x'] : String(pt[0])) + ',' + (t[k + 'y'] !== undefined ? t[k + 'y'] : String(pt[1]));
+		}).join(' ');
 	}
 	function dxfLinkAttrs(l) {
 		var a = [['ID', l.id]];
 		if (l.type === 'pipe') {
-			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')]);
+			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')],
+				['MINORLOSS', dxfNum(l, '_k', pipeK(l))]);
 		}
 		if (l.type === 'valve') {
-			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')]);
+			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')],
+				['MINORLOSS', dxfNum(l, '_k', pipeK(l))]);
 		}
-		a.push(['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
+		if (l.type === 'pump') {
+			var cid = effective(l, 'curveId') || '';
+			a.push(['STATUS', linkStoredStatus(l).toUpperCase()], ['SPEED', dxfVal(l, 'speed')], ['CURVE', cid], ['CURVEPOINTS', cid ? dxfCurvePoints(cid) : '']);
+		} else {
+			a.push(['STATUS', linkStoredStatus(l).toUpperCase()]);
+		}
+		a.push(['ACTIVE', isActive(l) ? 'YES' : 'NO'], ['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
 		return a;
 	}
 	// A point of the DRAWING FRAME (where a customer lives) through the outward boundary and on
@@ -45301,6 +45331,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		nodes.concat(links, customers).forEach(function (el) {
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
+		// The head loss formula, named and then coded in brackets (HW, DW or MANNING) for the import to find.
+		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is in the terms of that formula.')
+			.replace('{formula}', frictionMethodLabel()).replace('{code}', frictionMethod() === 'manning' ? 'MANNING' : frictionMethod().toUpperCase()));
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {

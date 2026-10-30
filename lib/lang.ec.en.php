@@ -2290,6 +2290,8 @@ $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in
 // {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
 // C-WATR-MODL-NODE-BASE.
 $ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.';
+$ec_lang['lpn_dxf_note_headloss']='Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.';
+$ec_lang['lpn_dxf_curve_points']='Pump head curve points (flow, head)';
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.';
 // {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
@@ -5038,7 +5040,9 @@ $ec_lang['lpn_gjnet_note_end_off_node']='The line of each of these links does no
 $ec_lang['lpn_gjnet_note_not_held']='A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.';
 $ec_lang['lpn_dxfnet_note_layer_foreign']='These layers do not begin with {prefix}, so nothing on them was read.';
 $ec_lang['lpn_dxfnet_note_layer_unknown']='These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.';
-$ec_lang['lpn_dxfnet_note_alternative']='These layers state an alternative other than BASE. Only the BASE alternative is read, so nothing on them was read.';
+$ec_lang['lpn_dxfnet_note_alternative']='These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.';
+$ec_lang['lpn_dxfnet_note_alt_read']='The drawing has no BASE alternative. The alternative {alt} was read.';
+$ec_lang['lpn_dxfnet_note_curve_differs']='These pumps state a curve ID that another pump uses with different points. The first curve was kept.';
 $ec_lang['lpn_dxfnet_note_shapes']='These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.';
 $ec_lang['lpn_dxfnet_note_entity_unread']='These entities are not a kind this import reads on their layer, and were not imported.';
 $ec_lang['lpn_dxfnet_note_paper_space']='Entities in paper space were not read: {n}.';
@@ -5053,7 +5057,7 @@ $ec_lang['lpn_dxfnet_note_line_no_block']='These service lines end where there i
 $ec_lang['lpn_dxfnet_note_end_ambiguous']='These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.';
 $ec_lang['lpn_dxfnet_note_end_no_node']='These links have an end where there is no node, and were not imported.';
 $ec_lang['lpn_dxfnet_note_end_loop']='These links start and end at the same node, and were not imported.';
-$ec_lang['lpn_dxfnet_note_pump_no_curve']='A DXF file does not hold pump curves. These pumps have none, so Calculate will not give the original results until each is given a curve.';
+$ec_lang['lpn_dxfnet_note_pump_no_curve']='These pumps state no head curve, so Calculate will not give the original results until each is given a curve.';
 $ec_lang['lpn_dxfnet_note_crs_unknown']='The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.';
 $ec_lang['lpn_dxfnet_note_method']='The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.';
 $ec_lang['lpn_dxfnet_note_geo_export']='This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.';
@@ -5061,13 +5065,13 @@ $ec_lang['lpn_dxfnet_count_nodes']='{n} junctions, reservoirs and tanks.';
 $ec_lang['lpn_dxfnet_count_links']='{n} pipes, pumps and valves.';
 $ec_lang['lpn_dxfnet_count_customers']='{n} customers.';
 $ec_lang['lpn_dxfnet_held_patterns']='patterns';
-$ec_lang['lpn_dxfnet_held_curves']='curves';
+$ec_lang['lpn_dxfnet_held_curves']='curves other than pump head curves';
 $ec_lang['lpn_dxfnet_held_controls']='controls and rules';
 $ec_lang['lpn_dxfnet_held_times']='time settings and EPANET options';
-$ec_lang['lpn_dxfnet_held_status']='pipe and pump status (every link opens Open)';
-$ec_lang['lpn_dxfnet_held_minor']='minor loss coefficients';
+$ec_lang['lpn_dxfnet_held_emitter']='emitter coefficients';
+$ec_lang['lpn_dxfnet_held_energy']='pump efficiency and energy settings';
 $ec_lang['lpn_dxfnet_held_demand']='demand categories (only a junction\'s total)';
-$ec_lang['lpn_dxfnet_held_quality']='initial quality';
+$ec_lang['lpn_dxfnet_held_quality']='reaction coefficients, sources and mixing';
 $ec_lang['lpn_dxfnet_held_custom']='custom properties';
 $ec_lang['lpn_dxfnet_held_text']='map Text items and hand-placed label positions';
 $ec_lang['lpn_dxfnet_note_unit_unknown']='The drawing states these units, which this page does not know. The units in use were kept for them.';

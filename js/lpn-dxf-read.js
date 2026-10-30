@@ -37,7 +37,7 @@
 		reservoir: { HEAD: 'lpn_u_elevhead' },
 		tank: { ELEV: 'lpn_u_elevhead', BASEELEV: 'lpn_u_elevhead', LEVEL: 'lpn_u_elevhead', MINLEVEL: 'lpn_u_elevhead',
 			MAXLEVEL: 'lpn_u_elevhead', DIAMETER: 'lpn_u_length' },
-		pipe: { DIAMETER: 'lpn_u_diameter', LENGTH: 'lpn_u_length' },
+		pipe: { DIAMETER: 'lpn_u_diameter', LENGTH: 'lpn_u_length', ROUGHNESS: 'lpn_u_roughness' },
 		valve: { DIAMETER: 'lpn_u_diameter' },
 		customer: { DEMAND: 'lpn_u_flow' }
 	};
@@ -174,6 +174,20 @@
 			var by = map[layer];
 			return layer + ' (' + Object.keys(by).map(function (t) { return by[t] + ' ' + t; }).join(', ') + ')';
 		}
+		// **WHICH ALTERNATIVE IS READ.** This page writes the whole network of one scenario, on layers
+		// ending in that scenario's name (BASE for Base), so a drawing it wrote holds one alternative.
+		// BASE is read where the file has it; otherwise the first alternative in the file, so this
+		// page's own export of any scenario opens as a network. The others are named, not read.
+		var altRead = '', altSeen = [];
+		items.forEach(function (it) {
+			var up = it.layer.toUpperCase(), m, a;
+			if (up.slice(0, prefix.length) !== prefix) { return; }
+			m = /^([^-]{4})-(.+)$/.exec(it.layer.slice(prefix.length));
+			if (!m || !CODE_TYPE[m[1].toUpperCase()] || m[1].toUpperCase() === 'SHAP') { return; }
+			a = m[2].toUpperCase();
+			if (altSeen.indexOf(a) < 0) { altSeen.push(a); }
+		});
+		altRead = altSeen.indexOf('BASE') >= 0 ? 'BASE' : (altSeen[0] || 'BASE');
 		items.forEach(function (it) {
 			var up = it.layer.toUpperCase(), m;
 			if (up === readme) {
@@ -189,7 +203,7 @@
 			m = /^([^-]{4})-(.+)$/.exec(it.layer.slice(prefix.length));
 			it.code = m ? m[1].toUpperCase() : '';
 			if (!m || !CODE_TYPE[it.code]) { tally(kinds, it.layer, it.type); return; }
-			if (m[2].toUpperCase() !== 'BASE') { tally(alts, it.layer, it.type); return; }
+			if (m[2].toUpperCase() !== altRead) { tally(alts, it.layer, it.type); return; }
 			if (it.code === 'SHAP') { tally(shapes, it.layer, it.type); return; }
 			wanted.push(it);
 		});
@@ -220,6 +234,45 @@
 		function vertsOf(ln) {
 			var pts = R.toWorld(R.lwVerts(ln), R.ocsOf(ln), R.num(R.group(ln, 38) || '0') || 0);
 			return pts.every(R.good) ? pts : null;
+		}
+
+		// A link's STATUS: EPANET's own words, which a drawing in any language carries. A check valve is a
+		// pipe's only; a pump or valve is Open or Closed.
+		// ACTIVE is YES or NO; an element that is not active stays on the drawing and out of the network.
+		function active(el, a) { if (val(a, 'ACTIVE').trim().toUpperCase() === 'NO') { el._active = false; } }
+		function status(lk, a, id) {
+			var t = val(a, 'STATUS').trim().toUpperCase();
+			if (t === '') { return; }
+			if (t === 'OPEN' || t === 'CLOSED' || (t === 'CV' && lk.type === 'pipe')) { lk._status = t.toLowerCase(); }
+			else { N.add('value-unread', id + ' STATUS: ' + t); }
+		}
+		// A pump's relative speed, and its head curve: the reference and the points, in the units the
+		// drawing states for flow and head. The same curve ID on two pumps is one curve.
+		var curves = [], curveById = {};
+		function pumpRead(lk, a, id) {
+			var ref = val(a, 'CURVE').trim(), pts = val(a, 'CURVEPOINTS').trim(), pairs, bad = false, c, sig;
+			put(lk, id, a, 'SPEED', 'speed');
+			if (lk.speed === 1) { delete lk.speed; if (lk.tok) { delete lk.tok.speed; } }
+			if (ref === '') { return; }
+			if (!idOk(ref)) { N.add('value-unread', id + ' CURVE: ' + ref); return; }
+			pairs = pts === '' ? [] : pts.split(/\s+/).map(function (q) {
+				var xy = q.split(',');
+				if (xy.length !== 2 || !NUMBER.test(xy[0]) || !NUMBER.test(xy[1])) { bad = true; }
+				return xy;
+			});
+			if (bad || !pairs.length) { N.add('value-unread', id + ' CURVE POINTS: ' + (pts || '(blank)')); return; }
+			c = { id: ref, kind: 'head', points: pairs.map(function (xy) { return [parseFloat(xy[0]), parseFloat(xy[1])]; }) };
+			pairs.forEach(function (xy, k) {
+				var tok = c.tok || (c.tok = {});
+				if (xy[0] !== String(c.points[k][0])) { tok[k + 'x'] = xy[0]; }
+				if (xy[1] !== String(c.points[k][1])) { tok[k + 'y'] = xy[1]; }
+			});
+			if (c.tok && !Object.keys(c.tok).length) { delete c.tok; }
+			sig = JSON.stringify(c.points);
+			if (curveById[ref]) {
+				if (curveById[ref].sig !== sig) { N.add('curve-differs', ref + ' (' + id + ')'); return; }
+			} else { curveById[ref] = { sig: sig }; curves.push(c); }
+			lk._curveId = ref;
 		}
 
 		var inserts = [], lines = [];
@@ -256,6 +309,8 @@
 				put(nd, id, a, 'MAXLEVEL', 'maxLevel');
 				put(nd, id, a, 'DIAMETER', 'tankDiameter');
 			}
+			put(nd, id, a, 'INITQUALITY', '_initQuality');
+			active(nd, a);
 			if (val(a, 'TAG') !== '') { nd.tag = val(a, 'TAG'); }
 			if (val(a, 'DESC') !== '') { nd.desc = val(a, 'DESC'); }
 			nodes.push(nd); nodeIds[id] = nd; counts[type]++;
@@ -306,6 +361,7 @@
 				put(lk, id, a, 'DIAMETER', '_diameter');
 				put(lk, id, a, 'LENGTH', '_length');
 				put(lk, id, a, 'ROUGHNESS', '_roughness');
+				put(lk, id, a, 'MINORLOSS', '_k');
 				if (lk._length === undefined) { lk.lenAuto = true; }
 			} else if (type === 'valve') {
 				vt = val(a, 'VALVETYPE').trim().toUpperCase();
@@ -313,8 +369,13 @@
 				put(lk, id, a, 'DIAMETER', '_diameter');
 				put(lk, id, a, 'SETTING', '_setting');
 				if (lk._setting === undefined) { lk._setting = 0; }
+				put(lk, id, a, 'MINORLOSS', '_k');
 				lk._length = 0;
+			} else {
+				pumpRead(lk, a, id);
 			}
+			status(lk, a, id);
+			active(lk, a);
 			if (val(a, 'TAG') !== '') { lk.tag = val(a, 'TAG'); }
 			if (val(a, 'DESC') !== '') { lk.desc = val(a, 'DESC'); }
 			links.push(lk); linkIds[id] = lk; counts[type]++;
@@ -350,16 +411,22 @@
 			if (!lineEnd[k].used) { N.add('line-no-block', lineEnd[k].ln.layer + ' at ' + lineEnd[k].from.tok.x + ', ' + lineEnd[k].from.tok.y); }
 		});
 
-		// A pump is its ends and its name here: the curve that gives it a head is not in the file.
-		links.forEach(function (l) { if (l.type === 'pump') { N.add('pump-no-curve', l.id); } });
+		// A pump with no head curve stated is its ends and its name: nothing gives it a head.
+		links.forEach(function (l) { if (l.type === 'pump' && !l._curveId) { N.add('pump-no-curve', l.id); } });
 
 		// ---- what was not read, by layer, with the count of each kind of entity ----
 		[['layer-foreign', foreign], ['layer-unknown', kinds], ['alternative', alts], ['shapes', shapes], ['entity-unread', unread]].forEach(function (g) {
-			Object.keys(g[1]).forEach(function (l) { N.add(g[0], say(g[1], l)); });
+			Object.keys(g[1]).forEach(function (l) { N.add(g[0], say(g[1], l), g[0] === 'alternative' ? altRead : undefined); });
 		});
+		if (altRead !== 'BASE' && (nodes.length || links.length)) { N.add('alt-read', null, altRead); }
+
+		// The head loss formula is the read-me's, as a code in brackets after its name: (HW), (DW) or (MANNING).
+		// The last such code wins, since the project's name leads the read-me and may hold brackets.
+		var method = '', mm, mre = /\((HW|DW|MANNING)\)/g;
+		while ((mm = mre.exec(readmeText.toUpperCase()))) { method = mm[1].toLowerCase(); }
 
 		return {
-			ok: true, nodes: nodes, links: links, customers: customers, insunits: rd.insunits,
+			ok: true, nodes: nodes, links: links, customers: customers, curves: curves, method: method, alternative: altRead, insunits: rd.insunits,
 			coordUnit: INSUNITS_NAME[rd.insunits] || '', crsCode: crsCode, readmeText: readmeText, unitText: unitText, notes: N.list, counts: counts
 		};
 	}
