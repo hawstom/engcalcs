@@ -138,7 +138,8 @@ async function main() {
 		await page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
 		await a._clickRow('#lpn_menu_list2', await a.lang('lpn_sm_menu'));
 		await a.settle(600);
-		ok('choosing it again in the same page load sends nothing more', cmds().length === 1, JSON.stringify(cmds()));
+		// Every use counts (Tom, 2026-10-29: "A use is a use."), so a second choice is a second beacon.
+		ok('choosing it again in the same page load sends a second beacon', cmds().length === 2 && cmds()[1] === cmds()[0], JSON.stringify(cmds()));
 
 		await a.openMenu('project');
 		await a._clickRow('#lpn_menu_list', await a.lang('lpn_analyze_menu'));
@@ -146,16 +147,16 @@ async function main() {
 		await a._clickRow('#lpn_menu_list2', await a.lang('lpn_ff_menu'));
 		await a.settle(900);
 		ok('Water > Analyze > Fire flow analysis sends exactly its own cmd beacon',
-			cmds().length === 2 && cmds()[1] === 'cmd:project/analyze_menu/ff_menu', JSON.stringify(cmds()));
+			cmds().length === 3 && cmds()[2] === 'cmd:project/analyze_menu/ff_menu', JSON.stringify(cmds()));
 
 		await page.click('#lpn_toolbar button[data-tool="add-junction"]');
 		await a.settle(300);
 		ok('the Junction toolbar button sends exactly one cmd:tb/add-junction',
-			cmds().length === 3 && cmds()[2] === 'cmd:tb/add-junction', JSON.stringify(cmds()));
+			cmds().length === 4 && cmds()[3] === 'cmd:tb/add-junction', JSON.stringify(cmds()));
 		await page.click('#lpn_toolbar button[data-tool="add-junction"]');
 		await page.click('#lpn_toolbar button[data-tool="add-junction"]');
 		await a.settle(300);
-		ok('pressing it again sends nothing more', cmds().length === 3, JSON.stringify(cmds()));
+		ok('pressing it twice more sends two more', cmds().length === 6 && cmds()[5] === 'cmd:tb/add-junction', JSON.stringify(cmds()));
 
 		// ---- C4: content is not a command ----------------------------------------------------------
 		console.log('\n---- C4. content is not a command ----');
@@ -170,7 +171,7 @@ async function main() {
 			await page.evaluate(() => { const rows = document.querySelectorAll('#lpn_menu_list button.lpn-menu-row'); rows[rows.length - 1].click(); });
 		});
 		await a.settle(500);
-		ok('choosing a scenario by name sends no cmd beacon', cmds().length === 3, JSON.stringify(cmds()) + ' row=' + scnRow);
+		ok('choosing a scenario by name sends no cmd beacon', cmds().length === 6, JSON.stringify(cmds()) + ' row=' + scnRow);
 
 		// ---- C5: nothing stored ---------------------------------------------------------------------
 		console.log('\n---- C5. nothing stored ----');

@@ -43,7 +43,8 @@ function takeBrowserLock(name, lockEnv) {
 
 // Loads Looped-Network.php with the Net1 example open and the consent bar and Tom's dialog answerer
 // out of the way, so OK in a dialog is a pressed button.
-async function openNet1(browser, name) {
+// `shipped: true` opens the Net1 card as the wall ships it (five scenarios); the default is plain Net1, Base alone.
+async function openNet1(browser, name, opts) {
 	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
 	const a = await Session.open(browser, name, { viewport: { width: 1400, height: 900 } });
 	const P = a.page;
@@ -58,7 +59,7 @@ async function openNet1(browser, name) {
 		delete window.lpnDialogAnswerer;
 	});
 	await clearSeams();
-	await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+	if (opts && opts.shipped) { await a.openExampleCard(await a.lang('lpn_ex_net1_title')); } else { await a.openNet1Plain(await a.lang('lpn_ex_net1_title')); }
 	await a.settle(1500);
 	await clearSeams();
 	return { a, P, strings: {} };

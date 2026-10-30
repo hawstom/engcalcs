@@ -95,15 +95,15 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-29 evening (forty-eighth session, Opus main, Sonnet agents)
+## STATE — 2026-10-30 small hours (forty-ninth session, Opus main, Sonnet agents)
 
-- **Merged on green with this handoff:** `fix/manual-search-speed` (marks laid lazily, chapter on screen first; a heading that is its chapter's first hit gets no row; a heading repeated within a chapter shows its parent, "Fire flow analysis: Example on Net1").
-- **Waiting his browser pass (all on Branch previews):** `box-design` round 4 (8103; carries Tasks 827, 828, 829); `feat/report-widths` (8110; his "Merge" stands, same batch as box-design); `feat/starter-example` (8107; he OK'd all three round-3 items but gave no merge word); `feat/dxf-import` (8101, Task 772 slice 1); `feat/gis-background` (8105, Task 720, built on box-design).
-- **`fix/usage-report-wording`** (no port; spock.php): his Looking/Calculating/Uses (others) wording with three precision fixes; waits his word.
-- **Asked of him in messenger.md:** the GIS privacy paragraph; whether the DXF export should carry status, initial quality and the head loss formula; Properties covering 86% of a phone (why a Text under it cannot be tapped); whether the grey bar he saw was the bottom pane's 5-row tab strip; the random theme show design.
-- **Rebase chain:** report-widths and gis-background each merge box-design; after any box-design commit, merge it into both.
-- **Trap met:** a finished agent kept re-sending its hand-back on every background tick; TaskStop it once its tree is clean.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/ee9f2ae0-dd3a-4b13-9207-529e957c3a18/scratchpad (brief-*.md, perry/).
+- **Merged on master this session:** `feat/starter-example` (his "Merge starter-examples") and `fix/usage-report-wording` round 2 (a defect fix, merged on green: every said-yes use is now logged, not once per page per session; new rows carry an `every` marker and spock.php finds the cutover from the data; `ec_seen` keeps only the human-view and language-demand bits; privacy.php's two `ec_seen` sentences rewritten). He wants to proofread spock.php once deployed. Payloads regenerated; Task 824 holds his theme-of-the-day words.
+- **Waiting his browser pass (Branch previews):** `box-design` round 5 (8103: half-height Properties on a phone, slim pill grips, rotate buttons in a DEM-style row; Perry confirmed all three; junction 31 at the screen bottom would not select by touch for Perry, cause unknown, possibly old); `feat/gis-background` round 2 (8105: Map > Add layer…, "ArcGIS REST (MapServer)", conventional privacy wording; Perry confirmed against real servers); `feat/dxf-import` round 2 (8101: scenario exports read back, status, quality, minor loss, pump curves, head loss formula carried; receipt names the lost demand multiplier); `feat/report-widths` (8110; his "Merge" stands, rides on box-design).
+- **Rebase chain:** report-widths and gis-background each merge box-design (both now carry box-design through 36fa47163; box-design's later commit is only Perry's journal).
+- **His open questions to answer or carry:** the theme-of-the-day list (Task 824); whether DXF should embed patterns, controls and options as text (asked in messenger.md); the new English strings on the dxf and gis branches.
+- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code and saw the old 12 s search. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
+- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master; `eaefc7569` went in under his name.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/d078a540-9bc6-4560-8e07-eb5a3591414f/scratchpad (brief-*.md, perry-*.js/log).
 
 ## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 

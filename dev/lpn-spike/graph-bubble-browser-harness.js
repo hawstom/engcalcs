@@ -132,7 +132,7 @@ async function main() {
 		console.log('1. BASIC NETWORK, steady state');
 		let a = await Session.open(browser, 'bub1', { viewport: { width: 1500, height: 950 } });
 		await prep(a);
-		await a.openExampleCard(await a.lang('lpn_ex_basic_us_title'));
+		await a.openExampleCard(await a.lang('lpn_ex_valves_title'));
 		await a.settle(1500);
 		const firstNode = await a.page.evaluate(() => document.querySelector('#lpn_canvas [data-node]').getAttribute('data-node'));
 		await rightClick(a, await pointOf(a.page, 'node', firstNode));

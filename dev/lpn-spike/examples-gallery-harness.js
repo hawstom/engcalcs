@@ -136,13 +136,13 @@ console.log('\n-- the Net2 pair carries the Net3 label and colour conventions, a
 	report(JSON.stringify(pair[0].labelSettings) === JSON.stringify(pair[1].labelSettings), 'Net2 SI and US share label settings');
 }
 
-console.log('\n-- the gallery runs Net3, Net2, Elm Street, Net1, then the two basics last --');
+console.log('\n-- the wall: the four starter examples first (SI before US), the two Net1 cards last --');
 {
 	const f = examples.map(e => e.file);
-	report(f.slice(-2).join() === 'Basic-example-SI-units.lwn,Basic-example-US-units.lwn', 'the two basics are the last two cards', f.slice(-3).join());
-	report(f[f.length - 3] === 'Net1-Scenarios.lwn', 'Net1 with scenarios sits just before them, after both Net1s');
-	report(f[f.length - 4] === 'Net1.lwn', 'Net1 US sits just before the scenarios version');
-	report(f[f.length - 5] === 'Net1-SI.lwn', 'Net1 SI sits just before Net1 US');
+	report(f.slice(0, 4).join() === 'Fire-flow-extension-SI.lwn,Fire-flow-extension.lwn,Community-well-tank-SI.lwn,Community-well-tank.lwn',
+		'the starter examples lead, each pair SI first (Tom, 2026-10-28)', f.slice(0, 4).join());
+	report(f.slice(-2).join() === 'Net1-Scenarios-SI.lwn,Net1-Scenarios.lwn', 'the two Net1 cards (both with scenarios and rules) are last, SI first', f.slice(-2).join());
+	report(!f.some(x => /^Basic-/.test(x) || x === 'Net1.lwn' || x === 'Net1-SI.lwn'), 'no Basic card and no plain Net1 card');
 }
 
 console.log('\n-- card descriptions read from the language file --');
@@ -152,26 +152,18 @@ console.log('\n-- card descriptions read from the language file --');
 	examples.forEach(function (ex) {
 		report(langOf(ex.descKey) === ex.description, `${ex.file}: manifest description equals ${ex.descKey}`);
 	});
-	examples.filter(e => /^lpn_ex_basic_/.test(e.titleKey)).forEach(function (ex) {
-		report(/^(A|Two) reservoirs?/.test(ex.description), `${ex.titleKey}: begins with what it is, a reservoir`, ex.description);
-		const f = JSON.parse(fs.readFileSync(path.join(outDir, ex.file), 'utf8'));
-		const c = (o, t) => o.filter(x => x.type === t).length;
-		report(c(f.nodes, 'reservoir') === 2 && c(f.nodes, 'junction') === 6 && c(f.links, 'pump') === 1 && c(f.links, 'pipe') === 6 && c(f.nodes, 'tank') === 0,
-			`${ex.file}: 2 reservoirs, 6 junctions, 1 pump, 6 pipes, no tank (the counts its description states)`);
-		report(!/start here|starting|the same|the smallest/i.test(ex.description), `${ex.titleKey}: none of the struck phrases`);
-	});
 	examples.filter(e => /^Net2/.test(e.file)).forEach(function (ex) {
 		// Wording is Tom's to reword; only that both twins state a size in their own length unit.
 		report(ex.system === 'si' ? /\bkm\b/.test(ex.description) : /\bmiles?\b/.test(ex.description),
 			`${ex.file}: states its size in its own length unit`);
 	});
 	const elm = examples.find(e => e.file === 'Elm-Street-Center.lwn');
-	report(/\(US\)$/.test(elm.title) && /^Gallons per minute, with feet and inches\./.test(elm.description), 'Elm Street Center discloses its units like the EPANET cards');
+	report(/\(US\)$/.test(elm.title) && /Gallons per minute, with feet and inches\.$/.test(elm.description), 'Elm Street Center discloses its units like the EPANET cards');
 }
 
 console.log('\n-- Net1: the counts the notes quote are the file\'s --');
 {
-	const n1 = JSON.parse(fs.readFileSync(path.join(outDir, 'Net1.lwn'), 'utf8'));
+	const n1 = JSON.parse(fs.readFileSync(path.join(outDir, 'Net1-Scenarios.lwn'), 'utf8'));
 	const cnt = (o, t) => Object.values(o).filter(x => x.type === t).length;
 	report(cnt(n1.nodes, 'junction') === 9, 'Net1 has 9 junctions', String(cnt(n1.nodes, 'junction')));
 	report(cnt(n1.nodes, 'reservoir') === 1 && cnt(n1.nodes, 'tank') === 1, 'Net1 has 1 reservoir and 1 tank');
@@ -297,29 +289,26 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		'every entry carries an explicit order');
 	const si = examples.filter(function (e) { return e.system === 'si'; });
 	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
-	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED.** Tom, 2026-10-11 (Task 786): the
-	// first four are Net3 SI, Net3 US, Net2 SI, Net2 US, then Elm Street Center, Net1, and (Tom,
-	// 2026-10-12) the two basics last. What survives of his 2026-08-14 "an SI example leads" is
-	// that an SI example is first, and that each SI twin precedes its US twin.
-	['Net3-Novato-CA-World-SI.lwn', 'Net3-Novato-CA-World.lwn', 'Net2-Branford-CT-SI.lwn',
+	// **THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED.** Tom, 2026-10-28: the new starter examples move to the
+	// front, not favoring the US ones (SI first, each pair); then Net3, Net2, Elm Street Center; the two Net1
+	// cards (both with scenarios and rule-based controls) last.
+	['Fire-flow-extension-SI.lwn', 'Fire-flow-extension.lwn', 'Community-well-tank-SI.lwn', 'Community-well-tank.lwn',
+		'Net3-Novato-CA-World-SI.lwn', 'Net3-Novato-CA-World.lwn', 'Net2-Branford-CT-SI.lwn',
 		'Net2-Branford-CT.lwn', 'Elm-Street-Center.lwn'].forEach(function (f, i) {
 		report(examples[i].file === f, 'wall position ' + (i + 1) + ' is ' + f, examples[i].file);
 	});
-	// Tom, 2026-10-19: Net1 follows Net2 and Net3 (SI first, then US), narrated alike, and the
-	// scenarios version comes after both.
 	const pos = function (f) { return examples.findIndex(function (e) { return e.file === f; }); };
-	report(pos('Net1-SI.lwn') >= 0 && pos('Net1-SI.lwn') < pos('Net1.lwn') && pos('Net1.lwn') < pos('Net1-Scenarios.lwn'),
-		'Net1 is SI first, then US, then the scenarios version', [pos('Net1-SI.lwn'), pos('Net1.lwn'), pos('Net1-Scenarios.lwn')].join(','));
-	const n1si = examples[pos('Net1-SI.lwn')], n1us = examples[pos('Net1.lwn')];
+	report(pos('Net1-Scenarios-SI.lwn') >= 0 && pos('Net1-Scenarios-SI.lwn') < pos('Net1-Scenarios.lwn'),
+		'Net1 is SI first, then US, both with scenarios', [pos('Net1-Scenarios-SI.lwn'), pos('Net1-Scenarios.lwn')].join(','));
+	const n1si = examples[pos('Net1-Scenarios-SI.lwn')], n1us = examples[pos('Net1-Scenarios.lwn')];
 	if (n1si && n1us) {
 		report(/gpm \(US\)$/.test(n1us.title) && /L\/s \(SI\)$/.test(n1si.title),
 			'the Net1 titles name their unit system like Net2 and Net3', n1us.title);
-		report(/^Gallons per minute, with feet and inches\./.test(n1us.description),
-			'the US Net1 opens its description by naming its units, like the SI one');
-		const tail = function (d) { return d.replace(/^[^.]*\.\s*/, '').replace(/converted from gallons per minute, feet, and inches, /, ''); };
-		report(tail(n1si.description) === tail(n1us.description),
-			'the US Net1 narrates what the SI one does (same inventory)', tail(n1us.description));
+		report(/Gallons per minute, with feet and inches\.$/.test(n1us.description) && /Liters per second, with meters and millimeters\.$/.test(n1si.description),
+			'every description ends with its units sentence (Tom, 2026-10-28)');
 	}
+	report(examples.every(function (e) { return /(with feet and inches|with meters and millimeters)\.$/.test(e.description); }),
+		'every card description ends with the units sentence, the unique part first');
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {
 		const a = examples[i - 1], b = examples[i];
@@ -327,19 +316,6 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		if (ka[0] > kb[0] || (ka[0] === kb[0] && ka[1] > kb[1])) { sorted = false; }
 	}
 	report(sorted, 'the wall runs order-then-size, so its tail grows from small to large');
-	// The two basics are the pair the reader compares, so the longer explanation belongs on the one
-	// they meet first; the second only has to say how it differs.
-	const basics = examples.filter(function (e) { return /^Basic network/.test(e.title); });
-	if (basics.length === 2) {
-		// Tom, 2026-08-14: "I like that the SI network comes first since it's our only SI example."
-		// The two basics are the same size, so a size sort cannot express this -- it is pinned in
-		// examples.json, and an intent that survives only because a sort happens to be stable will
-		// silently flip.
-		report(basics[0].system === 'si', 'SI still comes first of the two basics', basics[0].file);
-		report(basics[0].description.length > basics[1].description.length,
-			'the leading basic carries the fuller description; the other is the also-ran',
-			`${basics[0].description.length} vs ${basics[1].description.length}`);
-	}
 }
 
 console.log('\n-- the card text is translatable, and the page supplies it --');
@@ -360,26 +336,6 @@ console.log('\n-- the card text is translatable, and the page supplies it --');
 		'the gallery prefers the translated title, falling back to the manifest English');
 	report(/\(ex\.descKey && pc\[ex\.descKey\]\) \|\| ex\.description/.test(src),
 		'and likewise the description');
-}
-
-console.log('\n-- flow unit leads, the way EPANET names a unit system --');
-{
-	// EPANET's [OPTIONS] Units setting is literally GPM or LPS, never "US" or "SI", so a water
-	// engineer reads the flow unit as the name of the system (Tom, 2026-08-14: "list flow units
-	// first for two reasons: EPANET and clarity").
-	const basics = examples.filter(function (e) { return /^lpn_ex_basic_/.test(e.titleKey || ''); });
-	report(basics.length === 2, 'both basics are present', `${basics.length}`);
-	basics.forEach(function (ex) {
-		const t = ex.title, d = ex.description;
-		const flowAt = t.toLowerCase().indexOf(ex.system === 'si' ? 'l/s' : 'gpm');
-		report(flowAt > 0, `${ex.titleKey}: the title names the flow unit`, t);
-		// In the description, the flow unit must come before the length units.
-		const dl = d.toLowerCase();
-		const flowWord = ex.system === 'si' ? 'liters per second' : 'gallons per minute';
-		const lenWord = ex.system === 'si' ? 'meters' : 'feet';
-		report(dl.indexOf(flowWord) >= 0 && dl.indexOf(flowWord) < dl.indexOf(lenWord),
-			`${ex.descKey}: flow unit is listed before the length units`);
-	});
 }
 
 console.log('\n-- layout: thumbnails are drawings on white paper, in both themes --');

@@ -55,7 +55,7 @@ const note = (w, v, at) => { if (v > w.v) { w.v = v; w.at = at; } };
 
 function open(file, edit) {
 	setUnitSet(/-SI\.lwn$/.test(file) ? 'si' : 'us');
-	const saved = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
+	const saved = JSON.parse(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'));
 	if (edit) { edit(saved); }
 	L.applySaved(L.migrateSaved(saved));
 	return L.assembleModel();
@@ -134,8 +134,8 @@ function ruleMisses(ru, rs) {
 			});
 		});
 		{
-			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
-			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
+			const ru = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '-SI.lwn', 'utf8'));
 			const miss = ruleMisses(ru, rs);
 			ok('every elevation, diameter, demand, head, level, length, curve point and control depth follows the rounding rule',
 				miss.length === 0, miss.length ? miss.length + ' miss, first ' + miss[0] : '');
@@ -171,8 +171,8 @@ function ruleMisses(ru, rs) {
 		// not its drawn length in these files (EPA drew them schematically), so "bar equals stated"
 		// cannot hold even in the US file.
 		{
-			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
-			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
+			const ru = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '-SI.lwn', 'utf8'));
 			const K = kind === 'utm' ? 1 : 0.3048, wd = worst(), wl = worst();
 			const NU = {}, NS = {};
 			ru.nodes.forEach((n) => { NU[n.id] = n; }); rs.nodes.forEach((n) => { NS[n.id] = n; });
@@ -244,8 +244,8 @@ function ruleMisses(ru, rs) {
 
 		// 1c. A FEW NUMBERS, NAMED: what a reader would check by hand, from the files' own values --------
 		{
-			const ru = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '.lwn', 'utf8'));
-			const rs = JSON.parse(fs.readFileSync(ROOT + 'examples/' + file + '-SI.lwn', 'utf8'));
+			const ru = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '.lwn', 'utf8'));
+			const rs = JSON.parse(fs.readFileSync(ROOT + (file === 'Net1' ? 'dev/water-network-examples/' : 'examples/') + file + '-SI.lwn', 'utf8'));
 				ru.nodes.filter((n) => n._demand).slice(0, 3).forEach((a) => {
 				const b = rs.nodes.find((n) => n.id === a.id);
 				ok('node ' + a.id + ': ' + a._demand + ' gpm is ' + b._demand + ' L/s; ' + a.elev + ' ft is ' + b.elev + ' m',

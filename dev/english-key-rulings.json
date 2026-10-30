@@ -3456,9 +3456,9 @@
             "answer": "OK."
         },
         "lpn_guide_cmp_notes_def": {
-            "on": "<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>",
-            "ruled": "2026-10-17",
-            "answer": "His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)."
+            "on": "<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares scenarios on Net1.</li></ul>",
+            "ruled": "2026-10-29",
+            "answer": "Tom: \"I like “New”.\" (compares scenarios on Net1, not three scenarios)"
         },
         "lpn_guide_cmp_run_def": {
             "on": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>",

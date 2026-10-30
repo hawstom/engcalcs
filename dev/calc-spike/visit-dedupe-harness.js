@@ -106,7 +106,7 @@ const isCode = (v) => /^[0-9a-f]{16}$/.test(v);
 		}
 		if (!up) { r.ok(false, 'php -S came up'); return; }
 
-		r.section('1. ec_seen: one visit, consent-gated, first sighting only');
+		r.section('1. ec_seen: consent-gated; no row is de-duplicated any more (2026-10-29)');
 		clearLogs();
 		let a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
 		r.eq(a.status, 204, 'a said-yes human view is accepted');
@@ -118,10 +118,10 @@ const isCode = (v) => /^[0-9a-f]{16}$/.test(v);
 		r.ok(hv.length === 1 && hv[0][hv[0].length - 1] === 'visitor', 'one row, in the said-yes (visitor) bucket', JSON.stringify(hv));
 
 		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent, ec_seen: 'Manning-Pipe-Flow:2' }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
-		r.eq(rows('engcalcs-human-view.log').length, 1, 'the same browser on the same page again writes no second row');
+		r.eq(rows('engcalcs-human-view.log').length, 2, 'the same browser on the same page again writes a second row: a use is a use');
 
 		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: consent, ec_seen: 'Manning-Pipe-Flow:2' }, post: { page: 'Darcy-Weisbach', lang: 'en' } });
-		r.eq(rows('engcalcs-human-view.log').length, 2, 'the same browser on a different page is a first sighting there');
+		r.eq(rows('engcalcs-human-view.log').length, 3, 'the same browser on a different page writes a row too');
 		r.ok(a.set.ec_seen && /Manning-Pipe-Flow:2/.test(a.set.ec_seen.value) && /Darcy-Weisbach:2/.test(a.set.ec_seen.value),
 			'the rewrite keeps both pages', JSON.stringify(a.set.ec_seen));
 
@@ -132,6 +132,24 @@ const isCode = (v) => /^[0-9a-f]{16}$/.test(v);
 
 		a = await req(base, 'log-human-view.php', { cookies: { ec_consent: '0.1.1', ec_seen: 'Manning-Pipe-Flow:2' } });
 		r.ok(a.set.ec_seen && a.set.ec_seen.value === 'deleted', 'a refused browser still carrying ec_seen has it deleted', JSON.stringify(a.set.ec_seen));
+
+		r.section('1a. twenty said-yes uses are twenty rows; Browsers stays one');
+		clearLogs();
+		const code20 = '0123456789abcdef';
+		const yes20 = { ec_consent: consent, ec_code: code20 };
+		for (let i = 0; i < 20; i++) {
+			await req(base, 'log-calc-event.php', { cookies: yes20, post: { page: 'Orifice-Flow', lang: 'en', pointer: 'fine' } });
+			await req(base, 'log-signal-event.php', { cookies: yes20, post: { page: 'Looped-Network', lang: 'en', event: 'lpn', detail: 'cmd:draw/junction' } });
+		}
+		const usageLib = require('child_process').spawnSync('php', ['-r',
+			"require '" + path.join(ROOT, 'lib/UsageReport.lib.php') + "'; $r = ecUsageReportBuild(array('" + logDir + "'), '', ''); "
+			+ "echo json_encode(array('calc'=>$r['series']['calc']['bucketTotals']['visitor'], 'calcB'=>count($r['series']['calc']['codes']), 'cmd'=>$r['commands']['bucketTotals']['visitor'], 'cmdB'=>count($r['commands']['codes']), 'cut'=>$r['cutover']));"]).stdout.toString();
+		const u20 = JSON.parse(usageLib);
+		r.eq(u20.calc, 20, 'Calculating: 20 said-yes uses are 20 uses', usageLib);
+		r.eq(u20.cmd, 20, 'a toolbar command used 20 times is 20 uses', usageLib);
+		r.eq(u20.calcB, 1, 'and one browser', usageLib);
+		r.eq(u20.cmdB, 1, 'and one browser for the command', usageLib);
+		r.ok(/^\d{4}-\d\d-\d\d$/.test(u20.cut), 'the report finds its cutover in the marked rows', usageLib);
 
 		r.section('1b. the browser code (call F01, 2026-10-08)');
 		clearLogs();

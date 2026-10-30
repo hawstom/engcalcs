@@ -520,6 +520,20 @@ class Session {
 		}
 		throw new Error(`${this.name}: no "${title}" card on the wall — it holds ${JSON.stringify(seen)}`);
 	}
+	// The Net1 card carries a scenario tree and rule-based controls (Tom, 2026-10-28). A harness that needs
+	// Net1 as EPA ships it with rules, one scenario (Base) alone, is handed the plain file in place of the card's:
+	// the page fetches examples/Net1-Scenarios.lwn and gets dev/water-network-examples/Net1.lwn instead.
+	async openNet1Plain(title) {
+		const fs = require('fs'), path = require('path');
+		const body = fs.readFileSync(path.join(__dirname, '..', '..', 'water-network-examples', 'Net1.lwn'), 'utf8');
+		await this.page.evaluate((text) => {
+			const real = window.fetch;
+			window.fetch = function (url, opts) {
+				return /examples\/Net1-Scenarios\.lwn/.test(String(url)) ? Promise.resolve(new Response(text, { status: 200 })) : real.call(window, url, opts);
+			};
+		}, body);
+		return this.openExampleCard(title);
+	}
 	// File ▸ New project… — which opens the NEW-PROJECT BOX.
 	//
 	// **IT WAS A FLY-OUT OF FOUR TEMPLATES UNTIL TASK 477 (2026-08-27), AND THIS DID NOT FOLLOW.**

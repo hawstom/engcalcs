@@ -131,12 +131,12 @@ function load(transport) {
 
   title.value = 'North Main sizing rev B';
   title.fire('change');
-  ok('re-editing the same title does not log twice', t.titlePosts().length === 1);
+  ok('re-editing the same title logs again: a use is a use', t.titlePosts().length === 2);
 
   subtitle.value = 'For the Tuesday submittal';
   subtitle.fire('change');
-  ok('the subtitle is its own event', t.titlePosts().length === 2);
-  ok('  tagged field=subtitle', /field=subtitle/.test(t.titlePosts()[1].body));
+  ok('the subtitle is its own event', t.titlePosts().length === 3);
+  ok('  tagged field=subtitle', /field=subtitle/.test(t.titlePosts()[2].body));
 });
 
 

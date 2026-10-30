@@ -148,7 +148,7 @@ console.log('\n--- a NEW project made from that customized one gets the six agai
 
 console.log('\n--- a project file that is opened gets Base alone, and round-trips byte-identical ---');
 {
-	const text = fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8');
+	const text = fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8');
 	const saved = L.prepareDocument(JSON.parse(text));
 	L.importProject(saved);
 	const sc = L.getScenarios();
@@ -162,7 +162,7 @@ console.log('\n--- a project file that is opened gets Base alone, and round-trip
 
 console.log('\n--- a file that already holds the old Fire plus max day keeps it ---');
 {
-	const d = JSON.parse(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const d = JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	d.scenarios.push({ id: 'fire_max_day', name: '7. Fire plus max day', overrides: {}, demandMultiplier: 2 });
 	L.importProject(L.prepareDocument(JSON.parse(JSON.stringify(d))));
 	const f = L.getScenarios().filter((s) => s.id === 'fire_max_day')[0];
