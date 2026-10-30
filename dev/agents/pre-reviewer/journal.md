@@ -4705,3 +4705,11 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED MISSED (minor): the text column starts at the network's right edge + 10, not clear of the read-me, whose lines are up to 321 characters. On any network under ~290 units wide (all the grid examples) the read-me runs through the first piece of text at the same height. Real-scale and lat/lon projects unaffected.
 - OBSERVED: layer name fields are 6 and 3 characters (EPANET, INP); every other layer here uses 4-character fields (MODL, RDME, NODE, BASE).
 - Images: ~/webdev/worktrees/_panel/www/img/dxf3-net3.png and dxf3-net3-zoom.png. Not run: EPS comparison of my own (relied on the harness, checked it runs).
+
+# Perry, feat/dxf-import round 4 8be06eefb, 2026-10-30 (wrapped MTEXT, one EPANET text, header)
+- OBSERVED (real Chrome, examples unedited): Net1, Net2, Net3, Net1-Scenarios Max day export then import: heads diff 0, flows diff 0, patterns/controls/rules/curves/section line counts identical; header text appears in no imported field. A Net3 with a 2518-char .inp line, `\P`, braces, backslashes, ñ and Chinese in a comment and a pattern ID, and a project name with `{x} \P 中文` comes back byte-identical (comment-only `;` lines in a section are dropped on import, round-3 behaviour, not checked against a plain .inp import).
+- OBSERVED: ezdxf 1.4.5 recover: 0 errors, one EPANET MTEXT (36 chunks on the nasty file, none over 250) with one group 41 = 80 on all four; read-me too. Layer unfrozen, plot 0.
+- OBSERVED: text moved, layer frozen, layer off+locked, ezdxf resave, user-edited width/height/rotation, header deleted, header and BEGIN deleted, a note typed above the header, two-part reversed pieces on C-WATR-MODL-EPAN: all give the sections back. Re-layered text, and a round-3 file on the OLD layer name C-WATR-EPANET-INP (renamed in 3dbae68e1), give nothing back; the receipt names the layers not read.
+- OBSERVED: mutation (header strip removed from the reader) turns dxf-import-reader-harness red (2 FAIL); restored the file.
+- OBSERVED: Net3 sections text is ~98 wrapped lines = ~163 units tall against a 31-unit network; Net1 and Net2 ~157 and ~213 against 80 and 83. Read-me bottom is 3 to 4 units above the network top at a 0.9-per-character estimate.
+- Scratch: scratchpad/p4 (rt.js, var.js, mk.py, aud.py).
