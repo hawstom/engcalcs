@@ -298,6 +298,8 @@ async function main() {
 			return text;
 		};
 		const open = (await L('lpn_inpup_btn_scenario')).replace('{scenario}', 'Peak hour');
+		// With Basic mode off the open scenario then asks question 3 (which alternative); the default is answered here.
+		const answerAlt = async () => { const q = await a.dialog(); if (q && q.buttons.indexOf(await L('lpn_inpalt_go')) >= 0) { await a.dialogClick(await L('lpn_inpalt_go')); await a.settle(600); } };
 		const countNodes = async () => (await state()).nodes.length;
 		const n0 = await countNodes();
 		await survey();
@@ -311,6 +313,7 @@ async function main() {
 		await survey();
 		await a.dialogClick(open);
 		await a.settle(600);
+		await answerAlt();
 		let rep = await finish();
 		let s = await state();
 		ok('the open scenario: the report says the nodes went to Peak hour', rep.indexOf(await added('Peak hour')) >= 0, rep.slice(0, 120));
@@ -350,6 +353,7 @@ async function main() {
 		await survey();
 		await a.dialogClick(open);
 		await a.settle(600);
+		await answerAlt();
 		await finish();
 		ok('an edit was made (two nodes)', (await countNodes()) === n0 + 2);
 		await undo();
