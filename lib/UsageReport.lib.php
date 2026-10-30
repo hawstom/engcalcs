@@ -10,16 +10,18 @@
  * THE ONE RULE THIS FILE EXISTS TO HOLD. Every log row ends with a BUCKET, written by
  * ecLogBucketSuffix() in lib/config.inc.php:
  *
- *   'visitor'  a browser that said yes to the counting question. Those rows are DEDUPLICATED per
- *              (visit, page) against the ec_seen session cookie, so they count USES, once per
- *              visit. Since 2026-10-08 (Tom, call F01) each also carries the browser's random code,
+ *   'visitor'  a browser that said yes to the counting question. Until the cutover (the first row
+ *              carrying the 'every' marker, 2026-10-29) those rows were DEDUPLICATED per (visit,
+ *              page) against the ec_seen session cookie, so they counted USES once per visit; from
+ *              the cutover on every use is a row, like the others. Since 2026-10-08 (Tom, call F01) each also carries the browser's random code,
  *              so DISTINCT CODES count BROWSERS. Rows from before then have no code: they count as
  *              uses and never as browsers.
  *   'visit'    everybody else. Nothing may be stored to deduplicate against, so every page load
  *              writes a row. Those rows are the others bucket, and carry no code.
  *
- * THE TWO ARE NEVER SUMMED. A total would have a denominator in two units and a numerator in
- * neither -- the symptom formmail.php's own comment records. So every aggregate here returns the
+ * THE TWO ARE NEVER SUMMED ACROSS THE CUTOVER. Before it a said-yes use counts once per (visit,
+ * page) and an others use every page load, so a sum is in neither unit; and a ratio across them (formmail.php's old contact-funnel
+ * defect) means nothing. So every aggregate here returns the
  * two buckets as two separate series, keyed 'visitor' and 'visit', and nothing in this file adds
  * them together.
  *
@@ -84,10 +86,19 @@ function ecUsageParseRow($kind, $line)
         $code = array_pop($f);
     }
 
+    // The 'every' marker (2026-10-29) sits just before the code, or just before the bucket on a
+    // said-yes row that has no code. A row carrying it was never de-duplicated; a said-yes row
+    // without it was counted once per (visit, page).
+    $every = false;
+    if ($bucket === 'visitor' && count($f) > 2 && $f[count($f) - 1] === 'every') {
+        array_pop($f);
+        $every = true;
+    }
+
     $n = count($f);
     $get = function ($i) use ($f, $n) { return $i < $n ? $f[$i] : ''; };
 
-    $row = array('ts' => $ts, 'day' => substr($ts, 0, 10), 'bucket' => $bucket, 'code' => $code);
+    $row = array('ts' => $ts, 'day' => substr($ts, 0, 10), 'bucket' => $bucket, 'code' => $code, 'every' => $every);
 
     switch ($kind) {
         case 'reach':
@@ -434,6 +445,10 @@ function ecUsageReportBuild(array $dirs, $from, $to)
     $contactViews    = ecUsageNewSeries(array());
     $reachClassified = 0;
     $sources         = array();
+    // The cutover: the first day any said-yes row carries the 'every' marker, over the whole record
+    // and not the window. '' while none does. Said-yes rows before it were counted once per page per
+    // browser session; from it on, every use is a row.
+    $cutover         = '';
 
     foreach ($dirs as $dir) {
         $any = 0;
@@ -446,6 +461,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
                 $row = ecUsageParseRow($kind, $line);
                 if ($row === null) { continue; }
                 $any++;
+                if ($row['every'] && ($cutover === '' || $row['day'] < $cutover)) { $cutover = $row['day']; }
                 if (!isset($series[$kind])) { continue; }
                 // A command-use row (Task 815) has its own section and its own series: left in
                 // 'signal' it would bury first:, diag: and wrong: under a hundred command ids.
@@ -479,6 +495,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
         'contactViews'    => $contactViews,
         'reachClassified' => $reachClassified,
         'sources'         => $sources,
+        'cutover'         => $cutover,
     );
 }
 

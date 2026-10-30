@@ -130,7 +130,7 @@ async function fingerprint() {
 
 const exampleFiles = fs.readdirSync(ROOT + 'examples/').filter((f) => /\.lwn$/.test(f)).sort();
 function open(name) {
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8')));
+	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name, 'utf8')));
 	L.buildDom();
 }
 // The scenarios that existed before stage 3, none holding a setting of its own.

@@ -75,9 +75,8 @@ if (isset($_POST['offline_ts'])) {
 // Task 288: title and subtitle are two different findings and keep their own bits, so somebody
 // who adds a subtitle after a title still shows up as both.
 $fieldFlag = ecNamingFieldBit($field);
-$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, $fieldFlag);
-if (!$alreadyLogged) {
-    ecMarkSeen($page, $fieldFlag);
+// Every row is a use and is logged (Tom, 2026-10-29). Nothing is de-duplicated and nothing is stored.
+{
 
     // Task 319: filtered and length-capped like the two columns above -- see ecBrowserLangTag().
     $browserLang = ecBrowserLangTag();

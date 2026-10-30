@@ -4724,3 +4724,29 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
 - OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
 - Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
+
+## 2026-10-30 -- box-design round 5 (b1c19252c, 36fa47163)
+OBSERVED (re-verify before citing): builder's box-phone5 harness passes 54/54 in this worktree. My own touch-event runs
+(390x844, 360x740, PC 1200x800; CDP touch drags) agree: rotate row full width under Angle, pill 4x32 on transparent 19px(phone)/8px(PC)
+strip, half-height flyout (422/370 px = 50%), bottom pill drag +200 -> taller and stays open 3.5 s, side drag stays open 4 s, no :hover stuck.
+Harness blind spot: part A (Text) runs WITHOUT EC_DEFAULT_DOCKS, so it measures a floating popup, not the docked half-height flyout.
+With docks on, Text flyout is 50% high, rotate row fine, bottom pill overlaps body by ~1px only.
+Tapping empty map tucks the flyout (existing behaviour). Node 31 (Net1, y~774 at 390x844) would not select by touch, tucks flyout; cause not found, not shown to be this branch.
+Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
+# Perry, feat/starter-example 490a07194, 2026-10-28 (Task 823)
+- OBSERVED (real Chromium, OSM on, US and SI): every pipe of Fire flow extension (Johnson City: W Main St/US 290, N Ave F, N Ave E, E Pecan Dr) and Community well and tank (Munday: N 10th and 9th Ave, W D and W B St) sits on a street. Pipes hidden to compare with the bare map. TANK-1 is mid-block between W E and W F St.
+- OBSERVED MISSED: examples/Net1-Scenarios-SI.lwn tank N2 has bottomElev 850 (ft number, unconverted) beside elev 259.08 m. Page shows P=674.8 m at N23 (US file: ~85 psi), head 885 m. The scenario browser harness only compares ordering; si-example-equivalence-harness was repointed to the plain dev Net1 pair, so the shipped scenarios pair is unchecked.
+- OBSERVED: both Net1 descriptions end the walkthrough sentence with "gpm.. " / "L/s.. " (double period). Net1 cards are ~600 px tall at 167 px width and stretch the whole bottom row.
+- OBSERVED: Help guide entries "Open the Net1 example" (scn_example: type Max day / Larger main, comparison table; cmp notes) were written for one-scenario Net1; the only Net1 card now has Max day already.
+- OBSERVED: starter-examples-harness passes (62/56/48 psi, 1,500 gpm at 54.6... residual, 5 pump changes on tank level). HYD-P 61.91 psi on screen. Browser-pass find/zoomfitlabels pass.
+- OBSERVED: no reference to the removed cards in sw.php, sitemap, or the three landing sites (librewaternet editorial-review.md only mentions the two Basic examples in prose). Translated Net1/Net2/Net3/Elm/Valves descriptions still carry the old order (units first) and the old Net1 title.
+- Shots: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/3f74533f-715d-4c2a-a95d-24464ab34423/scratchpad/perry-starter/
+- OBSERVED full run_harnesses.sh on 490a07194: 614/620 pass. FAIL alone and pass on master: settings-table-browser, settings-table-owner-browser, table-export-dialog-browser, menu-mnemonic, theme-design-browser (amber/green "Calcul-ation" cut, section 12 Scenario manager on Net1), node-size-cap-browser (ENOENT examples/Net1.lwn). All open the Net1 card and assume the old plain file. zoomfurniture 1 fail (bootstrap tooltip page error) also fails on master. find, zoomfitlabels pass.
+
+## 2026-10-30 -- box-design round 6 (f5f92ff72, vs round 5 36fa47163)
+OBSERVED (re-verify before citing; real Chromium touch emulation, Net1; 390x844, 360x740, PC 1400x900): Properties rows visible without scrolling
+junction 8 -> 12 (390), 6 -> 11 (360); pipe 8 -> 13, 7 -> 11. Median pitch 41 -> 27 px (not 24: some rows are 28, wrapped labels 45), so "half as high" is about a third less. Inputs 24 px,
+a finger tap at centre and +-9 px focuses the input, typed value takes (verified by reselecting the node). No clipped text, overlap or misaligned label in Properties, Find, Fire flow, Criticality.
+OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
+OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
+Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".

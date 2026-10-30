@@ -305,7 +305,7 @@ console.log('\n--- Net3, with EPANET\'s own heads ---');
 // 700 ft above the datum — which is the ordinary case, not an unusual one.
 console.log('\n--- Net1: the truncation payoff ---');
 {
-	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8'));
+	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
 	const ref = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference', 'ref_Net1.json'), 'utf8'));
 	const elev = {}, head = {}, length = {}, type = {};
 	doc.nodes.forEach(n => { if (typeof n.elev === 'number') { elev[n.id] = n.elev; } });

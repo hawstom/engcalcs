@@ -65,7 +65,7 @@ if (d.units0.lpn_u_age) { d.units.lpn_u_age = d.units0.lpn_u_age; }
 const Dr = geo ? ((x) => x) : ((x) => Number((x * FT).toPrecision(DSIG)));
 d.nodes.forEach((n) => {
 	conv(n, ['x', 'y', 'lx', 'ly'], Dr);
-	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter'], L3);
+	conv(n, ['elev', '_head', '_level', 'minLevel', 'maxLevel', 'tankDiameter', 'bottomElev'], L3);
 	conv(n, ['_demand'], Q3);
 	if (n.demands) { throw new Error('node ' + n.id + ' has a demand list; extend the converter'); }
 });

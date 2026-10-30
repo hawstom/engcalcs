@@ -113,7 +113,7 @@ async function main() {
 		ok('b.4 a phone offers no pin button (nothing there can be pinned)', !dockBtns.includes('autohide') && dockBtns.includes('float'), JSON.stringify(dockBtns));
 		const grip = await rect(a.page, '.lpn-dock-grip.lpn-dock-grip-live');
 		const gripPill = await a.page.evaluate(() => { const g = document.querySelector('.lpn-dock-grip.lpn-dock-grip-live'), af = getComputedStyle(g, '::after'); return { w: parseFloat(af.width), h: parseFloat(af.height), bg: getComputedStyle(g).backgroundColor }; });
-		ok('b.5 the box edge has a touch strip at least 16 px wide, a transparent one, whose visible pill is at most 6 px wide', grip && grip.w >= 16 && gripPill.w <= 6 && gripPill.w > 0 && /rgba\(0, 0, 0, 0\)|transparent/.test(gripPill.bg), JSON.stringify({ grip, gripPill }));
+		ok('b.5 the box edge has a touch strip at least 12 px wide (round 6 narrowed it from 16), a transparent one, whose visible pill is at most 6 px wide', grip && grip.w >= 12 && gripPill.w <= 6 && gripPill.w > 0 && /rgba\(0, 0, 0, 0\)|transparent/.test(gripPill.bg), JSON.stringify({ grip, gripPill }));
 		if (grip) {
 			const y = grip.t + grip.h / 2, x0 = grip.l + grip.w / 2;
 			await touch(cdp, 'touchStart', [{ x: x0, y, id: 1 }]);

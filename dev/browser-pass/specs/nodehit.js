@@ -860,7 +860,7 @@ exports.run = async function ({ browser, report }) {
 		assertSymbolClicks(report, WHERE, clicks);
 	} finally { await elm.close(); }
 // ---- TOM'S 2026-09-10 SETUP: THE 1 px ISLAND HUNT -------------------------------------------
-	const tom = await example(browser, { key: 'lpn_ex_basic_us_title' });
+	const tom = await example(browser, { key: 'lpn_ex_valves_title' });
 	try {
 		await applyTomSetup(tom);
 		for (const notches of [0, 6, 12]) {
@@ -915,7 +915,7 @@ exports.run = async function ({ browser, report }) {
 	// are printed side by side because the comparison IS the result: four ratios, one answer.
 	// NOT `sweep`: that is this file's own grid-sweep function, and a `const` of the same name
 	// shadows it for the whole of this function -- including the call twenty lines above it.
-	const dprRows = await dprSweep(browser, report, { key: 'lpn_ex_basic_us_title' }, 'basic');
+	const dprRows = await dprSweep(browser, report, { key: 'lpn_ex_valves_title' }, 'basic');
 	report.note('the island hunt at four device pixel ratios, walking one DEVICE pixel at a time:');
 	report.note('   ratio   page says   phantom   slit   abutments');
 	dprRows.forEach((r) => report.note(

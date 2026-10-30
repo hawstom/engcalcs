@@ -174,11 +174,13 @@ async function main() {
 		ok('the drag floor holds: the name column is not narrower than 4rem', narrow.rows[0].name.w >= 4 * narrow.rem - 1, String(narrow.rows[0].name.w));
 		await a.page.locator('#lpn_ff_controls .lpn-gsplit').first().dblclick();
 
-		console.log('\n--- 5. a narrow host stacks ---');
+		console.log('\n--- 5. a narrow host keeps two columns ---');
 		await a.page.evaluate(() => { document.getElementById('lpn_ff_controls').style.width = '15rem'; });
 		await a.settle(300);
 		const st = await facts(a.page, '#lpn_ff_controls');
-		ok('under 18rem the name sits above its value', st.rows.every((r) => r.val.y > r.name.y), JSON.stringify(st.rows.slice(0, 2)));
+		// Tom, round 4 (2026-10-29): "two columns at every width, phone included; no stacked layout". The old assertion here
+		// required the value BELOW the name under 18rem; that stacked layout is ruled out.
+		ok('under 18rem the name and its value still sit side by side, in two columns', st.rows.every((r) => r.val.x >= r.name.x + r.name.w - 1 && Math.abs(r.val.y - r.name.y) < r.name.h), JSON.stringify(st.rows.slice(0, 2)));
 		await a.close();
 	} finally {
 		await browser.close();
