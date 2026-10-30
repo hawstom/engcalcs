@@ -44998,7 +44998,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The export's own read-me words for a latitude-and-longitude project ("..., in meters, not latitude
 	// and longitude."), in capitals as the export writes them; found in the page's language.
 	function dxfReadmeSaysGeo(text) {
-		var pc = EngCalcs.pageConfig || {}, tail = String(pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude.').split('{crs}')[1] || '',
+		var pc = EngCalcs.pageConfig || {}, tail = String(pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.').split('{crs}')[1] || '',
 			first = tail.split('.')[0].trim();
 		return !!first && String(text).toUpperCase().indexOf(first.toUpperCase()) >= 0;
 	}

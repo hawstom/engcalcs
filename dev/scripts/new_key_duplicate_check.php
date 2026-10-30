@@ -30,6 +30,10 @@ $allow = [
     'lpn_inpup_i_patterns'     => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_curves'       => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_controls'     => 'lowercase noun inside a sentence, not a heading',
+    'lpn_dxfnet_held_patterns' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
+    'lpn_dxfnet_held_curves' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
+    'lpn_dxfnet_held_custom' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
+    'lpn_dxfnet_held_quality' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
     'lpn_inpup_i_rules'        => 'lowercase noun inside a sentence, not a heading',
 ];
 
