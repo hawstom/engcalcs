@@ -794,7 +794,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      //
 		      // Its own corner, not a cell of #lpn_map_footer: the footer is left-packed and hidden
 		      // on print, and this has to survive both. Shown and hidden by refreshBasemapCredit(). ?>
-		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-basemap-credit="outdoors" style="display:none"><!-- Mapbox Outdoors (Task 617): the wordmark, (c) Mapbox, (c) OpenStreetMap and Improve this map. No imagery supplier, so no Maxar. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span></div>
+		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-basemap-credit="outdoors" style="display:none"><!-- Mapbox Outdoors (Task 617): the wordmark, (c) Mapbox, (c) OpenStreetMap and Improve this map. No imagery supplier, so no Maxar. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span><span data-gis-credit style="display:none"><!-- Task 720: text only, filled by js/looped-network.js from what a GIS server states about itself, or its host. --></span></div>
 	</div>
 </form>
 <?php // ---- THE BOTTOM PANE (ROADMAP Task 434) ----------------------------------------------------
@@ -3437,6 +3437,24 @@ EngCalcs.pageConfig = {
 	lpn_screenshot_copied: <?=json_encode($ec_lang['lpn_screenshot_copied'])?>,
 	lpn_screenshot_saved: <?=json_encode($ec_lang['lpn_screenshot_saved'])?>,
 	lpn_screenshot_no_basemap: <?=json_encode($ec_lang['lpn_screenshot_no_basemap'])?>,
+	lpn_gis_title: <?=json_encode($ec_lang['lpn_gis_title'])?>,
+	lpn_gis_unlocatable: <?=json_encode($ec_lang['lpn_gis_unlocatable'])?>,
+	lpn_gis_kind: <?=json_encode($ec_lang['lpn_gis_kind'])?>,
+	lpn_gis_kind_xyz: <?=json_encode($ec_lang['lpn_gis_kind_xyz'])?>,
+	lpn_gis_kind_wms: <?=json_encode($ec_lang['lpn_gis_kind_wms'])?>,
+	lpn_gis_kind_arcgis: <?=json_encode($ec_lang['lpn_gis_kind_arcgis'])?>,
+	lpn_gis_url: <?=json_encode($ec_lang['lpn_gis_url'])?>,
+	lpn_gis_wms_layers: <?=json_encode($ec_lang['lpn_gis_wms_layers'])?>,
+	lpn_gis_add: <?=json_encode($ec_lang['lpn_gis_add'])?>,
+	lpn_gis_draw: <?=json_encode($ec_lang['lpn_gis_draw'])?>,
+	lpn_gis_opacity: <?=json_encode($ec_lang['lpn_gis_opacity'])?>,
+	lpn_gis_note: <?=json_encode($ec_lang['lpn_gis_note'])?>,
+	lpn_gis_err_address: <?=json_encode($ec_lang['lpn_gis_err_address'])?>,
+	lpn_gis_err_template: <?=json_encode($ec_lang['lpn_gis_err_template'])?>,
+	lpn_gis_err_layers: <?=json_encode($ec_lang['lpn_gis_err_layers'])?>,
+	lpn_gis_err_mapserver: <?=json_encode($ec_lang['lpn_gis_err_mapserver'])?>,
+	lpn_gis_failed: <?=json_encode($ec_lang['lpn_gis_failed'])?>,
+	lpn_screenshot_no_gis: <?=json_encode($ec_lang['lpn_screenshot_no_gis'])?>,
 	lpn_screenshot_failed: <?=json_encode($ec_lang['lpn_screenshot_failed'])?>,
 	lpn_snip_hint_free: <?=json_encode($ec_lang['lpn_snip_hint_free'])?>,
 	lpn_snip_tip_rect: <?=json_encode($ec_lang['lpn_snip_tip_rect'])?>,
@@ -4793,6 +4811,7 @@ EngCalcs.pageConfig = {
       // is under, and with the same silent failure if it is broken: the View row simply never
       // appears. ?>
 <script src="/engcalcs/js/lpn-search.js?v=<?=filemtime(__DIR__.'/js/lpn-search.js')?>"></script>
+<script src="/engcalcs/js/lpn-gis.js?v=<?=filemtime(__DIR__.'/js/lpn-gis.js')?>"></script>
 <?php // Elevations from the land surface, and its own consent gate (ROADMAP Task 497). BEFORE
       // looped-network.js, which calls EngCalcs.lpnTerrainInit() at script scope -- same ordering
       // rule as lpn-search.js above, same silent failure if it is broken: the View row simply

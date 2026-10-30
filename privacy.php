@@ -169,10 +169,10 @@ answer changes to no. Use the <strong><?=htmlspecialchars($ec_lang['consent_sett
 analytics service, and no advertising partner. Every stylesheet, script, and font comes from this
 site.</p>
 
-<p>Four features on the Looped Pipe Network map reach outside this site. The street map shows on
-the first, empty project the page opens, and Map, World map, Detach hides it. The other three each
-ask first and separately, because each sends something different. No other page in the suite uses
-any of them.</p>
+<p>Five features on the Looped Pipe Network map reach outside this site. The street map shows on
+the first, empty project the page opens, and Map, World map, Detach hides it. The other four wait
+for you. Three of them ask first and separately, because each sends something different; a
+background layer starts only when you add one. No other page in the suite uses any of them.</p>
 
 <table class="ec-legal-table">
 	<tr><th>Feature</th><th>What is sent</th><th>To</th></tr>
@@ -180,6 +180,7 @@ any of them.</p>
 	<tr><td>Satellite and topo map imagery</td><td>Which tiles are in view, and the IP address</td><td><a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>, for the satellite and topo map images</td></tr>
 	<tr><td>Search for a place by name</td><td>The words typed into the search, and the IP address</td><td>OpenStreetMap&rsquo;s <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim</a></td></tr>
 	<tr><td>Ground elevations</td><td>The latitude and longitude of the network&rsquo;s nodes, and the IP address</td><td>Mapbox</td></tr>
+	<tr><td>Background layer from a GIS server</td><td>Which map images are in view, and the IP address</td><td>The server whose address you typed</td></tr>
 </table>
 
 <p>A map tile says where the map is <em>looking</em>; a search says what was <em>typed</em>; node
@@ -190,8 +191,15 @@ latitude, longitude, or elevation by hand.</p>
 
 <p>What each company does with the request is governed by its own privacy policy:
 <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap&rsquo;s</a>
-and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s</a>.
-A fifth such feature would ask in the same way.</p>
+and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s</a>.</p>
+
+<p>A background layer works differently from the other four, because we do not choose the server.
+When you add a layer, the page asks the server whose address you typed for map images of the area
+on screen, and asks again as you pan and zoom. That server sees your IP address, the area you are
+looking at, and that the request came from this site. Nothing is sent to it until you add a layer,
+and removing the layer ends the requests. The layer is saved in your project file, so opening that
+project later asks the server again. What the server does with the request is governed by its own
+privacy policy.</p>
 
 <h2>Where it goes</h2>
 

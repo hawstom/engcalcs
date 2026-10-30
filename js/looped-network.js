@@ -17853,24 +17853,26 @@ var EngCalcs = EngCalcs || {};
 	// the level whose native resolution is nearest what is on screen. Chosen on the longitude axis
 	// on purpose: that axis is drawn 1:1, and the latitude axis is the compressed one, so matching
 	// longitude means the raster is never magnified beyond its own pixels.
-	function tileZoomFor(scale) {
-		if (!(scale > 0)) { return 0; }
-		return Math.max(0, Math.min(tileSource().maxZ,
+	// `src`, where given, is a GIS background layer's own tile source ({id, minZ, maxZ, url(z, x, y)}).
+	function tileZoomFor(scale, src) {
+		var lo = src && src.minZ > 0 ? src.minZ : 0;
+		if (!(scale > 0)) { return lo; }
+		return Math.max(lo, Math.min(src ? src.maxZ : tileSource().maxZ,
 			Math.round(Math.log(scale * 360 / LPN_TILE_PX) / Math.LN2)));
 	}
 	// PURE, and the whole of the tile mathematics: a lon/lat window plus a scale in, the list of
 	// tiles and where each one goes out. No DOM, so dev/lpn-spike/basemap-harness.js can check every
 	// number in it. Positions come back in INTERNAL coordinates (origin-shifted, Y-down), which is
 	// what the world layer draws in.
-	function basemapTileList(lonMin, latMin, lonMax, latMax, scale) {
-		var z = tileZoomFor(scale), n, x0, x1, y0, y1, out, x, y, lonL, lonR, latT, latB, yT;
+	function basemapTileList(lonMin, latMin, lonMax, latMax, scale, src) {
+		var z = tileZoomFor(scale, src), n, x0, x1, y0, y1, out, x, y, lonL, lonR, latT, latB, yT;
 		for (;;) {
 			n = Math.pow(2, z);
 			x0 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMin, z))));
 			x1 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMax, z))));
 			y0 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMax, z))));
 			y1 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMin, z))));
-			if (z === 0 || (x1 - x0 + 1) * (y1 - y0 + 1) <= LPN_TILE_BUDGET) { break; }
+			if (z <= (src && src.minZ > 0 ? src.minZ : 0) || (x1 - x0 + 1) * (y1 - y0 + 1) <= LPN_TILE_BUDGET) { break; }
 			z--;
 		}
 		out = [];
@@ -17885,8 +17887,8 @@ var EngCalcs = EngCalcs || {};
 					// changed and kept the OLD <image>: switching the street map to satellite left
 					// OpenStreetMap tiles on screen -- under the Mapbox credit -- until a pan or a
 					// zoom happened to ask for different tile numbers.
-					key: basemapSource() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
-					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
+					key: (src ? src.id : basemapSource()) + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
+					url: src ? src.url(z, x, y) : tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
 					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT,
 					// The tile's own corner of the Earth, carried so a PROJECTED project can ask
 					// where this square lands in its plane. The geographic path ignores these:
@@ -18112,10 +18114,18 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapCredit() {
 		var c = document.getElementById('lpn_basemap_credit'), which;
 		if (!c) { return; }
-		c.style.display = basemapOn() ? 'block' : 'none';
+		var gisSpan = c.querySelector('[data-gis-credit]'), gisText = '';
+		// **A GIS server's own statement goes in the same line** (Task 720): what the service says, or
+		// its host; text only, never markup. Shown whether or not the basemap is.
+		if (gisSpan && gisCredits.length) {
+			gisText = gisCredits.filter(function (t, n, a) { return t && a.indexOf(t) === n; })
+				.map(function (t) { return t.length > 200 ? t.slice(0, 200) + '\u2026' : t; }).join(' \u00b7 ');
+		}
+		if (gisSpan) { gisSpan.textContent = gisText; gisSpan.style.display = gisText ? 'inline' : 'none'; }
+		c.style.display = (basemapOn() || gisText) ? 'block' : 'none';
 		which = basemapOn() ? basemapSource() : 'osm';
 		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
-			el2.style.display = (el2.getAttribute('data-basemap-credit') === which)
+			el2.style.display = (basemapOn() && el2.getAttribute('data-basemap-credit') === which)
 				? 'inline' : 'none';
 		});
 	}
@@ -18137,7 +18147,80 @@ var EngCalcs = EngCalcs || {};
 	// credit hangs off the painter, so no caller can paint tiles without it.
 	function refreshBasemap() {
 		paintBasemapTiles();
+		paintGisLayers();
 		refreshBasemapChrome();
+	}
+	// **WHERE ONE TILE GOES IN THE DRAWING, for any layer of tiles** (the basemap, and the GIS background
+	// layers beside it). Lifted out of paintBasemapTiles() unchanged so the two cannot place the same
+	// ground differently. Null for a tile that is degenerate at the pole.
+	function tilePlace(t, proj, xg) {
+		var place;
+		if (proj) {
+			// **ONE AFFINE PER TILE, WHICH IS THE WHOLE ACCURACY DECISION.** A Mercator tile
+			// is a curved quadrilateral in a projected plane and an SVG image can only be
+			// given an affine, so the curvature is absorbed tile by tile: pinned once for the
+			// whole view the error reaches 2,338 m across this suite's 300 km scope, and
+			// pinned per tile it is far under the width of the line a pipe is drawn with.
+			var cn = EngCalcs.lpnCrsTileCorners(projectCrsCode(), t.lonW, t.latN, t.lonE, t.latS);
+			if (!cn) { return null; }   // degenerate at the pole; one tile missing beats a smear
+			// Into the drawing frame at the page's own seam, which subtracts the local origin
+			// and NEGATES y -- without that a northing draws the world upside down.
+			var ax = inwardX(cn.tl.x), ay = inwardY(cn.tl.y);
+			place = {
+				x: 0, y: 0, width: 1, height: 1,
+				transform: 'matrix(' + [
+					inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
+					inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
+				].join(' ') + ')'
+			};
+		} else if (xg) {
+			// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
+			// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
+			// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
+			// while this frame is linear in latitude, which over one tile is far under the
+			// width of the line a pipe is drawn with.
+			// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
+			// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
+			// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
+			// nearer, independently -- so the tile holding the ANTIPODE of the transform's
+			// origin got its east edge wrapped a whole world away from its west edge. At the
+			// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
+			// the world-zoom view always contains it: measured, the offending tile's placement
+			// width came out **-1,750 where it should be +250**, and a negative width draws
+			// the raster BACKWARDS, stretched across the whole screen over every other tile.
+			// Tom saw it as reversed, upside-down place names.
+			//
+			// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
+			// the two latitude cuts are -- and there is no branch to choose in a difference,
+			// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
+			// corner-plus-edge is exactly the corner the old expression meant, everywhere the
+			// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
+			var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
+			if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return null; }
+			var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
+				dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
+			// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
+			// census asks of every site here: three corners go through the same door rather
+			// than each spelling the boundary out again.
+			var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
+			var gtl = inw(ptl.x, ptl.y),
+				gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
+				gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
+			place = {
+				x: 0, y: 0, width: 1, height: 1,
+				transform: 'matrix(' + [
+					gtr.x - gtl.x, gtr.y - gtl.y,
+					gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
+				].join(' ') + ')'
+			};
+		} else {
+			// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
+			// keeps its own proportions and needs no matrix at all. This said "NOT square in
+			// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
+			// the frame as it was before Task 145.
+			place = { x: t.px, y: t.py, width: t.pw, height: t.ph };
+		}
+		return place;
 	}
 	function paintBasemapTiles() {
 		if (!basemapLayer) { return; }
@@ -18284,72 +18367,8 @@ var EngCalcs = EngCalcs || {};
 			// would be two places to remember crossorigin, the class and the aspect rule, and
 			// dev/lpn-spike/basemap-harness.js counts the creation sites for exactly that reason.
 			// So the branch computes a box and hands it over.
-			var place;
-			if (proj) {
-				// **ONE AFFINE PER TILE, WHICH IS THE WHOLE ACCURACY DECISION.** A Mercator tile
-				// is a curved quadrilateral in a projected plane and an SVG image can only be
-				// given an affine, so the curvature is absorbed tile by tile: pinned once for the
-				// whole view the error reaches 2,338 m across this suite's 300 km scope, and
-				// pinned per tile it is far under the width of the line a pipe is drawn with.
-				var cn = EngCalcs.lpnCrsTileCorners(projectCrsCode(), t.lonW, t.latN, t.lonE, t.latS);
-				if (!cn) { return; }   // degenerate at the pole; one tile missing beats a smear
-				// Into the drawing frame at the page's own seam, which subtracts the local origin
-				// and NEGATES y -- without that a northing draws the world upside down.
-				var ax = inwardX(cn.tl.x), ay = inwardY(cn.tl.y);
-				place = {
-					x: 0, y: 0, width: 1, height: 1,
-					transform: 'matrix(' + [
-						inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
-						inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
-					].join(' ') + ')'
-				};
-			} else if (xg) {
-				// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
-				// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
-				// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
-				// while this frame is linear in latitude, which over one tile is far under the
-				// width of the line a pipe is drawn with.
-				// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
-				// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
-				// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
-				// nearer, independently -- so the tile holding the ANTIPODE of the transform's
-				// origin got its east edge wrapped a whole world away from its west edge. At the
-				// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
-				// the world-zoom view always contains it: measured, the offending tile's placement
-				// width came out **-1,750 where it should be +250**, and a negative width draws
-				// the raster BACKWARDS, stretched across the whole screen over every other tile.
-				// Tom saw it as reversed, upside-down place names.
-				//
-				// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
-				// the two latitude cuts are -- and there is no branch to choose in a difference,
-				// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
-				// corner-plus-edge is exactly the corner the old expression meant, everywhere the
-				// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
-				var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
-				if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return; }
-				var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
-					dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
-				// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
-				// census asks of every site here: three corners go through the same door rather
-				// than each spelling the boundary out again.
-				var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
-				var gtl = inw(ptl.x, ptl.y),
-					gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
-					gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
-				place = {
-					x: 0, y: 0, width: 1, height: 1,
-					transform: 'matrix(' + [
-						gtr.x - gtl.x, gtr.y - gtl.y,
-						gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
-					].join(' ') + ')'
-				};
-			} else {
-				// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
-				// keeps its own proportions and needs no matrix at all. This said "NOT square in
-				// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
-				// the frame as it was before Task 145.
-				place = { x: t.px, y: t.py, width: t.pw, height: t.ph };
-			}
+			var place = tilePlace(t, proj, xg);
+			if (!place) { return; }
 			// crossorigin=anonymous: no cookies and no credentials travel to the tile server, which
 			// is the cheapest privacy win available here. OSM's tile servers send
 			// Access-Control-Allow-Origin: *, so it costs nothing. The Referer is deliberately left
@@ -18443,6 +18462,165 @@ var EngCalcs = EngCalcs || {};
 			basemapDropCarried();
 		}
 		tileDebugRender();
+	}
+
+	// ---- BACKGROUND LAYERS FROM A GIS SERVER (ROADMAP Task 720) ---------------------------------
+	// Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server
+	// offering."* The visitor names a server (XYZ tile URL, OGC WMS, ArcGIS MapServer); its pictures
+	// are drawn under the network, above the street map, in the same tile grid and through the same
+	// tilePlace() as the basemap. js/lpn-gis.js builds the URLs; this paints them.
+	//
+	// **STORED IN THE PROJECT, as `project.gisLayers`, only when there is one**, so a project without
+	// layers serializes byte for byte as it did. **NEVER CACHED**: no service worker entry (the worker
+	// ignores other origins), no precache, no Cache API; the <image> elements die with the page.
+	//
+	// **NO crossorigin ATTRIBUTE, ON PURPOSE.** The basemap asks for CORS because OSM and Mapbox answer
+	// it. A utility's server often does not, and with crossorigin set such a server's tiles would not
+	// draw at all. Without it they draw; the one thing they cannot do is be read back into a canvas,
+	// which only the screenshot does, and snipInlineImage() already drops a tile it cannot read and the
+	// screenshot says so (`droppedGis`).
+	var gisLayerEl = null, gisGroups = [], gisEls = {}, gisInfo = {}, gisStat = {}, gisPaintedSig = '',
+		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null;
+	function gisLayers() { return (project && project.gisLayers) || []; }
+	function gisUsable() { return !!(EngCalcs.lpnGis && projectLocatable()); }
+	function gisSignature() {
+		return JSON.stringify(gisLayers().map(function (l) { return [l.kind, l.url, l.layers || '', l.on === false ? 0 : 1, l.opacity]; }));
+	}
+	function gisLayerKey(i, l) { return i + '|' + l.url + '|' + (l.layers || ''); }
+	function gisEmpty() {
+		var k;
+		for (k in gisEls) { if (gisEls.hasOwnProperty(k) && gisEls[k].remove) { gisEls[k].remove(); } }
+		gisEls = {}; gisWant = {};
+		gisGroups.forEach(function (g) { if (g && g.remove) { g.remove(); } });
+		gisGroups = [];
+		gisCredits = [];
+	}
+	// Writes the list through the Settings seam (one undo step), repaints, and saves. An empty list
+	// removes the key so the project is as it was before any layer was added.
+	function gisSetLayers(list) {
+		throughSettingSeam(function () {
+			if (list && list.length) { project.gisLayers = list; } else { delete project.gisLayers; }
+			refreshBasemap();
+			saveToStorage();
+		});
+	}
+	function gisHost(l) { return EngCalcs.lpnGis.hostOf(l.url) || l.url; }
+	// Said once per layer and session, naming the server, when nothing it was asked for came back.
+	function gisReportFailure(i, l) {
+		var st = gisStat[gisLayerKey(i, l)], pc = EngCalcs.pageConfig || {};
+		if (!st || st.ok > 0 || st.told) { return; }
+		st.told = true;
+		setNotice((pc.lpn_gis_failed || '{host} did not return a map image. Its layer is not drawn.')
+			.replace('{host}', gisHost(l)));
+	}
+	function gisFetchInfo(l, again) {
+		var root = l.url;
+		if (gisInfo[root]) { return; }
+		gisInfo[root] = { pending: true };
+		var done = function (json) {
+			gisInfo[root] = EngCalcs.lpnGis.arcgisInfo(json);
+			gisInfo[root].known = !!json;
+			again();
+		};
+		try {
+			// Credentials omitted: the server learns the visitor's address and the area, and nothing else.
+			fetch(root + '?f=json', { credentials: 'omit' }).then(function (r) { return r.ok ? r.json() : null; })
+				.then(done, function () { done(null); });
+		} catch (err) { done(null); }
+	}
+	function paintGisLayers() {
+		var list = gisLayers(), sig = gisSignature(), r, tl, br, bnds = null, xg, proj, scale, wpx, degPerPx,
+			i, want = {}, credits = [], anyPending = false;
+		if (!gisLayerEl) { return; }
+		if (!list.length || !gisUsable() || !svg || !mapSized) {
+			if (!list.length || !gisUsable()) { gisEmpty(); }
+			gisPaintedSig = sig;
+			return;
+		}
+		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			return;   // refreshBasemap() asks again when the transform has loaded
+		}
+		// A layer added, removed or edited rebuilds the pile; opacity and on/off change only below.
+		var structure = JSON.stringify(list.map(function (l) { return [l.kind, l.url, l.layers || '']; }));
+		if (structure !== gisStructSig) { gisEmpty(); gisStructSig = structure; }
+		gisPaintedSig = sig;
+		r = svg.getBoundingClientRect();
+		tl = screenToWorld(r.left, r.top);
+		br = screenToWorld(r.right, r.bottom);
+		proj = projectedBasemapOk();
+		if (proj) {
+			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(), outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
+			if (!bnds) { return; }
+			wpx = Math.max(1, r.right - r.left);
+			degPerPx = (bnds.east - bnds.west) / wpx;
+			scale = degPerPx > 0 ? 1 / degPerPx : state.s;
+		} else {
+			bnds = { west: outwardX(tl.x), south: outwardY(br.y), east: outwardX(br.x), north: outwardY(tl.y) };
+			scale = state.s;
+		}
+		// The tile boxes depend on the ground (frame, origin, coordinate system), as the basemap's do.
+		var placeSig = (project.coords || '') + '|' + docOrigin().x + ',' + docOrigin().y + '|' +
+			(proj ? projectCrsCode() : '');
+		if (gisPlaceSig !== null && gisPlaceSig !== placeSig) { gisEmpty(); gisStructSig = structure; }
+		gisPlaceSig = placeSig;
+		list.forEach(function (l, idx) {
+			var g = gisGroups[idx], key = gisLayerKey(idx, l), info = null, src, tiles, st;
+			if (!g) { g = gisGroups[idx] = el('g', { 'class': 'lpn-gis-layer' }, gisLayerEl); }
+			g.setAttribute('opacity', String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1));
+			g.style.display = l.on === false ? 'none' : '';
+			if (l.on === false) { return; }
+			if (l.kind === 'arcgis') {
+				gisFetchInfo(l, function () { refreshBasemap(); });
+				info = gisInfo[l.url];
+				if (info && info.pending) { anyPending = true; return; }
+			}
+			if (!gisStat[key]) { gisStat[key] = { ok: 0, fail: 0, told: false }; }
+			credits.push(EngCalcs.lpnGis.creditOf(l, info));
+			src = EngCalcs.lpnGis.source(l, idx, info);
+			tiles = basemapTileList(bnds.west, bnds.south, bnds.east, bnds.north, scale, src).tiles;
+			st = gisStat[key];
+			tiles.forEach(function (t) {
+				want[t.key] = true;
+				if (gisEls[t.key]) { return; }
+				var place = tilePlace(t, proj, null), img;
+				if (!place) { return; }
+				img = el('image', Object.assign({
+					href: t.url, preserveAspectRatio: 'none', 'class': 'lpn-gis-tile'
+				}, place), g);
+				img._lpnLayerIdx = idx;
+				img.addEventListener('load', function () {
+					st.ok++;
+					img._lpnSettled = true;
+					gisSweep();
+				});
+				img.addEventListener('error', function () {
+					st.fail++;
+					img._lpnSettled = true;
+					// A failed tile is forgotten, so the next paint asks again; the blank is not kept.
+					if (gisEls[t.key] === img) { delete gisEls[t.key]; }
+					if (img.remove) { img.remove(); }
+					setTimeout(function () { gisReportFailure(idx, l); }, 1500);
+					gisSweep();
+				});
+				gisEls[t.key] = img;
+			});
+		});
+		gisWant = want;
+		gisCredits = credits;
+		gisSweep();
+		gisPaintedSig = sig;
+	}
+	// Tiles the view no longer wants leave once everything asked for has settled, so a zoom does not
+	// blank the layer while the new pictures come down the wire. One generation is ever kept.
+	function gisSweep() {
+		var k, pending = false;
+		for (k in gisEls) {
+			if (gisEls.hasOwnProperty(k) && gisWant[k] && !gisEls[k]._lpnSettled) { pending = true; break; }
+		}
+		if (pending) { return; }
+		for (k in gisEls) {
+			if (gisEls.hasOwnProperty(k) && !gisWant[k]) { if (gisEls[k].remove) { gisEls[k].remove(); } delete gisEls[k]; }
+		}
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -55778,11 +55956,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			c.setAttribute('style', st.join(';'));
 			if (o.tagName === 'image') {
 				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
-				var isTile = o.classList.contains('lpn-basemap-tile');
+				var isTile = o.classList.contains('lpn-basemap-tile'), isGis = o.classList.contains('lpn-gis-tile');
 				pending.push(snipInlineImage(href).then(function (data) {
 					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
 					else {
 						if (isTile) { out.droppedBasemap = true; }
+						if (isGis) { out.droppedGis = true; }
 						if (c.parentNode) { c.parentNode.removeChild(c); }
 					}
 				}));
@@ -55918,6 +56097,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return renderScreenshot(r, poly).then(function (out) {
 			openSnipEditor(out);
 			if (out.droppedBasemap) { setNotice(pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+			else if (out.droppedGis) { setNotice(pc.lpn_screenshot_no_gis || 'A background layer from a GIS server could not be included.'); }
 		}).catch(function () {
 			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
 		});
@@ -57099,6 +57279,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// BELOW the user's own backdrop image: a registered plan sheet is the thing the person put
 		// there on purpose, and a street map is context behind it.
 		basemapLayer = el('g', { 'class': 'lpn-basemap' }, world);
+		// Background layers from a GIS server (Task 720): above the street map, below the user's backdrop.
+		gisLayerEl = el('g', { 'class': 'lpn-gis' }, world);
 		backdropLayer = el('g', { 'class': 'lpn-backdrop' }, world);
 		gridLayer = el('g', {}, world);
 		// **THE DRAWING'S OWN GROUP, so it can be held STILL while the map moves under it** (Task
@@ -63635,6 +63817,85 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
 		setboxTag(row(thematicBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect), [['settings', 'basemapStyle']]);
+		// ---- Background layers from a GIS server (Task 720). Beside the basemap style, because they are
+		// the same kind of thing: pictures behind the network. A row per layer (draw, opacity, remove) and
+		// one small form to add another. Stored in the project; see paintGisLayers().
+		(function () {
+			var gisBody = minorGroup(mapBody2, pc.lpn_gis_title || 'Background layers from a GIS server');
+			if (!EngCalcs.lpnGis) { return; }
+			if (!gisUsable()) {
+				note(gisBody, pc.lpn_gis_unlocatable || 'Background layers need a project that is placed on the earth.');
+				return;
+			}
+			var kindNames = {
+				xyz: pc.lpn_gis_kind_xyz || 'Tile URL ({z}/{x}/{y})',
+				wms: pc.lpn_gis_kind_wms || 'WMS server',
+				arcgis: pc.lpn_gis_kind_arcgis || 'ArcGIS MapServer'
+			};
+			gisLayers().forEach(function (l, idx) {
+				var grp = document.createElement('span'), on = document.createElement('input'),
+					op = document.createElement('input'), rm = document.createElement('button');
+				grp.className = 'lpn-set-ctlgroup';
+				on.type = 'checkbox'; on.checked = l.on !== false; on.className = 'lpn-gis-on';
+				on.setAttribute('aria-label', pc.lpn_gis_draw || 'Draw');
+				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
+				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
+				op.setAttribute('aria-label', pc.lpn_gis_opacity || 'Opacity (0 to 1)');
+				op.style.width = '4em';
+				rm.type = 'button'; rm.className = 'lpn-gis-remove'; rm.textContent = pc.lpn_fitting_remove || 'Remove';
+				on.addEventListener('change', function () {
+					var next = JSON.parse(JSON.stringify(gisLayers()));
+					next[idx].on = on.checked;
+					gisSetLayers(next);
+				});
+				op.addEventListener('change', function () {
+					var v = +op.value, next = JSON.parse(JSON.stringify(gisLayers()));
+					if (!(v > 0 && v <= 1)) { op.value = String(l.opacity || 1); return; }
+					next[idx].opacity = v;
+					gisSetLayers(next);
+				});
+				rm.addEventListener('click', function (e) {
+					var next = JSON.parse(JSON.stringify(gisLayers()));
+					if (e && e.preventDefault) { e.preventDefault(); }
+					next.splice(idx, 1);
+					gisSetLayers(next);
+					rebuildSettingsFields();
+				});
+				grp.appendChild(on); grp.appendChild(op); grp.appendChild(rm);
+				row(gisBody, kindNames[l.kind] + ': ' + gisHost(l) + (l.layers ? ' (' + l.layers + ')' : ''), grp);
+			});
+			var kindSel = document.createElement('select'), urlIn = document.createElement('input'),
+				layersIn = document.createElement('input'), addBtn = document.createElement('button');
+			EngCalcs.lpnGis.KINDS.forEach(function (k) {
+				var opt = document.createElement('option');
+				opt.value = k; opt.textContent = kindNames[k]; kindSel.appendChild(opt);
+			});
+			kindSel.id = 'lpn_gis_kind';
+			urlIn.type = 'text'; urlIn.id = 'lpn_gis_url'; urlIn.setAttribute('autocomplete', 'off'); urlIn.setAttribute('spellcheck', 'false');
+			layersIn.type = 'text'; layersIn.id = 'lpn_gis_layers'; layersIn.setAttribute('autocomplete', 'off');
+			addBtn.type = 'button'; addBtn.id = 'lpn_gis_add'; addBtn.textContent = pc.lpn_gis_add || 'Add layer';
+			row(gisBody, pc.lpn_gis_kind || 'Kind of server', kindSel);
+			row(gisBody, pc.lpn_gis_url || 'Server address', urlIn);
+			var layersRow = row(gisBody, pc.lpn_gis_wms_layers || 'WMS layer names (comma separated)', layersIn);
+			function showLayersRow() { layersRow.style.display = kindSel.value === 'wms' ? '' : 'none'; }
+			kindSel.addEventListener('change', showLayersRow);
+			showLayersRow();
+			row(gisBody, ' ', addBtn);
+			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent before you add one.');
+			addBtn.addEventListener('click', function (e) {
+				var res = EngCalcs.lpnGis.normalise({ kind: kindSel.value, url: urlIn.value, layers: layersIn.value });
+				if (e && e.preventDefault) { e.preventDefault(); }
+				if (!res.ok) {
+					setNotice(res.why === 'template' ? (pc.lpn_gis_err_template || 'A tile address must contain {z}, {x} and {y}.')
+						: res.why === 'layers' ? (pc.lpn_gis_err_layers || 'Enter at least one WMS layer name.')
+						: res.why === 'mapserver' ? (pc.lpn_gis_err_mapserver || 'An ArcGIS address must end with /MapServer.')
+						: (pc.lpn_gis_err_address || 'The server address must start with https://.'));
+					return;
+				}
+				gisSetLayers(gisLayers().concat([res.layer]));
+				rebuildSettingsFields();
+			});
+		}());
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -76390,7 +76651,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
 		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
-		if (coordsChanged || basemapChanged) {
+		if (coordsChanged || basemapChanged || gisSignature() !== gisPaintedSig) {
 			refreshBasemap();
 			refreshMapStatus();
 		}
