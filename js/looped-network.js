@@ -45421,7 +45421,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
 			nodes: nodes, links: links, customers: customers, shapes: shapes, readme: readme,
 			tags: tt.tags, prompts: tt.prompts, sections: dxfEmbeddedSections(),
-			sectionsHeader: (pc.lpn_dxf_sections_header || 'EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. The page reads this text back when the drawing is imported. You may move this text or freeze its layer; keep it on layer {layer}.')
+			sectionsHeader: (pc.lpn_dxf_sections_header || 'EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.')
 				.replace('{layer}', EngCalcs.lpnDxfSectionsLayer)
 		};
 	}

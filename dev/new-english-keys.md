@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**93 still to read on master**, of 255 untranslated keys, of 3220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**93 still to read on master**, of 256 untranslated keys, of 3221 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (255, 93 to read @@ NEEDS RULING)
+## lpn_  (256, 93 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -187,6 +187,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_note_headloss`**
   > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
   @@ NEEDS RULING
+- **`lpn_dxf_sections_header`**
+  > EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.
+  _Ruled 2026-10-30: Tom: "What page? EPANET++. Also DXF, not drawing."_
 - **`lpn_dxfnet_count_customers`**
   > {n} customers.
   @@ NEEDS RULING
@@ -801,7 +804,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**264 still to read**, of 307 new keys across 11 unmerged branch(es).
+**266 still to read**, of 309 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -812,7 +815,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`65d05adf2`) — 60 new, 60 to read @@ NEEDS RULING
+### box-design (`42dbd7128`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -997,9 +1000,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`733cdf128`) — adds no English strings
+### feat/dxf-import (`d05ff2974`) — adds no English strings
 
-### feat/gis-background (`236c4ef85`) — 80 new, 80 to read @@ NEEDS RULING
+### feat/gis-background (`83a92aab6`) — 80 new, 80 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -1242,8 +1245,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/import-alternative (`3bd2c9f65`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
 
+- **`lpn_export_table_scn_keeps`**
+  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
+  @@ NEEDS RULING
 - **`lpn_inpalt_base`**
   > The Base alternative
   @@ NEEDS RULING
@@ -1253,14 +1259,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inpalt_cancelled`**
   > Nothing was changed.
   @@ NEEDS RULING
-- **`lpn_inpalt_go`**
-  > Import
-  @@ NEEDS RULING
 - **`lpn_inpalt_heading`**
   > Alternative for {category}
   @@ NEEDS RULING
 - **`lpn_inpalt_lead`**
   > This file changes values in the categories below. Choose the alternative that receives the values of each.
+  @@ NEEDS RULING
+- **`lpn_inpalt_more`**
+  > and others ({n})
   @@ NEEDS RULING
 - **`lpn_inpalt_name`**
   > Name of the new alternative
@@ -1274,10 +1280,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inpalt_receipt`**
   > Alternatives that received the values: {list}
   @@ NEEDS RULING
+- **`lpn_inpalt_shared`**
+  > {alternative}, also used by {scenarios}
+  @@ NEEDS RULING
 
-### feat/native-quality (`0cc61c8ec`) — adds no English strings
-
-### feat/report-widths (`c8b40e477`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/report-widths (`5058a668e`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -1622,7 +1629,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-of-day (`ffc86361e`) — adds no English strings
+### feat/theme-of-day (`24665fe63`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 

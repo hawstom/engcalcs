@@ -2296,7 +2296,7 @@ $ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hy
 $ec_lang['lpn_dxf_note_headloss']='Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.';
 $ec_lang['lpn_dxf_note_demand_multiplier']='Demand multiplier: {n}.';
 // {layer} is the layer name C-WATR-MODL-EPAN. This is the header at the top of the text on that layer.
-$ec_lang['lpn_dxf_sections_header']='EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. The page reads this text back when the drawing is imported. You may move this text or freeze its layer; keep it on layer {layer}.';
+$ec_lang['lpn_dxf_sections_header']='EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.';
 $ec_lang['lpn_dxf_curve_points']='Pump head curve points (flow, head)';
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.';
