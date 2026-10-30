@@ -119,8 +119,9 @@ USA.</p>
 
 <h3>The counting question</h3>
 
-<p>To count each page once per visit rather than on every load, we keep one digit per page in the
-browser until it is closed. That is storage on your device, which is why we ask first. There are
+<p>To remember, for the length of a visit, which language we have counted and which pages have
+already been open long enough to count, we keep one digit per page in the
+browser until it is closed. Every use is counted, not once per visit. That is storage on your device, which is why we ask first. There are
 three answers. <em>Refuse all</em>: we store only that answer, so that we do not ask again.
 <em>Allow this</em>: it covers what is described here, and we ask again only if we ever want to do
 something different. <em>Allow all</em>: it covers that too, and we do not ask again.</p>
@@ -152,7 +153,7 @@ number.</p>
 	<tr><td><code>ec_geosearch</code></td><td>Your yes to place-name search. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_terrain</code></td><td>Your yes to elevation lookup. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_blang</code></td><td>One digit: we have already counted which language this browser asks for</td><td>1 year</td><td><strong>Yes</strong></td></tr>
-	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until the browser is closed</td><td><strong>Yes</strong></td></tr>
+	<tr><td><code>ec_seen</code></td><td>One digit per page: whether this visit's language is counted and whether a page has been open long enough to count. No identifier</td><td>Until the browser is closed</td><td><strong>Yes</strong></td></tr>
 	<tr><td><code>ec_code</code></td><td>A random code, so we don&rsquo;t count you again</td><td>400 days from the most recent visit</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>

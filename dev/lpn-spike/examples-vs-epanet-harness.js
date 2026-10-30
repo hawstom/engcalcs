@@ -82,7 +82,7 @@ async function rawRun(inpText) {
 }
 
 function openExample(name, edit) {
-	const saved = JSON.parse(fs.readFileSync(ROOT + 'examples/' + name + '.lwn', 'utf8'));
+	const saved = JSON.parse(fs.readFileSync(ROOT + (/^Net1(-SI)?$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name + '.lwn', 'utf8'));
 	if (edit) { edit(saved); }
 	L.applySaved(L.migrateSaved(saved));
 	return saved;
@@ -133,7 +133,7 @@ const said = (w) => w.frames + '/' + w.hours + ' hours, worst head ' + (w.h / 0.
 	await warmEpanet();
 	mod = await EC.lpnEpanetLoad('file://' + ROOT + 'js/vendor/epanet-js.js');
 	const ref = (n) => fs.readFileSync(ROOT + 'dev/lpn-spike/reference/' + n + '.inp', 'utf8');
-	const net1Rules = JSON.parse(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')).rules;
+	const net1Rules = JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8')).rules;
 	const net1WithRules = ref('Net1').replace('[RULES]', '[RULES]\n' + net1Rules.join('\n'));
 
 	console.log('1. EACH SHIPPED EXAMPLE AGAINST EPANET ON EPA\'S OWN FILE');

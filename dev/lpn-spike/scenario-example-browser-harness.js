@@ -49,7 +49,7 @@ async function main() {
 		a.__url = 'Looped-Network.php';
 		await page.setViewportSize({ width: 1400, height: 900 });
 		await a.goto(a.__url);
-		const title = await a.lang('lpn_ex_net1_scn_title');
+		const title = await a.lang('lpn_ex_net1_title');
 		await a.openExampleCard(title);
 		await a.settle(1500);
 		await page.evaluate(() => {

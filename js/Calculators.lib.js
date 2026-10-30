@@ -562,7 +562,6 @@ EngCalcs.cookieSlotsLength = 0;
 EngCalcs.pageTitle = '';
 EngCalcs.namePattern = /^[A-Za-z0-9 _.-]*$/;
 EngCalcs._loadTime = Date.now();
-EngCalcs._calcUsageLogged = false;
 EngCalcs.sessionAgeMs = EngCalcs.sessionAgeMs || 0;
 
 // Queue-and-flush for offline usage logging. The PWA's network-first
@@ -782,12 +781,10 @@ EngCalcs.pointerClass = function () {
 // Logs one confirmed-human calculator-usage event (see log-calc-event.php),
 // gated to real user-triggered recalculation at least 10s after page load so
 // the automatic initial calc-on-load and fast/scripted interaction don't count.
-// Deduped in-memory per page load; server-side dedup covers repeat page loads.
+// Every real calculation is a use and is logged; none is de-duplicated (Tom, 2026-10-29).
 EngCalcs.maybeLogCalcUsage = function () {
 	'use strict';
-	if (this._calcUsageLogged) return;
 	if (Date.now() - this._loadTime < 10000) return;
-	this._calcUsageLogged = true;
 	this._sendOrQueue('/engcalcs/log-calc-event.php', {
 		page: this.cookieName || '',
 		lang: document.documentElement.lang || '',
@@ -829,7 +826,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // No 10s dwell gate, unlike the other two beacons: those gate on time because a bot can trip a
 // page load or a calculation, whereas typing into a text field is already the human proof the
 // timer is a proxy for. Deduped per page load here, and per (session, page, field) server-side.
-EngCalcs._titleLogged = {};
 // ONE naming instrument for the whole suite (2026-09-08). `field` is 'title' or 'subtitle' on a
 // form calculator, 'save' or 'rename' on Looped-Network -- a project saved to a file and a tab
 // renamed are that page's way of saying the same thing a typed title says, and until this
@@ -839,12 +835,10 @@ EngCalcs._titleLogged = {};
 // and never the name: what a project is called is the user's business.
 // Gated like every other beacon: the server de-duplicates only for a consenting visitor and
 // counts everybody else once per page load in the 'visit' bucket; the offline queue is written
-// only with consent (see _queueBeacon). Deduped per page load here, per (visit, page, field)
-// server-side.
+// only with consent (see _queueBeacon). Every save or rename is a use and is logged; nothing is
+// de-duplicated, here or on the server.
 EngCalcs.logNamingEvent = function (field) {
 	'use strict';
-	if (this._titleLogged[field]) return;
-	this._titleLogged[field] = true;
 	this._sendOrQueue('/engcalcs/log-title-event.php', {
 		page: this.cookieName || '',
 		lang: document.documentElement.lang || '',
@@ -880,18 +874,25 @@ document.addEventListener('DOMContentLoaded', function () {
 // they had been here before, and where the map interface loses them. See lib/config.inc.php for
 // the six events and what each one decides.
 //
-// DEDUPED IN THIS PAGE'S MEMORY AND NOWHERE ELSE. The other beacons dedupe per (visit, page)
-// against the ec_seen cookie, whose five bits are full: a sixth would make it two base-32 digits
-// and make the consent banner's "a single digit per page" a false sentence. So a reload starts
-// these counters over, which is a small and honest cost. Nothing new is stored on the device by
-// any of this except the repeat-visit list below, which is gated on consent because it must be.
+// A USE IS A USE (Tom, 2026-10-29). A visitor's ACTION (a reference followed, a units choice, a share,
+// a menu or toolbar command) is logged every time it happens, here and on the server. Only a FACT
+// about the page load is held to once per page load in this page's memory: the first touch, the
+// return visit, the first move in a network, and a diagnostic code. Those are not repeatable
+// actions, and runSolve() re-meets a diagnostic after every keystroke. Nothing is stored for it.
 EngCalcs._signalSent = {};
+EngCalcs._signalRepeats = function (event, detail) {
+	'use strict';
+	if (event === 'outbound' || event === 'share' || event === 'units') return true;
+	return event === 'lpn' && detail.indexOf('cmd:') === 0;
+};
 EngCalcs.logSignal = function (event, detail) {
 	'use strict';
 	detail = detail || '';
 	var key = event + '|' + detail;
-	if (this._signalSent[key]) return;
-	this._signalSent[key] = true;
+	if (!this._signalRepeats(event, detail)) {
+		if (this._signalSent[key]) return;
+		this._signalSent[key] = true;
+	}
 	this._sendOrQueue('/engcalcs/log-signal-event.php', {
 		page: this.cookieName || '',
 		lang: document.documentElement.lang || '',

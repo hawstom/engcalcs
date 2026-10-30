@@ -37,7 +37,7 @@ function ok(label, cond, detail) {
 const r6 = (v) => Number(v.toPrecision(6));
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const WORLD = () => JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8'));
-const GRID = () => JSON.parse(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+const GRID = () => JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 
 // ---- RFC 7946, the rules a program can check ---------------------------------------------------
 function validateRfc7946(text) {

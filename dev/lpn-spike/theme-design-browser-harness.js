@@ -427,7 +427,7 @@ async function main() {
 			await sm.page.evaluate(() => { localStorage.setItem('lpn_scnbasic', 'off'); });
 			await sm.reload();
 			await sm.page.click('.ec-consent-btn').catch(() => {});
-			await sm.openExampleCard(await sm.lang('lpn_ex_net1_title'));
+			await sm.openNet1Plain(await sm.lang('lpn_ex_net1_title'));
 			await sm.settle(600);
 			await sm.page.click('#lpn_scenario_btn');
 			await sm.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });

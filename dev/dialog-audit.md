@@ -126,7 +126,6 @@ unless named. BLOCK = MUST BLOCK (now `askDialog()`), INFO = information at info
 | `openProjectMenu` | prompt | `lpn_prompt_project_name` | BLOCK | needs a typed name (rename) |
 | `openProjectMenu` | prompt | `lpn_prompt_project_name` | BLOCK | needs a typed name (new) |
 | `deleteNetwork` | confirm | `lpn_confirm_delete_network` | BLOCK | deletes the whole network |
-| `drawTestGrid` | confirm | `(literal English)` | BLOCK | adds to a network; undoable, so a candidate for Tom to drop (see open question) |
 | `nonNegative` | alert | `lpn_id_invalid` | WARN | bad ID entry |
 | `selectRow` | alert | `lpn_cp_key_needed` | WARN | bad key entry |
 | `selectRow` | alert | `lpn_cp_key_taken` | WARN | key in use |

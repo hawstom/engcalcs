@@ -17,8 +17,8 @@
  *
  * THE LEG THAT MATTERS MOST is the last one: the page must carry no total of the two buckets. One
  * counts PEOPLE (consented rows, deduplicated per person per page), the other counts PAGE LOADS
- * (everybody else, undeduplicated). A sum has a denominator in two units and a numerator in
- * neither, which is the symptom formmail.php's own comment records.
+ * (everybody else, undeduplicated). A sum is in neither unit, and a ratio across them is
+ * formmail.php's old contact-funnel defect.
  *
  * It touches nothing shipped: the fixture is a temporary directory, the page is driven through the
  * EC_USAGE_REPORT_DIRS constant (which nothing arriving over HTTP can define), and log/ is never
@@ -36,6 +36,16 @@ function ec_ur_expect($label, $ok, $detail = '') {
     $fail++;
     echo "  FAIL $label" . ($detail !== '' ? "\n        $detail" : '') . "\n";
 }
+
+// ---- 0. the 'every' marker (2026-10-29): the cutover from de-duplicated said-yes uses ------------
+$mk = ecUsageParseRow('view', "2026-10-30T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\tevery\t0123456789abcdef\tvisitor");
+ec_ur_expect('a marked said-yes row reads as marked, with its code, pointer and bucket intact',
+    $mk['every'] === true && $mk['code'] === '0123456789abcdef' && $mk['pointer'] === 'fine' && $mk['bucket'] === 'visitor');
+$mk2 = ecUsageParseRow('view', "2026-10-30T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\tevery\tvisitor");
+ec_ur_expect('a marked said-yes row without a code reads as marked and uncoded',
+    $mk2['every'] === true && $mk2['code'] === '' && $mk2['pointer'] === 'fine');
+$mk3 = ecUsageParseRow('view', "2026-10-01T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\t0123456789abcdef\tvisitor");
+ec_ur_expect('an older coded row is not marked', $mk3['every'] === false && $mk3['code'] === '0123456789abcdef');
 
 // ---- 1. the six filenames are still the six lib/config.inc.php defines ------------------------
 // The page deliberately does NOT require config.inc.php -- that file reads cookies and can clear
@@ -312,17 +322,17 @@ function ec_ur_code($path) {
 }
 
 ec_ur_expect('page dwells by page: Manning-Pipe-Flow is 0 browsers, 2 uses, 1 others (uses from before codes)',
-    ec_ur_row_in($xp, 'Page dwells by page', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '0', '2', '1'),
-    json_encode(ec_ur_row_in($xp, 'Page dwells by page', 'Manning-Pipe-Flow')));
+    ec_ur_row_in($xp, 'Looking, by page', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '0', '2', '1'),
+    json_encode(ec_ur_row_in($xp, 'Looking, by page', 'Manning-Pipe-Flow')));
 ec_ur_expect('page dwells by page: Looped-Network is 0 browsers, 0 uses, 2 others',
-    ec_ur_row_in($xp, 'Page dwells by page', 'Looped-Network') === array('Looped-Network', '0', '0', '2'),
-    json_encode(ec_ur_row_in($xp, 'Page dwells by page', 'Looped-Network')));
+    ec_ur_row_in($xp, 'Looking, by page', 'Looped-Network') === array('Looped-Network', '0', '0', '2'),
+    json_encode(ec_ur_row_in($xp, 'Looking, by page', 'Looped-Network')));
 ec_ur_expect('calculators used: Manning-Pipe-Flow is 2 browsers and 4 uses, 0 page loads',
-    ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '4', '0'),
-    json_encode(ec_ur_row_in($xp, 'Calculators actually used', 'Manning-Pipe-Flow')));
+    ec_ur_row_in($xp, 'Calculating, by page', 'Manning-Pipe-Flow') === array('Manning-Pipe-Flow', '2', '4', '0'),
+    json_encode(ec_ur_row_in($xp, 'Calculating, by page', 'Manning-Pipe-Flow')));
 ec_ur_expect('calculators used: Looped-Network is 1 browser, 2 uses and 1 page load',
-    ec_ur_row_in($xp, 'Calculators actually used', 'Looped-Network') === array('Looped-Network', '1', '2', '1'),
-    json_encode(ec_ur_row_in($xp, 'Calculators actually used', 'Looped-Network')));
+    ec_ur_row_in($xp, 'Calculating, by page', 'Looped-Network') === array('Looped-Network', '1', '2', '1'),
+    json_encode(ec_ur_row_in($xp, 'Calculating, by page', 'Looped-Network')));
 ec_ur_expect('the calculation chart says 6 uses from 2 browsers plus 2 uses with no code',
     strpos($html, 'SAID YES: 6 use(s), from 2 browser(s) plus 2 use(s) with no code') !== false);
 ec_ur_expect('the contact funnel: viewed 0 browsers 1 use; sent 1 browser 2 uses; no page loads',
@@ -345,11 +355,11 @@ foreach ($xp->query('//tbody/tr') as $tr) {
     if ($cells > 4) { $wide++; }
 }
 ec_ur_expect('no table row carries more than four cells', $wide === 0, "$wide row(s) do");
-ec_ur_expect('the bucket columns are named browsers (said yes), uses (said yes), others',
+ec_ur_expect('the bucket columns are named Browsers (said yes), Uses (said yes), Uses (others)',
     isset($heads['browsers (said yes)']) && isset($heads['uses (said yes)'])
-    && isset($heads['others']), implode(' | ', array_keys($heads)));
-ec_ur_expect('the page states in words that the two are never added',
-    strpos($html, 'never added together') !== false);
+    && isset($heads['uses (others)']), implode(' | ', array_keys($heads)));
+ec_ur_expect('the page states in words when the two Uses columns are and are not addable',
+    preg_match('/are\s+not\s+addable/', $html) === 1 && preg_match('/are\s+addable/', $html) === 1);
 ec_ur_expect('the page names its own source files, so every number is re-derivable',
     substr_count($html, 'log/engcalcs-human-view.log') >= 2
     && strpos($html, 'log/engcalcs-signal.log') !== false
@@ -436,7 +446,7 @@ $d2 = new DOMDocument();
 @$d2->loadHTML($html2);
 $x2 = new DOMXPath($d2);
 $cell = function ($id) use ($x2) {
-    foreach ($x2->query('//table[thead/tr/th[.="uses (said yes)"]]//tr[td[@title]]') as $tr) {
+    foreach ($x2->query('//table[thead/tr/th[.="Uses (said yes)"]]//tr[td[@title]]') as $tr) {
         $td = $tr->getElementsByTagName('td')->item(0);
         if ($td->getAttribute('title') === $id) {
             $o = array();
