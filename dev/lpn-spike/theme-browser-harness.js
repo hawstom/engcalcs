@@ -17,7 +17,7 @@
 //      System under a dark device draws exactly what Dark draws (theme-design-browser-harness.js proves the
 //      print and the exported files stay Light).
 //   5. The chrome DOES change: the page, the Settings box and the menu popup compute different colours.
-//   6. Browser furniture only: `lpn_theme` is the one key, System removes it, and the stored project
+//   6. Browser furniture only: `lpn_theme` is the one key, System stores "system", and the stored project
 //      holds no theme (nothing in it says "theme" or "dark"), saved while Dark was chosen.
 //   7. The other calculator pages are NOT themed (decided with the plan: they carry a light Bootstrap navbar
 //      and the parent site's stylesheet, which are not tokens): no attribute, light, under a dark OS too.
@@ -336,7 +336,7 @@ async function main() {
 			ok('7. ...it keeps its light form surface under a dark OS with Dark chosen', other.form === 'rgb(247, 249, 255)', JSON.stringify(other));
 			await shot(a.page, 'calculator-dark.png');
 
-			// back to System: the key is removed and the OS rules again
+			// back to System: "system" is stored and the OS rules again
 			await a.goto('Looped-Network.php');
 			// The Settings box remembers that it was open (lpn_setbox), so a fresh page may already show it.
 			if (!(await a.page.isVisible('#lpn_settings_box'))) { await a.toolbarClick(await a.lang('lpn_tool_settings')); }
@@ -347,7 +347,7 @@ async function main() {
 			await choose(a.page, 'system');
 			await a.settle(300);
 			t = await attrs(a.page);
-			ok('1. back to System: the key is gone and the dark device decides', t.stored === null && t.choice === 'system' && t.theme === 'dark' && t.bs === 'dark', JSON.stringify(t));
+			ok('1. back to System: "system" is stored and the dark device decides', t.stored === 'system' && t.choice === 'system' && t.theme === 'dark' && t.bs === 'dark', JSON.stringify(t));
 
 			// 1. a scheme change while open repaints with no reload
 			await a.page.emulateMedia({ colorScheme: 'light' });

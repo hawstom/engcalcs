@@ -4693,3 +4693,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: 14 deliberate mutations of the quality code (wall, bulk, FIFO/LIFO swap, 2COMP, zero source, MASS /60, SETPOINT, CONCEN junction, qstep +1, age step, tank bulk rate, stagnant threshold, source pattern, initial tank quality) were each caught (2 to 87 failures). One mutation target was not unique and was skipped. File restored with git checkout.
 - OBSERVED: worst quality-over-EPANET-hydraulics gap 1.4e-9 (tol 1e-8); tightest end-to-end is Net3 trace at 0.94 of its tolerance.
 - OBSERVED: diff vs master is js/lpn-native-run.js plus dev/ only; nothing outside it calls lpnNativeRun or passes quality:true. native-eps-harness 126/126.
+
+## 2026-10-30 feat/theme-of-day (HEAD ffc86361e), Task 824
+- OBSERVED: all 7 days open in the right theme in real Chrome (EC_NOW), noon UTC boundary right for all 7 noons, real clock (Fri 10:05 UTC = Thursday = platinum) right. One data-theme write, first paint already in final theme: no flash.
+- OBSERVED: System and Dark picks store "system"/"dark", survive reload and a later day.
+- OBSERVED: menu-button-harness fails 28 checks under lpn_theme=rounded on this branch AND on master archive: Rounded draws the menu buttons as pills (999px radius) in a brighter blue (11,87,208). The harness asserts the Light-theme style. Intended Rounded look, not a visitor defect; the clock pin hides a harness assumption, not a bug.
+- OBSERVED: Net1 legend overlaps the Tank label on a 390px phone in every theme (not theme related).
+- SPECULATION: visitors who earlier chose System had the key removed, so they now see the day theme until they pick again.
