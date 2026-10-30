@@ -203,8 +203,8 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
 - **Five third-party requests, all on this page:** OSM tiles, Mapbox satellite, Nominatim search
   (`js/lpn-search.js`, gate `ec_geosearch`), Terrain-RGB (gate `ec_terrain`), and a GIS background
   layer from a server the visitor names (`js/lpn-gis.js`, Task 720: XYZ, WMS or ArcGIS MapServer,
-  stored as `project.gisLayers`, never cached, nothing sent until a layer is added or the visitor agrees, in a
-  dialog naming each host, to draw those of a project they open). OSM tiles show behind the first, empty project (Tom,
+  stored as `project.gisLayers`, never cached, requests only to a server whose address was typed in, with no prompt: a project that
+  holds a layer draws it on opening, Tom 2026-10-30). OSM tiles show behind the first, empty project (Tom,
   2026-09-25); the other four are opt-in. Never write "the only third-party request". A sixth service
   is a new paragraph in `privacy.php`, not a `consent_body` change.
 - **A geographic project is drawn in Web Mercator and stored in longitude/latitude.** A lat/lon

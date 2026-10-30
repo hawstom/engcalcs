@@ -18483,34 +18483,10 @@ var EngCalcs = EngCalcs || {};
 	// which only the screenshot does, and snipInlineImage() already drops a tile it cannot read and the
 	// screenshot says so (`droppedGis`).
 	var gisLayerEl = null, gisGroups = [], gisEls = {}, gisInfo = {}, gisStat = {}, gisPaintedSig = '',
-		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null,
-		// **NOTHING IS ASKED OF A SERVER UNTIL THE VISITOR SAYS SO** (Perry's review). A project opened
-		// from a file can name any server, so opening it draws none of its layers: gisAll is the visitor's
-		// "Draw them" for this open, gisPicked the layers they added or ticked since, gisAsked that the
-		// question has been put for this open. All three are reset when a project is opened.
-		gisAll = false, gisPicked = {}, gisAsked = false;
-	function gisPermitted(l) { return l.on !== false && (gisAll || !!gisPicked[gisPlainKey(l)]); }
+		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null;
+	// A project that holds background layers draws them when it opens, as QGIS and ArcGIS Pro do (Tom, 2026-10-30).
+	function gisPermitted(l) { return l.on !== false; }
 	function gisPlainKey(l) { return l.url + '|' + (l.layers || ''); }
-	function gisForgetAnswers() { gisAll = false; gisPicked = {}; gisAsked = false; }
-	// Once per open: names every host, and draws nothing until the visitor answers.
-	function gisAskOnce() {
-		var pc = EngCalcs.pageConfig || {}, hosts = [];
-		if (gisAsked) { return; }
-		gisLayers().forEach(function (l) {
-			var h = gisHost(l);
-			if (l.on !== false && !gisPicked[gisPlainKey(l)] && hosts.indexOf(h) < 0) { hosts.push(h); }
-		});
-		if (!hosts.length) { return; }
-		gisAsked = true;
-		askDialog({
-			kind: 'confirm',
-			text: (pc.lpn_gis_ask || 'This project requests background layers from: {hosts}. Drawing them sends the area on screen and your IP address to those servers. Draw them?')
-				.replace('{hosts}', hosts.join(', ')),
-			ok: pc.lpn_gis_ask_yes || 'Draw them', cancel: pc.lpn_gis_ask_no || 'Not now'
-		}, function (yes) {
-			if (yes) { gisAll = true; refreshBasemap(); }
-		});
-	}
 	function gisLayers() { return (project && project.gisLayers) || []; }
 	function gisUsable() { return !!(EngCalcs.lpnGis && projectLocatable()); }
 	function gisSignature() {
@@ -18573,7 +18549,6 @@ var EngCalcs = EngCalcs || {};
 		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
 			return;   // refreshBasemap() asks again when the transform has loaded
 		}
-		gisAskOnce();
 		// A layer added, removed or edited rebuilds the pile; opacity and on/off change only below.
 		var structure = JSON.stringify(list.map(function (l) { return [l.kind, l.url, l.layers || '']; }));
 		if (structure !== gisStructSig) { gisEmpty(); gisStructSig = structure; }
@@ -43706,7 +43681,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// labelSettings and settings blocks below spell out: a key added after this save was written
 		// must come back at its default, not as undefined.
 		project = Object.assign({ name: '', activeScenario: 'base' }, saved.project || {});
-		gisForgetAnswers();   // a project just opened asks again before it contacts any server (Task 720)
 		scenarios = Array.isArray(saved.scenarios) && saved.scenarios.length ? saved.scenarios : defaultScenarios();
 		// Two structural guarantees the rest of the model leans on, restored here rather than
 		// trusted: exactly one Base exists, and the active scenario names a scenario that is really
@@ -63936,9 +63910,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				rm.type = 'button'; rm.className = 'lpn-gis-remove'; rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				on.addEventListener('change', function () {
 					var next = JSON.parse(JSON.stringify(gisLayers()));
-					// Ticking Draw is the visitor asking for this layer, so it is also the answer for it.
-					if (on.checked) { gisPicked[gisPlainKey(l)] = true; next[idx].on = true; }
-					else { delete gisPicked[gisPlainKey(l)]; next[idx].on = false; }
+					next[idx].on = !!on.checked;
 					gisSetLayers(next);
 				});
 				op.addEventListener('change', function () {
@@ -63976,7 +63948,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			kindSel.addEventListener('change', showLayersRow);
 			showLayersRow();
 			gisBody.appendChild(addBtn);
-			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent until you add a layer, or agree to draw the layers of a project you open.');
+			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Opening a project that holds a layer sends them again.');
 			addBtn.addEventListener('click', function (e) {
 				var res = EngCalcs.lpnGis.normalise({ kind: kindSel.value, url: urlIn.value, layers: layersIn.value });
 				if (e && e.preventDefault) { e.preventDefault(); }
@@ -63987,7 +63959,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						: (pc.lpn_gis_err_address || 'The server address must start with https://.'));
 					return;
 				}
-				gisPicked[gisPlainKey(res.layer)] = true;   // adding it is the visitor's yes for this layer
 				gisSetLayers(gisLayers().concat([res.layer]));
 				rebuildSettingsFields();
 			});

@@ -52,7 +52,8 @@ and what else reaches us, and it gives the legal details the law requires.</p>
 		access log and the usage counts are kept apart, and we never join them.</li>
 	<li>Five optional features on one page make third-party requests: four to OpenStreetMap or
 		Mapbox, and one to a GIS server you name. The street map shows on the first, empty project that
-		page opens, and you can hide it. The other four ask first.</li>
+		page opens, and you can hide it. Of the other four, three ask first, and the GIS server is
+		contacted only at an address that was typed in.</li>
 </ul>
 
 <h2>Who we are</h2>
@@ -173,7 +174,8 @@ site.</p>
 <p>Five features on the Looped Pipe Network map make third-party requests. The street map shows on
 the first, empty project the page opens, and Map, World map, Detach hides it. The other four wait
 for you. Three of them ask first and separately, because each sends something different; a
-background layer starts only when you add one or agree to draw one. No other page in the suite uses any of them.</p>
+background layer makes requests only to a server whose address was typed in, and a project that holds
+one requests from it each time the project is opened. No other page in the suite uses any of them.</p>
 
 <table class="ec-legal-table">
 	<tr><th>Feature</th><th>What is sent</th><th>To</th></tr>
@@ -198,9 +200,8 @@ and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener
 When you add a layer, the page sends tile requests to the server whose address you typed, for the area
 on screen, and again as you pan and zoom. That server sees your IP address, the area you are
 looking at, and that the request came from this site. Nothing is sent to it until you add a layer,
-or agree to draw the layers of a project you open, and removing the layer ends the requests. A layer
-is saved in your project file, so when you open that project later the page asks you before it
-makes requests to the server again. What the server does with the request is governed by its own
+and removing the layer ends the requests. A layer is saved in your project file, so when you open
+that project later the page makes requests to the server again. What the server does with the request is governed by its own
 privacy policy.</p>
 
 <h2>Where it goes</h2>

@@ -301,11 +301,11 @@ async function main() {
 		await page.check('.lpn-gis-on >> nth=1');
 		await a.settle(600);
 
-		console.log('\n--- 6. the project carries them, and asks before a reopened one reaches any server ---');
+		console.log('\n--- 6. the project carries them, and a reopened one draws them without a prompt ---');
 		const saved = JSON.parse(await stored());
 		ok('the saved project holds the four layers, in order', Array.isArray(saved.project.gisLayers) && saved.project.gisLayers.map((l) => l.kind).join() === 'xyz,wms,arcgis,arcgis', JSON.stringify(saved.project.gisLayers));
 		ok('...with their opacity and address', saved.project.gisLayers[0].opacity === 0.5 && saved.project.gisLayers[1].layers === 'roads' && saved.project.gisLayers[2].url === S + '/arc/tiled/MapServer');
-		// A reopened project draws nothing, and asks, before any server hears of it.
+		// A reopened project draws its layers at once, as QGIS and ArcGIS Pro do, and asks nothing.
 		// The harness routes the page's question box to Playwright's native dialogs (pickers.js), which
 		// answer at once with what the session was told; a.dialogs is what was asked.
 		const settingsOpen = async () => {
@@ -320,33 +320,13 @@ async function main() {
 			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 			await a.settle(2500);
 		};
-		const askText = await a.lang('lpn_gis_ask'), YES = await a.lang('lpn_gis_ask_yes'), NO = await a.lang('lpn_gis_ask_no');
 		const logLen0 = (await requests()).length;
 		await reopen(false);
-		const q = asked();
-		console.log('  (questions asked: ' + a.dialogs.length + ')');
-		ok('the prompt says the project requests background layers', /^This project requests background layers from: /.test(q) && q.indexOf('Drawing them sends the area on screen and your IP address') > 0, q.slice(0, 120));
-		ok('reopening asks, naming the host', a.dialogs.length >= 1 && q.indexOf('127.0.0.1:' + stub.port) >= 0 && q.indexOf(askText.split('{hosts}')[0]) === 0 && /Draw them\?$/.test(q), q.slice(0, 200));
-		ok('the box offers Draw them and Not now', await page.evaluate(async ([t, y, n]) => {
-			delete window.lpnDialogAnswerer;
-			EngCalcs.lpnAsk({ kind: 'confirm', text: t, ok: y, cancel: n }, function () { });
-			const labels = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim());
-			const b = document.querySelector('#lpn_dialog_buttons button:last-child'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
-			return labels.join('|') === y + '|' + n;
-		}, [q, YES, NO]));
-		await a.settle(500);
-		ok('Not now: nothing drawn and no server asked (the question came before any request)', (await page.evaluate(READ_TILES)).length === 0 && (await requests()).length === logLen0);
-		await settingsOpen();
-		ok('...the layers are still in the project and their Draw ticks are off', await page.evaluate(() => { const o = Array.from(document.querySelectorAll('.lpn-gis-on')); return o.length === 4 && o.every((x) => !x.checked); }));
-		await page.check('.lpn-gis-on >> nth=0');
-		await a.settle(1500);
-		const afterTick = await page.evaluate(READ_TILES);
-		ok('ticking Draw on one layer draws that layer only', afterTick.length > 0 && afterTick.every((t) => t.layer === 0), String(afterTick.length));
-		await reopen(true);
-		ok('reopening again asks again', a.dialogs.length >= 1);
 		await a.settle(2500);
+		console.log('  (questions asked: ' + a.dialogs.filter((d) => d.type !== 'beforeunload').length + ')');
+		ok('reopening asks nothing (Tom, 2026-10-30: it is the user\'s own project)', a.dialogs.filter((d) => d.type !== 'beforeunload').length === 0, JSON.stringify(a.dialogs).slice(0, 300));
 		const again = await page.evaluate(READ_TILES);
-		ok('Draw them: all four layers draw and their servers are asked', [0, 1, 2, 3].every((i) => again.some((t) => t.layer === i)) && (await requests()).length > logLen0, again.length + ' tiles');
+		ok('all four layers draw on reopening and their servers are asked', [0, 1, 2, 3].every((i) => again.some((t) => t.layer === i)) && (await requests()).length > logLen0, again.length + ' tiles');
 		ok('...and the credit is back, separated by |', await page.evaluate(() => { const c = document.querySelector('[data-gis-credit]'); return c.textContent.indexOf('Fake County GIS 2026') >= 0 && c.textContent.indexOf(' | ') > 0 && c.title === c.textContent; }));
 		ok('...and the credit line is capped in width', await page.evaluate(() => { const c = document.querySelector('[data-gis-credit]'); return c.getBoundingClientRect().width <= Math.max(0.4 * innerWidth, 352) + 1; }));
 		await settingsOpen();
@@ -354,6 +334,9 @@ async function main() {
 		console.log('\n--- 7. the project without layers is as it was ---');
 		for (let i = 0; i < 4; i++) { await page.click('.lpn-gis-remove >> nth=0'); await a.settle(500); }
 		await a.settle(800);
+		const logRemoved = (await requests()).length;
+		await a.settle(1500);
+		ok('nothing is requested once the layers are removed', (await requests()).length === logRemoved);
 		const after = await stored();
 		ok('no layers draw', (await page.evaluate(READ_TILES)).length === 0);
 		ok('the saved project has no gisLayers', after.indexOf('gisLayers') < 0);
