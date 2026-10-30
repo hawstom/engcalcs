@@ -4742,3 +4742,13 @@ a finger tap at centre and +-9 px focuses the input, typed value takes (verified
 OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
 OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
 Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".
+
+## 2026-10-30 -- box-design round 7 (606a749a3, 63a38fe95, 69bf45b31, vs round 6 7b62eb90b)
+OBSERVED (re-verify before citing; real Chromium touch emulation, Net1 and Net3): the round-6 tree REPRODUCES Tom's crushed Settings names (name column 20 px at 360 wide, 41 px at 390, rows 100-124 px tall); round 7 gives 106-117 px, rows 20-30 px. Fixed after dropdown-to-Page, after reload and after Start fresh (Start fresh reopens a 352 px wide box at 360, fine).
+OBSERVED MISSED (minor): at 360 wide the Settings pane still scrolls sideways 12 px (Symbology group, Customer: .lpn-set-part and column-head stick out 12 px); at 320 wide 4 px (a text input). Same 12 px in round 6. No overflow at 390. box-phone7 does not measure it.
+OBSERVED: full-height flyouts leave a 92 px strip of map at 390 (83 at 360, 55 at 320). On Net1 after tapping J22 only 2-3 elements stay tappable; box-phone6 had to reload Net1 between its element taps for this reason. Dragging the bottom pill up works at 390x844, 360x740/640, 340, 330, and survives reload.
+OBSERVED MISSED: bottom pill drag up does nothing at 320x640 and 320x700 (works at 320x844). Cause not found.
+OBSERVED: PC 1366x768 and landscape 844x390 identical to round 6. Find, Fire flow, Criticality open 382 px wide, full height on a 390 phone (cover whole map; not changed by this round).
+Harness edits: box-phone5/6 dropped the "map stays visible under the box" check, replaced by a shorter-than-default check; no other check weakened. box-phone 38 px -> 23-32 px matches round 6.
+Harnesses re-run green: box-phone7 14, box-phone6 67, box-phone5 52, box-phone 17, settings-phone-jump 104, settings-phone-width 24.
+Method: probe*.js in session scratchpad perry7; base tree via git archive 7b62eb90b. Shots: _panel/www/img/perry7-*.png.
