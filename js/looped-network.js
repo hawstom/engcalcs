@@ -27020,6 +27020,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.dock) { v.dock = findDockRec.dock; }
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
+		if (findDockRec.dockH) { v.dockH = findDockRec.dockH; }
 		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
@@ -27573,7 +27574,7 @@ var EngCalcs = EngCalcs || {};
 	// STRIP.**
 	//
 	// **FURNITURE, one browser key, `lpn_paneboxes`:** {tab id: {open, left, top, w, h, userSized,
-	// dock, autohide, dockW, dockOrd}}, the fields every other box record holds, one entry per tab
+	// dock, autohide, dockW, dockH, dockOrd}}, the fields every other box record holds, one entry per tab
 	// that was ever floated, docked or opened. Never in the project file. Not offered on a phone,
 	// where every box fills the window and there is no column to dock into.
 	var LPN_PANEBOXES_KEY = 'lpn_paneboxes';
@@ -27604,6 +27605,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.dock) { o.dock = r.dock; }
 			if (r.autohide) { o.autohide = true; }
 			if (r.dockW) { o.dockW = r.dockW; }
+			if (r.dockH) { o.dockH = r.dockH; }
 			if (r.dockOrd !== undefined) { o.dockOrd = r.dockOrd; }
 			if (Object.keys(o).length) { v[id] = o; n++; }
 		});
@@ -53699,7 +53701,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// A record as it is before any storage has been read.
 	function workspaceResetRecord(rec) {
-		['dock', 'autohide', 'dockW', 'dockOrd'].forEach(function (k) { delete rec[k]; });
+		['dock', 'autohide', 'dockW', 'dockH', 'dockOrd'].forEach(function (k) { delete rec[k]; });
 		['left', 'top', 'w', 'h', 'ix'].forEach(function (k) { if (rec.hasOwnProperty(k)) { rec[k] = null; } });
 		if (rec.hasOwnProperty('open')) { rec.open = false; }
 		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
@@ -66599,6 +66601,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
+		// The height of a phone flyout, set by dragging its bottom pill (Tom, 2026-10-30: "Why not saved?").
+		if (typeof v.dockH === 'number' && isFinite(v.dockH) && v.dockH > 0) { rec.dockH = Math.round(v.dockH); }
 		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
 	}
@@ -66749,6 +66753,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			r = { dock: d.rec.dock, open: !!d.open };
 			if (d.rec.autohide) { r.autohide = true; }
 			if (d.rec.dockW) { r.dockW = d.rec.dockW; }
+			if (d.rec.dockH) { r.dockH = d.rec.dockH; }
 			if (d.rec.dockOrd !== undefined) { r.dockOrd = d.rec.dockOrd; }
 			v[d.box.id] = r;
 			n++;
@@ -67098,6 +67103,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
 	}
+	// **A FINGER ON A GRIP DRAGS IT, WHATEVER CHROMIUM TARGETS** (Perry, 2026-10-30). A grip with :hover/:active styling made Chromium
+	// snap a touch to it from up to 10 px away, so a tap beside the strip never reached the map; the styling is gone for touch, and
+	// Chromium now picks a label or input of the box within a finger's reach over a grip that is not a tap target. So a touch whose own
+	// coordinates fall inside the strip starts the drag here, from the document, and takes the press from whatever was targeted.
+	function dockGripTouchFallback(el, down) {
+		function inside(x, y) {
+			var r;
+			if (!el.classList.contains('lpn-dock-grip-live') || getComputedStyle(el).display === 'none') { return false; }
+			r = el.getBoundingClientRect();
+			return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+		}
+		document.addEventListener('pointerdown', function (e) {
+			if (e.pointerType !== 'touch' || e.target === el || el.lpnDragging || !inside(e.clientX, e.clientY)) { return; }
+			e.stopPropagation();
+			down(e);
+		}, true);
+		// Without this the browser has already decided, from the label it targeted, that the touch is a pan.
+		document.addEventListener('touchstart', function (e) {
+			var t = e.touches && e.touches[0];
+			if (t && e.target !== el && inside(t.clientX, t.clientY) && e.cancelable) { e.preventDefault(); }
+		}, { capture: true, passive: false });
+	}
 	// Dragging the column's inner edge sets the width of every box docked in it, together.
 	function wireDockGrip(el, side) {
 		var from = null;
@@ -67105,15 +67132,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A finger never hovers, so its lifting is not a pointer leaving: a flyout sized by touch stays out
 		// until a press elsewhere or its own close/tab, as before the drag.
 		el.addEventListener('pointerleave', function (e) { if (dockFlyout && !el.lpnDragging && e.pointerType !== 'touch') { dockTuckLater(dockFlyout); } });
-		el.addEventListener('pointerdown', function (e) {
+		function down(e) {
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
 			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
 			dockGripLastSide = side;
 			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
-		});
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
 		el.addEventListener('pointermove', function (e) {
 			var w;
 			if (!from) { return; }
@@ -67129,13 +67159,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				from.list.forEach(function (d) { if (d.save) { d.save(); } });
 				from = null;
 				el.lpnDragging = false;
+				el.classList.remove('lpn-dock-grip-held');
 				if (dockFlyout && !(e && (e.pointerType === 'touch' || e.pointerType === 'pen'))) { dockTuckLater(dockFlyout); }
 			});
 		});
 	}
 	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT ABOUT HALF THE SCREEN'S HEIGHT** (Tom, 2026-10-29: "Don't cap the size. Just
 	// make the initial size reasonable"), so the map stays visible and tappable. Not a cap: its bottom edge carries a handle
-	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept for the page load), up to the whole column.
+	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept across reloads with the box's other dock fields), up to the whole column.
 	function dockFlyShort() {
 		return smallScreen() && (window.innerHeight || 0) > (window.innerWidth || 0);
 	}
@@ -67168,21 +67199,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function wireDockHGrip(el) {
 		var from = null;
-		el.addEventListener('pointerdown', function (e) {
+		function down(e) {
 			var d = el.lpnDock;
 			if (!d) { return; }
 			from = { y: e.clientY, h: d.box.getBoundingClientRect().height, d: d };
 			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
-		});
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
 		el.addEventListener('pointermove', function (e) {
 			if (!from) { return; }
 			from.d.rec.dockH = Math.round(Math.max(LPN_DOCK_FLY_MIN_H, Math.min(el.lpnColH || 9999, from.h + e.clientY - from.y)));
 			layoutDocks();
 		});
 		['pointerup', 'pointercancel'].forEach(function (evt) {
-			el.addEventListener(evt, function () { from = null; el.lpnDragging = false; });
+			el.addEventListener(evt, function () {
+				var d = from && from.d;
+				from = null;
+				el.lpnDragging = false;
+				el.classList.remove('lpn-dock-grip-held');
+				if (d && d.save) { d.save(); }
+			});
 		});
 	}
 	function dockPlace(d, x, y, w, h, mode) {

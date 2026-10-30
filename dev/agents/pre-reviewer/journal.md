@@ -4728,6 +4728,14 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: builder's harness 81/81 passes on this tree. My own run against real Esri World Imagery and terrestris OSM-WMS, PC 1400x900 and phone 390x844: Map > Add layer... opens Settings at the layer controls, focus in Kind of server, option reads "ArcGIS REST (MapServer)"; both layers draw; reopen asks first and sends 0 requests before answer; Draw them redraws; Remove then pan sends 0. No layout overflow after box-design merge. Screenshots perry-gis2-*.png.
 - OBSERVED: privacy.php says five features, but dev docs/UsageReport comment/third_party_request_check still say four (non-visitor). Summary says "other four ask first", detail says "three ask first" (layer starts on add): reads consistent enough.
 - Not checked: disabled Add layer... row on an unplaced project (explanation?), how it looks to the eye beyond screenshots.
+## 2026-10-30 -- box-design round 5 (b1c19252c, 36fa47163)
+OBSERVED (re-verify before citing): builder's box-phone5 harness passes 54/54 in this worktree. My own touch-event runs
+(390x844, 360x740, PC 1200x800; CDP touch drags) agree: rotate row full width under Angle, pill 4x32 on transparent 19px(phone)/8px(PC)
+strip, half-height flyout (422/370 px = 50%), bottom pill drag +200 -> taller and stays open 3.5 s, side drag stays open 4 s, no :hover stuck.
+Harness blind spot: part A (Text) runs WITHOUT EC_DEFAULT_DOCKS, so it measures a floating popup, not the docked half-height flyout.
+With docks on, Text flyout is 50% high, rotate row fine, bottom pill overlaps body by ~1px only.
+Tapping empty map tucks the flyout (existing behaviour). Node 31 (Net1, y~774 at 390x844) would not select by touch, tucks flyout; cause not found, not shown to be this branch.
+Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
 # Perry, feat/starter-example 490a07194, 2026-10-28 (Task 823)
 - OBSERVED (real Chromium, OSM on, US and SI): every pipe of Fire flow extension (Johnson City: W Main St/US 290, N Ave F, N Ave E, E Pecan Dr) and Community well and tank (Munday: N 10th and 9th Ave, W D and W B St) sits on a street. Pipes hidden to compare with the bare map. TANK-1 is mid-block between W E and W F St.
 - OBSERVED MISSED: examples/Net1-Scenarios-SI.lwn tank N2 has bottomElev 850 (ft number, unconverted) beside elev 259.08 m. Page shows P=674.8 m at N23 (US file: ~85 psi), head 885 m. The scenario browser harness only compares ordering; si-example-equivalence-harness was repointed to the plain dev Net1 pair, so the shipped scenarios pair is unchecked.
@@ -4743,3 +4751,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: privacy.php and lpn_gis_note no longer say "asks"/"agree"; but "only at an address that was typed in" and "the server whose address you typed" are untrue of a file someone else made (File > Open of a foreign .lwn contacts its server at once, measured).
 - OBSERVED: Settings box reopens on the last section (Symbology) when Add layer... is not used; not a regression.
 - NOT CHECKED: Dark theme, mutation of the harness, other languages (key text changed in English only, other files hold the English), CORS-less server.
+## 2026-10-30 -- box-design round 6 (f5f92ff72, vs round 5 36fa47163)
+OBSERVED (re-verify before citing; real Chromium touch emulation, Net1; 390x844, 360x740, PC 1400x900): Properties rows visible without scrolling
+junction 8 -> 12 (390), 6 -> 11 (360); pipe 8 -> 13, 7 -> 11. Median pitch 41 -> 27 px (not 24: some rows are 28, wrapped labels 45), so "half as high" is about a third less. Inputs 24 px,
+a finger tap at centre and +-9 px focuses the input, typed value takes (verified by reselecting the node). No clipped text, overlap or misaligned label in Properties, Find, Fire flow, Criticality.
+OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
+OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
+Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".

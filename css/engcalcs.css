@@ -2936,7 +2936,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:hover { background: var(--ec-hover-bg); }
 .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval:focus-visible { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 .lpn-demand-count { color: var(--ec-ink-muted); }
-@media (max-width: 30rem) { .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval { padding: 4px 6px 8px; font-size: .95em; } }
+@media (max-width: 30rem) { .lpn-propbox .lpn-gprops .lpn-grow > button.lpn-demand-more.lpn-gval { padding: 2px 6px 4px; font-size: .95em; } }
 /* The Elevation field's DEM control in the node popup (Task 542). A button and, once it has been
    asked, one line saying what the terrain service reported — kept together so the sentence reads as
    belonging to the button rather than to the field below it. */
@@ -4047,14 +4047,19 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-popover-body > .lpn-gsplit { display: block; grid-column: 2 / 3; grid-row: 1 / 3; }
 	}
 }
-/* TOUCH (Ida, 2026-10-29): one structure, two sizes. Rows are a finger tall; the divider is its column gridline (1 px, already
+/* TOUCH (Ida, 2026-10-29): one structure, two sizes. Rows were a finger tall (40 px); Tom, 2026-10-30, on a phone: *"the rows seem
+   gratuitously tall ... I might even make them half as high"*, so a row is now 24 px (the desktop grid's is 28), its cells padded 2 px above and below instead of 4: a phone shows
+   two thirds more rows. The divider is its column gridline (1 px, already
    drawn by the Label cell's rule) with an invisible 24 px hit area that starts just inside the Label cell's padding, so it
    never lies over label text, and a tap on it passes through to the cell beneath (js: gridWireSplit). No fat graphic. */
 @media (pointer: coarse) {
-	.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow:not(.lpn-gspan-row):not(.lpn-fill-row), #lpn_popup_title.lpn-gtitle-id.lpn-sheet { min-height: 2.5rem; }
+	.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow:not(.lpn-gspan-row):not(.lpn-fill-row), #lpn_popup_title.lpn-gtitle-id.lpn-sheet { min-height: 1.5rem; }
 	.lpn-gsplit, .lpn-propbox .lpn-popover-body > .lpn-gsplit { width: 24px; inset-inline-end: -16px; border-radius: 0; background: transparent; opacity: 1; }
 	.lpn-gsplit:hover, .lpn-gsplit:focus-visible { background: transparent; opacity: 1; }
 	.lpn-gridhost.lpn-sheet .lpn-gname, .lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-end: 8px; }
+	.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-gname, .lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-block: 2px; }
+	:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) { padding-block: 2px; }
+	.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
 	/* An empty editable cell is visibly a cell: no hover fill exists on touch. */
 	.lpn-sheet .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):not(:disabled), .lpn-propbox .lpn-gprops .lpn-grow > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):not(:disabled) { box-shadow: inset 0 -1px 0 0 var(--ec-hairline); }
 }
@@ -5235,15 +5240,19 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	border-radius: 2px; background: var(--ec-gray-bbb);
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
-/* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
-/* The finger-wide edge lies over the box's own border and padding (9 px) and 10 px of the map beside it, never over its text
-   (Tom, 2026-10-29: "overlap 1 1/2 characters of the labels"); more than 10 px over the map swallowed taps on whatever sat beside
-   the flyout (a Customer 14 px away could not be selected). */
+/* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*), but not nineteen:
+   Tom, 2026-10-30, *"the tap area for the bar/pill is too wide ... widening it was a mistake"*. The strip is the 4 px pill and
+   4 px each side (12 px), centred on the box's edge: 6 px over the box's own border and padding, never over its text, and 6 px
+   over the map, so a tap 7 px beside the flyout reaches whatever sits there. */
 @media (pointer: coarse), (max-width: 700px) {
-	#lpn_dock_grip_right { width: 19px; margin-left: -10px; }
-	#lpn_dock_grip_left { width: 19px; margin-left: -9px; }
+	#lpn_dock_grip_right, #lpn_dock_grip_left { width: 12px; margin-left: -6px; }
 }
-.lpn-dock-grip:hover::after, .lpn-dock-grip:active::after { background: var(--ec-border-strong); }
+/* NO :hover OR :active RULE MAY TARGET THE GRIP ON A TOUCH SCREEN (Perry, 2026-10-30: a tap up to 14 px beside the strip was swallowed).
+   Chromium treats an element with :hover/:active styling as something that responds to taps and snaps nearby touches to it,
+   whatever its width; measured by deleting this one rule. A mouse gets the hover rule only where hover exists; a finger or a
+   mouse that is pressing gets the class `lpn-dock-grip-held`, set by script. */
+@media (hover: hover) and (pointer: fine) { .lpn-dock-grip:hover::after { background: var(--ec-border-strong); } }
+.lpn-dock-grip.lpn-dock-grip-held::after { background: var(--ec-border-strong); }
 /* The bottom edge of a phone flyout that opens at half height: the same pill, lying down (32 x 4), in a transparent hit strip. */
 .lpn-dock-grip.lpn-dock-hgrip { width: auto; height: 19px; margin: -10px 0 0 0; cursor: row-resize; }
 .lpn-dock-grip.lpn-dock-hgrip::after { width: 32px; height: 4px; margin: -2px 0 0 -16px; }

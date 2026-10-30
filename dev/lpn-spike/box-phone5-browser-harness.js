@@ -134,7 +134,7 @@ async function main() {
 			ok(dev.n + ': the handle exists beside the flyout', !!s);
 			ok(dev.n + ': its visible part is a pill 4 px wide and 32 px tall', !!s && s.pillW === 4 && s.pillH === 32 && !/rgba\(0, 0, 0, 0\)/.test(s.pillBg), s && (s.pillW + 'x' + s.pillH + ' ' + s.pillBg));
 			ok(dev.n + ': the touch strip is transparent (no grey slab)', !!s && !gripPaintsSlab(s), s && s.bg);
-			ok(dev.n + ': the strip is a usable target (>= ' + (dev.touch ? 16 : 8) + ' px wide, at most 44)', !!s && s.hitW >= (dev.touch ? 16 : 8) && s.hitW <= 44, s && String(s.hitW));
+			ok(dev.n + ': the strip is a usable target (>= ' + (dev.touch ? 12 : 8) + ' px wide, at most 16; round 6 narrowed the phone strip from 19 px)', !!s && s.hitW >= (dev.touch ? 12 : 8) && s.hitW <= 16, s && String(s.hitW));
 			// Pressed or hovered: still no slab.
 			await P.mouse.move(s.x, s.y);
 			await S.settle(200);
