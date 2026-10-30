@@ -1064,6 +1064,8 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 require(ROOT + 'js/lpn-ramps.js');
 // The contour plot's pure half (Task 600); installs EngCalcs.lpnContour as its <script> tag does.
 require(ROOT + 'js/lpn-contour.js');
+// Background layers from a GIS server (Task 720); installs EngCalcs.lpnGis as its <script> tag does.
+require(ROOT + 'js/lpn-gis.js');
 // The fire flow sweep (ROADMAP Task 530). Same argument as lpn-ramps.js above: it installs itself
 // on globalThis.EngCalcs exactly as its <script> tag does, and without it every fire-flow path in
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a

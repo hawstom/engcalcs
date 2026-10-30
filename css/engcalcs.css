@@ -5691,6 +5691,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    "Use current view" -- stays inside the column and wraps its button under its box, rather than
    growing left out of the column and taking that row's one x with it. */
 .lpn-set-ctlgroup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; width: 100%; }
+.lpn-gis-opacity { width: 4em; }
 /* **HOW A VALUE IS ALIGNED INSIDE ITS CONTROL, once, for the whole box** (Tom, 2026-08-19: "Some
    inputs are right justified. Others are not. Standardize with an eye for design").
 

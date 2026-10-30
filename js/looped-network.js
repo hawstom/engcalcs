@@ -18548,14 +18548,16 @@ var EngCalcs = EngCalcs || {};
 		tl = screenToWorld(r.left, r.top);
 		br = screenToWorld(r.right, r.bottom);
 		proj = projectedBasemapOk();
+		// One crossing per axis for both branches: the corners in the frame the file is written in.
+		var ox0 = outwardX(tl.x), oy0 = outwardY(tl.y), ox1 = outwardX(br.x), oy1 = outwardY(br.y);
 		if (proj) {
-			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(), outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
+			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(), ox0, oy0, ox1, oy1);
 			if (!bnds) { return; }
 			wpx = Math.max(1, r.right - r.left);
 			degPerPx = (bnds.east - bnds.west) / wpx;
 			scale = degPerPx > 0 ? 1 / degPerPx : state.s;
 		} else {
-			bnds = { west: outwardX(tl.x), south: outwardY(br.y), east: outwardX(br.x), north: outwardY(tl.y) };
+			bnds = { west: ox0, south: oy1, east: ox1, north: oy0 };
 			scale = state.s;
 		}
 		// The tile boxes depend on the ground (frame, origin, coordinate system), as the basemap's do.
@@ -63841,7 +63843,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
 				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
 				op.setAttribute('aria-label', pc.lpn_gis_opacity || 'Opacity (0 to 1)');
-				op.style.width = '4em';
 				rm.type = 'button'; rm.className = 'lpn-gis-remove'; rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				on.addEventListener('change', function () {
 					var next = JSON.parse(JSON.stringify(gisLayers()));
