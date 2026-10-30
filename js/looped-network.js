@@ -26835,6 +26835,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.dock) { v.dock = findDockRec.dock; }
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
+		if (findDockRec.dockH) { v.dockH = findDockRec.dockH; }
 		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
@@ -27388,7 +27389,7 @@ var EngCalcs = EngCalcs || {};
 	// STRIP.**
 	//
 	// **FURNITURE, one browser key, `lpn_paneboxes`:** {tab id: {open, left, top, w, h, userSized,
-	// dock, autohide, dockW, dockOrd}}, the fields every other box record holds, one entry per tab
+	// dock, autohide, dockW, dockH, dockOrd}}, the fields every other box record holds, one entry per tab
 	// that was ever floated, docked or opened. Never in the project file. Not offered on a phone,
 	// where every box fills the window and there is no column to dock into.
 	var LPN_PANEBOXES_KEY = 'lpn_paneboxes';
@@ -27419,6 +27420,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.dock) { o.dock = r.dock; }
 			if (r.autohide) { o.autohide = true; }
 			if (r.dockW) { o.dockW = r.dockW; }
+			if (r.dockH) { o.dockH = r.dockH; }
 			if (r.dockOrd !== undefined) { o.dockOrd = r.dockOrd; }
 			if (Object.keys(o).length) { v[id] = o; n++; }
 		});
@@ -53514,7 +53516,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// A record as it is before any storage has been read.
 	function workspaceResetRecord(rec) {
-		['dock', 'autohide', 'dockW', 'dockOrd'].forEach(function (k) { delete rec[k]; });
+		['dock', 'autohide', 'dockW', 'dockH', 'dockOrd'].forEach(function (k) { delete rec[k]; });
 		['left', 'top', 'w', 'h', 'ix'].forEach(function (k) { if (rec.hasOwnProperty(k)) { rec[k] = null; } });
 		if (rec.hasOwnProperty('open')) { rec.open = false; }
 		if (rec.hasOwnProperty('userSized')) { rec.userSized = false; }
@@ -66305,6 +66307,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
+		// The height of a phone flyout, set by dragging its bottom pill (Tom, 2026-10-30: "Why not saved?").
+		if (typeof v.dockH === 'number' && isFinite(v.dockH) && v.dockH > 0) { rec.dockH = Math.round(v.dockH); }
 		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
 		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
 	}
@@ -66455,6 +66459,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			r = { dock: d.rec.dock, open: !!d.open };
 			if (d.rec.autohide) { r.autohide = true; }
 			if (d.rec.dockW) { r.dockW = d.rec.dockW; }
+			if (d.rec.dockH) { r.dockH = d.rec.dockH; }
 			if (d.rec.dockOrd !== undefined) { r.dockOrd = d.rec.dockOrd; }
 			v[d.box.id] = r;
 			n++;
@@ -66841,7 +66846,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT ABOUT HALF THE SCREEN'S HEIGHT** (Tom, 2026-10-29: "Don't cap the size. Just
 	// make the initial size reasonable"), so the map stays visible and tappable. Not a cap: its bottom edge carries a handle
-	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept for the page load), up to the whole column.
+	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept across reloads with the box's other dock fields), up to the whole column.
 	function dockFlyShort() {
 		return smallScreen() && (window.innerHeight || 0) > (window.innerWidth || 0);
 	}
@@ -66888,7 +66893,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			layoutDocks();
 		});
 		['pointerup', 'pointercancel'].forEach(function (evt) {
-			el.addEventListener(evt, function () { from = null; el.lpnDragging = false; });
+			el.addEventListener(evt, function () {
+				var d = from && from.d;
+				from = null;
+				el.lpnDragging = false;
+				if (d && d.save) { d.save(); }
+			});
 		});
 	}
 	function dockPlace(d, x, y, w, h, mode) {

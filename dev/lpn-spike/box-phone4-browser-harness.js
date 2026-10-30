@@ -182,7 +182,7 @@ async function main() {
 			ok(dev.n + ': the unpinned box shows its width handle', !!gv, JSON.stringify(gv));
 			ok(dev.n + ': the handle lies over no label or control text', !!gv && gv.overText === 0, JSON.stringify(gv));
 			ok(dev.n + ': the label text starts at or past the handle\'s inner edge', !!gv && gv.firstText >= gv.gripR - 0.5, JSON.stringify(gv));
-			ok(dev.n + ': the handle is wide enough to take (>= 16 px for a finger, >= 8 px for a pointer)', !!gv && gv.gripW >= (dev.touch ? 16 : 8), JSON.stringify(gv));
+			ok(dev.n + ': the handle is wide enough to take (>= 12 px for a finger, narrowed from 16 in round 6, >= 8 px for a pointer)', !!gv && gv.gripW >= (dev.touch ? 12 : 8), JSON.stringify(gv));
 			await S.close();
 		}
 
