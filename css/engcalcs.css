@@ -5247,7 +5247,12 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 @media (pointer: coarse), (max-width: 700px) {
 	#lpn_dock_grip_right, #lpn_dock_grip_left { width: 12px; margin-left: -6px; }
 }
-.lpn-dock-grip:hover::after, .lpn-dock-grip:active::after { background: var(--ec-border-strong); }
+/* NO :hover OR :active RULE MAY TARGET THE GRIP ON A TOUCH SCREEN (Perry, 2026-10-30: a tap up to 14 px beside the strip was swallowed).
+   Chromium treats an element with :hover/:active styling as something that responds to taps and snaps nearby touches to it,
+   whatever its width; measured by deleting this one rule. A mouse gets the hover rule only where hover exists; a finger or a
+   mouse that is pressing gets the class `lpn-dock-grip-held`, set by script. */
+@media (hover: hover) and (pointer: fine) { .lpn-dock-grip:hover::after { background: var(--ec-border-strong); } }
+.lpn-dock-grip.lpn-dock-grip-held::after { background: var(--ec-border-strong); }
 /* The bottom edge of a phone flyout that opens at half height: the same pill, lying down (32 x 4), in a transparent hit strip. */
 .lpn-dock-grip.lpn-dock-hgrip { width: auto; height: 19px; margin: -10px 0 0 0; cursor: row-resize; }
 .lpn-dock-grip.lpn-dock-hgrip::after { width: 32px; height: 4px; margin: -2px 0 0 -16px; }

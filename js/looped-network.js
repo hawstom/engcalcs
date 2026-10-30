@@ -66809,6 +66809,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
 	}
+	// **A FINGER ON A GRIP DRAGS IT, WHATEVER CHROMIUM TARGETS** (Perry, 2026-10-30). A grip with :hover/:active styling made Chromium
+	// snap a touch to it from up to 10 px away, so a tap beside the strip never reached the map; the styling is gone for touch, and
+	// Chromium now picks a label or input of the box within a finger's reach over a grip that is not a tap target. So a touch whose own
+	// coordinates fall inside the strip starts the drag here, from the document, and takes the press from whatever was targeted.
+	function dockGripTouchFallback(el, down) {
+		function inside(x, y) {
+			var r;
+			if (!el.classList.contains('lpn-dock-grip-live') || getComputedStyle(el).display === 'none') { return false; }
+			r = el.getBoundingClientRect();
+			return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+		}
+		document.addEventListener('pointerdown', function (e) {
+			if (e.pointerType !== 'touch' || e.target === el || el.lpnDragging || !inside(e.clientX, e.clientY)) { return; }
+			e.stopPropagation();
+			down(e);
+		}, true);
+		// Without this the browser has already decided, from the label it targeted, that the touch is a pan.
+		document.addEventListener('touchstart', function (e) {
+			var t = e.touches && e.touches[0];
+			if (t && e.target !== el && inside(t.clientX, t.clientY) && e.cancelable) { e.preventDefault(); }
+		}, { capture: true, passive: false });
+	}
 	// Dragging the column's inner edge sets the width of every box docked in it, together.
 	function wireDockGrip(el, side) {
 		var from = null;
@@ -66816,15 +66838,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A finger never hovers, so its lifting is not a pointer leaving: a flyout sized by touch stays out
 		// until a press elsewhere or its own close/tab, as before the drag.
 		el.addEventListener('pointerleave', function (e) { if (dockFlyout && !el.lpnDragging && e.pointerType !== 'touch') { dockTuckLater(dockFlyout); } });
-		el.addEventListener('pointerdown', function (e) {
+		function down(e) {
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
 			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
 			dockGripLastSide = side;
 			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
-		});
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
 		el.addEventListener('pointermove', function (e) {
 			var w;
 			if (!from) { return; }
@@ -66840,6 +66865,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				from.list.forEach(function (d) { if (d.save) { d.save(); } });
 				from = null;
 				el.lpnDragging = false;
+				el.classList.remove('lpn-dock-grip-held');
 				if (dockFlyout && !(e && (e.pointerType === 'touch' || e.pointerType === 'pen'))) { dockTuckLater(dockFlyout); }
 			});
 		});
@@ -66879,14 +66905,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function wireDockHGrip(el) {
 		var from = null;
-		el.addEventListener('pointerdown', function (e) {
+		function down(e) {
 			var d = el.lpnDock;
 			if (!d) { return; }
 			from = { y: e.clientY, h: d.box.getBoundingClientRect().height, d: d };
 			el.lpnDragging = true;
+			el.classList.add('lpn-dock-grip-held');
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
-		});
+		}
+		el.addEventListener('pointerdown', down);
+		dockGripTouchFallback(el, down);
 		el.addEventListener('pointermove', function (e) {
 			if (!from) { return; }
 			from.d.rec.dockH = Math.round(Math.max(LPN_DOCK_FLY_MIN_H, Math.min(el.lpnColH || 9999, from.h + e.clientY - from.y)));
@@ -66897,6 +66926,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var d = from && from.d;
 				from = null;
 				el.lpnDragging = false;
+				el.classList.remove('lpn-dock-grip-held');
 				if (d && d.save) { d.save(); }
 			});
 		});

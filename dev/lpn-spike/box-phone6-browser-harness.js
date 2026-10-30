@@ -167,6 +167,72 @@ async function main() {
 			await S.close();
 		}
 
+		console.log('\n--- B2. a finger beside a grip reaches the map; a finger on it drags (Perry, 2026-10-30) ---');
+		// Chromium snaps a touch to an element with :hover/:active styling, up to about 10 px away, so a rule of that kind on the grip
+		// swallowed taps well outside its strip. The events are read in the capture phase: the target of the press is what counts.
+		for (const dev of devices.filter((x) => x.touch)) {
+			const S = await Session.open(browser, NAME + '-b2-' + dev.tag, { viewport: { width: dev.w, height: dev.h }, hasTouch: true, isMobile: true });
+			const P = S.page;
+			await openNet1(S);
+			await P.evaluate(() => { window.__press = []; document.addEventListener('pointerdown', (e) => { window.__press.push(e.target.closest && e.target.closest('#lpn_canvas') ? 'lpn_canvas' : (e.target.id || String(e.target.className) || e.target.tagName)); }, true); });
+			const cdp = await P.context().newCDPSession(P);
+			const tp = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+			const side = () => P.evaluate(() => { const e = ['right', 'left'].map((k) => document.getElementById('lpn_dock_grip_' + k)).filter((x) => x && getComputedStyle(x).display !== 'none')[0]; const r = e.getBoundingClientRect(); return { l: r.left, r: r.right, y: r.top + r.height / 2, right: e.id.endsWith('right') }; });
+			const bottom = () => P.evaluate(() => { const e = document.getElementById('lpn_dock_hgrip'); if (!e || getComputedStyle(e).display === 'none') { return null; } const r = e.getBoundingClientRect(); return { t: r.top, b: r.bottom, x: r.left + r.width / 2 }; });
+			const boxSize = () => P.evaluate(() => { const r = document.getElementById('lpn_popup').getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; });
+			const drag = async (x0, y0, x1, y1) => { await tp('touchStart', x0, y0); for (let i = 1; i <= 6; i++) { await tp('touchMove', x0 + (x1 - x0) * i / 6, y0 + (y1 - y0) * i / 6); await S.settle(30); } await tp('touchEnd', 0, 0); await S.settle(300); };
+			await tapEl(S, true, '#lpn_canvas [data-node="22"]');
+			let g = await side();
+			// The flyout covers node 22, so it is tucked (a tap on bare map beside it) before each fresh tap on the node.
+			const g0 = g;
+			const reopen = async () => { const q = g0; await P.touchscreen.tap(q.right ? q.l - 40 : q.r + 40, q.y); await S.settle(700); await tapEl(S, true, '#lpn_canvas [data-node="22"]'); };
+			// a tap 8 px outside the strip
+			await P.evaluate(() => { window.__press = []; });
+			await P.touchscreen.tap(g.right ? g.l - 8 : g.r + 8, g.y);
+			await S.settle(400);
+			const pressed = await P.evaluate(() => window.__press[0] || '');
+			ok(dev.n + ': a tap 8 px beside the side grip lands on the map, not the grip', pressed === 'lpn_canvas', pressed);
+			// a drag that starts 8 px outside the strip does not resize; one on the pill does
+			await reopen();
+			g = await side();
+			const w0 = (await boxSize()).w;
+			await drag(g.right ? g.l - 8 : g.r + 8, g.y, (g.right ? g.l - 8 : g.r + 8) - 50, g.y);
+			const w1 = (await boxSize()).w;
+			ok(dev.n + ': a drag starting 8 px beside the side grip does not resize the box', Math.abs(w1 - w0) <= 2, w0 + ' -> ' + w1);
+			await reopen();
+			g = await side();
+			const w2 = (await boxSize()).w, cx = (g.l + g.r) / 2;
+			await P.evaluate(() => { window.__press = []; });
+			await drag(cx, g.y, cx + (g.right ? 50 : -50), g.y);
+			const w3 = (await boxSize()).w;
+			ok(dev.n + ': a drag starting on the pill resizes it (the column limit may stop it short of the full 50 px)', Math.abs(w3 - w2) >= 10, w2 + ' -> ' + w3);
+			// the bottom pill
+			await reopen();
+			const bg = await bottom();
+			ok(dev.n + ': the bottom pill is there', !!bg);
+			if (bg) {
+				await P.evaluate(() => { window.__press = []; });
+				await P.touchscreen.tap(bg.x, bg.b + 8);
+				await S.settle(400);
+				const pb = await P.evaluate(() => window.__press[0] || '');
+				ok(dev.n + ': a tap 8 px below the bottom pill lands on the map, not the pill', pb === 'lpn_canvas', pb);
+				await reopen();
+				const bg2 = await bottom();
+				await P.evaluate(() => { window.__press = []; });
+				await drag(bg2.x, bg2.b + 8, bg2.x, bg2.b + 108);
+				const pd = await P.evaluate(() => ({ t: window.__press[0] || '', out: document.getElementById('lpn_popup').classList.contains('lpn-dock-out') }));
+				// A press on the map tucks the flyout; a press taken by the pill would have left it out, taller.
+				ok(dev.n + ': a drag starting 8 px below the bottom pill is a map press and does not resize the box', pd.t === 'lpn_canvas', JSON.stringify(pd));
+				await reopen();
+				const bg3 = await bottom();
+				const h2 = (await boxSize()).h, cy = (bg3.t + bg3.b) / 2;
+				await drag(bg3.x, cy, bg3.x, cy + 100);
+				const h3 = (await boxSize()).h;
+				ok(dev.n + ': a drag starting on the bottom pill resizes it', h3 > h2 + 50, h2 + ' -> ' + h3);
+			}
+			await S.close();
+		}
+
 		console.log('\n--- C. a dragged flyout height survives a reload ---');
 		for (const dev of devices.filter((x) => x.touch)) {
 			const S = await Session.open(browser, NAME + '-c-' + dev.tag, { viewport: { width: dev.w, height: dev.h }, hasTouch: true, isMobile: true });
