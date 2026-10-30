@@ -67087,7 +67087,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wireDockGrip(el, side) {
 		var from = null;
 		el.addEventListener('pointerenter', function () { if (dockFlyout) { clearTimeout(dockTimer); } });
-		el.addEventListener('pointerleave', function () { if (dockFlyout && !el.lpnDragging) { dockTuckLater(dockFlyout); } });
+		// A finger never hovers, so its lifting is not a pointer leaving: a flyout sized by touch stays out
+		// until a press elsewhere or its own close/tab, as before the drag.
+		el.addEventListener('pointerleave', function (e) { if (dockFlyout && !el.lpnDragging && e.pointerType !== 'touch') { dockTuckLater(dockFlyout); } });
 		el.addEventListener('pointerdown', function (e) {
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
@@ -67107,12 +67109,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			layoutDocks();
 		});
 		['pointerup', 'pointercancel'].forEach(function (evt) {
-			el.addEventListener(evt, function () {
+			el.addEventListener(evt, function (e) {
 				if (!from) { return; }
 				from.list.forEach(function (d) { if (d.save) { d.save(); } });
 				from = null;
 				el.lpnDragging = false;
-				if (dockFlyout) { dockTuckLater(dockFlyout); }
+				if (dockFlyout && !(e && (e.pointerType === 'touch' || e.pointerType === 'pen'))) { dockTuckLater(dockFlyout); }
 			});
 		});
 	}
