@@ -4752,3 +4752,10 @@ OBSERVED: PC 1366x768 and landscape 844x390 identical to round 6. Find, Fire flo
 Harness edits: box-phone5/6 dropped the "map stays visible under the box" check, replaced by a shorter-than-default check; no other check weakened. box-phone 38 px -> 23-32 px matches round 6.
 Harnesses re-run green: box-phone7 14, box-phone6 67, box-phone5 52, box-phone 17, settings-phone-jump 104, settings-phone-width 24.
 Method: probe*.js in session scratchpad perry7; base tree via git archive 7b62eb90b. Shots: _panel/www/img/perry7-*.png.
+
+## 2026-10-30 -- box-design round 8 (55a756466, 0ab6ce3f5 vs 42dbd7128)
+OBSERVED (re-verify before citing; real Chromium, Net1/Net3, 390/360/320 touch + 1280 PC): Close in the Select area help hides only the bubble, mode stays on, a window drag then selects (18 on Net1 phone, 25/212 on PC); 390 Net3 and 320 windows selected 0 (my window clamped to a clipped network, not a Close defect). Mode is left by the tool button/Esc only now.
+OBSERVED MISSED (moderate): Properties shrinks to 80 px freely, no page sideways scroll, close button stays. But below ~130 px every value is pushed out of sight (inside-box sideways scroll, 0 of 13 inputs in view at 120/100/80); header title overlaps buttons below ~150; at 120 and under the dock/float/help buttons slip off the left edge. 150 px is usable (values truncate "10..."). Net3 shows 17-82 px of in-box sideways scroll from 180 px.
+OBSERVED PRE-EXISTING (same on master): on a phone, Properties docked -> tap Float gives a 382 px wide floating box at left 113, so its right 105 px incl. Close, dock and help buttons are off screen; no touch grip. Not caused by round 8.
+OBSERVED: settings-fit 17/18 fails on PC 580 px narrowing (gap above name line 0 vs 2 px below); phone passes. Invisible to Tom. box-narrow 22/22, phone-select 20/20, phone-dock 22/22, small-screen pass.
+Method: probes in session scratchpad p8probe; shots _panel/www/img/perry8-*.png.
