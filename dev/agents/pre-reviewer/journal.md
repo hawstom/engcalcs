@@ -4708,3 +4708,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - Scenario: edit in the box is an override (alternatives values n:11 demands), Base node unchanged, undo clears. Tables Junctions shows 210 after a 60 category. Builder's demand-rows harness 23/23, but it asserts neither the box size nor Tab.
 - Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
 - NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.
+
+# Perry, feat/gis-background f682e400c, 2026-10-29 night (Task 720 GIS background layers)
+- OBSERVED (real Chromium, 1400x900 and 390x844 touch, Fotobi as a lat/lon file, real servers): World_Imagery MapServer (tiled, /tile/18/...), terrestris WMS (OSM-WMS, GetMap EPSG:3857) and an XYZ OSM layer each draw (12 tiles PC, 8 phone); opacity 0.3 and Draw off reach the layer; Remove empties tiles and credit; reload restores all (also the off one and the opacity); five bad addresses each give a plain message, a dead host is named once. Builder's harness 63/63 here. No page errors.
+- OBSERVED: credit line runs together ("© OpenStreetMap contributorsSource: Esri...") with no separator, and with three layers it grows over the status bar's Longitude cell on PC.
+- OBSERVED: Server address box is about 72 px wide (PC and phone), the kind dropdown cuts "Tile URL ({z}/{x}/{"; the layer rows show a tick, a number and Remove with no visible words for Draw/Opacity (aria-label only).
+- OBSERVED: opening a project holding a layer sends requests to its server at once (reload test), so "Nothing is sent before you add one" (Settings note) is not true for an opened file; the privacy paragraph and CLAUDE.md say so honestly.
+- NOT CHECKED: mutation of the harness; WMS registration by eye (harness measures tile boxes against the street tiles); unlocatable project message; Dark theme; a CORS-less real server.
