@@ -40,7 +40,7 @@
  * file, no cache. log/lang-log-stats.sh remains the authority, and every number here is
  * re-derivable by running it.
  *
- * THE TWO BUCKETS ARE NEVER SUMMED. See lib/UsageReport.lib.php for what each one counts. Every
+ * THE TWO BUCKETS ARE NOT SUMMED BEFORE THE CUTOVER (UsageReport.lib.php). See lib/UsageReport.lib.php for what each one counts. Every
  * table below has two SAID YES columns (browsers: distinct codes; uses: rows) and an OTHERS
  * column, and no total column; every chart draws one bucket with its own scale. Browsers is a count
  * inside the said-yes bucket, never added to anything (Tom, call F01, 2026-10-08).
@@ -173,6 +173,12 @@ $reachClassified = $report['reachClassified'];
 // A plain line count of the windowed reach rows -- not a bucket total presented as a metric, just
 // how many lines matched, so it is the two bucket totals added for that description only.
 $reachWindowCount = $reach['bucketTotals']['visitor'] + $reach['bucketTotals']['visit'];
+
+// The cutover, found in the data: the first day a said-yes row carries the 'every' marker. A window
+// whose first day is earlier than it (or any window, while no marked row exists yet) holds said-yes
+// rows counted once per page per browser session, so its two Uses columns are not addable.
+$cutover       = $report['cutover'];
+$reachesBefore = ($cutover === '' || $from < $cutover);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -225,13 +231,21 @@ p.unused { color: #777; font-size: .85rem; margin: .2rem 0 .8rem; }
 <strong>Key to the three columns from 2026-10-08 forward:</strong>
 <br><strong>Browsers (said yes)</strong> is the de-duplicated count of browsers doing the action.
 It's intended to be close to a count of how many <strong>users</strong> did the action.
-<br><strong>Uses (said yes)</strong> is uses of the action by the same users as above, counted once
-per page per browser session. A said-yes row from before 2026-10-08 carries no code, so it counts
+<br><strong>Uses (said yes)</strong> is uses of the action by the same users as above, every use
+counted. Before <?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, said-yes uses were
+counted once per page per browser session. A said-yes row from before 2026-10-08 carries no code, so it counts
 here as a use and never as a browser.
 <br><strong>Uses (others)</strong> is uses of the action by browsers that did not say yes. Nothing
 may be stored to de-duplicate them, so every page load counts.
-<br>The two Uses columns are never added together: one counts once per page per browser session,
-the other every page load, so a sum would be in neither unit.
+<br>For logs before <?= $cutover === '' ? 'the change (no later log has been written yet)' : ur_h($cutover) ?>,
+reported in a window that reaches back before it, there is confusion on this point: Uses (said yes)
+was counted once per page per browser session and Uses (others) every time, so the two Uses columns
+are not addable. From <?= $cutover === '' ? 'the change' : ur_h($cutover) ?> on, Uses (said yes) and Uses (others) are
+addable.
+<?php if ($reachesBefore): ?><br><strong>This window reaches back before <?= $cutover === '' ? 'the change' : ur_h($cutover) ?>, so its two Uses
+columns are not addable.</strong>
+<?php else: ?><br><strong>This window starts on or after <?= ur_h($cutover) ?>, so its two Uses columns are addable.</strong>
+<?php endif; ?>
 <br><strong>Looking and Calculating:</strong> Under <em>Looking</em> and <em>Calculating</em>, a row
 is written by the page's script once the visit is at least 10 seconds old (and, for Calculating,
 only after a real calculation), so an others row there is most likely a human. Under <em>Page loads

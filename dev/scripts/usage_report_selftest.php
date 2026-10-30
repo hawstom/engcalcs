@@ -37,6 +37,16 @@ function ec_ur_expect($label, $ok, $detail = '') {
     echo "  FAIL $label" . ($detail !== '' ? "\n        $detail" : '') . "\n";
 }
 
+// ---- 0. the 'every' marker (2026-10-29): the cutover from de-duplicated said-yes uses ------------
+$mk = ecUsageParseRow('view', "2026-10-30T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\tevery\t0123456789abcdef\tvisitor");
+ec_ur_expect('a marked said-yes row reads as marked, with its code, pointer and bucket intact',
+    $mk['every'] === true && $mk['code'] === '0123456789abcdef' && $mk['pointer'] === 'fine' && $mk['bucket'] === 'visitor');
+$mk2 = ecUsageParseRow('view', "2026-10-30T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\tevery\tvisitor");
+ec_ur_expect('a marked said-yes row without a code reads as marked and uncoded',
+    $mk2['every'] === true && $mk2['code'] === '' && $mk2['pointer'] === 'fine');
+$mk3 = ecUsageParseRow('view', "2026-10-01T00:00:01Z\tManning-Pipe-Flow\ten\ten-us\tfine\t0123456789abcdef\tvisitor");
+ec_ur_expect('an older coded row is not marked', $mk3['every'] === false && $mk3['code'] === '0123456789abcdef');
+
 // ---- 1. the six filenames are still the six lib/config.inc.php defines ------------------------
 // The page deliberately does NOT require config.inc.php -- that file reads cookies and can clear
 // them at load time, and a report page must do neither. The cost of not requiring it is that the
@@ -348,8 +358,8 @@ ec_ur_expect('no table row carries more than four cells', $wide === 0, "$wide ro
 ec_ur_expect('the bucket columns are named Browsers (said yes), Uses (said yes), Uses (others)',
     isset($heads['browsers (said yes)']) && isset($heads['uses (said yes)'])
     && isset($heads['uses (others)']), implode(' | ', array_keys($heads)));
-ec_ur_expect('the page states in words that the two are never added',
-    strpos($html, 'never added together') !== false);
+ec_ur_expect('the page states in words when the two Uses columns are and are not addable',
+    preg_match('/are\s+not\s+addable/', $html) === 1 && preg_match('/are\s+addable/', $html) === 1);
 ec_ur_expect('the page names its own source files, so every number is re-derivable',
     substr_count($html, 'log/engcalcs-human-view.log') >= 2
     && strpos($html, 'log/engcalcs-signal.log') !== false
