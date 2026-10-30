@@ -380,6 +380,29 @@ async function main() {
 		await page.waitForSelector('#lpn_snip_copy', { state: 'visible', timeout: 15000 });
 		const nsnip = await a.notice();
 		ok('the screenshot opened and said a background layer was left out', nsnip === await a.lang('lpn_screenshot_no_gis'), nsnip);
+		console.log('\n--- 10. the Settings group on a 390 px phone ---');
+		await page.setViewportSize({ width: 390, height: 844 });
+		await a.settle(800);
+		const shownNow = () => page.evaluate(() => { const e = document.getElementById('lpn_gis_add'); return !!(e && e.getClientRects().length); });
+		if (!(await shownNow())) {
+			await page.evaluate((l) => { const b = Array.from(document.querySelectorAll('#lpn_toolbar button')).find((x) => ((x.getAttribute('aria-label') || x.textContent) || '').trim() === l); if (b) { b.click(); } }, await a.lang('lpn_tool_settings'));
+			await a.settle(800);
+		}
+		const ph = await page.evaluate(() => {
+			const add = document.getElementById('lpn_gis_add');
+			if (!add) { return null; }
+			add.scrollIntoView();
+			const grp = add.parentNode, box = (document.getElementById('lpn_settings_box') || grp).getBoundingClientRect(), kids = [];
+			const rows = Array.from(grp.querySelectorAll('.lpn-set-row')).map((r) => getComputedStyle(r).gridTemplateColumns);
+			grp.querySelectorAll('.lpn-gis-item, .lpn-set-row, #lpn_gis_add, .lpn-set-note').forEach((e) => { if (e.getClientRects().length) { kids.push(e.getBoundingClientRect()); } });
+			let overlap = 0, wide = 0;
+			kids.forEach((r, i) => { if (r.right > box.right + 1 || r.left < box.left - 1) { wide++; } kids.forEach((q, j) => { if (j > i && r.left < q.right - 1 && q.left < r.right - 1 && r.top < q.bottom - 1 && q.top < r.bottom - 1) { overlap++; } }); });
+			const sc = document.getElementById('lpn_settings_box');
+			return { shown: add.getClientRects().length > 0, kidsN: kids.length, rows, overlap, wide, sideways: sc ? sc.scrollWidth > sc.clientWidth + 1 : false, boxw: box.width };
+		});
+		ok('phone: the add form rows keep two columns', !!ph && ph.rows.length > 0 && ph.shown && ph.rows.every((c) => c.replace(/minmax\([^)]*\)/g, 'M').split(' ').length === 2), JSON.stringify(ph));
+		ok('phone: nothing in the group overlaps or runs outside it, and the box does not scroll sideways', !!ph && ph.overlap === 0 && ph.wide === 0 && !ph.sideways, JSON.stringify(ph));
+		await page.setViewportSize({ width: 1400, height: 900 });
 		ok('no page errors', a.errors.length === errsBefore && a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await browser.close();
