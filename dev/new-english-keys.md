@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**43 still to read on master**, of 208 untranslated keys, of 3177 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**70 still to read on master**, of 235 untranslated keys, of 3204 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (208, 43 to read @@ NEEDS RULING)
+## lpn_  (235, 70 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -178,6 +178,81 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
+- **`lpn_dxfnet_counts`**
+  > {nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, and {customers} customers.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_none`**
+  > Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_alternative`**
+  > These layers state an alternative other than BASE. Only the BASE alternative is read, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_bad_id`**
+  > These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_block_no_line`**
+  > These link blocks have no polyline through their middle, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_block_unknown`**
+  > These blocks are not the block this page writes for their layer, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_coord_unit`**
+  > The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_customer_loose`**
+  > The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_dup_id`**
+  > These IDs are stated by more than one element of the same kind. Only the first was imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_ambiguous`**
+  > These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_loop`**
+  > These links start and end at the same node, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_no_node`**
+  > These links have an end where there is no node, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_entity_unread`**
+  > These entities are not a kind this import reads on their layer, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_layer_foreign`**
+  > These layers do not begin with {prefix}, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_layer_unknown`**
+  > These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_line_no_block`**
+  > These service lines end where there is no customer block, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_link_no_block`**
+  > These polylines have no block at their middle to state the link's ID and properties, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_no_position`**
+  > These blocks have no usable position and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_not_held`**
+  > A DXF file does not hold patterns, curves, controls, rules, time settings, EPANET options, the head loss formula, the pressure and velocity units, pipe status, minor loss coefficients, or the demand categories of a junction (only their sum), so none of these was imported. Hazen-Williams was assumed, and the pressure and velocity units follow the elevation unit.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_paper_space`**
+  > Entities in paper space were not read: {n}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_shapes`**
+  > These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_tag_unknown`**
+  > These attribute tags are not ones this page writes for their block, and their values were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_unit_unknown`**
+  > The drawing states these units, which this page does not know. The units in use were kept for them.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_value_unread`**
+  > These values are not numbers or are not recognized, and were not used.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_report_lead`**
+  > What was not read, and each change made during import, is listed below with the layer, block or ID concerned:
+  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   _Ruled OK 2026-10-20._
@@ -247,6 +322,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
   _Ruled OK 2026-10-20._
+- **`lpn_file_import_dxfnet`**
+  > DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_import_dxfnet_tip`**
+  > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
+  @@ NEEDS RULING
 - **`lpn_file_import_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -660,7 +741,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**122 still to read**, of 165 new keys across 10 unmerged branch(es).
+**200 still to read**, of 243 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -671,13 +752,250 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`3814bf175`) — already merged into feat/report-widths; its strings are listed there
+### box-design (`1a8b478b1`) — already merged into feat/gis-background; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/first-view (`20ee39a5d`) — adds no English strings
+### feat/dxf-import (`530377adb`) — adds no English strings
 
-### feat/report-widths (`ba774364f`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/gis-background (`f682e400c`) — 78 new, 78 to read @@ NEEDS RULING
+
+- **`lpn_col_level`**
+  > Level
+  @@ NEEDS RULING
+- **`lpn_crit_col_stopped`**
+  > Run stopped at
+  @@ NEEDS RULING
+- **`lpn_demand_cats`**
+  > Demand categories
+  @@ NEEDS RULING
+- **`lpn_demand_total_tip`**
+  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
+  @@ NEEDS RULING
+- **`lpn_edit_curves`**
+  > Edit curves…
+  @@ NEEDS RULING
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
+- **`lpn_ff_col_more`**
+  > How many others
+  @@ NEEDS RULING
+- **`lpn_field_active_short`**
+  > Active
+  @@ NEEDS RULING
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
+- **`lpn_field_auto_length_tip`**
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  @@ NEEDS RULING
+- **`lpn_field_cv_short`**
+  > Check valve
+  @@ NEEDS RULING
+- **`lpn_field_km_fittings_tip`**
+  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list chosen" to type a value.
+  @@ NEEDS RULING
+- **`lpn_field_km_short_tip`**
+  > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short`**
+  > Initial depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short_tip`**
+  > Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short`**
+  > Maximum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short_tip`**
+  > Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short`**
+  > Minimum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short_tip`**
+  > Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_valve_km_short_tip`**
+  > Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.
+  @@ NEEDS RULING
+- **`lpn_gis_add`**
+  > Add layer
+  @@ NEEDS RULING
+- **`lpn_gis_draw`**
+  > Draw
+  @@ NEEDS RULING
+- **`lpn_gis_err_address`**
+  > The server address must start with https://.
+  @@ NEEDS RULING
+- **`lpn_gis_err_layers`**
+  > Enter at least one WMS layer name.
+  @@ NEEDS RULING
+- **`lpn_gis_err_mapserver`**
+  > An ArcGIS address must end with /MapServer.
+  @@ NEEDS RULING
+- **`lpn_gis_err_template`**
+  > A tile address must contain {z}, {x} and {y}.
+  @@ NEEDS RULING
+- **`lpn_gis_failed`**
+  > {host} did not return a map image. Its layer is not drawn.
+  @@ NEEDS RULING
+- **`lpn_gis_kind`**
+  > Kind of server
+  @@ NEEDS RULING
+- **`lpn_gis_kind_arcgis`**
+  > ArcGIS MapServer
+  @@ NEEDS RULING
+- **`lpn_gis_kind_wms`**
+  > WMS server
+  @@ NEEDS RULING
+- **`lpn_gis_kind_xyz`**
+  > Tile URL ({z}/{x}/{y})
+  @@ NEEDS RULING
+- **`lpn_gis_note`**
+  > Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent before you add one.
+  @@ NEEDS RULING
+- **`lpn_gis_opacity`**
+  > Opacity (0 to 1)
+  @@ NEEDS RULING
+- **`lpn_gis_title`**
+  > Background layers from a GIS server
+  @@ NEEDS RULING
+- **`lpn_gis_unlocatable`**
+  > Background layers need a project that is placed on the earth.
+  @@ NEEDS RULING
+- **`lpn_gis_url`**
+  > Server address
+  @@ NEEDS RULING
+- **`lpn_gis_wms_layers`**
+  > WMS layer names (comma separated)
+  @@ NEEDS RULING
+- **`lpn_heading_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base_ask`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_also`**
+  > Initial quality {quality} is cleared too.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_both`**
+  > Clear elevation {elev} and demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_demand`**
+  > Clear demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_elev`**
+  > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_quality`**
+  > Clear initial quality {quality} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_switch`**
+  > Switch to Base and morph
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt`**
+  > This override is stored in alternative "{alternative}".
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt_shared`**
+  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear_one`**
+  > Click to clear this override.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol`**
+  > {label}, {symbol}
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol_unit`**
+  > {label}, {symbol} ({unit})
+  @@ NEEDS RULING
+- **`lpn_prop_label_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration_short`**
+  > {chemical} conc.
+  @@ NEEDS RULING
+- **`lpn_reaction_bulk_pipe_tip`**
+  > Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_tank_short_tip`**
+  > Reaction coefficient: the rate of reaction in the water held in this tank, in 1/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_wall_pipe_tip`**
+  > Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+- **`lpn_result_concentration_short`**
+  > Conc.
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_gis`**
+  > A background layer from a GIS server could not be included.
+  @@ NEEDS RULING
+- **`lpn_settings_held_default`**
+  > the default
+  @@ NEEDS RULING
+- **`lpn_settings_held_from`**
+  > the value in {parent}
+  @@ NEEDS RULING
+- **`lpn_settings_held_item`**
+  > {setting}: {restores}
+  @@ NEEDS RULING
+- **`lpn_settings_held_none`**
+  > no text
+  @@ NEEDS RULING
+
+### feat/report-widths (`78a91b264`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level
@@ -860,10 +1178,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/scenario-io (`627fffec6`) — already merged into feat/shape-scenario; its strings are listed there
-
-### feat/shape-scenario (`8ee873fdd`) — adds no English strings
-
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
@@ -1026,31 +1340,31 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/starter-example (`8f00dc78c`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/starter-example (`f771b5cad`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_ex_extension_desc`**
-  > A new loop of 12 inch and 8 inch main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
+  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_desc`**
-  > A new loop of 300 mm and 200 mm main tied into an existing system, which is a reservoir and a pump built from a hydrant flow test, in Johnson City, Texas. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
+  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_title`**
-  > Fire flow extension, L/s (SI)
+  > Johnson City extension, L/s (SI)
   @@ NEEDS RULING
 - **`lpn_ex_extension_title`**
-  > Fire flow extension, gpm (US)
+  > Johnson City extension, gpm (US)
   @@ NEEDS RULING
 - **`lpn_ex_well_desc`**
-  > A well pump with a check valve, a loop of 6 inch main, and a ground tank of 67,000 gallons on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
+  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > A well pump with a check valve, a loop of 150 mm main, and a ground tank of 265 cubic meters on a single connection, with a 24-hour extended-period simulation, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
+  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
-  > Community well and tank, L/s (SI)
+  > Munday well and tank, L/s (SI)
   @@ NEEDS RULING
 - **`lpn_ex_well_title`**
-  > Community well and tank, gpm (US)
+  > Munday well and tank, gpm (US)
   @@ NEEDS RULING
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
@@ -1189,3 +1503,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
+
+### fix/manual-search-speed (`c37d5b7ae`) — adds no English strings
+
+### fix/usage-report-wording (`425485aa4`) — adds no English strings

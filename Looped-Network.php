@@ -4495,6 +4495,8 @@ EngCalcs.pageConfig = {
 	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
 	lpn_file_import_gjnet: <?=json_encode($ec_lang['lpn_file_import_gjnet'])?>,
 	lpn_file_import_gjnet_tip: <?=json_encode($ec_lang['lpn_file_import_gjnet_tip'])?>,
+	lpn_file_import_dxfnet: <?=json_encode($ec_lang['lpn_file_import_dxfnet'])?>,
+	lpn_file_import_dxfnet_tip: <?=json_encode($ec_lang['lpn_file_import_dxfnet_tip'])?>,
 	lpn_gjnet_refuse_crs: <?=json_encode($ec_lang['lpn_gjnet_refuse_crs'])?>,
 	lpn_gjnet_refuse_empty: <?=json_encode($ec_lang['lpn_gjnet_refuse_empty'])?>,
 	lpn_gjnet_target_node_type: <?=json_encode($ec_lang['lpn_gjnet_target_node_type'])?>,
@@ -4561,6 +4563,32 @@ EngCalcs.pageConfig = {
 	lpn_gjnet_note_pattern_conflict: <?=json_encode($ec_lang['lpn_gjnet_note_pattern_conflict'])?>,
 	lpn_gjnet_note_end_off_node: <?=json_encode($ec_lang['lpn_gjnet_note_end_off_node'])?>,
 	lpn_gjnet_note_not_held: <?=json_encode($ec_lang['lpn_gjnet_note_not_held'])?>,
+	lpn_dxfnet_note_layer_foreign: <?=json_encode($ec_lang['lpn_dxfnet_note_layer_foreign'])?>,
+	lpn_dxfnet_note_layer_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_layer_unknown'])?>,
+	lpn_dxfnet_note_alternative: <?=json_encode($ec_lang['lpn_dxfnet_note_alternative'])?>,
+	lpn_dxfnet_note_shapes: <?=json_encode($ec_lang['lpn_dxfnet_note_shapes'])?>,
+	lpn_dxfnet_note_entity_unread: <?=json_encode($ec_lang['lpn_dxfnet_note_entity_unread'])?>,
+	lpn_dxfnet_note_paper_space: <?=json_encode($ec_lang['lpn_dxfnet_note_paper_space'])?>,
+	lpn_dxfnet_note_tag_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_tag_unknown'])?>,
+	lpn_dxfnet_note_value_unread: <?=json_encode($ec_lang['lpn_dxfnet_note_value_unread'])?>,
+	lpn_dxfnet_note_block_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_block_unknown'])?>,
+	lpn_dxfnet_note_bad_id: <?=json_encode($ec_lang['lpn_dxfnet_note_bad_id'])?>,
+	lpn_dxfnet_note_dup_id: <?=json_encode($ec_lang['lpn_dxfnet_note_dup_id'])?>,
+	lpn_dxfnet_note_no_position: <?=json_encode($ec_lang['lpn_dxfnet_note_no_position'])?>,
+	lpn_dxfnet_note_link_no_block: <?=json_encode($ec_lang['lpn_dxfnet_note_link_no_block'])?>,
+	lpn_dxfnet_note_block_no_line: <?=json_encode($ec_lang['lpn_dxfnet_note_block_no_line'])?>,
+	lpn_dxfnet_note_line_no_block: <?=json_encode($ec_lang['lpn_dxfnet_note_line_no_block'])?>,
+	lpn_dxfnet_note_end_ambiguous: <?=json_encode($ec_lang['lpn_dxfnet_note_end_ambiguous'])?>,
+	lpn_dxfnet_note_end_no_node: <?=json_encode($ec_lang['lpn_dxfnet_note_end_no_node'])?>,
+	lpn_dxfnet_note_end_loop: <?=json_encode($ec_lang['lpn_dxfnet_note_end_loop'])?>,
+	lpn_dxfnet_note_pump_no_curve: <?=json_encode($ec_lang['lpn_dxfnet_note_pump_no_curve'])?>,
+	lpn_dxfnet_note_unit_unknown: <?=json_encode($ec_lang['lpn_dxfnet_note_unit_unknown'])?>,
+	lpn_dxfnet_note_coord_unit: <?=json_encode($ec_lang['lpn_dxfnet_note_coord_unit'])?>,
+	lpn_dxfnet_note_customer_loose: <?=json_encode($ec_lang['lpn_dxfnet_note_customer_loose'])?>,
+	lpn_dxfnet_note_not_held: <?=json_encode($ec_lang['lpn_dxfnet_note_not_held'])?>,
+	lpn_dxfnet_none: <?=json_encode($ec_lang['lpn_dxfnet_none'])?>,
+	lpn_dxfnet_counts: <?=json_encode($ec_lang['lpn_dxfnet_counts'])?>,
+	lpn_dxfnet_report_lead: <?=json_encode($ec_lang['lpn_dxfnet_report_lead'])?>,
 	lpn_file_import_dxf: <?=json_encode($ec_lang['lpn_file_import_dxf'])?>,
 	lpn_file_import_dxf_tip: <?=json_encode($ec_lang['lpn_file_import_dxf_tip'])?>,
 	lpn_file_import_shp: <?=json_encode($ec_lang['lpn_file_import_shp'])?>,
@@ -4759,6 +4787,10 @@ EngCalcs.pageConfig = {
 <?php // Writing a DXF file of the model (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
       // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
 <script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
+<?php // Reading a DXF file this page wrote, as a network (ROADMAP Task 772, slice 1). Pure text, no DOM, no request;
+      // uses EngCalcs.lpnDxfRead (lpn-gisread.js) and lpn-dxf.js's constants. BEFORE looped-network.js, which
+      // calls EngCalcs.lpnDxfNetRead() when File > Import > Network > DXF file is chosen. ?>
+<script src="/engcalcs/js/lpn-dxf-read.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf-read.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

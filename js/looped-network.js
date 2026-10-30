@@ -44741,6 +44741,243 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, deletedRows: r.deletedRows, mode: mode });
 		}
 	}
+	// ---- IMPORT A DXF NETWORK (ROADMAP Task 772, slice 1) --------------------------------------------
+	//
+	// **READS EXACTLY WHAT THE EXPORT BELOW WRITES, AND NOTHING ELSE** (dev/dxf-interface.md: the
+	// import "should read exactly what this export writes, and the round trip is its first
+	// harness"). Layers C-WATR-MODL-<ASSET>-BASE, LWPOLYLINE links, attributed INSERT nodes. A
+	// stranger's drawing (Tom's tag matching, the Interface Manager's translation table) is slice 2.
+	// js/lpn-dxf-read.js reads the file; this half does what needs the project: the units strip, the
+	// document, the customers, and the receipt. It lands as a NEW project, as an `.inp` does, with the
+	// same receipt dialog; nothing in the file is dropped without a line in it naming what.
+	//
+	// **VALUES ARE TAKEN AS TYPED, IN THE UNITS THE FILE STATES.** The export records a unit in the
+	// prompt of each ATTDEF ("ELEVATION (FT)"), so the units strip is set to those first and the
+	// numbers are then stored as they are, with their own characters beside them (CLAUDE.md: only the
+	// user touches a file's numbers). A unit the file does not state keeps the strip as it was, and
+	// the receipt says the file does not carry it.
+	function pickDxfNetworkFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.accept = '.dxf';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0], reader;
+			if (!f) { return; }
+			reader = new FileReader();
+			reader.onload = function (ev) { landDxfNetwork(ev.target.result, f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			// BYTES: the file states its own code page, and decoding it as UTF-8 first would turn
+			// every accented letter of an R2000 file into the wrong character.
+			reader.readAsArrayBuffer(f);
+		});
+		pick.click();
+	}
+	// The option of a unit family whose symbol is the one a prompt states (upper case, as the export
+	// writes it, in the page's locale or without one).
+	function dxfUnitKeyFor(family, stated) {
+		var s = unitEl(family), want = String(stated).toUpperCase(), i, o, label, loc = dxfLocale(), locUp;
+		if (!s || !s.options) { return null; }
+		for (i = 0; i < s.options.length; i++) {
+			o = s.options[i];
+			label = String(o.textContent || '');
+			locUp = label;
+			if (loc) { try { locUp = label.toLocaleUpperCase(loc); } catch (e) { locUp = label; } }
+			if (label.toUpperCase() === want || locUp === want || String(o.value).toUpperCase() === want) { return o.value; }
+		}
+		return null;
+	}
+	// What the file says about units: the units strip it asks for, and the families it states but this
+	// page does not know. Pressure and velocity are not in a DXF file at all; they follow the head unit
+	// the way an `.inp` file's follow its unit system.
+	function dxfNetUnits(r, notes) {
+		var before = readUnitSelections(), want = {}, unknown = [];
+		Object.keys(r.unitText).forEach(function (fam) {
+			var k = dxfUnitKeyFor(fam, r.unitText[fam]);
+			if (k) { want[fam] = k; } else { unknown.push(r.unitText[fam]); }
+		});
+		if (!want.lpn_u_length && r.coordUnit && dxfUnitKeyFor('lpn_u_length', r.coordUnit)) { want.lpn_u_length = dxfUnitKeyFor('lpn_u_length', r.coordUnit); }
+		if (want.lpn_u_elevhead === 'fth2o') { want.lpn_u_pressure = 'psi'; want.lpn_u_velocity = 'ftps'; }
+		else if (want.lpn_u_elevhead === 'mh2o') { want.lpn_u_pressure = 'mh2o'; want.lpn_u_velocity = 'mps'; }
+		if (unknown.length) { notes.push({ code: 'unit-unknown', ids: unknown, detail: '' }); }
+		return Object.assign({}, before, want);
+	}
+	function dxfNetNoteText(note) {
+		var pc = EngCalcs.pageConfig || {}, prefix = EngCalcs.lpnDxfModelPrefix, T = {
+			'layer-foreign': ['lpn_dxfnet_note_layer_foreign', 'These layers do not begin with {prefix}, so nothing on them was read.'],
+			'layer-unknown': ['lpn_dxfnet_note_layer_unknown', 'These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.'],
+			'alternative': ['lpn_dxfnet_note_alternative', 'These layers state an alternative other than BASE. Only the BASE alternative is read, so nothing on them was read.'],
+			'shapes': ['lpn_dxfnet_note_shapes', 'These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.'],
+			'entity-unread': ['lpn_dxfnet_note_entity_unread', 'These entities are not a kind this import reads on their layer, and were not imported.'],
+			'paper-space': ['lpn_dxfnet_note_paper_space', 'Entities in paper space were not read: {n}.'],
+			'tag-unknown': ['lpn_dxfnet_note_tag_unknown', 'These attribute tags are not ones this page writes for their block, and their values were not imported.'],
+			'value-unread': ['lpn_dxfnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
+			'block-unknown': ['lpn_dxfnet_note_block_unknown', 'These blocks are not the block this page writes for their layer, and were not imported.'],
+			'bad-id': ['lpn_dxfnet_note_bad_id', 'These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.'],
+			'dup-id': ['lpn_dxfnet_note_dup_id', 'These IDs are stated by more than one element of the same kind. Only the first was imported.'],
+			'no-position': ['lpn_dxfnet_note_no_position', 'These blocks have no usable position and were not imported.'],
+			'link-no-block': ['lpn_dxfnet_note_link_no_block', 'These polylines have no block at their middle to state the link\'s ID and properties, and were not imported.'],
+			'block-no-line': ['lpn_dxfnet_note_block_no_line', 'These link blocks have no polyline through their middle, and were not imported.'],
+			'line-no-block': ['lpn_dxfnet_note_line_no_block', 'These service lines end where there is no customer block, and were not imported.'],
+			'end-ambiguous': ['lpn_dxfnet_note_end_ambiguous', 'These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.'],
+			'end-no-node': ['lpn_dxfnet_note_end_no_node', 'These links have an end where there is no node, and were not imported.'],
+			'end-loop': ['lpn_dxfnet_note_end_loop', 'These links start and end at the same node, and were not imported.'],
+			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'A DXF file does not hold pump curves. These pumps have none, and are written to an EPANET file as pipes until each is given a curve.'],
+			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
+			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
+			'customer-loose': ['lpn_dxfnet_note_customer_loose', 'The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.'],
+			'not-in-dxf': ['lpn_dxfnet_note_not_held', 'A DXF file does not hold patterns, curves, controls, rules, time settings, EPANET options, the head loss formula, the pressure and velocity units, pipe status, minor loss coefficients, or the demand categories of a junction (only their sum), so none of these was imported. Hazen-Williams was assumed, and the pressure and velocity units follow the elevation unit.']
+		}, t = T[note.code] || [null, note.code], s = String((t[0] && pc[t[0]]) || t[1]);
+		return s.split('{prefix}').join(prefix).split('{n}').join(String(note.detail))
+			.split('{coord}').join(String((note.detail || {}).coord || '')).split('{length}').join(String((note.detail || {}).length || ''));
+	}
+	function dxfNetReportLines(r) {
+		var CAP = 50;
+		return r.notes.map(function (n) {
+			var ids = n.ids.slice(0, CAP).join(', ');
+			if (n.ids.length > CAP) { ids += ' ' + ((EngCalcs.pageConfig || {}).lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
+			return { code: n.code, text: dxfNetNoteText(n) + (n.ids.length ? ' (' + ids + ')' : '') };
+		});
+	}
+	function showDxfNetReport(r, fileName, empty) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			function p(text, bold) {
+				var e = document.createElement('p');
+				e.style.margin = '0 0 8px';
+				if (bold) { e.style.fontWeight = 'bold'; }
+				e.textContent = text;
+				body.appendChild(e);
+			}
+			var c = r.counts, ul = document.createElement('ul');
+			if (empty) { p((pc.lpn_dxfnet_none || 'Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.').replace('{file}', fileName).replace('{prefix}', EngCalcs.lpnDxfModelPrefix), true); }
+			else {
+				p((pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName), true);
+				p((pc.lpn_dxfnet_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, and {customers} customers.')
+					.replace('{nodes}', c.junction + c.reservoir + c.tank).replace('{links}', c.pipe + c.pump + c.valve).replace('{customers}', c.customer));
+			}
+			p(pc.lpn_dxfnet_report_lead || 'What was not read, and each change made during import, is listed below with the layer, block or ID concerned:');
+			ul.id = 'lpn_dxfnet_report';
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			ul.style.maxHeight = '50vh';
+			ul.style.overflow = 'auto';
+			dxfNetReportLines(r).forEach(function (row) {
+				var li = document.createElement('li');
+				li.setAttribute('data-code', row.code);
+				li.style.marginBottom = '4px';
+				li.textContent = row.text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	/**
+	 * The built network as a saved document, ready for importProject(): docFromInp()'s shape, a grid
+	 * project in the file's own X and Y. Settings are the open project's with what the file states
+	 * written onto them (nothing of EPANET's options, which a DXF file does not hold).
+	 */
+	function docFromDxfNet(r, name, defaults) {
+		var next = newNextId(), s = JSON.parse(JSON.stringify(settings));
+		s.method = 'hw';
+		s.defaults = defaults || s.defaults;
+		s.hydraulics = {}; s.qualityOptions = {}; s.fileOptions = {};
+		s.quality = { mode: 'none', traceNode: '' };
+		readQualitySections({}, s, r.nodes, r.links);
+		readEnergySection({}, s, r.links);
+		readSourceMixingSections({}, s, r.nodes);
+		readTagsSection({}, s, r.nodes, r.links);
+		function claim(id, key) {
+			var prefix = s.idPrefixes[key] || key, n;
+			if (String(id).slice(0, prefix.length) !== prefix) { return; }
+			n = parseInt(String(id).slice(prefix.length), 10);
+			if (isFinite(n) && String(n) === String(id).slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
+		}
+		r.nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
+		r.links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
+		r.customers.forEach(function (c) { claim(c.id, 'M'); });
+		return rebaseDocument({
+			v: LPN_STORAGE_VERSION,
+			project: { name: name, activeScenario: 'base' },
+			scenarios: defaultScenarios(),
+			nodes: r.nodes, links: r.links, labels: [], nextId: next,
+			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
+			backdrop: null,
+			settings: s,
+			patterns: [], curves: [], defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
+			units: readUnitSelections()
+		});
+	}
+	// The customers go in through addCustomer(), the one door that knows how an offset along a pipe is
+	// stored, once the project is open: the service line's first point names the pipe (or the node)
+	// it leaves, and the block's point is where the meter stands. Returns the IDs of those whose
+	// service line leaves nothing, which are placed loose.
+	function placeDxfCustomers(list) {
+		var loose = [];
+		list.forEach(function (c) {
+			var P = { x: inwardX(c.x), y: inwardY(c.y) }, A = c.from ? { x: inwardX(c.from.x), y: inwardY(c.from.y) } : null, best = null, tol, made;
+			if (A) {
+				tol = 1e-6 * Math.max(1, Math.abs(A.x), Math.abs(A.y));
+				doc.links.forEach(function (l) {
+					var hit = Geom.nearestFractionOnPolyline(linkPointList(l), A.x, A.y);
+					if (hit.dist <= tol && (!best || hit.dist < best.dist)) { best = { link: l.id, t: hit.f, dist: hit.dist }; }
+				});
+			}
+			if (best) { made = addCustomer(P.x, P.y, { link: best.link, t: best.t < 1e-9 ? 0 : (best.t > 1 - 1e-9 ? 1 : best.t) }, c.id); }
+			else { made = addCustomer(P.x, P.y, null, c.id); if (c.from) { loose.push(c.id); } }
+			if (c.demand !== undefined) { made.demand = c.demand; made.tok = { demand: c.tok.demand }; }   // base-write: import builds Base
+			if (c.count !== undefined) { made.count = c.count; (made.tok = made.tok || {}).count = c.tok.count; }   // base-write: import builds Base
+			if (c.tag !== undefined) { made.tag = c.tag; }
+			if (c.desc !== undefined) { made.desc = c.desc; }
+		});
+		return loose;
+	}
+	// The bytes of a DXF file, to a new project. `done(result)` is called once; a harness drives this half.
+	function landDxfNetwork(buffer, fileName, done) {
+		var pc = EngCalcs.pageConfig || {}, r, units, before, changed, defaults, name, id, loose, text;
+		logLpnFirstAction('import');
+		function refuse(key, fallback, why) {
+			var msg = String(pc[key] || fallback).replace('{file}', fileName);
+			setWarning(msg);
+			if (done) { done({ ok: false, error: why, message: msg }); }
+		}
+		text = EngCalcs.lpnDxfDecode(new Uint8Array(buffer));
+		r = EngCalcs.lpnDxfNetRead(text, { keys: LPN_DXF_KEYS, tags: dxfTagTable().tags });
+		if (!r.ok) {
+			if (r.detail === 'binary') { refuse('lpn_dxf_import_binary', '{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.', 'binary'); }
+			else { refuse('lpn_dxf_import_unreadable', '{file} is not an ASCII DXF file.', 'unreadable'); }
+			return;
+		}
+		if (!r.nodes.length) {
+			showDxfNetReport(r, fileName, true);
+			if (done) { done({ ok: false, error: 'empty', net: r }); }
+			return;
+		}
+		before = readUnitSelections();
+		units = dxfNetUnits(r, r.notes);
+		if (r.coordUnit && r.coordUnit !== units.lpn_u_length) {
+			r.notes.push({ code: 'coord-unit', ids: [], detail: { coord: r.coordUnit, length: units.lpn_u_length } });
+		}
+		// The project being left is saved BEFORE the strip moves, as for an `.inp` (R-415).
+		rememberOutgoingProject();
+		applyUnitSelections(units);
+		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
+		defaults = geoJsonNetDefaults(changed);
+		name = String(fileName).replace(/\.dxf$/i, '') || String(fileName);
+		id = importProject(docFromDxfNet(r, name, defaults), true);
+		if (!id) { applyUnitSelections(before); refreshMapStatus(); if (done) { done({ ok: false, error: 'storage' }); } return; }
+		loose = placeDxfCustomers(r.customers);
+		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }
+		r.notes.push({ code: 'not-in-dxf', ids: [], detail: '' });
+		clearUndo();
+		saveToStorage();
+		stampProjectSaved(id);
+		renderTabs();
+		showDxfNetReport(r, fileName, false);
+		if (done) { done({ ok: true, id: id, net: r }); }
+	}
+
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
 	//
 	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
@@ -52885,7 +53122,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_import_msx_tip, fn: openMsxRow },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
 			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON file…', key: 'lpn_file_import_gjnet',
-			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile }
+			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
+			// A DXF file this page exported, read back as a network (Task 772, slice 1).
+			{ icon: 'open', label: pc.lpn_file_import_dxfnet || 'DXF file…', key: 'lpn_file_import_dxfnet',
+			  tip: pc.lpn_file_import_dxfnet_tip, fn: pickDxfNetworkFile }
 		];
 	}
 	function importShapeRows() {
