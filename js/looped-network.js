@@ -45332,7 +45332,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
 		// The head loss formula, named and then coded in brackets (HW, DW or MANNING) for the import to find.
-		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is in the terms of that formula.')
+		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.')
 			.replace('{formula}', frictionMethodLabel()).replace('{code}', frictionMethod() === 'manning' ? 'MANNING' : frictionMethod().toUpperCase()));
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
