@@ -3921,6 +3921,7 @@ var EngCalcs = EngCalcs || {};
 			d += 'M' + rx + ',' + ry + 'h' + rw + 'v' + lh + 'h' + (-rw) + 'Z';
 		}
 		hit.setAttribute('d', d);
+		hit.style.setProperty('--lpn-lhit', LPN_TEXT_TOUCH_PX / s);   // a finger's reach round a Text's words (css/engcalcs.css, .lpn-lbl-hit[data-lbl])
 		// A rotated label (an aligned link label, a turned Text) is turned about the same point by
 		// the same transform: copied rather than recomputed, so there is one rotation and not two.
 		tr = textEl.getAttribute('transform');
@@ -9919,6 +9920,9 @@ var EngCalcs = EngCalcs || {};
 	// still mean this node" and is used by the finders AFTER a hit; this is the width of an
 	// invisible mark on the drawing, and giving it 14 would swallow every pipe end.
 	var LPN_NODE_HIT_PX = 12;
+	// A Text's grab shape is its words' row boxes (a 12 px strip at 12 px type), which a fingertip misses. On a coarse pointer the shape gains this many
+	// screen pixels all round (Tom, 2026-10-29: "on phone, tapping on the text doesn't even open Properties"); a node still outranks it (touchNodeOver).
+	var LPN_TEXT_TOUCH_PX = 16;
 	// **A PUMP AND A VALVE ARE BIG, SO THEIR GRAB SHAPE IS NEARLY BARE INK** (Task 618, Tom:
 	// *"everything would have a hit area that exactly matches what you see aka WYSIWYG"*, with a
 	// forgiving margin only where a target is small or thin). A volute is drawn 20-35 screen pixels
@@ -13624,7 +13628,7 @@ var EngCalcs = EngCalcs || {};
 		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
 		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
 		// brings back the plot as it was; the node colouring is the dots' and is left alone.
-		row(pc.lpn_contour_show || 'Show contours', check('lpn_contour_show', contourIsOn(), function (on) {
+		row(pc.lpn_contour_show || 'Show plot', check('lpn_contour_show', contourIsOn(), function (on) {
 			if (on) {
 				var was = contourShownBefore || { fill: 'smooth', lines: true };
 				settings.contourFill = was.fill; settings.contourLines = was.lines;
@@ -25237,9 +25241,8 @@ var EngCalcs = EngCalcs || {};
 	// percentile of their natural widths), so one long label wraps instead of widening the whole
 	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
 	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
-	// A host this narrow stacks its names above its values: 16 rem under a finger (a phone's box fills the screen, so it keeps two columns), 18 rem under a mouse
-	// (where the Value column is allowed down to a few characters and a stack is for a true collapse only).
-	function gridNarrowRem() { try { return window.matchMedia && window.matchMedia('(pointer: coarse)').matches ? 16 : 18; } catch (e) { return 18; } }
+	// A host NEVER stacks its names above its values (Tom, 2026-10-29: "TOM REJECTS THE STACKED LAYOUT"): the name column shrinks and wraps, the value column keeps a floor.
+	function gridNarrowRem() { return 0; }
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
 	function gridIsNarrow(host) { return !!(host.classList && host.classList.contains('lpn-gnarrow')); }
 	// The label column's natural widths, one a label: a range over each name's words, with its track
@@ -71489,7 +71492,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				nm.__lpnRO = true;
 				new ResizeObserver(function () {
 					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
-					if (w) { nm.classList.toggle('lpn-gnarrow', gridNarrowRem() < 17 && w < 16 * gridRem()); }   // under 16 rem the name stands above its value
+					if (w) { nm.classList.remove('lpn-gnarrow'); }   // Properties is two columns at every width
 					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
 					gridFitSoon(nm);
 				}).observe(nm);
