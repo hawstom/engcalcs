@@ -4686,3 +4686,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: no reference to the removed cards in sw.php, sitemap, or the three landing sites (librewaternet editorial-review.md only mentions the two Basic examples in prose). Translated Net1/Net2/Net3/Elm/Valves descriptions still carry the old order (units first) and the old Net1 title.
 - Shots: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/3f74533f-715d-4c2a-a95d-24464ab34423/scratchpad/perry-starter/
 - OBSERVED full run_harnesses.sh on 490a07194: 614/620 pass. FAIL alone and pass on master: settings-table-browser, settings-table-owner-browser, table-export-dialog-browser, menu-mnemonic, theme-design-browser (amber/green "Calcul-ation" cut, section 12 Scenario manager on Net1), node-size-cap-browser (ENOENT examples/Net1.lwn). All open the Net1 card and assume the old plain file. zoomfurniture 1 fail (bootstrap tooltip page error) also fails on master. find, zoomfitlabels pass.
+
+## 2026-10-30 feat/theme-of-day (HEAD ffc86361e), Task 824
+- OBSERVED: all 7 days open in the right theme in real Chrome (EC_NOW), noon UTC boundary right for all 7 noons, real clock (Fri 10:05 UTC = Thursday = platinum) right. One data-theme write, first paint already in final theme: no flash.
+- OBSERVED: System and Dark picks store "system"/"dark", survive reload and a later day.
+- OBSERVED: menu-button-harness fails 28 checks under lpn_theme=rounded on this branch AND on master archive: Rounded draws the menu buttons as pills (999px radius) in a brighter blue (11,87,208). The harness asserts the Light-theme style. Intended Rounded look, not a visitor defect; the clock pin hides a harness assumption, not a bug.
+- OBSERVED: Net1 legend overlaps the Tank label on a 390px phone in every theme (not theme related).
+- SPECULATION: visitors who earlier chose System had the key removed, so they now see the day theme until they pick again.
