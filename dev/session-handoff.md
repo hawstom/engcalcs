@@ -95,15 +95,17 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-30 (fiftieth session, Opus main, Sonnet agents, Opus for native quality)
+## STATE — 2026-10-30 afternoon (fifty-first session, Opus main, Sonnet agents)
 
-- **Nothing merged to master this session** but this handoff: every branch below waits his pass or word. Budget pressure released (Tom, 10-30).
-- **Waiting his browser pass (Branch previews):** `box-design` round 6 (8103: phone rows 40 -> 24 px, grip strip 12 px, Chrome's touch adjustment snapped taps to the grip because of a `:hover` rule, now hover-capable only; dragged height kept as `dockH` in the existing `lpn_dockbox` records); `feat/gis-background` round 3 (8105: no prompt, his "It's the user's project"; privacy says the server is the one saved in the project; keys `lpn_gis_ask*` deleted); `feat/dxf-import` round 3 (8101: .inp sections as MTEXT on visible, non-plotting layer `C-WATR-MODL-EPAN`, read back; demand multiplier restored; nine `lpn_dxfnet_held_*` keys deleted); `feat/theme-of-day` (8106, Task 824; `lpn_theme` now also holds "system"); `feat/import-alternative` (8107, Task 814 question 3); `feat/report-widths` (8110; his "Merge" stands, rides on box-design, re-merged 10-30).
-- **Waiting his word, no browser pass:** `feat/native-quality` (Task 733; Perry's 14 mutations all caught).
-- **Rebase chain:** gis-background and report-widths each merge box-design through 7b62eb90b. Merge box-design first; the other two follow without conflict.
-- **Trap met:** an agent's merge of master into gis-background dropped `lpn_guide_scn_example_def` from 26 lang files; restored from box-design on the re-merge. After any agent merge, compare a lang key's count across branches.
-- **Trap met:** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content (read it first).
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/743120ef-2c40-475f-bebe-8669dbdc729d/scratchpad (brief-*.md, perry logs).
+- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task now waits on him or a sprint; do not start a fresh slice.
+- **Merged on his word:** `feat/native-quality` (Task 733 quality phase, unwired).
+- **Waiting his browser pass:** `box-design` round 7 (8103: Settings label column floor, his Page bug; phone flyouts full height like PC, a dragged `dockH` still wins; open question whether full height crowds out "tap a junction, then a pipe"); `feat/dxf-import` round 4 (8101: one MTEXT with width 41 and a header key `lpn_dxf_sections_header`, English only, waits his word; Net3's text column is ~5x the network's height; old layer name C-WATR-EPANET-INP no longer read; a `;` comment line inside a section is dropped on import, older than round 4).
+- **Waiting his word after his "Good"/"OK", not a typed "merge":** `feat/gis-background` round 3 (8105), `feat/theme-of-day` (8106). `feat/report-widths` (8110, his "Merge" stands) rides on box-design. Rebase chain: box-design first, then gis-background and report-widths.
+- **Parked on his word:** `feat/import-alternative` (8107, Task 814 q3): *"Ask me later. I am not ready to deal with this task."* Do not touch or re-ask unprompted.
+- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any agent merge, compare a key's count across branches.
+- **Trap met (10-30):** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content.
+- **Trap met:** wrapping a harness in `flock` deadlocks it (NOT RUN after 280 s); the rule above applies to single harnesses too.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/c1728af5-5a12-46a9-b064-1b41f5eaa51b/scratchpad.
 
 ## STATE — 2026-10-30 small hours (forty-ninth session)
 
