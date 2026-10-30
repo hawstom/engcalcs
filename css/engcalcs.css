@@ -2826,6 +2826,10 @@ html[lang="zh"] .ec-welcome {
    stroke perimeter as well, which with no `stroke-width` declared is 1 USER UNIT, and on this map
    that is not one pixel. The `visible` prefix is what makes a label nobody can see un-grabbable. */
 .lpn-lbl-hit { fill: transparent; stroke: none; pointer-events: visibleFill; }
+/* A Text on a finger: its grab shape is stroked wider (the 12 px strip its words fill is under a fingertip's error). A stroke of 0 on a pointer. */
+@media (pointer: coarse) {
+	.lpn-lbl-hit[data-lbl] { stroke: transparent; stroke-width: var(--lpn-lhit, 0); stroke-linejoin: round; pointer-events: visible; }
+}
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
@@ -5226,11 +5230,12 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
 /* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
-/* The finger-wide edge lies wholly INSIDE the box it sizes: a grip reaching over the map swallowed taps on
-   whatever sat beside the flyout (a Customer 14 px away could not be selected). */
+/* The finger-wide edge lies over the box's own border and padding (9 px) and 10 px of the map beside it, never over its text
+   (Tom, 2026-10-29: "overlap 1 1/2 characters of the labels"); more than 10 px over the map swallowed taps on whatever sat beside
+   the flyout (a Customer 14 px away could not be selected). */
 @media (pointer: coarse), (max-width: 700px) {
-	#lpn_dock_grip_right { width: 28px; margin-left: 0; }
-	#lpn_dock_grip_left { width: 28px; margin-left: -28px; }
+	#lpn_dock_grip_right { width: 19px; margin-left: -10px; }
+	#lpn_dock_grip_left { width: 19px; margin-left: -9px; }
 }
 .lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
 /* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
@@ -5529,11 +5534,6 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	.lpn-rpane-grip::after { content: ""; position: absolute; top: 0; bottom: 0; left: -12px; width: 24px; height: auto; margin: 0; background: transparent; }
 	.lpn-pane-grip:hover, .lpn-rpane-grip:hover { background: var(--ec-border-strong); }
 }
-/* TOUCH: Properties narrower than 16 rem stacks the name above its value (the host class is set by the box's own observer). */
-.lpn-propbox .lpn-popover-body.lpn-gnarrow { grid-template-columns: var(--lpn-g-gutw, 0px) 0 minmax(0, 1fr); }
-.lpn-propbox .lpn-popover-body.lpn-gnarrow .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > .lpn-gname { grid-column: 2 / -1; border-inline-end: 0; }
-.lpn-propbox .lpn-popover-body.lpn-gnarrow .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > .lpn-gval, .lpn-propbox .lpn-popover-body.lpn-gnarrow #lpn_popup_title.lpn-gtitle-id > input { grid-column: 3; }
-.lpn-propbox .lpn-popover-body.lpn-gnarrow > .lpn-gsplit { display: none; }
 .lpn-rpane { flex-direction: row; }
 .lpn-rpane-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
 .lpn-rpane-head { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--ec-border); }
@@ -5648,9 +5648,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the two tracks (11.5 + 12.5) plus their gap, i.e. the first width at which the two-column form
    is honest. A browser without container queries keeps the two columns, which is where this
    shipped. */
-@container lpnset (max-width: 24rem) {
-	.lpn-set-row { grid-template-columns: minmax(0, 1fr); }
-}
+/* NEVER STACKED (Tom, 2026-10-29: a stacked box is rejected, on a phone above all): the name column shrinks and wraps, the control group wraps its button under its box. */
 .lpn-rp-credit { margin-top: 6px; }
 /* **THE ACKNOWLEDGEMENT IS REACHABLE FROM THE PICKER IT IS ABOUT** (Tom, 2026-08-20: "Were we going
    to put a Credits link near the color pickers? Maybe under the Color scheme label?"). A POINTER,

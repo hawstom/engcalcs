@@ -4715,3 +4715,11 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: Server address box is about 72 px wide (PC and phone), the kind dropdown cuts "Tile URL ({z}/{x}/{"; the layer rows show a tick, a number and Remove with no visible words for Draw/Opacity (aria-label only).
 - OBSERVED: opening a project holding a layer sends requests to its server at once (reload test), so "Nothing is sent before you add one" (Settings note) is not true for an opened file; the privacy paragraph and CLAUDE.md say so honestly.
 - NOT CHECKED: mutation of the harness; WMS registration by eye (harness measures tile boxes against the street tiles); unlocatable project message; Dark theme; a CORS-less real server.
+
+# Perry, box-design 7de287871 (round 4), 2026-10-29 evening
+- OBSERVED (real Chromium; 1400x900 mouse, 390x844 and 360x740 touch; Net1): Properties on node 22 opens two columns at all three sizes, 19 rows, no name over its value, no stacking; a docked Properties has a 240 px floor and holds two columns there. Contour plot, Fire flow, Criticality, Find and replace, Settings are two columns on the phone with no overlap and no text past the box edge; Contour's first row reads "Show plot".
+- OBSERVED: Settings corner grip on the phone is 28 px at the box corner and a real touch drag shrinks the box (352x620 to 292x540). A first attempt failed only because my script had clicked every section header and opened the theme picker.
+- OBSERVED: the flyout's left-edge handle (19 px phone, 8 px PC) overlaps no text or control; text starts 2 px (Properties, 360) to 4 px (Contour, 390) clear of it.
+- OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
+- OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
+- Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
