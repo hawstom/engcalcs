@@ -160,7 +160,7 @@ surprising thing. Questions 2 and 3 appear only when they apply.
    *{scenario}'s own alternative* (default) / *A new alternative, child of {parent}* (name field) /
    *The Base alternative.*
 
-**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is not asked.
+**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is asked after the destination, by `askImportAlternatives()`: see 2e.
 
 Then one **preview line** and the buttons. Imports that can be previewed without cost (a table of
 values, survey points) preview; a whole network preview is the existing import report afterwards.
@@ -169,20 +169,39 @@ values, survey points) preview; a whole network preview is the existing import r
 
 | Command (numbers from part 1) | Format level | Today | Treatment under the standard |
 |---|---|---|---|
-| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Receipt is a dialog naming the scenario |
-| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Alternative question (3) not asked |
+| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Question 3 built for the open scenario with Basic mode off: one choice per category the file writes (the scenario's own alternative, a new one with a name, the Base alternative). Receipt is a dialog naming the scenario and the alternatives |
+| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Question 3 built: the Active topology alternative takes the nodes (the open scenario's own, a new one, or Base's) |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct; Shapes now say "Shapes appear in every scenario." | No question; the same receipt line for profile and picture is left |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
 | 14 Workspace, 15 Calibration | none | Silent | No change; calibration's header names the scenario it was compared with |
 | 18 Tables paste, 19 Paste properties, 20 DEM | 0 | Each names the scenario it wrote to (built) | No new dialog (a cell-level gesture must not gain a dialog); the notice names the scenario and counts overrides |
 | 1-6 Own file | 4 | Whole tree | No question; Save as and Duplicate unchanged |
 | 21 `.inp`, 22 GeoJSON, 23 DXF | 1 | One scenario, partly disclosed | Export confirmation (3 in 2b) when the project has more than Base; receipt naming the scenario |
-| 24-26 Tables files | 2 | Already asks Scenarios Current/All | Keep the box; add the sentence about what All does and does not keep |
+| 24-26 Tables files | 2 | Already asks Scenarios Current/All | Keep the box; the sentence about what All does and does not keep is built |
 | 28-35 Pane export, copy, print, full report, run report, screenshot, Copy properties | 1 | One scenario's view, silent | Receipt line names the scenario; no dialog |
 | 36 Copy curve points | 0 | Silent | No change |
 | B1 Scenario workbook export | 3 | n/a | Receipt: export, not a save, not a sync |
 | B2 Scenario workbook import | 3 | Compare and apply | Already the model; add "new project or this project" only if it ever can land in a new one |
 | B3 Bentley import | 3 | n/a | Landing is a new project (the model differs); compare-and-apply report is not possible into a new project, so the receipt lists what Bentley held that this page did not keep |
+
+### 2e. What is Built and what is Left (checked in the code, 2026-10-30)
+
+| Row (2d) | Treatment | Status |
+|---|---|---|
+| 7 `.inp`, 8 GeoJSON network | Question 1 and 2: new project, open scenario, new scenario, Base; receipt dialog | Built |
+| 7, 8 | Question 3, the alternative, for the open scenario with Basic mode off | Built (`import-alternative-browser-harness.js`). Not asked for a new scenario (it makes its own alternative) or for Base |
+| 9 Survey points | Question 2 | Built |
+| 9 Survey points | Question 3 (Active topology alone) | Built, same harness |
+| 10-12 Shapes | Receipt line "Shapes appear in every scenario." | Built |
+| 13 Libraries | Receipt line "Every scenario can use them." | Built |
+| 16 Profile, 17 Picture | Receipt line | Closed: Tom ruled they get no scenario line (see "Rows still short" above) |
+| 14 Workspace, 15 Calibration | Calibration's header names its scenario | Built |
+| 18-20 Tables paste, Paste properties, DEM | Notice names the scenario and counts overrides | Built |
+| 21-23 `.inp`, GeoJSON, DXF export | Confirmation and receipt naming the scenario | Built. The optional "Scenario to export" choice is Left |
+| 24-26 Tables files | The sentence about what All does and does not keep | Built (`table-export-dialog-browser-harness.js`) |
+| 28-35 Pane export, copy, print, reports, screenshot | Name the scenario | Built |
+| B1-B3 | Scenario workbook, Bentley | Not on `master`; they follow their branches |
+| Tables-file IMPORT (ODS/CSV) | A level 0 import of values | Not a command yet. It is Task 752 step 3, which uses question 3 as built here |
 
 ## Part 3. Draft English
 
