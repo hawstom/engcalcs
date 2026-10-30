@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**91 open tasks.** Next (100): 4 · Soon (75): 15 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**92 open tasks.** Next (100): 4 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
 ## 100 — Next (4)
 
@@ -25,7 +25,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (15)
+## 75 — Soon (16)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -42,6 +42,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 823 — Starter examples a new user can build from.
 - Task 848 — Report column widths a reader can drag, kept per browser.
 - Task 849 — Every place uses the short Properties name for a field.
+- Task 851 — Net1's legend box covers the Tank label on a phone.
 
 ## 50 — Someday (30)
 
@@ -122,5 +123,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 91 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
