@@ -2432,7 +2432,6 @@ $ec_lang['lpn_inpalt_own']='{scenario}\'s own alternative';
 $ec_lang['lpn_inpalt_new']='A new alternative, child of {parent}';
 $ec_lang['lpn_inpalt_name']='Name of the new alternative';
 $ec_lang['lpn_inpalt_base']='The Base alternative';
-$ec_lang['lpn_inpalt_go']='Import';
 // {list} is a list such as "Physical: Peak; Demand: Base"; each item is a category and the alternative that took the values.
 $ec_lang['lpn_inpalt_receipt']='Alternatives that received the values: {list}';
 $ec_lang['lpn_inpalt_cancelled']='Nothing was changed.';

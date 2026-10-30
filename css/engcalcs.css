@@ -7292,3 +7292,9 @@ textarea.lpn-desc-ta {
 .lpn-theme-choice-name { max-width: 132px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
 @keyframes lpn-theme-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lpn-theme-choice { animation: none; } }
+
+/* The import's alternative question (Task 814, question 3): one paragraph, one group of choices, one indented name field. */
+.lpn-dlg-p { margin: 0 0 8px; }
+.lpn-dlg-strong { font-weight: bold; }
+.lpn-dlg-group { margin: 0 0 10px; }
+.lpn-dlg-indent { margin: 2px 0 0 20px; }

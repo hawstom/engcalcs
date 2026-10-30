@@ -3806,7 +3806,6 @@ EngCalcs.pageConfig = {
 	lpn_inpalt_new: <?=json_encode($ec_lang['lpn_inpalt_new'])?>,
 	lpn_inpalt_name: <?=json_encode($ec_lang['lpn_inpalt_name'])?>,
 	lpn_inpalt_base: <?=json_encode($ec_lang['lpn_inpalt_base'])?>,
-	lpn_inpalt_go: <?=json_encode($ec_lang['lpn_inpalt_go'])?>,
 	lpn_inpalt_receipt: <?=json_encode($ec_lang['lpn_inpalt_receipt'])?>,
 	lpn_inpalt_cancelled: <?=json_encode($ec_lang['lpn_inpalt_cancelled'])?>,
 	lpn_survey_where_title: <?=json_encode($ec_lang['lpn_survey_where_title'])?>,

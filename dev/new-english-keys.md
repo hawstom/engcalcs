@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**63 still to read on master**, of 225 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**62 still to read on master**, of 224 untranslated keys, of 3189 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (225, 63 to read @@ NEEDS RULING)
+## lpn_  (224, 62 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -321,9 +321,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_inpalt_cancelled`**
   > Nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_inpalt_go`**
-  > Import
   @@ NEEDS RULING
 - **`lpn_inpalt_heading`**
   > Alternative for {category}
@@ -1276,7 +1273,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > no text
   @@ NEEDS RULING
 
-### feat/import-alternative (`3bd2c9f65`) — adds no English strings
+### feat/import-alternative (`fcd504f14`) — adds no English strings
 
 ### feat/native-quality (`0cc61c8ec`) — adds no English strings
 

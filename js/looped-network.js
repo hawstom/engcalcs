@@ -46840,7 +46840,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			go(route);
 			return;
 		}
-		buttons = [{ label: pc.lpn_inpalt_go || 'Import', isDefault: true, fn: function () {
+		buttons = [{ label: pc.lpn_library_import_go || 'Import', isDefault: true, fn: function () {
 			var bad = null;
 			cats.forEach(function (cat) {
 				var c = ctrl[cat], mode = c.radios.filter(function (r) { return r.checked; })[0].value, name = String(c.name.value || '').trim();
@@ -46855,7 +46855,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			go(route);
 		} }, { label: pc.lpn_cancel || 'Cancel', fn: cancel }];
 		openDialog(function (body) {
-			function p(t, bold) { var e = document.createElement('p'); e.style.margin = '0 0 8px'; if (bold) { e.style.fontWeight = 'bold'; } e.textContent = t; body.appendChild(e); return e; }
+			function p(t, bold) { var e = document.createElement('p'); e.className = bold ? 'lpn-dlg-p lpn-dlg-strong' : 'lpn-dlg-p'; e.textContent = t; body.appendChild(e); return e; }
 			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. Choose the alternative that receives the values of each.');
 			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes them all.');
 			cats.forEach(function (cat) {
@@ -46863,7 +46863,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					opts = [['own', (pc.lpn_inpalt_own || '{scenario}\'s own alternative').replace('{scenario}', scenarioDisplayName(scn))],
 						['new', (pc.lpn_inpalt_new || 'A new alternative, child of {parent}').replace('{parent}', parent.name)],
 						['base', pc.lpn_inpalt_base || 'The Base alternative']], radios = [], nameInp = document.createElement('input');
-				wrap.style.margin = '0 0 10px';
+				wrap.className = 'lpn-dlg-group';
 				p((pc.lpn_inpalt_heading || 'Alternative for {category}').replace('{category}', altCategoryLabel(cat)), true);
 				opts.forEach(function (o) {
 					var lab = document.createElement('label'), inp = document.createElement('input');
@@ -46883,7 +46883,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				nameInp.value = pr ? pr.name : defName(cat);
 				nameInp.title = pc.lpn_inpalt_name || 'Name of the new alternative';
 				nameInp.setAttribute('aria-label', pc.lpn_inpalt_name || 'Name of the new alternative');
-				nameInp.style.margin = '2px 0 0 20px';
+				nameInp.className = 'lpn-dlg-indent';
 				nameInp.addEventListener('input', function () { radios[1].checked = true; });
 				wrap.appendChild(nameInp);
 				body.appendChild(wrap);

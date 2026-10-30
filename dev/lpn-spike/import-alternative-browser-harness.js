@@ -191,7 +191,7 @@ async function main() {
 			return out;
 		};
 		const catHeading = async (cat) => (await L('lpn_inpalt_heading')).replace('{category}', await a.lang('lpn_alt_cat_' + cat));
-		const goBtn = await L('lpn_inpalt_go');
+		const goBtn = await L('lpn_library_import_go');
 		const open = (await L('lpn_inpup_btn_scenario')).replace('{scenario}', 'Peak hour');
 		// Basic mode off, with Peak hour open.
 		await page.click('#lpn_scenario_btn');
