@@ -4,8 +4,8 @@
 //      (390 x 844, 360 x 740, and a PC);
 //   B. the left-edge drag handle is a slim pill (4 x 32 px) with a transparent hit strip and no grey slab, in rest, hover
 //      and pressed states, phone and PC; dragging still resizes and the flyout stays open after the drag;
-//   C. on a phone in tall mode a Properties flyout opens at about half the screen height, a drag of its bottom handle makes
-//      it taller, and a PC flyout is still the full column.
+//   C. on a phone in tall mode a Properties flyout opens at the full column height, a drag of its bottom handle makes
+//      it shorter (its own height), and a PC flyout is still the full column.
 // EC_SHOTS=<dir> saves box5-*.png there.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -163,7 +163,7 @@ async function main() {
 			await S.close();
 		}
 
-		console.log('\n--- C. Properties opens at about half the screen height on a phone ---');
+		console.log('\n--- C. Properties opens at the full column height on a phone ---');
 		for (const dev of devices) {
 			const S = await Session.open(browser, NAME + '-c-' + dev.tag, { viewport: { width: dev.w, height: dev.h }, hasTouch: dev.touch, isMobile: dev.touch });
 			const P = S.page;
@@ -174,19 +174,18 @@ async function main() {
 			const z = await sz();
 			console.log('  ' + dev.n + ' ' + JSON.stringify(z));
 			if (dev.touch) {
-				ok(dev.n + ': opens at 40 to 60% of the screen height', z.out && z.frac >= 0.4 && z.frac <= 0.6, JSON.stringify(z));
-				ok(dev.n + ': the map below it stays visible (>= 30% of the screen free under the box)', z.vh - z.bottom >= z.vh * 0.3, JSON.stringify(z));
-				ok(dev.n + ': a bottom handle is there to drag it taller', !!z.hg, JSON.stringify(z.hg));
+				ok(dev.n + ': opens at the full column height (>= 80% of the screen height), as on a PC', z.out && z.frac >= 0.8, JSON.stringify(z));
+								ok(dev.n + ': a bottom handle is there to drag it taller', !!z.hg, JSON.stringify(z.hg));
 				await shot(S, 'box5-props-' + dev.tag + '.png');
 				if (z.hg) {
 					const cdp = await P.context().newCDPSession(P);
 					const tp = (type, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: z.hg.x, y, id: 1 }] });
 					await tp('touchStart', z.hg.y);
-					for (let i = 1; i <= 8; i++) { await tp('touchMove', z.hg.y + i * 30); await S.settle(30); }
+					for (let i = 1; i <= 8; i++) { await tp('touchMove', z.hg.y - i * 30); await S.settle(30); }
 					await tp('touchEnd', 0);
 					await S.settle(400);
 					const z2 = await sz();
-					ok(dev.n + ': dragging the bottom handle down makes it taller (not capped)', z2.h > z.h + 100, z.h + ' -> ' + z2.h);
+					ok(dev.n + ': dragging the bottom handle up makes it shorter, and that height is its own', z2.h < z.h - 100, z.h + ' -> ' + z2.h);
 					ok(dev.n + ': it is still open after the drag', z2.out);
 				}
 			} else {

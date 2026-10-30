@@ -66870,15 +66870,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 	}
-	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT ABOUT HALF THE SCREEN'S HEIGHT** (Tom, 2026-10-29: "Don't cap the size. Just
-	// make the initial size reasonable"), so the map stays visible and tappable. Not a cap: its bottom edge carries a handle
+	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT THE COLUMN'S FULL HEIGHT, AS ON A PC** (Tom, 2026-10-29: "Don't cap the size. Just
+	// make the initial size reasonable"; 2026-10-30: unpinned docked boxes have always been full height on his PC). It first opened at half
+	// the screen, which he read as gratuitously short. Not a cap: its bottom edge carries a handle
 	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept across reloads with the box's other dock fields), up to the whole column.
 	function dockFlyShort() {
 		return smallScreen() && (window.innerHeight || 0) > (window.innerWidth || 0);
 	}
 	function dockFlyHeight(d, h) {
 		if (!dockFlyShort()) { return h; }
-		return Math.min(h, Math.max(LPN_DOCK_FLY_MIN_H, d.rec.dockH || Math.round((window.innerHeight || 844) * 0.5)));
+		return d.rec.dockH ? Math.min(h, Math.max(LPN_DOCK_FLY_MIN_H, d.rec.dockH)) : h;
 	}
 	function dockHGripEl() {
 		var el = document.getElementById('lpn_dock_hgrip');
