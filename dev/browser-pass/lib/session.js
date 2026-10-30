@@ -30,6 +30,7 @@ class Session {
 	// and nothing happens, silently. Nothing is stubbed or hidden to fix that: the window is simply
 	// big enough for the page it is showing, which is also the window this page is designed for
 	// (a full-window drawing surface; see CLAUDE.md on not reasoning about it from a phone).
+	static FIXED_NOW = Date.UTC(2026, 9, 28, 15, 0, 0); // Wednesday 15:00 UTC: System
 	static VIEWPORT = { width: 1400, height: 1200 };
 
 	// **`extra` REACHES newContext AND NOTHING ELSE.** It exists for one property that cannot be set
@@ -39,6 +40,9 @@ class Session {
 	// 1.4-million-sample island hunt could not reproduce (specs/nodehit.js).
 	static async open(browser, name, extra) {
 		const context = await browser.newContext(Object.assign({ viewport: Session.VIEWPORT }, extra || {}));
+		// Task 824: a browser with no stored theme opens in the theme of the day. A fixed Wednesday (System)
+		// keeps every spec on the plain default; a spec that wants another day sets window.EC_NOW itself.
+		await context.addInitScript('if (typeof window.EC_NOW === "undefined") { window.EC_NOW = ' + Session.FIXED_NOW + '; }');
 		await context.addInitScript(INIT_SCRIPT);
 		await context.addInitScript(NATIVE_DIALOG_SEAM);
 		const page = await context.newPage();
