@@ -351,6 +351,81 @@ async function main() {
 		const st6 = await state();
 		ok('one undo takes the nodes and the alternative', st6.nodes.length === n0 && !altsIn(st6).some((x) => x.name === 'Survey nodes'));
 
+
+		console.log('--- A6. layout, and the label when the alternative is shared ---');
+		// The name box sits directly under the second choice.
+		await importInp('edited.inp');
+		await a.dialogClick(open);
+		await a.settle(700);
+		ok('the name box follows the "new" choice directly',
+			await page.evaluate(() => { const r = document.getElementById('lpn_inpalt_physical_new'); const n = document.getElementById('lpn_inpalt_physical_name'); return !!r && !!n && r.parentNode.nextElementSibling === n; }));
+		await a.dialogClick(await L('lpn_cancel'));
+		await a.settle(400);
+		// Two scenarios share one Physical alternative.
+		const d2 = JSON.parse(JSON.stringify(d));
+		d2.alternatives = [{ id: 'a1', category: 'physical', name: 'Shared pipes', parent: null }];
+		d2.scenarios.find((x) => x.id === 's1').alternatives = { physical: 'a1' };
+		d2.scenarios.push({ id: 's2', name: 'Off peak', overrides: {}, alternatives: { physical: 'a1' } });
+		d2.scenarios.push({ id: 's3', name: 'Fire A', overrides: {}, alternatives: { physical: 'a1' } });
+		d2.scenarios.push({ id: 's4', name: 'Fire B', overrides: {}, alternatives: { physical: 'a1' } });
+		d2.scenarios.push({ id: 's5', name: 'Fire C', overrides: {}, alternatives: { physical: 'a1' } });
+		d2.project = Object.assign({}, d2.project, { activeScenario: 's1' });
+		await boot(d2);
+		const basicRow = async () => {
+			await page.click('#lpn_scenario_btn');
+			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			const t = await page.evaluate((x) => { const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row, #lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.indexOf(x) >= 0); return r ? r.textContent : ''; }, await L('lpn_scenario_basic'));
+			if (t.indexOf('✓') >= 0) { await clickRow('#lpn_menu_list button.lpn-menu-row, #lpn_menu_list2 button.lpn-menu-row', await L('lpn_scenario_basic')); await a.settle(900); const m = await a.dialog(); if (m) { await a.dialogClick(m.buttons[0]); await a.settle(600); } } else { await page.keyboard.press('Escape'); }
+		};
+		await basicRow();
+		await toScenario('Peak hour');
+		await importInp('shared.inp');
+		await a.dialogClick(open);
+		await a.settle(700);
+		dlg = await a.dialog();
+		const sharedLabel = (await L('lpn_inpalt_shared')).replace('{alternative}', 'Shared pipes');
+		ok('the default is labelled with the alternative and its first three other users, then the count',
+			dlg && dlg.text.indexOf(sharedLabel.split('{scenarios}')[0] + 'Off peak, Fire A, Fire B ' + (await L('lpn_inpalt_more')).replace('{n}', '1')) >= 0 && dlg.text.split(await catHeading('topology'))[0].indexOf("Peak hour's own alternative") < 0, dlg && dlg.text.slice(150, 500));
+		ok('the default is still chosen', await page.isChecked('#lpn_inpalt_physical_own'));
+		await a.dialogClick(await L('lpn_library_import_go'));
+		await a.settle(1200);
+		dlg = await a.dialog();
+		if (dlg) { await a.dialogClick(await L('lpn_dialog_ok')); }
+		await declineMore();
+		const st7 = await state();
+		const h7 = valueHolders(st7, jid, 'elev');
+		ok('the default wrote into the shared alternative', h7.length === 1 && h7[0].where === 'alternative Shared pipes', JSON.stringify(h7));
+		await undo();
+		// Active topology answered Base, then New.
+		await importInp('topo.inp');
+		await a.dialogClick(open);
+		await a.settle(700);
+		await page.click('#lpn_inpalt_topology_base');
+		await a.dialogClick(await L('lpn_library_import_go'));
+		await a.settle(1200);
+		dlg = await a.dialog();
+		ok('the receipt names Base for Active topology', dlg && dlg.text.indexOf((await a.lang('lpn_alt_cat_topology')) + ': Base') >= 0, dlg && dlg.text.slice(0, 300));
+		await a.dialogClick(await L('lpn_dialog_ok'));
+		await declineMore();
+		const st8 = await state();
+		ok('the added asset is active in Base itself and held by no alternative', !!nodeOf(st8, 'NEWJ') && nodeOf(st8, 'NEWJ')._active !== false && valueHolders(st8, 'NEWJ', 'active').length === 0, JSON.stringify(valueHolders(st8, 'NEWJ', 'active')));
+		await undo();
+		await importInp('topo2.inp');
+		await a.dialogClick(open);
+		await a.settle(700);
+		await page.click('#lpn_inpalt_topology_new');
+		await page.fill('#lpn_inpalt_topology_name', 'New nodes');
+		await a.dialogClick(await L('lpn_library_import_go'));
+		await a.settle(1200);
+		dlg = await a.dialog();
+		if (dlg) { await a.dialogClick(await L('lpn_dialog_ok')); }
+		await declineMore();
+		const st9 = await state();
+		const t9 = altsIn(st9).find((x) => x.name === 'New nodes');
+		ok('a new Active topology alternative holds the activation and Peak hour names it',
+			!!t9 && t9.category === 'topology' && JSON.stringify(t9.values || {}).indexOf('NEWJ') >= 0 && peakOf(st9).alternatives.topology === t9.id, JSON.stringify(t9));
+		await undo();
+
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();
