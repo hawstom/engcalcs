@@ -5043,7 +5043,6 @@ $ec_lang['lpn_dxfnet_note_shapes']='These layers hold Shapes, which this import 
 $ec_lang['lpn_dxfnet_note_entity_unread']='These entities are not a kind this import reads on their layer, and were not imported.';
 $ec_lang['lpn_dxfnet_note_paper_space']='Entities in paper space were not read: {n}.';
 $ec_lang['lpn_dxfnet_note_tag_unknown']='These attribute tags are not ones this page writes for their block, and their values were not imported.';
-$ec_lang['lpn_dxfnet_note_value_unread']='These values are not numbers or are not recognized, and were not used.';
 $ec_lang['lpn_dxfnet_note_block_unknown']='These blocks are not the block this page writes for their layer, and were not imported.';
 $ec_lang['lpn_dxfnet_note_bad_id']='These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.';
 $ec_lang['lpn_dxfnet_note_dup_id']='These IDs are stated by more than one element of the same kind. Only the first was imported.';

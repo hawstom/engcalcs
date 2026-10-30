@@ -26,6 +26,7 @@ foreach (glob($root . '/lib/lang.ec.??.php') as $f) {
 $allow = [
     'lpn_file_import_msx'      => 'menu row, command ID',
     'lpn_file_export_item_msx' => 'menu row, command ID',
+    'lpn_file_import_dxfnet'   => 'menu row, command ID: the same words as Shapes > DXF file, in the Network group',
     'lpn_inpup_i_patterns'     => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_curves'       => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_controls'     => 'lowercase noun inside a sentence, not a heading',

@@ -7191,6 +7191,12 @@ textarea.lpn-desc-ta {
 /* The Beta marker at the top of the GeoJSON network import's dialog (Task 728). */
 .lpn-gjnet-beta { margin: 0 0 6px; font-size: 0.85em; color: var(--ec-ink-muted); cursor: help; }
 
+/* The DXF network import's receipt (Task 772): paragraphs, then the list of what was not read. */
+.lpn-dxfnet-p { margin: 0 0 8px; }
+.lpn-dxfnet-p.lpn-dxfnet-bold { font-weight: bold; }
+.lpn-dxfnet-list { margin: 0; padding-left: 20px; max-height: 50vh; overflow: auto; }
+.lpn-dxfnet-list li { margin-bottom: 4px; }
+
 /* The GeoJSON network import's mapping table (Task 728): one card per field on a narrow screen,
    so the Unit select stays on screen at 390 px instead of past a sideways scroll. Each cell names
    its column in data-label; the heading row is hidden. */

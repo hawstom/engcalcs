@@ -44812,7 +44812,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'entity-unread': ['lpn_dxfnet_note_entity_unread', 'These entities are not a kind this import reads on their layer, and were not imported.'],
 			'paper-space': ['lpn_dxfnet_note_paper_space', 'Entities in paper space were not read: {n}.'],
 			'tag-unknown': ['lpn_dxfnet_note_tag_unknown', 'These attribute tags are not ones this page writes for their block, and their values were not imported.'],
-			'value-unread': ['lpn_dxfnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
+			'value-unread': ['lpn_gjnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
 			'block-unknown': ['lpn_dxfnet_note_block_unknown', 'These blocks are not the block this page writes for their layer, and were not imported.'],
 			'bad-id': ['lpn_dxfnet_note_bad_id', 'These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.'],
 			'dup-id': ['lpn_dxfnet_note_dup_id', 'These IDs are stated by more than one element of the same kind. Only the first was imported.'],
@@ -44845,8 +44845,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		openDialog(function (body) {
 			function p(text, bold) {
 				var e = document.createElement('p');
-				e.style.margin = '0 0 8px';
-				if (bold) { e.style.fontWeight = 'bold'; }
+				e.className = 'lpn-dxfnet-p' + (bold ? ' lpn-dxfnet-bold' : '');
 				e.textContent = text;
 				body.appendChild(e);
 			}
@@ -44859,14 +44858,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			p(pc.lpn_dxfnet_report_lead || 'What was not read, and each change made during import, is listed below with the layer, block or ID concerned:');
 			ul.id = 'lpn_dxfnet_report';
-			ul.style.margin = '0';
-			ul.style.paddingLeft = '20px';
-			ul.style.maxHeight = '50vh';
-			ul.style.overflow = 'auto';
+			ul.className = 'lpn-dxfnet-list';
 			dxfNetReportLines(r).forEach(function (row) {
 				var li = document.createElement('li');
 				li.setAttribute('data-code', row.code);
-				li.style.marginBottom = '4px';
 				li.textContent = row.text;
 				ul.appendChild(li);
 			});
