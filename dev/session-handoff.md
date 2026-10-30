@@ -95,15 +95,21 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-30 small hours (forty-ninth session, Opus main, Sonnet agents)
+## STATE — 2026-10-30 (fiftieth session, Opus main, Sonnet agents, Opus for native quality)
 
-- **Merged on master this session:** `feat/starter-example` (his "Merge starter-examples") and `fix/usage-report-wording` round 2 (a defect fix, merged on green: every said-yes use is now logged, not once per page per session; new rows carry an `every` marker and spock.php finds the cutover from the data; `ec_seen` keeps only the human-view and language-demand bits; privacy.php's two `ec_seen` sentences rewritten). He wants to proofread spock.php once deployed. Payloads regenerated; Task 824 holds his theme-of-the-day words.
-- **Waiting his browser pass (Branch previews):** `box-design` round 5 (8103: half-height Properties on a phone, slim pill grips, rotate buttons in a DEM-style row; Perry confirmed all three; junction 31 at the screen bottom would not select by touch for Perry, cause unknown, possibly old); `feat/gis-background` round 2 (8105: Map > Add layer…, "ArcGIS REST (MapServer)", conventional privacy wording; Perry confirmed against real servers); `feat/dxf-import` round 2 (8101: scenario exports read back, status, quality, minor loss, pump curves, head loss formula carried; receipt names the lost demand multiplier); `feat/report-widths` (8110; his "Merge" stands, rides on box-design).
-- **Rebase chain:** report-widths and gis-background each merge box-design (both now carry box-design through 36fa47163; box-design's later commit is only Perry's journal).
-- **His open questions to answer or carry:** the theme-of-the-day list (Task 824); whether DXF should embed patterns, controls and options as text (asked in messenger.md); the new English strings on the dxf and gis branches.
-- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code and saw the old 12 s search. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
-- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master; `eaefc7569` went in under his name.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/d078a540-9bc6-4560-8e07-eb5a3591414f/scratchpad (brief-*.md, perry-*.js/log).
+- **Nothing merged to master this session** but this handoff: every branch below waits his pass or word. Budget pressure released (Tom, 10-30).
+- **Waiting his browser pass (Branch previews):** `box-design` round 6 (8103: phone rows 40 -> 24 px, grip strip 12 px, Chrome's touch adjustment snapped taps to the grip because of a `:hover` rule, now hover-capable only; dragged height kept as `dockH` in the existing `lpn_dockbox` records); `feat/gis-background` round 3 (8105: no prompt, his "It's the user's project"; privacy says the server is the one saved in the project; keys `lpn_gis_ask*` deleted); `feat/dxf-import` round 3 (8101: .inp sections as MTEXT on visible, non-plotting layer `C-WATR-MODL-EPAN`, read back; demand multiplier restored; nine `lpn_dxfnet_held_*` keys deleted); `feat/theme-of-day` (8106, Task 824; `lpn_theme` now also holds "system"); `feat/import-alternative` (8107, Task 814 question 3); `feat/report-widths` (8110; his "Merge" stands, rides on box-design, re-merged 10-30).
+- **Waiting his word, no browser pass:** `feat/native-quality` (Task 733; Perry's 14 mutations all caught).
+- **Rebase chain:** gis-background and report-widths each merge box-design through 7b62eb90b. Merge box-design first; the other two follow without conflict.
+- **Trap met:** an agent's merge of master into gis-background dropped `lpn_guide_scn_example_def` from 26 lang files; restored from box-design on the re-merge. After any agent merge, compare a lang key's count across branches.
+- **Trap met:** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content (read it first).
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/743120ef-2c40-475f-bebe-8669dbdc729d/scratchpad (brief-*.md, perry logs).
+
+## STATE — 2026-10-30 small hours (forty-ninth session)
+
+- He wants to proofread spock.php once deployed. Task 824 holds his theme-of-the-day words.
+- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
+- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master.
 
 ## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 
