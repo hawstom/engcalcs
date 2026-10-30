@@ -249,6 +249,30 @@ console.log('\n7. status, minor loss, initial quality, active, pump curve and sp
 	const r3 = read(three);
 	ok('two alternatives and no BASE: the first in the file is read, the other named', r3.alternative === 'A_ONE' && note(r3, 'alternative') && note(r3, 'alternative').ids.some((t) => /TANK-B_TWO/.test(t)) && note(r3, 'alt-read') && note(r3, 'alt-read').detail === 'A_ONE', JSON.stringify(r3.notes.map((n) => n.code + ':' + n.detail)));
 }
+{
+	// the embedded .inp sections (Tom, 2026-10-30): text on C-WATR-EPANET-INP, in pieces, put back in order
+	const lines = [];
+	lines.push('[PATTERNS]', ';ID Multipliers', '1 1.0 1.2 0.8 {x} \\n } back\\slash 100%% ^caret é Ωmega');
+	for (let i = 0; i < 400; i++) { lines.push('P' + i + '  ' + (i * 0.37).toFixed(3) + ' ' + (i * 1.1).toFixed(2) + ' ;comment ' + i); }
+	lines.push('[RULES]', 'RULE 1', 'IF TANK T1 LEVEL ABOVE 20', 'THEN PUMP PU1 STATUS IS CLOSED', 'x'.repeat(5000));
+	const text = lines.join('\n') + '\n';
+	const dxf = E.lpnDxfWrite(model({ sections: text }));
+	const r = read(dxf);
+	ok('embedded text comes back whole, in order, through many pieces (braces, backslash, percent pairs, caret, accents, a 5000-character line)', r.sectionsText === text, r.sectionsText.length + ' vs ' + text.length);
+	ok('...on the layer C-WATR-EPANET-INP, visible, not plotted, outside the model prefix, and the layer is not reported as foreign or unknown', /\n\s*2\r?\nC-WATR-EPANET-INP\r?\n\s*70\r?\n\s*0\r?\n\s*62\r?\n\s*7\r?\n/.test(dxf) && !r.notes.some((n) => n.code === 'layer-foreign' || n.code === 'layer-unknown'), JSON.stringify(r.notes.map((n) => n.code)));
+	// pieces in the wrong order in the file are put back by their markers
+	const parts = dxf.split(/\r?\n  0\r?\nMTEXT/);
+	const mt = parts.slice(1).map((q, i) => (i === parts.length - 2 ? q.split(/\r?\n  0\r?\nENDSEC/)[0] : q));
+	ok('the file holds the text in more than one piece, each MTEXT under the 2049-character limit and each chunk under 250', mt.length >= 4 && mt.every((q) => {
+		const g = q.split(/\r?\n/); let tot = 0, big = 0;
+		for (let i = 0; i + 1 < g.length; i++) { const c = g[i].trim(); if (c === '1' || c === '3') { tot += g[i + 1].length; big = Math.max(big, g[i + 1].length); } }
+		return tot > 0 ? tot <= 2049 && big <= 250 : true;
+	}), String(mt.length));
+	const flipped = [parts[0]].concat(mt.slice().reverse().map((q, i, a) => q)).join('\n  0\nMTEXT');
+	const r2 = read(flipped + '\n  0\nENDSEC\n  0\nEOF\n');
+	ok('...and pieces written in another order are read in the order their markers give', r2.ok && r2.sectionsText === text, r2.ok ? r2.sectionsText.length + ' vs ' + text.length : JSON.stringify(r2));
+	ok('a file with no such layer has no sectionsText, and imports as before', read(E.lpnDxfWrite(model())).sectionsText === '');
+}
 
 console.log('\ndxf-import-reader-harness: ' + (checks - fails) + '/' + checks + ' checks passed');
 process.exit(fails ? 1 : 0);

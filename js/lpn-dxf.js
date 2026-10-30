@@ -69,6 +69,12 @@
 	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
 	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.
 	var README_LAYER = 'C-WATR-RDME';
+	// **THE .INP SECTIONS A BLOCK ATTRIBUTE CANNOT CARRY** (patterns, controls, rules, times, options...)
+	// ride as MTEXT on this ordinary, visible layer, outside the model prefix so an import never
+	// reads them as an asset (Tom, 2026-10-30: *"Why hidden? User can freeze."*). Not plotted.
+	var SECTIONS_LAYER = 'C-WATR-EPANET-INP';
+	var SECTIONS_MARK = 'EPANET-INP';
+	var SECTIONS_PIECE = 2000;    // escaped characters in one MTEXT, under the Reference's 2049
 	/**
 	 * An alternative's name as the part of a layer name after the asset code: capitals in the
 	 * page's locale, letters and digits of ANY script kept (pre-review 2026-10-07: "Пожар" fell back
@@ -252,6 +258,23 @@
 		// default line spacing factor of 1).
 		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + (5 / 3) * readme.length };
 		if (readme.length) { grow(readmeAt.x, readmeAt.y); }
+		// The embedded text sits to the right of the network, clear of it: columns of pieces, eight
+		// to a row, rows going down from the top of the network. A character is about 0.9 wide at
+		// text height 1, so a column is as wide as its longest line.
+		var pieces = sectionPieces(model.sections), secAt = [];
+		if (pieces.length) {
+			var colW = 0, rowH = 0, per = 8, n0;
+			pieces.forEach(function (pc) {
+				pc.lines.forEach(function (ln) { colW = Math.max(colW, ln.length); });
+				rowH = Math.max(rowH, pc.lines.length);
+			});
+			colW = colW * 0.9 + 4; rowH = rowH * (5 / 3) + 3;
+			pieces.forEach(function (pc, k) {
+				n0 = { x: ext.x1 + 10 + (k % per) * colW, y: ext.y1 - Math.floor(k / per) * rowH };
+				secAt.push(n0);
+				grow(n0.x + colW, n0.y - rowH);
+			});
+		}
 		ext.x0 -= 2; ext.y0 -= 2; ext.x1 += 2; ext.y1 += 2;
 
 		// Handles are fixed for the structural objects, then counted up for everything else.
@@ -259,7 +282,7 @@
 			'ltByBlock', 'ltByLayer', 'ltCont', 'layer0', 'style', 'appAcad', 'dimStd', 'vpActive',
 			'brModel', 'brPaper', 'blkModel', 'endModel', 'blkPaper', 'endPaper',
 			'dictRoot', 'dictGroup', 'dictLayout', 'dictPsn', 'psnNormal', 'layoutModel', 'layoutPaper',
-			'layerReadme'
+			'layerReadme', 'layerSections'
 		].forEach(function (k) { H[k] = w.handle(); });
 		var hasCustomers = !!(model.customers || []).length;
 		var hasShapes = !!(model.shapes || []).length;
@@ -355,6 +378,50 @@
 			}
 			flush();
 			return out;
+		}
+		// The embedded text cut into pieces of at most SECTIONS_PIECE escaped characters, at a line break
+		// where it can, each led by a marker line that gives its place (`;EPANET-INP PART 2 OF 5`), so an
+		// import puts them back in order whatever order a CAD program writes them in. A piece is joined
+		// to the one before it by plain concatenation, so a line longer than a piece may be cut inside.
+		function sectionPieces(text) {
+			var t = String(text === undefined || text === null ? '' : text).replace(/\r\n?/g, '\n'), out = [], rest = t, mark = 40, take, j, cut;
+			if (!t) { return out; }
+			function escLen(v) {
+				return v.split('\n').map(function (ln) { return mtextParts(ln).reduce(function (a, q) { return a + q.length; }, 0); })
+					.reduce(function (a, b) { return a + b + 2; }, -2);
+			}
+			while (rest.length) {
+				take = Math.min(rest.length, SECTIONS_PIECE);
+				while (take > 1 && escLen(rest.slice(0, take)) > SECTIONS_PIECE - mark) { take = Math.floor(take * 0.9); }
+				cut = rest.slice(0, take);
+				if (take < rest.length) {
+					j = cut.lastIndexOf('\n');
+					if (j > 0) { take = j + 1; cut = rest.slice(0, take); }
+				}
+				out.push(cut);
+				rest = rest.slice(take);
+			}
+			return out.map(function (pc, k) {
+				return { lines: [';' + SECTIONS_MARK + ' PART ' + (k + 1) + ' OF ' + out.length].concat(pc.split('\n')) };
+			});
+		}
+		// The embedded text goes out exactly as it is (no capitals, no cap on length: the pieces each
+		// fit), one MTEXT per piece, with the same MTEXT escapes.
+		function mtextRaw(lines, x, y, layer) {
+			var chunks = [], cur = '', size = 0, parts = [];
+			lines.forEach(function (ln, n) {
+				if (n) { parts.push('\\P'); }
+				mtextParts(ln).forEach(function (q) { parts.push(q); });
+			});
+			parts.forEach(function (q) {
+				if (size + q.length > 250) { chunks.push(cur); cur = ''; size = 0; }
+				cur += q; size += q.length;
+			});
+			entity('MTEXT', layer);
+			body.g(100, 'AcDbMText').g(10, num(x)).g(20, num(y)).g(30, '0.0').g(40, '1.0')
+				.g(71, 1).g(72, 5);
+			chunks.forEach(function (c) { body.g(3, c); });
+			body.g(1, cur).g(7, 'Standard');
 		}
 		function mtext(lines, x, y, layer) {
 			var parts = [], chunks = [], cur = '', size = 0, k, j, per = lines.map(mtextParts), rest = 0, budget, sz;
@@ -466,6 +533,7 @@
 			lwpoly(sh.pts, lay, !!sh.closed);
 		});
 		if (readme.length) { mtext(readme, readmeAt.x, readmeAt.y, README_LAYER); }
+		pieces.forEach(function (pc, k) { mtextRaw(pc.lines, secAt[k].x, secAt[k].y, SECTIONS_LAYER); });
 		// ---- BLOCKS, built next for the same reason ----
 		var blk = new Writer();
 		blk.next = body.next;
@@ -522,7 +590,7 @@
 				w.g(2, lt[1]).g(70, 0).g(3, lt[2]).g(72, 65).g(73, 0).g(40, '0.0');
 			});
 		w.g(0, 'ENDTAB');
-		table('LAYER', H.layerT, layerTypes.length + 2);
+		table('LAYER', H.layerT, layerTypes.length + 2 + (pieces.length ? 1 : 0));
 		rec('LAYER', H.layer0, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, '0').g(70, 0).g(62, 7).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
 		layerTypes.forEach(function (T) {
@@ -532,6 +600,10 @@
 		// Group 290 = 0: not plotted (the DXF Reference's LAYER plotting flag).
 		rec('LAYER', H.layerReadme, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, README_LAYER).g(70, 0).g(62, 7).g(6, 'Continuous').g(290, 0).g(370, -3).g(390, H.psnNormal);
+		if (pieces.length) {
+			rec('LAYER', H.layerSections, H.layerT, 'AcDbLayerTableRecord');
+			w.g(2, SECTIONS_LAYER).g(70, 0).g(62, 7).g(6, 'Continuous').g(290, 0).g(370, -3).g(390, H.psnNormal);
+		}
 		w.g(0, 'ENDTAB');
 		// **STYLE Standard ON txt, THE FONT AUTOCAD ITSELF GIVES IT** (Tom, 2026-10-06: *"Use
 		// 'Standard' style."*). Group 3 is the STYLE record's primary font file name (DXF Reference,
@@ -641,6 +713,8 @@
 	EngCalcs.lpnDxfWrite = writeDxf;
 	EngCalcs.lpnDxfModelPrefix = MODEL_PREFIX;
 	EngCalcs.lpnDxfReadmeLayer = README_LAYER;
+	EngCalcs.lpnDxfSectionsLayer = SECTIONS_LAYER;
+	EngCalcs.lpnDxfSectionsMark = SECTIONS_MARK;
 	EngCalcs.lpnDxfAssetCodes = ASSET_CODE;
 	EngCalcs.lpnDxfAlternative = alternativeCode;
 	EngCalcs.lpnDxfTag = tagName;

@@ -9,7 +9,7 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 
 ## Rules
 
-- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB, SEQEND and the one MTEXT read-me, nothing else: every link a
+- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB, SEQEND, the MTEXT read-me and the MTEXT pieces of the embedded .inp sections (below), nothing else: every link a
   polyline through every bend, every element an attributed block (a link's at mid-run), a
   customer's service line a two-point polyline. No TEXT, LINE or MULTILEADER. Tom allowed
   annotation only as MLEADER; MULTILEADER is an AutoCAD 2008 entity (in the AutoCAD 2008 DXF
@@ -118,16 +118,30 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
 - **Which alternative is read:** BASE where the file has it; otherwise the first alternative in the file (this
   page's own export of a scenario has only that scenario's layers), with a line saying which was read. Layers of any
   other alternative are named and not read (Task 721 owns reading several).
+- **The .inp sections a block cannot hold ride in the drawing as text** (Tom, 2026-10-30: asked whether to
+  hide them, *"Why hidden? User can freeze."*): MTEXT on the ordinary, visible layer `C-WATR-EPANET-INP`
+  (white, not plotted, outside the model prefix), to the right of the network, pieces of at most 2000 characters
+  in columns, each led by a marker line `;EPANET-INP PART n OF m` so the import puts them in order whatever order
+  a CAD program writes them in. The text is the .inp export's own sections for the scenario on screen, as typed,
+  not capitalized: PATTERNS, CURVES, CONTROLS, RULES, TIMES, OPTIONS (a scenario's Demand Multiplier among them),
+  ENERGY, REACTIONS, QUALITY, SOURCES, MIXING, REPORT, DEMANDS (several categories; customers excluded, the import
+  places them itself) and EMITTERS, plus a section of this page's own, `[ASSIGNMENTS]` (`DEMAND j pattern`,
+  `HEAD r pattern`, `SPEED p pattern`, `VOLUME t curve`), for the references the element rows hold and the blocks
+  do not. On import the drawing's own network is written as an .inp, these sections replace the sections of the
+  same name, and the whole is read by the .inp reader (`embedDxfSections()`), so a section means what it means in
+  an .inp. **What the blocks state wins**: an element keeps every value its block gave, a pump curve the blocks
+  gave keeps its points, and only a junction the embedded DEMANDS itemizes takes its demand list from the text.
+  A drawing with no such layer imports as before. Receipt: one line, "The EPANET sections embedded in the drawing
+  were read: ...", or one saying they could not be read as an EPANET file.
 - **Round trip (`dxf-roundtrip-calc-harness.js`):** Net1, Net2, Net3, Net1 with a closed pipe and a minor loss,
-  Net1 as Darcy-Weisbach, and Net1-Scenarios with a scenario on screen export to DXF and import back with the same
-  heads (1e-6) and flows (1 percent of the largest) from Calculate, once the patterns, clock, controls, rules and a
-  scenario's calculation set (its demand multiplier) are taken away, because the file cannot hold those.
-- **Cannot round-trip, and why:** patterns and every pattern reference (a pattern is a list, not an attribute);
-  efficiency, volume and head loss curves (only a pump's head curve is carried); controls and rules; the clock and
-  EPANET options (viscosity, accuracy, demand multiplier: project settings, not element properties); several demand
-  categories (only the total); emitter coefficients (stored in SI per pressure to an exponent the file does not state);
-  reaction coefficients, sources, mixing and pump energy settings; pipe types and fitting lists (the minor loss sum is
-  written instead); custom properties; map Text and hand-placed label positions; a scenario's calculation settings (demand multiplier and other options; the read-me states a multiplier other than 1, and the receipt lists the settings).
+  Net1 as Darcy-Weisbach, and Net1-Scenarios with Max day on screen (demand multiplier 1.5) export to DXF and
+  import back with the same heads (1e-6) and flows (1 percent of the largest) from Calculate, nothing taken away
+  first; Net2 and Net3 are also run through the EPANET engine over time and agree at 0, 3, 6, 12 and 24 hours.
+  The writer and reader alone, with escapes, a 5000-character line and shuffled pieces: `dxf-import-reader-harness.js`.
+- **Not carried, and why:** custom properties; map Text and hand-placed label positions; pipe types and fitting
+  lists (the minor loss sum is written instead); a pump defined by power rather than a head curve (it is named
+  as a pump with no head curve); other scenarios' overrides (one alternative is read); a unit the drawing cannot
+  state (pressure and velocity follow the head unit, so embedded pressure-bearing numbers are read in that unit).
 - **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives not read, Shape layers, entities of a kind not read, paper space, unknown attribute tags,
   non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
   what a DXF cannot hold (the list above). A pump that states no head curve is named.

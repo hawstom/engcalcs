@@ -44830,25 +44830,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
 			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
 			'customer-loose': ['lpn_dxfnet_note_customer_loose', 'The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.'],
+			'sections-read': ['lpn_dxfnet_note_sections_read', 'The EPANET sections embedded in the drawing were read: {sections}.'],
+			'sections-unread': ['lpn_dxfnet_note_sections_unread', 'The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.'],
 			'not-in-dxf': ['lpn_dxfnet_note_not_held', 'A DXF file does not hold these, so none was imported:'],
 			'method': ['lpn_dxfnet_note_method', 'The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.'],
 			'geo-export': ['lpn_dxfnet_note_geo_export', 'This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.'],
 		}, t = T[note.code] || [null, note.code], s = String((t[0] && pc[t[0]]) || t[1]);
 		return s.split('{prefix}').join(prefix).split('{n}').join(String(note.detail))
-			.split('{alt}').join(String(note.detail))
+			.split('{alt}').join(String(note.detail)).split('{sections}').join(String(note.detail))
 			.split('{coord}').join(String((note.detail || {}).coord || '')).split('{length}').join(String((note.detail || {}).length || ''));
 	}
 	// What a DXF file cannot hold, one item per line under the standing lead (the key, then its English).
 	var LPN_DXFNET_HELD = [
-		['lpn_dxfnet_held_patterns', 'patterns'],
-		['lpn_dxfnet_held_curves', 'curves other than pump head curves'],
-		['lpn_dxfnet_held_controls', 'controls and rules'],
-		['lpn_dxfnet_held_times', 'time settings and EPANET options'],
-		['lpn_dxfnet_held_calc', 'the scenario\'s calculation settings (demand multiplier and other options)'],
-		['lpn_dxfnet_held_demand', 'demand categories (each junction\'s demands are summed into one base demand)'],
-		['lpn_dxfnet_held_emitter', 'emitter coefficients'],
-		['lpn_dxfnet_held_quality', 'reaction coefficients, sources and mixing'],
-		['lpn_dxfnet_held_energy', 'pump efficiency and energy settings'],
 		['lpn_dxfnet_held_custom', 'custom properties'],
 		['lpn_dxfnet_held_text', 'map Text items and hand-placed label positions']
 	];
@@ -44939,6 +44932,72 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			units: readUnitSelections()
 		});
 	}
+	// **THE EMBEDDED .INP SECTIONS, READ BACK** (Tom, 2026-10-30). The drawing's own network is exported
+	// as an .inp, the embedded sections replace its sections of the same name, and the whole is read by
+	// the .inp reader, so the sections mean to the import exactly what they mean in an .inp. What the
+	// blocks state wins over the embedded text: an element keeps every value its block gave, and a
+	// curve the blocks gave keeps its points. Returns the names of the sections read, or null if the
+	// text could not be read as an .inp (the network is then imported without them).
+	function embedDxfSections(dx, text, name) {
+		var secs = dxfSplitInp(text), own, composed, parsed, di, names = [], assign = [], byName = {};
+		if (!EngCalcs.lpnExportInp || !EngCalcs.lpnInpParse) { return null; }
+		secs = secs.filter(function (sec) {
+			if (sec.name === 'ASSIGNMENTS') { assign = sec.lines.map(function (l) { return l.replace(/;.*$/, '').trim().split(/\s+/); }).filter(function (t) { return t.length === 3; }); return false; }
+			return !LPN_DXF_BLOCK_SECTIONS[sec.name];
+		});
+		secs.forEach(function (sec) { byName[sec.name] = true; if (names.indexOf(sec.name) < 0) { names.push(sec.name); } });
+		own = EngCalcs.lpnExportInp(Object.assign({}, dx, { customers: [] }), {});
+		if (!own || !own.ok) { return null; }
+		composed = dxfSplitInp(own.inp).filter(function (sec) { return !byName[sec.name]; }).concat(secs)
+			.map(function (sec) { return '[' + sec.name + ']\n' + sec.lines.join('\n') + '\n'; }).join('\n') + '\n[END]\n';
+		parsed = EngCalcs.lpnInpParse(composed);
+		if (!parsed || !parsed.ok) { return null; }
+		di = docFromInp(parsed, name);
+		// the document-wide parts
+		dx.patterns = di.patterns || []; dx.defaultPattern = di.defaultPattern || null; dx.times = di.times || null;
+		dx.controls = di.controls || []; dx.rules = di.rules || [];
+		dx.inpSections = {};
+		Object.keys(di.inpSections || {}).forEach(function (k) { if (k !== 'TAGS') { dx.inpSections[k] = di.inpSections[k]; } });
+		['hydraulics', 'qualityOptions', 'fileOptions', 'quality', 'emitterExponent', 'reactions', 'energy', 'sources', 'mixing'].forEach(function (k) {
+			if (di.settings[k] !== undefined) { dx.settings[k] = di.settings[k]; }
+		});
+		// curves: the blocks' own first
+		(di.curves || []).forEach(function (c) {
+			if (!(dx.curves || (dx.curves = [])).some(function (q) { return q.id === c.id; })) { dx.curves.push(c); }
+		});
+		// the elements: every key the block did not give; a junction's demand list, when the embedded text
+		// itemizes it, replaces the total the block holds
+		function carry(list, from) {
+			var by = {};
+			from.forEach(function (e) { by[e.id] = e; });
+			list.forEach(function (e) {
+				var f = by[e.id];
+				if (!f) { return; }
+				Object.keys(f).forEach(function (k) {
+					if (k === 'importNotes' || k === 'tok') { return; }
+					if (!(k in e)) { e[k] = f[k]; }
+				});
+				if (f.tok) {
+					e.tok = e.tok || {};
+					Object.keys(f.tok).forEach(function (k) { if (!(k in e.tok)) { e.tok[k] = f.tok[k]; } });
+				}
+				if (e.type === 'junction' && (f.extraDemands || f.demandCategory || f.demandItemized)) {
+					['_demand', 'demandPattern', 'demandCategory', 'extraDemands', 'demandItemized'].forEach(function (k) { if (f[k] !== undefined) { e[k] = f[k]; } });
+					if (f.tok) { Object.keys(f.tok).forEach(function (k) { if (/demand/i.test(k)) { (e.tok = e.tok || {})[k] = f.tok[k]; } }); }
+				}
+			});
+		}
+		carry(dx.nodes, di.nodes); carry(dx.links, di.links);
+		assign.forEach(function (a) {
+			var kind = a[0].toUpperCase(), el = (kind === 'SPEED' ? dx.links : dx.nodes).filter(function (e) { return String(e.id) === a[1]; })[0];
+			if (!el) { return; }
+			if (kind === 'DEMAND' && el.type === 'junction' && !el.demandPattern) { el.demandPattern = a[2]; }
+			else if (kind === 'HEAD' && el.type === 'reservoir' && !el.headPattern) { el.headPattern = a[2]; }
+			else if (kind === 'SPEED' && el.type === 'pump' && !el.speedPattern) { el.speedPattern = a[2]; }
+			else if (kind === 'VOLUME' && el.type === 'tank' && !el.volCurve) { el.volCurve = a[2]; }
+		});
+		return names;
+	}
 	// The customers go in through addCustomer(), the one door that knows how an offset along a pipe is
 	// stored, once the project is open: the service line's first point names the pipe (or the node)
 	// it leaves, and the block's point is where the meter stands. Returns the IDs of those whose
@@ -45019,7 +45078,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
 		defaults = geoJsonNetDefaults(changed);
 		name = String(fileName).replace(/\.dxf$/i, '') || String(fileName);
-		id = importProject(docFromDxfNet(r, name, defaults, crs), true);
+		var newDoc = docFromDxfNet(r, name, defaults, crs), embedded = null;
+		if (r.sectionsText) {
+			try { embedded = embedDxfSections(newDoc, r.sectionsText, name); } catch (err) { if (window.console && console.error) { console.error(err); } embedded = null; }
+			r.notes.push({ code: embedded ? 'sections-read' : 'sections-unread', ids: [], detail: embedded ? embedded.join(', ') : '' });
+		}
+		r.sectionsRead = !!embedded;
+		id = importProject(newDoc, true);
 		if (!id) { applyUnitSelections(before); refreshMapStatus(); if (done) { done({ ok: false, error: 'storage' }); } return; }
 		loose = placeDxfCustomers(r.customers);
 		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }
@@ -45355,8 +45420,56 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			insunits: frame.insunits, measurement: frame.measurement,
 			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
 			nodes: nodes, links: links, customers: customers, shapes: shapes, readme: readme,
-			tags: tt.tags, prompts: tt.prompts
+			tags: tt.tags, prompts: tt.prompts, sections: dxfEmbeddedSections()
 		};
+	}
+	// **THE .INP SECTIONS A BLOCK ATTRIBUTE CANNOT CARRY, AS TEXT** (Tom, 2026-10-30, on whether to embed
+	// them: *"Why hidden? User can freeze."*, so on an ordinary visible layer). They are the sections the
+	// .inp export writes for this scenario on screen, so a scenario's own patterns, options and demand
+	// multiplier go out as that scenario has them. Left out: the sections the blocks already hold (the
+	// element rows, [STATUS], [TAGS]) and the map ([COORDINATES], [VERTICES], [LABELS], [BACKDROP]).
+	// Customers are left out of the document handed to the writer: their demands are lumped into
+	// [DEMANDS] there, and an import places the customers themselves. A few references the element
+	// rows hold and the blocks do not (a junction's demand pattern, a reservoir's head pattern, a pump's
+	// speed pattern, a tank's volume curve) go in a section of this page's own, [ASSIGNMENTS].
+	var LPN_DXF_BLOCK_SECTIONS = { TITLE: 1, JUNCTIONS: 1, RESERVOIRS: 1, TANKS: 1, PIPES: 1, PUMPS: 1, VALVES: 1, STATUS: 1, TAGS: 1,
+		COORDINATES: 1, VERTICES: 1, LABELS: 1, BACKDROP: 1, END: 1 };
+	function dxfSplitInp(text) {
+		var out = [], cur = null;
+		String(text).split(/\r\n|\r|\n/).forEach(function (ln) {
+			var m = /^\s*\[([^\]]+)\]/.exec(ln);
+			if (m) { cur = { name: m[1].trim().toUpperCase(), lines: [] }; out.push(cur); }
+			else if (cur) { cur.lines.push(ln); }
+		});
+		out.forEach(function (sec) { while (sec.lines.length && !sec.lines[sec.lines.length - 1].trim()) { sec.lines.pop(); } });
+		return out;
+	}
+	function dxfEmbeddedSections() {
+		var d = inpExportDocument(), res, secs, text = '', assign = [];
+		d = Object.assign({}, d, { customers: [], labels: [] });
+		try { res = EngCalcs.lpnExportInp(d, inpExportOptions()); } catch (err) { return ''; }
+		if (!res || !res.ok) { return ''; }
+		secs = dxfSplitInp(res.inp);
+		function toks(ln) { return ln.replace(/;.*$/, '').trim().split(/\s+/).filter(Boolean); }
+		secs.forEach(function (sec) {
+			sec.lines.forEach(function (ln) {
+				var t = toks(ln), i;
+				if (!t.length) { return; }
+				if (sec.name === 'JUNCTIONS' && t[3]) { assign.push('DEMAND ' + t[0] + ' ' + t[3]); }
+				else if (sec.name === 'RESERVOIRS' && t[2]) { assign.push('HEAD ' + t[0] + ' ' + t[2]); }
+				else if (sec.name === 'TANKS' && t[7] && t[7] !== '*') { assign.push('VOLUME ' + t[0] + ' ' + t[7]); }
+				else if (sec.name === 'PUMPS') {
+					for (i = 3; i + 1 < t.length; i += 2) { if (t[i].toUpperCase() === 'PATTERN') { assign.push('SPEED ' + t[0] + ' ' + t[i + 1]); } }
+				}
+			});
+		});
+		secs.forEach(function (sec) {
+			if (LPN_DXF_BLOCK_SECTIONS[sec.name]) { return; }
+			if (!sec.lines.some(function (l) { return l.trim(); })) { return; }
+			text += '[' + sec.name + ']\n' + sec.lines.join('\n') + '\n\n';
+		});
+		if (assign.length) { text += '[ASSIGNMENTS]\n' + assign.join('\n') + '\n\n'; }
+		return text;
 	}
 	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
 	function dxfExportText(frame) {

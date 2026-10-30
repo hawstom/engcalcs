@@ -200,8 +200,8 @@ function specChecks(d, label) {
 		[...types].every(t => ['LWPOLYLINE', 'INSERT', 'ATTRIB', 'SEQEND', 'MTEXT'].indexOf(t) >= 0), [...types].join(','));
 	const layers = tables.filter(e => e.type === 'LAYER');
 	const names = layers.map(e => g(e, 2));
-	ok(label + ': every layer but 0 is C-WATR-MODL-XXXX-ALT or the read-me layer',
-		names.every(n => n === '0' || n === 'C-WATR-RDME' || /^C-WATR-MODL-[A-Z0-9_]{4}-[A-Z0-9_]+$/.test(n)), names.join(' '));
+	ok(label + ': every layer but 0 is C-WATR-MODL-XXXX-ALT, the read-me layer or the embedded-sections layer',
+		names.every(n => n === '0' || n === 'C-WATR-RDME' || n === 'C-WATR-EPANET-INP' || /^C-WATR-MODL-[A-Z0-9_]{4}-[A-Z0-9_]+$/.test(n)), names.join(' '));
 	const rd = layers.find(e => g(e, 2) === 'C-WATR-RDME');
 	ok(label + ': the read-me layer is white (62 = 7) and does not plot (290 = 0)', rd && g(rd, 62).trim() === '7' && g(rd, 290).trim() === '0');
 	const brNames = tables.filter(e => e.type === 'BLOCK_RECORD').map(e => g(e, 2)).filter(n => n[0] !== '*');
@@ -225,7 +225,11 @@ function specChecks(d, label) {
 	ok(label + ': one STYLE, Standard, on font txt; no Arial anywhere in the file',
 		styles.length === 1 && g(styles[0], 2) === 'Standard' && g(styles[0], 3) === 'txt' &&
 		!d.pairs.some(p => /arial/i.test(p[1] || '')), styles.map(s => g(s, 2) + '/' + g(s, 3)).join(','));
-	const mts = ents.filter(e => e.type === 'MTEXT'), mt = mts[0];
+	const mts = ents.filter(e => e.type === 'MTEXT' && g(e, 8) === 'C-WATR-RDME'), mt = mts[0];
+	{
+		const sl = layers.find(e => g(e, 2) === 'C-WATR-EPANET-INP'), sm = ents.filter(e => e.type === 'MTEXT' && g(e, 8) === 'C-WATR-EPANET-INP');
+		ok(label + ': the embedded .inp sections are MTEXT on an ordinary visible layer (not frozen, white, not plotted), led by a part marker', !!sl && (+g(sl, 70) & 1) === 0 && g(sl, 62).trim() === '7' && g(sl, 290).trim() === '0' && sm.length >= 1 && /^;EPANET-INP PART 1 OF \d+/.test(gAll(sm[0], 3).concat(gAll(sm[0], 1)).join('')), String(sm.length));
+	}
 	const readme = mt ? gAll(mt, 3).concat(gAll(mt, 1)).join('').split('\\P') : [];
 	ok(label + ': the read-me is ONE MTEXT on C-WATR-RDME (AcDbMText, top-left, Standard, height 1), no README block',
 		mts.length === 1 && g(mt, 8) === 'C-WATR-RDME' && gAll(mt, 100).indexOf('AcDbMText') >= 0 && g(mt, 71) === '1' &&

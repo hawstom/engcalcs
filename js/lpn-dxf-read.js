@@ -61,6 +61,28 @@
 	}
 
 	/**
+	 * One MTEXT's string, as the person who typed it meant it: the MTEXT escapes `\P` (a paragraph),
+	 * `\\`, `\{` and `\}`, then the file's own string escapes (unesc). Any other backslash code
+	 * (a font or colour a CAD program added) is dropped with its text-format arguments.
+	 */
+	function mtextPlain(raw) {
+		var out = '', i = 0, c, d, m;
+		raw = String(raw);
+		while (i < raw.length) {
+			c = raw.charAt(i);
+			if (c !== '\\') { out += c; i++; continue; }
+			d = raw.charAt(i + 1);
+			if (d === 'P' || d === 'p') { out += '\n'; i += 2; }
+			else if (d === '\\' || d === '{' || d === '}') { out += '\u0001' + d.charCodeAt(0) + ';'; i += 2; }
+			else if (d === 'U' && /^\\U\+[0-9A-Fa-f]{4}/.test(raw.slice(i, i + 7))) { out += raw.slice(i, i + 7); i += 7; }
+			else if ((m = /^\\[fFHhQqWwCcTtAa][^;]*;/.exec(raw.slice(i)))) { i += m[0].length; }
+			else if (d) { i += 2; }
+			else { i++; }
+		}
+		return unesc(out).replace(/\u0001(\d+);/g, function (a, k) { return String.fromCharCode(+k); });
+	}
+
+	/**
 	 * The bytes of a DXF as text: the file says its own code page ($DWGCODEPAGE, ANSI_1252 for the
 	 * R2000 this page writes) unless it is AutoCAD 2007 or later, which is UTF-8.
 	 */
@@ -111,13 +133,14 @@
 			tagKeys = {}, unitText = {}, items = [], wanted = [], nodes = [], links = [], customers = [],
 			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, customer: 0 },
 			nodeIds = {}, linkIds = {}, custIds = {}, nodesByPos = {}, ambiguous = {}, paper = 0,
-			foreign = {}, kinds = {}, alts = {}, shapes = {}, unread = {}, crsCode = '', readmeText = '', readme, blockOf, typeOfBlock = {};
+			foreign = {}, kinds = {}, alts = {}, shapes = {}, unread = {}, crsCode = '', readmeText = '', readme, sectionsLayer, pieces = [], blockOf, typeOfBlock = {};
 		if (!R) { return { ok: false, detail: 'reader' }; }
 		rd = R.entities(text, true);
 		if (!rd.ok) { return rd; }
 		if (!rd.sawEnt) { return { ok: false, detail: 'sections' }; }
 		prefix = EngCalcs.lpnDxfModelPrefix.toUpperCase();
 		readme = String(EngCalcs.lpnDxfReadmeLayer).toUpperCase();
+		sectionsLayer = String(EngCalcs.lpnDxfSectionsLayer).toUpperCase();
 		blockOf = EngCalcs.lpnDxfBlocks;
 		Object.keys(blockOf).forEach(function (t) { typeOfBlock[blockOf[t]] = t; });
 		ents = rd.ents;
@@ -197,6 +220,11 @@
 				readmeText += rt;
 				said = /EPSG:(\d+)/i.exec(rt);
 				if (said && !crsCode) { crsCode = 'EPSG:' + said[1]; }
+				return;
+			}
+			if (up === sectionsLayer) {
+				if (it.type !== 'MTEXT') { tally(unread, it.layer, it.type); return; }
+				pieces.push(mtextPlain(it.g.filter(function (q) { return q[0] === 3 || q[0] === 1; }).map(function (q) { return q[1]; }).join('')));
 				return;
 			}
 			if (up.slice(0, prefix.length) !== prefix) { tally(foreign, it.layer, it.type); return; }
@@ -425,8 +453,17 @@
 		var method = '', mm, mre = /\((HW|DW|MANNING)\)/g;
 		while ((mm = mre.exec(readmeText.toUpperCase()))) { method = mm[1].toLowerCase(); }
 
+		// The embedded .inp sections: the pieces in the order their markers give (a piece with none keeps
+		// its place in the file), each marker line removed, the rest joined as it was cut.
+		var markRe = new RegExp('^;' + String(EngCalcs.lpnDxfSectionsMark).replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&') + ' PART (\\d+) OF (\\d+)\\n?'), sectionsText = '';
+		pieces = pieces.map(function (t, k) {
+			var m = markRe.exec(t);
+			return { n: m ? +m[1] : k + 1, t: m ? t.slice(m[0].length) : t };
+		}).sort(function (a, b) { return a.n - b.n; });
+		sectionsText = pieces.map(function (q) { return q.t; }).join('');
+
 		return {
-			ok: true, nodes: nodes, links: links, customers: customers, curves: curves, method: method, alternative: altRead, insunits: rd.insunits,
+			ok: true, sectionsText: sectionsText, nodes: nodes, links: links, customers: customers, curves: curves, method: method, alternative: altRead, insunits: rd.insunits,
 			coordUnit: INSUNITS_NAME[rd.insunits] || '', crsCode: crsCode, readmeText: readmeText, unitText: unitText, notes: N.list, counts: counts
 		};
 	}

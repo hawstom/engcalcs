@@ -6,9 +6,11 @@
 // Tom, 2026-10-29: "I think we should export everything that our format can hold." So, for Net1,
 // Net2 and Net3, a Darcy-Weisbach project, a project with a closed pipe and a closed pump, and a
 // scenario that is not Base: open it, let it solve, export the DXF, import the DXF as a new project,
-// let that solve, and compare every head and every flow. The pattern, clock, control and rule parts
-// of the examples are removed first because a DXF file cannot hold them (the receipt lists them);
-// what remains is everything a DXF file CAN hold, and it must come back to the same answers.
+// let that solve, and compare every head and every flow. Round 3 (Tom, 2026-10-30): the patterns,
+// controls, rules, clock, options and the rest ride in the DXF as text on the layer C-WATR-EPANET-INP
+// ("Why hidden? User can freeze."), so NOTHING is taken away first. Net2 and Net3 are also run through
+// the EPANET engine over time and compared at several time steps, and a scenario's demand multiplier
+// (1.5, Max day) comes back in [OPTIONS].
 // Also: a scenario's own export (layers named for the scenario, no BASE) opens as a network, with
 // the receipt saying which alternative was read.
 'use strict';
@@ -123,29 +125,23 @@ function compare(A, B) {
 }
 
 // ---- the projects: the gallery examples with what a DXF cannot hold taken away ------------------
-function example(file, edit, keepCalc) {
+function example(file, edit) {
 	const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', file), 'utf8'));
-	d.patterns = []; d.defaultPattern = null; d.times = null; d.controls = []; d.rules = [];
-	d.nodes.forEach((n) => { delete n.demandPattern; delete n.headPattern; });
-	d.links.forEach((l) => { delete l.speedPattern; });
-	// A scenario's demand multiplier is a calculation setting, like EPANET's Demand Multiplier option: a DXF file does not hold it.
-	if (!keepCalc) { delete d.calcSets; (d.scenarios || []).forEach((sc) => { delete sc.calc; }); }
 	if (edit) { edit(d); }
 	return d;
 }
 const lk = (d, id) => d.links.find((l) => l.id === id);
 const CASES = [
 	{ label: 'Net1 (a pump with a one-point curve)', doc: example('Net1.lwn'), pumps: 1 },
-	{ label: 'Net2 (a tank, no pump)', doc: example('Net2.lwn'), pumps: 0 },
-	{ label: 'Net3 (two pumps with three-point curves, one closed, a closed pipe, tanks)', doc: example('Net3.lwn'), pumps: 2, closed: true },
+	{ label: 'Net2 (a tank, no pump, patterns)', doc: example('Net2.lwn'), pumps: 0, eps: true },
+	{ label: 'Net3 (two pumps with three-point curves, one closed, a closed pipe, tanks, patterns, controls)', doc: example('Net3.lwn'), pumps: 2, closed: true, eps: true },
 	{ label: 'Net1 with pipe 111 closed and a minor loss on pipe 21', doc: example('Net1.lwn', (d) => { lk(d, '111')._status = 'closed'; lk(d, '21')._k = 7.5; }), pumps: 1, closed: true, minor: ['21', 7.5] },
 	{ label: 'Net1 as a Darcy-Weisbach project', doc: example('Net1.lwn', (d) => {
 		d.settings.method = 'dw';
 		d.units = Object.assign({}, d.units, { lpn_u_roughness: 'mm' });
 		d.links.forEach((l, i) => { if (l.type === 'pipe') { l._roughness = 0.25 + 0.05 * (i % 7); } });
 	}), pumps: 1, method: 'dw' },
-	{ label: 'Net1-Scenarios with Max day with main break on screen, calculation set kept (not compared)', doc: example('Net1-Scenarios.lwn', (d) => { d.project.activeScenario = 's2'; }, true), pumps: 1, scenario: true, keepCalc: true },
-	{ label: 'Net1 with the scenario Max day with main break on screen', doc: example('Net1-Scenarios.lwn', (d) => { d.project.activeScenario = 's2'; }), pumps: 1, scenario: true }
+	{ label: 'Net1-Scenarios with Max day with main break on screen (demand multiplier 1.5)', doc: example('Net1-Scenarios.lwn', (d) => { d.project.activeScenario = 's2'; }), pumps: 1, scenario: true, keepCalc: true }
 ];
 
 async function runCase(browser, c) {
@@ -167,12 +163,15 @@ async function runCase(browser, c) {
 	const txt = dxf.toString('latin1');
 	const imp = await importDxf(a, 'rt.dxf', dxf);
 	const codes = imp.items.map((i) => i.code);
-	const allowed = ['not-in-dxf', 'alt-read', 'alternative', 'pump-no-curve', 'method'];
+	const allowed = ['not-in-dxf', 'alt-read', 'alternative', 'pump-no-curve', 'method', 'sections-read'];
 	ok(label + ': the receipt names only what a DXF cannot hold (and, for a scenario, the alternative read)', codes.every((x) => allowed.indexOf(x) >= 0) && codes.indexOf('method') < 0 && codes.indexOf('pump-no-curve') < 0, JSON.stringify(imp.items.map((i) => i.text.slice(0, 100))));
 	{
 		const held = imp.items.find((i) => i.code === 'not-in-dxf');
 		ok(label + ': the read-me states the demand multiplier when the scenario has one other than 1, and not otherwise', !!c.keepCalc === /DEMAND MULTIPLIER: 1\.5\./.test(txt), String(/DEMAND MULTIPLIER: [^\r\n]*/.exec(txt)));
-		if (c.keepCalc) { ok(label + ': the receipt names the scenario\'s calculation settings and the demand multiplier among what a DXF cannot hold', !!held && /calculation settings \(demand multiplier and other options\)/.test(held.text), held && held.text); }
+		ok(label + ': the receipt lists only custom properties and map Text as not carried (no patterns, curves, controls, options)', !!held && /custom properties/.test(held.text) && !/patterns|curves|controls|calculation settings/.test(held.text), held && held.text);
+		const sr = imp.items.find((i) => i.code === 'sections-read');
+		ok(label + ': the receipt says the embedded EPANET sections were read, naming OPTIONS', !!sr && /OPTIONS/.test(sr.text), sr && sr.text);
+		ok(label + ': the file has the embedded layer C-WATR-EPANET-INP, visible (not frozen), with the text in MTEXT', /\n\s*8\r?\nC-WATR-EPANET-INP\r?\n/.test(txt) && /\n\s*2\r?\nC-WATR-EPANET-INP\r?\n\s*70\r?\n\s*0\r?\n/.test(txt) && /\[OPTIONS\]/.test(txt.replace(/\\P/g, '\n')));
 	}
 	if (c.scenario) {
 		const alt = imp.items.find((i) => i.code === 'alt-read');
@@ -198,13 +197,49 @@ async function runCase(browser, c) {
 	if (c.minor) { ok(label + ': the minor loss on pipe ' + c.minor[0] + ' is ' + c.minor[1], (after.doc.links.find((l) => l.id === c.minor[0]) || {})._k === c.minor[1]); }
 	const B = await solved(a, nNodes);
 	ok(label + ': the import solves', !!B && B.converged !== false);
-	if (B && !c.keepCalc) {
+	if (B) {
 		const bad = compare(A, B);
 		ok(label + ': ' + Object.keys(A.heads).length + ' heads and ' + Object.keys(A.flows).length + ' flows come back the same as the original\'s', bad.length === 0 && Object.keys(B.flows).length === Object.keys(A.flows).length, bad.slice(0, 5).join('; '));
 		if (c.closed) {
 			const closedId = (c.minor ? '111' : null);
 			if (closedId) { ok(label + ': the closed pipe carries no flow in either', Math.abs(A.flows[closedId]) < 1e-9 && Math.abs(B.flows[closedId]) < 1e-9, A.flows[closedId] + ' / ' + B.flows[closedId]); }
 		}
+	}
+	if (c.keepCalc) {
+		const dm = after.doc.settings.hydraulics && after.doc.settings.hydraulics.demandMultiplier;
+		ok(label + ': the scenario\'s demand multiplier 1.5 comes back as the import\'s Demand Multiplier option', +dm === 1.5, String(dm));
+	}
+	if (c.eps && B) {
+		// An extended-period run through the EPANET engine, compared at several time steps.
+		const eps = async (pg, n) => {
+			await pg.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
+			await pg.waitFor(() => pg.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 150000);
+			const out = {};
+			for (const t of [0, 3600 * 3, 3600 * 6, 3600 * 12, 3600 * 24]) {
+				await pg.page.evaluate((x) => EngCalcs.lpnTimeGoTo(x), t);
+				await pg.page.waitForTimeout(700);
+				out[t] = await pg.page.evaluate(() => { const r = EngCalcs.lpnSolveProbe(); return r ? JSON.parse(JSON.stringify({ heads: r.heads, flows: r.flows })) : null; });
+			}
+			return { frames: await pg.page.evaluate(() => EngCalcs.lpnTimeRunState().frames), at: out };
+		};
+		const E2 = await eps(a, nNodes);
+		const i0 = after.id;
+		ok(label + ': the import carries the clock (time settings) and the patterns', !!after.doc.times && (after.doc.patterns || []).length === (before.doc.patterns || []).length && (before.doc.patterns || []).length > 0, JSON.stringify({ times: after.doc.times, p: (after.doc.patterns || []).length }));
+		// the original project's own run: reopen it from storage
+		await a.page.evaluate((id) => { const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}'); idx.openId = id; localStorage.setItem('lpn_index', JSON.stringify(idx)); }, before.id);
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await a.page.evaluate(() => { const x = document.getElementById('ec-consent'); if (x) { x.remove(); } });
+		await a.settle(2500);
+		const E1 = await eps(a, nNodes);
+		ok(label + ': the EPANET engine runs both over time with the same number of time steps (' + E1.frames + ')', E1.frames > 1 && E1.frames === E2.frames, E1.frames + ' / ' + E2.frames);
+		const h0 = (E1.at[0] || {}).heads || {}, h12 = (E1.at[43200] || {}).heads || {}, k0 = Object.keys(h0)[5];
+		ok(label + ': the time steps are not all the same (the run really moves, so the comparison means something)', k0 !== undefined && Math.abs(h0[k0] - h12[k0]) > 1e-3, String(h0[k0]) + ' / ' + String(h12[k0]));
+		Object.keys(E1.at).forEach((t) => {
+			const x = E1.at[t], y = E2.at[t], bad = x && y ? compare(x, y) : ['missing'];
+			ok(label + ': at ' + (t / 3600) + ' h, ' + Object.keys((x || {}).heads || {}).length + ' heads and flows come back the same', bad.length === 0, bad.slice(0, 4).join('; '));
+		});
+		void i0;
 	}
 	ok(label + ': no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.close();
