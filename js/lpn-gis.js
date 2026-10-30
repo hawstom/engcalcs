@@ -79,7 +79,7 @@
 		b = tileBbox3857(z, x, y).map(num).join(',');
 		if (layer.kind === 'wms') {
 			base = layer.url + (layer.url.indexOf('?') < 0 ? '?' : (/[?&]$/.test(layer.url) ? '' : '&'));
-			return base + 'SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=' + encodeURIComponent(layer.layers) +
+			return base + 'SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=' + encodeURIComponent(layer.layers).replace(/%2C/g, ',') +
 				'&STYLES=&SRS=EPSG:3857&BBOX=' + b + '&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=TRUE';
 		}
 		if (info && info.tiled) { return layer.url + '/tile/' + z + '/' + y + '/' + x; }
