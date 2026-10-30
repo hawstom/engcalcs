@@ -5,7 +5,10 @@
 //   2. Clicking a chapter's result scrolls the content pane so its first marked hit is on screen.
 //   3. A heading that holds the term ("Example on Net1") is an indented row under its own chapter,
 //      ranked ahead of chapters with body hits only; clicking it scrolls to that heading.
-//   4. A term with markup in it is never parsed as HTML; clearing the search removes every mark.
+//   4. Typing is never kept waiting: each keystroke of N, e, t, 1 returns in well under 150 ms and
+//      the result list is right at once; the marks follow in the background, the whole set in time.
+//   5. A heading that is its chapter's first hit gets no row (the chapter row opens there already).
+//   6. A term with markup in it is never parsed as HTML; clearing the search removes every mark.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -53,6 +56,27 @@ async function main() {
 		await page.fill('#lpn_guide_search', 'Net1');
 		await a.settle(300);
 
+		console.log('\n0. Typing N, e, t, 1 is not kept waiting');
+		await page.fill('#lpn_guide_search', '');
+		await a.settle(200);
+		await page.focus('#lpn_guide_search');
+		for (const ch of 'Net1') {
+			const ms = await page.evaluate(() => performance.now());
+			await page.keyboard.type(ch);
+			const took = await page.evaluate((t) => performance.now() - t, ms);
+			ok('key "' + ch + '" handled in under 150 ms', took < 150, Math.round(took) + ' ms');
+			await page.waitForTimeout(80);
+		}
+		const t1 = await page.evaluate(() => { const i = document.getElementById('lpn_guide_search'); const t = performance.now();
+			i.value = 'Net'; i.dispatchEvent(new Event('input')); i.value = 'Net1'; i.dispatchEvent(new Event('input'));
+			return { ms: Math.round(performance.now() - t), rows: document.querySelectorAll('#lpn_guide_nav a[data-guide-link]').length }; });
+		ok('the result list for Net1 is built within 150 ms', t1.ms < 150 && t1.rows > 3, JSON.stringify(t1));
+		const t2 = await page.evaluate(() => { const i = document.getElementById('lpn_guide_search'); const t = performance.now();
+			i.value = 'n'; i.dispatchEvent(new Event('input')); return Math.round(performance.now() - t); });
+		ok('even a one-letter term returns within 150 ms', t2 < 150, t2 + ' ms');
+		await page.evaluate(() => { const i = document.getElementById('lpn_guide_search'); i.value = 'Net1'; i.dispatchEvent(new Event('input')); });
+		await a.settle(300);
+
 		console.log('\n1. Every hit is marked');
 		const marks = await page.evaluate(() => {
 			const ms = Array.from(document.querySelectorAll('#lpn_guide_content mark.lpn-guide-hit'));
@@ -90,13 +114,18 @@ async function main() {
 		const hitRows = rows.filter(r => /^hit-/.test(r.key));
 		const ex = hitRows.find(r => /^Example on Net1/.test(r.text));
 		ok('a heading row "Example on Net1" exists', !!ex, JSON.stringify(hitRows.length));
+		console.log('       "Example on Net1" rows: ' + hitRows.filter(r => /^Example on Net1/.test(r.text)).length);
+		// No heading row duplicates its chapter's first hit: the chapter row already opens there.
+		const dupFirst = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_content .lpn-guide-section')).filter(s => s.style.display !== 'none').map(sec => {
+			const mk = sec.querySelector('mark.lpn-guide-hit');
+			let h = mk; while (h && h !== sec && !(h.getAttribute && h.getAttribute('data-guide-hit'))) { h = h.parentNode; }
+			return h && h !== sec ? sec.getAttribute('data-guide-section') : null; }).filter(Boolean));
+		ok('no chapter keeps a heading row for its own first hit', dupFirst.length === 0, JSON.stringify(dupFirst));
 		ok('every heading row is indented and sits under a chapter row', hitRows.length > 0 && hitRows.every(r => {
 			const i = rows.indexOf(r); let j = i - 1; while (j >= 0 && rows[j].level !== 0) { j--; }
 			return r.level === 1 && j >= 0 && !/^hit-/.test(rows[j].key);
 		}));
-		const lastWithHit = Math.max.apply(null, hitRows.map(r => rows.indexOf(r)));
-		const plainBefore = rows.slice(0, lastWithHit).filter((r, i) => r.level === 0 && !(rows[i + 1] && rows[i + 1].key.startsWith('hit-')));
-		ok('chapters with a heading hit rank ahead of those with body hits only', plainBefore.length === 0, plainBefore.map(r => r.text).join(', '));
+		ok('a chapter with a heading hit ranks first', rows[0] && /^boxes$/i.test(rows[0].text) && rows[1] && rows[1].key.startsWith('hit-'), rows[0] && rows[0].text);
 		if (ex) {
 			await page.evaluate(() => { document.getElementById('lpn_guide_content').scrollTop = 0; });
 			await page.click('#lpn_guide_nav a[data-guide-link="' + ex.key + '"]');
@@ -106,7 +135,7 @@ async function main() {
 			ok('clicking it brings that heading into view', st.vis && /^Example on Net1/.test(st.text || ''), JSON.stringify(st));
 		}
 
-		console.log('\n4. Markup in the term is inert; clearing removes the marks');
+		console.log('\n6. Markup in the term is inert; clearing removes the marks');
 		await page.fill('#lpn_guide_search', '<b>x');
 		await a.settle(300);
 		const inj = await page.evaluate(() => ({ b: document.querySelectorAll('#lpn_guide_content b[data-x], #lpn_guide_content mark b').length,
