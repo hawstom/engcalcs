@@ -4716,3 +4716,12 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: touch tap on a Text opens Properties at centre, either end, and 6 px above the words; 12 px below does not. Master opens it at centre and ends too, fails 6 px above.
 - OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
 - Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
+
+## 2026-10-30 -- box-design round 5 (b1c19252c, 36fa47163)
+OBSERVED (re-verify before citing): builder's box-phone5 harness passes 54/54 in this worktree. My own touch-event runs
+(390x844, 360x740, PC 1200x800; CDP touch drags) agree: rotate row full width under Angle, pill 4x32 on transparent 19px(phone)/8px(PC)
+strip, half-height flyout (422/370 px = 50%), bottom pill drag +200 -> taller and stays open 3.5 s, side drag stays open 4 s, no :hover stuck.
+Harness blind spot: part A (Text) runs WITHOUT EC_DEFAULT_DOCKS, so it measures a floating popup, not the docked half-height flyout.
+With docks on, Text flyout is 50% high, rotate row fine, bottom pill overlaps body by ~1px only.
+Tapping empty map tucks the flyout (existing behaviour). Node 31 (Net1, y~774 at 390x844) would not select by touch, tucks flyout; cause not found, not shown to be this branch.
+Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
