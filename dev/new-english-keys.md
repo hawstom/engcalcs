@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**89 still to read on master**, of 254 untranslated keys, of 3223 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**91 still to read on master**, of 256 untranslated keys, of 3225 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (254, 89 to read @@ NEEDS RULING)
+## lpn_  (256, 91 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -181,6 +181,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
   @@ NEEDS RULING
+- **`lpn_dxf_note_demand_multiplier`**
+  > Demand multiplier: {n}.
+  @@ NEEDS RULING
 - **`lpn_dxf_note_headloss`**
   > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
   @@ NEEDS RULING
@@ -193,6 +196,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dxfnet_count_nodes`**
   > {n} junctions, reservoirs and tanks.
   @@ NEEDS RULING
+- **`lpn_dxfnet_held_calc`**
+  > the scenario's calculation settings (demand multiplier and other options)
+  @@ NEEDS RULING
 - **`lpn_dxfnet_held_controls`**
   > controls and rules
   @@ NEEDS RULING
@@ -203,7 +209,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > custom properties
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_demand`**
-  > demand categories (only a junction's total)
+  > demand categories (each junction's demands are summed into one base demand)
   @@ NEEDS RULING
 - **`lpn_dxfnet_held_emitter`**
   > emitter coefficients
@@ -798,7 +804,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**197 still to read**, of 240 new keys across 8 unmerged branch(es).
+**257 still to read**, of 300 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -809,13 +815,194 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`36fa47163`) — already merged into feat/gis-background; its strings are listed there
+### box-design (`f884b8d6c`) — 60 new, 60 to read @@ NEEDS RULING
+
+- **`lpn_col_level`**
+  > Level
+  @@ NEEDS RULING
+- **`lpn_crit_col_stopped`**
+  > Run stopped at
+  @@ NEEDS RULING
+- **`lpn_demand_cats`**
+  > Demand categories
+  @@ NEEDS RULING
+- **`lpn_demand_total_tip`**
+  > The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.
+  @@ NEEDS RULING
+- **`lpn_edit_curves`**
+  > Edit curves…
+  @@ NEEDS RULING
+- **`lpn_edit_fittings`**
+  > Edit fittings…
+  @@ NEEDS RULING
+- **`lpn_edit_pipetypes`**
+  > Edit types…
+  @@ NEEDS RULING
+- **`lpn_ff_col_more`**
+  > How many others
+  @@ NEEDS RULING
+- **`lpn_field_active_short`**
+  > Active
+  @@ NEEDS RULING
+- **`lpn_field_auto_length`**
+  > Auto length
+  @@ NEEDS RULING
+- **`lpn_field_auto_length_tip`**
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  @@ NEEDS RULING
+- **`lpn_field_cv_short`**
+  > Check valve
+  @@ NEEDS RULING
+- **`lpn_field_km_fittings_tip`**
+  > Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list chosen" to type a value.
+  @@ NEEDS RULING
+- **`lpn_field_km_short_tip`**
+  > Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short`**
+  > Initial depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_level_short_tip`**
+  > Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short`**
+  > Maximum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_maxlevel_short_tip`**
+  > Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short`**
+  > Minimum depth
+  @@ NEEDS RULING
+- **`lpn_field_tank_minlevel_short_tip`**
+  > Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.
+  @@ NEEDS RULING
+- **`lpn_field_valve_km_short_tip`**
+  > Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.
+  @@ NEEDS RULING
+- **`lpn_heading_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_morph_vertex`**
+  > Vertex
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_base_ask`**
+  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_also`**
+  > Initial quality {quality} is cleared too.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_both`**
+  > Clear elevation {elev} and demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_demand`**
+  > Clear demands {demands} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_elev`**
+  > Clear elevation {elev} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_clear_quality`**
+  > Clear initial quality {quality} on {id}?
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_customers`**
+  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_demand`**
+  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_done`**
+  > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_kind`**
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_links`**
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_loop`**
+  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_own`**
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_pipes`**
+  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_switch`**
+  > Switch to Base and morph
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_text`**
+  > {id} was not morphed into a vertex: a Text is attached to it.
+  @@ NEEDS RULING
+- **`lpn_morph_vertex_type`**
+  > {id} was not morphed into a vertex: only a junction can become one.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt`**
+  > This override is stored in alternative "{alternative}".
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_alt_shared`**
+  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear_one`**
+  > Click to clear this override.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_ovm_restores`**
+  > Clear restores {value}, {source}.
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol`**
+  > {label}, {symbol}
+  @@ NEEDS RULING
+- **`lpn_prop_label_symbol_unit`**
+  > {label}, {symbol} ({unit})
+  @@ NEEDS RULING
+- **`lpn_prop_label_unit`**
+  > {label} ({unit})
+  @@ NEEDS RULING
+- **`lpn_quality_named_concentration_short`**
+  > {chemical} conc.
+  @@ NEEDS RULING
+- **`lpn_reaction_bulk_pipe_tip`**
+  > Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_tank_short_tip`**
+  > Reaction coefficient: the rate of reaction in the water held in this tank, in 1/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_reaction_wall_pipe_tip`**
+  > Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.
+  @@ NEEDS RULING
+- **`lpn_replace_selected_only`**
+  > Only the selected assets
+  @@ NEEDS RULING
+- **`lpn_report_copy_html`**
+  > Copy HTML
+  @@ NEEDS RULING
+- **`lpn_result_concentration_short`**
+  > Conc.
+  @@ NEEDS RULING
+- **`lpn_settings_held_default`**
+  > the default
+  @@ NEEDS RULING
+- **`lpn_settings_held_from`**
+  > the value in {parent}
+  @@ NEEDS RULING
+- **`lpn_settings_held_item`**
+  > {setting}: {restores}
+  @@ NEEDS RULING
+- **`lpn_settings_held_none`**
+  > no text
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`097ec0339`) — adds no English strings
+### feat/dxf-import (`1670095ec`) — adds no English strings
 
-### feat/gis-background (`82be219db`) — 83 new, 83 to read @@ NEEDS RULING
+### feat/gis-background (`d7d9b91e5`) — 83 new, 83 to read @@ NEEDS RULING
 
 - **`lpn_col_level`**
   > Level

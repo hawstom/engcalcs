@@ -44844,7 +44844,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		['lpn_dxfnet_held_curves', 'curves other than pump head curves'],
 		['lpn_dxfnet_held_controls', 'controls and rules'],
 		['lpn_dxfnet_held_times', 'time settings and EPANET options'],
-		['lpn_dxfnet_held_demand', 'demand categories (only a junction\'s total)'],
+		['lpn_dxfnet_held_calc', 'the scenario\'s calculation settings (demand multiplier and other options)'],
+		['lpn_dxfnet_held_demand', 'demand categories (each junction\'s demands are summed into one base demand)'],
 		['lpn_dxfnet_held_emitter', 'emitter coefficients'],
 		['lpn_dxfnet_held_quality', 'reaction coefficients, sources and mixing'],
 		['lpn_dxfnet_held_energy', 'pump efficiency and energy settings'],
@@ -45334,6 +45335,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The head loss formula, named and then coded in brackets (HW, DW or MANNING) for the import to find.
 		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.')
 			.replace('{formula}', frictionMethodLabel()).replace('{code}', frictionMethod() === 'manning' ? 'MANNING' : frictionMethod().toUpperCase()));
+		// A scenario's demand multiplier is a calculation setting the file does not hold; the read-me states it
+		// when it is not 1, so a reader can enter it again.
+		var dmx = settingFor(activeScenario(), ['settings', 'hydraulics', 'demandMultiplier']);
+		if (typeof dmx === 'number' && isFinite(dmx) && dmx !== 1) {
+			readme.push((pc.lpn_dxf_note_demand_multiplier || 'Demand multiplier: {n}.').replace('{n}', String(dmx)));
+		}
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {

@@ -127,7 +127,7 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
   EPANET options (viscosity, accuracy, demand multiplier: project settings, not element properties); several demand
   categories (only the total); emitter coefficients (stored in SI per pressure to an exponent the file does not state);
   reaction coefficients, sources, mixing and pump energy settings; pipe types and fitting lists (the minor loss sum is
-  written instead); custom properties; map Text and hand-placed label positions; a scenario's calculation set.
+  written instead); custom properties; map Text and hand-placed label positions; a scenario's calculation settings (demand multiplier and other options; the read-me states a multiplier other than 1, and the receipt lists the settings).
 - **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives not read, Shape layers, entities of a kind not read, paper space, unknown attribute tags,
   non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
   what a DXF cannot hold (the list above). A pump that states no head curve is named.

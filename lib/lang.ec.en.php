@@ -2291,6 +2291,7 @@ $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in
 // C-WATR-MODL-NODE-BASE.
 $ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.';
 $ec_lang['lpn_dxf_note_headloss']='Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.';
+$ec_lang['lpn_dxf_note_demand_multiplier']='Demand multiplier: {n}.';
 $ec_lang['lpn_dxf_curve_points']='Pump head curve points (flow, head)';
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.';
@@ -5070,7 +5071,8 @@ $ec_lang['lpn_dxfnet_held_controls']='controls and rules';
 $ec_lang['lpn_dxfnet_held_times']='time settings and EPANET options';
 $ec_lang['lpn_dxfnet_held_emitter']='emitter coefficients';
 $ec_lang['lpn_dxfnet_held_energy']='pump efficiency and energy settings';
-$ec_lang['lpn_dxfnet_held_demand']='demand categories (only a junction\'s total)';
+$ec_lang['lpn_dxfnet_held_demand']='demand categories (each junction\'s demands are summed into one base demand)';
+$ec_lang['lpn_dxfnet_held_calc']='the scenario\'s calculation settings (demand multiplier and other options)';
 $ec_lang['lpn_dxfnet_held_quality']='reaction coefficients, sources and mixing';
 $ec_lang['lpn_dxfnet_held_custom']='custom properties';
 $ec_lang['lpn_dxfnet_held_text']='map Text items and hand-placed label positions';

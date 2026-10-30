@@ -199,7 +199,7 @@ function everythingProject() {
 
 // The same list of things the receipt must always name: the page's own sentence.
 async function pcOf(a, k) { return a.page.evaluate((key) => (window.EngCalcs.pageConfig || {})[key], k); }
-const HELD = ['patterns', 'curves', 'controls', 'times', 'emitter', 'energy', 'demand', 'quality', 'custom', 'text'];
+const HELD = ['patterns', 'curves', 'controls', 'times', 'calc', 'emitter', 'energy', 'demand', 'quality', 'custom', 'text'];
 
 async function roundTrip(browser, label, how) {
 	console.log('\n--- ' + label + ' ---');
@@ -223,9 +223,9 @@ async function roundTrip(browser, label, how) {
 	const lead = await pcOf(a, 'lpn_dxfnet_note_not_held'), heldLi = imp.items.find((i) => i.code === 'not-in-dxf');
 	const heldWords = [];
 	for (const k of HELD) { heldWords.push(await pcOf(a, 'lpn_dxfnet_held_' + k)); }
-	ok(label + ': the receipt lists what a DXF cannot carry: a lead, then each of ten items on its own line',
+	ok(label + ': the receipt lists what a DXF cannot carry: a lead, then each of eleven items on its own line',
 		!!heldLi && heldLi.text.indexOf(lead) === 0 && heldWords.every((w) => heldLi.text.indexOf(w) > 0) &&
-		(await a.page.$$eval('#lpn_dxfnet_report > li[data-code="not-in-dxf"] > ul > li', (l) => l.length)) === 10, heldLi && heldLi.text.slice(0, 200));
+		(await a.page.$$eval('#lpn_dxfnet_report > li[data-code="not-in-dxf"] > ul > li', (l) => l.length)) === 11, heldLi && heldLi.text.slice(0, 200));
 	ok(label + ': ...including custom properties, and map Text items and label positions; and no longer status, minor loss or initial quality, which the file now carries',
 		/custom properties/.test(heldLi.text) && /map Text items and hand-placed label positions/.test(heldLi.text) && /patterns/.test(heldLi.text) && /curves other than pump head curves/.test(heldLi.text) &&
 		!/status|minor loss|initial quality/.test(heldLi.text), heldLi.text);

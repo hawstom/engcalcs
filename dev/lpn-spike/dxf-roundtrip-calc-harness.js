@@ -123,14 +123,13 @@ function compare(A, B) {
 }
 
 // ---- the projects: the gallery examples with what a DXF cannot hold taken away ------------------
-function example(file, edit) {
+function example(file, edit, keepCalc) {
 	const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', file), 'utf8'));
 	d.patterns = []; d.defaultPattern = null; d.times = null; d.controls = []; d.rules = [];
 	d.nodes.forEach((n) => { delete n.demandPattern; delete n.headPattern; });
 	d.links.forEach((l) => { delete l.speedPattern; });
 	// A scenario's demand multiplier is a calculation setting, like EPANET's Demand Multiplier option: a DXF file does not hold it.
-	delete d.calcSets;
-	(d.scenarios || []).forEach((sc) => { delete sc.calc; });
+	if (!keepCalc) { delete d.calcSets; (d.scenarios || []).forEach((sc) => { delete sc.calc; }); }
 	if (edit) { edit(d); }
 	return d;
 }
@@ -145,6 +144,7 @@ const CASES = [
 		d.units = Object.assign({}, d.units, { lpn_u_roughness: 'mm' });
 		d.links.forEach((l, i) => { if (l.type === 'pipe') { l._roughness = 0.25 + 0.05 * (i % 7); } });
 	}), pumps: 1, method: 'dw' },
+	{ label: 'Net1-Scenarios with Max day with main break on screen, calculation set kept (not compared)', doc: example('Net1-Scenarios.lwn', (d) => { d.project.activeScenario = 's2'; }, true), pumps: 1, scenario: true, keepCalc: true },
 	{ label: 'Net1 with the scenario Max day with main break on screen', doc: example('Net1-Scenarios.lwn', (d) => { d.project.activeScenario = 's2'; }), pumps: 1, scenario: true }
 ];
 
@@ -169,6 +169,11 @@ async function runCase(browser, c) {
 	const codes = imp.items.map((i) => i.code);
 	const allowed = ['not-in-dxf', 'alt-read', 'alternative', 'pump-no-curve', 'method'];
 	ok(label + ': the receipt names only what a DXF cannot hold (and, for a scenario, the alternative read)', codes.every((x) => allowed.indexOf(x) >= 0) && codes.indexOf('method') < 0 && codes.indexOf('pump-no-curve') < 0, JSON.stringify(imp.items.map((i) => i.text.slice(0, 100))));
+	{
+		const held = imp.items.find((i) => i.code === 'not-in-dxf');
+		ok(label + ': the read-me states the demand multiplier when the scenario has one other than 1, and not otherwise', !!c.keepCalc === /DEMAND MULTIPLIER: 1\.5\./.test(txt), String(/DEMAND MULTIPLIER: [^\r\n]*/.exec(txt)));
+		if (c.keepCalc) { ok(label + ': the receipt names the scenario\'s calculation settings and the demand multiplier among what a DXF cannot hold', !!held && /calculation settings \(demand multiplier and other options\)/.test(held.text), held && held.text); }
+	}
 	if (c.scenario) {
 		const alt = imp.items.find((i) => i.code === 'alt-read');
 		ok(label + ': a scenario\'s own export has no BASE layers, and the receipt says which alternative was read', !/-BASE\r?\n/.test(txt) && !!alt && /MAX_DAY_WITH_MAIN_BREAK/.test(alt.text), alt && alt.text);
@@ -193,7 +198,7 @@ async function runCase(browser, c) {
 	if (c.minor) { ok(label + ': the minor loss on pipe ' + c.minor[0] + ' is ' + c.minor[1], (after.doc.links.find((l) => l.id === c.minor[0]) || {})._k === c.minor[1]); }
 	const B = await solved(a, nNodes);
 	ok(label + ': the import solves', !!B && B.converged !== false);
-	if (B) {
+	if (B && !c.keepCalc) {
 		const bad = compare(A, B);
 		ok(label + ': ' + Object.keys(A.heads).length + ' heads and ' + Object.keys(A.flows).length + ' flows come back the same as the original\'s', bad.length === 0 && Object.keys(B.flows).length === Object.keys(A.flows).length, bad.slice(0, 5).join('; '));
 		if (c.closed) {
