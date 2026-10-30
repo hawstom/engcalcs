@@ -54086,6 +54086,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 			}
 		});
+		// A heading row whose text is repeated within its chapter names the heading it sits under
+		// ("Fire flow analysis: Example on Net1"), so the rows say where they go.
+		hitsOf.forEach(function (list, i) {
+			list.forEach(function (ht) {
+				var el = secs[i].querySelector('[data-guide-hit="' + ht.key + '"]'), en = el && el.closest ? el.closest('.lpn-guide-boxentry, .lpn-guide-menu') : null,
+					ph = en && en.querySelector('h3, h4');
+				ht.parent = ph && ph !== el ? String(ph.textContent || '').replace(/\s+/g, ' ').trim() : '';
+			});
+			list.forEach(function (ht) {
+				var dup = list.filter(function (o) { return o.text === ht.text; }).length > 1;
+				if (dup && ht.parent) { ht.text = ht.parent + ': ' + ht.text; }
+			});
+		});
 		secs = secs.map(function (sec, i) { return { sec: sec, hits: hitsOf[i], i: i, ranked: !!rankedFirst[i] }; });
 		if (q) { secs.sort(function (x, y) { return (y.ranked ? 1 : 0) - (x.ranked ? 1 : 0) || x.i - y.i; }); }
 		secs.forEach(function (rec) {

@@ -115,6 +115,9 @@ async function main() {
 		const ex = hitRows.find(r => /^Example on Net1/.test(r.text));
 		ok('a heading row "Example on Net1" exists', !!ex, JSON.stringify(hitRows.length));
 		console.log('       "Example on Net1" rows: ' + hitRows.filter(r => /^Example on Net1/.test(r.text)).length);
+		const boxesAt = rows.findIndex(r => /^boxes$/i.test(r.text));
+		const under = []; for (let j = boxesAt + 1; j < rows.length && rows[j].level === 1 && /^hit-/.test(rows[j].key); j++) { under.push(rows[j].text); }
+		ok('under Boxes no two heading rows have identical text', under.length > 3 && new Set(under).size === under.length, under.length + ' rows; e.g. ' + under[0]);
 		// No heading row duplicates its chapter's first hit: the chapter row already opens there.
 		const dupFirst = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_guide_content .lpn-guide-section')).filter(s => s.style.display !== 'none').map(sec => {
 			const mk = sec.querySelector('mark.lpn-guide-hit');
