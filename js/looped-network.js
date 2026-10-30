@@ -18504,7 +18504,7 @@ var EngCalcs = EngCalcs || {};
 		gisAsked = true;
 		askDialog({
 			kind: 'confirm',
-			text: (pc.lpn_gis_ask || 'This project draws background layers from: {hosts}. Opening them sends the area on screen and your IP address to those servers. Draw them?')
+			text: (pc.lpn_gis_ask || 'This project requests background layers from: {hosts}. Drawing them sends the area on screen and your IP address to those servers. Draw them?')
 				.replace('{hosts}', hosts.join(', ')),
 			ok: pc.lpn_gis_ask_yes || 'Draw them', cancel: pc.lpn_gis_ask_no || 'Not now'
 		}, function (yes) {
@@ -55598,6 +55598,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_map_attach_menu || 'World map…',
 				tip: pc.lpn_map_attach_tip,
 				submenu: function () { return mapgeoRows(); } },
+			// Add layer... (Task 720; Tom, 2026-10-29: *"I think it needs to be under Map, Add layer. I
+			// couldn't find it on my own in Settings."*). A door, not a second form: it opens Settings at
+			// the one set of background-layer controls and puts the cursor in the first of them.
+			{ icon: 'globe', hidden: !EngCalcs.lpnGis, disabled: !gisUsable(),
+				label: pc.lpn_gis_menu || 'Add layer…',
+				fn: function () {
+					openSettingsBox('gis');
+					var k = document.getElementById('lpn_gis_kind');
+					if (k && k.focus) { k.focus(); }
+				} },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -63935,6 +63945,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// one small form to add another. Stored in the project; see paintGisLayers().
 		(function () {
 			var gisBody = minorGroup(mapBody2, pc.lpn_gis_title || 'Background layers from a GIS server');
+			gisBody.id = 'lpn_set_sub_gis';
 			if (!EngCalcs.lpnGis) { return; }
 			if (!gisUsable()) {
 				note(gisBody, pc.lpn_gis_unlocatable || 'Background layers need a project that is placed on the earth.');
@@ -63943,7 +63954,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var kindNames = {
 				xyz: pc.lpn_gis_kind_xyz || 'Tile URL',
 				wms: pc.lpn_gis_kind_wms || 'WMS',
-				arcgis: pc.lpn_gis_kind_arcgis || 'ArcGIS MapServer'
+				arcgis: pc.lpn_gis_kind_arcgis || 'ArcGIS REST (MapServer)'
 			};
 			// One block per layer: its kind and host in plain sight (and a mark when the server did not
 			// answer this session), then Draw, Opacity and Remove with their words beside them.
@@ -64619,7 +64630,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		time: 'lpn_set_sub_time',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
-		page: 'lpn_set_sec_page'
+		page: 'lpn_set_sec_page',
+		gis: 'lpn_set_sub_gis'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//

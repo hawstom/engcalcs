@@ -199,8 +199,22 @@ async function main() {
 			await page.click('#lpn_gis_add');
 			await a.settle(1500);
 		}
-		await a.toolbarClick(await a.lang('lpn_tool_settings'));
-		await a.settle(600);
+		// Tom, 2026-10-29: *"I think it needs to be under Map, Add layer."* The menu row is the door.
+		const rows = await a.menuRows('map');
+		const menuLabel = await a.lang('lpn_gis_menu');
+		ok('the Map menu has an Add layer row, enabled', rows.some((r) => r.label === menuLabel && !r.disabled && !r.submenu), menuLabel);
+		ok('the row reads Add layer...', menuLabel.replace('\u2026', '...') === 'Add layer...', menuLabel);
+		ok('the Settings box is closed before the row is pressed', !(await page.evaluate(() => { const b = document.getElementById('lpn_settings_box'); return b && getComputedStyle(b).display !== 'none'; })));
+		await a.menuClick(menuLabel, 'map');
+		await a.settle(800);
+		const opened = await page.evaluate(() => {
+			const b = document.getElementById('lpn_settings_box'), k = document.getElementById('lpn_gis_kind');
+			if (!b || !k) { return null; }
+			const r = k.getBoundingClientRect(), br = b.getBoundingClientRect();
+			return { shown: getComputedStyle(b).display !== 'none', inView: r.top >= br.top - 1 && r.bottom <= br.bottom + 1, focused: document.activeElement === k };
+		});
+		ok('Map > Add layer opens Settings at the background-layer controls', !!opened && opened.shown && opened.inView, JSON.stringify(opened));
+		ok('...with the cursor in Kind of server', !!opened && opened.focused);
 		ok('the Settings box has the add form', await page.$('#lpn_gis_add') !== null);
 		const form = await page.evaluate(() => {
 			const u = document.getElementById('lpn_gis_url'), k = document.getElementById('lpn_gis_kind'), col = u.parentNode.getBoundingClientRect();
@@ -208,7 +222,7 @@ async function main() {
 				opts: Array.from(k.options).map((o) => o.textContent) };
 		});
 		ok('the address box fills the value column', form.uw >= 120, JSON.stringify(form));
-		ok('the kind box shows its whole text', form.ksw <= form.kcw + 1 && form.opts.join() === 'Tile URL,WMS,ArcGIS MapServer', JSON.stringify(form));
+		ok('the kind box shows its whole text', form.ksw <= form.kcw + 1 && form.opts.join() === 'Tile URL,WMS,ArcGIS REST (MapServer)', JSON.stringify(form));
 
 		console.log('\n--- 3. the four kinds draw, in place ---');
 		await addLayer('xyz', S + '/xyz/{z}/{x}/{y}.png');
@@ -311,6 +325,7 @@ async function main() {
 		await reopen(false);
 		const q = asked();
 		console.log('  (questions asked: ' + a.dialogs.length + ')');
+		ok('the prompt says the project requests background layers', /^This project requests background layers from: /.test(q) && q.indexOf('Drawing them sends the area on screen and your IP address') > 0, q.slice(0, 120));
 		ok('reopening asks, naming the host', a.dialogs.length >= 1 && q.indexOf('127.0.0.1:' + stub.port) >= 0 && q.indexOf(askText.split('{hosts}')[0]) === 0 && /Draw them\?$/.test(q), q.slice(0, 200));
 		ok('the box offers Draw them and Not now', await page.evaluate(async ([t, y, n]) => {
 			delete window.lpnDialogAnswerer;

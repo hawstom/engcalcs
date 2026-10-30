@@ -3446,6 +3446,7 @@ EngCalcs.pageConfig = {
 	lpn_gis_url: <?=json_encode($ec_lang['lpn_gis_url'])?>,
 	lpn_gis_wms_layers: <?=json_encode($ec_lang['lpn_gis_wms_layers'])?>,
 	lpn_gis_add: <?=json_encode($ec_lang['lpn_gis_add'])?>,
+	lpn_gis_menu: <?=json_encode($ec_lang['lpn_gis_menu'])?>,
 	lpn_gis_draw: <?=json_encode($ec_lang['lpn_gis_draw'])?>,
 	lpn_gis_opacity: <?=json_encode($ec_lang['lpn_gis_opacity'])?>,
 	lpn_gis_note: <?=json_encode($ec_lang['lpn_gis_note'])?>,
