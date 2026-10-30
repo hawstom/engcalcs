@@ -891,7 +891,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**107 still to read**, of 150 new keys across 11 unmerged branch(es).
+**108 still to read**, of 151 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -902,11 +902,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`7b62eb90b`) — already merged into feat/gis-background; its strings are listed there
+### box-design (`42dbd7128`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`3dbae68e1`) — 41 new, 41 to read @@ NEEDS RULING
+### feat/dxf-import (`7f73816d2`) — 42 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_dxf_curve_points`**
   > Pump head curve points (flow, head)
@@ -916,6 +916,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_dxf_note_headloss`**
   > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
+  @@ NEEDS RULING
+- **`lpn_dxf_sections_header`**
+  > EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.
   @@ NEEDS RULING
 - **`lpn_dxfnet_count_customers`**
   > {n} customers.
@@ -1032,8 +1035,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
   @@ NEEDS RULING
 
-### feat/gis-background (`166e90b32`) — adds no English strings
-
 ### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_export_table_scn_keeps`**
@@ -1072,8 +1073,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inpalt_shared`**
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
-
-### feat/native-quality (`0cc61c8ec`) — adds no English strings
 
 ### feat/report-widths (`5058a668e`) — adds no English strings
 
@@ -1238,8 +1237,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
-
-### feat/theme-of-day (`24665fe63`) — adds no English strings
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 

@@ -95,17 +95,18 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-30 afternoon (fifty-first session, Opus main, Sonnet agents)
+## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
 
-- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task now waits on him or a sprint; do not start a fresh slice.
-- **Merged on his word:** `feat/native-quality` (Task 733 quality phase, unwired).
-- **Waiting his browser pass:** `box-design` round 7 (8103: Settings label column floor, his Page bug; phone flyouts full height like PC, a dragged `dockH` still wins; open question whether full height crowds out "tap a junction, then a pipe"); `feat/dxf-import` round 4 (8101: one MTEXT with width 41 and a header key `lpn_dxf_sections_header`, English only, waits his word; Net3's text column is ~5x the network's height; old layer name C-WATR-EPANET-INP no longer read; a `;` comment line inside a section is dropped on import, older than round 4).
-- **Waiting his word after his "Good"/"OK", not a typed "merge":** `feat/gis-background` round 3 (8105), `feat/theme-of-day` (8106). `feat/report-widths` (8110, his "Merge" stands) rides on box-design. Rebase chain: box-design first, then gis-background and report-widths.
-- **Parked on his word:** `feat/import-alternative` (8107, Task 814 q3): *"Ask me later. I am not ready to deal with this task."* Do not touch or re-ask unprompted.
-- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any agent merge, compare a key's count across branches.
+- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task waits on him or a sprint; do not start a fresh slice.
+- **Merged on his typed word 10-30:** `feat/theme-of-day` and `feat/gis-background` (Task 720 closed). **gis-background carried 197 box-design commits (round 6)**, so master now holds box-design minus its round-7 and round-8 commits. Tasks 827/828/829 finish when box-design merges.
+- **box-design round 8, built this session from his round-7 phone pass** (*"Make the "Exit" button in the Select area help box exit only the box, not the mode ... Maybe the button needs to say "Close""*; *"The Properties box has an inappropriate lower width limit. Remove that limit ... this applies to the global style"*). He answered Yes to full-height phone boxes and readable Settings names. Read `git log master..box-design` and Perry's journal there before reporting on it; it waits his pass (port 8103).
+- **feat/dxf-import round 5:** his header wording applied (`7f73816d2`: "EPANET++ reads this text back when the DXF is imported"), recorded in `english-key-rulings.json`. He passed wrap, header and the tall column ("Yes"). Ready to merge on his typed word; English only until a sprint.
+- **Waiting his word:** `feat/report-widths` (8110, his "Merge" stands) rides on box-design. **Parked on his word:** `feat/import-alternative` (8107): *"Ask me later."* Do not touch or re-ask unprompted.
+- **CC shells (Tom asked 10-30 that the count be accurate):** before saying done, every background shell and agent this session started has exited or been stopped (TaskStop), and `ps` shows no `sleep` loop, `php -S`, or harness left by it. Agent briefs forbid polling loops and leftover servers. The final report states the count.
+- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any merge, run a three-way key-set comparison (master, branch, merge base) per language.
 - **Trap met (10-30):** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content.
-- **Trap met:** wrapping a harness in `flock` deadlocks it (NOT RUN after 280 s); the rule above applies to single harnesses too.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/c1728af5-5a12-46a9-b064-1b41f5eaa51b/scratchpad.
+- **Trap met (10-30):** `git merge` on master takes the author from the environment only for the commit it makes itself; a conflicted merge committed later in another shell call is authored as Tom. Export `GIT_AUTHOR_*` in the same call as the commit.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/9eca90e2-5a59-420c-8f3e-01d61c7e6527/scratchpad.
 
 ## STATE — 2026-10-30 small hours (forty-ninth session)
 
