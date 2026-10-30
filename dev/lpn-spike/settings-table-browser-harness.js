@@ -156,7 +156,7 @@ async function main() {
 		const H = helpers(a);
 		const L = async (k) => a.lang(k);
 		await a.goto('Looped-Network.php');
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await a.settle(1500);
 		await H.hideConsent();
 		await a.toolbarClick(await L('lpn_pane_toggle'));

@@ -61,7 +61,7 @@ async function main() {
 		const settle = (ms) => a.settle(ms);
 		await page.setViewportSize({ width: 1600, height: 1000 });
 		await a.goto('Looped-Network.php');
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await settle(1500);
 		await page.evaluate(() => {
 			let e = document.querySelector('.ec-consent-actions');
@@ -516,7 +516,7 @@ async function main() {
 		await settle(300);
 		await a.menuClick(await L('lpn_examples_menu'));
 		await settle(800);
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await settle(1500);
 		await page.evaluate(() => { let e = document.querySelector('.ec-consent-actions'); while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; } if (e) { e.style.display = 'none'; } });
 		await scenarioMenu(await L('lpn_scenario_basic'));

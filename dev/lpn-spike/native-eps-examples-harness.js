@@ -101,8 +101,10 @@ async function compare(file, text) {
 	const refused = EC.lpnNativeRunRefusals(model);
 	const r0 = EC.lpnNativeRun(model);
 	if (!text) {
-		ok(file + ' as shipped: refused by name, so the caller uses EPANET', refused.length > 0 && r0.refused === true,
-			refused.map((r) => r.code).join(', '));
+		// Most examples run water quality or state a full [ENERGY], which the loop refuses by name. The
+		// Community well (Task 823) states neither beyond a price and an efficiency, so it runs natively as shipped.
+		ok(file + (refused.length ? ' as shipped: refused by name, so the caller uses EPANET' : ' as shipped: runs in the built-in loop'),
+			refused.length > 0 ? r0.refused === true : r0.ok === true, refused.map((r) => r.code).join(', '));
 	}
 	const hadRules = !!(model.rules && model.rules.length);
 	if (!text && rulesInDoc && !hadRules) { ok(file + ' reaches the model with its rules', false, 'no rules on the model'); return; }

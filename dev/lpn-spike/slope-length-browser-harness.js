@@ -360,9 +360,9 @@ async function main() {
 		await closePopup();
 
 		// ---- 7 ------------------------------------------------------------------------------------
-		console.log('\n7. THE SHIPPED BASIC EXAMPLES (reported, not asserted)');
+		console.log('\n7. THE SHIPPED NET1 EXAMPLES (reported, not asserted)');
 		const fs = require('fs');
-		for (const [file, key] of [['Basic-example-US-units.lwn', 'lpn_ex_basic_us_title'], ['Basic-example-SI-units.lwn', 'lpn_ex_basic_si_title']]) {
+		for (const [file, key] of [['Net1-Scenarios.lwn', 'lpn_ex_net1_title'], ['Net1-Scenarios-SI.lwn', 'lpn_ex_net1_si_title']]) {
 			const was = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', file), 'utf8'));
 			const b = await Session.open(browser, 'slopelen-ex', { viewport: { width: 1500, height: 950 } });
 			await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
@@ -381,9 +381,7 @@ async function main() {
 				if (Math.abs(pct) > Math.abs(worst.pct)) { worst = { id: l.id, pct }; }
 			});
 			console.log('       largest: ' + worst.id + ' ' + worst.pct.toFixed(2) + '%');
-			// L6 runs from R2 (200) to J4 (60): 140 ft or m of rise over 420 of drawing.
-			ok(file + ' is brought to slope distance on open: L6 = sqrt(420^2 + 140^2 or 42^2)',
-				near(now.L6.len, slope(420, file.indexOf('US') >= 0 ? 140 : 42), 1e-6), now.L6.len);
+			ok(file + ' opens with every pipe at its stored length (no auto length is re-derived)', worst.pct === 0 || Math.abs(worst.pct) < 1e-9, worst.pct.toFixed(4) + '%');
 			ok('...and stamped as the current version', bDoc.v >= 13, String(bDoc.v));
 			ok(file + ' opens with no unsaved-work mark', !(await b.currentTabDirty()));
 			await b.close();

@@ -48,7 +48,7 @@ function ok(name, cond, extra) {
 
 async function setup(a, page, netKey) {
 	await a.goto(a.__url);
-	await a.openExampleCard(await a.lang(netKey));
+	await (netKey === 'lpn_ex_net1_title' ? a.openNet1Plain(await a.lang(netKey)) : a.openExampleCard(await a.lang(netKey)));
 	await a.settle(1500);
 	await page.evaluate(() => {
 		let e = document.querySelector('.ec-consent-actions');

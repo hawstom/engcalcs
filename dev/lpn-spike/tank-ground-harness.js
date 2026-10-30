@@ -183,7 +183,7 @@ function tokens(text, section) {
 	console.log('\n3. AN OLD PROJECT: base = ground = its old elevation, every number as it was');
 	// =============================================================================================
 	for (const f of ['Net1.lwn', 'Net3-Novato-CA-World.lwn']) {
-		const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', f), 'utf8'));
+		const raw = JSON.parse(fs.readFileSync(path.join(ROOT, f === 'Net1.lwn' ? 'dev/water-network-examples' : 'examples', f), 'utf8'));
 		const oldTanks = {};
 		raw.nodes.filter((n) => n.type === 'tank').forEach((n) => { oldTanks[n.id] = JSON.parse(JSON.stringify(n)); });
 		ok(f + ' is an old project (v' + raw.v + ') with tanks and no base field',

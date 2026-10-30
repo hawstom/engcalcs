@@ -115,8 +115,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const phone = (w, h) => ({ viewport: { width: w, height: h }, isMobile: true, hasTouch: true, deviceScaleFactor: 2.625 });
 	const EXAMPLES = ['lpn_ex_net3_si_title', 'lpn_ex_net3_title', 'lpn_ex_net2_si_title', 'lpn_ex_net2_title',
-		'lpn_ex_elm_street_title', 'lpn_ex_net1_si_title', 'lpn_ex_net1_title', 'lpn_ex_basic_si_title',
-		'lpn_ex_basic_us_title'];
+		'lpn_ex_elm_street_title', 'lpn_ex_net1_si_title', 'lpn_ex_net1_title'];
 	// The 1440 x 900 fit of each example before R-403, which a desktop must keep. Elm Street's was
 	// 1.265734716274574 until Task 807 (leader-keep) kept its 14 dragged labels on their own side,
 	// nearer their nodes; less lettering to frame, so the fit closes in. Checked by screenshot.
@@ -127,8 +126,7 @@ async function main() {
 		lpn_ex_net3_si_title: 0.09285952936161293, lpn_ex_net3_title: 0.02719966817844265,
 		lpn_ex_net2_si_title: 0.1722048547892766, lpn_ex_net2_title: 0.052488039708116024,
 		lpn_ex_elm_street_title: 1.4334291332773326, lpn_ex_net1_si_title: 26.1141072219296,
-		lpn_ex_net1_title: 7.959579890262752, lpn_ex_basic_si_title: 0.8257611638584945,
-		lpn_ex_basic_us_title: 0.825466326020089
+		lpn_ex_net1_title: 7.959579890262752
 	};
 	try {
 		for (const [w, h] of [[360, 800], [390, 844], [412, 915]]) {

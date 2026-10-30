@@ -114,8 +114,7 @@
 // clock, in label-batch-harness.js, and a saving worth defending is worth a countable guard.
 //
 // **THE NETWORK IS WRITTEN INTO THE PROJECT'S OWN STORAGE, which is the one place this file departs
-// from doing what a user does** — 256 junctions cannot be clicked out, and Insert's "[dev] Draw large
-// test network" builds 64. It writes the document format the page itself writes (specs/gallery.js
+// from doing what a user does** — 256 junctions cannot be clicked out. It writes the document format the page itself writes (specs/gallery.js
 // reads the same storage), and then RELOADS, so everything measured after that is the ordinary open
 // path with nothing stubbed.
 

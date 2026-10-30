@@ -671,7 +671,7 @@ async function run() {
 	for (const c of RULE_CASES) { await compare(c); }
 	console.log('-- slice 4: EPA\'s Net1 WITH the two rules the gallery ships on it (CLOCKTIME windows, tank 2 LEVEL in feet), and variations');
 	{
-		const text = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8')).rules.join('\n');
+		const text = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).rules.join('\n');
 		const withR = loadEpa('Net1.inp', false, false, text);
 		ok('Net1 carries both gallery rules', withR.model.rules.length === 2);
 		await compare({ name: 'Net1 with its controls AND the gallery rules, 24 h (pump 9)', model: withR.model, statusOf: '9', switches: 3 });
