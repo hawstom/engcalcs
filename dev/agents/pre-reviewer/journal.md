@@ -4676,3 +4676,12 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - (5) header gap 0 above grid in all PC boxes; none on single-row boxes (Full report, Calibration). Junction second run (Demand... Is active) has no header. Phone Description not cut. FIXED.
 - (6) pipe 196px = 1.52x p75 (as claimed), PRV 1.47x. (7) comma proper in ar fa ur ps zh. FIXED.
 - Shots: boxrows-1026/*-v2.png
+
+# Perry, feat/dxf-import e3b6c3e00, 2026-10-29 (Task 772 slice 1, DXF network import)
+- OBSERVED (real Chromium, menu route): Net1, Net3, lat/lon Net3 export to DXF and import back with all nodes and links, same IDs, types, ends, elevations, demands, diameters, lengths, roughness. Customers not exercised in my run (the branch harness does).
+- OBSERVED: lat/lon Net3 comes back as a projected project (EPSG:32610 UTM, metres), not geographic; map shows OSM attribution; node positions differ in stored x,y by design. Receipt does not mention the change of system.
+- OBSERVED: Net3 closed pipe 330 and closed pump 10 come back OPEN (receipt says only "pipe status" in the generic line). Net1 Calculate after import: N10 39.0 psi vs 127.54, pump flow 3865 vs 1866 gpm (pump 9 lost its curve, solves as a pipe). Stated in receipt but not that results will differ.
+- OBSERVED: map Text items (Tank, Source, Pump on Net1), initial quality (_initQuality), label positions (lx, ly, lside), demand patterns, custom property _custom_date_installed are not carried; Text items, initial quality and custom properties are NOT in the receipt's "not held" sentence.
+- OBSERVED: ezdxf (AC1015) add LINE on WALLS, save: exactly one extra receipt line, "(WALLS (1 LINE))", Net1 and Net3. Phone 390x844: File > Import > Network > DXF file reachable, receipt scrolls inside, OK visible, no sideways scroll.
+- OBSERVED: only lang.ec.en.php carries the 28 new keys (other 26 files none); German page still worked in branch harness (fallback).
+- Scratch scripts: scratchpad pv/ (lib.js, run1.js, run3.js).
