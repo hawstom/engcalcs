@@ -4686,3 +4686,9 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED: no reference to the removed cards in sw.php, sitemap, or the three landing sites (librewaternet editorial-review.md only mentions the two Basic examples in prose). Translated Net1/Net2/Net3/Elm/Valves descriptions still carry the old order (units first) and the old Net1 title.
 - Shots: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/3f74533f-715d-4c2a-a95d-24464ab34423/scratchpad/perry-starter/
 - OBSERVED full run_harnesses.sh on 490a07194: 614/620 pass. FAIL alone and pass on master: settings-table-browser, settings-table-owner-browser, table-export-dialog-browser, menu-mnemonic, theme-design-browser (amber/green "Calcul-ation" cut, section 12 Scenario manager on Net1), node-size-cap-browser (ENOENT examples/Net1.lwn). All open the Net1 card and assume the old plain file. zoomfurniture 1 fail (bootstrap tooltip page error) also fails on master. find, zoomfitlabels pass.
+
+## 2026-10-30 feat/import-alternative (Task 814) at e25a4e5eb
+- OBSERVED: builder's harness 32/32 passes. My own run: GeoJSON network door asks the same question, own/new/base all land correctly, one undo (all measured). Surveyed points ask Active topology only. Phone 390x844: dialog fits, no sideways scroll, Import/Cancel visible.
+- OBSERVED: the name field sits under "The Base alternative", not under "A new alternative"; reads as belonging to the wrong choice.
+- OBSERVED: with a shared alternative open (two scenarios name "Shared terrain"), "{scenario}'s own alternative" writes into the shared one; the other scenario changes silently; the label is false there. Receipt does name "Shared terrain".
+- My GeoJSON first attempt added no asset because I duplicated the name field, not a defect.
