@@ -222,10 +222,12 @@ const AGE_CASES = [
 	{ name: 'age: one pipe, constant 20 L/s (the far end reaches the travel time, 3534.3 s)', model: onePipe(AGE), tol: 0.5, reaches: 3500,
 		check: (e) => { const v = e.frames[e.frames.length - 1].qualities.J, want = Math.PI * 0.15 * 0.15 * 1000 / 0.02;
 			return { ok: Math.abs(v - want) < 60, why: `J at 6 h ${v.toFixed(1)} s, volume / flow ${want.toFixed(1)} s` }; } },
-	{ name: 'age: tank on a demand pattern, completely mixed, 48 h', model: lineWithTank({ quality: AGE }), tol: 1, reaches: 20 * H },
-	{ name: 'age: the same tank, two compartments (mixing zone 0.3)', model: lineWithTank({ quality: AGE, mixing: { model: '2COMP', fraction: 0.3 } }), tol: 1, reaches: 20 * H },
-	{ name: 'age: the same tank, first in first out', model: lineWithTank({ quality: AGE, mixing: { model: 'FIFO' } }), tol: 1, reaches: 20 * H },
-	{ name: 'age: the same tank, last in first out', model: lineWithTank({ quality: AGE, mixing: { model: 'LIFO' } }), tol: 1, reaches: 20 * H },
+	// linkTol 2 s on the tank cases: P2, the tank's own pipe, measured 0.98 s at 42 h (the tank's
+	// average age of 40 h meets the reservoir's minutes-old water in that pipe, both ways in a day).
+	{ name: 'age: tank on a demand pattern, completely mixed, 48 h', model: lineWithTank({ quality: AGE }), tol: 1, linkTol: 2, reaches: 20 * H },
+	{ name: 'age: the same tank, two compartments (mixing zone 0.3)', model: lineWithTank({ quality: AGE, mixing: { model: '2COMP', fraction: 0.3 } }), tol: 1, linkTol: 2, reaches: 20 * H },
+	{ name: 'age: the same tank, first in first out', model: lineWithTank({ quality: AGE, mixing: { model: 'FIFO' } }), tol: 1, linkTol: 2, reaches: 20 * H },
+	{ name: 'age: the same tank, last in first out', model: lineWithTank({ quality: AGE, mixing: { model: 'LIFO' } }), tol: 1, linkTol: 2, reaches: 20 * H },
 	{ name: 'age: a tank that fills to its limit and stays full (FIFO)', model: lineWithTank({ quality: AGE, q: 12, level: 2, max: 3, dia: 10, mixing: { model: 'FIFO' } }), tol: 1, reaches: 5 * H },
 	{ name: 'age: a tank that fills to its limit and stays full (LIFO)', model: lineWithTank({ quality: AGE, q: 12, level: 2, max: 3, dia: 10, mixing: { model: 'LIFO' } }), tol: 1, reaches: 5 * H },
 	// linkTol: PD is the dead end (measured 34 s on an age of 48 h).
@@ -241,7 +243,7 @@ const AGE_CASES = [
 	{ name: 'age: quality step stated (60 s), report step 30 min', model: (() => { const m = twoSources(AGE);
 		m.time.times = Object.assign(m.time.times, { qualityStep: 60, reportStep: H / 2, duration: 24 * H }); return m; })(), tol: 10, linkTol: 20, reaches: 5 * H },
 	{ name: 'age: hydraulic step 30 min, quality step its default (180 s)', model: (() => { const m = lineWithTank({ quality: AGE, mixing: { model: 'FIFO' } });
-		m.time.times.hydraulicStep = H / 2; return m; })(), tol: 1, reaches: 20 * H }
+		m.time.times.hydraulicStep = H / 2; return m; })(), tol: 1, linkTol: 2, reaches: 20 * H }
 ];
 
 // ---- Q2: SOURCE TRACE ---------------------------------------------------------------------------------
