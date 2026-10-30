@@ -4155,14 +4155,15 @@ option:disabled { color: var(--ec-ink-muted); }
 /* The drag handle IS the top edge, which is where a hand aims. Tall enough to hit with a mouse
    and a real amount of pointer slop; the ruled line inside says "grab me" without a glyph. */
 .lpn-pane-grip {
-	height: 8px; cursor: row-resize; background: var(--ec-gray-f2f2f2);
-	border-bottom: 1px solid var(--ec-gray-e0e0e0); touch-action: none;
+	height: 8px; cursor: row-resize; background: transparent;
+	border-bottom: 0; touch-action: none;
 }
+/* A slim pill grabber (Material 3 drag handle, 32 x 4), never a grey slab; the transparent strip around it is the hit area. */
 .lpn-pane-grip::after {
-	content: ""; display: block; width: 3rem; height: 2px; margin: 3px auto 0;
+	content: ""; display: block; width: 32px; height: 4px; margin: 2px auto 0; border-radius: 2px;
 	background: var(--ec-gray-bbb);
 }
-.lpn-pane-grip:hover { background: var(--ec-gray-e8e8e8); }
+.lpn-pane-grip:hover::after { background: var(--ec-border-strong); }
 /* SEVEN TABS, AND THEY WRAP (Task 455). Tom chose wrapping over hiding five behind a type
    selector, so the strip is allowed to become two lines and the X stays pinned to the top-right
    rather than stretching down beside them. The pane's own height accounting reads the chrome by
@@ -5226,7 +5227,12 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 /* The column's inner edge: drag it to make the docked column wider or narrower. */
 .lpn-dock-grip {
 	position: fixed; z-index: 7; width: 8px; margin-left: -4px; cursor: col-resize; touch-action: none;
-	display: none;
+	display: none; background: transparent;
+}
+/* The visible part is a slim pill grabber, 4 x 32 (Material 3 drag handle); the strip around it is a transparent hit area. */
+.lpn-dock-grip::after {
+	content: ""; position: absolute; top: 50%; left: 50%; width: 4px; height: 32px; margin: -16px 0 0 -2px;
+	border-radius: 2px; background: var(--ec-gray-bbb);
 }
 .lpn-dock-grip.lpn-dock-grip-live { display: block; }
 /* A finger needs more than eight pixels to take an edge (Tom, 2026-10-24: *"the pinned box is unsizeable"*). */
@@ -5237,7 +5243,10 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	#lpn_dock_grip_right { width: 19px; margin-left: -10px; }
 	#lpn_dock_grip_left { width: 19px; margin-left: -9px; }
 }
-.lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
+.lpn-dock-grip:hover::after, .lpn-dock-grip:active::after { background: var(--ec-border-strong); }
+/* The bottom edge of a phone flyout that opens at half height: the same pill, lying down (32 x 4), in a transparent hit strip. */
+.lpn-dock-grip.lpn-dock-hgrip { width: auto; height: 19px; margin: -10px 0 0 0; cursor: row-resize; }
+.lpn-dock-grip.lpn-dock-hgrip::after { width: 32px; height: 4px; margin: -2px 0 0 -16px; }
 /* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
    narrows, and every overlay inside the wrapper moves with it. Never on paper. */
 .lpn-map-wrap { margin-left: var(--lpn-dock-ml, 0px); margin-right: var(--lpn-dock-mr, 0px); }
@@ -5519,13 +5528,13 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 /* The grip IS the left edge, the mirror of the bottom pane's top edge, and the same 8px of
    pointer slop. */
 .lpn-rpane-grip {
-	flex: 0 0 8px; cursor: col-resize; background: var(--ec-gray-f2f2f2);
-	border-right: 1px solid var(--ec-gray-e0e0e0); touch-action: none;
+	flex: 0 0 8px; cursor: col-resize; background: transparent;
+	border-right: 0; touch-action: none;
 }
 .lpn-rpane-grip::after {
-	content: ""; display: block; width: 2px; height: 3rem; margin: 1rem auto 0; background: var(--ec-gray-bbb);
+	content: ""; display: block; width: 4px; height: 32px; margin: 1rem auto 0; border-radius: 2px; background: var(--ec-gray-bbb);
 }
-.lpn-rpane-grip:hover { background: var(--ec-gray-e8e8e8); }
+.lpn-rpane-grip:hover::after { background: var(--ec-border-strong); }
 @media (pointer: coarse) {
 	/* The pane splitters (bottom pane's top edge, right pane's left edge): a 1 px line and an invisible 24 px hit area, no gray bar. */
 	.lpn-pane-grip { position: relative; height: 1px; background: var(--ec-border-strong); border-bottom: 0; }
@@ -5533,6 +5542,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	.lpn-rpane-grip { position: relative; flex: 0 0 1px; background: var(--ec-border-strong); border-right: 0; }
 	.lpn-rpane-grip::after { content: ""; position: absolute; top: 0; bottom: 0; left: -12px; width: 24px; height: auto; margin: 0; background: transparent; }
 	.lpn-pane-grip:hover, .lpn-rpane-grip:hover { background: var(--ec-border-strong); }
+	.lpn-pane-grip:hover::after, .lpn-rpane-grip:hover::after { background: transparent; }
 }
 .lpn-rpane { flex-direction: row; }
 .lpn-rpane-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }

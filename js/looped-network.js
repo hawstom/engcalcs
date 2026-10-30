@@ -66317,7 +66317,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
 	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
 	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockSoft = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -66884,6 +66884,58 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 	}
+	// **A FLYOUT ON A PHONE IN TALL MODE OPENS AT ABOUT HALF THE SCREEN'S HEIGHT** (Tom, 2026-10-29: "Don't cap the size. Just
+	// make the initial size reasonable"), so the map stays visible and tappable. Not a cap: its bottom edge carries a handle
+	// (#lpn_dock_hgrip) and a height dragged to is the box's own (`rec.dockH`, kept for the page load), up to the whole column.
+	function dockFlyShort() {
+		return smallScreen() && (window.innerHeight || 0) > (window.innerWidth || 0);
+	}
+	function dockFlyHeight(d, h) {
+		if (!dockFlyShort()) { return h; }
+		return Math.min(h, Math.max(LPN_DOCK_FLY_MIN_H, d.rec.dockH || Math.round((window.innerHeight || 844) * 0.5)));
+	}
+	function dockHGripEl() {
+		var el = document.getElementById('lpn_dock_hgrip');
+		if (!el) {
+			el = document.createElement('div');
+			el.id = 'lpn_dock_hgrip';
+			el.className = 'd-print-none lpn-dock-grip lpn-dock-hgrip';
+			el.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(el);
+			wireDockHGrip(el);
+		}
+		return el;
+	}
+	function placeDockHGrip(x, y, w, d, colH) {
+		var el = dockHGripEl();
+		el.lpnDock = x === null ? null : d;
+		el.lpnColH = colH;
+		el.classList.toggle('lpn-dock-grip-live', x !== null);
+		if (x === null) { return; }
+		el.style.zIndex = d.box.style.zIndex ? String(Number(d.box.style.zIndex) + 1) : '';
+		el.style.left = Math.round(x) + 'px';
+		el.style.top = Math.round(y) + 'px';
+		el.style.width = Math.round(w) + 'px';
+	}
+	function wireDockHGrip(el) {
+		var from = null;
+		el.addEventListener('pointerdown', function (e) {
+			var d = el.lpnDock;
+			if (!d) { return; }
+			from = { y: e.clientY, h: d.box.getBoundingClientRect().height, d: d };
+			el.lpnDragging = true;
+			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
+			e.preventDefault();
+		});
+		el.addEventListener('pointermove', function (e) {
+			if (!from) { return; }
+			from.d.rec.dockH = Math.round(Math.max(LPN_DOCK_FLY_MIN_H, Math.min(el.lpnColH || 9999, from.h + e.clientY - from.y)));
+			layoutDocks();
+		});
+		['pointerup', 'pointercancel'].forEach(function (evt) {
+			el.addEventListener(evt, function () { from = null; el.lpnDragging = false; });
+		});
+	}
 	function dockPlace(d, x, y, w, h, mode) {
 		var b = d.box;
 		b.style.setProperty('--lpn-dock-x', Math.round(x) + 'px');
@@ -66946,7 +66998,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function layoutDocks() {
 		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
-			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
+			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n, hgrip = false;
 		dockQueued = false;
 		if (!wrap) { return; }
 		dockBoxes.forEach(function (d) {
@@ -67017,18 +67069,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			S.auto.forEach(function (d) {
 				var w = clampDockW(dockWidthOf(d), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true),
 					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
-				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
+				dockPlace(d, ax, top, w, d === dockFlyout ? dockFlyHeight(d, h) : h, d === dockFlyout ? 'out' : 'tucked');
 			});
 			renderDockStrip(s, S.auto.concat(S.pinned).sort(dockByOrd), s === 'left' ? outerL : outerR - c.strip, top, h);
 			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
 			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
 			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
 				w = clampDockW(dockWidthOf(dockFlyout), Math.floor(outerR - outerL - c.strip - dockOppReserve(s, col)), true);
-				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
+				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, dockFlyHeight(dockFlyout, h), [dockFlyout]);
+				if (dockFlyShort()) { placeDockHGrip(s === 'left' ? outerL + c.strip : outerR - c.strip - w, top + dockFlyHeight(dockFlyout, h), w, dockFlyout, h); hgrip = true; }
 			} else {
 				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
 			}
 		});
+		if (!hgrip) { placeDockHGrip(null); }
 		if (want.left !== dockMargins.left || want.right !== dockMargins.right) {
 			dockMargins = want;
 			wrap.style.setProperty('--lpn-dock-ml', want.left + 'px');
@@ -67043,8 +67097,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!g || g.lpnDockList !== undefined && g.lpnDockList[0] !== d) { return false; }
 		return !!g.lpnDragging || g.matches(':hover');
 	}
+	function dockHGripHeld() {
+		var g = document.getElementById('lpn_dock_hgrip');
+		return !!g && (!!g.lpnDragging || g.matches(':hover'));
+	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d); } catch (e) { return false; }
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockHGripHeld() || dockOwnMenuHovered(d); } catch (e) { return false; }
 	}
 	// **A RIGHT-CLICK MENU A BOX OPENED IS PART OF THAT BOX** (Tom, 2026-10-12: *"In Scenario Manager,
 	// any right-click action hides the box. (F2 does not.)"*). The menu is drawn on the page's body,
@@ -75792,7 +75850,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (a === null) { return; }   // no pipes drawn: nothing to match, and nothing to say
 			setRotation(a);
 		});
-		fields.appendChild(matchBtn);
+		// The two buttons stand in a full-width row of their own under the Angle row, as the DEM buttons stand under Elevation
+		// (Tom, 2026-10-29: "Can we manage their layout like the DEM buttons?").
+		var rotBtns = document.createElement('div');
+		rotBtns.className = 'lpn-elev-dem lpn-rot-btns';
+		rotBtns.appendChild(matchBtn);
+		fields.appendChild(rotBtns);
 		// +180 and nothing else. It exists because the readable normalisation in readableAngle()
 		// picks the half-turn that reads left to right, and on a near-vertical pipe either choice
 		// is defensible -- so the user gets the other one on request, rather than an automatic rule
@@ -75801,7 +75864,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		flipBtn.type = 'button';
 		flipBtn.textContent = pc.lpn_field_text_flip || 'Turn 180°';
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
-		fields.appendChild(flipBtn);
+		rotBtns.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, lb, 'rot');
 		var here = textLabelPoint(lb);
