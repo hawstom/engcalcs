@@ -6167,7 +6167,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    and which is the correct last resort. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
-#lpn_labels_customer_fields { min-width: 14.88rem; }   /* 15.3rem less the three narrowed columns, 3 x 0.14rem (Tom, 2026-10-27: 0.000, Show and Drop to the heading's width) */
+#lpn_labels_customer_fields { min-width: min(14.88rem, 100%); }   /* 15.3rem less the three narrowed columns, 3 x 0.14rem (Tom, 2026-10-27: 0.000, Show and Drop to the heading's width) */
 /* No spinner on the two-digit boxes: its hover arrows covered the digits of a 35 px box. Arrow keys still step. */
 #lpn_labels_node_fields input.lpn-digit,
 #lpn_labels_link_fields input.lpn-digit,
@@ -7193,7 +7193,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.85rem !important; }
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields,
-		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields { min-width: 14.88rem; }
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields { min-width: min(14.88rem, 100%); }
 	}
 
 	/* **AND BELOW 340px THE COLUMNS NARROW AGAIN** (Task 760): at 320px the pane is 170px, and 11.4rem

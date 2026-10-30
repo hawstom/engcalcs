@@ -2,7 +2,9 @@
 //   node dev/lpn-spike/box-phone7-browser-harness.js   (takes the browser lock itself)
 //   A. no name column is crushed: on a phone (touch), at 390, 360 and 320 px wide (Tom's phone showed Settings > Page one letter wide), every Settings section's names are at least 5 characters wide,
 //      and so are the names of Properties, Find and replace, Fire flow and Criticality;
-//   B. a phone flyout opens tall (the column's whole height) (a dragged `dockH` still wins: box-phone5 C and box-phone6 C).
+//   B. a phone flyout opens tall (the column's whole height, less the room its bottom pill needs) (a dragged `dockH` still wins: box-phone5 C and box-phone6 C);
+//   C. at 390, 360 and 320 px no Settings section scrolls sideways (scrollWidth <= clientWidth + 1 on the pane);
+//   D. the flyout's bottom pill lies wholly on screen and dragging it up shortens the box, on short screens (320 x 640, 320 x 700, 360 x 640).
 // EC_SHOTS=<dir> saves box7-*.png there.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -76,7 +78,7 @@ async function main() {
 			const P = S.page;
 			const n = await P.evaluate(() => document.querySelectorAll('#lpn_setbox_index .lpn-setbox-link').length);
 			ok('the Settings index lists its sections', n >= 15, String(n));
-			let bad = [];
+			let bad = [], wide = [];
 			for (let i = 0; i < n; i++) {
 				await P.evaluate(() => { const b = document.querySelector('#lpn_setbox_jump'); if (b) { b.click(); } });
 				await S.settle(200);
@@ -85,9 +87,12 @@ async function main() {
 				const m = await narrowest(S, '#lpn_setbox_content', '.lpn-set-row > :first-child, .lpn-set-name');
 				if (process.env.EC_DEBUG && m) { console.log('    ' + t + ' ' + JSON.stringify(m)); }
 				if (m && m.ch < MIN_CHARS) { bad.push(t + ' "' + m.t + '" ' + Math.round(m.w) + 'px'); }
+				const sw = await P.evaluate(() => ['lpn_setbox_content', 'lpn_setbox_index'].map((id) => { const e = document.getElementById(id); return e ? e.scrollWidth - e.clientWidth : 0; }));
+				if (Math.max.apply(null, sw) > 1) { wide.push(t + ' +' + Math.max.apply(null, sw) + 'px'); }
 				if (t === 'Page') { await shot(S, 'box7-settings-page-phone' + (vw === 390 ? '' : '-' + vw) + '.png'); }
 			}
 			ok('no Settings name is narrower than ' + MIN_CHARS + ' characters in any of the ' + n + ' sections', bad.length === 0, bad.join(' | '));
+			ok('C. no Settings section scrolls sideways at ' + vw + ' px (scrollWidth <= clientWidth + 1)', wide.length === 0, wide.join(' | '));
 			ok('no page error', S.errors.length === 0, S.errors.join(' | '));
 			await S.close();
 		}
@@ -128,6 +133,28 @@ async function main() {
 			console.log('  ' + JSON.stringify(g));
 			ok('the Settings flyout is at least 75% of the map column tall', g.h >= 0.75 * (g.cbottom - g.ctop), Math.round(g.h) + ' of ' + Math.round(g.cbottom - g.ctop));
 			await shot(S, 'box7-settings-phone.png');
+			await S.close();
+		}
+
+		console.log('\n--- D. the bottom pill on short screens ---');
+		for (const [w, h] of [[320, 640], [320, 700], [360, 640]]) {
+			const S = await Session.open(browser, NAME + '-d' + w + 'x' + h, { viewport: { width: w, height: h }, hasTouch: true, isMobile: true });
+			await openNet1(S, 100);
+			await S.menuClick(await S.lang('lpn_tool_settings'), 'project');
+			await S.settle(900);
+			const info = () => S.page.evaluate(() => { const b = document.getElementById('lpn_settings_box').getBoundingClientRect(), g = document.getElementById('lpn_dock_hgrip'), r = g.getBoundingClientRect();
+				return { h: Math.round(b.height), gt: r.top, gb: r.bottom, x: r.left + r.width / 2, y: r.top + r.height / 2, shown: getComputedStyle(g).display !== 'none', vh: innerHeight }; });
+			const z = await info();
+			ok(w + 'x' + h + ': the bottom pill is there and its touch strip lies wholly on screen', z.shown && z.gb <= z.vh, JSON.stringify(z));
+			const cdp = await S.page.context().newCDPSession(S.page);
+			const tp = (type, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: z.x, y, id: 1 }] });
+			await tp('touchStart', z.y);
+			for (let i = 1; i <= 8; i++) { await tp('touchMove', z.y - i * 30); await S.settle(30); }
+			await tp('touchEnd', 0);
+			await S.settle(400);
+			const z2 = await info();
+			ok(w + 'x' + h + ': dragging the pill up makes the box shorter', z2.h < z.h - 100, z.h + ' -> ' + z2.h);
+			ok('no page error', S.errors.length === 0, S.errors.join(' | '));
 			await S.close();
 		}
 	} finally {

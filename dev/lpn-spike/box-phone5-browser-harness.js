@@ -175,7 +175,7 @@ async function main() {
 			console.log('  ' + dev.n + ' ' + JSON.stringify(z));
 			if (dev.touch) {
 				ok(dev.n + ': opens at the full column height (>= 80% of the screen height), as on a PC', z.out && z.frac >= 0.8, JSON.stringify(z));
-								ok(dev.n + ': a bottom handle is there to drag it taller', !!z.hg, JSON.stringify(z.hg));
+				ok(dev.n + ': a bottom handle is there to drag it taller', !!z.hg, JSON.stringify(z.hg));
 				await shot(S, 'box5-props-' + dev.tag + '.png');
 				if (z.hg) {
 					const cdp = await P.context().newCDPSession(P);

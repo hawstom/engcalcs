@@ -61156,7 +61156,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		input.type = 'number'; input.step = 'any'; input.min = '0'; input.setAttribute('inputmode', 'decimal');
 		// **THE SAME WIDTH ON BOTH ROWS** (Tom, 2026-09-23 pre-review: the customer box was 2.6rem,
 		// the all-labels box 7em -- visibly narrower for no reason tied to what either box holds).
-		input.style.width = '7em'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
+		input.style.width = '7em'; input.style.maxWidth = '100%'; input.style.flex = '0 0 auto'; input.style.boxSizing = 'border-box';
 		if (spec.id) { input.id = spec.id; }
 		input.placeholder = pc.lpn_settings_label_always || 'Always show';
 		input.setAttribute('aria-label', spec.label || pc.lpn_settings_label_max_width ||
@@ -66274,7 +66274,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
 	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
 	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_HGRIP_REACH = 10, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockSoft = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -66879,6 +66879,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function dockFlyHeight(d, h) {
 		if (!dockFlyShort()) { return h; }
+		// The bottom pill's touch strip is centred on the box's bottom edge and reaches LPN_DOCK_HGRIP_REACH below it, so
+		// a box ending flush with the screen put half the strip off it, where a finger (or the OS gesture bar) cannot take hold.
+		h = Math.max(LPN_DOCK_FLY_MIN_H, h - LPN_DOCK_HGRIP_REACH);
 		return d.rec.dockH ? Math.min(h, Math.max(LPN_DOCK_FLY_MIN_H, d.rec.dockH)) : h;
 	}
 	function dockHGripEl() {
