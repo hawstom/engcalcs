@@ -46445,19 +46445,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		(doc.patterns || []).forEach(function (p) { patternIds[p.id] = true; });
 		function touch(el) { var k = elGroup(el) + '\u0000' + el.id; if (!seen[k]) { seen[k] = 1; touched.push(el); } }
 		plan.changes.forEach(function (c) {
-			setProp(c.el, c.prop, c.newV);
-			// The file's own characters ride with the number, in Base only: a scenario's override holds
-			// a number and nothing else, and an exporter believes a token only while it parses to the
-			// stored value, so a stale one is harmless.
-			if (inBaseFor(categoryOf(c.prop, elGroup(c.el))) && c.tok !== undefined && parseFloat(c.tok) === c.newV) {
-				(c.el.tok || (c.el.tok = {}))[c.key] = c.tok;   // base-write: the file's text for a number the user's file stated
-			}
-			if (c.prop === 'length' && inBaseFor(categoryOf('length', 'link'))) { c.el.lenAuto = false; }
+			// Question 3 (importAltIn()): a category sent to the Base alternative is written with Base open.
+			importAltIn(plan.route, categoryOf(c.prop, elGroup(c.el)), function () {
+				setProp(c.el, c.prop, c.newV);
+				// The file's own characters ride with the number, in Base only: a scenario's override holds
+				// a number and nothing else, and an exporter believes a token only while it parses to the
+				// stored value, so a stale one is harmless.
+				if (inBaseFor(categoryOf(c.prop, elGroup(c.el))) && c.tok !== undefined && parseFloat(c.tok) === c.newV) {
+					(c.el.tok || (c.el.tok = {}))[c.key] = c.tok;   // base-write: the file's text for a number the user's file stated
+				}
+				if (c.prop === 'length' && inBaseFor(categoryOf('length', 'link'))) { c.el.lenAuto = false; }
+			});
 			touch(c.el);
 		});
 		if (!plan.notAdded) {
 			var geo = isLatLonProject();
-			plan.addedNodes.forEach(function (id) {
+			plan.addedNodes.forEach(function (id) { importAltIn(plan.route, 'topology', function () {
 				var r = plan.rec.nodes.filter(function (n) { return n.id === id; })[0], raw = plan.rawNode[id],
 					n = addNode(r.type, inwardX(raw.x), inwardY(raw.y), id), k;
 				for (k in r) {
@@ -46474,8 +46477,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (n.demandPattern && !patternIds[n.demandPattern]) { stripped.push(inpTL(r.type, id)); delete n.demandPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				if (n.headPattern && !patternIds[n.headPattern]) { stripped.push(inpTL(r.type, id)); delete n.headPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(n);
-			});
-			plan.addedLinks.forEach(function (id) {
+			}); });
+			plan.addedLinks.forEach(function (id) { importAltIn(plan.route, 'topology', function () {
 				var r = plan.rec.links.filter(function (l) { return l.id === id; })[0], raw = plan.rawLink[id],
 					l = addLink(r.type, r.from, r.to, (raw.verts || []).map(function (v) { return { x: inwardX(v.x), y: inwardY(v.y) }; }), id), k;
 				for (k in r) {
@@ -46487,7 +46490,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (l._efficCurveId && !curveIds[l._efficCurveId]) { delete l._efficCurveId; }
 				if (l.speedPattern && !patternIds[l.speedPattern]) { stripped.push(inpTL(r.type, id)); delete l.speedPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(l);
-			});
+			}); });
 		}
 		plan.stripped = stripped.filter(function (v, i, a) { return a.indexOf(v) === i; });
 		return touched;
@@ -46533,6 +46536,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(nVals || nAdded ? ' ' + (pc.lpn_inpup_undo || 'Undo reverses all of it in one step.') : ''));
 			if (plan.newScn && !plan.newScn.none) {
 				p(importNewScenarioCreatedText(plan.newScn.name, plan.newScn.parent));
+			}
+			if (plan.altLines && plan.altLines.length && (nVals || nAdded)) {
+				p((pc.lpn_inpalt_receipt || 'Alternatives that received the values: {list}').replace('{list}', plan.altLines.join('; ') + '.'));
 			}
 			if (!nVals && !nAdded) { p((pc.lpn_inpup_nothing || 'Every value in the file that matches an asset here is already the same in {scenario}.').replace('{scenario}', scnName) +
 				(plan.newScn && plan.newScn.none ? ' ' + (pc.lpn_inpup_new_none || 'No scenario was created.') : '')); }
@@ -46614,31 +46620,47 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			plan = inpWithScenario(scn.id, makePlan);
 		}
-		if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
-			if (!snapped) { saveUndoSnapshot(); }
-			try {
-				touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan); });
-				afterPropertyEdits(touched);
-				refreshPopupIfOpen();
-			} catch (err) {
-				// A failure part way is never left as a half update: the one snapshot taken above goes back.
-				undo();
-				redoStack.length = 0;
-				openDialog(function (body) {
-					var e = document.createElement('p');
-					e.style.margin = '0 0 8px';
-					e.textContent = (pc.lpn_inpup_failed || 'The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}')
-						.replace('{project}', projectDisplayName(project)).replace('{reason}', String((err && err.message) || err));
-					body.appendChild(e);
-				}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }], { title: inpUpdateTitle(kind) });
-				return false;
+		function proceed() {
+			if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
+				if (!snapped) { saveUndoSnapshot(); }
+				try {
+					if (plan.route) { importAltPrepare(scn, plan.route, importPlanCategories(plan)); }
+					touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan); });
+					if (plan.route) { plan.altLines = importAltLines(scn, plan.route, importPlanCategories(plan)); }
+					afterPropertyEdits(touched);
+					refreshPopupIfOpen();
+				} catch (err) {
+					// A failure part way is never left as a half update: the one snapshot taken above goes back.
+					undo();
+					redoStack.length = 0;
+					openDialog(function (body) {
+						var e = document.createElement('p');
+						e.style.margin = '0 0 8px';
+						e.textContent = (pc.lpn_inpup_failed || 'The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}')
+							.replace('{project}', projectDisplayName(project)).replace('{reason}', String((err && err.message) || err));
+						body.appendChild(e);
+					}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }], { title: inpUpdateTitle(kind) });
+					return false;
+				}
+				setNotice((pc.lpn_inpup_status || 'Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).')
+					.replace('{project}', projectDisplayName(project)).replace('{file}', fileName).replace('{scenario}', scnName)
+					.replace('{n}', String(plan.changes.length)).replace('{a}', String(plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length)));
 			}
-			setNotice((pc.lpn_inpup_status || 'Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).')
-				.replace('{project}', projectDisplayName(project)).replace('{file}', fileName).replace('{scenario}', scnName)
-				.replace('{n}', String(plan.changes.length)).replace('{a}', String(plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length)));
+			showInpUpdateReceipt(plan, fileName, scnName, msxFile, kind);
+			return !plan.refused.length;
 		}
-		showInpUpdateReceipt(plan, fileName, scnName, msxFile, kind);
-		return !plan.refused.length;
+		// **QUESTION 3, WHICH ALTERNATIVE** (Task 814): asked only for the open scenario, with Basic mode
+		// off, and only for the categories this file writes. A new scenario makes its own alternative and
+		// Base is Base, so neither asks.
+		var cats = (!fresh && target !== 'base') ? importPlanCategories(plan) : [];
+		if (!plan.refused.length && cats.length && importAltAsk(scn)) {
+			askImportAlternatives(cats, (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName), scn, function (route) {
+				plan.route = route;
+				proceed();
+			}, function () { setNotice(pc.lpn_inpalt_cancelled || 'Nothing was changed.'); });
+			return true;
+		}
+		return proceed();
 	}
 	// The one small question. Asked only when the open project has something in it; an empty one
 	// takes the file as a new project, as it always did.
@@ -46743,6 +46765,129 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return null;
 		}
 		return v;
+	}
+	// **QUESTION 3: WHICH ALTERNATIVE RECEIVES THE VALUES** (Task 814, dev/import-export-scenarios.md 2c).
+	// Asked after the destination, only for the open scenario and only with Basic mode off (Basic mode
+	// hides alternatives; a new scenario makes its own; Base is Base), one choice per category the file
+	// writes: the scenario's own alternative (the default, and what a write always did), a NEW alternative
+	// that is a child of the one the scenario uses now (with a name), or the Base alternative, which is
+	// what every scenario inherits. A route is {category: {mode: 'own' | 'new' | 'base', name}}.
+	function importAltAsk(scn) { return !scenarioBasicMode && !!scn && !scn.isBase; }
+	// The categories a plan writes, in the order the manager lists them. An asset added is Active topology.
+	function importPlanCategories(plan) {
+		var seen = {};
+		(plan.changes || []).forEach(function (c) { seen[categoryOf(c.prop, elGroup(c.el))] = true; });
+		if (!plan.notAdded && ((plan.addedNodes || []).length || (plan.addedLinks || []).length)) { seen.topology = true; }
+		return LPN_ALT_CATEGORIES.filter(function (cat) { return seen[cat]; });
+	}
+	// What the scenario uses now for a category, as a tree key and a name: the parent of a new alternative.
+	function importAltParent(scn, cat) {
+		var c = smChoice(scn, cat), key = (c.id !== null && c.id !== undefined) ? c.id : (c.own ? smImplicitKey(c.via || scn, cat) : smBaseKey(cat));
+		return { key: key, name: smName(cat, key) };
+	}
+	// Runs `fn` as the Base alternative where the route says so: Base open and naming no alternative for the category.
+	function importAltIn(route, cat, fn) {
+		var r = route && route[cat], b;
+		if (!r || r.mode !== 'base') { return fn(); }
+		b = baseScenario();
+		return inpWithScenario(b.id, function () { return withBasePick(b, cat, null, fn); });
+	}
+	// Makes the new alternatives of a route, inside the caller's one undo step: a child of what the
+	// scenario uses (its own values in the category first become a stored alternative, so the parent is
+	// a real record), named by the visitor, and the scenario then names it.
+	function importAltPrepare(scn, route, cats) {
+		cats.forEach(function (cat) {
+			var r = route[cat], parentId, named, made, kept;
+			if (!r || r.mode !== 'new') { return; }
+			if (scenarioHoldsLocal(scn, cat)) {
+				kept = promoteStored(scn.id, cat, smUniqueName(cat, scenarioDisplayName(scn), smImplicitKey(scn, cat)));
+				parentId = kept && kept.id ? kept.id : null;
+			} else {
+				named = storedChoiceOf(scn, cat);
+				parentId = named === undefined ? inheritedStoredChoice(scn, cat) : (named === LPN_BASE_CHOICE ? null : named);
+			}
+			made = createStored('alt', cat, r.name, parentId);
+			if (made.refused) { r.mode = 'own'; return; }
+			assignStored('alt', scn.id, cat, made.id);
+		});
+	}
+	// "Physical: Peak", "Demand: Base": the alternative that took the values, for the receipt.
+	function importAltLines(scn, route, cats) {
+		return cats.map(function (cat) {
+			var r = route[cat] || { mode: 'own' }, c, name;
+			if (r.mode === 'base') { name = smName(cat, smBaseKey(cat)); }
+			else {
+				c = smChoice(scn, cat);
+				name = (c.id !== null && c.id !== undefined) ? smName(cat, c.id) : (c.own ? scenarioDisplayName(c.via || scn) : smName(cat, smBaseKey(cat)));
+			}
+			return altCategoryLabel(cat) + ': ' + name;
+		});
+	}
+	// The question. `go(route)` applies; `cancel()` leaves everything as it was. A headless harness answers
+	// through window.lpnInpAlternative ('own', 'new', 'base', or {category: {mode, name}}); the DOM stub
+	// that answers the destination alone gets 'own', which is what every write did before the question.
+	function askImportAlternatives(cats, title, scn, go, cancel, prior) {
+		var pc = EngCalcs.pageConfig || {}, seam = window.lpnInpAlternative, route = {}, ctrl = {}, buttons;
+		function defName(cat) { return smChildName(cat, importAltParent(scn, cat).key); }
+		if (seam !== undefined || typeof window.lpnInpDestination === 'string') {
+			cats.forEach(function (cat) {
+				var m = (seam && typeof seam === 'object') ? seam[cat] : seam;
+				if (m && typeof m === 'object') { route[cat] = { mode: m.mode || 'own', name: m.name || defName(cat) }; }
+				else { route[cat] = { mode: m || 'own', name: defName(cat) }; }
+			});
+			go(route);
+			return;
+		}
+		buttons = [{ label: pc.lpn_inpalt_go || 'Import', isDefault: true, fn: function () {
+			var bad = null;
+			cats.forEach(function (cat) {
+				var c = ctrl[cat], mode = c.radios.filter(function (r) { return r.checked; })[0].value, name = String(c.name.value || '').trim();
+				route[cat] = { mode: mode, name: name || defName(cat) };
+				if (mode === 'new' && smNameTaken(cat, route[cat].name)) { bad = bad || route[cat].name; }
+			});
+			if (bad !== null) {
+				setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace(/\{name\}/g, bad));
+				askImportAlternatives(cats, title, scn, go, cancel, route);
+				return;
+			}
+			go(route);
+		} }, { label: pc.lpn_cancel || 'Cancel', fn: cancel }];
+		openDialog(function (body) {
+			function p(t, bold) { var e = document.createElement('p'); e.style.margin = '0 0 8px'; if (bold) { e.style.fontWeight = 'bold'; } e.textContent = t; body.appendChild(e); return e; }
+			p(pc.lpn_inpalt_lead || 'This file changes values in the categories below. Choose the alternative that receives the values of each.');
+			p(pc.lpn_inpalt_base_note || 'Every scenario inherits the Base alternative, so choosing it changes them all.');
+			cats.forEach(function (cat) {
+				var parent = importAltParent(scn, cat), pr = prior && prior[cat], wrap = document.createElement('div'),
+					opts = [['own', (pc.lpn_inpalt_own || '{scenario}\'s own alternative').replace('{scenario}', scenarioDisplayName(scn))],
+						['new', (pc.lpn_inpalt_new || 'A new alternative, child of {parent}').replace('{parent}', parent.name)],
+						['base', pc.lpn_inpalt_base || 'The Base alternative']], radios = [], nameInp = document.createElement('input');
+				wrap.style.margin = '0 0 10px';
+				p((pc.lpn_inpalt_heading || 'Alternative for {category}').replace('{category}', altCategoryLabel(cat)), true);
+				opts.forEach(function (o) {
+					var lab = document.createElement('label'), inp = document.createElement('input');
+					lab.style.display = 'block';
+					inp.type = 'radio';
+					inp.name = 'lpn_inpalt_' + cat;
+					inp.value = o[0];
+					inp.id = 'lpn_inpalt_' + cat + '_' + o[0];
+					inp.checked = pr ? pr.mode === o[0] : o[0] === 'own';
+					lab.appendChild(inp);
+					lab.appendChild(document.createTextNode(' ' + o[1]));
+					wrap.appendChild(lab);
+					radios.push(inp);
+				});
+				nameInp.type = 'text';
+				nameInp.id = 'lpn_inpalt_' + cat + '_name';
+				nameInp.value = pr ? pr.name : defName(cat);
+				nameInp.title = pc.lpn_inpalt_name || 'Name of the new alternative';
+				nameInp.setAttribute('aria-label', pc.lpn_inpalt_name || 'Name of the new alternative');
+				nameInp.style.margin = '2px 0 0 20px';
+				nameInp.addEventListener('input', function () { radios[1].checked = true; });
+				wrap.appendChild(nameInp);
+				body.appendChild(wrap);
+				ctrl[cat] = { radios: radios, name: nameInp };
+			});
+		}, buttons, { title: title });
 	}
 	// **SURVEYED POINTS: WHERE DO THEY GO?** (Task 814, Tom's call 1.) Asked only when the project holds
 	// more than Base; with Base alone there is nothing to choose. `go(target, name)`, target 'open', 'base' or 'new'.
@@ -47781,7 +47926,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// With more than Base in the project the points are asked where they go (Task 814).
 				askSurveyDestination(function (target, newName) {
 					var from = activeScenario(), outcome, scn = from, made = null;
-					if (target === 'open') { showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan())); return; }
+					if (target === 'open' && !importAltAsk(from)) { showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan())); return; }
+					// Question 3 (Basic mode off): which Active topology alternative takes the new nodes.
+					if (target === 'open') {
+						askImportAlternatives(['topology'], pc.lpn_survey_where_title || 'Import surveyed points', from, function (route) {
+							var res, lines;
+							undoGroup = { taken: false };
+							try {
+								saveUndoSnapshot();
+								importAltPrepare(from, route, ['topology']);
+								res = importAltIn(route, 'topology', function () { return createSurveyNodes(parsed, assetType, plan()); });
+								if (route.topology.mode === 'base') { applyScenarioChange(); }
+							} finally { undoGroup = null; }
+							lines = importAltLines(from, route, ['topology']);
+							showSurveyReport(parsed, res, route.topology.mode === 'base' ? baseScenario() : undefined, null,
+								(pc.lpn_inpalt_receipt || 'Alternatives that received the values: {list}').replace('{list}', lines.join('; ') + '.'));
+						}, function () { setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.'); });
+						return;
+					}
 					// One undo step for the new scenario and its nodes together.
 					undoGroup = { taken: false };
 					try {
@@ -47936,7 +48098,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It
 	// used to open with the file's name in bold. The reader chose that file a moment ago and is
 	// looking at the box they asked for; what they do not know is how many points came out of it.
-	function showSurveyReport(parsed, outcome, scnGiven, madeUnder) {
+	function showSurveyReport(parsed, outcome, scnGiven, madeUnder, altLine) {
 		var pc = EngCalcs.pageConfig || {},
 			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes()),
 			svScn = scnGiven || activeScenario();
@@ -47948,6 +48110,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (madeUnder) {
 			lines = [{ text: importNewScenarioCreatedText(scenarioDisplayName(svScn), madeUnder), raw: null }].concat(lines);
 		}
+		// Question 3 answered: the Active topology alternative that took the nodes.
+		if (altLine) { lines = [{ text: altLine, raw: null }].concat(lines); }
 		openDialog(function (body) {
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
 			// should print the entire line with a much shorter message"*). The line is drawn in a
