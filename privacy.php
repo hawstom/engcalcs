@@ -172,7 +172,7 @@ site.</p>
 <p>Five features on the Looped Pipe Network map reach outside this site. The street map shows on
 the first, empty project the page opens, and Map, World map, Detach hides it. The other four wait
 for you. Three of them ask first and separately, because each sends something different; a
-background layer starts only when you add one. No other page in the suite uses any of them.</p>
+background layer starts only when you add one or agree to draw one. No other page in the suite uses any of them.</p>
 
 <table class="ec-legal-table">
 	<tr><th>Feature</th><th>What is sent</th><th>To</th></tr>
@@ -197,8 +197,9 @@ and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener
 When you add a layer, the page asks the server whose address you typed for map images of the area
 on screen, and asks again as you pan and zoom. That server sees your IP address, the area you are
 looking at, and that the request came from this site. Nothing is sent to it until you add a layer,
-and removing the layer ends the requests. The layer is saved in your project file, so opening that
-project later asks the server again. What the server does with the request is governed by its own
+or agree to draw the layers of a project you open, and removing the layer ends the requests. A layer
+is saved in your project file, so when you open that project later the page asks you before it
+contacts the server again. What the server does with the request is governed by its own
 privacy policy.</p>
 
 <h2>Where it goes</h2>

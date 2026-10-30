@@ -18118,10 +18118,9 @@ var EngCalcs = EngCalcs || {};
 		// **A GIS server's own statement goes in the same line** (Task 720): what the service says, or
 		// its host; text only, never markup. Shown whether or not the basemap is.
 		if (gisSpan && gisCredits.length) {
-			gisText = gisCredits.filter(function (t, n, a) { return t && a.indexOf(t) === n; })
-				.map(function (t) { return t.length > 200 ? t.slice(0, 200) + '\u2026' : t; }).join(' \u00b7 ');
+			gisText = gisCredits.filter(function (t, n, a) { return t && a.indexOf(t) === n; }).join(' | ');
 		}
-		if (gisSpan) { gisSpan.textContent = gisText; gisSpan.style.display = gisText ? 'inline' : 'none'; }
+		if (gisSpan) { gisSpan.textContent = gisText; gisSpan.title = gisText; gisSpan.style.display = gisText ? 'inline-block' : 'none'; }
 		c.style.display = (basemapOn() || gisText) ? 'block' : 'none';
 		which = basemapOn() ? basemapSource() : 'osm';
 		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
@@ -18480,13 +18479,40 @@ var EngCalcs = EngCalcs || {};
 	// which only the screenshot does, and snipInlineImage() already drops a tile it cannot read and the
 	// screenshot says so (`droppedGis`).
 	var gisLayerEl = null, gisGroups = [], gisEls = {}, gisInfo = {}, gisStat = {}, gisPaintedSig = '',
-		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null;
+		gisCredits = [], gisWant = {}, gisStructSig = '', gisPlaceSig = null,
+		// **NOTHING IS ASKED OF A SERVER UNTIL THE VISITOR SAYS SO** (Perry's review). A project opened
+		// from a file can name any server, so opening it draws none of its layers: gisAll is the visitor's
+		// "Draw them" for this open, gisPicked the layers they added or ticked since, gisAsked that the
+		// question has been put for this open. All three are reset when a project is opened.
+		gisAll = false, gisPicked = {}, gisAsked = false;
+	function gisPermitted(l) { return l.on !== false && (gisAll || !!gisPicked[gisPlainKey(l)]); }
+	function gisPlainKey(l) { return l.url + '|' + (l.layers || ''); }
+	function gisForgetAnswers() { gisAll = false; gisPicked = {}; gisAsked = false; }
+	// Once per open: names every host, and draws nothing until the visitor answers.
+	function gisAskOnce() {
+		var pc = EngCalcs.pageConfig || {}, hosts = [];
+		if (gisAsked) { return; }
+		gisLayers().forEach(function (l) {
+			var h = gisHost(l);
+			if (l.on !== false && !gisPicked[gisPlainKey(l)] && hosts.indexOf(h) < 0) { hosts.push(h); }
+		});
+		if (!hosts.length) { return; }
+		gisAsked = true;
+		askDialog({
+			kind: 'confirm',
+			text: (pc.lpn_gis_ask || 'This project draws background layers from: {hosts}. Opening them sends the area on screen and your IP address to those servers. Draw them?')
+				.replace('{hosts}', hosts.join(', ')),
+			ok: pc.lpn_gis_ask_yes || 'Draw them', cancel: pc.lpn_gis_ask_no || 'Not now'
+		}, function (yes) {
+			if (yes) { gisAll = true; refreshBasemap(); }
+		});
+	}
 	function gisLayers() { return (project && project.gisLayers) || []; }
 	function gisUsable() { return !!(EngCalcs.lpnGis && projectLocatable()); }
 	function gisSignature() {
-		return JSON.stringify(gisLayers().map(function (l) { return [l.kind, l.url, l.layers || '', l.on === false ? 0 : 1, l.opacity]; }));
+		return JSON.stringify(gisLayers().map(function (l) { return [l.kind, l.url, l.layers || '', gisPermitted(l) ? 1 : 0, l.opacity]; }));
 	}
-	function gisLayerKey(i, l) { return i + '|' + l.url + '|' + (l.layers || ''); }
+	function gisLayerKey(i, l) { return gisPlainKey(l); }
 	function gisEmpty() {
 		var k;
 		for (k in gisEls) { if (gisEls.hasOwnProperty(k) && gisEls[k].remove) { gisEls[k].remove(); } }
@@ -18510,6 +18536,9 @@ var EngCalcs = EngCalcs || {};
 		var st = gisStat[gisLayerKey(i, l)], pc = EngCalcs.pageConfig || {};
 		if (!st || st.ok > 0 || st.told) { return; }
 		st.told = true;
+		Array.prototype.forEach.call(document.querySelectorAll('.lpn-gis-bad'), function (e) {
+			if (e.getAttribute('data-gis-key') === gisLayerKey(i, l)) { e.textContent = ' (' + (pc.lpn_gis_unreachable || 'not reachable') + ')'; }
+		});
 		setNotice((pc.lpn_gis_failed || '{host} did not return a map image. Its layer is not drawn.')
 			.replace('{host}', gisHost(l)));
 	}
@@ -18540,6 +18569,7 @@ var EngCalcs = EngCalcs || {};
 		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
 			return;   // refreshBasemap() asks again when the transform has loaded
 		}
+		gisAskOnce();
 		// A layer added, removed or edited rebuilds the pile; opacity and on/off change only below.
 		var structure = JSON.stringify(list.map(function (l) { return [l.kind, l.url, l.layers || '']; }));
 		if (structure !== gisStructSig) { gisEmpty(); gisStructSig = structure; }
@@ -18569,8 +18599,8 @@ var EngCalcs = EngCalcs || {};
 			var g = gisGroups[idx], key = gisLayerKey(idx, l), info = null, src, tiles, st;
 			if (!g) { g = gisGroups[idx] = el('g', { 'class': 'lpn-gis-layer' }, gisLayerEl); }
 			g.setAttribute('opacity', String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1));
-			g.style.display = l.on === false ? 'none' : '';
-			if (l.on === false) { return; }
+			g.style.display = gisPermitted(l) ? '' : 'none';
+			if (!gisPermitted(l)) { return; }
 			if (l.kind === 'arcgis') {
 				gisFetchInfo(l, function () { refreshBasemap(); });
 				info = gisInfo[l.url];
@@ -43673,6 +43703,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// labelSettings and settings blocks below spell out: a key added after this save was written
 		// must come back at its default, not as undefined.
 		project = Object.assign({ name: '', activeScenario: 'base' }, saved.project || {});
+		gisForgetAnswers();   // a project just opened asks again before it contacts any server (Task 720)
 		scenarios = Array.isArray(saved.scenarios) && saved.scenarios.length ? saved.scenarios : defaultScenarios();
 		// Two structural guarantees the rest of the model leans on, restored here rather than
 		// trusted: exactly one Base exists, and the active scenario names a scenario that is really
@@ -63830,23 +63861,38 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return;
 			}
 			var kindNames = {
-				xyz: pc.lpn_gis_kind_xyz || 'Tile URL ({z}/{x}/{y})',
-				wms: pc.lpn_gis_kind_wms || 'WMS server',
+				xyz: pc.lpn_gis_kind_xyz || 'Tile URL',
+				wms: pc.lpn_gis_kind_wms || 'WMS',
 				arcgis: pc.lpn_gis_kind_arcgis || 'ArcGIS MapServer'
 			};
+			// One block per layer: its kind and host in plain sight (and a mark when the server did not
+			// answer this session), then Draw, Opacity and Remove with their words beside them.
 			gisLayers().forEach(function (l, idx) {
-				var grp = document.createElement('span'), on = document.createElement('input'),
-					op = document.createElement('input'), rm = document.createElement('button');
-				grp.className = 'lpn-set-ctlgroup';
-				on.type = 'checkbox'; on.checked = l.on !== false; on.className = 'lpn-gis-on';
-				on.setAttribute('aria-label', pc.lpn_gis_draw || 'Draw');
+				var item = document.createElement('div'), name = document.createElement('div'),
+					bad = document.createElement('span'), grp = document.createElement('div'),
+					onL = document.createElement('label'), on = document.createElement('input'),
+					opL = document.createElement('label'), op = document.createElement('input'),
+					rm = document.createElement('button'), st = gisStat[gisLayerKey(idx, l)];
+				item.className = 'lpn-gis-item';
+				name.className = 'lpn-gis-name';
+				name.textContent = kindNames[l.kind] + ': ' + gisHost(l) + (l.layers ? ' (' + l.layers + ')' : '');
+				bad.className = 'lpn-gis-bad';
+				bad.setAttribute('data-gis-key', gisLayerKey(idx, l));
+				bad.textContent = (st && st.told && st.ok === 0) ? ' (' + (pc.lpn_gis_unreachable || 'not reachable') + ')' : '';
+				name.appendChild(bad);
+				grp.className = 'lpn-gis-controls';
+				on.type = 'checkbox'; on.className = 'lpn-gis-on'; on.checked = gisPermitted(l);
+				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Draw')));
 				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
 				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
-				op.setAttribute('aria-label', pc.lpn_gis_opacity || 'Opacity (0 to 1)');
+				op.setAttribute('inputmode', 'decimal');
+				opL.appendChild(document.createTextNode((pc.lpn_gis_opacity || 'Opacity') + ' ')); opL.appendChild(op);
 				rm.type = 'button'; rm.className = 'lpn-gis-remove'; rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				on.addEventListener('change', function () {
 					var next = JSON.parse(JSON.stringify(gisLayers()));
-					next[idx].on = on.checked;
+					// Ticking Draw is the visitor asking for this layer, so it is also the answer for it.
+					if (on.checked) { gisPicked[gisPlainKey(l)] = true; next[idx].on = true; }
+					else { delete gisPicked[gisPlainKey(l)]; next[idx].on = false; }
 					gisSetLayers(next);
 				});
 				op.addEventListener('change', function () {
@@ -63862,8 +63908,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					gisSetLayers(next);
 					rebuildSettingsFields();
 				});
-				grp.appendChild(on); grp.appendChild(op); grp.appendChild(rm);
-				row(gisBody, kindNames[l.kind] + ': ' + gisHost(l) + (l.layers ? ' (' + l.layers + ')' : ''), grp);
+				grp.appendChild(onL); grp.appendChild(opL); grp.appendChild(rm);
+				item.appendChild(name); item.appendChild(grp);
+				gisBody.appendChild(item);
 			});
 			var kindSel = document.createElement('select'), urlIn = document.createElement('input'),
 				layersIn = document.createElement('input'), addBtn = document.createElement('button');
@@ -63871,28 +63918,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var opt = document.createElement('option');
 				opt.value = k; opt.textContent = kindNames[k]; kindSel.appendChild(opt);
 			});
-			kindSel.id = 'lpn_gis_kind';
-			urlIn.type = 'text'; urlIn.id = 'lpn_gis_url'; urlIn.setAttribute('autocomplete', 'off'); urlIn.setAttribute('spellcheck', 'false');
-			layersIn.type = 'text'; layersIn.id = 'lpn_gis_layers'; layersIn.setAttribute('autocomplete', 'off');
-			addBtn.type = 'button'; addBtn.id = 'lpn_gis_add'; addBtn.textContent = pc.lpn_gis_add || 'Add layer';
+			kindSel.id = 'lpn_gis_kind'; kindSel.className = 'lpn-gis-wide';
+			urlIn.type = 'text'; urlIn.id = 'lpn_gis_url'; urlIn.className = 'lpn-gis-wide';
+			urlIn.setAttribute('autocomplete', 'off'); urlIn.setAttribute('spellcheck', 'false');
+			layersIn.type = 'text'; layersIn.id = 'lpn_gis_layers'; layersIn.className = 'lpn-gis-wide'; layersIn.setAttribute('autocomplete', 'off');
+			addBtn.type = 'button'; addBtn.id = 'lpn_gis_add'; addBtn.className = 'lpn-gis-addbtn'; addBtn.textContent = pc.lpn_gis_add || 'Add layer';
 			row(gisBody, pc.lpn_gis_kind || 'Kind of server', kindSel);
 			row(gisBody, pc.lpn_gis_url || 'Server address', urlIn);
 			var layersRow = row(gisBody, pc.lpn_gis_wms_layers || 'WMS layer names (comma separated)', layersIn);
 			function showLayersRow() { layersRow.style.display = kindSel.value === 'wms' ? '' : 'none'; }
 			kindSel.addEventListener('change', showLayersRow);
 			showLayersRow();
-			row(gisBody, ' ', addBtn);
-			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent before you add one.');
+			gisBody.appendChild(addBtn);
+			note(gisBody, pc.lpn_gis_note || 'Adding a layer sends the area on screen, and your IP address, to the server you name. Nothing is sent until you add a layer, or agree to draw the layers of a project you open.');
 			addBtn.addEventListener('click', function (e) {
 				var res = EngCalcs.lpnGis.normalise({ kind: kindSel.value, url: urlIn.value, layers: layersIn.value });
 				if (e && e.preventDefault) { e.preventDefault(); }
 				if (!res.ok) {
-					setNotice(res.why === 'template' ? (pc.lpn_gis_err_template || 'A tile address must contain {z}, {x} and {y}.')
+					setNotice(res.why === 'template' ? (pc.lpn_gis_err_template || 'A tile URL must contain {z}, {x} and {y}.')
 						: res.why === 'layers' ? (pc.lpn_gis_err_layers || 'Enter at least one WMS layer name.')
 						: res.why === 'mapserver' ? (pc.lpn_gis_err_mapserver || 'An ArcGIS address must end with /MapServer.')
 						: (pc.lpn_gis_err_address || 'The server address must start with https://.'));
 					return;
 				}
+				gisPicked[gisPlainKey(res.layer)] = true;   // adding it is the visitor's yes for this layer
 				gisSetLayers(gisLayers().concat([res.layer]));
 				rebuildSettingsFields();
 			});

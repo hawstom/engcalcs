@@ -202,6 +202,13 @@ async function main() {
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await a.settle(600);
 		ok('the Settings box has the add form', await page.$('#lpn_gis_add') !== null);
+		const form = await page.evaluate(() => {
+			const u = document.getElementById('lpn_gis_url'), k = document.getElementById('lpn_gis_kind'), col = u.parentNode.getBoundingClientRect();
+			return { cols: getComputedStyle(u.parentNode).gridTemplateColumns, cssw: getComputedStyle(u).width, js: getComputedStyle(u).justifySelf, cls: u.className, uw: u.getBoundingClientRect().width, cw: col.width, kw: k.getBoundingClientRect().width, ksw: k.scrollWidth, kcw: k.clientWidth,
+				opts: Array.from(k.options).map((o) => o.textContent) };
+		});
+		ok('the address box fills the value column', form.uw >= 120, JSON.stringify(form));
+		ok('the kind box shows its whole text', form.ksw <= form.kcw + 1 && form.opts.join() === 'Tile URL,WMS,ArcGIS MapServer', JSON.stringify(form));
 
 		console.log('\n--- 3. the four kinds draw, in place ---');
 		await addLayer('xyz', S + '/xyz/{z}/{x}/{y}.png');
@@ -280,17 +287,54 @@ async function main() {
 		await page.check('.lpn-gis-on >> nth=1');
 		await a.settle(600);
 
-		console.log('\n--- 6. the project carries them ---');
+		console.log('\n--- 6. the project carries them, and asks before a reopened one reaches any server ---');
 		const saved = JSON.parse(await stored());
 		ok('the saved project holds the four layers, in order', Array.isArray(saved.project.gisLayers) && saved.project.gisLayers.map((l) => l.kind).join() === 'xyz,wms,arcgis,arcgis', JSON.stringify(saved.project.gisLayers));
 		ok('...with their opacity and address', saved.project.gisLayers[0].opacity === 0.5 && saved.project.gisLayers[1].layers === 'roads' && saved.project.gisLayers[2].url === S + '/arc/tiled/MapServer');
-		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.reload();
-		await a.answerTrainingPanel().catch(() => {});
+		// A reopened project draws nothing, and asks, before any server hears of it.
+		// The harness routes the page's question box to Playwright's native dialogs (pickers.js), which
+		// answer at once with what the session was told; a.dialogs is what was asked.
+		const settingsOpen = async () => {
+			const vis = () => page.evaluate(() => { const e = document.querySelector('.lpn-gis-on') || document.getElementById('lpn_gis_add'); return !!(e && e.getClientRects().length); });
+			if (!(await vis())) { await a.toolbarClick(await a.lang('lpn_tool_settings')); await a.settle(600); }
+		};
+		const asked = () => String((a.dialogs[a.dialogs.length - 1] || {}).message || '');
+		const reopen = async (yes) => {
+			a.answerConfirmsWith(yes);
+			a.dialogs.length = 0;
+			await a.reload();
+			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await a.settle(2500);
+		};
+		const askText = await a.lang('lpn_gis_ask'), YES = await a.lang('lpn_gis_ask_yes'), NO = await a.lang('lpn_gis_ask_no');
+		const logLen0 = (await requests()).length;
+		await reopen(false);
+		const q = asked();
+		console.log('  (questions asked: ' + a.dialogs.length + ')');
+		ok('reopening asks, naming the host', a.dialogs.length >= 1 && q.indexOf('127.0.0.1:' + stub.port) >= 0 && q.indexOf(askText.split('{hosts}')[0]) === 0 && /Draw them\?$/.test(q), q.slice(0, 200));
+		ok('the box offers Draw them and Not now', await page.evaluate(async ([t, y, n]) => {
+			delete window.lpnDialogAnswerer;
+			EngCalcs.lpnAsk({ kind: 'confirm', text: t, ok: y, cancel: n }, function () { });
+			const labels = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim());
+			const b = document.querySelector('#lpn_dialog_buttons button:last-child'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); }
+			return labels.join('|') === y + '|' + n;
+		}, [q, YES, NO]));
+		await a.settle(500);
+		ok('Not now: nothing drawn and no server asked (the question came before any request)', (await page.evaluate(READ_TILES)).length === 0 && (await requests()).length === logLen0);
+		await settingsOpen();
+		ok('...the layers are still in the project and their Draw ticks are off', await page.evaluate(() => { const o = Array.from(document.querySelectorAll('.lpn-gis-on')); return o.length === 4 && o.every((x) => !x.checked); }));
+		await page.check('.lpn-gis-on >> nth=0');
+		await a.settle(1500);
+		const afterTick = await page.evaluate(READ_TILES);
+		ok('ticking Draw on one layer draws that layer only', afterTick.length > 0 && afterTick.every((t) => t.layer === 0), String(afterTick.length));
+		await reopen(true);
+		ok('reopening again asks again', a.dialogs.length >= 1);
 		await a.settle(2500);
 		const again = await page.evaluate(READ_TILES);
-		ok('after a reload the layers draw again', [0, 1, 2, 3].every((i) => again.some((t) => t.layer === i)), again.length + ' tiles');
-		ok('...and the credit is back', await page.evaluate(() => (document.querySelector('[data-gis-credit]') || {}).textContent.indexOf('Fake County GIS 2026') >= 0));
+		ok('Draw them: all four layers draw and their servers are asked', [0, 1, 2, 3].every((i) => again.some((t) => t.layer === i)) && (await requests()).length > logLen0, again.length + ' tiles');
+		ok('...and the credit is back, separated by |', await page.evaluate(() => { const c = document.querySelector('[data-gis-credit]'); return c.textContent.indexOf('Fake County GIS 2026') >= 0 && c.textContent.indexOf(' | ') > 0 && c.title === c.textContent; }));
+		ok('...and the credit line is capped in width', await page.evaluate(() => { const c = document.querySelector('[data-gis-credit]'); return c.getBoundingClientRect().width <= Math.max(0.4 * innerWidth, 352) + 1; }));
+		await settingsOpen();
 
 		console.log('\n--- 7. the project without layers is as it was ---');
 		for (let i = 0; i < 4; i++) { await page.click('.lpn-gis-remove >> nth=0'); await a.settle(500); }
@@ -306,6 +350,7 @@ async function main() {
 		const n1 = await a.notice();
 		ok('the refusing server is named in a message', n1.indexOf('127.0.0.1:' + stub.port) >= 0 && /did not return/.test(n1), n1);
 		ok('nothing is drawn for it', (await page.evaluate(READ_TILES)).length === 0);
+		ok('its row in Settings says it was not reachable, and shows the host', await page.evaluate(() => { const r = Array.from(document.querySelectorAll('.lpn-gis-item')).pop(); return /not reachable/.test(r.textContent) && /127\.0\.0\.1:\d+/.test(r.querySelector('.lpn-gis-name').textContent) && /Draw/.test(r.textContent) && /Opacity/.test(r.textContent); }));
 		await addLayer('xyz', 'http://127.0.0.1:' + dead + '/{z}/{x}/{y}.png');
 		await a.settle(3500);
 		const n2 = await a.notice();
