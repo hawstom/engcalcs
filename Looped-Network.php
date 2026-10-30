@@ -2328,6 +2328,7 @@ EngCalcs.pageConfig = {
 	lpn_dxf_note_blocks: <?=json_encode($ec_lang['lpn_dxf_note_blocks'])?>,
 	lpn_dxf_note_headloss: <?=json_encode($ec_lang['lpn_dxf_note_headloss'])?>,
 	lpn_dxf_note_demand_multiplier: <?=json_encode($ec_lang['lpn_dxf_note_demand_multiplier'])?>,
+	lpn_dxf_sections_header: <?=json_encode($ec_lang['lpn_dxf_sections_header'])?>,
 	lpn_dxf_curve_points: <?=json_encode($ec_lang['lpn_dxf_curve_points'])?>,
 	lpn_dxf_note_categories: <?=json_encode($ec_lang['lpn_dxf_note_categories'])?>,
 	lpn_file_export_geojson_tip: <?=json_encode($ec_lang['lpn_file_export_geojson_tip'])?>,

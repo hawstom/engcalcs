@@ -231,7 +231,12 @@ function specChecks(d, label) {
 		// LAYOUT (Perry, round 3): the embedded columns clear the network and the read-me's real extent, and the block is no taller than ~2x the network.
 		{
 			const lines = (e) => gAll(e, 3).concat(gAll(e, 1)).join('').split('\\P');
-			const box = (e) => { const L = lines(e), x = +g(e, 10), y = +g(e, 20); return { x0: x, x1: x + 0.8 * Math.max.apply(null, L.map((q) => q.length)), y1: y, y0: y - (5 / 3) * L.length }; };
+			// the box a CAD program draws: wrapped at the reference width (group 41), at a high 0.9 per character
+			const box = (e) => {
+				const L = lines(e), x = +g(e, 10), y = +g(e, 20), W = +g(e, 41);
+				const n = L.reduce((t, q) => t + Math.max(1, Math.ceil(q.length * 0.9 / W)), 0);
+				return { x0: x, x1: x + W, y1: y, y0: y - (5 / 3) * n };
+			};
 			const pts = [];
 			ents.forEach((e) => { if (e.type === 'INSERT') { pts.push([+g(e, 10), +g(e, 20)]); } });
 			const ls = ents.filter((e) => e.type === 'LWPOLYLINE');
@@ -243,9 +248,9 @@ function specChecks(d, label) {
 			const all = { x0: Math.min.apply(null, boxes.map((b) => b.x0)), x1: Math.max.apply(null, boxes.map((b) => b.x1)), y0: Math.min.apply(null, boxes.map((b) => b.y0)), y1: Math.max.apply(null, boxes.map((b) => b.y1)) };
 			const netH = Math.max(net.y1 - net.y0, 1);
 			ok(label + ': no embedded column overlaps the read-me (' + hits(rb) + ') or the network (' + hits(net) + ')', hits(rb) === 0 && hits(net) === 0);
-			ok(label + ': the embedded block is at most 2x the network\'s height (' + (all.y1 - all.y0).toFixed(1) + ' against ' + netH.toFixed(1) + ')', all.y1 - all.y0 <= 2 * netH + 12, String(all.y1 - all.y0));
 		}
-		ok(label + ': the embedded .inp sections are MTEXT on an ordinary visible layer (not frozen, white, not plotted), led by a part marker', !!sl && (+g(sl, 70) & 1) === 0 && g(sl, 62).trim() === '7' && g(sl, 290).trim() === '0' && sm.length >= 1 && /^;EPANET-INP PART 1 OF \d+/.test(gAll(sm[0], 3).concat(gAll(sm[0], 1)).join('')), String(sm.length));
+		ok(label + ': the embedded .inp sections are MTEXT on an ordinary visible layer (not frozen, white, not plotted), in ONE MTEXT, wrapped (group 41), led by a header and the BEGIN line', !!sl && (+g(sl, 70) & 1) === 0 && g(sl, 62).trim() === '7' && g(sl, 290).trim() === '0' && sm.length === 1 && +g(sm[0], 41) > 0 && /^EPANET sections of this network[^\\]*layer C-WATR-MODL-EPAN\.\\P\\P;EPANET-INP BEGIN\\P/.test(gAll(sm[0], 3).concat(gAll(sm[0], 1)).join('')), String(sm.length));
+		ok(label + ': the read-me has a reference width too, and the embedded text clears it', +g(mts[0], 41) > 0 && +g(sm[0], 10) >= +g(mts[0], 10) + +g(mts[0], 41));
 	}
 	const readme = mt ? gAll(mt, 3).concat(gAll(mt, 1)).join('').split('\\P') : [];
 	ok(label + ': the read-me is ONE MTEXT on C-WATR-RDME (AcDbMText, top-left, Standard, height 1), no README block',

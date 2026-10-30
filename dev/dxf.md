@@ -120,10 +120,15 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
   other alternative are named and not read (Task 721 owns reading several).
 - **The .inp sections a block cannot hold ride in the drawing as text** (Tom, 2026-10-30: asked whether to
   hide them, *"Why hidden? User can freeze."*): MTEXT on the ordinary, visible layer `C-WATR-MODL-EPAN`
-  (white, not plotted, outside the model prefix), to the right of the network and of the read-me's real width, pieces of at most 2000 characters
-  and no more lines than the network is tall, in one row of columns (so the block is about as tall as the network and
-  zoom-extents keeps the network in view), each led by a marker line `;EPANET-INP PART n OF m` so the import puts them in order whatever order
-  a CAD program writes them in. The text is the .inp export's own sections for the scenario on screen, as typed,
+  (white, not plotted, outside the model prefix), to the right of the network and of the read-me's width, with its top at
+  the network's top, as ONE MTEXT. The earlier cut into pieces of 2000 characters read the Reference's 2049-character
+  limit, which is for one group-code string, as a limit on a whole MTEXT; an MTEXT goes past it in 250-character
+  chunks (group 3), so there is no limit to honour. **Width**: the read-me and this text both carry a reference width
+  (group 41), the network's width held between 80 and 160 text heights, so long lines wrap in CAD (display only: no
+  line break enters the text, `\P` stays the only paragraph code); the read-me sits high enough for its wrapped height
+  (0.9 of a text height a character, a high estimate). **Header**: the text opens with a paragraph (key
+  `lpn_dxf_sections_header`: what it is; move it or freeze its layer, never change its layer), a blank line and the
+  line `;EPANET-INP BEGIN`; the import cuts through that line and ignores the header. The text is the .inp export's own sections for the scenario on screen, as typed,
   not capitalized: PATTERNS, CURVES, CONTROLS, RULES, TIMES, OPTIONS (a scenario's Demand Multiplier among them),
   ENERGY, REACTIONS, QUALITY, SOURCES, MIXING, REPORT, DEMANDS (several categories; customers excluded, the import
   places them itself) and EMITTERS, plus a section of this page's own, `[ASSIGNMENTS]` (`DEMAND j pattern`,
@@ -138,7 +143,7 @@ Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-impor
   Net1 as Darcy-Weisbach, and Net1-Scenarios with Max day on screen (demand multiplier 1.5) export to DXF and
   import back with the same heads (1e-6) and flows (1 percent of the largest) from Calculate, nothing taken away
   first; Net2 and Net3 are also run through the EPANET engine over time and agree at 0, 3, 6, 12 and 24 hours.
-  The writer and reader alone, with escapes, a 5000-character line and shuffled pieces: `dxf-import-reader-harness.js`.
+  The writer and reader alone, with escapes, a 5000-character line, the width and the header: `dxf-import-reader-harness.js`.
 - **Not carried, and why:** custom properties; map Text and hand-placed label positions; pipe types and fitting
   lists (the minor loss sum is written instead); a pump defined by power rather than a head curve (it is named
   as a pump with no head curve); other scenarios' overrides (one alternative is read); a unit the drawing cannot

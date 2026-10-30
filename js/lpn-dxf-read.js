@@ -456,9 +456,12 @@
 		// The embedded .inp sections: the pieces in the order their markers give (a piece with none keeps
 		// its place in the file), each marker line removed, the rest joined as it was cut.
 		var markRe = new RegExp('^;' + String(EngCalcs.lpnDxfSectionsMark).replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&') + ' PART (\\d+) OF (\\d+)\\n?'), sectionsText = '';
+		// A header (what the text is, and that its layer stays) ends at the BEGIN line, within the first lines.
+		var beginRe = new RegExp('^(?:[^\\n]*\\n){0,9}?' + String(EngCalcs.lpnDxfSectionsBegin).replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&') + '\\n?');
 		pieces = pieces.map(function (t, k) {
-			var m = markRe.exec(t);
-			return { n: m ? +m[1] : k + 1, t: m ? t.slice(m[0].length) : t };
+			var m = markRe.exec(t), n = m ? +m[1] : k + 1;
+			if (!m) { m = beginRe.exec(t); }
+			return { n: n, t: m ? t.slice(m[0].length) : t };
 		}).sort(function (a, b) { return a.n - b.n; });
 		sectionsText = pieces.map(function (q) { return q.t; }).join('');
 
