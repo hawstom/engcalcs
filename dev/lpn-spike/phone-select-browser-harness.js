@@ -103,17 +103,23 @@ async function main() {
 		const selectedCount = () => page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-selected').length);
 		const lang = (k) => a.lang(k);
 
-		console.log('--- 1. Exit in the help box ---');
+		console.log('--- 1. Close in the help box ---');
 		await a.menuClick(await lang('lpn_tool_area_window'), 'edit');
 		await a.settle(400);
 		ok('1.1 the area tool is on', await areaToolOn(page));
 		ok('1.2 the help box shows', await visible(page, '#lpn_area_hint'));
-		ok('1.3 ...with an Exit control', await visible(page, '#lpn_area_hint_exit'));
+		ok('1.3 ...with a Close control', await visible(page, '#lpn_area_hint_exit'));
 		const sz = await page.evaluate(() => { const r = document.getElementById('lpn_area_hint_exit').getBoundingClientRect(); return { w: r.width, h: r.height }; });
 		ok('1.4 ...that is finger-sized (40 px tall)', sz.h >= 40, JSON.stringify(sz));
 		await page.tap('#lpn_area_hint_exit');
 		await a.settle(400);
-		ok('1.5 Exit returns to the normal Select mode: tool off, help box gone', !(await areaToolOn(page)) && !(await visible(page, '#lpn_area_hint')));
+		ok('1.5 Close hides only the help box: Select area stays active', (await areaToolOn(page)) && !(await visible(page, '#lpn_area_hint')));
+		ok('1.6 ...and the button said Close', (await lang('lpn_close')) === 'Close');
+		await page.keyboard.press('Escape');
+		await a.settle(200);
+		await a.menuClick(await lang('lpn_tool_area_window'), 'edit');
+		await a.settle(400);
+		ok('1.7 ...and the box returns when the tool is entered again', (await areaToolOn(page)) && await visible(page, '#lpn_area_hint'));
 
 		console.log('\n--- 2. an area that catches something ends the mode ---');
 		const box = await page.evaluate(() => {

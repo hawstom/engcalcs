@@ -22804,11 +22804,13 @@ var EngCalcs = EngCalcs || {};
 	 */
 	var areaHintPos = null;    // where the reader dragged the bubble to, this session
 	var areaHintNote = '';     // what the last commit reported, shown above the instruction
+	var areaHintClosed = false; // the reader pressed Close on the bubble; lasts until the mode is left
 	function updateAreaHint() {
 		var box = document.getElementById('lpn_area_hint'), pc = EngCalcs.pageConfig || {},
 			started = areaDrawing(), key, text, was, r, at, m, note, line;
 		if (!box) { return; }
-		if (mode !== 'select-area') { box.style.display = 'none'; box.textContent = ''; return; }
+		if (mode !== 'select-area') { areaHintClosed = false; box.style.display = 'none'; box.textContent = ''; return; }
+		if (areaHintClosed) { box.style.display = 'none'; box.textContent = ''; return; }
 		// **DISMISSED MEANS GONE, INCLUDING THE COUNT LINE** (Tom's 2026-09-08 worklist). The count also goes to
 		// setNotice() over the map, so nothing a reader asked for is lost by switching this off --
 		// what goes is the instruction, which is the thing somebody who has used the tool a hundred
@@ -22832,17 +22834,17 @@ var EngCalcs = EngCalcs || {};
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
 			'Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.');
 		box.appendChild(line);
-		// **AN EXIT IN THE BUBBLE** (Tom, 2026-10-24, on a phone: the mode could be left only by Esc,
-		// by the Select tool or by an insert tool). It returns to the normal Select mode, with
-		// whatever is selected left as it is. It is not a <div>, so it takes the press the way the
+		// **A CLOSE IN THE BUBBLE** (Tom, 2026-10-30, on a phone: "Exit" left the whole mode, and a
+		// phone has no other way to select several objects). It closes only the bubble; Select area
+		// stays active, the selection untouched, and the bubble returns the next time the mode is entered. It is not a <div>, so it takes the press the way the
 		// checkbox below does; while a ring is open the whole bubble is inert, so the button cannot
 		// eat the closing click.
 		var exitBtn = document.createElement('button');
 		exitBtn.type = 'button';
 		exitBtn.className = 'lpn-area-hint-exit';
 		exitBtn.id = 'lpn_area_hint_exit';
-		exitBtn.textContent = pc.lpn_fitting_exit || 'Exit';
-		exitBtn.addEventListener('click', function () { setMode('select'); });
+		exitBtn.textContent = pc.lpn_close || 'Close';
+		exitBtn.addEventListener('click', function () { areaHintClosed = true; updateAreaHint(); });
 		box.appendChild(exitBtn);
 		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
 		// Checked, always: it is the state you are looking at, and the only act it offers is
@@ -66274,7 +66276,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
 	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
 	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_HGRIP_REACH = 10, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
+	var LPN_DOCK_MIN_W = 80, LPN_DOCK_ROOM_FLOOR = 240, LPN_DOCK_FLY_MIN_H = 200, LPN_DOCK_HGRIP_REACH = 10, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockSoft = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -66508,8 +66510,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 2026-10-08: *"Why not cover the map entirely when it's an autohide box. A pinned box is
 	// different, of course. It needs its limits."*). A flyout takes no space from the map, so the
 	// 320 px floor protects nothing; `over` lifts it and leaves only `room`.
+	// LPN_DOCK_MIN_W is how narrow a person may make a docked box (Tom, 2026-10-30: no lower limit worth the name); LPN_DOCK_ROOM_FLOOR is the
+	// least width a window too small for the map's minimum still lends a docked box that is not being dragged, so a docked float is not crushed.
 	function clampDockW(w, room, over) {
-		var max = over && room > 0 ? room : Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
+		var max = over && room > 0 ? room : Math.max(LPN_DOCK_ROOM_FLOOR, Math.floor((window.innerWidth || 1000) - LPN_DOCK_MAP_MIN));
 		if (!(w > 0)) { w = smallScreen() ? Math.round((window.innerWidth || 390) * 0.7) : LPN_DOCK_DEFAULT_W; }   // a phone's flyout leaves the left 30% of the map to look at
 		if (room > 0) { max = Math.min(max, room); }
 		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
@@ -66853,7 +66857,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.addEventListener('pointermove', function (e) {
 			var w;
 			if (!from) { return; }
-			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
+			w = Math.max(1, from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX));   // never <= 0: clampDockW reads that as 'no width yet' and opens the default
 			var wrap = dockMapWrap(), over = dockAuto(from.list[0]);
 			w = clampDockW(w, over && wrap ? Math.floor(wrap.getBoundingClientRect().width + dockMargins.left + dockMargins.right - LPN_DOCK_STRIP_W - dockOppReserve(side, null)) : 0, over);
 			from.list.forEach(function (d) { d.rec.dockW = w; });

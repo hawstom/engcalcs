@@ -2899,7 +2899,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-add { font: inherit; margin: 2px 0; }
 /* THE DEMAND CATEGORIES BOX (sheet-light). The list Properties no longer draws: the same light sheet as the other boxes (hairline rules, no box
    round a cell, an editable cell filled on hover and outlined on focus, an empty one underlined faintly), as a table of one row per category. */
-.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: min(20rem, 94vw); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
+.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: var(--lpn-box-min-w, 5rem); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
 .lpn-demands-ov { display: flex; align-items: center; gap: 4px; padding: 4px 6px; font-size: .85em; color: var(--ec-ink-muted); border-bottom: 1px solid var(--ec-hairline); }
 .lpn-demands-ov .lpn-ovm-cell { position: static; margin: 0; }
 #lpn_demands_body { overflow: auto; }
@@ -3373,8 +3373,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    `resize: both` needs a non-visible overflow to be drawn at all, and it costs nothing: the
    scrolling already lives on `.lpn-popover-body`, which takes the height a drag gave the box. The
    floor is a width, as it is on every other box here -- the property rows stop fitting first. */
-.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
-@media (min-width: 30.01rem) { .lpn-propbox { min-width: 12rem; } }   /* the Value column shrinks and truncates (Tom, 2026-10-28), so the box may be narrow; a phone keeps 17 rem, which its demand table needs */
+/* **NO BOX HAS A LOWER WIDTH LIMIT WORTH THE NAME** (Tom, 2026-10-30, phone: "The Properties box has an inappropriate lower width limit. Remove that limit."). Every box floor is the one token --lpn-box-min-w, 5 rem: room for the close button and a few characters, so a box shrunk that far can still be found and dragged back. Content inside wraps, truncates or scrolls within the box; the page never scrolls sideways. */
+.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
 .lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 /* A Text's words in Properties fill the box's width and follow it when the box is dragged wider;
    the words box itself drags taller only (R-394). A short number (the Text's Size multiplier) gets
@@ -3404,7 +3404,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    fitting first, and everything below the floor is a sideways scrollbar. */
 .lpn-findbox {
 	width: min(22rem, calc(100vw - 8px));
-	min-width: min(16rem, 94vw);
+	min-width: var(--lpn-box-min-w, 5rem);
 	flex-direction: column;
 	resize: both;
 	overflow: hidden;
@@ -3812,7 +3812,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
 .lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-namemax: 11rem; --lpn-g-valmax: 9.5rem; }   /* a box of fixed width: a longer name wraps at a space, never widens it */
-.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
+.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: var(--lpn-box-min-w, 5rem); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }
 /* ==== THE SPREADSHEET BOX ROW (Task 828; Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET
    and WaterGEMS"; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
@@ -3867,7 +3867,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
 }
 /* A box that wraps its content is no narrower than a Label column and a Value column need. */
-#lpn_new_panel, #lpn_convas_panel { min-width: min(26rem, 94vw); }
+#lpn_new_panel, #lpn_convas_panel { min-width: var(--lpn-box-min-w, 5rem); }
 .lpn-convas-foot { padding-top: 8px; border-top: 1px solid var(--ec-border-strong); }
 /* THE CHOICES OF EVERY PULL-DOWN HAVE PAPER OF THEIR OWN, IN EVERY THEME (Tom, 2026-10-24 and again 2026-10-27: "The
    invisibility in Dark mode bug hit again for all selectors ... use global styles"). A pull-down in the standard
@@ -5088,7 +5088,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	box-sizing: border-box;
 	resize: both;
 	overflow: hidden;
-	min-width: min(25rem, 94vw);
+	min-width: var(--lpn-box-min-w, 5rem);
 	min-height: min(18rem, 92vh);
 	max-width: 98vw;
 	max-height: 96vh;
@@ -5669,6 +5669,8 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    is honest. A browser without container queries keeps the two columns, which is where this
    shipped. */
 /* NEVER STACKED (Tom, 2026-10-29: a stacked box is rejected, on a phone above all): the name column shrinks and wraps, the control group wraps its button under its box. */
+/* Stacked only where the two floors (5.5 + 6 rem and the gap) no longer fit, i.e. a box a person has shrunk below its old lower limit (Tom, 2026-10-30): label, then the control group whole beneath. A phone's 94vw box and every default width stay two columns. */
+@container lpnset (max-width: 12.5rem) { .lpn-set-row { grid-template-columns: minmax(0, 1fr); } }
 .lpn-rp-credit { margin-top: 6px; }
 /* **THE ACKNOWLEDGEMENT IS REACHABLE FROM THE PICKER IT IS ABOUT** (Tom, 2026-08-20: "Were we going
    to put a Credits link near the color pickers? Maybe under the Color scheme label?"). A POINTER,
