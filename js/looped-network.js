@@ -84571,7 +84571,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sel = ffEl('select', null, null, null);
 		sel.id = 'lpn_scnres_kind';
 		ffRow(sec, pc.lpn_survey_codes_col_type || 'Asset type', null, sel, '');
-		ctl = ffEl('div', 'lpn-scnres-controls lpn-gcol2', null, sec);
+		ctl = ffEl('div', 'lpn-scnres-controls lpn-gfull', null, sec);
 		SCNRES_KINDS.forEach(function (k) {
 			var o = ffEl('option', null, pc[k.label] || k.fb, sel);
 			o.value = k.id;
