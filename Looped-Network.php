@@ -1518,7 +1518,7 @@ echoHeader("EngCalcsApp", $html_title,
       // band (that band is the dock icons' and the X's), and the row stays put as the table
       // scrolls, because this table can run to thousands of rows and a button that scrolls away
       // with it is a button nobody finds. ?>
-<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_fullbox_title">
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_fullbox_title">
 	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
 	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1530,7 +1530,7 @@ echoHeader("EngCalcsApp", $html_title,
       // file input lives inside the box because loading a file is the box's own first step; the
       // file is held in memory only, and so is where the box sits -- it writes nothing to the
       // visitor's device. Built in JS (rebuildCalibReport). ?>
-<div id="lpn_calib_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_calibbox_title">
+<div id="lpn_calib_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_calibbox_title">
 	<div id="lpn_calibbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_calib_title']?></div>
 	<button type="button" id="lpn_calib_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<input type="file" id="lpn_calib_file" accept=".dat,.txt,.cal,text/plain" style="display:none">
