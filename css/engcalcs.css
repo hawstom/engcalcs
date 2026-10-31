@@ -3967,6 +3967,32 @@ option:disabled { color: var(--ec-ink-muted); }
 	#lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; justify-self: start; }
 	#lpn_popup_graph > .lpn-pgraph-chart, #lpn_popup_graph > .lpn-profile-say { grid-column: 1 / -1; }
 }
+/* **A BOX SHRUNK BELOW ABOUT 14 REM STACKS: THE LABEL ABOVE ITS VALUE, AND A VALUE NEVER VANISHES** (Tom, 2026-10-30: a clipped number is a
+   defect; mid-word wrap of a label is accepted). `lpn-box-stack` is set on the box by wireNarrowStack() in js/looped-network.js, which also puts
+   `lpn-gnarrow` on every `.lpn-gridhost` inside it (the generic boxes already stack under that class). Here is the Properties box's own three-track body
+   collapsed to one track, every cell of every row (and the ID line and the Time series row) in it, and each value control the width of the box. */
+@supports (grid-template-columns: subgrid) {
+	.lpn-propbox.lpn-box-stack .lpn-popover-body { grid-template-columns: minmax(0, 1fr); }
+	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-ggut,
+	.lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > .lpn-gname, .lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > input,
+	.lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > label, .lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > select,
+	.lpn-propbox.lpn-box-stack .lpn-gprops > .lpn-gspan2, .lpn-propbox.lpn-box-stack .lpn-gprops > .lpn-gspan3 { grid-column: 1 / -1; }
+	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-gname, .lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > .lpn-gname,
+	.lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > label { border-inline-end: 0; padding-bottom: 0; }
+	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gval:not([type="checkbox"]):not([type="radio"]),
+	.lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > input,
+	.lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > select {
+		box-sizing: border-box; width: calc(100% - 12px); min-width: 0; max-width: calc(100% - 12px); justify-self: stretch;
+	}
+	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gw-fill, .lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-ramp-picker { min-width: 0; }
+	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-ggut { grid-row: auto; }
+}
+/* The corner buttons share what room the title and the X leave, and the title gives way first (a box 80 px wide still shows its X and docking buttons). */
+.lpn-box-stack > .lpn-box-corner { max-width: calc(100% - 28px); right: 28px; }
+.lpn-box-stack > .lpn-box-corner > .lpn-corner-btn { flex: 0 1 28px; min-width: 0; width: auto; }
+.lpn-box-stack > .lpn-popover-x { width: 28px; }
+.lpn-box-stack.lpn-has-corner > :is(.lpn-setbox-title) { padding-right: min(calc(28px + var(--lpn-corner-w, 0px)), 100%); padding-left: 6px; }
+.lpn-box-stack:not(.lpn-has-corner) > :is(.lpn-setbox-title) { padding-right: 28px; padding-left: 6px; }
 /* Spreadsheet look: the header, the ruled rows. A phone has the same grid as a PC (Tom, 2026-10-29); only a touch pointer changes sizes (below). */
 @media all {
 	@supports (grid-template-columns: subgrid) {
@@ -7696,3 +7722,9 @@ textarea.lpn-desc-ta {
 .lpn-theme-choice-name { max-width: 132px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
 @keyframes lpn-theme-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lpn-theme-choice { animation: none; } }
+
+/* A narrow box has no column to split, and a drawn chart never widens it (Tom, 2026-10-30). */
+.lpn-box-stack .lpn-gsplit { display: none !important; }
+.lpn-box-stack .lpn-gname bdi { white-space: normal; overflow-wrap: anywhere; }
+.lpn-box-stack #lpn_popup_graph svg { overflow: hidden; max-width: 100%; }
+.lpn-box-stack .lpn-pgraph-chart, .lpn-box-stack #lpn_popup_graph { overflow: hidden; }

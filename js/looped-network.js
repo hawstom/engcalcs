@@ -66683,6 +66683,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (dockFlyout === d) { dockFlyout = null; }
 		layoutDocks();
+		if (act === 'float') { keepFloatOnScreen(d.box); }
 		// Pinned from a width only a flyout may have, it keeps the map's minimum: store what it got.
 		if (act === 'autohide' && !d.rec.autohide && d.rec.dock) {
 			r = d.box.getBoundingClientRect();
@@ -71028,8 +71029,57 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `handles` (optional): elements INSIDE the box that also start a drag when pressed -- a title
 	// line that is a child element rather than the box's own padding. The placement bars need it
 	// (wireWizardBars()); every other box drags by its chrome alone and passes nothing.
+	// **A BOX SHRUNK NARROW STACKS ITS ROWS, AND NO BOX HANGS OFF THE SCREEN** (Tom, 2026-10-30). One observer per box: below LPN_STACK_BELOW px of
+	// width the box carries `lpn-box-stack` and its grids `lpn-gnarrow` (label above value, css/engcalcs.css; 12.25 rem, just under the 12.5 rem Tom keeps in two columns, 2026-10-29); it is lifted at LPN_STACK_ABOVE so a box
+	// sitting on the line does not flicker. The grids are rebuilt as the box is refilled, so a childList observer re-applies the class. A floating box
+	// is also kept wholly on screen when the window changes (keepFloatOnScreen()).
+	var LPN_STACK_BELOW = 196, LPN_STACK_ABOVE = 204, floatClampWired = false;
+	function applyNarrowStack(box) {
+		var w = box.clientWidth, was = box.classList.contains('lpn-box-stack'), narrow, hosts, i;
+		if (!(w > 0)) { return; }
+		narrow = was ? w < LPN_STACK_ABOVE : w < LPN_STACK_BELOW;
+		if (narrow !== was) { box.classList.toggle('lpn-box-stack', narrow); }
+		hosts = box.querySelectorAll('.lpn-gridhost');
+		for (i = 0; i < hosts.length; i++) { if (hosts[i].classList.contains('lpn-gnarrow') !== narrow) { hosts[i].classList.toggle('lpn-gnarrow', narrow); } }
+	}
+	function wireNarrowStack(box) {
+		var queued = false;
+		function later() {
+			if (queued) { return; }
+			queued = true;
+			(window.requestAnimationFrame || window.setTimeout)(function () { queued = false; applyNarrowStack(box); });
+		}
+		if (window.ResizeObserver) { new window.ResizeObserver(later).observe(box); }
+		if (window.MutationObserver) { new window.MutationObserver(later).observe(box, { childList: true, subtree: true }); }
+		later();
+	}
+	// A floating box wholly on screen: its width no more than the window less an edge each side, its left and top inside. Docked boxes are laid by the dock.
+	function keepFloatOnScreen(box) {
+		var r, iw = window.innerWidth || 0, ih = window.innerHeight || 0, w, at;
+		if (!box || box.style.display === 'none' || box.classList.contains('lpn-docked') || boxIsDocked(box)) { return; }
+		r = box.getBoundingClientRect();
+		if (!(r.width > 0) || !iw) { return; }
+		w = Math.min(r.width, iw - 2 * POPUP_EDGE);
+		if (w < r.width - 0.5) { box.style.width = Math.max(0, Math.floor(w)) + 'px'; box.style.maxWidth = 'none'; }
+		at = clampPanel(r.left, r.top, w, r.height, iw, ih, chromeFloor());
+		if (Math.abs(at.left - r.left) > 0.5) { box.style.left = at.left + 'px'; }
+		if (Math.abs(at.top - r.top) > 0.5) { box.style.top = at.top + 'px'; }
+	}
+	function keepFloatsOnScreen() {
+		var i;
+		for (i = 0; i < lpnPanels.length; i++) { if (lpnPanels[i].__lpnDock || lpnPanels[i].id === 'lpn_popup') { keepFloatOnScreen(lpnPanels[i]); } }
+	}
 	function makePanelDraggable(popup, onMove, handles) {
 		var drag = null;
+		if (!popup.__lpnNarrow && popup.classList && popup.querySelectorAll && window.requestAnimationFrame) {
+			popup.__lpnNarrow = true;
+			wireNarrowStack(popup);
+			// Every box that can be resized by mouse can be resized by finger: the grip is added after the box's own wiring has had its chance to add one with a callback.
+			window.setTimeout(function () {
+				if (popup.classList.contains('lpn-docked') || (window.getComputedStyle && window.getComputedStyle(popup).resize !== 'none')) { addPanelResizeGrip(popup); }   // a docked box has resize: none and floats resizable
+			}, 0);
+			if (!floatClampWired) { floatClampWired = true; window.addEventListener('resize', keepFloatsOnScreen); }
+		}
 		// **EVERY PRESS RAISES, INCLUDING ONE ON A CONTROL INSIDE THE BOX.** Registered in the
 		// capture phase and separately from the drag handler below, which returns early unless the
 		// press is on the panel's own chrome -- typing in a field or pressing a button must bring
