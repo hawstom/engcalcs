@@ -55,7 +55,10 @@ function auditInPage(spec) {
 	// A control that SPANS the grid (a Text's words, which fills the box on Tom's word of 2026-10-15) starts
 	// at the name column instead; it is checked there.
 	const spans = (e) => !!e.closest('.lpn-gspan, .lpn-gspan2') || e.classList.contains('lpn-gspan2');
-	const offSpan = ctrls.filter((e) => spans(e) && Math.abs(R(e).left - nameX) > 2).map((e) => 'span ' + (e.className || e.nodeName) + '@' + Math.round(R(e).left - nameX));
+	// The Text's rotate buttons stand in their own full-width row since b1c19252c (Tom approved): the row starts at the name column and its later buttons follow the first.
+	const runLater = (e) => { const g = e.closest('.lpn-rot-btns'); return g && Array.from(g.querySelectorAll('button')).filter(vis)[0] !== e; };
+	const spanTol = (e) => (e.closest('.lpn-rot-btns') ? 8 : 2);   // a marked row's span cell carries 6 px of padding (css .lpn-gspan2)
+	const offSpan = ctrls.filter((e) => spans(e) && !runLater(e) && Math.abs(R(e).left - nameX) > spanTol(e)).map((e) => 'span ' + (e.className || e.nodeName) + '@' + Math.round(R(e).left - nameX));
 	const offGrid = offSpan.concat(ctrls.filter((e) => !spans(e) && !lead(e) && (R(e).left - cellX < -2 || R(e).left - cellX > 8)).map((e) =>
 		(e.id || e.getAttribute('aria-label') || e.className || e.nodeName) + '@' + Math.round(R(e).left - cellX)))
 		.concat(groups.filter((g) => (R(g).left - cellX < -2 || R(g).left - cellX > 8)).map((g) => 'group ' + g.className + '@' + Math.round(R(g).left - cellX)));

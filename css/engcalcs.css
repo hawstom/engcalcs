@@ -6225,7 +6225,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
 #lpn_labels_customer_fields { container-type: inline-size; container-name: lpnlbl; }
-@container lpnlbl (max-width: 26.5rem) {
+@container lpnlbl (max-width: 26.95rem) {   /* measured: a row wraps at a list width of 431 px (name 184 + 4 + group 226 + the row's 18 px), which 26.5rem (424) missed by 7 px */
 	#lpn_labels_node_fields > div:not(.lpn-set-colhead),
 	#lpn_labels_link_fields > div:not(.lpn-set-colhead),
 	#lpn_labels_customer_fields > div:not(.lpn-set-colhead) { margin-top: 10px; row-gap: 0; }

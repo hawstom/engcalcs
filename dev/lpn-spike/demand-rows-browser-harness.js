@@ -196,9 +196,10 @@ async function main() {
 			const rs = Array.from(f.querySelectorAll('.lpn-grow')).filter((x) => x.querySelector('.lpn-gname') && R(x).height > 0);
 			const at = (re) => rs.findIndex((x) => re.test(x.querySelector('.lpn-gname').textContent.trim()));
 			const ic = at(/^Demand categories/), iu = at(/^Customer demands/), v = iu >= 0 ? rs[iu].querySelector('span.lpn-gval') : null;
-			return { ic, iu, text: v ? v.textContent.trim() : null, muted: v ? getComputedStyle(v).color : null, ink: getComputedStyle(f).color, demand: (rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0] || { querySelector: () => null }).querySelector('span.lpn-gval') && rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0].querySelector('span.lpn-gval').textContent.trim() };
+			return { ic, iu, id: at(/^Demand \(/), text: v ? v.textContent.trim() : null, muted: v ? getComputedStyle(v).color : null, ink: getComputedStyle(f).color, demand: (rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0] || { querySelector: () => null }).querySelector('span.lpn-gval') && rs.filter((x) => /^Demand \(/.test(x.querySelector('.lpn-gname').textContent.trim()))[0].querySelector('span.lpn-gval').textContent.trim() };
 		});
-		ok('R11 Properties shows the customers line directly under Demand categories', cu.iu === cu.ic + 1 && cu.ic >= 0, JSON.stringify(cu));
+		// Row order since 99e9b4292 (Tom, 2026-10-29): Demand categories, the Demand total it adds to, then the customers line that explains it.
+		ok('R11 Properties shows the customers line under Demand categories, with the Demand total between', cu.ic >= 0 && cu.id === cu.ic + 1 && cu.iu === cu.id + 1, JSON.stringify(cu));
 		ok('R11 ...saying 5 gpm from Customers (1), in muted ink', /^5 gpm from Customers \(1\)$/.test(cu.text || '') && cu.muted !== cu.ink, JSON.stringify(cu));
 		ok('R11 ...which explains the Demand of 155', /^155/.test(cu.demand || ''), JSON.stringify(cu.demand));
 		await c2.close();
