@@ -326,6 +326,55 @@ async function main() {
 				await S.close();
 			}
 		}
+
+		console.log('\n=== G. phone 390x844, Properties docked and auto-hidden: a finger drag inside it never retracts it ===');
+		{
+			const S = await Session.open(browser, NAME + '-g', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+			const P = S.page;
+			await P.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
+			await open(S);
+			await tapAt(S, true, await pipeAt(S));
+			await S.settle(1300);
+			const state = () => P.evaluate(() => {
+				const b = document.getElementById('lpn_popup'), r = b.getBoundingClientRect(), cx = r.left + Math.min(r.width / 2, 60), cy = r.top + 120;
+				const top = document.elementFromPoint(cx, cy);
+				return { shown: getComputedStyle(b).display !== 'none', left: Math.round(r.left), right: Math.round(r.right), w: Math.round(r.width), onTop: !!top && b.contains(top), docked: b.classList.contains('lpn-docked') };
+			});
+			const touchDrag = async (from, dx, dy) => {
+				const cdp = await S.context.newCDPSession(P);
+				const touch = async (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+				await touch('touchStart', from.x, from.y);
+				for (let i = 1; i <= 12; i++) { await touch('touchMove', from.x + dx * i / 12, from.y + dy * i / 12); }
+				await touch('touchEnd', 0, 0);
+				await cdp.detach().catch(() => {});
+			};
+			const st0 = await state();
+			ok('G1. Properties is out and on top (docked flyout)', st0.shown && st0.onTop, JSON.stringify(st0));
+			const sp = await splitAt(S, '#lpn_popup');
+			const w0 = await nameColW(S, '#lpn_popup');
+			await touchDrag(sp, -40, 0);
+			await S.settle(1200);
+			const st1 = await state();
+			ok('G2. after a finger drag of the Label | Value divider the box has not retracted, 1.2 s later', st1.shown && st1.onTop && st1.right >= st0.right - 2, JSON.stringify([st0, st1]));
+			const w1 = await nameColW(S, '#lpn_popup');
+			ok('G3. ...and the drag did change the Label column (' + w0 + ' -> ' + w1 + ')', w1 < w0 - 15, w0 + ' -> ' + w1);
+			const sp2 = await splitAt(S, '#lpn_popup');
+			const map0 = await P.evaluate(() => document.getElementById('lpn_canvas').innerHTML.length);
+			await touchDrag(sp2, 30, 0);
+			await S.settle(1200);
+			const st2 = await state(), w2 = await nameColW(S, '#lpn_popup');
+			ok('G4. a second finger drag moves the divider again (the map is not panned)', st2.shown && st2.onTop && w2 > w1 + 10, w1 + ' -> ' + w2 + ' ' + JSON.stringify(st2));
+			const grip = await P.evaluate(() => { const e = ['right', 'left'].map((k) => document.getElementById('lpn_dock_grip_' + k)).filter((x) => x && getComputedStyle(x).display !== 'none')[0]; if (!e) { return null; } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, sign: e.id === 'lpn_dock_grip_right' ? 1 : -1 }; });
+			ok('G5. the dock grip is there', !!grip, JSON.stringify(grip));
+			if (grip) {
+				await touchDrag(grip, grip.sign * 40, 0);
+				await S.settle(1200);
+				const st3 = await state();
+				ok('G6. after a finger drag of the dock grip the box has not retracted either', st3.shown && st3.onTop, JSON.stringify(st3));
+			}
+			ok('G7. no page error', S.errors.length === 0, S.errors.join(' | '));
+			await S.close();
+		}
 	} finally {
 		await browser.close();
 		env.stopServer();

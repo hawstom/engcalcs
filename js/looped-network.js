@@ -68102,7 +68102,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
-		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
+		// A finger never hovers: lifting it from the box is not the pointer leaving (Perry, 2026-10-31: after a finger drag of the divider the box retracted and the next drag panned the map).
+		box.addEventListener('pointerleave', function (e) { if (dockFlyout === d && !(e && (e.pointerType === 'touch' || e.pointerType === 'pen'))) { dockTuckLater(d); } });
 		// **A CLICK ON A BUTTON INSIDE A FLYOUT SOFT-PINS IT** (Tom, 2026-10-24: *"why doesn't
 		// the box 'soft-pin' when I click a button?"*): it stays out when the pointer leaves, until a
 		// press outside it (the map, another tab; dockOutsidePress) or Escape tucks it. Not the corner
@@ -76149,7 +76150,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	};
 	function multiTip(c, els) {
 		var pc = EngCalcs.pageConfig || {};
-		if (c.key === 'elev' && els && els.length && els.every(function (e) { return e.type === 'tank'; })) { return pc.lpn_tank_ground_elev_tip || ''; }
+		if (c.key === 'elev' && els && els.length && els.every(function (e) { return e.type === 'tank'; })) { return pc.lpn_tank_ground_elev_tip; }
 		return LPN_MULTI_TIPS[c.key] ? pc[LPN_MULTI_TIPS[c.key]] || '' : '';
 	}
 	function multiRow(host, c, els) {
