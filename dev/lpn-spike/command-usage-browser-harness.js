@@ -239,9 +239,11 @@ async function main() {
 		await c.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await c.goto('Looped-Network.php?ec_nolog=1');   // a tester browser: this is the gating that says no
 		await c.settle(2000);
-		await c.page.click('#lpn_toolbar button[data-tool="add-text"]');
+		// Shape, not Text: tool-key-order-browser-harness presses Text in this checkout during the same suite.
+		// The ordinary leg below presses Shape too, so a row leaked here also fails its "exactly one".
+		await c.page.click('#lpn_toolbar button[data-tool="add-shape"]');
 		await c.settle(1200);
-		ok('a tester browser (ec_nolog) leaves no cmd: row in the log', readNew('tb/add-text').length === 0, readNew('tb/add-text').join(' | '));
+		ok('a tester browser (ec_nolog) leaves no cmd: row in the log', readNew('tb/add-shape').length === 0, readNew('tb/add-shape').join(' | '));
 		await c.context.close();
 
 		const d = await Session.open(browser, 'D', { serviceWorkers: 'block' });
