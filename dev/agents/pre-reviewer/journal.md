@@ -4698,6 +4698,14 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - Method: the page's own dialogs are auto-answered by the Session until `delete window.lpnDialogAnswerer`; a test that never deletes it never sees a dialog. Scenario manager menu rows are disabled in the way unless a scenario exists.
 - NOT CHECKED: Google Docs; phone Properties; Tables headings in a browser; mutation of the new harnesses.
 
+# Perry, feat/report-widths 4650ca130, 2026-10-28 night (Task 848, adjustable report columns)
+- OBSERVED (real Chromium, real mouse, Net3 + a second scenario): builder's harness passes (15 ok). Fire flow, Criticality, Demand scaling, Energy, Status, Full report, Scenario comparison, floating AND docked right: every column has a divider; automatic widths show no sideways scroll; a drag sets the width, the others keep theirs, it survives reopen and reload; double-click resets and clears the key. Calibration not run (needs a file).
+- OBSERVED DEFECT: press on any divider while the table is scrolled sideways and the scroll snaps to 0 (rptColStartDrag clears the table width first). Double-click on a divider that needed scrolling to reach (Status, last column widened +300 past the box) does NOT reset: stored key stays. Not covered by the harness.
+- OBSERVED: after a drag the table freezes at its widths; enlarging the box leaves it 694 px in a 1114 px box (blank right); shrinking scrolls. Automatic tables still refit. Units are not in the key (heading "demand not served", not "(gpm)"), so a unit change keeps widths.
+- OBSERVED: the 7 px divider covers the right half of the 15 px sort arrow; a click on it neither sorts nor resizes. Click on heading body and arrow centre sort; a sorted table keeps its dragged widths. Touch: no touch handler on the divider (mouse only). Phone 390: Fire flow, Full report, Scenario comparison scroll sideways at automatic widths, identical on 4650ca130^ (pre-existing).
+- OBSERVED: Copy HTML, Copy text, Print and CSV byte-identical before and after a drag on all seven reports. lpn_rptcols is in the inventory and the furniture/storage checks pass.
+- Method: ad-hoc Playwright scripts in the session scratchpad; the box title buttons relabel to "Copied" after a click.
+
 # Perry, feat/sheet-light b53d074ab, 2026-10-28 night (light sheet, Demand as rows)
 - OBSERVED (real Chromium, 1366x768 and 390 touch, light and dark): hairline sheet is consistent across Properties (junction, pipe, tank, pump, PRV), Find, Contour, Fire flow, Criticality, Demand scaling, Scenario comparison, floating and docked. No sideways scroll anywhere.
 - OBSERVED: the Demand categories box opens 618x615 (CSS asks 432x352): `.lpn-setbox` is declared later in the file than `.lpn-demandsbox` and wins. Docked it is 618 wide.
