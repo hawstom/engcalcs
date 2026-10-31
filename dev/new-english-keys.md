@@ -905,7 +905,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`efb086597`) — adds no English strings
+### box-design (`e99bba05d`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -1378,4 +1378,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/master-after-gis (`69ded8c2a`) — adds no English strings
+### fix/master-after-gis (`652882965`) — adds no English strings
