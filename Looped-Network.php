@@ -1629,7 +1629,7 @@ echoHeader("EngCalcsApp", $html_title,
       // reason every other panel on this page is: the strings are language keys and PHP is where
       // those live. What JS builds here is only the eight unit selects, and those are CLONED from
       // the page's own strip so nothing about a unit family or an option value is retyped. ?>
-<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
+<div id="lpn_new_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_tab_new']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-gridhost" id="lpn_new_body">
@@ -1682,7 +1682,7 @@ echoHeader("EngCalcsApp", $html_title,
 		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
 		      // two preset buttons are here because they are markup with strings in them. ?>
 		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></div>
-		<div class="lpn-new-presets lpn-gcol2">
+		<div class="lpn-new-presets lpn-gfull">
 			<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
 			      // the suite serves a worldwide audience and most of it is metric). Same two
 			      // strings as that row, so there is one name for each system on this page. ?>
@@ -1703,7 +1703,7 @@ echoHeader("EngCalcsApp", $html_title,
 				</select>
 			</div>
 		</div>
-		<div class="lpn-new-actions lpn-gcol2">
+		<div class="lpn-new-actions lpn-gfull">
 			<button type="button" id="lpn_new_create"><?=$ec_lang['lpn_new_create']?></button>
 			<button type="button" id="lpn_new_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
@@ -1719,7 +1719,7 @@ echoHeader("EngCalcsApp", $html_title,
       // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
       // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
       // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
-<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+<div id="lpn_convas_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<?php // The coordinate system and the units are Label | Value rows of the box's one grid, as in New project
@@ -1744,7 +1744,7 @@ echoHeader("EngCalcsApp", $html_title,
 			</div>
 		</div>
 		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_convas_units_tip'])?></div>
-		<div class="lpn-new-presets lpn-gcol2">
+		<div class="lpn-new-presets lpn-gfull">
 			<button type="button" id="lpn_convas_si"><?=$ec_lang['calc_units_si']?></button>
 			<button type="button" id="lpn_convas_us"><?=$ec_lang['calc_units_us']?></button>
 		</div>
@@ -1771,29 +1771,33 @@ echoHeader("EngCalcsApp", $html_title,
 		      // refreshOneLabelInPlace() the stale-snapshot ruling requires) -- eight-plus touch
 		      // points across the map's core render and collision path, for a feature (a new kind of
 		      // map label) Tom has not asked for. That is Tom's call, not this wizard's. ?>
-		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></legend>
-			<div class="lpn-convas-round-head">
-				<span></span>
-				<span class="lpn-convas-round-col"><?=$ec_lang['lpn_convas_round']?></span>
-				<span class="lpn-convas-round-col"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></span>
-			</div>
+		<?php // THE ROUNDING AND THE SUFFIX ARE SHEET ROWS (round 10b, Tom 2026-10-31: the sheet style wherever it fits). One value per
+		      // row, so the two columns Tom asked for in 2026-09-23 are two stretches of the one grid: the step to round to, then the suffix. ?>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></div>
+		<div class="lpn-grid">
 			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
 				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
-			<div class="lpn-convas-round-row">
-				<label for="lpn_convas_round_<?=$rk?>"><?=$ec_lang[$rkey]?></label>
-				<select id="lpn_convas_round_<?=$rk?>">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_round_<?=$rk?>"><?=$ec_lang[$rkey]?></label></span>
+				<select id="lpn_convas_round_<?=$rk?>" class="lpn-gval lpn-gw-fill">
 					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
 					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
 				</select>
-				<?php // R-217 (Tom, 2026-09-24) dropped this row's own tip glyph for alignment; that
-				      // stands. Depth's suffix box is no longer disabled -- tank water depth is now a
-				      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three
-				      // (Tom, 2026-09-25). ?>
-				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
 			</div>
 			<?php } ?>
-		</fieldset>
+		</div>
+		<?php // R-217 (Tom, 2026-09-24) dropped each row's own tip glyph; that stands. Depth's suffix box is enabled: tank water depth is a
+		      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three (Tom, 2026-09-25). ?>
+		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></div>
+		<div class="lpn-grid">
+			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
+				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_convas_suffix_<?=$rk?>"><?=$ec_lang[$rkey]?></label></span>
+				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix lpn-gval lpn-gw-fill">
+			</div>
+			<?php } ?>
+		</div>
 		<p class="lpn-dim"><?=$ec_lang['lpn_convas_oneway']?></p>
 	</div>
 	<?php // OK and Cancel stand in a footer outside the scrolling body, so they are always in view. ?>

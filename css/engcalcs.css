@@ -4035,6 +4035,8 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
 			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
 		}
+		/* A radio that stands beside a button in a value cell (the projection chooser) is the same size as a lone one. */
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-gwrap > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0 6px; }
 		/* A ramp picker is a cell too: its left edge is the Value column's. */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 2px 0; width: 100%; min-width: 0; }
 		/* The colour-scheme bar and the Time series pull-down at the foot of Properties are cells too, the same as the sheet's other pull-downs (Tom, 2026-10-29). */
@@ -5290,24 +5292,6 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-new-crs-name.lpn-dim { opacity: .55; }
 #lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
 #lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
-/* **THE LABEL COLUMN TAKES THE FLEXIBLE SPACE, THE OTHER TWO ARE FIXED-WIDTH** (R-217, Tom,
-   2026-09-24: "All the rounding selectors are misaligned with each other and their label
-   heading."). `justify-content: space-between` on a row whose first child sizes to its own text
-   put a different amount of space in front of the select on every row -- Diameter, Depth, Flow and
-   Head are not the same width -- so the select's left edge moved row to row and never lined up
-   under its heading. Matching the header's own layout (label flexes, the two value columns are a
-   fixed width) fixes both at once: every select's left edge sits at the same x, and so does every
-   suffix box's. */
-.lpn-convas-round-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
-.lpn-convas-round-row label { flex: 1 1 auto; }
-.lpn-convas-round-row select { flex: 0 0 auto; width: 8.5rem; }
-.lpn-convas-suffix { flex: 0 0 auto; width: 5rem; box-sizing: border-box; padding: 2px 4px; }
-/* The two column headings over the rounding selects and the suffix boxes (Tom, 2026-09-23):
-   same widths as the row cells below them, so the two columns line up. */
-.lpn-convas-round-head { display: flex; align-items: flex-end; gap: 8px; font-size: .85em; margin: 2px 0; }
-.lpn-convas-round-head span:first-child { flex: 1 1 auto; }
-.lpn-convas-round-head .lpn-convas-round-col:nth-child(2) { width: 8.5rem; flex: 0 0 auto; }
-.lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: var(--ec-gray-f2f2f2); color: var(--ec-gray-777); cursor: not-allowed; }
