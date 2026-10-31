@@ -83,7 +83,7 @@ function helpers(a) {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
 		const [chooser] = await Promise.all([
 			P.waitForEvent('filechooser', { timeout: 10000 }),
-			a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang(labelKey), 'file')
+			a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang(labelKey), 'file', 'lpn_pane_tab_shapes')
 		]);
 		await chooser.setFiles(files);
 		await settle(1200);

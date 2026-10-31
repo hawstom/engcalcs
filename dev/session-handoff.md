@@ -95,6 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-10-31 small hours (fifty-third session, Opus main, Sonnet agents)
+
+- **Pushed with this handoff:** `feat/dxf-import` (his word) and `fix/p100-defects` (on green): icons alone in a button centred (phone menu bar, desktop toolbar); a Dark pull-down harness; Tasks 836, 841, 843 closed as found fixed. The dxf merge broke three harnesses, none a visitor defect: Import now has two "DXF file…" rows (Network and Shapes), so a harness must name the group (`importVia`); `lib/lpn-commands.json` regenerated.
+- **box-design round 9** (his round-8 notes, *"Give the user control."*): no automatic stacking at any width; no label floor, labels one line with ellipsis and full text as tip; multi-selection Properties sections no longer overlap and share one divider; Find in sheet style when narrow. `feat/report-widths` merged INTO box-design (his "Merge" stands; it brings Fire flow's draggable result columns, Task 848, and localStorage `lpn_rptcols`). Perry's round-9 review is in that worktree's journal; Tom's pass on 8103 is next. box-design still owes a `git merge master` (guide sentence, dxf).
+- **His answer owed:** the default label fit is the 80th percentile, so about one label in five is cut at first open; or fit the longest.
+- **Roadmap lags:** Tasks 838, 839, 840 were built and reached master through box-design round 6; close them when he has seen them.
+- **Known on box-design, not fixed:** `settings-box-held-browser-harness` wheel-zoom fails since round 8's keep-on-screen float.
+
 ## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
 
 - **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task waits on him or a sprint; do not start a fresh slice.

@@ -755,3 +755,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|826| CLOSED 2026-10-24 (`fix/example-crs`): no shipped example is lat/lon; Net3 US is on EPSG:2227 and Net3 SI on EPSG:26910 (later EPSG:26943, Task 826 follow-up); `examples-crs-harness.js` holds it.
 - 0|820| CLOSED 2026-10-28 (`fix/label-snapshot-demand`): with Recalculate off a map label's Demand (Q) follows the kept run, Base demand (Qb) the open scenario; `label-snapshot-demand-browser-harness.js`.
 - 0|720| CLOSED 2026-10-30 (merged on Tom's word, `feat/gis-background`): background layers from a GIS server (XYZ, WMS, ArcGIS MapServer), stored in the project, with a privacy.php paragraph; `gis-background-browser-harness.js`.
+- 0|836| CLOSED 2026-10-30 (found already fixed, `66b1d68c6`): Morph to vertex in a scenario asks "Switch to Base and morph?"; `morph-vertex-harness.js`.
+- 0|841| CLOSED 2026-10-30 (found already fixed, `045b75581`): `LPN_LABEL_STATIONS_MAX` caps label stations per pipe; `label-station-cap-harness.js`.
+- 0|843| CLOSED 2026-10-30 (`fix/p100-defects`): one global `option, optgroup` rule makes every pull-down readable in Dark; `select-dark-sheet-browser-harness.js` added.
