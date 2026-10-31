@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 3247,
-        "delta_key_count": 359,
+        "expected_key_count": 3289,
+        "delta_key_count": 401,
         "english_changed_key_count": 73,
         "exempt_key_count": 39,
         "exempt_keys": [
@@ -94,7 +94,7 @@
         "lpn_guide_cmp_notes_def": "<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.<\/li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.<\/li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.<\/li><li>The example given in the Scenario manager entry compares scenarios on Net1.<\/li><\/ul>",
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
-        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
+        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists inputs and then results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
@@ -159,6 +159,10 @@
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
         "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.",
+        "lpn_dxf_note_headloss": "Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.",
+        "lpn_dxf_note_demand_multiplier": "Demand multiplier: {n}.",
+        "lpn_dxf_sections_header": "EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.",
+        "lpn_dxf_curve_points": "Pump head curve points (flow, head)",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -364,7 +368,45 @@
         "lpn_file_import_shapes": "GeoJSON file…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON file…",
+        "lpn_file_import_dxfnet": "DXF file…",
+        "lpn_file_import_dxfnet_tip": "Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_dxfnet_note_layer_foreign": "These layers do not begin with {prefix}, so nothing on them was read.",
+        "lpn_dxfnet_note_layer_unknown": "These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.",
+        "lpn_dxfnet_note_alternative": "These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.",
+        "lpn_dxfnet_note_alt_read": "The drawing has no BASE alternative. The alternative {alt} was read.",
+        "lpn_dxfnet_note_curve_differs": "These pumps state a curve ID that another pump uses with different points. The first curve was kept.",
+        "lpn_dxfnet_note_shapes": "These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.",
+        "lpn_dxfnet_note_entity_unread": "These entities are not a kind this import reads on their layer, and were not imported.",
+        "lpn_dxfnet_note_paper_space": "Entities in paper space were not read: {n}.",
+        "lpn_dxfnet_note_tag_unknown": "These attribute tags are not ones this page writes for their block, and their values were not imported.",
+        "lpn_dxfnet_note_block_unknown": "These blocks are not the block this page writes for their layer, and were not imported.",
+        "lpn_dxfnet_note_bad_id": "These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.",
+        "lpn_dxfnet_note_dup_id": "These IDs are stated by more than one element of the same kind. Only the first was imported.",
+        "lpn_dxfnet_note_no_position": "These blocks have no usable position and were not imported.",
+        "lpn_dxfnet_note_link_no_block": "These polylines have no block at their middle to state the link's ID and properties, and were not imported.",
+        "lpn_dxfnet_note_block_no_line": "These link blocks have no polyline through their middle, and were not imported.",
+        "lpn_dxfnet_note_line_no_block": "These service lines end where there is no customer block, and were not imported.",
+        "lpn_dxfnet_note_end_ambiguous": "These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.",
+        "lpn_dxfnet_note_end_no_node": "These links have an end where there is no node, and were not imported.",
+        "lpn_dxfnet_note_end_loop": "These links start and end at the same node, and were not imported.",
+        "lpn_dxfnet_note_pump_no_curve": "These pumps state no head curve, so Calculate will not give the original results until each is given a curve.",
+        "lpn_dxfnet_note_crs_unknown": "The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.",
+        "lpn_dxfnet_note_method": "The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.",
+        "lpn_dxfnet_note_geo_export": "This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.",
+        "lpn_dxfnet_note_sections_read": "The EPANET sections embedded in the drawing were read: {sections}.",
+        "lpn_dxfnet_note_sections_unread": "The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.",
+        "lpn_dxfnet_count_nodes": "{n} junctions, reservoirs and tanks.",
+        "lpn_dxfnet_count_links": "{n} pipes, pumps and valves.",
+        "lpn_dxfnet_count_customers": "{n} customers.",
+        "lpn_dxfnet_held_custom": "custom properties",
+        "lpn_dxfnet_held_text": "map Text items and hand-placed label positions",
+        "lpn_dxfnet_note_unit_unknown": "The drawing states these units, which this page does not know. The units in use were kept for them.",
+        "lpn_dxfnet_note_coord_unit": "The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.",
+        "lpn_dxfnet_note_customer_loose": "The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.",
+        "lpn_dxfnet_note_not_held": "A DXF file does not hold these, so none was imported:",
+        "lpn_dxfnet_none": "Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.",
+        "lpn_dxfnet_report_lead": "What was not read, and each change made during import, is listed below with the layer, block or ID concerned:",
         "lpn_shapes_every_scenario": "Shapes appear in every scenario.",
         "lpn_shapes_this_scenario": "Shapes appear in {scenario} only.",
         "lpn_library_import_every_scenario": "Every scenario can use them.",
@@ -455,7 +497,7 @@
         "lpn_guide_cmp_notes_def": "<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.<\/li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.<\/li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.<\/li><li>The example given in the Scenario manager entry compares scenarios on Net1.<\/li><\/ul>",
         "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
-        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Active, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
+        "lpn_guide_prop_example_def": "<p>Open the Net1 example and click Pipe 10. Properties lists inputs and then results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft\/sec, and Head loss 19.12 ft H2O.<\/p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_bx_dock_def": "<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box tucks back into its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.<\/p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.<\/p>",
         "lpn_guide_bx_phone_def": "<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it flies out over the map. Nothing is pinned. A box that is not docked fills the window.<\/p>",
@@ -520,6 +562,10 @@
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
         "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.",
+        "lpn_dxf_note_headloss": "Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.",
+        "lpn_dxf_note_demand_multiplier": "Demand multiplier: {n}.",
+        "lpn_dxf_sections_header": "EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.",
+        "lpn_dxf_curve_points": "Pump head curve points (flow, head)",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -725,7 +771,45 @@
         "lpn_file_import_shapes": "GeoJSON file…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON file…",
+        "lpn_file_import_dxfnet": "DXF file…",
+        "lpn_file_import_dxfnet_tip": "Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_dxfnet_note_layer_foreign": "These layers do not begin with {prefix}, so nothing on them was read.",
+        "lpn_dxfnet_note_layer_unknown": "These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.",
+        "lpn_dxfnet_note_alternative": "These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.",
+        "lpn_dxfnet_note_alt_read": "The drawing has no BASE alternative. The alternative {alt} was read.",
+        "lpn_dxfnet_note_curve_differs": "These pumps state a curve ID that another pump uses with different points. The first curve was kept.",
+        "lpn_dxfnet_note_shapes": "These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.",
+        "lpn_dxfnet_note_entity_unread": "These entities are not a kind this import reads on their layer, and were not imported.",
+        "lpn_dxfnet_note_paper_space": "Entities in paper space were not read: {n}.",
+        "lpn_dxfnet_note_tag_unknown": "These attribute tags are not ones this page writes for their block, and their values were not imported.",
+        "lpn_dxfnet_note_block_unknown": "These blocks are not the block this page writes for their layer, and were not imported.",
+        "lpn_dxfnet_note_bad_id": "These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.",
+        "lpn_dxfnet_note_dup_id": "These IDs are stated by more than one element of the same kind. Only the first was imported.",
+        "lpn_dxfnet_note_no_position": "These blocks have no usable position and were not imported.",
+        "lpn_dxfnet_note_link_no_block": "These polylines have no block at their middle to state the link's ID and properties, and were not imported.",
+        "lpn_dxfnet_note_block_no_line": "These link blocks have no polyline through their middle, and were not imported.",
+        "lpn_dxfnet_note_line_no_block": "These service lines end where there is no customer block, and were not imported.",
+        "lpn_dxfnet_note_end_ambiguous": "These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.",
+        "lpn_dxfnet_note_end_no_node": "These links have an end where there is no node, and were not imported.",
+        "lpn_dxfnet_note_end_loop": "These links start and end at the same node, and were not imported.",
+        "lpn_dxfnet_note_pump_no_curve": "These pumps state no head curve, so Calculate will not give the original results until each is given a curve.",
+        "lpn_dxfnet_note_crs_unknown": "The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.",
+        "lpn_dxfnet_note_method": "The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.",
+        "lpn_dxfnet_note_geo_export": "This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.",
+        "lpn_dxfnet_note_sections_read": "The EPANET sections embedded in the drawing were read: {sections}.",
+        "lpn_dxfnet_note_sections_unread": "The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.",
+        "lpn_dxfnet_count_nodes": "{n} junctions, reservoirs and tanks.",
+        "lpn_dxfnet_count_links": "{n} pipes, pumps and valves.",
+        "lpn_dxfnet_count_customers": "{n} customers.",
+        "lpn_dxfnet_held_custom": "custom properties",
+        "lpn_dxfnet_held_text": "map Text items and hand-placed label positions",
+        "lpn_dxfnet_note_unit_unknown": "The drawing states these units, which this page does not know. The units in use were kept for them.",
+        "lpn_dxfnet_note_coord_unit": "The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.",
+        "lpn_dxfnet_note_customer_loose": "The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.",
+        "lpn_dxfnet_note_not_held": "A DXF file does not hold these, so none was imported:",
+        "lpn_dxfnet_none": "Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.",
+        "lpn_dxfnet_report_lead": "What was not read, and each change made during import, is listed below with the layer, block or ID concerned:",
         "lpn_shapes_every_scenario": "Shapes appear in every scenario.",
         "lpn_shapes_this_scenario": "Shapes appear in {scenario} only.",
         "lpn_library_import_every_scenario": "Every scenario can use them.",
@@ -2188,6 +2272,70 @@
                     "key": "lpn_file_export_inp_tip",
                     "value": "Bu şebekeyi bir EPANET .inp dosyası olarak indirir (varsa görüntüsüyle birlikte bir zip dosyası içinde). .inp biçiminin tutamadığı her şey sonrasında sizin için listelenir.",
                     "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
+            }
+        },
+        "lpn_dxf_note_headloss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_dxf_note_blocks",
+                    "value": "Katmanlar {prefix}, varlık kodu, bir tire ve alternatif olarak adlandırılır, {example} örneğindeki gibi. Her öğe, 1 birim yüksekliğinde özniteliklerle 1 ölçeğinde yerleştirilmiş bir bloktur; metin yüksekliğini ayarlamak için blokları ölçekleyin. Her öznitelik görünürdür; bir öğenin öznitelikleri sembolünün yanında bir sütun halinde dizilir.",
+                    "english": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol."
+                },
+                "next_translated": {
+                    "key": "lpn_dxf_note_shortened",
+                    "value": "Bir DXF dosyasının izin verdiğinden ({max} karakter) uzun değerler: {n}. Her biri kısaltıldı ve üç noktayla bitiyor.",
+                    "english": "Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods."
+                }
+            }
+        },
+        "lpn_dxf_note_demand_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_dxf_note_blocks",
+                    "value": "Katmanlar {prefix}, varlık kodu, bir tire ve alternatif olarak adlandırılır, {example} örneğindeki gibi. Her öğe, 1 birim yüksekliğinde özniteliklerle 1 ölçeğinde yerleştirilmiş bir bloktur; metin yüksekliğini ayarlamak için blokları ölçekleyin. Her öznitelik görünürdür; bir öğenin öznitelikleri sembolünün yanında bir sütun halinde dizilir.",
+                    "english": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol."
+                },
+                "next_translated": {
+                    "key": "lpn_dxf_note_shortened",
+                    "value": "Bir DXF dosyasının izin verdiğinden ({max} karakter) uzun değerler: {n}. Her biri kısaltıldı ve üç noktayla bitiyor.",
+                    "english": "Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods."
+                }
+            }
+        },
+        "lpn_dxf_sections_header": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_dxf_note_blocks",
+                    "value": "Katmanlar {prefix}, varlık kodu, bir tire ve alternatif olarak adlandırılır, {example} örneğindeki gibi. Her öğe, 1 birim yüksekliğinde özniteliklerle 1 ölçeğinde yerleştirilmiş bir bloktur; metin yüksekliğini ayarlamak için blokları ölçekleyin. Her öznitelik görünürdür; bir öğenin öznitelikleri sembolünün yanında bir sütun halinde dizilir.",
+                    "english": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol."
+                },
+                "next_translated": {
+                    "key": "lpn_dxf_note_shortened",
+                    "value": "Bir DXF dosyasının izin verdiğinden ({max} karakter) uzun değerler: {n}. Her biri kısaltıldı ve üç noktayla bitiyor.",
+                    "english": "Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods."
+                }
+            }
+        },
+        "lpn_dxf_curve_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_dxf_note_blocks",
+                    "value": "Katmanlar {prefix}, varlık kodu, bir tire ve alternatif olarak adlandırılır, {example} örneğindeki gibi. Her öğe, 1 birim yüksekliğinde özniteliklerle 1 ölçeğinde yerleştirilmiş bir bloktur; metin yüksekliğini ayarlamak için blokları ölçekleyin. Her öznitelik görünürdür; bir öğenin öznitelikleri sembolünün yanında bir sütun halinde dizilir.",
+                    "english": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol."
+                },
+                "next_translated": {
+                    "key": "lpn_dxf_note_shortened",
+                    "value": "Bir DXF dosyasının izin verdiğinden ({max} karakter) uzun değerler: {n}. Her biri kısaltıldı ve üç noktayla bitiyor.",
+                    "english": "Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods."
                 }
             }
         },
@@ -5573,6 +5721,46 @@
                 "value": "Bir GeoJSON dosyasını yeni bir proje olarak açar. Noktalar düğüm, rezervuar veya depo olarak, çizgiler boru olarak içe aktarılır. Bu sayfadan dışa aktarılmış bir dosya yazıldığı gibi okunur; başka herhangi bir dosya için bir adım, alanlarını özelliklere ve birimlere eşler."
             }
         },
+        "lpn_file_import_dxfnet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "Bir GeoJSON dosyasını yeni bir proje olarak açar. Noktalar düğüm, rezervuar veya depo olarak, çizgiler boru olarak içe aktarılır. Bu sayfadan dışa aktarılmış bir dosya yazıldığı gibi okunur; başka herhangi bir dosya için bir adım, alanlarını özelliklere ve birimlere eşler.",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                },
+                "next_translated": {
+                    "key": "lpn_gjnet_refuse_crs",
+                    "value": "{file}, {crs} koordinat sistemini belirtiyor. GeoJSON konumları WGS 84 enlem ve boylamıdır (RFC 7946) ve bu sayfa başka bir sistemdeki GeoJSON dosyasını dönüştürmez. Katmanı CBS'den EPSG:4326 (WGS 84) olarak dışa aktarın, sonra o dosyayı içe aktarın.",
+                    "english": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_dxfnet_tip",
+                "english": "Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read."
+            }
+        },
+        "lpn_file_import_dxfnet_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "Bir GeoJSON dosyasını yeni bir proje olarak açar. Noktalar düğüm, rezervuar veya depo olarak, çizgiler boru olarak içe aktarılır. Bu sayfadan dışa aktarılmış bir dosya yazıldığı gibi okunur; başka herhangi bir dosya için bir adım, alanlarını özelliklere ve birimlere eşler.",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                },
+                "next_translated": {
+                    "key": "lpn_gjnet_refuse_crs",
+                    "value": "{file}, {crs} koordinat sistemini belirtiyor. GeoJSON konumları WGS 84 enlem ve boylamıdır (RFC 7946) ve bu sayfa başka bir sistemdeki GeoJSON dosyasını dönüştürmez. Katmanı CBS'den EPSG:4326 (WGS 84) olarak dışa aktarın, sonra o dosyayı içe aktarın.",
+                    "english": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_dxfnet",
+                "english": "DXF file…"
+            }
+        },
         "lpn_gjnet_note_not_held": {
             "reason": "english_changed",
             "current_value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
@@ -5581,6 +5769,582 @@
                     "key": "lpn_gjnet_note_end_off_node",
                     "value": "Bu hatların her birinin çizgisi düğümünde başlamıyor veya bitmiyor. Düğüm konumu kullanıldı.",
                     "english": "The line of each of these links does not start or end at its node. The node position was used."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_layer_foreign": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_layer_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_alternative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_alt_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_curve_differs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_shapes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_entity_unread": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_paper_space": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_tag_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_block_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_bad_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_dup_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_no_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_link_no_block": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_block_no_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_line_no_block": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_end_ambiguous": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_end_no_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_end_loop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_pump_no_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_crs_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_method": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_geo_export": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_sections_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_sections_unread": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_count_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_count_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_count_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_held_custom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_held_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_unit_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_coord_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_customer_loose": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_note_not_held": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figür {file} dosyasından içe aktarıldı.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_dxfnet_report_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_not_held",
+                    "value": "Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.",
+                    "english": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
                 },
                 "next_translated": {
                     "key": "lpn_geojson_import_done",

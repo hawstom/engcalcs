@@ -1772,6 +1772,11 @@
             "ruled": "2026-10-20",
             "answer": "OK."
         },
+        "lpn_dxf_sections_header": {
+            "on": "EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.",
+            "ruled": "2026-10-30",
+            "answer": "Tom: \"What page? EPANET++. Also DXF, not drawing.\""
+        },
         "lpn_dxf_note_blocks": {
             "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
             "ruled": "2026-10-08",
@@ -3581,9 +3586,9 @@
             "answer": "OK."
         },
         "lpn_guide_prop_example_def": {
-            "on": "<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Is active?, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>",
-            "ruled": "2026-10-17",
-            "answer": "OK."
+            "on": "<p>Open the Net1 example and click Pipe 10. Properties lists inputs and then results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>",
+            "ruled": "2026-10-30",
+            "answer": "Tom's own wording: \"Properties lists inputs and then results\"."
         },
         "lpn_guide_prop_id_def": {
             "on": "<p>The ID is edited in the title bar. It cannot contain a space or a quotation mark, and a node's ID cannot be that of another node, nor a link's that of another link. A node and a link can have the same ID. A refused ID leaves the old one in place and shows a message. Renaming an asset carries its scenario overrides with it.</p>",
@@ -8511,6 +8516,16 @@
             "on": "A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.",
             "ruled": "2026-10-25",
             "answer": "Tom's own wording."
+        },
+        "lpn_guide_text_demands_box": {
+            "on": "Lists the demand categories of the selected junction, one row for each, with the base demand and the demand pattern of every category. The plus button adds a category. With more than one category, Base demand in Properties is their total and is read-only. Customers lumped at the junction are listed with their demand. In a scenario, an edit is an override and Base is not changed.",
+            "ruled": "2026-10-30",
+            "answer": "Good."
+        },
+        "lpn_guide_ct_example_def": {
+            "on": "<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>",
+            "ruled": "2026-10-30",
+            "answer": "Good."
         }
     }
 }

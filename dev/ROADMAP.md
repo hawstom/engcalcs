@@ -359,7 +359,7 @@ the block.
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
-  **DXF import slice 1 BUILT 2026-10-29 on `feat/dxf-import`**: reads what our export writes, round trip on Net1-3 and a lat/lon project. Slice 2 (a stranger's drawing, the Interface Manager table) not started. Waits his pass.
+  **DXF import slice 1 MERGED 2026-10-30** (reads what our export writes; round trip on Net1-3 and a lat/lon project). Slice 2 (a stranger's drawing, the Interface Manager table) not started.
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
   Tom, 2026-10-06: **DXF export first** (plain AutoCAD cannot read a shapefile); stable, venerable,
