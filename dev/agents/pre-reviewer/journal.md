@@ -4844,3 +4844,7 @@ OBSERVED MISSED: Fire flow RESULTS columns cannot be dragged by finger: grip cod
 OBSERVED MISSED (minor): Fire flow control label "Lowest system pressure allowed (psi)?" is cut at first open with no tip (PC and phone); the harness flags cutNoTitle 5 and passes anyway because it asserts only for Properties.
 OBSERVED PRE-EXISTING (same on master): phone, docked Properties, a finger divider drag ends and the flyout retracts ~200 ms later; the next drag then pans the map. May be a CDP-touch artifact.
 Method: scratchpad p9 (fit, ff, multi, find, mp*.js); shots _panel/www/img/perry9-*.png.
+
+## 2026-10-31 -- box-design round 9b (e2a7bf8fd)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC mouse, phone touch, docks on): all four round-9 findings FIXED. Phone finger drag of a Fire flow result column: 66 -> 126 px, stored `lpn_rptcols` 8.78 em, squeeze to 29 px; PC mouse 71 -> 151 still fine. Multi first Label column 153-165 px vs single 154-161 (was 85-124), cut labels 3-5 (was 13-21), `?` markers present as in single. Cut Fire flow control label has its full tip at rest (my first reading missed it: an armed tip sits in data-bs-original-title, not title). Phone docked Properties stays after a finger divider drag; four successive drags moved the divider (153->98->190->156->207). PC multi divider drags 154->94->194, 165->105->205.
+Method: scratchpad p9 (ff, multi, fit, mp, mp4, tips, find); shots perry9b-*.png. LESSON: read data-bs-original-title as well as title when checking tips.
