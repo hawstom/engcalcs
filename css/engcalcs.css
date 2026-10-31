@@ -2416,8 +2416,8 @@ html[lang="zh"] .ec-welcome {
 #lpn_popup_fields.lpn-ovm-gut2, #lpn_popup_title.lpn-ovm-gut2 { padding-inline-start: 2.05em; }
 #lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -1.1em; }
 #lpn_popup_fields.lpn-ovm-gut2 .lpn-ovm { margin-inline-start: -2.05em; }
-#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.1em; }
-#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-row, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 [data-lpn-setting] { padding-inline-start: 2.05em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut .lpn-units-item, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.1em; }
+#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-row, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-units-item, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 [data-lpn-setting] { padding-inline-start: 2.05em; }
 /* A column heading over marked rows gives up the same room, or it sits 1.1em left of its column. */
 #lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.1em / 0.85); }   /* the heading is .85em, the rows 1em */
 #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-colhead { padding-inline-start: calc(2.05em / 0.85); }
@@ -7742,3 +7742,13 @@ textarea.lpn-desc-ta {
 /* The projection box: the Search button sits at the left under the place field; the register's list fills the box (round 10b). */
 .lpn-crs-search { margin-block: 4px; }
 .lpn-crs-list > select { width: 100%; box-sizing: border-box; }
+/* SETTINGS > UNITS ARE SETTINGS ROWS (round 10b, the sheet-style audit, A2): the strip's label-above-select stacks take the same two-column row as every other
+   setting, the unit's name in the name track and its select in the control track. The strip's own markup (one name, one select) is unchanged. */
+#lpn_set_units_fields .lpn-units-group { display: block; }
+#lpn_set_units_fields .lpn-units-item {
+	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
+	align-items: baseline; gap: 6px; margin: 3px 0;
+}
+#lpn_set_units_fields .lpn-units-item > * { min-width: 0; }
+#lpn_set_units_fields .lpn-units-item > :nth-child(2) { justify-self: start; }
+#lpn_set_units_fields .lpn-units-name { overflow: hidden; white-space: nowrap; }
