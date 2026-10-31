@@ -11,7 +11,7 @@ profile. Every sysvar listing includes 'Where it's stored.'"*
 |---|---|---|---|
 | Project | Saved with the project | `lpn_saved_project` | Rides in `serializeProject()`; goes to the file and to a colleague |
 | This browser | Saved in this browser | `lpn_saved_browser` | A `localStorage` key; follows the device, never the file |
-| This session | Not saved | `lpn_saved_session` | Forgotten on reload. No Settings control is in this class today; the key exists so the next one is not an excuse to invent a fourth |
+| This session | Not saved | `lpn_saved_session` | Forgotten on reload. Only the three boxes of the GIS add-layer form (Kind of server, Server address, WMS layer names) are in this class: a draft kept until Add layer is pressed |
 
 CLAUDE.md's rule is unchanged: a `lpn_` setting belongs to the project **or** the browser, never
 both. The harness reports a control that changed both as `both` and fails it.
@@ -87,7 +87,7 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
-| `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
+| `lpn_set_sub_mapDisplay` | 22 | 19 | 0 | 3 |
 | `lpn_set_sub_page` | 3 | 0 | 3 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
@@ -97,10 +97,13 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 130 | 126 | 4 | 0 |
+| **Total** | 133 | 126 | 4 | 3 |
 
 Controls whose home is not their heading's default, as observed:
 
+- `lpn_set_sub_mapDisplay`: Kind of server -- session
+- `lpn_set_sub_mapDisplay`: Server address -- session
+- `lpn_set_sub_mapDisplay`: WMS layer names -- session
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show all properties on hover -- browser
 - `lpn_set_sub_page`: Show override markers on the map -- browser

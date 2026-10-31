@@ -5,10 +5,11 @@
 //   1. Every interface name the chapter quotes is the language file's own.
 //   2. The entry has the box's paragraph and the chapter's three terms.
 //   3. In a scenario, Water, Graphs, Contour turns the plot on in that scenario only (the settings are
-//      stored in it, and Base has no contour). Then in Base: the node colors become pressure, the line
-//      under the key is the chapter's (9 nodes, 11 pipes, 2.5, every 5 psi), the box holds the
-//      controls the chapter lists with the values it implies, and clearing Show contours keeps the
-//      node colors.
+//      stored in it, and Base has no contour). Then in Base: the plot spreads pressure while the node
+//      colors are left as they were (e1aaca674, Tom 2026-10-29: opening the box must not turn on
+//      Settings Colors), the line under the key is the chapter's (9 nodes, 11 pipes, 2.5, every 5 psi),
+//      the box holds the controls the chapter lists with the values it implies, and clearing Show
+//      contours keeps the node colors.
 //   4. A page in another language renders the same terms.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -60,7 +61,7 @@ async function main() {
 		await contour();
 		const st = await U.storedProject(ctx);
 		const alt = JSON.stringify(st.alternatives || []);
-		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourFill') >= 0 && alt.indexOf('colorNodeField') >= 0, alt.slice(0, 220));
+		ok('Graphs, Contour in a scenario turns the plot on there: the fill is drawn, and the scenario stores the settings', (await fills()) > 0 && alt.indexOf('contourFill') >= 0 && alt.indexOf('colorNodeField') < 0, alt.slice(0, 220));
 		ok('...and the project\'s own settings still have no contour', !st.settings.contourFill && !st.settings.colorNodeField, JSON.stringify([st.settings.contourFill, st.settings.colorNodeField]));
 		await closeBox();
 		await P.click('#lpn_scenario_btn');
@@ -78,11 +79,11 @@ async function main() {
 		const ctl = await P.evaluate(() => ({ labels: document.getElementById('lpn_contour_body').innerText.replace(/\s+/g, ' '), vals: Array.from(document.querySelectorAll('#lpn_contour_body input, #lpn_contour_body select')).map((e) => e.type === 'checkbox' ? e.checked : e.value) }));
 		const needs = ['lpn_contour_show', 'lpn_contour_fill', 'lpn_contour_opacity', 'lpn_contour_lines', 'lpn_contour_interval', 'lpn_contour_buffer'].map(enString);
 		ok('the box holds the controls the chapter lists', needs.every((w) => ctl.labels.indexOf(w) >= 0), ctl.labels.slice(0, 200));
-		ok('...opening on Show contours checked, pressure, Smooth, 60 percent, lines on, every 5, buffer 2.5', ctl.vals[0] === true && ctl.vals[1] === 'pressure' && ctl.vals[2] === 'smooth' && ctl.vals[3] === '60' && ctl.vals[4] === true && ctl.vals[5] === '5' && ctl.vals[7] === '2.5', JSON.stringify(ctl.vals));
+		ok('...opening on Show contours checked, node colors untouched (none), Smooth, 60 percent, lines on, every 5, buffer 2.5', ctl.vals[0] === true && ctl.vals[1] === '' && ctl.vals[2] === 'smooth' && ctl.vals[3] === '60' && ctl.vals[4] === true && ctl.vals[5] === '5' && ctl.vals[7] === '2.5', JSON.stringify(ctl.vals));
 		await P.evaluate(() => { const c = document.querySelector('#lpn_contour_body input[type=checkbox]'); c.click(); });
 		await settle(1200);
 		const after = await P.evaluate(() => ({ color: document.querySelector('#lpn_contour_body select').value, nodes: Array.from(document.querySelectorAll('#lpn_canvas circle[data-node]')).filter((c) => c.style.fill || c.getAttribute('fill')).length }));
-		ok('clearing Show contours removes the fill and the lines, and the node coloring stays on pressure', (await fillNames()).length <= 1 && after.color === 'pressure', JSON.stringify(after));
+		ok('clearing Show contours removes the fill and the lines, and the node coloring stays as it was (none)', (await fillNames()).length <= 1 && after.color === '', JSON.stringify(after));
 		ok('no page errors (English)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.context.close().catch(() => {});
 

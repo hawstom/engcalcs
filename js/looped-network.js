@@ -63932,6 +63932,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				item.appendChild(name); item.appendChild(grp);
 				gisBody.appendChild(item);
 			});
+			// The three boxes of the add-layer form are a draft: nothing is kept until Add layer, so each says This session.
 			var kindSel = document.createElement('select'), urlIn = document.createElement('input'),
 				layersIn = document.createElement('input'), addBtn = document.createElement('button');
 			EngCalcs.lpnGis.KINDS.forEach(function (k) {
@@ -63943,9 +63944,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			urlIn.setAttribute('autocomplete', 'off'); urlIn.setAttribute('spellcheck', 'false');
 			layersIn.type = 'text'; layersIn.id = 'lpn_gis_layers'; layersIn.className = 'lpn-gis-wide'; layersIn.setAttribute('autocomplete', 'off');
 			addBtn.type = 'button'; addBtn.id = 'lpn_gis_add'; addBtn.className = 'lpn-gis-addbtn'; addBtn.textContent = pc.lpn_gis_add || 'Add layer';
-			row(gisBody, pc.lpn_gis_kind || 'Kind of server', kindSel);
-			row(gisBody, pc.lpn_gis_url || 'Server address', urlIn);
-			var layersRow = row(gisBody, pc.lpn_gis_wms_layers || 'WMS layer names (comma separated)', layersIn);
+			row(gisBody, pc.lpn_gis_kind || 'Kind of server', kindSel, null, null, 'session');
+			row(gisBody, pc.lpn_gis_url || 'Server address', urlIn, null, null, 'session');
+			var layersRow = row(gisBody, pc.lpn_gis_wms_layers || 'WMS layer names (comma separated)', layersIn, null, null, 'session');
 			function showLayersRow() { layersRow.style.display = kindSel.value === 'wms' ? '' : 'none'; }
 			kindSel.addEventListener('change', showLayersRow);
 			showLayersRow();

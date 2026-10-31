@@ -98,7 +98,8 @@ async function main() {
 		await page.keyboard.press('ArrowDown');
 		let w = await where(page);
 		ok('Down from the first field lands on the second', w.in && w.text === list[1].text, JSON.stringify(w));
-		ok('...with its contents selected', w.selected === true, JSON.stringify(w));
+		// Since 99e9b4292 the second field of a junction is the Active? tick, which has no contents to select.
+		ok('...with its contents selected (a tick has none)', w.selected === true || (w.type === 'checkbox' && w.selected === null), JSON.stringify(w));
 		await page.keyboard.press('ArrowUp');
 		w = await where(page);
 		ok('Up goes back to the first', w.in && w.text === list[0].text, JSON.stringify(w));

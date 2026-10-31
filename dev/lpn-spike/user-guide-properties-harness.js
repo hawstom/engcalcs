@@ -87,10 +87,12 @@ async function main() {
 		await settle(500);
 		let rows = await popupRows();
 		const idx = (rows, start) => rows.findIndex((r) => r.text.indexOf(start) === 0);
-		const lastInput = idx(rows, await T('lpn_field_active_short'));
+		// Row order since 99e9b4292 (Tom, 2026-10-29): From and To right after the ID, Active near the top, every input, then the calculated rows last.
+		const lastInput = rows.map((r) => r.input).lastIndexOf(true);
 		const flow = idx(rows, await T('lpn_result_flow')), vel = idx(rows, await T('lpn_result_velocity'));
-		ok('Pipe 10: Description is the first row and Active the last input; the calculated rows follow it', idx(rows, await T('lpn_field_desc')) === 0 && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
-		ok('...the calculated rows have no box to type in', rows.slice(lastInput + 1).every((r) => !r.input), JSON.stringify(rows.slice(lastInput + 1).map((r) => r.input)));
+		const act = idx(rows, await T('lpn_field_active_short')), desc = idx(rows, await T('lpn_field_desc')), tag = idx(rows, await T('lpn_field_tag'));
+		ok('Pipe 10: From, To and Active lead, then Description and Tag; every input comes before the calculated rows', idx(rows, await T('lpn_field_from')) === 0 && act > 0 && act < desc && desc < tag && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
+		ok('...the calculated rows have no box to type in', rows.slice(flow).every((r) => !r.input), JSON.stringify(rows.slice(flow).map((r) => r.input)));
 		const ex = plain(enString('lpn_guide_prop_example_def'));
 		const val = (i) => rows[i].text.replace(/[^0-9.]+$/, '').split(' ').pop();
 		const HL = rows[idx(rows, await T('lpn_result_headloss'))].text;
@@ -102,8 +104,9 @@ async function main() {
 		await settle(500);
 		rows = await popupRows();
 		const head = idx(rows, await T('lpn_field_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
-		ok('Junction 11: Head and Pressure are read-only rows that sit before its last inputs', head > 0 && pressure > head && initq > pressure && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
-		ok('...and the last row is an input again, Is active?', rows[rows.length - 1].text.indexOf(await T('lpn_field_active_short')) === 0 && rows[rows.length - 1].input);
+		const lastIn11 = rows.map((r) => r.input).lastIndexOf(true);
+		ok('Junction 11: Head and Pressure are read-only rows that sit after its inputs', head > 0 && pressure > head && initq > 0 && head > lastIn11 && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
+		ok('...and Is active? is the first row, an input', rows[0].text.indexOf(await T('lpn_field_active_short')) === 0 && rows[0].input);
 
 		// ---- 4. the ID ------------------------------------------------------------------------------
 		console.log('\n4. The ID');
