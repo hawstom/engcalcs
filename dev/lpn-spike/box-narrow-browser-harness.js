@@ -61,17 +61,31 @@ async function main() {
 		const r = hits[0].getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 	});
 	// Every value control visible and wholly inside the box, the header buttons on screen, nothing scrolling sideways inside the box.
-	const fitReport = (S) => S.page.evaluate(() => {
-		const b = document.getElementById('lpn_popup'), br = b.getBoundingClientRect(), body = b.querySelector('.lpn-popover-body'), d = document.documentElement;
+	const fitReport = (S, sel) => S.page.evaluate((boxSel) => {
+		const b = document.querySelector(boxSel || '#lpn_popup'), br = b.getBoundingClientRect(), body = b.querySelector('.lpn-popover-body') || b, d = document.documentElement;
 		const inside = (r) => r.left >= br.left - 1 && r.right <= br.right + 1 && r.left >= -1 && r.right <= innerWidth + 1;
-		const ins = Array.from(b.querySelectorAll('#lpn_popup_fields input:not([type=hidden]), #lpn_popup_fields select, #lpn_popup_fields textarea')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+		const ins = Array.from(b.querySelectorAll('input:not([type=hidden]), select, textarea')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; });
 		const bad = ins.filter((e) => !inside(e.getBoundingClientRect()));
-		const btns = Array.from(b.querySelectorAll('.lpn-box-corner button, .lpn-popover-x'));
+		const btns = Array.from(b.querySelectorAll('.lpn-box-corner button, .lpn-popover-x, .lpn-setbox-x, button[id$="_close"]')).filter((e) => b.contains(e) && e.getBoundingClientRect().height > 0 || e.classList.contains('lpn-popover-x'));
 		const badBtn = btns.filter((e) => { const r = e.getBoundingClientRect(); return !(r.width > 0) || !inside(r); });
-		const t = b.querySelector('.lpn-setbox-title'), tr = t && t.getBoundingClientRect(), cr = b.querySelector('.lpn-box-corner') && b.querySelector('.lpn-box-corner').getBoundingClientRect();
+		const t = b.querySelector('.lpn-setbox-title'), tr = t && t.getBoundingClientRect();
+		// The title's RENDERED text, clipped by its own box (an ellipsis cuts it), against the left edge of the first header button.
+		let textRight = 0, firstBtnLeft = Infinity;
+		if (t) { const rg = document.createRange(); rg.selectNodeContents(t); textRight = Math.min(rg.getBoundingClientRect().right, t.getBoundingClientRect().right); }
+		btns.forEach((e) => { const r = e.getBoundingClientRect(); if (r.width > 0 && r.left < firstBtnLeft) { firstBtnLeft = r.left; } });
+		const titleOver = Math.max(0, Math.round(textRight - firstBtnLeft));
+		// Stacked rows: no label or value lies over another.
+		const cells = Array.from(body.querySelectorAll('.lpn-gname, .lpn-gval, .lpn-set-row > *')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; });
+		const rects = cells.map((e) => e.getBoundingClientRect());
+		let overlaps = 0, ex = '';
+		for (let a = 0; a < cells.length; a++) for (let c = a + 1; c < cells.length; c++) {
+			if (cells[a].contains(cells[c]) || cells[c].contains(cells[a])) { continue; }
+			const x = Math.min(rects[a].right, rects[c].right) - Math.max(rects[a].left, rects[c].left), y = Math.min(rects[a].bottom, rects[c].bottom) - Math.max(rects[a].top, rects[c].top);
+			if (x > 1 && y > 1) { overlaps++; if (!ex) { ex = (cells[a].textContent || cells[a].value || '').trim().slice(0, 12) + ' / ' + (cells[c].textContent || cells[c].value || '').trim().slice(0, 12) + ' ' + Math.round(y) + 'px'; } }
+		}
 		const bb = body.getBoundingClientRect(), wideEls = Array.from(body.querySelectorAll('*')).filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > bb.right + 1; }).slice(0, 4).map((e) => e.tagName + '.' + String(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className).slice(0, 24) + '+' + Math.round(e.getBoundingClientRect().right - bb.right)).join(' ');
-		return { wideEls, w: Math.round(br.width), inputs: ins.length, badInputs: bad.length, firstBad: bad[0] ? bad[0].className + ' ' + Math.round(bad[0].getBoundingClientRect().left - br.left) + '..' + Math.round(bad[0].getBoundingClientRect().right - br.left) : '', titleOverlap: (tr && cr) ? Math.max(0, Math.round((tr.right - parseFloat(getComputedStyle(t).paddingRight)) - cr.left)) : 0, btns: btns.length, badBtns: badBtn.length, bodySide: body.scrollWidth - body.clientWidth, pageX: d.scrollWidth - d.clientWidth };
-	});
+		return { wideEls, w: Math.round(br.width), inputs: ins.length, badInputs: bad.length, firstBad: bad[0] ? bad[0].tagName + '.' + bad[0].className + ' ' + Math.round(bad[0].getBoundingClientRect().left - br.left) + '..' + Math.round(bad[0].getBoundingClientRect().right - br.left) : '', titleOverlap: titleOver, overlaps, overlapEx: ex, btns: btns.length, badBtns: badBtn.length, bodySide: body.scrollWidth - body.clientWidth, pageX: d.scrollWidth - d.clientWidth };
+	}, sel);
 	const geo = (S, sel) => S.page.evaluate((s) => {
 		const b = document.querySelector(s), r = b.getBoundingClientRect(), d = document.documentElement;
 		return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right), minW: getComputedStyle(b).minWidth, pageX: d.scrollWidth - d.clientWidth, shown: getComputedStyle(b).display !== 'none' };
@@ -209,7 +223,8 @@ async function main() {
 					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: box is ' + target + ' wide', Math.abs(f.w - target) <= 3, String(f.w));
 					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: all ' + f.inputs + ' value controls wholly inside the box', f.inputs > 0 && f.badInputs === 0, f.badInputs + ' outside; first ' + f.firstBad);
 					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: ' + f.btns + ' header buttons on screen', f.btns >= 2 && f.badBtns === 0, f.badBtns + ' off');
-					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: the title stops before the header buttons', f.titleOverlap <= 1, f.titleOverlap + ' px over');
+					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: the title stops before the header buttons', f.titleOverlap <= 1, f.titleOverlap + ' px of title text over the first button');
+					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: no label or value lies over another', f.overlaps === 0, f.overlaps + ' e.g. ' + f.overlapEx);
 					ok('E. ' + net + ' ' + mode + ' ' + target + ' px: no sideways scroll in the box or the page', f.bodySide <= 1 && f.pageX <= 0, f.bodySide + ' / ' + f.pageX);
 					if (target === 100) { await shot(S, 'boxnarrow-e-' + net + '-' + (phone ? 'phone' : 'pc') + '.png'); }
 				}
@@ -257,6 +272,47 @@ async function main() {
 			ok('F. ' + vw + ': a window narrowed to 240 px keeps the box wholly on screen', g.l >= 0 && g.r <= g.vw + 1, JSON.stringify(g));
 			ok('F. ' + vw + ': no page error', S.errors.length === 0, S.errors.join(' | '));
 			await S.close();
+		}
+
+		console.log('\n--- G. Find and Fire flow at 150, 100 and 80 px: values visible, header buttons on screen, title short of them, nothing over anything ---');
+		for (const phone of [false, true]) {
+			for (const [what, sel, door] of [
+				['Find and replace', '#lpn_find_popup', async (S) => { await S.menuClick(await S.lang('lpn_find_menu'), 'edit'); }],
+				['Fire flow', '#lpn_ff_box', async (S) => { await S.menuClickSub(await S.lang('lpn_analyze_menu'), await S.lang('lpn_ff_menu'), 'project'); }]]) {
+				const mode = phone ? 'phone' : 'PC';
+				const S = await Session.open(browser, NAME + '-g', phone ? { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } : { viewport: { width: 1280, height: 800 } });
+				const P = S.page;
+				await openNet1(S, phone);
+				await door(S);
+				await S.settle(1000);
+				ok('G. ' + what + ' ' + mode + ': opens', (await geo(S, sel)).shown);
+				for (const target of [150, 100, 80]) {
+					const grip = phone ? await P.evaluate((q) => { const b = document.querySelector(q); if (!b.classList.contains('lpn-docked')) { return null; } const e = ['right', 'left'].map((k) => document.getElementById('lpn_dock_grip_' + k)).filter((x) => x && getComputedStyle(x).display !== 'none')[0]; if (!e) { return null; } const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, sign: e.id === 'lpn_dock_grip_right' ? 1 : -1 }; }, sel) : null;
+					if (grip) {
+						const cur = (await geo(S, sel)).w;
+						const cdp = await S.context.newCDPSession(P);
+						const touch = async (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+						await touch('touchStart', grip.x, grip.y);
+						for (let k = 1; k <= 10; k++) { await touch('touchMove', grip.x + grip.sign * (cur - target) * k / 10, grip.y); }
+						await touch('touchEnd', 0, 0);
+					} else {
+						await P.evaluate((a) => { const b = document.querySelector(a.q); b.style.setProperty('width', a.w + 'px', 'important'); b.style.setProperty('max-width', 'none', 'important'); }, { q: sel, w: target });
+					}
+					await S.settle(500);
+					const f = await fitReport(S, sel);
+					const tag = 'G. ' + what + ' ' + mode + ' ' + target + ' px: ';
+					console.log('  ' + tag + JSON.stringify(f));
+					ok(tag + 'box is that wide', Math.abs(f.w - target) <= 3, String(f.w));
+					ok(tag + 'all ' + f.inputs + ' value controls wholly inside the box', f.inputs > 0 && f.badInputs === 0, f.badInputs + ' outside; first ' + f.firstBad);
+					ok(tag + f.btns + ' header buttons on screen, inside the box', f.btns >= 1 && f.badBtns === 0, f.badBtns + ' off');
+					ok(tag + 'the title stops before the header buttons', f.titleOverlap <= 1, f.titleOverlap + ' px');
+					ok(tag + 'no label or value lies over another', f.overlaps === 0, f.overlaps + ' e.g. ' + f.overlapEx);
+					ok(tag + 'no sideways scroll in the box or the page', f.bodySide <= 1 && f.pageX <= 0, f.bodySide + ' / ' + f.pageX + ' ' + f.wideEls);
+					if (target === 100) { await shot(S, 'boxnarrow-g-' + what.split(' ')[0] + '-' + mode + '.png'); }
+				}
+				ok('G. ' + what + ' ' + mode + ': no page error', S.errors.length === 0, S.errors.join(' | '));
+				await S.close();
+			}
 		}
 
 		console.log('\n--- D. Settings shrunk below two columns stacks its rows ---');

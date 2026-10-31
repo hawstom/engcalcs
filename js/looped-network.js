@@ -71050,7 +71050,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			(window.requestAnimationFrame || window.setTimeout)(function () { queued = false; applyNarrowStack(box); });
 		}
 		if (window.ResizeObserver) { new window.ResizeObserver(later).observe(box); }
-		if (window.MutationObserver) { new window.MutationObserver(later).observe(box, { childList: true, subtree: true }); }
+		if (window.MutationObserver) { new window.MutationObserver(later).observe(box, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); }
 		later();
 	}
 	// A floating box wholly on screen: its width no more than the window less an edge each side, its left and top inside. Docked boxes are laid by the dock.

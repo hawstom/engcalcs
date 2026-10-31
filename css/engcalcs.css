@@ -3972,7 +3972,8 @@ option:disabled { color: var(--ec-ink-muted); }
    `lpn-gnarrow` on every `.lpn-gridhost` inside it (the generic boxes already stack under that class). Here is the Properties box's own three-track body
    collapsed to one track, every cell of every row (and the ID line and the Time series row) in it, and each value control the width of the box. */
 @supports (grid-template-columns: subgrid) {
-	.lpn-propbox.lpn-box-stack .lpn-popover-body { grid-template-columns: minmax(0, 1fr); }
+	/* max-content rows: with the default auto rows the body sized its ID row to one line, and the stacked ID value lay over the next label. */
+	.lpn-propbox.lpn-box-stack .lpn-popover-body { grid-template-columns: minmax(0, 1fr); grid-auto-rows: max-content; }
 	.lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gname, .lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox.lpn-box-stack .lpn-gprops .lpn-grow > .lpn-ggut,
 	.lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > .lpn-gname, .lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id > input,
 	.lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > label, .lpn-propbox.lpn-box-stack #lpn_popup_graph .lpn-pgraph-row > select,
@@ -3991,8 +3992,10 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-box-stack > .lpn-box-corner { max-width: calc(100% - 28px); right: 28px; }
 .lpn-box-stack > .lpn-box-corner > .lpn-corner-btn { flex: 0 1 28px; min-width: 0; width: auto; }
 .lpn-box-stack > .lpn-popover-x { width: 28px; }
-.lpn-box-stack.lpn-has-corner > :is(.lpn-setbox-title) { padding-right: min(calc(28px + var(--lpn-corner-w, 0px)), 100%); padding-left: 6px; }
-.lpn-box-stack:not(.lpn-has-corner) > :is(.lpn-setbox-title) { padding-right: 28px; padding-left: 6px; }
+/* The title's own box ends where the buttons begin (its overflow clips there), so even a zero-width text area draws nothing over them. */
+.lpn-box-stack.lpn-has-corner > :is(.lpn-setbox-title) { right: min(calc(28px + var(--lpn-corner-w, 0px)), calc(100% - 2px)); padding-right: 0; padding-left: 6px; }
+.lpn-box-stack:not(.lpn-has-corner) > :is(.lpn-setbox-title) { right: min(28px, calc(100% - 2px)); padding-right: 0; padding-left: 6px; }
+@supports (grid-template-columns: subgrid) { .lpn-propbox.lpn-box-stack #lpn_popup_title.lpn-gtitle-id { display: block; } }
 /* Spreadsheet look: the header, the ruled rows. A phone has the same grid as a PC (Tom, 2026-10-29); only a touch pointer changes sizes (below). */
 @media all {
 	@supports (grid-template-columns: subgrid) {
@@ -7728,3 +7731,4 @@ textarea.lpn-desc-ta {
 .lpn-box-stack .lpn-gname bdi { white-space: normal; overflow-wrap: anywhere; }
 .lpn-box-stack #lpn_popup_graph svg { overflow: hidden; max-width: 100%; }
 .lpn-box-stack .lpn-pgraph-chart, .lpn-box-stack #lpn_popup_graph { overflow: hidden; }
+.lpn-box-stack button, .lpn-box-stack .lpn-rptbox-copy { max-width: 100%; min-width: 0; box-sizing: border-box; }
