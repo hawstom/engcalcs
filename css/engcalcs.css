@@ -1675,8 +1675,6 @@ input[type=number] {
    margin-inline-end, not margin-right: in Arabic, Hebrew, Persian, Urdu and Pashto the icon sits
    to the RIGHT of its word and the gap has to follow it there. */
 button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
-/* The gap is for a word beside the icon: an icon alone in its control is centred (2026-10-30, "the menu icons are not centered"). */
-button > .ec-icon:only-child, a > .ec-icon:only-child { margin-inline-end: 0; }
 /* Except inside the lpn menu's fixed-width icon column, where the cell already provides the gap
    and a margin on top of it would push every label off the column it is meant to line up with. */
 .lpn-menu-icon > .ec-icon { margin-inline-end: 0; }
@@ -6857,8 +6855,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) .lpn-menubar-word { display: none; }
 	/* An icon alone in a box padded for a word reads as a gap with a drawing in it. */
 	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
-	/* ...and with the word gone the icon is the only thing in the box, so it loses the word's gap and its text-line strut. */
-	html:has(#lpn_canvas) .lpn-menubar-item > .ec-icon { margin-inline-end: 0; display: block; }
+	/* ...and with the word gone the icon is the only thing in the box, so it loses the word's gap and its text-line offset, and keeps the bar its full 32 px height. */
+	html:has(#lpn_canvas) .lpn-menubar-item > .ec-icon { margin-inline-end: 0; vertical-align: middle; }
+	html:has(#lpn_canvas) #lpn_msglog_btn > .ec-icon { margin-inline-end: 0; }
 
 	/* **5. THE SETTINGS INDEX STAYS A NARROW SIDE COLUMN ON A PHONE, RESTORED 2026-08-29.**
 
