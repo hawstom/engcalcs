@@ -149,7 +149,7 @@ function checkDrawing(label, out, geo) {
 	// --- data only ---
 	const kinds = new Set(ents.map((e) => e.type));
 	ok(label + ': no TEXT, LINE or MULTILEADER', !['TEXT', 'LINE', 'MULTILEADER'].some((k) => kinds.has(k)), [...kinds].join(','));
-	ok(label + ': every layer is 0, C-WATR-MODL-XXXX-ALT or C-WATR-RDME', [...layerNames].every((n) => n === '0' || n === 'C-WATR-RDME' || /^C-WATR-MODL-[A-Z0-9_]{4}-BASE$/.test(n)),
+	ok(label + ': every layer is 0, C-WATR-MODL-XXXX-ALT, C-WATR-RDME or C-WATR-MODL-EPAN', [...layerNames].every((n) => n === '0' || n === 'C-WATR-RDME' || n === 'C-WATR-MODL-EPAN' || /^C-WATR-MODL-[A-Z0-9_]{4}-BASE$/.test(n)),
 		[...layerNames].join(' '));
 	const rd = tables.find((e) => e.type === 'LAYER' && get(e, 2) === 'C-WATR-RDME');
 	ok(label + ': the read-me layer is white (ACI 7)', rd && +get(rd, 62) === 7);

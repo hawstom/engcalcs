@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**127 still to read on master**, of 286 untranslated keys, of 3247 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**167 still to read on master**, of 328 untranslated keys, of 3289 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (286, 127 to read @@ NEEDS RULING)
+## lpn_  (328, 167 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -181,8 +181,128 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_start`**
   > Fire starts at
   _Ruled OK 2026-10-20._
+- **`lpn_dxf_curve_points`**
+  > Pump head curve points (flow, head)
+  @@ NEEDS RULING
 - **`lpn_dxf_exported_geo_tail`**
   > Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_demand_multiplier`**
+  > Demand multiplier: {n}.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_headloss`**
+  > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
+  @@ NEEDS RULING
+- **`lpn_dxf_sections_header`**
+  > EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.
+  _Ruled 2026-10-30: Tom: "What page? EPANET++. Also DXF, not drawing."_
+- **`lpn_dxfnet_count_customers`**
+  > {n} customers.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_count_links`**
+  > {n} pipes, pumps and valves.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_count_nodes`**
+  > {n} junctions, reservoirs and tanks.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_held_custom`**
+  > custom properties
+  @@ NEEDS RULING
+- **`lpn_dxfnet_held_text`**
+  > map Text items and hand-placed label positions
+  @@ NEEDS RULING
+- **`lpn_dxfnet_none`**
+  > Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_alt_read`**
+  > The drawing has no BASE alternative. The alternative {alt} was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_alternative`**
+  > These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_bad_id`**
+  > These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_block_no_line`**
+  > These link blocks have no polyline through their middle, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_block_unknown`**
+  > These blocks are not the block this page writes for their layer, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_coord_unit`**
+  > The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_crs_unknown`**
+  > The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_curve_differs`**
+  > These pumps state a curve ID that another pump uses with different points. The first curve was kept.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_customer_loose`**
+  > The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_dup_id`**
+  > These IDs are stated by more than one element of the same kind. Only the first was imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_ambiguous`**
+  > These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_loop`**
+  > These links start and end at the same node, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_end_no_node`**
+  > These links have an end where there is no node, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_entity_unread`**
+  > These entities are not a kind this import reads on their layer, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_geo_export`**
+  > This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_layer_foreign`**
+  > These layers do not begin with {prefix}, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_layer_unknown`**
+  > These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_line_no_block`**
+  > These service lines end where there is no customer block, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_link_no_block`**
+  > These polylines have no block at their middle to state the link's ID and properties, and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_method`**
+  > The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_no_position`**
+  > These blocks have no usable position and were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_not_held`**
+  > A DXF file does not hold these, so none was imported:
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_paper_space`**
+  > Entities in paper space were not read: {n}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_pump_no_curve`**
+  > These pumps state no head curve, so Calculate will not give the original results until each is given a curve.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_sections_read`**
+  > The EPANET sections embedded in the drawing were read: {sections}.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_sections_unread`**
+  > The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_shapes`**
+  > These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_tag_unknown`**
+  > These attribute tags are not ones this page writes for their block, and their values were not imported.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_note_unit_unknown`**
+  > The drawing states these units, which this page does not know. The units in use were kept for them.
+  @@ NEEDS RULING
+- **`lpn_dxfnet_report_lead`**
+  > What was not read, and each change made during import, is listed below with the layer, block or ID concerned:
   @@ NEEDS RULING
 - **`lpn_edit_curves`**
   > Edit curves…
@@ -322,6 +442,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
   _Ruled OK 2026-10-20._
+- **`lpn_file_import_dxfnet`**
+  > DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_import_dxfnet_tip`**
+  > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
+  @@ NEEDS RULING
 - **`lpn_file_import_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -426,7 +552,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_guide_text_demands_box`**
   > Lists the demand categories of the selected junction, one row for each, with the base demand and the demand pattern of every category. The plus button adds a category. With more than one category, Base demand in Properties is their total and is read-only. Customers lumped at the junction are listed with their demand. In a scenario, an edit is an override and Base is not changed.
-  @@ NEEDS RULING
+  _Ruled 2026-10-30: Good._
 - **`lpn_inpup_ask_title`**
   > Import {file}
   _Ruled OK 2026-10-20._
@@ -894,7 +1020,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**108 still to read**, of 151 new keys across 9 unmerged branch(es).
+**66 still to read**, of 109 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -905,138 +1031,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`e99bba05d`) — adds no English strings
+### box-design (`33665636e`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/dxf-import (`7f73816d2`) — 42 new, 42 to read @@ NEEDS RULING
-
-- **`lpn_dxf_curve_points`**
-  > Pump head curve points (flow, head)
-  @@ NEEDS RULING
-- **`lpn_dxf_note_demand_multiplier`**
-  > Demand multiplier: {n}.
-  @@ NEEDS RULING
-- **`lpn_dxf_note_headloss`**
-  > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
-  @@ NEEDS RULING
-- **`lpn_dxf_sections_header`**
-  > EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_count_customers`**
-  > {n} customers.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_count_links`**
-  > {n} pipes, pumps and valves.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_count_nodes`**
-  > {n} junctions, reservoirs and tanks.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_custom`**
-  > custom properties
-  @@ NEEDS RULING
-- **`lpn_dxfnet_held_text`**
-  > map Text items and hand-placed label positions
-  @@ NEEDS RULING
-- **`lpn_dxfnet_none`**
-  > Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_alt_read`**
-  > The drawing has no BASE alternative. The alternative {alt} was read.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_alternative`**
-  > These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_bad_id`**
-  > These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_block_no_line`**
-  > These link blocks have no polyline through their middle, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_block_unknown`**
-  > These blocks are not the block this page writes for their layer, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_coord_unit`**
-  > The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_crs_unknown`**
-  > The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_curve_differs`**
-  > These pumps state a curve ID that another pump uses with different points. The first curve was kept.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_customer_loose`**
-  > The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_dup_id`**
-  > These IDs are stated by more than one element of the same kind. Only the first was imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_end_ambiguous`**
-  > These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_end_loop`**
-  > These links start and end at the same node, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_end_no_node`**
-  > These links have an end where there is no node, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_entity_unread`**
-  > These entities are not a kind this import reads on their layer, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_geo_export`**
-  > This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_layer_foreign`**
-  > These layers do not begin with {prefix}, so nothing on them was read.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_layer_unknown`**
-  > These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_line_no_block`**
-  > These service lines end where there is no customer block, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_link_no_block`**
-  > These polylines have no block at their middle to state the link's ID and properties, and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_method`**
-  > The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_no_position`**
-  > These blocks have no usable position and were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_not_held`**
-  > A DXF file does not hold these, so none was imported:
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_paper_space`**
-  > Entities in paper space were not read: {n}.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_pump_no_curve`**
-  > These pumps state no head curve, so Calculate will not give the original results until each is given a curve.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_sections_read`**
-  > The EPANET sections embedded in the drawing were read: {sections}.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_sections_unread`**
-  > The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_shapes`**
-  > These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_tag_unknown`**
-  > These attribute tags are not ones this page writes for their block, and their values were not imported.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_note_unit_unknown`**
-  > The drawing states these units, which this page does not know. The units in use were kept for them.
-  @@ NEEDS RULING
-- **`lpn_dxfnet_report_lead`**
-  > What was not read, and each change made during import, is listed below with the layer, block or ID concerned:
-  @@ NEEDS RULING
-- **`lpn_file_import_dxfnet`**
-  > DXF file…
-  @@ NEEDS RULING
-- **`lpn_file_import_dxfnet_tip`**
-  > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
-  @@ NEEDS RULING
+### feat/dxf-import (`7f73816d2`) — adds no English strings
 
 ### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
 
@@ -1377,5 +1376,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
-
-### fix/master-after-gis (`652882965`) — adds no English strings

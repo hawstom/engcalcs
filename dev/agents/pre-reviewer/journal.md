@@ -4736,6 +4736,19 @@ Harness blind spot: part A (Text) runs WITHOUT EC_DEFAULT_DOCKS, so it measures 
 With docks on, Text flyout is 50% high, rotate row fine, bottom pill overlaps body by ~1px only.
 Tapping empty map tucks the flyout (existing behaviour). Node 31 (Net1, y~774 at 390x844) would not select by touch, tucks flyout; cause not found, not shown to be this branch.
 Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
+# Perry, feat/dxf-import e3b6c3e00, 2026-10-29 (Task 772 slice 1, DXF network import)
+- OBSERVED (real Chromium, menu route): Net1, Net3, lat/lon Net3 export to DXF and import back with all nodes and links, same IDs, types, ends, elevations, demands, diameters, lengths, roughness. Customers not exercised in my run (the branch harness does).
+- OBSERVED: lat/lon Net3 comes back as a projected project (EPSG:32610 UTM, metres), not geographic; map shows OSM attribution; node positions differ in stored x,y by design. Receipt does not mention the change of system.
+- OBSERVED: Net3 closed pipe 330 and closed pump 10 come back OPEN (receipt says only "pipe status" in the generic line). Net1 Calculate after import: N10 39.0 psi vs 127.54, pump flow 3865 vs 1866 gpm (pump 9 lost its curve, solves as a pipe). Stated in receipt but not that results will differ.
+- OBSERVED: map Text items (Tank, Source, Pump on Net1), initial quality (_initQuality), label positions (lx, ly, lside), demand patterns, custom property _custom_date_installed are not carried; Text items, initial quality and custom properties are NOT in the receipt's "not held" sentence.
+- OBSERVED: ezdxf (AC1015) add LINE on WALLS, save: exactly one extra receipt line, "(WALLS (1 LINE))", Net1 and Net3. Phone 390x844: File > Import > Network > DXF file reachable, receipt scrolls inside, OK visible, no sideways scroll.
+- OBSERVED: only lang.ec.en.php carries the 28 new keys (other 26 files none); German page still worked in branch harness (fallback).
+- Scratch scripts: scratchpad pv/ (lib.js, run1.js, run3.js).
+
+## 2026-10-30 feat/dxf-import round 2 (commits through 1670095ec)
+- OBSERVED: real Chrome, unstripped examples, export then import DXF. Net1 and Net1 DW and a scenario that closes pipe 111 give identical Calculate results (diff <1e-12). Net1-Scenarios s2 and s1 import as networks, receipt "The drawing has no BASE alternative. The alternative MAX_DAY_WITH_MAIN_BREAK was read." Harness dxf-roundtrip-calc 66/66.
+- OBSERVED: Net2/Net3 raw (with patterns) and Net1-Scenarios s1/s2 (scenario demand multiplier 1.5) come back with DIFFERENT results; receipt lists patterns but never a scenario demand multiplier. Harness strips patterns and calcSets first, so it cannot see this.
+- Not run: mutation of the reader fix.
 # Perry, feat/starter-example 490a07194, 2026-10-28 (Task 823)
 - OBSERVED (real Chromium, OSM on, US and SI): every pipe of Fire flow extension (Johnson City: W Main St/US 290, N Ave F, N Ave E, E Pecan Dr) and Community well and tank (Munday: N 10th and 9th Ave, W D and W B St) sits on a street. Pipes hidden to compare with the bare map. TANK-1 is mid-block between W E and W F St.
 - OBSERVED MISSED: examples/Net1-Scenarios-SI.lwn tank N2 has bottomElev 850 (ft number, unconverted) beside elev 259.08 m. Page shows P=674.8 m at N23 (US file: ~85 psi), head 885 m. The scenario browser harness only compares ordering; si-example-equivalence-harness was repointed to the plain dev Net1 pair, so the shipped scenarios pair is unchecked.
@@ -4772,3 +4785,17 @@ a finger tap at centre and +-9 px focuses the input, typed value takes (verified
 OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
 OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
 Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".
+# Perry, feat/dxf-import round 3 a970103df, 2026-10-30 (embedded .inp sections)
+- OBSERVED (real Chrome): dxf-roundtrip-calc-harness 107/107. My own runs: Net3, Net2, Net1 Base, Net1-Scenarios s1 (Max day) and Net3-Novato lat/lon export then import: heads and flows identical (diff 0); patterns, controls, rules counts match; s1 comes back with Demand Multiplier 1.5. Receipt line "The EPANET sections embedded in the drawing were read: ..." true on desktop and phone width. Export with the layer removed imports with no sections line (0 patterns). Pipe diameter edited to 777 with ezdxf wins on import.
+- OBSERVED: ezdxf 1.4.5 recover + audit: 0 errors on all five exports. Layer C-WATR-EPANET-INP, white, plot flag 0, not frozen.
+- OBSERVED MISSED (minor): the text column starts at the network's right edge + 10, not clear of the read-me, whose lines are up to 321 characters. On any network under ~290 units wide (all the grid examples) the read-me runs through the first piece of text at the same height. Real-scale and lat/lon projects unaffected.
+- OBSERVED: layer name fields are 6 and 3 characters (EPANET, INP); every other layer here uses 4-character fields (MODL, RDME, NODE, BASE).
+- Images: ~/webdev/worktrees/_panel/www/img/dxf3-net3.png and dxf3-net3-zoom.png. Not run: EPS comparison of my own (relied on the harness, checked it runs).
+
+# Perry, feat/dxf-import round 4 8be06eefb, 2026-10-30 (wrapped MTEXT, one EPANET text, header)
+- OBSERVED (real Chrome, examples unedited): Net1, Net2, Net3, Net1-Scenarios Max day export then import: heads diff 0, flows diff 0, patterns/controls/rules/curves/section line counts identical; header text appears in no imported field. A Net3 with a 2518-char .inp line, `\P`, braces, backslashes, ñ and Chinese in a comment and a pattern ID, and a project name with `{x} \P 中文` comes back byte-identical (comment-only `;` lines in a section are dropped on import, round-3 behaviour, not checked against a plain .inp import).
+- OBSERVED: ezdxf 1.4.5 recover: 0 errors, one EPANET MTEXT (36 chunks on the nasty file, none over 250) with one group 41 = 80 on all four; read-me too. Layer unfrozen, plot 0.
+- OBSERVED: text moved, layer frozen, layer off+locked, ezdxf resave, user-edited width/height/rotation, header deleted, header and BEGIN deleted, a note typed above the header, two-part reversed pieces on C-WATR-MODL-EPAN: all give the sections back. Re-layered text, and a round-3 file on the OLD layer name C-WATR-EPANET-INP (renamed in 3dbae68e1), give nothing back; the receipt names the layers not read.
+- OBSERVED: mutation (header strip removed from the reader) turns dxf-import-reader-harness red (2 FAIL); restored the file.
+- OBSERVED: Net3 sections text is ~98 wrapped lines = ~163 units tall against a 31-unit network; Net1 and Net2 ~157 and ~213 against 80 and 83. Read-me bottom is 3 to 4 units above the network top at a 0.9-per-character estimate.
+- Scratch: scratchpad/p4 (rt.js, var.js, mk.py, aud.py).

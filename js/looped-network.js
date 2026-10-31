@@ -45642,6 +45642,363 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			gisPlaceShapes(items, fileName, lines, skipped, done, { skipped: r.skipped, holes: r.holes, multipart: r.multipart, deletedRows: r.deletedRows, mode: mode });
 		}
 	}
+	// ---- IMPORT A DXF NETWORK (ROADMAP Task 772, slice 1) --------------------------------------------
+	//
+	// **READS EXACTLY WHAT THE EXPORT BELOW WRITES, AND NOTHING ELSE** (dev/dxf-interface.md: the
+	// import "should read exactly what this export writes, and the round trip is its first
+	// harness"). Layers C-WATR-MODL-<ASSET>-BASE, LWPOLYLINE links, attributed INSERT nodes. A
+	// stranger's drawing (Tom's tag matching, the Interface Manager's translation table) is slice 2.
+	// js/lpn-dxf-read.js reads the file; this half does what needs the project: the units strip, the
+	// document, the customers, and the receipt. It lands as a NEW project, as an `.inp` does, with the
+	// same receipt dialog; nothing in the file is dropped without a line in it naming what.
+	//
+	// **VALUES ARE TAKEN AS TYPED, IN THE UNITS THE FILE STATES.** The export records a unit in the
+	// prompt of each ATTDEF ("ELEVATION (FT)"), so the units strip is set to those first and the
+	// numbers are then stored as they are, with their own characters beside them (CLAUDE.md: only the
+	// user touches a file's numbers). A unit the file does not state keeps the strip as it was, and
+	// the receipt says the file does not carry it.
+	function pickDxfNetworkFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.accept = '.dxf';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0], reader;
+			if (!f) { return; }
+			reader = new FileReader();
+			reader.onload = function (ev) { landDxfNetwork(ev.target.result, f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			// BYTES: the file states its own code page, and decoding it as UTF-8 first would turn
+			// every accented letter of an R2000 file into the wrong character.
+			reader.readAsArrayBuffer(f);
+		});
+		pick.click();
+	}
+	// The option of a unit family whose symbol is the one a prompt states (upper case, as the export
+	// writes it, in the page's locale or without one).
+	function dxfUnitKeyFor(family, stated) {
+		var s = unitEl(family), want = String(stated).toUpperCase(), i, o, label, loc = dxfLocale(), locUp;
+		if (!s || !s.options) { return null; }
+		for (i = 0; i < s.options.length; i++) {
+			o = s.options[i];
+			label = String(o.textContent || '');
+			locUp = label;
+			if (loc) { try { locUp = label.toLocaleUpperCase(loc); } catch (e) { locUp = label; } }
+			if (label.toUpperCase() === want || locUp === want || String(o.value).toUpperCase() === want) { return o.value; }
+		}
+		return null;
+	}
+	// What the file says about units: the units strip it asks for, and the families it states but this
+	// page does not know. Pressure and velocity are not in a DXF file at all; they follow the head unit
+	// the way an `.inp` file's follow its unit system.
+	function dxfNetUnits(r, notes) {
+		var before = readUnitSelections(), want = {}, unknown = [];
+		Object.keys(r.unitText).forEach(function (fam) {
+			var k = dxfUnitKeyFor(fam, r.unitText[fam]);
+			if (k) { want[fam] = k; } else { unknown.push(r.unitText[fam]); }
+		});
+		if (!want.lpn_u_length && r.coordUnit && dxfUnitKeyFor('lpn_u_length', r.coordUnit)) { want.lpn_u_length = dxfUnitKeyFor('lpn_u_length', r.coordUnit); }
+		if (want.lpn_u_elevhead === 'fth2o') { want.lpn_u_pressure = 'psi'; want.lpn_u_velocity = 'ftps'; }
+		else if (want.lpn_u_elevhead === 'mh2o') { want.lpn_u_pressure = 'mh2o'; want.lpn_u_velocity = 'mps'; }
+		if (unknown.length) { notes.push({ code: 'unit-unknown', ids: unknown, detail: '' }); }
+		return Object.assign({}, before, want);
+	}
+	function dxfNetNoteText(note) {
+		var pc = EngCalcs.pageConfig || {}, prefix = EngCalcs.lpnDxfModelPrefix, T = {
+			'layer-foreign': ['lpn_dxfnet_note_layer_foreign', 'These layers do not begin with {prefix}, so nothing on them was read.'],
+			'layer-unknown': ['lpn_dxfnet_note_layer_unknown', 'These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.'],
+			'alternative': ['lpn_dxfnet_note_alternative', 'These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.'],
+			'alt-read': ['lpn_dxfnet_note_alt_read', 'The drawing has no BASE alternative. The alternative {alt} was read.'],
+			'curve-differs': ['lpn_dxfnet_note_curve_differs', 'These pumps state a curve ID already used by another pump with different points. The first curve was kept.'],
+			'shapes': ['lpn_dxfnet_note_shapes', 'These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.'],
+			'entity-unread': ['lpn_dxfnet_note_entity_unread', 'These entities are not a kind this import reads on their layer, and were not imported.'],
+			'paper-space': ['lpn_dxfnet_note_paper_space', 'Entities in paper space were not read: {n}.'],
+			'tag-unknown': ['lpn_dxfnet_note_tag_unknown', 'These attribute tags are not ones this page writes for their block, and their values were not imported.'],
+			'value-unread': ['lpn_gjnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
+			'block-unknown': ['lpn_dxfnet_note_block_unknown', 'These blocks are not the block this page writes for their layer, and were not imported.'],
+			'bad-id': ['lpn_dxfnet_note_bad_id', 'These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.'],
+			'dup-id': ['lpn_dxfnet_note_dup_id', 'These IDs are stated by more than one element of the same kind. Only the first was imported.'],
+			'no-position': ['lpn_dxfnet_note_no_position', 'These blocks have no usable position and were not imported.'],
+			'link-no-block': ['lpn_dxfnet_note_link_no_block', 'These polylines have no block at their middle to state the link\'s ID and properties, and were not imported.'],
+			'block-no-line': ['lpn_dxfnet_note_block_no_line', 'These link blocks have no polyline through their middle, and were not imported.'],
+			'line-no-block': ['lpn_dxfnet_note_line_no_block', 'These service lines end where there is no customer block, and were not imported.'],
+			'end-ambiguous': ['lpn_dxfnet_note_end_ambiguous', 'These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.'],
+			'end-no-node': ['lpn_dxfnet_note_end_no_node', 'These links have an end where there is no node, and were not imported.'],
+			'end-loop': ['lpn_dxfnet_note_end_loop', 'These links start and end at the same node, and were not imported.'],
+			'pump-no-curve': ['lpn_dxfnet_note_pump_no_curve', 'These pumps state no head curve, so Calculate will not give the original results until each is given a curve.'],
+			'crs-unknown': ['lpn_dxfnet_note_crs_unknown', 'The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.'],
+			'unit-unknown': ['lpn_dxfnet_note_unit_unknown', 'The drawing states these units, which this page does not know. The units in use were kept for them.'],
+			'coord-unit': ['lpn_dxfnet_note_coord_unit', 'The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.'],
+			'customer-loose': ['lpn_dxfnet_note_customer_loose', 'The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.'],
+			'sections-read': ['lpn_dxfnet_note_sections_read', 'The EPANET sections embedded in the drawing were read: {sections}.'],
+			'sections-unread': ['lpn_dxfnet_note_sections_unread', 'The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.'],
+			'not-in-dxf': ['lpn_dxfnet_note_not_held', 'A DXF file does not hold these, so none was imported:'],
+			'method': ['lpn_dxfnet_note_method', 'The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.'],
+			'geo-export': ['lpn_dxfnet_note_geo_export', 'This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.'],
+		}, t = T[note.code] || [null, note.code], s = String((t[0] && pc[t[0]]) || t[1]);
+		return s.split('{prefix}').join(prefix).split('{n}').join(String(note.detail))
+			.split('{alt}').join(String(note.detail)).split('{sections}').join(String(note.detail))
+			.split('{coord}').join(String((note.detail || {}).coord || '')).split('{length}').join(String((note.detail || {}).length || ''));
+	}
+	// What a DXF file cannot hold, one item per line under the standing lead (the key, then its English).
+	var LPN_DXFNET_HELD = [
+		['lpn_dxfnet_held_custom', 'custom properties'],
+		['lpn_dxfnet_held_text', 'map Text items and hand-placed label positions']
+	];
+	function dxfNetHeldItems() {
+		var pc = EngCalcs.pageConfig || {};
+		return LPN_DXFNET_HELD.map(function (x) { return String(pc[x[0]] || x[1]); });
+	}
+	function dxfNetReportLines(r) {
+		var CAP = 50;
+		return r.notes.map(function (n) {
+			var ids = n.ids.slice(0, CAP).join(', ');
+			if (n.ids.length > CAP) { ids += ' ' + ((EngCalcs.pageConfig || {}).lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
+			return { code: n.code, text: n.code === 'geo-export' ? dxfNetNoteText(n).split('{crs}').join(String(n.detail)) : dxfNetNoteText(n) + (n.ids.length ? ' (' + ids + ')' : ''),
+				items: n.code === 'not-in-dxf' ? dxfNetHeldItems() : null };
+		});
+	}
+	function showDxfNetReport(r, fileName, empty) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			function p(text, bold) {
+				var e = document.createElement('p');
+				e.className = 'lpn-dxfnet-p' + (bold ? ' lpn-dxfnet-bold' : '');
+				e.textContent = text;
+				body.appendChild(e);
+			}
+			var c = r.counts, ul = document.createElement('ul');
+			if (empty) { p((pc.lpn_dxfnet_none || 'Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.').replace('{file}', fileName).replace('{prefix}', EngCalcs.lpnDxfModelPrefix), true); }
+			else {
+				p((pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName), true);
+				// A kind with none in the file is not counted ("0 customers" says nothing).
+				p([[c.junction + c.reservoir + c.tank, 'lpn_dxfnet_count_nodes', '{n} junctions, reservoirs and tanks.'],
+					[c.pipe + c.pump + c.valve, 'lpn_dxfnet_count_links', '{n} pipes, pumps and valves.'],
+					[c.customer, 'lpn_dxfnet_count_customers', '{n} customers.']].filter(function (x) { return x[0] > 0; })
+					.map(function (x) { return String(pc[x[1]] || x[2]).replace('{n}', x[0]); }).join(' '));
+			}
+			p(pc.lpn_dxfnet_report_lead || 'What was not read, and each change made during import, is listed below with the layer, block or ID concerned:');
+			ul.id = 'lpn_dxfnet_report';
+			ul.className = 'lpn-dxfnet-list';
+			dxfNetReportLines(r).forEach(function (row) {
+				var li = document.createElement('li');
+				li.setAttribute('data-code', row.code);
+				li.textContent = row.text;
+				if (row.items) {
+					var sub = document.createElement('ul');
+					sub.className = 'lpn-dxfnet-sub';
+					row.items.forEach(function (t) { var si = document.createElement('li'); si.textContent = t; sub.appendChild(si); });
+					li.appendChild(sub);
+				}
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	/**
+	 * The built network as a saved document, ready for importProject(): docFromInp()'s shape, a grid
+	 * project in the file's own X and Y. Settings are the open project's with what the file states
+	 * written onto them (nothing of EPANET's options, which a DXF file does not hold).
+	 */
+	function docFromDxfNet(r, name, defaults, crs) {
+		var next = newNextId(), s = JSON.parse(JSON.stringify(settings));
+		s.method = r.method === 'dw' || r.method === 'manning' ? r.method : 'hw';
+		s.defaults = defaults || s.defaults;
+		s.hydraulics = {}; s.qualityOptions = {}; s.fileOptions = {};
+		s.quality = { mode: 'none', traceNode: '' };
+		readQualitySections({}, s, r.nodes, r.links);
+		readEnergySection({}, s, r.links);
+		readSourceMixingSections({}, s, r.nodes);
+		readTagsSection({}, s, r.nodes, r.links);
+		function claim(id, key) {
+			var prefix = s.idPrefixes[key] || key, n;
+			if (String(id).slice(0, prefix.length) !== prefix) { return; }
+			n = parseInt(String(id).slice(prefix.length), 10);
+			if (isFinite(n) && String(n) === String(id).slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
+		}
+		r.nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
+		r.links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
+		r.customers.forEach(function (c) { claim(c.id, 'M'); });
+		return rebaseDocument({
+			v: LPN_STORAGE_VERSION,
+			// A stated coordinate system makes a projected project, its X and Y in that system's own unit.
+			project: crs ? { name: name, activeScenario: 'base', crs: crs } : { name: name, activeScenario: 'base' },
+			scenarios: defaultScenarios(),
+			nodes: r.nodes, links: r.links, labels: [], nextId: next,
+			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
+			backdrop: null,
+			settings: s,
+			patterns: [], curves: r.curves || [], defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
+			units: readUnitSelections()
+		});
+	}
+	// **THE EMBEDDED .INP SECTIONS, READ BACK** (Tom, 2026-10-30). The drawing's own network is exported
+	// as an .inp, the embedded sections replace its sections of the same name, and the whole is read by
+	// the .inp reader, so the sections mean to the import exactly what they mean in an .inp. What the
+	// blocks state wins over the embedded text: an element keeps every value its block gave, and a
+	// curve the blocks gave keeps its points. Returns the names of the sections read, or null if the
+	// text could not be read as an .inp (the network is then imported without them).
+	function embedDxfSections(dx, text, name) {
+		var secs = dxfSplitInp(text), own, composed, parsed, di, names = [], assign = [], byName = {};
+		if (!EngCalcs.lpnExportInp || !EngCalcs.lpnInpParse) { return null; }
+		secs = secs.filter(function (sec) {
+			if (sec.name === 'ASSIGNMENTS') { assign = sec.lines.map(function (l) { return l.replace(/;.*$/, '').trim().split(/\s+/); }).filter(function (t) { return t.length === 3; }); return false; }
+			return !LPN_DXF_BLOCK_SECTIONS[sec.name];
+		});
+		secs.forEach(function (sec) { byName[sec.name] = true; if (names.indexOf(sec.name) < 0) { names.push(sec.name); } });
+		own = EngCalcs.lpnExportInp(Object.assign({}, dx, { customers: [] }), {});
+		if (!own || !own.ok) { return null; }
+		composed = dxfSplitInp(own.inp).filter(function (sec) { return !byName[sec.name]; }).concat(secs)
+			.map(function (sec) { return '[' + sec.name + ']\n' + sec.lines.join('\n') + '\n'; }).join('\n') + '\n[END]\n';
+		parsed = EngCalcs.lpnInpParse(composed);
+		if (!parsed || !parsed.ok) { return null; }
+		di = docFromInp(parsed, name);
+		// the document-wide parts
+		dx.patterns = di.patterns || []; dx.defaultPattern = di.defaultPattern || null; dx.times = di.times || null;
+		dx.controls = di.controls || []; dx.rules = di.rules || [];
+		dx.inpSections = {};
+		Object.keys(di.inpSections || {}).forEach(function (k) { if (k !== 'TAGS') { dx.inpSections[k] = di.inpSections[k]; } });
+		['hydraulics', 'qualityOptions', 'fileOptions', 'quality', 'emitterExponent', 'reactions', 'energy', 'sources', 'mixing'].forEach(function (k) {
+			if (di.settings[k] !== undefined) { dx.settings[k] = di.settings[k]; }
+		});
+		// curves: the blocks' own first
+		(di.curves || []).forEach(function (c) {
+			if (!(dx.curves || (dx.curves = [])).some(function (q) { return q.id === c.id; })) { dx.curves.push(c); }
+		});
+		// the elements: every key the block did not give; a junction's demand list, when the embedded text
+		// itemizes it, replaces the total the block holds
+		function carry(list, from) {
+			var by = {};
+			from.forEach(function (e) { by[e.id] = e; });
+			list.forEach(function (e) {
+				var f = by[e.id];
+				if (!f) { return; }
+				Object.keys(f).forEach(function (k) {
+					if (k === 'importNotes' || k === 'tok') { return; }
+					if (!(k in e)) { e[k] = f[k]; }
+				});
+				if (f.tok) {
+					e.tok = e.tok || {};
+					Object.keys(f.tok).forEach(function (k) { if (!(k in e.tok)) { e.tok[k] = f.tok[k]; } });
+				}
+				if (e.type === 'junction' && (f.extraDemands || f.demandCategory || f.demandItemized)) {
+					['_demand', 'demandPattern', 'demandCategory', 'extraDemands', 'demandItemized'].forEach(function (k) { if (f[k] !== undefined) { e[k] = f[k]; } });
+					if (f.tok) { Object.keys(f.tok).forEach(function (k) { if (/demand/i.test(k)) { (e.tok = e.tok || {})[k] = f.tok[k]; } }); }
+				}
+			});
+		}
+		carry(dx.nodes, di.nodes); carry(dx.links, di.links);
+		assign.forEach(function (a) {
+			var kind = a[0].toUpperCase(), el = (kind === 'SPEED' ? dx.links : dx.nodes).filter(function (e) { return String(e.id) === a[1]; })[0];
+			if (!el) { return; }
+			if (kind === 'DEMAND' && el.type === 'junction' && !el.demandPattern) { el.demandPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'HEAD' && el.type === 'reservoir' && !el.headPattern) { el.headPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'SPEED' && el.type === 'pump' && !el.speedPattern) { el.speedPattern = a[2]; }   // base-write: import builds Base
+			else if (kind === 'VOLUME' && el.type === 'tank' && !el.volCurve) { el.volCurve = a[2]; }   // base-write: import builds Base
+		});
+		return names;
+	}
+	// The customers go in through addCustomer(), the one door that knows how an offset along a pipe is
+	// stored, once the project is open: the service line's first point names the pipe (or the node)
+	// it leaves, and the block's point is where the meter stands. Returns the IDs of those whose
+	// service line leaves nothing, which are placed loose.
+	function placeDxfCustomers(list) {
+		var loose = [];
+		list.forEach(function (c) {
+			var P = { x: inwardX(c.x), y: inwardY(c.y) }, A = c.from ? { x: inwardX(c.from.x), y: inwardY(c.from.y) } : null, best = null, tol, made;
+			if (A) {
+				tol = 1e-6 * Math.max(1, Math.abs(A.x), Math.abs(A.y));
+				doc.links.forEach(function (l) {
+					var hit = Geom.nearestFractionOnPolyline(linkPointList(l), A.x, A.y);
+					if (hit.dist <= tol && (!best || hit.dist < best.dist)) { best = { link: l.id, t: hit.f, dist: hit.dist }; }
+				});
+			}
+			if (best) { made = addCustomer(P.x, P.y, { link: best.link, t: best.t < 1e-9 ? 0 : (best.t > 1 - 1e-9 ? 1 : best.t) }, c.id); }
+			else { made = addCustomer(P.x, P.y, null, c.id); if (c.from) { loose.push(c.id); } }
+			if (c.demand !== undefined) { made.demand = c.demand; made.tok = { demand: c.tok.demand }; }   // base-write: import builds Base
+			if (c.count !== undefined) { made.count = c.count; (made.tok = made.tok || {}).count = c.tok.count; }   // base-write: import builds Base
+			if (c.tag !== undefined) { made.tag = c.tag; }
+			if (c.desc !== undefined) { made.desc = c.desc; }
+		});
+		return loose;
+	}
+	// The bytes of a DXF file, to a new project. `done(result)` is called once; a harness drives this half.
+	function landDxfNetwork(buffer, fileName, done) {
+		var pc = EngCalcs.pageConfig || {}, r, text;
+		logLpnFirstAction('import');
+		function refuse(key, fallback, why) {
+			var msg = String(pc[key] || fallback).replace('{file}', fileName);
+			setWarning(msg);
+			if (done) { done({ ok: false, error: why, message: msg }); }
+		}
+		text = EngCalcs.lpnDxfDecode(new Uint8Array(buffer));
+		r = EngCalcs.lpnDxfNetRead(text, { keys: LPN_DXF_KEYS, tags: dxfTagTable().tags });
+		if (!r.ok) {
+			if (r.detail === 'binary') { refuse('lpn_dxf_import_binary', '{file} is a binary DXF. Save it from your CAD program as an ASCII DXF, then import again.', 'binary'); }
+			else { refuse('lpn_dxf_import_unreadable', '{file} is not an ASCII DXF file.', 'unreadable'); }
+			return;
+		}
+		if (!r.nodes.length) {
+			showDxfNetReport(r, fileName, true);
+			if (done) { done({ ok: false, error: 'empty', net: r }); }
+			return;
+		}
+		// **A COORDINATE SYSTEM THE READ-ME STATES IS THE PROJECT'S** (a latitude-and-longitude project
+		// is drawn in UTM metres, and read as a grid in feet it would land at the wrong scale). It
+		// opens as a projected project in that system, so the network lands where it was; a code
+		// this page does not know is named and the drawing opens as a grid.
+		if (r.crsCode && !crsIsLatLonCode(r.crsCode) && EngCalcs.lpnCrsLoad) {
+			EngCalcs.lpnCrsLoad(function () {
+				var known = EngCalcs.lpnCrsHas(r.crsCode);
+				if (!known) { r.notes.push({ code: 'crs-unknown', ids: [r.crsCode], detail: '' }); }
+				if (known && dxfReadmeSaysGeo(r.readmeText)) { r.notes.push({ code: 'geo-export', ids: [], detail: dxfCrsName(r.crsCode) }); }
+				finishDxfNetwork(r, fileName, done, known ? r.crsCode : '');
+			});
+			return;
+		}
+		finishDxfNetwork(r, fileName, done, '');
+	}
+	// The export's own read-me words for a latitude-and-longitude project ("..., in meters, not latitude
+	// and longitude."), in capitals as the export writes them; found in the page's language.
+	function dxfReadmeSaysGeo(text) {
+		var pc = EngCalcs.pageConfig || {}, tail = String(pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.').split('{crs}')[1] || '',
+			first = tail.split('.')[0].trim();
+		return !!first && String(text).toUpperCase().indexOf(first.toUpperCase()) >= 0;
+	}
+	function finishDxfNetwork(r, fileName, done, crs) {
+		var units, before, changed, defaults, name, id, loose;
+		before = readUnitSelections();
+		units = dxfNetUnits(r, r.notes);
+		if (!crs && r.coordUnit && r.coordUnit !== units.lpn_u_length) {
+			r.notes.push({ code: 'coord-unit', ids: [], detail: { coord: r.coordUnit, length: units.lpn_u_length } });
+		}
+		// The project being left is saved BEFORE the strip moves, as for an `.inp` (R-415).
+		rememberOutgoingProject();
+		applyUnitSelections(units);
+		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
+		defaults = geoJsonNetDefaults(changed);
+		name = String(fileName).replace(/\.dxf$/i, '') || String(fileName);
+		var newDoc = docFromDxfNet(r, name, defaults, crs), embedded = null;
+		if (r.sectionsText) {
+			try { embedded = embedDxfSections(newDoc, r.sectionsText, name); } catch (err) { if (window.console && console.error) { console.error(err); } embedded = null; }
+			r.notes.push({ code: embedded ? 'sections-read' : 'sections-unread', ids: [], detail: embedded ? embedded.join(', ') : '' });
+		}
+		r.sectionsRead = !!embedded;
+		id = importProject(newDoc, true);
+		if (!id) { applyUnitSelections(before); refreshMapStatus(); if (done) { done({ ok: false, error: 'storage' }); } return; }
+		loose = placeDxfCustomers(r.customers);
+		if (loose.length) { r.notes.push({ code: 'customer-loose', ids: loose, detail: '' }); }
+		r.notes.push({ code: 'not-in-dxf', ids: [], detail: '' });
+		if (!r.method) { r.notes.push({ code: 'method', ids: [], detail: '' }); }
+		clearUndo();
+		saveToStorage();
+		stampProjectSaved(id);
+		renderTabs();
+		showDxfNetReport(r, fileName, false);
+		if (done) { done({ ok: true, id: id, net: r }); }
+	}
+
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
 	//
 	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
@@ -45744,12 +46101,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The properties each block carries, by internal key. Data only: no solve results, which an
 	// import would have no property to put back into.
 	var LPN_DXF_KEYS = {
-		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
-		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
-		tank: ['ID', 'ELEV', 'BASEELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
-		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
-		pump: ['ID', 'TAG', 'DESC'],
-		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
+		junction: ['ID', 'ELEV', 'DEMAND', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		reservoir: ['ID', 'HEAD', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'BASEELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'INITQUALITY', 'ACTIVE', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'MINORLOSS', 'STATUS', 'ACTIVE', 'TAG', 'DESC'],
+		pump: ['ID', 'STATUS', 'SPEED', 'CURVE', 'CURVEPOINTS', 'ACTIVE', 'TAG', 'DESC'],
+		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'MINORLOSS', 'STATUS', 'ACTIVE', 'TAG', 'DESC'],
 		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
 	};
 	// **A TAG IS THE PROPERTY'S LABEL** in the page's language (dev/dxf-interface.md: *"attributes
@@ -45770,7 +46127,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			DIAMETER: [pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'],
 			'tank.DIAMETER': [pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'],
 			LENGTH: [pc.lpn_field_length || 'Length', 'lpn_u_length'],
-			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'],
+			// Darcy-Weisbach roughness is a length, so its prompt states the unit; C and n have none.
+			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'].concat(frictionMethod() === 'dw' ? ['lpn_u_roughness'] : []),
+			MINORLOSS: [pc.lpn_field_km_short || 'Minor loss, k'],
+			STATUS: [pc.lpn_result_status || 'Status'],
+			INITQUALITY: [pc.lpn_quality_initial || 'Initial quality'],
+			ACTIVE: [pc.lpn_field_active || 'Is active?'],
+			SPEED: [pc.lpn_field_pump_speed || 'Relative speed'],
+			CURVE: [pc.lpn_pump_curve_source || 'Pump head curve'],
+			CURVEPOINTS: [pc.lpn_dxf_curve_points || 'Pump head curve points (flow, head)'],
 			VALVETYPE: [pc.lpn_field_valve_type || 'Valve type'],
 			SETTING: [pc.lpn_field_valve_setting || 'Setting'],
 			COUNT: [pc.lpn_field_meter_count || 'Number of services'],
@@ -45811,18 +46176,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
 				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
 		}
+		a.push(['INITQUALITY', dxfVal(n, 'initQuality')], ['ACTIVE', isActive(n) ? 'YES' : 'NO']);
 		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
 		return a;
+	}
+	// A pump's head curve as the points it holds, "flow,head" pairs in the project units and as typed
+	// (the curve's own coordinate text where it keeps one), blank where the pump has no curve.
+	function dxfCurvePoints(id) {
+		var c = (doc.curves || []).filter(function (q) { return q.id === id && q.kind === 'head'; })[0];
+		if (!c || !(c.points || []).length) { return ''; }
+		return c.points.map(function (pt, k) {
+			var t = c.tok || {};
+			return (t[k + 'x'] !== undefined ? t[k + 'x'] : String(pt[0])) + ',' + (t[k + 'y'] !== undefined ? t[k + 'y'] : String(pt[1]));
+		}).join(' ');
 	}
 	function dxfLinkAttrs(l) {
 		var a = [['ID', l.id]];
 		if (l.type === 'pipe') {
-			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')]);
+			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')],
+				['MINORLOSS', dxfNum(l, '_k', pipeK(l))]);
 		}
 		if (l.type === 'valve') {
-			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')]);
+			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')],
+				['MINORLOSS', dxfNum(l, '_k', pipeK(l))]);
 		}
-		a.push(['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
+		if (l.type === 'pump') {
+			var cid = effective(l, 'curveId') || '';
+			a.push(['STATUS', linkStoredStatus(l).toUpperCase()], ['SPEED', dxfVal(l, 'speed')], ['CURVE', cid], ['CURVEPOINTS', cid ? dxfCurvePoints(cid) : '']);
+		} else {
+			a.push(['STATUS', linkStoredStatus(l).toUpperCase()]);
+		}
+		a.push(['ACTIVE', isActive(l) ? 'YES' : 'NO'], ['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
 		return a;
 	}
 	// A point of the DRAWING FRAME (where a customer lives) through the outward boundary and on
@@ -45914,6 +46298,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		nodes.concat(links, customers).forEach(function (el) {
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
+		// The head loss formula, named and then coded in brackets (HW, DW or MANNING) for the import to find.
+		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.')
+			.replace('{formula}', frictionMethodLabel()).replace('{code}', frictionMethod() === 'manning' ? 'MANNING' : frictionMethod().toUpperCase()));
+		// A scenario's demand multiplier is a calculation setting the file does not hold; the read-me states it
+		// when it is not 1, so a reader can enter it again.
+		var dmx = settingFor(activeScenario(), ['settings', 'hydraulics', 'demandMultiplier']);
+		if (typeof dmx === 'number' && isFinite(dmx) && dmx !== 1) {
+			readme.push((pc.lpn_dxf_note_demand_multiplier || 'Demand multiplier: {n}.').replace('{n}', String(dmx)));
+		}
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {
@@ -45928,8 +46321,58 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			insunits: frame.insunits, measurement: frame.measurement,
 			codes: codes, alternative: alternative, locale: dxfLocale(), idTags: tt.idTags,
 			nodes: nodes, links: links, customers: customers, shapes: shapes, readme: readme,
-			tags: tt.tags, prompts: tt.prompts
+			tags: tt.tags, prompts: tt.prompts, sections: dxfEmbeddedSections(),
+			sectionsHeader: (pc.lpn_dxf_sections_header || 'EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.')
+				.replace('{layer}', EngCalcs.lpnDxfSectionsLayer)
 		};
+	}
+	// **THE .INP SECTIONS A BLOCK ATTRIBUTE CANNOT CARRY, AS TEXT** (Tom, 2026-10-30, on whether to embed
+	// them: *"Why hidden? User can freeze."*, so on an ordinary visible layer). They are the sections the
+	// .inp export writes for this scenario on screen, so a scenario's own patterns, options and demand
+	// multiplier go out as that scenario has them. Left out: the sections the blocks already hold (the
+	// element rows, [STATUS], [TAGS]) and the map ([COORDINATES], [VERTICES], [LABELS], [BACKDROP]).
+	// Customers are left out of the document handed to the writer: their demands are lumped into
+	// [DEMANDS] there, and an import places the customers themselves. A few references the element
+	// rows hold and the blocks do not (a junction's demand pattern, a reservoir's head pattern, a pump's
+	// speed pattern, a tank's volume curve) go in a section of this page's own, [ASSIGNMENTS].
+	var LPN_DXF_BLOCK_SECTIONS = { TITLE: 1, JUNCTIONS: 1, RESERVOIRS: 1, TANKS: 1, PIPES: 1, PUMPS: 1, VALVES: 1, STATUS: 1, TAGS: 1,
+		COORDINATES: 1, VERTICES: 1, LABELS: 1, BACKDROP: 1, END: 1 };
+	function dxfSplitInp(text) {
+		var out = [], cur = null;
+		String(text).split(/\r\n|\r|\n/).forEach(function (ln) {
+			var m = /^\s*\[([^\]]+)\]/.exec(ln);
+			if (m) { cur = { name: m[1].trim().toUpperCase(), lines: [] }; out.push(cur); }
+			else if (cur) { cur.lines.push(ln); }
+		});
+		out.forEach(function (sec) { while (sec.lines.length && !sec.lines[sec.lines.length - 1].trim()) { sec.lines.pop(); } });
+		return out;
+	}
+	function dxfEmbeddedSections() {
+		var d = inpExportDocument(), res, secs, text = '', assign = [];
+		d = Object.assign({}, d, { customers: [], labels: [] });
+		try { res = EngCalcs.lpnExportInp(d, inpExportOptions()); } catch (err) { return ''; }
+		if (!res || !res.ok) { return ''; }
+		secs = dxfSplitInp(res.inp);
+		function toks(ln) { return ln.replace(/;.*$/, '').trim().split(/\s+/).filter(Boolean); }
+		secs.forEach(function (sec) {
+			sec.lines.forEach(function (ln) {
+				var t = toks(ln), i;
+				if (!t.length) { return; }
+				if (sec.name === 'JUNCTIONS' && t[3]) { assign.push('DEMAND ' + t[0] + ' ' + t[3]); }
+				else if (sec.name === 'RESERVOIRS' && t[2]) { assign.push('HEAD ' + t[0] + ' ' + t[2]); }
+				else if (sec.name === 'TANKS' && t[7] && t[7] !== '*') { assign.push('VOLUME ' + t[0] + ' ' + t[7]); }
+				else if (sec.name === 'PUMPS') {
+					for (i = 3; i + 1 < t.length; i += 2) { if (t[i].toUpperCase() === 'PATTERN') { assign.push('SPEED ' + t[0] + ' ' + t[i + 1]); } }
+				}
+			});
+		});
+		secs.forEach(function (sec) {
+			if (LPN_DXF_BLOCK_SECTIONS[sec.name]) { return; }
+			if (!sec.lines.some(function (l) { return l.trim(); })) { return; }
+			text += '[' + sec.name + ']\n' + sec.lines.join('\n') + '\n\n';
+		});
+		if (assign.length) { text += '[ASSIGNMENTS]\n' + assign.join('\n') + '\n\n'; }
+		return text;
 	}
 	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
 	function dxfExportText(frame) {
@@ -53817,7 +54260,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_import_msx_tip, fn: openMsxRow },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
 			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON file…', key: 'lpn_file_import_gjnet',
-			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile }
+			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
+			// A DXF file this page exported, read back as a network (Task 772, slice 1).
+			{ icon: 'open', label: pc.lpn_file_import_dxfnet || 'DXF file…', key: 'lpn_file_import_dxfnet',
+			  tip: pc.lpn_file_import_dxfnet_tip, fn: pickDxfNetworkFile }
 		];
 	}
 	function importShapeRows() {

@@ -28,9 +28,11 @@ $allow = [
     'lpn_gis_menu'             => 'menu row; the form button keeps the bare Add layer',
     'lpn_gis_add'              => 'form button; the menu row carries the ellipsis',
     'lpn_file_export_item_msx' => 'menu row, command ID',
+    'lpn_file_import_dxfnet'   => 'menu row, command ID: the same words as Shapes > DXF file, in the Network group',
     'lpn_inpup_i_patterns'     => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_curves'       => 'lowercase noun inside a sentence, not a heading',
     'lpn_inpup_i_controls'     => 'lowercase noun inside a sentence, not a heading',
+    'lpn_dxfnet_held_custom' => 'lowercase noun in a list of what a DXF cannot hold, not a heading',
     'lpn_inpup_i_rules'        => 'lowercase noun inside a sentence, not a heading',
 ];
 

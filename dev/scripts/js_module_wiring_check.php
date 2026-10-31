@@ -95,6 +95,9 @@ const EC_HARNESS_LAZY_MODULES = [
     'lpn-dxf.js' => 'writing a DXF file of the model. Pure text, no DOM and no request; the editor calls it '
                   . 'when File > Export DXF file is chosen, not during boot, and '
                   . 'dev/lpn-spike/dxf-export-harness.js loads it.',
+    'lpn-dxf-read.js' => 'reading a DXF file this page wrote, as a network. Pure text, no DOM and no request; the '
+                       . 'editor calls it when File > Import > Network > DXF file is chosen, not during boot, and '
+                       . 'dev/lpn-spike/dxf-import-roundtrip-harness.js loads the page it runs in.',
     'lpn-crs.js' => 'the projected-coordinate transform. It fetches js/vendor/proj4.js and 62 KB '
                   . 'of definitions on first use, so booting it in the shared stub would make '
                   . 'every harness pay for a library almost none of them touch; the projection '
