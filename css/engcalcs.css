@@ -4036,7 +4036,7 @@ option:disabled { color: var(--ec-ink-muted); }
 			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
 		}
 		/* A radio that stands beside a button in a value cell (the projection chooser) is the same size as a lone one. */
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-gwrap > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0 6px; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-gwrap > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0 6px 0 0; }
 		/* A ramp picker is a cell too: its left edge is the Value column's. */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 2px 0; width: 100%; min-width: 0; }
 		/* The colour-scheme bar and the Time series pull-down at the foot of Properties are cells too, the same as the sheet's other pull-downs (Tom, 2026-10-29). */

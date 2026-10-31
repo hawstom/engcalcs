@@ -180,9 +180,9 @@ async function main() {
 			await a.settle(300);
 
 			await openLibraries();
-			const mark = await P(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).map((e) => ({ id: e.querySelector('input.lpn-lib-id').value, text: e.querySelector('.lpn-lib-head').textContent })));
+			const mark = await P(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).map((e) => ({ id: e.querySelector('input.lpn-lib-id').value, text: e.textContent })));
 			ok('only the default row (1) carries the "(default)" mark', mark.length > 1 && mark.filter((m) => /\(default\)/.test(m.text)).map((m) => m.id).join() === '1', JSON.stringify(mark.map((m) => m.id + ':' + /\(default\)/.test(m.text))));
-			const tip = await P(() => { const s = Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-head span')).find((x) => /\(default\)/.test(x.textContent)); return s ? (s.title || s.getAttribute('data-ec-title') || '') : ''; });
+			const tip = await P(() => { const s = Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-actions span')).find((x) => /\(default\)/.test(x.textContent)); return s ? (s.title || s.getAttribute('data-ec-title') || '') : ''; });
 			console.log('  mark tip:', JSON.stringify(tip));
 
 			// Before the rename: the demand a junction carries over the day.
@@ -207,7 +207,7 @@ async function main() {
 				i.value = 'X'; i.dispatchEvent(new Event('change', { bubbles: true }));
 			});
 			await a.settle(400);
-			const mark2 = await P(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).filter((e) => /\(default\)/.test(e.querySelector('.lpn-lib-head').textContent)).map((e) => e.querySelector('input.lpn-lib-id').value));
+			const mark2 = await P(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).filter((e) => /\(default\)/.test(e.textContent)).map((e) => e.querySelector('input.lpn-lib-id').value));
 			ok('after the rename the "(default)" mark follows to X', mark2.join() === 'X', mark2.join());
 			await closeLibraries();
 			row = await settingsRow();

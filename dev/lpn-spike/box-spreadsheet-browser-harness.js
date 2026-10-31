@@ -273,7 +273,7 @@ async function main() {
 				unitRows: b.querySelectorAll('#lpn_convas_units_fields .lpn-grow').length, scroll: b.scrollWidth - b.clientWidth };
 		});
 		ok('Convert as is a box of Label | Value rows: the coordinate system and the units', !!cv && cv.grid && cv.unitRows >= 8, JSON.stringify(cv));
-		ok('...a run of two or more rows has a header and a run of one has none', !!cv && cv.runs.every((g) => g.hdr === (g.rows >= 2)), JSON.stringify(cv && cv.runs));
+		ok('...it is a sheet: no "Label | Value" heading band over any run of rows (round 10b, Task 842)', !!cv && cv.runs.every((g) => !g.hdr), JSON.stringify(cv && cv.runs));
 		ok('...and it does not scroll sideways', !!cv && cv.scroll <= 1, String(cv && cv.scroll));
 		const cv2 = await c.page.evaluate(() => {
 			const b = document.getElementById('lpn_convas_body'), ok = document.getElementById('lpn_convas_ok'), R = (e) => e.getBoundingClientRect(), vh = window.innerHeight;
