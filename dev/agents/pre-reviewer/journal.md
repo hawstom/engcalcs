@@ -4759,3 +4759,10 @@ OBSERVED MISSED (moderate): Properties shrinks to 80 px freely, no page sideways
 OBSERVED PRE-EXISTING (same on master): on a phone, Properties docked -> tap Float gives a 382 px wide floating box at left 113, so its right 105 px incl. Close, dock and help buttons are off screen; no touch grip. Not caused by round 8.
 OBSERVED: settings-fit 17/18 fails on PC 580 px narrowing (gap above name line 0 vs 2 px below); phone passes. Invisible to Tom. box-narrow 22/22, phone-select 20/20, phone-dock 22/22, small-screen pass.
 Method: probes in session scratchpad p8probe; shots _panel/www/img/perry8-*.png.
+
+## 2026-10-30 -- box-design round 8b (efb086597)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, 390/320 touch docked + floated, 1280 PC floating, 180..80 px): every Properties value inside the box, 0 sideways scroll (page or body), 4 of 4 header buttons inside, at every width; Float on phone lands wholly on screen (l 4, r 386 / 316), has a 28 px grip, finger shrinks it to ~100 px with all values visible. Round-8 defect 1 and 2 FIXED.
+OBSERVED MISSED (minor, visual): the Properties title is not kept clear of the header buttons: title text right edge is 701 px against button left edges 695 (150 px wide), 645 (100), 625 (80), so "Properties" is drawn over the buttons from 150 down (screenshots perry8b-phone-docked-80/150, float-shrunk). The harness titleOverlap check reads 0, so it is blind to this. Stacked rows: the ID value "10" collides with the "From" label at 80-150 px.
+OBSERVED MISSED: Find and Fire flow (not fixed by this round) at 100/80 px: no input visible (0 of 5, 0 of 7), 2-3 header buttons off the box; at 150 px 2 buttons off. 200 px and up fine. Phone default widths 382/312 fine, 28 px grip present.
+OBSERVED: harnesses green: box-narrow 148/148, settings-phone-width 24/24, box-phone7 26/26.
+Method: p8probe/sweep2.js, ff.js, ti.js; shots _panel/www/img/perry8b-*.png.
