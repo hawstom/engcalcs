@@ -25450,13 +25450,15 @@ var EngCalcs = EngCalcs || {};
 	// with a `title`; a label that fits keeps the title it was built with (a `?` label's tip, else none), one that is cut reads "Label: tip" (or just the label). Run
 	// on every width change (the host's observer, a divider drag, a fit) and just before a pointer rests on a label. A title is written, never removed.
 	function gridTitleOne(n) {
-		var cut, text, want;
+		var cut, text, want, cur;
 		if (!n || !n.getBoundingClientRect || !n.getBoundingClientRect().width) { return; }
-		if (n.__lpnTip0 === undefined || (n.title !== n.__lpnTipSet && n.title !== n.__lpnTip0)) { n.__lpnTip0 = n.title || ''; }
+		// An armed tip lives in `data-bs-original-title` (the attribute itself is blanked); an unarmed one in `title`.
+		cur = n.hasAttribute('data-bs-original-title') ? n.getAttribute('data-bs-original-title') : n.title;
+		if (n.__lpnTip0 === undefined || (cur !== n.__lpnTipSet && cur !== n.__lpnTip0)) { n.__lpnTip0 = cur || ''; }
 		cut = n.scrollWidth > n.clientWidth + 1;
 		text = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
 		want = cut ? (n.__lpnTip0 ? text + ': ' + n.__lpnTip0 : text) : n.__lpnTip0;
-		if (n.title !== want) { n.title = want; }
+		if (cur !== want) { n.title = want; }
 		n.__lpnTipSet = want;
 	}
 	function gridTitlesNow(host) {
@@ -25494,7 +25496,7 @@ var EngCalcs = EngCalcs || {};
 		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
 	}
 	function gridFitNow(host) {
-		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
+		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals, secs;
 		host.__lpnFitQ = false;
 		gridTitlesSoon(host);
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
@@ -25507,14 +25509,27 @@ var EngCalcs = EngCalcs || {};
 		names = gridNaturalNames(host);
 		if (!hr.width || !names.length) { host.style.removeProperty('--lpn-g-name'); return; }
 		px = gridRem();
-		names.sort(function (a, b) { return a - b; });
-		w = names[Math.min(names.length - 1, Math.ceil(LPN_GFIT_PCT * names.length) - 1)];
-		w = Math.max(w, Math.min(names[names.length - 1], LPN_GFIT_FLOOR));
+		// The fit of one run of labels: the 80th percentile, with the floor.
+		function fitOf(list) {
+			var v;
+			list.sort(function (a, b) { return a - b; });
+			v = list[Math.min(list.length - 1, Math.ceil(LPN_GFIT_PCT * list.length) - 1)];
+			return Math.max(v, Math.min(list[list.length - 1], LPN_GFIT_FLOOR));
+		}
+		// **THE MULTI-SELECTION BOX FITS EACH SECTION AS ITS OWN ELEMENT'S PROPERTIES WOULD, AND TAKES THE WIDEST** (Perry, 2026-10-31: 85 px against 161): the 80th
+		// percentile over every section's labels together is pulled down by the many short ones, and cuts labels a single element would not.
+		secs = host.querySelectorAll('.lpn-multi-section');
+		if (secs.length) {
+			w = 0;
+			Array.prototype.forEach.call(secs, function (sec) { var l = gridNaturalNames(sec); if (l.length) { w = Math.max(w, fitOf(l)); } });
+		}
+		if (!w) { w = fitOf(names); }
 		cs = window.getComputedStyle(host);
 		pad = 14;   // the cell's own padding and the divider line
 		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
 		for (i = 0; i < vals.length; i++) { valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
 		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
+		if (secs.length) { cap = Math.max(cap, hr.width * 0.6); }   // a multi-selection's value cells are all 'Various' boxes and selects of natural width; the Value column keeps 40% of the box, as it does beside a single element's labels
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
 		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
 		gridNoteFrac(host);
@@ -72376,9 +72391,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE PROPERTIES BOX'S BODY OWNS THE TRACKS, FOR ONE ELEMENT AND FOR SEVERAL ALIKE** (Tom, 2026-10-30: "they act differently than the Properties columns"). The body gets
 	// the Label | Value divider and the remembered or fitted width; openMultiProperties() calls it too, so each of its sections is a two-column block under the same divider.
 	function propsBodyOwn(fields) {
-		var nm;
+		var nm, kind;
 		if (!(fields && fields.id === 'lpn_popup_fields' && fields.parentNode)) { return; }
 		nm = fields.parentNode;
+		// One element's rows and several's are different label lists: the fit starts again when the kind changes, not scaled from the other kind's.
+		kind = fields.querySelector('.lpn-multi-section') ? 'multi' : 'single';
+		if (nm.__lpnKind !== kind) { nm.__lpnKind = kind; nm.__lpnScaled = false; nm.__lpnFrac = 0; }
 		nm.setAttribute('data-gcols-id', 'lpn_popup');
 		gcolApply(nm);
 		propsHeaderPlace(nm, fields);
@@ -76119,6 +76137,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return first;
 	}
+	// The tip a column's row carries in one element's Properties, by the column's key (Perry, 2026-10-31: multi rows lacked the `?` single rows have).
+	var LPN_MULTI_TIPS = {
+		active: 'lpn_field_active_tip', closed: 'lpn_field_closed_tip', cv: 'lpn_field_cv_tip', tag: 'lpn_field_tag_tip', emitter: 'lpn_field_emitter_tip',
+		head: 'lpn_field_head_tip', headPattern: 'lpn_field_head_pattern_tip', speed: 'lpn_field_pump_speed_tip', speedPattern: 'lpn_field_speed_pattern_tip',
+		roughness: 'lpn_field_roughness_tip', km: 'lpn_field_km_short_tip', length: 'lpn_field_length_slope_tip', diameter: 'lpn_field_pipetype_tip', typeId: 'lpn_field_pipetype_tip',
+		fittingsId: 'lpn_field_fittings_tip', axis1: 'lpn_field_coord_tip', axis2: 'lpn_field_coord_tip', allZoom: 'lpn_field_text_all_zoom_tip', anchor: 'lpn_field_text_attached_tip',
+		bottomElev: 'lpn_field_tank_base_elev_tip', level: 'lpn_field_tank_level_short_tip', minLevel: 'lpn_field_tank_minlevel_short_tip', maxLevel: 'lpn_field_tank_maxlevel_short_tip',
+		tankDiameter: 'lpn_field_tank_diameter_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
+		sourceType: 'lpn_source_type_tip', sourceQuality: 'lpn_source_quality_tip', sourcePattern: 'lpn_source_pattern_tip', mixingModel: 'lpn_mixing_model_tip', mixingFraction: 'lpn_mixing_fraction_tip'
+	};
+	function multiTip(c, els) {
+		var pc = EngCalcs.pageConfig || {};
+		if (c.key === 'elev' && els && els.length && els.every(function (e) { return e.type === 'tank'; })) { return pc.lpn_tank_ground_elev_tip || ''; }
+		return LPN_MULTI_TIPS[c.key] ? pc[LPN_MULTI_TIPS[c.key]] || '' : '';
+	}
 	function multiRow(host, c, els) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
@@ -76160,6 +76193,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return (c.bool) ? (input.checked ? '1' : '0') : input.value;
 		}
 		input.setAttribute('aria-label', paneHeadingText(c));
+		input.setAttribute('data-gkey', c.key);
 		input.addEventListener('change', function () {
 			var n = 0, v = rowValue();
 			// **AN UNTOUCHED ROW WRITES NOTHING.** Every row in this box is a field the user did
@@ -76184,7 +76218,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshPaneIfOpen();
 			refreshSelection();
 		});
-		label.appendChild(document.createTextNode(paneHeadingText(c) + ' '));
+		setFieldLabel(label, paneHeadingText(c), multiTip(c, els));   // the same label markup, and the same `?`, as one element's row
 		label.appendChild(input);
 		host.appendChild(label);
 		// One property per line, as every other popup on this page (Tom, 2026-09-08: *"That
@@ -87054,7 +87088,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (wrap) { wrap.scrollLeft = sl; }
 	}
 	function rptColStartDrag(table, i, th, ev) {
-		var startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startW, fs, moved = false, host = table._ecRwHost, key = table._ecRwKeys[i];
+		var startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startW, fs, moved = false, host = table._ecRwHost, key = table._ecRwKeys[i], target = (ev && ev.currentTarget) || document;
 		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
 		if (ev && ev.preventDefault) { ev.preventDefault(); }
 		startW = th.getBoundingClientRect().width; fs = rptColFont(table);
@@ -87067,8 +87101,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		function up(e2) {
 			var p, w;
-			document.removeEventListener('mousemove', move);
-			document.removeEventListener('mouseup', up);
+			target.removeEventListener('pointermove', move);
+			target.removeEventListener('pointerup', up);
+			target.removeEventListener('pointercancel', up);
+			try { if (ev && ev.pointerId !== undefined) { target.releasePointerCapture(ev.pointerId); } } catch (err) { /* already released */ }
 			move(e2);
 			if (moved) {
 				w = widthAt(e2);
@@ -87078,8 +87114,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			rptColLayout(table);
 		}
-		document.addEventListener('mousemove', move);
-		document.addEventListener('mouseup', up);
+		// Pointer events, captured on the grip: a mouse and a finger drag alike (Perry, 2026-10-31: the grips listened to the mouse only).
+		try { if (ev && ev.pointerId !== undefined) { target.setPointerCapture(ev.pointerId); } } catch (err) { /* no capture: the move still arrives while over the grip */ }
+		target.addEventListener('pointermove', move);
+		target.addEventListener('pointerup', up);
+		target.addEventListener('pointercancel', up);
 	}
 	function rptColReset(table, i) {
 		var p = rptColRead()[table._ecRwHost];
@@ -87112,7 +87151,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					grip.className = 'lpn-pane-colgrip lpn-rpt-colgrip';
 					grip.setAttribute('aria-hidden', 'true');
 					if (tipText && (typeof ecCanHover !== 'function' || ecCanHover())) { grip.title = tipText; grip.setAttribute('data-ec-tip-delay', '1000'); }
-					grip.addEventListener('mousedown', function (ev) { rptColStartDrag(table, i, th, ev); });
+					grip.addEventListener('pointerdown', function (ev) { if (ev.button !== undefined && ev.button !== 0) { return; } rptColStartDrag(table, i, th, ev); });
 					grip.addEventListener('dblclick', function (ev) { if (ev.stopPropagation) { ev.stopPropagation(); } rptColReset(table, i); });
 					grip.addEventListener('click', function (ev) { if (ev.stopPropagation) { ev.stopPropagation(); } });
 					th.classList.add('lpn-rpt-gripth');

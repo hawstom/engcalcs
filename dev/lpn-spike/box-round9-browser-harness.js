@@ -45,10 +45,12 @@ async function main() {
 	const net1 = fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8');
 	const shot = (S, n) => SHOTS ? S.page.screenshot({ path: path.join(SHOTS, n) }) : Promise.resolve();
 	const MODES = [['PC', { viewport: { width: 1366, height: 768 } }], ['phone', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }]];
-	const open = async (S) => {
+	const netTexts = {};
+	const netText = (n) => (netTexts[n] = netTexts[n] || fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', n + '.lwn'), 'utf8'));
+	const open = async (S, netName) => {
 		await S.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (r) => r.abort());
 		await S.goto('Looped-Network.php?ec_nolog=1');
-		await S.page.evaluate((t) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', t); localStorage.setItem('lpn_hovercard', 'off'); }, net1);
+		await S.page.evaluate((t) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', t); localStorage.setItem('lpn_hovercard', 'off'); }, netName ? netText(netName) : net1);
 		await S.reload();
 		await S.answerTrainingPanel().catch(() => {});
 		await S.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -87,9 +89,9 @@ async function main() {
 		const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow !== 'ellipsis' || cs.overflow !== 'hidden'; }).length;
 		const tall = names.filter((n) => n.getBoundingClientRect().height > 40).length;
 		const cut = names.filter((n) => n.scrollWidth > n.clientWidth + 1);
-		const cutNoTitle = cut.filter((n) => { const t = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(); return !n.title || n.title.indexOf(t) !== 0; });
+		const cutNoTitle = cut.filter((n) => { const t = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(); return ((n.getAttribute('data-bs-original-title') || n.title || '').indexOf(t) !== 0); });
 		const w = names.length ? Math.max.apply(null, names.map((n) => n.getBoundingClientRect().width)) : 0;
-		return { n: names.length, bad, tall, cut: cut.length, cutNoTitle: cutNoTitle.length, ex: cutNoTitle[0] ? (cutNoTitle[0].textContent || '').trim().slice(0, 30) + ' | ' + cutNoTitle[0].title : '', maxW: Math.round(w) };
+		return { n: names.length, bad, tall, cut: cut.length, cutNoTitle: cutNoTitle.length, ex: cutNoTitle[0] ? (cutNoTitle[0].textContent || '').trim().slice(0, 30) + ' | ' + (cutNoTitle[0].getAttribute('data-bs-original-title') || cutNoTitle[0].title) : '', maxW: Math.round(w) };
 	}, sel);
 	// Every row: the label left of the value, the two in one band, and no label or value over another.
 	const rowsOf = (S, sel) => S.page.evaluate((s) => {
@@ -123,6 +125,8 @@ async function main() {
 				await tapAt(S, phone, await pipeAt(S));
 				await S.settle(1300);
 				ok(mode + ' A1. Properties opens', await S.page.evaluate(() => getComputedStyle(document.getElementById('lpn_popup')).display !== 'none'));
+				const l0 = await labelsOf(S, '#lpn_popup');
+				ok(mode + ' A1b. at first open every cut label already carries its full text as its tip (no hover)', l0.n > 5 && l0.cutNoTitle === 0, JSON.stringify(l0));
 				await setWidth(S, '#lpn_popup', 330);
 				await S.settle(500);
 				let sp = await splitAt(S, '#lpn_popup');
@@ -167,6 +171,8 @@ async function main() {
 				await P.mouse.move(20, 180); await P.mouse.down(); await P.mouse.move(vp.width / 2, vp.height / 2, { steps: 5 }); await P.mouse.move(vp.width - 20, vp.height - 80, { steps: 5 }); await P.mouse.up();
 				await S.settle(1300);
 				const n = await P.evaluate(() => document.querySelectorAll('#lpn_popup .lpn-multi-section').length);
+				const lm0 = await labelsOf(S, '#lpn_popup');
+				ok(mode + ' C1b. at first open every cut label in the multi box carries its full text as its tip', lm0.n > 5 && lm0.cutNoTitle === 0, JSON.stringify(lm0));
 				ok(mode + ' C1. a Select area over Net1 opens the multi-selection box with several sections', n >= 3, String(n));
 				for (const w of [315, 200, 120]) {
 					await setWidth(S, '#lpn_popup', w);
@@ -186,7 +192,7 @@ async function main() {
 					ok(mode + ' C. ' + w + ' px: no two sections share a vertical band; each starts below the one before', m.sections >= 3 && m.overlap === 0 && m.stacked, JSON.stringify(m));
 					ok(mode + ' C. ' + w + ' px: every row\'s label and value are in one band, nothing overlaps', rr.rows > 10 && rr.notSideBySide === 0 && rr.overlaps === 0 && rr.pageX <= 0, JSON.stringify(rr));
 					ok(mode + ' C. ' + w + ' px: the sections share one Label column and one Value column', m.labelXsAlign && m.valueXsAlign, JSON.stringify(m));
-					ok(mode + ' C. ' + w + ' px: global style (sheet grid with the divider), labels clipped on one line', m.inSheet && m.split && ll.bad === 0 && ll.tall === 0, JSON.stringify(ll));
+					ok(mode + ' C. ' + w + ' px: global style (sheet grid with the divider), labels clipped on one line, every cut one tipped', m.inSheet && m.split && ll.bad === 0 && ll.tall === 0 && ll.cutNoTitle === 0, JSON.stringify(ll));
 					if (w === 315) { await shot(S, 'boxr9-c-' + mode + '.png'); }
 				}
 				await setWidth(S, '#lpn_popup', 315);
@@ -215,13 +221,15 @@ async function main() {
 				await door(S);
 				await S.settle(1100);
 				ok(mode + ' D. ' + what + ': opens', await S.page.evaluate((s) => { const b = document.querySelector(s); return !!b && getComputedStyle(b).display !== 'none'; }, sel));
+				const ld0 = await labelsOf(S, sel);
+				ok(mode + ' D. ' + what + ': at first open every cut label carries its full text as its tip (no hover)', ld0.n > 3 && ld0.cutNoTitle === 0, JSON.stringify(ld0));
 				for (const w of [300, 150, 100]) {
 					await setWidth(S, sel, w);
 					await S.settle(600);
 					const g = await S.page.evaluate((h) => { const e = document.querySelector(h); return { sheet: e.classList.contains('lpn-sheet'), narrow: e.classList.contains('lpn-gnarrow'), split: !!e.querySelector('.lpn-gsplit'), rows: e.querySelectorAll('.lpn-grow').length, hdr: getComputedStyle(e).display }; }, hostSel);
 					const r = await rowsOf(S, sel), l = await labelsOf(S, sel);
 					ok(mode + ' D. ' + what + ' ' + w + ' px: the global box style (sheet grid, divider, two columns)', g.sheet && !g.narrow && g.split && g.rows >= 4 && r.notSideBySide === 0 && r.narrow === 0, JSON.stringify([g, r]));
-					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line with an ellipsis, nothing over anything', l.bad === 0 && l.tall === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
+					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line with an ellipsis, every cut one tipped, nothing over anything', l.bad === 0 && l.tall === 0 && l.cutNoTitle === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
 				}
 				await setWidth(S, sel, 380);
 				await S.settle(600);
@@ -243,6 +251,55 @@ async function main() {
 				}
 				if (what === 'Fire flow') { await shot(S, 'boxr9-ff-' + mode + '.png'); }
 				ok(mode + ' D. ' + what + ': no page error', S.errors.length === 0, S.errors.join(' | '));
+				await S.close();
+			}
+
+			console.log('--- F. multi-selection opens with the label width and the `?` markers single Properties has ---');
+			for (const netName of ['Net1', 'Net3']) {
+				const S = await Session.open(browser, NAME + '-f-' + mode, ctx);
+				const P = S.page;
+				await open(S, netName);
+				// Single Properties of a sample of elements, one per distinct label list: the Label column's width and which labels carry a `?`.
+				const singles = new Map();
+				for (const kind of ['node-junction', 'node-reservoir', 'node-tank', 'link-pipe', 'link-pump', 'link-valve']) {
+					const cands = await P.evaluate((o) => Array.from(document.querySelectorAll('#lpn_canvas .lpn-' + o.k)).map((e) => {
+						let r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+						if (e.tagName === 'polyline' && e.points && e.points.length > 1 && e.getScreenCTM) { const a = e.points[0], c = e.points[1], m = e.getScreenCTM(); const p = e.ownerSVGElement.createSVGPoint(); p.x = (a.x + c.x) / 2; p.y = (a.y + c.y) / 2; const q = p.matrixTransform(m); x = q.x; y = q.y; }
+						return { x, y, ok: x > 10 && y > 150 && x < innerWidth - o.lim && y < innerHeight - 70 };
+					}).filter((c) => c.ok).slice(0, 8), { k: kind, lim: phone ? 20 : 400 });
+					for (const q of cands) {
+						await P.mouse.click(q.x, q.y); await S.settle(500);
+						const one = await P.evaluate(() => {
+							const b = document.getElementById('lpn_popup'); if (!b || getComputedStyle(b).display === 'none' || b.querySelector('.lpn-multi-section')) { return null; }
+							const names = Array.from(b.querySelectorAll('#lpn_popup_fields .lpn-gname')).filter((n) => n.getBoundingClientRect().height > 0);
+							const lab = (n) => (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+							return { w: names.length ? names[0].getBoundingClientRect().width : 0, labels: names.map(lab), tipped: names.filter((n) => n.querySelector('.ec-tip') || n.classList.contains('ec-help')).map(lab) };
+						});
+						if (one && one.labels.length) { singles.set(kind, one); break; }
+					}
+				}
+				const sing = Array.from(singles.values());
+				await P.keyboard.press('Escape'); await S.settle(300);
+				await P.keyboard.press('a'); await S.settle(300);
+				await P.evaluate(() => { const h = document.getElementById('lpn_area_hint'); if (h) { const b = h.querySelector('button'); if (b) { b.click(); } } });
+				await S.settle(300);
+				const vp = P.viewportSize();
+				await P.mouse.move(20, 180); await P.mouse.down(); await P.mouse.move(vp.width / 2, vp.height / 2, { steps: 5 }); await P.mouse.move(vp.width - 20, vp.height - 80, { steps: 5 }); await P.mouse.up();
+				await S.settle(1500);
+				const multi = await P.evaluate(() => {
+					const b = document.getElementById('lpn_popup');
+					const names = Array.from(b.querySelectorAll('.lpn-multi-section .lpn-gname')).filter((n) => n.getBoundingClientRect().height > 0);
+					const lab = (n) => (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+					return { w: names.length ? names[0].getBoundingClientRect().width : 0, sections: b.querySelectorAll('.lpn-multi-section').length, tipped: names.filter((n) => n.querySelector('.ec-tip') || n.classList.contains('ec-help')).map(lab), all: names.map(lab) };
+				});
+				const maxSingle = Math.max.apply(null, sing.map((x) => x.w));
+				console.log('  ' + netName + ' ' + mode + ': single label widths ' + JSON.stringify(sing.map((x) => Math.round(x.w))) + ', multi ' + Math.round(multi.w) + ', ' + sing.length + ' singles sampled, ' + multi.sections + ' sections');
+				ok(mode + ' F. ' + netName + ': ' + sing.length + ' kinds of element opened singly', sing.length >= 3, Array.from(singles.keys()).join(','));
+				ok(mode + ' F. ' + netName + ': multi\'s first Label column (' + Math.round(multi.w) + ' px) matches the widest single fit (' + Math.round(maxSingle) + ' px): at least it, and at most 12 px more (the Text section is not sampled singly)', multi.w >= maxSingle - 6 && multi.w <= maxSingle + 12, multi.w + ' vs ' + maxSingle);
+				const needTip = new Set(); sing.forEach((x) => x.tipped.forEach((t) => { if (multi.all.indexOf(t) >= 0) { needTip.add(t); } }));
+				const missing = Array.from(needTip).filter((t) => multi.tipped.indexOf(t) < 0);
+				ok(mode + ' F. ' + netName + ': every label single Properties marks with a `?` (' + needTip.size + ') is marked in multi too', needTip.size >= 3 && missing.length === 0, 'missing: ' + JSON.stringify(missing));
+				ok(mode + ' F. ' + netName + ': no page error', S.errors.length === 0, S.errors.join(' | '));
 				await S.close();
 			}
 

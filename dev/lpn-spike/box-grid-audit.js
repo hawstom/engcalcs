@@ -68,11 +68,10 @@ function auditInPage(spec) {
 		const cs = getComputedStyle(e), t = e.textContent.trim().slice(0, 40);
 		const inner = e.querySelector('.lpn-gtext');
 		const clipped = (x) => x.scrollWidth > x.clientWidth + 1 || getComputedStyle(x).textOverflow === 'ellipsis' && x.scrollWidth > x.clientWidth;
-		// Round 9: a cut name is fine if it is one line, ellipsised, and tipped with its full words (the pointer arms the tip).
+		// Round 9: a cut name is fine if it is one line, ellipsised, and tipped with its full words (at rest, no hover needed; an armed tip lives in data-bs-original-title).
 		if (clipped(e) || (inner && clipped(inner))) {
-			e.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
 			const words = e.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-			if (cs.textOverflow !== 'ellipsis' || cs.whiteSpace !== 'nowrap' || !e.title || e.title.indexOf(words) !== 0) { ellipsis.push(t); }
+			if (cs.textOverflow !== 'ellipsis' || cs.whiteSpace !== 'nowrap' || (e.getAttribute('data-bs-original-title') || e.title || '').indexOf(words) !== 0) { ellipsis.push(t); }
 		}
 		const fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.25;
 		if (R(e).height > lh * 1.45 + 1 && !(spec.wrapOk || []).some((w) => t.indexOf(w) === 0)) { wrapped.push(t + ' h' + Math.round(R(e).height)); }

@@ -230,7 +230,45 @@ async function main() {
 		await closeBox('lpn_scncmp_box');
 
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+
+		// ---- a phone, real touch events (Perry, 2026-10-31: the grips listened to the mouse only and were 4 px wide) ----
 		await a.close();
+		{
+			const b = await Session.open(browser, 'B', { serviceWorkers: 'block', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+			const bp = b.page;
+			await bp.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+			await b.goto('Looped-Network.php?ec_nolog=1');
+			await bp.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(d));
+			await b.reload();
+			await b.answerTrainingPanel().catch(() => {});
+			await bp.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await b.settle(2500);
+			await dock.openBox(b, 'lpn_ff_box');
+			for (const bt of await bp.$$('#lpn_ff_controls button.lpn-ff-run')) { if (((await bt.textContent()) || '').trim() === runLabel) { await bt.click(); break; } }
+			await b.waitFor(() => bp.evaluate(() => { const r = document.querySelector('#lpn_ff_report'); return !!r && !!r.querySelector('tbody tr'); }), 'a table on the phone', 600000);
+			await b.settle(500);
+			const info = () => bp.evaluate(() => {
+				const t = document.querySelector('#lpn_ff_report table.lpn-ff-table'), g = t.querySelector('.lpn-rpt-colgrip'), th = g.parentElement, wrap = t.closest('.lpn-ff-tablewrap');
+				wrap.scrollLeft = 0;
+				const r = g.getBoundingClientRect(), tr = th.getBoundingClientRect();
+				return { x: r.left + r.width / 2, y: r.top + r.height / 2, gw: r.width, thw: tr.width, top: document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === g };
+			});
+			let g0 = await info();
+			ok('phone: the column divider has a finger-size hit area (24 px)', g0.gw >= 24, JSON.stringify(g0));
+			ok('phone: the divider is the element under the finger', g0.top, JSON.stringify(g0));
+			const cdp = await b.context.newCDPSession(bp);
+			const touch = (ty, x, y) => cdp.send('Input.dispatchTouchEvent', { type: ty, touchPoints: ty === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+			await touch('touchStart', g0.x, g0.y);
+			for (let k = 1; k <= 10; k++) { await touch('touchMove', g0.x + 6 * k, g0.y); }
+			await touch('touchEnd', 0, 0);
+			await b.settle(400);
+			const g1 = await info();
+			const stored = await bp.evaluate(() => { try { return localStorage.getItem('lpn_rptcols'); } catch (e) { return null; } });
+			ok('phone: a finger drag widens the column (' + Math.round(g0.thw) + ' -> ' + Math.round(g1.thw) + ' px)', g1.thw > g0.thw + 30, JSON.stringify([g0.thw, g1.thw]));
+			ok('phone: ...and the width is stored', !!stored && stored.length > 4, String(stored));
+			ok('phone: no uncaught page errors', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+			await b.close();
+		}
 	} finally {
 		await browser.close();
 		env.stopServer();

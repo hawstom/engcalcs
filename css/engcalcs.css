@@ -6705,7 +6705,12 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    the whole sort arrow (moved 5 px in) stays clickable. A dragged column is fixed on screen only (Print and
    Copy HTML are built from text); its cells break at the character. Undragged columns keep automatic layout. */
 .lpn-ff-table th.lpn-rpt-gripth { position: relative; }
-.lpn-rpt-colgrip { width: 4px; }
+.lpn-rpt-colgrip { width: 4px; touch-action: none; }
+/* A finger: the same 24 px hit area as the Properties divider (Perry, 2026-10-31); the sort arrow moves out of its way. */
+@media (pointer: coarse) {
+	.lpn-rpt-colgrip { width: 24px; }
+	.lpn-ff-table th.lpn-rpt-gripth .lpn-ff-sortarrow { inset-inline-end: 26px; }
+}
 .lpn-ff-table th.lpn-rpt-gripth .lpn-ff-sortarrow { inset-inline-end: 5px; }
 .lpn-ff-table .lpn-rpt-dc { overflow: hidden; overflow-wrap: anywhere; white-space: normal; min-width: 0; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
