@@ -25236,7 +25236,7 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(note);
 			back = document.createElement('button');
 			back.type = 'button';
-			back.className = 'lpn-gcol2';
+			back.className = 'lpn-gfull';
 			back.textContent = pc.lpn_find_q_restore || 'Use the controls instead';
 			back.addEventListener('click', function () {
 				// findState still holds the last query the controls DID express, so this is a
@@ -25821,11 +25821,11 @@ var EngCalcs = EngCalcs || {};
 			control: findQueryInput, kind: 'text' });
 		// Tom's own line, and "expandable" is his word: it says the grammar will grow.
 		hint = document.createElement('div');
-		hint.className = 'lpn-find-hint lpn-gcol2';
+		hint.className = 'lpn-find-hint lpn-gfull';
 		hint.textContent = pc.lpn_find_query_hint || 'Combine conditions with AND, OR and ()';
 		box.appendChild(hint);
 		findQueryMsgEl = document.createElement('div');
-		findQueryMsgEl.className = 'lpn-find-msg lpn-gcol2';
+		findQueryMsgEl.className = 'lpn-find-msg lpn-gfull';
 		box.appendChild(findQueryMsgEl);
 		findQueryInput.value = findQueryString();
 		renderFindMessage();
@@ -26021,7 +26021,7 @@ var EngCalcs = EngCalcs || {};
 	// is exactly one Find button and exactly one place that wires its click.
 	function buildFilterRow(box, findBtn) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
-		row.className = 'lpn-find-filter lpn-gcol2';
+		row.className = 'lpn-find-filter lpn-gfull';
 		row.appendChild(findBtn);
 		btn = document.createElement('button');
 		btn.type = 'button';
@@ -26961,7 +26961,7 @@ var EngCalcs = EngCalcs || {};
 		if (replaceIsDem()) {
 			btn = document.createElement('button');
 			btn.type = 'button';
-			btn.className = 'lpn-gcol2';
+			btn.className = 'lpn-gfull';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
@@ -26986,7 +26986,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			btn = document.createElement('button');
 			btn.type = 'button';
-			btn.className = 'lpn-gcol2';
+			btn.className = 'lpn-gfull';
 			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
@@ -27007,7 +27007,7 @@ var EngCalcs = EngCalcs || {};
 		lpnGridRow(box, { label: pc.lpn_replace_value || 'New value', control: input, kind: 'text' });
 		btn = document.createElement('button');
 		btn.type = 'button';
-		btn.className = 'lpn-gcol2';
+		btn.className = 'lpn-gfull';
 		setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 		btn.addEventListener('click', runReplacePreview);
 		box.appendChild(btn);
@@ -36697,7 +36697,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (withScn) {
 				var note = document.createElement('div');
 				note.id = 'lpn_export_scn_note';
-				note.className = 'lpn-gcol2';
+				note.className = 'lpn-gfull';
 				var noteText = pc.lpn_export_table_scn_note || 'Results are exported only for the scenario last calculated.';
 				body.appendChild(note);
 				groups.scenarios.addEventListener('change', function () { note.textContent = picked('scenarios') === 'all' ? noteText : ''; });
@@ -87795,7 +87795,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
 		btn.type = 'button';
 		btn.id = 'lpn_calib_load';
-		btn.className += ' lpn-gcol2';
+		btn.className += ' lpn-gfull';
 		if (pc.lpn_calib_load_tip) { btn.title = pc.lpn_calib_load_tip; }
 		btn.addEventListener('click', function () {
 			var input = document.getElementById('lpn_calib_file');

@@ -96,8 +96,8 @@ async function sectionAlignment(a, host, label) {
 	// A toggle stands 6 px in, where the text of the cells beside it starts (the standard sheet style).
 	ok(label + ': every value starts at one x', uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x)).length === 1 && uniq(f.rows.filter((r) => r.chk).map((r) => r.val.x - 6)).every((x) => x === uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x))[0]), JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
 	// Round 9 (Tom, 2026-10-30): a label never wraps; the column cuts it with an ellipsis and a cut label carries its full text as its tip.
-	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => getComputedStyle(n).whiteSpace !== 'nowrap' || getComputedStyle(n).textOverflow !== 'ellipsis').length, host);
-	ok(label + ': every label is one line with an ellipsis', cut === 0, String(cut));
+	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => getComputedStyle(n).whiteSpace !== 'nowrap' || getComputedStyle(n).textOverflow === 'ellipsis').length, host);
+	ok(label + ': every label is one line clipped, with no ellipsis', cut === 0, String(cut));
 	ok(label + ': a label is one line high', f.rows.every((r) => r.name.h < 2.4 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));
 	const fillers = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gw-fill')).map((e) => e.getBoundingClientRect().width), host);
 	// The standard sheet style: a control fills its Value cell (Tom, 2026-10-27), so the bound is the box's right edge, not 17rem.
@@ -167,7 +167,7 @@ async function main() {
 		for (let i = 0; i < 40; i++) { await a.page.keyboard.press('ArrowLeft'); }
 		await a.settle(200);
 		const clip = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname')).map((n) => ({ clipped: n.scrollWidth > n.clientWidth + 1, text: n.textContent })));
-		// Round 9: no label wraps; one the column cannot hold is cut with an ellipsis.
+		// Round 9: no label wraps; one the column cannot hold is clipped.
 		const oneLine = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname')).every((n) => n.getBoundingClientRect().height < 1.6 * parseFloat(getComputedStyle(n).fontSize) + 8));
 		ok('at the narrowest, every label stays on one line and a long one is cut', clip.length > 0 && oneLine && clip.some((n) => n.clipped), JSON.stringify(clip.slice(0, 2)));
 		const narrow = await facts(a.page, '#lpn_ff_controls');

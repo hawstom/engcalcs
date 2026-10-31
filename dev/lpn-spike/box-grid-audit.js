@@ -49,14 +49,16 @@ function auditInPage(spec) {
 	});
 	// A run of buttons or ticks is ONE thing in the value column: its group starts there, and its
 	// later members follow the first.
+	const FULL = '.lpn-gfull, .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-ff-buttons:has(> .lpn-ff-stopbtn)';
 	const GROUPS = '.lpn-gwrap, .lpn-ff-buttons, .lpn-gbtns, .lpn-find-filter, .lpn-new-actions, .lpn-new-presets, .lpn-scnres-controls';
-	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip))).filter((g) => !g.querySelector('.lpn-demand-add'));
+	const groups = Array.from(root.querySelectorAll(GROUPS)).filter(vis).filter((g) => !(skip && g.closest(skip))).filter((g) => !g.querySelector('.lpn-demand-add')).filter((g) => !g.matches(FULL));
 	const lead = (e) => { const g = e.closest(GROUPS); return g && Array.from(g.querySelectorAll('input, select, textarea, button')).filter(vis)[0] !== e; };
 	// A control that SPANS the grid (a Text's words, which fills the box on Tom's word of 2026-10-15) starts
 	// at the name column instead; it is checked there.
-	const spans = (e) => !!e.closest('.lpn-gspan, .lpn-gspan2') || e.classList.contains('lpn-gspan2');
+	// Round 10: a button row or a help line (.lpn-gfull, a Run/Stop button row) spans BOTH columns and starts at the name column.
+	const spans = (e) => !!e.closest('.lpn-gspan, .lpn-gspan2, ' + FULL) || e.classList.contains('lpn-gspan2');
 	// The Text's rotate buttons stand in their own full-width row since b1c19252c (Tom approved): the row starts at the name column and its later buttons follow the first.
-	const runLater = (e) => { const g = e.closest('.lpn-rot-btns'); return g && Array.from(g.querySelectorAll('button')).filter(vis)[0] !== e; };
+	const runLater = (e) => { const g = e.closest('.lpn-rot-btns, ' + FULL); return g && Array.from(g.querySelectorAll('button')).filter(vis)[0] !== e; };
 	const spanTol = (e) => (e.closest('.lpn-rot-btns') ? 8 : 2);   // a marked row's span cell carries 6 px of padding (css .lpn-gspan2)
 	const offSpan = ctrls.filter((e) => spans(e) && !runLater(e) && Math.abs(R(e).left - nameX) > spanTol(e)).map((e) => 'span ' + (e.className || e.nodeName) + '@' + Math.round(R(e).left - nameX));
 	const offGrid = offSpan.concat(ctrls.filter((e) => !spans(e) && !lead(e) && (R(e).left - cellX < -2 || R(e).left - cellX > 8)).map((e) =>
@@ -68,10 +70,10 @@ function auditInPage(spec) {
 		const cs = getComputedStyle(e), t = e.textContent.trim().slice(0, 40);
 		const inner = e.querySelector('.lpn-gtext');
 		const clipped = (x) => x.scrollWidth > x.clientWidth + 1 || getComputedStyle(x).textOverflow === 'ellipsis' && x.scrollWidth > x.clientWidth;
-		// Round 9: a cut name is fine if it is one line, ellipsised, and tipped with its full words (at rest, no hover needed; an armed tip lives in data-bs-original-title).
+		// Round 9: a cut name is fine if it is one line, clipped, and tipped with its full words (at rest, no hover needed; an armed tip lives in data-bs-original-title).
 		if (clipped(e) || (inner && clipped(inner))) {
 			const words = e.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-			if (cs.textOverflow !== 'ellipsis' || cs.whiteSpace !== 'nowrap' || (e.getAttribute('data-bs-original-title') || e.title || '').indexOf(words) !== 0) { ellipsis.push(t); }
+			if (cs.textOverflow === 'ellipsis' || cs.whiteSpace !== 'nowrap' || (e.getAttribute('data-bs-original-title') || e.title || '').indexOf(words) !== 0) { ellipsis.push(t); }
 		}
 		const fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.25;
 		if (R(e).height > lh * 1.45 + 1 && !(spec.wrapOk || []).some((w) => t.indexOf(w) === 0)) { wrapped.push(t + ' h' + Math.round(R(e).height)); }
@@ -96,7 +98,7 @@ async function auditBox(page, spec, ok, tag) {
 	if (m.missing || !m.vals) { return m; }
 	ok(tag + ': every visible control stands in the value column', m.offGrid.length === 0, JSON.stringify(m.offGrid));
 	ok(tag + ': every name starts at one x', m.offName.length === 0, JSON.stringify(m.offName));
-	ok(tag + ': a cut name is one line, ellipsised, and tipped with its full text', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
+	ok(tag + ': a cut name is one line, clipped, no ellipsis, and tipped with its full text', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
 	ok(tag + ': like number boxes share a width', m.unlike.length === 0, JSON.stringify(m.unlike));
 	ok(tag + ': the value stands beside its name, not under it', m.beside >= 20, String(m.beside));
 	ok(tag + ': does not scroll sideways', m.scroll <= 1, String(m.scroll));

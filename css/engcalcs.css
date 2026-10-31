@@ -3846,6 +3846,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: stretch; min-width: 0; overflow-wrap: anywhere; }   /* stretch, not start: a block narrower than its words wraps them instead of leaving the box (round 9, no stacking) */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-gcol2, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gsub > .lpn-gcol2,
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { margin-inline-start: 6px; margin-block: 4px; }
+	/* A BUTTON ROW OR A HELP LINE SPANS BOTH COLUMNS (Tom, 2026-10-31, of Find: "The buttons and the complex query help should span both columns"). It is not a value, so it does not sit under the Value column. */
+	.lpn-gridhost > .lpn-gfull, .lpn-gsub > .lpn-gfull, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 1 / -1; justify-self: stretch; min-width: 0; margin-inline-start: 0; overflow-wrap: anywhere; }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-gfull, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gsub > .lpn-gfull, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { margin-inline-start: 0; margin-block: 4px; }
 	/* The header row. */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-ghdr {
 		display: grid; grid-template-columns: subgrid; align-items: stretch;
@@ -3890,8 +3893,8 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gplain .lpn-grid { row-gap: 6px; }
 .lpn-grow, .lpn-gspan-row { display: contents; }
 .lpn-grow > * { min-width: 0; }
-/* A label never wraps: one line, an ellipsis, the full label in its tip (Tom, 2026-10-30: "truncate instead of wrapping"; gridTitlesNow()). */
-.lpn-gname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; opacity: .8; }
+/* A label never wraps: one line, clipped at the column edge, the full label in its tip (Tom, 2026-10-30: "truncate instead of wrapping"; gridTitlesNow()). */
+.lpn-gname { min-width: 0; overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* The `?` follows the label's last word in the text flow, so a wrapped label never strands it at the far edge; a unit
    (in <bdi>) never breaks inside its brackets. */
 .lpn-gname.ec-help { display: block; }
@@ -4082,7 +4085,7 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gdlg-wide { min-width: 19rem; }
 .lpn-gridhost.lpn-gnarrow, .lpn-contourbox .lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 .lpn-gnarrow .lpn-gw-fill { max-width: none; }
-.lpn-gnarrow .lpn-gcol2, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }
+.lpn-gnarrow .lpn-gcol2, .lpn-gnarrow .lpn-gfull, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }
 .lpn-gnarrow .lpn-grow > .lpn-gval { max-width: 100%; }
 .lpn-gnarrow > .lpn-grid { grid-template-columns: minmax(0, 1fr); }
 @supports (grid-template-columns: subgrid) { .lpn-gnarrow > .lpn-grid { grid-template-columns: subgrid; } }
@@ -5618,7 +5621,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
-/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, an ellipsis, the full label in its tip. */
+/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, clipped at the column edge, the full label in its tip. */
 .lpn-set-row {
 	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
@@ -5634,7 +5637,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the treatment Tom named twice as the one he likes and the one to converge on. It was the only
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
-.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; opacity: .8; }
+.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
 .lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on

@@ -1,5 +1,5 @@
 // Box round 9 (Tom, 2026-10-30, round-8 phone and PC pass: "Give the user control."), at PC 1366x768 and phone 390x844:
-//   A. Properties: the Label column drags to near zero, by mouse and by finger; labels are one line, clipped with an ellipsis, and a cut label carries its full text as its tip.
+//   A. Properties: the Label column drags to near zero, by mouse and by finger; labels are one line, clipped with no ellipsis, and a cut label carries its full text as its tip.
 //   B. No stacking: at 100 px every row keeps its label and its value side by side (the label left of the value, in one band), and no grid is marked narrow.
 //   C. Multi-selection Properties (Net1, a Select area over everything): each section is its own two-column block, stacked one after another (section boxes do not overlap, each
 //      row's label and value share a band), under the one divider, which drags by mouse and by finger and moves every section's Label column together.
@@ -86,7 +86,7 @@ async function main() {
 	// First label of a box: its width, style and title; and the widest label that has been cut.
 	const labelsOf = (S, sel) => S.page.evaluate((s) => {
 		const b = document.querySelector(s), names = Array.from(b.querySelectorAll('.lpn-gname')).filter((e) => e.getBoundingClientRect().height > 0);
-		const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow !== 'ellipsis' || cs.overflow !== 'hidden'; }).length;
+		const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow === 'ellipsis' || cs.overflow !== 'hidden'; }).length;
 		const tall = names.filter((n) => n.getBoundingClientRect().height > 40).length;
 		const cut = names.filter((n) => n.scrollWidth > n.clientWidth + 1);
 		const cutNoTitle = cut.filter((n) => { const t = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(); return ((n.getAttribute('data-bs-original-title') || n.title || '').indexOf(t) !== 0); });
@@ -136,7 +136,7 @@ async function main() {
 				const w1 = await nameColW(S, '#lpn_popup');
 				ok(mode + ' A3. the Label column drags to near zero (was ' + w0 + ' px)', w1 >= 0 && w1 <= 8 && w0 > 60, w0 + ' -> ' + w1 + ' px');
 				const l1 = await labelsOf(S, '#lpn_popup');
-				ok(mode + ' A4. every label is one line, clipped with an ellipsis, never wrapped', l1.n > 5 && l1.bad === 0 && l1.tall === 0, JSON.stringify(l1));
+				ok(mode + ' A4. every label is one line, clipped with no ellipsis, never wrapped', l1.n > 5 && l1.bad === 0 && l1.tall === 0, JSON.stringify(l1));
 				ok(mode + ' A5. every label the column cuts carries its full text as its tip', l1.cut > 5 && l1.cutNoTitle === 0, l1.cut + ' cut; ' + l1.ex);
 				const r1 = await rowsOf(S, '#lpn_popup');
 				ok(mode + ' A6. at that width every value is still beside its label, nothing over anything', r1.rows > 5 && r1.notSideBySide === 0 && r1.overlaps === 0 && r1.pageX <= 0, JSON.stringify(r1));
@@ -229,7 +229,21 @@ async function main() {
 					const g = await S.page.evaluate((h) => { const e = document.querySelector(h); return { sheet: e.classList.contains('lpn-sheet'), narrow: e.classList.contains('lpn-gnarrow'), split: !!e.querySelector('.lpn-gsplit'), rows: e.querySelectorAll('.lpn-grow').length, hdr: getComputedStyle(e).display }; }, hostSel);
 					const r = await rowsOf(S, sel), l = await labelsOf(S, sel);
 					ok(mode + ' D. ' + what + ' ' + w + ' px: the global box style (sheet grid, divider, two columns)', g.sheet && !g.narrow && g.split && g.rows >= 4 && r.notSideBySide === 0 && r.narrow === 0, JSON.stringify([g, r]));
-					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line with an ellipsis, every cut one tipped, nothing over anything', l.bad === 0 && l.tall === 0 && l.cutNoTitle === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
+					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line clipped, no ellipsis, every cut one tipped, nothing over anything', l.bad === 0 && l.tall === 0 && l.cutNoTitle === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
+				}
+				if (what === 'Find') {
+					// Round 10 (Tom, 2026-10-31): the buttons and the query help span both columns, at every width.
+					for (const w of [380, 200]) {
+						await setWidth(S, sel, w);
+						await S.settle(500);
+						const sp2 = await S.page.evaluate((h) => {
+							const host = document.querySelector(h), hr = host.getBoundingClientRect(), nm = host.querySelector('.lpn-gname').getBoundingClientRect();
+							const one = (q) => { const e = host.querySelector(q); if (!e || !e.getBoundingClientRect().width) { return null; } const r = e.getBoundingClientRect(); return { l: Math.round(r.left - nm.left), r: Math.round(hr.right - r.right), w: Math.round(r.width) }; };
+							return { filter: one('.lpn-find-filter'), hint: one('.lpn-find-hint'), valW: Math.round(host.querySelector('.lpn-gval, select, input').getBoundingClientRect().width) };
+						}, hostSel);
+						const spans = (x) => x && x.l <= 8 && x.r <= 14;
+						ok(mode + ' D. Find ' + w + ' px: the button row and the query help start at the label column\'s left edge and reach the right edge', spans(sp2.filter) && spans(sp2.hint), JSON.stringify(sp2));
+					}
 				}
 				await setWidth(S, sel, 380);
 				await S.settle(600);
@@ -314,12 +328,12 @@ async function main() {
 				const m = await S.page.evaluate(() => {
 					const c = document.getElementById('lpn_setbox_content'), rows = Array.from(c.querySelectorAll('.lpn-set-row')).filter((r) => r.getBoundingClientRect().width > 0);
 					const names = rows.map((r) => r.firstElementChild).filter((n) => n && n.getBoundingClientRect().width > 0);
-					const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow !== 'ellipsis'; }).length;
+					const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow === 'ellipsis'; }).length;
 					const cols = rows[0] ? getComputedStyle(rows[0]).gridTemplateColumns : '';
 					const two = rows.filter((r) => getComputedStyle(r).gridTemplateColumns.split(' ').length > 1).length;
 					return { rows: rows.length, bad, two, cols, pageX: document.documentElement.scrollWidth - document.documentElement.clientWidth };
 				});
-				ok(mode + ' E1. Settings names never wrap and clip with an ellipsis at 12 rem', m.rows > 3 && m.bad === 0, JSON.stringify(m));
+				ok(mode + ' E1. Settings names never wrap and clip with no ellipsis at 12 rem', m.rows > 3 && m.bad === 0, JSON.stringify(m));
 				ok(mode + ' E1b. its rows keep two columns', m.rows > 3 && m.two === m.rows, m.two + ' of ' + m.rows);
 				ok(mode + ' E2. the page does not scroll sideways', m.pageX <= 0, String(m.pageX));
 				ok(mode + ' E3. no page error', S.errors.length === 0, S.errors.join(' | '));
