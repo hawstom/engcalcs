@@ -6,7 +6,7 @@
 //   2. the Show and Drop columns are fully visible or reachable by scrolling the content pane
 //      sideways, and no ancestor between them and the pane clips them;
 //   3. a two-digit Drop value is not clipped, and the default PC box fits the table with its override column;
-//   3b. no name is cut off (scrollWidth <= clientWidth), in English and in German and Russian;
+//   3b. a name the column cuts is one line, clipped with no ellipsis, and carries its full text as a tip (round 9 and 10: no label floor), in English, German and Russian;
 //
 //   node dev/lpn-spike/settings-labels-rows-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -44,7 +44,17 @@ async function measure(page) {
 		out.cut = [];
 		lists.forEach((id) => {
 			const e = document.getElementById(id);
-			if (e) { e.querySelectorAll('label').forEach((l) => { if (l.offsetParent && (l.scrollWidth > l.clientWidth + 1 || getComputedStyle(l).textOverflow === 'ellipsis' && l.scrollWidth > l.clientWidth)) { out.cut.push(l.textContent.trim().slice(0, 30)); } }); }
+			// Round 9/10 (Tom, 2026-10-30 and 10-31: "no lower limit and truncate instead of wrapping"; "clipped, no ellipsis"): a name the column cuts is fine
+			// if it is one line, clipped with NO ellipsis, and carries its full text as a tip (on the label or the name cell holding it).
+			if (e) { e.querySelectorAll('label').forEach((l) => {
+				if (!l.offsetParent) { return; }
+				const cell = l.closest('.lpn-set-name') || l, cs = getComputedStyle(cell), words = l.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+				const cutNow = [l, cell].some((x) => x.scrollWidth > x.clientWidth + 1);
+				if (!cutNow) { return; }
+				l.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));   // the tip is written when a pointer arrives (gridTitleOne), so arrive
+				const tip = [l, cell, l.closest('[title], [data-bs-original-title]')].filter(Boolean).map((x) => x.getAttribute('data-bs-original-title') || x.title || '').join(' ');
+				if (cs.textOverflow === 'ellipsis' || cs.whiteSpace !== 'nowrap' || tip.indexOf(words) < 0) { out.cut.push(words.slice(0, 30)); }
+			}); }
 		});
 		// A two-digit Drop value: typed into the Drop box of a row that has one, then read back unclipped.
 		out.dropClip = [];
@@ -121,7 +131,7 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		ok(label + ': labels rows were found', m.rows > 10, String(m.rows));
 		ok(label + ': every row of controls stays on one line (no control reflows onto a second line)', m.wrapped.length === 0, m.wrapped.slice(0, 3).join(' | '));
 		ok(label + ': a two-digit Drop value is not clipped', m.dropClip.length === 0, m.dropClip.join(' | '));
-		ok(label + ': no name is cut off (no ellipsis)', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
+		ok(label + ': a cut name is one line, clipped with no ellipsis, and tipped with its full text', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
 		ok(label + ': Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
 		if (!touch && !lang) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
