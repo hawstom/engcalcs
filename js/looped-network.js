@@ -76196,7 +76196,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fittingsId: 'lpn_field_fittings_tip', axis1: 'lpn_field_coord_tip', axis2: 'lpn_field_coord_tip', allZoom: 'lpn_field_text_all_zoom_tip', anchor: 'lpn_field_text_attached_tip',
 		bottomElev: 'lpn_field_tank_base_elev_tip', level: 'lpn_field_tank_level_short_tip', minLevel: 'lpn_field_tank_minlevel_short_tip', maxLevel: 'lpn_field_tank_maxlevel_short_tip',
 		tankDiameter: 'lpn_field_tank_diameter_tip', demand: 'lpn_demand_tip', fireFlow: 'lpn_ff_required_node_tip', initQuality: 'lpn_quality_initial_tip',
-		sourceType: 'lpn_source_type_tip', sourceQuality: 'lpn_source_quality_tip', sourcePattern: 'lpn_source_pattern_tip', mixingModel: 'lpn_mixing_model_tip', mixingFraction: 'lpn_mixing_fraction_tip'
+		sourceType: 'lpn_source_type_tip', sourceQuality: 'lpn_source_quality_tip', sourcePattern: 'lpn_source_pattern_tip', mixingModel: 'lpn_mixing_model_tip', mixingFraction: 'lpn_mixing_fraction_tip',
+		curveId: 'lpn_pump_curve_source_tip', efficCurveId: 'lpn_pump_effic_curve_tip', energyPrice: 'lpn_energy_price_tip', energyPattern: 'lpn_energy_price_pattern_tip'   // the pump's curves, price and price pattern carry the `?` one pump's Properties gives them
 	};
 	function multiTip(c, els) {
 		var pc = EngCalcs.pageConfig || {};
