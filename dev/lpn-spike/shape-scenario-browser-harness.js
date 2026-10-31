@@ -6,7 +6,7 @@
 // Tom, 2026-10-24: Shapes go in the Presentation category, and "No elements act jointly": each Shape
 // switches by itself. 1. A Shape drawn in Base is in every scenario. 2. A Shape drawn inside a
 // scenario is born inactive in Base and active there (stored as an `s:` override in the scenario's
-// Presentation values) and is drawn only there. 3. The Shapes table's Is active column switches a
+// Presentation values) and is drawn only there. 3. The Shapes table's Active column switches a
 // Base Shape off in one scenario without touching Base or the Text beside it. 4. Delete of a Shape
 // that exists only here deletes it; Delete of a Base Shape in a scenario only switches it off.
 // 5. The DXF export of a scenario writes only the Shapes active in it.
@@ -111,7 +111,7 @@ async function main() {
 		ok('both are drawn in the scenario', (await drawn()).length === 2);
 		ok('the status bar counts the drawn Shape as one override', (await bar()) === 1, String(await bar()));
 
-		// One Shape selected opens the multi-properties box, which carries its Is active row.
+		// One Shape selected opens the multi-properties box, which carries its Active row.
 		await esc(); await a.toolbarClick('Select').catch(async () => { await P.keyboard.press('1'); }); await settle(200);
 		const sx = await centre('#lpn_canvas .lpn-shape[data-shape="' + base1.id + '"] .lpn-shape-x');
 		await click(sx); await settle(500);
@@ -119,8 +119,8 @@ async function main() {
 			const f = document.getElementById('lpn_popup_fields');
 			return f ? Array.from(f.querySelectorAll('label, .lpn-multi-section *')).map((l) => (l.textContent || '').replace(/\u00ad/g, '').trim().slice(0, 40)) : ['no fields box'];
 		});
-		const actWord = (await a.lang('lpn_field_active')).replace(/\u00ad/g, '').trim();
-		ok('a selected Shape\'s Properties box has an Is active row', rowTxt.some((t) => t.indexOf(actWord) === 0), JSON.stringify(rowTxt));
+		const actWord = (await a.lang('lpn_field_active_short')).replace(/\u00ad/g, '').trim();
+		ok('a selected Shape\'s Properties box has an Active row', rowTxt.some((t) => t.indexOf(actWord) === 0), JSON.stringify(rowTxt));
 		await esc();
 
 		const dots = () => P.evaluate(() => { const f = document.getElementById('lpn_popup_fields'); return f ? { dot: f.querySelectorAll('.lpn-ovm-dot').length, hollow: f.querySelectorAll('.lpn-ovm-hollow').length, vis: Array.from(f.querySelectorAll('.lpn-ovm-dot')).every((e) => { const r = e.getBoundingClientRect(); return r.width > 4 && r.height > 4; }) } : null; });
@@ -144,15 +144,15 @@ async function main() {
 		const dxfScn = await shapeDxfCount();
 		ok('the scenario DXF file writes both Shapes', dxfScn === 2, String(dxfScn));
 
-		console.log('--- 4. the Is active column switches a Shape off in one scenario ---');
+		console.log('--- 4. the Active column switches a Shape off in one scenario ---');
 		await a.toolbarClick(await a.lang('lpn_pane_toggle')); await settle(500);
 		await P.click('#lpn_pane_tab_shapes'); await settle(600);
 		const act = await P.evaluate((lbl) => {
 			const t = document.querySelector('#lpn_pane_shapes table');
 			const ths = Array.from(t.querySelectorAll('thead th')), idx = ths.findIndex((h) => h.textContent.replace(/\s+/g, ' ').indexOf(lbl) >= 0);
 			return { idx: idx, heads: ths.map((h) => h.textContent.trim()) };
-		}, (await a.lang('lpn_field_active')).replace(/­/g, '').slice(0, 6));
-		ok('the Shapes table has an Is active column', act.idx >= 0, JSON.stringify(act.heads));
+		}, (await a.lang('lpn_field_active_short')).replace(/­/g, '').slice(0, 6));
+		ok('the Shapes table has an Active column', act.idx >= 0, JSON.stringify(act.heads));
 		const boxFor = (id) => P.evaluate(([i, id2]) => {
 			const rows = Array.from(document.querySelectorAll('#lpn_pane_shapes tbody tr'));
 			const r = rows.find((x) => x.textContent.indexOf(id2) >= 0);

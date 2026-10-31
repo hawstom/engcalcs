@@ -408,8 +408,10 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR A TEXT'S POSITION IN A SCENARIO** (Tom, 2026-10-12): textCoordOut()
 	// stores a free Text's override outward, as a node's position override is. Its inverse,
 	// textCoordIn(), took the place of setLabelCoordAxis()'s own inward pair, so inward is unchanged.
-	ok('outwardX has one definition and 43 call sites', count(/outwardX\(/g) === 44, count(/outwardX\(/g));
-	ok('outwardY has one definition and 43 call sites', count(/outwardY\(/g) === 44, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR THE GIS BACKGROUND WINDOW** (Task 720): paintGisLayers() brings the screen
+	// corners out once, for the geographic and the projected branch alike.
+	ok('outwardX has one definition and 43 call sites', count(/outwardX\(/g) === 46, count(/outwardX\(/g));
+	ok('outwardY has one definition and 43 call sites', count(/outwardY\(/g) === 46, count(/outwardY\(/g));
 	// **TASK 772 ADDED ONE SITE PER AXIS: THE DXF EXPORT.**
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame

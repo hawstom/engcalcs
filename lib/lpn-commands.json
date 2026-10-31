@@ -262,6 +262,11 @@
      "parent": "World map…"
     },
     {
+     "id": "map/gis_menu",
+     "label": "Add layer…",
+     "parent": ""
+    },
+    {
      "id": "map/clean_map",
      "label": "Clean map",
      "parent": ""

@@ -95,15 +95,25 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-30 small hours (forty-ninth session, Opus main, Sonnet agents)
+## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
 
-- **Merged on master this session:** `feat/starter-example` (his "Merge starter-examples") and `fix/usage-report-wording` round 2 (a defect fix, merged on green: every said-yes use is now logged, not once per page per session; new rows carry an `every` marker and spock.php finds the cutover from the data; `ec_seen` keeps only the human-view and language-demand bits; privacy.php's two `ec_seen` sentences rewritten). He wants to proofread spock.php once deployed. Payloads regenerated; Task 824 holds his theme-of-the-day words.
-- **Waiting his browser pass (Branch previews):** `box-design` round 5 (8103: half-height Properties on a phone, slim pill grips, rotate buttons in a DEM-style row; Perry confirmed all three; junction 31 at the screen bottom would not select by touch for Perry, cause unknown, possibly old); `feat/gis-background` round 2 (8105: Map > Add layer…, "ArcGIS REST (MapServer)", conventional privacy wording; Perry confirmed against real servers); `feat/dxf-import` round 2 (8101: scenario exports read back, status, quality, minor loss, pump curves, head loss formula carried; receipt names the lost demand multiplier); `feat/report-widths` (8110; his "Merge" stands, rides on box-design).
-- **Rebase chain:** report-widths and gis-background each merge box-design (both now carry box-design through 36fa47163; box-design's later commit is only Perry's journal).
-- **His open questions to answer or carry:** the theme-of-the-day list (Task 824); whether DXF should embed patterns, controls and options as text (asked in messenger.md); the new English strings on the dxf and gis branches.
-- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code and saw the old 12 s search. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
-- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master; `eaefc7569` went in under his name.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/d078a540-9bc6-4560-8e07-eb5a3591414f/scratchpad (brief-*.md, perry-*.js/log).
+- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task waits on him or a sprint; do not start a fresh slice.
+- **Merged on his typed word 10-30:** `feat/theme-of-day` and `feat/gis-background` (Task 720 closed). **gis-background carried 197 box-design commits (round 6)**, so master now holds box-design minus its round-7 and round-8 commits. Tasks 827/828/829 finish when box-design merges.
+- **box-design round 8, built this session from his round-7 phone pass** (*"Make the "Exit" button in the Select area help box exit only the box, not the mode ... Maybe the button needs to say "Close""*; *"The Properties box has an inappropriate lower width limit. Remove that limit ... this applies to the global style"*). He answered Yes to full-height phone boxes and readable Settings names. Read `git log master..box-design` and Perry's journal there before reporting on it; it waits his pass (port 8103).
+- **Master's suite after the two merges failed 17 harnesses**, all from box-design round 6 riding in on gis-background (its own tip failed them; agents never run the full suite). `fix/master-after-gis` fixed them: mostly harnesses following round 6's design, plus the lost 9-column scenarios table in all 27 guide files, a settings-wrap breakpoint, the GIS form marked session, `lpn_guide_text_demands_box` (new, English only) and a corrected contour example. **Owed his call:** `lpn_guide_prop_example_def` still says "from Description to Active", but Properties now starts From, To, Active, Description.
+- **feat/dxf-import round 5:** his header wording applied (`7f73816d2`: "EPANET++ reads this text back when the DXF is imported"), recorded in `english-key-rulings.json`. He passed wrap, header and the tall column ("Yes"). Ready to merge on his typed word; English only until a sprint.
+- **Waiting his word:** `feat/report-widths` (8110, his "Merge" stands) rides on box-design. **Parked on his word:** `feat/import-alternative` (8107): *"Ask me later."* Do not touch or re-ask unprompted.
+- **CC shells (Tom asked 10-30 that the count be accurate):** before saying done, every background shell and agent this session started has exited or been stopped (TaskStop), and `ps` shows no `sleep` loop, `php -S`, or harness left by it. Agent briefs forbid polling loops and leftover servers. The final report states the count.
+- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any merge, run a three-way key-set comparison (master, branch, merge base) per language.
+- **Trap met (10-30):** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content.
+- **Trap met (10-30):** `git merge` on master takes the author from the environment only for the commit it makes itself; a conflicted merge committed later in another shell call is authored as Tom. Export `GIT_AUTHOR_*` in the same call as the commit.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/9eca90e2-5a59-420c-8f3e-01d61c7e6527/scratchpad.
+
+## STATE — 2026-10-30 small hours (forty-ninth session)
+
+- He wants to proofread spock.php once deployed. Task 824 holds his theme-of-the-day words.
+- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
+- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master.
 
 ## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
 

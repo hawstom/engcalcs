@@ -48,10 +48,13 @@ async function main() {
 		const page = a.page;
 		await a.context.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; });
 		await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		// The Net1 card now opens the scenarios example (Max day, Peak hour, and children, which Basic mode cannot show), so the plain Net1 is loaded as the project.
 		await a.goto('Looped-Network.php?ec_nolog=1');
+		await page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); localStorage.setItem('lpn_hovercard', 'off'); },
+			require('fs').readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+		await a.reload();
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(2500);
 		const L = (k) => a.lang(k);
 		console.log('--- 1. the tab ---');

@@ -99,6 +99,9 @@ async function main() {
 			}, label);
 		};
 		const typeFor = async (label, n) => {
+			// From and To take a node ID and refuse one that does not exist (endField), so they are typed a real Net1 node
+			if (label === 'From') { return '31'; }
+			if (label === 'To') { return '32'; }
 			const t = (await page.evaluate((l) => {
 				const x = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((y) => (y.querySelector('.lpn-gname') || y.firstChild).textContent.trim() === l)[0];
 				return x.querySelector('input').type;

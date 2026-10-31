@@ -5740,6 +5740,14 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    "Use current view" -- stays inside the column and wraps its button under its box, rather than
    growing left out of the column and taking that row's one x with it. */
 .lpn-set-ctlgroup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; width: 100%; }
+.lpn-gis-opacity { width: 4em; }
+.lpn-set-row > .lpn-gis-wide, .lpn-gis-wide, #lpn_settings_box .lpn-set-secbody input[type="text"].lpn-gis-wide { width: 100%; justify-self: stretch; box-sizing: border-box; }
+.lpn-gis-item { margin: 6px 0; }
+.lpn-gis-name { font-size: .85em; overflow-wrap: anywhere; }
+.lpn-gis-bad { color: var(--ec-warn-ink); }
+.lpn-gis-controls { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.lpn-gis-addbtn { margin: 4px 0; }
+.lpn-gis-credit { max-width: min(40vw, 22rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 /* **HOW A VALUE IS ALIGNED INSIDE ITS CONTROL, once, for the whole box** (Tom, 2026-08-19: "Some
    inputs are right justified. Others are not. Standardize with an eye for design").
 
@@ -6249,7 +6257,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
 #lpn_labels_customer_fields { container-type: inline-size; container-name: lpnlbl; }
-@container lpnlbl (max-width: 26.5rem) {
+@container lpnlbl (max-width: 26.95rem) {   /* measured: a row wraps at a list width of 431 px (name 184 + 4 + group 226 + the row's 18 px), which 26.5rem (424) missed by 7 px */
 	#lpn_labels_node_fields > div:not(.lpn-set-colhead),
 	#lpn_labels_link_fields > div:not(.lpn-set-colhead),
 	#lpn_labels_customer_fields > div:not(.lpn-set-colhead) { margin-top: 10px; row-gap: 0; }

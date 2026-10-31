@@ -45,7 +45,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 676 — Watch the sites, and send a derived weekly report.
-- Task 720 — Background layers from a GIS server.
 - ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
@@ -57,6 +56,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 847 — The built-in solver leaves flow circulating in a loop with no demand.
 - Task 848 — Report column widths a reader can drag, kept per browser.
 - Task 849 — Every place uses the short Properties name for a field.
+- Task 851 — Net1's legend box covers the Tank label on a phone.
 
 ## 50 — Someday (30)
 

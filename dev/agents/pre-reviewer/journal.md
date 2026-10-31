@@ -4709,6 +4709,13 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - Method: my own scripts under scratchpad/perry; base tree via git archive; Playwright mouse.click on a node while a dock is open lands in the wrong place (map shifts).
 - NOT CHECKED: mutation of harnesses; Settings/Library boxes; RTL; docked box following another junction.
 
+# Perry, feat/gis-background f682e400c, 2026-10-29 night (Task 720 GIS background layers)
+- OBSERVED (real Chromium, 1400x900 and 390x844 touch, Fotobi as a lat/lon file, real servers): World_Imagery MapServer (tiled, /tile/18/...), terrestris WMS (OSM-WMS, GetMap EPSG:3857) and an XYZ OSM layer each draw (12 tiles PC, 8 phone); opacity 0.3 and Draw off reach the layer; Remove empties tiles and credit; reload restores all (also the off one and the opacity); five bad addresses each give a plain message, a dead host is named once. Builder's harness 63/63 here. No page errors.
+- OBSERVED: credit line runs together ("© OpenStreetMap contributorsSource: Esri...") with no separator, and with three layers it grows over the status bar's Longitude cell on PC.
+- OBSERVED: Server address box is about 72 px wide (PC and phone), the kind dropdown cuts "Tile URL ({z}/{x}/{"; the layer rows show a tick, a number and Remove with no visible words for Draw/Opacity (aria-label only).
+- OBSERVED: opening a project holding a layer sends requests to its server at once (reload test), so "Nothing is sent before you add one" (Settings note) is not true for an opened file; the privacy paragraph and CLAUDE.md say so honestly.
+- NOT CHECKED: mutation of the harness; WMS registration by eye (harness measures tile boxes against the street tiles); unlocatable project message; Dark theme; a CORS-less real server.
+
 # Perry, box-design 7de287871 (round 4), 2026-10-29 evening
 - OBSERVED (real Chromium; 1400x900 mouse, 390x844 and 360x740 touch; Net1): Properties on node 22 opens two columns at all three sizes, 19 rows, no name over its value, no stacking; a docked Properties has a 240 px floor and holds two columns there. Contour plot, Fire flow, Criticality, Find and replace, Settings are two columns on the phone with no overlap and no text past the box edge; Contour's first row reads "Show plot".
 - OBSERVED: Settings corner grip on the phone is 28 px at the box corner and a real touch drag shrinks the box (352x620 to 292x540). A first attempt failed only because my script had clicked every section header and opened the theme picker.
@@ -4717,6 +4724,10 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - OBSERVED, not caused by round 4 (the code is older): on a phone, releasing a finger after dragging the flyout's edge tucks the flyout away (dockTuckLater, no hover on touch).
 - Method: scripts in scratchpad/perry; the box-phone4 harness exists and I did not rely on it. NOT CHECKED: left-docked box handle, mutation of the harness, Properties for non-junction elements, other languages (only English "Show plot" changed).
 
+## 2026-10-30 feat/gis-background round 2 (Task 720), HEAD 82be219db
+- OBSERVED: builder's harness 81/81 passes on this tree. My own run against real Esri World Imagery and terrestris OSM-WMS, PC 1400x900 and phone 390x844: Map > Add layer... opens Settings at the layer controls, focus in Kind of server, option reads "ArcGIS REST (MapServer)"; both layers draw; reopen asks first and sends 0 requests before answer; Draw them redraws; Remove then pan sends 0. No layout overflow after box-design merge. Screenshots perry-gis2-*.png.
+- OBSERVED: privacy.php says five features, but dev docs/UsageReport comment/third_party_request_check still say four (non-visitor). Summary says "other four ask first", detail says "three ask first" (layer starts on add): reads consistent enough.
+- Not checked: disabled Add layer... row on an unplaced project (explanation?), how it looks to the eye beyond screenshots.
 ## 2026-10-30 -- box-design round 5 (b1c19252c, 36fa47163)
 OBSERVED (re-verify before citing): builder's box-phone5 harness passes 54/54 in this worktree. My own touch-event runs
 (390x844, 360x740, PC 1200x800; CDP touch drags) agree: rotate row full width under Angle, pill 4x32 on transparent 19px(phone)/8px(PC)
@@ -4735,6 +4746,25 @@ Screens: _panel/www/img/perry5-*.png. Scripts in session scratchpad perry5*.js.
 - Shots: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/3f74533f-715d-4c2a-a95d-24464ab34423/scratchpad/perry-starter/
 - OBSERVED full run_harnesses.sh on 490a07194: 614/620 pass. FAIL alone and pass on master: settings-table-browser, settings-table-owner-browser, table-export-dialog-browser, menu-mnemonic, theme-design-browser (amber/green "Calcul-ation" cut, section 12 Scenario manager on Net1), node-size-cap-browser (ENOENT examples/Net1.lwn). All open the Net1 card and assume the old plain file. zoomfurniture 1 fail (bootstrap tooltip page error) also fails on master. find, zoomfitlabels pass.
 
+## 2026-10-30 Perry: feat/native-quality (d9bf806c3), Task 733 quality phase
+
+- OBSERVED: truth is the vendored EPANET 2.3.5 WASM (lpnEpanetRun for the reference; saved .hyd read back for the OVER path), independent of js/lpn-native-run.js. 106/106 pass.
+- OBSERVED: 14 deliberate mutations of the quality code (wall, bulk, FIFO/LIFO swap, 2COMP, zero source, MASS /60, SETPOINT, CONCEN junction, qstep +1, age step, tank bulk rate, stagnant threshold, source pattern, initial tank quality) were each caught (2 to 87 failures). One mutation target was not unique and was skipped. File restored with git checkout.
+- OBSERVED: worst quality-over-EPANET-hydraulics gap 1.4e-9 (tol 1e-8); tightest end-to-end is Net3 trace at 0.94 of its tolerance.
+- OBSERVED: diff vs master is js/lpn-native-run.js plus dev/ only; nothing outside it calls lpnNativeRun or passes quality:true. native-eps-harness 126/126.
+
+## 2026-10-30 feat/theme-of-day (HEAD ffc86361e), Task 824
+- OBSERVED: all 7 days open in the right theme in real Chrome (EC_NOW), noon UTC boundary right for all 7 noons, real clock (Fri 10:05 UTC = Thursday = platinum) right. One data-theme write, first paint already in final theme: no flash.
+- OBSERVED: System and Dark picks store "system"/"dark", survive reload and a later day.
+- OBSERVED: menu-button-harness fails 28 checks under lpn_theme=rounded on this branch AND on master archive: Rounded draws the menu buttons as pills (999px radius) in a brighter blue (11,87,208). The harness asserts the Light-theme style. Intended Rounded look, not a visitor defect; the clock pin hides a harness assumption, not a bug.
+- OBSERVED: Net1 legend overlaps the Tank label on a 390px phone in every theme (not theme related).
+- SPECULATION: visitors who earlier chose System had the key removed, so they now see the day theme until they pick again.
+
+## 2026-10-30 feat/gis-background round 3 (Task 720), HEAD 236c4ef85
+- OBSERVED (real Chromium, 1400x900 and 390x844; real Esri World_Imagery MapServer + terrestris OSM-WMS): add draws (12/8 tiles per layer); reload of the saved project draws both with no dialog (only the browser's own beforeunload), no console error; a .lwn holding a layer opened by File > Open draws at once, no dialog; Remove both layers then pan/zoom and reload: 0 GIS requests; projects with no layer: 0 GIS requests. Add-layer form does not overflow on the phone.
+- OBSERVED: privacy.php and lpn_gis_note no longer say "asks"/"agree"; but "only at an address that was typed in" and "the server whose address you typed" are untrue of a file someone else made (File > Open of a foreign .lwn contacts its server at once, measured).
+- OBSERVED: Settings box reopens on the last section (Symbology) when Add layer... is not used; not a regression.
+- NOT CHECKED: Dark theme, mutation of the harness, other languages (key text changed in English only, other files hold the English), CORS-less server.
 ## 2026-10-30 -- box-design round 6 (f5f92ff72, vs round 5 36fa47163)
 OBSERVED (re-verify before citing; real Chromium touch emulation, Net1; 390x844, 360x740, PC 1400x900): Properties rows visible without scrolling
 junction 8 -> 12 (390), 6 -> 11 (360); pipe 8 -> 13, 7 -> 11. Median pitch 41 -> 27 px (not 24: some rows are 28, wrapped labels 45), so "half as high" is about a third less. Inputs 24 px,

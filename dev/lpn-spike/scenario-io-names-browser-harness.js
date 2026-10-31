@@ -55,7 +55,8 @@ async function openFindDem(page, a, L) {
 	await page.keyboard.press('Enter');
 	await a.settle(700);
 	const pick = (labelText, val) => page.evaluate(([t, v]) => {
-		const l = Array.from(document.querySelectorAll('#lpn_find_popup label')).find((x) => x.textContent.trim().indexOf(t) === 0 && x.querySelector('select'));
+		// Find's rows are .lpn-grow cells (a name beside a value) since the box-design sheet style, no longer labels.
+		const l = Array.from(document.querySelectorAll('#lpn_find_popup label, #lpn_find_popup .lpn-grow')).find((x) => (x.querySelector('.lpn-gname') || x).textContent.trim().indexOf(t) === 0 && x.querySelector('select'));
 		const s = l && l.querySelector('select');
 		if (!s || !Array.from(s.options).some((o) => o.value === v)) { return false; }
 		s.value = v; s.dispatchEvent(new Event('change', { bubbles: true }));
