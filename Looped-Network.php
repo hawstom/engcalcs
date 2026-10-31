@@ -1826,34 +1826,41 @@ echoHeader("EngCalcsApp", $html_title,
       //
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
-<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+<div id="lpn_crsbox" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
 	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired
 	      // with it. ?>
 	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_coordsys']?></div>
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
+	<?php // Label | Value rows of the box's one sheet (round 10b, the sheet-style audit, A11); the register's list is a list, not a value, so it spans both columns. js/looped-network.js
+	      // (openCrsBox) makes the body the grid. ?>
+	<div class="lpn-popover-body" id="lpn_crsbox_body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
 		      // MOVES the thing it filters by on the right. ?>
-		<div class="lpn-new-block">
-			<label><input type="checkbox" id="lpn_crsbox_view" checked> <?=ecTipLabel($ec_lang['lpn_crs_view'], $ec_lang['lpn_crs_view_tip'])?></label>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_crsbox_view"><?=ecTipLabel($ec_lang['lpn_crs_view'], $ec_lang['lpn_crs_view_tip'])?></label></span>
+				<input type="checkbox" id="lpn_crsbox_view" class="lpn-gval" checked>
+			</div>
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_crsbox_place"><?=ecTipLabel($ec_lang['lpn_crs_place'], $ec_lang['lpn_crs_place_tip'])?></label></span>
+				<input type="text" id="lpn_crsbox_place" class="lpn-gval lpn-gw-fill" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_new_place_hint'])?>">
+			</div>
 		</div>
-		<div class="lpn-new-block">
-			<label for="lpn_crsbox_place"><?=ecTipLabel($ec_lang['lpn_crs_place'], $ec_lang['lpn_crs_place_tip'])?></label>
-			<input type="text" id="lpn_crsbox_place" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_new_place_hint'])?>">
-			<button type="button" id="lpn_crsbox_search"><?=$ec_lang['lpn_crs_search']?></button>
+		<div class="lpn-gfull lpn-crs-search"><button type="button" id="lpn_crsbox_search"><?=$ec_lang['lpn_crs_search']?></button></div>
+		<div class="lpn-grid">
+			<div class="lpn-grow">
+				<span class="lpn-gname"><label for="lpn_crsbox_name"><?=ecTipLabel($ec_lang['lpn_crs_name'], $ec_lang['lpn_crs_name_tip'])?></label></span>
+				<input type="text" id="lpn_crsbox_name" class="lpn-gval lpn-gw-fill" autocomplete="off">
+			</div>
 		</div>
-		<div class="lpn-new-block">
-			<label for="lpn_crsbox_name"><?=ecTipLabel($ec_lang['lpn_crs_name'], $ec_lang['lpn_crs_name_tip'])?></label>
-			<input type="text" id="lpn_crsbox_name" autocomplete="off">
-		</div>
-		<div class="lpn-new-block">
-			<label for="lpn_crsbox_list"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_crs_list_tip'])?></label>
+		<div class="lpn-ghead"><label for="lpn_crsbox_list"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_crs_list_tip'])?></label></div>
+		<div class="lpn-gfull lpn-crs-list">
 			<select id="lpn_crsbox_list" size="10"></select>
 			<div id="lpn_crsbox_note"></div>
 		</div>
-		<div class="lpn-new-actions">
+		<div class="lpn-new-actions lpn-gfull">
 			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_dialog_ok']?></button>
 			<button type="button" id="lpn_crsbox_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>

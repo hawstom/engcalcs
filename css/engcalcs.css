@@ -7739,3 +7739,6 @@ textarea.lpn-desc-ta {
 .lpn-export-choice > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0; }
 /* A Library entry's Delete button and "(default)" mark: one row of their own under the entry's fields (round 10b). */
 .lpn-lib-actions { display: flex; align-items: center; gap: 8px; margin-block: 4px; }
+/* The projection box: the Search button sits at the left under the place field; the register's list fills the box (round 10b). */
+.lpn-crs-search { margin-block: 4px; }
+.lpn-crs-list > select { width: 100%; box-sizing: border-box; }
