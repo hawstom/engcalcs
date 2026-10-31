@@ -25,7 +25,7 @@ const QUOTES = {
 	lpn_guide_prop_open_def: ['lpn_tool_select', 'lpn_copy_props_menu', 'lpn_paste_props_menu', 'lpn_tsb_menu'],
 	lpn_guide_prop_edit_def: ['lpn_pipetype_detach', 'lpn_settings_auto_run'],
 	lpn_guide_prop_multi_def: ['lpn_multi_varies'],
-	lpn_guide_prop_example_def: ['lpn_field_desc', 'lpn_field_active_short', 'lpn_field_diameter', 'lpn_multi_varies']
+	lpn_guide_prop_example_def: ['lpn_field_diameter', 'lpn_multi_varies']
 };
 const TERMS = ['lpn_guide_prop_open_term', 'lpn_guide_prop_edit_term', 'lpn_guide_prop_id_term', 'lpn_guide_prop_scn_term',
 	'lpn_guide_prop_multi_term', 'lpn_guide_scn_example_term'];
