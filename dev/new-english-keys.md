@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**126 still to read on master**, of 285 untranslated keys, of 3246 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**127 still to read on master**, of 286 untranslated keys, of 3247 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (285, 126 to read @@ NEEDS RULING)
+## lpn_  (286, 127 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -423,6 +423,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_guide_scn_move_term`**
   > Moving or merging between scenarios
+  @@ NEEDS RULING
+- **`lpn_guide_text_demands_box`**
+  > Lists the demand categories of the selected junction, one row for each, with the base demand and the demand pattern of every category. The plus button adds a category. With more than one category, Base demand in Properties is their total and is read-only. Customers lumped at the junction are listed with their demand. In a scenario, an edit is an override and Base is not changed.
   @@ NEEDS RULING
 - **`lpn_inpup_ask_title`**
   > Import {file}
@@ -891,7 +894,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**108 still to read**, of 151 new keys across 8 unmerged branch(es).
+**108 still to read**, of 151 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -902,7 +905,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`42dbd7128`) — adds no English strings
+### box-design (`efb086597`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -1374,3 +1377,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
+
+### fix/master-after-gis (`69ded8c2a`) — adds no English strings
