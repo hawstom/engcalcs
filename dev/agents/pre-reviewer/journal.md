@@ -4796,3 +4796,8 @@ OBSERVED MISSED (minor, visual): the Properties title is not kept clear of the h
 OBSERVED MISSED: Find and Fire flow (not fixed by this round) at 100/80 px: no input visible (0 of 5, 0 of 7), 2-3 header buttons off the box; at 150 px 2 buttons off. 200 px and up fine. Phone default widths 382/312 fine, 28 px grip present.
 OBSERVED: harnesses green: box-narrow 148/148, settings-phone-width 24/24, box-phone7 26/26.
 Method: p8probe/sweep2.js, ff.js, ti.js; shots _panel/www/img/perry8b-*.png.
+
+## 2026-10-30 -- box-design round 8c (87c9abd0a)
+OBSERVED (re-verify before citing; Chromium, Net1): Find, Fire flow, Properties at 150/100/80 px (PC floating; Properties also phone docked): every input and every header button incl. Close inside the box, no page or body sideways scroll, no text drawn over an input, stacked ID/From rows clear. Title is hidden at narrow widths, not overlapping (screenshots). Default widths two columns (PC 500, phone 273). 8b defects 1-3 FIXED.
+OBSERVED (minor): a finger drag on the phone Find/Fire flow grip goes to 70 px, below the 80 px floor, with 5-9 px in-box sideways scroll; one Find text input shows "Everythin" clipped at 100 px (clip, not scroll). My title-overlap range metric is unreliable under ellipsis; judged by eye.
+Method: p8probe/c.js, d.js; shots perry8c-*.png.
