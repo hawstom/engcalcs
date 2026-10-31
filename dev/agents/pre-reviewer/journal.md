@@ -4837,3 +4837,10 @@ Method: p8probe/c.js, d.js; shots perry8c-*.png.
 - OBSERVED: mutation (header strip removed from the reader) turns dxf-import-reader-harness red (2 FAIL); restored the file.
 - OBSERVED: Net3 sections text is ~98 wrapped lines = ~163 units tall against a 31-unit network; Net1 and Net2 ~157 and ~213 against 80 and 83. Read-me bottom is 3 to 4 units above the network top at a 0.9-per-character estimate.
 - Scratch: scratchpad/p4 (rt.js, var.js, mk.py, aud.py).
+
+## 2026-10-31 -- box-design round 9 (79f765c61)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366x768 mouse, phone 390x844 touch, docks on): box-round9 harness 118/118. Labels one line with ellipsis in Properties, multi, Find, Fire flow; multi-selection sections do not overlap, share one divider, mouse and finger drag it; Find is sheet style with divider at natural width. First open: single Properties cuts 1/14..4/23 labels (the unit-bearing ones), multi cuts 13/69 (Net1) and 21/50 (Net3, 42%), multi Label column 85 px vs 161 single.
+OBSERVED MISSED: Fire flow RESULTS columns cannot be dragged by finger: grip code listens to mousedown only, grip is 4 px wide; phone drag changed nothing. PC drag works and is stored in lpn_rptcols.
+OBSERVED MISSED (minor): Fire flow control label "Lowest system pressure allowed (psi)?" is cut at first open with no tip (PC and phone); the harness flags cutNoTitle 5 and passes anyway because it asserts only for Properties.
+OBSERVED PRE-EXISTING (same on master): phone, docked Properties, a finger divider drag ends and the flyout retracts ~200 ms later; the next drag then pans the map. May be a CDP-touch artifact.
+Method: scratchpad p9 (fit, ff, multi, find, mp*.js); shots _panel/www/img/perry9-*.png.
