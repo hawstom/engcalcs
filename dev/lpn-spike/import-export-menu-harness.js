@@ -4,7 +4,7 @@
 //   EC_REPO=<another checkout> node ...                (proves the harness fails on master)
 //
 //   M1  Import holds Network, Shapes, Surveyed points, Libraries, Workspace (last). Network opens a
-//       third level of EPANET file, EPANET-MSX file, GeoJSON file; Shapes of GeoJSON file, DXF file,
+//       third level of EPANET file, EPANET-MSX file, GeoJSON file, DXF file; Shapes of GeoJSON file, DXF file,
 //       Shapefile. Rows inside a group carry the shortened names.
 //   M2  Export holds Network, Tables, Workspace (last). Network: EPANET file, GeoJSON file, DXF file
 //       (EPANET-MSX only when one is attached); Tables: ODS, XLSX, CSV.
@@ -104,7 +104,7 @@ async function main() {
 		await a._clickRow('#lpn_menu_list2', 'Network');
 		await page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
 		const net = await rowsOf(page, 3);
-		ok('Network holds EPANET file, EPANET-MSX file, GeoJSON file', same(labels(net), ['EPANET file…', 'EPANET-MSX file…', 'GeoJSON file…']), JSON.stringify(labels(net)));
+		ok('Network holds EPANET file, EPANET-MSX file, GeoJSON file, DXF file', same(labels(net), ['EPANET file…', 'EPANET-MSX file…', 'GeoJSON file…', 'DXF file…']), JSON.stringify(labels(net)));
 		ok('the Import fly-out stays open beside the third level', await page.evaluate(() => document.getElementById('lpn_menu_popup2').style.display === 'block'));
 		await a._clickRow('#lpn_menu_list2', 'Shapes');
 		await page.waitForFunction(() => document.getElementById('lpn_menu_list3').textContent.indexOf('DXF') >= 0);
