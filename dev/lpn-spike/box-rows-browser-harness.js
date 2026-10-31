@@ -95,10 +95,10 @@ async function sectionAlignment(a, host, label) {
 	ok(label + ': every name starts at one x', uniq(f.rows.map((r) => r.name.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.name.x))));
 	// A toggle stands 6 px in, where the text of the cells beside it starts (the standard sheet style).
 	ok(label + ': every value starts at one x', uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x)).length === 1 && uniq(f.rows.filter((r) => r.chk).map((r) => r.val.x - 6)).every((x) => x === uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x))[0]), JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
-	// A label may wrap (Tom, 2026-10-26); it is never cut.
-	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => n.scrollWidth > n.clientWidth + 1).length, host);
-	ok(label + ': no label is cut', cut === 0, String(cut));
-	ok(label + ': a label wraps in at most three lines', f.rows.every((r) => r.name.h < 4.4 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));
+	// Round 9 (Tom, 2026-10-30): a label never wraps; the column cuts it with an ellipsis and a cut label carries its full text as its tip.
+	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => getComputedStyle(n).whiteSpace !== 'nowrap' || getComputedStyle(n).textOverflow !== 'ellipsis').length, host);
+	ok(label + ': every label is one line with an ellipsis', cut === 0, String(cut));
+	ok(label + ': a label is one line high', f.rows.every((r) => r.name.h < 2.4 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));
 	const fillers = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gw-fill')).map((e) => e.getBoundingClientRect().width), host);
 	// The standard sheet style: a control fills its Value cell (Tom, 2026-10-27), so the bound is the box's right edge, not 17rem.
 	ok(label + ': no control reaches past the box\'s right edge', f.rows.every((r) => r.val.x + r.val.w <= f.hostRight + 1), JSON.stringify(f.rows.map((r) => r.val.x + r.val.w)) + ' vs ' + f.hostRight);
@@ -163,15 +163,15 @@ async function main() {
 		ok('a double-click returns to the default', Math.abs(f3.rows[0].name.w - w0) <= 1.5, f3.rows[0].name.w + ' vs ' + w0);
 		ok('...and removes the stored width (and the key, when it was the only one)', (await stored(a.page)) === null);
 
-		console.log('\n--- 4. a long label wraps ---');
+		console.log('\n--- 4. a long label is cut, never wrapped ---');
 		for (let i = 0; i < 40; i++) { await a.page.keyboard.press('ArrowLeft'); }
 		await a.settle(200);
 		const clip = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname')).map((n) => ({ clipped: n.scrollWidth > n.clientWidth + 1, text: n.textContent })));
-		// Labels wrap at a space, and mid-word when a word is longer than the column; none is cut.
-		const taller = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname')).some((n) => n.getBoundingClientRect().height > 1.6 * parseFloat(getComputedStyle(n).fontSize)));
-		ok('at the narrowest, a label wraps instead of being cut', clip.length > 0 && taller && clip.every((n) => !n.clipped), JSON.stringify(clip.slice(0, 2)));
+		// Round 9: no label wraps; one the column cannot hold is cut with an ellipsis.
+		const oneLine = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls .lpn-gname')).every((n) => n.getBoundingClientRect().height < 1.6 * parseFloat(getComputedStyle(n).fontSize) + 8));
+		ok('at the narrowest, every label stays on one line and a long one is cut', clip.length > 0 && oneLine && clip.some((n) => n.clipped), JSON.stringify(clip.slice(0, 2)));
 		const narrow = await facts(a.page, '#lpn_ff_controls');
-		ok('the drag floor holds: the name column is not narrower than 4rem', narrow.rows[0].name.w >= 4 * narrow.rem - 1, String(narrow.rows[0].name.w));
+		ok('there is no floor: the name column goes below 4rem', narrow.rows[0].name.w < 4 * narrow.rem - 1, String(narrow.rows[0].name.w));
 		await a.page.locator('#lpn_ff_controls .lpn-gsplit').first().dblclick();
 
 		console.log('\n--- 5. a narrow host keeps two columns ---');

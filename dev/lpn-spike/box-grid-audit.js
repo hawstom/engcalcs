@@ -9,8 +9,8 @@
 //      +-2 px), except a control in a unit cell, a table's own, the report buttons another branch owns,
 //      and a control named in `skip`;
 //   2. every name starts at the one name x (+-2 px);
-//   3. no name is ellipsised (scrollWidth > clientWidth, or text-overflow: ellipsis in force). A name
-//      may wrap (Tom, 2026-10-26: "wrap, even mid-word, is fine"); it is never cut;
+//   3. no name wraps; a name the column cuts is clipped with an ellipsis and carries its full text as its tip
+//      (round 9, Tom 2026-10-30: "truncate instead of wrapping");
 //   4. number boxes that hold the same number of digits share one width (+-1 px);
 //   5. the box does not scroll sideways.
 'use strict';
@@ -68,7 +68,12 @@ function auditInPage(spec) {
 		const cs = getComputedStyle(e), t = e.textContent.trim().slice(0, 40);
 		const inner = e.querySelector('.lpn-gtext');
 		const clipped = (x) => x.scrollWidth > x.clientWidth + 1 || getComputedStyle(x).textOverflow === 'ellipsis' && x.scrollWidth > x.clientWidth;
-		if (clipped(e) || (inner && clipped(inner))) { ellipsis.push(t); }
+		// Round 9: a cut name is fine if it is one line, ellipsised, and tipped with its full words (the pointer arms the tip).
+		if (clipped(e) || (inner && clipped(inner))) {
+			e.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+			const words = e.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+			if (cs.textOverflow !== 'ellipsis' || cs.whiteSpace !== 'nowrap' || !e.title || e.title.indexOf(words) !== 0) { ellipsis.push(t); }
+		}
 		const fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.25;
 		if (R(e).height > lh * 1.45 + 1 && !(spec.wrapOk || []).some((w) => t.indexOf(w) === 0)) { wrapped.push(t + ' h' + Math.round(R(e).height)); }
 	});
@@ -92,7 +97,7 @@ async function auditBox(page, spec, ok, tag) {
 	if (m.missing || !m.vals) { return m; }
 	ok(tag + ': every visible control stands in the value column', m.offGrid.length === 0, JSON.stringify(m.offGrid));
 	ok(tag + ': every name starts at one x', m.offName.length === 0, JSON.stringify(m.offName));
-	ok(tag + ': no name is ellipsised', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
+	ok(tag + ': a cut name is one line, ellipsised, and tipped with its full text', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
 	ok(tag + ': like number boxes share a width', m.unlike.length === 0, JSON.stringify(m.unlike));
 	ok(tag + ': the value stands beside its name, not under it', m.beside >= 20, String(m.beside));
 	ok(tag + ': does not scroll sideways', m.scroll <= 1, String(m.scroll));

@@ -25392,7 +25392,7 @@ var EngCalcs = EngCalcs || {};
 	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
 	// the next row starts a new one, and both share the host's one width.
 	var LPN_GCOLS_KEY = 'lpn_gcols';
-	var LPN_GNAME_MIN = 4, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GSTEP = 0.5;   // rem
+	var LPN_GNAME_MIN = 0, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GSTEP = 0.5;   // rem
 	var gcolPrefs = null;
 	function gcolRead() {
 		var raw = null, v;
@@ -25446,6 +25446,35 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// **A LABEL THE COLUMN CUTS SHORT CARRIES ITS FULL TEXT AS ITS TIP** (Tom, 2026-10-30: labels truncate, never wrap). The suite's tip system arms any element
+	// with a `title`; a label that fits keeps the title it was built with (a `?` label's tip, else none), one that is cut reads "Label: tip" (or just the label). Run
+	// on every width change (the host's observer, a divider drag, a fit) and just before a pointer rests on a label. A title is written, never removed.
+	function gridTitleOne(n) {
+		var cut, text, want;
+		if (!n || !n.getBoundingClientRect || !n.getBoundingClientRect().width) { return; }
+		if (n.__lpnTip0 === undefined || (n.title !== n.__lpnTipSet && n.title !== n.__lpnTip0)) { n.__lpnTip0 = n.title || ''; }
+		cut = n.scrollWidth > n.clientWidth + 1;
+		text = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+		want = cut ? (n.__lpnTip0 ? text + ': ' + n.__lpnTip0 : text) : n.__lpnTip0;
+		if (n.title !== want) { n.title = want; }
+		n.__lpnTipSet = want;
+	}
+	function gridTitlesNow(host) {
+		var names = host.querySelectorAll('.lpn-gname'), i;
+		host.__lpnTitleQ = false;
+		for (i = 0; i < names.length; i++) { gridTitleOne(names[i]); }
+	}
+	function gridTitlesSoon(host) {
+		if (host.__lpnTitleQ) { return; }
+		host.__lpnTitleQ = true;
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridTitlesNow(host); });
+	}
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('pointerover', function (e) {
+			var t = e.target, n = t && t.closest ? t.closest('.lpn-gname, .lpn-set-name') : null;
+			if (n) { gridTitleOne(n); }
+		}, true);
+	}
 	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
 	// so a later change of the box's width can scale both columns by it.
 	function gridNoteFrac(host) {
@@ -25467,6 +25496,7 @@ var EngCalcs = EngCalcs || {};
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals;
 		host.__lpnFitQ = false;
+		gridTitlesSoon(host);
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
 		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain')) { return; }
@@ -25527,6 +25557,7 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host);
 			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
 			host.style.setProperty('--lpn-g-name', v + 'rem');
+			gridTitlesSoon(host);
 			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
@@ -25650,6 +25681,7 @@ var EngCalcs = EngCalcs || {};
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
+				gridTitlesSoon(host);
 				if (w) {
 					var now = w < gridNarrowRem() * px, prevW = host.__lpnW;
 					host.classList.toggle('lpn-gnarrow', now);
@@ -72341,6 +72373,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		kids.forEach(function (n) { if (n.parentNode) { n.parentNode.removeChild(n); } });
 		groups.forEach(function (g) { g.nodes.forEach(function (n) { fields.appendChild(n); }); });
 	}
+	// **THE PROPERTIES BOX'S BODY OWNS THE TRACKS, FOR ONE ELEMENT AND FOR SEVERAL ALIKE** (Tom, 2026-10-30: "they act differently than the Properties columns"). The body gets
+	// the Label | Value divider and the remembered or fitted width; openMultiProperties() calls it too, so each of its sections is a two-column block under the same divider.
+	function propsBodyOwn(fields) {
+		var nm;
+		if (!(fields && fields.id === 'lpn_popup_fields' && fields.parentNode)) { return; }
+		nm = fields.parentNode;
+		nm.setAttribute('data-gcols-id', 'lpn_popup');
+		gcolApply(nm);
+		propsHeaderPlace(nm, fields);
+		gridFitSoon(nm);
+		if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
+			nm.__lpnRO = true;
+			new ResizeObserver(function () {
+				var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
+				gridTitlesSoon(nm);
+				if (w) { nm.classList.remove('lpn-gnarrow'); }   // Properties is two columns at every width
+				if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
+				gridFitSoon(nm);
+			}).observe(nm);
+		}
+	}
 	function lpnPropsGrid(fields) {
 		var kids, i, k, gut = null, last = null, loose = null, c, cell, marked, btns = null, nm;
 		// What stands after a row's control (a link, a button, a word) goes on a line of its own under the row,
@@ -72409,23 +72462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			loose.appendChild(k);
 		}
 		if (gut) { gut = null; }
-		if (fields.id === 'lpn_popup_fields' && fields.parentNode) {
-			// The box's body owns the tracks: it gets the Label | Value header and the remembered or fitted width.
-			nm = fields.parentNode;
-			nm.setAttribute('data-gcols-id', 'lpn_popup');
-			gcolApply(nm);
-			propsHeaderPlace(nm, fields);
-			gridFitSoon(nm);
-			if (!nm.__lpnRO && typeof ResizeObserver !== 'undefined') {
-				nm.__lpnRO = true;
-				new ResizeObserver(function () {
-					var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
-					if (w) { nm.classList.remove('lpn-gnarrow'); }   // Properties is two columns at every width
-					if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
-					gridFitSoon(nm);
-				}).observe(nm);
-			}
-		}
+		propsBodyOwn(fields);
 	}
 	function tipsIn(root) {
 		initTipsIn(root);
@@ -76215,6 +76252,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		popupTitleSet(String(pc.lpn_multi_title || '{n} selected')
 			.replace('{n}', String(selectionCount())));
 		groups.forEach(function (g) { multiSection(fields, g); });
+		propsBodyOwn(fields);   // the same divider and column widths as one element's Properties
 		// **BESIDE THE SELECTION, NOT IN THE MIDDLE OF THE SCREEN** (Tom, 2026-09-08: *"Open it
 		// immediately next to the extent of the selection"*, his preference and subject to change).
 		// Off the right edge of the subject's screen extent, top-aligned with it -- the same side

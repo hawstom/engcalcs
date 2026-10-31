@@ -86,7 +86,8 @@ async function main() {
 			Array.from(document.querySelectorAll('#lpn_popup_fields .lpn-gname, #lpn_popup_title .lpn-gname')).forEach((n) => {
 				if (!n.getBoundingClientRect().width) { return; }
 				const rg = document.createRange(); rg.selectNodeContents(n);
-				Array.from(rg.getClientRects()).forEach((q) => { if (q.right > r.left + 0.5 && q.left < r.right) { overlap++; } });
+				const ncs = getComputedStyle(n), nb = { right: n.getBoundingClientRect().right - (parseFloat(ncs.paddingRight) || 0) - (parseFloat(ncs.borderRightWidth) || 0) };   // round 9: a label is clipped by its own cell, so only the text it shows can lie under the hit area
+				Array.from(rg.getClientRects()).forEach((q) => { const qr = Math.min(q.right, nb.right); if (qr > r.left + 0.5 && q.left < r.right && q.left < nb.right) { overlap++; } });
 			});
 			return { left: r.left, right: r.right, top: r.top, w: r.width, painted: !!painted, paintedW: painted ? r.width : 0, overlap, display: cs.display, nameBorder: getComputedStyle(nm).borderInlineEndWidth };
 		});

@@ -136,11 +136,11 @@ async function main() {
 					const rects = Array.from(r.getClientRects()).filter((x) => x.width > 0), last = Math.max.apply(null, rects.map((x) => x.top)), g = tip.getBoundingClientRect();
 					if (Math.abs(g.top - last) > 6) { out.strayed.push(t); }
 				}
-				n.querySelectorAll('bdi').forEach((b) => { if (Array.from(b.getClientRects()).filter((x) => x.width > 0).length > 1) { out.broken.push(b.textContent); } });
+				if (n.getBoundingClientRect().height > 2.4 * parseFloat(getComputedStyle(n).fontSize)) { out.broken.push(t); }   // round 9: a label never wraps, so a unit cannot break either; a name that is tall has wrapped
 			});
 			return out;
 		});
-		ok('a "?" stays with its label\'s last line and a unit never breaks inside its brackets', glue.strayed.length === 0 && glue.broken.length === 0 && glue.names > 10, JSON.stringify(glue));
+		ok('a "?" stays with its label\'s line and no label wraps, so no unit breaks (round 9)', glue.strayed.length === 0 && glue.broken.length === 0 && glue.names > 10, JSON.stringify(glue));
 
 		// The divider: drag, remembered per box, kept across a reload, reset by a double-click.
 		console.log('\n--- the divider ---');

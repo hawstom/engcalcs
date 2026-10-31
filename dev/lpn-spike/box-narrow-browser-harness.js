@@ -3,7 +3,7 @@
 //      floors (17 rem / 12 rem and 16 rem) and the page never scrolls sideways.
 //   B. FLOATING, a 390 px touch phone: the same box, sized by the touch grip, goes below the old 17 rem phone floor.
 //   C. DOCKED (EC_DEFAULT_DOCKS), a desktop window: the dock's own handle takes the Properties box below the old 240 px clamp.
-//   D. a Settings box shrunk below two columns stacks its rows (label, then the control group), and the page does not scroll sideways.
+//   D. a Settings box shrunk narrow keeps its two columns (round 9: nothing stacks; the name column clips), and the page does not scroll sideways.
 // EC_SHOTS=<dir> saves boxnarrow-*.png there.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -315,7 +315,7 @@ async function main() {
 			}
 		}
 
-		console.log('\n--- D. Settings shrunk below two columns stacks its rows ---');
+		console.log('\n--- D. Settings shrunk narrow keeps two columns (round 9: no stacking) ---');
 		{
 			const S = await Session.open(browser, NAME + '-d', { viewport: { width: 1280, height: 800 } });
 			const P = S.page;
@@ -332,7 +332,7 @@ async function main() {
 			});
 			console.log('  ' + JSON.stringify(m));
 			ok('D1. Settings honours a 12 rem width (old floor 25 rem)', m.w < 250, m.w + ' px');
-			ok('D2. its rows are stacked (one column)', m.rows > 0 && m.two === 0, m.two + ' of ' + m.rows + ' still two columns');
+			ok('D2. its rows keep two columns (round 9: no automatic stacking)', m.rows > 0 && m.two === m.rows, m.two + ' of ' + m.rows + ' two columns');
 			ok('D3. the page does not scroll sideways', m.pageX <= 0, String(m.pageX));
 			await shot(S, 'boxnarrow-settings.png');
 			ok('D4. no page error', S.errors.length === 0, S.errors.join(' | '));

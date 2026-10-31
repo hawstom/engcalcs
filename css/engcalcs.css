@@ -2521,7 +2521,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-hide-titles { font-size: .6em; font-weight: normal; white-space: nowrap; }
 /* A collapsible heading per type in the multi-properties box. Open by default and the reader
    closes what they are not using, never the other way round. */
-.lpn-multi-section { margin: 0 0 .5em; }
+.lpn-multi-section { margin: 0 0 .5em; grid-column: 1 / -1; min-width: 0; }
+/* Each section is its own two-column block with the box's tracks (Tom, 2026-10-30); sections stack one after another and never share a row. */
+.lpn-multi-section > .lpn-gprops { row-gap: 0; }
 .lpn-multi-section > summary { font-weight: bold; cursor: pointer; padding: 2px 0; }
 .lpn-multi-note { margin: .2em 0 .4em; font-size: .9em; }
 .lpn-tool-more { position: relative; }
@@ -3830,18 +3832,18 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 @supports (grid-template-columns: subgrid) {
 	.lpn-gridhost {
 		display: grid; align-content: start; column-gap: 0; row-gap: 0;
-		grid-template-columns: minmax(var(--lpn-g-name-min, 5.5em), var(--lpn-g-name, max-content)) minmax(3em, 1fr);   /* the Value column gives way to a few characters and truncates; the Label column wraps */
+		grid-template-columns: minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);   /* the Value column gives way to a few characters and truncates; the Label column wraps */
 	}
 	.lpn-gridhost > * { grid-column: 1 / -1; min-width: 0; }
 	/* Contour plot is a box of fixed width, docked at the 20 rem floor: its Label column gives way before the box scrolls sideways. */
-	.lpn-contourbox .lpn-gridhost { grid-template-columns: minmax(var(--lpn-g-name-min, 5.5em), var(--lpn-g-name, max-content)) minmax(3em, 1fr); }
+	.lpn-contourbox .lpn-gridhost { grid-template-columns: minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr); }
 	.lpn-gridhost > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	.lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 	.lpn-gsub { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > * { grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	/* What stands in the value column when it is not a row's control: a button row, a lone button, a run of ticks. */
-	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: start; }
+	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: stretch; min-width: 0; overflow-wrap: anywhere; }   /* stretch, not start: a block narrower than its words wraps them instead of leaving the box (round 9, no stacking) */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-gcol2, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gsub > .lpn-gcol2,
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { margin-inline-start: 6px; margin-block: 4px; }
 	/* The header row. */
@@ -3888,9 +3890,8 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gplain .lpn-grid { row-gap: 6px; }
 .lpn-grow, .lpn-gspan-row { display: contents; }
 .lpn-grow > * { min-width: 0; }
-/* A label wraps at a space, and mid-word when a word is longer than the column (Tom, 2026-10-26: wrap,
-   even mid-word, is fine). The words and the `?` (the tip's target) stay together. */
-.lpn-gname { min-width: 0; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A label never wraps: one line, an ellipsis, the full label in its tip (Tom, 2026-10-30: "truncate instead of wrapping"; gridTitlesNow()). */
+.lpn-gname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* The `?` follows the label's last word in the text flow, so a wrapped label never strands it at the far edge; a unit
    (in <bdi>) never breaks inside its brackets. */
 .lpn-gname.ec-help { display: block; }
@@ -3919,7 +3920,7 @@ option:disabled { color: var(--ec-ink-muted); }
    cannot stretch the box. */
 .lpn-gprops {
 	display: grid; align-content: start; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
-	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(var(--lpn-g-name-min, 5.5em), var(--lpn-g-name, max-content)) minmax(3em, 1fr);
+	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; padding-inline-start: 0; }
@@ -3950,7 +3951,7 @@ option:disabled { color: var(--ec-ink-muted); }
 @supports (grid-template-columns: subgrid) {
 	.lpn-propbox .lpn-popover-body {
 		display: grid; align-content: start; justify-content: start; align-items: start; column-gap: 0; row-gap: 0;
-		grid-template-columns: var(--lpn-g-gutw, 0px) minmax(var(--lpn-g-name-min, 5.5em), var(--lpn-g-name, max-content)) minmax(3em, 1fr);
+		grid-template-columns: var(--lpn-g-gutw, 0px) minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 	}
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut, .lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; }
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; }
@@ -3985,7 +3986,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-hairline); }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gval { margin: 2px 6px; align-self: start; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
-		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; max-width: calc(100% - 12px); min-width: 0; }   /* a read-out narrower than its words is cut, never drawn past the box (round 9) */
 		/* The Time series row is ruled like the rows above it (B, C). */
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; column-gap: 0; align-items: center; min-height: 1.75rem;
@@ -5617,9 +5618,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
-/* **NEITHER COLUMN CAN BE CRUSHED** (Tom, 2026-10-30, phone: the name column of Page was one letter wide, the label running down the screen). The control column was a fixed 12.5rem and the name took what was left; on a narrow pane or a larger text size that left nothing. Both tracks now have a floor (name 5.5rem, control 6rem) and share the rest, so the control group wraps its button before the name is starved. */
+/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, an ellipsis, the full label in its tip. */
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(var(--lpn-set-name-min, 5.5rem), var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
+	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
@@ -5633,7 +5634,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the treatment Tom named twice as the one he likes and the one to converge on. It was the only
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
-.lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
 .lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
@@ -5677,8 +5678,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    is honest. A browser without container queries keeps the two columns, which is where this
    shipped. */
 /* NEVER STACKED (Tom, 2026-10-29: a stacked box is rejected, on a phone above all): the name column shrinks and wraps, the control group wraps its button under its box. */
-/* Stacked only where the two floors (5.5 + 6 rem and the gap) no longer fit, i.e. a box a person has shrunk below its old lower limit (Tom, 2026-10-30): label, then the control group whole beneath. A phone's 94vw box and every default width stay two columns. */
-@container lpnset (max-width: 12.5rem) { .lpn-set-row { grid-template-columns: minmax(0, 1fr); } }
+/* Settings rows never stack, at any width (Tom, 2026-10-30, round 9): the name column clips and the control column keeps its 6 rem floor. */
 .lpn-rp-credit { margin-top: 6px; }
 /* **THE ACKNOWLEDGEMENT IS REACHABLE FROM THE PICKER IT IS ABOUT** (Tom, 2026-08-20: "Were we going
    to put a Credits link near the color pickers? Maybe under the Color scheme label?"). A POINTER,
@@ -7725,3 +7725,10 @@ textarea.lpn-desc-ta {
 .lpn-box-stack #lpn_popup_graph svg { overflow: hidden; max-width: 100%; }
 .lpn-box-stack .lpn-pgraph-chart, .lpn-box-stack #lpn_popup_graph { overflow: hidden; }
 .lpn-box-stack button, .lpn-box-stack .lpn-rptbox-copy { max-width: 100%; min-width: 0; box-sizing: border-box; }
+
+/* **A LABEL COLUMN CAN BE DRAGGED TO NEARLY NOTHING** (Tom, 2026-10-30: "no lower limit"). A cell cannot be narrower than its own padding, so the padding shrinks with the
+   column (a percentage is of the column), and a column of a few pixels is a few pixels, not 13 lying over the Value column. */
+:root:root .lpn-gridhost .lpn-gname, :root:root .lpn-propbox .lpn-gprops .lpn-gname, :root:root .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-start: min(6px, 20%); padding-inline-end: min(6px, 20%); }
+@media (pointer: coarse) {
+	:root:root .lpn-gridhost .lpn-gname, :root:root .lpn-propbox .lpn-gprops .lpn-gname, :root:root .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-end: min(8px, 20%); }
+}
