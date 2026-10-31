@@ -53964,7 +53964,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
 		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
 		box.style.display = 'block';
-		lpnGridHost(document.getElementById('lpn_crsbox_body'));   // the sheet style, as New project's rows have
+		if (document.getElementById('lpn_crsbox_body')) { lpnGridHost(document.getElementById('lpn_crsbox_body')); }   // the sheet style, as New project's rows have
 		crsRegisterLoad(function () {
 			// Only if the box is still the one on screen -- a load that lands after the user has
 			// closed it must not repaint a hidden panel.

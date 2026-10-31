@@ -2416,8 +2416,10 @@ html[lang="zh"] .ec-welcome {
 #lpn_popup_fields.lpn-ovm-gut2, #lpn_popup_title.lpn-ovm-gut2 { padding-inline-start: 2.05em; }
 #lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -1.1em; }
 #lpn_popup_fields.lpn-ovm-gut2 .lpn-ovm { margin-inline-start: -2.05em; }
-#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut .lpn-units-item, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.1em; }
-#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-row, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-units-item, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 [data-lpn-setting] { padding-inline-start: 2.05em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.1em; }
+#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-row, #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 [data-lpn-setting] { padding-inline-start: 2.05em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-units-item { position: relative; padding-inline-start: 1.1em; }
+#lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-units-item { padding-inline-start: 2.05em; }
 /* A column heading over marked rows gives up the same room, or it sits 1.1em left of its column. */
 #lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.1em / 0.85); }   /* the heading is .85em, the rows 1em */
 #lpn_settings_box.lpn-ovm-gut.lpn-ovm-gut2 .lpn-set-colhead { padding-inline-start: calc(2.05em / 0.85); }
