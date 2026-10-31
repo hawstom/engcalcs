@@ -71770,18 +71770,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `handles` (optional): elements INSIDE the box that also start a drag when pressed -- a title
 	// line that is a child element rather than the box's own padding. The placement bars need it
 	// (wireWizardBars()); every other box drags by its chrome alone and passes nothing.
-	// **A BOX SHRUNK NARROW STACKS ITS ROWS, AND NO BOX HANGS OFF THE SCREEN** (Tom, 2026-10-30). One observer per box: below LPN_STACK_BELOW px of
-	// width the box carries `lpn-box-stack` and its grids `lpn-gnarrow` (label above value, css/engcalcs.css; 12.25 rem, just under the 12.5 rem Tom keeps in two columns, 2026-10-29); it is lifted at LPN_STACK_ABOVE so a box
-	// sitting on the line does not flicker. The grids are rebuilt as the box is refilled, so a childList observer re-applies the class. A floating box
-	// is also kept wholly on screen when the window changes (keepFloatOnScreen()).
+	// **A BOX SHRUNK NARROW KEEPS ITS TWO COLUMNS (Tom, 2026-10-30), AND NO BOX HANGS OFF THE SCREEN.** One observer per box: below LPN_STACK_BELOW px of
+	// width the box carries `lpn-box-stack`, which only keeps the title and the X reachable (css/engcalcs.css); it is lifted at LPN_STACK_ABOVE so a box
+	// sitting on the line does not flicker. A floating box is also kept wholly on screen when the window changes (keepFloatOnScreen()).
 	var LPN_STACK_BELOW = 196, LPN_STACK_ABOVE = 204, floatClampWired = false;
 	function applyNarrowStack(box) {
-		var w = box.clientWidth, was = box.classList.contains('lpn-box-stack'), narrow, hosts, i;
+		var w = box.clientWidth, was = box.classList.contains('lpn-box-stack'), narrow;
 		if (!(w > 0)) { return; }
 		narrow = was ? w < LPN_STACK_ABOVE : w < LPN_STACK_BELOW;
 		if (narrow !== was) { box.classList.toggle('lpn-box-stack', narrow); }
-		hosts = box.querySelectorAll('.lpn-gridhost');
-		for (i = 0; i < hosts.length; i++) { if (hosts[i].classList.contains('lpn-gnarrow') !== narrow) { hosts[i].classList.toggle('lpn-gnarrow', narrow); } }
 	}
 	function wireNarrowStack(box) {
 		var queued = false;
