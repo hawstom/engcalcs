@@ -25496,7 +25496,7 @@ var EngCalcs = EngCalcs || {};
 		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
 	}
 	function gridFitNow(host) {
-		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals, secs;
+		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals, secs, sheetFit;
 		host.__lpnFitQ = false;
 		gridTitlesSoon(host);
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
@@ -25527,7 +25527,9 @@ var EngCalcs = EngCalcs || {};
 		cs = window.getComputedStyle(host);
 		pad = 14;   // the cell's own padding and the divider line
 		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
-		for (i = 0; i < vals.length; i++) { valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
+		sheetFit = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet');
+		// A sheet's input that fills its cell has no width of its own to protect: it is whatever the Value column is, so measuring it only caps the Label column at the track it already has.
+		for (i = 0; i < vals.length; i++) { if (sheetFit && vals[i].classList.contains('lpn-gw-fill')) { continue; } valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
 		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
 		if (secs.length) { cap = Math.max(cap, hr.width * 0.6); }   // a multi-selection's value cells are all 'Various' boxes and selects of natural width; the Value column keeps 40% of the box, as it does beside a single element's labels
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
@@ -69371,7 +69373,49 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (libSection === 'rules') { buildRuleSection(sec); }
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
+		libSheetFields(sec);
 		initTipsIn(content);
+	}
+	// **THE LIBRARY'S ENTRY FIELDS ARE SHEET ROWS** (round 10b, the sheet-style audit, A7). Each entry builder makes its ID, Description, Curve type and
+	// the like as label-above-input stacks in a flex row; this pass, run once the section is built, turns each stack into a Label | Value row of the
+	// entry's own grid and gathers the Delete button and the "(default)" mark into one row of their own. The point tables, the multiplier strip and
+	// the fittings' quantity rows stay what they are: they are tables, not a name and a value.
+	function libSheetFields(sec) {
+		var entries = sec.querySelectorAll('.lpn-lib-entry');
+		if (!entries.length) { return; }
+		Array.prototype.forEach.call(entries, function (entry) {
+			var acts = [], last = null;
+			entry.setAttribute('data-gcols-id', 'lpn_lib_' + libSection);   // one remembered Label width for every entry of a section
+			lpnGridHost(entry);
+			Array.prototype.slice.call(entry.children).forEach(function (cont) {
+				var fields = Array.prototype.filter.call(cont.children, function (f) { return f.classList.contains('lpn-lib-field'); }), wrap;
+				if (!fields.length || cont.querySelector('.lpn-lib-qty')) { return; }
+				wrap = document.createElement('div');
+				wrap.className = 'lpn-gsub';
+				entry.insertBefore(wrap, cont);
+				fields.forEach(function (f) {
+					var nm = f.querySelector('.lpn-lib-fieldname'), ctl = f.querySelector('input, select, textarea, output'), tag, row;
+					if (!ctl) { return; }
+					tag = ctl.tagName.toLowerCase();
+					ctl.classList.remove('lpn-lib-wide');
+					row = lpnGridRow(wrap, { label: nm ? nm.textContent : '', control: ctl,
+						kind: tag === 'select' ? 'select' : tag === 'output' ? 'readout' : (tag === 'textarea' || ctl.type === 'text' ? 'text' : 'num') });
+					if (entry._lpnEqField === f) { entry._lpnEqField = row; }
+				});
+				while (cont.lastChild) {
+					if (cont.lastChild.classList && cont.lastChild.classList.contains('lpn-lib-field')) { cont.removeChild(cont.lastChild); continue; }
+					acts.unshift(cont.removeChild(cont.lastChild));
+				}
+				entry.removeChild(cont);
+				last = wrap;
+			});
+			if (acts.length && last) {
+				var bar = document.createElement('div');
+				bar.className = 'lpn-gfull lpn-lib-actions';
+				acts.forEach(function (a) { bar.appendChild(a); });
+				entry.insertBefore(bar, last.nextSibling);
+			}
+		});
 	}
 	// **THE DEFAULT DEMAND PATTERN IS A SETTINGS ROW, NOT A LIBRARY ROW** (Task 553, Tom
 	// 2026-08-28: *"the default pattern must be specified in Settings along with other Hydraulics

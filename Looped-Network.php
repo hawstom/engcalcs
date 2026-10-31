@@ -1350,7 +1350,7 @@ echoHeader("EngCalcsApp", $html_title,
       // and scrolls to them; these three are disjoint editors rather than sections of one document,
       // so a click SHOWS one and hides the others. Built in JS (buildLibraryBox), because what is
       // in each depends entirely on the document. ?>
-<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_libbox_title">
+<div id="lpn_library_box" class="d-print-none lpn-popover lpn-sheetbox lpn-setbox lpn-libbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_libbox_title">
 	<div id="lpn_libbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_library_menu']?></div>
 	<button type="button" id="lpn_libbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
