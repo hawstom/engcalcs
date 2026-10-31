@@ -7734,3 +7734,6 @@ textarea.lpn-desc-ta {
 @media (pointer: coarse) {
 	:root:root .lpn-gridhost .lpn-gname, :root:root .lpn-propbox .lpn-gprops .lpn-gname, :root:root .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-end: min(8px, 20%); }
 }
+/* Export tables dialog: a choice between radios is a row of its own, the radio then its words, across the whole box (round 10b). */
+.lpn-export-choice { display: flex; align-items: center; gap: 6px; padding: 3px 6px; cursor: pointer; }
+.lpn-export-choice > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0; }

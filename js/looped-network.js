@@ -36672,7 +36672,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				inp.id = 'lpn_export_' + key + '_' + o[0];
 				inp.checked = i === 0 || !!o[2];
 				if (o[2] === 'off') { inp.disabled = true; inp.checked = false; }
-				lpnGridRow(wrap, { label: o[1], control: inp, kind: 'check', forId: inp.id });
+				// A choice's words ARE the whole row, so the radio and its words span both columns and the words are never cut (round 10b, A10).
+				var lab = document.createElement('label');
+				lab.className = 'lpn-gfull lpn-export-choice';
+				lab.appendChild(inp);
+				lab.appendChild(document.createTextNode(' ' + o[1]));
+				wrap.appendChild(lab);
 			});
 			body.appendChild(wrap);
 			groups[key] = wrap;
