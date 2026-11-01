@@ -7781,4 +7781,5 @@ textarea.lpn-desc-ta {
 .lpn-dlg-p { margin: 0 0 8px; }
 .lpn-dlg-strong { font-weight: bold; }
 .lpn-dlg-group { margin: 0 0 10px; }
+.lpn-dlg-opt { display: block; }
 .lpn-dlg-indent { margin: 2px 0 0 20px; }

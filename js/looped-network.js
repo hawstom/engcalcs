@@ -48031,10 +48031,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return !plan.refused.length;
 		}
 		// **QUESTION 3, WHICH ALTERNATIVE** (Task 814): asked only for the open scenario, with Basic mode
-		// off, and only for the categories this file writes. A new scenario makes its own alternative and
+		// off, and only for the categories this file writes in which the scenario names an alternative. A new scenario makes its own alternative and
 		// Base is Base, so neither asks.
 		var cats = (!fresh && target !== 'base') ? importPlanCategories(plan) : [];
-		if (!plan.refused.length && cats.length && importAltAsk(scn)) {
+		if (!plan.refused.length && cats.length && importAltAsk(scn, cats)) {
 			askImportAlternatives(cats, (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName), scn, function (route) {
 				plan.route = route;
 				proceed();
@@ -48148,12 +48148,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return v;
 	}
 	// **QUESTION 3: WHICH ALTERNATIVE RECEIVES THE VALUES** (Task 814, dev/import-export-scenarios.md 2c).
-	// Asked after the destination, only for the open scenario and only with Basic mode off (Basic mode
-	// hides alternatives; a new scenario makes its own; Base is Base), one choice per category the file
+	// Asked after the destination, only for the open scenario, with Basic mode off, and only when the scenario
+	// names an alternative for a category the file writes (a new scenario makes its own; Base is Base), one choice per category the file
 	// writes: the scenario's own alternative (the default, and what a write always did), a NEW alternative
 	// that is a child of the one the scenario uses now (with a name), or the Base alternative, which is
 	// what every scenario inherits. A route is {category: {mode: 'own' | 'new' | 'base', name}}.
-	function importAltAsk(scn) { return !scenarioBasicMode && !!scn && !scn.isBase; }
+	// Asked only when it can matter (Tom): Basic mode off, and for a category the file writes the open
+	// scenario names an alternative (a stored one, or Base's, chosen or inherited) rather than holding its own values.
+	// Otherwise the values go to the scenario's own alternative, as every edit does. `cats` omitted: any category.
+	function importAltAsk(scn, cats) {
+		if (scenarioBasicMode || !scn || scn.isBase) { return false; }
+		return (cats || LPN_ALT_CATEGORIES).some(function (cat) { var c = smChoice(scn, cat); return (c.id !== null && c.id !== undefined) || !!c.chosen; });
+	}
 	// The categories a plan writes, in the order the manager lists them. An asset added is Active topology.
 	function importPlanCategories(plan) {
 		var seen = {};
@@ -48260,7 +48266,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				p((pc.lpn_inpalt_heading || 'Alternative for {category}').replace('{category}', altCategoryLabel(cat)), true);
 				opts.forEach(function (o) {
 					var lab = document.createElement('label'), inp = document.createElement('input');
-					lab.style.display = 'block';
+					lab.className = 'lpn-dlg-opt';
 					inp.type = 'radio';
 					inp.name = 'lpn_inpalt_' + cat;
 					inp.value = o[0];
@@ -49321,7 +49327,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// With more than Base in the project the points are asked where they go (Task 814).
 				askSurveyDestination(function (target, newName) {
 					var from = activeScenario(), outcome, scn = from, made = null;
-					if (target === 'open' && !importAltAsk(from)) { showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan())); return; }
+					if (target === 'open' && !importAltAsk(from, ['topology'])) { showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan())); return; }
 					// Question 3 (Basic mode off): which Active topology alternative takes the new nodes.
 					if (target === 'open') {
 						askImportAlternatives(['topology'], pc.lpn_survey_where_title || 'Import surveyed points', from, function (route) {

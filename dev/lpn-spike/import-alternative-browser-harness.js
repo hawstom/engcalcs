@@ -49,10 +49,17 @@ async function main() {
 	const errors = [];
 	try {
 		const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'latlon-originals', 'Net3-Novato-CA-World.lwn'), 'utf8'));
-		d.scenarios.push({ id: 's1', name: 'Peak hour', overrides: {}, demandMultiplier: 3 });
-		d.project = Object.assign({}, d.project, { name: 'Elm Street', activeScenario: 'base' });
-		d.settings.engine = 'native';
-		d.settings.autoRun = false;
+		// The question is asked only when the scenario names an alternative (Tom): Peak hour names one in
+		// Physical and one in Active topology here; case A0 boots a copy where it names none.
+		const d0 = JSON.parse(JSON.stringify(d));
+		d0.scenarios.push({ id: 's1', name: 'Peak hour', overrides: {}, demandMultiplier: 3 });
+		d.alternatives = [{ id: 'p1', category: 'physical', name: 'Peak pipes', parent: null }, { id: 'p2', category: 'topology', name: 'Peak nodes', parent: null }];
+		d.scenarios.push({ id: 's1', name: 'Peak hour', overrides: {}, demandMultiplier: 3, alternatives: { physical: 'p1', topology: 'p2' } });
+		[d, d0].forEach((x) => {
+			x.project = Object.assign({}, x.project, { name: 'Elm Street', activeScenario: 'base' });
+			x.settings.engine = 'native';
+			x.settings.autoRun = false;
+		});
 		const a = await Session.open(browser, 'A', { serviceWorkers: 'block', acceptDownloads: true });
 		const page = a.page;
 		page.on('pageerror', (e) => errors.push(String(e && e.message)));
@@ -219,14 +226,14 @@ async function main() {
 		ok('it heads Physical (the elevation)', dlg && dlg.text.indexOf(await catHeading('physical')) >= 0, dlg && dlg.text.slice(0, 300));
 		ok('it heads Active topology (the asset added)', dlg && dlg.text.indexOf(await catHeading('topology')) >= 0);
 		ok('each category offers the three answers',
-			dlg && dlg.text.indexOf((await L('lpn_inpalt_own')).replace('{scenario}', 'Peak hour')) >= 0 && dlg.text.indexOf((await L('lpn_inpalt_new')).replace('{parent}', 'Base')) >= 0 && dlg.text.indexOf(await L('lpn_inpalt_base')) >= 0, dlg && dlg.text.slice(0, 500));
+			dlg && dlg.text.indexOf((await L('lpn_inpalt_own')).replace('{scenario}', 'Peak hour')) >= 0 && dlg.text.indexOf((await L('lpn_inpalt_new')).replace('{parent}', 'Peak pipes')) >= 0 && dlg.text.indexOf(await L('lpn_inpalt_base')) >= 0, dlg && dlg.text.slice(0, 500));
 		ok('the default is the scenario\'s own alternative', await page.isChecked('#lpn_inpalt_physical_own') && await page.isChecked('#lpn_inpalt_topology_own'));
-		ok('the new alternative has a default name', (await page.inputValue('#lpn_inpalt_physical_name')) === 'Child_1_of_Base', await page.inputValue('#lpn_inpalt_physical_name'));
+		ok('the new alternative has a default name', (await page.inputValue('#lpn_inpalt_physical_name')) === 'Child_1_of_Peak pipes', await page.inputValue('#lpn_inpalt_physical_name'));
 		await a.dialogClick(goBtn);
 		await a.settle(1200);
 		dlg = await a.dialog();
 		ok('the receipt names the alternatives that took the values',
-			dlg && dlg.text.indexOf((await L('lpn_inpalt_receipt')).split('{list}')[0]) >= 0 && dlg.text.indexOf(await a.lang('lpn_alt_cat_physical') + ': Peak hour') >= 0, dlg && dlg.text.slice(0, 400));
+			dlg && dlg.text.indexOf((await L('lpn_inpalt_receipt')).split('{list}')[0]) >= 0 && dlg.text.indexOf(await a.lang('lpn_alt_cat_physical') + ': Peak pipes') >= 0, dlg && dlg.text.slice(0, 400));
 		await a.dialogClick(await L('lpn_dialog_ok'));
 		await declineMore();
 		let st1 = await state();
@@ -247,14 +254,14 @@ async function main() {
 		await declineMore();
 		let st2 = await state();
 		const made = altsIn(st2).find((x) => x.name === 'Elevation study');
-		ok('the alternative exists in Physical, a child of Base', !!made && made.category === 'physical' && (made.parent === null || made.parent === undefined), JSON.stringify(made));
+		ok('the alternative exists in Physical, a child of what Peak hour used', !!made && made.category === 'physical' && made.parent === 'p1', JSON.stringify(made));
 		ok('Peak hour names it', peakOf(st2).alternatives && peakOf(st2).alternatives.physical === (made && made.id), JSON.stringify(peakOf(st2).alternatives));
 		const h2 = valueHolders(st2, jid, 'elev');
 		ok('the elevation is held by the new alternative alone', h2.length === 1 && h2[0].where === 'alternative Elevation study' && h2[0].value === baseElev + 7, JSON.stringify(h2));
 		ok('the asset added is active in Peak hour through its own Active topology alternative', !!nodeOf(st2, 'NEWJ') && nodeOf(st2, 'NEWJ')._active === false);
 		await undo();
 		st2 = await state();
-		ok('one undo removes the alternative, the value and the asset', !altsIn(st2).some((x) => x.name === 'Elevation study') && !(peakOf(st2).alternatives || {}).physical && !nodeOf(st2, 'NEWJ'));
+		ok('one undo removes the alternative, the value and the asset', !altsIn(st2).some((x) => x.name === 'Elevation study') && (peakOf(st2).alternatives || {}).physical === 'p1' && !nodeOf(st2, 'NEWJ'));
 		// A taken name is refused and the question is asked again, the typed name kept.
 		await toAlternativeQuestion();
 		await page.click('#lpn_inpalt_physical_new');
@@ -364,7 +371,8 @@ async function main() {
 		// Two scenarios share one Physical alternative.
 		const d2 = JSON.parse(JSON.stringify(d));
 		d2.alternatives = [{ id: 'a1', category: 'physical', name: 'Shared pipes', parent: null }];
-		d2.scenarios.find((x) => x.id === 's1').alternatives = { physical: 'a1' };
+		d2.alternatives.push({ id: 'a2', category: 'topology', name: 'Peak nodes', parent: null });
+		d2.scenarios.find((x) => x.id === 's1').alternatives = { physical: 'a1', topology: 'a2' };
 		d2.scenarios.push({ id: 's2', name: 'Off peak', overrides: {}, alternatives: { physical: 'a1' } });
 		d2.scenarios.push({ id: 's3', name: 'Fire A', overrides: {}, alternatives: { physical: 'a1' } });
 		d2.scenarios.push({ id: 's4', name: 'Fire B', overrides: {}, alternatives: { physical: 'a1' } });
@@ -424,6 +432,22 @@ async function main() {
 		const t9 = altsIn(st9).find((x) => x.name === 'New nodes');
 		ok('a new Active topology alternative holds the activation and Peak hour names it',
 			!!t9 && t9.category === 'topology' && JSON.stringify(t9.values || {}).indexOf('NEWJ') >= 0 && peakOf(st9).alternatives.topology === t9.id, JSON.stringify(t9));
+		await undo();
+
+		console.log('--- A0. no question while the scenario names no alternative ---');
+		await boot(d0);
+		await basicRow();
+		ok('Peak hour is open, naming no alternative', await toScenario('Peak hour'));
+		await importInp('edited.inp');
+		await a.dialogClick(open);
+		await a.settle(900);
+		dlg = await a.dialog();
+		ok('Basic mode off, but no alternative is named: the import goes straight to the receipt', dlg && dlg.buttons.indexOf(goBtn) < 0, dlg && dlg.buttons.join(' | '));
+		await a.dialogClick(await L('lpn_dialog_ok'));
+		await declineMore();
+		const st0b = await state();
+		const h0 = valueHolders(st0b, jid, 'elev');
+		ok('the elevation is held by the own alternative of Peak hour, none named', h0.length === 1 && /^(scenario|alternative) Peak hour$/.test(h0[0].where) && h0[0].value === baseElev + 7, JSON.stringify(h0));
 		await undo();
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));

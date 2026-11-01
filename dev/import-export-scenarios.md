@@ -159,7 +159,7 @@ surprising thing. Questions 2 and 3 appear only when they apply.
    Base or the visitor is not in Base)
    *{open scenario}, open now* (default) / *A new scenario, child of {open scenario}* (name field) /
    *Base. Every scenario inherits Base.*
-3. **Which alternative?** (only with Basic mode off, one line per category the file touches)
+3. **Which alternative?** (only with Basic mode off and only where the open scenario names an alternative for a category the file touches; one line per such category)
    *{scenario}'s own alternative* (default) / *A new alternative, child of {parent}* (name field) /
    *The Base alternative.*
 
@@ -172,7 +172,7 @@ values, survey points) preview; a whole network preview is the existing import r
 
 | Command (numbers from part 1) | Format level | Today | Treatment under the standard |
 |---|---|---|---|
-| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Question 3 built for the open scenario with Basic mode off: one choice per category the file writes (the scenario's own alternative, a new one with a name, the Base alternative). Receipt is a dialog naming the scenario and the alternatives |
+| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Question 3 built, asked only when the scenario names an alternative (Basic mode off): one choice per category the file writes (the scenario's own alternative, a new one with a name, the Base alternative). Receipt is a dialog naming the scenario and the alternatives |
 | 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Question 3 built: the Active topology alternative takes the nodes (the open scenario's own, a new one, or Base's) |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct; Shapes now say "Shapes appear in every scenario." | No question; the same receipt line for profile and picture is left |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
@@ -193,7 +193,7 @@ values, survey points) preview; a whole network preview is the existing import r
 | Row (2d) | Treatment | Status |
 |---|---|---|
 | 7 `.inp`, 8 GeoJSON network | Question 1 and 2: new project, open scenario, new scenario, Base; receipt dialog | Built |
-| 7, 8 | Question 3, the alternative, for the open scenario with Basic mode off | Built (`import-alternative-browser-harness.js`). Not asked for a new scenario (it makes its own alternative) or for Base |
+| 7, 8 | Question 3, the alternative: asked only when it can matter (Basic mode off, and the open scenario names an alternative other than its own for a category the file writes) | Built (`import-alternative-browser-harness.js`). Not asked for a new scenario (it makes its own alternative) or for Base |
 | 9 Survey points | Question 2 | Built |
 | 9 Survey points | Question 3 (Active topology alone) | Built, same harness |
 | 10-12 Shapes | Receipt line "Shapes appear in every scenario." | Built |
