@@ -1005,6 +1005,250 @@
                 "it"
             ],
             "reason": "No -- the word for no in Spanish and Italian (sprint 1017)."
+        },
+        "lpn_settings_held_item": {
+            "category": "symbol",
+            "languages": [
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_scnres_col": {
+            "category": "symbol",
+            "languages": [
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_scnres_at_time": {
+            "category": "symbol",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_gis_kind_arcgis": {
+            "category": "brand",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "pt",
+                "ro",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur"
+            ],
+            "reason": "Identical to English is correct: the ArcGIS REST (MapServer) service type, a product name (sprint 1101, translators filed it)."
+        },
+        "lpn_gis_kind_wms": {
+            "category": "brand",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fa",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur",
+                "zh"
+            ],
+            "reason": "Identical to English is correct: WMS, the OGC standard name (sprint 1101, translators filed it)."
+        },
+        "lpn_result_status_cv": {
+            "category": "symbol",
+            "languages": [
+                "am",
+                "ar",
+                "bn",
+                "cs",
+                "es",
+                "fa",
+                "fr",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur"
+            ],
+            "reason": "Identical to English is correct: CV, the EPANET status code for a check valve (sprint 1101, translators filed it)."
+        },
+        "lpn_file_import_shp": {
+            "category": "brand",
+            "languages": [
+                "es",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "tr"
+            ],
+            "reason": "Identical to English is correct: Shapefile, the ESRI format name (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_zoom": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "fr",
+                "id",
+                "it",
+                "pt",
+                "ro"
+            ],
+            "reason": "Identical to English is correct: Zoom is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_desktop": {
+            "category": "cognate",
+            "languages": [
+                "id",
+                "it",
+                "ro"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_arcade": {
+            "category": "cognate",
+            "languages": [
+                "fr",
+                "it"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_prairie": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_angle": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_positions": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_inpup_i_descriptions": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_inpup_i_options": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
         }
     }
 }

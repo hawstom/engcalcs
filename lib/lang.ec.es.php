@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Lo que no hace';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='No se modelan las sobrepresiones transitorias ni el golpe de ariete: todos los resultados corresponden a flujo permanente o de variación lenta, no a la onda de presión transitoria causada por un cierre rápido de una válvula. La calidad del agua multiespecie (EPANET-MSX) no se modela. Sí se modelan la edad del agua, el rastreo de fuente y una sustancia química reactiva.';
+$ec_lang['lpn_notes_2_def']='No se modelan las sobrepresiones transitorias ni el golpe de ariete: todos los resultados corresponden a flujo permanente o de variación lenta, no a la onda de presión transitoria causada por un cierre rápido de una válvula. Sí se modelan la edad del agua, el rastreo de fuente, una sustancia química reactiva y la calidad del agua multiespecie de un archivo EPANET-MSX adjunto.';
 $ec_lang['lpn_notes_3_term']='Guardado de proyectos';
 $ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se guarda en este navegador mientras usted trabaja. Borrar los datos del navegador las elimina todas, así que el trabajo debe guardarse en un archivo: Archivo, Guardar como. Un asterisco en una pestaña indica que contiene cambios que no están en un archivo, y al cerrar esa pestaña se pregunta antes. Nada se escribe nunca en un archivo salvo que se elija Guardar o Guardar como. En algunos navegadores, un proyecto se conecta al archivo en el que se guarda, y Archivo, Guardar escribe de vuelta en ese mismo archivo de ahí en adelante; en otros no es posible ninguna conexión, así que Guardar está deshabilitado y solo está disponible Guardar como. Este sitio lleva el registro de quién tiene abierto un archivo de proyecto, para que dos personas no escriban una sobre la otra. Al abrir un archivo que un colega ya tiene abierto se ofrecen Preguntar, Abrir solo lectura y Romper bloqueo. Si no se puede conectar con el servidor, una advertencia indica que otro usuario puede editar el mismo archivo al mismo tiempo.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='Las presiones más bajas se leen antes de que s
 $ec_lang['lpn_ff_at_step']='Probado en el paso de informe {time}.';
 $ec_lang['lpn_ff_at_minp']='Probado a las {time}, el paso de informe con la presión más baja entre los nudos probados.';
 $ec_lang['lpn_ff_at_all']='El peor de {n} pasos de informe. Cada fila muestra el paso con el menor caudal disponible para ese nudo.';
-$ec_lang['lpn_ff_col_more']='Y otros';
+$ec_lang['lpn_ff_col_more']='Cuántos otros';
 $ec_lang['lpn_crit_col_unserved_peak']='Mayor demanda no atendida';
 $ec_lang['lpn_file_import_dxfnet']='Archivo DXF…';
 $ec_lang['lpn_file_import_dxfnet_tip']='Cree un proyecto nuevo a partir de un archivo DXF que exportó esta página. Se leen con sus atributos los bloques y las polilíneas de las capas que comienzan con C-WATR-MODL-. Cualquier otra cosa del dibujo se enumera y no se lee.';
@@ -5309,4 +5309,4 @@ $ec_lang['lpn_reaction_tank_short_tip']='Coeficiente de reacción: la tasa de re
 $ec_lang['lpn_field_tank_level_short_tip']='Profundidad inicial: la profundidad del agua en el depósito al comienzo de la simulación, medida hacia arriba desde el fondo del depósito.';
 $ec_lang['lpn_field_tank_minlevel_short_tip']='Profundidad mínima: la menor profundidad permitida del agua en el depósito, medida hacia arriba desde el fondo del depósito.';
 $ec_lang['lpn_field_tank_maxlevel_short_tip']='Profundidad máxima: la mayor profundidad permitida del agua en el depósito, medida hacia arriba desde el fondo del depósito.';
-$ec_lang['lpn_field_auto_length_tip']='Longitud automática: cuando está marcada, la longitud de la pendiente se calcula a lo largo de la línea dibujada, y sigue al dibujo cuando se mueve un nodo o cambia la elevación de un extremo. Desmarque la casilla para escribir una longitud propia.';
+$ec_lang['lpn_field_auto_length_tip']='Longitud automática: cuando está marcada, la longitud se mide a lo largo de la pendiente: a lo largo de la línea dibujada, con el ascenso o descenso entre las dos elevaciones de los extremos, y sigue al dibujo cuando se mueve un nodo o cambia la elevación de un extremo. Desmarque la casilla para escribir una longitud propia.';

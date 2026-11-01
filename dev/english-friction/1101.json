@@ -1,0 +1,1511 @@
+{
+    "sprint": "1101",
+    "description": "Translator suggestion box, sprint 1101 (401 keys x 26 languages, 2026-11-01). 130 entries, mostly cognates kept identical to English; two English strings were corrected from them.",
+    "entries": [
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "am",
+            "complaint": "CV is the EPANET status code, a proper cognate; identical to English is correct.",
+            "readings": [
+                "status code CV (keep)",
+                "spelled-out check valve"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "am",
+            "complaint": "Only a placeholder in parentheses; identical to English is correct.",
+            "readings": [
+                "({time}) placeholder only"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "am",
+            "complaint": "WMS is a standard acronym; kept as is.",
+            "readings": [
+                "acronym WMS (keep)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "am",
+            "complaint": "ArcGIS REST (MapServer) is a product and service name; kept as is.",
+            "readings": [
+                "product name (keep)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_status_title",
+            "source": "translator",
+            "lang": "am",
+            "complaint": "Scenario and status both map to the single Amharic word ሁኔታ in the existing file; I used አቋም for status in box titles to keep them distinct, but other status keys still use ሁኔታ.",
+            "readings": [
+                "status = ሁኔታ (same as scenario)",
+                "status = አቋም"
+            ],
+            "disposition": "glossary",
+            "resolution": "The Scenario and Status collision in am and my is Task 737; box title split for now, the remaining Status strings wait for that task."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "CV is EPANET's status abbreviation for a check valve; the Arabic engineering usage is the same Latin abbreviation, so it is identical to English.",
+            "readings": [
+                "kept CV as the status code (cognate)",
+                "a spelled-out Arabic word, rejected for a narrow status column"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "The string is only the placeholders {setting}: {restores}, with nothing to translate.",
+            "readings": [
+                "kept as is (placeholder-only)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "The string is only the placeholder ({time}) in parentheses, with nothing to translate.",
+            "readings": [
+                "kept as is (placeholder-only)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "WMS is a standard protocol acronym with no Arabic equivalent.",
+            "readings": [
+                "kept WMS (acronym)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "ArcGIS REST (MapServer) is a product and protocol name with no Arabic equivalent.",
+            "readings": [
+                "kept as is (product name)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "bg",
+            "complaint": "Only placeholders joined by a colon; identical to English is correct (candidate for the exempt list).",
+            "readings": [
+                "kept identical: only placeholders/product names and punctuation, nothing to translate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "bg",
+            "complaint": "Only placeholders and punctuation; identical to English is correct.",
+            "readings": [
+                "kept identical: only placeholders/product names and punctuation, nothing to translate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "bg",
+            "complaint": "Only a placeholder in parentheses; identical to English is correct.",
+            "readings": [
+                "kept identical: only placeholders/product names and punctuation, nothing to translate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "bg",
+            "complaint": "Product name and service type (ArcGIS REST, MapServer); identical to English is correct.",
+            "readings": [
+                "kept identical: only placeholders/product names and punctuation, nothing to translate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Value is only placeholders, so it is identical to English by necessity.",
+            "readings": [
+                "placeholders only, kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Value is only placeholders and punctuation, identical to English by necessity.",
+            "readings": [
+                "placeholders only, kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Value is only a placeholder in parentheses, identical to English by necessity.",
+            "readings": [
+                "placeholder only, kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Product name 'ArcGIS REST (MapServer)' has no translation.",
+            "readings": [
+                "kept as product name"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "CV is EPANET's status code, kept as the acronym.",
+            "readings": [
+                "kept as acronym"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_field_auto_length_tip",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "'slope length' for a pipe: unclear whether length along the slope or simply pipe length.",
+            "readings": [
+                "length along the drawn line, rendered as ঢাল বরাবর দৈর্ঘ্য",
+                "plain pipe length"
+            ],
+            "disposition": "english",
+            "resolution": "English reworded to say the length is measured along the slope, with the rise or fall between the end elevations (verified in autoLenRise); retranslated in all 26."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a pure placeholders {setting}: {restores}; Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a pure placeholders; Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a pure placeholder ({time}); Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a product name ArcGIS REST (MapServer); Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a EPANET status acronym CV; Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Identical to English because it is a acronym WMS; Czech uses the same form.",
+            "readings": [
+                "kept identical (cognate/symbol)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "de",
+            "complaint": "The string is only two placeholders and a colon, so it is identical to English by necessity.",
+            "readings": [
+                "cognate/placeholder-only, kept",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "de",
+            "complaint": "Placeholders and punctuation only; identical to English by necessity.",
+            "readings": [
+                "kept",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "de",
+            "complaint": "Placeholder in parentheses only; identical to English by necessity.",
+            "readings": [
+                "kept",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "de",
+            "complaint": "Product/protocol name 'ArcGIS REST (MapServer)'; identical to English by necessity (WMS likewise).",
+            "readings": [
+                "kept",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "de",
+            "complaint": "Status abbreviation CV for check valve: German 'RV' chosen (Rueckschlagventil), but RV is also used for Regelventil.",
+            "readings": [
+                "RV",
+                "CV"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_notes_2_def",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "The text says multi-species water quality (EPANET-MSX) is not modeled, but this batch adds EPANET-MSX import, a Multi-species quality option and species keys, so the claim looks stale.",
+            "readings": [
+                "translated as written",
+                "claim is false now that EPANET-MSX runs through the EPANET-MSX engine"
+            ],
+            "disposition": "english",
+            "resolution": "English corrected (838673432): the page does run an attached EPANET-MSX file; retranslated in all 26."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "CV is EPANET's own link-status abbreviation (the tip says 'EPANET calls this status CV'); kept identical to English rather than invent VR.",
+            "readings": [
+                "CV kept (acronym as EPANET prints it)",
+                "VR for válvula de retención"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "WMS and ArcGIS REST (MapServer) are protocol/product names; kept identical to English.",
+            "readings": [
+                "kept as proper names"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_file_import_shp",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "Shapefile is the standard format name in Spanish GIS usage; kept identical to English (also Zoom).",
+            "readings": [
+                "kept as format name",
+                "archivo shape"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "CV is the EPANET status acronym for check valve; the correct Persian engineering usage is the acronym itself.",
+            "readings": [
+                "kept CV as written in EPANET",
+                "rejected a made-up Persian abbreviation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "WMS is a protocol acronym and a proper name with no Persian equivalent, so it is identical to English.",
+            "readings": [
+                "kept WMS",
+                "rejected a Persian expansion"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_inpup_i_descriptions",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "French 'descriptions' is the correct word and identical to the English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_inpup_i_options",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "French 'options' is the correct word and identical to the English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_angle",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Angle' is the French word, identical to English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_zoom",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Zoom' is the French word, identical to English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_positions",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Positions' is the French word, identical to English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_theme_arcade",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Arcade' is the French word for the theme, identical to English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_theme_prairie",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Prairie' is the French word, identical to English.",
+            "readings": [
+                "kept cognate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "CV is an EPANET status symbol kept as is.",
+            "readings": [
+                "kept symbol"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "WMS is a protocol acronym.",
+            "readings": [
+                "kept acronym"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "ArcGIS REST (MapServer) is a product and protocol name.",
+            "readings": [
+                "kept name"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "Pure placeholders pattern, identical to English by construction.",
+            "readings": [
+                "kept pattern"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "Pure placeholder '({time})', identical to English by construction.",
+            "readings": [
+                "kept pattern"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Pure placeholders and punctuation; identical to English is correct, so it needs an exemption.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Only placeholders and punctuation; identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Only a placeholder in parentheses; identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Product name ArcGIS REST (MapServer); identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_notes_2_def",
+            "source": "translator",
+            "lang": "he",
+            "complaint": "Says multi-species water quality (EPANET-MSX) is not modeled, yet this batch adds MSX attach, species and run keys (lpn_file_import_msx, lpn_quality_msx); the claim looks stale.",
+            "readings": [
+                "translated as written",
+                "treated as contradicting the MSX keys"
+            ],
+            "disposition": "english",
+            "resolution": "English corrected (838673432): the page does run an attached EPANET-MSX file; retranslated in all 26."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "CV is the EPANET status code; kept as the identical acronym.",
+            "readings": [
+                "keep CV",
+                "translate"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "WMS is a standard acronym; kept identical.",
+            "readings": [
+                "keep WMS"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Product name ArcGIS REST (MapServer); kept identical.",
+            "readings": [
+                "keep"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholder-only pattern; nothing to translate.",
+            "readings": [
+                "keep"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholder-only pattern; nothing to translate.",
+            "readings": [
+                "keep"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholder-only pattern; nothing to translate.",
+            "readings": [
+                "keep"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_field_auto_length_tip",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "\"slope length\" is not used elsewhere; the label is just Auto length, so it is unclear whether slope length differs from pipe length.",
+            "readings": [
+                "length measured along the sloping drawn line (duljina po nagibu)",
+                "a separate property called slope length"
+            ],
+            "disposition": "english",
+            "resolution": "English reworded to say the length is measured along the slope, with the rise or fall between the end elevations (verified in autoLenRise); retranslated in all 26."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "CV is the EPANET status code and is kept as the identical acronym; same for lpn_gis_kind_wms, lpn_gis_kind_arcgis, lpn_file_import_shp (Shapefile), which are product or format names.",
+            "readings": [
+                "keep EPANET code CV",
+                "invent a Croatian abbreviation (NV)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "CV is the EPANET status code and abbreviation for check valve; written as in English.",
+            "readings": [
+                "kept CV (code)",
+                "Katup searah (too long for a status cell)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_theme_desktop",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Desktop is the established loanword in Indonesian for the desktop-style theme.",
+            "readings": [
+                "kept Desktop",
+                "Komputer meja (unnatural)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_zoom",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Zoom is the standard word in Indonesian map interfaces.",
+            "readings": [
+                "kept Zoom",
+                "Pembesaran (less used)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_file_import_shp",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Shapefile is the format's proper name; no Indonesian equivalent.",
+            "readings": [
+                "kept Shapefile…",
+                "Berkas bentuk (loses the format name)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Pure placeholders and punctuation; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "invented distinct wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Pure placeholders and punctuation; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "invented distinct wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Pure placeholder in parentheses; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "invented distinct wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "Product name and protocol, ArcGIS REST (MapServer); not translatable.",
+            "readings": [
+                "kept identical",
+                "invented distinct wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_notes_2_def",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "States that multi-species water quality (EPANET-MSX) is not modeled, but this sprint adds EPANET-MSX import and runs (lpn_msx_report_kept).",
+            "readings": [
+                "translated as written",
+                "claim looks stale"
+            ],
+            "disposition": "english",
+            "resolution": "English corrected (838673432): the page does run an attached EPANET-MSX file; retranslated in all 26."
+        },
+        {
+            "key": "lpn_guide_ff_asks_def",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Sibling labels lpn_ff_minpressure and lpn_crit_minpressure are two different names for what the guide calls the same setting.",
+            "readings": [
+                "used lpn_ff_minpressure wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "The Fire flow and Criticality boxes label one shared number in their own words on purpose, and lpn_crit_minpressure_tip says it is the same number."
+        },
+        {
+            "key": "lpn_guide_scn_move_term",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Moving or merging between scenarios: 'merge' also names the Merge upward command with another meaning.",
+            "readings": [
+                "moving/combining elements",
+                "scenario merge command"
+            ],
+            "disposition": "dismissed",
+            "resolution": "The guide entry covers Merge upward as well as moving, so the shared word is right."
+        },
+        {
+            "key": "lpn_theme_desktop",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Italian uses the English word as is (loanword, product or format name); identical to English by correct usage.",
+            "readings": [
+                "kept English word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_theme_arcade",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Italian uses the English word as is (loanword, product or format name); identical to English by correct usage.",
+            "readings": [
+                "kept English word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_file_import_shp",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Italian uses the English word as is (loanword, product or format name); identical to English by correct usage.",
+            "readings": [
+                "kept English word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Italian uses the English word as is (loanword, product or format name); identical to English by correct usage.",
+            "readings": [
+                "kept English word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_zoom",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Italian uses the English word as is (loanword, product or format name); identical to English by correct usage.",
+            "readings": [
+                "kept English word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "String is only placeholders and punctuation, so it is identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "String is only placeholders and punctuation, so it is identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "String is only placeholders and punctuation, so it is identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_file_import_shp",
+            "source": "translator",
+            "lang": "km",
+            "complaint": "Shapefile is a file-format name; the Khmer word is the English word.",
+            "readings": [
+                "Shapefile… (kept)",
+                "a Khmer descriptive phrase"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "km",
+            "complaint": "Pure placeholders and punctuation; identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "km",
+            "complaint": "Pure placeholder '({time})'; identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "km",
+            "complaint": "Product and protocol name (ArcGIS REST (MapServer)); stays in Latin script.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_file_import_shp",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "Shapefile is the file-format name; the correct word is the English one. Identical to English by design.",
+            "readings": [
+                "kept English",
+                "invented Burmese word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "Pure placeholders ({setting}: {restores}); nothing to translate. Identical to English by design.",
+            "readings": [
+                "kept English",
+                "invented Burmese word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "Pure placeholder ({time}) in parentheses; nothing to translate. Identical to English by design.",
+            "readings": [
+                "kept English",
+                "invented Burmese word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "my",
+            "complaint": "Product name ArcGIS REST (MapServer); stays in English. Identical to English by design.",
+            "readings": [
+                "kept English",
+                "invented Burmese word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "The string is only two placeholders joined by a colon, so any correct Pashto rendering is identical to English.",
+            "readings": [
+                "kept identical",
+                "change punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "The string is only a parenthesised placeholder, so the correct Pashto rendering is identical to English.",
+            "readings": [
+                "kept identical",
+                "invent a word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "CV is the EPANET status code and the cognate/acronym; identical to English is correct",
+            "readings": [
+                "kept CV (EPANET status code)",
+                "VR (válvula de retenção)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_zoom",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Zoom is the standard Portuguese word",
+            "readings": [
+                "kept Zoom"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_theme_desktop",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Cognate: the genuine Romanian IT word for a theme named Desktop is Desktop itself; identical-to-English is correct.",
+            "readings": [
+                "Desktop (kept)",
+                "Birou (rejected: reads as office/desk, not a look)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_grp_zoom",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Zoom is the established Romanian word; identical to English is correct.",
+            "readings": [
+                "Zoom (kept)",
+                "Mărire (rejected: not the map-control word)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Product name and acronym (ArcGIS REST (MapServer)) must stay as written; also lpn_gis_kind_wms, lpn_scnres_col, lpn_scnres_at_time, lpn_settings_held_item are only placeholders/symbols.",
+            "readings": [
+                "unchanged (kept)",
+                "translate (rejected: product name)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "The string is only two placeholders; identical to English is correct.",
+            "readings": [
+                "identity string, kept",
+                "none other"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "Only placeholders and punctuation; identical to English is correct.",
+            "readings": [
+                "identity string, kept",
+                "none other"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "Only a placeholder in parentheses; identical to English is correct.",
+            "readings": [
+                "identity string, kept",
+                "none other"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "CV is EPANET's own status code, kept as is.",
+            "readings": [
+                "EPANET status code CV, kept",
+                "a Russian abbreviation (ОК), rejected"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "WMS is a protocol acronym; identical to English is correct.",
+            "readings": [
+                "acronym kept",
+                "none other"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_field_auto_length_tip",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "'the slope length' is unclear: length along the incline (true length) versus plan length, or the length of a pipe on a slope.",
+            "readings": [
+                "length measured along the sloping pipe line, as drawn",
+                "horizontal plan length"
+            ],
+            "disposition": "english",
+            "resolution": "English reworded to say the length is measured along the slope, with the rise or fall between the end elevations (verified in autoLenRise); retranslated in all 26."
+        },
+        {
+            "key": "lpn_noscn_lead",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "{format} is inserted as a noun phrase ('an EPANET file'); Russian needs a case, and the other uses of the format keys are unseen.",
+            "readings": [
+                "nominative, 'файл EPANET не содержит'",
+                "prepositional, 'в файле EPANET'"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Restructure the sentence around {format} where the case system needs it; the format keys are noun phrases naming a file type."
+        },
+        {
+            "key": "lpn_ovm_restores",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "'Clear restores {value}, {source}.' has the verb Clear with no stated object, and {source} is a phrase from other keys (the value in {parent}, the default).",
+            "readings": [
+                "Clearing returns {value}, {source}",
+                "Clear button restores"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Clear is the button that clears this override; {source} is a noun phrase (the value in the parent, or the default)."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "sr",
+            "complaint": "Pure placeholder string ({setting}: {restores}); identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "sr",
+            "complaint": "Pure placeholder string ({quantity} ({unit}), {scenario}); identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "sr",
+            "complaint": "Pure placeholder string ({time}); identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "sr",
+            "complaint": "Product name 'ArcGIS REST (MapServer)'; identical to English is correct.",
+            "readings": [
+                "kept as is",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "CV is the EPANET status code for a check valve; the correct Swahili engineering usage keeps the acronym, so the value equals the English.",
+            "readings": [
+                "kept the acronym CV (EPANET status code)",
+                "rejected an invented Swahili abbreviation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "WMS and ArcGIS REST (MapServer) are protocol/product names with no translation, so they are identical to the English.",
+            "readings": [
+                "kept the names",
+                "rejected any translation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "ArcGIS REST (MapServer) is a product/protocol name; identical to English by necessity.",
+            "readings": [
+                "kept the name",
+                "rejected any translation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "The string is placeholders and a colon only ({setting}: {restores}), so it has nothing to translate and equals the English.",
+            "readings": [
+                "kept as is",
+                "rejected a rewording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Only placeholders, parentheses and commas ({quantity} ({unit}), {scenario}); nothing to translate, equals the English.",
+            "readings": [
+                "kept as is",
+                "rejected a rewording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Only a placeholder in parentheses ({time}); equals the English.",
+            "readings": [
+                "kept as is",
+                "rejected a rewording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_notes_2_def",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "It says multi-species water quality (EPANET-MSX) is not modeled, but other new keys (lpn_file_import_msx_tip, lpn_quality_msx) say an attached EPANET-MSX file is run by the EPANET-MSX engine, so the claim looks stale.",
+            "readings": [
+                "translated as written",
+                "rejected silently dropping the sentence"
+            ],
+            "disposition": "english",
+            "resolution": "English corrected (838673432): the page does run an attached EPANET-MSX file; retranslated in all 26."
+        },
+        {
+            "key": "lpn_guide_scn_example_def",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Says 'in all of them' where the older English said all three; the table has three scenarios, but the text also says the example's own scenarios are listed, which is unclear.",
+            "readings": [
+                "translated literally as 'in all'",
+                "rejected 'all three'"
+            ],
+            "disposition": "dismissed",
+            "resolution": "The example may hold any number of its own scenarios, so all of them is deliberate."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Product and protocol name (ArcGIS REST, MapServer) has no Turkish form; kept as written.",
+            "readings": [
+                "kept identical to English",
+                "translate the words REST/MapServer (rejected: they are the literal URL suffix the next error string asks for)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholder-only string; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholder and punctuation only; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholder in parentheses only; nothing to translate.",
+            "readings": [
+                "kept identical",
+                "none"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "CV is EPANET's status code for check valve; kept as the code, no distinct Turkish abbreviation exists.",
+            "readings": [
+                "CV kept",
+                "invent a Turkish abbreviation (rejected)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_scn_marks_def",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Translator note says use everyday family words (inherit = miras almak, parent = ebeveyn, child = cocuk) but existing labels such as lpn_ovl_col_inherited use 'Devralinan deger'; prose I wrote says 'miras alinan' so the label and the prose now differ.",
+            "readings": [
+                "family words in prose (miras, ebeveyn, cocuk)",
+                "keep devral- to match existing labels"
+            ],
+            "disposition": "glossary",
+            "resolution": "Tom’s translator notes (family words) govern new text; older Turkish labels using Devralınan are left for a later consistency pass rather than changed mid-sprint."
+        },
+        {
+            "key": "lpn_scncmp_title",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Box titles lpn_scncmp_title and lpn_demand_cats had to be reworded to 'Karsilastirma: senaryolar' and 'Kategoriler: talep' to avoid sharing a first word with lpn_sm_title and lpn_ds_title; the English menu path 'Scenario comparison' is now cited by a different label than guide prose elsewhere.",
+            "readings": [
+                "colon form to make first words distinct",
+                "keep natural phrase and share first word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Box titles may share a first word when they differ within the first 12 characters (Tom’s own model, Escenarios: administrador); a note on process, not on the English."
+        },
+        {
+            "key": "lpn_settings_held_item",
+            "source": "translator",
+            "lang": "uk",
+            "complaint": "Value is only two placeholders joined by a colon, so it is identical to English in every language.",
+            "readings": [
+                "kept as is (cognate/placeholder-only)",
+                "reorder placeholders"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_col",
+            "source": "translator",
+            "lang": "uk",
+            "complaint": "Only placeholders and punctuation; identical to English by necessity.",
+            "readings": [
+                "kept as is",
+                "vary punctuation (rejected, dodge)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_scnres_at_time",
+            "source": "translator",
+            "lang": "uk",
+            "complaint": "Only a placeholder in parentheses; identical to English by necessity.",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "uk",
+            "complaint": "Product name and protocol (ArcGIS REST (MapServer)); identical to English by necessity. Same for lpn_gis_kind_wms (WMS) and lpn_result_status_cv (CV, EPANET status code).",
+            "readings": [
+                "kept as is"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_result_status_cv",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "CV is EPANET's own status code (check valve); the correct Urdu is the same abbreviation, so it is identical to English.",
+            "readings": [
+                "kept as CV",
+                "invented Urdu abbreviation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_wms",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "WMS is a protocol acronym with no Urdu form; kept identical to English.",
+            "readings": [
+                "kept as WMS",
+                "invented Urdu expansion"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gis_kind_arcgis",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "ArcGIS REST (MapServer) is a product and interface name; kept identical to English.",
+            "readings": [
+                "kept as ArcGIS REST (MapServer)",
+                "transliterated"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Identical to English is correct here (a placeholder-only template, a product or format name, an acronym, or a true cognate); exemption recorded for that language in translation_exempt_keys.json."
+        }
+    ]
+}

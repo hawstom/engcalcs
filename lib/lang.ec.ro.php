@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Ce nu face';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Supratensiunile și lovitura de berbec nu sunt modelate: toate rezultatele sunt valabile pentru curgere permanentă sau lent variabilă, nu pentru unda de presiune tranzitorie produsă de închiderea rapidă a unei vane. Calitatea apei multispecie (EPANET-MSX) nu este modelată. Vârsta apei, urmărirea sursei și o singură substanță chimică reactivă sunt modelate.';
+$ec_lang['lpn_notes_2_def']='Supratensiunile și lovitura de berbec nu sunt modelate: toate rezultatele sunt valabile pentru curgere permanentă sau lent variabilă, nu pentru unda de presiune tranzitorie produsă de închiderea rapidă a unei vane. Vârsta apei, urmărirea sursei, o singură substanță chimică reactivă și calitatea apei multispecie dintr-un fișier EPANET-MSX atașat sunt modelate.';
 $ec_lang['lpn_notes_3_term']='Salvarea proiectelor';
 $ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă este salvată în acest browser pe măsură ce lucrați. Ștergerea datelor browserului le șterge pe toate, deci munca trebuie păstrată într-un fișier: Fișier, Salvare ca. Un asterisc pe o filă înseamnă că aceasta conține modificări care nu se află într-un fișier, iar închiderea acelei file întreabă mai întâi. Nimic nu este scris vreodată într-un fișier decât dacă se alege Salvare sau Salvare ca. În unele browsere un proiect se conectează la fișierul în care este salvat, iar Fișier, Salvare scrie de atunci încolo în același fișier; în altele nicio conexiune nu este posibilă, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Acest site ține evidența cine are deschis un fișier de proiect, astfel încât două persoane să nu scrie una peste alta. Deschiderea unui fișier pe care un coleg îl are deja deschis oferă Cere, Deschide numai pentru citire și Rupe blocarea. Dacă serverul nu poate fi contactat, un avertisment spune că un alt utilizator poate edita același fișier în același timp.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='Cele mai mici presiuni sunt citite înainte ca 
 $ec_lang['lpn_ff_at_step']='Testat la pasul de raportare {time}.';
 $ec_lang['lpn_ff_at_minp']='Testat la {time}, pasul de raportare cu cea mai mică presiune dintre joncțiunile testate.';
 $ec_lang['lpn_ff_at_all']='Cel mai defavorabil dintre {n} pași de raportare. Fiecare rând arată pasul cu cel mai mic debit disponibil pentru acea joncțiune.';
-$ec_lang['lpn_ff_col_more']='Și altele';
+$ec_lang['lpn_ff_col_more']='Câte altele';
 $ec_lang['lpn_crit_col_unserved_peak']='Cea mai mare cerință neservită';
 $ec_lang['lpn_file_import_dxfnet']='Fișier DXF…';
 $ec_lang['lpn_file_import_dxfnet_tip']='Creați un proiect nou dintr-un fișier DXF exportat de această pagină. Blocurile și polilinii de pe straturile care încep cu C-WATR-MODL- sunt citite cu atributele lor. Orice altceva din desen este listat și nu este citit.';
@@ -5309,4 +5309,4 @@ $ec_lang['lpn_reaction_tank_short_tip']='Coeficientul de reacție: viteza de rea
 $ec_lang['lpn_field_tank_level_short_tip']='Adâncime inițială: adâncimea apei din bazin la începutul rulării, măsurată în sus de la fundul bazinului.';
 $ec_lang['lpn_field_tank_minlevel_short_tip']='Adâncime minimă: cea mai mică adâncime admisă a apei din bazin, măsurată în sus de la fundul bazinului.';
 $ec_lang['lpn_field_tank_maxlevel_short_tip']='Adâncime maximă: cea mai mare adâncime admisă a apei din bazin, măsurată în sus de la fundul bazinului.';
-$ec_lang['lpn_field_auto_length_tip']='Lungime automată: când este bifat, lungimea pantei este calculată de-a lungul liniei desenate și urmează desenul când un nod este mutat sau când se schimbă o cotă de capăt. Debifați caseta pentru a tasta o lungime proprie.';
+$ec_lang['lpn_field_auto_length_tip']='Lungime automată: când este bifat, lungimea este măsurată de-a lungul pantei: pe linia desenată, cu urcarea sau coborârea dintre cele două cote de capăt, și urmează desenul când un nod este mutat sau când se schimbă o cotă de capăt. Debifați caseta pentru a tasta o lungime proprie.';

@@ -46,9 +46,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`a23b5b40e`) — adds no English strings
+### box-design (`867b6ace9`) — adds no English strings
 
-### chore/sprint-1101 (`ad8124f97`) — adds no English strings
+### chore/sprint-1101 (`f31ed562d`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 

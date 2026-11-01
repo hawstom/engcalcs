@@ -2150,7 +2150,7 @@ $ec_lang['lpn_crs_name_tip']='Texto que filtra a lista: só são mostrados os si
 $ec_lang['lpn_crs_list_tip']='Os sistemas de coordenadas que passam pelos filtros acima. Escolha um e pressione OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Nenhum lugar foi buscado ainda, então a lista inteira é oferecida. Busque um lugar acima ou aplique zoom no mapa para restringir.';
-$ec_lang['lpn_crs_count']='{n} de {total} projeções listadas.';
+$ec_lang['lpn_crs_count']='{n} de {total} sistemas de coordenadas listados.';
 // The same count when the list is filtered by the whole network's extent (File, Convert as, Tom
 // 2026-09-26: "should automatically filter EPSG CRSes for the displayed area or network extents"),
 // so the reader knows why the list is short. The Filter by map view box above still shows them all.
@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Não modelado';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Transientes e golpe de aríete não são modelados: todos os resultados são para escoamento permanente ou de variação lenta, não para a onda de pressão transitória causada pelo fechamento rápido de uma válvula. A qualidade da água com várias espécies (EPANET-MSX) não é modelada. Idade da água, rastreamento de fonte e uma substância química reagente são modelados.';
+$ec_lang['lpn_notes_2_def']='Transientes e golpe de aríete não são modelados: todos os resultados são para escoamento permanente ou de variação lenta, não para a onda de pressão transitória causada pelo fechamento rápido de uma válvula. Idade da água, rastreamento de fonte, uma substância química reagente e a qualidade da água com várias espécies de um arquivo EPANET-MSX anexado são modeladas.';
 $ec_lang['lpn_notes_3_term']='Salvando projetos';
 $ec_lang['lpn_notes_3_def']='Cada projeto é uma aba, e cada aba é salva neste navegador à medida que o trabalho avança. Limpar os dados do navegador exclui todas elas, de modo que o trabalho deve ficar em um arquivo: Arquivo, Salvar como. Um asterisco em uma aba significa que ela contém alterações que não estão em um arquivo, e fechar essa aba pergunta antes. Nada é gravado em um arquivo a menos que Salvar ou Salvar como seja escolhido. Em alguns navegadores, um projeto se conecta ao arquivo em que é salvo, e Arquivo, Salvar grava de volta nesse mesmo arquivo a partir de então; em outros, nenhuma conexão é possível, de modo que Salvar fica desativado e apenas Salvar como está disponível. Este site registra quem está com um arquivo de projeto aberto, para que duas pessoas não sobrescrevam o trabalho uma da outra. Abrir um arquivo que um colega já tem aberto oferece Perguntar, Abrir somente leitura e Quebrar o bloqueio dessa pessoa. Se o servidor não puder ser alcançado, um aviso informa que outro usuário pode editar o mesmo arquivo ao mesmo tempo.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='As menores pressões são lidas antes de um tan
 $ec_lang['lpn_ff_at_step']='Testado no passo do relatório {time}.';
 $ec_lang['lpn_ff_at_minp']='Testado às {time}, o passo do relatório com a menor pressão entre as junções testadas.';
 $ec_lang['lpn_ff_at_all']='Pior de {n} passos do relatório. Cada linha mostra o passo com a menor vazão disponível para aquela junção.';
-$ec_lang['lpn_ff_col_more']='E outros';
+$ec_lang['lpn_ff_col_more']='Quantos outros';
 $ec_lang['lpn_crit_col_unserved_peak']='Maior demanda não atendida';
 $ec_lang['lpn_file_import_dxfnet']='Arquivo DXF…';
 $ec_lang['lpn_file_import_dxfnet_tip']='Cria um novo projeto a partir de um arquivo DXF que esta página exportou. Os blocos e polilinhas nas camadas que começam com C-WATR-MODL- são lidos com seus atributos. Qualquer outra coisa no desenho é listada e não é lida.';
@@ -5292,7 +5292,7 @@ $ec_lang['lpn_export_receipt_heading']='{file} exportado de {scenario} de {proje
 $ec_lang['lpn_export_receipt_note']='Isto é uma exportação, não um salvamento: este projeto não está ligado ao arquivo.';
 $ec_lang['lpn_dxf_exported_geo_tail']='Suas coordenadas são {crs}, em metros, e não latitude e longitude.';
 $ec_lang['lpn_field_auto_length']='Comprimento automático';
-$ec_lang['lpn_field_auto_length_tip']='Comprimento automático: quando marcado, o comprimento do declive é calculado ao longo da linha desenhada e acompanha o desenho quando um nó é movido ou a elevação de uma extremidade muda. Desmarque a caixa para digitar um comprimento próprio.';
+$ec_lang['lpn_field_auto_length_tip']='Comprimento automático: quando marcado, o comprimento é medido ao longo do declive: ao longo da linha desenhada, com a subida ou a descida entre as duas elevações das extremidades, e acompanha o desenho quando um nó é movido ou a elevação de uma extremidade muda. Desmarque a caixa para digitar um comprimento próprio.';
 $ec_lang['lpn_edit_pipetypes']='Editar tipos…';
 $ec_lang['lpn_edit_fittings']='Editar conexões…';
 $ec_lang['lpn_edit_curves']='Editar curvas…';

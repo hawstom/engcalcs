@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Ne yapmadığı';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir. Çok türlü su kalitesi (EPANET-MSX) modellenmez. Su yaşı, kaynak izleme ve tepkimeye giren tek bir kimyasal modellenir.';
+$ec_lang['lpn_notes_2_def']='Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir. Su yaşı, kaynak izleme, tepkimeye giren tek bir kimyasal ve eklenmiş bir EPANET-MSX dosyasından gelen çok türlü su kalitesi modellenir.';
 $ec_lang['lpn_notes_3_term']='Projeleri kaydetme';
 $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme bu tarayıcıya kaydedilir. Tarayıcı verilerinin temizlenmesi hepsini siler; bu yüzden çalışma bir dosyada tutulmalıdır: Dosya, Farklı kaydet. Bir sekmedeki yıldız işareti, bir dosyada olmayan değişiklikler taşıdığı anlamına gelir ve o sekmeyi kapatmak önce sorar. Kaydet veya Farklı kaydet seçilmedikçe hiçbir şey asla bir dosyaya yazılmaz. Bazı tarayıcılarda bir proje, kaydedildiği dosyaya bağlanır ve Dosya, Kaydet bundan sonra o aynı dosyaya geri yazar; diğerlerinde bağlantı mümkün değildir, bu yüzden Kaydet devre dışıdır ve yalnızca Farklı kaydet kullanılabilir. Bu site, iki kişi birbirinin üzerine yazmasın diye bir proje dosyasını kimin açık tuttuğunu izler. Bir meslektaşın zaten açık tuttuğu bir dosyayı açmak Sor, Salt okunur aç ve Kilidi kır seçeneklerini sunar. Sunucuya ulaşılamazsa bir uyarı, başka bir kullanıcının aynı dosyayı aynı anda düzenleyebileceğini bildirir.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -4829,7 +4829,7 @@ $ec_lang['lpn_geojson_import_local']='GeoJSON konumları enlem ve boylamdır ve 
 $ec_lang['lpn_geojson_import_unreadable']='{file} bir GeoJSON dosyası değil: {detail}';
 $ec_lang['lpn_file_import_dxf']='DXF dosyası…';
 $ec_lang['lpn_file_import_dxf_tip']='Bir ASCII DXF dosyasındaki noktaları, çizgileri ve çoklu çizgileri bu projeye Figür olarak okur; her katman adı bir özellik olarak korunur. Diğer öğeler sayılır ve listelenir, içe aktarılmaz. Koordinatlar dönüşüm yapılmadan bu projenin X ve Y değerleri olarak okunur.';
-$ec_lang['lpn_file_import_shp']='Shapefile figürlerini içe aktar…';
+$ec_lang['lpn_file_import_shp']='Shapefile…';
 $ec_lang['lpn_file_import_shp_tip']='Bir ESRI shapefile dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur; öznitelik sütunları özellik olarak korunur. .zip dosyasını ya da .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun). Projeden farklı bir koordinat sistemindeki koordinatlar dönüştürülür ve bildirimde bu belirtilir.';
 $ec_lang['lpn_dxf_import_skipped']='{n} öğe içe aktarılmadı: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='Bir öğe içe aktarılmadı: {list}.';
@@ -5149,7 +5149,7 @@ $ec_lang['lpn_scnres_failed']='{scenario} çözülemedi; bu yüzden sütunları 
 $ec_lang['lpn_scnres_flow_tip']='Bir debinin işareti çözücünün iç yön işaretidir. Çözücünün dışında, bir debinin senaryolar arasında yön değiştirip değiştirmediğini burada göstermek dışında hiçbir işe yaramaz.';
 $ec_lang['lpn_scnres_stale']='Yeniden hesaplama kapalı; bu yüzden haritadaki ve Tablolar panelindeki sonuçlar daha önceki bir çözümden. Buradaki {scenario} sütunları geçerli girdilerden çözülür ve onlardan farklı olabilir.';
 $ec_lang['lpn_report_copy_html']='HTML\'yi kopyala';
-$ec_lang['lpn_demand_cats']='Kategoriler: talep';
+$ec_lang['lpn_demand_cats']='Talep: kategoriler';
 $ec_lang['lpn_demand_total_tip']='Bu düğümdeki tüm talep kategorilerinin baz taleplerinin toplamı. Bir kategoriyi değiştirmek için Kategoriler: talep kutusunu açın.';
 $ec_lang['lpn_when']='Sınanan raporlama adımı';
 $ec_lang['lpn_when_now']='Ekrandaki raporlama adımı';
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='En düşük basınçlar bir depo boşalmadan ö
 $ec_lang['lpn_ff_at_step']='{time} raporlama adımında sınandı.';
 $ec_lang['lpn_ff_at_minp']='{time} anında sınandı; bu, sınanan düğümler arasında en düşük basıncın olduğu raporlama adımıdır.';
 $ec_lang['lpn_ff_at_all']='{n} raporlama adımının en kötüsü. Her satır, o düğüm için en düşük kullanılabilir debinin olduğu adımı gösterir.';
-$ec_lang['lpn_ff_col_more']='Ve diğerleri';
+$ec_lang['lpn_ff_col_more']='Kaç tane daha';
 $ec_lang['lpn_crit_col_unserved_peak']='Karşılanmayan en büyük talep';
 $ec_lang['lpn_file_import_dxfnet']='DXF dosyası…';
 $ec_lang['lpn_file_import_dxfnet_tip']='Bu sayfanın dışa aktardığı bir DXF dosyasından yeni bir proje oluşturun. C-WATR-MODL- ile başlayan katmanlardaki bloklar ve çoklu çizgiler öznitelikleriyle birlikte okunur. Çizimdeki başka her şey listelenir ve okunmaz.';
@@ -5309,4 +5309,4 @@ $ec_lang['lpn_reaction_tank_short_tip']='Tepkime katsayısı: bu depoda tutulan 
 $ec_lang['lpn_field_tank_level_short_tip']='Başlangıç derinliği: çalıştırmanın başında depodaki su derinliği, depo tabanından yukarı doğru ölçülür.';
 $ec_lang['lpn_field_tank_minlevel_short_tip']='En düşük derinlik: depodaki izin verilen en düşük su derinliği, depo tabanından yukarı doğru ölçülür.';
 $ec_lang['lpn_field_tank_maxlevel_short_tip']='En yüksek derinlik: depodaki izin verilen en yüksek su derinliği, depo tabanından yukarı doğru ölçülür.';
-$ec_lang['lpn_field_auto_length_tip']='Otomatik uzunluk: işaretliyse eğim uzunluğu çizilen çizgi boyunca hesaplanır ve bir düğüm taşındığında veya bir uç kotu değiştiğinde çizimi izler. Kendi uzunluğunuzu yazmak için işareti kaldırın.';
+$ec_lang['lpn_field_auto_length_tip']='Otomatik uzunluk: işaretliyse uzunluk eğim boyunca ölçülür: çizilen çizgi boyunca, iki uç kotu arasındaki yükselme veya alçalma dahil, ve bir düğüm taşındığında veya bir uç kotu değiştiğinde çizimi izler. Kendi uzunluğunuzu yazmak için işareti kaldırın.';

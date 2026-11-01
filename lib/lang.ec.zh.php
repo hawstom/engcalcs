@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='本工具不做的事';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。未对多物种水质（EPANET-MSX）建模，但水龄、水源追踪和一种反应性化学物质可以建模。';
+$ec_lang['lpn_notes_2_def']='未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。水龄、水源追踪、一种反应性化学物质，以及所附 EPANET-MSX 文件中的多物种水质均可建模。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目是一个标签页，且每个标签页在工作进行中即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此工作成果应保存到文件中：使用“文件”、“另存为”。标签页上的星号表示其中含有尚未保存到文件的更改，关闭该标签页前会先询问。除非选择“保存”或“另存为”，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到所保存的文件，此后“文件”、“保存”会写回该文件；在另一些浏览器中无法建立此连接，因此“保存”不可用，只能使用“另存为”。本网站会记录谁打开了某个项目文件，以免两人互相覆盖。打开同事已经打开的文件时，会提供“询问”、“以只读方式打开”和“解除锁定”。如果无法连接服务器，会有警告说明其他用户可能同时编辑同一个文件。';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='最低压力在水箱放空之前读取。低�
 $ec_lang['lpn_ff_at_step']='在报告时间步 {time} 测试。';
 $ec_lang['lpn_ff_at_minp']='在 {time} 测试，即受测节点中压力最低的报告时间步。';
 $ec_lang['lpn_ff_at_all']='{n} 个报告时间步中最不利的一步。每行显示该节点可用流量最低的那一步。';
-$ec_lang['lpn_ff_col_more']='其他';
+$ec_lang['lpn_ff_col_more']='其余数量';
 $ec_lang['lpn_crit_col_unserved_peak']='最大未供应需水量';
 $ec_lang['lpn_file_import_dxfnet']='DXF 文件…';
 $ec_lang['lpn_file_import_dxfnet_tip']='根据本页面导出的 DXF 文件创建新项目。图层名以 C-WATR-MODL- 开头的块和多段线会连同其属性一起读取。图中的其他内容会被列出，但不读取。';
@@ -5309,4 +5309,4 @@ $ec_lang['lpn_reaction_tank_short_tip']='反应系数：此水箱所存水体内
 $ec_lang['lpn_field_tank_level_short_tip']='初始水深：运行开始时水箱中的水深，从水箱底部向上量起。';
 $ec_lang['lpn_field_tank_minlevel_short_tip']='最小水深：水箱中允许的最低水深，从水箱底部向上量起。';
 $ec_lang['lpn_field_tank_maxlevel_short_tip']='最大水深：水箱中允许的最高水深，从水箱底部向上量起。';
-$ec_lang['lpn_field_auto_length_tip']='自动长度：勾选时，坡面长度沿所绘线条计算，并在移动节点或端点高程改变时随图纸变化。取消勾选可键入您自己的长度。';
+$ec_lang['lpn_field_auto_length_tip']='自动长度：勾选时，长度沿坡面测量，即沿所绘线条，并计入两端高程之间的升降，且在移动节点或端点高程改变时随图纸变化。取消勾选可键入您自己的长度。';

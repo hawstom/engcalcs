@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Yang tidak dilakukannya';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Lonjakan tekanan (surge) dan pukulan air (water hammer) tidak dimodelkan: semua hasil berlaku untuk aliran tunak atau berubah lambat, bukan untuk gelombang tekanan transien akibat penutupan katup yang cepat. Kualitas air multispesies (EPANET-MSX) tidak dimodelkan. Umur air, penelusuran sumber, dan satu bahan kimia yang bereaksi dimodelkan.';
+$ec_lang['lpn_notes_2_def']='Lonjakan tekanan (surge) dan pukulan air (water hammer) tidak dimodelkan: semua hasil berlaku untuk aliran tunak atau berubah lambat, bukan untuk gelombang tekanan transien akibat penutupan katup yang cepat. Umur air, penelusuran sumber, satu bahan kimia yang bereaksi, dan kualitas air multispesies dari berkas EPANET-MSX terlampir dimodelkan.';
 $ec_lang['lpn_notes_3_term']='Menyimpan proyek';
 $ec_lang['lpn_notes_3_def']='Setiap proyek adalah sebuah tab, dan setiap tab disimpan di peramban ini saat pekerjaan berlangsung. Membersihkan data peramban menghapus semuanya, jadi pekerjaan harus disimpan ke berkas: Berkas, Simpan sebagai. Tanda bintang pada tab berarti tab itu berisi perubahan yang belum ada di berkas, dan menutup tab itu akan bertanya lebih dahulu. Tidak ada yang pernah ditulis ke berkas kecuali Simpan atau Simpan sebagai dipilih. Pada sebagian peramban, sebuah proyek tersambung ke berkas tempatnya disimpan, dan Berkas, Simpan sejak itu menulis kembali ke berkas yang sama; pada peramban lain sambungan tidak dimungkinkan, sehingga Simpan dinonaktifkan dan hanya Simpan sebagai yang tersedia. Situs ini mencatat siapa yang membuka berkas proyek, sehingga dua orang tidak saling menimpa pekerjaan. Membuka berkas yang sudah dibuka rekan kerja menawarkan Tanya, Buka hanya-baca, dan Ambil alih kunci. Jika server tidak dapat dihubungi, sebuah peringatan menyatakan bahwa pengguna lain dapat menyunting berkas yang sama pada saat yang sama.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -5205,7 +5205,7 @@ $ec_lang['lpn_crit_empty_note']='Tekanan terendah dibaca sebelum tangki kosong. 
 $ec_lang['lpn_ff_at_step']='Diuji pada langkah pelaporan {time}.';
 $ec_lang['lpn_ff_at_minp']='Diuji pada {time}, langkah pelaporan dengan tekanan terendah di antara simpul yang diuji.';
 $ec_lang['lpn_ff_at_all']='Terburuk dari {n} langkah pelaporan. Setiap baris menunjukkan langkah dengan debit tersedia terendah untuk simpul itu.';
-$ec_lang['lpn_ff_col_more']='Dan lainnya';
+$ec_lang['lpn_ff_col_more']='Berapa lainnya';
 $ec_lang['lpn_crit_col_unserved_peak']='Kebutuhan tidak terlayani terbesar';
 $ec_lang['lpn_file_import_dxfnet']='Berkas DXF…';
 $ec_lang['lpn_file_import_dxfnet_tip']='Buat proyek baru dari berkas DXF yang diekspor halaman ini. Blok dan polyline pada layer yang diawali C-WATR-MODL- dibaca beserta atributnya. Hal lain dalam gambar didaftar dan tidak dibaca.';
@@ -5309,4 +5309,4 @@ $ec_lang['lpn_reaction_tank_short_tip']='Koefisien reaksi: laju reaksi dalam air
 $ec_lang['lpn_field_tank_level_short_tip']='Kedalaman awal: kedalaman air dalam tangki pada awal proses, diukur dari dasar tangki ke atas.';
 $ec_lang['lpn_field_tank_minlevel_short_tip']='Kedalaman minimum: kedalaman air terendah yang diizinkan dalam tangki, diukur dari dasar tangki ke atas.';
 $ec_lang['lpn_field_tank_maxlevel_short_tip']='Kedalaman maksimum: kedalaman air tertinggi yang diizinkan dalam tangki, diukur dari dasar tangki ke atas.';
-$ec_lang['lpn_field_auto_length_tip']='Panjang otomatis: bila dicentang, panjang miring dihitung sepanjang garis yang digambar, dan mengikuti gambar ketika simpul dipindahkan atau elevasi ujung berubah. Hapus centang untuk mengetik panjang Anda sendiri.';
+$ec_lang['lpn_field_auto_length_tip']='Panjang otomatis: bila dicentang, panjang diukur sepanjang kemiringan: sepanjang garis yang digambar, dengan naik atau turunnya antara kedua elevasi ujung, dan mengikuti gambar ketika simpul dipindahkan atau elevasi ujung berubah. Hapus centang untuk mengetik panjang Anda sendiri.';
