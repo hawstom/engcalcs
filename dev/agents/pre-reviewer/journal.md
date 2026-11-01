@@ -4875,3 +4875,9 @@ OBSERVED: Libraries Curves/Pipe types/Fittings ?: no title, aria "User manual: <
 OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 3/5, units-wrap es FAILs, sheet-style 85/86).
 SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
 Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.
+
+## 2026-11-01 -- feat/alternative-import (c8be0f791), Task 814 port
+OBSERVED (re-verify before citing; Chromium headless, PC 1600 and phone 320 viewport, Net3 + Peak hour naming a shared Physical alternative): import-alternative-browser-harness 39/39 passes. My own probe: the question lists Physical and Active topology, name box sits directly under "A new alternative" in each group, the shared label reads "Shared pipes, also used by Off peak, Fire A, Fire B and others (2)", Cancel says "Nothing was changed.". At 320 px the box is 16..304 px, no sideways page scroll, text wraps, the body scrolls and Import/Cancel stay pinned. Both old findings (name box position, own-label false when shared) hold.
+OBSERVED: stylesheet adds only four `.lpn-dlg-*` rules (5 lines), no duplicate or conflicting rule; adhoc_style_check counts unchanged from baseline. One inline `label.style.display='block'` in askImportAlternatives (not counted, a class would be tidier).
+OBSERVED MISSED (judgement): the build report and Tom's answer say the question is asked only when the open scenario names an alternative the file would touch; the code (importAltAsk) asks whenever Basic mode is off and the scenario is not Base, and harness A1 confirms it asks for a scenario that names none.
+Method: scratchpad probe.js probe3.js; shots q-320.png q-1600.png.
