@@ -45139,7 +45139,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		openDialog(function (body) {
 			function p(text) {
 				var e = document.createElement('p');
-				e.style.margin = '0 0 8px';
+				e.className = 'lpn-wtg-box-p';
 				e.textContent = text;
 				body.appendChild(e);
 			}
@@ -45148,11 +45148,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			p(pcX.lpn_wtg_export_need || 'The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.');
 			p(pcX.lpn_wtg_export_lost_lead || 'The file cannot carry the following, so they are left out:');
 			ul.id = 'lpn_wtg_export_lost';
-			ul.style.margin = '0';
-			ul.style.paddingLeft = '20px';
+			ul.className = 'lpn-wtg-box-list';
 			wtgNotCarriedLines(planned.notCarried).forEach(function (text) {
 				var li = document.createElement('li');
-				li.style.marginBottom = '4px';
 				li.textContent = text;
 				ul.appendChild(li);
 			});
