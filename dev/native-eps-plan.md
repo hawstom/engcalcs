@@ -84,10 +84,16 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    scaling, the scenario comparison and the Alternatives preview still call `lpnEpanetRun`. The loop returns
    the convergence fields of the EPANET run. Test: `native-wire-harness.js` (Net1 chlorine, Net2 fluoride,
    Net3 trace and Net3 plain, through the page's run path, held to the tolerances above; a refused case).
-   **Reaction rates are not computed.** The report column reads EPANET's binary output, whose accumulation
-   (`reactpipes()` rate averaging) could not be transcribed without its source at hand, so a built-in chemical
-   run leaves the column empty and says so once per page load (`lpn_time_native_no_rates`). The run report is
-   empty on a built-in run (`lpn_time_no_report` says why). EPANET-MSX stays on EPANET.
+   **Reaction rates are computed** (`reactpipes()` keeps the volume-weighted mean of |c_new - c_old| per second of
+   the step, scaled to a day, and `ratecoeffs()` zeroes it at each hydraulic period, so a report time reads the
+   last step of the period before it); a chemical frame carries `linkRates` for every pipe, in mass/L/day, held to
+   EPANET's within 5e-7 relative over its own hydraulics and 2e-3 absolute end to end on all 24 chemical cases
+   (`native-eps-quality-harness.js`) and on Net1, Net2 and Net3 (`native-wire-harness.js`). The mass balance and the
+   average rates in mass per hour that EPANET's report prints are shown by no part of the page, so the built-in
+   loop does not keep them. After every Calculate the status bar says which solver answered
+   (`lpn_engine_native_used`; the routed-run sentences name EPANET) and the run summary says it for either solver
+   (`lpn_engine_native_used`, `lpn_engine_epanet_used`). The run report is empty on a built-in run
+   (`lpn_time_no_report` says why). EPANET-MSX stays on EPANET.
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -277,8 +283,8 @@ writes no Quality line); a tank with no area in a quality run; a source type or 
 does not know (error 213); a source on a pattern the model lacks (error 205); a quality step that
 comes to 0 (hydraulic step under 10 s, none stated: EPANET's walk never advances).
 
-**Not copied.** The mass balance and the average reaction rates (the page's reaction-rate column reads
-EPANET's binary output): they change no value a frame carries. A pump at speed 0 left OPEN, which
+**Not copied.** The mass balance and the average reaction rates in mass per hour (no part of the page shows
+them). The per-pipe reaction rate the page's column shows IS copied (slice 7). A pump at speed 0 left OPEN, which
 EPANET carries a flow of 1e-8 x its head difference through and the loop carries 0.
 
 Test: `native-eps-quality-harness.js`, 106 checks. Every case is run three ways: EPANET; the pass over
@@ -325,3 +331,33 @@ the loop end to end. Tolerances, at every node and link at every reporting time:
 ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine_why`,
 `lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`, `lpn_time_no_report`. What stays
 true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.
+
+## What still falls back to EPANET under the built-in setting (2026-11-01)
+
+Nothing here is built; it is the next slice's list. Cost is an engineering estimate in working days, from
+the size of the matching EPANET 2.3.5 source and the slices already done.
+
+**A period the transport runs** (`lpnTimeNativePlan()`; the status bar names the element or setting):
+
+| Falls back for | Where it is decided | Estimate |
+|---|---|---|
+| A pressure-driven demand model (steady and period) | `lpnDemandModelIsPda`; its own note `lpn_engine_pda_route` | 3 days: the demand function and its derivative enter the global gradient solve (hydraul.c `demandheadloss()`, `pda` in `netsolve`), then the quality pass reads the delivered demand |
+| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | 10 or more days: a multi-species reaction network with an RK5 or Rosenbrock integrator and its own segment transport; the least likely to be worth copying |
+| A simple control on a reservoir level, on a junction pressure that switches a valve, on a GPV status, a setting-less control on a non-valve, or any control on a check-valve pipe | `native-run-control-unsupported` | 1 day for the reservoir and junction-pressure conditions (controls.c `controlcondition()`); the rest are inputs EPANET itself refuses (errors 207 and 211), so the right answer is the same refusal in both engines, not a copy |
+| A [RULES] block the rule parser cannot read, or a hydraulic step under 10 s with rules | `native-run-rules` | 1 day for the unread grammar once Task 713's list of rejected rules is in hand |
+| A pump speed pattern on a pump with no curve, or a speed pattern with a negative multiplier | `native-run-speed-pattern` | under 1 day; the first is a pump EPANET reads as a pipe |
+| A tank volume curve the model carries no usable rows for | `native-run-volume-curve` | none: EPANET refuses it too (error 225); route the refusal, do not copy it |
+| A tank whose initial level lies outside its limits | `native-run-tank-levels` | none: EPANET refuses it (error 225) |
+| Quality: a trace on a node out of the run, a tank with no area, an unknown source type or mixing model, a source on a pattern the model lacks, a hydraulic step under 10 s with no quality step | `native-run-quality` | none: each is an input EPANET errors on or does not advance |
+| Energy: a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase | `native-run-energy` | none: EPANET refuses each |
+| A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | none: a real failure, shown as EPANET's answer |
+
+**Everything that is not the transport's run** still calls `lpnEpanetRun` whatever the setting says:
+
+| Falls back for | Where | Estimate |
+|---|---|---|
+| The scenario comparison, for a scenario with a total run time | `scenarioCompareRunsPeriod()`, `runScenarioCompare()` | 0.5 day: call `periodRun()`'s plan per scenario and keep the one-engine-at-a-time chain |
+| Fire flow over a duration (`runDurationFire`), criticality (`runCriticality`) and demand scaling (`demandScaleCase`) when the project has a total run time | `lpnEpanetRun(m, {})` at each | 1 day for the three: one shared helper that asks the plan and runs the loop in slices, then `lpnEpsRunResult()` on the frames |
+| The Alternatives preview and the analysis run (`analysisRun`, `analysisCanRun`) | `lpnEpanetRun(model, ...)` | 0.5 day, same helper |
+| The run report (Project, EPANET run report) | no report exists on a built-in run; `lpn_time_no_report` says so | 2 days to compose one from the loop's own warnings and step statistics, or none if the report is declared EPANET's by definition |
+| The run's warnings in EPANET's words (negative pressure, disconnected, unbalanced) | `nativeWarnings()` carries only the bridge's notes | 1 day: hydraul.c `writehydwarn()` is short |
