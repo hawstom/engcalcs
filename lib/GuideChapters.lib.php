@@ -36,7 +36,7 @@ function ecGuideChapters() {
         'notes' => array('page' => false, 'title' => 'lpn_help_notes', 'intro' => array(), 'terms' => array('lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_engine', 'lpn_guide_nt_example')),
         'find' => array('title' => 'lpn_find_title', 'intro' => array('lpn_guide_text_find_popup'), 'terms' => array('lpn_guide_find_query', 'lpn_guide_find_examples', 'lpn_guide_find_results', 'lpn_guide_find_replace', 'lpn_guide_find_notes')),
         'scenarios' => array('title' => 'lpn_sm_title', 'intro' => array('lpn_sm_help'), 'terms' => array('lpn_guide_scn_use', 'lpn_guide_scn_open', 'lpn_guide_scn_marks', 'lpn_guide_scn_make', 'lpn_guide_scn_move', 'lpn_guide_scn_scope', 'lpn_guide_scn_example', 'lpn_guide_scn_notes')),
-        'libraries' => array('title' => 'lpn_library_menu', 'intro' => array('lpn_guide_text_library_box'), 'terms' => array('lpn_guide_lib_kinds', 'lpn_guide_lib_refs', 'lpn_guide_lib_scn', 'lpn_guide_lib_ctl', 'lpn_guide_lib_import', 'lpn_guide_lib_example', 'lpn_guide_lib_notes')),
+        'libraries' => array('title' => 'lpn_library_menu', 'intro' => array('lpn_guide_text_library_box'), 'terms' => array('lpn_guide_lib_kinds', 'lpn_guide_lib_curves', 'lpn_guide_lib_pipetypes', 'lpn_guide_lib_fittings', 'lpn_guide_lib_refs', 'lpn_guide_lib_scn', 'lpn_guide_lib_ctl', 'lpn_guide_lib_import', 'lpn_guide_lib_example', 'lpn_guide_lib_notes')),
         'properties' => array('title' => 'lpn_popup_boxtitle', 'intro' => array('lpn_guide_text_popup'), 'terms' => array('lpn_guide_prop_open', 'lpn_guide_prop_edit', 'lpn_guide_prop_id', 'lpn_guide_prop_scn', 'lpn_guide_prop_multi', 'lpn_guide_prop_example')),
         'settings' => array('title' => 'lpn_tool_settings', 'intro' => array('lpn_guide_text_settings_box'), 'terms' => array('lpn_guide_set_where', 'lpn_guide_set_search', 'lpn_guide_set_scn', 'lpn_guide_set_units', 'lpn_guide_set_assets', 'lpn_guide_set_reset')),
         'fire-flow' => array('title' => 'lpn_ff_title', 'intro' => array('lpn_ff_intro'), 'terms' => array('lpn_guide_ff_asks', 'lpn_guide_ff_result', 'lpn_guide_ff_marks', 'lpn_guide_ff_dur', 'lpn_guide_ff_example')),
@@ -151,6 +151,9 @@ function ecGuideTermKey($stem) {
         'lpn_guide_cmp_notes' => 'lpn_guide_scn_notes_term',
         'lpn_guide_find_notes' => 'lpn_guide_scn_notes_term',
         'lpn_guide_lib_notes' => 'lpn_guide_scn_notes_term',
+        'lpn_guide_lib_curves' => 'lpn_library_curves',
+        'lpn_guide_lib_pipetypes' => 'lpn_library_pipetypes',
+        'lpn_guide_lib_fittings' => 'lpn_library_fittings',
         'lpn_guide_cal_example' => 'lpn_guide_scn_example_term',
         'lpn_guide_cr_example' => 'lpn_guide_scn_example_term',
         'lpn_guide_ct_example' => 'lpn_guide_scn_example_term',
@@ -167,6 +170,36 @@ function ecGuideTermKey($stem) {
 }
 
 /**
+ * The language keys whose texts, in order, are a term's definition, for a term whose definition is the
+ * words an interface section already carries (the Libraries box's introductions for Curves, Pipe types
+ * and Fittings). Each key is one paragraph. Every other term has its own `<stem>_def` key.
+ *
+ * @param string $stem  a chapter term's stem.
+ * @return array        the language keys, or an empty array.
+ */
+function ecGuideDefKeys($stem) {
+    $alias = array('lpn_guide_lib_curves' => array('lpn_library_curves_note', 'lpn_library_curve_values_tip'),
+        'lpn_guide_lib_pipetypes' => array('lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip'),
+        'lpn_guide_lib_fittings' => array('lpn_library_fittings_note', 'lpn_library_fittings_source'));
+    return isset($alias[$stem]) ? $alias[$stem] : array();
+}
+
+/**
+ * A term's definition, as HTML.
+ *
+ * @param string $stem  a chapter term's stem.
+ * @return string       the definition.
+ */
+function ecGuideDefHtml($stem) {
+    global $ec_lang;
+    $keys = ecGuideDefKeys($stem);
+    if (!$keys) { return $ec_lang[$stem . '_def']; }
+    $html = '';
+    foreach ($keys as $k) { $html .= '<p>' . htmlspecialchars($ec_lang[$k]) . '</p>'; }
+    return $html;
+}
+
+/**
  * The chapter's term and definition list, as HTML.
  *
  * @param string $slug  a chapter slug.
@@ -178,11 +211,11 @@ function ecGuideDl($slug) {
     if (!isset($c[$slug])) { return ''; }
     $html = "<dl>\n";
     foreach ($c[$slug]['terms'] as $stem) {
-        $def = ($slug === 'map' && $stem === 'lpn_hotkeys_map') ? ecGuideMapDef() : $ec_lang[$stem . '_def'];
+        $def = ($slug === 'map' && $stem === 'lpn_hotkeys_map') ? ecGuideMapDef() : ecGuideDefHtml($stem);
         // A term that only repeats its chapter's heading is marked, and the stylesheet hides it.
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
         $termKey = ecGuideTermKey($stem);
-        $html .= "\t<dt" . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
+        $html .= "\t<dt id=\"guide-term-" . $stem . '"' . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
     }
     return $html . "</dl>";
 }

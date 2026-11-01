@@ -55668,6 +55668,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function guideGoto(key, focusIn) {
 		var content = guideContentEl(), el, pulseEl, heading;
 		if (!content) { return false; }
+		// An entry inside a chapter (a <dt id="guide-term-STEM">, as ecGuideDl() writes it) is addressed as `term-STEM`:
+		// it scrolls to the term and leaves the box entry that holds it as the current one in the rail.
+		if (/^term-[A-Za-z0-9_]+$/.test(String(key))) {
+			el = content.querySelector('[id="guide-' + key + '"]');
+			if (!el || (el.closest && el.closest('[style*="display: none"]'))) { return false; }
+			content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+			guidePinKey = null;
+			heading = el.closest ? el.closest('[data-guide-key]') : null;
+			if (heading) { guideSetCurrent(heading.getAttribute('data-guide-key')); }
+			guidePulse(el);
+			try { history.replaceState(null, '', '#guide/' + key); } catch (e) {}
+			return true;
+		}
 		var safe = String(key).replace(/"/g, ''), isHit = /^hit-\d+$/.test(safe), mark = null;
 		el = content.querySelector(isHit ? '[data-guide-hit="' + safe + '"]' : '[data-guide-key="' + safe + '"]');
 		if (!el || el.style.display === 'none') { return false; }
@@ -55692,16 +55705,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return true;
 	}
 	// Opens the Guide at the entry for one box: the "?" in its title bar, and F1 inside it.
-	function openGuideForBox(boxId) {
+	function openGuideForBox(boxId, termKey) {
 		var input = document.getElementById('lpn_guide_search');
 		if (dialogIsOpen()) { return; }
 		if (input) { input.value = ''; }
 		openHotkeysBox();
 		guideFilter();
-		if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
-		(window.requestAnimationFrame || setTimeout)(function () {
-			if (!guideGoto('box-' + boxId, true)) { guideGoto('boxes', true); }
-		});
+		// With a termKey (`term-STEM`) the Guide lands on that entry inside the box's chapter, else on the box's entry.
+		function land() { return (termKey && guideGoto(termKey)) || guideGoto('box-' + boxId, true) || guideGoto('boxes', true); }
+		land();
+		(window.requestAnimationFrame || setTimeout)(land);
 	}
 	// ---- the rail: collapsed state is window furniture inside the record the box already keeps ----
 	var guideRailPhoneClosed = true;
@@ -69522,35 +69535,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
-	// **A SECTION'S LONG EXPLANATION IS THE TIP OF ITS HEADING'S `?`, AND THE HEADING OPENS THE USER MANUAL** (Tom, round 11: "Curves, Pipe Types, and Fittings still start with rambling explanations that need to be abstracted. Maybe a ? glyph at each one that leads to a User Manual section?"). The heading stays plain; its `?` is a button that opens the Libraries chapter (the manual has one entry for the box, no entry per section) and shows the explanation as its hover tip. The words are the keys the paragraphs always used.
-	var LIB_INTRO = {
-		curves: [['lpn_library_curves_note', 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'],
-			['lpn_library_curve_values_tip', 'Select one or two columns in a spreadsheet, copy them, and paste into the first target cell. Rows are added as needed. Lines copied directly from an EPANET file, including the curve name, can also be pasted.']],
-		pipetypes: [['lpn_library_pipetypes_note', 'Each project has a separate pipe type library. Properties may be left blank in a pipe type definition; for example, a pipe type may specify a roughness and no diameter. Pipe types are assigned to pipes in the pipe properties. Editing a definition here changes every pipe that references it.'],
-			['lpn_library_pipetype_blank_tip', 'Blank properties in a pipe type definition are left to be entered individually for each pipe.']],
-		fittings: [['lpn_library_fittings_note', 'Each project has a separate fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'],
-			['lpn_library_fittings_source', 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point, not as final values.']]
-	};
+	// **A SECTION'S LONG EXPLANATION IS AN ENTRY IN THE USER MANUAL, AND THE HEADING'S `?` OPENS IT** (Tom, round 12: *"send the user to the user manual for long explanations. But we have to land them in the right place."*). Curves, Pipe types and Fittings carry the `?`; its words live once, in the Libraries chapter (lib/GuideChapters.lib.php, ecGuideDefKeys()).
+	var LIB_INTRO = { curves: true, pipetypes: true, fittings: true };
 	function libSectionHead(cur) {
-		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, tip, btn, label = pc[cur.label] || cur.id;
+		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, btn, label = pc[cur.label] || cur.id;
 		if (!intro) {
 			// Patterns, Controls and Rules: the plain heading they always had, its tip on the heading.
 			head = libEl('h3', 'ec-help', label);
 			if (pc[cur.tip]) { head.title = pc[cur.tip]; }
 			return head;
 		}
-		// The heading is plain text. The `?` beside it is a button with a title, exactly the box title bar's
-		// `?` (guideCornerButton): a hovering pointer gets the name tip (the explanation), a click or tap opens
-		// the Guide at the Libraries entry through openGuideForBox().
+		// The heading is plain text. The `?` beside it is a button with no tip (a tap cannot hover): a click or a tap opens
+		// the User Manual at this section's own entry in the Libraries chapter (ecGuideDl() writes `guide-term-<stem>`),
+		// which says the section's introduction in the same words this box used to carry (GuideChapters.lib.php).
 		head = libEl('h3', '', label + ' ');
-		tip = intro.map(function (k) { return pc[k[0]] || k[1]; }).join(' ');
 		btn = document.createElement('button');
 		btn.type = 'button';
 		btn.className = 'lpn-lib-manual';
-		btn.title = tip;
-		btn.setAttribute('aria-label', pc.lpn_guide_box_help || 'Help for this box');
+		btn.setAttribute('aria-label', (pc.lpn_help_manual || 'User manual') + ': ' + label);
 		btn.textContent = '?';
-		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box'); });
+		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box', 'term-lpn_guide_lib_' + cur.id); });
 		head.appendChild(btn);
 		return head;
 	}
