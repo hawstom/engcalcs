@@ -13,7 +13,7 @@ alternatives each scenario names, inheritance, and the Presentation and Calculat
 
 ## Part 1. The inventory
 
-36 commands on `master` (6 that read or write this page's own file, 14 imports of other things,
+39 commands on `master` (rows 8a, 8b and 23a added 2026-11-01; 6 that read or write this page's own file, 14 imports of other things,
 16 exports), plus 2 on `feat/sheet-sync` and 1 planned on `feat/sqlite-reader`. There is **no file
 drag-and-drop** on the page (no `drop` handler takes files); every file comes through a menu row and
 a hidden `<input type=file>` (declared in `Looped-Network.php`, wired in `js/looped-network.js`).
@@ -45,6 +45,8 @@ where marked **(not traced)**.
 |---|---|---|---|---|---|
 | 7 | File > Import > EPANET file… | `pickInpFile`, `importInpFromFile`, `landInpText`, `inpAskDestination`, `updateProjectFromInp` | `.inp`, or EPANET's `.net` | With the open project empty: a **new project**, Base only, as always. With assets in it: asks **a new project / this project (or the open scenario, or Base)**. *This project* matches assets by ID, updates differing values through `setProp()` (an override in a scenario), adds assets only in the file (inactive in Base when a scenario is the target), keeps and names assets only in the project, refuses a file whose units or head loss formula differ, is **one undo step**, and ends in a **receipt dialog** naming the scenario. Built, Task 814 | X, or S |
 | 8 | File > Import > GeoJSON network… | `pickGeoJsonNetFile`, `landGeoJsonNetText`, `askImportDestination`, `updateProjectFromGeoJson`, `finishGeoJsonNet` | GeoJSON | **The same as row 7, by the same code** (`askImportDestination`, `inpPlanFromSource`, `updateProjectWithPlan`, `showInpUpdateReceipt`): a file from another source passes the mapping step first, then the same question; a file this page wrote asks only the question. The receipt adds a *Reading the file* list of the importer's own differences. The file's `scenario` property is still not read back. Built, Task 814 | X, or S |
+| 8a | File > Import > Network > DXF file… | `pickDxfNetworkFile`, `landDxfNetwork`, `finishDxfNetwork`, `docFromDxfNet`, `showDxfNetReport` | ASCII DXF this page wrote | Always a **new project**, so no question arises. Reads one alternative's layers (the file holds one scenario's network) and lists what it skipped in a report. Built | X |
+| 8b | File > Import > Network > EPANET-MSX file… | `openMsxRow`, `pickMsxFile`, `attachMsx` | `.msx` | Attaches the text to the open project (`doc.msx`), kept and written back unchanged; Multi-species quality is chosen. Not scenario data, so no scenario question. Built | P |
 | 9 | File > Import > Surveyed points… | `pickSurveyFile`, `landSurveyText`, `createSurveyNodes` | CSV, TXT, PNT | Into the **open project**. Each node goes through `addNode()`, which calls `bornInScenario()`: in a scenario other than Base, the node is **inactive in Base and active only there**. When the project holds more than Base the box asks where they go (the open scenario, a new child scenario, or Base) and the report names the scenario. Built | S |
 | 10 | File > Import > GeoJSON shapes… | `pickGeoJsonFile`, `landGeoJsonShapes` | GeoJSON | Shapes are "in no scenario" (`js/lpn-geojson.js`). Open project, one undo step. The receipt says "Shapes appear in every scenario." when the project holds more than Base. Built, `scenario-io-names-browser-harness.js` S1 | P |
 | 11 | File > Import > DXF shapes… | `pickDxfShapesFile`, `importDxfShapesFromFile` | ASCII DXF | As 10 The same receipt line as row 10. Built | P |
@@ -65,7 +67,8 @@ where marked **(not traced)**.
 | 21 | File > Export > EPANET file… | `exportInpFile`; `inpExportDocument`, `inpExportOptions` | `.inp` (+ `.zip` with picture) | **The open scenario's resolved values**, its own demand list, positions, `[TIMES]` and demand multiplier. File named `<project>-<scenario>.inp` (not for Base). Other scenarios, alternatives, Presentation: none. With more than Base, or any stored alternative, a confirmation (`confirmExportLeaves`) asks before the file is written, naming the scenario and what is left; every export then ends in a receipt dialog (`showExportReceipt`) and a status line (`exportScenarioSentence`). The flattening dialog (`showInpExportFlattening`) still appears for pipe types, fittings, customers, inactive controls and moved nodes | S |
 | 22 | File > Export > GeoJSON file… | `exportGeoJsonFile`, `geoJsonExportOptions` | GeoJSON | Open scenario's resolved values; its name stored **inside** the file (`scenario` property); file named `<project>-<scenario>.geojson` outside Base; results attached only when they belong to the open scenario (`geoJsonStaleScenario`); same confirmation and receipt as row 21 | S |
 | 23 | File > Export > DXF file… | `exportDxfFile`, `dxfModel` | DXF | Open scenario as the "alternative" layer name (`BASE` for Base); whole network as that scenario has it. File named `<project>-<scenario>.dxf` outside Base; same confirmation and receipt as row 21 | S |
-| 24 | File > Export > ODS file… | `openExportTableBox('ods')`, `paneExportDownload` | ODS | Box asks **Tables** (Current/All) and, if the project has a scenario besides Base, **Scenarios** (Current/All). All = one sheet per scenario, side by side; no tree; results for the last-calculated scenario only (note shown). Sheet and file names carry the scenario (`paneExportDownload`). The box does not yet say that parents, alternatives and inheritance are not in the file | S, or all |
+| 23a | File > Export > Network > EPANET-MSX file… | `exportMsxFile` | `.msx` | Writes back exactly the text that came in; asks nothing, names no scenario (the file is not scenario data). Built | P |
+| 24 | File > Export > ODS file… | `openExportTableBox('ods')`, `paneExportDownload` | ODS | Box asks **Tables** (Current/All) and, if the project has a scenario besides Base, **Scenarios** (Current/All). All = one sheet per scenario, side by side; no tree; results for the last-calculated scenario only (note shown). Sheet and file names carry the scenario (`paneExportDownload`). The box says that parents, alternatives and inheritance are not in the file (`lpn_export_table_scn_keeps`). Built | S, or all |
 | 25 | File > Export > XLSX file… | as 24 | XLSX | as 24 | S, or all |
 | 26 | File > Export > CSV file… | as 24 (a zip when more than one) | CSV | as 24 | S, or all |
 | 27 | File > Export > Workspace… | `exportWorkspaceFile` | JSON | None (browser furniture) | - |
@@ -98,7 +101,7 @@ where marked **(not traced)**.
 
 Rows 9, 18, 19 and 20 write into whichever scenario is open, and each now says which; 21, 22, 23 leave the other scenarios behind, and each now asks first and says so. What still does not tell is listed in the next paragraph.
 
-**Rows still short of the standard (2026-10-24):** none for 13, 16 and 17 (Tom: profiles and pictures get no scenario line at all); 24-26 (the box does not say what All leaves out); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
+**Rows still short of the standard (2026-10-24):** none for 13, 16 and 17 (Tom: profiles and pictures get no scenario line at all); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
 
 ## Part 2. The standard
 
@@ -173,6 +176,7 @@ values, survey points) preview; a whole network preview is the existing import r
 | 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Question 3 built: the Active topology alternative takes the nodes (the open scenario's own, a new one, or Base's) |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct; Shapes now say "Shapes appear in every scenario." | No question; the same receipt line for profile and picture is left |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
+| 8a DXF network, 8b MSX | 1, 0 | A new project; or attached to the project, not scenario data | No question |
 | 14 Workspace, 15 Calibration | none | Silent | No change; calibration's header names the scenario it was compared with |
 | 18 Tables paste, 19 Paste properties, 20 DEM | 0 | Each names the scenario it wrote to (built) | No new dialog (a cell-level gesture must not gain a dialog); the notice names the scenario and counts overrides |
 | 1-6 Own file | 4 | Whole tree | No question; Save as and Duplicate unchanged |
@@ -195,6 +199,7 @@ values, survey points) preview; a whole network preview is the existing import r
 | 10-12 Shapes | Receipt line "Shapes appear in every scenario." | Built |
 | 13 Libraries | Receipt line "Every scenario can use them." | Built |
 | 16 Profile, 17 Picture | Receipt line | Closed: Tom ruled they get no scenario line (see "Rows still short" above) |
+| 8a DXF network, 8b MSX import, 23a MSX export | No question: a new project, or not scenario data | Built |
 | 14 Workspace, 15 Calibration | Calibration's header names its scenario | Built |
 | 18-20 Tables paste, Paste properties, DEM | Notice names the scenario and counts overrides | Built |
 | 21-23 `.inp`, GeoJSON, DXF export | Confirmation and receipt naming the scenario | Built. The optional "Scenario to export" choice is Left |
