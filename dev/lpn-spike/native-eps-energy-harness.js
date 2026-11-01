@@ -354,9 +354,11 @@ function refusals() {
 		void rowKeys;
 	}
 	{
-		// the page does not call this file. js/lpn-time.js must still send every period run to EPANET.
-		const src = fs.readFileSync(path.join(ROOT, 'js', 'lpn-time.js'), 'utf8') + fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
-		ok('nothing a visitor loads calls lpnNativeRun yet', !/lpnNativeRun\b/.test(src));
+		// Slice 7 wired this file to the page: Looped-Network.php loads it, and js/lpn-time.js asks for it only
+		// through the plan that refuses what it cannot run (dev/lpn-spike/native-wire-harness.js holds the path).
+		const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8'), tsrc = fs.readFileSync(path.join(ROOT, 'js', 'lpn-time.js'), 'utf8');
+		ok('the page loads lpnNativeRun, and only lpn-time.js calls it, after the plan', /js\/lpn-native-run\.js/.test(php) && /lpnNativeRunRefusals\(model, \{ quality: true \}\)/.test(tsrc) &&
+			!/lpnNativeRun/.test(fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8')));
 	}
 }
 

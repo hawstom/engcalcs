@@ -118,9 +118,11 @@
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
 // awkward to copy exactly.
 //
-// NOT WIRED TO THE PAGE. js/lpn-time.js still sends every period run to EPANET, and this file is
-// loaded by nothing a visitor loads. It is here, and held to EPANET's answer by
-// dev/lpn-spike/native-eps-harness.js, so that the slices after it have a floor to stand on.
+// WIRED TO THE PAGE (slice 7). js/lpn-time.js runs a period through lpnNativeRun(model, {quality: true})
+// when the project's engine setting is the built-in solver and lpnNativeRunRefusals() names nothing
+// (EngCalcs.lpnTimeNativePlan); otherwise it uses EPANET as before and says so. It is held to EPANET's
+// answer by dev/lpn-spike/native-eps-harness.js and its siblings, and, through the page's own run path,
+// by dev/lpn-spike/native-wire-harness.js.
 
 (function (root) {
 	'use strict';
@@ -608,7 +610,8 @@
 			emax = Math.max(emax, psum);
 		}
 		rtime = repStep;
-		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [];
+		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [],
+			stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0, convAccuracy = null;
 
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
@@ -639,6 +642,11 @@
 			});
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
+			// The run's convergence is a conjunction over its solves, as js/lpn-epanet.js noteStep() keeps it.
+			stepsRun++;
+			if (convAccuracy === null) { convAccuracy = res.accuracy; }
+			if (res.relativeError > worstRelErr) { worstRelErr = res.relativeError; }
+			if (res.converged === false) { stepsUnconverged++; if (firstBadT === null) { firstBadT = htime; } }
 			readBack(stepModel, stepLinks, ls, res);
 			solveTimes.push(htime);
 			if (qcfg.mode) { hydRecs.push(hydRecord(model, cur, res, ls, htime)); }   // savehyd()
@@ -692,6 +700,10 @@
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
 		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes,
+			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
+			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
+			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,
+			reportStart: times.reportStart || 0, reportStep: repStep,
 			// What the pumps used and cost, or null for a model with no pump (the page's own rule,
 			// js/lpn-epanet.js). A pump without a curve is a pipe to EPANET and is not listed.
 			energy: anyPumpLink ? energySummary(ecfg, epumps, emax, dur) : null };

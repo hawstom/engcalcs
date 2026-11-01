@@ -74,10 +74,20 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    cases, 20 constructed cases, 3 Net1 cases, 7 refusals) and `native-eps-examples-harness.js`
    (the five pumped gallery examples with a price, pattern, demand charge and efficiency curves added
    through `assembleModel()`, with and without a speed pattern, in US and SI units).
-7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
-   engine setting is built-in and nothing is refused; the transport, frames and Run box are
-   unchanged because the frames have the shape `lpnEpanetRun` resolves to. Water quality is built
-   (phase 4, below) and is wired the same way, on his word; EPANET-MSX stays on EPANET.
+7. **Wiring to the page (built, on branch `feat/native-wire`; merges on Tom's word).** `lpnTimeRun()` asks
+   `EngCalcs.lpnTimeNativePlan(model)` (js/lpn-time.js): the loop runs the period, quality included
+   (`lpnNativeRun(model, {quality: true})`), when the open scenario's engine setting is the built-in solver and
+   `lpnNativeRunRefusals(model, {quality: true})` names nothing; otherwise EPANET runs it as before and, if the
+   user had chosen the built-in solver, the status bar says so (`lpn_engine_native_route`, `..._ids`; a
+   pressure-driven model keeps `lpn_engine_pda_route`). `modelNeedsEpanet()` no longer calls a period EPANET's
+   when the plan says the loop runs it. Only the transport's run is wired: fire flow, criticality, demand
+   scaling, the scenario comparison and the Alternatives preview still call `lpnEpanetRun`. The loop returns
+   the convergence fields of the EPANET run. Test: `native-wire-harness.js` (Net1 chlorine, Net2 fluoride,
+   Net3 trace and Net3 plain, through the page's run path, held to the tolerances above; a refused case).
+   **Reaction rates are not computed.** The report column reads EPANET's binary output, whose accumulation
+   (`reactpipes()` rate averaging) could not be transcribed without its source at hand, so a built-in chemical
+   run leaves the column empty and says so once per page load (`lpn_time_native_no_rates`). The run report is
+   empty on a built-in run (`lpn_time_no_report` says why). EPANET-MSX stays on EPANET.
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -311,6 +321,7 @@ the loop end to end. Tolerances, at every node and link at every reporting time:
 
 ## Wording
 
-"The built-in solver solves one instant" (CLAUDE.md, `lpn_time_no_engine`, `lpn-time.js` comments)
-stays true until slice 7 ships to visitors. It becomes false for the networks a slice covers at that
-moment, not when the code merges. Do not edit it earlier.
+"The built-in solver solves one instant" was false for the networks the loop covers from the day slice 7
+ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine_why`,
+`lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`, `lpn_time_no_report`. What stays
+true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.

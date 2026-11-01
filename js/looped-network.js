@@ -38431,7 +38431,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (why === 'failed') { return pc.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.'; }
 		if (why === 'engine') {
 			if (EngCalcs.lpnTimeNoEngineText) { return EngCalcs.lpnTimeNoEngineText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0); }
-			return String(pc.lpn_time_no_engine || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.')
+			return String(pc.lpn_time_no_engine || 'The built-in solver shows this network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.')
 				.replace('{time}', EngCalcs.lpnTimeElapsedText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0));
 		}
 		return pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.';
@@ -81349,7 +81349,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The model's own clock when it carries one (Task 755): the scenario comparison assembles
 		// each scenario's model in turn, and a scenario's run time is its own.
 		if (model && model.time && model.time.times && EngCalcs.lpnTimeIsExtended) {
-			if (EngCalcs.lpnTimeIsExtended(model.time.times)) { return true; }
+			// **A PERIOD NEEDS EPANET UNLESS THE BUILT-IN SOLVER'S OWN LOOP WILL RUN IT** (Task 733,
+			// slice 7): chosen by the user, and nothing in the model one the loop refuses.
+			if (EngCalcs.lpnTimeIsExtended(model.time.times)) {
+				return !(EngCalcs.lpnTimeNativePlan && EngCalcs.lpnTimeNativePlan(model).use);
+			}
 		} else if (effectiveTimesExtended()) { return true; }
 		return !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 	}
@@ -84985,7 +84989,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
 			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(),
 			noReport = pc.lpn_time_no_report ||
-				'There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated.';
+				'There is no run report. The report is the EPANET text report, so it appears after the EPANET solver has calculated this network. The built-in solver does not write one.';
 		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
 		// the built-in solver prints nothing, so a network that has never reached EPANET has no
 		// report and never will until it does, and a sentence saying that teaches what a vanishing
@@ -88652,6 +88656,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is a period run in the middle of typing: the exact thing the change is for.
 			solveNow: runSolve,
 			native: function (m) { return EngCalcs.lpnSolve(m, { tol: solveAccuracy() }); },
+			// **WHICH SOLVER THE USER ASKED FOR** (Task 733, slice 7): the open scenario's engine
+			// setting, 'native' or 'epanet'. js/lpn-time.js runs the period with the built-in solver's
+			// own loop when this says 'native' and the loop refuses nothing in the model.
+			engine: function () { return scnSetting('engine'); },
+			// The sentence the status bar carries after a period the user asked the built-in solver
+			// to run was sent to EPANET (empty to clear it). The same slot as the pressure-driven note.
+			routeNote: function (t) { engineRouteNote = t || ''; },
 			snapshot: saveUndoSnapshot, save: saveToStorage,
 			toSI: toSI, toDisplay: toDisplay, unitLabel: unitLabel,
 			// The one door from the Time TAB (the transport) to the Time SETTINGS, which moved to

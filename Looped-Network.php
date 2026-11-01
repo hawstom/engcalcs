@@ -4359,6 +4359,9 @@ EngCalcs.pageConfig = {
 	lpn_settings_pressure_exponent: <?=json_encode($ec_lang['lpn_settings_pressure_exponent'])?>,
 	lpn_settings_pressure_exponent_tip: <?=json_encode($ec_lang['lpn_settings_pressure_exponent_tip'])?>,
 	lpn_engine_pda_route: <?=json_encode($ec_lang['lpn_engine_pda_route'])?>,
+	lpn_engine_native_route: <?=json_encode($ec_lang['lpn_engine_native_route'])?>,
+	lpn_engine_native_route_ids: <?=json_encode($ec_lang['lpn_engine_native_route_ids'])?>,
+	lpn_time_native_no_rates: <?=json_encode($ec_lang['lpn_time_native_no_rates'])?>,
 	lpn_diag_valve_conflict: <?=json_encode($ec_lang['lpn_diag_valve_conflict'])?>,
 	lpn_diag_gpv_curve_order: <?=json_encode($ec_lang['lpn_diag_gpv_curve_order'])?>,
 	lpn_gpv_one_point_note: <?=json_encode($ec_lang['lpn_gpv_one_point_note'])?>,
@@ -4828,6 +4831,11 @@ EngCalcs.pageConfig = {
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this
       // order wrong and the Time tab simply never appears, silently. ?>
 <script src="/engcalcs/js/lpn-time.js?v=<?=filemtime(__DIR__.'/js/lpn-time.js')?>"></script>
+<?php // The built-in solver's own period loop and water-quality pass (Task 733, slice 7). AFTER
+      // lpn-solver.js and lpn-patterns.js, which it reads at call time; lpn-time.js asks for it
+      // through EngCalcs.lpnNativeRun and works without it, so a failed load costs only the
+      // built-in solver's periods, which then go to EPANET. ?>
+<script src="/engcalcs/js/lpn-native-run.js?v=<?=filemtime(__DIR__.'/js/lpn-native-run.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <?php // Rule-based controls, the language (ROADMAP Task 248.03). Pure grammar and unit kinds, no
       // DOM. BEFORE looped-network.js, whose modelRules() parses and converts every rule on the
