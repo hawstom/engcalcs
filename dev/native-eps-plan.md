@@ -342,7 +342,7 @@ named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 
 | Falls back for | Where it is decided | Why it stays |
 |---|---|---|
-| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | A separate extension: a multi-species reaction network with its own integrator and segment transport. Left on EPANET by decision. |
+| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | In scope since Tom, 2026-11-01 ("I'd prefer to implement EPANET-MSX even if it causes us a delay"). Built slice by slice (`## EPANET-MSX in the built-in solver`); falls back to EPANET until a slice runs the whole file. |
 | A hydraulic step under 10 s with any rule | `native-run-rules` | EPANET's rule step is the hydraulic step over ten in whole seconds, so under 10 s it is zero and `% 0` stops the engine (measured: `lpnEpanetRun` returns not-ok with no issues). There is no answer to match. |
 | A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
 | A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
@@ -427,3 +427,27 @@ as typed in millimetres); a GPV's SETTING (the index of its curve, read from the
 throttle a curveless GPV is written as); and a reservoir's LEVEL and PRESSURE (its head less its base head, which EPANET
 keeps in the node's elevation, so 0 until a head pattern moves it). Held by 8 cases in `native-eps-harness.js` and by
 `native-rules-refusal-harness.js`, which now says the loop copies them.
+
+## Run report and warning words (native-wire, slice 4)
+
+`EngCalcs.lpnNativeRun(...).report` is EPANET 2.3.5's text report, written as the run goes from report.c, epanet.c and
+hydraul.c's own strings (text.h FMT18 to FMT69, WARN01 to WARN06): the banner, the summary of the project, "Analysis begun",
+"Hydraulic Status:", then for every instant "Balanced after N trials", each tank and reservoir whose state changed
+(thresholds on its net inflow of 0.001 cfs), each link whose status changed (pipes, then pumps, then valves, EPANET's
+numbering), the control and rule actions in the order they act, the WARNING lines (negative pressures, a valve that cannot
+deliver, a pump past its curve or unable to lift, disconnected nodes and the closed link that cuts them off, unbalanced),
+the flow balance and "Analysis ended". Held to EPANET's own report line for line, the three clock stamps aside, on Net1,
+Net2 and Net3 at Accuracy 1e-5 and 1e-3, on Net3 with its demands raised, and on warning cases
+(`native-report-harness.js`, 22 checks), and on every constructed case of `native-eps-harness.js`.
+
+What makes the trial count equal: the solve stops at EPANET's trial (`opts.epAcc`, hasconverged(): total flow change within
+Accuracy of total flow, Accuracy clamped to 1e-5 .. 1e-1, 0.001 when none is stated), from the flows EPANET starts from
+(initlinkflow(): a closed link QZERO, a pump its speed times its design flow, every other link 1 ft/s; later steps from the
+last flows, a closed link's being its leak), and a pump's flow is read as it stands (no floor), as pumpcoeff() reads it.
+**This changes the answer the page gives under the built-in setting:** it is now EPANET's trial's, not a tighter one, so at
+the page's default Accuracy of 0.001 the heads are EPANET's, to the last digit, and equally loose.
+
+**Not held**, said where they are (17 constructed cases print `GAP`): a pressure or flow control valve, a pressure control
+on a junction, a general purpose valve and a Darcy-Weisbach project count a different number of trials, because the loop
+decides a valve's state between solves and EPANET inside one. The flow balance's numbers agree to 2e-5 of themselves.
+Quality runs write the summary lines for the analysis but not EPANET's "Water Quality Mass Balance" block.
