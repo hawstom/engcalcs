@@ -175,14 +175,14 @@ async function main() {
 		};
 		const popupField = (label) => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0)[0];
+				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0).sort((x, y) => !!x.querySelector('input[type="checkbox"]') - !!y.querySelector('input[type="checkbox"]'))[0];   // "Longitud" also begins "Longitud automática": the value field wins over the Auto checkbox
 			if (!l) { return null; }
 			const i = l.querySelector('input'), h = l.querySelector('.ec-help');
 			return { value: i ? i.value : null, tip: h ? (h.title || h.getAttribute('data-bs-original-title') || '') : null };
 		}, label);
 		const typePopup = (label, v) => page.evaluate(([t, val]) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0)[0];
+				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0).sort((x, y) => !!x.querySelector('input[type="checkbox"]') - !!y.querySelector('input[type="checkbox"]'))[0];   // "Longitud" also begins "Longitud automática": the value field wins over the Auto checkbox
 			const i = l.querySelector('input');
 			i.focus(); i.value = val;
 			i.dispatchEvent(new Event('input', { bubbles: true }));
@@ -335,7 +335,7 @@ async function main() {
 			ok(id + ' opens in Properties', await clickEl('#lpn_canvas [data-link="' + id + '"]'));
 			await page.evaluate((t) => {
 				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf('Auto length') === 0)[0];
+					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf(((window.EngCalcs && EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_field_auto_length) || 'Auto length').trim()) === 0)[0];   // the page's own word, so a translated page is found
 				const box = l.querySelector('input[type="checkbox"]');   // Auto length is a row of its own above Length (Task 828)
 				box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
 				box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true }));

@@ -163,7 +163,7 @@ async function main() {
 		await press('#lpn_dialog_body button.lpn-ovl-clearsame');
 		await settle(500);
 		const askEs = await askText();
-		ok('C6 it asks in the dialog with the count and name', askEs !== null && askEs.indexOf('(2 total)') >= 0 && askEs.indexOf(CHILD) >= 0, String(askEs));
+		ok('C6 it asks in the dialog with the count and name', askEs !== null && /(^|[^0-9])2([^0-9]|$)/.test(askEs) && askEs.indexOf(CHILD) >= 0, String(askEs));
 		const lbl = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim()));
 		await pressDialog(lbl[0]);
 		await settle(1200);

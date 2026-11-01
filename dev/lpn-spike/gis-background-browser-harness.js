@@ -348,7 +348,7 @@ async function main() {
 		const n1 = await a.notice();
 		ok('the refusing server is named in a message', n1.indexOf('127.0.0.1:' + stub.port) >= 0 && /did not return/.test(n1), n1);
 		ok('nothing is drawn for it', (await page.evaluate(READ_TILES)).length === 0);
-		ok('its row in Settings says it was not reachable, and shows the host', await page.evaluate(() => { const r = Array.from(document.querySelectorAll('.lpn-gis-item')).pop(); return /not reachable/.test(r.textContent) && /127\.0\.0\.1:\d+/.test(r.querySelector('.lpn-gis-name').textContent) && /Draw/.test(r.textContent) && /Opacity/.test(r.textContent); }));
+		ok('its row in Settings says it was not reachable, and shows the host', await page.evaluate(() => { const r = Array.from(document.querySelectorAll('.lpn-gis-item')).pop(); return /not reachable/.test(r.textContent) && /127\.0\.0\.1:\d+/.test(r.querySelector('.lpn-gis-name').textContent) && r.textContent.indexOf((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_gis_draw) || 'Show') >= 0 && /Opacity/.test(r.textContent); }));
 		await addLayer('xyz', 'http://127.0.0.1:' + dead + '/{z}/{x}/{y}.png');
 		await a.settle(3500);
 		const n2 = await a.notice();

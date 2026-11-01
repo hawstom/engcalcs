@@ -223,8 +223,8 @@
                 "length along the drawn line, rendered as ঢাল বরাবর দৈর্ঘ্য",
                 "plain pipe length"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too."
+            "disposition": "dismissed",
+            "resolution": "Tom, 2026-11-01: \"Slope length is a standard engineering term. Translators should not be confused by it.\" English stays as he set it on 2026-10-27; the translations already render it as the length along the slope, including the rise or fall."
         },
         {
             "key": "lpn_settings_held_item",
@@ -691,8 +691,8 @@
                 "length measured along the sloping drawn line (duljina po nagibu)",
                 "a separate property called slope length"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too."
+            "disposition": "dismissed",
+            "resolution": "Tom, 2026-11-01: \"Slope length is a standard engineering term. Translators should not be confused by it.\" English stays as he set it on 2026-10-27; the translations already render it as the length along the slope, including the rise or fall."
         },
         {
             "key": "lpn_result_status_cv",
@@ -1170,8 +1170,8 @@
                 "length measured along the sloping pipe line, as drawn",
                 "horizontal plan length"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too."
+            "disposition": "dismissed",
+            "resolution": "Tom, 2026-11-01: \"Slope length is a standard engineering term. Translators should not be confused by it.\" English stays as he set it on 2026-10-27; the translations already render it as the length along the slope, including the rise or fall."
         },
         {
             "key": "lpn_noscn_lead",
