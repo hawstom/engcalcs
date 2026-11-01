@@ -1661,7 +1661,7 @@
             "definition": "",
             "symbol": "EGL",
             "context": "The total-head line (elevation + pressure head + velocity head) along a pipe or channel. Appears in Irrigation Pressure Method note.",
-            "translation_notes": "Use the established hydraulics term for the total-head line. NEVER calque word-by-word: es \"Linea de Grado de Energia\", fr \"ligne d'energie grade\", it \"Linea di Grado Energia\", ro \"Linia Gradului Energetic\", bg/uk \"line of the energy class\", cs \"energy layer\" are all wrong renderings found in shipped files. Task 109 stages 4-5 (2026-07-19): uk must be лінія енергії — the wrong-concept calque 'лінія питомої енергії' (specific-energy line, a distinct concept) was removed; cs 'energy layer' also corrected to grade line. | [2026-10-15 sprint 737b] my: the file uses the Latin abbreviation EGL at every site; စွမ်းអင်မျဉ်း retired. | [2026-10-15 sprint 737b] zh: the file uses 能量坡降线 at 4 sites; the glossary's 能量坡度线 is used nowhere; 总水头线 is the textbook term. Left for a native ruling.",
+            "translation_notes": "Use the established hydraulics term for the total-head line. NEVER calque word-by-word: es \"Linea de Grado de Energia\", fr \"ligne d'energie grade\", it \"Linea di Grado Energia\", ro \"Linia Gradului Energetic\", bg/uk \"line of the energy class\", cs \"energy layer\" are all wrong renderings found in shipped files. Task 109 stages 4-5 (2026-07-19): uk must be лінія енергії — the wrong-concept calque 'лінія питомої енергії' (specific-energy line, a distinct concept) was removed; cs 'energy layer' also corrected to grade line. | [2026-10-15 sprint 737b] my: the file uses the Latin abbreviation EGL at every site; စွမ်းអင်မျဉ်း retired. | [2026-10-15 sprint 737b] zh: the file uses 能量坡降线 at 4 sites; the glossary's 能量坡度线 is used nowhere; 总水头线 is the textbook term. Left for a native ruling. | 2026-11-01, sprint 737c: zh EGL is 能量坡降线, as the keys use; the glossary had 能量坡度线.",
             "translations": {
                 "en": "energy grade line",
                 "am": "የኃይል መስመር",
@@ -1689,7 +1689,7 @@
                 "tr": "enerji çizgisi",
                 "uk": "лінія енергії",
                 "ur": "توانائی لائن",
-                "zh": "能量坡度线"
+                "zh": "能量坡降线"
             },
             "source": "ai-generated (Fable 5 linguistic audit, 2026-07); verify before treating as standard-sourced",
             "plain": "line showing the total energy per weight of water, from elevation, pressure, and speed, as an elevation, height, or level",
@@ -2438,7 +2438,7 @@
             "definition": "",
             "symbol": "y",
             "context": "Depth of flow in a channel/pipe (Manning trapezoidal channel mtc_, pipe flow mpf_, canal seepage cs_). The water depth, not the water column/pressure head — do not translate as 'water column'.",
-            "translation_notes": "Task 109 stage 2 (2026-07-19): bg 'воден стълб' (water column) corrected to 'дълбочина' (depth) for flow depth; дълбочина is used consistently across mpf_/mtc_ in bg. Only bg has captured textual evidence in the log; other languages left empty for a future fill.",
+            "translation_notes": "Task 109 stage 2 (2026-07-19): bg 'воден стълб' (water column) corrected to 'дълбочина' (depth) for flow depth; дълбочина is used consistently across mpf_/mtc_ in bg. Only bg has captured textual evidence in the log; other languages left empty for a future fill. | 2026-11-01, sprint 737c: fr Depth is profondeur (was hauteur d'eau) in the Depth and tank level keys.",
             "translations": {
                 "en": "depth",
                 "am": "",
@@ -2449,7 +2449,7 @@
                 "de": "",
                 "es": "",
                 "fa": "",
-                "fr": "",
+                "fr": "profondeur",
                 "he": "",
                 "hi": "",
                 "hr": "",
@@ -2570,7 +2570,7 @@
                 "a legal demand/claim",
                 "a request in the everyday sense"
             ],
-            "translation_notes": "Filled 2026-07-24 from the bpn_ sprint (source label bpn_demand), replacing the seeded placeholder note.",
+            "translation_notes": "Filled 2026-07-24 from the bpn_ sprint (source label bpn_demand), replacing the seeded placeholder note. | 2026-11-01, sprint 737c: my Demand is လိုအင်, the lpn_ majority word; လိုအပ်ချက် also means requirement.",
             "translations": {
                 "am": "ፍላጎት",
                 "ar": "الطلب",
@@ -2587,7 +2587,7 @@
                 "id": "Kebutuhan",
                 "it": "Richiesta",
                 "km": "តម្រូវការ",
-                "my": "လိုအပ်ချက်",
+                "my": "လိုအင်",
                 "ps": "غوښتنه",
                 "pt": "Demanda",
                 "ro": "Cerință",
@@ -2741,19 +2741,19 @@
                 "an economic supply curve",
                 "a demand curve"
             ],
-            "translation_notes": "Seeded 2026-07-23 for the bpn_ (Branched Pipe Network) calculator; per-language translations pending the bpn_ sprint (fill + write back). [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): fr/tr forms proposed for completeness; the concept has no dedicated label in the lpn_ key set, so these are less strongly attested than the rest of this batch.",
+            "translation_notes": "Seeded 2026-07-23 for the bpn_ (Branched Pipe Network) calculator; per-language translations pending the bpn_ sprint (fill + write back). [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): fr/tr forms proposed for completeness; the concept has no dedicated label in the lpn_ key set, so these are less strongly attested than the rest of this batch. | 2026-11-01, sprint 737c: Curve: hi कर्व and bn কার্ভ, the transliterated word the Curve keys use, replacing वक्र and বক্ররেখা.",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
-                "bn": "",
+                "bn": "কার্ভ",
                 "cs": "",
                 "de": "",
                 "es": "curva de suministro",
                 "fa": "",
                 "fr": "courbe d'alimentation",
                 "he": "",
-                "hi": "",
+                "hi": "कर्व",
                 "hr": "",
                 "id": "",
                 "it": "",
@@ -3228,35 +3228,35 @@
                 "a chain link (the physical object)",
                 "a connection in the social or logistical sense"
             ],
-            "translation_notes": "Pairs with \"node\". If the language has no neutral graph-edge term, \"pipe or pump\" (the two things it actually covers) reads better than a computing loanword. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the pipe-or-pump edge. Every language avoided its hyperlink word (es enlace, fr lien, tr bağlantı) as the avoid list requires. es línea and pt trecho match the incumbent bpn_ line-table wording already shipped; tr hat matches bpn_ usage. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65. Task 251 wave 3 (2026-08-13), harvested from shipped strings. NOTE THE COLLAPSE: ru and uk both render junction AND node with the same word (узел / вузол), because that is genuinely the standard term in Russian and Ukrainian water-supply practice (SP/SNiP register) -- so the EPANET distinction between the graph supertype and the demand-bearing junction is not carried lexically in these two languages, and a future agent should not try to force it apart. ps and sw do keep them distinct (نقطه vs جنکشن; kifundo vs muunganiko). sw is UNATTESTED: its agent reported no established Swahili standard exists for any of node/junction/link/vertex and coined a self-consistent set, deliberately avoiding makutano (a road crossing) for junction. Treat sw here as a proposal, not a standard, and flag it for the term-centric sweep alongside hi. ro (wave 3) keeps all four apart -- nod / Joncțiune / legătură -- and deliberately refuses the loanword link, which Romanians use for a hyperlink; it also pairs Rezervor (the fixed-head boundary lpn_ models) against bazin de acumulare (the variable-level tank it does not), which is the cleanest rendering of that paired trap in any language so far. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose. | [2026-08-25, glossary_rendering_census.php] MEASUREMENT CAVEAT, recorded so a later sweep does not act on a bad number. A rendering census keyed on the English word \"link\" cannot be trusted for this entry, because the English file uses \"link\" for BOTH the graph edge and a hyperlink (\"copy link\"). Every file therefore scores its hyperlink word as a rival to its graph word -- de link 4, cs odkaz 4, fr lien 4, pt link 4, id tautan 4, ps لینک 4, es enlace 3, it link 3 -- when those are correct usage and the avoid list is doing its job. Separate the two senses in the ENGLISH before counting this term again.",
+            "translation_notes": "Pairs with \"node\". If the language has no neutral graph-edge term, \"pipe or pump\" (the two things it actually covers) reads better than a computing loanword. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the pipe-or-pump edge. Every language avoided its hyperlink word (es enlace, fr lien, tr bağlantı) as the avoid list requires. es línea and pt trecho match the incumbent bpn_ line-table wording already shipped; tr hat matches bpn_ usage. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65. Task 251 wave 3 (2026-08-13), harvested from shipped strings. NOTE THE COLLAPSE: ru and uk both render junction AND node with the same word (узел / вузол), because that is genuinely the standard term in Russian and Ukrainian water-supply practice (SP/SNiP register) -- so the EPANET distinction between the graph supertype and the demand-bearing junction is not carried lexically in these two languages, and a future agent should not try to force it apart. ps and sw do keep them distinct (نقطه vs جنکشن; kifundo vs muunganiko). sw is UNATTESTED: its agent reported no established Swahili standard exists for any of node/junction/link/vertex and coined a self-consistent set, deliberately avoiding makutano (a road crossing) for junction. Treat sw here as a proposal, not a standard, and flag it for the term-centric sweep alongside hi. ro (wave 3) keeps all four apart -- nod / Joncțiune / legătură -- and deliberately refuses the loanword link, which Romanians use for a hyperlink; it also pairs Rezervor (the fixed-head boundary lpn_ models) against bazin de acumulare (the variable-level tank it does not), which is the cleanest rendering of that paired trap in any language so far. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose. | [2026-08-25, glossary_rendering_census.php] MEASUREMENT CAVEAT, recorded so a later sweep does not act on a bad number. A rendering census keyed on the English word \"link\" cannot be trusted for this entry, because the English file uses \"link\" for BOTH the graph edge and a hyperlink (\"copy link\"). Every file therefore scores its hyperlink word as a rival to its graph word -- de link 4, cs odkaz 4, fr lien 4, pt link 4, id tautan 4, ps لینک 4, es enlace 3, it link 3 -- when those are correct usage and the avoid list is doing its job. Separate the two senses in the ENGLISH before counting this term again. | 2026-11-01, sprint 737c: Link now has its own word apart from Pipe in every language whose link keys changed (the Link line width and Link labels keys previously said pipe). es has no separate noun in its keys ('líneas'), left empty.",
             "translations": {
                 "en": "link",
-                "am": "",
-                "ar": "",
-                "bg": "",
-                "bn": "",
-                "cs": "",
+                "am": "የግንኙነት",
+                "ar": "رابط",
+                "bg": "връзка",
+                "bn": "লিংক",
+                "cs": "spoj",
                 "de": "Verbindung",
                 "es": "línea",
-                "fa": "",
+                "fa": "اتصال",
                 "fr": "liaison",
-                "he": "",
+                "he": "קישור",
                 "hi": "लिंक",
-                "hr": "",
+                "hr": "vod",
                 "id": "penghubung",
-                "it": "",
+                "it": "collegamento",
                 "km": "តំណ",
-                "my": "",
+                "my": "မျဉ်း",
                 "ps": "تړاو",
                 "pt": "trecho",
                 "ro": "legătură",
                 "ru": "связь",
-                "sr": "",
+                "sr": "веза",
                 "sw": "kiungo",
                 "tr": "hat",
-                "uk": "зʼєднання",
+                "uk": "з’єднання",
                 "ur": "لنک",
-                "zh": ""
+                "zh": "连接"
             },
             "plain": "pipe network connector, such as a pipe, pump, or valve",
             "old_definition": "An element joining two nodes: a pipe, a pump or a valve."
@@ -3359,14 +3359,14 @@
                 "a curve in the geometric/road sense",
                 "a pump characteristic confused with an efficiency or power curve -- this one is head against flow"
             ],
-            "translation_notes": "Three sub-terms appear in lpn_notes_5_def and are written as descriptions rather than jargon on purpose: \"the head at zero flow\" (shutoff head), \"the normal working point\" (duty point), and \"the point of highest flow\" (run-out). Translate the descriptions; do not restore the English jargon terms unless the language's own engineers use direct equivalents. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): head against flow, H = H0 - aQ^b. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose.",
+            "translation_notes": "Three sub-terms appear in lpn_notes_5_def and are written as descriptions rather than jargon on purpose: \"the head at zero flow\" (shutoff head), \"the normal working point\" (duty point), and \"the point of highest flow\" (run-out). Translate the descriptions; do not restore the English jargon terms unless the language's own engineers use direct equivalents. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): head against flow, H = H0 - aQ^b. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose. | 2026-11-01, sprint 737c: de Curve is Kennlinie (was Kurve).",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
                 "bn": "",
                 "cs": "",
-                "de": "",
+                "de": "Kennlinie",
                 "es": "curva de la bomba",
                 "fa": "",
                 "fr": "courbe de la pompe",
@@ -3447,7 +3447,7 @@
                 "a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.",
                 "an eigenvalue-adjacent word for the sibling string \"own values\"."
             ],
-            "translation_notes": "The concept is \"case\" or \"variant\", as used by scenario managers in InfoWater/WaterGEMS. Not yet visible in the UI as of 2026-07-31 (Base is the only scenario); seeded now so the sprint does not have to invent it later. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a named set of demand overrides, not a duplicate network. All four used their modelling/variant-case term, not the dramatic or worst-case-story sense. [2026-08-25, ROADMAP Task 513] MERGED with a second same-named entry that was keyed by the term STRING rather than by an id. Because termIndexByName() keys the glossary by NAME, that one won every payload -- so translators had been shown its Swahili-specific note and NOT the three cautions above or the case/variant framing. Its content is folded in here and it is deleted. Its own note, kept because it is a real observation: [2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads. No established Swahili engineering standard was found, so the transliteration was a deliberate choice, not a shortcut; Base is Msingi.",
+            "translation_notes": "The concept is \"case\" or \"variant\", as used by scenario managers in InfoWater/WaterGEMS. Not yet visible in the UI as of 2026-07-31 (Base is the only scenario); seeded now so the sprint does not have to invent it later. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a named set of demand overrides, not a duplicate network. All four used their modelling/variant-case term, not the dramatic or worst-case-story sense. [2026-08-25, ROADMAP Task 513] MERGED with a second same-named entry that was keyed by the term STRING rather than by an id. Because termIndexByName() keys the glossary by NAME, that one won every payload -- so translators had been shown its Swahili-specific note and NOT the three cautions above or the case/variant framing. Its content is folded in here and it is deleted. Its own note, kept because it is a real observation: [2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads. No established Swahili engineering standard was found, so the transliteration was a deliberate choice, not a shortcut; Base is Msingi. | 2026-11-01, sprint 737c: my Alternative (Scenario manager item) is အစားထိုးရွေးချယ်မှု; Scenario itself stays အခြေအနေ.",
             "translations": {
                 "am": "",
                 "ar": "",
@@ -4188,13 +4188,14 @@
                 "the energy grade line, which is a different line -- the HGL sits below it by the velocity head."
             ],
             "context": "The line joining the elevations to which water would rise in open tubes along the pipe: elevation head plus pressure head. Drawn against the ground line on a profile, and the quantity a designer checks minimum pressure against.",
-            "translation_notes": "[2026-08-19, sprint 438 wave 0] The chart legend key lpn_profile_hgl and the prose in lpn_profile_tip must come out as the SAME phrase; they were diverging in English (\"Hydraulic grade\" vs \"hydraulic grade line\") and the English has been made to agree. The existing \"energy grade line\" entry is the neighbouring concept and should use a parallel construction. | 2026-10-14 sprint 737 (one word per concept): he None -> 'קו העומד ההידראולי'. | [2026-10-15 sprint 737b] ru: линия гидравлического уклона collided with гидравлический уклон (the head-loss gradient); calculator abbreviation ГГЛ left for the next ru audit. | [2026-10-15 sprint 737b] zh: 水力坡降线 collided with 水力坡降 (the head-loss gradient). | [2026-10-15 sprint 737b] km: follows the Head change to ក្បាលទឹក.",
+            "translation_notes": "[2026-08-19, sprint 438 wave 0] The chart legend key lpn_profile_hgl and the prose in lpn_profile_tip must come out as the SAME phrase; they were diverging in English (\"Hydraulic grade\" vs \"hydraulic grade line\") and the English has been made to agree. The existing \"energy grade line\" entry is the neighbouring concept and should use a parallel construction. | 2026-10-14 sprint 737 (one word per concept): he None -> 'קו העומד ההידראולי'. | [2026-10-15 sprint 737b] ru: линия гидравлического уклона collided with гидравлический уклон (the head-loss gradient); calculator abbreviation ГГЛ left for the next ru audit. | [2026-10-15 sprint 737b] zh: 水力坡降线 collided with 水力坡降 (the head-loss gradient). | [2026-10-15 sprint 737b] km: follows the Head change to ក្បាលទឹក. | 2026-11-01, sprint 737c: fa HGL is خط فشار هیدرولیکی (was خط شیب هیدرولیکی, which reads as a gradient).",
             "translations": {
                 "en": "hydraulic grade line",
                 "he": "קו העומד ההידראולי",
                 "ru": "пьезометрическая линия",
                 "zh": "测压管水头线",
-                "km": "ខ្សែក្បាលទឹកធារាសាស្ត្រ"
+                "km": "ខ្សែក្បាលទឹកធារាសាស្ត្រ",
+                "fa": "خط فشار هیدرولیکی"
             },
             "source": "sprint 438-wave0, 2026-08-19",
             "plain": "line showing how high, to what height or level, water would rise in a standpipe or open tube or channel",
@@ -4229,9 +4230,14 @@
                 "a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand."
             ],
             "context": "EPANET's time series of multipliers: the base demand at a junction is multiplied by the pattern value for the current time step. A pattern belongs to the file and has a name; several junctions may share one.",
-            "translation_notes": "[2026-08-19, sprint 438 wave 0] The word carries the .inp import report (lpn_inp_drop_patterns, lpn_inp_drop_demand_pattern) and the clock, so one rendering must serve all of them.",
+            "translation_notes": "[2026-08-19, sprint 438 wave 0] The word carries the .inp import report (lpn_inp_drop_patterns, lpn_inp_drop_demand_pattern) and the clock, so one rendering must serve all of them. | 2026-11-01, sprint 737c: Pattern moved from график/графік, which equalled the Graphs menu, to шаблон/шаблон in bg, ru, uk; zh 时间模式 is EPANET's term, distinct from bare 模式 (Mode); fr keeps 'courbe de modulation' (EPANET French).",
             "translations": {
-                "en": "demand pattern"
+                "en": "demand pattern",
+                "bg": "шаблон",
+                "ru": "шаблон",
+                "uk": "шаблон",
+                "zh": "时间模式",
+                "fr": "courbe de modulation"
             },
             "source": "sprint 438-wave0, 2026-08-19",
             "plain": "time-step by time-step multipliers or factors for water use",
@@ -4394,12 +4400,17 @@
                 "a 'source' meaning a reservoir or tank, which is the sense the Find connectivity operators use"
             ],
             "context": "EPANET's own name for the water-quality analysis that reports, at every node, what fraction of the water arriving there came from one chosen node. The ANALYSIS is the Source trace; the NUMBER it reports at a node is the Source share, a percentage. Two things, two names, deliberately. The node whose water is followed is the trace node.",
-            "translation_notes": "Anchor on EPANET's own interface wording in your language if there is a localized EPANET; otherwise use the water-quality field's term for following water from one supply point. | 2026-10-14 sprint 737 (one word per concept): es None -> 'rastreo de fuente'; cs None -> 'sledování původu'; it None -> 'traccia sorgente'.",
+            "translation_notes": "Anchor on EPANET's own interface wording in your language if there is a localized EPANET; otherwise use the water-quality field's term for following water from one supply point. | 2026-10-14 sprint 737 (one word per concept): es None -> 'rastreo de fuente'; cs None -> 'sledování původu'; it None -> 'traccia sorgente'. | 2026-11-01, sprint 737c: water-quality Source: cs dávkování, de Quelle (was Dosierung), pt fonte (was origem), ur سورس, zh 水源 (was 来源), it sorgente (was provenienza), my ရင်းမြစ် (was အရင်းအမြစ်); cs Source share now follows it. bpn_ Source in cs stays Zdroj, the supply point.",
             "translations": {
                 "en": "source trace",
                 "es": "rastreo de fuente",
-                "cs": "sledování původu",
-                "it": "traccia sorgente"
+                "cs": "dávkování",
+                "it": "sorgente",
+                "de": "Quelle",
+                "pt": "fonte",
+                "ur": "سورس",
+                "zh": "水源",
+                "my": "ရင်းမြစ်"
             },
             "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)",
             "plain": "share from a given source at a given point"
@@ -4686,10 +4697,10 @@
                 "a price tag, a brand label or a product sticker"
             ],
             "context": "This suite's Label: the map annotation the page generates from an asset's data. EPANET calls it Notation, and EPANET's own word Label means our Text; that one vocabulary collision is the only place this suite departs from EPANET (CLAUDE.md, lpn_). Keys: lpn_tool_labels, lpn_labels_heading_node, lpn_labels_heading_link, see key_concepts.json. NOTE: lpn_cp_label is also \"Label\" in English and is a DIFFERENT concept, the display name of a custom property.",
-            "translation_notes": "Created 2026-09-29 (ROADMAP Task 737) as a concept record. Translations empty on purpose: the next sprint fills them from the definition, and its write-back records what each language chose. Every language must give this concept a word that no neighbouring concept (Label, Text, Tag, Description) shares. | 2026-10-14 sprint 737 (one word per concept): fr '' -> 'étiquette'; hr '' -> 'oznaka'.",
+            "translation_notes": "Created 2026-09-29 (ROADMAP Task 737) as a concept record. Translations empty on purpose: the next sprint fills them from the definition, and its write-back records what each language chose. Every language must give this concept a word that no neighbouring concept (Label, Text, Tag, Description) shares. | 2026-10-14 sprint 737 (one word per concept): fr '' -> 'étiquette'; hr '' -> 'oznaka'. | 2026-11-01, sprint 737c: Label: uk Підпис (was Мітка), ru Подпись (was Заголовок), am ምልክት (was መለያ), each now distinct from the neighbouring Tag/Text words.",
             "translations": {
                 "en": "Label",
-                "am": "",
+                "am": "ምልክት",
                 "ar": "",
                 "bg": "",
                 "bn": "",
@@ -4708,11 +4719,11 @@
                 "ps": "",
                 "pt": "",
                 "ro": "",
-                "ru": "",
+                "ru": "Подпись",
                 "sr": "",
                 "sw": "",
                 "tr": "",
-                "uk": "",
+                "uk": "Підпис",
                 "ur": "",
                 "zh": ""
             },
@@ -5264,9 +5275,11 @@
             "definition": "",
             "symbol": "",
             "context": "",
-            "translation_notes": "",
+            "translation_notes": "2026-11-01, sprint 737c: am አቋም and my အနေအထား for Status, moved off ሁኔታ and အခြေအနေ, which are the Scenario words.",
             "translations": {
-                "en": "status"
+                "en": "status",
+                "am": "አቋም",
+                "my": "အနေအထား"
             },
             "source": "dev/terms.md",
             "uniqueness_group": 3

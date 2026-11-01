@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='អត្ថន័យរបារឧបករណ៍'
 $ec_lang['lpn_pane_right_toggle']='ភាពមើលឃើញ';
 $ec_lang['lpn_color_legend_open_tip']='ចុចដើម្បីបើកការកំណត់ពណ៌ ហើយប្ដូរពណ៌ទាំងនេះ។';
 $ec_lang['lpn_color_node_field']='ដាក់ពណ៌ថ្នាំងតាម';
-$ec_lang['lpn_color_link_field']='ដាក់ពណ៌បំពង់តាម';
+$ec_lang['lpn_color_link_field']='ដាក់ពណ៌តំណតាម';
 $ec_lang['lpn_color_ramp_sequential']='លំដាប់';
 $ec_lang['lpn_color_ramp_diverging']='ពីរទិស';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='ទំហំអក្សរ (ភិចសែ
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='ទំហំសញ្ញា (ភិចសែល)';
-$ec_lang['lpn_settings_link_width']='ទទឹងខ្សែបំពង់ (ភិចសែល)';
+$ec_lang['lpn_settings_link_width']='ទទឹងខ្សែតំណ (ភិចសែល)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='ព្រួញទិសលំហូរ';
 $ec_lang['lpn_settings_show_arrows_tip']='គូរព្រួញលើបំពង់នីមួយៗបង្ហាញទិសដែលទឹកហូរ។ ព្រួញបង្ហាញបន្ទាប់ពីការដំណើរការ ហើយការបិទវាមិនផ្លាស់ប្ដូរលទ្ធផលទេ។';
-$ec_lang['lpn_settings_align_labels']='តម្រឹមស្លាកបំពង់តាមបំពង់';
+$ec_lang['lpn_settings_align_labels']='តម្រឹមស្លាកតំណតាមខ្សែតំណ';
 $ec_lang['lpn_settings_readability_bias']='អង្សាពីខាងឆ្វេងបន្ទាត់បញ្ឈរ មុននឹងស្លាកមួយត្រូវបានបង្វិលត្រឡប់';
 $ec_lang['lpn_settings_readability_bias_tip']='បង្វិលស្លាកមួយត្រឡប់ ដើម្បីរក្សាទុកឲ្យវានៅត្រង់ នៅពេលវាទេពីខាងឆ្វេងបន្ទាត់បញ្ឈរលើសពីចំនួនអង្សានេះ។';
 $ec_lang['lpn_settings_mask_labels']='ផ្ទៃខាងក្រោយតាន់ពណ៌ពីក្រោយស្លាក';

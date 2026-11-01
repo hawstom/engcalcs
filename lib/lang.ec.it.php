@@ -1008,7 +1008,7 @@ $ec_lang['lpn_guide_find_results_term']='Risultati, selezione e Tabelle';
 $ec_lang['lpn_guide_find_results_def']='<p>Gli elementi corrispondenti sono elencati sotto il pulsante Trova. Maggiore di e n più alti elencano per primo il valore più alto, minore di e n più bassi per primo il valore più basso, e le altre condizioni elencano per valore trovato, poi per ID. Una ricerca con AND (E) o OR (O) elenca prima i nodi, poi i collegamenti, ciascuno per ID. Una singola corrispondenza viene mostrata subito sulla mappa. Seleziona una riga per centrare la mappa su quell\'elemento. Se non è selezionato nulla, l\'elemento viene anche selezionato; se qualcosa è selezionato, l\'elemento viene evidenziato e la selezione non cambia. Maiusc+clic o Ctrl+clic su una riga per aggiungerla alla selezione o rimuoverla. Trova non seleziona da solo tutte le corrispondenze.</p><p>Il pulsante Filtra nella tabella attuale applica la stessa ricerca al pannello Tabelle. Ogni tabella a cui la ricerca si applica mostra solo le righe corrispondenti, con la ricerca e il conteggio delle righe sopra di esse. Per selezionare sulla mappa tutte le corrispondenze, seleziona quelle righe e scegli Seleziona sulla mappa dal menu del tasto destro. Un filtro di tabella non è salvato con il progetto e termina quando la pagina viene ricaricata. Una riga modificata in modo da non corrispondere più resta nella tabella, attenuata e contrassegnata da un segnale di avvertimento, finché non si preme di nuovo il pulsante Filtra nella tabella attuale.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Sostituisci e Annulla';
 $ec_lang['lpn_guide_find_replace_def']='<p>La parte Modifica ciò che è stato trovato del riquadro scrive una proprietà su ogni elemento trovato dalla ricerca. Scegli la proprietà nell\'elenco Proprietà da modificare, inserisci il nuovo valore nel campo Nuovo valore nell\'unità visualizzata e premi il pulsante Sostituisci. Il riquadro indica poi quanti elementi cambierebbero, esclusi quelli che hanno già il nuovo valore. Premi il pulsante Modificali per applicare la modifica, oppure Annulla. Un solo Annulla ripristina l\'intera sostituzione.</p><p>Esempio su Net1: <code>Pipe.Diameter below 10</code> trova le tubazioni 31, 122, 113 e 121. Scegli Diametro, inserisci 10 e premi Sostituisci; il riquadro mostra "Modificare 4 elementi?". Premi Modificali per portare tutte e quattro le tubazioni a 10 in. Un solo Annulla le riporta a 6 e 8 in.</p><p>Esempio su Net3: <code>Pipe.ID equal to \'247\'</code> trova la tubazione 247. Scegli Chiusa, scegli di nuovo Chiusa nell\'elenco Nuovo valore, e premi Sostituisci, poi Modificali, per chiudere la tubazione per l\'esempio di connettività qui sopra. Annulla la riapre.</p><p>Sostituisci richiede un solo tipo di elemento, quindi sotto Tutto scegli prima un tipo di elemento nell\'elenco Cosa cercare. In uno scenario diverso da Base, una sostituzione è memorizzata in quello scenario, come lo sarebbe la stessa modifica in Proprietà. Dove sono disponibili le quote Mapbox, la Quota può essere sostituita dal DEM Mapbox invece che da un valore digitato.</p>';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>I valori sono confrontati a piena precisione ed elencati con quattro cifre decimali. Uguale a raramente corrisponde a un risultato calcolato; usa maggiore di e minore di.</li><li>Pressione, carico, portata, velocità e gli altri risultati sono quelli dell\'ultimo calcolo. Con l\'impostazione Ricalcola automaticamente deselezionata, descrivono la rete com\'era all\'ultimo Calcola.</li><li>Maggiore di e minore di sul testo usano l\'ordine alfabetico, con i numeri in ordine numerico: su Net1, <code>Junction.ID above \'20\'</code> trova i nodi 21, 22, 23, 31 e 32.</li><li>Sotto Tutto sono offerti solo ID, Descrizione, Etichetta e Connettività. Scegli un tipo di elemento nell\'elenco Cosa cercare per vedere l\'elenco completo delle sue proprietà.</li><li>Un elemento Testo non ha un ID. Cercalo per le sue parole, come in <code>Text.Text contains \'pump\'</code>.</li><li>Le quattro condizioni di connettività per un nodo sono nessuna tubazione al nodo, nessuna tubazione aperta al nodo, nessun percorso verso una sorgente e nessun percorso aperto verso una sorgente. Una fonte è un serbatoio o una vasca.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>I valori sono confrontati a piena precisione ed elencati con quattro cifre decimali. Uguale a raramente corrisponde a un risultato calcolato; usa maggiore di e minore di.</li><li>Pressione, carico, portata, velocità e gli altri risultati sono quelli dell\'ultimo calcolo. Con l\'impostazione Ricalcola automaticamente deselezionata, descrivono la rete com\'era all\'ultimo Calcola.</li><li>Maggiore di e minore di sul testo usano l\'ordine alfabetico, con i numeri in ordine numerico: su Net1, <code>Junction.ID above \'20\'</code> trova i nodi 21, 22, 23, 31 e 32.</li><li>Sotto Tutto sono offerti solo ID, Descrizione, Etichetta e Connettività. Scegli un tipo di elemento nell\'elenco Cosa cercare per vedere l\'elenco completo delle sue proprietà.</li><li>Un elemento Testo non ha un ID. Cercalo per le sue parole, come in <code>Text.Text contains \'pump\'</code>.</li><li>Le quattro condizioni di connettività per un nodo sono nessun collegamento al nodo, nessun collegamento aperto al nodo, nessun percorso verso una sorgente e nessun percorso aperto verso una sorgente. Una sorgente è un serbatoio o una vasca.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
 // (lpn_sm_help, Tom's wording of 2026-10-16) comes first in the entry; nothing here restates or
@@ -1307,7 +1307,7 @@ $ec_lang['lpn_result_gradient']='Gradiente di perdita di carico';
 $ec_lang['lpn_result_gradient_tip']='Perdita di carico divisa per la lunghezza della tubazione. Usalo per confrontare tubazioni di lunghezza diversa rispetto a un unico limite di progetto.';
 $ec_lang['lpn_result_water_age']='Età dell\'acqua';
 $ec_lang['lpn_result_water_age_tip']='Tempo trascorso nel sistema dall\'acqua che raggiunge questo punto. Dove le portate si incontrano, il numero è la media delle età in arrivo, ponderata sulla portata. In una vasca è l\'età media dell\'acqua contenuta, quindi una vasca che si ricambia lentamente di solito contiene l\'acqua più vecchia di una rete. Non esiste un limite normativo con cui confrontarla, quindi valutala rispetto alle condizioni del sistema da modellare.';
-$ec_lang['lpn_result_source_share']='Quota di provenienza';
+$ec_lang['lpn_result_source_share']='Quota della sorgente';
 $ec_lang['lpn_result_source_share_tip']='Quanta parte dell\'acqua che arriva in questo punto proviene dal nodo di traccia. È ciò che riporta l\'analisi Traccia sorgente.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Barra degli strumenti';
 $ec_lang['lpn_pane_right_toggle']='Visibilità';
 $ec_lang['lpn_color_legend_open_tip']='Premi per aprire le impostazioni di colorazione e cambiare questi colori.';
 $ec_lang['lpn_color_node_field']='Colora i nodi in base a';
-$ec_lang['lpn_color_link_field']='Colora le tubazioni in base a';
+$ec_lang['lpn_color_link_field']='Colora i collegamenti in base a';
 $ec_lang['lpn_color_ramp_sequential']='Sequenziale';
 $ec_lang['lpn_color_ramp_diverging']='Divergente';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1883,8 +1883,8 @@ $ec_lang['lpn_find_prop_demand_desc']='Descrizione della categoria di richiesta'
 // searcher wants: pick how wide to cast. Earlier wordings ("is cut off for any reason", "is
 // behind closed links", "reaches no source") presented four mutually exclusive cases he did not
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
-$ec_lang['lpn_find_op_conn_unlinked']='nessuna tubazione al nodo';
-$ec_lang['lpn_find_op_conn_noopen']='nessuna tubazione aperta al nodo';
+$ec_lang['lpn_find_op_conn_unlinked']='nessun collegamento al nodo';
+$ec_lang['lpn_find_op_conn_noopen']='nessun collegamento aperto al nodo';
 $ec_lang['lpn_find_op_conn_nolinksource']='nessun percorso verso una sorgente';
 $ec_lang['lpn_find_op_conn_noopensource']='nessun percorso aperto verso una sorgente';
 // A result row prints the NARROWEST condition true of that node beside its id, because "no links"
@@ -1894,7 +1894,7 @@ $ec_lang['lpn_find_op_conn_noopensource']='nessun percorso aperto verso una sorg
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Ogni nodo è collegato.';
-$ec_lang['lpn_find_conn_no_fixed']='Questa rete non ha un serbatoio o una vasca, quindi non c\'è una sorgente da raggiungere. Si possono cercare solo nessuna tubazione al nodo e nessuna tubazione aperta al nodo.';
+$ec_lang['lpn_find_conn_no_fixed']='Questa rete non ha un serbatoio o una vasca, quindi non c\'è una sorgente da raggiungere. Si possono cercare solo nessun collegamento al nodo e nessun collegamento aperto al nodo.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Dimensione del testo (pixel)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Dimensione dei simboli (pixel)';
-$ec_lang['lpn_settings_link_width']='Spessore della linea delle tubazioni (pixel)';
+$ec_lang['lpn_settings_link_width']='Spessore della linea dei collegamenti (pixel)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Frecce di direzione del flusso';
 $ec_lang['lpn_settings_show_arrows_tip']='Disegna su ogni tubazione una freccia che mostra in che direzione scorre l\'acqua. Le frecce compaiono dopo una simulazione, e disattivarle lascia i risultati invariati.';
-$ec_lang['lpn_settings_align_labels']='Allinea le etichette delle tubazioni alle tubazioni';
+$ec_lang['lpn_settings_align_labels']='Allinea le etichette dei collegamenti ai collegamenti';
 $ec_lang['lpn_settings_readability_bias']='Gradi a sinistra della verticale prima che un\'etichetta venga capovolta';
 $ec_lang['lpn_settings_readability_bias_tip']='Capovolge un\'etichetta per mantenerla dritta quando è inclinata più di questi gradi a sinistra della verticale.';
 $ec_lang['lpn_settings_mask_labels']='Sfondo pieno dietro le etichette';

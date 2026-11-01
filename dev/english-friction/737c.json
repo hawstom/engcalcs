@@ -1,0 +1,54 @@
+{
+ "sprint": "737c",
+ "description": "Term-centric sweep for Task 737, third pass, from the 2026-11-01 audit: Scenario vs Status (am, my), Link vs Pipe (24 languages), Pattern vs Graph/Mode (bg, ru, uk, zh), Source, Label, Depth, Curve, HGL and Demand consistency. Junction vs Node left for Tom.",
+ "entries": [
+  {
+   "key": "bpn_source_label",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "English 'Source' in the branched-network calculator is the supply (a reservoir or pump station), and cs Reservoir is Zdroj too, so the same Czech word names both; the water-quality Source is Dávkování, which is distinct.",
+   "readings": [
+    "Source here means the supply, so Zdroj equal to Reservoir is correct and nothing changes",
+    "Source here should get a word apart from Reservoir (for example Zásobní zdroj)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "bpn_ Source is the branched network's supply point, a reservoir in effect; Zdroj names it correctly in cs and the bpn_ calculator has no Reservoir to confuse it with."
+  },
+  {
+   "key": "bpn_demand",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "The glossary term 'demand' records လိုအပ်ချက် (from the bpn_ sprint), but လိုအင် is the majority word in lpn_ keys. လိုအပ်ချက် also means 'requirement', which collides with 'required' in ip_no_solution.",
+   "readings": [
+    "Use လိုအင် everywhere (applied)",
+    "Use လိုအပ်ချက် everywhere, per the glossary"
+   ],
+   "disposition": "glossary",
+   "resolution": "Demand is the majority လိုအင်; လိုအပ်ချက် also means requirement. Glossary my Demand updated to လိုအင်."
+  },
+  {
+   "key": "lpn_labels_heading_node",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "Node has four renderings (နေရာ 93 keys, Latin node 51, အမှတ် 44, and the Junction word). Only the Junction-word leak was changed (to အမှတ်, the word in lpn_ts_group_nodes); the rest awaits Tom's Junction/Node call.",
+   "readings": [
+    "နေရာ as the one Node word",
+    "အမှတ် as the one Node word"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Outside sprint 737c's scope: Junction and Node words wait on Tom's call (Task 737). Only the Junction-word leak into Node keys was fixed."
+  },
+  {
+   "key": "lpn_library_patterns",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "Chinese EPANET itself renders Pattern as 时间模式, which contains the Mode word 模式. A Pattern word that differs from Mode had to be a new term.",
+   "readings": [
+    "Pattern = 时变系数 (chosen, distinct from Mode 模式)",
+    "Pattern = 时间模式 (EPANET's own), with Mode renamed instead"
+   ],
+   "disposition": "glossary",
+   "resolution": "Pattern is EPANET's 时间模式, a compound distinct from bare 模式 (Mode); the invented 时变系数 was replaced. Written back to the glossary."
+  }
+ ]
+}

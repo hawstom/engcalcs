@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3289,
+    "count": 3290,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6481,6 +6481,13 @@
                 "lpn_field_auto_length_tip"
             ],
             "reason": "English restored to Tom's 2026-10-27 wording; the 26 translations say the same thing, made explicit (sprint 1101)"
+        },
+        {
+            "date": "2026-11-01",
+            "keys": [
+                "lpn_about_dedication"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -6711,6 +6718,7 @@
         "ip_worst_case_warn": "c7d976948870f36b695876178c5d80a74f866d9e",
         "ip_x": "ce96d56fb659e465e64bc305acff584c73edfdec",
         "lpn_about_credits": "bfac50d6424b5166c3ee2808c85ae7c139b5182f",
+        "lpn_about_dedication": "c3f5d7d9b6039a55d9eb30982b87a9aba5aec4e5",
         "lpn_about_license": "4af04a4c7d9b35a6fcbd325fbb041853fced2ba9",
         "lpn_ago_days": "c752c6dea2f93583c2da965c3b0ac6a837aa088d",
         "lpn_ago_hours": "bc7107f4a791a1034616e2c069ba6e03643fedaa",
@@ -10682,6 +10690,10 @@
         "lpn_about_credits": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_about_dedication": {
+            "words": 17,
+            "ends_sentence": true
         },
         "lpn_about_license": {
             "words": 10,

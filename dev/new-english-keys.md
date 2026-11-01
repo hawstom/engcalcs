@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 3289 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 3290 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,39 +21,9 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (3 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
-
-### from sprint 1101
-
-- **`lpn_field_auto_length_tip`**
-  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
-  *The finding:* 'slope length' for a pipe: unclear whether length along the slope or simply pipe length.
-  1. length along the drawn line, rendered as ঢাল বরাবর দৈর্ঘ্য
-  2. plain pipe length
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
-  @@ NEEDS RULING
-- **`lpn_field_auto_length_tip`**
-  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
-  *The finding:* "slope length" is not used elsewhere; the label is just Auto length, so it is unclear whether slope length differs from pipe length.
-  1. length measured along the sloping drawn line (duljina po nagibu)
-  2. a separate property called slope length
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
-  @@ NEEDS RULING
-- **`lpn_field_auto_length_tip`**
-  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
-  *The finding:* 'the slope length' is unclear: length along the incline (true length) versus plan length, or the length of a pipe on a slope.
-  1. length measured along the sloping pipe line, as drawn
-  2. horizontal plan length
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
-  @@ NEEDS RULING
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
 ## Plain sentences to check  (0, none are stale)
 
@@ -65,7 +35,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**66 still to read**, of 109 new keys across 8 unmerged branch(es).
+**69 still to read**, of 112 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -75,10 +45,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### box-design (`867b6ace9`) — adds no English strings
-
-### chore/sprint-1101 (`efe3f018a`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -121,7 +87,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
-### feat/report-widths (`5058a668e`) — already merged into box-design; its strings are listed there
+### feat/native-wire (`154abbde9`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_engine_epanet_used`**
+  > Solved with the EPANET solver.
+  @@ NEEDS RULING
+- **`lpn_engine_native_route`**
+  > Solved with the EPANET solver, because the built-in solver does not run this simulation.
+  @@ NEEDS RULING
+- **`lpn_engine_native_route_ids`**
+  > Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.
+  @@ NEEDS RULING
+- **`lpn_engine_native_used`**
+  > Solved with the built-in solver.
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -287,7 +266,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`ad86a1b96`) — 44 new, 44 to read @@ NEEDS RULING
+### feat/wtg-page-export (`acfffb1df`) — 43 new, 43 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -316,6 +295,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_lost_controls_pressure`**
   > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
   @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_category`**
+  > Demand category names (junctions {ids}). The flows are written; the names are not.
+  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_model`**
   > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
   @@ NEEDS RULING
@@ -328,9 +310,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_lost_energy_price`**
   > Energy price, price pattern, and demand charge.
   @@ NEEDS RULING
-- **`lpn_wtg_export_lost_extra_demands`**
-  > Second and later demands on a junction: {ids}. Only the first demand is written.
-  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_lead`**
   > The file cannot carry the following, so they are left out:
   @@ NEEDS RULING
@@ -339,9 +318,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_positions`**
   > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_pump_efficiency_curve`**
-  > Pump efficiency curve (pumps {ids}). A constant efficiency is written.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_pump_speed_pattern`**
   > Pump speed pattern (pumps {ids}).
@@ -421,3 +397,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_working`**
   > Writing the .wtg project…
   @@ NEEDS RULING
+
+### fix/name-wrap (`0f47d9ff2`) — adds no English strings

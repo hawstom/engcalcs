@@ -943,7 +943,7 @@ $ec_lang['lpn_examples_blank']='Atau mulai dengan peta kosong';
 // reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
 // "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
 // project either way.
-$ec_lang['lpn_examples_size']='Simpul: {nodes}, pipa: {links}';
+$ec_lang['lpn_examples_size']='Simpul: {nodes}, penghubung: {links}';
 $ec_lang['lpn_examples_failed']='Contoh tidak dapat dimuat. Gunakan File, Proyek baru untuk memulai gambar.';
 $ec_lang['lpn_examples_loading']='Memuat contoh…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Bilah alat';
 $ec_lang['lpn_pane_right_toggle']='Visibilitas';
 $ec_lang['lpn_color_legend_open_tip']='Tekan untuk membuka pengaturan pewarnaan dan mengubah warna-warna ini.';
 $ec_lang['lpn_color_node_field']='Warnai simpul berdasarkan';
-$ec_lang['lpn_color_link_field']='Warnai pipa berdasarkan';
+$ec_lang['lpn_color_link_field']='Warnai penghubung berdasarkan';
 $ec_lang['lpn_color_ramp_sequential']='Sekuensial';
 $ec_lang['lpn_color_ramp_diverging']='Divergen';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3592,7 +3592,7 @@ $ec_lang['lpn_settings_link_width']='Lebar garis penghubung (piksel)';
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Panah arah aliran';
 $ec_lang['lpn_settings_show_arrows_tip']='Gambar panah pada setiap pipa yang menunjukkan arah aliran air. Panah muncul setelah proses dijalankan, dan mematikannya tidak mengubah hasil.';
-$ec_lang['lpn_settings_align_labels']='Sejajarkan label pipa dengan pipanya';
+$ec_lang['lpn_settings_align_labels']='Sejajarkan label penghubung dengan garis penghubungnya';
 $ec_lang['lpn_settings_readability_bias']='Balikkan label jika miringnya melebihi sekian derajat ke kiri dari vertikal';
 $ec_lang['lpn_settings_readability_bias_tip']='Membalikkan label agar tetap tegak saat kemiringannya melebihi sekian derajat ke kiri dari vertikal.';
 $ec_lang['lpn_settings_mask_labels']='Latar belakang solid di balik label';
