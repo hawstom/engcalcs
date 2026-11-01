@@ -83,7 +83,7 @@ async function boxFor(model, report, run) {
 	check(cleanRun.ok, 'Net1 runs');
 	let st = await boxFor(null, null, cleanRun);
 	check(st.warnings === 0, 'Net1: no warnings counted', String(st.warnings));
-	check(/^The run finished\. Reporting time steps: \d+\. Time taken: [\d.]+ s\.$/.test(st.text), 'Net1: the plain finish line, unchanged', st.text);
+	check(/^The run finished\. Reporting time steps: \d+\. Time taken: [\d.]+ s\. Solved with the EPANET solver\.$/.test(st.text), 'Net1: the plain finish line, then the solver that answered', st.text);
 
 	// ---- unbalanced ----
 	const unRun = await real.call(EngCalcs, Object.assign(await load(net3), { hydraulics: { trials: 1, accuracy: 1e-8, unbalanced: 'continue', unbalancedTrials: 0 } }), {});
