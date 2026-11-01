@@ -7,17 +7,13 @@ standing prose that is not a task.
 | Priority | Means |
 |---|---|
 | **100** | **Next.** Being worked, or the thing to pick up on finishing something. |
-| **95** | **Next, held** (temporary) behind fit and finish. |
 | **75** | **Soon.** Real, wanted, queued behind Next. |
 | **50** | **Someday.** Agreed worth doing; nothing is waiting on it. |
 | **25** | **Maybe.** Worth keeping; not obviously worth doing. |
 | **5** | **Parked.** Alive only so it is not re-proposed from scratch. |
 | **0** | **Closed** — the block moves to `dev/roadmap-closed-ids.md` in the same edit. |
 
-**95 IS A TEMPORARY TIER, from 2026-10-24** (Tom: *"Move all priority 100 tasks to 95 temporarily
-while we work on production fit and finish and elimination of embarrassments."*). It holds the
-Next work that waits behind fit and finish. When fit and finish is done, every 95 returns to 100
-and 95 is removed from `roadmap_id_check.php` in the same edit. 99 stays retired (2026-09-29).
+99 and 95 stay retired (95 was a temporary hold, 2026-10-24 to 2026-11-01).
 
 **NO TASK MAY SIT AT ANY OTHER NUMBER** (Tom, 2026-09-12: *"No tasks are allowed at any other
 priority tiers."*). `roadmap_id_check.php` fails on one: the rule was prose for three weeks and
@@ -59,26 +55,17 @@ the block.
 
 ## 100 — Next.
 
-- 100|827| **Phones dock and autohide Properties by default; first-time view layout.** Tom, 2026-10-24: only Settings pinned, Properties/Libraries/Junctions autohidden (Properties unfurls itself), Scenario Manager and User Manual stay edge tabs; open them when the first project opens, not over the gallery. Water menu order Properties, Settings, Libraries to be discussed. Ida: `dev/agents/interface-designer/first-time-view-2026-10-24.md`.
-  **BUILT on `box-design`**; round 6 reached master 2026-10-30 inside `feat/gis-background`, rounds 7 and 8 wait on the branch.
-- 100|828| **One standard two-column style for every box's label and value rows.** Tom, 2026-10-24: *"all the other software I have seen uses clean columns like our Settings box instead of ragtag lines... We need a standard answer with standard styling so that tweaks apply across all these boxes."* Properties, Find and replace, Contour plot, Fire flow and Criticality first; Fire flow's is the best design so far. Input widths sized to their content (Km never wider than 00.00; Diameter, Roughness, Length, From, To, Date installed). WTG and EPANET truncate rather than wrap, and let the label and value columns be sized separately. Ida's design first: her hopper.
-  **BUILT on `box-design`**, round 4 2026-10-29: two columns at every width, phone included (Tom: no stacked layout). Waits his pass.
-- 100|829| **Every analysis box gets Download CSV, Copy HTML and Print report.** Tom, 2026-10-24, of Fire flow, Criticality, Demand scaling, Pump energy, Scenario comparison, Status changes and Calibration: *"Needs printout and/or Copy HTML."* Full report is the model. Scenario comparison's lone Copy and Download CSV become the same standard set.
-  **BUILT on `box-design`** (`1a1d219be`, one Download CSV, Copy HTML, Print report row on every report box). Waits his pass.
-- 100|842| **One spreadsheet style for every box's rows, no first-column heading.** Tom, 2026-10-27 night, of Properties: *"Make this a standard style and apply it to Find and Replace, Contour Plot, Fire flow analysis, Criticality analysis, and Demand analysis."* Heading: *"Property, Label, or none (my preference)"*: none. Building on `fix/box-style`.
-- 100|845| **Report tables: economical width, adjustable columns, "And others", "Time (hr)".** Tom, 2026-10-27 night: split columns *"if not applied with aggressive economy, can result in more wasted width"*; debug what made them wider; his Google Doc paste set every cell bold. Rotated headings for narrow columns on long tables: his ideal, not yet built. `fix/report-width`.
+- 100|852| **Re-evaluate truncation in boxes: cut text needs a way to reveal.** Tom, 2026-11-01: *"It may need some form of mitigation. Ellipsis is not a mitigation. Tip could be. Wrapping could be. Guaranteed resizing could be. This may be an issue only with Settings, which has its own styling. I find that Head loss gradient, if truncated, has no way for a user-forced reveal."*
 - 75|847| **The built-in solver leaves flow circulating in a loop with no demand.** Perry, 2026-10-27, on the starter extension's Static scenario: 3.18 gpm round a closed loop with zero demand (EPANET 0.07 gpm). Likely a convergence tolerance; a loop with no source or sink must carry zero.
 
-## 95 — Next, held behind fit and finish (temporary, Tom 2026-10-24).
-
-- 95|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Slice 2 (simple controls) merged. Slice 3 (pump speed patterns, stated SPEED 0, and a pump that cannot lift (XHEAD), which the built-in solver lacked even for one instant) merged 2026-10-22 on his word (`feat/native-eps-3`), within 0.8 mm of EPANET 2.3.5 on 12 constructed cases, Net3 with patterns and five examples; not wired to the page (slice 7, on his word). Slices 4 ([RULES]), 5 (tank volume curves, minimum volume, overflow) and 6 (pump energy) merged 2026-10-22 on his word (`feat/native-eps-6`), each within EPANET 2.3.5's tolerance. **Quality phase merged 2026-10-30 on his word** (`feat/native-quality`, unwired): age, trace and one chemical (four source types, bulk and wall reactions, MIXED/2COMP/FIFO/LIFO) match EPANET 2.3.5 on 49 cases. Next: slice 7, wiring to the page, on his word; it owes reaction rates for the page's column. Slice 6 found the page's own energy summary departs from EPANET's `addenergy()` (Task 821). Tom, 2026-09-26
+- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Slice 2 (simple controls) merged. Slice 3 (pump speed patterns, stated SPEED 0, and a pump that cannot lift (XHEAD), which the built-in solver lacked even for one instant) merged 2026-10-22 on his word (`feat/native-eps-3`), within 0.8 mm of EPANET 2.3.5 on 12 constructed cases, Net3 with patterns and five examples; not wired to the page (slice 7, on his word). Slices 4 ([RULES]), 5 (tank volume curves, minimum volume, overflow) and 6 (pump energy) merged 2026-10-22 on his word (`feat/native-eps-6`), each within EPANET 2.3.5's tolerance. **Quality phase merged 2026-10-30 on his word** (`feat/native-quality`, unwired): age, trace and one chemical (four source types, bulk and wall reactions, MIXED/2COMP/FIFO/LIFO) match EPANET 2.3.5 on 49 cases. Next: slice 7, wiring to the page, on his word; it owes reaction rates for the page's column. Slice 6 found the page's own energy summary departs from EPANET's `addenergy()` (Task 821). Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
-- 95|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
+- 100|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
   **Not done, 2026-10-18** (Tom asked "Done?"): the am and my Status words (terms entries written 2026-10-17) and the "labels, and Text" mode prompts reach those languages only through the next sprint.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
@@ -102,7 +89,7 @@ the block.
   The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
-- 95|681| **Economize the label layout: it is half the cost of a project switch.**
+- 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-15 merged (`perf/switch-cost`, `perf/cross-shed`):**
   a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
   `switch-cost-browser-harness.js`): Net3 geographic 311 -> 184 ms, the 600-junction generated network 3.2 -> 1.3 s.
@@ -154,7 +141,7 @@ the block.
     burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
-- 95|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+- 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
   **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
   Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
@@ -169,7 +156,7 @@ the block.
   **Tom, 2026-10-22: export, not import.** *"I am not convinced that importing wtg is feasible in the short term or maybe ever as long as we keep our EPANET paradigm. I think that the best we can hope to do is export to wtg. Can we use what we have learned to try to make an export of Net3 that will run in wtg?"* Feasibility spike: `feat/wtg-export`. `feat/sqlite-reader` stays as what we learned.
   **His test, 2026-10-22:** Net3 opens in his WaterGEMS and runs with the same results (*"Huge congratulations"*); symbols came in tiny (fixed). Next, one thing per file from him: tank-level controls first (`feat/wtg-export`, dev/wtg-export.md).
   Tom, 2026-10-20: *"I found out that pumps and valves are nodes in WaterGEMS, and this is a major paradigm incompatibility that could prevent 1 to 1 conversion. That said, I like it better than the EPANET paradigm."* and *"Patterns can be continuous or stepwise ... Maybe we should not undertake to import WaterCAD. Maybe we should only try to export."* Undecided; he asked to be prompted later. Next step he approved: import the alternatives themselves.
-- 95|814| **Classify every import and export by its scenario awareness.**
+- 100|814| **Classify every import and export by its scenario awareness.**
   **A new scenario as an import destination merged 2026-10-23 on his word** (`feat/import-new-scenario`), with the surveyed-points question.
   **Scenario in file names, receipts and "no scenarios" notices merged 2026-10-29 on his word** (`feat/scenario-io`); what is left is in the inventory.
   Comes before Task 752 goes on. Tom, 2026-10-17: *"We must get perfect clarity about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."* His three classes: current scenario, current project, separate project. For each command: how aware the format is of scenarios and alternatives, and how well it fits this project; an import from a less aware format asks where it goes (current or new scenario/alternative, current or new project); an export to one asks to confirm exporting part of the project; an equally aware one discloses that it is an export, not a save or a sync. Maybe one standard questionnaire or wizard.
@@ -187,7 +174,7 @@ the block.
   the simplest door, into the current scenario, asking where it goes per Task 814. **Rejected for now:**
   the whole-project workbook round trip and a live Sheets link (his 2026-09-30 and 10-07 wants, Bentley's
   Connection the model), until a real user asks. `feat/sheet-sync` holds phase 1 of the old shape.
-- 95|812| **Port the label bench's proven findings to master, one branch each.**
+- 100|812| **Port the label bench's proven findings to master, one branch each.**
   **Step 2 (`fix/label-last-pad`) measured and rejected, 2026-10-23:** +6 node labels in 2548 for +3.5% pass time, new labels over node symbols on n600, some views losing labels. Steps 1, 3 and most of 4 are on master; 5 is speed only. What is left of his lessons (look like your neighbours; leaders a person would draw) is new design work, not a port: start from N163 on Novato.
   Tom, 2026-10-17: *"We need to figure out what and how to merge the current best findings from our label placement project to improve our performance and results."* The bench branches are 2,300 commits behind and never merge as they are; the plan is `dev/label-trials/port-plan.md` on `docs/label-port`.
   Tom's pass of `feat/label-beside` (2026-10-17): no difference from master seen on Net3 or Novato; not one level label seen; the page reports no zoom factor, so "at 2x" cannot be followed; he could not reach the 600-junction network. Short pipes should also try the level spot.
