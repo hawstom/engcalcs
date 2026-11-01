@@ -764,3 +764,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|839| CLOSED 2026-10-31 (`6de3f9384`, via box-design round 6): Ida's short Properties labels, each with a tip that expands it.
 - 0|840| CLOSED 2026-10-31 (via box-design round 6): report cells mixing value, place and time are split into columns.
 - 0|844| CLOSED 2026-10-31 (`17413e4d7`, `fix/settings-fit`): Settings 618 px, the tick tight on its row, the phone bar as heading.
+- 0|835| CLOSED 2026-10-31 (`ddea93a80`, via box-design round 6): on a phone, Settings has a section bar under its search box.
+- 0|837| CLOSED 2026-10-31 (`66afa5074`, via box-design round 6): in Properties the input is the cell; a tick box toggles on one click or Space.
+- 0|846| CLOSED 2026-10-31 (via box-design round 6): the Basic mode tick stays in the Scenario manager either way.
