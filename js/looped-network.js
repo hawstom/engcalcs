@@ -84984,7 +84984,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
 			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(),
 			noReport = pc.lpn_time_no_report ||
-				'There is no run report. The report is the EPANET text report, so it appears after a run has calculated this network over time.';
+				'There is no run report. The report is the EPANET text report, so it appears after an extended period simulation of this network.';
 		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
 		// the built-in solver prints nothing, so a network that has never reached EPANET has no
 		// report and never will until it does, and a sentence saying that teaches what a vanishing

@@ -103,7 +103,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/native-wire (`1be1c6973`) — adds no English strings
+### feat/native-wire (`cc8b963a4`) — adds no English strings
 
 ### feat/settings-solver (`b9f7aa5ad`) — 1 new, 1 to read @@ NEEDS RULING
 
