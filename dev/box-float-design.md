@@ -56,5 +56,13 @@ panels shown by their own openers, centred, raised by `raisePanel()`, and **alre
 
 ## Other dialogs this affects
 None of `openDialog()`'s callers. `gridHeadersSync()` changes only for a host carrying the new
-class, so no other box's dividers change. New project (another agent's territory this round) is
-not made movable here; it would be the same three lines through `wireFloatBox()`.
+class, so no other box's dividers change.
+
+## Round 11d
+
+- **New project joins them** through `wireFloatBox()`/`placeFloatBox()`, with a floor of 26 rem on its opening width
+  (`__lpnOpenMinRem`) so the Friction method's value is whole.
+- **The chooser opens at one width, 36 rem capped by the window** (`__lpnOpenRem`), from either opener and on any network;
+  before, the width followed the list's widest entry.
+- **Convert as** trims its column-heading row and closing margin so it opens whole at 1366x900.
+- The nowrap that keeps names on one line is on the Scenarios table only (`.lpn-pane-scntable`); the printed tables wrap.
