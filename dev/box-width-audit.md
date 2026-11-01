@@ -1,7 +1,7 @@
 # Dockable box widths: measurements and Tom's checklist
 
-Branch `fix/dock-widths` (Task 825). Harness: `node dev/lpn-spike/dock-width-harness.js` (73 checks;
-it prints the measurement table below each run).
+Task 825. Harness: `node dev/lpn-spike/dock-width-harness.js` (it prints the measurement table below each
+run). Cut text: `node dev/lpn-spike/box-cut-label-probe.js` (fails today, so it is not run by `run_harnesses.sh`).
 
 ## How a width is chosen
 
@@ -23,30 +23,42 @@ The numbers live in `LPN_DOCK_OPTIMAL_REM` in `js/looped-network.js`. Changing o
 docked width and nothing else; the harness then says whether the content agrees. Two boxes may share
 a width only when each has its own reason (both past the cap, or two measurements that agree).
 
-## The table (English, 16 px root font, 1600 px window)
+## The table (English; widths read off the page 2026-11-01, after box-design merged)
 
-| Box | Measured | Docked | What sets it |
-|---|---|---|---|
-| Pump energy report | 496 | 496 (31 rem) | The pump table's headings (% of run, Avg. kW, Peak kW) |
-| Scenario comparison | 1056 | 832, cap | Its scenario table's headings; wider with more scenarios |
-| Run report | 544 | 544 (34 rem) | The EPANET text report's line length |
-| Status changes | 256 | 320, floor | The title bar; the table is only Time and Event |
-| Calibration report | 496 | 496 (31 rem) | The Parameter row; measured with no calibration file loaded |
-| Full report | 1248 | 832, cap | Eleven result columns |
-| Settings | 552 | 552 (34.5 rem) | The label rows, with "Bulk reaction coefficient" on one line |
-| Properties | 416 | 416 (26 rem) | A junction's demand table (a pipe needs 352) |
-| Find and replace | 368 | 368 (23 rem) | Its condition rows |
-| Libraries | 432 | 432 (27 rem) | Its section list ("Pipe types") and the pattern rows |
-| Contour plot | 336 | 320 (floor) | Tom: narrower. Three labels wrap onto two lines; nothing scrolls |
-| Fire flow analysis | 1272 after a run (456 before) | 560 (35 rem) | Tom: far too wide. Controls need 456; the ten-column results table wraps its headings and scrolls sideways inside its own container (777 px in 542) |
-| Criticality analysis | 792 after a run (344 before) | 528 (33 rem) | Tom: 50% too wide. Controls need 344; the four-column table fits at 528 with its "Worst effect" cells wrapping onto more lines |
-| Demand scaling | 384 after a run | 384 (24 rem) | Its setting rows and verdict |
-| User manual | prose | 848 (53 rem) | Contents list plus a 36 rem reading column |
-| Scenario manager | not measured | own rule | Widens to its table (Task 746 code); unchanged |
-| Screenshot | not measured | 288 (its CSS) | Not in the table; docks at its floating width |
-| A pane tab popped out as a box | not measured | 480 (its CSS) | Unchanged |
+Measured by `dev/lpn-spike/box-cut-label-probe.js` on Net1 and Net3 (`EC_SHOTS=<dir>` saves a picture of
+every case; the ones from 2026-11-01 are `box825-<net>-<view>-<float|dock>-<box>.png`). PC is 1366x768,
+phone 390x844 touch. "Cut" means the text is clipped with no scrollbar to reveal it (the probe's
+definition); the rows say which text. Net1 and Net3 agree unless a row says otherwise. Not covered:
+an analysis box (Fire flow, Criticality, Demand scaling) after its own run, and a long translation.
 
-A box the visitor docks by its button takes the width it had floating (floor 320; the map's minimum caps it) and saves it as its docked width. Floating widths are unchanged: the report-type boxes still float at 52 rem.
+| Box | Docked PC | Floating PC | Phone (floating) | Cut text |
+|---|---|---|---|---|
+| Pump energy report | 416 (26 rem) | 832 | 382 | none |
+| Scenario comparison | 832, cap | 832 | 382 | none; scrolls sideways inside its table on a phone ("Lowest pressure", "Junction") |
+| Run report | 544 (34 rem) | 832 | 382 | none; its text lines scroll sideways on a phone |
+| Status changes | 320, floor | 832 | 382 | none |
+| Calibration report | 320, floor (was 496) | 832 | 382 | none |
+| Full report | 832, cap | 832 | 382 | none; scrolls sideways inside its table on a phone |
+| Scenario manager | own rule | 352 on Net3, 1050 on Net1 (widens to its table) | 382 | on a phone docked at 273: scenario names "Max day with main break", "Peak hour with main break" (Net1) |
+| Settings | 618 (38.6 rem; was 552) | 618 | 382 floating, 273 docked | **PC, both:** "Average Chlorine concentration", "Show labels when zoomed to this map width", "Text halo width (percent of text size)", "Label flip angle adjustment (degrees)", "Snap leader lines to set angles", "Prevent nodes from scaling larger than", "Draw link labels along the link line", "Solid background behind labels", "Time series graphs on the map", "Background image opacity (0 to 1)", "Show override markers on the map", "Use the built-in solver when possible", "Bulk reaction coefficient (1/day)", "Wall reaction coefficient (ft/day)" (Net3 lacks the first); the Before and unit boxes hold "Qb=", "Init.", "mg/L", "km=", "Cb=", "Cw=" slightly cut. **Phone:** more than sixty labels, among them "Head loss gradient", "Elevation and head", "Map coordinates", "Data classification method", "Friction method", "Demand model", "Pump efficiency (percent)" |
+| Properties | 320 (20 rem; was 416) | 413 on Net1, 402 on Net3 | 382 floating, 273 docked | PC none, except the Net3 junction's coordinates "2223768.890508" and "5968033.952953" at 320. Phone docked 273: "Emitter coefficient ()", "Chlorine concentration ()" and their unit "gpm/psi", "mg/L" |
+| Demand categories | 328 | 328 | 382 | docked on PC: "Demand categories (10)" (Net1 and Net3) |
+| Find and replace | 368 (23 rem) | 352 | 382 | none |
+| Libraries | 432 (27 rem) | 704 | 382 floating, 273 docked | PC docked and phone: the curve-point lists in Net3's pattern and curve rows (values, e.g. "1.34 1.94 1.46 ..."), cut in their input field |
+| Contour plot | 320 (floor) | 408 | 382 | none |
+| Fire flow analysis | 560 (35 rem) | 832 | 382 | none before a run |
+| Criticality analysis | 528 (33 rem) | 832 | 382 | none before a run |
+| Demand scaling | 328 (20.5 rem; was 384) | 832 | 382 | none before a run |
+| User manual | 848 (53 rem) | 992 | 382 floating, 273 docked | none (its search-anchor headings are hidden on purpose) |
+| Screenshot, a pane tab popped out | not measured | not measured | not measured | not measured |
+
+On a phone every box takes the window's width (382) when it floats and at most 70% of it (273) when it
+docks. A box the visitor docks by its button takes the width it had floating (floor 320; the map's minimum
+caps it) and saves it as its docked width.
+
+Rows that look fine, with no cut text and no sideways scroll at any width tried: Pump energy report,
+Status changes, Calibration report, Find and replace, Contour plot, Fire flow, Criticality, Demand
+scaling, User manual, and every report box on a PC.
 
 Also in this branch: the Decimals, Show and Drop columns of the label rows are 2.34 rem (90% of 2.6).
 A row without one of those boxes holds the column open with a spacer, and the spacer is now the same
@@ -67,6 +79,27 @@ Initial status, Status, Water age) up to 12 px left of the others.
 5. Resize a docked box by its edge, reload. It keeps the width you set.
 6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
    the window.
+
+## What Tom should look at with his own eyes
+
+1. **Settings** is the one box with cut labels on a PC, at its own width, docked or floating: about a dozen
+   rows in the Map, Calculation and Quality sections (list in the table). They are clipped without an
+   ellipsis and without a tip, as box-design chose; Task 852 decides whether that is acceptable for a name
+   a visitor must read. The "Head loss gradient" label Tom found is cut on a phone only, at 273 docked
+   and at 382 floating.
+2. **Settings on a phone** (docked 273): more than sixty labels cut. The two-column row keeps the name column
+   at a fixed share, so the name is what is lost.
+3. **Properties on a phone, docked**, junction with Chlorine concentration or Emitter coefficient: the
+   labels and their units are cut. **Scenario manager on a phone, docked**: scenario names.
+4. **Libraries**, a curve's point list: it is cut inside its input; check whether that field scrolls or
+   can be widened.
+5. **Demand categories docked on a PC**: the button text "Demand categories (10)" is clipped at 328.
+6. The docked widths that changed since the last audit: Pump energy 496 to 416, Calibration 496 to 320,
+   Settings 552 to 618, Properties 416 to 320, Demand scaling 384 to 328. Check each feels right.
+7. In the probe's run with `EC_DEFAULT_DOCKS` on, these boxes opened floating from their menu rows, not docked (Pump energy, Scenario comparison, Run
+   report, Status changes, Calibration, Full report, Demand categories, Find, Contour plot, the analyses)
+   so their "Docked PC" widths above are the stored ones (`LPN_DOCK_OPTIMAL_REM`), not observed. If they should
+   open docked, that is a finding.
 
 ## What is not covered
 
