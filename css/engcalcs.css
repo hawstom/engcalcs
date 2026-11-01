@@ -2916,7 +2916,7 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body > .lpn-demand-table td:last-child { text-align: center; white-space: nowrap; }
 #lpn_demands_body .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
 	display: block; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px; box-sizing: border-box;
-	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em; text-overflow: ellipsis;
+	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em;
 }
 #lpn_demands_body .lpn-demand-table input[type="number"] { text-align: end; font-variant-numeric: tabular-nums; }
 #lpn_demands_body .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
@@ -4019,9 +4019,8 @@ option:disabled { color: var(--ec-ink-muted); }
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
 			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
 			padding: 4px 6px; box-sizing: border-box; align-self: stretch; text-align: start; font-size: .85em;   /* the Label cell's size: 13.6 px text and 8 px of padding, a 28 px row */
-			text-overflow: ellipsis;   /* a Value shorter than its text is cut with an ellipsis, never wraps and never widens the box (Tom, 2026-10-28) */
+			/* A Value longer than its cell is clipped plain, with no ellipsis; it never wraps and never widens the box (Tom asked to truncate, 2026-10-28). */
 		}
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > select.lpn-gval { text-overflow: ellipsis; }
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus {
 			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
 		}
@@ -4029,7 +4028,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		/* An empty editable cell is plain: the hover fill and the focus outline are what say it can be typed in (Tom, 2026-10-29). */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; white-space: nowrap; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
 			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
 		}
@@ -4045,7 +4044,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick {
 			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
-			padding: 4px 6px; box-sizing: border-box; align-self: stretch; font-size: .85em; text-overflow: ellipsis;
+			padding: 4px 6px; box-sizing: border-box; align-self: stretch; font-size: .85em;
 		}
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:hover:not(:focus) { background: var(--ec-hover-bg); }
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
@@ -4602,8 +4601,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
-/* The Scenarios table's plain-text cells are cut like the inputs and selects beside them: one line, an ellipsis, the column as wide as the reader drags it, the full name in the cell's tip (Tom, 2026-10-31: *"limited on sizing that column... truncating the contents per the global style convention"*). A table cell cannot be narrower than its text unless its own max-width is 0; the column's <col> width then decides. Only this table: the printed tables wrap. */
-.lpn-pane-scntable tbody td:not(:has(input, select)) { max-width: 0; white-space: nowrap; text-overflow: ellipsis; }
+/* The Scenarios table's plain-text cells are cut like the inputs and selects beside them: one line, clipped plain with no ellipsis, the column as wide as the reader drags it (Tom, 2026-10-31: *"limited on sizing that column... truncating the contents per the global style convention"*). A table cell cannot be narrower than its text unless its own max-width is 0; the column's <col> width then decides. Only this table: the printed tables wrap. */
+.lpn-pane-scntable tbody td:not(:has(input, select)) { max-width: 0; white-space: nowrap; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
    highlight cells, not characters. But I see characters highlighting as in Entry mode."*). Every
    editable cell here is an <input>, and dragging across one leaves the browser's own text
@@ -5294,7 +5293,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 /* The rounding step and the suffix share a row's Value cell, drawn as two sheet cells: the input is the cell, a hairline between them, and the heading row names the second. */
 #lpn_convas_panel .lpn-grow > .lpn-gwrap { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; margin: 0; padding: 0; align-self: stretch; justify-self: stretch; box-sizing: border-box; width: auto; max-width: none; min-width: 0; }   /* the whole Value cell, so the Round to | Suffix line and its divider share one measure */
 #lpn_convas_panel .lpn-gwrap > :is(select, input) {
-	margin: 0; border: 0; border-radius: 0; background: transparent; padding: 2px 6px; box-sizing: border-box; font: inherit; font-size: .85rem; line-height: 1.3; text-overflow: ellipsis; min-width: 0; align-self: stretch;
+	margin: 0; border: 0; border-radius: 0; background: transparent; padding: 2px 6px; box-sizing: border-box; font: inherit; font-size: .85rem; line-height: 1.3; min-width: 0; align-self: stretch;
 }
 /* The EPSG row's radio keeps its own size beside the ... button (a narrow phone cell shrank it to nothing, and a tap on it fell through) and sits on the button's middle line. */
 #lpn_convas_panel .lpn-gwrap > input[type="radio"] { flex: none; align-self: center; padding: 0; margin: 0 6px; }
@@ -6587,7 +6586,7 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-row.lpn-sm-into { outline: 2px solid var(--ec-ink); outline-offset: -2px; }
 .lpn-sm-row.lpn-sm-before { border-top-color: var(--ec-ink); }
 .lpn-sm-row.lpn-sm-after { border-bottom-color: var(--ec-ink); }
-.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
 .lpn-sm-name input { width: 100%; box-sizing: border-box; }
 .lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
 /* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
@@ -7775,4 +7774,4 @@ textarea.lpn-desc-ta {
 /* Settings > Units: each unit is a `.lpn-set-row` (js, rebuildSettingsFieldsNow), one per line instead of the strip's flex-wrap. */
 #lpn_set_units_fields .lpn-units-group { display: block; }
 /* The derived Map coordinates value is as tall as the select beside every other unit's name, so its row has its neighbours' spacing (round 10c, Perry). */
-#lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+#lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; overflow: hidden; white-space: nowrap; }
