@@ -1,8 +1,9 @@
-// LIBRARIES: A SECTION'S LONG EXPLANATION IS A TIP ON ITS HEADING, AND THE HEADING OPENS THE MANUAL (Tom, round 11).
+// LIBRARIES: A SECTION'S LONG EXPLANATION IS AN ENTRY IN THE USER MANUAL, AND THE HEADING'S `?` LANDS ON IT (Tom, round 12).
 // Curves, Pipe types and Fittings opened on two paragraphs of explanation. Real Chromium: in each of those
 // sections no explanatory paragraph stands in the section above the Add button; the heading is plain text (not a
-// link, the colour and decoration of another box heading) with one `?` button; the `?` tip is the two paragraphs' own words;
-// a real click on the `?` opens the user manual at the Libraries entry.
+// link) with one `?` button and NO title (a tap cannot hover); a real click AND a touch tap on the `?` open the user
+// manual with that section's own entry (its term and its two paragraphs) scrolled into the pane, and the entry says
+// the very words the box used to carry.
 //   node dev/lpn-spike/library-intro-tip-browser-harness.js   (takes the browser lock itself)
 'use strict';
 const path = require('path');
@@ -18,33 +19,42 @@ function ok(name, cond, extra) { checks++; if (!cond) { fails++; } console.log((
 	await env.startServer();
 	const browser = await chromium.launch({ executablePath: env.findChromium() });
 	try {
-		const { a, P } = await U.openNet1(browser, 'lit');
-		await openBox(a, 'lpn_library_box'); await a.settle(500);
 		const KEYS = { curves: ['lpn_library_curves_note', 'lpn_library_curve_values_tip'], pipetypes: ['lpn_library_pipetypes_note', 'lpn_library_pipetype_blank_tip'], fittings: ['lpn_library_fittings_note', 'lpn_library_fittings_source'] };
-		await P.click('#lpn_libbox_link_patterns'); await a.settle(400);
-		const ref = await P.evaluate(() => { const h = document.querySelector('#lpn_libbox_content .lpn-lib-sec > h3'), cs = getComputedStyle(h); return { color: cs.color, deco: cs.textDecorationLine, weight: cs.fontWeight, link: h.querySelectorAll('a').length }; });
-		ok('Patterns heading is not a link', ref.link === 0, JSON.stringify(ref));
-		for (const id of Object.keys(KEYS)) {
-			await P.click('#lpn_libbox_link_' + id); await a.settle(400);
-			const want = (await Promise.all(KEYS[id].map((k) => a.lang(k)))).join(' ');
-			const none = await a.lang('lpn_pane_none');
-			const m = await P.evaluate((none) => {
-				const sec = document.querySelector('#lpn_libbox_content .lpn-lib-sec'), h = sec.querySelector(':scope > h3');
-				const btn = h.querySelector('button'), cs = getComputedStyle(h), cp = getComputedStyle(document.querySelector('#lpn_libbox_content .lpn-lib-sec > h3'));
-				return { notes: Array.from(sec.querySelectorAll(':scope > p.lpn-lib-note')).filter((p) => p.textContent !== none).length, glyphs: h.querySelectorAll('button').length, tip: btn ? btn.title || btn.getAttribute('data-bs-original-title') : null, links: h.querySelectorAll('a').length, color: cs.color, deco: cs.textDecorationLine, weight: cs.fontWeight };
-			}, none);
-			ok(id + ': no explanatory paragraph above the list', m.notes === 0, String(m.notes));
-			ok(id + ': the heading carries exactly one `?`', m.glyphs === 1, String(m.glyphs));
-			ok(id + ': the tip is the two paragraphs\' own words', m.tip === want, String(m.tip).slice(0, 80));
-			ok(id + ': the heading is NOT a link', m.links === 0, String(m.links));
-			ok(id + ': the heading has the same colour and decoration as another box heading', m.color === ref.color && m.deco === ref.deco && m.weight === ref.weight && m.color !== 'rgb(13, 110, 253)', JSON.stringify([m.color, m.deco, ref.color, ref.deco]));
-			await P.hover('#lpn_libbox_content .lpn-lib-sec > h3 button'); await a.settle(900);
-			const shown = await P.evaluate(() => { const t = document.querySelector('.tooltip.show'); return t ? t.textContent : ''; });
-			ok(id + ': hovering the `?` shows the explanation', shown.length > 40 && want.indexOf(shown.slice(0, 40)) === 0, shown.slice(0, 60));
-			await P.click('#lpn_libbox_content .lpn-lib-sec > h3 button'); await a.settle(900);
-			const g = await P.evaluate(() => { const b = document.getElementById('lpn_hotkeys_popup'), e = document.querySelector('#lpn_guide_content [data-guide-key="box-lpn_library_box"]'); return { open: !!b && getComputedStyle(b).display !== 'none', at: e ? Math.round(e.getBoundingClientRect().top - document.getElementById('lpn_guide_content').getBoundingClientRect().top) : null }; });
-			ok(id + ': a real click on the `?` opens the manual at the Libraries entry', g.open && g.at !== null && g.at < 120, JSON.stringify(g));
-			await P.evaluate(() => { const x = document.querySelector('#lpn_hotkeys_popup .lpn-popover-x'); if (x) { x.click(); } }); await a.settle(200);
+		const HEAD = { curves: 'lpn_library_curves', pipetypes: 'lpn_library_pipetypes', fittings: 'lpn_library_fittings' };
+		for (const mode of ['click', 'tap']) {
+			const { a, P } = await U.openNet1(browser, 'lit-' + mode, mode === 'tap' ? { context: { hasTouch: true } } : undefined);
+			await openBox(a, 'lpn_library_box'); await a.settle(500);
+			await P.click('#lpn_libbox_link_patterns'); await a.settle(400);
+			const ref = await P.evaluate(() => { const h = document.querySelector('#lpn_libbox_content .lpn-lib-sec > h3'), cs = getComputedStyle(h); return { color: cs.color, deco: cs.textDecorationLine, weight: cs.fontWeight, link: h.querySelectorAll('a').length }; });
+			ok(mode + ': Patterns heading is not a link', ref.link === 0, JSON.stringify(ref));
+			for (const id of Object.keys(KEYS)) {
+				await P.click('#lpn_libbox_link_' + id); await a.settle(400);
+				const want = await Promise.all(KEYS[id].map((k) => a.lang(k)));
+				const none = await a.lang('lpn_pane_none');
+				const m = await P.evaluate((none) => {
+					const sec = document.querySelector('#lpn_libbox_content .lpn-lib-sec'), h = sec.querySelector(':scope > h3');
+					const btn = h.querySelector('button'), cs = getComputedStyle(h);
+					return { notes: Array.from(sec.querySelectorAll(':scope > p.lpn-lib-note')).filter((p) => p.textContent !== none).length, glyphs: h.querySelectorAll('button').length, hasTitle: btn ? btn.hasAttribute('title') : null, aria: btn ? btn.getAttribute('aria-label') : null, links: h.querySelectorAll('a').length, color: cs.color, deco: cs.textDecorationLine, weight: cs.fontWeight };
+				}, none);
+				ok(mode + ' ' + id + ': no explanatory paragraph above the list', m.notes === 0, String(m.notes));
+				ok(mode + ' ' + id + ': the heading carries exactly one `?`', m.glyphs === 1, String(m.glyphs));
+				ok(mode + ' ' + id + ': the `?` has no title (no hover tip) and a name', m.hasTitle === false && !!m.aria && m.aria.indexOf(await a.lang(HEAD[id])) >= 0, JSON.stringify([m.hasTitle, m.aria]));
+				ok(mode + ' ' + id + ': the heading is NOT a link, and looks like another box heading', m.links === 0 && m.color === ref.color && m.deco === ref.deco && m.weight === ref.weight && m.color !== 'rgb(13, 110, 253)', JSON.stringify([m.color, m.deco, ref.color, ref.deco]));
+				if (mode === 'click') { await P.click('#lpn_libbox_content .lpn-lib-sec > h3 button'); } else { await P.tap('#lpn_libbox_content .lpn-lib-sec > h3 button'); }
+				await a.settle(900);
+				const g = await P.evaluate((stem) => {
+					const b = document.getElementById('lpn_hotkeys_popup'), c = document.getElementById('lpn_guide_content'), dt = c.querySelector('#guide-term-lpn_guide_lib_' + stem);
+					if (!dt || !b) { return { open: !!b && getComputedStyle(b).display !== 'none', found: false }; }
+					const cr = c.getBoundingClientRect(), r = dt.getBoundingClientRect(), dd = dt.nextElementSibling;
+					return { open: getComputedStyle(b).display !== 'none', found: true, top: Math.round(r.top - cr.top), paneH: Math.round(cr.height), term: dt.textContent.trim(), paras: Array.from(dd.querySelectorAll('p')).map((p) => p.textContent) };
+				}, id);
+				ok(mode + ' ' + id + ': the `?` opens the manual at that section\'s own entry, in view', g.open && g.found && g.top >= -2 && g.top < g.paneH, JSON.stringify([g.top, g.paneH]));
+				ok(mode + ' ' + id + ': the entry\'s term is the section heading', g.term === (await a.lang(HEAD[id])).trim(), g.term);
+				ok(mode + ' ' + id + ': the entry says the box\'s own two paragraphs, word for word', JSON.stringify(g.paras) === JSON.stringify(want), JSON.stringify(g.paras).slice(0, 90));
+				await P.evaluate(() => { const x = document.querySelector('#lpn_hotkeys_popup .lpn-popover-x'); if (x) { x.click(); } }); await a.settle(300);
+			}
+			ok(mode + ': no page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+			await a.context.close().catch(() => {});
 		}
 		console.log('library-intro-tip-browser-harness: ' + (checks - fails) + '/' + checks + ' ok');
 	} finally { await browser.close(); env.stopServer(); }

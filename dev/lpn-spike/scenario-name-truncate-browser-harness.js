@@ -1,9 +1,9 @@
 // SCENARIO MANAGER: THE SCENARIO COLUMN IS AS WIDE AS THE READER DRAGS IT, AND A NAME TOO LONG FOR IT IS
-// CUT WITH AN ELLIPSIS, ITS FULL TEXT IN THE TIP (Tom, round 11: "I am limited on sizing that column...
+// CLIPPED PLAIN: NO ELLIPSIS, NO TIP (Tom, round 11: "I am limited on sizing that column...
 // truncating the contents per the global style convention"). A "no wrap" rule that only held the cell open
 // at its text's width made the column undraggable. Real Chromium, the shipped Net1 scenarios, one name made long.
 // Drag the Scenario column's divider far left: the column ends narrower than 5em, no name wraps, the cell
-// clips with an ellipsis, the cell's title is the full name.
+// clips (text-overflow: clip), and carries no title.
 //   node dev/lpn-spike/scenario-name-truncate-browser-harness.js   (takes the browser lock itself)
 'use strict';
 const path = require('path');
@@ -22,7 +22,7 @@ function ok(name, cond, extra) { checks++; if (!cond) { fails++; } console.log((
 		const { a, P } = await U.openNet1(browser, 'snt', { shipped: true });
 		await openBox(a, 'lpn_sm_box'); await a.settle(600);
 		const long = 'Peak hour with the north pump station out of service';
-		await P.evaluate((long) => { const td = document.querySelector('#lpn_sm_table tbody td.lpn-pane-col-sc_name'); td.textContent = long; td.title = long; }, long);
+		await P.evaluate((long) => { const td = document.querySelector('#lpn_sm_table tbody td.lpn-pane-col-sc_name'); td.textContent = long; }, long);
 		const m = () => P.evaluate(() => {
 			const t = document.getElementById('lpn_sm_table'), th = t.querySelector('thead th.lpn-pane-col-sc_name'), em = parseFloat(getComputedStyle(t).fontSize);
 			const tds = Array.from(t.querySelectorAll('tbody td.lpn-pane-col-sc_name'));
@@ -39,8 +39,8 @@ function ok(name, cond, extra) { checks++; if (!cond) { fails++; } console.log((
 		const d = await m();
 		ok('the column drags narrower than its longest name (' + b.thEm.toFixed(1) + 'em to ' + d.thEm.toFixed(1) + 'em)', d.thEm < 5, d.thEm.toFixed(1) + 'em');
 		ok('no name wraps: every row keeps one height', d.ws.every((w) => w === 'nowrap') && d.hs.every((h) => h === d.hs[0]), JSON.stringify(d.hs));
-		ok('the cut name ends in an ellipsis', d.ell === 'ellipsis' && d.clipped, d.ell + ' ' + d.clipped);
-		ok('the full name is in the tip', d.title === long, d.title);
+		ok('the cut name is clipped plain, no ellipsis', d.ell === 'clip' && d.clipped, d.ell + ' ' + d.clipped);
+		ok('the cell has no tip (no new tips)', d.title === '', d.title);
 				console.log('scenario-name-truncate-browser-harness: ' + (checks - fails) + '/' + checks + ' ok');
 	} finally { await browser.close(); env.stopServer(); }
 })().then(() => process.exit(fails ? 1 : 0), (e) => { console.error(e); process.exit(1); });

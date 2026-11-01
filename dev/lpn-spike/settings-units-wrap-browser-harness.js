@@ -1,9 +1,9 @@
 // SETTINGS > UNITS: A VALUE TOO LONG FOR ITS COLUMN NEVER RUNS OVER THE NEXT ROW (Tom, round 11).
 // The derived Map coordinates value is plain text in a fixed-height row; a long one ("Pie topografico
 // de EE. UU.") wrapped to a second line and sat on the Diametro select. Settings' own convention is one
-// line, clipped with an ellipsis, the full text in the tip. Real Chromium, ?lang=es and en, a 600 px
+// line, clipped plain (no ellipsis, no tip). Real Chromium, ?lang=es and en, a 600 px
 // docked-width box and a 390 phone: every row of the Units fields clears the row below it, and the
-// derived value is one line, ellipsised, with its text as the tip.
+// derived value is one line, clipped, with no tip.
 //   node dev/lpn-spike/settings-units-wrap-browser-harness.js   (takes the browser lock itself)
 'use strict';
 const path = require('path');
@@ -49,27 +49,26 @@ async function main() {
 					const d = document.getElementById('lpn_u_mapcoords');
 					// WHAT TOM SAW, BEFORE ANY OVERRIDE: Net2 is in a US survey foot plane, so the page itself writes the
 					// value ("Pie topografico de EE. UU." in Spanish). The Map coordinates row must end above the next row.
-					const real = d.textContent, mrow = d.closest('.lpn-set-row'), vis = Array.from(document.querySelectorAll('#lpn_set_units_fields .lpn-set-row')).filter((r) => r.offsetParent), nxt = vis[vis.indexOf(mrow) + 1];
+					const realTipV = d.title, real = d.textContent, mrow = d.closest('.lpn-set-row'), vis = Array.from(document.querySelectorAll('#lpn_set_units_fields .lpn-set-row')).filter((r) => r.offsetParent), nxt = vis[vis.indexOf(mrow) + 1];
 					const rg = document.createRange(); rg.selectNodeContents(d);
 					// The element is a fixed 21 px tall, so a wrapped value overflows IT and the element's own rect never shows it: measure the text.
 					const realGap = nxt ? Math.round((nxt.getBoundingClientRect().top - Math.max(mrow.getBoundingClientRect().bottom, rg.getBoundingClientRect().bottom)) * 10) / 10 : null, realText = real;
 					d.textContent = 'Pie topografico de EE. UU. con un nombre muy largo';
-					d.title = d.textContent;
 					d.scrollIntoView({ block: 'center' });
 					const rows = Array.from(document.querySelectorAll('#lpn_set_units_fields .lpn-set-row')).filter((r) => r.offsetParent);
 					const bad = [];
 					for (let i = 0; i + 1 < rows.length; i++) { const x = rows[i].getBoundingClientRect(), y = rows[i + 1].getBoundingClientRect(); if (x.bottom > y.top + 1) { bad.push(i); } }
 					const dr = d.getBoundingClientRect(), cs = getComputedStyle(d);
 					const row = d.closest('.lpn-set-row').getBoundingClientRect();
-					return { realText, realGap, n: rows.length, bad, h: dr.height, lh: parseFloat(cs.lineHeight), clipped: d.scrollWidth > d.clientWidth, ell: cs.textOverflow, ws: cs.whiteSpace, tip: d.title, inside: dr.bottom <= row.bottom + 1 };
+					return { realText, realGap, n: rows.length, bad, h: dr.height, lh: parseFloat(cs.lineHeight), clipped: d.scrollWidth > d.clientWidth, ell: cs.textOverflow, ws: cs.whiteSpace, tip: d.title, realTip: realTipV, inside: dr.bottom <= row.bottom + 1 };
 				}, vp);
 				const tag = lang + ' ' + vp.w + 'px: ';
 				ok(tag + 'the real Map coordinates value is the page\'s own (' + m.realText + ')', lang !== 'es' || /EE\. UU\./.test(m.realText), m.realText);
 				ok(tag + 'the Map coordinates row\'s bottom is at or above the next row\'s top', m.realGap !== null && m.realGap >= -1, String(m.realGap));
 				ok(tag + 'the Units rows exist', m.n >= 5, m.n);
 				ok(tag + 'no Units row overlaps the next', m.bad.length === 0, JSON.stringify(m.bad));
-				ok(tag + 'the derived value is one line, ellipsised', m.h <= m.lh + 2 && m.ell === 'ellipsis' && m.ws === 'nowrap' && m.clipped && m.inside, JSON.stringify(m));
-				ok(tag + 'the full text is its tip', m.tip.length > 20);
+				ok(tag + 'the derived value is one line, clipped plain', m.h <= m.lh + 2 && m.ell === 'clip' && m.ws === 'nowrap' && m.clipped && m.inside, JSON.stringify(m));
+				ok(tag + 'the value has no tip, before or after a long text', m.tip === '' && m.realTip === '');
 				await a.close && a.close();
 			}
 		}
