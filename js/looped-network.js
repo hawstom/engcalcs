@@ -69142,7 +69142,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// interval chosen so no two touch (EngCalcs.lpnPatternAxis). Redrawn whenever the row's width
 		// changes, which is how a narrow Library box and a wide one both read cleanly.
 		function layout() {
-			var W = timeRow.clientWidth, cv, cx, longest, lt, lp, tw, ptw, a2;
+			var W = timeRow.clientWidth, cv, cx, longest, lt, lp, tw, ptw, a2, showTicks, showTitles;
 			if (!(W > 0) || W === lastW || !mult.length) { return; }
 			lastW = W;
 			cv = layout.cv || (layout.cv = document.createElement('canvas'));
@@ -69152,18 +69152,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lp = String(mult.length);
 			longest = Math.max(cx.measureText(lt).width, cx.measureText(lp).width);
 			tw = Math.max(cx.measureText(timeTitle).width, cx.measureText(stepTitle).width);
-			a2 = EngCalcs.lpnPatternAxis(mult, times.patternStep, { width: W, labelPx: Math.ceil(longest), titlePx: Math.ceil(tw), gapPx: 8 });
+			// A row too narrow for its labels draws none of them, never one that touches another or leaves the row (a Libraries box dragged very narrow, round 10c): the titles
+			// go first (no room for the first tick beside its title), then the ticks (no room for a single label).
+			showTicks = W >= Math.ceil(longest) + 1;
+			showTitles = W >= Math.ceil(longest) + 8 + Math.ceil(tw);
+			a2 = EngCalcs.lpnPatternAxis(mult, times.patternStep, { width: W, labelPx: Math.ceil(longest), titlePx: showTitles ? Math.ceil(tw) : 0, gapPx: 8 });
 			while (timeRow.firstChild) { timeRow.removeChild(timeRow.firstChild); }
 			while (perRow.firstChild) { perRow.removeChild(perRow.firstChild); }
-			a2.ticks.forEach(function (t) {
+			(showTicks ? a2.ticks : []).forEach(function (t) {
 				var cls = t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first',
 					a = libEl('span', cls, t.time), b = libEl('span', cls, String(t.period));
 				a.style.left = b.style.left = (t.frac * 100).toFixed(2) + '%';
 				timeRow.appendChild(a);
 				perRow.appendChild(b);
 			});
-			timeRow.appendChild(libEl('span', 'lpn-lib-xtitle', timeTitle));
-			perRow.appendChild(libEl('span', 'lpn-lib-xtitle', stepTitle));
+			if (showTitles) {
+				timeRow.appendChild(libEl('span', 'lpn-lib-xtitle', timeTitle));
+				perRow.appendChild(libEl('span', 'lpn-lib-xtitle', stepTitle));
+			}
 		}
 		if (ax.ticks.length) {
 			y.appendChild(libEl('span', '', num(ax.hi)));
