@@ -1771,30 +1771,26 @@ echoHeader("EngCalcsApp", $html_title,
 		      // refreshOneLabelInPlace() the stale-snapshot ruling requires) -- eight-plus touch
 		      // points across the map's core render and collision path, for a feature (a new kind of
 		      // map label) Tom has not asked for. That is Tom's call, not this wizard's. ?>
-		<?php // THE ROUNDING AND THE SUFFIX ARE SHEET ROWS (round 10b, Tom 2026-10-31: the sheet style wherever it fits). One value per
-		      // row, so the two columns Tom asked for in 2026-09-23 are two stretches of the one grid: the step to round to, then the suffix. ?>
+		<?php // ONE ROW A QUANTITY: THE ROUNDING AND THE SUFFIX SIDE BY SIDE (Tom, 2026-09-23, restored 2026-10-31). The Label column is the sheet's; the Value cell
+		      // holds both controls, the step to round to and then the suffix, and the heading row over them names the second column. R-217 (Tom, 2026-09-24) dropped each
+		      // row's own tip glyph; that stands. Depth's suffix box is enabled: tank water depth is a label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three (Tom, 2026-09-25). ?>
 		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_convas_round'], $ec_lang['lpn_convas_round_tip'])?></div>
 		<div class="lpn-grid">
+			<div class="lpn-grow lpn-convas-colhead">
+				<span class="lpn-gname"></span>
+				<span class="lpn-gwrap lpn-gval"><span class="lpn-convas-c1"></span><span class="lpn-convas-c2"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></span></span>
+			</div>
 			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
 				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
 			<div class="lpn-grow">
 				<span class="lpn-gname"><label for="lpn_convas_round_<?=$rk?>"><?=$ec_lang[$rkey]?></label></span>
-				<select id="lpn_convas_round_<?=$rk?>" class="lpn-gval lpn-gw-fill">
-					<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
-					<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
-				</select>
-			</div>
-			<?php } ?>
-		</div>
-		<?php // R-217 (Tom, 2026-09-24) dropped each row's own tip glyph; that stands. Depth's suffix box is enabled: tank water depth is a
-		      // label field (nodeFieldDefs()'s 'level' row) with a suffix like the other three (Tom, 2026-09-25). ?>
-		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_convas_label_col'], $ec_lang['lpn_convas_label_tip'])?></div>
-		<div class="lpn-grid">
-			<?php foreach (array('diameter' => 'lpn_field_diameter', 'depth' => 'lpn_field_tank_level',
-				'flow' => 'lpn_convas_round_flow', 'head' => 'lpn_field_head') as $rk => $rkey) { ?>
-			<div class="lpn-grow">
-				<span class="lpn-gname"><label for="lpn_convas_suffix_<?=$rk?>"><?=$ec_lang[$rkey]?></label></span>
-				<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix lpn-gval lpn-gw-fill">
+				<span class="lpn-gwrap lpn-gval">
+					<select id="lpn_convas_round_<?=$rk?>" class="lpn-convas-c1">
+						<option value=""><?=$ec_lang['lpn_convas_round_none']?></option>
+						<?php foreach (array('100', '10', '1', '0.1', '0.01', '0.001') as $st) { ?><option value="<?=$st?>"><?=$st?></option><?php } ?>
+					</select>
+					<input type="text" id="lpn_convas_suffix_<?=$rk?>" class="lpn-convas-suffix lpn-convas-c2" aria-label="<?=htmlspecialchars(strip_tags($ec_lang[$rkey]) . ' ' . strip_tags($ec_lang['lpn_convas_label_col']))?>">
+				</span>
 			</div>
 			<?php } ?>
 		</div>
