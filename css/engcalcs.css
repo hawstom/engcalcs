@@ -7774,4 +7774,4 @@ textarea.lpn-desc-ta {
 /* Settings > Units: each unit is a `.lpn-set-row` (js, rebuildSettingsFieldsNow), one per line instead of the strip's flex-wrap. */
 #lpn_set_units_fields .lpn-units-group { display: block; }
 /* The derived Map coordinates value is as tall as the select beside every other unit's name, so its row has its neighbours' spacing (round 10c, Perry). */
-#lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; }
+#lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

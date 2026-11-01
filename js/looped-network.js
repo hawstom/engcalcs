@@ -61483,7 +61483,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function refreshMapCoordsUnit() {
 		var el = document.getElementById('lpn_u_mapcoords');
-		if (el) { el.textContent = mapCoordsUnitText(); }
+		if (el) { el.textContent = mapCoordsUnitText(); el.title = el.textContent; }
 	}
 	// How many junctions the latest pressure-driven solve left short of their demand.
 	function pdaShortCount(result) {
