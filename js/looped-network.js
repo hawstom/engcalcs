@@ -25392,7 +25392,7 @@ var EngCalcs = EngCalcs || {};
 	// good. Anything a caller appends to the host between rows (a note, a button row) ends the grid;
 	// the next row starts a new one, and both share the host's one width.
 	var LPN_GCOLS_KEY = 'lpn_gcols';
-	var LPN_GNAME_MIN = 0, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GSTEP = 0.5;   // rem
+	var LPN_GNAME_MIN = 0, LPN_GVAL_MIN = 10, LPN_GVAL_SHEET_MIN = 3, LPN_GVAL_FIT_REM = 6, LPN_GSTEP = 0.5;   // rem
 	var gcolPrefs = null;
 	function gcolRead() {
 		var raw = null, v;
@@ -25427,7 +25427,7 @@ var EngCalcs = EngCalcs || {};
 	// With no remembered width the label column is FITTED: wide enough for most labels (the 80th
 	// percentile of their natural widths), so one long label wraps instead of widening the whole
 	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
-	var LPN_GFIT_PCT = 0.8, LPN_GFIT_FLOOR = 140;   // the 80th percentile, and no narrower than 140 px of words (or the longest label, if shorter), so a box of few labels wraps none
+	// (The Label column's fit is the longest label: one rule, no percentile, no floor; see gridFitNow.)
 	// A host NEVER stacks its names above its values (Tom, 2026-10-29: "TOM REJECTS THE STACKED LAYOUT"): the name column shrinks and wraps, the value column keeps a floor.
 	function gridNarrowRem() { return 0; }
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }
@@ -25460,10 +25460,29 @@ var EngCalcs = EngCalcs || {};
 		return false;
 	}
 	function gridScaleNow(host) {
-		var w = host.getBoundingClientRect().width, px = gridRem(), sheet = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet'), v;
+		var w = host.getBoundingClientRect().width, px = gridRem(), sheet = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet'), v, id;
 		if (!w || !host.__lpnFrac) { return; }
 		v = Math.max(LPN_GNAME_MIN, Math.min(w / px - (sheet ? LPN_GVAL_SHEET_MIN : LPN_GVAL_MIN), host.__lpnFrac * w / px));
+		// With no width of the reader's own, the Label column never falls below what its longest label needs while the box has room for it (the one rule, gridFitNow).
+		id = gcolId(host);
+		if (!(id && typeof gcolRead()[id] === 'number') && host.__lpnWantPx && host.__lpnReservePx !== undefined) { v = Math.max(v, Math.min(host.__lpnWantPx, w - host.__lpnReservePx) / px); }
 		host.style.setProperty('--lpn-g-name', (Math.round(v * 20) / 20) + 'rem');
+	}
+	// The hosts that share this host's Label width: every host in the page that carries the same `data-gcols-id` (the entries of one Libraries
+	// box), else just the host. One drag, one reset and one fit serve all of them (Tom, 2026-10-31: "uniform column widths should apply to all
+	// entries in any given library").
+	function gridGroup(host) {
+		var id = host.getAttribute && host.getAttribute('data-gcols-id'), list;
+		if (!id || !host.isConnected) { return [host]; }
+		list = Array.prototype.filter.call(document.querySelectorAll('[data-gcols-id]'), function (h) { return h.getAttribute('data-gcols-id') === id && h.__lpnGridHost; });
+		return list.indexOf(host) >= 0 ? list : [host];
+	}
+	function gridNaturalNamesAtMax(h) {
+		var had = h.style.getPropertyValue('--lpn-g-name'), out;
+		h.style.setProperty('--lpn-g-name', 'max-content');
+		out = gridNaturalNames(h);
+		if (had) { h.style.setProperty('--lpn-g-name', had); } else { h.style.removeProperty('--lpn-g-name'); }
+		return out;
 	}
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals, secs, sheetFit;
@@ -25478,32 +25497,29 @@ var EngCalcs = EngCalcs || {};
 		names = gridNaturalNames(host);
 		if (!hr.width || !names.length) { host.style.removeProperty('--lpn-g-name'); return; }
 		px = gridRem();
-		// The fit of one run of labels: the 80th percentile, with the floor.
-		function fitOf(list) {
-			var v;
-			list.sort(function (a, b) { return a - b; });
-			v = list[Math.min(list.length - 1, Math.ceil(LPN_GFIT_PCT * list.length) - 1)];
-			return Math.max(v, Math.min(list[list.length - 1], LPN_GFIT_FLOOR));
-		}
-		// **THE MULTI-SELECTION BOX FITS EACH SECTION AS ITS OWN ELEMENT'S PROPERTIES WOULD, AND TAKES THE WIDEST** (Perry, 2026-10-31: 85 px against 161): the 80th
-		// percentile over every section's labels together is pulled down by the many short ones, and cuts labels a single element would not.
+		// THE ONE RULE (Tom, 2026-10-31: "let's try 100% for all of them ... a single control"): the Label column is as wide as the longest
+		// label, over every label of the host (and of every host that shares its remembered width, see gridGroup). Only the box can cut it.
+		w = 0;
 		secs = host.querySelectorAll('.lpn-multi-section');
-		if (secs.length) {
-			w = 0;
-			Array.prototype.forEach.call(secs, function (sec) { var l = gridNaturalNames(sec); if (l.length) { w = Math.max(w, fitOf(l)); } });
-		}
-		if (!w) { w = fitOf(names); }
+		gridGroup(host).forEach(function (h) { var l = h === host ? names : gridNaturalNamesAtMax(h); l.forEach(function (n) { w = Math.max(w, n); }); });
 		cs = window.getComputedStyle(host);
 		pad = 14;   // the cell's own padding and the divider line
 		vals = host.querySelectorAll('.lpn-grow > .lpn-gval');
 		sheetFit = host.classList.contains('lpn-sheet') || !!host.querySelector('.lpn-sheet');
-		// A sheet's input that fills its cell has no width of its own to protect: it is whatever the Value column is, so measuring it only caps the Label column at the track it already has.
-		for (i = 0; i < vals.length; i++) { if (sheetFit && vals[i].classList.contains('lpn-gw-fill')) { continue; } valW = Math.max(valW, vals[i].getBoundingClientRect().width); }
-		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (host.classList.contains('lpn-sheet') || host.querySelector('.lpn-sheet') ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
+		// A sheet's input, select, text area or button fills its cell (css, .lpn-sheet .lpn-grow > .lpn-gval): it is whatever the Value column is, so measuring it would only cap the Label column at the track it already has.
+		// What keeps a width of its own (a tick, a button, a read-out, a radio with its button) is measured, with the 6 px margin either side a control carries in its cell.
+		for (i = 0; i < vals.length; i++) {
+			if (sheetFit && ((/^(input|select|textarea|button)$/i.test(vals[i].tagName) && !/^(checkbox|radio)$/i.test(vals[i].type || '')) || vals[i].classList.contains('lpn-ramp-picker'))) { continue; }
+			valW = Math.max(valW, vals[i].getBoundingClientRect().width + (sheetFit && !/^span$/i.test(vals[i].tagName) ? 12 : 0));
+		}
+		if (sheetFit) { valW = Math.max(valW, LPN_GVAL_FIT_REM * px); }   // however long the longest label, the Value column keeps room for a value
+		cap = hr.width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - valW - (sheetFit ? 2 : 14);   // a sheet's input fills its cell: no 6 px margin either side to leave
+		host.__lpnReservePx = hr.width - cap;   // what the Value column and the box's padding take: a later change of the box's width moves the cap by the same amount (gridScaleNow)
 		if (secs.length) { cap = Math.max(cap, hr.width * 0.6); }   // a multi-selection's value cells are all 'Various' boxes and selects of natural width; the Value column keeps 40% of the box, as it does beside a single element's labels
+		host.__lpnWantPx = w + pad;   // what the longest label needs; a box that shrinks to its content reads the shortfall (boxOpenWidthFitted)
 		w = Math.max(LPN_GNAME_MIN * px, Math.min(w + pad, cap > LPN_GNAME_MIN * px ? cap : w + pad));
-		host.style.setProperty('--lpn-g-name', (Math.round(w / px * 20) / 20) + 'rem');
-		gridNoteFrac(host);
+		w = (Math.ceil(w / px * 20) / 20) + 'rem';   // rounded UP: a label is never left a hair short
+		gridGroup(host).forEach(function (h) { h.style.setProperty('--lpn-g-name', w); gridNoteFrac(h); });
 	}
 	function gridFitSoon(host) {
 		if (host.__lpnFitQ) { return; }
@@ -25542,17 +25558,14 @@ var EngCalcs = EngCalcs || {};
 		function setRem(v, keep) {
 			var id = gcolId(host);
 			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
-			host.style.setProperty('--lpn-g-name', v + 'rem');
-			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
+			gridGroup(host).forEach(function (h) { h.style.setProperty('--lpn-g-name', v + 'rem'); if (keep) { h.__lpnScaled = false; gridNoteFrac(h); } });
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
 		}
 		function reset() {
 			var id = gcolId(host), prefs = gcolRead();
 			if (id) { delete prefs[id]; gcolSave(); }
-			host.style.removeProperty('--lpn-g-name');
-			host.__lpnScaled = false;
-			gridFitSoon(host);
+			gridGroup(host).forEach(function (h) { h.style.removeProperty('--lpn-g-name'); h.__lpnScaled = false; gridFitSoon(h); });
 		}
 		function dirSign() { return window.getComputedStyle(anchor).direction === 'rtl' ? -1 : 1; }
 		// A finger: the 24 px hit area lies over the cell beside the line, so a press only becomes a drag after 4 px of travel, and a tap passes through to the cell under it (Ida, 2026-10-29).
@@ -25624,7 +25637,7 @@ var EngCalcs = EngCalcs || {};
 		var sheet = host.classList.contains('lpn-sheet');
 		if (host.classList.contains('lpn-gplain')) { return; }
 		Array.prototype.forEach.call(host.querySelectorAll('.lpn-grid'), function (g) {
-			var rows = 0, i, k, prev = g.previousElementSibling, has = !!prev && prev.classList.contains('lpn-ghdr');
+			var rows = 0, need, i, k, prev = g.previousElementSibling, has = !!prev && prev.classList.contains('lpn-ghdr');
 			for (i = 0; i < g.children.length; i++) {
 				k = g.children[i];
 				if (k.classList.contains('lpn-grow') && !k.classList.contains('lpn-gspan-row')) { rows++; }
@@ -25632,8 +25645,10 @@ var EngCalcs = EngCalcs || {};
 			if (sheet) {
 				// THE STANDARD SPREADSHEET STYLE has no column headings (WaterGEMS; Tom, 2026-10-27): a run of two or more
 				// rows carries only the divider, down the Label column's right edge.
-				if (rows >= 2 && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
-				else if (rows < 2 && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
+				// An entry of a shared-width group (the Libraries box) carries it from one row: its rules are drawn, so they are draggable, and one drag moves every entry's.
+				need = host.getAttribute('data-gcols-id') ? 1 : 2;
+				if (rows >= need && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
+				else if (rows < need && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
 				return;
 			}
 			if (rows >= 2 && !has) { g.parentNode.insertBefore(gridHeaderMake(host), g); }
@@ -53340,6 +53355,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var live = unitEl(name), item = unitStripItem(live), copy, sel, nm;
 			if (!item) { return; }
 			copy = item.cloneNode(true);
+			copy.classList.remove('lpn-set-row');   // the Settings box's own row class; a copy is a row of some other box's style
 			copy.removeAttribute('id');   // #lpn_u_roughness_row is the strip's, not ours
 			sel = copy.querySelector('select');
 			if (!sel) { return; }
@@ -53641,6 +53657,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else if (e.key === 'Escape') { e.preventDefault(); closeNewBox(); }
 		});
 	}
+	// **A BOX THAT SHRINKS TO ITS CONTENT OPENS AT A WIDTH OF ITS OWN, WIDE ENOUGH FOR ITS LONGEST LABEL, AND KEEPS IT** (Tom, 2026-10-31, New project: "Dragging the
+	// divider resizes the box ... Make it wide enough to accommodate its labels both on PC and phone"). Left to shrink-wrap, the box follows the Label column, so a
+	// drag of the divider moved the box's edge. The width is read once, with the Label column at max-content (the box's natural width), stated in pixels, and the
+	// Label column then fitted to it by the sheet's one rule (gridFitNow). On a phone the box takes the whole width the screen allows.
+	function boxOpenWidthFitted(box, host) {
+		var avail = Math.max(0, (window.innerWidth || 0) - 2 * POPUP_EDGE), w, short;
+		if (!box || !host) { return; }
+		box.style.width = '';
+		host.style.removeProperty('--lpn-g-name');
+		host.__lpnScaled = false; host.__lpnFrac = 0; host.__lpnW = 0;
+		w = box.getBoundingClientRect().width;
+		if (avail < 30 * gridRem()) { w = avail; }   // a phone (a screen under 30 rem): as wide as the screen allows
+		box.style.width = Math.ceil(Math.min(w, avail)) + 'px';
+		gridFitNow(host);
+		// A grid track at max-content leaves a label a few pixels short of its words, so the fit may ask for more than the box has: give it that much.
+		short = (host.__lpnWantPx || 0) - parseFloat(host.style.getPropertyValue('--lpn-g-name')) * gridRem();
+		if (short > 0.5 && w < avail) {
+			box.style.width = Math.ceil(Math.min(w + short, avail)) + 'px';
+			gridFitNow(host);
+		}
+	}
 	function openNewProjectBox() {
 		var box = newBoxEl(), h, r, method;
 		if (!box) { return; }
@@ -53664,6 +53701,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		syncNewBoxCrsPick();
 		box.style.display = 'block';
 		raisePanel(box);   // centred, not dragged, so it is raised where it becomes visible
+		boxOpenWidthFitted(box, document.getElementById('lpn_new_body'));
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
@@ -64469,6 +64507,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var hideLink = unitsBlock.querySelector('a[data-bs-toggle="collapse"]');
 			if (hideLink) { hideLink.parentNode.removeChild(hideLink); }
 			unitsBody.appendChild(unitsBlock);
+			// **SETTINGS > UNITS ARE SETTINGS ROWS** (Tom, 2026-10-31: "Settings should be a reserved space for the other style"): each unit's name and select is a `.lpn-set-row`, as every other row of this box.
+			Array.prototype.forEach.call(unitsBlock.querySelectorAll('.lpn-units-item'), function (it) { it.classList.add('lpn-set-row'); });
 		}
 		// ---- hydraulics ----
 		// **"HYDRAULICS" IS EPANET'S OWN NAME FOR THIS GROUP** -- friction method, accuracy, and who
@@ -69359,7 +69399,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!entries.length) { return; }
 		Array.prototype.forEach.call(entries, function (entry) {
 			var acts = [], last = null;
-			entry.setAttribute('data-gcols-id', 'lpn_lib_' + libSection);   // one remembered Label width for every entry of a section
+			entry.setAttribute('data-gcols-id', 'lpn_lib');   // one remembered Label width for every entry of the whole box (gridGroup: a drag, a reset and the fit serve them all)
 			lpnGridHost(entry);
 			Array.prototype.slice.call(entry.children).forEach(function (cont) {
 				var fields = Array.prototype.filter.call(cont.children, function (f) { return f.classList.contains('lpn-lib-field'); }), wrap;
