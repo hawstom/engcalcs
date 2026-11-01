@@ -2315,7 +2315,6 @@ $ec_lang['lpn_wtg_export_lost_energy_price']='Energy price, price pattern, and d
 $ec_lang['lpn_wtg_export_lost_rules']='Rule-based controls.';
 $ec_lang['lpn_wtg_export_lost_controls_pressure']='Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.';
 $ec_lang['lpn_wtg_export_lost_tank_mixing']='Tank mixing model (tanks {ids}). Tanks are written fully mixed.';
-$ec_lang['lpn_wtg_export_lost_tank_minvol']='Tank minimum volume (tanks {ids}).';
 $ec_lang['lpn_wtg_export_lost_pump_speed_pattern']='Pump speed pattern (pumps {ids}).';
 $ec_lang['lpn_wtg_export_lost_positions']='True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.';
 $ec_lang['lpn_wtg_export_lost_demand_multiplier']='Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.';

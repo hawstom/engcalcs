@@ -949,8 +949,6 @@ function plan(doc, opts) {
 	if (frozen.length) { notCarried.push({ code: 'controls_pressure', ids: frozen }); }
 	const mix = idsOf(nodes, (n) => n.type === 'tank' && n.mixingModel && String(n.mixingModel).toUpperCase() !== 'MIXED');
 	if (mix.length) { notCarried.push({ code: 'tank_mixing', ids: mix }); }
-	const minvol = idsOf(nodes, (n) => n.type === 'tank' && n.minVol > 0);
-	if (minvol.length) { notCarried.push({ code: 'tank_minvol', ids: minvol }); }
 	const sp = idsOf(links, (l) => l.type === 'pump' && l.speedPattern);
 	if (sp.length) { notCarried.push({ code: 'pump_speed_pattern', ids: sp }); }
 	// Settings and drawing data with no place in the file. The multiplier and the demand model change the
