@@ -108,7 +108,7 @@ function head(t) { console.log('\n' + t); }
 	ok('it names the water quality analysis (Net3 traces Lake), pipe material and map positions',
 		codes.indexOf('quality') >= 0 && codes.indexOf('material') >= 0 && codes.indexOf('positions') >= 0, codes.join(','));
 	ok('it names no emitters, no rules and no pressure controls (Net3 has none)',
-		['emitters', 'rules', 'controls_pressure', 'extra_demands', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
+		['emitters', 'rules', 'controls_pressure', 'demand_category', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
 	ok('the plan reads 92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps',
 		planned.parsed.nodes.filter((n) => n.type === 'junction').length === 92 && planned.parsed.nodes.filter((n) => n.type === 'reservoir').length === 2
 		&& planned.parsed.nodes.filter((n) => n.type === 'tank').length === 3 && planned.parsed.links.filter((l) => l.type === 'pipe').length === 117

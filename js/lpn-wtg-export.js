@@ -359,16 +359,26 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const curveById = {};
 	parsed.curves.forEach((c) => { curveById[c.id] = c; });
 	const pumpDefId = {};
+	// A pump's efficiency curve (EPANET [ENERGY] "Pump <id> Efficiency <curve>"): two or more points make a
+	// multiple-point efficiency curve; one point is a constant. Two pumps share a definition only if both curves match.
+	function effCurveOf(pm) {
+		const c = pm.efficCurveId && curveById[pm.efficCurveId];
+		return c && c.points && c.points.length ? c : null;
+	}
+	function defKey(pm) { return pm.curveId + '|' + (effCurveOf(pm) ? effCurveOf(pm).id : ''); }
 	links.filter((l) => l.type === 'pump').forEach((pm) => {
 		const c = curveById[pm.curveId];
 		if (!c || c.points.length !== 3 || c.points[0][0] !== 0) {
 			throw fail('pump-curve', 'Pump ' + pm.id + ' has no three-point head curve (shutoff, design, maximum). Power pumps and multiple-point curves are not written.', [pm.id], 'pump_curve', { ids: pm.id });
 		}
-		if (pumpDefId[pm.curveId]) { return; }
-		const id = newId(); pumpDefId[pm.curveId] = id;
+		const dk = defKey(pm);
+		if (pumpDefId[dk]) { return; }
+		const id = newId(); pumpDefId[dk] = id;
+		const ec = effCurveOf(pm);
 		const pts = c.points;
 		supportElement(id, 51, 'Pump Curve ' + c.id, 'EPANET curve ' + c.id + (c.note ? ': ' + c.note : ''));
-		const eff = opts.efficiency || 75;
+		const eff = ec && ec.points.length === 1 ? ec.points[0][1] : (opts.efficiency || 75);
+		const multi = !!(ec && ec.points.length > 1);
 		cloneRows(proto.pumpDef, id, { IdahoPumpDefinition_PumpEfficiencyType_BestEfficiencyPointType: 1 }, {
 			IdahoPumpDefinition: {
 				PumpDefinitionType: 2,                       // standard three point (observed: Tom's PD1 and its design/shutoff/max fields)
@@ -376,10 +386,17 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				DesignDischarge: pts[1][0] * GPM_TO_CFS, DesignHead: pts[1][1],
 				MaxOperatingDischarge: pts[2][0] * GPM_TO_CFS, MaxOperatingHead: pts[2][1],
 				IdahoPumpDefinition_MotorEfficiency: 100.0,
-				PumpEfficiencyType: 0                        // constant (EPS sample's ConstantEfficiencyType)
+				PumpEfficiencyType: multi ? 2 : 0            // 0 constant (EPS sample's ConstantEfficiencyType); 2 efficiency points (the reader's)
 			}
 		});
 		insert(db, 'IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType', { SupportElementID: id, ConstantEfficiencyType_PumpEfficiency: eff });
+		if (multi) {
+			// The rows are the curve's own points, flow gpm to ft3/s, efficiency as stated.
+			insert(db, 'IdahoPumpDefinition_PumpEfficiencyType_MultipleEfficiencyPointsType', { SupportElementID: id, DischargeEfficiencyCurveCount: ec.points.length });
+			ec.points.forEach((pt) => {
+				insert(db, 'IdahoPumpDefinition_DischargeEfficiencyCurve', { SupportElementID: id, DischargeEfficiencyCurve_Discharge: pt[0] * GPM_TO_CFS, DischargeEfficiencyCurve_Efficiency: pt[1] });
+			});
+		}
 	});
 	carried('pump curves: ' + Object.keys(pumpDefId).length + ' three-point pump definitions, constant efficiency ' + (opts.efficiency || 75) + ' %');
 
@@ -422,6 +439,10 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const defaultPattern = parsed.defaultPattern;
 	const circle = (d) => Math.PI * d * d / 4;
 	let nJ = 0, nR = 0, nT = 0;
+	// A junction's demands: row 0 is its own demand, the rest are `extraDemands`. A row that states no flow is not written.
+	function demandRows(n) {
+		return [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base);
+	}
 	nodes.forEach((n) => {
 		const id = newId(); elId['n:' + n.id] = id;
 		const xy = P(n);
@@ -430,20 +451,21 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			domainElement(id, 55, n.id);
 			const ov = Object.assign({}, geo, {
 				BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.elev },
-				IdahoDemandNode_Demand_Data: { DemandCollectionCount: n.demand ? 1 : 0, UnitDemandLoadCollectionCount: 0 },
+				IdahoDemandNode_Demand_Data: { DemandCollectionCount: demandRows(n).length, UnitDemandLoadCollectionCount: 0 },
 				IdahoFireFlowNode_Physical_Data: { Physical_EmitterCoefficient: 0 }
 			});
 			if (n.emitter) { lost('emitter on ' + n.id + ' (storage unit of the emitter coefficient is not measured)'); }
 			cloneRows(proto.junction, id, { IdahoDemandNode_Demand_DemandCollection: 1 }, ov);
-			if (n.demand) {
-				const pat = n.demandPattern || defaultPattern;
+			// One row per demand, in the order the junction states them (EPANET's [DEMANDS] lines).
+			demandRows(n).forEach((d) => {
+				const pat = d.pattern || defaultPattern;
 				const row = Object.assign({}, demandProtoRow);
 				delete row.ItemID;
 				row.DomainElementID = id; row.AlternativeID = altOfType[20];
-				row.DemandCollection_BaseFlow = n.demand * GPM_TO_CFS;
+				row.DemandCollection_BaseFlow = d.base * GPM_TO_CFS;
 				row.DemandCollection_DemandPattern = pat ? patId[pat] : null;
 				insert(db, 'IdahoDemandNode_Demand_DemandCollection', row);
-			}
+			});
 			nJ++;
 		} else if (n.type === 'reservoir') {
 			domainElement(id, 56, n.id);
@@ -575,7 +597,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			BaseDirectedNode_HmiDataSetGeometry_Data: { HMIGeometry: wkbPoint(mid[0], mid[1]) },
 			BaseDirectedNode_HMIDataSetTopology_Data: { HMITopologyDownstreamLinkID: bId },
 			BaseDirectedNode_Physical_Data: { Physical_NodeElevation: a.type === 'reservoir' ? a.head : a.elev },
-			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[l.curveId] },
+			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[defKey(l)] },
 			BasePump_InitialSettings_Data: { InitialSettings_RelativeSpeedFactor: l.speed > 0 ? l.speed : 1 }
 		});
 		if (l.speedPattern) { lost('speed pattern ' + l.speedPattern + ' on pump ' + l.id + ' (the table exists, no sample states it)'); }
@@ -710,6 +732,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const hy = parsed.hydraulics || {};
 	const sg = hy.specificGravity > 0 ? hy.specificGravity : 1.0, visc = hy.viscosity > 0 ? hy.viscosity : 1.0;
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
+	// The report time step, in seconds like the other two. 0 is the template's "same as the hydraulic step"; no
+	// results depend on it. (Whether WaterGEMS reports at it is for Tom's copy to say.)
+	if (T.reportStep > 0 && T.reportStep !== T.hydraulicStep) { db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_ReportingTimeStep = ?', [T.reportStep]); }
 	// EPANET's own physical constants for the file (specific gravity 1.0; relative viscosity 1.0 is
 	// 1.1e-5 ft2/s) and its "Unbalanced Continue 10". Hazen-Williams never reads the viscosity.
 	db.run('UPDATE EpaNetEngine SET TimeAnalysisType = 1, FrictionMethod = 1, EpaNetEngine_AnalysisStartTime = ?, '
@@ -853,10 +878,10 @@ function plan(doc, opts) {
 	});
 	if (badPumps.length) { refused.push({ code: 'pump_curve', ids: badPumps }); }
 
+	const cat = idsOf(nodes, (n) => n.type === 'junction' && ((n.demandCategory) || (n.extraDemands || []).some((d) => d.category)));
+	if (cat.length) { notCarried.push({ code: 'demand_category', ids: cat }); }
 	const emit = idsOf(nodes, (n) => n.type === 'junction' && n.emitter);
 	if (emit.length) { notCarried.push({ code: 'emitters', ids: emit }); }
-	const multi = idsOf(nodes, (n) => n.type === 'junction' && n.extraDemands && n.extraDemands.length);
-	if (multi.length) { notCarried.push({ code: 'extra_demands', ids: multi }); }
 	// A water quality analysis asked for ([OPTIONS] Quality other than None), or a source, a mixing model or a reaction stated.
 	const q = parsed.qualityOptions || {};
 	const quality = (String(q.quality || '').trim() !== '' && !/^none\b/i.test(String(q.quality).trim()))
@@ -888,8 +913,6 @@ function plan(doc, opts) {
 	if (minvol.length) { notCarried.push({ code: 'tank_minvol', ids: minvol }); }
 	const sp = idsOf(links, (l) => l.type === 'pump' && l.speedPattern);
 	if (sp.length) { notCarried.push({ code: 'pump_speed_pattern', ids: sp }); }
-	const ec = idsOf(links, (l) => l.type === 'pump' && l.efficCurveId);
-	if (ec.length) { notCarried.push({ code: 'pump_efficiency_curve', ids: ec }); }
 	// Settings and drawing data with no place in the file. The multiplier and the demand model change the
 	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.
 	const hy = parsed.hydraulics || {};

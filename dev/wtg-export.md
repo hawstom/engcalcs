@@ -143,7 +143,7 @@ import already keeps). In the spike they are in `report.notCarried`.
 | Pipe material, install year | no EPANET field | every pipe keeps the template's default material (Ductile Iron) |
 | Emitter coefficient | storage unit not measured | none in Net3 |
 | Tank minimum volume (a volume curve is carried), mixing model | the minimum-volume column is not kept by our `.inp` reader; mixing codes unseen | none in Net3 |
-| Pump speed pattern, constant-power and multiple-point pumps | tables exist, no sample states them | none in Net3 |
+| Pump speed pattern, constant-power and multiple-point pumps (head curve) | tables exist, no sample states them | none in Net3 |
 | Pumps other than three-point (power, multiple point, custom) | tables exist | none in Net3 |
 | Non-US units | storage units measured for US only | |
 | Scenarios and their overrides | not written (see below) | Net3 has none |
@@ -172,6 +172,7 @@ prints NOT RUN without them):
   seconds exactly (checked). Every tank moves 6 to 9 ft over the day in both runs, so the agreement is not two
   flat lines.
 - The tiny network (reservoir, pump, junction on a pattern, tank) agrees to 7e-5 ft and 8e-4 gpm.
+- `wtg-export-demands.inp` (the tiny network with three demands on J1, two patterns and the default, an efficiency curve on the pump, a 2 h report step) is written, read back (demands in order, efficiency curve, report step), checked table by table (three demand rows and a count of 3; `PumpEfficiencyType` 2 with three curve rows) and agrees with EPANET over 24 h to 0.0001 ft and 0.001 gpm.
 
 What this does **not** show: that WaterGEMS opens the files. The reader and the writer were written from the
 same samples, so agreement shows they are consistent with each other and with the samples, not that either is right.
@@ -298,7 +299,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | EPANET item | Writes today | Evidence for how WaterGEMS stores it | Can we write it without a new file from Tom |
 |---|---|---|---|
 | `[JUNCTIONS]`, demand, pattern | yes | Tom's fixture, Zenodo, TSNet | done |
-| Several demands on one junction | no (first only) | the table is a collection (`IdahoDemandNode_Demand_DemandCollection`), one row per demand | yes, same table, more rows; not done because the parser keeps one |
+| Several demands on one junction | yes: one row per demand, in order, the default pattern made explicit on a row with none; `DemandCollectionCount` states the number | the table is a collection (`IdahoDemandNode_Demand_DemandCollection`); the parser's row 0 plus `extraDemands` feed it (`wtg-export-demands.inp`, 24 h EPANET agreement to 0.0001 ft). A demand category name is not carried and is named | done; whether WaterGEMS shows all rows is Tom's test |
 | `[EMITTERS]` | no | column `Physical_EmitterCoefficient` exists (all zero in every file); no `.inp` pairs a nonzero value with its stored number, so the storage unit is unknown | **no: ask 2** |
 | `[RESERVOIRS]` head, pattern | head yes; pattern yes | column `Physical_HglPattern` (reader reads it); no sample states a nonzero one | written; semantics unproven in WaterGEMS |
 | `[TANKS]` cylindrical | yes | all samples | done |
@@ -313,7 +314,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[STATUS]` closed pipe, pump, valve | yes (through the upstream pipe) | `PipeStatus` | done |
 | `[PATTERNS]` | yes | Zenodo, TSNet | done |
 | `[CURVES]` pump, headloss, volume | yes | as above | done |
-| `[CURVES]` efficiency curve | constant only | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2) | a curve: not yet written; no new file needed, but nothing in Net3 uses it |
+| `[CURVES]` efficiency curve | yes: two or more points are `PumpEfficiencyType` 2 with a `..._MultipleEfficiencyPointsType` row (count) and one `IdahoPumpDefinition_DischargeEfficiencyCurve` row per point (flow gpm to ft3/s, efficiency as stated); one point is written as a constant. Pumps share a definition only when head and efficiency curves both match | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2); table layout from the template's schema, no sample states a non-empty one | done; read back by our reader (`wtg-export-demands.inp`). Efficiency never changes a hydraulic result, so the EPANET agreement is unaffected; whether WaterGEMS accepts the rows is Tom's test |
 | `[ENERGY]` global efficiency | yes | constant efficiency | done |
 | `[ENERGY]` price, price pattern, demand charge | no | `EnergyCost_EnergyPricingID` points at an energy-pricing support element; no sample holds one | no |
 | `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls in the same control set | the one sample control (Zenodo) | done |
@@ -321,7 +322,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes (the ELSE column and a priority column are in `IdahoControl_ControlType_LogicalType`) | needs a sample with an ELSE |
 | `[QUALITY]`, `[REACTIONS]`, `[SOURCES]` | no | trace and constituent tables exist; nothing stored in any file | no |
 | `[TIMES]` duration, hydraulic step, start | yes | | done |
-| `[TIMES]` pattern step, report step | pattern step through each pattern's points; report step not written | `EpsType_ReportingTimeStep` | yes, not done: no effect on results |
+| `[TIMES]` pattern step, report step | pattern step through each pattern's points; report step written to `EpsType_ReportingTimeStep` in seconds when it differs from the hydraulic step (otherwise the template's 0) | `EpsType_ReportingTimeStep` (the reader reads it, 0 meaning the hydraulic step) | done; `OverrideReportingTimeStep` is left 0, its meaning unseen. No effect on results |
 | `[OPTIONS]` friction method | Hazen-Williams only | `FrictionMethod` | Darcy-Weisbach and Chezy-Manning: codes unseen |
 | `[OPTIONS]` specific gravity, viscosity | yes | TGH-1 (0.998 changes a psi setting by 0.2 percent) | done |
 | `[OPTIONS]` trials, accuracy, unbalanced | the template's defaults, which equal EPANET's | | done |

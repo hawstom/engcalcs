@@ -340,6 +340,38 @@ function head(t) { console.log('\n' + t); }
 		await compareToEpanet('tgh1', fs.readFileSync(tomInp, 'utf8'), 'TGH', null, [3600]);
 	}
 
+	// ---- 10. several demands on one junction, a pump efficiency curve, the report time step ----
+	head('10. Three demands on one junction, an efficiency curve on the pump, a 2 h report step');
+	const demText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-demands.inp'), 'utf8');
+	const dp = EngCalcs.lpnInpParse(demText);
+	ok('the parser holds the three demands on J1 (the writer\'s input)', dp.nodes.find((n) => n.id === 'J1').extraDemands.length === 2);
+	await compareToEpanet('demands', demText, 'demands', function (pp, bp, rbk, R2) {
+		const j1 = bp.nodes.find((n) => n.id === 'J1'), rows = [{ base: j1.demand, pattern: j1.demandPattern }].concat(j1.extraDemands || []);
+		ok('J1 comes back with its three demands, in order: 100 on P1, 40 on P2, 25 on the default pattern P1, made explicit',
+			rows.length === 3 && rows[0].base === 100 && rows[0].pattern === 'P1' && rows[1].base === 40 && rows[1].pattern === 'P2' && rows[2].base === 25 && rows[2].pattern === 'P1',
+			JSON.stringify(rows));
+		const lostCodes = (R2.notCarried || []).join(' ');
+		ok('no "only the first demand" or "efficiency curve" loss is reported', !/second and later|efficiency curve/i.test(lostCodes), lostCodes);
+		const eff = bp.curves.find((c) => c.id === (bp.links.find((l) => l.id === 'PU1') || {}).efficCurveId);
+		ok('pump PU1 comes back with its three-point efficiency curve (0,40) (300,78) (600,62)',
+			!!eff && JSON.stringify(eff.points.map((q) => q.map((v) => Math.round(v * 1e6) / 1e6))) === '[[0,40],[300,78],[600,62]]', eff && JSON.stringify(eff.points));
+		ok('the report time step comes back 2 h, the hydraulic step still 1 h', bp.times.reportStep === 7200 && bp.times.hydraulicStep === 3600, JSON.stringify(bp.times));
+	});
+	// The database itself: one row per demand, the pump definition a multiple-point efficiency definition.
+	{
+		const dw = lib.writeWtg(SQL, tplBytes, dp, { initial: {}, changes: [] }, { name: 'demands', efficiency: 75 });
+		const dd = new SQL.Database(dw.bytes);
+		const q = (sql) => { const r = dd.exec(sql); return r.length ? r[0].values : []; };
+		const j1 = q("SELECT ElementID FROM HMIModelingElement WHERE Label = 'J1'")[0][0];
+		ok('three rows in the demand collection for J1, count column 3', q('SELECT COUNT(*) FROM IdahoDemandNode_Demand_DemandCollection WHERE DomainElementID = ' + j1)[0][0] === 3
+			&& q('SELECT DemandCollectionCount FROM IdahoDemandNode_Demand_Data WHERE DomainElementID = ' + j1)[0][0] === 3);
+		ok('PumpEfficiencyType 2 with three efficiency rows and a count of 3',
+			q('SELECT PumpEfficiencyType FROM IdahoPumpDefinition')[0][0] === 2 && q('SELECT COUNT(*) FROM IdahoPumpDefinition_DischargeEfficiencyCurve')[0][0] === 3
+			&& q('SELECT DischargeEfficiencyCurveCount FROM IdahoPumpDefinition_PumpEfficiencyType_MultipleEfficiencyPointsType')[0][0] === 3);
+		ok('integrity ok, no foreign key violations', dw.report.integrity === 'ok' && dw.report.foreignKeyViolations === 0);
+		dd.close();
+	}
+
 	console.log(fails ? '\n' + fails + ' check(s) FAILED:' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });
