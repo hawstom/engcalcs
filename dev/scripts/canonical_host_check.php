@@ -197,6 +197,18 @@ hc_ok(ecCanonicalRedirectTarget($s, $s, false, 'https://hawsedc.com', '') === nu
 hc_ok(ecCanonicalOrigin($s, 'https://hawsedc.com', 'evil.example') === 'https://epanet-plus-plus.org',
     'ecCanonicalOrigin() with an unknown host answers epanet-plus-plus.org');
 
+// 6. The About box's dedication is in the page's language (Tom, 2026-11-01: in Spanish and Romanian
+// it showed in English, because it was a hard-coded English sentence).
+foreach (array('es', 'ro') as $lang) {
+    $html = (string)shell_exec('php ' . escapeshellarg($root . '/dev/scripts/render_page.php') . ' Looped-Network.php '
+        . escapeshellarg('--lang=' . $lang) . ' 2>/dev/null');
+    $ec_lang = array();
+    include $root . '/lib/lang.ec.' . $lang . '.php';
+    $got = preg_match('~<p class="lpn-about-dedication"><a [^>]*>([^<]*)</a>~', $html, $m) ? html_entity_decode($m[1], ENT_QUOTES, 'UTF-8') : '';
+    hc_ok($got !== '' && $got === $ec_lang['lpn_about_dedication'] && strpos($got, 'You are loved') === false,
+        "About dedication in $lang", "got '$got'");
+}
+
 if ($fail) {
     echo "\nFAIL: $fail of " . ($fail + $pass) . " host-canonical assertions\n";
     exit(1);
