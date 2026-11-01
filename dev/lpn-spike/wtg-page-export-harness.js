@@ -105,8 +105,8 @@ function head(t) { console.log('\n' + t); }
 	const planned = L.wtgPlan();
 	ok('the plan is made, with no refusal', planned.ok && planned.refused.length === 0, planned.ok ? '' : planned.detail);
 	const codes = planned.notCarried.map((x) => x.code);
-	ok('it names the water quality analysis (Net3 traces Lake), pipe material and map positions',
-		codes.indexOf('quality') >= 0 && codes.indexOf('material') >= 0 && codes.indexOf('positions') >= 0, codes.join(','));
+	ok('it names the water quality analysis (Net3 traces Lake) and map positions, and no pipe material (the project states none)',
+		codes.indexOf('quality') >= 0 && codes.indexOf('material') < 0 && codes.indexOf('positions') >= 0, codes.join(','));
 	ok('it names no emitters, no rules and no pressure controls (Net3 has none)',
 		['emitters', 'rules', 'controls_pressure', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
 	ok('the plan reads 92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps',

@@ -2317,7 +2317,6 @@ $ec_lang['lpn_wtg_export_lost_controls_pressure']='Controls on a junction pressu
 $ec_lang['lpn_wtg_export_lost_tank_mixing']='Tank mixing model (tanks {ids}). Tanks are written fully mixed.';
 $ec_lang['lpn_wtg_export_lost_tank_minvol']='Tank minimum volume (tanks {ids}).';
 $ec_lang['lpn_wtg_export_lost_pump_speed_pattern']='Pump speed pattern (pumps {ids}).';
-$ec_lang['lpn_wtg_export_lost_material']='Pipe material and installation year. Every pipe is written with the default material.';
 $ec_lang['lpn_wtg_export_lost_positions']='True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.';
 $ec_lang['lpn_wtg_export_lost_demand_multiplier']='Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.';
 $ec_lang['lpn_wtg_export_lost_demand_model']='Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.';

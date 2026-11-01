@@ -804,7 +804,6 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
 	report.notCarried.push('quality analysis (Trace Lake), reactions, mixing, sources, energy price and pattern, the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
-	report.notCarried.push('pipe material (every pipe keeps the template default)');
 	return { bytes: bytes, report: report };
 }
 
@@ -961,8 +960,8 @@ function plan(doc, opts) {
 	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA') { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
 	if ((parsed.labels || []).length) { notCarried.push({ code: 'texts', ids: [] }); }
 	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
-	// Always: these have no place in the file, whatever the network.
-	notCarried.push({ code: 'material', ids: [] });
+	// Always: this has no place in the file, whatever the network. (A pipe's material is not named: an EPANET project
+	// states none, so there is nothing to leave out; every pipe keeps the template's default.)
 	notCarried.push({ code: 'positions', ids: [] });
 	return { ok: true, refused: refused, notCarried: notCarried, inp: out.inp, parsed: parsed, differences: out.differences || [] };
 }

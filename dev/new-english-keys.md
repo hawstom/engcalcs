@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 35 untranslated keys, of 3325 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 34 untranslated keys, of 3324 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (35, 35 to read @@ NEEDS RULING)
+## lpn_  (34, 34 to read @@ NEEDS RULING)
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -69,9 +69,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_lead`**
   > This export does not yet write the following:
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_material`**
-  > Pipe material and installation year. Every pipe is written with the default material.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_positions`**
   > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
@@ -416,4 +413,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`e3d85d685`) — adds no English strings
+### feat/wtg-page-export (`26657bfad`) — adds no English strings
