@@ -76,6 +76,21 @@ async function main() {
 					cur: (EngCalcs.lpnTimeCurrentFrame() || {}).engine };
 			});
 		};
+		// A fixed interaction, timed: every reporting time shown in turn (what the slider does). Page load,
+		// the first draw and the engine download are not in it. Also counts runs that start by themselves
+		// in the quiet seconds that follow, which a leftover timer or listener would add.
+		const scrub = async () => a.page.evaluate(async () => {
+			if (!window.__wrapped) {
+				window.__wrapped = true; window.__runs = 0;
+				const oe = EngCalcs.lpnEpanetRun; EngCalcs.lpnEpanetRun = function () { window.__runs++; return oe.apply(this, arguments); };
+				const on = EngCalcs.lpnNativeRunSteps; EngCalcs.lpnNativeRunSteps = function* () { window.__runs++; return yield* on.apply(this, arguments); };
+			}
+			const T = EngCalcs.lpnTimeKeep().run.frames.map((f) => f.t), t0 = performance.now(), r0 = window.__runs;
+			for (let rep = 0; rep < 3; rep++) { for (const t of T) { EngCalcs.lpnTimeGoTo(t); await new Promise((r) => requestAnimationFrame(() => r())); } }
+			const per = (performance.now() - t0) / (3 * T.length);
+			await new Promise((r) => setTimeout(r, 3000));
+			return { per, runs: window.__runs - r0 };
+		});
 		for (const [key, name] of [['lpn_ex_net1_title', 'Net1'], ['lpn_ex_net3_title', 'Net3']]) {
 			console.log('\n--- ' + name + ' ---');
 			await a.openExampleCard(await a.lang(key));
@@ -86,10 +101,19 @@ async function main() {
 			ok(name + ': the period was run by the built-in loop', r.engine === 'native' && r.cur === 'native', JSON.stringify({ engine: r.engine, frames: r.frames }));
 			ok(name + ': no EPANET loading banner is up', !/EPANET/.test(r.banner), r.banner);
 			ok(name + ': the status line does not claim EPANET ran it', !/Solved with the EPANET solver/.test(r.status), r.status.slice(0, 120));
+			ok(name + ': the status line says the built-in solver answered', r.status.indexOf(await a.lang('lpn_engine_native_used')) >= 0, r.status.slice(0, 120));
+			const sNative = await scrub();
 			ok('the box was unticked', (await tick(false)) === 'ok');
 			await a.settle(300);
 			r = await runIt();
 			ok(name + ': with the box unticked EPANET ran it', r.engine === 'epanet' && r.cur === 'epanet', JSON.stringify({ engine: r.engine, frames: r.frames }));
+			ok(name + ': with the box unticked the status line does not name the built-in solver', r.status.indexOf(await a.lang('lpn_engine_native_used')) < 0, r.status.slice(0, 120));
+			// THE PAGE MUST NOT SLOW DOWN BY HAVING RUN THE BUILT-IN SOLVER FIRST (Tom, 2026-11-01).
+			await scrub();
+			const sEpanet = await scrub();
+			ok(name + ': after built-in then EPANET, stepping through the times costs no more than it did on the built-in run (' + sNative.per.toFixed(0) + ' ms a step, then ' + sEpanet.per.toFixed(0) + ')',
+				sEpanet.per <= sNative.per * 1.5 + 25, '');
+			ok(name + ': no run starts by itself in the quiet seconds after either', sNative.runs === 0 && sEpanet.runs === 0, 'runs ' + sNative.runs + ', ' + sEpanet.runs);
 		}
 			// ---- 600 junctions, 1000 pipes, a day: the page must stay alive while the built-in loop runs ----
 		console.log('\n--- 600 junctions, 1000 pipes, 24 h, built-in solver ---');
