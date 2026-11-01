@@ -844,12 +844,28 @@ EngCalcs.lpnSolve = function (model, options) {
 		return [hl, hg];
 	}
 
+	// validate.c: a custom curve's Q0 is half way along its flows, any other pump's the middle sample of the
+	// three the bridge writes (0.5 of the flow at zero head); times the pump's speed.
+	function epPumpSeed(link) {
+		var sp = typeof link.pumpSpeed === 'number' && link.pumpSpeed > 0 ? link.pumpSpeed : 1, pc, q0;
+		pc = link.curveSI && link.curveSI.length ? EngCalcs.lpnPumpFromCurve(link.curveSI) : null;
+		if (pc && pc.custom) { q0 = (pc.x[0] + pc.x[pc.x.length - 1]) / 2; }
+		else if (link.a > 0 && link.b > 0 && link.h0 > 0) { q0 = 0.5 * Math.pow(link.h0 / link.a, 1 / link.b); }
+		else { return 0.3048 * Math.PI * link.diameter * link.diameter / 4; }
+		return sp * q0;
+	}
+
 	// Initial guess. Any nonzero flow works because of the gradient floor; a
 	// velocity-scaled seed simply starts closer than a constant would.
 	for (k = 0; k < links.length; k++) {
 		Q[k] = links[k].status === 'closed'
 			? 0
-			: 0.3 * Math.PI * links[k].diameter * links[k].diameter / 4;
+			: (opts.epAcc ? 0.3048 : 0.3) * Math.PI * links[k].diameter * links[k].diameter / 4;
+		// hydraul.c initlinkflow(): a pump starts at its setting times its design flow, every other link at a
+		// velocity of 1 ft/s. Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
+		if (opts.epAcc && links[k].status !== 'closed' && links[k].type === 'pump') {
+			Q[k] = epPumpSeed(links[k]);
+		}
 		// **A START FROM THE LAST SOLUTION** (Task 733, slice 7), as EPANET's period loop starts every step
 		// from the flows of the one before. Only a closed link's 0 is kept; an open one with no usable
 		// previous flow keeps the seed above.
@@ -1652,6 +1668,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 
 		if (maxFlowChange < (demandScale > 0 ? tol : Math.min(tol, 1e-9)) || sumAbsDq < absTol) { done = true; }
+		if (opts.epAcc && sumAbsQ > 0 && sumAbsDq / sumAbsQ <= opts.epAcc) { done = true; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
 		// floor of the factorization, then stops improving -- measured on a

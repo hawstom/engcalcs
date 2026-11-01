@@ -369,7 +369,7 @@
 	EC.lpnNativeRunSteps = function* (model, options) {
 		var opts = options || {}, refusals = EC.lpnNativeRunRefusals(model, opts), tm, times, dur,
 			patStep, patStart, repStep, hydStep, tStart, byPat = {}, dm, tanks = [], frames = [], warnings = [], solveTimes = [],
-			htime = 0, rtime, guard = 0, res, stepModel, tstep, t, nextPat, dmult, levelNow = {}, cur,
+			htime = 0, rtime, guard = 0, epAcc, res, stepModel, tstep, t, nextPat, dmult, levelNow = {}, cur,
 			links, ls, ctl, tankById = {}, nodeById = {};
 		if (refusals.length) { return { ok: false, refused: true, issues: refusals }; }
 		tm = model.time || {};
@@ -384,6 +384,10 @@
 		if (hydStep > patStep) { hydStep = patStep; }
 		if (hydStep > repStep) { hydStep = repStep; }
 		(tm.patterns || []).forEach(function (p) { byPat[String(p.id)] = p; });
+		// **THE SOLVE STOPS WHERE EPANET'S DOES** (hydsolver.c hasconverged()): the first trial whose total flow change is within
+		// Accuracy of the total flow, Accuracy being the project's, held by EPANET to 1e-5 .. 1e-1 (0.001 when none is
+		// stated). Its answer is that trial's, not a tighter one, and "Balanced after N trials" counts to it.
+		epAcc = opts.epAcc || Math.min(Math.max(model.hydraulics && model.hydraulics.accuracy > 0 ? model.hydraulics.accuracy : 0.001, 1e-5), 1e-1);
 		dm = model.hydraulics && typeof model.hydraulics.demandMultiplier === 'number'
 			? model.hydraulics.demandMultiplier : 1;
 		dmult = dm;
@@ -739,6 +743,7 @@
 			var sOpts = {};
 			if (opts.tol) { sOpts.tol = opts.tol; }
 			sOpts.closedLeak = true;
+			sOpts.epAcc = epAcc;
 			if (ctl.some(function (c) { return c.on === 'junction'; })) { sOpts.pswitch = pswitch(stepLinks); }
 			sOpts.tempClosed = {};
 			sOpts.xhead = {};   // and a pump that could not lift starts the next solve shut, as XHEAD does
@@ -749,11 +754,11 @@
 				if (st.s === XHEAD && st.kind === 'pump') { sOpts.xhead[links[k].id] = true; }
 				if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; }
 			});
-			if (opts.warm !== false && res) { sOpts.flows0 = res.flows; }
+			if (opts.warm !== false && res) { sOpts.flows0 = Object.assign({}, res.flows, res.leakFlows || {}); }
 			res = solveInFeet(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
-				sOpts.flows0 = res.flows;
+				sOpts.flows0 = Object.assign({}, res.flows, res.leakFlows || {});
 				res = solveInFeet(stepModel, sOpts);
 				if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			}

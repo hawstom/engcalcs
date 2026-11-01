@@ -139,6 +139,18 @@ async function run() {
 		const r15 = await both(scaled(1.5)), w15 = worst(r15, 54000);
 		ok('Net3 demands x1.5: every step up to the 15:07:56 event within 0.8 mm of EPANET (the knife edge after it is not held)', w15.w <= 8e-4, `worst ${(w15.w * 1000).toFixed(4)} mm at ${w15.at}`);
 	}
+	// The solve stops where EPANET's does (hydsolver.c hasconverged(): total flow change within Accuracy of total flow),
+	// from the flows EPANET starts from (hydraul.c initlinkflow(): 1 ft/s, a pump at its design flow), so the number
+	// of trials EPANET reports for every step is the number the loop reports.
+	for (const file of ['Net1.inp', 'Net2.inp', 'Net3.inp']) {
+		for (const acc of [1e-5, 1e-3]) {
+			const m = load(file); m.hydraulics.accuracy = acc;
+			const r = await both(m);
+			const diffs = r.e.frames.filter((f, i) => !r.n.frames[i] || f.iterations !== r.n.frames[i].iterations);
+			ok(`${file} at Accuracy ${acc}: every step takes the same number of trials as EPANET`, diffs.length === 0 && r.e.frames.length === r.n.frames.length,
+				`${r.e.frames.length} steps, ${diffs.length} differ` + (diffs.length ? ' first at ' + diffs[0].t : ''));
+		}
+	}
 	// A refusal falls back to EPANET, quietly: the analysis is not the transport's status bar.
 	{
 		const m = load('Net1.inp');
