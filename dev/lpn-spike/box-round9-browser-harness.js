@@ -1,5 +1,5 @@
 // Box round 9 (Tom, 2026-10-30, round-8 phone and PC pass: "Give the user control."), at PC 1366x768 and phone 390x844:
-//   A. Properties: the Label column drags to near zero, by mouse and by finger; labels are one line, clipped with no ellipsis, and a cut label carries its full text as its tip.
+//   A. Properties: the Label column drags to near zero, by mouse and by finger; labels are one line, clipped with no ellipsis, and a cut label is clipped and carries no tip of its owns full text as its tip.
 //   B. No stacking: at 100 px every row keeps its label and its value side by side (the label left of the value, in one band), and no grid is marked narrow.
 //   C. Multi-selection Properties (Net1, a Select area over everything): each section is its own two-column block, stacked one after another (section boxes do not overlap, each
 //      row's label and value share a band), under the one divider, which drags by mouse and by finger and moves every section's Label column together.
@@ -89,9 +89,9 @@ async function main() {
 		const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'nowrap' || cs.textOverflow === 'ellipsis' || cs.overflow !== 'hidden'; }).length;
 		const tall = names.filter((n) => n.getBoundingClientRect().height > 40).length;
 		const cut = names.filter((n) => n.scrollWidth > n.clientWidth + 1);
-		const cutNoTitle = cut.filter((n) => { const t = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(); return ((n.getAttribute('data-bs-original-title') || n.title || '').indexOf(t) !== 0); });
+		const cutTipped = cut.filter((n) => { const t = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(); return ((n.getAttribute('data-bs-original-title') || n.title || '').replace(/\s+/g, ' ').trim() === t); });   // a tip that only repeats the cut name (Tom, 2026-10-31: none)
 		const w = names.length ? Math.max.apply(null, names.map((n) => n.getBoundingClientRect().width)) : 0;
-		return { n: names.length, bad, tall, cut: cut.length, cutNoTitle: cutNoTitle.length, ex: cutNoTitle[0] ? (cutNoTitle[0].textContent || '').trim().slice(0, 30) + ' | ' + (cutNoTitle[0].getAttribute('data-bs-original-title') || cutNoTitle[0].title) : '', maxW: Math.round(w) };
+		return { n: names.length, bad, tall, cut: cut.length, cutTipped: cutTipped.length, ex: cutTipped[0] ? (cutTipped[0].textContent || '').trim().slice(0, 30) + ' | ' + (cutTipped[0].getAttribute('data-bs-original-title') || cutTipped[0].title) : '', maxW: Math.round(w) };
 	}, sel);
 	// Every row: the label left of the value, the two in one band, and no label or value over another.
 	const rowsOf = (S, sel) => S.page.evaluate((s) => {
@@ -126,7 +126,7 @@ async function main() {
 				await S.settle(1300);
 				ok(mode + ' A1. Properties opens', await S.page.evaluate(() => getComputedStyle(document.getElementById('lpn_popup')).display !== 'none'));
 				const l0 = await labelsOf(S, '#lpn_popup');
-				ok(mode + ' A1b. at first open every cut label already carries its full text as its tip (no hover)', l0.n > 5 && l0.cutNoTitle === 0, JSON.stringify(l0));
+				ok(mode + ' A1b. at first open no cut label carries a truncation tip', l0.n > 5 && l0.cutTipped === 0, JSON.stringify(l0));
 				await setWidth(S, '#lpn_popup', 330);
 				await S.settle(500);
 				let sp = await splitAt(S, '#lpn_popup');
@@ -137,7 +137,7 @@ async function main() {
 				ok(mode + ' A3. the Label column drags to near zero (was ' + w0 + ' px)', w1 >= 0 && w1 <= 8 && w0 > 60, w0 + ' -> ' + w1 + ' px');
 				const l1 = await labelsOf(S, '#lpn_popup');
 				ok(mode + ' A4. every label is one line, clipped with no ellipsis, never wrapped', l1.n > 5 && l1.bad === 0 && l1.tall === 0, JSON.stringify(l1));
-				ok(mode + ' A5. every label the column cuts carries its full text as its tip', l1.cut > 5 && l1.cutNoTitle === 0, l1.cut + ' cut; ' + l1.ex);
+				ok(mode + ' A5. no label the column cuts carries a truncation tip', l1.cut > 5 && l1.cutTipped === 0, l1.cut + ' cut; ' + l1.ex);
 				const r1 = await rowsOf(S, '#lpn_popup');
 				ok(mode + ' A6. at that width every value is still beside its label, nothing over anything', r1.rows > 5 && r1.notSideBySide === 0 && r1.overlaps === 0 && r1.pageX <= 0, JSON.stringify(r1));
 				await shot(S, 'boxr9-a-' + mode + '.png');
@@ -172,7 +172,7 @@ async function main() {
 				await S.settle(1300);
 				const n = await P.evaluate(() => document.querySelectorAll('#lpn_popup .lpn-multi-section').length);
 				const lm0 = await labelsOf(S, '#lpn_popup');
-				ok(mode + ' C1b. at first open every cut label in the multi box carries its full text as its tip', lm0.n > 5 && lm0.cutNoTitle === 0, JSON.stringify(lm0));
+				ok(mode + ' C1b. at first open no cut label in the multi box carries a truncation tip', lm0.n > 5 && lm0.cutTipped === 0, JSON.stringify(lm0));
 				ok(mode + ' C1. a Select area over Net1 opens the multi-selection box with several sections', n >= 3, String(n));
 				for (const w of [315, 200, 120]) {
 					await setWidth(S, '#lpn_popup', w);
@@ -192,7 +192,7 @@ async function main() {
 					ok(mode + ' C. ' + w + ' px: no two sections share a vertical band; each starts below the one before', m.sections >= 3 && m.overlap === 0 && m.stacked, JSON.stringify(m));
 					ok(mode + ' C. ' + w + ' px: every row\'s label and value are in one band, nothing overlaps', rr.rows > 10 && rr.notSideBySide === 0 && rr.overlaps === 0 && rr.pageX <= 0, JSON.stringify(rr));
 					ok(mode + ' C. ' + w + ' px: the sections share one Label column and one Value column', m.labelXsAlign && m.valueXsAlign, JSON.stringify(m));
-					ok(mode + ' C. ' + w + ' px: global style (sheet grid with the divider), labels clipped on one line, every cut one tipped', m.inSheet && m.split && ll.bad === 0 && ll.tall === 0 && ll.cutNoTitle === 0, JSON.stringify(ll));
+					ok(mode + ' C. ' + w + ' px: global style (sheet grid with the divider), labels clipped on one line, no truncation tip', m.inSheet && m.split && ll.bad === 0 && ll.tall === 0 && ll.cutTipped === 0, JSON.stringify(ll));
 					if (w === 315) { await shot(S, 'boxr9-c-' + mode + '.png'); }
 				}
 				await setWidth(S, '#lpn_popup', 315);
@@ -222,14 +222,14 @@ async function main() {
 				await S.settle(1100);
 				ok(mode + ' D. ' + what + ': opens', await S.page.evaluate((s) => { const b = document.querySelector(s); return !!b && getComputedStyle(b).display !== 'none'; }, sel));
 				const ld0 = await labelsOf(S, sel);
-				ok(mode + ' D. ' + what + ': at first open every cut label carries its full text as its tip (no hover)', ld0.n > 3 && ld0.cutNoTitle === 0, JSON.stringify(ld0));
+				ok(mode + ' D. ' + what + ': at first open no cut label carries a truncation tip', ld0.n > 3 && ld0.cutTipped === 0, JSON.stringify(ld0));
 				for (const w of [300, 150, 100]) {
 					await setWidth(S, sel, w);
 					await S.settle(600);
 					const g = await S.page.evaluate((h) => { const e = document.querySelector(h); return { sheet: e.classList.contains('lpn-sheet'), narrow: e.classList.contains('lpn-gnarrow'), split: !!e.querySelector('.lpn-gsplit'), rows: e.querySelectorAll('.lpn-grow').length, hdr: getComputedStyle(e).display }; }, hostSel);
 					const r = await rowsOf(S, sel), l = await labelsOf(S, sel);
 					ok(mode + ' D. ' + what + ' ' + w + ' px: the global box style (sheet grid, divider, two columns)', g.sheet && !g.narrow && g.split && g.rows >= 4 && r.notSideBySide === 0 && r.narrow === 0, JSON.stringify([g, r]));
-					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line clipped, no ellipsis, every cut one tipped, nothing over anything', l.bad === 0 && l.tall === 0 && l.cutNoTitle === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
+					ok(mode + ' D. ' + what + ' ' + w + ' px: labels one line clipped, no ellipsis, no truncation tip, nothing over anything', l.bad === 0 && l.tall === 0 && l.cutTipped === 0 && r.overlaps === 0, JSON.stringify([l, r.overlaps]));
 				}
 				if (what === 'Find') {
 					// Round 10 (Tom, 2026-10-31): the buttons and the query help span both columns, at every width.

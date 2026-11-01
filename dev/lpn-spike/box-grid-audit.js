@@ -9,7 +9,7 @@
 //      +-2 px), except a control in a unit cell, a table's own, the report buttons another branch owns,
 //      and a control named in `skip`;
 //   2. every name starts at the one name x (+-2 px);
-//   3. no name wraps; a name the column cuts is clipped with an ellipsis and carries its full text as its tip
+//   3. no name wraps; a name the column cuts is clipped with no ellipsis and carries no truncation tip
 //      (round 9, Tom 2026-10-30: "truncate instead of wrapping");
 //   4. number boxes that hold the same number of digits share one width (+-1 px);
 //   5. the box does not scroll sideways.
@@ -70,10 +70,10 @@ function auditInPage(spec) {
 		const cs = getComputedStyle(e), t = e.textContent.trim().slice(0, 40);
 		const inner = e.querySelector('.lpn-gtext');
 		const clipped = (x) => x.scrollWidth > x.clientWidth + 1 || getComputedStyle(x).textOverflow === 'ellipsis' && x.scrollWidth > x.clientWidth;
-		// Round 9: a cut name is fine if it is one line, clipped, and tipped with its full words (at rest, no hover needed; an armed tip lives in data-bs-original-title).
+		// Round 9/10 (Tom, 2026-10-31): a cut name is fine if it is one line and clipped with no ellipsis, and it carries NO tip that only repeats its words (a `?` tip is another matter).
 		if (clipped(e) || (inner && clipped(inner))) {
 			const words = e.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-			if (cs.textOverflow === 'ellipsis' || cs.whiteSpace !== 'nowrap' || (e.getAttribute('data-bs-original-title') || e.title || '').indexOf(words) !== 0) { ellipsis.push(t); }
+			if (cs.textOverflow === 'ellipsis' || cs.whiteSpace !== 'nowrap' || (e.getAttribute('data-bs-original-title') || e.title || '').replace(/\s+/g, ' ').trim() === words) { ellipsis.push(t); }
 		}
 		const fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.25;
 		if (R(e).height > lh * 1.45 + 1 && !(spec.wrapOk || []).some((w) => t.indexOf(w) === 0)) { wrapped.push(t + ' h' + Math.round(R(e).height)); }
@@ -98,7 +98,7 @@ async function auditBox(page, spec, ok, tag) {
 	if (m.missing || !m.vals) { return m; }
 	ok(tag + ': every visible control stands in the value column', m.offGrid.length === 0, JSON.stringify(m.offGrid));
 	ok(tag + ': every name starts at one x', m.offName.length === 0, JSON.stringify(m.offName));
-	ok(tag + ': a cut name is one line, clipped, no ellipsis, and tipped with its full text', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
+	ok(tag + ': a cut name is one line, clipped, no ellipsis, and no truncation tip', m.ellipsis.length === 0, JSON.stringify(m.ellipsis));
 	ok(tag + ': like number boxes share a width', m.unlike.length === 0, JSON.stringify(m.unlike));
 	ok(tag + ': the value stands beside its name, not under it', m.beside >= 20, String(m.beside));
 	ok(tag + ': does not scroll sideways', m.scroll <= 1, String(m.scroll));

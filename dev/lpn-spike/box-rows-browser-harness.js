@@ -95,7 +95,7 @@ async function sectionAlignment(a, host, label) {
 	ok(label + ': every name starts at one x', uniq(f.rows.map((r) => r.name.x)).length === 1, JSON.stringify(uniq(f.rows.map((r) => r.name.x))));
 	// A toggle stands 6 px in, where the text of the cells beside it starts (the standard sheet style).
 	ok(label + ': every value starts at one x', uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x)).length === 1 && uniq(f.rows.filter((r) => r.chk).map((r) => r.val.x - 6)).every((x) => x === uniq(f.rows.filter((r) => !r.chk).map((r) => r.val.x))[0]), JSON.stringify(uniq(f.rows.map((r) => r.val.x))));
-	// Round 9 (Tom, 2026-10-30): a label never wraps; the column cuts it with an ellipsis and a cut label carries its full text as its tip.
+	// Round 9 (Tom, 2026-10-30): a label never wraps; the column clips it (no ellipsis, no tip added for it).
 	const cut = await a.page.evaluate((h) => Array.from(document.querySelectorAll(h + ' .lpn-gname')).filter((n) => getComputedStyle(n).whiteSpace !== 'nowrap' || getComputedStyle(n).textOverflow === 'ellipsis').length, host);
 	ok(label + ': every label is one line clipped, with no ellipsis', cut === 0, String(cut));
 	ok(label + ': a label is one line high', f.rows.every((r) => r.name.h < 2.4 * f.rem), JSON.stringify(f.rows.map((r) => r.name.h)));

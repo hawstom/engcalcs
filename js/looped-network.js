@@ -25446,94 +25446,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
-	// **A LABEL THE COLUMN CUTS SHORT CARRIES ITS FULL TEXT AS ITS TIP** (Tom, 2026-10-30: labels truncate, never wrap). The suite's tip system arms any element
-	// with a `title`; a label that fits keeps the title it was built with (a `?` label's tip, else none), one that is cut reads "Label: tip" (or just the label). Run
-	// on every width change (the host's observer, a divider drag, a fit) and just before a pointer rests on a label. A title is written, never removed.
-	function gridTitleOne(n) {
-		var cut, text, want, cur;
-		if (!n || !n.getBoundingClientRect || !n.getBoundingClientRect().width) { return; }
-		// An armed tip lives in `data-bs-original-title` (the attribute itself is blanked); an unarmed one in `title`.
-		cur = n.hasAttribute('data-bs-original-title') ? n.getAttribute('data-bs-original-title') : n.title;
-		if (n.__lpnTip0 === undefined || (cur !== n.__lpnTipSet && cur !== n.__lpnTip0)) { n.__lpnTip0 = cur || ''; }
-		cut = n.scrollWidth > n.clientWidth + 1;
-		text = (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-		want = cut ? (n.__lpnTip0 ? text + ': ' + n.__lpnTip0 : text) : n.__lpnTip0;
-		if (cur !== want) { n.title = want; }
-		n.__lpnTipSet = want;
-	}
-	function gridTitlesNow(host) {
-		var names = host.querySelectorAll('.lpn-gname'), i;
-		host.__lpnTitleQ = false;
-		for (i = 0; i < names.length; i++) { gridTitleOne(names[i]); }
-	}
-	function gridTitlesSoon(host) {
-		if (host.__lpnTitleQ) { return; }
-		host.__lpnTitleQ = true;
-		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridTitlesNow(host); });
-	}
-	// **THE SETTINGS BOX'S NAME CELLS, THE SAME RULE** (Tom, 2026-10-31, Perry round 10): the first child of a `.lpn-set-row`, or a `.lpn-set-name`, is cut at the column edge, and a cut one carries its
-	// full text as its tip. The tip belongs to the element a pointer lands on: a tipped wrapper with no `?` (its tip becomes "Name: tip"), else the cell; a `?` row's explanation stays on its `?`. Cleared (`title = ''`) when the cell is no longer cut.
-	function settingsNameCell(el) {
-		var t = el && el.closest ? el.closest('.lpn-set-row > :first-child, .lpn-set-name') : null;
-		return t && t.closest('#lpn_setbox_content') ? t : null;
-	}
-	// An element that holds a `?` glyph is armed by the tip system as an explanation host (click the `?`), so a name tip cannot sit on it. The name text gets an element of its own: the words
-	// directly under the `?`'s parent are wrapped once in a span (a link name is its own element already), and that is where the name tip goes.
-	function settingsNameTarget(cell) {
-		var g = cell.querySelector('.ec-tip'), host, a, kids, i, w, ht, text, hs, j;
-		text = (cell.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-		if (!g) {
-			hs = cell.querySelectorAll('.ec-help');
-			for (j = 0; j < hs.length; j++) {
-				ht = (hs[j].textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-				if (ht && ht === text) { return hs[j]; }
-			}
-			return cell;
-		}
-		a = cell.querySelector(':scope > a, :scope > * > a');
-		if (a) { return a; }
-		host = g.parentNode;
-		w = host.querySelector(':scope > .lpn-set-nametext');
-		if (w) { return w; }
-		kids = Array.prototype.filter.call(host.childNodes, function (k) { return k.nodeType === 3 && k.nodeValue.trim() !== ''; });
-		if (!kids.length) { return null; }
-		w = document.createElement('span');
-		w.className = 'lpn-set-nametext';
-		host.insertBefore(w, kids[0]);
-		for (i = 0; i < kids.length; i++) { w.appendChild(kids[i]); }
-		return w;
-	}
-	function settingsCellText(cell) {
-		var c = cell.cloneNode(true);
-		Array.prototype.forEach.call(c.querySelectorAll('.ec-tip'), function (g) { g.parentNode.removeChild(g); });
-		return (c.textContent || '').replace(/\s+/g, ' ').trim();
-	}
-	function settingsTitleOne(cell) {
-		var tgt, cut, text, want, cur;
-		if (!cell || !cell.getBoundingClientRect || !cell.getBoundingClientRect().width) { return; }
-		tgt = settingsNameTarget(cell);
-		if (!tgt) { return; }
-		text = settingsCellText(cell);   // the cell's whole text: a cell cut only by its "Saved in this browser" badge says that too
-		cur = tgt.hasAttribute('data-bs-original-title') ? tgt.getAttribute('data-bs-original-title') : tgt.title;
-		if (tgt.__lpnTip0 === undefined || (cur !== tgt.__lpnTipSet && cur !== tgt.__lpnTip0)) { tgt.__lpnTip0 = cur || ''; }
-		cut = cell.scrollWidth > cell.clientWidth + 1;
-		want = cut ? (tgt.__lpnTip0 && tgt.__lpnTip0 !== text ? text + ': ' + tgt.__lpnTip0 : text) : tgt.__lpnTip0;
-		if (cur !== want) { tgt.title = want; }
-		tgt.__lpnTipSet = want;
-	}
-	function settingsTitlesNow() {
-		var c = document.getElementById('lpn_setbox_content');
-		if (!c) { return; }
-		Array.prototype.forEach.call(c.querySelectorAll('.lpn-set-row > :first-child, .lpn-set-name'), settingsTitleOne);
-	}
-	if (typeof document !== 'undefined' && window.addEventListener) {
-		// On `window`, in the capture phase: it runs BEFORE the tip system's own capture listener on `document`, so the title is written before the element is armed.
-		window.addEventListener('pointerover', function (e) {
-			var t = e.target, n = t && t.closest ? t.closest('.lpn-gname, .lpn-set-name') : null, c = settingsNameCell(t);
-			if (n) { gridTitleOne(n); }
-			if (c) { settingsTitleOne(c); }
-		}, true);
-	}
+	// **A LABEL THE COLUMN CUTS IS CLIPPED AND NOTHING MORE** (Tom, 2026-10-31: no tip added for truncation). A tip a label has for another reason (its `?`, a short name's expansion) is its own.
 	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
 	// so a later change of the box's width can scale both columns by it.
 	function gridNoteFrac(host) {
@@ -25555,7 +25468,6 @@ var EngCalcs = EngCalcs || {};
 	function gridFitNow(host) {
 		var id = gcolId(host), prefs = gcolRead(), hr, names, valW = 0, px, cs, cap, w, pad, i, vals, secs, sheetFit;
 		host.__lpnFitQ = false;
-		gridTitlesSoon(host);
 		if (host.__lpnDrag) { return; }   // the reader has the divider in hand
 		if (host.isConnected && !gridIsNarrow(host)) { gridHeadersSync(host); }
 		if (!host.isConnected || gridIsNarrow(host) || host.classList.contains('lpn-gplain')) { return; }
@@ -25631,7 +25543,6 @@ var EngCalcs = EngCalcs || {};
 			var id = gcolId(host);
 			v = Math.max(LPN_GNAME_MIN, Math.min(room(), Math.round(v * 20) / 20));
 			host.style.setProperty('--lpn-g-name', v + 'rem');
-			gridTitlesSoon(host);
 			if (keep) { host.__lpnScaled = false; gridNoteFrac(host); }
 			if (keep && id) { gcolRead()[id] = v; gcolSave(); }
 			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
@@ -25755,8 +25666,7 @@ var EngCalcs = EngCalcs || {};
 			new ResizeObserver(function () {
 				var px = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16, w = host.getBoundingClientRect().width;
 				// Narrow is a host under 18 rem, or any box on a phone (a screen under 30 rem).
-				gridTitlesSoon(host);
-				if (w) {
+					if (w) {
 					var now = w < gridNarrowRem() * px, prevW = host.__lpnW;
 					host.classList.toggle('lpn-gnarrow', now);
 					host.__lpnFitted = true;
@@ -66109,17 +66019,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var jump = document.getElementById('lpn_setbox_jump'), content = document.getElementById('lpn_setbox_content'), queued = false;
 		if (setboxJumpWired || !jump || !content) { return; }
 		setboxJumpWired = true;
-		if (window.ResizeObserver) {   // the box or its divider resized: a name that was cut may not be now, and the reverse
-			var tq = false;
-			var soon = function () {
-				if (tq) { return; }
-				tq = true;
-				(window.requestAnimationFrame || setTimeout)(function () { tq = false; settingsTitlesNow(); });
-			};
-			new window.ResizeObserver(soon).observe(content);
-			// A row added or rebuilt after the box opened is wrapped and titled before a pointer reaches it (a name wrapped under the pointer is missed by that first arrival).
-			if (window.MutationObserver) { new window.MutationObserver(soon).observe(content, { childList: true, subtree: true }); }
-		}
 		jump.addEventListener('click', function () { setboxJumpOpen(!setboxJumpIsOpen()); });
 		['touchstart', 'touchmove', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
 			content.addEventListener(ev, function () { setboxSpyPinned = false; }, { passive: true });
@@ -72530,7 +72429,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			nm.__lpnRO = true;
 			new ResizeObserver(function () {
 				var w = nm.getBoundingClientRect().width, prevW = nm.__lpnW;
-				gridTitlesSoon(nm);
 				if (w) { nm.classList.remove('lpn-gnarrow'); }   // Properties is two columns at every width
 				if (w && gridResized(nm, w, prevW, gridIsNarrow(nm))) { return; }
 				gridFitSoon(nm);
