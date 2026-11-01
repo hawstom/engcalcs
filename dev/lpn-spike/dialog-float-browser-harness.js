@@ -1,6 +1,8 @@
 // CONVERT AS AND THE COORDINATE-SYSTEM CHOOSER MOVE, RESIZE, AND EVERY ROW'S DIVIDER DRAGS (round 11b; Tom, 2026-10-31: Convert as
 // "(1) The second divider is not draggable. 2. The box is not draggable or resizeable, and I see no good reason why not." and of the
 // chooser "(1) It seems a little like a bug that the last 'row' doesn't have a draggable divider. (2) Also not draggable or resizeable.").
+// Round 11d adds New project (the same shell, move, resize, every divider, stacking with the chooser, Esc and focus) and the
+// chooser's opening width: the same from Convert as and from New project, and on Net1 and Net3.
 // Design: dev/box-float-design.md. On Net1, at 1366 x 900 with a mouse and at 390 x 844 with a finger, for both boxes:
 //   - a drag of the title band moves the box by the drag;
 //   - a drag of the resize corner (the browser's own on a PC, the grip on a phone) changes its size, and the rows reflow to it;
@@ -125,7 +127,9 @@ async function main() {
 				ok(tag + ': ' + want + ' dividers stand in the box', n === want, String(n));
 				for (let i = 0; i < n; i++) {
 					const at = () => page.$$eval(sel + ' .lpn-gsplit', (l, i) => {
-						const s = l.filter((e) => e.getBoundingClientRect().width > 0)[i], r = s.getBoundingClientRect();
+						const s = l.filter((e) => e.getBoundingClientRect().width > 0)[i];
+						s.scrollIntoView({ block: 'nearest' });   // a box sized shorter scrolls its body
+						const r = s.getBoundingClientRect();
 						const hit = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(10, r.height / 2));
 						return { x: r.left + r.width / 2, y: r.top + Math.min(10, r.height / 2), c1: s.classList.contains('lpn-convas-split'), hit: hit === s, top: r.top };
 					}, i);
@@ -141,14 +145,47 @@ async function main() {
 				}
 			}
 
+			// ---- the chooser's opening width is one width, from either opener and on either network (round 11d) ----
+			const vw = opt.viewport.width, vh = opt.viewport.height;
+			async function chooserWidth(opener) {
+				if (opener === 'convas') {
+					await a.menuClick(await a.lang('lpn_file_convert_as'), 'file');
+					await page.waitForSelector('#lpn_convas_panel', { state: 'visible', timeout: 4000 });
+					await a.settle(400);
+					await tap('#lpn_convas_kind_epsg');
+					await tap('#lpn_convas_crs_pick');
+				} else {
+					await a.menuClick(await a.lang('lpn_file_new'), 'file');
+					await page.waitForSelector('#lpn_new_panel', { state: 'visible', timeout: 4000 });
+					await a.settle(400);
+					await tap('#lpn_new_coords_geo');
+					await tap('#lpn_new_crs_pick');
+				}
+				await page.waitForSelector('#lpn_crsbox', { state: 'visible', timeout: 4000 });
+				await a.settle(900);
+				const w = (await rect('#lpn_crsbox')).w;
+				await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+				await a.settle(300);
+				return w;
+			}
+			const cw = [await chooserWidth('convas'), await chooserWidth('new')];
+			await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+			await a.settle(1500);
+			cw.push(await chooserWidth('convas'), await chooserWidth('new'));
+			ok('chooser: opens at one width from Convert as and New project, on Net1 and Net3', cw.every((w) => near(w, cw[0], 1)), cw.map(Math.round).join(', '));
+			if (touch) { ok('chooser: a phone fills the width', near(cw[0], vw - 8, 2), String(cw[0])); }
+			else { ok('chooser: on a PC it is wide enough for its longest entries (>= 34 rem) and fits the window', cw[0] >= 34 * 16 && cw[0] <= vw - 8, String(cw[0])); }
+
 			// ---- Convert as ----
 			await a.menuClick(await a.lang('lpn_file_convert_as'), 'file');
 			await page.waitForSelector('#lpn_convas_panel', { state: 'visible', timeout: 4000 });
 			await a.settle(700);
-			const pr = await rect('#lpn_convas_panel'), vw = opt.viewport.width, vh = opt.viewport.height;
+			const pr = await rect('#lpn_convas_panel');
 			ok('convert as: opens wholly on screen', pr.x >= 0 && pr.y >= 0 && pr.r <= vw + 0.5 && pr.b <= vh + 0.5, JSON.stringify(pr));
 			const footIn = await page.$eval('#lpn_convas_ok', (e) => e.getBoundingClientRect().bottom <= window.innerHeight);
 			ok('convert as: Convert and Cancel are in view', footIn);
+			const bodyCut = await page.$eval('#lpn_convas_body', (e) => e.scrollHeight - e.clientHeight);
+			if (!touch) { ok('convert as: its body is not cut at its opening height (the closing sentence is whole)', bodyCut <= 1, String(bodyCut)); }
 			if (touch) { ok('convert as: a phone box fills the width', near(pr.w, vw - 8, 2), String(pr.w)); }
 			await shot('convas-open', '#lpn_convas_panel');
 			await moveAndSize('convert as', '#lpn_convas_panel', '#lpn_convas_body');
@@ -212,6 +249,49 @@ async function main() {
 			if (touch) { ok('reopened on a phone: it fills the width again', near(re.w, vw - 8, 2), String(re.w)); }
 			else { ok('reopened on a PC: where and as big as it was left', near(re.w, pr.w + 90, 5), Math.round(re.w) + ' vs ' + Math.round(pr.w + 90)); }
 			await tap('#lpn_convas_cancel');
+			// ---- New project: the same shell ----
+			await a.menuClick(await a.lang('lpn_file_new'), 'file');
+			await page.waitForSelector('#lpn_new_panel', { state: 'visible', timeout: 4000 });
+			await a.settle(700);
+			const np0 = await rect('#lpn_new_panel');
+			ok('new project: opens wholly on screen', np0.x >= 0 && np0.y >= 0 && np0.r <= vw + 0.5 && np0.b <= vh + 0.5, JSON.stringify(np0));
+			const fm = await page.evaluate(() => {
+				const s = document.getElementById('lpn_new_method'), c = document.createElement('span'), cs = getComputedStyle(s);
+				c.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:' + cs.font;
+				c.textContent = s.selectedOptions[0].text;
+				document.body.appendChild(c);
+				const need = c.getBoundingClientRect().width;
+				c.remove();
+				return { need, have: s.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 22 };
+			});
+			ok('new project: the Friction method value is not cut', fm.have >= fm.need, JSON.stringify(fm));
+			await shot('new-open', '#lpn_new_panel');
+			await moveAndSize('new project', '#lpn_new_panel', '#lpn_new_body');
+			const nsp = await page.$$eval('#lpn_new_panel .lpn-gsplit', (l) => l.filter((x) => x.getBoundingClientRect().width > 0).length);
+			await dividers('new project', '#lpn_new_panel', nsp);
+			ok('new project: has dividers to drag', nsp >= 1, String(nsp));
+			await tap('#lpn_new_coords_geo');
+			await tap('#lpn_new_crs_pick');
+			await page.waitForSelector('#lpn_crsbox', { state: 'visible', timeout: 4000 });
+			await a.settle(700);
+			const nz = await page.evaluate(() => [document.getElementById('lpn_crsbox'), document.getElementById('lpn_new_panel')].map((e) => +getComputedStyle(e).zIndex));
+			ok('new project: the chooser stands in front of it', nz[0] > nz[1], nz.join(' over '));
+			await page.focus('#lpn_crsbox_name');
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+			const na = await page.evaluate(() => ({ crs: getComputedStyle(document.getElementById('lpn_crsbox')).display, np: getComputedStyle(document.getElementById('lpn_new_panel')).display, focus: document.activeElement && document.activeElement.id }));
+			ok('new project: Esc in the chooser closes the chooser only', na.crs === 'none' && na.np !== 'none', JSON.stringify(na));
+			ok('new project: ...and the focus goes back to its ... button', na.focus === 'lpn_new_crs_pick', na.focus);
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+			ok('new project: a second Esc closes it', await page.$eval('#lpn_new_panel', (e) => getComputedStyle(e).display === 'none'));
+			await a.menuClick(await a.lang('lpn_file_new'), 'file');
+			await page.waitForSelector('#lpn_new_panel', { state: 'visible', timeout: 4000 });
+			await a.settle(500);
+			const npr = await rect('#lpn_new_panel');
+			if (touch) { ok('new project reopened on a phone: it fills the width again', near(npr.w, vw - 8, 2), String(npr.w)); }
+			else { ok('new project reopened on a PC: as big as it was left', near(npr.w, np0.w + 90, 5), Math.round(npr.w) + ' vs ' + Math.round(np0.w + 90)); }
+			await tap('#lpn_new_cancel');
 			const keys1 = await page.evaluate(() => Object.keys(localStorage).filter((k) => !/^lpn_project_/.test(k)).sort());
 			const added = keys1.filter((k) => keys0.indexOf(k) < 0 && k !== 'lpn_gcols');
 			ok('no new key is stored on the visitor\'s device (the divider rides in lpn_gcols)', added.length === 0, JSON.stringify(added));
