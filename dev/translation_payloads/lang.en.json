@@ -1716,6 +1716,7 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_about_dedication": "You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.",
         "lpn_notes_1_term": "How it is solved",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_term": "What it does not do",
@@ -3291,7 +3292,7 @@
         "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.",
         "lpn_prop_label_symbol": "{label}, {symbol}"
     },
-    "count": 3289,
+    "count": 3290,
     "active_prefixes": [
         "about",
         "bpn",
