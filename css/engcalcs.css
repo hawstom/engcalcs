@@ -6811,6 +6811,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only
    one section is on screen at a time, so there is nothing to lose track of. */
 .lpn-lib-sec { margin: 0; }
+.lpn-lib-manual { border: 0; background: transparent; padding: 0 2px; font: inherit; font-size: 0.9em; color: var(--ec-help-ink); cursor: pointer; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong); }
 
 /* THE FIELDS AN INPUT UNIT DECIDES, ONE PER LINE (ROADMAP Task 425). Tom asked for a column rather

@@ -69522,7 +69522,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
-	// **A SECTION'S LONG EXPLANATION IS THE TIP OF ITS HEADING'S `?`, AND THE HEADING OPENS THE USER MANUAL** (Tom, round 11: "Curves, Pipe Types, and Fittings still start with rambling explanations that need to be abstracted. Maybe a ? glyph at each one that leads to a User Manual section?"). The heading is a link with a separate `?` glyph, the pattern of ecLinkTipLabel(); the link opens the Libraries chapter (the manual has one entry for the box, no entry per section). The words are the keys the paragraphs always used.
+	// **A SECTION'S LONG EXPLANATION IS THE TIP OF ITS HEADING'S `?`, AND THE HEADING OPENS THE USER MANUAL** (Tom, round 11: "Curves, Pipe Types, and Fittings still start with rambling explanations that need to be abstracted. Maybe a ? glyph at each one that leads to a User Manual section?"). The heading stays plain; its `?` is a button that opens the Libraries chapter (the manual has one entry for the box, no entry per section) and shows the explanation as its hover tip. The words are the keys the paragraphs always used.
 	var LIB_INTRO = {
 		curves: [['lpn_library_curves_note', 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'],
 			['lpn_library_curve_values_tip', 'Select one or two columns in a spreadsheet, copy them, and paste into the first target cell. Rows are added as needed. Lines copied directly from an EPANET file, including the curve name, can also be pasted.']],
@@ -69532,14 +69532,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_library_fittings_source', 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point, not as final values.']]
 	};
 	function libSectionHead(cur) {
-		var pc = EngCalcs.pageConfig || {}, head = libEl('h3', '', ''), a,
-			intro = LIB_INTRO[cur.id], tip = intro ? intro.map(function (k) { return pc[k[0]] || k[1]; }).join(' ') : (pc[cur.tip] || '');
-		a = document.createElement('a');
-		a.href = '#guide/box-lpn_library_box';
-		a.textContent = pc[cur.label] || cur.id;
-		a.addEventListener('click', function (e) { e.preventDefault(); openGuideForBox('lpn_library_box'); });
-		head.appendChild(a);
-		if (tip) { head.appendChild(findHelpLabel('', tip)); }
+		var pc = EngCalcs.pageConfig || {}, intro = LIB_INTRO[cur.id], head, tip, btn, label = pc[cur.label] || cur.id;
+		if (!intro) {
+			// Patterns, Controls and Rules: the plain heading they always had, its tip on the heading.
+			head = libEl('h3', 'ec-help', label);
+			if (pc[cur.tip]) { head.title = pc[cur.tip]; }
+			return head;
+		}
+		// The heading is plain text. The `?` beside it is a button with a title, exactly the box title bar's
+		// `?` (guideCornerButton): a hovering pointer gets the name tip (the explanation), a click or tap opens
+		// the Guide at the Libraries entry through openGuideForBox().
+		head = libEl('h3', '', label + ' ');
+		tip = intro.map(function (k) { return pc[k[0]] || k[1]; }).join(' ');
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-lib-manual';
+		btn.title = tip;
+		btn.setAttribute('aria-label', pc.lpn_guide_box_help || 'Help for this box');
+		btn.textContent = '?';
+		btn.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox('lpn_library_box'); });
+		head.appendChild(btn);
 		return head;
 	}
 	function buildLibraryIndex() {
