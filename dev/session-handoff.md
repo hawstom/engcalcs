@@ -95,13 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-31 afternoon (fifty-fourth session, Opus main, Sonnet agents)
+## STATE — 2026-10-31 evening (fifty-fifth session, Opus main, Sonnet agents)
 
-- **Tom's calls 10-31 on box-design:** round 9 passed (*"All good"*). Labels: *"I didn't ask for an ellipsis. Remove it."*, then *"I'd prefer you don't add a 'Show extra tip when truncated' system"*, and he chose removing the round-9 cut-label tip everywhere: a cut label is simply clipped, no ellipsis, no tip; `?` tips and Task 839's short-name tips stay. Value cells keep their ellipsis. The Label column keeps opening at the 80th percentile (his "No" to fit-the-longest; *"I may change my decision before or after release"*). Of the style: *"I probably want to run with it for deployment ... audit the entire app to be sure that it is applied cleanly and systematically wherever appropriate."*
-- **box-design round 10 built** (10a clip and Find spans, 10b the audit's boxes moved onto the sheet, 10c Perry's findings and six stale harnesses). Audit and Perry's review: this session's scratch `sheet-style-audit.md` and the worktree's Perry journal. Guard: `sheet-coverage-browser-harness.js`. Open for Tom: Settings stays on `.lpn-set-row`, not `.lpn-sheet`; Fire flow / Criticality / Demand scaling number inputs fill the Value cell (as Properties) though Task 828 says "sized to content". box-design waits his pass and his merge word.
-- **Tasks 835, 837, 846 were built 10-27 (`ddea93a80`, `66afa5074`) and are on master**; the 10-31 small-hours report wrongly called them new design work. Close on his look.
-- **Task 825**: the widths in `dev/box-width-audit.md` predate box-design; re-measure after box-design merges, then his six-step pass.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/883ed6c1-d8db-4144-9cea-516129ed966e/scratchpad.
+- **box-design round 11 built from Tom's round-10 notes, pushed 3fae5925c, preview row updated (8103).** 11a: the label column fits the LONGEST label (`gridFitNow`, one rule; Tom: *"let's try 100% for all of them ... I very much hope that this is a single control"*); New project fixed-width; Libraries one shared label width (`gridGroup`, `data-gcols-id="lpn_lib"`); Settings > Units back on `.lpn-set-row` (Tom: *"Settings should be a reserved space for the other style"*); Scenario names nowrap (class `lpn-pane-scntable` only). 11b (Opus, design note `dev/box-float-design.md`): Convert as, the CRS chooser and (11d) New project move and resize via `wireFloatBox`/`placeFloatBox`, non-modal; the Round to | Suffix line is a divider stored as `lpn_convas_round_c1` inside existing `lpn_gcols` (Tom told). Every sheet run of ONE or more rows has a divider (merge 4a9c93493). Perry reviewed (712297b76); 11d fixed his findings. Waits Tom's pass and merge word.
+- **Open question for Tom:** Libraries *"Controls columns are not sizeable"*: 11a read it as the Controls/Rules entries' one Description row; Perry thinks he meant the curve point (Flow, Head) columns or the control inputs. Ask, do not assume.
+- **Tom 10-31, item 2(b):** "the box has no border" was wrong: the sheet cell is ruled by hairline gridlines and the input fills it; hover shades, focus outlines. Screenshots `box11-inputs-*.png` in `_panel/www/img/`.
+- **Leftover per-box override:** `.lpn-contourbox { --lpn-g-valmax: 9.5rem }` (Value side). Phone Contour on Net3 clips "Ground between nodes from Mapbox".
+- Tasks 835, 837, 846 closed (Tom: *"Close the tasks."*). Task 825 re-measure after box-design merges. Priority 100 is empty except box-design's merge (827, 828, 829, 842, 845 close with it).
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/45c7992a-1027-4c85-bddf-37721c1fe9c7/scratchpad (briefs 11a-11d, sheet-style-audit.md).
 
 ## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
 

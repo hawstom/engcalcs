@@ -7,19 +7,16 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**97 open tasks.** Next (100): 9 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**94 open tasks.** Next (100): 6 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
-## 100 — Next (9)
+## 100 — Next (6)
 
 - Task 825 — Audit every dockable box's width, with a checklist.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 835 — Settings on a phone: a top menu for its sections, narrower columns.
-- Task 837 — Spreadsheet cells: the input is the cell, and toggles follow 2026 practice.
 - Task 842 — One spreadsheet style for every box's rows, no first-column heading.
 - Task 845 — Report tables: economical width, adjustable columns, "And others", "Time (hr)".
-- ! Task 846 — The Basic mode toggle stays in the Scenario manager when Basic is off.
 
 ## 95 — Priority 95 (6)
 
@@ -128,5 +125,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-88 of 97 titles are within 4–12 words. `!` marks the rest;
+86 of 94 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
