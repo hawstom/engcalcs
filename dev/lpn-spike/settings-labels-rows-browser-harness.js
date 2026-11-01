@@ -6,6 +6,7 @@
 //   2. the Show and Drop columns are fully visible or reachable by scrolling the content pane
 //      sideways, and no ancestor between them and the pane clips them;
 //   3. a two-digit Drop value is not clipped, and the default PC box fits the table with its override column;
+//   3c. EVERY name cell in the Settings box that the column cuts (not only the Labels tables), really hovered, shows a styled tip holding its full text;
 //   3b. a name the column cuts is one line, clipped with no ellipsis, and carries its full text as a tip (round 9 and 10: no label floor), in English, German and Russian;
 //
 //   node dev/lpn-spike/settings-labels-rows-browser-harness.js   (takes the browser lock itself)
@@ -113,6 +114,46 @@ async function measure(page) {
 	}, LISTS);
 }
 
+// 3c. Every Settings name the column cuts, really hovered (a real mouse on a PC; a real tap on a phone, which cannot hover).
+async function hoverAllCutNames(page, a, label, touch) {
+	const n = await page.evaluate(() => {
+		const c = document.getElementById('lpn_setbox_content'); let i = 0;
+		Array.from(c.querySelectorAll('.lpn-set-row > :first-child, .lpn-set-name')).forEach((el) => {
+			if (!el.offsetParent || !el.getBoundingClientRect().width) { return; }
+			if (el.scrollWidth > el.clientWidth + 1) { el.setAttribute('data-cutprobe', String(i++)); }
+		});
+		return i;
+	});
+	const bad = []; let shown = 0;
+	for (let k = 0; k < n; k++) {
+		const pos = await page.evaluate((k) => {
+			const el = document.querySelector('[data-cutprobe="' + k + '"]'), c = document.getElementById('lpn_setbox_content');
+			el.scrollIntoView({ block: 'center' });
+			const nt = el.querySelector('.lpn-set-nametext'), r = (nt || el).getBoundingClientRect(), cr = c.getBoundingClientRect();
+			const cl = el.cloneNode(true); cl.querySelectorAll('.ec-tip, .lpn-saved').forEach((x) => x.remove());   // the name's words: not the ? and not the Saved badge (the tip holds them and more)
+			const text = (cl.textContent || '').replace(/\s+/g, ' ').trim();
+			for (const fx of [0.15, 0.3, 0.05]) {
+				const x = Math.min(r.left + Math.max(6, r.width * fx), cr.right - 4), y = r.top + r.height / 2, top = document.elementFromPoint(x, y);
+				if (top && el.contains(top) && top !== el && top.tagName !== 'INPUT' && !top.closest('.ec-tip, .lpn-saved')) { return { x, y, text }; }
+			}
+			return { x: r.left + 6, y: r.top + r.height / 2, text, off: true };
+		}, k);
+		if (touch) { await page.touchscreen.tap(pos.x, pos.y); await a.settle(500); }   // a phone has no hover: a tap on the name opens its tip
+		else { await page.mouse.move(2, 2); await a.settle(150); await page.mouse.move(pos.x, pos.y); await a.settle(700); }
+		const got = await page.evaluate(() => { const t = document.querySelector('.tooltip.show .tooltip-inner'); return t ? t.textContent : null; });
+		if (got !== null && got.replace(/\s+/g, ' ').indexOf(pos.text) >= 0) { shown++; } else {
+			const dbg = await page.evaluate((k) => { const el = document.querySelector('[data-cutprobe="' + k + '"]'); const nt = el && el.querySelector('.lpn-set-nametext'); return el ? 'nametext=' + (nt ? nt.outerHTML.slice(0, 120) : 'none') + ' tooltips=' + document.querySelectorAll('.tooltip').length + ' shown=' + document.querySelectorAll('.tooltip.show').length + ' cut=' + (el.scrollWidth > el.clientWidth + 1) : 'cell gone'; }, k);
+			bad.push(pos.text.slice(0, 30) + ' got ' + JSON.stringify(got && got.slice(0, 30)) + ' @' + Math.round(pos.x) + ',' + Math.round(pos.y) + ' ' + dbg);
+		}
+		if (touch) { await page.touchscreen.tap(pos.x, pos.y); await a.settle(300); }   // the second tap closes it (and puts back a tick the first one toggled)
+		else { await page.mouse.move(2, 2); await a.settle(200); }
+	}
+	await page.evaluate(() => Array.from(document.querySelectorAll('[data-cutprobe]')).forEach((e) => e.removeAttribute('data-cutprobe')));
+	console.log('  cut Settings names hovered: ' + n);
+	ok(label + ': Settings has cut names to hover', n >= 5, String(n));
+	ok(label + ': every cut Settings name, really hovered, shows its full text as a tip (' + shown + '/' + n + ')', bad.length === 0, bad.slice(0, 4).join(' ;; '));
+}
+
 async function run(browser, Session, label, viewport, touch, lang) {
 	const a = await Session.open(browser, NAME + '-' + label, Object.assign({ viewport }, touch ? { hasTouch: true, isMobile: true, deviceScaleFactor: 2 } : {}));
 	const page = a.page;
@@ -133,6 +174,7 @@ async function run(browser, Session, label, viewport, touch, lang) {
 		ok(label + ': a two-digit Drop value is not clipped', m.dropClip.length === 0, m.dropClip.join(' | '));
 		ok(label + ': a cut name is one line, clipped with no ellipsis, and tipped with its full text', m.cut.length === 0, m.cut.slice(0, 3).join(' | '));
 		ok(label + ': Show and Drop reachable, never clipped', m.clipped.length === 0, m.clipped.slice(0, 3).join(' | '));
+		await hoverAllCutNames(page, a, label, touch);
 		console.log('  widest list ' + m.listW + ' px, pane ' + m.pane + ' px, past the pane: ' + m.wide.join('; '));
 		if (!touch && !lang) { ok(label + ': the docked-width default fits the labels table without a sideways scroll', m.listW + 8 <= m.pane, m.listW + ' (+8 indent) vs ' + m.pane); }
 		// A scenario override on a label row.
@@ -170,10 +212,12 @@ async function main() {
 	if (!executablePath) { console.error('no Chromium; SKIPPING'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		await run(browser, Session, 'phone', { width: 390, height: 844 }, true);
-		await run(browser, Session, 'pc', { width: 1366, height: 768 }, false);
-		await run(browser, Session, 'phone-de', { width: 390, height: 844 }, true, 'de');
-		await run(browser, Session, 'pc-ru', { width: 1366, height: 768 }, false, 'ru');
+		const only = (process.env.EC_SLR_ONLY || '').split(',').filter(Boolean);   // e.g. EC_SLR_ONLY=pc-ru to run one view
+		const want = (n) => !only.length || only.indexOf(n) >= 0;
+		if (want('phone')) { await run(browser, Session, 'phone', { width: 390, height: 844 }, true); }
+		if (want('pc')) { await run(browser, Session, 'pc', { width: 1366, height: 768 }, false); }
+		if (want('phone-de')) { await run(browser, Session, 'phone-de', { width: 390, height: 844 }, true, 'de'); }
+		if (want('pc-ru')) { await run(browser, Session, 'pc-ru', { width: 1366, height: 768 }, false, 'ru'); }
 	} finally { await browser.close(); env.stopServer(); }
 	console.log('\n' + NAME + ': ' + (checks - fails) + '/' + checks + ' checks passed');
 	if (fails) { process.exitCode = 1; }

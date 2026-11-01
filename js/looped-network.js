@@ -25471,10 +25471,67 @@ var EngCalcs = EngCalcs || {};
 		host.__lpnTitleQ = true;
 		(window.requestAnimationFrame || function (f) { return setTimeout(f, 16); })(function () { gridTitlesNow(host); });
 	}
-	if (typeof document !== 'undefined' && document.addEventListener) {
-		document.addEventListener('pointerover', function (e) {
-			var t = e.target, n = t && t.closest ? t.closest('.lpn-gname, .lpn-set-name') : null;
+	// **THE SETTINGS BOX'S NAME CELLS, THE SAME RULE** (Tom, 2026-10-31, Perry round 10): the first child of a `.lpn-set-row`, or a `.lpn-set-name`, is cut at the column edge, and a cut one carries its
+	// full text as its tip. The tip belongs to the element a pointer lands on: a tipped wrapper with no `?` (its tip becomes "Name: tip"), else the cell; a `?` row's explanation stays on its `?`. Cleared (`title = ''`) when the cell is no longer cut.
+	function settingsNameCell(el) {
+		var t = el && el.closest ? el.closest('.lpn-set-row > :first-child, .lpn-set-name') : null;
+		return t && t.closest('#lpn_setbox_content') ? t : null;
+	}
+	// An element that holds a `?` glyph is armed by the tip system as an explanation host (click the `?`), so a name tip cannot sit on it. The name text gets an element of its own: the words
+	// directly under the `?`'s parent are wrapped once in a span (a link name is its own element already), and that is where the name tip goes.
+	function settingsNameTarget(cell) {
+		var g = cell.querySelector('.ec-tip'), host, a, kids, i, w, ht, text, hs, j;
+		text = (cell.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+		if (!g) {
+			hs = cell.querySelectorAll('.ec-help');
+			for (j = 0; j < hs.length; j++) {
+				ht = (hs[j].textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
+				if (ht && ht === text) { return hs[j]; }
+			}
+			return cell;
+		}
+		a = cell.querySelector(':scope > a, :scope > * > a');
+		if (a) { return a; }
+		host = g.parentNode;
+		w = host.querySelector(':scope > .lpn-set-nametext');
+		if (w) { return w; }
+		kids = Array.prototype.filter.call(host.childNodes, function (k) { return k.nodeType === 3 && k.nodeValue.trim() !== ''; });
+		if (!kids.length) { return null; }
+		w = document.createElement('span');
+		w.className = 'lpn-set-nametext';
+		host.insertBefore(w, kids[0]);
+		for (i = 0; i < kids.length; i++) { w.appendChild(kids[i]); }
+		return w;
+	}
+	function settingsCellText(cell) {
+		var c = cell.cloneNode(true);
+		Array.prototype.forEach.call(c.querySelectorAll('.ec-tip'), function (g) { g.parentNode.removeChild(g); });
+		return (c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	function settingsTitleOne(cell) {
+		var tgt, cut, text, want, cur;
+		if (!cell || !cell.getBoundingClientRect || !cell.getBoundingClientRect().width) { return; }
+		tgt = settingsNameTarget(cell);
+		if (!tgt) { return; }
+		text = settingsCellText(cell);   // the cell's whole text: a cell cut only by its "Saved in this browser" badge says that too
+		cur = tgt.hasAttribute('data-bs-original-title') ? tgt.getAttribute('data-bs-original-title') : tgt.title;
+		if (tgt.__lpnTip0 === undefined || (cur !== tgt.__lpnTipSet && cur !== tgt.__lpnTip0)) { tgt.__lpnTip0 = cur || ''; }
+		cut = cell.scrollWidth > cell.clientWidth + 1;
+		want = cut ? (tgt.__lpnTip0 && tgt.__lpnTip0 !== text ? text + ': ' + tgt.__lpnTip0 : text) : tgt.__lpnTip0;
+		if (cur !== want) { tgt.title = want; }
+		tgt.__lpnTipSet = want;
+	}
+	function settingsTitlesNow() {
+		var c = document.getElementById('lpn_setbox_content');
+		if (!c) { return; }
+		Array.prototype.forEach.call(c.querySelectorAll('.lpn-set-row > :first-child, .lpn-set-name'), settingsTitleOne);
+	}
+	if (typeof document !== 'undefined' && window.addEventListener) {
+		// On `window`, in the capture phase: it runs BEFORE the tip system's own capture listener on `document`, so the title is written before the element is armed.
+		window.addEventListener('pointerover', function (e) {
+			var t = e.target, n = t && t.closest ? t.closest('.lpn-gname, .lpn-set-name') : null, c = settingsNameCell(t);
 			if (n) { gridTitleOne(n); }
+			if (c) { settingsTitleOne(c); }
 		}, true);
 	}
 	// The Label column's share of the box's width, noted whenever the column is set (a fit, a remembered width, a divider drag),
@@ -66052,6 +66109,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var jump = document.getElementById('lpn_setbox_jump'), content = document.getElementById('lpn_setbox_content'), queued = false;
 		if (setboxJumpWired || !jump || !content) { return; }
 		setboxJumpWired = true;
+		if (window.ResizeObserver) {   // the box or its divider resized: a name that was cut may not be now, and the reverse
+			var tq = false;
+			var soon = function () {
+				if (tq) { return; }
+				tq = true;
+				(window.requestAnimationFrame || setTimeout)(function () { tq = false; settingsTitlesNow(); });
+			};
+			new window.ResizeObserver(soon).observe(content);
+			// A row added or rebuilt after the box opened is wrapped and titled before a pointer reaches it (a name wrapped under the pointer is missed by that first arrival).
+			if (window.MutationObserver) { new window.MutationObserver(soon).observe(content, { childList: true, subtree: true }); }
+		}
 		jump.addEventListener('click', function () { setboxJumpOpen(!setboxJumpIsOpen()); });
 		['touchstart', 'touchmove', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
 			content.addEventListener(ev, function () { setboxSpyPinned = false; }, { passive: true });
