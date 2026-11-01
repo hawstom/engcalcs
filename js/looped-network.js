@@ -33012,7 +33012,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		table = document.createElement('table');
 		// Under a filter the ID column keeps room for Task 738's warning sign from the start, so the
 		// first sign to appear does not widen the column and shift the whole table sideways.
-		table.className = 'lpn-pane-table' + (filterNote ? ' lpn-pane-filtered' : '');
+		table.className = 'lpn-pane-table' + (filterNote ? ' lpn-pane-filtered' : '') + (spec.group === 'scenario' ? ' lpn-pane-scntable' : '');
 		// **A <colgroup> IS HOW A TABLE COLUMN IS GIVEN A WIDTH**, rather than a width on each cell:
 		// one element per column, so a drag rewrites one style instead of four hundred, and the
 		// heading and its cells cannot end up at two different widths. The inputs keep their own

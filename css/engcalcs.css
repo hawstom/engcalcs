@@ -4601,8 +4601,9 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
-/* A cell's words never wrap: one line, clipped at the column edge, as an input or a select in the next cell is (Tom, 2026-10-31: the Scenario column wrapped where every alternatives selector does not). */
-.lpn-pane-table tbody td { overflow: hidden; white-space: nowrap; }
+.lpn-pane-table tbody td { overflow: hidden; }
+/* The Scenarios table's words never wrap: one line, clipped at the column edge, as a pick-list in the next cell is (Tom, 2026-10-31: the Scenario column wrapped where every alternatives selector does not). Only that table: the printed tables wrap on purpose. */
+.lpn-pane-scntable tbody td { white-space: nowrap; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
    highlight cells, not characters. But I see characters highlighting as in Entry mode."*). Every
    editable cell here is an <input>, and dragging across one leaves the browser's own text
