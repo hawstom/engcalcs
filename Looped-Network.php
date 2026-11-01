@@ -1719,7 +1719,7 @@ echoHeader("EngCalcsApp", $html_title,
       // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
       // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
       // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
-<div id="lpn_convas_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+<div id="lpn_convas_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<?php // The coordinate system and the units are Label | Value rows of the box's one grid, as in New project
@@ -1822,7 +1822,7 @@ echoHeader("EngCalcsApp", $html_title,
       //
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
-<div id="lpn_crsbox" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+<div id="lpn_crsbox" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_crsbox_title">
 	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired

@@ -5291,18 +5291,28 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-new-crs-name.lpn-dim { opacity: .55; }
 #lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
 /* The rounding step and the suffix share a row's Value cell, drawn as two sheet cells: the input is the cell, a hairline between them, and the heading row names the second. */
-#lpn_convas_panel .lpn-grow > .lpn-gwrap { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; margin: 0; align-self: stretch; width: 100%; min-width: 0; }
+#lpn_convas_panel .lpn-grow > .lpn-gwrap { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; margin: 0; padding: 0; align-self: stretch; justify-self: stretch; box-sizing: border-box; width: auto; max-width: none; min-width: 0; }   /* the whole Value cell, so the Round to | Suffix line and its divider share one measure */
 #lpn_convas_panel .lpn-gwrap > :is(select, input) {
 	margin: 0; border: 0; border-radius: 0; background: transparent; padding: 2px 6px; box-sizing: border-box; font: inherit; font-size: .85rem; line-height: 1.3; text-overflow: ellipsis; min-width: 0; align-self: stretch;
 }
 #lpn_convas_panel .lpn-gwrap > :is(select, input):hover:not(:focus) { background: var(--ec-hover-bg); }
 #lpn_convas_panel .lpn-gwrap > :is(select, input):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
-#lpn_convas_panel .lpn-convas-c1 { flex: 0 1 8.5rem; width: 8.5rem; }
-#lpn_convas_panel .lpn-convas-c2 { flex: 1 1 5rem; width: 5rem; border-inline-start: 1px solid var(--ec-hairline); }
+/* The Round to | Suffix line is a divider of its own (round 11b): --lpn-convas-c1 is where the reader dragged it, else 8.5 rem or 63% of a narrow cell; the Suffix cell keeps at least 2 rem. */
+#lpn_convas_panel .lpn-convas-c1 { flex: 0 0 min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem); width: auto; }
+#lpn_convas_panel .lpn-convas-c2 { flex: 1 1 0; width: auto; border-inline-start: 1px solid var(--ec-hairline); }
+#lpn_convas_panel .lpn-grid > .lpn-convas-split { display: block; grid-column: 2 / 3; grid-row: auto; inset-inline-end: auto; inset-inline-start: calc(min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem) - 3px); }
+@media (pointer: coarse) { #lpn_convas_panel .lpn-grid > .lpn-convas-split { inset-inline-start: calc(min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem) - 8px); } }
 #lpn_convas_panel .lpn-convas-colhead { font-size: .85em; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-gwrap > span { box-sizing: border-box; padding: 2px 6px; min-width: 0; line-height: 1.3; }
 #lpn_convas_panel .lpn-convas-colhead .lpn-convas-c2 { overflow: hidden; white-space: nowrap; }
 #lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
+/* **CONVERT AS AND THE COORDINATE-SYSTEM CHOOSER MOVE AND RESIZE** (Tom, 2026-10-31; dev/box-float-design.md): the Find box's shell. They open
+   at most 40 rem wide; once open the width is the box's own (js wireFloatBox), so a drag of the corner can widen it past that. The body scrolls
+   and Convert as's OK and Cancel stay under it, always in view. */
+#lpn_convas_panel, #lpn_crsbox { max-width: min(40rem, calc(100vw - 8px)); flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
+#lpn_convas_panel.lpn-float-sized, #lpn_crsbox.lpn-float-sized { max-width: calc(100vw - 8px); }   /* once open, its width is its own */
+#lpn_convas_panel > .lpn-popover-body, #lpn_crsbox > .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
+#lpn_convas_panel > .lpn-convas-foot { flex: none; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: var(--ec-gray-f2f2f2); color: var(--ec-gray-777); cursor: not-allowed; }

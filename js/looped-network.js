@@ -25643,10 +25643,9 @@ var EngCalcs = EngCalcs || {};
 			if (sheet) {
 				// THE STANDARD SPREADSHEET STYLE has no column headings (WaterGEMS; Tom, 2026-10-27): a run of two or more
 				// rows carries only the divider, down the Label column's right edge.
-				// An entry of a shared-width group (the Libraries box) carries it from one row: its rules are drawn, so they are draggable, and one drag moves every entry's.
-				need = host.getAttribute('data-gcols-id') ? 1 : 2;
-				if (rows >= need && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
-				else if (rows < need && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
+				// Every run carries it, one row included (Tom, 2026-10-31, of a chooser's last row: "It seems a little like a bug").
+				if (rows >= 1 && !g.__lpnSplit) { try { g.__lpnSplit = gridWireSplit(host, g); } catch (e) { /* a page without pointer events keeps the rules */ } }
+				else if (rows < 1 && g.__lpnSplit && g.__lpnSplit.parentNode) { g.__lpnSplit.parentNode.removeChild(g.__lpnSplit); g.__lpnSplit = null; }
 				return;
 			}
 			if (rows >= 2 && !has) { g.parentNode.insertBefore(gridHeaderMake(host), g); }
@@ -49504,6 +49503,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (ok) { ok.addEventListener('click', convasOk); }
 		if (cancel) { cancel.addEventListener('click', closeConvasBox); }
 		if (close) { close.addEventListener('click', closeConvasBox); }
+		wireFloatBox(box);
+		wireConvasColSplit(box);
 		if (si) { si.addEventListener('click', function () { applyPresetToClones(convasUnits, 'si'); refreshConvasSuffixPrefill(); }); }
 		if (us) { us.addEventListener('click', function () { applyPresetToClones(convasUnits, 'us'); refreshConvasSuffixPrefill(); }); }
 		['epsg', 'unnamed', 'none'].forEach(function (k) {
@@ -49534,13 +49535,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		box.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape') { e.preventDefault(); closeConvasBox(); }
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeConvasBox(); }
 		});
 	}
 	// **IT OPENS ON THE PROJECT AS IT IS**: its own coordinate case and system, its own units, and no
 	// rounding. Pressing Convert without changing anything therefore makes a plain copy.
 	function openConvertAsBox() {
-		var pc = EngCalcs.pageConfig || {}, box = convasEl(), from = projectCoordKind(), h, r, fromEl;
+		var pc = EngCalcs.pageConfig || {}, box = convasEl(), from = projectCoordKind(), fromEl;
 		if (!box) { return; }
 		closeMenu();
 		closeViewPopovers();
@@ -49575,37 +49576,88 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		refreshConvasSuffixPrefill();
 		syncConvasCrs();
-		box.style.display = 'block';
-		raisePanel(box);
-		h = fitPanelToViewport(box);
-		r = box.getBoundingClientRect();
-		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
-		capPanelToRoomBelow(box, parseFloat(box.style.top));
-		convasFitFooter(box);
-		// The rows' headers and fitted Label column arrive a frame later and make the box taller: centre it again.
+		// A movable, resizable box (round 11b, wireFloatBox): centred, or where it was left this session; a phone fills the window.
+		box.style.display = 'flex';
+		placeFloatBox(box);
+		// The rows' fitted Label column arrives a frame later and can make the box taller: placed again, unless the reader has it in hand.
 		(window.requestAnimationFrame || function (f) { return setTimeout(f, 32); })(function () {
-			var h2 = fitPanelToViewport(box);
-			box.style.top = Math.max(chromeFloor(), (window.innerHeight - h2) / 2) + 'px';
-			capPanelToRoomBelow(box, parseFloat(box.style.top));   // what is left under the chrome: the rest scrolls inside the box
-			convasFitFooter(box);
+			if (panelIsOpen(box) && !box.__lpnFloatHeld) { placeFloatBox(box); }
 		});
 		initTipsIn(box);
 		var ok = document.getElementById('lpn_convas_ok');
 		if (ok && ok.focus) { ok.focus({ preventScroll: true }); }
 		(function (b) { if (b) { b.scrollTop = 0; } }(document.getElementById('lpn_convas_body')));
 	}
-	// OK and Cancel stand in a footer under the scrolling body; the body gives up as much height as the footer
-	// would otherwise hang below the screen.
-	function convasFitFooter(box) {
-		var body = document.getElementById('lpn_convas_body'), foot = box.querySelector('.lpn-convas-foot'), over, mh;
-		if (!body || !foot) { return; }
-		over = foot.getBoundingClientRect().bottom + 12 - ((window.innerHeight || 0) - POPUP_EDGE);
-		if (over > 0) {
-			mh = parseFloat(body.style.maxHeight) || body.getBoundingClientRect().height;
-			body.style.maxHeight = Math.max(80, mh - over) + 'px';
+	// ---- THE LINE BETWEEN ROUND TO AND SUFFIX DRAGS (Tom, 2026-10-31: "The second divider is not draggable") ----
+	// The sheet divider's look and gestures (gridWireSplit), moving only that line: --lpn-convas-c1 on the rounding grid, never the
+	// box. Remembered as one more entry in the `lpn_gcols` record (window furniture; no new key). Double-click or Home puts it back.
+	var LPN_CONVAS_C1_ID = 'lpn_convas_round_c1', LPN_CONVAS_C1_MIN = 2;   // rem; the CSS keeps the Suffix cell at least this wide too
+	function wireConvasColSplit(box) {
+		var head = box.querySelector('.lpn-convas-colhead'), grid = head && head.parentNode, split, start = null, pending = null, rem = 16, v0;
+		if (!grid || grid.__lpnC1) { return; }
+		split = document.createElement('div');
+		split.className = 'lpn-gsplit lpn-convas-split';
+		split.setAttribute('role', 'separator');
+		split.setAttribute('aria-orientation', 'vertical');
+		split.setAttribute('aria-label', (EngCalcs.pageConfig || {}).lpn_convas_label_col || 'Suffix');
+		split.tabIndex = 0;
+		grid.appendChild(split);
+		grid.__lpnC1 = split;
+		function c1() { return grid.querySelector('.lpn-grow:not(.lpn-convas-colhead) .lpn-convas-c1'); }
+		function nowRem() { var c = c1(); return c ? c.getBoundingClientRect().width / gridRem() : 8.5; }
+		function set(v, keep) {
+			var c = c1(), cell = c ? c.parentNode.getBoundingClientRect().width / gridRem() : 0;
+			rem = gridRem();
+			v = Math.round(Math.max(LPN_CONVAS_C1_MIN, cell ? Math.min(cell - LPN_CONVAS_C1_MIN, v) : v) * 20) / 20;
+			grid.style.setProperty('--lpn-convas-c1', v + 'rem');
+			split.setAttribute('aria-valuenow', String(Math.round(v * 10) / 10));
+			if (keep) { gcolRead()[LPN_CONVAS_C1_ID] = v; gcolSave(); }
 		}
-		body.scrollTop = 0;
+		function reset() { delete gcolRead()[LPN_CONVAS_C1_ID]; gcolSave(); grid.style.removeProperty('--lpn-convas-c1'); }
+		function dir() { return window.getComputedStyle(grid).direction === 'rtl' ? -1 : 1; }
+		function begin(e) {
+			rem = gridRem();
+			start = { x: e.clientX, w: nowRem() };
+			try { split.setPointerCapture(e.pointerId); } catch (err) { /* drag without capture */ }
+		}
+		// A finger: a press becomes a drag only after 4 px, and a tap goes through to the cell under the hit area, as on every sheet divider.
+		function passThrough(e) {
+			var el, had = split.style.pointerEvents;
+			split.style.pointerEvents = 'none';
+			el = document.elementFromPoint(e.clientX, e.clientY);
+			split.style.pointerEvents = had;
+			if (!el || el === split) { return; }
+			try { if (el.focus) { el.focus(); } if (el.tagName === 'SELECT' && el.showPicker) { el.showPicker(); } else if (el.click) { el.click(); } } catch (err) { /* a picker that needs a gesture of its own stays closed */ }
+		}
+		split.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			if (e.pointerType === 'touch') { pending = { x: e.clientX }; return; }
+			begin(e);
+			e.preventDefault();
+		});
+		split.addEventListener('pointermove', function (e) {
+			if (pending && Math.abs(e.clientX - pending.x) > 4) { pending = null; begin(e); }
+			if (start) { set(start.w + dir() * (e.clientX - start.x) / rem, false); }
+		});
+		function end(e) {
+			var v;
+			if (pending) { pending = null; if (e.type === 'pointerup') { passThrough(e); } return; }
+			if (!start) { return; }
+			start = null;
+			try { split.releasePointerCapture(e.pointerId); } catch (err) { /* already released */ }
+			v = parseFloat(grid.style.getPropertyValue('--lpn-convas-c1'));
+			if (isFinite(v)) { set(v, true); }
+		}
+		split.addEventListener('pointerup', end);
+		split.addEventListener('pointercancel', end);
+		split.addEventListener('dblclick', function (e) { e.preventDefault(); reset(); });
+		split.addEventListener('keydown', function (e) {
+			var k = e.key, d = dir();
+			if (k === 'ArrowLeft' || k === 'ArrowRight') { e.preventDefault(); set(nowRem() + (k === 'ArrowRight' ? d : -d) * LPN_GSTEP, true); }
+			else if (k === 'Home') { e.preventDefault(); e.stopPropagation(); reset(); }
+		});
+		v0 = gcolRead()[LPN_CONVAS_C1_ID];
+		if (typeof v0 === 'number' && isFinite(v0) && v0 >= LPN_CONVAS_C1_MIN) { grid.style.setProperty('--lpn-convas-c1', v0 + 'rem'); }
 	}
 	// Tom's four (Task 688): Diameter, Depth, Demand and Flow, Head.
 	var LPN_CONVAS_ROUND = ['diameter', 'depth', 'flow', 'head'];
@@ -53870,7 +53922,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			renderCrsBoxList();
 		});
 	}
-	function closeCrsBox() { hidePanel(crsBoxEl()); }
+	// Closing hands the focus back to the button that opened the chooser (Convert as's or New project's `...`), when the focus was in the chooser.
+	function closeCrsBox() {
+		var box = crsBoxEl(), o = crsBox.opener, had = !!(box && document.activeElement && box.contains(document.activeElement));
+		crsBox.opener = null;
+		hidePanel(box);
+		if (had && o && o.focus && o.isConnected && o.offsetParent !== null && !o.disabled) {
+			try { o.focus({ preventScroll: true }); } catch (e) { /* nothing to return to */ }
+		}
+	}
 	function crsBoxOk() {
 		var sel = document.getElementById('lpn_crsbox_list'),
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
@@ -53928,16 +53988,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				e.preventDefault();
 				if (e.target === document.getElementById('lpn_crsbox_place')) { crsBoxSearch(); }
 				else { crsBoxOk(); }
-			} else if (e.key === 'Escape') { e.preventDefault(); closeCrsBox(); }
+			} else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCrsBox(); }   // the chooser only: a Convert as under it stays open
 		});
+		wireFloatBox(box);
 	}
 	// `code` is what to open on, `place` the point already found if there is one, `onPick` where the
 	// answer goes. The caller owns the answer: this box states no project's projection itself, which
 	// is what keeps assignProjectCrs() the only writer.
 	function openCrsBox(code, place, onPick) {
-		var box = crsBoxEl(), h, r, v;
+		var box = crsBoxEl(), v;
 		if (!box) { return; }
 		wireCrsBox();
+		if (!panelIsOpen(box)) { crsBox.opener = document.activeElement || null; }
 		crsBox.code = code || LPN_CRS_LATLON;
 		crsBox.onPick = onPick || null;
 		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
@@ -53966,7 +54028,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// from the built-in table, so the box opens at once and grows to the full register when it
 		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
 		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
-		box.style.display = 'block';
+		box.style.display = 'flex';
 		if (document.getElementById('lpn_crsbox_body')) { lpnGridHost(document.getElementById('lpn_crsbox_body')); }   // the sheet style, as New project's rows have
 		crsRegisterLoad(function () {
 			// Only if the box is still the one on screen -- a load that lands after the user has
@@ -53986,11 +54048,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
 			});
 		}
-		raisePanel(box);
-		h = fitPanelToViewport(box);
-		r = box.getBoundingClientRect();
-		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		placeFloatBox(box);   // raised above whatever opened it (Convert as, New project); movable and resizable (round 11b)
 		initTipsIn(box);
 		// The place field, because the box's own Escape and Enter live on a keydown handler that
 		// only fires while focus is inside it -- and because a place is the first thing to type.
@@ -67030,6 +67088,73 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 	}
 
+	// ---- A QUESTION BOX THAT MOVES AND RESIZES (round 11b; dev/box-float-design.md): File, Convert as and the coordinate-system chooser.
+	// Not modal, as before. The drag, the z-order, the touch grip and the phone fill are every standing box's (makePanelDraggable,
+	// placePanelForScreen). The corner and size it was left at are kept on the element for the life of the page and on a PC only, as the
+	// Properties box keeps its own: no storage. A double-click on the title band puts it back where and how it opens.
+	function wireFloatBox(box) {
+		var mem = box.__lpnFloatMem = {}, down = null;
+		box.__lpnFloat = true;
+		makePanelDraggable(box, function (pos) {
+			box.__lpnFloatHeld = true;
+			if (smallScreen()) { return; }
+			mem.left = pos.left;
+			mem.top = pos.top;
+		});
+		function resized() {
+			var r = box.getBoundingClientRect();
+			box.__lpnFloatHeld = true;
+			if (smallScreen() || !(r.width > 0) || !(r.height > 0)) { return; }
+			mem.w = Math.round(r.width);
+			mem.h = Math.round(r.height);
+		}
+		addPanelResizeGrip(box, resized);
+		// The browser's own corner fires no event: a press on the box's own edge that leaves it another size was a resize.
+		box.addEventListener('mousedown', function (e) {
+			var r = box.getBoundingClientRect();
+			down = e.target === box ? { w: r.width, h: r.height } : null;
+		});
+		window.addEventListener('mouseup', function () {
+			var r;
+			if (!down) { return; }
+			r = box.getBoundingClientRect();
+			if (Math.abs(r.width - down.w) > 1 || Math.abs(r.height - down.h) > 1) { resized(); }
+			down = null;
+		});
+		box.addEventListener('dblclick', function (e) {
+			if (e.target !== box) { return; }
+			['left', 'top', 'w', 'h'].forEach(function (k) { delete mem[k]; });
+			box.__lpnFloatHeld = false;
+			placeFloatBox(box);
+		});
+	}
+	// On a PC: the size it was left at, else its natural size (at most 40 rem wide, the stylesheet's cap) fixed as its own so the corner can
+	// widen it past that; centred under the chrome, or at the corner it was left at; and no taller than the room under the chrome, the rest
+	// scrolling inside. On a phone placePanelForScreen() fills the window.
+	function placeFloatBox(box) {
+		box.__lpnFloatHeld = false;
+		return placePanelForScreen(box, function () {
+			var mem = box.__lpnFloatMem || {}, floor = chromeFloor(), iw = window.innerWidth, ih = window.innerHeight, room, r, h, at;
+			resetPanelHeight(box, panelBody(box));
+			box.style.width = mem.w ? mem.w + 'px' : '';
+			box.style.height = mem.h ? mem.h + 'px' : '';
+			box.classList.toggle('lpn-float-sized', !!mem.w);   // the 40 rem opening cap lifted (css/engcalcs.css)
+			r = box.getBoundingClientRect();
+			if (!mem.w) { box.style.width = Math.ceil(r.width) + 'px'; box.classList.add('lpn-float-sized'); }
+			room = Math.max(80, ih - floor - POPUP_EDGE);
+			h = r.height;
+			if (!mem.h && h > room) { box.style.height = room + 'px'; h = room; }
+			if (typeof mem.left === 'number' && typeof mem.top === 'number') {
+				at = restoreBounds(mem.left, mem.top, r.width, h, iw, ih);
+				box.style.left = at.left + 'px';
+				box.style.top = Math.max(floor, at.top) + 'px';
+				return;
+			}
+			box.style.left = Math.max(POPUP_EDGE, (iw - r.width) / 2) + 'px';
+			box.style.top = Math.max(floor, (ih - h) / 2) + 'px';
+		});
+	}
+
 	// ---- DOCKING: DOCK LEFT, DOCK RIGHT, FLOAT, AUTO-HIDE (ROADMAP Task 441) ---------------------
 	//
 	// Tom, 2026-10-03: *"implementing the conventional docking, hide, autohide, etc icon buttons at
@@ -71914,7 +72039,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function keepFloatsOnScreen() {
 		var i;
-		for (i = 0; i < lpnPanels.length; i++) { if (lpnPanels[i].__lpnDock || lpnPanels[i].id === 'lpn_popup') { keepFloatOnScreen(lpnPanels[i]); } }
+		for (i = 0; i < lpnPanels.length; i++) { if (lpnPanels[i].__lpnDock || lpnPanels[i].__lpnFloat || lpnPanels[i].id === 'lpn_popup') { keepFloatOnScreen(lpnPanels[i]); } }
 	}
 	function makePanelDraggable(popup, onMove, handles) {
 		var drag = null;

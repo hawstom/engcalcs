@@ -139,7 +139,8 @@ console.log('\n--- a panel that opens comes to the front ---');
 	let m;
 	while ((m = re.exec(code)) !== null) {
 		const fn = coveringFn(m.index);
-		if (/__lpnRaise|raisePanel\(|placePanelForScreen\(/.test(fn)) { continue; }
+		// placeFloatBox() is placePanelForScreen() for Convert as and the coordinate-system chooser (round 11b).
+		if (/__lpnRaise|raisePanel\(|placePanelForScreen\(|placeFloatBox\(/.test(fn)) { continue; }
 		shows.push(m[1] + ' @' + code.slice(0, m.index).split('\n').length);
 	}
 	// Declared: what is made visible that is NOT a draggable panel. A row here is a sentence somebody
