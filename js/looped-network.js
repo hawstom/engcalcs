@@ -33245,7 +33245,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
-				if (!c.result) { td.textContent = paneCellDisplayText(c, el, true); if (spec.group === 'scenario') { td.title = td.textContent; } }
+				if (!c.result) { td.textContent = paneCellDisplayText(c, el, true); }
 				// **AND IT SAYS, ON THE CELL, WHY IT IS NOT A BOX.** The class carries the styling
 				// that tells a reader at a glance that this is a state and not a value; the tip is
 				// the same sentence the property popup gives, so there is one explanation and not
@@ -33418,7 +33418,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// moved re-laid-out all ~1,300 cells, on every solve and now on every tab switch.
 				if (paneCellIsPlain(c, el)) {
 					text = paneCellDisplayText(c, el, true);
-					if (target.textContent !== text) { target.textContent = text; if (spec.group === 'scenario') { target.title = text; } }
+					if (target.textContent !== text) { target.textContent = text; }
 				} else if (c.bool && target.type === 'checkbox') {
 					if (target.checked !== !!c.get(el)) { target.checked = !!c.get(el); }
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
@@ -61483,7 +61483,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function refreshMapCoordsUnit() {
 		var el = document.getElementById('lpn_u_mapcoords');
-		if (el) { el.textContent = mapCoordsUnitText(); el.title = el.textContent; }
+		if (el) { el.textContent = mapCoordsUnitText(); }
 	}
 	// How many junctions the latest pressure-driven solve left short of their demand.
 	function pdaShortCount(result) {
