@@ -6727,7 +6727,7 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-table th.lpn-rpt-gripth .lpn-ff-sortarrow { inset-inline-end: 5px; }
 .lpn-ff-table .lpn-rpt-dc { overflow: hidden; overflow-wrap: anywhere; white-space: normal; min-width: 0; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
-.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; white-space: nowrap; vertical-align: bottom; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
    words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its
@@ -7727,7 +7727,7 @@ textarea.lpn-desc-ta {
 .lpn-theme-btn .ec-tc-menu { height: 10px; padding: 1px 3px 0; }
 .lpn-theme-btn .ec-tc-menu i { width: 12px; height: 6px; }
 .lpn-theme-btn .ec-tc-map { left: 3px; right: 3px; top: 13px; bottom: 3px; }
-.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; }
 /* The gallery: fixed over the page, above the boxes (1200-1799) and the menu pop-up (1850), under the modal. */
 .lpn-theme-gallery {
 	position: fixed; z-index: 1855; box-sizing: border-box;

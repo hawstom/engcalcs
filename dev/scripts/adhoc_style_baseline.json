@@ -196,14 +196,12 @@
     },
     "css": {
         "ellipsis": {
-            "count": 6,
+            "count": 4,
             "fp": [
                 "8ef0c8c8",
                 "d1cfb9fb",
                 "4ca8fcbd",
-                "9bd74286",
-                "7db8996d",
-                "5cb410d7"
+                "7db8996d"
             ]
         },
         "perbox": {
