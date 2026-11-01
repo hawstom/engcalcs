@@ -1197,7 +1197,8 @@
 	//               and roughness-correlated coefficients) and convertunits() (a concentration is held
 	//               per cubic foot, x 28.317; a coefficient per second);
 	//   project.c   buildadjlists(), whose list order decides the node sort and so the answer.
-	// Mass balance and the average reaction rates are not kept: they change no value a frame carries.
+	// Mass balance and the average reaction rates (mass per hour) are not kept: the page shows neither. The
+	// per-pipe reaction rate (PipeRateCoeff) is kept, for a chemical, as `linkRates` on each frame.
 	var Q_STAGNANT = 0.005 / 448.831,      // cfs (quality.c, 0.005 gpm)
 		LPERFT3 = 28.317,                  // L per ft3 (types.h LperFT3)
 		Q_BIGNUM = 1e10,                   // types.h BIG
@@ -1307,7 +1308,7 @@
 			patStep = times.patternStep > 0 ? times.patternStep : 3600, patStart = times.patternStart > 0 ? times.patternStart : 0,
 			dur = times.duration > 0 ? times.duration : 0,
 			qstep, ctol, viscos, diffus, sc, bulkOrder, wallOrder, tankOrder, kbulk, kwall, climit, rfactor, bucf, tucf,
-			nodeQual = new Array(N + 1), sourceQual = 0, flowDir = new Array(L + 1), rc = new Array(L + 1),
+			nodeQual = new Array(N + 1), sourceQual = 0, flowDir = new Array(L + 1), rc = new Array(L + 1), pipeRate = new Array(L + 1).fill(0),
 			first = [], last = [], adj = [], sorted = new Array(N + 1), reactflag,
 			tk = [], tankOfNode = {}, srcOf = new Array(N + 1), kb = new Array(L + 1), kw = new Array(L + 1),
 			cur = null, i, j, k, n, r, frameAt = {}, traceIx = cfg.traceNode ? net.ix[cfg.traceNode] : 0, qtime;
@@ -1422,7 +1423,7 @@
 				addseg(t.chain, v - v1, c0);
 			}
 		});
-		for (k = 1; k <= L; k++) { flowDir[k] = 0; rc[k] = 0; }
+		for (k = 1; k <= L; k++) { flowDir[k] = 0; rc[k] = 0; pipeRate[k] = 0; }
 
 		// ---- qualreact.c ----
 		function piperate(k2) {
@@ -1447,7 +1448,8 @@
 			return (4 / d) * kk * kf / (kf + Math.abs(kk));
 		}
 		function ratecoeffs() {
-			for (var k2 = 1; k2 <= L; k2++) { rc[k2] = kw[k2] !== 0 ? piperate(k2) : 0; }
+			// qualreact.c ratecoeffs() also zeroes qual->PipeRateCoeff, the reaction rate a report reads.
+			for (var k2 = 1; k2 <= L; k2++) { rc[k2] = kw[k2] !== 0 ? piperate(k2) : 0; pipeRate[k2] = 0; }
 		}
 		function bulkrate(c, kk, order) {
 			var c1;
@@ -1486,9 +1488,18 @@
 			return Math.max(0, c + dc);
 		}
 		function reactpipes(dt) {
-			for (var k2 = 1; k2 <= L; k2++) {
+			var k2, s, cn, rsum, vsum;
+			for (k2 = 1; k2 <= L; k2++) {
 				if (links[k2].type !== 'pipe') { continue; }
-				for (var s = first[k2]; s; s = s.prev) { s.c = pipereact(k2, s.c, dt); }
+				rsum = 0; vsum = 0;
+				for (s = first[k2]; s; s = s.prev) {
+					cn = pipereact(k2, s.c, dt);
+					// qualreact.c reactpipes(): the volume-weighted mean of |c_new - c_old| over the segments
+					// in the pipe, per second of the step, scaled to a day (a chemical only).
+					rsum += Math.abs(cn - s.c) * s.v; vsum += s.v;
+					s.c = cn;
+				}
+				pipeRate[k2] = CHEM && vsum > 0 ? rsum / vsum / dt * 86400 : 0;
 			}
 		}
 		function reacttanks(dt) {
@@ -1786,6 +1797,11 @@
 			f.qualities = {}; f.linkQualities = {};
 			for (n2 = 1; n2 <= N; n2++) { f.qualities[nodes[n2].id] = nodeQual[n2] * scale; }
 			for (k2 = 1; k2 <= L; k2++) { f.linkQualities[links[k2].id] = avgqual(k2) * scale; }
+			// output.c linkoutput(REACTRATE): PipeRateCoeff x Ucf[LINKQUAL], mass/L/day, for a pipe only.
+			if (CHEM) {
+				f.linkRates = {};
+				for (k2 = 1; k2 <= L; k2++) { if (links[k2].type === 'pipe') { f.linkRates[links[k2].id] = pipeRate[k2] * ucfQ; } }
+			}
 		}
 
 		// ---- quality.c runqual() / nextqual(), over the saved hydraulics ----

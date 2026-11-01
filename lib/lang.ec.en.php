@@ -3909,7 +3909,6 @@ $ec_lang['lpn_time_stat_range']='Range';
 $ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 // Said once per page load after a chemical simulation run by the built-in solver, which reports no reaction rates.
-$ec_lang['lpn_time_native_no_rates']='The built-in solver does not report reaction rates. To see them, clear Use the built-in solver when possible in Settings.';
 $ec_lang['lpn_time_running']='Running the extended period simulation.';
 $ec_lang['lpn_time_no_engine']='The built-in solver shows this network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
@@ -5259,6 +5258,8 @@ $ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve 
 // An extended period simulation that the user asked the built-in solver to run, and that the built-in solver does
 // not run (Task 733, slice 7). {ids} are the controls, rules, tanks, pumps or settings it names.
 $ec_lang['lpn_engine_native_route']='Solved with the EPANET solver, because the built-in solver does not run this simulation.';
+$ec_lang['lpn_engine_native_used']='Solved with the built-in solver.';
+$ec_lang['lpn_engine_epanet_used']='Solved with the EPANET solver.';
 $ec_lang['lpn_engine_native_route_ids']='Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.';
 $ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
 $ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';

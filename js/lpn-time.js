@@ -564,8 +564,10 @@
 			// run, goes to EPANET; the status bar says so (Task 733, slice 7). Shared with no other file.
 			routeGeneric: pageConfig.lpn_engine_native_route || 'Solved with the EPANET solver, because the built-in solver does not run this simulation.',
 			routeIds: pageConfig.lpn_engine_native_route_ids || 'Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.',
-			// Kept in the status bar after a chemical run by the built-in solver: that run has no reaction rates.
-			nativeNoRates: pageConfig.lpn_time_native_no_rates || 'The built-in solver does not report reaction rates. To see them, clear Use the built-in solver when possible in Settings.',
+			// Which solver answered, said in the status bar after a built-in run (the routed run above says
+			// EPANET) and in the run summary after either (Tom, 2026-11-01: nothing said what was done differently).
+			nativeUsed: pageConfig.lpn_engine_native_used || 'Solved with the built-in solver.',
+			epanetUsed: pageConfig.lpn_engine_epanet_used || 'Solved with the EPANET solver.',
 			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver rejected this network, so the run did not start.',
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
 			// nothing of ours could reconstruct that.
@@ -1033,9 +1035,8 @@
 				withQuality = !!(model.quality && model.quality.mode && model.quality.mode !== 'none');
 			function finish(run) {
 				if (!run || !run.ok) { resolve(withEpanet(routeNoteText({ refusals: (run && run.issues) || [] }, model))); return; }
-				// A chemical run has no reaction rates, and the Reaction rate column is empty: the status bar
-				// keeps saying why, in the slot the routed-run note uses, until the next run replaces it.
-				if (host.routeNote) { host.routeNote(model.quality && model.quality.mode === 'chemical' ? strings().nativeNoRates : ''); }
+				// The status bar names the solver, in the slot the routed-run note uses, until the next run replaces it.
+				if (host.routeNote) { host.routeNote(strings().nativeUsed); }
 				run.engineVersion = undefined;
 				run.issues = [];
 				run.report = '';
@@ -1810,6 +1811,7 @@
 		boxState.phase = 'done';
 		boxState.fraction = 1;
 		boxState.frames = ((run && run.frames) || []).length;
+		boxState.engine = (run && run.engine) || 'epanet';
 		boxState.ms = ms;
 		boxReport = (run && run.report) || '';
 		boxState.reportLength = boxReport.length;
@@ -1904,6 +1906,8 @@
 			// "no time was measured" rather than "it was quick", which is the opposite of what the
 			// number is there to say.
 			.replace('{secs}', (boxState.ms / 1000).toFixed(boxState.ms < 1000 ? 2 : 1));
+		// Which solver produced the run, whichever it was.
+		if (boxState.phase === 'done') { line += ' ' + (boxState.engine === 'native' ? S.nativeUsed : S.epanetUsed); }
 		if (boxState.unbalanced > 0) { line += ' ' + S.runUnbalanced.replace('{n}', String(boxState.unbalanced)); }
 		if (boxState.warnings > 0) { line += ' ' + S.runWarnings.replace('{n}', String(boxState.warnings)); }
 		if (boxState.unbalanced > 0 || boxState.warnings > 0) { line += ' ' + S.runSeeReport.replace('{report}', S.runReport); }

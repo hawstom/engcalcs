@@ -38,6 +38,13 @@ const HEAD_TOL = 0.8e-3;   // m, also a tank's level
 const FLOW_TOL = 2e-6;     // m3/s
 const FLOW_REL = 1e-5;     // of the largest flow
 
+// Strings read from the real lang file, so no English literal is asserted here.
+function langEn() {
+	const src = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8'), out = {};
+	src.replace(/\$ec_lang\['(lpn_engine_[a-z_]+)'\]='((?:[^'\\]|\\.)*)';/g, (m, k, v) => { out[k] = v.replace(/\\'/g, "'"); return m; });
+	return out;
+}
+
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {
 	console.log((cond ? 'PASS ' : 'FAIL ') + name + (extra ? '   ' + extra : ''));
@@ -191,10 +198,15 @@ async function compareNet(name, model, tol) {
 		ok(name + ': the page frame carries the quality, in the run\'s mode',
 			viaNative.frames.every((f) => f.qualities && f.linkQualities && f.qualityMode === model.quality.mode));
 		if (model.quality.mode === 'chemical') {
-			const said = viaNative.routeNotes.some((t) => /does not report reaction rates/.test(t));
-			ok(name + ': no reaction rates on a built-in run; the status bar says why, every run, in the persistent slot',
-				viaNative.frames.every((f) => f.linkRates === undefined) && viaEpanet.frames.some((f) => f.linkRates) &&
-				said && viaNative.notices.length === 0 && !viaEpanet.routeNotes.some((t) => /reaction rates/.test(t)), `routeNotes ${JSON.stringify(viaNative.routeNotes)}`);
+			// Reaction rates: the built-in loop carries EPANET's per-pipe figure (mass/L/day), within the quality
+			// harness's tolerance, and the status bar names the solver instead.
+			const rr = worst(E.frames, N.frames, 'linkRates'), PCx = langEn();
+			ok(name + ': reaction rates on a built-in run agree with EPANET\'s (every pipe, every reporting time)',
+				(rr.big > 0 || /Net2/.test(name)) && rr.d <= Math.max(2e-3, 1e-3 * rr.big) && N.frames.every((f) => f.linkRates),
+				`worst ${rr.d.toExponential(2)} @${rr.at}, largest ${rr.big.toPrecision(4)}`);
+			ok(name + ': the status bar names the built-in solver, the EPANET run says nothing of it',
+				viaNative.routeNotes.length > 0 && viaNative.routeNotes.every((t) => t === PCx.lpn_engine_native_used) && viaNative.notices.length === 0 &&
+				viaEpanet.routeNotes.every((t) => t === ''), `routeNotes ${JSON.stringify(viaNative.routeNotes)}`);
 			noRatesAlreadySaid = true;
 		}
 	}

@@ -81098,6 +81098,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			runSolveEpanet(model);
 			return;
 		}
+		// The built-in solver was asked for and answered: the status bar says so (Tom, 2026-11-01).
+		if (engine === 'native') { engineRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_native_used || 'Solved with the built-in solver.'; }
 		applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 	}
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
