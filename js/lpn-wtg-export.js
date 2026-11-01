@@ -42,7 +42,7 @@ var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 // The core schema versions the writer has been tested against (HMISchemaVersionInfo, name
 // HMICoreSchemaVersion). Anything else is refused, because a release can add a table or change a
 // default. Adding a version means a harness run against a project saved by that release.
-var TESTED_SCHEMAS = [['1', '0', '54', '0'].join('.')];   // spelled in parts: a bare 1.0.54 reads as a head loss constant to js_constant_check
+var TESTED_SCHEMAS = [['1', '0', '44', '0'].join('.'), ['1', '0', '54', '0'].join('.')];   // spelled in parts: a bare 1.0.54 reads as a head loss constant to js_constant_check
 
 function uuid() {
 	if (root.crypto && typeof root.crypto.randomUUID === 'function') { return root.crypto.randomUUID(); }
@@ -84,8 +84,19 @@ function colsOf(db, table) {
 function tablesOf(db) {
 	return rowsOf(db, "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite\\_%' ESCAPE '\\' ORDER BY name").map((r) => r.name);
 }
+// Columns this writer states that the template's layout does not have (an older schema lacks a few that a newer one
+// added) are left out, and named in report.notes by the caller through `skippedColumns`.
+let skippedColumns = {};
+const columnCache = new WeakMap();
 function insert(db, table, obj) {
-	const keys = Object.keys(obj);
+	let cache = columnCache.get(db);
+	if (!cache) { cache = {}; columnCache.set(db, cache); }
+	const have = cache[table] || (cache[table] = colsOf(db, table));
+	const keys = Object.keys(obj).filter((k) => {
+		if (have.indexOf(k) >= 0) { return true; }
+		skippedColumns[table + '.' + k] = 1;
+		return false;
+	});
 	db.run('INSERT INTO "' + table + '" (' + keys.map((k) => '"' + k + '"').join(',') + ') VALUES (' + keys.map(() => '?').join(',') + ')',
 		keys.map((k) => obj[k]));
 }
@@ -175,6 +186,7 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	opts = opts || {};
 	const report = { carried: [], notCarried: [], counts: {}, ids: {}, notes: [] };
+	skippedColumns = {};
 	function carried(s) { report.carried.push(s); }
 	function lost(s) { report.notCarried.push(s); }
 
@@ -257,14 +269,19 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		db.run('DELETE FROM HMIScenario WHERE ScenarioID IN (' + childScen.join(',') + ')');
 	}
 	if (childAlts.length) { db.run('DELETE FROM HMIAlternative WHERE AlternativeID IN (' + childAlts.join(',') + ')'); }
-	db.run('DELETE FROM HMIModelingElement WHERE ElementID > ' + DEFAULT_MAX);
+	// Elements go by their kind (domain 3, support 4) and the removed child alternatives and scenarios by their id; the
+	// live scenario, alternatives and calculation options stay whatever their numbers (a project saved after edits has
+	// them above 30).
+	db.run('DELETE FROM HMIModelingElement WHERE ElementID > ' + DEFAULT_MAX + ' AND (ElementType IN (3, 4)'
+		+ (childAlts.concat(childScen).length ? ' OR ElementID IN (' + childAlts.concat(childScen).join(',') + ')' : '') + ')');
+	const keptMax = Math.max(DEFAULT_MAX, rowsOf(db, 'SELECT MAX(ElementID) AS m FROM HMIModelingElement')[0].m || 0);
 	db.run("DELETE FROM sqlite_sequence WHERE name <> 'HMIModelingElement'");
-	db.run("UPDATE sqlite_sequence SET seq = " + DEFAULT_MAX + " WHERE name = 'HMIModelingElement'");
-	db.run('UPDATE HMIDomainDataSet SET ActiveScenarioID = (SELECT MIN(ScenarioID) FROM HMIScenario)');
+	db.run("UPDATE sqlite_sequence SET seq = " + keptMax + " WHERE name = 'HMIModelingElement'");
+	db.run('UPDATE HMIDomainDataSet SET ActiveScenarioID = (SELECT MIN(ScenarioID) FROM HMIScenario WHERE IsDeleted = 0)');
 	report.removedChildScenarios = childScen; report.removedChildAlternatives = childAlts;
 
 	// ---- ids and labels ----
-	let nextId = DEFAULT_MAX + 1;
+	let nextId = keptMax + 1;
 	const newId = () => nextId++;
 	const live = { 55: 0, 56: 0, 52: 0, 69: 0, 68: 0, 64: 0, 65: 0, 66: 0, 60: 0, 61: 0, 62: 0 };
 	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 59: 0, 63: 0 };
@@ -379,7 +396,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		supportElement(id, 51, 'Pump Curve ' + c.id, 'EPANET curve ' + c.id + (c.note ? ': ' + c.note : ''));
 		const eff = ec && ec.points.length === 1 ? ec.points[0][1] : (opts.efficiency || 75);
 		const multi = !!(ec && ec.points.length > 1);
-		cloneRows(proto.pumpDef, id, { IdahoPumpDefinition_PumpEfficiencyType_BestEfficiencyPointType: 1 }, {
+		cloneRows(proto.pumpDef, id, { IdahoPumpDefinition_PumpEfficiencyType_BestEfficiencyPointType: 1, IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType: 1 }, {
 			IdahoPumpDefinition: {
 				PumpDefinitionType: 2,                       // standard three point (observed: Tom's PD1 and its design/shutoff/max fields)
 				ShutoffHead: pts[0][1],
@@ -734,11 +751,13 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
 	// The report time step, in seconds like the other two. 0 is the template's "same as the hydraulic step"; no
 	// results depend on it. (Whether WaterGEMS reports at it is for Tom's copy to say.)
-	if (T.reportStep > 0 && T.reportStep !== T.hydraulicStep) { db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_ReportingTimeStep = ?', [T.reportStep]); }
+	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_ReportingTimeStep = ?', [T.reportStep > 0 && T.reportStep !== T.hydraulicStep ? T.reportStep : 0]);
 	// EPANET's own physical constants for the file (specific gravity 1.0; relative viscosity 1.0 is
 	// 1.1e-5 ft2/s) and its "Unbalanced Continue 10". Hazen-Williams never reads the viscosity.
+	// The extra-iterations column exists from schema 1.0.54 on; an older layout has no such setting.
+	const hasExtra = colsOf(db, 'EpaNetEngine').indexOf('EpaNetEngine_ExtraIterations') >= 0;
 	db.run('UPDATE EpaNetEngine SET TimeAnalysisType = 1, FrictionMethod = 1, EpaNetEngine_AnalysisStartTime = ?, '
-		+ 'EpaNetEngine_LiquidSpecificGravity = ?, EpaNetEngine_LiquidKinematicViscosity = ?, EpaNetEngine_ExtraIterations = 10',
+		+ 'EpaNetEngine_LiquidSpecificGravity = ?, EpaNetEngine_LiquidKinematicViscosity = ?' + (hasExtra ? ', EpaNetEngine_ExtraIterations = 10' : ''),
 		[EPOCH_2000 + (T.startClock || 0), sg, 1.1e-5 * visc]);
 
 	// ---- counts, dataset notes ----
@@ -758,7 +777,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.run('VACUUM');
 	const bytes = db.export();
 	db.close();
-	report.ids = { firstId: DEFAULT_MAX + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
+	report.skippedColumns = Object.keys(skippedColumns);
+	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
 	report.notCarried.push('quality analysis (Trace Lake), reactions, mixing, sources, energy price and pattern, the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	report.notCarried.push('pipe material (every pipe keeps the template default)');

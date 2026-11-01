@@ -27,7 +27,15 @@ require('./bootstrap.js');
 const helper = require('./wtg-sqljs.js');
 const lib = require('./wtg-export.js');
 
-const TEMPLATE_DIR = process.env.WTG_TEMPLATE_DIR || path.join(os.homedir(), 'webdev', 'fixtures', 'wtg-tgh-1');
+// The template is the one the page ships (js/data/wtg-template/, unpacked into a temporary folder) unless
+// WTG_TEMPLATE_DIR names a folder holding WTG-tgh-1.wtg.sqlite and .wtg (a project saved from the program).
+let TEMPLATE_DIR = process.env.WTG_TEMPLATE_DIR;
+if (!TEMPLATE_DIR) {
+	TEMPLATE_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-builtin-'));
+	const tplDir = path.join(ROOT, 'js', 'data', 'wtg-template');
+	fs.writeFileSync(path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg.sqlite'), require('zlib').gunzipSync(fs.readFileSync(path.join(tplDir, 'wtg-template.wtg.sqlite.gz'))));
+	fs.writeFileSync(path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg'), require('zlib').gunzipSync(fs.readFileSync(path.join(tplDir, 'wtg-template.wtg.gz'))));
+}
 const TPL_SQLITE = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg.sqlite'), TPL_WTG = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg');
 
 let fails = 0;
@@ -57,6 +65,9 @@ function head(t) { console.log('\n' + t); }
 
 
 	// Write a network, read it back, and run EPANET on both over 24 h. `extra(parsed, back, readback, report)` adds checks.
+	// A project laid out as schema 1.0.44 has no "continue if unbalanced" setting, so the read-back .inp cannot state
+	// one; the comparison continues past an unbalanced step as the original networks do (dev/wtg-export.md).
+	const continueUnbalanced = (t) => /^\s*Unbalanced/mi.test(t) ? t : t.replace(/\[OPTIONS\]\s*\r?\n/i, (m) => m + ' Unbalanced Continue 10\n');
 	async function compareToEpanet(tag, text, name, extra, skipSeconds) {
 		const pp = EngCalcs.lpnInpParse(text);
 		const w = lib.writeWtg(SQL, tplBytes, pp, { initial: {}, changes: [] }, { name: name, efficiency: Number((/Global Efficiency\s+([\d.]+)/i.exec(text) || [])[1]) || 75 });
@@ -65,13 +76,15 @@ function head(t) { console.log('\n' + t); }
 		const r2 = EngCalcs.lpnWtgRead(d2, { display: display, flowUnits: 'GPM' });
 		ok(tag + ': read back', r2.ok, r2.message);
 		const bp = EngCalcs.lpnInpParse(r2.inp);
+		if (process.env.WTG_DEBUG) { fs.writeFileSync(path.join(os.tmpdir(), 'wtg-debug-' + tag + '.inp'), r2.inp); }
 		const nodeIds = pp.nodes.map((n) => n.id), linkIds = pp.links.map((l) => l.id);
 		const nm = pp.links.filter((l) => l.type === 'pump' || l.type === 'valve').length;
 		ok(tag + ': every node and link of the original is in the read-back', nodeIds.every((i) => bp.nodes.some((n) => n.id === i)) && linkIds.every((i) => bp.links.some((l) => l.id === i)));
 		// Both runs at a tighter accuracy than EPANET's default 0.001: with valves and many added nodes, two networks
 		// that are the same to the foot can stop iterating at different points inside that tolerance.
 		const tight = (t) => t.replace(/(Accuracy\s+)[\d.eE+-]+/i, '$10.00001').replace(/(Trials\s+)\d+/i, '$1200');
-		const A2 = await lib.epanetReference(tight(text), [], nodeIds, linkIds), B2 = await lib.epanetReference(tight(r2.inp), [], nodeIds, linkIds);
+		const A2 = await lib.epanetReference(tight(text), [], nodeIds, linkIds), B2 = await lib.epanetReference(tight(continueUnbalanced(r2.inp)), [], nodeIds, linkIds);
+		if (process.env.WTG_DEBUG) { console.log('   steps A', Object.keys(A2.snapshots).join(','), '| B', Object.keys(B2.snapshots).join(',')); }
 		let wh2 = 0, wq2 = 0, whAt2 = '', wqAt2 = '';
 		Object.keys(A2.snapshots).forEach((t) => {
 			if (skipSeconds && skipSeconds.indexOf(Number(t)) >= 0) { return; }
@@ -91,13 +104,18 @@ function head(t) { console.log('\n' + t); }
 		}
 		ok(tag + ': 24 hours, worst head ' + wh2.toFixed(4) + ' ft at ' + whAt2 + ' (tolerance 0.02 ft)', wh2 < 0.02);
 		ok(tag + ': 24 hours, worst flow ' + wq2.toFixed(3) + ' gpm at ' + wqAt2 + ' (tolerance 0.1 gpm)', wq2 < 0.1);
-		if (process.env.WTG_DEBUG) { fs.writeFileSync(path.join(os.tmpdir(), 'wtg-debug-' + tag + '.inp'), r2.inp); }
 		if (extra) { extra(pp, bp, r2, w.report); }
 	}
 
 	// ---- 1. write ----
 	head('1. Write Net3 into a copy of the saved WaterGEMS project');
 	const tplBytes = fs.readFileSync(TPL_SQLITE);
+	const tplFacts = (function () {
+		const t = new SQL.Database(new Uint8Array(tplBytes));
+		const f = { tables: t.exec("select count(*) from sqlite_master where type='table'")[0].values[0][0], ver: t.exec("select Value from HMISchemaVersionInfo where Name='HMICoreSchemaVersion'")[0].values[0][0] };
+		t.close();
+		return f;
+	}());
 	const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat(parsed.controls.map((c) => c.link))));
 	const ref = await lib.epanetReference(inpText, watch, parsed.nodes.map((n) => n.id), parsed.links.map((l) => l.id));
 	const out = lib.writeWtg(SQL, tplBytes, parsed, { initial: ref.initial, changes: ref.changes }, { name: 'Net3', efficiency: 75 });
@@ -127,9 +145,9 @@ function head(t) { console.log('\n' + t); }
 		+ "'ver':db.execute(\"select Value from HMISchemaVersionInfo where Name='HMICoreSchemaVersion'\").fetchone()[0]}))";
 	const pyOut = JSON.parse(execFileSync('python3', ['-I', '-c', py, sqlitePath], { encoding: 'utf8' }));
 	ok('integrity_check ok, no foreign key violations', pyOut.integrity === 'ok' && pyOut.fk === 0, JSON.stringify(pyOut));
-	ok('same table count as the template (406): the schema is untouched', pyOut.tables === 406);
+	ok('same table count as the template: the schema is untouched', pyOut.tables === tplFacts.tables, pyOut.tables + ' of ' + tplFacts.tables);
 	ok('220 live elements (97 nodes + 2 pump nodes + 121 pipes), none soft-deleted', pyOut.live === 220 && pyOut.deleted === 0);
-	ok('schema version is the template\'s', pyOut.ver === '1.0.54.0', pyOut.ver);
+	ok('schema version is the template\'s', pyOut.ver === tplFacts.ver, pyOut.ver);
 
 	// ---- 3. read it back with the WaterGEMS reader ----
 	head('3. Read it back with the WaterGEMS reader (branch feat/sqlite-reader)');
@@ -301,8 +319,9 @@ function head(t) { console.log('\n' + t); }
 	const tdb = await EngCalcs.lpnSqliteOpen(Buffer.from(tw.bytes));
 	const trb = EngCalcs.lpnWtgRead(tdb, { display: display, flowUnits: 'GPM' });
 	ok('read back', trb.ok, trb.message);
+	if (process.env.WTG_DEBUG) { fs.writeFileSync(path.join(os.tmpdir(), 'wtg-debug-tiny.inp'), trb.inp); }
 	const tids = tp.nodes.map((n) => n.id), tlids = tp.links.map((l) => l.id);
-	const TA = await lib.epanetReference(tinyText, [], tids, tlids), TB = await lib.epanetReference(trb.inp, [], tids, tlids);
+	const TA = await lib.epanetReference(tinyText, [], tids, tlids), TB = await lib.epanetReference(continueUnbalanced(trb.inp), [], tids, tlids);
 	let th = 0, tq = 0;
 	Object.keys(TA.snapshots).forEach((t) => {
 		tids.forEach((id) => { th = Math.max(th, Math.abs(TA.snapshots[t].heads[id] - TB.snapshots[t].heads[id])); });
@@ -330,7 +349,7 @@ function head(t) { console.log('\n' + t); }
 		ok('tank TK keeps its volume curve (levels 2 to 30, volumes 0 to 21000)', vcp.length === 4 && vcp.every((p, i) => Math.abs(p[0] - [2, 10, 20, 30][i]) < 1e-6 && Math.abs(p[1] - [0, 2400, 9000, 21000][i]) < 1e-3), JSON.stringify(vcp));
 	});
 	// Tom's own saved project, exported by his WaterGEMS to EPANET: every valve kind and a volume curve in his data.
-	const tomInp = path.join(TEMPLATE_DIR, 'WTG-export-tgh-1-TGH-1.inp');
+	const tomInp = path.join(process.env.WTG_TEMPLATE_DIR || path.join(os.homedir(), 'webdev', 'fixtures', 'wtg-tgh-1'), 'WTG-export-tgh-1-TGH-1.inp');
 	if (fs.existsSync(tomInp)) {
 		head('9. Tom\'s TGH-1 export from his WaterGEMS (three pumps, six valves, a volume curve)');
 		// Hour 1 is left out: both runs agree at hours 0, 2 and 3 (to 0.0007 ft), but at hour 1 the demand pattern
