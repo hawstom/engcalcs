@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 3290 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**37 still to read on master**, of 37 untranslated keys, of 3327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,13 +29,125 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (37, 37 to read @@ NEEDS RULING)
+
+- **`lpn_file_export_item_wtg`**
+  > .wtg.sqlite file…
+  @@ NEEDS RULING
+- **`lpn_file_export_wtg_tip`**
+  > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_exported`**
+  > Exported {zip}, holding {wtg} and {sqlite}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_extract`**
+  > Extract both files into one folder, then open the .wtg.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_failed`**
+  > The .wtg project was not written: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_left_out`**
+  > Not written: {items}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_backdrop`**
+  > The background picture.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_controls_pressure`**
+  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_category`**
+  > Demand category names (junctions {ids}). The flows are written; the names are not.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_model`**
+  > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_demand_multiplier`**
+  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_emitters`**
+  > Emitter coefficients: {ids}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_energy_price`**
+  > Energy price, price pattern, and demand charge.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_lead`**
+  > This export does not yet write the following:
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_material`**
+  > Pipe material and installation year. Every pipe is written with the default material.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_positions`**
+  > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_pump_speed_pattern`**
+  > Pump speed pattern (pumps {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_quality`**
+  > Water quality: the analysis, reactions, sources, and tank mixing.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_rules`**
+  > Rule-based controls.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tags`**
+  > Tags.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_minvol`**
+  > Tank minimum volume (tanks {ids}).
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_tank_mixing`**
+  > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_lost_texts`**
+  > Text on the map.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_empty`**
+  > This project has no nodes, so there is nothing to export.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_headloss`**
+  > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_pump_curve`**
+  > This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_no_units`**
+  > This network cannot be written: its flow unit is {unit}, and only gpm is written.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_refused`**
+  > This project cannot be written as a .wtg project: {detail}
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_asset_kind`**
+  > Asset {id} is of a kind this export does not write.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_gpv_curve`**
+  > Valve {id} has no headloss curve in this project.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_head_pattern`**
+  > Reservoir {id} names a head pattern that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_integrity`**
+  > The files written failed their own check, so they were not offered.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_layout`**
+  > The export template does not match the layout this export writes.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_offline`**
+  > The export needs a connection to this site the first time, to load its template and the database and EPANET engines. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_missing`**
+  > Tank {id} names a volume curve that this project does not define.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_t_vol_range`**
+  > The volume curve of tank {id} does not cover the tank's range of water depth.
+  @@ NEEDS RULING
+- **`lpn_wtg_export_working`**
+  > Writing the .wtg project…
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**69 still to read**, of 112 new keys across 7 unmerged branch(es).
+**37 still to read**, of 80 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -45,6 +157,39 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### feat/alternative-import (`e82c51502`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_export_table_scn_keeps`**
+  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
+  @@ NEEDS RULING
+- **`lpn_inpalt_base`**
+  > The Base alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_base_note`**
+  > Every scenario inherits the Base alternative, so choosing it changes them all.
+  @@ NEEDS RULING
+- **`lpn_inpalt_cancelled`**
+  > Nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_inpalt_heading`**
+  > Alternative for {category}
+  @@ NEEDS RULING
+- **`lpn_inpalt_lead`**
+  > This file changes values in the categories below. Choose the alternative that receives the values of each.
+  @@ NEEDS RULING
+- **`lpn_inpalt_name`**
+  > Name of the new alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_new`**
+  > A new alternative, child of {parent}
+  @@ NEEDS RULING
+- **`lpn_inpalt_own`**
+  > {scenario}'s own alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_receipt`**
+  > Alternatives that received the values: {list}
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -87,8 +232,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
-### feat/native-wire (`154abbde9`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/native-wire (`ae10e1721`) — 5 new, 5 to read @@ NEEDS RULING
 
+- **`lpn_diag_rules_refused`**
+  > EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:
+  @@ NEEDS RULING
 - **`lpn_engine_epanet_used`**
   > Solved with the EPANET solver.
   @@ NEEDS RULING
@@ -266,136 +414,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`acfffb1df`) — 43 new, 43 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_wtg`**
-  > .wtg.sqlite file…
-  @@ NEEDS RULING
-- **`lpn_file_export_wtg_tip`**
-  > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, written into a project you saved yourself from the program that opens .wtg files.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_choose`**
-  > Choose the saved project…
-  @@ NEEDS RULING
-- **`lpn_wtg_export_exported`**
-  > Exported {zip}, holding {wtg} and {sqlite}.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_extract`**
-  > Extract both files into one folder, then open the .wtg.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_failed`**
-  > The .wtg project was not written: {detail}
-  @@ NEEDS RULING
-- **`lpn_wtg_export_left_out`**
-  > Left out: {items}
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_backdrop`**
-  > The background picture.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_controls_pressure`**
-  > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_demand_category`**
-  > Demand category names (junctions {ids}). The flows are written; the names are not.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_demand_model`**
-  > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_demand_multiplier`**
-  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_emitters`**
-  > Emitter coefficients: {ids}.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_energy_price`**
-  > Energy price, price pattern, and demand charge.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_lead`**
-  > The file cannot carry the following, so they are left out:
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_material`**
-  > Pipe material and installation year. Every pipe keeps the saved project's default material.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_positions`**
-  > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_pump_speed_pattern`**
-  > Pump speed pattern (pumps {ids}).
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_quality`**
-  > Water quality: the analysis, reactions, sources, and tank mixing.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_rules`**
-  > Rule-based controls.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tags`**
-  > Tags.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tank_minvol`**
-  > Tank minimum volume (tanks {ids}).
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tank_mixing`**
-  > Tank mixing model (tanks {ids}). Tanks are written fully mixed.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_texts`**
-  > Text on the map.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_need`**
-  > The database layout comes from a project you saved yourself. Save one from the program that opens .wtg files, holding at least one junction, reservoir, tank, pipe, pump, pump definition, and pattern, and one valve of each kind this network uses. Then choose its .wtg and .wtg.sqlite files together.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_need_both`**
-  > Choose the .wtg and the .wtg.sqlite file together (hold Ctrl or Shift to select both).
-  @@ NEEDS RULING
-- **`lpn_wtg_export_no_empty`**
-  > This project has no nodes, so there is nothing to export.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_no_headloss`**
-  > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_no_pump_curve`**
-  > This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_no_units`**
-  > This network cannot be written: its flow unit is {unit}, and only gpm is written.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_refused`**
-  > This project cannot be written as a .wtg project: {detail}
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_asset_kind`**
-  > Asset {id} is of a kind this export does not write.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_gpv_curve`**
-  > Valve {id} has no headloss curve in this project.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_head_pattern`**
-  > Reservoir {id} names a head pattern that this project does not define.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_integrity`**
-  > The files written failed their own check, so they were not offered.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_kind`**
-  > The saved project has no {kind} to copy from. Add one, save the project, and choose it again.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_layout`**
-  > The saved project is laid out differently from the one this export was tested with.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_not_project`**
-  > This file is not a saved project of the kind this export needs. Choose the .wtg file and the .wtg.sqlite file of a project you saved.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_offline`**
-  > The export needs a connection to this site the first time, to load the database and EPANET engines. Check the connection and try again.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_schema`**
-  > This saved project is laid out as version {found}, and this export has been tested only with {tested}. Save the project from a program version that writes {tested}.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_vol_missing`**
-  > Tank {id} names a volume curve that this project does not define.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_t_vol_range`**
-  > The volume curve of tank {id} does not cover the tank's range of water depth.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_working`**
-  > Writing the .wtg project…
-  @@ NEEDS RULING
-
-### fix/name-wrap (`0f47d9ff2`) — adds no English strings
+### feat/wtg-page-export (`f31efad2e`) — adds no English strings
