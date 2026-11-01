@@ -451,3 +451,65 @@ the page's default Accuracy of 0.001 the heads are EPANET's, to the last digit, 
 on a junction, a general purpose valve and a Darcy-Weisbach project count a different number of trials, because the loop
 decides a valve's state between solves and EPANET inside one. The flow balance's numbers agree to 2e-5 of themselves.
 Quality runs write the summary lines for the analysis but not EPANET's "Water Quality Mass Balance" block.
+
+## EPANET-MSX in the built-in solver
+
+Tom, 2026-11-01: *"I'd prefer to implement EPANET-MSX even if it causes us a delay. There is no rush on this."* and *"Trudge forward."*
+`dev/msx-scope.md` Phase 3 ("do not start until Phase 2 has users") is superseded by that call.
+
+### What MSX computes (EPANET-MSX 1.1 / 2.0, read from the source, not from memory)
+
+The reference implementation is OpenWaterAnalytics/epanet-msx, `src/` (msxqual.c, msxchem.c, msxtank.c, rk5.c, ros2.c,
+newton.c, msxutils.c, mathexpr.c, msxinp.c, msxproj.c), Copyright (C) 2007 Feng Shang, Lewis Rossman and James Uber (US EPA).
+**Licence:** `doc/license.txt` in that repository is the GNU LGPL v3 (with `dev/msx-scope.md` having said MIT, which was wrong
+or out of date); LGPL v3 and this project's GPL v3 combine, and every file written from it names the source and carries that
+notice. The vendored epanet-js build already runs it (the page's Phase 2); that WASM engine is the test oracle here.
+
+- **Input.** A second file, `model.msx.text`: `[OPTIONS]` (AREA_UNITS FT2 default, M2, CM2; RATE_UNITS **DAY** default, SEC, MIN, HR;
+  SOLVER EUL default, RK5, ROS2; COUPLING NONE default, FULL; TIMESTEP 300 s; RTOL 0.001; ATOL 0.01; COMPILER ignored),
+  `[SPECIES]` (BULK or WALL, units, optional ATOL and RTOL), `[COEFFICIENTS]` (CONSTANT, PARAMETER), `[TERMS]` (named
+  expressions), `[PIPES]` and `[TANKS]` (one RATE, FORMULA or EQUIL expression per species; tanks reuse the pipe set when none is
+  given), `[SOURCES]` (CONCEN, MASS, SETPOINT, FLOWPACED; species, node, strength, pattern), `[QUALITY]` (GLOBAL, NODE, LINK
+  initial values), `[PARAMETERS]` (PIPE and TANK overrides), `[PATTERNS]`. Expressions are + - * / ^, unary minus, parentheses and
+  the functions abs, sgn, sqrt, step, exp, log, log10, sin, cos, tan, cot, asin, acos, atan, acot, sinh, cosh, tanh, coth,
+  asinh, acosh, atanh, acoth; they may use any species, term, parameter, constant, and the pipe's hydraulic variables
+  D (diameter, project length unit), Q (flow), U (velocity), Re, Us (shear velocity), Ff (Darcy-Weisbach friction factor),
+  Av (wall area per volume, area unit per litre) and Kc (roughness). In a tank the hydraulic variables are 0.
+- **Hydraulics.** MSX reads EPANET's saved hydraulics (node demands D, heads H and link flows Q as 4-byte floats, step by step),
+  so it runs after the hydraulic run and over the same records the water quality pass already keeps (`hydRecord()`).
+- **Transport.** Time-driven, not event-driven: every quality step (TIMESTEP, cut to land on each hydraulic change) does, in order,
+  react every segment of every pipe and tank (`MSXchem_react`), advect (wall species only: the entering segment takes the
+  volume-weighted wall concentration of the segments displaced, and the rest shift), accumulate (take the flow volume from the
+  leading segments of each pipe into its downstream node; a pipe whose volume is less than the flow passes the upstream node's
+  concentration), update nodes (mix inflows; a tank by its mixing model MIXED, 2COMP, FIFO or LIFO; new equilibrium), add
+  sources (CONCEN on external inflow, MASS, SETPOINT, FLOWPACED) and release (a new segment at the entrance of each pipe, or
+  the last segment grown when its concentrations are within every species' ATOL of the new ones).
+- **Chemistry in a segment.** RATE species integrate dC/dt over the step in RATE_UNITS by Euler (clipped at 0), RK5 (Cash-Karp/
+  Dormand-Prince, adaptive, with its remembered step `hstep` kept on the segment, tolerances per species) or ROS2 (a two-stage
+  Rosenbrock, adaptive, forward-difference Jacobian eps 1e-7). EQUIL species are the solution of a Newton system (20 iterations,
+  3 significant digits, the Jacobian by central differences of eps 1e-7) after every reaction, and inside every rate
+  evaluation when COUPLING is FULL. FORMULA species are evaluated last. Negative results are clipped to 0.
+- **Outputs the page shows.** Per reporting time, per node and per link, one number per species in the file's order, in the
+  species' units (wall species per AREA_UNITS, none at a node): a node's concentration (a tank's own) and a link's volume-weighted
+  mean over its segments, as `MSXqual_getNodeQual()` and `MSXqual_getLinkQual()` give them (`frames[].msxNodes`, `.msxLinks`,
+  `msxSpecies`). The MSX text report is not produced.
+
+### Test cases
+
+EPA's arsenic oxidation and adsorption example (`dev/lpn-spike/fixtures/msx-example/`: As5Adsorb, with its published `.rpt`),
+the one-species chlorine decay (`dev/lpn-spike/fixtures/chlorine-decay.msx`) on Net1, EPANET's own chemical analysis as the
+cross-check of the decay (`msx-run-harness.js` already holds both against the engine), and constructed networks run through
+both engines by `native-msx-harness.js`: each solver, FULL coupling, equilibrium, wall species, every source type, every tank
+mixing model, a pattern, per-pipe parameters.
+
+### Slices (each ends with its harness green and a commit)
+
+1. **The file and the expressions.** `js/lpn-native-msx.js`: the `.msx` parser with MSX's defaults, units and errors (named, in
+   the file's words), and the expression evaluator. Held by `native-msx-harness.js` against the engine's own reading of the
+   same files (`msxGetCount`, `msxGetSpecies`, `msxGetConstant`, `msxGetParameter`) and by hand-computed expressions.
+2. **The chemistry of one segment.** EUL, RK5, ROS2, Newton, equilibrium, formulas, coupling. Held by a reaction-only network
+   (no flow, one pipe, one tank) against the engine at 1e-6 relative.
+3. **Transport and nodes for bulk species**, a MIXED tank, sources and initial quality. Held on Net1 and the chlorine decay.
+4. **Wall species**, the arsenic example against its published report and the engine.
+5. **Tank models 2COMP, FIFO, LIFO**, per-element parameters, patterns on sources.
+6. **Wiring.** The run no longer falls back to EPANET for a file the slices cover; `lpnNativeRunRefusals` names what is not covered.
