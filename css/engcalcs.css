@@ -5313,6 +5313,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
    at most 40 rem wide; once open the width is the box's own (js wireFloatBox), so a drag of the corner can widen it past that. The body scrolls
    and Convert as's OK and Cancel stay under it, always in view. */
 #lpn_convas_panel, #lpn_crsbox { max-width: min(40rem, calc(100vw - 8px)); flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
+#lpn_convas_panel.lpn-float-sized, #lpn_crsbox.lpn-float-sized { max-width: calc(100vw - 8px); }   /* once open, its width is its own */
 #lpn_convas_panel > .lpn-popover-body, #lpn_crsbox > .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 #lpn_convas_panel > .lpn-convas-foot { flex: none; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather

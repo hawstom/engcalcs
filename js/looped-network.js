@@ -67102,9 +67102,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			resetPanelHeight(box, panelBody(box));
 			box.style.width = mem.w ? mem.w + 'px' : '';
 			box.style.height = mem.h ? mem.h + 'px' : '';
-			box.style.maxWidth = mem.w ? 'calc(100vw - 8px)' : '';
+			box.classList.toggle('lpn-float-sized', !!mem.w);   // the 40 rem opening cap lifted (css/engcalcs.css)
 			r = box.getBoundingClientRect();
-			if (!mem.w) { box.style.width = Math.ceil(r.width) + 'px'; box.style.maxWidth = 'calc(100vw - 8px)'; }
+			if (!mem.w) { box.style.width = Math.ceil(r.width) + 'px'; box.classList.add('lpn-float-sized'); }
 			room = Math.max(80, ih - floor - POPUP_EDGE);
 			h = r.height;
 			if (!mem.h && h > room) { box.style.height = room + 'px'; h = room; }
