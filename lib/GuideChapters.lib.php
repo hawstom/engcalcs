@@ -215,7 +215,7 @@ function ecGuideDl($slug) {
         // A term that only repeats its chapter's heading is marked, and the stylesheet hides it.
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
         $termKey = ecGuideTermKey($stem);
-        $html .= "\t<dt id=\"guide-term-" . $stem . '"' . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
+        $html .= "\t<dt" . (ecGuideDefKeys($stem) ? ' id="guide-term-' . $stem . '"' : '') . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
     }
     return $html . "</dl>";
 }
