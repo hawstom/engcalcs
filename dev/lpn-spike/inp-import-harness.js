@@ -112,7 +112,7 @@ const L = loadLoopedNetwork(
 	// box; this answers it the way this section means, lat/lon (EPSG:4326), and presses Convert.
 	"\t\topenAsGeo: function (f) { openAsGeoFile(f);\n" +
 	"\t\t\tvar box = document.getElementById('lpn_convas_panel');\n" +
-	"\t\t\tif (box && box.style.display === 'block') { closeConvasBox();\n" +
+	"\t\t\tif (box && box.style.display === 'flex') { closeConvasBox();\n" +
 	"\t\t\t\tif (!isLatLonProject()) { runConvertAs({ kind: 'epsg', crs: LPN_CRS_LATLON, units: {}, rounding: {} }); } } },\n" +
 	"\t\tserialize: serializeProject,\n" +
 	"\t\tgeorefState: function () { return georef; }, georefCancel: georefCancel,\n" +

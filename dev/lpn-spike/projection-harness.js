@@ -486,7 +486,7 @@ setUnitSet('si');
 	L.reset();
 	let picked = null;
 	L.openCrsBox(L.WEBMERC, null, function (code, ll) { picked = { code: code, ll: ll }; });
-	ok('it opens', byId.lpn_crsbox.style.display === 'block', byId.lpn_crsbox.style.display);
+	ok('it opens', byId.lpn_crsbox.style.display === 'flex', byId.lpn_crsbox.style.display);
 	ok('...on the whole catalogue, because no place has been found yet',
 		listEl.children.length === 184, String(listEl.children.length));
 	ok('...and says so rather than looking broken', noteEl.textContent === PC.lpn_crs_noview,
@@ -526,7 +526,7 @@ setUnitSet('si');
 		picked && picked.code === 'EPSG:32610', picked && picked.code);
 	ok('...and the place with it, so one search answers two questions',
 		picked && picked.ll && picked.ll.lat === PETALUMA.lat);
-	ok('...and the box is shut', byId.lpn_crsbox.style.display !== 'block');
+	ok('...and the box is shut', byId.lpn_crsbox.style.display === 'none');
 	ok('...and no project declared anything', L.crsCode() === '');
 
 	// **AND DOUBLE-CLICKING A ROW IS THE SAME ACT** (Tom, 2026-09-14: *"When I double-click a
@@ -541,7 +541,7 @@ setUnitSet('si');
 	(dblList._listeners.dblclick || []).forEach(function (f) { f({}); });
 	ok('a double-click hands the code back exactly as Select does',
 		picked2 && picked2.code === 'EPSG:32610', picked2 && picked2.code);
-	ok('...and shuts the box', byId.lpn_crsbox.style.display !== 'block');
+	ok('...and shuts the box', byId.lpn_crsbox.style.display === 'none');
 	ok('...and still declares nothing itself', L.crsCode() === '');
 
 	// **THE PLACE-NAME SEARCH IS THE SUITE'S ONE GEOCODER, THROUGH ITS OWN GATE.** What is asserted

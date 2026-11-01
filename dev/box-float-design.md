@@ -1,8 +1,7 @@
 # Convert as and the coordinate-system chooser: movable, resizable boxes (round 11b)
 
-Tom, 2026-10-31: Convert as "is not draggable or resizeable, and I see no good reason why not";
-"the second divider is not draggable". Of the chooser: "the last 'row' doesn't have a draggable
-divider", and it too is "not draggable or resizeable".
+Tom, 2026-10-31: Convert as "is not draggable or resizeable"; "the second divider is not
+draggable". The chooser: "the last 'row' doesn't have a draggable divider"; also not movable.
 
 ## How boxes move and size today
 
@@ -16,18 +15,14 @@ divider", and it too is "not draggable or resizeable".
 - **On a phone every standing box opens through `placePanelForScreen()`, which fills the window**
   (Tom, 2026-09-01) and remembers nothing measured there. `panel-fill-harness.js` counts every
   draggable panel against that seam or a declared exemption.
-- **Memory:** the standing boxes (Settings, Find, Libraries, reports, Fire flow ...) keep corner and
-  size in their own `localStorage` key. The Properties box, an answer to a click, keeps its dragged
-  corner and size **in memory for the page only** (`popupUserPos`, `popupUserSize`). Not every box
-  remembers: New project, the area hint and the wizard bars do not store anything.
+- **Memory:** the standing boxes keep corner and size in their own `localStorage` key; the
+  Properties box keeps them **in memory for the page only**; New project and the wizard bars none.
 
 ## How the two boxes are built today
 
-Neither uses `openDialog()` (`#lpn_dialog`, the page's one modal question box, with a backdrop).
-Both are static panels in Looped-Network.php, shown by their own openers (`openConvertAsBox`,
-`openCrsBox`), centred, capped to the viewport, raised by `raisePanel()`, and **already not modal**:
-the map and the tabs behind stay live (Convert as already re-asks if the tab changed under it).
-They were simply never passed through `makePanelDraggable()` and carry no `resize`.
+Neither uses `openDialog()` (the page's one modal question box, with a backdrop). Both are static
+panels shown by their own openers, centred, raised by `raisePanel()`, and **already not modal**
+(Convert as re-asks if the tab changed under it). They never went through `makePanelDraggable()`.
 
 ## The plan: the existing machinery, nothing new
 
@@ -59,7 +54,6 @@ They were simply never passed through `makePanelDraggable()` and carry no `resiz
    boxes are marked. `gridFitNow`'s API and the `lpn-sheet` CSS are unchanged.
 
 ## Other dialogs this affects
-
 None of `openDialog()`'s callers. `gridHeadersSync()` changes only for a host carrying the new
 class, so no other box's dividers change. New project (another agent's territory this round) is
 not made movable here; it would be the same three lines through `wireFloatBox()`.
