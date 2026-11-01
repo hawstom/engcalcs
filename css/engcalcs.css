@@ -5635,9 +5635,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
-/* **THE NAME WRAPS AS NEEDED AND THE COLUMN HAS A FLOOR** (Task 852; Tom, 2026-11-01: "I would rather that they kept wrapping as needed"; Ida's design dev/agents/interface-designer/truncation-852-2026-11-01.md; this reverses the 2026-10-30 one-line clip). Both columns keep a floor (7rem and 6rem) so neither a name nor a value is squeezed to nothing; a box narrower than the two floors scrolls its content pane sideways. A name takes as many lines as it needs; nothing is clipped, no ellipsis, no tip. */
+/* **THE NAME WRAPS AS NEEDED AND THE COLUMN HAS A FLOOR** (Task 852; Tom, 2026-11-01: "I would rather that they kept wrapping as needed"; Ida's design dev/agents/interface-designer/truncation-852-2026-11-01.md; this reverses the 2026-10-30 one-line clip). Both columns keep a floor (6rem and 6rem, which with the gap fits a 320 px phone) so neither a name nor a value is squeezed to nothing; a box narrower than the two floors scrolls its content pane sideways. A name takes as many lines as it needs; nothing is clipped, no ellipsis, no tip. */
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(var(--lpn-set-name-min, 7rem), var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
+	display: grid; grid-template-columns: minmax(var(--lpn-set-name-min, 6rem), var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
