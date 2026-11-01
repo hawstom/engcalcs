@@ -53686,6 +53686,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (si) { si.addEventListener('click', function () { applyNewBoxPreset('si'); }); }
 		if (us) { us.addEventListener('click', function () { applyNewBoxPreset('us'); }); }
 		if (method) { method.addEventListener('change', syncNewBoxRoughness); }
+		box.__lpnOpenMinRem = 26;   // wide enough that the Friction method's "Hazen-Williams" and the chosen system's name are not cut
+		wireFloatBox(box);
 		var pick = document.getElementById('lpn_new_crs_pick');
 		if (pick) {
 			pick.addEventListener('click', function () {
@@ -53750,15 +53752,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (method) { method.value = frictionMethod(); }
 		syncNewBoxRoughness();
 		syncNewBoxCrsPick();
-		box.style.display = 'block';
-		raisePanel(box);   // centred, not dragged, so it is raised where it becomes visible
-		boxOpenWidthFitted(box, document.getElementById('lpn_new_body'));
-		h = fitPanelToViewport(box);
-		r = box.getBoundingClientRect();
-		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
-		// A box taller than the room under the chrome (a phone) scrolls inside, so Create stays reachable.
-		capPanelToRoomBelow(box, parseFloat(box.style.top));
+		// A movable, resizable box (round 11d, wireFloatBox), as Convert as and the chooser: centred, or where it was left this session; a phone fills the window.
+		box.style.display = 'flex';
+		placeFloatBox(box);
+		(window.requestAnimationFrame || function (f) { return setTimeout(f, 32); })(function () {
+			if (panelIsOpen(box) && !box.__lpnFloatHeld) { placeFloatBox(box); }
+		});
 		initTipsIn(box);
 		var create = document.getElementById('lpn_new_create');
 		if (create && create.focus) { create.focus(); }
@@ -53991,6 +53990,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else { crsBoxOk(); }
 			} else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeCrsBox(); }   // the chooser only: a Convert as under it stays open
 		});
+		box.__lpnOpenRem = 36;   // 36 rem: the longest register entries ("NAD83(HARN) / California zone 2 (ftUS) (EPSG:2871)") and the rows' labels, from any opener
 		wireFloatBox(box);
 	}
 	// `code` is what to open on, `place` the point already found if there is one, `onPick` where the
@@ -67144,7 +67144,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// It opens wide enough for its longest label (boxOpenWidthFitted), the 40 rem cap lifted for the measuring; a phone is filled by the seam.
 				box.classList.add('lpn-float-sized');
 				host = panelBody(box);
-				if (host && host.querySelector('.lpn-grid')) { boxOpenWidthFitted(box, host); } else { box.style.width = Math.ceil(box.getBoundingClientRect().width) + 'px'; }
+				if (box.__lpnOpenRem) {
+					// A box that holds a list of the register's own entries opens at one width wherever it was opened from and whatever it lists (round 11d); the Label column is fitted to it.
+					box.style.width = Math.ceil(Math.min(Math.max(0, iw - 2 * POPUP_EDGE), box.__lpnOpenRem * gridRem())) + 'px';
+					if (host && host.__lpnGridHost) { host.__lpnScaled = false; host.__lpnFrac = 0; host.__lpnW = 0; gridFitNow(host); }
+				} else if (host && host.querySelector('.lpn-grid')) {
+					boxOpenWidthFitted(box, host);
+					// A floor for a box whose values need room (New project's "Hazen-Williams" beside its arrow); a phone is filled by the seam anyway.
+					if (box.__lpnOpenMinRem && box.getBoundingClientRect().width < box.__lpnOpenMinRem * gridRem()) {
+						box.style.width = Math.ceil(Math.min(Math.max(0, iw - 2 * POPUP_EDGE), box.__lpnOpenMinRem * gridRem())) + 'px';
+						host.__lpnScaled = false; host.__lpnFrac = 0; host.__lpnW = 0;
+						gridFitNow(host);
+					}
+				} else { box.style.width = Math.ceil(box.getBoundingClientRect().width) + 'px'; }
 			}
 			r = box.getBoundingClientRect();
 			room = Math.max(80, ih - floor - POPUP_EDGE);
