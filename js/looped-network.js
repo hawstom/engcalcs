@@ -69522,6 +69522,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
+	// **A SECTION'S LONG EXPLANATION IS THE TIP OF ITS HEADING'S `?`, AND THE HEADING OPENS THE USER MANUAL** (Tom, round 11: "Curves, Pipe Types, and Fittings still start with rambling explanations that need to be abstracted. Maybe a ? glyph at each one that leads to a User Manual section?"). The heading is a link with a separate `?` glyph, the pattern of ecLinkTipLabel(); the link opens the Libraries chapter (the manual has one entry for the box, no entry per section). The words are the keys the paragraphs always used.
+	var LIB_INTRO = {
+		curves: [['lpn_library_curves_note', 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'],
+			['lpn_library_curve_values_tip', 'Select one or two columns in a spreadsheet, copy them, and paste into the first target cell. Rows are added as needed. Lines copied directly from an EPANET file, including the curve name, can also be pasted.']],
+		pipetypes: [['lpn_library_pipetypes_note', 'Each project has a separate pipe type library. Properties may be left blank in a pipe type definition; for example, a pipe type may specify a roughness and no diameter. Pipe types are assigned to pipes in the pipe properties. Editing a definition here changes every pipe that references it.'],
+			['lpn_library_pipetype_blank_tip', 'Blank properties in a pipe type definition are left to be entered individually for each pipe.']],
+		fittings: [['lpn_library_fittings_note', 'Each project has a separate fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'],
+			['lpn_library_fittings_source', 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point, not as final values.']]
+	};
+	function libSectionHead(cur) {
+		var pc = EngCalcs.pageConfig || {}, head = libEl('h3', '', ''), a,
+			intro = LIB_INTRO[cur.id], tip = intro ? intro.map(function (k) { return pc[k[0]] || k[1]; }).join(' ') : (pc[cur.tip] || '');
+		a = document.createElement('a');
+		a.href = '#guide/box-lpn_library_box';
+		a.textContent = pc[cur.label] || cur.id;
+		a.addEventListener('click', function (e) { e.preventDefault(); openGuideForBox('lpn_library_box'); });
+		head.appendChild(a);
+		if (tip) { head.appendChild(findHelpLabel('', tip)); }
+		return head;
+	}
 	function buildLibraryIndex() {
 		var index = document.getElementById('lpn_libbox_index'), pc = EngCalcs.pageConfig || {};
 		if (!index) { return; }
@@ -69550,9 +69570,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		content.innerHTML = '';
 		sec = libEl('section', 'lpn-lib-sec');
 		cur = LIB_SECTIONS.filter(function (s) { return s.id === libSection; })[0] || LIB_SECTIONS[0];
-		head = libEl('h3', 'ec-help', pc[cur.label] || cur.id);
-		if (pc[cur.tip]) { head.title = pc[cur.tip]; }
-		sec.appendChild(head);
+		sec.appendChild(libSectionHead(cur));
 		if (libSection === 'patterns') { buildPatternSection(sec); }
 		else if (libSection === 'curves') { buildCurveSection(sec); }
 		else if (libSection === 'pipetypes') { buildPipeTypeSection(sec); }
@@ -70421,11 +70439,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 */
 	function buildPipeTypeSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libPipeTypesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'Each project has a separate pipe type library. Properties may be left blank in a pipe type definition; for example, a pipe type may specify a roughness and no diameter. Pipe types are assigned to pipes in the pipe properties. Editing a definition here changes every pipe that references it.'));
 		// Said once for the section, not once per entry -- buildCurveSection()'s rule, and for the
 		// same reason: it is the same sentence about every row, and twenty copies of a sentence is
 		// what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetype_blank_tip || 'Blank properties in a pipe type definition are left to be entered individually for each pipe.'));
 		host.appendChild(libButton(pc.lpn_library_pipetype_add || 'Add a pipe type', function () {
 			saveUndoSnapshot();
 			// **A NEW TYPE STATES NOTHING**, which is the honest starting point: a definition seeded
@@ -70612,11 +70628,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function buildFittingSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libFittingSetsRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has a separate fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'));
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point, not as final values.'));
 		host.appendChild(libButton(pc.lpn_library_fittings_add || 'Add a fittings list', function () {
 			saveUndoSnapshot();
 			// EMPTY, for the reason a new curve has no points: a list that arrived with an elbow in
@@ -70822,10 +70836,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function buildCurveSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
 		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
 		// curve in the list, and twenty copies of it is what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first target cell. Rows are added as needed. Lines copied directly from an EPANET file, including the curve name, can also be pasted.'));
 		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
 			saveUndoSnapshot();
 			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
