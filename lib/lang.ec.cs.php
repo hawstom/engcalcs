@@ -82,7 +82,7 @@ $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 // EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
 // "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
 // their old sentence until the next translation sprint, under the same version.
-$ec_lang['consent_body']='Smíme si v tomto prohlížeči uložit náhodný kód, abychom mohli počítat, kolik prohlížečů používá jednotlivé části tohoto webu? Kód se vytvoří na místě, nic o vás ani o vašem zařízení nevypovídá a nezaznamenává nic, co zadáte. Bez něj nedokážeme rozlišit vaši druhou návštěvu od první návštěvy někoho jiného.';
+$ec_lang['consent_body']='Smíme si v tomto prohlížeči uložit náhodný kód, abychom vás nepočítali znovu? Kód se vytvoří na místě, nic o vás ani o vašem zařízení nevypovídá a nezaznamenává nic, co zadáte.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Vypočítá tuto síť v každém hydraulickém časovém kroku.';
 $ec_lang['consent_accept']='Přijmout tentokrát';
@@ -992,7 +992,7 @@ $ec_lang['lpn_guide_text_contour_box']='Řídí vrstevnicový graf vykreslený n
 $ec_lang['lpn_guide_text_scncmp_box']='Vypočte z kopie výkresu každý scénář zaškrtnutý ve Správci scénářů, tedy všechny, pokud nebyla některá odškrtnuta, a pro každý uvede v tabulce počet specifických hodnot, násobitel odběru, celkovou dobu běhu, hydraulický časový krok, nejnižší tlak a nejvyšší rychlost. Otevřete je volbou Voda, Sestavy, Porovnání scénářů. Porovnání se spustí při otevření a znovu po každé úpravě, dokud zůstává otevřené.\n\nProjekt nemění a otevřený scénář zůstává tak, jak byl.';
 $ec_lang['lpn_guide_text_rptbox']='Zobrazuje textovou sestavu zapsanou výpočetním jádrem EPANET pro poslední simulaci s časovým průběhem, včetně jejích varování a souhrnu sítě. Každá simulace s časovým průběhem ji nahradí; výpočet jednoho okamžiku ne a úprava ponechá předchozí sestavu beze změny.';
 $ec_lang['lpn_guide_text_status_box']='Uvádí v časovém pořadí každou změnu během poslední simulace s časovým průběhem: otevření nebo zavření čerpadla, ventilu či potrubí, začátek plnění nebo vyprazdňování nádrže, její naplnění nebo vyprázdnění a každý časový krok, který plně nezkonvergoval. Uvedeny jsou jen změny, ne každý časový krok.';
-$ec_lang['lpn_guide_text_full_box']='Uvádí každý uzel a každé potrubí při každém časovém kroku hlášení, v jednotkách zobrazených na panelu Tabulky. Bez simulace s časovým průběhem zobrazuje aktuální řešení v jediném okamžiku. Stažení nebo tisk zahrnuje všechny časové kroky, tabulka zobrazuje vždy jeden.';
+$ec_lang['lpn_guide_text_full_box']='Uvádí každý uzel a každý spoj v každém časovém kroku hlášení, v jednotkách zobrazených na panelu Tabulky. Bez simulace s časovým průběhem zobrazuje aktuální řešení v jediném okamžiku. Stažení, kopírování i tisk zahrnují všechny časové kroky, tabulka zobrazuje vždy jeden.';
 $ec_lang['lpn_guide_text_calib_box']='Porovnává soubor terénních měření s vypočtenými výsledky na stejných místech a ve stejných časech, jeden soubor pro každou veličinu. Soubor se drží jen po dobu aktuální relace a neukládá se s projektem.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='Příručka. Její části jsou Použití příručky, Panel nástrojů, Nabídky, Mapa, Snímek obrazovky, Tabulky, Okna, O tomto kalkulátoru a Poznámky k této stránce. Panel nástrojů a Nabídky uvádějí každé tlačítko panelu nástrojů a každý řádek nabídky s klávesovou zkratkou, část Okna má položku pro každé okno a ostatní části popisují, co stránka dělá. Zvolením řádku se zobrazí, kde se tento ovládací prvek nachází; nikdy jej nespustí. Hledání spustíte stisknutím Ctrl+K nebo klávesou /, má-li příručka fokus. Ctrl+K nehledá, dokud je otevřena otázka.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
@@ -1016,29 +1016,29 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Hodnoty se porovnávají v plné p
 $ec_lang['lpn_guide_scn_use_term']='K čemu scénář slouží';
 $ec_lang['lpn_guide_scn_use_def']='<p>Scénáře uchovávají v jednom projektu mnoho návrhů, pohledů nebo situací, například průměrný den, maximální den, špičkovou hodinu, obrázek pro prezentaci v sestavě, vyřazený hlavní řad nebo navrhovanou výměnu. Síť se nakreslí jednou, v základním scénáři. Každý další scénář uchovává jen své specifické hodnoty, tedy hodnoty, které se liší od scénáře, z něhož dědí, a vše ostatní přebírá z tohoto scénáře. Úprava základního scénáře proto zasáhne každý scénář, který tuto hodnotu nepřepsal.</p><p>Nový projekt začíná šesti připravenými scénáři: 1. Zkouška průtoku: statická, 2. Zkouška průtoku: střední, 3. Zkouška průtoku: maximální, 4. Průměrný den, 5. Maximální den a 6. Špičková hodina. Jsou to běžné scénáře, které lze přejmenovat, upravit i smazat. Každý začíná jednou specifickou hodnotou, svým násobitelem odběru: 1 pro zkoušky průtoku a Průměrný den, 2 pro Maximální den a 3 pro Špičkovou hodinu. Násobitele jsou zástupné hodnoty, které je třeba nahradit hodnotami pro modelovanou soustavu. Projekt otevřený ze souboru, včetně každého příkladu, nebo importovaný ze souboru EPANET má pouze základní scénář.</p><p>Požární průtok se kontroluje v okně Požární průtok: analýza, které testuje každý uzel nebo vybrané uzly. Při jejím spuštění bývá otevřen scénář Maximální den.</p>';
 $ec_lang['lpn_guide_scn_open_term']='Otevřený scénář';
-$ec_lang['lpn_guide_scn_open_def']='<p>Tlačítko Scénář ve stavovém pruhu pod mapou uvádí název otevřeného scénáře a počet jeho specifických hodnot, například Scénář: Základní | Počet specifických hodnot: 0. Kliknutím na něj nebo volbou Voda, Scénáře přepnete scénář nebo přidáte, zkopírujete, přejmenujete či smažete scénář. Každý scénář v seznamu uvádí v závorce počet svých specifických hodnot a u otevřeného je zaškrtnutí. Řádek Správce scénářů otevře strom scénářů a alternativ. Je zašedlý, dokud je Základní režim zaškrtnut.</p><p>Výkres, popisky, Vlastnosti, Tabulky i výsledky patří otevřenému scénáři a stránka počítá pouze otevřený scénář. Porovnání scénářů, popsané ve vlastní položce, počítá ostatní z kopií. Otevřený scénář se ukládá s projektem.</p>';
+$ec_lang['lpn_guide_scn_open_def']='<p>Tlačítko Scénář ve stavovém pruhu pod mapou uvádí název otevřeného scénáře a počet jeho specifických hodnot, například Scénář: Základní | Počet specifických hodnot: 0. Kliknutím na něj nebo volbou Voda, Scénáře přepnete scénář nebo přidáte, zkopírujete, přejmenujete či smažete scénář. Každý scénář v seznamu uvádí v závorce počet svých specifických hodnot a u otevřeného je zaškrtnutí. Řádek Správce scénářů otevře strom scénářů a alternativ, nebo jen seznam scénářů, dokud je zaškrtnut Základní režim.</p><p>Výkres, popisky, Vlastnosti, Tabulky i výsledky patří otevřenému scénáři a stránka počítá pouze otevřený scénář. Porovnání scénářů, popsané ve vlastní položce, počítá ostatní z kopií. Otevřený scénář se ukládá s projektem.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Kde se specifické hodnoty zobrazují';
-$ec_lang['lpn_guide_scn_marks_def']='<p>Na mapě je prvek, který má v otevřeném scénáři specifickou hodnotu, obkroužen žlutooranžově a prvek, který dědí specifickou hodnotu z nadřazeného scénáře nebo alternativy, je obkroužen čárkovanou šedou čarou. U odběru, průměru, drsnosti, součinitele místní ztráty a délky se kroužek zobrazí jen tehdy, když Nastavení, Vizualizace, Popisky uzlů nebo Popisky spojů zobrazují tuto hodnotu na mapě; specifická hodnota jakékoli jiné vlastnosti má kroužek vždy. V Tabulkách je buňka s hodnotou nastavenou otevřeným scénářem žlutooranžová a její tip uvádí alternativu, která ji drží, například Fyzikální alt.: Větší řad. Zobrazit scénáře v nabídce buňky tabulky uvede každý prvek jednou pro každý scénář.</p><p>Každý řádek Vlastností, který může scénář přepsat, má vlevo značku. Plná tečka znamená, že hodnotu přepisuje otevřený scénář; kliknutím na ni specifickou hodnotu zrušíte. Prázdná tečka znamená, že hodnota je zděděná; kliknutím na ni se zobrazená hodnota stane specifickou hodnotou. Trojúhelník znamená, že hodnotu přepisují scénáře pod tímto; kliknutím na něj jejich specifické hodnoty po potvrzení zrušíte. Pod přepsaným řádkem je zděděná hodnota, kterou nahrazuje, například Základní scénář: 18. Okno Nastavení má jen plnou tečku a trojúhelník, protože specifickou hodnotu tvoří už samotné zadání hodnoty.</p><p>Kroužky skryjete odškrtnutím Zobrazit značky specifických hodnot na mapě v Nastavení, Mapa a stránka, Stránka, nebo volbou Mapa, Vyčistit mapu. Obojí se uchovává v tomto prohlížeči, ne v projektu. Tabulky označují specifické hodnoty v obou případech.</p>';
+$ec_lang['lpn_guide_scn_marks_def']='<p>Na mapě je prvek, který má v otevřeném scénáři specifickou hodnotu, obkroužen žlutooranžově a prvek, který dědí specifickou hodnotu ze scénáře nebo alternativy, která je jeho rodičem, je obkroužen čárkovanou šedou čarou. U odběru, průměru, drsnosti, součinitele místní ztráty a délky se kroužek zobrazí jen tehdy, když Nastavení, Vizualizace, Popisky uzlů nebo Popisky spojů zobrazují tuto hodnotu na mapě; specifická hodnota jakékoli jiné vlastnosti má kroužek vždy. V Tabulkách je buňka s hodnotou nastavenou otevřeným scénářem žlutooranžová a její tip uvádí alternativu, která ji drží, například Fyzikální alt.: Větší řad. Zobrazit scénáře v nabídce buňky tabulky uvede každý prvek jednou pro každý scénář.</p><p>Každý řádek Vlastností, který může scénář přepsat, má vlevo značku. Plná tečka znamená, že hodnotu přepisuje otevřený scénář; kliknutím na ni specifickou hodnotu zrušíte. Prázdná tečka znamená, že hodnota je zděděná; kliknutím na ni se zobrazená hodnota stane specifickou hodnotou. Trojúhelník znamená, že hodnotu přepisují scénáře pod tímto; kliknutím na něj jejich specifické hodnoty po potvrzení zrušíte. Pod přepsaným řádkem je uvedeno, co Zrušit obnoví, například Zrušit obnoví 18 in, tedy hodnotu v Základním scénáři. Okno Nastavení má jen plnou tečku a trojúhelník, protože specifickou hodnotu tvoří už samotné zadání hodnoty.</p><p>Kroužky skryjete odškrtnutím Zobrazit značky specifických hodnot na mapě v Nastavení, Stránka, nebo volbou Mapa, Vyčistit mapu. Obojí se uchovává v tomto prohlížeči, ne v projektu. Tabulky označují specifické hodnoty v obou případech.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Vytváření a rušení specifických hodnot';
-$ec_lang['lpn_guide_scn_make_def']='<p>Je-li otevřen jiný scénář než Základní, ukládá se úprava hodnoty, kterou scénáře mohou přepsat, jako specifická hodnota otevřeného scénáře, ať je provedena jakkoli: zadáním ve Vlastnostech, úpravou buňky v Tabulkách, volbou Nahradit v Najít a nahradit, přetažením uzlu nebo zadáním jeho souřadnic, Změnou typu (nový typ je specifická hodnota) nebo Vložením vlastností do výběru. Nastavení zadané v okně Nastavení se ukládá jako specifická hodnota, mohou-li scénáře toto nastavení přepsat. Základní scénář se nemění. V základním scénáři tytéž úpravy mění samotnou síť a zasáhnou každý scénář, který hodnotu nepřepsal.</p><p>Smazat působí jinak. Ve scénáři Smazat neodstraní prvek, který existuje v základním scénáři. Učiní prvek neaktivním v otevřeném scénáři, u uzlu i jeho potrubí, a zpráva to oznámí. Prvek zůstává ve výkresu i v ostatních scénářích. Prvek nakreslený při otevřeném scénáři je neaktivní v základním scénáři a aktivní v tomto scénáři a Smazat v tomto scénáři jej odstraní. Smazání prvku v základním scénáři smaže také jeho specifické hodnoty v každém scénáři, a to po otázce, která je spočítá. Odběratelé a Útvary nepatří žádnému scénáři a mažou se úplně.</p><p>Řádek Správce specifických hodnot v seznamu Scénáře otevře seznam všech specifických hodnot otevřeného scénáře podle kategorií, každou vedle zděděné hodnoty, kterou nahrazuje. Graf časové řady na mapě, který scénář otevřel, přesunul nebo změnil, je samostatný řádek. Zaškrtněte řádky a klikněte na Zrušit vybrané specifické hodnoty, klikněte na Zrušit specifickou hodnotu v jednom řádku nebo klikněte na Zrušit všechny specifické hodnoty. Každá hodnota se pak vrátí na zděděnou hodnotu a Zpět to vrátí. Vyberte v seznamu ID a přejdete na prvek na mapě. Tečka ve Vlastnostech a řádek Zrušit specifickou hodnotu v nabídce buňky Tabulek ruší vždy jednu specifickou hodnotu.</p>';
+$ec_lang['lpn_guide_scn_make_def']='<p>Je-li otevřen jiný scénář než Základní, ukládá se úprava hodnoty, kterou scénáře mohou přepsat, jako specifická hodnota otevřeného scénáře, ať je provedena jakkoli: zadáním ve Vlastnostech, úpravou buňky v Tabulkách, volbou Nahradit v Najít a nahradit, přetažením uzlu nebo zadáním jeho souřadnic, Změnou typu (nový typ je specifická hodnota) nebo Vložením vlastností do výběru. Nastavení zadané v okně Nastavení se ukládá jako specifická hodnota, mohou-li scénáře toto nastavení přepsat. Základní scénář se nemění. V základním scénáři tytéž úpravy mění samotnou síť a zasáhnou každý scénář, který hodnotu nepřepsal.</p><p>Smazat působí jinak. Ve scénáři Smazat neodstraní prvek, který existuje v základním scénáři. Učiní prvek neaktivním v otevřeném scénáři, u uzlu i jeho potrubí, a zpráva to oznámí. Prvek zůstává ve výkresu i v ostatních scénářích. Prvek nakreslený při otevřeném scénáři je neaktivní v základním scénáři a aktivní v tomto scénáři a Smazat v tomto scénáři jej odstraní. Smazání prvku v základním scénáři smaže také jeho specifické hodnoty v každém scénáři, a to po otázce, která je spočítá. Útvar se řídí stejným pravidlem jako prvek. Odběratelé nepatří žádnému scénáři a mažou se úplně.</p><p>Řádek Správce specifických hodnot v seznamu Scénáře otevře seznam všech specifických hodnot otevřeného scénáře podle kategorií, každou vedle zděděné hodnoty, kterou nahrazuje. Graf časové řady na mapě, který scénář otevřel, přesunul nebo změnil, je samostatný řádek. Zaškrtněte řádky a klikněte na Zrušit vybrané specifické hodnoty, klikněte na Zrušit specifickou hodnotu v jednom řádku nebo klikněte na Zrušit všechny specifické hodnoty. Každá hodnota se pak vrátí na zděděnou hodnotu a Zpět to vrátí. Vyberte v seznamu ID a přejdete na prvek na mapě. Tečka ve Vlastnostech a řádek Zrušit specifickou hodnotu v nabídce buňky Tabulek ruší vždy jednu specifickou hodnotu.</p>';
 $ec_lang['lpn_guide_scn_scope_term']='Co scénář může a nemůže přepsat';
-$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Vlastnosti</td><td>Každá vlastnost uzlu nebo spoje s výjimkou níže uvedených, včetně jeho polohy, zda je aktivní, a jeho typu (Změnit typ). Text může přepsat svá slova, polohu, velikost, zarovnání, tučné písmo, úhel a zda se zobrazuje. Vlastní vlastnost lze přepsat vždy. Vlastnosti jsou rozděleny do kategorií Fyzikální, Odběr, Aktivní topologie, Počáteční nastavení, Složka, Požární průtok, Náklady na energii, Vlastní vlastnosti, Text, Prezentace a Výpočet.</td></tr><tr><td>Nastavení</td><td>Nastavení uložená s projektem s výjimkou níže uvedených: možnosti výpočtu (například násobitel odběru, celková doba běhu, hydraulický časový krok a metoda tření), výchozí vzorec odběru, hodnoty přidělené novým prvkům a nastavení prezentace (velikosti, barvy, popisky, vrstevnice, pohled mapy a grafy časových řad na mapě).</td></tr><tr><td>Stejné v každém scénáři</td><td>ID, Popis a Značka prvku; koncové uzly a zlomy spoje; Odběratelé a Útvary; jednotky a souřadnicový systém; a obsah Knihoven (vzorce, křivky, typy potrubí, seznamy armatur, řídicí pravidla a pravidla). Úprava kteréhokoli z nich mění každý scénář. Scénář může prvku přiřadit jinou křivku, typ potrubí, seznam armatur nebo vzorec, ale nemůže měnit, co v nich je.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Vlastnosti</td><td>Každá vlastnost uzlu nebo spoje s výjimkou níže uvedených, včetně jeho polohy, zda je aktivní, a jeho typu (Změnit typ). Text může přepsat svá slova, polohu, velikost, zarovnání, tučné písmo, úhel a zda se zobrazuje. Útvar může přepsat, zda se zobrazuje. Vlastní vlastnost lze přepsat vždy. Vlastnosti jsou rozděleny do kategorií Fyzikální, Odběr, Aktivní topologie, Počáteční nastavení, Složka, Požární průtok, Náklady na energii, Vlastní vlastnosti, Text, Prezentace a Výpočet.</td></tr><tr><td>Nastavení</td><td>Nastavení uložená s projektem s výjimkou níže uvedených: možnosti výpočtu (například násobitel odběru, celková doba běhu, hydraulický časový krok a metoda tření), výchozí vzorec odběru, hodnoty přidělené novým prvkům a nastavení prezentace (velikosti, barvy, popisky, vrstevnice, pohled mapy a grafy časových řad na mapě).</td></tr><tr><td>Stejné v každém scénáři</td><td>ID, Popis a Značka prvku; koncové uzly a zlomy spoje; Odběratelé a body Útvaru; jednotky a souřadnicový systém; a obsah Knihoven (vzorce, křivky, typy potrubí, seznamy armatur, řídicí pravidla a pravidla). Úprava kteréhokoli z nich mění každý scénář. Scénář může prvku přiřadit jinou křivku, typ potrubí, seznam armatur nebo vzorec, ale nemůže měnit, co v nich je.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_scn_example_term']='Příklad na Net1';
-$ec_lang['lpn_guide_scn_example_def']='<p>Otevřete příklad Net1. Zvolte Voda, Scénáře, Nový scénář…, zadejte Větší řad a klikněte na OK. Vyberte na mapě Potrubí 10 a ve Vlastnostech zadejte pro Průměr 24; Základní scénář má 18 in, což je zobrazeno pod polem jako Základní scénář: 18. V seznamu Scénáře zvolte Základní, znovu zvolte Nový scénář…, zadejte Maximální den a v Nastavení, Výpočet, Hydraulika zadejte pro Násobitel odběru 1,8. Poté zvolte Voda, Sestavy, Porovnání scénářů.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">Nejnižší tlak</td><td colspan="3">Nejvyšší rychlost</td></tr><tr><td>Scénář</td><td>Počet specifických hodnot</td><td>Násobitel odběru</td><td>Uzel</td><td>Tlak (psi)</td><td>Čas (hr)</td><td>Spoj</td><td>Rychlost (ft/s)</td><td>Čas (hr)</td></tr><tr><td>Základní</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2,76</td><td>16:00</td></tr><tr><td>Větší řad</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2,87</td><td>16:00</td></tr><tr><td>Maximální den</td><td>1</td><td>1,8</td><td>N32</td><td>15,78</td><td>9:00</td><td>L10</td><td>3,49</td><td>9:00</td></tr></tbody></table><p>Celková doba běhu je ve všech třech 24:00, takže každý nejnižší tlak a nejvyšší rychlost je extrém za den, v uvedeném čase. Větší řad zvýší nejnižší tlak asi o 1 psi. Násobitel 1,8 jej sníží na 15,78 psi v 9:00 a nejvyšší rychlost se přesune na Potrubí 10. Každý scénář má jednu specifickou hodnotu a Základní si ponechává své hodnoty.</p>';
+$ec_lang['lpn_guide_scn_example_def']='<p>Otevřete příklad Net1. Porovnání níže uvádí také vlastní scénáře příkladu, Maximální den, Špičková hodina a jejich podřízené scénáře s poruchou řadu, které se zde nepoužívají. Zvolte Voda, Scénáře, Nový scénář…, zadejte Větší řad a klikněte na OK. Vyberte na mapě Potrubí 10 a ve Vlastnostech zadejte pro Průměr 24; Základní scénář má 18 in, což je zobrazeno pod polem jako Základní scénář: 18. V seznamu Scénáře zvolte Základní, znovu zvolte Nový scénář…, zadejte Maximální den 1,8 a v Nastavení, Výpočet, Hydraulika zadejte pro Násobitel odběru 1,8. Poté zvolte Voda, Sestavy, Porovnání scénářů.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">Nejnižší tlak</td><td colspan="3">Nejvyšší rychlost</td></tr><tr><td>Scénář</td><td>Počet specifických hodnot</td><td>Násobitel odběru</td><td>Uzel</td><td>Tlak (psi)</td><td>Čas (hr)</td><td>Spoj</td><td>Rychlost (ft/s)</td><td>Čas (hr)</td></tr><tr><td>Základní</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2,76</td><td>16:00</td></tr><tr><td>Větší řad</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2,87</td><td>16:00</td></tr><tr><td>Maximální den 1,8</td><td>1</td><td>1,8</td><td>N32</td><td>15,78</td><td>9:00</td><td>L10</td><td>3,49</td><td>9:00</td></tr></tbody></table><p>Celková doba běhu je ve všech 24:00, takže každý nejnižší tlak a nejvyšší rychlost je extrém za den, v uvedeném čase. Větší řad zvýší nejnižší tlak asi o 1 psi. Násobitel 1,8 jej sníží na 15,78 psi v 9:00 a nejvyšší rychlost se přesune na Potrubí 10. Každý zde vytvořený scénář má jednu specifickou hodnotu a Základní si ponechává své hodnoty.</p>';
 $ec_lang['lpn_guide_scn_notes_term']='Na co dát pozor';
-$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Specifická hodnota rovná zděděné hodnotě je stále specifickou hodnotou. Počítá se a Správce specifických hodnot ji označuje (stejná).</li><li>Základní režim je nastavení tohoto prohlížeče, ne projektu. Je zakázán pro projekt, jehož scénáře a alternativy nedokáže zobrazit. Alternativy a Správce scénářů jsou popsány v nápovědě na začátku této položky.</li><li>Zpět uchovává 20 kroků. Každý krok obnoví spolu s výkresem také scénáře a otevřený scénář, takže přidání, přejmenování i smazání scénáře lze vrátit.</li><li>Export souboru EPANET zapíše pouze otevřený scénář, s hodnotami a polohami uzlů, které tento scénář čte. Samotné scénáře se zaznamenávají jen v souboru projektu.</li></ul>';
+$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Specifická hodnota rovná zděděné hodnotě je stále specifickou hodnotou. Počítá se a Správce specifických hodnot ji označuje (stejná).</li><li>Základní režim je nastavení tohoto prohlížeče, ne projektu. Je zakázán pro projekt, jehož scénáře a alternativy nedokáže zobrazit. Alternativy a Správce scénářů jsou popsány v částech Jak fungují scénáře a alternativy a Jak spravovat scénáře na začátku této položky.</li><li>Zpět uchovává 20 kroků. Každý krok obnoví spolu s výkresem také scénáře a otevřený scénář, takže přidání, přejmenování i smazání scénáře lze vrátit.</li><li>Export souboru EPANET zapíše pouze otevřený scénář, s hodnotami a polohami uzlů, které tento scénář čte. Samotné scénáře se zaznamenávají jen v souboru projektu.</li></ul>';
 // The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
 // the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
 $ec_lang['lpn_guide_cmp_cols_term']='Co tabulka obsahuje';
-$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scénář</td><td>Název scénáře. Otevřený scénář je označen (právě otevřený).</td></tr><tr><td>Počet specifických hodnot</td><td>Specifické hodnoty samotného scénáře, počítané jako v seznamu Scénáře. Možnost výpočtu, například násobitel odběru, se počítá jako jedna a počítá se i specifická hodnota rovná zděděné hodnotě.</td></tr><tr><td>Násobitel odběru, Celková doba běhu, Hydraulický časový krok</td><td>Hodnoty, s nimiž byl scénář vypočten, jeho vlastní nebo hodnoty projektu. Ustálený scénář ukazuje u časového kroku pomlčku.</td></tr><tr><td>Nejnižší tlak</td><td>Nejnižší tlak v uzlu s jeho ID a časem, kdy nastane. Zdroje a nádrže jsou vynechány, protože každý má pevnou tlakovou výšku.</td></tr><tr><td>Nejvyšší rychlost</td><td>Nejvyšší rychlost v potrubí nebo ventilu s jeho ID a časem, kdy nastane. Čerpadla jsou vynechána.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scénář</td><td>Název scénáře. Otevřený scénář je označen (právě otevřený).</td></tr><tr><td>Počet specifických hodnot</td><td>Specifické hodnoty samotného scénáře, počítané jako v seznamu Scénáře. Možnost výpočtu, například násobitel odběru, se počítá jako jedna a počítá se i specifická hodnota rovná zděděné hodnotě.</td></tr><tr><td>Násobitel odběru, Celková doba běhu, Hydraulický časový krok</td><td>Hodnoty, s nimiž byl scénář vypočten, jeho vlastní nebo hodnoty projektu. Ustálený scénář ukazuje u časového kroku pomlčku.</td></tr><tr><td>Nejnižší tlak: Uzel, Tlak, Čas (hr)</td><td>Nejnižší tlak v uzlu ve třech sloupcích: ID uzlu, tlak a čas, kdy nastane. Zdroje a nádrže jsou vynechány, protože každý má pevnou tlakovou výšku.</td></tr><tr><td>Nejvyšší rychlost: Spoj, Rychlost, Čas (hr)</td><td>Nejvyšší rychlost v potrubí nebo ventilu ve třech sloupcích: ID spoje, rychlost a čas, kdy nastane. Čerpadla jsou vynechána.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Ustálené scénáře a scénáře s dlouhodobou simulací';
 $ec_lang['lpn_guide_cmp_run_def']='<p>Scénář s Celkovou dobou běhu větší než 0 se počítá po celé období jádrem EPANET. Jeho nejnižší tlak a nejvyšší rychlost jsou extrémy přes všechny časové kroky, každý s uvedeným časem. Scénář s Celkovou dobou běhu 0 se řeší v jednom okamžiku. Celková doba běhu je jednou z možností, které scénář může přepsat, takže jedna tabulka může obsahovat oba druhy.</p>';
-$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Scénář, který nelze vyřešit, ukazuje místo svých dvou výsledků důvod, například že uzel nemá cestu ke zdroji poté, co bylo potrubí učiněno neaktivním. Ostatní scénáře se přesto vypočtou. Scénář, který nekonvergoval, ukazuje své poslední výsledky a zprávu.</li><li>Blok nad tabulkou, Stejné v každém scénáři, uvádí metodu tření, jednotky, přesnost a maximální počet pokusů. Nastavení, které se mezi scénáři liší, je z bloku vynecháno.</li><li>Neexistuje žádná mez pro vyhovění či nevyhovění. Čísla posuzujte podle návrhových kritérií modelované soustavy.</li><li>Příklad uvedený v položce Správce scénářů porovnává tři scénáře na Net1.</li></ul>';
+$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Scénář, který nelze vyřešit, ukazuje místo svých dvou výsledků důvod, například že uzel nemá cestu ke zdroji poté, co bylo potrubí učiněno neaktivním. Ostatní scénáře se přesto vypočtou. Scénář, který nekonvergoval, ukazuje své poslední výsledky a zprávu.</li><li>Blok nad tabulkou, Stejné v každém scénáři, uvádí metodu tření, jednotky, přesnost a maximální počet pokusů. Nastavení, které se mezi scénáři liší, je z bloku vynecháno.</li><li>Neexistuje žádná mez pro vyhovění či nevyhovění. Čísla posuzujte podle návrhových kritérií modelované soustavy.</li><li>Příklad uvedený v položce Správce scénářů porovnává scénáře na Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
 // dev/lpn-spike/user-guide-library-harness.js.
 $ec_lang['lpn_guide_lib_kinds_term']='Co která část obsahuje';
-$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Vzorce</td><td>Seznam násobitelů, který se opakuje po celou dobu běhu, jeden násobitel pro každý časový krok vzorce. Nový vzorec tvoří 24 násobitelů 1. Vložením sloupce z tabulky se vyplní pole Násobitele. Výchozí vzorec odběru je označen (výchozí) a volí se v Nastavení, Výpočet, Hydraulika.</td></tr><tr><td>Křivky</td><td>Čtyři druhy, volené jako Typ křivky: Tlaková výška čerpadla, Účinnost čerpadla, Objem nádrže a Ztráta tlakové výšky ventilu. Body se zadávají do mřížky, která přijímá vložený sloupec z tabulky nebo řádky zkopírované ze souboru EPANET. Křivka tlakové výšky čerpadla se proloží body a řádek Rovnice ukazuje proložení; jeden bod se čte jako návrhový bod s uzavírací tlakovou výškou 1,33334násobku jeho tlakové výšky a maximálním průtokem 2násobku jeho průtoku, jak jej čte EPANET. Ostatní druhy spojují své body přímkami. Čerpadlo nebo ventil uvádí svou křivku ve Vlastnostech, kde odkaz Křivky otevře tuto část.</td></tr><tr><td>Typy potrubí</td><td>Definice průměru, drsnosti a koeficientů reakcí, na kterou odkazuje více potrubí. Vlastnost může být v definici ponechána prázdná a pak se zadává u každého potrubí. Ve Vlastnostech jsou hodnoty, které typ potrubí uvádí, zakázané a Odpojit od typu potrubí je zkopíruje do potrubí a potrubí přestane typ používat.</td></tr><tr><td>Armatury</td><td>Seznamy armatur s počtem kusů u každé, sečtené do jednoho součinitele místní ztráty k pro potrubí nebo typ potrubí. Nabízeno je třináct armatur z tabulky 3.3 uživatelské příručky EPANET 2.2 a Jiná armatura. Zvolením jedné se její součinitel zkopíruje do řádku, kde jej lze změnit.</td></tr><tr><td>Řídicí pravidla</td><td>Každé je jedním příkazem v syntaxi EPANET, například <code>LINK id OPEN IF NODE id BELOW value</code>. Pod každým okno uvádí, zda mu bylo porozuměno.</td></tr><tr><td>Pravidla</td><td>Každé má několik řádků v syntaxi EPANET: RULE, IF, AND, OR, THEN, ELSE a PRIORITY. Pod každým okno uvádí, zda bylo přečteno.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Vzorce</td><td>Seznam násobitelů, který se opakuje po celou dobu běhu, jeden násobitel pro každý časový krok vzorce. Nový vzorec tvoří 24 násobitelů 1. Vložením sloupce z tabulky se vyplní pole Násobitele. Výchozí vzorec odběru je označen (výchozí) a volí se v Nastavení, Výpočet, Hydraulika.</td></tr><tr><td>Křivky</td><td>Čtyři druhy, volené jako Druh křivky: Tlaková výška čerpadla, Účinnost čerpadla, Objem nádrže a Ztráta tlakové výšky ventilu. Body se zadávají do mřížky, která přijímá vložený sloupec z tabulky nebo řádky zkopírované ze souboru EPANET. Křivka tlakové výšky čerpadla s jedním bodem nebo se třemi body začínajícími při nulovém průtoku se proloží a řádek Rovnice ukazuje proložení; jeden bod se čte jako návrhový bod s uzavírací tlakovou výškou 1,33334násobku jeho tlakové výšky a maximálním průtokem 2násobku jeho průtoku, jak jej čte EPANET. Každá jiná křivka tlakové výšky čerpadla a každý z ostatních druhů spojují své body přímkami. Čerpadlo nebo ventil uvádí svou křivku ve Vlastnostech, kde poslední volba v seznamu křivek, Upravit křivky…, otevře tuto část.</td></tr><tr><td>Typy potrubí</td><td>Definice průměru, drsnosti a koeficientů reakcí, na kterou odkazuje více potrubí. Vlastnost může být v definici ponechána prázdná a pak se zadává u každého potrubí. Ve Vlastnostech jsou hodnoty, které typ potrubí uvádí, zakázané a Odpojit od typu potrubí je zkopíruje do potrubí a potrubí přestane typ používat.</td></tr><tr><td>Armatury</td><td>Seznamy armatur s počtem kusů u každé, sečtené do jednoho součinitele místní ztráty k pro potrubí nebo typ potrubí. Nabízeno je třináct armatur z tabulky 3.3 uživatelské příručky EPANET 2.2 a Jiná armatura. Zvolením jedné se její součinitel zkopíruje do řádku, kde jej lze změnit.</td></tr><tr><td>Řídicí pravidla</td><td>Každé je jedním příkazem v syntaxi EPANET, například <code>LINK id OPEN IF NODE id BELOW value</code>. Pod každým okno uvádí, zda mu bylo porozuměno.</td></tr><tr><td>Pravidla</td><td>Každé má několik řádků v syntaxi EPANET: RULE, IF, AND, OR, THEN, ELSE a PRIORITY. Pod každým okno uvádí, zda bylo přečteno.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_lib_refs_term']='Přejmenování, mazání a co na položku odkazuje';
 $ec_lang['lpn_guide_lib_refs_def']='<p>ID se mění v jeho části. Prázdné ID ani ID již použité ve stejné části se nepřijme. Přejmenováním položky se přesunou všechny odkazy na ni, v základním scénáři i v každém dalším. U vzorce jsou odkazy vzorec odběru uzlu a vzorec každé jeho kategorie odběru, vzorec odběru odběratele, vzorec tlakové výšky zdroje, vzorec otáček čerpadla a výchozí vzorec odběru.</p><p>Vzorec, který se používá, lze smazat a každý odkaz na něj se zruší. Byl-li to výchozí vzorec odběru, oznámení uvede, jaký vzorec nyní používají uzly bez vzorce. Křivka, typ potrubí nebo seznam armatur, které se používají, se nemažou. Zpráva uvádí prvky, které je používají, a každému z nich je třeba nejprve přiřadit jinou křivku nebo jej odpojit od typu či seznamu.</p>';
 $ec_lang['lpn_guide_lib_scn_term']='Knihovny a scénáře';
@@ -1046,7 +1046,7 @@ $ec_lang['lpn_guide_lib_scn_def']='<p>Knihovny jsou ve všech scénářích stej
 $ec_lang['lpn_guide_lib_ctl_term']='Řídicí pravidla a pravidla při výpočtu';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>Řídicí pravidlo je jeden příkaz. Pravidlo je několik řádků, které začínají RULE. Klíčová slova se zadávají anglicky bez ohledu na jazyk stránky a čísla jsou v jednotkách projektu. Přidat řídicí pravidlo vychází z příkazu sestaveného ze sítě, který se pak upraví na zamýšlený.</p><p>Řídicí pravidla a pravidla mění výsledek jen při dlouhodobé simulaci, tedy když je Celková doba běhu větší než 0. Ustálené řešení nemění ani jedno. Pravidla uplatňuje pouze jádro EPANET. Obojí se ukládá s projektem a zapisuje se do souboru EPANET.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Import knihoven z jiného projektu';
-$ec_lang['lpn_guide_lib_import_def']='<p>Soubor, Importovat…, Importovat knihovny… otevře jiný soubor projektu a zkopíruje z něj celé knihovny do tohoto projektu. Položka, jejíž název se zde již používá, se přeskočí a vypíše, takže nic, co už zde je, se nezmění. Uvádějí-li soubor a projekt veličinu v různých jednotkách, zobrazí se varování a položky se importují tak, jak jsou zapsány. Typy potrubí, které odkazují na seznam armatur, jenž tento projekt nemá, se vypíší; vyřešíte to importem knihovny armatur ze stejného souboru.</p>';
+$ec_lang['lpn_guide_lib_import_def']='<p>Soubor, Importovat…, Knihovny… otevře jiný soubor projektu a zkopíruje z něj celé knihovny do tohoto projektu. Položka, jejíž název se zde již používá, se přeskočí a vypíše, takže nic, co už zde je, se nezmění. Uvádějí-li soubor a projekt veličinu v různých jednotkách, zobrazí se varování a položky se importují tak, jak jsou zapsány. Typy potrubí, které odkazují na seznam armatur, jenž tento projekt nemá, se vypíší; vyřešíte to importem knihovny armatur ze stejného souboru.</p>';
 $ec_lang['lpn_guide_lib_example_def']='<p>Otevřete příklad Net1 a zvolte Voda, Knihovny. Vzorce obsahují vzorec 1, Demand Pattern, s 12 násobiteli po 2:00, pokrývající 24:00, označený (výchozí). Křivky obsahují křivku 1, Pump Curve for Pump 9, křivku tlakové výšky čerpadla s jedním bodem, 1500 gpm při 250 ft. Řídicí pravidla obsahují dva příkazy: první otevře Spoj 9, když Uzel 2 klesne pod 110, a druhý jej zavře, když Uzel 2 stoupne nad 140. Pravidla obsahují dvě pravidla, která testují čas hodin a hladinu Nádrže 2.</p><p>Zvolte Voda, Vypočítat a poté Voda, Sestavy, Změny stavu. Čerpadlo L9 je nyní zavřeno v 10:00, nyní otevřeno v 15:00 a nyní zavřeno v 21:00 a Nádrž N2 se nyní vyprazdňuje ve 22:00. V Řídicích pravidlech změňte ve druhém pravidle 140 na 135 a znovu zvolte Voda, Vypočítat. Poslední zavření se přesune na 20:00 a Nádrž N2 se nyní vyprazdňuje v 21:00.</p>';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>Vzorec se opakuje po celou dobu běhu, takže nemusí pokrývat celý běh.</li><li>Soubor EPANET nemá místo pro typ potrubí ani seznam armatur. Soubor nese čísla, která každé potrubí čte, a export uvádí, která potrubí byla zploštěna.</li><li>Poloha a velikost okna Knihovny se uchovávají v tomto prohlížeči. Položky se ukládají s projektem.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
@@ -1061,11 +1061,11 @@ $ec_lang['lpn_guide_prop_scn_term']='Ve scénáři';
 $ec_lang['lpn_guide_prop_scn_def']='<p>V jiném scénáři než Základní se úprava hodnoty, kterou scénáře mohou přepsat, ukládá jako specifická hodnota otevřeného scénáře a řádek je vlevo označen. Položka Správce scénářů popisuje značky a uvádí, co je ve všech scénářích stejné: ID, Popis a Značka. Odběratel nemá žádné hodnoty podle scénáře. Přepnutí scénářů ponechá Vlastnosti otevřené na stejném prvku a zobrazí hodnoty scénáře, který je nyní otevřen.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Vybráno více prvků';
 $ec_lang['lpn_guide_prop_multi_def']='<p>Záhlaví uvádí například 2 vybráno. Okno má jednu část pro každý typ prvku ve výběru, nadepsanou názvem typu a počtem prvků tohoto typu, například Potrubí (2), a každou část lze sbalit. Část uvádí vlastnosti, které mají Tabulky jako sloupce a které lze nastavit na každém prvku v ní. Výsledky a hodnoty, které uvádí typ potrubí, se nevypisují. Řádek ukazuje hodnotu, kterou mají prvky společnou, nebo Různé, liší-li se.</p><p>Zadáním hodnoty do řádku se nastaví na každém prvku daného typu ve výběru. Řádek, kterého se nikdo nedotkne, nic nezapíše. Oznámení uvádí počet, například Nastaveno Průměr (in) na 2., a jedno Zpět vrátí celý řádek. V jiném scénáři než Základní se hodnoty ukládají jako specifické hodnoty.</p>';
-$ec_lang['lpn_guide_prop_example_def']='<p>Otevřete příklad Net1 a klikněte na Potrubí 10. Vlastnosti uvádějí jeho vstupy od Popisu po Je aktivní? a poté jeho výsledky v zobrazeném čase: Průtok 1866,2 gpm, Rychlost 2,4 ft/s a Ztráta tlakové výšky 19,12 ft H2O.</p><p>Klikněte na Potrubí 113 a klikněte se Shiftem na Potrubí 31. Záhlaví uvádí 2 vybráno, jedinou částí je Potrubí (2) a Průměr ukazuje Různé, protože Potrubí 31 má 6 in a Potrubí 113 má 8 in. Zadejte pro Průměr 10. Oznámení uvádí Nastaveno Průměr (in) na 2., obě potrubí mají 10 in a jedno Zpět je vrátí na 6 a 8 in.</p>';
+$ec_lang['lpn_guide_prop_example_def']='<p>Otevřete příklad Net1 a klikněte na Potrubí 10. Vlastnosti uvádějí vstupy a poté výsledky v zobrazeném čase: Průtok 1866,2 gpm, Rychlost 2,4 ft/s a Ztráta tlakové výšky 19,12 ft H2O.</p><p>Klikněte na Potrubí 113 a klikněte se Shiftem na Potrubí 31. Záhlaví uvádí 2 vybráno, jedinou částí je Potrubí (2) a Průměr ukazuje Různé, protože Potrubí 31 má 6 in a Potrubí 113 má 8 in. Zadejte pro Průměr 10. Oznámení uvádí Nastaveno Průměr (in) na 2., obě potrubí mají 10 in a jedno Zpět je vrátí na 6 a 8 in.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Části a kam se nastavení ukládají';
-$ec_lang['lpn_guide_set_where_def']='<p>Seznam vlevo v okně přeskočí na část nebo podnadpis. Části jsou Vizualizace (Popisky uzlů, Barvy uzlů, Popisky spojů, Barvy spojů, Odběratel a Uzel a spoj), Mapa a stránka (Vzhled a Stránka), Prvky (Předpony ID, Hodnoty nových prvků a Vlastní vlastnosti), Výpočet (Jednotky, Čas, Hydraulika, Energie a Kvalita vody) a Poděkování. Každý podnadpis uvádí, zda jsou jeho nastavení Uloženo s projektem, nebo Uloženo v tomto prohlížeči. Vše se ukládá s projektem kromě nastavení v části Stránka a jednoho řádku v Hydraulice, Zobrazit okno průběhu výpočtu, který sám uvádí Uloženo v tomto prohlížeči.</p><p>Karta Nastavení v Tabulkách uvádí tatáž nastavení jako řádky s jejich Kategorií a Hodnotou, takže je lze najít a zkontrolovat i tam.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>Seznam vlevo v okně přeskočí na část nebo podnadpis. Části jsou Vizualizace (Popisky uzlů, Barvy uzlů, Popisky spojů, Barvy spojů, Odběratel a Vše), Mapa, Stránka, Prvky (Předpony ID, Hodnoty a Vlastní vlastnosti), Výpočet (Jednotky, Čas, Hydraulika, Energie a Kvalita vody) a Poděkování. Každý podnadpis uvádí, zda jsou jeho nastavení Uloženo s projektem, nebo Uloženo v tomto prohlížeči. Vše se ukládá s projektem kromě nastavení v části Stránka a jednoho řádku v Hydraulice, Zobrazit okno průběhu výpočtu, který sám uvádí Uloženo v tomto prohlížeči.</p><p>Karta Nastavení v Tabulkách uvádí tatáž nastavení jako řádky s jejich Kategorií a Hodnotou, takže je lze najít a zkontrolovat i tam.</p>';
 $ec_lang['lpn_guide_set_search_term']='Hledání';
 $ec_lang['lpn_guide_set_search_def']='<p>Zadejte jedno či více slov do pole Hledat v nastavení a zobrazí se jen nastavení, která zmiňují všechna z nich, v názvu nebo v tipu. Slovo, které odpovídá nadpisu, zobrazí každé nastavení pod tímto nadpisem. Například krytí uvede Krytí symbolu (0 až 1) a Krytí podkladového obrázku (0 až 1); krytí symbolu uvede jen první; a kropení uvede Exponent emitoru, jehož tip kropení zmiňuje a jehož název nikoli. Hledání žádné nastavení nemění.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Nastavení ve scénáři';
@@ -1106,14 +1106,14 @@ $ec_lang['lpn_guide_tbl_fill_term']='Vyplňování, filtry a scénáře';
 $ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D vyplní vybraný rozsah dolů od jeho horního řádku a Ctrl+Enter jej vyplní hodnotou aktivní buňky. Obojí ponechá sloupec ID a buňky jen pro čtení beze změny a oznámení uvádí, kolik buněk bylo vyplněno a kolik nebylo změněno. Ctrl+Shift+L zobrazí jen prvky vybrané na mapě. Při zapnutém filtru působí Ctrl+A a Ctrl+D pouze na zobrazené řádky a řádek upravený tak, že filtru již neodpovídá, zůstane, dokud se filtr znovu neuplatní.</p><p>V jiném scénáři než Základní se úprava buňky, Ctrl+D, Ctrl+Enter a vložení ukládají jako specifické hodnoty otevřeného scénáře.</p>';
 // The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
 $ec_lang['lpn_guide_bx_dock_term']='Ukotvení a karty';
-$ec_lang['lpn_guide_bx_dock_def']='<p>V rohu záhlaví okna jsou Ukotvit vlevo od mapy, Ukotvit vpravo od mapy a Plovoucí a po ukotvení okna také Automaticky skrýt. Ukotvené okno je sloupec vedle mapy. S Automaticky skrýt je to karta na úzkém pruhu na kraji mapy. Karta otevře okno při najetí po 150 ms myší nebo perem, nebo kliknutím či klepnutím, a okno se zase schová do karty, jak je popsáno výše. Schované okno je stále otevřené. Řádek nabídky nebo tlačítko panelu nástrojů, které jej otevírá, je vysune z karty.</p><p>Přetažení ukotveného okna za záhlaví je učiní plovoucím a vypne automatické skrývání. Okna ukotvená na jedné straně sdílejí jednu šířku a mapě zůstává alespoň 320 px. Karty se přeřazují přetažením nebo stisknutím Alt+Nahoru či Alt+Dolů na kartě s fokusem.</p>';
+$ec_lang['lpn_guide_bx_dock_def']='<p>V rohu záhlaví okna jsou Ukotvit vlevo od mapy, Ukotvit vpravo od mapy a Plovoucí a po ukotvení okna také Automaticky skrýt. Ukotvené okno je sloupec vedle mapy. S Automaticky skrýt je to karta na úzkém pruhu na kraji mapy. Karta otevře okno při najetí po 150 ms myší nebo perem, nebo kliknutím či klepnutím. Okno se sbalí do karty, když z něj ukazatel odešel a fokus v něm není, když stisknete kdekoli mimo něj nebo když stisknete Esc. Sbalené okno je stále otevřené. Řádek nabídky nebo tlačítko panelu nástrojů, které jej otevírá, je vysune z karty.</p><p>Přetažení ukotveného okna za záhlaví je učiní plovoucím a vypne automatické skrývání. Okna ukotvená na jedné straně sdílejí jednu šířku a mapě zůstává alespoň 320 px. Karty se přeřazují přetažením nebo stisknutím Alt+Nahoru či Alt+Dolů na kartě s fokusem.</p>';
 $ec_lang['lpn_guide_bx_keep_term']='Co si okno pamatuje';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Každé okno si v tomto prohlížeči pamatuje, kde plave, svou velikost, zda je otevřené, stranu ukotvení, zda se automaticky skrývá, svou ukotvenou šířku a místo své karty. Vlastnosti, Kritičnost: analýza, Škálování odběru a Kalibrace si pamatují jen stranu ukotvení, automatické skrývání, místo karty a zda jsou otevřené; místo, kde plavou, vydrží jedno načtení stránky. Prohlížeč bez uloženého rozvržení začíná s několika okny ukotvenými jako karty a nic se neukládá, dokud se okno nezmění.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='Na telefonu';
-$ec_lang['lpn_guide_bx_phone_def']='<p>Při šířce 640 px nebo méně se žádné okno neukotvuje a každé okno vyplní celé okno prohlížeče. Tlačítka ukotvení se nenabízejí. Ukotvené rozvržení se zachová a vrátí se v širším okně.</p>';
+$ec_lang['lpn_guide_bx_phone_def']='<p>Při šířce 640 px nebo méně je ukotvené okno vždy kartou s automatickým skrýváním a otevírá se jako panel přes mapu. Nic se nepřipíná. Okno, které není ukotveno, vyplní celé okno prohlížeče.</p>';
 // The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
 $ec_lang['lpn_guide_ff_asks_term']='Co se zjišťuje u každého uzlu';
-$ec_lang['lpn_guide_ff_asks_def']='<p>Každý testovaný uzel dostane dva testy, na kopii sítě v časovém kroku na obrazovce a v otevřeném scénáři. První zjišťuje, kolik průtoku uzel dokáže dodat, zatímco udrží zbytkový tlak. V uzlu se odebírá průtok a opakovaná řešení jej zužují, až do stropu rovného 10000 gpm. Uzel, který udrží zbytkový tlak i na stropu, je uveden jako dodávající více než strop. Druhý test, návrhová kontrola, odebírá v uzlu požadovaný průtok a zjišťuje, zda některý jiný uzel v jejím rozsahu klesne pod Nejnižší povolený tlak jinde, nebo některé potrubí v jejím rozsahu překročí Nejvyšší povolenou rychlost. Návrhová kontrola se neprovádí, je-li její rozsah Žádná.</p><p>Uzel s vlastní vlastností Požadovaný požární průtok se testuje podle této hodnoty a každý další uzel podle hodnoty v okně.</p>';
+$ec_lang['lpn_guide_ff_asks_def']='<p>Každý testovaný uzel dostane dva testy, na kopii sítě v časovém kroku na obrazovce a v otevřeném scénáři. První zjišťuje, kolik průtoku uzel dokáže dodat, zatímco udrží zbytkový tlak. V uzlu se odebírá průtok a opakovaná řešení jej zužují, až do stropu rovného 10000 gpm. Uzel, který udrží zbytkový tlak i na stropu, je uveden jako dodávající více než strop. Druhý test, návrhová kontrola, odebírá v uzlu požadovaný průtok a zjišťuje, zda některý jiný uzel v jeho rozsahu klesne pod Nejnižší povolený tlak jinde, nebo některé potrubí v jeho rozsahu překročí Nejvyšší povolenou rychlost. Návrhová kontrola se neprovádí, je-li její rozsah Žádný.</p><p>Uzel s vlastní vlastností Požadovaný požární průtok se testuje podle této hodnoty a každý další uzel podle hodnoty v okně.</p>';
 $ec_lang['lpn_guide_ff_result_term']='Čtení výsledků';
 $ec_lang['lpn_guide_ff_result_def']='<p>Shrnutí počítá uzly, které prošly všemi kontrolami, uzly, které selhaly při požárním průtoku, a uzly, které ovlivnily zbytek soustavy. Tabulka uvádí pro každý testovaný uzel Statický tlak před odběrem jakéhokoli požárního průtoku, Požadovaný průtok, Tlak při požadovaném průtoku, Dostupný průtok, Udržený zbytkový tlak, Nejhorší vliv a Návrhový limit návrhové kontroly, počet Výpočtů, což je počet řešení celé sítě, a Způsoby selhání. Buňka bez čísla ukazuje pomlčku, nikdy nulu. Uzel, který nešlo vyřešit, ukazuje místo čísel svůj důvod. Tabulka vytiskne nejvýše 200 uzlů a uvede, kolik jich nevytiskla.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Kroužky, Zastavit a jedna analýza najednou';
@@ -1141,8 +1141,8 @@ $ec_lang['lpn_guide_en_example_def']='<p>Otevřete příklad Net1, který má ce
 $ec_lang['lpn_guide_ct_what_term']='Co je graf';
 $ec_lang['lpn_guide_ct_what_def']='<p>Zvolte Voda, Grafy, Vrstevnice. Řádek zapne graf v otevřeném scénáři jako plynulou výplň s popsanými čarami, použije tlak, pokud uzly ještě nejsou obarveny, a otevře okno. Graf rozprostře barvy uzlů podél potrubí a do vzdálenosti stanoveného násobku mediánu délky potrubí vedle nich, přičemž ve vnější části slábne. Nebarví přes čerpadla, ventily ani uzavřené spoje. Řádek pod barevným klíčem uvádí, kolik uzlů a potrubí graf používá, dosah vedle potrubí a interval čar. Při příliš málo uzlech to uvede.</p>';
 $ec_lang['lpn_guide_ct_box_term']='Okno';
-$ec_lang['lpn_guide_ct_box_def']='<p>Zobrazit vrstevnice, je-li odškrtnuto, skryje výplň i čáry a ponechá barvy uzlů. Okno obsahuje také Barvit uzly podle a Barevné schéma, což jsou tatáž dvě nastavení jako v Nastavení, Vizualizace, Barvy uzlů, dále Výplň (Žádná, Plynulá nebo Pásy, které vykreslí každou třídu plošně), Krytí výplně, Vrstevnice s jejich Intervalem a Popisky a Dosah v násobcích mediánu délky potrubí. V projektu umístěném na Zemi může okno také převzít terén mezi uzly z Mapbox DEM, poté co návštěvník souhlasí s odesláním čísel dlaždic oblasti sítě. Tato nastavení se ukládají s projektem a scénář je může přepsat. Graf mění jen zobrazení, nikoli síť.</p>';
-$ec_lang['lpn_guide_ct_example_def']='<p>Otevřete příklad Net1 a zvolte Voda, Grafy, Vrstevnice. Uzly jsou obarveny podle tlaku a řádek pod barevným klíčem uvádí 9 uzlů, 11 potrubí, dosah 2,5násobku mediánu délky potrubí vedle nich a čáry po 5 psi. Čerpadlo, Spoj 9, není jedním z 11 potrubí. Je-li Zobrazit vrstevnice odškrtnuto, uzly zůstanou obarveny podle tlaku.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>Zobrazit vrstevnice, je-li odškrtnuto, skryje výplň i čáry a ponechá barvy uzlů. Okno obsahuje také Barvit uzly podle a Barevné schéma, což jsou tatáž dvě nastavení jako v Nastavení, Vizualizace, Barvy uzlů, dále Výplň (Žádná, Plynulá nebo Pásy, které vykreslí každou třídu jednou plnou barvou), Krytí výplně, Vrstevnice s jejich Intervalem a Popisky a Dosah (× medián délky potrubí). V projektu umístěném na Zemi může okno také převzít terén mezi uzly z Mapbox DEM, poté co návštěvník souhlasí s odesláním čísel dlaždic oblasti sítě. Tato nastavení se ukládají s projektem a scénář je může přepsat. Graf mění jen zobrazení, nikoli síť.</p>';
+$ec_lang['lpn_guide_ct_example_def']='<p>Otevřete příklad Net1 a zvolte Voda, Grafy, Vrstevnice. Vrstevnicový graf ukazuje tlak a řádek pod barevným klíčem uvádí 9 uzlů, 11 potrubí, dosah 2,5násobku mediánu délky potrubí vedle nich a čáry po 5 psi. Čerpadlo, Spoj 9, není jedním z 11 potrubí. Uzly si ponechávají barvy, které měly, před grafem i po odškrtnutí Zobrazit vrstevnice.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='Co zpráva obsahuje';
 $ec_lang['lpn_guide_rr_what_def']='<p>Zvolte Voda, Sestavy, Výpočet. Zpráva je text, který jádro EPANET zapsalo pro poslední dlouhodobou simulaci, rozdělený na stránky. Začíná záhlavím a názvem sítě, poté počítá uzly, zdroje, nádrže, potrubí, čerpadla a ventily, pak uvádí možnosti analýzy a nakonec vypisuje hydraulický stav výpočtu s jeho varováními. Tlačítko Kopírovat text zkopíruje.</p>';
@@ -1150,7 +1150,7 @@ $ec_lang['lpn_guide_rr_example_def']='<p>Otevřete příklad Net1, který již b
 $ec_lang['lpn_guide_st_what_term']='Co se vypisuje';
 $ec_lang['lpn_guide_st_what_def']='<p>Zvolte Voda, Sestavy, Změny stavu. Každý řádek uvádí čas změny a změnu: čerpadlo, ventil nebo potrubí nyní otevřené či zavřené, nebo nádrž nyní plnící se, vyprazdňující se, plná či prázdná. Uveden je i časový krok, který zcela nezkonvergoval. Seznam je v časovém pořadí a obsahuje jen změny, ne každý krok. Čte se ze stejné dlouhodobé simulace jako panel Tabulky a Úplná sestava.</p>';
 $ec_lang['lpn_guide_st_example_def']='<p>Otevřete příklad Net1 a zvolte Voda, Sestavy, Změny stavu. Nádrž N2 se nyní plní v 1:00, vyprazdňuje v 11:00, plní v 16:00 a vyprazdňuje ve 22:00. Čerpadlo L9 je nyní zavřeno v 10:00, nyní otevřeno v 15:00 a nyní zavřeno v 21:00.</p>';
-$ec_lang['lpn_guide_fr_what_def']='<p>Zvolte Voda, Sestavy, Úplná. Tabulka má jeden řádek pro každý uzel a spoj v každém časovém kroku sestavy, v jednotkách panelu Tabulky. Její sloupce jsou Typ, ID, Odběr, Tlaková výška, Tlak, Koncentrace chloru, Průtok, Rychlost, Ztráta tlakové výšky, Tlaková výška čerpadla a Stav a buňka je prázdná tam, kde prvek takovou veličinu nemá. Seznam Časový krok volí zobrazený krok a Stáhnout CSV a Vytisknout sestavu obsahují každý krok. Bez dlouhodobé simulace tabulka ukazuje aktuální řešení v jednom okamžiku.</p>';
+$ec_lang['lpn_guide_fr_what_def']='<p>Zvolte Voda, Sestavy, Úplná. Tabulka má jeden řádek pro každý uzel a spoj v každém časovém kroku hlášení, v jednotkách panelu Tabulky. Její sloupce jsou Typ, ID, Odběr, Tlaková výška, Tlak, Koncentrace chloru, Průtok, Rychlost, Ztráta tlakové výšky, Tlaková výška čerpadla a Stav a buňka je prázdná tam, kde prvek takovou veličinu nemá. Seznam Časový krok volí zobrazený krok a Stáhnout CSV, Kopírovat HTML a Vytisknout sestavu obsahují každý krok. Bez simulace s časovým průběhem tabulka ukazuje aktuální řešení v jednom okamžiku.</p>';
 $ec_lang['lpn_guide_fr_example_def']='<p>Otevřete příklad Net1 a zvolte Voda, Sestavy, Úplná. Uvedeno je 24 prvků ve 25 krocích sestavy, od 0:00 do 24:00, tedy 600 řádků. V 0:00 má Uzel 11 odběr 150 gpm, tlakovou výšku 985,23 ft H2O a tlak 119,26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='Co sestava porovnává';
@@ -1239,23 +1239,23 @@ $ec_lang['lpn_map_unmeasurable']='Tato stránka nedokázala určit velikost kres
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 s řízením pomocí pravidel';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1, scénáře a řízení, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Fiktivní příklad EPANET s chlorem, 1 zdrojem a 1 nádrží.';
-$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 s řízením pomocí pravidel, L/s (SI)';
-$ec_lang['lpn_ex_net1_si_desc']='Litry za sekundu, s metry a milimetry. Fiktivní příklad EPANET převedený z galonů za minutu, stop a palců, s chlorem, 1 zdrojem, 1 nádrží, 1 čerpadlem a dvěma řízeními pomocí pravidel.';
+$ec_lang['lpn_ex_net1_desc']='Čtyři scénáře pod Základním, průměrným dnem: Maximální den (násobitel odběru 1,5) a Špičková hodina (2,25), každý s potomkem, scénářem s poruchou řadu. Fiktivní příklad EPANET s chlorem, 1 zdrojem, 1 nádrží, 1 čerpadlem a dvěma řídicími pravidly. Galony za minutu, se stopami a palci.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1, scénáře a řízení, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Čtyři scénáře pod Základním, průměrným dnem: Maximální den (násobitel odběru 1,5) a Špičková hodina (2,25), každý s potomkem, scénářem s poruchou řadu. Fiktivní příklad EPANET s chlorem, 1 zdrojem, 1 nádrží, 1 čerpadlem a dvěma řídicími pravidly. Litry za sekundu, s metry a milimetry.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Branfordu ve státě Connecticut, převedený z galonů za minutu, stop a palců: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 2 km krát 4 km. Fluorid, nereaktivní látka, vstupuje v jednom dávkování.';
+$ec_lang['lpn_ex_net2_si_desc']='Příklad EPANET z Branfordu ve státě Connecticut, převedený z galonů za minutu, stop a palců: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 2 km krát 4 km. Fluorid, nereaktivní látka, vstupuje v jednom zdroji. Litry za sekundu, s metry a milimetry.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Branfordu ve státě Connecticut: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 1 míle krát 2 míle. Fluorid, nereaktivní látka, vstupuje v jednom dávkování.';
+$ec_lang['lpn_ex_net2_desc']='Příklad EPANET z Branfordu ve státě Connecticut: 35 uzlů a 1 nádrž, bez zdroje, bez čerpadla a bez ventilů, přibližně 1 míle krát 2 míle. Fluorid, nereaktivní látka, vstupuje v jednom zdroji. Galony za minutu, se stopami a palci.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Litry za sekundu, s metry a milimetry. Příklad EPANET z Novata v Kalifornii, převedený z galonů za minutu, stop a palců, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 8 km na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake).';
+$ec_lang['lpn_ex_net3_si_desc']='Příklad EPANET z Novata v Kalifornii, převedený z galonů za minutu, stop a palců, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 8 km na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake). Litry za sekundu, s metry a milimetry.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Galony za minutu, se stopami a palci. Příklad EPANET z Novata v Kalifornii, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 5 mil na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake).';
+$ec_lang['lpn_ex_net3_desc']='Příklad EPANET z Novata v Kalifornii, s mapou světa v pozadí: 92 uzlů, 3 nádrže a 2 zdroje, bez ventilů, přibližně 5 mil na stranu. 24hodinová simulace s časovým průběhem, se sledováním původu z jezera (Lake). Galony za minutu, se stopami a palci.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Galony za minutu, se stopami a palci. Prescott Valley v Arizoně: 17 uzlů, 1 zdroj a 1 čerpadlo. Komerční areál řešený pro požární průtok navíc k maximálnímu dennímu odběru, v jednom okamžiku, nakreslený na podkladu situačního plánu.';
+$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley v Arizoně: 17 uzlů, 1 zdroj a 1 čerpadlo. Komerční areál řešený pro požární průtok navíc k maximálnímu dennímu odběru, v jednom okamžiku, nakreslený na podkladu situačního plánu. Galony za minutu, se stopami a palci.';
 $ec_lang['lpn_tool_undo']='Zpět';
 $ec_lang['lpn_confirm_example']='Tímto se příklad přidá do sítě, kterou už máte. Pokračovat?';
 $ec_lang['lpn_field_diameter']='Průměr';
@@ -1456,7 +1456,7 @@ $ec_lang['lpn_georef_step1']='Krok 1 z 2 — rychlý';
 $ec_lang['lpn_georef_step2']='Krok 2 z 2 — přesný';
 $ec_lang['lpn_georef_step1_hint']='Projekt zůstává na obrazovce pevně. Posouvejte a přibližujte mapu pod ním, dokud mapa neukazuje přibližně správné místo v přibližně správném měřítku, a poté stiskněte tlačítko Umístit model sem.';
 $ec_lang['lpn_georef_detach']='Zvednout jej znovu';
-$ec_lang['lpn_georef_size_prompt']='Jak přibližně široké je pracoviště, napříč celým projektem?';
+$ec_lang['lpn_georef_size_prompt']='Přibližná šířka projektu od východu na západ?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -1875,7 +1875,7 @@ $ec_lang['lpn_find_no_value']='Zadejte, co hledat.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Propojení';
-$ec_lang['lpn_find_prop_demand_desc']='Popis této kategorie odběru';
+$ec_lang['lpn_find_prop_demand_desc']='Popis kategorie odběru';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2061,7 +2061,7 @@ $ec_lang['lpn_freq_axis_percent']='Procento nižších hodnot';
 $ec_lang['lpn_contour_menu']='Vrstevnice';
 $ec_lang['lpn_contour_tip']='Zobrazí na mapě vrstevnicový graf: barvy uzlů se rozprostřou podél potrubí i vedle něj a doplní je popsané vrstevnice. Otevře okno pro jeho doladění nebo vypnutí.';
 $ec_lang['lpn_contour_plot']='Vrstevnicový graf';
-$ec_lang['lpn_contour_show']='Zobrazit vrstevnice';
+$ec_lang['lpn_contour_show']='Zobrazit graf';
 $ec_lang['lpn_contour_show_tip']='Zrušením zaškrtnutí skryjete výplň i vrstevnice; zaškrtnutím je vrátíte tak, jak byly. Barvy uzlů zůstávají.';
 $ec_lang['lpn_contour_fill']='Výplň';
 $ec_lang['lpn_contour_fill_tip']='Plynulá přechází z barvy jedné třídy do druhé. Pásy vykreslí každou třídu barevné legendy jednolitě.';
@@ -2070,7 +2070,7 @@ $ec_lang['lpn_contour_fill_bands']='Pásy';
 $ec_lang['lpn_contour_opacity']='Krytí výplně';
 $ec_lang['lpn_contour_lines']='Vrstevnice';
 $ec_lang['lpn_contour_interval']='Interval';
-$ec_lang['lpn_contour_buffer']='Dosah';
+$ec_lang['lpn_contour_buffer']='Dosah (× medián délky potrubí)';
 $ec_lang['lpn_contour_buffer_unit']='× medián délky potrubí';
 $ec_lang['lpn_contour_buffer_tip']='Dosah barvy od každého potrubí, jako násobek mediánu délky potrubí. Ve vnější části postupně slábne.';
 $ec_lang['lpn_contour_few']='Příliš málo uzlů pro vrstevnice.';
@@ -2222,9 +2222,9 @@ $ec_lang['lpn_dialog_ok']='OK';
 // fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
 // own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='Importovat…';
-$ec_lang['lpn_file_import_inp']='Importovat soubor EPANET…';
+$ec_lang['lpn_file_import_inp']='Soubor EPANET…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Načte síť ze souboru EPANET, ať už jde o textový soubor .inp, nebo soubor .net, který ukládá EPANET, a uloží ji v tomto prohlížeči jako nový projekt.';
+$ec_lang['lpn_file_import_inp_tip']='Vytvoří nový projekt ze souboru EPANET, nebo je-li projekt otevřen, aktualizuje jej ze souboru. Soubor je buď exportní formát .inp (upřednostňovaný), nebo nativní formát .net (poslední možnost). Chcete-li současně otevřít i model EPANET-MSX, zvolte zároveň jeho soubor .msx.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2235,8 +2235,8 @@ $ec_lang['lpn_file_export_item_geojson']='Soubor GeoJSON…';
 $ec_lang['lpn_file_export_item_ods']='Soubor ODS…';
 $ec_lang['lpn_file_export_item_xlsx']='Soubor XLSX…';
 $ec_lang['lpn_file_export_item_csv']='Soubor CSV…';
-$ec_lang['lpn_file_export_tables_tip']='Stáhne tabulky tak, jak je zobrazuje panel Tabulky, v jednom sešitu s listem pro každou tabulku (a pro každý zvolený scénář) a s listem pro každou knihovnu, na kterou se jejich ID odkazují: vzorce, křivky, typy potrubí a armatury. Výsledky jsou zahrnuty pouze pro naposledy vypočtený scénář.';
-$ec_lang['lpn_file_export_csv_tip']='Stáhne tabulku tak, jak ji zobrazuje panel Tabulky. Jedna tabulka se stáhne jako jeden soubor CSV bez knihoven. Více tabulek nebo scénářů se stáhne jako jeden soubor zip se soubory CSV a s jedním souborem pro každou knihovnu, na kterou se jejich ID odkazují. Výsledky jsou zahrnuty pouze pro naposledy vypočtený scénář.';
+$ec_lang['lpn_file_export_tables_tip']='Stáhne tabulky tak, jak je zobrazuje panel Tabulky, v jednom sešitu s listem pro každou tabulku (a pro každý zvolený scénář) a s listem pro každou knihovnu, která má položky: vzorce, křivky, typy potrubí, armatury, řídicí pravidla a pravidla. Výsledky jsou zahrnuty pouze pro naposledy vypočtený scénář.';
+$ec_lang['lpn_file_export_csv_tip']='Stáhne tabulku tak, jak ji zobrazuje panel Tabulky. Jedna tabulka se stáhne jako jeden soubor CSV bez knihoven. Více tabulek nebo scénářů se stáhne jako jeden soubor zip se soubory CSV a s jedním souborem pro každou knihovnu, která má položky. Výsledky jsou zahrnuty pouze pro naposledy vypočtený scénář.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Stáhne tuto síť jako soubor EPANET .inp (případně v souboru zip spolu s obrázkem). Vše, co formát .inp nedokáže uchovat, je poté vypsáno.';
 $ec_lang['lpn_status_inp_exported']='Exportováno: {file}.';
@@ -2276,9 +2276,9 @@ $ec_lang['lpn_dxf_note_categories']='Uzly s více než jednou kategorií odběru
 $ec_lang['lpn_file_export_geojson_tip']='Stáhne tuto síť jako soubor GeoJSON pro QGIS, ArcGIS Pro a další programy GIS. Uzly, nádrže a zdroje jsou body, potrubí, čerpadla a ventily jsou čáry sledující své vrcholy. Polohy jsou zeměpisná šířka a délka. Výsledky jsou zahrnuty pouze tehdy, je-li síť vyřešena.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Pracovní plocha…';
-$ec_lang['lpn_file_export_workspace_tip']='Stáhne malý soubor s polohou oken, jejich velikostmi, informací o tom, která jsou otevřená nebo ukotvená, a velikostmi panelů a sloupců, spolu s volbami zobrazení této stránky, například které bubliny nápovědy a karta při najetí jsou zobrazeny. Projekty, nastavení projektů a cookies (jazyk, souhlas, jednotky) v něm nejsou. Načtěte jej na jiné obrazovce nebo v jiném prohlížeči příkazem Soubor, Importovat, Pracovní plocha.';
+$ec_lang['lpn_file_export_workspace_tip']='Stáhne malý soubor s rozvržením této stránky: kde jsou umístěny panely, sloupce tabulek a okna, jejich velikosti a která jsou otevřená, ukotvená nebo skrytá, spolu s volbami zobrazení této stránky, například které bubliny nápovědy a karta při najetí jsou zobrazeny. Projekty, nastavení projektů a cookies (jazyk, souhlas, jednotky) v něm nejsou. Načtěte jej na jiné obrazovce nebo v jiném prohlížeči příkazem Soubor, Importovat, Pracovní plocha.';
 $ec_lang['lpn_file_import_workspace']='Pracovní plocha…';
-$ec_lang['lpn_file_import_workspace_tip']='Použije soubor pracovní plochy uložený příkazem Soubor, Exportovat, Pracovní plocha: polohy a velikosti oken, ukotvení, velikosti panelů a volby zobrazení této stránky, například které bubliny nápovědy a karta při najetí jsou zobrazeny. Projekty a cookies se nemění.';
+$ec_lang['lpn_file_import_workspace_tip']='Použije soubor pracovní plochy uložený příkazem Soubor, Exportovat, Pracovní plocha: rozvržení panelů, sloupců tabulek a oken a volby zobrazení této stránky, například které bubliny nápovědy a karta při najetí jsou zobrazeny. Projekty a cookies se nemění.';
 $ec_lang['lpn_workspace_exported']='Pracovní plocha uložena do {file}: {n} nastavení.';
 $ec_lang['lpn_workspace_imported']='Pracovní plocha použita ze souboru {file}. Použitá nastavení: {n}. Vrácená na výchozí hodnoty: {r}.';
 $ec_lang['lpn_workspace_ignored']='Položky ignorované, protože nebyly rozpoznány: {u}.';
@@ -2309,7 +2309,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Textové popisky jsou umístěny stejn�
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='Soubory EPANET neobsahují souřadnicový systém, takže tento soubor zpočátku nebude georeferencovaný. Chcete-li jej umístit na mapu světa, použijte Mapa, Mapa světa… Chcete-li převést jeho souřadnice, použijte Soubor, Převést jako…';
 $ec_lang['lpn_inp_backdrop_attach']='Připojit {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='Webová stránka nemůže otevřít obrázek podle jeho názvu. Vyberte jej ve svém zařízení a umístí se tam, kam podle souboru patří.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Webová stránka nemůže automaticky otevřít přidružený soubor. Zvolte soubor podkladu a umístí se tak, jak je určeno.';
 $ec_lang['lpn_inp_backdrop_attached']='Připojeno: {file}, umístěno tam, kam podle souboru patří.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Připojeno: {picked}, umístěno tam, kam podle souboru patří. Soubor uvádí {file}, což je jiný název.';
 $ec_lang['lpn_inp_report_lead']='Tato stránka nepoužívá všechny funkce programu EPANET, ale žádná data v souboru se nezahazují. Seznam níže uvádí data v souboru, která jsou zachována, ale nepoužita, a všechny změny provedené při importu:';
@@ -2599,7 +2599,7 @@ $ec_lang['lpn_notes_1_term']='Jak se to řeší';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='Ve výchozím stavu síť řeší řešič EPANET. Je-li nastavena celková doba běhu, každý vykazovaný časový krok se vypočte postupně: nádrže se plní a vyprazdňují, odběry sledují své vzorce a panel nástrojů výpočet přehrává. Při zaškrtnutém Používat vestavěný řešič, kde je to možné lze řešení v jednom okamžiku místo toho vyřešit vestavěným řešičem, ale dlouhodobou simulaci nebo síť s ventilem rušícím tlak nebo obecným ventilem (PBV, GPV) vždy řeší řešič EPANET.';
+$ec_lang['lpn_notes_1_def']='Ve výchozím stavu síť řeší řešič EPANET. Je-li nastavena celková doba běhu, každý časový krok hlášení se vypočte postupně: nádrže se plní a vyprazdňují, odběry sledují své vzorce a panel nástrojů běh přehrává. Při zaškrtnutém Používat vestavěný řešič, kde je to možné lze řešení v jednom okamžiku místo toho vyřešit vestavěným řešičem, ale simulaci s časovým průběhem vždy řeší řešič EPANET.';
 $ec_lang['lpn_notes_2_term']='Co se nedělá';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Co se nedělá';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Ráz a vodní kladivo se nemodelují: všechny výsledky platí pro ustálené nebo pomalu se měnící proudění, nikoli pro tlakovou vlnu při prudkém uzavření ventilu.';
+$ec_lang['lpn_notes_2_def']='Ráz a vodní kladivo se nemodelují: všechny výsledky platí pro ustálené nebo pomalu se měnící proudění, nikoli pro tlakovou vlnu při prudkém uzavření ventilu. Vícedruhová kvalita vody (EPANET-MSX) se nemodeluje. Stáří vody, sledování původu a jedna reagující chemická látka se modelují.';
 $ec_lang['lpn_notes_3_term']='Ukládání projektů';
 $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během práce ukládá do tohoto prohlížeče. Vymazání dat prohlížeče je všechny smaže, proto patří práce do souboru: Soubor, Uložit jako. Hvězdička na kartě znamená, že obsahuje změny, které nejsou v souboru, a zavření této karty se nejprve zeptá. Do souboru se nikdy nic nezapíše, pokud není zvoleno Uložit nebo Uložit jako. V některých prohlížečích se projekt připojí k souboru, do kterého je uložen, a Soubor, Uložit od té chvíle zapisuje zpět do stejného souboru; v jiných spojení možné není, proto je Uložit zakázáno a dostupné je pouze Uložit jako. Tento server sleduje, kdo má soubor projektu otevřený, aby si dva lidé navzájem nepřepsali práci. Otevření souboru, který už má otevřený kolega, nabídne Zeptat se, Otevřít jen pro čtení a Převzít zámek. Nelze-li se k serveru připojit, varování uvede, že jiný uživatel může upravovat stejný soubor současně.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2623,7 +2623,7 @@ $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během 
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Křivka čerpadla';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='Čerpadlo se řídí vztahem H = H₀ − aQ^b, kde H je tlaková výška, kterou čerpadlo přidává, a Q je průtok, který jím prochází. Body křivky se zadávají ve Voda, Knihovny jako křivka Tlaková výška čerpadla a čerpadlo tuto křivku uvádí ve Vlastnostech. Tři body – tlaková výška při nulovém průtoku, normální pracovní bod a bod nejvyššího průtoku – proloží H₀, a i b přímo a nejvěrněji sledují publikovanou křivku. Dva body proloží parabolu (b = 2) s vrcholem při nulovém průtoku. Jeden bod používá pravidlo EPANET: tlaková výška při nulovém průtoku je 1,33334násobek zadané tlakové výšky a nejvyšší průtok je 2násobek zadaného průtoku, což opět dává b = 2. Čerpadlo bez zadané křivky nepřidává žádnou tlakovou výšku. Křivka není oříznuta v místě, kde tlaková výška dosáhne nuly, takže průtok vyšší, než jaký křivka dokáže dodat, dá zápornou tlakovou výšku. Řešením je větší čerpadlo nebo menší odběr, ne jiné proložení křivky. Křivka může obsahovat i více než tři body. Řešič EPANET dostane všechny a mezi nimi interpoluje, zatímco řádek Rovnice a vestavěný řešič používají nejnižší, prostřední a nejvyšší bod.';
+$ec_lang['lpn_notes_5_def']='Křivka čerpadla se zadává ve Voda, Knihovny jako křivka Tlaková výška čerpadla a čerpadlo tuto křivku uvádí ve Vlastnostech. Oba řešiče ji čtou tak, jak ji čte EPANET. Jeden bod používá pravidlo EPANET: tlaková výška při nulovém průtoku je 1,33334násobek zadané tlakové výšky a nejvyšší průtok je 2násobek zadaného průtoku. Křivka o jednom bodu a křivka o třech bodech, která začíná při nulovém průtoku, se prokládají vztahem H = H₀ − aQ^b, kde H je tlaková výška, kterou čerpadlo přidává, a Q je průtok, který jím prochází, a řádek Rovnice ukazuje proložení. Každá jiná křivka (dva body, tři body nezačínající při nulovém průtoku, nebo čtyři a více bodů) se používá jako přímky mezi svými body a první a poslední přímka se prodlouží za konce křivky. Čerpadlo bez zadané křivky nepřidává žádnou tlakovou výšku. Křivka není oříznuta v místě, kde tlaková výška dosáhne nuly, takže průtok vyšší, než jaký křivka dokáže dodat, dá zápornou tlakovou výšku. Řešením je větší čerpadlo nebo menší odběr, ne jiná křivka.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2677,10 +2677,10 @@ $ec_lang['lpn_omitted_note']='Z tohoto výpočtu vynecháno, protože z nich nev
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Stahuje se řešič EPANET. Stáhne se jednou a poté se uloží v tomto zařízení, takže poté funguje offline.';
 $ec_lang['lpn_engine_ready']='Řešič EPANET je nyní v tomto zařízení a funguje offline.';
-$ec_lang['lpn_engine_unavailable']='Řešič EPANET, který je nutný k řešení ventilů rušících tlak a obecných ventilů (PBV, GPV), se nepodařilo stáhnout. Po jednom připojení k internetu se řešič uloží v tomto zařízení.';
+$ec_lang['lpn_engine_unavailable']='Řešič EPANET, který je nutný k řešení této sítě, se nepodařilo stáhnout. Po jednom připojení k internetu se řešič uloží v tomto zařízení.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Ventily rušící tlak a obecné ventily (PBV, GPV) nelze řešit bez řešiče EPANET. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='Tuto síť nelze řešit bez řešiče EPANET. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Řešič EPANET se načítá, zatímco síť vytváříte. Výsledky budou k dispozici po úplném načtení.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2942,7 +2942,7 @@ $ec_lang['lpn_field_text_size']='Násobitel velikosti';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='Zobrazovat při všech úrovních přiblížení';
-$ec_lang['lpn_field_text_all_zoom_tip']='Ponechá tento text na výkresu bez ohledu na to, jak moc oddálíte. Zrušením zaškrtnutí se text skryje spolu s ostatními popisky, jakmile je pohled širší než práh zobrazování popisků nastavený v Mapa a stránka.';
+$ec_lang['lpn_field_text_all_zoom_tip']='Ponechá tento text na výkresu bez ohledu na to, jak moc oddálíte. Zrušením zaškrtnutí se text skryje spolu s ostatními popisky, jakmile je pohled širší než práh zobrazování popisků nastavený v části Mapa.';
 $ec_lang['lpn_tool_labels']='Popisky';
 $ec_lang['lpn_labels_heading_node']='Popisky uzlů';
 $ec_lang['lpn_labels_heading_link']='Popisky spojů';
@@ -2961,7 +2961,7 @@ $ec_lang['lpn_labels_separator_tip']='Text mezi jednou vlastností a další na 
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
 // crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Priorita';
+$ec_lang['lpn_labels_priority']='Pořadí vynechávání';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
@@ -3126,9 +3126,9 @@ $ec_lang['lpn_settings_hover_card_tip']='Zastavením ukazatele na uzlu, spoji ne
 $ec_lang['lpn_settings_override_marks']='Zobrazit značky specifických hodnot na mapě';
 $ec_lang['lpn_settings_override_marks_tip']='Zobrazí jantarový kroužek u prvku se specifickou hodnotou v otevřeném scénáři a čárkovaný šedý kroužek u prvku, který ji dědí. Panel Tabulky označuje specifické hodnoty v obou případech. Mapa, Vyčistit mapu skryje kroužky, dokud je zaškrtnuto. Toto nastavení platí pro tento prohlížeč, nikoli pro projekt.';
 $ec_lang['lpn_clean_map']='Vyčistit mapu';
-$ec_lang['lpn_clean_map_tip']='Zaškrtnuto: tlačítka přiblížení, tlačítko mapy ulic a satelitu, tlačítko Zprávy a oznámení, nápověda k výběru, tlačítko zpětné vazby a kroužky specifických hodnot jsou skryty. Odškrtnuto: jsou zobrazeny. Chyby se na mapě zobrazují i nadále a každé oznámení zůstává uloženo ve Zprávách. Toto nastavení platí pro tento prohlížeč, nikoli pro projekt.';
+$ec_lang['lpn_clean_map_tip']='Zaškrtnuto: tlačítka přiblížení, tlačítko mapy ulic a satelitu, řádek Režim, zprávy a tlačítko Zprávy, tlačítko zpětné vazby a kroužky specifických hodnot jsou skryty. Odškrtnuto: jsou zobrazeny. Na mapě zůstane jen zpráva, že běh nedal žádnou odpověď. Skryté zprávy jsou nadále uchovány a Zprávy je po odškrtnutí zobrazí znovu. Toto nastavení platí pro tento prohlížeč, nikoli pro projekt.';
 $ec_lang['lpn_settings_theme']='Motiv';
-$ec_lang['lpn_settings_theme_tip']='Zvolte světlé nebo tmavé barvy stránky. Systém se řídí nastavením vašeho zařízení. Kresba mapy vypadá ve všech motivech stejně. Toto nastavení platí pro tento prohlížeč, nikoli pro projekt.';
+$ec_lang['lpn_settings_theme_tip']='Zvolte vzhled stránky: její barvy a v některých motivech i tvary a písmo. Každá karta ukazuje motiv na této stránce ještě před jeho zvolením. Systém se řídí nastavením zařízení. Na obrazovce se motivem řídí i mapa; vytištěné stránky, snímky obrazovky a exportované soubory se vždy kreslí ve Světlém. Toto nastavení platí pro tento prohlížeč, nikoli pro projekt.';
 $ec_lang['lpn_theme_system']='Systém';
 $ec_lang['lpn_theme_light']='Světlý';
 $ec_lang['lpn_theme_dark']='Tmavý';
@@ -3276,7 +3276,7 @@ $ec_lang['lpn_scenario_only_deleted']='{id} je smazán. Byl součástí pouze sc
 $ec_lang['lpn_scenario_delete_blocked']='{id} nebyl smazán, protože na něm končí potrubí {link}, které existuje i mimo scénář {scenario}. Chcete-li smazat obojí, smažte je ve scénáři {base}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Základní režim';
-$ec_lang['lpn_scenario_basic_tip']='Zaškrtnuto: alternativy jsou skryté a automatické, každý scénář ukazuje své specifické hodnoty jako vlastní a všechny nové scénáře jsou podřízené Základnímu scénáři; Správce scénářů a tabulka Scénáře se nezobrazují. Odškrtnuto: Správce scénářů a tabulka Scénáře se zobrazují a alternativy lze sdílet mezi scénáři. Správce scénářů je zakázán, dokud je Základní režim zapnut. Základní režim je zakázán, má-li projekt vztahy scénářů a alternativ, které Základní režim nedokáže zobrazit.';
+$ec_lang['lpn_scenario_basic_tip']='Zaškrtnuto: alternativy jsou skryté a automatické, každý scénář ukazuje své specifické hodnoty jako vlastní a všechny nové scénáře jsou potomky Základního scénáře; Správce scénářů ukazuje seznam scénářů a tabulka Scénáře se nezobrazuje. Odškrtnuto: Správce scénářů ukazuje svůj strom, tabulka Scénáře se zobrazuje a alternativy lze sdílet mezi scénáři. Základní režim je zakázán, má-li projekt vztahy scénářů a alternativ, které Základní režim nedokáže zobrazit.';
 $ec_lang['lpn_scenario_basic_misfit']='Tento projekt má vztahy scénářů a alternativ, které se s Základním režimem scénářů neslučují, a Základní režim je proto zakázán.';
 $ec_lang['lpn_scenario_basic_misfit_base']='Základní scénář používá jinou alternativu než Základní.';
 $ec_lang['lpn_scenario_copy']='Kopírovat scénář';
@@ -3331,7 +3331,7 @@ $ec_lang['lpn_ovl_col_inherited']='Zděděná hodnota';
 $ec_lang['lpn_ovl_col_inherited_tip']='Hodnota, kterou tento scénář čte bez specifické hodnoty: hodnota nadřazené alternativy nebo Základní hodnota.';
 $ec_lang['lpn_ovl_same']='(stejná)';
 $ec_lang['lpn_ovl_same_tip']='Rovná se zděděné hodnotě. Stále je to specifická hodnota a počítá se.';
-$ec_lang['lpn_sm_help']='Jak fungují scénáře a alternativy:\n\nV Základním režimu jsou alternativy skryté a automatické a všechny nové scénáře jsou podřízené Základnímu scénáři.\n\nPři vypnutém Základním režimu je k dispozici složitý strom dědičnosti a alternativy lze sdílet mezi scénáři. Výchozí chování úprav, když je potřeba nová vazba na alternativu (bez aktivní správy ze strany uživatele), je však vytvořit alternativu pojmenovanou podle aktuálního scénáře, čímž každý scénář získá vlastní sadu alternativ.\n\nVlastnosti a nastavení patří do kategorií alternativ, které se zobrazují jako sloupce tabulky scénářů a alternativ a jako možnosti správy ve Správci scénářů.\n\nSpecifické hodnoty se vytvářejí ve scénářích, ale ve skutečnosti patří příslušným alternativám přiřazeným ke scénáři; scénář je tedy jako okno do svých alternativ. Přiřazení alternativ ke scénářům se spravuje v pravém panelu Správce scénářů nebo v tabulce Scénáře ve spodním panelu. Vytvoření nového scénáře nevytváří žádné alternativy; nový scénář používá alternativy svého nadřazeného, dokud nevzniknou specifické hodnoty, které potřebují nové alternativy. Když se ve scénáři vytvoří specifické hodnoty, ukládají se do příslušné alternativy pro tento scénář; nemá-li scénář takovou alternativu, vytvoří se nová alternativa pojmenovaná podle scénáře.\n\nPříklad: Vytvoříte scénář „Obrázek: ID uzlů a spojů“ a upravíte Text tak, aby uváděl „ID uzlů a spojů“. Při vytvoření scénáře se nevytvoří žádné alternativy. V okamžiku uložení Textu se však vytvoří alternativa Textu nazvaná „Obrázek: ID uzlů a spojů“ se specifickou hodnotou Textu. V Základním režimu to vidíte jednoduše jako specifickou hodnotu ve scénáři samotném.\n\nKopírovat vlastnosti kopíruje pouze specifické hodnoty. V jakémkoli jiném scénáři než Základní kopíruje jen specifické hodnoty, které má prvek v tomto scénáři.\n\nJak scénáře spravovat:\n\n- Zvolte Scénáře nebo kategorii alternativ v seznamu nahoře a zobrazí se jeho strom.\n\n- Potomka vybrané položky vytvoříte příkazem Přidat potomka. Přidat základ přidá další Základ, který začíná jako kopie Základu tak, jak je nyní; pozdější úpravy Základu jej nemění. Nový potomek je pojmenován podle svého nadřazeného; zadáním názvu jej přejmenujete. Kopírovat zkopíruje vybranou alternativu. Sloučit nahoru přesune specifické hodnoty vybrané alternativy do alternativy nad ní, zvolené podle názvu, a vybraná alternativa je pak dědí; nejprve uvede každou hodnotu, kterou přepisuje i alternativa, jež se přeskakuje, a ta se nemění. Chcete-li zkopírovat scénář, použijte v Základním režimu Kopírovat scénář v nabídce Scénáře; zkopíruje specifické hodnoty scénáře spolu s alternativami, které je drží. Přidat základ i Kopírovat scénář vytvářejí alternativy: Přidat základ vytvoří Základní alternativu pro nový Základ v každé kategorii, která drží hodnoty, a Kopírovat scénář vytvoří novou alternativu, pojmenovanou jako kopie, pro každou alternativu, která drží specifické hodnoty scénáře.\n\n- Přetažením položky na jinou z ní uděláte potomka této položky. Scénář přesunutý pod nového nadřazeného z něj dědí vše, co nepřepsal; to, co přepsal, se nemění. Přetažením položky mezi dvě položky je přeřadíte.\n\n- Kliknutím na položku ji vyberete. Stisknutím F2 nebo volbou Přejmenovat přejmenujete vybranou položku. Přejmenování scénáře se zeptá, zda přejmenovat i alternativy, které nesou jeho název; v Základním režimu se přejmenují spolu s ním, bez dotazu. Dvojitým kliknutím na scénář nebo stisknutím Enter jej učiníte aktuálním. Kliknutím na šipku vedle položky nebo stisknutím Doleva či Doprava ji sbalíte nebo rozbalíte. Kliknutím pravým tlačítkem na položku získáte stejné příkazy jako u tlačítek.\n\n- Stisknutím Delete nebo kliknutím na tlačítko mínus vybranou položku smažete. Používaná položka se nesmaže a zpráva uvádí, co ji používá. Smazání scénáře při vypnutém Základním režimu ponechá alternativy, které používá. Smazání scénáře při zapnutém Základním režimu smaže také každou jeho alternativu, kterou nepoužívá žádný jiný scénář.\n\n- Aby scénář používal jinou alternativu, včetně Základní, zvolte ji v řádku scénáře v pravém panelu Správce scénářů nebo v tabulce Scénáře. Specifická hodnota vytvořená ve sdílené alternativě změní každý scénář, který ji používá.';
+$ec_lang['lpn_sm_help']='Jak fungují scénáře a alternativy:\n\nV Základním režimu jsou alternativy skryté a automatické a všechny nové scénáře jsou potomky Základního scénáře.\n\nPři vypnutém Základním režimu je k dispozici složitý strom dědičnosti a alternativy lze sdílet mezi scénáři. Výchozí chování úprav, když je potřeba nová vazba na alternativu (bez aktivní správy ze strany uživatele), je však vytvořit alternativu pojmenovanou podle aktuálního scénáře, čímž každý scénář získá vlastní sadu alternativ.\n\nVlastnosti a nastavení patří do kategorií alternativ, které se zobrazují jako sloupce tabulky scénářů a alternativ a jako možnosti správy ve Správci scénářů.\n\nSpecifické hodnoty se vytvářejí ve scénářích, ale ve skutečnosti patří příslušným alternativám přiřazeným ke scénáři; scénář je tedy jako okno do svých alternativ. Přiřazení alternativ ke scénářům se spravuje ve druhém panelu Správce scénářů nebo v tabulce Scénáře ve spodním panelu. Vytvoření nového scénáře nevytváří žádné alternativy; nový scénář používá alternativy svého rodiče, dokud nevzniknou specifické hodnoty, které potřebují nové alternativy. Když se ve scénáři vytvoří specifické hodnoty, ukládají se do příslušné alternativy pro tento scénář; nemá-li scénář takovou alternativu, vytvoří se nová alternativa pojmenovaná podle scénáře.\n\nPříklad: Vytvoříte scénář „Obrázek: ID uzlů a spojů“ a upravíte Text tak, aby uváděl „ID uzlů a spojů“. Při vytvoření scénáře se nevytvoří žádné alternativy. V okamžiku uložení Textu se však vytvoří alternativa Textu nazvaná „Obrázek: ID uzlů a spojů“ se specifickou hodnotou Textu. V Základním režimu to vidíte jednoduše jako specifickou hodnotu ve scénáři samotném.\n\nKopírovat vlastnosti kopíruje pouze specifické hodnoty. V jakémkoli jiném scénáři než Základní kopíruje jen specifické hodnoty, které má prvek v tomto scénáři.\n\nJak scénáře spravovat:\n\n- Zvolte Scénáře nebo kategorii alternativ v seznamu nahoře a zobrazí se jeho strom.\n\n- Potomka vybrané položky vytvoříte příkazem Přidat potomka. Přidat základ přidá další Základ, který začíná jako kopie Základu tak, jak je nyní; pozdější úpravy Základu jej nemění. Nový potomek je pojmenován podle svého rodiče; zadáním názvu jej přejmenujete. Kopírovat zkopíruje vybranou alternativu. Sloučit nahoru přesune specifické hodnoty vybrané alternativy do alternativy nad ní, zvolené podle názvu, a vybraná alternativa je pak dědí; nejprve uvede každou hodnotu, kterou přepisuje i alternativa, jež se přeskakuje, a ta se nemění. Chcete-li zkopírovat scénář, použijte v Základním režimu Kopírovat scénář v nabídce Scénáře; zkopíruje specifické hodnoty scénáře spolu s alternativami, které je drží. Přidat základ i Kopírovat scénář vytvářejí alternativy: Přidat základ vytvoří Základní alternativu pro nový Základ v každé kategorii, která drží hodnoty, a Kopírovat scénář vytvoří novou alternativu, pojmenovanou jako kopie, pro každou alternativu, která drží specifické hodnoty scénáře.\n\n- Přetažením položky na jinou z ní uděláte potomka této položky. Scénář přesunutý pod nového rodiče z něj dědí vše, co nepřepsal; to, co přepsal, se nemění. Přetažením položky mezi dvě položky je přeřadíte.\n\n- Kliknutím na položku ji vyberete. Stisknutím F2 nebo volbou Přejmenovat přejmenujete vybranou položku. Přejmenování scénáře se zeptá, zda přejmenovat i alternativy, které nesou jeho název; v Základním režimu se přejmenují spolu s ním, bez dotazu. Dvojitým kliknutím na scénář nebo stisknutím Enter jej učiníte aktuálním. Kliknutím na šipku vedle položky nebo stisknutím Doleva či Doprava ji sbalíte nebo rozbalíte. Kliknutím pravým tlačítkem na položku získáte stejné příkazy jako u tlačítek.\n\n- Stisknutím Delete nebo kliknutím na tlačítko mínus vybranou položku smažete. Používaná položka se nesmaže a zpráva uvádí, co ji používá. Smazání scénáře při vypnutém Základním režimu ponechá alternativy, které používá. Smazání scénáře při zapnutém Základním režimu smaže také každou jeho alternativu, kterou nepoužívá žádný jiný scénář.\n\n- Aby scénář používal jinou alternativu, včetně Základní, zvolte ji v řádku scénáře ve druhém panelu Správce scénářů nebo v tabulce Scénáře. Specifická hodnota vytvořená ve sdílené alternativě změní každý scénář, který ji používá.';
 $ec_lang['lpn_sm_delete_alt_ask']='Smazat alternativu {name}?';
 $ec_lang['lpn_sm_in_use']='{item}\nnelze smazat, dokud ji používá\n{list}';
 $ec_lang['lpn_sm_alt_delete_has_children']='Alternativu {name} nelze smazat, protože má podřízené alternativy: {list}. Nejprve je smažte nebo přesuňte pod jiný nadřazený.';
@@ -3464,7 +3464,7 @@ $ec_lang['lpn_elev_dem_none']='DEM pro tento uzel nemá žádnou nadmořskou vý
 $ec_lang['lpn_elev_dem_said']='Nadmořská výška podle Mapbox DEM: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Zdroj nadmořské výšky';
 $ec_lang['lpn_settings_elev_source_tip']='Přesnost Mapbox DEM v roce 2026, nejprve vodorovná, poté svislá: v USA 1–10 m a méně než 1 m, v Evropě a Japonsku 2–10 m a 1–3 m, globálně 30 m a 10–16 m a na pólech 90 m a více než 16 m.';
-$ec_lang['lpn_settings_elev_source_typed']='Výše';
+$ec_lang['lpn_settings_elev_source_typed']='Zadaná hodnota';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM (výškopis)';
 $ec_lang['lpn_settings_accuracy']='Přesnost';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -3533,7 +3533,7 @@ $ec_lang['lpn_settings_engine_native']='Používat vestavěný řešič, kde je 
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Zaškrtnutím povolíte použití vestavěného řešiče, kde je to možné. Jinak se vždy použije řešič EPANET americké agentury EPA. Vestavěný řešič se nepoužívá pro dlouhodobé simulace ani pro ventily rušící tlak a obecné ventily (PBV, GPV). Při prvním použití řešiče EPANET se stáhne asi 650 KB, které se poté uchovají v tomto zařízení. Má-li potrubí místní ztrátu, oba řešiče se liší v posledních číslicích: EPANET používá zaokrouhlenou hodnotu tíhového zrychlení, takže jeho místní ztráty jsou o málo nižší než v přesném tvaru.';
+$ec_lang['lpn_settings_engine_native_tip']='Zaškrtnutím povolíte použití vestavěného řešiče, kde je to možné. Jinak se vždy použije řešič EPANET americké agentury EPA. Vestavěný řešič se nepoužívá pro simulace s časovým průběhem. Při prvním použití řešiče EPANET se stáhne asi 650 KB, které se poté uchovají v tomto zařízení. Má-li potrubí místní ztrátu, oba řešiče se liší v posledních číslicích: EPANET používá zaokrouhlenou hodnotu tíhového zrychlení, takže jeho místní ztráty jsou o málo nižší než v přesném tvaru.';
 $ec_lang['lpn_engine_loading']='Načítání řešiče EPANET…';
 $ec_lang['lpn_engine_failed']='Řešič EPANET se nepodařilo načíst. Místo něj se zobrazuje vestavěný řešič.';
 $ec_lang['lpn_engine_failed_why']='{reason} Místo něj se zobrazuje vestavěný řešič.';
@@ -4006,7 +4006,7 @@ $ec_lang['lpn_energy_no_pumps']='Tato síť nemá žádná čerpadla, takže nic
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Porovnání scénářů';
-$ec_lang['lpn_scncmp_menu_tip']='Tabulka scénářů s počtem specifických hodnot, nejnižším tlakem a nejvyšší rychlostí';
+$ec_lang['lpn_scncmp_menu_tip']='Tabulka scénářů s počtem specifických hodnot, nejnižším tlakem a nejvyšší rychlostí a tabulka výsledků podle prvků, kterou lze zkopírovat do tabulkového procesoru';
 $ec_lang['lpn_scncmp_running']='Počítají se všechny scénáře…';
 $ec_lang['lpn_scncmp_empty']='Zatím nic nebylo nakresleno, takže není co počítat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Nejvyšší rychlost';
@@ -4052,13 +4052,13 @@ $ec_lang['lpn_status_note']='Čteno ze stejného běhu s časovým průběhem ja
 // Same rule as Status above: the row says "Full", the box says "Full report".
 $ec_lang['lpn_reports_full']='Úplná';
 $ec_lang['lpn_reports_full_tip']='Tabulka všech uzlů a spojů při každém vykazovaném časovém kroku posledního výpočtu';
-$ec_lang['lpn_full_title']='Úplná sestava';
-$ec_lang['lpn_full_needs_run']='Úplná sestava uvádí každý uzel a každý spoj při každém kroku hlášení. Stiskněte Vypočítat, a poté otevřete Voda, Sestavy, Úplná sestava.';
-$ec_lang['lpn_full_note']='Jeden řádek na uzel nebo spoj a krok hlášení, v jednotkách zobrazených na panelu Tabulky. Prázdná buňka je sloupec, který tato veličina nemá. Stažení nebo tisk obsahuje každý časový krok; tabulka níže zobrazuje vždy jeden.';
+$ec_lang['lpn_full_title']='Sestava: úplná';
+$ec_lang['lpn_full_needs_run']='Úplná sestava uvádí každý uzel a každý spoj v každém časovém kroku hlášení. Stiskněte Vypočítat, a poté otevřete Voda, Sestavy, Úplná.';
+$ec_lang['lpn_full_note']='Jeden řádek na uzel nebo spoj a časový krok hlášení, v jednotkách zobrazených na panelu Tabulky. Buňka je prázdná tam, kde uzel nebo spoj takovou veličinu nemá. Stažení, kopírování i tisk obsahuje každý časový krok; tabulka níže zobrazuje vždy jeden.';
 $ec_lang['lpn_full_step_label']='Časový krok';
 $ec_lang['lpn_full_download_csv']='Stáhnout CSV';
 $ec_lang['lpn_full_print']='Vytisknout sestavu';
-$ec_lang['lpn_full_col_time']='Čas';
+$ec_lang['lpn_full_col_time']='Čas (hr)';
 $ec_lang['lpn_full_col_type']='Typ';
 $ec_lang['lpn_heading_unit']='{label} ({unit})';
 $ec_lang['lpn_result_concentration_short']='Koncentrace';
@@ -4262,7 +4262,7 @@ $ec_lang['lpn_library_fittings_in_use']='Tento seznam armatur používají potru
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
 // the FILE decides what is on offer rather than whatever section anybody was looking at.
-$ec_lang['lpn_library_import']='Importovat knihovny…';
+$ec_lang['lpn_library_import']='Knihovny…';
 $ec_lang['lpn_library_import_tip']='Zvolte jiný soubor projektu a zkopírujte z něj do tohoto projektu celé knihovny. Cokoli, jehož název je zde už použit, se přeskočí a uvede v seznamu, takže se nic, co už máte, nezmění.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
 // beside each name is the only thing on that screen that says what the file actually has in it.
@@ -4505,7 +4505,7 @@ $ec_lang['lpn_analyze_menu_tip']='Analýzy, které provedou výpočet sítě na 
 $ec_lang['lpn_ff_menu']='Požární průtok: analýza…';
 $ec_lang['lpn_ff_menu_tip']='Otestuje každý vybraný uzel na požární průtok a zkontroluje dopad na zbytek systému';
 $ec_lang['lpn_ff_title']='Požární průtok: analýza';
-$ec_lang['lpn_ff_intro']='Každý uzel postupně odebírá požární průtok navíc ke svému stávajícímu odběru. Výpočet používá kopii sítě v časovém kroku zobrazeném na obrazovce, takže se nic v projektu nemění.\n\nPožární průtok se obvykle testuje při odběru maximálního dne, proto nejprve nastavte síť na tento stav.\n\nKaždý testovaný uzel vyžaduje asi 16 řešení celé sítě, takže velký systém trvá minuty: uzly zvolte před spuštěním a kdykoli můžete výpočet zastavit, aby se zachovaly dílčí výsledky.';
+$ec_lang['lpn_ff_intro']='Každý uzel postupně odebírá požární průtok navíc ke svému stávajícímu odběru. Výpočet používá kopii sítě v časovém kroku zobrazeném na obrazovce, takže se nic v projektu nemění.\n\nMá-li projekt simulaci s časovým průběhem, volí podmínku Testovaný krok hlášení: časový krok na obrazovce, zvolený krok hlášení, krok hlášení s nejnižším tlakem mezi testovanými uzly, nebo každý krok hlášení. Poslední možnost provede prověření v každém kroku hlášení s hladinami nádrží, vzorci odběru a stavy spojů tohoto kroku a ukáže každý uzel v jeho vlastním nejhorším kroku, tedy v kroku s nejnižším dostupným průtokem, ve sloupci Krok s nejnižším průtokem.\n\nPožární průtok se obvykle testuje při odběru maximálního dne, proto nejprve nastavte síť na tento stav.\n\nKaždý testovaný uzel vyžaduje asi 16 řešení celé sítě, takže velký systém trvá minuty: uzly zvolte před spuštěním a kdykoli můžete výpočet zastavit, aby se zachovaly dílčí výsledky.';
 $ec_lang['lpn_ff_scope']='Uzly k otestování';
 $ec_lang['lpn_ff_all']='Všechny uzly';
 $ec_lang['lpn_ff_selected']='Vybrané uzly';
@@ -4524,7 +4524,7 @@ $ec_lang['lpn_ff_design_off']='Žádná';
 $ec_lang['lpn_ff_design_all']='Všechny';
 $ec_lang['lpn_ff_design_selected']='Vybrané';
 $ec_lang['lpn_ff_design_no_selection']='Rozsah návrhové kontroly je nastaven na Vybrané, ale nejsou vybrány žádné prvky. Vyberte prvky na mapě, nebo zvolte Všechny.';
-$ec_lang['lpn_ff_minpressure']='Nejnižší povolený tlak jinde';
+$ec_lang['lpn_ff_minpressure']='Nejnižší povolený tlak v síti';
 $ec_lang['lpn_ff_minpressure_tip']='Uzel, který klesne pod tuto hodnotu, zatímco jiný odebírá svůj požární průtok, je nahlášen jako návrhový problém.';
 $ec_lang['lpn_ff_maxvelocity']='Nejvyšší povolená rychlost';
 $ec_lang['lpn_ff_maxvelocity_tip']='Potrubí běžící nad touto hodnotou, zatímco se odebírá požární průtok, je nahlášeno jako návrhový problém.';
@@ -4654,13 +4654,13 @@ $ec_lang['lpn_ff_err_unknown']='Žádný výsledek. Kód chyby: {code}';
 $ec_lang['lpn_crit_menu']='Kritičnost: analýza…';
 $ec_lang['lpn_crit_menu_tip']='Postupně odebere ze sítě každé potrubí, čerpadlo a ventil a ohlásí dopad na systém.';
 $ec_lang['lpn_crit_title']='Kritičnost: analýza';
-$ec_lang['lpn_crit_intro']='Každý prvek se postupně vyjme ze sítě a síť se vypočítá v časovém kroku zobrazeném na obrazovce v aktivním scénáři. Nic v projektu se nemění; celý výpočet probíhá na kopii.';
+$ec_lang['lpn_crit_intro']='Každý prvek se postupně vyjme ze sítě a síť se vypočítá v časovém kroku zobrazeném na obrazovce v aktivním scénáři. Nic v projektu se nemění; celý běh probíhá na kopii.\n\nMá-li projekt simulaci s časovým průběhem, lze Testovaný krok hlášení nastavit na Celý běh. Každá odstávka se pak simuluje po celý běh a tabulka uvádí nejnižší tlak a krok hlášení, ve kterém nastane, hodiny, které kterýkoli uzel stráví pod nejnižším povoleným tlakem, krok hlášení, ve kterém se nádrž poprvé vyprázdní, a největší nedodaný odběr za běh. Nejnižší tlaky se čtou jen před vyprázdněním nádrže.';
 $ec_lang['lpn_crit_scope']='Spoje k přerušení';
 $ec_lang['lpn_crit_scope_tip']='Všechna potrubí, čerpadla a ventily, nebo jen ty vybrané na mapě. Množinu zvolte před spuštěním.';
 $ec_lang['lpn_crit_scope_all']='Všechny spoje';
 $ec_lang['lpn_crit_scope_selected']='Vybrané spoje';
 $ec_lang['lpn_crit_minpressure']='Nejnižší povolený tlak';
-$ec_lang['lpn_crit_minpressure_tip']='Je to stejné číslo jako Nejnižší povolený tlak jinde v okně Požární průtok: analýza. Změna zde ho změní i tam.';
+$ec_lang['lpn_crit_minpressure_tip']='Je to stejné číslo jako pole Nejnižší povolený tlak v síti v okně Požární průtok: analýza. Změna zde ho změní i tam.';
 $ec_lang['lpn_crit_col_asset']='Prvek';
 $ec_lang['lpn_crit_col_unserved']='Nedodaný odběr';
 $ec_lang['lpn_crit_col_cutoff']='Odříznuté uzly';
@@ -4691,7 +4691,7 @@ $ec_lang['lpn_crit_skipped_dead']='Přeskočené spoje ve slepých zakončeních
 $ec_lang['lpn_ds_menu']='Škálování odběru…';
 $ec_lang['lpn_ds_menu_tip']='Vynásobí odběry na kopii sítě a zobrazí tlaky a rychlosti, nebo najde největší měřítko odběru, které systém unese.';
 $ec_lang['lpn_ds_title']='Škálování odběru';
-$ec_lang['lpn_ds_intro']='Tlačítkem Spustit vynásobíte odběry ve vybraných uzlech měřítkem odběru a zobrazíte tlaky a rychlosti.\n\nTlačítkem Najít zjistíte největší měřítko odběru, s přesností na {step}, při kterém všechny tyto uzly udrží alespoň nejnižší povolený tlak; hledá se od 0 do {max}.\n\nObě fungují na kopii sítě, vyřešené v časovém kroku zobrazeném na obrazovce v aktivním scénáři, takže se nic v projektu nemění. Škáluje se pouze tento časový krok a hladiny a stavy se přebírají z něj; chcete-li testovat špičku, před spuštěním přesuňte hodiny na špičkový odběr.';
+$ec_lang['lpn_ds_intro']='Tlačítkem Spustit vynásobíte odběry ve vybraných uzlech měřítkem odběru a zobrazíte tlaky a rychlosti.\n\nTlačítkem Najít zjistíte největší měřítko odběru, s přesností na {step}, při kterém všechny tyto uzly udrží alespoň nejnižší povolený tlak; hledá se od 0 do {max}.\n\nObě fungují na kopii sítě, vyřešené v časovém kroku zobrazeném na obrazovce v aktivním scénáři, takže se nic v projektu nemění. Ve výchozím stavu se škáluje pouze časový krok na obrazovce a hladiny a stavy se přebírají z něj. Má-li projekt simulaci s časovým průběhem, nastavte Testovaný krok hlášení na Celý běh, aby se odběry škálovaly po celý běh: posuzuje se každý krok hlášení, nádrž, která se vyprázdní, měřítko nesplní, a odpověď uvede omezující krok hlášení.';
 $ec_lang['lpn_ds_scope']='Uzly ke škálování';
 $ec_lang['lpn_ds_head_scale']='Škálovat odběry';
 $ec_lang['lpn_ds_multiplier']='Měřítko odběru';
@@ -4738,13 +4738,13 @@ $ec_lang['lpn_analyze_time_moved']='⚠ Výsledek byl vypočten v čase {time}, 
 // probably a longitude in the wrong column, and this page says so and changes nothing, because it
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
-$ec_lang['lpn_file_import_survey']='Importovat geodeticky zaměřené body…';
+$ec_lang['lpn_file_import_survey']='Zaměřené body…';
 $ec_lang['lpn_file_import_survey_tip']='Načte seznam zaměřených bodů z textového souboru a vytvoří jeden uzel v každém bodě, přičemž pro vše, co soubor neuvádí, použije nastavení nových prvků. Žádné potrubí se nekreslí, pokud nezaškrtnete Číst popis jako terénní kódy, a žádný řádek není nikdy vynechán bez uvedení. Čte souřadnicový systém, který tento projekt již používá, georeferencovaný či nikoli.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='Importovat útvary GeoJSON…';
-$ec_lang['lpn_file_import_shapes_tip']='Načte body, čáry a mnohoúhelníky ze souboru GeoJSON do tohoto projektu jako Útvary. Prvky sítě v souboru se neimportují; síť importujte ze souboru EPANET nebo příkazem Importovat síť GeoJSON. Projekt musí být georeferencovaný nebo musí uvádět souřadnicový systém.';
-$ec_lang['lpn_file_import_gjnet']='Importovat síť GeoJSON…';
+$ec_lang['lpn_file_import_shapes']='Soubor GeoJSON…';
+$ec_lang['lpn_file_import_shapes_tip']='Načte body, čáry a mnohoúhelníky ze souboru GeoJSON do tohoto projektu jako Útvary. Prvky sítě v souboru se neimportují; síť importujte příkazem Soubor, Importovat, Síť, Soubor EPANET, nebo Soubor, Importovat, Síť, Soubor GeoJSON. Projekt musí být georeferencovaný nebo musí uvádět souřadnicový systém.';
+$ec_lang['lpn_file_import_gjnet']='Soubor GeoJSON…';
 $ec_lang['lpn_file_import_gjnet_tip']='Otevře soubor GeoJSON jako nový projekt. Body se importují jako uzly, zdroje nebo nádrže a čáry jako potrubí. Soubor exportovaný z této stránky se čte tak, jak byl zapsán; u jakéhokoli jiného souboru jeden krok přiřadí jeho pole k vlastnostem a jednotkám.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} uvádí souřadnicový systém {crs}. Polohy GeoJSON jsou zeměpisná šířka a délka WGS 84 (RFC 7946) a tato stránka soubor GeoJSON z jiného systému nepřevádí. Exportujte vrstvu z GIS v EPSG:4326 (WGS 84) a poté importujte tento soubor.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} neobsahuje žádné body ani čáry.';
@@ -4811,7 +4811,7 @@ $ec_lang['lpn_gjnet_note_demand_rows']='Tyto uzly měly více než jeden řádek
 $ec_lang['lpn_gjnet_note_pipe_type']='Tato potrubí uvádějí typ potrubí uvedený v závorce, jehož definici soubor GeoJSON neobsahuje. Typ potrubí nebyl importován; průměr a drsnost uvedené v souboru ano.';
 $ec_lang['lpn_gjnet_note_pattern_conflict']='Tyto vzorce jsou uvedeny s různými násobiteli u různých objektů. Použit byl první.';
 $ec_lang['lpn_gjnet_note_end_off_node']='Čára každého z těchto spojů nezačíná ani nekončí ve svém uzlu. Použita byla poloha uzlu.';
-$ec_lang['lpn_gjnet_note_not_held']='Soubor GeoJSON neobsahuje řídicí pravidla, pravidla, nastavení času, textové popisky, možnosti EPANET ani knihovny typů potrubí, armatur a křivek účinnosti, takže nic z toho nebylo importováno.';
+$ec_lang['lpn_gjnet_note_not_held']='Soubor GeoJSON neobsahuje řídicí pravidla, pravidla, nastavení času, položky Textu, volby EPANET ani knihovny typů potrubí, armatur a křivek účinnosti, takže nic z toho nebylo importováno.';
 $ec_lang['lpn_geojson_import_done']='Importováno Útvarů: {n}, ze souboru {file}.';
 $ec_lang['lpn_geojson_import_done_one']='Importován jeden Útvar ze souboru {file}.';
 $ec_lang['lpn_geojson_import_renamed']='Počet názvů objektů, které nelze použít jako ID Útvarů: {n}. Každý Útvar dostal jiné ID a ponechal si název objektu: {list}.';
@@ -4827,9 +4827,9 @@ $ec_lang['lpn_geojson_import_parts']='Vícedílné objekty ({n}) importovány ja
 $ec_lang['lpn_geojson_import_parts_one']='Jeden vícedílný objekt importován jako jeden Útvar pro každou část.';
 $ec_lang['lpn_geojson_import_local']='Polohy GeoJSON jsou zeměpisná šířka a délka a tento projekt nemá na Zemi žádné místo, na které by je bylo možné převést. Nejprve jej georeferencujte pomocí Mapa, Mapa světa, Připojit a poté importujte znovu.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} není soubor GeoJSON: {detail}';
-$ec_lang['lpn_file_import_dxf']='Importovat útvary DXF…';
+$ec_lang['lpn_file_import_dxf']='Soubor DXF…';
 $ec_lang['lpn_file_import_dxf_tip']='Načte body, čáry a lomené čáry z ASCII souboru DXF do tohoto projektu jako Útvary, přičemž název každé vrstvy zůstane zachován jako vlastnost. Ostatní entity se spočítají a vypíšou, ale neimportují. Souřadnice se čtou jako X a Y tohoto projektu, bez převodu.';
-$ec_lang['lpn_file_import_shp']='Importovat útvary shapefile…';
+$ec_lang['lpn_file_import_shp']='Soubor shapefile…';
 $ec_lang['lpn_file_import_shp_tip']='Načte body, čáry a mnohoúhelníky ze souboru ESRI shapefile do tohoto projektu jako Útvary, přičemž sloupce atributů zůstanou zachovány jako vlastnosti. Vyberte buď soubor .zip, nebo soubor .shp spolu se soubory .shx, .dbf a .prj (několik souborů vyberete podržením klávesy Ctrl nebo Shift). Souřadnice v jiném souřadnicovém systému než projekt se převedou a oznámení to uvádí.';
 $ec_lang['lpn_dxf_import_skipped']='Neimportované entity ({n}): {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='Neimportována jedna entita: {list}.';
@@ -4982,3 +4982,331 @@ $ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
 $ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';
+$ec_lang['lpn_guide_page_open']='Otevřít aplikaci';
+$ec_lang['lpn_guide_page_desc']='Uživatelská příručka {name}: jedna stránka pro každou kapitolu, od mapy a Vlastností po scénáře, analýzu požárního průtoku a analýzu kritičnosti.';
+$ec_lang['lpn_guide_page_what']='{name} je bezplatná webová aplikace pro modelování vodovodních sítí, rozšíření programu EPANET.';
+$ec_lang['lpn_guide_page_missing']='Taková kapitola neexistuje. Kapitoly jsou uvedeny níže.';
+$ec_lang['lpn_guide_text_demands_box']='Uvádí kategorie odběru vybraného uzlu, jeden řádek pro každou, se základním odběrem a vzorcem odběru každé kategorie. Tlačítko plus přidá kategorii. Má-li uzel více než jednu kategorii, je Základní odběr ve Vlastnostech jejich součtem a je jen pro čtení. Odběratelé soustředění v uzlu jsou uvedeni se svým odběrem. Ve scénáři je úprava specifickou hodnotou a Základní se nemění.';
+$ec_lang['lpn_guide_scn_move_term']='Přesun nebo sloučení mezi scénáři';
+$ec_lang['lpn_guide_scn_move_def']='<p>Chcete-li přesunout nebo sloučit prvky z jednoho scénáře do druhého, otevřete jejich Tabulku, v kontextové nabídce po kliknutí pravým tlačítkem zvolte Zobrazit scénáře a poté v každém scénáři nastavte jejich přepínač Je aktivní a Zrušit specifickou hodnotu podle potřeby.</p>';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Pod tabulkou uvádí Výsledky podle prvků jeden řádek pro každý prvek druhu zvoleného v poli Typ prvku, s jedním sloupcem pro každý zaškrtnutý výsledek v každém scénáři, například tlak v každém uzlu v Základním, Maximálním dni a Špičkové hodině. Scénář s celkovou dobou běhu se čte v časovém kroku na obrazovce, nebo v jeho posledním časovém kroku, končí-li jeho běh dříve, a každé záhlaví uvádí přečtený čas. Scénář, který nelze vyřešit, má sloupce prázdné a poznámku s důvodem a scénář, který nekonvergoval, je v záhlaví označen (nekonvergoval). Kopírovat vloží tabulku do schránky jako text oddělený tabulátory, připravený k vložení do tabulkového procesoru. Stáhnout CSV uloží tutéž tabulku jako soubor. Obojí obsahuje jednotky v záhlaví a čísla v plné přesnosti, bez zaokrouhlení zobrazeného v okně. Znaménko průtoku je interní znaménko směru řešiče. Mimo řešič nemá využití, jen v této tabulce ukazuje, zda průtok mezi scénáři změnil směr.</p>';
+$ec_lang['lpn_guide_ff_dur_def']='<p>Má-li projekt simulaci s časovým průběhem, zvolte pod Testovaný krok hlášení možnost Požár po stanovenou dobu. Požadovaný požární průtok se pak odebírá v jediném uzlu vybraném na mapě, od času v poli Požár začíná v po dobu uvedenou v poli Doba trvání požáru, obojí jako celé násobky časového kroku vzorce. Celá simulace se spustí na kopii sítě a porovná se s toutéž simulací bez požáru. Shrnutí uvádí, zda uzel udrží Zbytkový tlak k udržení během požáru, nejnižší tlak kdekoli, zda se některá nádrž vyprázdní a zda se soustava po požáru zotaví. Jedna tabulka uvádí nejnižší hladinu každé nádrže a další uvádí tlak v uzlu s požárem v každém časovém kroku hlášení.</p>';
+$ec_lang['lpn_ex_valves_title']='Typy ventilů, gpm (US)';
+$ec_lang['lpn_ex_valves_desc']='Zdroj na vrcholu kopce zásobuje rozvodný uzel přes PBV, z něhož se větví PRV, PSV, FCV, TCV a GPV, každý z nich v řešené síti regulující. Galony za minutu, se stopami a palci.';
+$ec_lang['lpn_ex_extension_si_title']='Prodloužení řadu Johnson City, L/s (SI)';
+$ec_lang['lpn_ex_extension_si_desc']='Model prodloužení řadu s testovacími kalibračními scénáři. Stávající soustava je modelována jako zdroj a čerpadlo na základě zkoušky průtoku hydrantem v Johnson City v Texasu. Napojuje se na ni nová smyčka řadu DN 300 a DN 200. Uzel s požárním hydrantem dodává 95 L/s při zbytkovém tlaku 14 m. Litry za sekundu, s metry a milimetry.';
+$ec_lang['lpn_ex_extension_title']='Prodloužení řadu Johnson City, gpm (US)';
+$ec_lang['lpn_ex_extension_desc']='Model prodloužení řadu s testovacími kalibračními scénáři. Stávající soustava je modelována jako zdroj a čerpadlo na základě zkoušky průtoku hydrantem v Johnson City v Texasu. Napojuje se na ni nová smyčka řadu 12 in a 8 in. Uzel s požárním hydrantem dodává 1 500 gpm při zbytkovém tlaku 20 psi. Galony za minutu, se stopami a palci.';
+$ec_lang['lpn_ex_well_si_title']='Studna a nádrž Munday, L/s (SI)';
+$ec_lang['lpn_ex_well_si_desc']='Studna, čerpadlo, zpětná klapka, smyčka a vodojem, se 24hodinovou simulací s časovým průběhem a scénáři pro Maximální den a Špičkovou hodinu, v Munday v Texasu. Uzel s požárním hydrantem dodává 32 L/s při zbytkovém tlaku 14 m. Litry za sekundu, s metry a milimetry.';
+$ec_lang['lpn_ex_well_title']='Studna a nádrž Munday, gpm (US)';
+$ec_lang['lpn_ex_well_desc']='Studna, čerpadlo, zpětná klapka, smyčka a vodojem, se 24hodinovou simulací s časovým průběhem a scénáři pro Maximální den a Špičkovou hodinu, v Munday v Texasu. Uzel s požárním hydrantem dodává 500 gpm při zbytkovém tlaku 20 psi. Galony za minutu, se stopami a palci.';
+$ec_lang['lpn_result_status_cv']='CV';
+$ec_lang['lpn_ovm_dot_clear_one']='Kliknutím tuto specifickou hodnotu zrušíte.';
+$ec_lang['lpn_ovm_dot_alt']='Tato specifická hodnota je uložena v alternativě „{alternative}“.';
+$ec_lang['lpn_ovm_dot_alt_shared']='Tato specifická hodnota je uložena v alternativě „{alternative}“, kterou používá také {list}, takže její zrušení nebo úprava změní i je.';
+$ec_lang['lpn_ovm_dot_set_from']='Zděděno z {name}. Kliknutím z toho v tomto scénáři uděláte specifickou hodnotu, která drží zobrazenou hodnotu.';
+$ec_lang['lpn_morph_vertex']='Vrchol';
+$ec_lang['lpn_morph_vertex_base']='Uzel lze změnit na vrchol jen v Základním scénáři, protože zlomy potrubí jsou ve všech scénářích stejné.';
+$ec_lang['lpn_morph_vertex_base_ask']='Uzel lze změnit na vrchol jen v Základním scénáři, protože zlomy potrubí jsou ve všech scénářích stejné. Přepnout na Základní a změnit?';
+$ec_lang['lpn_morph_vertex_switch']='Přepnout na Základní a změnit';
+$ec_lang['lpn_morph_vertex_type']='{id} nebyl změněn na vrchol: vrcholem se může stát jen uzel.';
+$ec_lang['lpn_morph_vertex_links']='{id} nebyl změněn na vrchol: spojuje {n} potrubí, ale vrchol patří právě jednomu potrubí, takže uzel musí spojovat právě dvě.';
+$ec_lang['lpn_morph_vertex_kind']='{id} nebyl změněn na vrchol: je k němu připojeno čerpadlo nebo ventil a vrchol patří jen potrubí.';
+$ec_lang['lpn_morph_vertex_loop']='{id} nebyl změněn na vrchol: jeho dvě potrubí spojují týž další uzel a jedno potrubí nemůže začínat a končit ve stejném uzlu.';
+$ec_lang['lpn_morph_vertex_demand']='{id} nebyl změněn na vrchol: má odběr nebo koeficient emitoru a vrchol žádný nemá. Nejprve je nastavte na 0.';
+$ec_lang['lpn_morph_vertex_customers']='{id} nebyl změněn na vrchol: jsou k němu připojeni Odběratelé a vrchol žádné nemá.';
+$ec_lang['lpn_morph_vertex_text']='{id} nebyl změněn na vrchol: je k němu připojen Text.';
+$ec_lang['lpn_morph_vertex_pipes']='{id} nebyl změněn na vrchol: jeho dvě potrubí se liší průměrem nebo drsností a jedno potrubí nemůže mít obojí.';
+$ec_lang['lpn_morph_vertex_own']='{id} nebyl změněn na vrchol: má vlastní nadmořskou výšku, značku, popis nebo jiná data a vrchol žádná nemá. Nejprve tato data vymažte.';
+$ec_lang['lpn_morph_vertex_clear_both']='Vymazat nadmořskou výšku {elev} a odběry {demands} u {id}?';
+$ec_lang['lpn_morph_vertex_clear_elev']='Vymazat nadmořskou výšku {elev} u {id}?';
+$ec_lang['lpn_morph_vertex_clear_demand']='Vymazat odběry {demands} u {id}?';
+$ec_lang['lpn_morph_vertex_clear_quality']='Vymazat počáteční kvalitu {quality} u {id}?';
+$ec_lang['lpn_morph_vertex_clear_also']='Počáteční kvalita {quality} se vymaže také.';
+$ec_lang['lpn_morph_vertex_done']='Změněno na vrcholy: {n}. V každém jsou nyní dvě potrubí jedním potrubím, které si ponechává ID a hodnoty prvního z nich.';
+$ec_lang['lpn_calc_hint']='Je-li zapnuto „Přepočítávat automaticky“, tento příkaz není potřeba.';
+$ec_lang['lpn_calc_hint_mute']='Již nezobrazovat';
+$ec_lang['lpn_replace_selected_only']='Pouze vybrané prvky';
+$ec_lang['lpn_dxf_note_headloss']='Vzorec ztráty tlakové výšky: {formula} ({code}). ROUGHNESS je součinitel drsnosti tohoto vzorce.';
+$ec_lang['lpn_dxf_note_demand_multiplier']='Násobitel odběru: {n}.';
+$ec_lang['lpn_dxf_sections_header']='Sekce EPANET této sítě: vzorce, řídicí pravidla, pravidla, časy, volby a další nastavení, která bloky nemohou obsahovat. EPANET++ tento text načte zpět při importu DXF. Tento text smíte přesunout nebo zmrazit jeho hladinu; ponechte jej na hladině {layer}.';
+$ec_lang['lpn_dxf_curve_points']='Body křivky tlakové výšky čerpadla (průtok, tlaková výška)';
+$ec_lang['lpn_file_import_msx']='Soubor EPANET-MSX…';
+$ec_lang['lpn_file_import_msx_tip']='Připojí k tomuto projektu soubor EPANET-MSX (.msx), nebo zobrazí ten, který je již připojen. Uchovává se s projektem, zapisuje se zpět beze změny a spouští jej modul EPANET-MSX v simulaci s časovým průběhem.';
+$ec_lang['lpn_file_export_item_msx']='Soubor EPANET-MSX…';
+$ec_lang['lpn_file_export_msx_tip']='Stáhne připojený soubor EPANET-MSX přesně tak, jak byl importován.';
+$ec_lang['lpn_msx_report_heading']='Připojeno {file}';
+$ec_lang['lpn_msx_report_kept']='Tento soubor EPANET-MSX se uchovává s projektem a při exportu souboru EPANET-MSX se zapisuje zpět beze změny. Kvalita vody je v Nastavení, Výpočet, Kvalita vody nastavena na Vícedruhová (EPANET-MSX), takže simulace s časovým průběhem počítá každý druh látky v souboru.';
+$ec_lang['lpn_msx_report_species']='Druhy látek v souboru: {list}.';
+$ec_lang['lpn_msx_report_no_species']='V souboru nejsou uvedeny žádné druhy látek.';
+$ec_lang['lpn_msx_too_big']='Soubor {file} je příliš velký na uložení v úložišti prohlížeče, a proto nebyl připojen.';
+$ec_lang['lpn_msx_report_missing']='ID v souboru, která tato síť nemá: {ids}.';
+$ec_lang['lpn_msx_not_msx']='Soubor {file} nevypadá jako soubor EPANET-MSX: nemá sekci [SPECIES].';
+$ec_lang['lpn_msx_attached_heading']='Připojený soubor EPANET-MSX: {file}';
+$ec_lang['lpn_msx_removed']='Soubor {file} byl z tohoto projektu odebrán.';
+$ec_lang['lpn_quality_msx']='Vícedruhová (EPANET-MSX)';
+$ec_lang['lpn_quality_msx_species']='Druh látky';
+$ec_lang['lpn_quality_msx_species_tip']='Druh látky EPANET-MSX, který zobrazují barvy mapy, panel Tabulky a panel Graf. Všechny druhy látek v souboru se počítají ve stejném běhu, takže změna nevyžaduje nový běh. Hodnoty jsou v jednotkách, které soubor EPANET-MSX deklaruje: hmotnost na litr u objemového druhu, hmotnost na jednotku plochy u stěnového druhu.';
+$ec_lang['lpn_quality_msx_none']='K tomuto projektu není připojen žádný soubor EPANET-MSX. Připojte jej příkazem Soubor, Importovat, Síť, Soubor EPANET-MSX.';
+$ec_lang['lpn_result_msx_tip']='Hodnota tohoto druhu látky EPANET-MSX, vypočtená modulem EPANET-MSX, v jednotkách, které soubor EPANET-MSX deklaruje. U spoje je to průměr po délce spoje.';
+$ec_lang['lpn_inpup_ask_title']='Importovat {file}';
+$ec_lang['lpn_inpup_lead']='Zvolte, kam tento soubor EPANET importovat.\n\nPři importu se prvky párují podle ID. Hodnoty se mění u shodných prvků, prvky jedinečné v importu se přidají a prvky jedinečné v tomto projektu zůstanou beze změny.';
+$ec_lang['lpn_inpup_how']='V tomto projektu se prvky párují podle ID. Hodnoty se mění u shodných prvků, prvky jedinečné v souboru se přidají a prvky jedinečné v tomto projektu zůstanou beze změny.';
+$ec_lang['lpn_inpup_base_note']='Volba Základní nezruší žádné specifické hodnoty scénářů.';
+$ec_lang['lpn_inpup_btn_new']='Nový projekt';
+$ec_lang['lpn_inpup_btn_project']='Tento projekt, {project}';
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, právě otevřený';
+$ec_lang['lpn_inpup_btn_newscn']='Nový scénář, potomek {parent}';
+$ec_lang['lpn_inpup_newscn_name']='Název, zvolíte-li nový scénář';
+$ec_lang['lpn_inpup_new_scn']='Byl vytvořen scénář {scenario}, potomek {parent}, a byl otevřen.';
+$ec_lang['lpn_inpup_btn_newscn_basic']='Nový scénář';
+$ec_lang['lpn_inpup_new_scn_basic']='Byl vytvořen scénář {scenario} a byl otevřen.';
+$ec_lang['lpn_inpup_new_none']='Žádný scénář nebyl vytvořen.';
+$ec_lang['lpn_survey_where_title']='Importovat zaměřené body';
+$ec_lang['lpn_survey_where_lead']='Každý bod se stane uzlem. Zvolte, kam uzly přijdou.';
+$ec_lang['lpn_survey_where_note']='Ve scénáři jsou uzly neaktivní v Základním a aktivní jen tam. Volba Základní je přidá do Základního, takže je zdědí každý scénář.';
+$ec_lang['lpn_inpup_title']='Aktualizovat ze souboru EPANET';
+$ec_lang['lpn_gjup_lead']='Zvolte, kam tento soubor GeoJSON importovat.\n\nPři importu se prvky párují podle ID. Hodnoty se mění u shodných prvků, prvky jedinečné v importu se přidají a prvky jedinečné v tomto projektu zůstanou beze změny.';
+$ec_lang['lpn_gjup_title']='Aktualizovat ze souboru GeoJSON';
+$ec_lang['lpn_gjup_h_notes']='Poznámky k importu';
+$ec_lang['lpn_inpup_heading']='Importován soubor {file} do scénáře {scenario} projektu {project}';
+$ec_lang['lpn_inpup_counts']='Změněné hodnoty ({n}), u prvků ({m}). Přidané prvky ({a}). Ponechané prvky, které soubor neobsahuje ({k}).';
+$ec_lang['lpn_inpup_undo']='Zpět vrátí vše jedním krokem.';
+$ec_lang['lpn_inpup_nothing']='Každá hodnota v souboru, která odpovídá zdejšímu prvku, je ve scénáři {scenario} již stejná.';
+$ec_lang['lpn_inpup_status']='Importován soubor {file} do scénáře {scenario} projektu {project}. Změněné hodnoty ({n}). Přidané prvky ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Změněné hodnoty';
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} na {new}';
+$ec_lang['lpn_inpup_more']='další: {n}';
+$ec_lang['lpn_inpup_blank']='prázdné';
+$ec_lang['lpn_inpup_h_added']='Přidané prvky';
+$ec_lang['lpn_inpup_h_kept']='Ponecháno, v souboru nejsou';
+$ec_lang['lpn_inpup_h_na']='Nepoužito';
+$ec_lang['lpn_inpup_na_general']='Soubor obsahuje také {items}. Nebyly použity.';
+$ec_lang['lpn_inpup_na_type']='Soubor uvádí pro tyto prvky jiný typ, takže žádná z jejich hodnot nebyla změněna: {ids}';
+$ec_lang['lpn_inpup_na_owned']='Typ potrubí uvádí některé hodnoty těchto potrubí, takže tyto hodnoty nebyly změněny: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Drsnost nebyla použita, protože tento projekt používá vzorec Darcy-Weisbach a drsnost se v tom případě neporovnává.';
+$ec_lang['lpn_inpup_na_geo']='Prvky pouze v souboru ({n}) nebyly přidány, protože soubor a tento projekt používají různé souřadnicové systémy.';
+$ec_lang['lpn_inpup_na_refs']='Tyto přidané prvky odkazují na vzorec nebo křivku, kterou tento projekt nemá, takže odkaz byl vynechán: {ids}';
+$ec_lang['lpn_inpup_na_msx']='Soubor .msx zvolený spolu s tímto souborem nebyl načten. Chcete-li jej k tomuto projektu připojit, zvolte jej samostatně.';
+$ec_lang['lpn_inpup_refused_heading']='V projektu {project} nebylo nic změněno.';
+$ec_lang['lpn_inpup_refused_lead']='Jednotky souboru se liší od jednotek tohoto projektu a tato stránka čísla v souboru nepřevádí. Importujte soubor jako nový projekt, nebo otevřete projekt, který používá stejné jednotky.';
+$ec_lang['lpn_inpup_unit_row']='{family}: soubor používá {file} a tento projekt používá {project}.';
+$ec_lang['lpn_inpup_method_row']='Vzorec ztráty tlakové výšky: soubor používá {file} a tento projekt používá {project}.';
+$ec_lang['lpn_inpup_refused_lead_formula']='Vzorec ztráty tlakové výšky v souboru se liší od vzorce tohoto projektu a tato stránka hodnoty drsnosti nepřevádí. Importujte soubor jako nový projekt, nebo otevřete projekt, který používá stejný vzorec.';
+$ec_lang['lpn_inpup_refused_lead_both']='Jednotky a vzorec ztráty tlakové výšky v souboru se liší od jednotek a vzorce tohoto projektu a tato stránka čísla v souboru nepřevádí. Importujte soubor jako nový projekt, nebo otevřete projekt, který používá stejné jednotky i vzorec.';
+$ec_lang['lpn_inpup_failed']='Aktualizace se zastavila dříve, než skončila, takže v projektu {project} nebylo nic změněno. Chcete-li soubor otevřít, importujte jej jako nový projekt. Důvod: {reason}';
+$ec_lang['lpn_inpup_i_positions']='polohy stávajících prvků';
+$ec_lang['lpn_inpup_i_connections']='napojení';
+$ec_lang['lpn_inpup_i_descriptions']='popisy';
+$ec_lang['lpn_inpup_i_patterns']='vzorce';
+$ec_lang['lpn_inpup_i_curves']='křivky';
+$ec_lang['lpn_inpup_i_controls']='řídicí pravidla';
+$ec_lang['lpn_inpup_i_rules']='pravidla';
+$ec_lang['lpn_inpup_i_options']='volby';
+$ec_lang['lpn_roughness_method_note']='⚠ Potrubí s drsností mimo běžný rozsah pro {method}: {n}. Hodnoty zůstaly beze změny a mohly být zadány pro jinou metodu tření.';
+$ec_lang['lpn_field_cv']='Zpětná klapka (CV)';
+$ec_lang['lpn_field_cv_tip']='Toto potrubí propouští vodu jen z počátečního uzlu do koncového uzlu, jako zpětná klapka. Kdyby se průtok měl obrátit, potrubí se uzavře, dokud nebude moci znovu proudit dopředu. EPANET tento stav nazývá CV.';
+$ec_lang['lpn_theme_hc']='Vysoký kontrast';
+$ec_lang['lpn_theme_amber']='Jantarový';
+$ec_lang['lpn_theme_green']='Zelený';
+$ec_lang['lpn_theme_platinum']='Platinový';
+$ec_lang['lpn_theme_rounded']='Zaoblený';
+$ec_lang['lpn_theme_desktop']='Plocha';
+$ec_lang['lpn_theme_newspaper']='Noviny';
+$ec_lang['lpn_theme_arcade']='Herní automat';
+$ec_lang['lpn_theme_space']='Vesmír';
+$ec_lang['lpn_theme_prairie']='Prérie';
+$ec_lang['lpn_ovl_clear_same']='Zrušit specifické hodnoty rovné zděděným';
+$ec_lang['lpn_ovl_clear_same_ask']='Zrušit specifické hodnoty scénáře {name}, které se rovnají zděděné hodnotě (celkem {n})? Každá hodnota zůstane, jaká je, a bude znovu zděděná. Zpět to vrátí.';
+$ec_lang['lpn_settings_held_item']='{setting}: {restores}';
+$ec_lang['lpn_ovm_restores']='Zrušit obnoví {value}, {source}.';
+$ec_lang['lpn_settings_held_from']='hodnotu v {parent}';
+$ec_lang['lpn_settings_held_default']='výchozí hodnotu';
+$ec_lang['lpn_settings_held_none']='žádný text';
+$ec_lang['lpn_dem_scenario']='Nadmořské výšky zapsané zde jsou specifické hodnoty ve scénáři {scenario}.';
+$ec_lang['lpn_dem_base']='Nadmořské výšky zapsané zde se uloží do Základního scénáře, takže je zdědí každý scénář, který nadmořskou výšku nepřepsal.';
+$ec_lang['lpn_settings_grp_size']='Velikost';
+$ec_lang['lpn_settings_grp_angle']='Úhel';
+$ec_lang['lpn_settings_grp_zoom']='Přiblížení';
+$ec_lang['lpn_settings_grp_positions']='Polohy';
+$ec_lang['lpn_settings_grp_thematic']='Tematické';
+$ec_lang['lpn_time_run_unbalanced']='Časové kroky nejsou vyvážené ({n}).';
+$ec_lang['lpn_time_run_warnings']='Varování ({n}).';
+$ec_lang['lpn_time_run_see_report']='Viz {report}.';
+$ec_lang['lpn_scncmp_progress']='Řeší se scénář {done} z {total}…';
+$ec_lang['lpn_scncmp_stopped']='Zastaveno po {done} z {total} scénářů. Výsledky níže jsou ty, které již byly dokončeny.';
+$ec_lang['lpn_scnres_title']='Výsledky podle prvků';
+$ec_lang['lpn_scnres_col']='{quantity} ({unit}), {scenario}';
+$ec_lang['lpn_scnres_none']='Zaškrtněte alespoň jeden výsledek k zobrazení.';
+$ec_lang['lpn_scnres_empty']='Tento projekt žádné z těchto prvků neobsahuje.';
+$ec_lang['lpn_scnres_time_note']='Scénář s celkovou dobou běhu se čte v časovém kroku na obrazovce, {time}, nebo v jeho posledním časovém kroku, končí-li jeho běh dříve. Každé záhlaví uvádí přečtený čas.';
+$ec_lang['lpn_scnres_at_time']='({time})';
+$ec_lang['lpn_scnres_steady']='(ustálený stav)';
+$ec_lang['lpn_scnres_not_converged']='(nekonvergoval)';
+$ec_lang['lpn_scnres_not_converged_note']='Sloupec označený {mark} ukazuje poslední výsledky, kterých řešič dosáhl, než se zastavil bez konvergence.';
+$ec_lang['lpn_scnres_failed']='Scénář {scenario} nelze vyřešit, takže jeho sloupce jsou prázdné. {why}';
+$ec_lang['lpn_scnres_flow_tip']='Znaménko průtoku je interní znaménko směru řešiče. Mimo řešič nemá využití, jen zde ukazuje, zda průtok mezi scénáři změnil směr.';
+$ec_lang['lpn_scnres_stale']='Přepočet je vypnutý, takže výsledky na mapě a v panelu Tabulky pocházejí z dřívějšího řešení. Sloupce scénáře {scenario} zde jsou vyřešeny z aktuálních vstupů a mohou se od nich lišit.';
+$ec_lang['lpn_report_copy_html']='Kopírovat HTML';
+$ec_lang['lpn_demand_cats']='Kategorie odběru';
+$ec_lang['lpn_demand_total_tip']='Součet základních odběrů všech kategorií odběru v tomto uzlu. Chcete-li kategorii změnit, otevřete okno Kategorie odběru.';
+$ec_lang['lpn_when']='Testovaný krok hlášení';
+$ec_lang['lpn_when_now']='Krok hlášení na obrazovce';
+$ec_lang['lpn_when_hour']='Zvolený krok hlášení';
+$ec_lang['lpn_when_minp']='Krok hlášení s nejnižším tlakem';
+$ec_lang['lpn_when_all']='Každý krok hlášení, nejhorší případ';
+$ec_lang['lpn_when_step']='Krok hlášení';
+$ec_lang['lpn_when_run']='Celý běh';
+$ec_lang['lpn_dur_option']='Požár po stanovenou dobu';
+$ec_lang['lpn_dur_start']='Požár začíná v';
+$ec_lang['lpn_dur_junction']='Uzel s požárem';
+$ec_lang['lpn_dur_junction_none']='Žádný není vybrán. Vyberte na mapě jeden uzel.';
+$ec_lang['lpn_dur_junction_many']='Je vybráno několik. Vyberte na mapě jeden uzel.';
+$ec_lang['lpn_dur_length']='Doba trvání požáru';
+$ec_lang['lpn_dur_length_tip']='Hodiny a minuty, například 2:00. Požární průtok je Požadovaný požární průtok, odebíraný v jediném uzlu vybraném na mapě od času začátku po tuto dobu. Celá simulace s časovým průběhem se spustí na kopii sítě a porovná se s týmž během bez požáru. Začátek i doba trvání musí být celými násobky časového kroku vzorce. Soustava se považuje za zotavenou, pokud v posledním kroku hlášení není žádný uzel o více než asi 0,14 psi (1 kPa) a žádná nádrž o více než asi 0,3 ft (0,1 m) mimo běh bez požáru.';
+$ec_lang['lpn_dur_no_junction']='Vyberte jeden uzel pro požár.';
+$ec_lang['lpn_dur_bad_time']='Začátek i doba trvání musí být celými násobky časového kroku vzorce, {step}, a požár musí začít v průběhu běhu.';
+$ec_lang['lpn_dur_head']='Požární průtok {flow} v uzlu {id}, od {start} do {end}.';
+$ec_lang['lpn_dur_holds']='✓ Uzel {id} drží během požáru alespoň {pressure}, nad zbytkovým tlakem {residual}, v {time}.';
+$ec_lang['lpn_dur_shortfall']='⚠ V uzlu {id} se v {time} dodává jen {delivered} z požárního průtoku {flow}, takže zbytkový tlak není zkouškou tohoto požáru.';
+$ec_lang['lpn_dur_fails']='⚠ Uzel {id} klesne během požáru na {pressure}, pod zbytkový tlak {residual}, v {time}.';
+$ec_lang['lpn_dur_lowest']='Nejnižší tlak kdekoli je {pressure}, v uzlu {id}, v {time}.';
+$ec_lang['lpn_dur_no_empty']='✓ Žádná nádrž se nevyprázdní.';
+$ec_lang['lpn_dur_empties']='⚠ Nádrž {id} se vyprázdní v {time}. Tlaky od tohoto kroku dále se nečtou.';
+$ec_lang['lpn_dur_recovers']='✓ Soustava se po požáru zotaví: v {time}, posledním kroku hlášení, se žádný uzel neliší od běhu bez požáru o více než {pressure} a žádná nádrž o více než {level}.';
+$ec_lang['lpn_dur_not_back_tank']='⚠ V {time}, posledním kroku hlášení, se nádrž {id} nevrátila na svou hladinu bez požáru. Rozdíl je {level} při toleranci {tolerance}.';
+$ec_lang['lpn_dur_not_back_junction']='⚠ V {time}, posledním kroku hlášení, se uzel {id} nevrátil na svůj tlak bez požáru. Rozdíl je {pressure} při toleranci {tolerance}.';
+$ec_lang['lpn_dur_recovery_to_end']='Požár trvá do konce běhu, takže zotavení po něm se nehodnotí.';
+$ec_lang['lpn_dur_recovery_cut']='Běh se zastavil před svým koncem, takže zotavení po požáru se nehodnotí.';
+$ec_lang['lpn_dur_col_pressure']='Tlak v uzlu s požárem';
+$ec_lang['lpn_dur_col_nofire']='Tlak bez požáru';
+$ec_lang['lpn_dur_col_low']='Dosažená nejnižší hladina';
+$ec_lang['lpn_col_level']='Hladina';
+$ec_lang['lpn_dur_col_margin']='Nad nejnižší hloubkou vody';
+$ec_lang['lpn_dur_col_drop']='Pokles od začátku';
+$ec_lang['lpn_dur_col_end']='Hladina na konci';
+$ec_lang['lpn_dur_col_end_nofire']='Hladina na konci bez požáru';
+$ec_lang['lpn_crit_col_hours']='Hodiny pod minimem';
+$ec_lang['lpn_crit_col_stopped']='Běh zastaven v';
+$ec_lang['lpn_crit_col_empty']='Nádrž se vyprázdní';
+$ec_lang['lpn_ds_run_note']='Posuzováno za celý běh, v každém kroku hlášení.';
+$ec_lang['lpn_ds_limit_at']='Omezující krok hlášení: {time}.';
+$ec_lang['lpn_ds_empties_at']='⚠ Při měřítku odběru {m} se nádrž vyprázdní v {time}.';
+$ec_lang['lpn_ds_lowest_at_time']='Při měřítku odběru {m} je nejnižší tlak {pressure}, v uzlu {id}, v {time}.';
+$ec_lang['lpn_crit_run_note']='Každá odstávka byla simulována po celou simulaci ({n} kroků hlášení).';
+$ec_lang['lpn_ff_working_steps']='Probíhá výpočet: krok hlášení {step} z {steps}, uzel {done} z {total}.';
+$ec_lang['lpn_ff_col_hour']='Krok s nejnižším průtokem';
+$ec_lang['lpn_ds_col_hour']='Krok s nejnižším tlakem';
+$ec_lang['lpn_ff_no_steps']='Nádrž se vyprázdní v {time}, dříve než bylo možné testovat první krok hlášení, takže nebyl testován žádný krok.';
+$ec_lang['lpn_ff_tank_empties']='Nádrž se vyprázdní v {time}; kroky od tohoto okamžiku nebyly testovány.';
+$ec_lang['lpn_crit_col_lowest_tip']='Čte se jen před vyprázdněním nádrže. Po tomto kroku uzly, které zůstaly bez zdroje, uvádějí nesmyslné tlaky; krok uvádí sloupec Nádrž se vyprázdní.';
+$ec_lang['lpn_crit_empty_note']='Nejnižší tlaky se čtou před vyprázdněním nádrže. Uzly pod minimem zahrnují uzly, které od tohoto kroku zůstaly bez zdroje.';
+$ec_lang['lpn_ff_at_step']='Testováno v kroku hlášení {time}.';
+$ec_lang['lpn_ff_at_minp']='Testováno v {time}, kroku hlášení s nejnižším tlakem mezi testovanými uzly.';
+$ec_lang['lpn_ff_at_all']='Nejhorší z {n} kroků hlášení. Každý řádek ukazuje krok s nejnižším dostupným průtokem pro daný uzel.';
+$ec_lang['lpn_ff_col_more']='A další';
+$ec_lang['lpn_crit_col_unserved_peak']='Největší nedodaný odběr';
+$ec_lang['lpn_file_import_dxfnet']='Soubor DXF…';
+$ec_lang['lpn_file_import_dxfnet_tip']='Vytvoří nový projekt ze souboru DXF, který exportovala tato stránka. Bloky a lomené čáry na hladinách začínajících C-WATR-MODL- se čtou spolu se svými atributy. Cokoli jiného ve výkresu se vypíše a nečte se.';
+$ec_lang['lpn_dxfnet_note_layer_foreign']='Tyto hladiny nezačínají na {prefix}, takže nic na nich nebylo načteno.';
+$ec_lang['lpn_dxfnet_note_layer_unknown']='Tyto hladiny začínají na {prefix}, ale nepokračují kódem prvku, který tato stránka zapisuje (NODE, LINK, RESV, TANK, PUMP, VALV, CUST), a alternativou, takže nic na nich nebylo načteno.';
+$ec_lang['lpn_dxfnet_note_alternative']='Tyto hladiny patří jiné alternativě než {alt}, tedy té, která byla načtena, takže nic na nich nebylo načteno.';
+$ec_lang['lpn_dxfnet_note_alt_read']='Výkres nemá alternativu BASE. Byla načtena alternativa {alt}.';
+$ec_lang['lpn_dxfnet_note_curve_differs']='Tato čerpadla uvádějí ID křivky, které jiné čerpadlo používá s jinými body. První křivka byla ponechána.';
+$ec_lang['lpn_dxfnet_note_shapes']='Tyto hladiny obsahují Útvary, které tento import nečte. Použijte pro ně Importovat, Útvary, Soubor DXF.';
+$ec_lang['lpn_dxfnet_note_entity_unread']='Tyto entity nejsou druhem, který tento import na jejich hladině čte, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_paper_space']='Entity v prostoru papíru nebyly načteny: {n}.';
+$ec_lang['lpn_dxfnet_note_tag_unknown']='Tyto značky atributů tato stránka pro jejich blok nezapisuje a jejich hodnoty nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_block_unknown']='Tyto bloky nejsou blokem, který tato stránka pro jejich hladinu zapisuje, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_bad_id']='Tyto prvky mají ID, které je prázdné, delší než 31 znaků nebo obsahuje mezeru, středník nebo uvozovku, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_dup_id']='Tato ID uvádí více než jeden prvek téhož druhu. Importován byl jen první.';
+$ec_lang['lpn_dxfnet_note_no_position']='Tyto bloky nemají použitelnou polohu a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_link_no_block']='Tyto lomené čáry nemají uprostřed blok, který by uváděl ID a vlastnosti spoje, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_block_no_line']='Těmito bloky spojů neprochází uprostřed žádná lomená čára a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_line_no_block']='Tyto přípojky končí tam, kde není blok odběratele, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_end_ambiguous']='Tyto spoje mají konec tam, kde leží dva uzly na stejném bodě, takže nelze určit, ve kterém uzlu spoj končí, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_end_no_node']='Tyto spoje mají konec tam, kde není žádný uzel, a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_end_loop']='Tyto spoje začínají a končí ve stejném uzlu a nebyly importovány.';
+$ec_lang['lpn_dxfnet_note_pump_no_curve']='Tato čerpadla neuvádějí křivku tlakové výšky, takže Vypočítat nedá původní výsledky, dokud každé nedostane křivku.';
+$ec_lang['lpn_dxfnet_note_crs_unknown']='Soubor Přečtěte-mě uvádí souřadnicový systém, který tato stránka nezná, takže se výkres otevřel jako mřížka, bez místa na mapě.';
+$ec_lang['lpn_dxfnet_note_method']='Vzorec ztráty tlakové výšky v souboru není, proto se předpokládal Hazen-Williams. Hodnoty drsnosti byly načteny jako Hazen-Williamsovo C.';
+$ec_lang['lpn_dxfnet_note_geo_export']='Tento výkres byl exportován z projektu v zeměpisné šířce a délce. Otevírá se v {crs}, v metrech, na stejném místě na mapě.';
+$ec_lang['lpn_dxfnet_note_sections_read']='Sekce EPANET vložené do výkresu byly načteny: {sections}.';
+$ec_lang['lpn_dxfnet_note_sections_unread']='Sekce EPANET vložené do výkresu nebylo možné načíst jako soubor EPANET, takže nebyla importována žádná.';
+$ec_lang['lpn_dxfnet_count_nodes']='Uzlů, zdrojů a nádrží: {n}.';
+$ec_lang['lpn_dxfnet_count_links']='Potrubí, čerpadel a ventilů: {n}.';
+$ec_lang['lpn_dxfnet_count_customers']='Odběratelů: {n}.';
+$ec_lang['lpn_dxfnet_held_custom']='vlastní vlastnosti';
+$ec_lang['lpn_dxfnet_held_text']='položky Textu na mapě a ručně umístěné polohy popisků';
+$ec_lang['lpn_dxfnet_note_unit_unknown']='Výkres uvádí tyto jednotky, které tato stránka nezná. Pro ně byly ponechány používané jednotky.';
+$ec_lang['lpn_dxfnet_note_coord_unit']='Výkres uvádí své souřadnice v {coord} a své délky v {length}. Souřadnice byly načteny jako {length}.';
+$ec_lang['lpn_dxfnet_note_customer_loose']='Přípojky těchto odběratelů nezačínají na potrubí ani v uzlu. Odběratelé byli umístěni bez napojení.';
+$ec_lang['lpn_dxfnet_note_not_held']='Soubor DXF toto neobsahuje, takže nic z toho nebylo importováno:';
+$ec_lang['lpn_dxfnet_none']='Ze souboru {file} nebylo nic importováno. Nemá žádné bloky na hladinách začínajících {prefix}, které by tato stránka mohla číst.';
+$ec_lang['lpn_dxfnet_report_lead']='Co nebylo načteno a každá změna provedená při importu je uvedena níže spolu s dotčenou hladinou, blokem nebo ID:';
+$ec_lang['lpn_shapes_every_scenario']='Útvary se zobrazují v každém scénáři.';
+$ec_lang['lpn_shapes_this_scenario']='Útvary se zobrazují pouze ve scénáři {scenario}.';
+$ec_lang['lpn_library_import_every_scenario']='Může je používat každý scénář.';
+$ec_lang['lpn_menu_back']='Zpět';
+$ec_lang['lpn_diag_valve_conflict']='Tyto řídicí ventily jsou navzájem spojeny způsobem, který EPANET nepřipouští, například dva redukční ventily tlaku za sebou. Vložte mezi ně krátké potrubí:';
+$ec_lang['lpn_diag_gpv_curve_order']='Křivky ztráty tlakové výšky těchto obecných ventilů nelze přečíst: každý průtok musí být větší než předchozí a křivka s jedním bodem potřebuje průtok větší než nula:';
+$ec_lang['lpn_gpv_one_point_note']='⚠ Tyto obecné ventily mají křivku ztráty tlakové výšky jen s jedním bodem, takže jejich ztráta tlakové výšky byla brána jako úměrná průtoku, procházející tímto bodem: {ids}';
+$ec_lang['lpn_gis_title']='Podkladové vrstvy ze serveru GIS';
+$ec_lang['lpn_gis_unlocatable']='Podkladové vrstvy vyžadují projekt umístěný na Zemi.';
+$ec_lang['lpn_gis_kind']='Druh serveru';
+$ec_lang['lpn_gis_kind_xyz']='Adresa dlaždic';
+$ec_lang['lpn_gis_kind_wms']='WMS';
+$ec_lang['lpn_gis_kind_arcgis']='ArcGIS REST (MapServer)';
+$ec_lang['lpn_gis_url']='Adresa serveru';
+$ec_lang['lpn_gis_wms_layers']='Názvy vrstev WMS (oddělené čárkou)';
+$ec_lang['lpn_gis_add']='Přidat vrstvu';
+$ec_lang['lpn_gis_menu']='Přidat vrstvu…';
+$ec_lang['lpn_gis_draw']='Zobrazit';
+$ec_lang['lpn_gis_opacity']='Krytí';
+$ec_lang['lpn_gis_note']='Přidání vrstvy odešle oblast na obrazovce a vaši adresu IP na server, který uvedete. Otevření projektu, který vrstvu obsahuje, je odešle znovu.';
+$ec_lang['lpn_gis_err_address']='Adresa serveru musí začínat https://.';
+$ec_lang['lpn_gis_err_template']='Adresa dlaždic musí obsahovat {z}, {x} a {y}.';
+$ec_lang['lpn_gis_err_layers']='Zadejte alespoň jeden název vrstvy WMS.';
+$ec_lang['lpn_gis_err_mapserver']='Adresa ArcGIS musí končit /MapServer.';
+$ec_lang['lpn_gis_unreachable']='nedostupný';
+$ec_lang['lpn_gis_failed']='Server {host} nevrátil obraz mapy. Jeho vrstva se nekreslí.';
+$ec_lang['lpn_screenshot_no_gis']='Podkladovou vrstvu ze serveru GIS nebylo možné zahrnout.';
+$ec_lang['lpn_export_holds_scenario']='Obsahuje pouze scénář {scenario}.';
+$ec_lang['lpn_export_holds_base']='Obsahuje pouze Základní scénář.';
+$ec_lang['lpn_geojson_results_other']='Výsledky nejsou zahrnuty, protože výsledky na obrazovce patří scénáři {scenario}.';
+$ec_lang['lpn_survey_added_scenario']='Uzly byly přidány do scénáře {scenario}. V Základním jsou neaktivní.';
+$ec_lang['lpn_pane_pasted_scenario']='Tyto hodnoty jsou specifické hodnoty ve scénáři {scenario}.';
+$ec_lang['lpn_pane_pasted_overrides']='Nové specifické hodnoty ({n}).';
+$ec_lang['lpn_run_of_scenario']='Výsledky scénáře {scenario}.';
+$ec_lang['lpn_calib_scenario']='Porovnáno s výsledky scénáře {scenario}.';
+$ec_lang['lpn_export_leaves_alternatives']='Alternativy uložené v tomto projektu v souboru nejsou.';
+$ec_lang['lpn_export_confirm_title']='Exportovat {format}';
+$ec_lang['lpn_noscn_lead']='Tento projekt má scénáře ({n}), ale {format} nemá žádné scénáře ani alternativy.';
+$ec_lang['lpn_noscn_fmt_inp']='soubor EPANET';
+$ec_lang['lpn_noscn_fmt_geojson']='soubor GeoJSON';
+$ec_lang['lpn_noscn_fmt_dxf']='soubor DXF';
+$ec_lang['lpn_export_goes_scenario']='Exportuje se scénář „{scenario}“ pod jedinečným názvem souboru.';
+$ec_lang['lpn_export_goes_base']='Exportuje se Základní scénář.';
+$ec_lang['lpn_export_receipt_heading']='Exportován soubor {file} ze scénáře {scenario} projektu {project}.';
+$ec_lang['lpn_export_receipt_note']='Je to export, ne uložení: tento projekt není se souborem spojen.';
+$ec_lang['lpn_dxf_exported_geo_tail']='Jeho souřadnice jsou {crs}, v metrech, nikoli zeměpisná šířka a délka.';
+$ec_lang['lpn_field_auto_length']='Automatická délka';
+$ec_lang['lpn_edit_pipetypes']='Upravit typy…';
+$ec_lang['lpn_edit_fittings']='Upravit armatury…';
+$ec_lang['lpn_edit_curves']='Upravit křivky…';
+$ec_lang['lpn_field_tank_level_short']='Počáteční hloubka';
+$ec_lang['lpn_field_tank_minlevel_short']='Minimální hloubka';
+$ec_lang['lpn_field_tank_maxlevel_short']='Maximální hloubka';
+$ec_lang['lpn_field_active_short']='Aktivní';
+$ec_lang['lpn_field_cv_short']='Zpětná klapka';
+$ec_lang['lpn_field_km_short_tip']='Součinitel místní ztráty, k: tlaková výška ztracená na armaturách a obloucích podél potrubí, jako násobek rychlostní výšky.';
+$ec_lang['lpn_field_km_fittings_tip']='Součinitel místní ztráty, k: součet součinitelů seznamu armatur zvoleného výše. Chcete-li zadat hodnotu, zvolte „Není zvolen seznam armatur“.';
+$ec_lang['lpn_field_valve_km_short_tip']='Součinitel místní ztráty, k: ztráta průchodem tělesem ventilu při plně otevřeném ventilu, jako násobek rychlostní výšky, navíc ke každé ztrátě plynoucí z nastavení ventilu. Použijte 0, má-li se ignorovat.';
+$ec_lang['lpn_reaction_bulk_pipe_tip']='Koeficient objemové reakce: rychlost reakce v objemu vody v tomto potrubí (viz nápověda programu EPANET). Záporné číslo chemickou látku rozkládá a kladné ji zvyšuje. Prázdné pole znamená použití koeficientu nastaveného pro celou síť v Nastavení, Výpočet, Kvalita vody.';
+$ec_lang['lpn_reaction_wall_pipe_tip']='Koeficient stěnové reakce: rychlost reakce na stěně tohoto potrubí (viz nápověda programu EPANET). Záporné číslo chemickou látku rozkládá. Prázdné pole znamená použití koeficientu nastaveného pro celou síť v Nastavení, Výpočet, Kvalita vody.';
+$ec_lang['lpn_reaction_tank_short_tip']='Koeficient reakce: rychlost reakce ve vodě v této nádrži, v 1/den. Záporné číslo chemickou látku rozkládá a kladné ji zvyšuje. Prázdné pole znamená použití koeficientu objemové reakce nastaveného pro celou síť v Nastavení, Výpočet, Kvalita vody.';
+$ec_lang['lpn_field_tank_level_short_tip']='Počáteční hloubka: hloubka vody v nádrži na začátku běhu, měřená od dna nádrže.';
+$ec_lang['lpn_field_tank_minlevel_short_tip']='Minimální hloubka: nejnižší přípustná hloubka vody v nádrži, měřená od dna nádrže.';
+$ec_lang['lpn_field_tank_maxlevel_short_tip']='Maximální hloubka: nejvyšší přípustná hloubka vody v nádrži, měřená od dna nádrže.';
+$ec_lang['lpn_field_auto_length_tip']='Automatická délka: je-li zaškrtnuto, délka sklonu se vypočítá podél nakreslené čáry a sleduje výkres, když se přesune uzel nebo změní nadmořská výška konce. Odškrtnutím pole zadáte vlastní délku.';

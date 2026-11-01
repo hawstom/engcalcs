@@ -82,7 +82,7 @@ $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 // EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
 // "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
 // their old sentence until the next translation sprint, under the same version.
-$ec_lang['consent_body']='Sitenin her bölümünü kaç tarayıcının kullandığını sayabilmemiz için bu tarayıcıya rastgele bir kod kaydedebilir miyiz? Kod o anda üretilir, sizin veya cihazınız hakkında hiçbir şey söylemez ve girdiğiniz hiçbir şeyi kaydetmez. Bu kod olmadan ikinci ziyaretinizi başka birinin ilk ziyaretinden ayırt edemeyiz.';
+$ec_lang['consent_body']='Sizi yeniden saymayalım diye bu tarayıcıya rastgele bir kod kaydedebilir miyiz? Kod o anda üretilir, sizin veya cihazınız hakkında hiçbir şey söylemez ve girdiğiniz hiçbir şeyi kaydetmez.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Bu şebekeyi her hidrolik zaman adımında çözer.';
 $ec_lang['consent_accept']='Kabul et';
@@ -992,7 +992,7 @@ $ec_lang['lpn_guide_text_contour_box']='Haritada, Düğümleri şuna göre renkl
 $ec_lang['lpn_guide_text_scncmp_box']='Senaryo yöneticisinde işaretli her senaryoyu (işaretler kaldırılmadıkça hepsini) çizimin bir kopyasından çözer ve her biri için senaryo değeri sayısını, talep çarpanını, toplam çalışma süresini, hidrolik zaman adımını, en düşük basıncı ve en yüksek hızı tablolaştırır. Açmak için Su, Raporlar, Senaryo karşılaştırması öğesini seçin. Karşılaştırma kutu açılırken başlar ve kutu açık kaldığı sürece her düzenlemeden sonra yeniden başlar.\n\nProjeyi değiştirmez; açık olan senaryo olduğu gibi bırakılır.';
 $ec_lang['lpn_guide_text_rptbox']='Son uzun süreli simülasyon için EPANET motorunun yazdığı metin raporunu, uyarıları ve şebeke özetiyle birlikte gösterir. Her uzun süreli simülasyon onun yerine geçer; tek bir andaki çözüm geçmez ve bir düzenleme önceki raporu yerinde bırakır.';
 $ec_lang['lpn_guide_text_status_box']='Son uzun süreli simülasyon sırasındaki her değişikliği zaman sırasıyla listeler: bir pompanın, vananın veya borunun açılıp kapanması, bir deponun dolmaya veya boşalmaya başlaması ya da dolması veya boşalması ve tam yakınsamayan her zaman adımı. Yalnızca değişiklikler listelenir, her zaman adımı değil.';
-$ec_lang['lpn_guide_text_full_box']='Her düğümü ve her hattı her raporlama zaman adımında, Tablolar panelinde gösterilen birimlerle listeler. Uzun süreli simülasyon yoksa tek bir andaki geçerli çözümü gösterir. İndirme veya yazdırma her zaman adımını içerir; tablo ise her seferinde birini gösterir.';
+$ec_lang['lpn_guide_text_full_box']='Her düğümü ve her hattı her raporlama zaman adımında, Tablolar panelinde gösterilen birimlerle listeler. Uzun süreli simülasyon yoksa tek bir andaki geçerli çözümü gösterir. İndirme, kopyalama veya yazdırma her zaman adımını içerir; tablo ise her seferinde birini gösterir.';
 $ec_lang['lpn_guide_text_calib_box']='Bir saha ölçümü dosyasını, aynı yerlerdeki ve zamanlardaki hesaplanan sonuçlarla karşılaştırır; her parametre için bir dosya kullanılır. Dosya yalnızca geçerli oturum için tutulur ve projeyle birlikte kaydedilmez.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='Kılavuz. Bölümleri Kılavuzu kullanma, Araç çubuğu, Menüler, Harita, Ekran görüntüsü, Tablolar, Kutular, Bu hesaplayıcı hakkında ve Bu sayfa hakkında notlardır. Araç çubuğu ve Menüler, her araç çubuğu düğmesini ve menü satırını klavye kısayoluyla listeler; Kutular her kutu için bir girdi içerir; diğer bölümler sayfanın ne yaptığını anlatır. Bir satırı seçmek o denetimin nerede olduğunu gösterir; onu asla çalıştırmaz. Aramak için Ctrl+K tuşlarına veya kılavuzda odak varken / tuşuna basın. Bir soru açıkken Ctrl+K arama yapmaz.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
@@ -1003,7 +1003,7 @@ $ec_lang['lpn_guide_text_hotkeys_popup']='Kılavuz. Bölümleri Kılavuzu kullan
 $ec_lang['lpn_guide_find_query_term']='Sorgu dili';
 $ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>Tek bir koşul. Kapsam Her şey, Düğüm, Rezervuar, Depo, Boru, Pompa, Vana, Metin, Müşteri veya Kaynak olabilir. Özellik, o kapsam için Özellik listesindeki herhangi bir girdidir.</td></tr><tr><td>Koşullar</td><td>şuna eşit, şundan büyük, şundan küçük, içerir, en yüksek n, en düşük n ve boş. İçerir yalnızca metne uygulanır. En yüksek n ve en düşük n koşullarında n bir sayıdır, En yüksek 5 gibi. n harfinin kendisiyle (<code>Pipe.Velocity n highest</code> gibi) ya da Değer kutusu boşken 10 varlık listelenir. Boş, özelliği için değeri olmayan varlıkları bulur. Bağlantı özelliğinin dört koşulu vardır ve değer almaz.</td></tr><tr><td>Değerler</td><td>Bir sayı birimi olmadan, Özellikler\'de ve Tablolar panelinde gösterilen birimle girilir: 40 psi değil, 40. Bir kimlik (ID) dahil metin, tek veya çift tırnak içine alınır: <code>\'60\'</code>.</td></tr><tr><td>VE, VEYA ve parantezler</td><td>VE, VEYA\'dan önce değerlendirilir ve parantezler koşulları gruplar. DEĞİL kullanılamaz.</td></tr><tr><td>Yazım</td><td>Sözcüklerde büyük/küçük harf ayrımı yoktur. İngilizce sözcükler her dilde kabul edilir, bu yüzden bu kılavuzdan kopyalanan bir sorgu her dildeki bir sayfada çalışır.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Net3 üzerinde örnekler';
-$ec_lang['lpn_guide_find_examples_def']='<p>Bunları izlemek için Net3 örneğini açın. Basınç psi, hız ft/s cinsindendir.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>60 numaralı düğüm ve 60 numaralı boru. Bir düğüm ve bir boru aynı kimliğe (ID) sahip olabilir, bu yüzden Her şey altında bir ID araması birden fazla varlık döndürebilir.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>10, 40, 50, 20 ve 153 numaralı düğümler, en düşük basınç önce. 10 numaralı düğüm -0,6 psi\'dedir, bu incelenmesi gereken negatif bir basınçtır.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>60, 125, 329, 123 ve 149 numaralı borular, en yüksek hız önce. 60 numaralı boru 9,3 ft/s taşır.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>10, 20, 40 ve 50 numaralı düğümler ile 60, 125 ve 329 numaralı borular: düşük basınçlar ve yüksek hızlar tek bir listede.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>10, 20, 40 ve 50 numaralı düğümler, yüksek arazideki düşük basınçlar. Her iki koşul da aynı türde bir varlığı adlandırmalıdır: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> hiçbir şeyle eşleşmez, çünkü hiçbir varlık hem düğüm hem boru değildir.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>330 numaralı boru, Net3 dosyasında kapalı olan tek boru.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Dosya dağıtıldığı haliyle hiçbir şey. 247 numaralı boru kapalıyken (bkz. Değiştir ve Geri al), 215, 217, 219 ve 225 numaralı düğümler: 247 numaralı borudaki bir kırılmanın susuz bırakacağı düğümler. Bunu her boru için tekrarlamak bir kritiklik analizidir.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_def']='<p>Bunları izlemek için Net3 örneğini açın. Basınç psi, hız ft/s cinsindendir.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>60 numaralı düğüm ve 60 numaralı boru. Bir düğüm ve bir boru aynı ID\'ye sahip olabilir; bu yüzden Her şey altında bir ID araması birden fazla varlık döndürebilir.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>10, 40, 50, 20 ve 153 numaralı düğümler, en düşük basınç önce. 10 numaralı düğüm -0,6 psi\'dedir; bu, incelenmesi gereken negatif bir basınçtır.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>60, 125, 329, 123 ve 149 numaralı borular, en yüksek hız önce. 60 numaralı boru 9,3 ft/s taşır.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>10, 20, 40 ve 50 numaralı düğümler ile 60, 125 ve 329 numaralı borular: düşük basınçlar ve yüksek hızlar tek bir listede.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>10, 20, 40 ve 50 numaralı düğümler, yüksek arazideki düşük basınçlar. Her iki koşul da aynı türde varlığı adlandırmalıdır: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> hiçbir şeyle eşleşmez, çünkü hiçbir varlık hem düğüm hem boru değildir.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>330 numaralı boru, Net3 dosyasında kapalı olan tek boru.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Dosya dağıtıldığı haliyle hiçbir şey. 247 numaralı boru kapalıyken (bkz. Değiştir ve Geri al), 215, 217, 219 ve 225 numaralı düğümler: 247 numaralı borudaki bir kırılmanın susuz bırakacağı düğümler. Bunu her boru için tekrarlamak bir kritiklik analizidir.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Sonuçlar, seçim ve Tablolar';
 $ec_lang['lpn_guide_find_results_def']='<p>Eşleşen varlıklar Bul düğmesinin altında listelenir. Şundan büyük ve en yüksek n önce en yüksek değeri, şundan küçük ve en düşük n önce en düşük değeri listeler; diğer koşullar bulunan değere göre, sonra ID\'ye göre listeler. VE veya VEYA içeren bir sorgu önce düğümleri, sonra hatları, her birini ID\'ye göre listeler. Tek bir eşleşme haritada hemen gösterilir. Haritayı o varlığa ortalamak için bir satırı seçin. Hiçbir şey seçili değilse varlık da seçilir; bir şey seçiliyse varlık vurgulanır ve seçim değişmez. Seçime eklemek veya çıkarmak için bir satırı Shift+tıklayın ya da Ctrl+tıklayın. Bul kendi başına tüm eşleşmeleri seçmez.</p><p>Geçerli tabloda filtrele düğmesi aynı sorguyu Tablolar paneline uygular. Sorgunun uygulandığı her tablo yalnızca eşleşen satırları gösterir; sorgu ve satır sayısı üstlerinde yer alır. Haritada tüm eşleşmeleri seçmek için bu satırları seçin ve sağ tık menüsünden Haritada seç\'i seçin. Bir tablo filtresi projeyle birlikte kaydedilmez ve sayfa yeniden yüklendiğinde sona erer. Artık eşleşmeyecek şekilde düzenlenen bir satır, Geçerli tabloda filtrele düğmesine yeniden basılana kadar tabloda soluk ve bir uyarı işaretiyle kalır.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Değiştir ve Geri al';
@@ -1016,29 +1016,29 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Değerler tam duyarlılıkla karş
 $ec_lang['lpn_guide_scn_use_term']='Senaryo ne işe yarar';
 $ec_lang['lpn_guide_scn_use_def']='<p>Senaryolar, aynı projede birçok tasarımı, görünümü veya durumu saklar; örneğin ortalama gün, en yüksek gün, pik saat, rapor sunumu için bir şekil, devre dışı bir ana boru veya önerilen bir değişim. Şebeke yalnızca bir kez, Temel senaryoda çizilir. Her diğer senaryo yalnızca kendi senaryo değerlerini, yani devraldığı senaryodan farklı olan değerleri tutar ve geri kalan her şeyi o senaryodan okur. Bu nedenle Temel senaryoda yapılan bir düzenleme, o değeri kendi senaryo değeriyle değiştirmemiş her senaryoya ulaşır.</p><p>Yeni bir proje altı hazır senaryoyla başlar: 1. Debi testi: Statik, 2. Debi testi: Orta, 3. Debi testi: Maks, 4. Ortalama gün, 5. Maksimum gün ve 6. Pik saat. Bunlar yeniden adlandırılabilen, düzenlenebilen ve silinebilen sıradan senaryolardır. Her biri tek bir senaryo değeriyle, yani talep çarpanıyla başlar: debi testleri ve Ortalama gün için 1, Maksimum gün için 2 ve Pik saat için 3. Çarpanlar, modellenen sistemin değerleriyle değiştirilmesi gereken yer tutuculardır. Bir dosyadan açılan, her örnek dahil, veya bir EPANET dosyasından içe aktarılan bir projede yalnızca Temel senaryo bulunur.</p><p>Yangın debisi, her düğümü veya seçili düğümleri sınayan Yangın debisi analiziyle denetlenir. Maksimum gün, çalıştırıldığında normalde açık olan senaryodur.</p>';
 $ec_lang['lpn_guide_scn_open_term']='Açık senaryo';
-$ec_lang['lpn_guide_scn_open_def']='<p>Haritanın altındaki durum şeridinde bulunan Senaryo düğmesi açık senaryoyu adlandırır ve senaryo değerlerini sayar; örneğin Senaryo: Temel | Senaryo değeri sayısı: 0. Senaryolar arasında geçmek veya bir senaryo eklemek, kopyalamak, yeniden adlandırmak ya da silmek için ona tıklayın veya Su, Senaryolar öğesini seçin. Listedeki her senaryo senaryo değeri sayısını parantez içinde gösterir ve açık olanın yanında bir onay işareti bulunur. Senaryo yöneticisi satırı, senaryo ve alternatif ağacını açar. Temel mod işaretliyken soluk görünür.</p><p>Çizim, etiketler, Özellikler, Tablolar ve sonuçların hepsi açık senaryoya aittir ve sayfa yalnızca açık senaryoyu çözer. Kendi girdisinde açıklanan Senaryo karşılaştırması diğerlerini kopyalardan çözer. Açık senaryo projeyle birlikte kaydedilir.</p>';
+$ec_lang['lpn_guide_scn_open_def']='<p>Haritanın altındaki durum şeridinde bulunan Senaryo düğmesi açık senaryoyu adlandırır ve senaryo değerlerini sayar; örneğin Senaryo: Temel | Senaryo değeri sayısı: 0. Senaryolar arasında geçmek veya bir senaryo eklemek, kopyalamak, yeniden adlandırmak ya da silmek için ona tıklayın veya Su, Senaryolar öğesini seçin. Listedeki her senaryo senaryo değeri sayısını parantez içinde gösterir ve açık olanın yanında bir onay işareti bulunur. Senaryo yöneticisi satırı, senaryoların ve alternatiflerin soy ağacını açar; Temel mod işaretliyken yalnızca senaryo listesini açar.</p><p>Çizim, etiketler, Özellikler, Tablolar ve sonuçların hepsi açık senaryoya aittir ve sayfa yalnızca açık senaryoyu çözer. Kendi girdisinde açıklanan Senaryo karşılaştırması diğerlerini kopyalardan çözer. Açık senaryo projeyle birlikte kaydedilir.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Senaryo değerleri nerede görünür';
-$ec_lang['lpn_guide_scn_marks_def']='<p>Haritada, açık senaryoda bir senaryo değeri olan varlık kehribar renkli bir halkayla, üst senaryodan veya alternatiften bir senaryo değeri devralan varlık ise kesikli gri bir halkayla çevrelenir. Talep, çap, pürüzlülük, küçük (yerel) kayıp katsayısı ve uzunluk için halka yalnızca Ayarlar, Görselleştirme, Düğüm etiketleri veya Hat etiketleri o değeri haritada gösterirken görünür; başka herhangi bir özelliğin senaryo değerinin halkası her zaman vardır. Tablolarda, açık senaryonun belirlediği bir değeri tutan hücre kehribar renklidir ve ipucu onu tutan alternatifi söyler; örneğin Fiziksel alt.: Daha büyük ana boru. Bir tablonun hücre menüsündeki Senaryoları göster, her varlığı her senaryo için bir kez listeler.</p><p>Bir senaryonun değiştirebildiği Özellikler satırlarının her birinin solunda bir işaret vardır. Dolu bir nokta, açık senaryonun değeri kendi senaryo değeriyle değiştirdiği anlamına gelir; senaryo değerini temizlemek için ona tıklayın. İçi boş bir nokta, değerin devralındığı anlamına gelir; gösterilen değeri bir senaryo değeri yapmak için ona tıklayın. Bir üçgen, bunun altındaki senaryoların değeri değiştirdiği anlamına gelir; onaydan sonra onların senaryo değerlerini temizlemek için ona tıklayın. Senaryo değeri olan bir satırın altında, onun yerini aldığı devralınan değer görünür; örneğin Temel senaryo: 18. Ayarlar kutusunda yalnızca dolu nokta ve üçgen vardır, çünkü orada bir değer yazmak senaryo değeri oluşturur.</p><p>Halkaları gizlemek için Ayarlar, Harita ve sayfa, Sayfa altındaki Senaryo değeri işaretlerini haritada göster ayarının işaretini kaldırın veya Harita, Temiz harita öğesini seçin. İkisi de projede değil, bu tarayıcıda tutulur. Tablolar her iki durumda da senaryo değerlerini işaretler.</p>';
+$ec_lang['lpn_guide_scn_marks_def']='<p>Haritada, açık senaryoda bir senaryo değeri olan varlık kehribar renkli bir halkayla, ebeveyn senaryodan veya alternatiften bir senaryo değerini miras alan varlık ise kesikli gri bir halkayla çevrelenir. Talep, çap, pürüzlülük, küçük (yerel) kayıp katsayısı ve uzunluk için halka yalnızca Ayarlar, Görselleştirme, Düğüm etiketleri veya Hat etiketleri o değeri haritada gösterirken görünür; başka herhangi bir özelliğin senaryo değerinin halkası her zaman vardır. Tablolarda, açık senaryonun belirlediği bir değeri tutan hücre kehribar renklidir ve ipucu onu tutan alternatifi söyler; örneğin Fiziksel alt.: Daha büyük ana boru. Bir tablonun hücre menüsündeki Senaryoları göster, her varlığı her senaryo için bir kez listeler.</p><p>Bir senaryonun değiştirebildiği Özellikler satırlarının her birinin solunda bir işaret vardır. Dolu bir nokta, açık senaryonun değeri kendi senaryo değeriyle değiştirdiği anlamına gelir; senaryo değerini temizlemek için ona tıklayın. İçi boş bir nokta, değerin miras alındığı anlamına gelir; gösterilen değeri bir senaryo değeri yapmak için ona tıklayın. Bir üçgen, bunun altındaki senaryoların değeri değiştirdiği anlamına gelir; onaydan sonra onların senaryo değerlerini temizlemek için ona tıklayın. Senaryo değeri olan bir satırın altında, Temizle\'nin geri yükleyeceği değer görünür; örneğin 18 inç geri yüklenir, Temeldeki değer. Ayarlar kutusunda yalnızca dolu nokta ve üçgen vardır, çünkü orada bir değer yazmak senaryo değeri oluşturur.</p><p>Halkaları gizlemek için Ayarlar, Sayfa içinde Senaryo değeri işaretlerini haritada göster ayarının işaretini kaldırın veya Harita, Temiz harita öğesini seçin. İkisi de projede değil, bu tarayıcıda tutulur. Tablolar her iki durumda da senaryo değerlerini işaretler.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Senaryo değerlerini oluşturma ve temizleme';
-$ec_lang['lpn_guide_scn_make_def']='<p>Temel dışında bir senaryo açıkken, senaryoların değiştirebildiği bir değerde yapılan düzenleme, nasıl yapılırsa yapılsın, açık senaryoda bir senaryo değeri olarak saklanır: Özelliklerde yazmak, Tablolarda bir hücreyi düzenlemek, Bul ve değiştir içinde Değiştir, bir düğümü sürüklemek veya koordinatlarını girmek, Türü değiştir (yeni tür senaryo değeridir) ya da Özellikleri seçime yapıştır. Ayarlar kutusunda yazılan bir ayar, senaryolar o ayarı değiştirebiliyorsa senaryo değeri olarak saklanır. Temel senaryo değişmez. Temelde aynı düzenlemeler şebekenin kendisini değiştirir ve değeri değiştirmemiş her senaryoya ulaşır.</p><p>Sil farklı davranır. Bir senaryoda Sil, Temelde bulunan bir varlığı kaldırmaz. Varlığı açık senaryoda etkin olmayan hale getirir; bir düğüm için boruları da, ve bir ileti bunu bildirir. Varlık çizimde ve diğer senaryolarda durmaya devam eder. Bir senaryo açıkken çizilen varlık Temelde etkin değildir, o senaryoda etkindir ve o senaryoda Sil onu kaldırır. Temelde bir varlığı silmek, onu sayan bir sorudan sonra, her senaryodaki senaryo değerlerini de siler. Müşteriler ve Figürler hiçbir senaryoya ait değildir ve doğrudan silinir.</p><p>Senaryolar listesindeki Senaryo değeri yöneticisi satırı, açık senaryonun her senaryo değerinin kategoriye göre bir listesini, her birinin yanında değiştirdiği devralınan değerle birlikte açar. Senaryonun açtığı, taşıdığı veya değiştirdiği haritadaki bir zaman serisi grafiği ayrı bir satırdır. Satırları işaretleyin ve Seçili senaryo değerlerini temizle düğmesine tıklayın, bir satırdaki Senaryo değerini temizle düğmesine tıklayın veya Tüm senaryo değerlerini temizle düğmesine tıklayın. Her değer devralınan değere döner ve Geri al bunu geri alır. Haritada varlığa gitmek için listeden bir ID seçin. Özelliklerdeki nokta ve Tabloların hücre menüsündeki Senaryo değerini temizle satırı, senaryo değerlerini tek tek temizler.</p>';
+$ec_lang['lpn_guide_scn_make_def']='<p>Temel dışında bir senaryo açıkken, senaryoların değiştirebildiği bir değerde yapılan düzenleme, nasıl yapılırsa yapılsın, açık senaryoda bir senaryo değeri olarak saklanır: Özelliklerde yazmak, Tablolarda bir hücreyi düzenlemek, Bul ve değiştir içinde Değiştir, bir düğümü sürüklemek veya koordinatlarını girmek, Türü değiştir (yeni tür senaryo değeridir) ya da Özellikleri seçime yapıştır. Ayarlar kutusunda yazılan bir ayar, senaryolar o ayarı değiştirebiliyorsa senaryo değeri olarak saklanır. Temel değişmez. Temelde aynı düzenlemeler şebekenin kendisini değiştirir ve değeri değiştirmemiş, yani miras alan her senaryoya ulaşır.</p><p>Sil farklı davranır. Bir senaryoda Sil, Temelde bulunan bir varlığı kaldırmaz. Varlığı açık senaryoda etkin olmayan hale getirir; bir düğüm için boruları da, ve bir ileti bunu bildirir. Varlık çizimde ve diğer senaryolarda durmaya devam eder. Bir senaryo açıkken çizilen varlık Temelde etkin değildir, o senaryoda etkindir ve o senaryoda Sil onu kaldırır. Temelde bir varlığı silmek, onları sayan bir sorudan sonra, her senaryodaki senaryo değerlerini de siler. Bir Figür, bir varlıkla aynı kurala uyar. Müşteriler hiçbir senaryoya ait değildir ve doğrudan silinir.</p><p>Senaryolar listesindeki Senaryo değeri yöneticisi satırı, açık senaryonun her senaryo değerinin kategoriye göre bir listesini, her birinin yanında değiştirdiği miras alınan değerle birlikte açar. Senaryonun açtığı, taşıdığı veya değiştirdiği haritadaki bir zaman serisi grafiği ayrı bir satırdır. Satırları işaretleyin ve Seçili senaryo değerlerini temizle düğmesine tıklayın, bir satırdaki Senaryo değerini temizle düğmesine tıklayın veya Tüm senaryo değerlerini temizle düğmesine tıklayın. Her değer miras alınan değere döner ve Geri al bunu geri alır. Haritada varlığa gitmek için listeden bir ID seçin. Özelliklerdeki nokta ve Tabloların hücre menüsündeki Senaryo değerini temizle satırı, senaryo değerlerini tek tek temizler.</p>';
 $ec_lang['lpn_guide_scn_scope_term']='Bir senaryo neyi değiştirebilir ve neyi değiştiremez';
-$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Özellikler</td><td>Bir düğümün veya hattın, aşağıda sayılanlar dışındaki her özelliği; konumu, etkin olup olmadığı ve türü (Türü değiştir) dahil. Bir Metin; sözcüklerini, konumunu, boyutunu, hizalamasını, kalın olup olmadığını, açısını ve gösterilip gösterilmediğini değiştirebilir. Özel bir özellik her zaman değiştirilebilir. Özellikler şu kategorilerde tutulur: Fiziksel, Talep, Etkin topoloji, Başlangıç ayarları, Madde, Yangın debisi, Enerji maliyeti, Özel özellikler, Metin, Sunum ve Hesaplama.</td></tr><tr><td>Ayarlar</td><td>Projeyle birlikte kaydedilen ayarlar, aşağıda sayılanlar hariç: hesaplama seçenekleri (örneğin talep çarpanı, toplam çalışma süresi, hidrolik zaman adımı ve sürtünme yöntemi), varsayılan talep deseni, yeni varlıklara verilen değerler ve sunum ayarları (boyutlar, renkler, etiketler, eş eğriler, harita görünümü ve haritadaki zaman serisi grafikleri).</td></tr><tr><td>Her senaryoda aynı olanlar</td><td>Bir varlığın ID\'si, Açıklaması ve Künyesi; bir hattın uç düğümleri ve kırılma noktaları; Müşteriler ve Figürler; birimler ve koordinat sistemi; ve Kitaplıkların içeriği (desenler, eğriler, boru türleri, bağlantı parçası listeleri, kontroller ve kurallar). Bunlardan herhangi birinde yapılan düzenleme her senaryoyu değiştirir. Bir senaryo bir varlığı farklı bir eğriye, boru türüne, bağlantı parçası listesine veya desene yönlendirebilir, ancak onların içindekileri değiştiremez.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Özellikler</td><td>Bir düğümün veya hattın, aşağıda sayılanlar dışındaki her özelliği; konumu, etkin olup olmadığı ve türü (Türü değiştir) dahil. Bir Metin; sözcüklerini, konumunu, boyutunu, hizalamasını, kalın olup olmadığını, açısını ve gösterilip gösterilmediğini değiştirebilir. Bir Figür yalnızca gösterilip gösterilmediğini değiştirebilir. Özel bir özellik her zaman değiştirilebilir. Özellikler şu kategorilerde tutulur: Fiziksel, Talep, Etkin topoloji, Başlangıç ayarları, Madde, Yangın debisi, Enerji maliyeti, Özel özellikler, Metin, Sunum ve Hesaplama.</td></tr><tr><td>Ayarlar</td><td>Projeyle birlikte kaydedilen ayarlar, aşağıda sayılanlar hariç: hesaplama seçenekleri (örneğin talep çarpanı, toplam çalışma süresi, hidrolik zaman adımı ve sürtünme yöntemi), varsayılan talep deseni, yeni varlıklara verilen değerler ve sunum ayarları (boyutlar, renkler, etiketler, eş eğriler, harita görünümü ve haritadaki zaman serisi grafikleri).</td></tr><tr><td>Her senaryoda aynı olanlar</td><td>Bir varlığın ID\'si, Açıklaması ve Künyesi; bir hattın uç düğümleri ve kırılma noktaları; Müşteriler ve bir Figürün noktaları; birimler ve koordinat sistemi; ve Kitaplıkların içeriği (desenler, eğriler, boru türleri, bağlantı parçası listeleri, kontroller ve kurallar). Bunlardan herhangi birinde yapılan düzenleme her senaryoyu değiştirir. Bir senaryo bir varlığı farklı bir eğriye, boru türüne, bağlantı parçası listesine veya desene yönlendirebilir, ancak onların içindekileri değiştiremez.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_scn_example_term']='Net1 üzerinde örnek';
-$ec_lang['lpn_guide_scn_example_def']='<p>Net1 örneğini açın. Su, Senaryolar, Yeni senaryo… öğesini seçin, Daha büyük ana boru yazın ve Tamam\'a tıklayın. Haritada Boru 10\'u seçin ve Özelliklerde Çap için 24 girin; Temelde 18 inç vardır ve alanın altında Temel senaryo: 18 olarak gösterilir. Senaryolar listesinde Temel\'i seçin, yine Yeni senaryo… öğesini seçin, En yüksek gün yazın ve Ayarlar, Hesaplama, Hidrolik içinde Talep çarpanı için 1,8 girin. Sonra Su, Raporlar, Senaryo karşılaştırması öğesini seçin.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">En düşük basınç</td><td colspan="3">En yüksek hız</td></tr><tr><td>Senaryo</td><td>Senaryo değeri sayısı</td><td>Talep çarpanı</td><td>Düğüm</td><td>Basınç (psi,)</td><td>Zaman (hr)</td><td>Hat</td><td>Hız (ft/sn,)</td><td>Zaman (hr)</td></tr><tr><td>Temel</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2,76</td><td>16:00</td></tr><tr><td>Daha büyük ana boru</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2,87</td><td>16:00</td></tr><tr><td>En yüksek gün</td><td>1</td><td>1,8</td><td>N32</td><td>15,78</td><td>9:00</td><td>L10</td><td>3,49</td><td>9:00</td></tr></tbody></table><p>Toplam çalışma süresi üçünde de 24:00\'dır; bu yüzden her en düşük basınç ve en yüksek hız, gösterilen zamandaki gün boyu uç değerdir. Daha büyük ana boru en düşük basıncı yaklaşık 1 psi artırır. 1,8 çarpanı onu 9:00\'da 15,78 psi\'ye düşürür ve en yüksek hız Boru 10\'a geçer. Her senaryo bir senaryo değeri tutar ve Temel değerlerini korur.</p>';
+$ec_lang['lpn_guide_scn_example_def']='<p>Net1 örneğini açın. Aşağıdaki karşılaştırma, örneğin kendi senaryolarını, En yüksek gün, Pik saat ve bunların ana boru kırılması çocuklarını da listeler; bunlar burada kullanılmaz. Su, Senaryolar, Yeni senaryo… öğesini seçin, Daha büyük ana boru yazın ve Tamam\'a tıklayın. Haritada Boru 10\'u seçin ve Özelliklerde Çap için 24 girin; Temelde 18 inç vardır ve alanın altında Temel senaryo: 18 olarak gösterilir. Senaryolar listesinde Temel\'i seçin, yine Yeni senaryo… öğesini seçin, En yüksek gün 1,8 yazın ve Ayarlar, Hesaplama, Hidrolik içinde Talep çarpanı için 1,8 girin. Sonra Su, Raporlar, Karşılaştırma: senaryolar öğesini seçin.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">En düşük basınç</td><td colspan="3">En yüksek hız</td></tr><tr><td>Senaryo</td><td>Senaryo değeri sayısı</td><td>Talep çarpanı</td><td>Düğüm</td><td>Basınç (psi)</td><td>Zaman (hr)</td><td>Hat</td><td>Hız (ft/sec)</td><td>Zaman (hr)</td></tr><tr><td>Temel</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2,76</td><td>16:00</td></tr><tr><td>Daha büyük ana boru</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2,87</td><td>16:00</td></tr><tr><td>En yüksek gün 1,8</td><td>1</td><td>1,8</td><td>N32</td><td>15,78</td><td>9:00</td><td>L10</td><td>3,49</td><td>9:00</td></tr></tbody></table><p>Toplam çalışma süresi üçünde de 24:00\'dır; bu yüzden her en düşük basınç ve en yüksek hız, gösterilen zamandaki gün boyu uç değerdir. Daha büyük ana boru en düşük basıncı yaklaşık 1 psi artırır. 1,8 çarpanı onu 9:00\'da 15,78 psi\'ye düşürür ve en yüksek hız Boru 10\'a geçer. Burada yapılan her senaryo bir senaryo değeri tutar ve Temel değerlerini korur.</p>';
 $ec_lang['lpn_guide_scn_notes_term']='Dikkat edilecek noktalar';
-$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Devralınan değere eşit bir senaryo değeri de yine bir senaryo değeridir. Sayılır ve Senaryo değeri yöneticisi onu (aynı) ile işaretler.</li><li>Temel mod, proje için değil, bu tarayıcı için bir ayardır. Senaryolarını ve alternatiflerini gösteremediği bir proje için devre dışıdır. Alternatifler ve Senaryo yöneticisi bu girdinin başındaki yardımda açıklanmıştır.</li><li>Geri al 20 adım tutar. Her adım, çizimle birlikte senaryoları ve açık senaryoyu da geri yükler; bu yüzden bir senaryo eklemek, yeniden adlandırmak ve silmek geri alınabilir.</li><li>Bir EPANET dosyasını dışa aktarmak yalnızca açık senaryoyu, o senaryonun okuduğu değerler ve düğüm konumlarıyla yazar. Senaryoların kendileri yalnızca proje dosyasına kaydedilir.</li></ul>';
+$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Miras alınan değere eşit bir senaryo değeri de yine bir senaryo değeridir. Sayılır ve Senaryo değeri yöneticisi onu (aynı) ile işaretler.</li><li>Temel mod, proje için değil, bu tarayıcı için bir ayardır. Senaryolarını ve alternatiflerini gösteremediği bir proje için devre dışıdır. Alternatifler ve Senaryo yöneticisi, bu girdinin başındaki Senaryolar ve alternatifler nasıl çalışır ve Senaryolar nasıl yönetilir başlıklarında açıklanmıştır.</li><li>Geri al 20 adım tutar. Her adım, çizimle birlikte senaryoları ve açık senaryoyu da geri yükler; bu yüzden bir senaryo eklemek, yeniden adlandırmak ve silmek geri alınabilir.</li><li>Bir EPANET dosyasını dışa aktarmak yalnızca açık senaryoyu, o senaryonun okuduğu değerler ve düğüm konumlarıyla yazar. Senaryoların kendileri yalnızca proje dosyasına kaydedilir.</li></ul>';
 // The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
 // the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
 $ec_lang['lpn_guide_cmp_cols_term']='Tablonun içeriği';
-$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Senaryo</td><td>Senaryonun adı. Açık senaryo (şu anda açık) ile işaretlenir.</td></tr><tr><td>Senaryo değeri sayısı</td><td>Senaryonun kendi senaryo değerleri, Senaryolar listesindeki gibi sayılır. Talep çarpanı gibi bir hesaplama seçeneği bir sayılır ve devralınan değere eşit bir senaryo değeri de sayılır.</td></tr><tr><td>Talep çarpanı, Toplam çalışma süresi, Hidrolik zaman adımı</td><td>Senaryonun çözüldüğü değerler; kendisine ait olanlar veya projeninkiler. Daimi rejimli bir senaryo zaman adımı için tire gösterir.</td></tr><tr><td>En düşük basınç</td><td>Bir düğümdeki en düşük basınç; ID\'si ve oluştuğu zamanla birlikte. Rezervuarlar ve depolar, her birinin yükü sabit olduğu için dışarıda bırakılır.</td></tr><tr><td>En yüksek hız</td><td>Bir boruda veya vanadaki en yüksek hız; ID\'si ve oluştuğu zamanla birlikte. Pompalar dışarıda bırakılır.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Senaryo</td><td>Senaryonun adı. Açık senaryo (şu anda açık) ile işaretlenir.</td></tr><tr><td>Senaryo değeri sayısı</td><td>Senaryonun kendi senaryo değerleri, Senaryolar listesindeki gibi sayılır. Talep çarpanı gibi bir hesaplama seçeneği bir sayılır ve miras alınan değere eşit bir senaryo değeri de sayılır.</td></tr><tr><td>Talep çarpanı, Toplam çalışma süresi, Hidrolik zaman adımı</td><td>Senaryonun çözüldüğü değerler; kendisine ait olanlar veya projeninkiler. Daimi rejimli bir senaryo zaman adımı için tire gösterir.</td></tr><tr><td>En düşük basınç: Düğüm, Basınç, Zaman (hr)</td><td>Bir düğümdeki en düşük basınç, üç sütunda: düğümün ID\'si, basınç ve oluştuğu zaman. Rezervuarlar ve depolar, her birinin yükü sabit olduğu için dışarıda bırakılır.</td></tr><tr><td>En yüksek hız: Hat, Hız, Zaman (hr)</td><td>Bir boruda veya vanadaki en yüksek hız, üç sütunda: hattın ID\'si, hız ve oluştuğu zaman. Pompalar dışarıda bırakılır.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Daimi rejimli ve uzun süreli senaryolar';
 $ec_lang['lpn_guide_cmp_run_def']='<p>Toplam çalışma süresi 0\'dan büyük olan bir senaryo, EPANET motoruyla tüm dönem boyunca çalıştırılır. En düşük basıncı ve en yüksek hızı, her biri zamanıyla birlikte gösterilen, her zaman adımındaki uç değerlerdir. Toplam çalışma süresi 0 olan bir senaryo tek bir anda çözülür. Toplam çalışma süresi bir senaryonun değiştirebildiği seçeneklerden biridir; bu yüzden tek bir tablo iki türü de tutabilir.</p>';
-$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Çözülemeyen bir senaryo, iki sonucunun yerinde nedenini gösterir; örneğin bir boru etkin olmayan hale getirildikten sonra bir düğümün kaynağa yolu kalmaması. Diğer senaryolar yine de çözülür. Yakınsamayan bir senaryo son sonuçlarını ve bir ileti gösterir.</li><li>Tablonun üstündeki Her senaryoda aynı olanlar bloğu sürtünme yöntemini, birimleri, doğruluğu ve en fazla deneme sayısını bildirir. Senaryolar arasında farklı olan bir ayar bloğun dışında bırakılır.</li><li>Geçti veya kaldı eşiği yoktur. Sayıları, modellenen sistemin tasarım ölçütlerine göre okuyun.</li><li>Senaryo yöneticisi girdisinde verilen örnek, Net1 üzerinde üç senaryoyu karşılaştırır.</li></ul>';
+$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Çözülemeyen bir senaryo, iki sonucunun yerinde nedenini gösterir; örneğin bir boru etkin olmayan hale getirildikten sonra bir düğümün kaynağa yolu kalmaması. Diğer senaryolar yine de çözülür. Yakınsamayan bir senaryo son sonuçlarını ve bir ileti gösterir.</li><li>Tablonun üstündeki Her senaryoda aynı olanlar bloğu sürtünme yöntemini, birimleri, doğruluğu ve en fazla deneme sayısını bildirir. Senaryolar arasında farklı olan bir ayar bloğun dışında bırakılır.</li><li>Geçti veya kaldı eşiği yoktur. Sayıları, modellenen sistemin tasarım ölçütlerine göre okuyun.</li><li>Senaryo yöneticisi girdisinde verilen örnek, senaryoları Net1 üzerinde karşılaştırır.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
 // dev/lpn-spike/user-guide-library-harness.js.
 $ec_lang['lpn_guide_lib_kinds_term']='Her bölümün içeriği';
-$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Desenler</td><td>Bir çalıştırma sürdüğü kadar tekrarlanan bir çarpan listesi; her desen zaman adımı için bir çarpan. Yeni bir desen, 1 değerinde 24 çarpandır. Bir elektronik tablo sütununu yapıştırmak Çarpanlar kutusunu doldurur. Varsayılan talep deseni (varsayılan) ile işaretlenir ve Ayarlar, Hesaplama, Hidrolik içinde seçilir.</td></tr><tr><td>Eğriler</td><td>Eğri türü olarak seçilen dört tür: Pompa yükü, Pompa verimi, Depo hacmi ve Vana yük kaybı. Noktalar, yapıştırılmış bir elektronik tablo sütununu veya bir EPANET dosyasından kopyalanmış satırları kabul eden bir ızgaraya girilir. Bir pompa yük eğrisi noktalarından geçecek şekilde uydurulur ve Denklem satırı uydurmayı gösterir; tek nokta tasarım noktası olarak okunur, EPANET\'in okuduğu gibi kapama yükü o yükün 1,33334 katı ve en yüksek debi o debinin 2 katıdır. Diğer türler noktalarını düz çizgilerle birleştirir. Bir pompa veya vana eğrisini Özelliklerde belirtir; oradaki Eğriler bağlantısı bu bölümü açar.</td></tr><tr><td>Boru türleri</td><td>Birçok borunun başvurduğu çap, pürüzlülük ve reaksiyon katsayıları tanımı. Bir özellik tanımda boş bırakılabilir ve sonra her boru için girilir. Özelliklerde, bir boru türünün belirttiği değerler devre dışıdır ve Boru türünden ayır bunları boruya kopyalar ve borunun türü kullanmasını durdurur.</td></tr><tr><td>Bağlantı parçaları</td><td>Her biri için bir adet bulunan bağlantı parçası listeleri; bir boru veya boru türü için tek bir küçük (yerel) kayıp katsayısı, k, olarak toplanır. Sunulan bağlantı parçaları EPANET 2.2 kullanım kılavuzunun Tablo 3.3\'ündeki on üç parça ve Diğer bağlantı parçasıdır. Birini seçmek katsayısını satıra kopyalar; orada değiştirilebilir.</td></tr><tr><td>Kontroller</td><td>Her biri EPANET sözdiziminde tek bir ifade, <code>LINK id OPEN IF NODE id BELOW value</code> gibi. Her birinin altında kutu, ifadenin anlaşılıp anlaşılmadığını bildirir.</td></tr><tr><td>Kurallar</td><td>Her biri EPANET sözdiziminde birkaç satır: RULE, IF, AND, OR, THEN, ELSE ve PRIORITY. Her birinin altında kutu, kuralın okunup okunmadığını bildirir.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Desenler</td><td>Bir çalıştırma sürdüğü kadar tekrarlanan bir çarpan listesi; her desen zaman adımı için bir çarpan. Yeni bir desen, 1 değerinde 24 çarpandır. Bir elektronik tablo sütununu yapıştırmak Çarpanlar kutusunu doldurur. Varsayılan talep deseni (varsayılan) ile işaretlenir ve Ayarlar, Hesaplama, Hidrolik içinde seçilir.</td></tr><tr><td>Eğriler</td><td>Eğri türü olarak seçilen dört tür: Pompa yükü, Pompa verimi, Depo hacmi ve Vana yük kaybı. Noktalar, yapıştırılmış bir elektronik tablo sütununu veya bir EPANET dosyasından kopyalanmış satırları kabul eden bir ızgaraya girilir. Tek noktalı veya sıfır debide başlayan üç noktalı bir pompa yük eğrisine bir eğri uydurulur ve Denklem satırı uydurmayı gösterir; tek nokta tasarım noktası olarak okunur, EPANET\'in okuduğu gibi kapama yükü o yükün 1,33334 katı ve en yüksek debi o debinin 2 katıdır. Diğer her pompa yük eğrisi ve diğer türlerin her biri noktalarını düz çizgilerle birleştirir. Bir pompa veya vana eğrisini Özelliklerde belirtir; eğri listesindeki son seçenek olan Eğrileri düzenle…, bu bölümü açar.</td></tr><tr><td>Boru türleri</td><td>Birçok borunun başvurduğu çap, pürüzlülük ve reaksiyon katsayıları tanımı. Bir özellik tanımda boş bırakılabilir ve sonra her boru için girilir. Özelliklerde, bir boru türünün belirttiği değerler devre dışıdır ve Boru türünden ayır bunları boruya kopyalar ve borunun türü kullanmasını durdurur.</td></tr><tr><td>Bağlantı parçaları</td><td>Her biri için bir adet bulunan bağlantı parçası listeleri; bir boru veya boru türü için tek bir küçük (yerel) kayıp katsayısı, k, olarak toplanır. Sunulan bağlantı parçaları EPANET 2.2 kullanım kılavuzunun Tablo 3.3\'ündeki on üç parça ve Diğer bağlantı parçasıdır. Birini seçmek katsayısını satıra kopyalar; orada değiştirilebilir.</td></tr><tr><td>Kontroller</td><td>Her biri EPANET sözdiziminde tek bir ifade, <code>LINK id OPEN IF NODE id BELOW value</code> gibi. Her birinin altında kutu, ifadenin anlaşılıp anlaşılmadığını bildirir.</td></tr><tr><td>Kurallar</td><td>Her biri EPANET sözdiziminde birkaç satır: RULE, IF, AND, OR, THEN, ELSE ve PRIORITY. Her birinin altında kutu, kuralın okunup okunmadığını bildirir.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_lib_refs_term']='Yeniden adlandırma, silme ve bir öğeye başvuranlar';
 $ec_lang['lpn_guide_lib_refs_def']='<p>Bir ID, kendi bölümünde değiştirilir. Boş bir ID veya aynı bölümde zaten kullanılan bir ID kabul edilmez. Bir öğeyi yeniden adlandırmak, ona yapılan her başvuruyu, Temelde ve her senaryoda taşır. Bir desen için başvurular şunlardır: bir düğümün talep deseni ve talep kategorilerinin her birinin deseni, bir Müşterinin talep deseni, bir rezervuarın yük deseni, bir pompanın hız deseni ve varsayılan talep deseni.</p><p>Kullanımda olan bir desen silinebilir ve ona yapılan her başvuru temizlenir. Varsayılan talep deseni olsaydı, bir bildirim deseni olmayan düğümlerin artık neyi kullandığını bildirir. Kullanımda olan bir eğri, boru türü veya bağlantı parçası listesi silinmez. İleti onu kullanan varlıkları adlandırır ve her birine önce başka bir eğri verilmelidir ya da türden veya listeden ayrılmalıdır.</p>';
 $ec_lang['lpn_guide_lib_scn_term']='Kitaplıklar ve senaryolar';
@@ -1046,7 +1046,7 @@ $ec_lang['lpn_guide_lib_scn_def']='<p>Kitaplıklar her senaryoda aynıdır. Bir 
 $ec_lang['lpn_guide_lib_ctl_term']='Bir çalıştırmada kontroller ve kurallar';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>Bir kontrol tek bir ifadedir. Bir kural, RULE ile başlayan birkaç satırdır. Anahtar sözcükler sayfanın dili ne olursa olsun İngilizce yazılır ve sayılar projenin birimlerindedir. Kontrol ekle, şebekeden oluşturulan bir ifadeyle başlar; bu ifade sonra amaçlanana dönüşecek biçimde düzenlenir.</p><p>Kontroller ve kurallar bir sonucu yalnızca uzun süreli bir benzetimde, yani Toplam çalışma süresi 0\'dan büyükken değiştirir. Daimi rejimli bir çözümü hiçbiri değiştirmez. Kurallar yalnızca EPANET motoruyla uygulanır. İkisi de projeyle birlikte kaydedilir ve bir EPANET dosyasına yazılır.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Kitaplıkları başka bir projeden içe aktarma';
-$ec_lang['lpn_guide_lib_import_def']='<p>Dosya, İçe aktar…, Kitaplıkları içe aktar… başka bir proje dosyasını açar ve ondan tüm kitaplıkları bu projeye kopyalar. Adı burada zaten kullanılan bir öğe atlanır ve listelenir; böylece burada zaten bulunan hiçbir şey değişmez. Dosya ve proje bir büyüklüğü farklı birimlerde belirtiyorsa bir uyarı gösterilir ve öğeler yazıldığı gibi içe aktarılır. Bu projede bulunmayan bir bağlantı parçası listesine başvuran boru türleri listelenir; bunları çözmek için bağlantı parçaları kitaplığını aynı dosyadan içe aktarın.</p>';
+$ec_lang['lpn_guide_lib_import_def']='<p>Dosya, İçe aktar…, Kitaplıklar… başka bir proje dosyasını açar ve ondan tüm kitaplıkları bu projeye kopyalar. Adı burada zaten kullanılan bir öğe atlanır ve listelenir; böylece burada zaten bulunan hiçbir şey değişmez. Dosya ve proje bir büyüklüğü farklı birimlerde belirtiyorsa bir uyarı gösterilir ve öğeler yazıldığı gibi içe aktarılır. Bu projede bulunmayan bir bağlantı parçası listesine başvuran boru türleri listelenir; bunları çözmek için bağlantı parçaları kitaplığını aynı dosyadan içe aktarın.</p>';
 $ec_lang['lpn_guide_lib_example_def']='<p>Net1 örneğini açın ve Su, Kitaplıklar öğesini seçin. Desenler, 2:00 aralıklı, 24:00\'ü kapsayan 12 çarpanlı, (varsayılan) ile işaretli 1 numaralı deseni, Demand Pattern\'i tutar. Eğriler, bir noktalı bir Pompa yükü eğrisi olan 1 numaralı eğriyi, Pump 9 için Pump Curve\'ü tutar: 250 ft\'te 1500 gpm. Kontroller iki ifade tutar: birincisi 2 numaralı düğüm 110\'un altına düştüğünde Hat 9\'u açar, ikincisi 2 numaralı düğüm 140\'ın üstüne çıktığında kapatır. Kurallar, saat zamanını ve Depo 2\'nin seviyesini sınayan iki kural tutar.</p><p>Su, Hesapla öğesini ve sonra Su, Raporlar, Durum değişiklikleri öğesini seçin. Pompa L9 artık 10:00\'da kapalı, 15:00\'te açık ve 21:00\'de kapalıdır ve Depo N2 artık 22:00\'de boşalmaktadır. Kontrollerde ikinci kontroldeki 140\'ı 135 yapın ve Su, Hesapla öğesini yine seçin. Son kapanma 20:00\'ye kayar ve Depo N2 artık 21:00\'de boşalmaktadır.</p>';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>Bir desen bir çalıştırma sürdüğü kadar tekrarlanır; bu yüzden tüm çalıştırmayı kapsaması gerekmez.</li><li>Bir EPANET dosyasında bir boru türü veya bağlantı parçası listesi için yer yoktur. Dosya, her borunun okuduğu sayıları taşır ve dışa aktarma hangi boruların düzleştirildiğini söyler.</li><li>Kitaplıklar kutusunun konumu ve boyutu bu tarayıcıda tutulur. Öğeler projeyle birlikte kaydedilir.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
@@ -1061,11 +1061,11 @@ $ec_lang['lpn_guide_prop_scn_term']='Bir senaryoda';
 $ec_lang['lpn_guide_prop_scn_def']='<p>Temel dışındaki bir senaryoda, senaryoların değiştirebildiği bir değerde yapılan düzenleme, açık senaryonun bir senaryo değeri olarak saklanır ve satır solunda işaretlenir. Senaryo yöneticisi girdisi işaretleri açıklar ve her senaryoda aynı olanları listeler: ID, Açıklama ve Künye bunlardandır. Bir Müşterinin senaryo değerleri yoktur. Senaryolar arasında geçmek, Özellikleri aynı varlıkta açık bırakır ve şimdi açık olan senaryonun değerlerini gösterir.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Birden çok varlık seçili';
 $ec_lang['lpn_guide_prop_multi_def']='<p>Başlık, örneğin, 2 seçili yazar. Kutunun seçimdeki her varlık türü için bir bölümü vardır; başlığı türün adı ve o türden varlık sayısıdır, Borular (2) gibi, ve her bölüm daraltılabilir. Bir bölüm, Tabloların sütun olarak sahip olduğu ve içindeki her varlıkta ayarlanabilen özellikleri listeler. Sonuçlar ve bir boru türünün belirttiği değerler listelenmez. Bir satır, varlıkların paylaştığı değeri veya farklı oldukları yerde Değişken gösterir.</p><p>Bir satıra değer yazmak, seçimdeki o türden her varlığa onu ayarlar. Dokunulmayan bir satır hiçbir şey yazmaz. Bir bildirim sayıyı bildirir, 2 üzerinde Çap (inç) ayarlandı. gibi, ve tek bir Geri al satırın tamamını geri alır. Temel dışındaki bir senaryoda değerler senaryo değeri olarak saklanır.</p>';
-$ec_lang['lpn_guide_prop_example_def']='<p>Net1 örneğini açın ve Boru 10\'a tıklayın. Özellikler, Açıklama\'dan Etkin mi?\'ye girdilerini ve sonra gösterilen zamandaki sonuçlarını listeler: Debi 1866,2 gpm, Hız 2,4 ft/sn ve Yük kaybı 19,12 ft H2O.</p><p>Boru 113\'e tıklayın ve Boru 31\'e Shift ile tıklayın. Başlık 2 seçili yazar, tek bölüm Borular (2)\'dir ve Çap Değişken gösterir, çünkü Boru 31 6 inç, Boru 113 ise 8 inçtir. Çap için 10 girin. Bildirim 2 üzerinde Çap (inç) ayarlandı. yazar, iki boru da 10 inçtir ve tek bir Geri al onları 6 ve 8 inç değerlerine döndürür.</p>';
+$ec_lang['lpn_guide_prop_example_def']='<p>Net1 örneğini açın ve Boru 10\'a tıklayın. Özellikler girdileri ve sonra gösterilen zamandaki sonuçları listeler: Debi 1866,2 gpm, Hız 2,4 ft/sec ve Yük kaybı 19,12 ft H2O.</p><p>Boru 113\'e tıklayın ve Boru 31\'e Shift ile tıklayın. Başlık 2 seçili yazar, tek bölüm Borular (2)\'dir ve Çap Değişken gösterir, çünkü Boru 31 6 inç, Boru 113 ise 8 inçtir. Çap için 10 girin. Bildirim 2 üzerinde Çap (inç) ayarlandı. yazar, iki boru da 10 inçtir ve tek bir Geri al onları 6 ve 8 inç değerlerine döndürür.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Bölümler ve ayarların nerede kaydedildiği';
-$ec_lang['lpn_guide_set_where_def']='<p>Kutunun solundaki liste bir bölüme veya alt başlığa atlar. Bölümler Görselleştirme (Düğüm etiketleri, Düğüm renkleri, Hat etiketleri, Hat renkleri, Müşteri ve Tümü), Harita ve sayfa (Görünüm ve Sayfa), Öğeler (ID önekleri, Değerler ve Özel özellikler), Hesaplama (Birimler, Zaman, Hidrolik, Enerji ve Su kalitesi) ve Emeği geçenlerdir. Her alt başlık, ayarlarının Projeyle kaydedildiğini mi yoksa Bu tarayıcıda kaydedildiğini mi bildirir. Sayfa altındaki ayarlar ve Hidrolik içindeki, kendisi Bu tarayıcıda kaydedilir diyen bir satır olan Çalıştırma ilerleme kutusunu göster dışında her şey projeyle birlikte kaydedilir.</p><p>Tablolardaki Ayarlar sekmesi aynı ayarları Kategori ve Değer ile satırlar olarak listeler; böylece bir ayar orada da bulunabilir ve denetlenebilir.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>Kutunun solundaki liste bir bölüme veya alt başlığa atlar. Bölümler Görselleştirme (Düğüm etiketleri, Düğüm renkleri, Hat etiketleri, Hat renkleri, Müşteri ve Tümü), Harita, Sayfa, Öğeler (ID önekleri, Değerler ve Özel özellikler), Hesaplama (Birimler, Zaman, Hidrolik, Enerji ve Su kalitesi) ve Emeği geçenlerdir. Her alt başlık, ayarlarının Projeyle kaydedildiğini mi yoksa Bu tarayıcıda kaydedildiğini mi bildirir. Sayfa altındaki ayarlar ve Hidrolik içindeki, kendisi Bu tarayıcıda kaydedilir diyen bir satır olan Çalıştırma ilerleme kutusunu göster dışında her şey projeyle birlikte kaydedilir.</p><p>Tablolardaki Ayarlar sekmesi aynı ayarları Kategori ve Değer ile satırlar olarak listeler; böylece bir ayar orada da bulunabilir ve denetlenebilir.</p>';
 $ec_lang['lpn_guide_set_search_term']='Arama';
 $ec_lang['lpn_guide_set_search_def']='<p>Ayarlarda ara alanına bir veya daha fazla sözcük yazarak yalnızca hepsinden adında veya ipucunda söz eden ayarları listeleyin. Bir başlıkla eşleşen sözcük, o başlık altındaki her ayarı gösterir. Örneğin opaklık, Simge opaklığı (0 ile 1) ve Arka plan görüntüsü opaklığı (0 ile 1) ayarlarını listeler; opaklık simge yalnızca birincisini listeler; ve yağmurlama, ipucunda yağmurlamadan söz eden ancak adında etmeyen Damlatıcı üssünü listeler. Arama hiçbir ayarı değiştirmez.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Bir senaryoda ayarlar';
@@ -1106,14 +1106,14 @@ $ec_lang['lpn_guide_tbl_fill_term']='Doldurma, süzgeçler ve senaryolar';
 $ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D seçili bir aralığı üst satırından aşağı doldurur ve Ctrl+Enter onu etkin hücrenin değeriyle doldurur. İkisi de ID sütununa ve salt okunur hücrelere dokunmaz ve bir bildirim kaç hücrenin doldurulduğunu ve kaçının değiştirilmediğini bildirir. Ctrl+Shift+L yalnızca haritada seçili varlıkları gösterir. Bir süzgeç açıkken Ctrl+A ve Ctrl+D yalnızca gösterilen satırlarda işlem yapar ve artık eşleşmeyecek biçimde düzenlenen bir satır, süzgeç yeniden uygulanana kadar kalır.</p><p>Temel dışındaki bir senaryoda bir hücre düzenlemesi, Ctrl+D, Ctrl+Enter ve bir yapıştırma, açık senaryonun senaryo değerleri olarak saklanır.</p>';
 // The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
 $ec_lang['lpn_guide_bx_dock_term']='Yerleştirme ve sekmeler';
-$ec_lang['lpn_guide_bx_dock_def']='<p>Bir kutunun başlık çubuğunun köşesinde Haritanın soluna yerleştir, Haritanın sağına yerleştir ve Yüzdür ile, kutu yerleştirildikten sonra, Otomatik gizle bulunur. Yerleştirilmiş bir kutu haritanın yanında bir sütundur. Otomatik gizle ile haritanın kenarındaki dar bir şeritte bir sekmedir. Sekme, bir fareyle veya kalemle 150 ms sonra üzerine gelindiğinde ya da tıklanınca veya dokunulunca kutuyu açar ve kutu yukarıda açıklandığı gibi sekmesine geri çekilir. Çekilmiş bir kutu hâlâ açıktır. Onu açan bir menü satırı veya araç çubuğu düğmesi kutuyu sekmesinden çıkarır.</p><p>Yerleştirilmiş bir kutuyu başlık çubuğundan sürüklemek onu yüzdürür ve otomatik gizlemeyi kapatır. Bir kenara yerleştirilmiş kutular tek bir genişliği paylaşır ve harita en az 320 px korur. Sekmeler sürüklenerek veya odaktaki bir sekmede Alt+Yukarı ya da Alt+Aşağı tuşlarına basılarak yeniden sıralanır.</p>';
+$ec_lang['lpn_guide_bx_dock_def']='<p>Bir kutunun başlık çubuğunun köşesinde Haritanın soluna yerleştir, Haritanın sağına yerleştir ve Yüzdür ile, kutu yerleştirildikten sonra, Otomatik gizle bulunur. Yerleştirilmiş bir kutu haritanın yanında bir sütundur. Otomatik gizle ile haritanın kenarındaki dar bir şeritte bir sekmedir. Sekme, bir fareyle veya kalemle 150 ms sonra üzerine gelindiğinde ya da tıklanınca veya dokunulunca kutuyu açar. Kutu, işaretçi ondan ayrıldığında ve odak içinde olmadığında, dışında herhangi bir yere bastığınızda veya Esc tuşuna bastığınızda sekmesine çekilir. Çekilmiş bir kutu hâlâ açıktır. Onu açan bir menü satırı veya araç çubuğu düğmesi kutuyu sekmesinden genişletir.</p><p>Yerleştirilmiş bir kutuyu başlık çubuğundan sürüklemek onu yüzdürür ve otomatik gizlemeyi kapatır. Bir kenara yerleştirilmiş kutular tek bir genişliği paylaşır ve harita en az 320 px korur. Sekmeler sürüklenerek veya odaktaki bir sekmede Alt+Yukarı ya da Alt+Aşağı tuşlarına basılarak yeniden sıralanır.</p>';
 $ec_lang['lpn_guide_bx_keep_term']='Bir kutunun hatırladıkları';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Her kutu bu tarayıcıda nerede yüzdüğünü, boyutunu, açık olup olmadığını, yerleştirildiği tarafı, otomatik gizlenip gizlenmediğini, yerleştirilmiş genişliğini ve sekmesinin yerini tutar. Özellikler, Kritiklik analizi, Talep ölçekleme ve Kalibrasyon yalnızca yerleştirildikleri tarafı, otomatik gizlemeyi, sekme yerini ve açık olup olmadıklarını tutar; yüzdükleri yer bir sayfa yüklemesi boyunca sürer. Kayıtlı düzeni olmayan bir tarayıcı bazı kutular sekme olarak yerleştirilmiş şekilde başlar ve bir kutu değiştirilene kadar hiçbir şey saklanmaz.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='Bir telefonda';
-$ec_lang['lpn_guide_bx_phone_def']='<p>640 px veya daha darda hiçbir kutu yerleşmez ve her kutu pencereyi doldurur. Yerleştirme düğmeleri sunulmaz. Yerleştirilmiş bir düzen saklanır ve daha geniş bir pencerede geri gelir.</p>';
+$ec_lang['lpn_guide_bx_phone_def']='<p>640 px veya daha darda yerleştirilmiş bir kutu her zaman bir otomatik gizle sekmesidir ve haritanın üzerinde bir panel olarak açılır. Hiçbir şey sabitlenmez. Yerleştirilmemiş bir kutu pencereyi doldurur.</p>';
 // The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
 $ec_lang['lpn_guide_ff_asks_term']='Her düğümden ne istenir';
-$ec_lang['lpn_guide_ff_asks_def']='<p>Sınanan her düğüm, şebekenin ekrandaki zaman adımında ve açık senaryodaki bir kopyası üzerinde iki sınav alır. Birincisi, düğümün kalıntı basıncı korurken ne kadar debi verebileceğini sorar. Düğümden bir debi çekilir ve tekrarlanan çözümler onu daraltır; üst sınır 10000 gpm\'e eşittir. Üst sınırda hâlâ kalıntı basıncı koruyan bir düğüm, üst sınırdan fazlasını verdiği şeklinde bildirilir. İkinci sınav, tasarım denetimi, düğümden gereken debiyi çeker ve kapsamındaki başka bir düğümün Başka yerde izin verilen en düşük basıncın altına düşüp düşmediğini ya da kapsamındaki herhangi bir borunun İzin verilen en yüksek hızın üstünde çalışıp çalışmadığını sorar. Kapsamı Yok olduğunda tasarım denetimi yapılmaz.</p><p>Kendi Gereken yangın debisi özelliği olan bir düğüm bu değere göre, diğer her düğüm ise kutudaki değere göre sınanır.</p>';
+$ec_lang['lpn_guide_ff_asks_def']='<p>Sınanan her düğüm, şebekenin ekrandaki zaman adımında ve açık senaryodaki bir kopyası üzerinde iki sınav alır. Birincisi, düğümün kalıntı basıncı korurken ne kadar debi verebileceğini sorar. Düğümden bir debi çekilir ve tekrarlanan çözümler onu daraltır; üst sınır 10000 gpm\'e eşittir. Üst sınırda hâlâ kalıntı basıncı koruyan bir düğüm, üst sınırdan fazlasını verdiği şeklinde bildirilir. İkinci sınav, tasarım denetimi, düğümden gereken debiyi çeker ve kapsamındaki başka bir düğümün İzin verilen en düşük sistem basıncının altına düşüp düşmediğini ya da kapsamındaki herhangi bir borunun İzin verilen en yüksek hızın üstünde çalışıp çalışmadığını sorar. Kapsamı Yok olduğunda tasarım denetimi yapılmaz.</p><p>Kendi Gereken yangın debisi özelliği olan bir düğüm bu değere göre, diğer her düğüm ise kutudaki değere göre sınanır.</p>';
 $ec_lang['lpn_guide_ff_result_term']='Sonuçları okuma';
 $ec_lang['lpn_guide_ff_result_def']='<p>Özet, tüm denetimleri geçen düğümleri, yangın debisinde başarısız olan düğümleri ve sistemin geri kalanını etkileyen düğümleri sayar. Tablo, sınanan her düğüm için şunları listeler: herhangi bir yangın debisi çekilmeden önceki Statik basınç, Gereken debi, Gereken debideki basınç, Mevcut debi, Korunan kalıntı, tasarım denetiminin En kötü etkisi ve Tasarım sınırı, tüm şebekenin çözüm sayısı olan Çalıştırma sayısı ve Başarısızlık türleri. Sayısı olmayan bir hücre asla sıfır değil, tire gösterir. Çözülemeyen bir düğüm, sayıların yerinde nedenini gösterir. Tablo en fazla 200 düğüm yazdırır ve kaçını yazdırmadığını bildirir.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Halkalar, Durdur ve aynı anda tek bir analiz';
@@ -1121,13 +1121,13 @@ $ec_lang['lpn_guide_ff_marks_def']='<p>Bir çalıştırmadan sonra, sınanan her
 $ec_lang['lpn_guide_ff_example_def']='<p>Net1 örneğini açın, Su, Analiz, Yangın debisi analizi… öğesini seçin ve kutu açıldığı gibi Çalıştır\'a tıklayın. Zaman adımı 0:00\'dır ve çalıştırma tüm şebekeyi 135 kez çözer. Dokuz düğümün sekizi tüm denetimleri geçer. N32 düğümü yangın debisinde başarısız olur: statik basıncı 111 psi\'dir, gereken 1000 gpm\'de yalnızca 1,19 psi kalır ve mevcut debisi 892 gpm\'dir. N31 düğümü 1339 gpm verebilir, N12 düğümü ise 10000 gpm\'den fazla.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='Her durumun yaptığı';
-$ec_lang['lpn_guide_cr_case_def']='<p>Kapsamdaki her hat için hat, şebekenin bir kopyasında etkin olmayan hale getirilir ve kopya, ekrandaki zaman adımında ve açık senaryoda çözülür. Bir çalıştırma, her hat için bir çözüm ve hiçbir şey bozulmadan bir çözüm daha demektir. Bir rezervuara veya depoya açık yolu kalmayan bir düğüm ayrılmıştır: çözümden önce kaldırılır ve talebi Karşılanmayan talep olarak sayılır. Hâlâ bağlı olan düğümlerden, Asgarinin altındaki düğümler basıncı İzin verilen en düşük basıncın altına düşenleri listeler. Hiçbir şey bozulmadan zaten onun altında olan bir düğüm hiçbir hat aleyhine sayılmaz ve özet kaç tane olduğunu bildirir. İzin verilen en düşük basınç, Yangın debisi analizinin Başka yerde izin verilen en düşük basınç kutusuyla aynı ayardır.</p>';
+$ec_lang['lpn_guide_cr_case_def']='<p>Kapsamdaki her hat için hat, şebekenin bir kopyasında etkin olmayan hale getirilir ve kopya, ekrandaki zaman adımında ve açık senaryoda çözülür. Bir çalıştırma, her hat için bir çözüm ve hiçbir şey bozulmadan bir çözüm daha demektir. Bir rezervuara veya depoya açık yolu kalmayan bir düğüm ayrılmıştır: çözümden önce kaldırılır ve talebi Karşılanmayan talep olarak sayılır. Hâlâ bağlı olan düğümlerden, Asgarinin altındaki düğümler basıncı İzin verilen en düşük basıncın altına düşenleri listeler. Hiçbir şey bozulmadan zaten onun altında olan bir düğüm hiçbir hat aleyhine sayılmaz ve özet kaç tane olduğunu bildirir. İzin verilen en düşük basınç, Yangın debisi analizinin İzin verilen en düşük sistem basıncı kutusuyla aynı ayardır.</p>';
 $ec_lang['lpn_guide_cr_dead_term']='Çıkmaz uçlar ve liste';
 $ec_lang['lpn_guide_cr_dead_def']='<p>Çıkmaz uçlu hat, kaldırılması yalnızca ondan geçilerek ulaşılabilen düğümleri ayıran hattır. Ötesindeki her şey onun kaybıdır; bu yüzden Çıkmaz uçları atla işaretliyken hat çözülmez ve özet kaçının atlandığını bildirir. Liste her hat için Karşılanmayan talebi, Ayrılan düğümleri ve Asgarinin altındaki düğümleri, her biri sayı ve ilk beş ID ile gösterir ve bir ID\'ye tıklamak haritada ona gider. Sistemin bir şeye mal olduğu hatlar, bir sütun başlığına tıklanıp sıralanana kadar ilk sırada listelenir ve özet onları sınanan hat sayısına göre sayar. Yalnızca haritada seçili hatları bozmak için Seçili hatlar\'ı seçin.</p>';
 $ec_lang['lpn_guide_cr_example_def']='<p>Net1 örneğini açın, Su, Analiz, Kritiklik analizi… öğesini seçin, İzin verilen en düşük basınç için 116 girin ve Çalıştır\'a tıklayın. Zaman adımı 0:00\'dır ve çalıştırma tüm şebekeyi 14 kez çözer. 13 hattan dördü devre dışıyken bir düğümü 116 psi\'nin altına düşürür: L9 (N10, N11 ve N21), L10 (N11 ve N21), L111 (N21 ve N22) ve L112 (N21 ve N22). İki düğüm hiçbir şey bozulmadan zaten 116 psi\'nin altındadır ve sayılmaz. Net1 halkalı olduğu için bir hattı kaybetmek hiçbir düğümü susuz bırakmaz.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
 $ec_lang['lpn_guide_ds_run_def']='<p>Çalıştır, seçilen düğümlerdeki talepleri, şebekenin ekrandaki zaman adımındaki ve açık senaryodaki bir kopyası üzerinde, Talep ölçeğiyle çarpar. İki çözüm yapar: biri talepler olduğu gibi, biri ölçeklenmiş. Sonuç, haritanın gösterdiği değer olan Ölçeksiz değerin yanında Ölçekli değerle birlikte En düşük basınçları ve En yüksek hızları listeler. Her liste on satır tutar ve kutu kaç hattı göstermediğini bildirir. Talep ölçeği, açık senaryonun talep çarpanına ek olarak uygulanır ve asla projeye kaydedilmez.</p>';
-$ec_lang['lpn_guide_ds_find_def']='<p>Bul, 0\'dan 20\'ye kadar talep ölçeklerini 0,01\'e yakın aralıkla arar ve seçilen her düğümün en az İzin verilen en düşük basıncı koruduğu en büyük ölçeği bulur. Ölçeği ve oradaki en düşük basıncı, ve basıncın ilk kez sınırın altına düştüğü bir sonraki adım için aynısını bildirir. Girildiği gibi talepler zaten bir düğümü sınırın altında bırakıyorsa yanıt bir uyarı işaretiyle işaretlenir. 20\'de her düğüm sınırı koruyorsa yanıt bunu söyler. Durdur bir aramayı yanıt vermeden bitirir. İzin verilen en düşük basınç, Yangın debisi analizinin Başka yerde izin verilen en düşük basınç kutusuyla aynı ayardır.</p>';
+$ec_lang['lpn_guide_ds_find_def']='<p>Bul, 0\'dan 20\'ye kadar talep ölçeklerini 0,01\'e yakın aralıkla arar ve seçilen her düğümün en az İzin verilen en düşük basıncı koruduğu en büyük ölçeği bulur. Ölçeği ve oradaki en düşük basıncı, ve basıncın ilk kez sınırın altına düştüğü bir sonraki adım için aynısını bildirir. Girildiği gibi talepler zaten bir düğümü sınırın altında bırakıyorsa yanıt bir uyarı işaretiyle işaretlenir. 20\'de her düğüm sınırı koruyorsa yanıt bunu söyler. Durdur bir aramayı yanıt vermeden bitirir. İzin verilen en düşük basınç, Yangın debisi analizinin İzin verilen en düşük sistem basıncı kutusuyla aynı ayardır.</p>';
 $ec_lang['lpn_guide_ds_scope_term']='Düğümler ve zaman adımı';
 $ec_lang['lpn_guide_ds_scope_def']='<p>Seçili düğümler ile yalnızca haritada seçili düğümler ölçeklenir ve denetlenir. Diğer düğümler olduğu gibi bırakılır ve sınırın altına düşenler yanıtı sınırlamadan listelenir. Yalnızca ekrandaki zaman adımı ölçeklenir ve seviyeler ile durumlar ondan alınır. Pik değeri sınamak için çalıştırmadan önce saati pik talebe getirin.</p>';
 $ec_lang['lpn_guide_ds_example_def']='<p>Net1 örneğini açın ve Su, Analiz, Talep ölçekleme… öğesini seçin. 0:00 zaman adımında, kutu açıldığı gibi Bul\'a tıklayın. Her düğüm, en düşük basıncın N32 düğümünde 20,11 psi olduğu 5,76 talep ölçeğine kadar en az 20 psi korur. 5,77\'de 19,8 psi\'dir ve arama 13 çözüm aldı. Talep ölçeği için 3 girin ve Çalıştır\'a tıklayın: N32 düğümü ölçeksiz 111 psi\'den 85,99 psi\'ye düşer ve L112 hattı 0,535 ft/sn\'den 3,13 ft/sn\'ye çıkar.</p>';
@@ -1141,8 +1141,8 @@ $ec_lang['lpn_guide_en_example_def']='<p>Toplam çalışma süresi 24:00 olan Ne
 $ec_lang['lpn_guide_ct_what_term']='Grafik nedir';
 $ec_lang['lpn_guide_ct_what_def']='<p>Su, Grafikler, Eş eğri öğesini seçin. Satır grafiği açık senaryoda, düğümler henüz renklendirilmemişse basıncı kullanarak, etiketli çizgilerle yumuşak bir dolgu olarak açar ve kutuyu açar. Grafik düğüm renklerini borular boyunca ve yanlarında ortanca boru uzunluğunun belirli bir katına kadar yayar; dış kısımda soluklaşır. Pompaların, vanaların veya kapalı hatların üzerinden renklendirmez. Renk anahtarının altındaki satır, grafiğin kaç düğüm ve boru kullandığını, boruların yanındaki erişimi ve çizgilerin aralığını bildirir. Çok az düğümle bunu söyler.</p>';
 $ec_lang['lpn_guide_ct_box_term']='Kutu';
-$ec_lang['lpn_guide_ct_box_def']='<p>Eş eğrileri göster, işareti kaldırıldığında dolguyu ve çizgileri gizler ve düğüm renklerini korur. Kutuda ayrıca Ayarlar, Görselleştirme, Düğüm renkleri içindeki aynı iki ayar olan Düğümleri şuna göre renklendir ve Renk düzeni, Dolgu (Yok, Yumuşak veya her sınıfı düz boyayan Bantlar), Dolgu opaklığı, Aralığı ve Etiketleri olan Eş eğri çizgileri ve ortanca boru uzunluğunun katı olarak Tampon bulunur. Dünya üzerine yerleştirilmiş bir projede kutu, ziyaretçi şebekenin alanının karo numaralarını göndermeyi kabul ettikten sonra düğümler arasındaki zemini Mapbox DEM\'den de alabilir. Bu ayarlar projeyle birlikte kaydedilir ve bir senaryo tarafından değiştirilebilir. Grafik yalnızca görüntüyü değiştirir, şebekeyi değiştirmez.</p>';
-$ec_lang['lpn_guide_ct_example_def']='<p>Net1 örneğini açın ve Su, Grafikler, Eş eğri öğesini seçin. Düğümler basınca göre renklendirilir ve renk anahtarının altındaki satır 9 düğümü, 11 boruyu, yanlarında ortanca boru uzunluğunun 2,5 katı erişimi ve her 5 psi\'de çizgileri bildirir. Pompa, Hat 9, 11 borudan biri değildir. Eş eğrileri göster işareti kaldırıldığında düğümler basınca göre renkli kalır.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>Grafiği göster, işareti kaldırıldığında dolguyu ve çizgileri gizler ve düğüm renklerini korur. Kutuda ayrıca Ayarlar, Görselleştirme, Düğüm renkleri içindeki aynı iki ayar olan Düğümleri şuna göre renklendir ve Renk düzeni, Dolgu (Yok, Yumuşak veya her sınıfı düz bir renkle boyayan Bantlar), Dolgu opaklığı, Aralığı ve Etiketleri olan Eş eğri çizgileri ve Tampon (ortanca boru uzunluğunun katı olarak) bulunur. Dünya üzerine yerleştirilmiş bir projede kutu, ziyaretçi şebekenin alanının karo numaralarını göndermeyi kabul ettikten sonra düğümler arasındaki zemini Mapbox DEM\'den de alabilir. Bu ayarlar projeyle birlikte kaydedilir ve bir senaryo tarafından değiştirilebilir. Grafik yalnızca görüntüyü değiştirir, şebekeyi değiştirmez.</p>';
+$ec_lang['lpn_guide_ct_example_def']='<p>Net1 örneğini açın ve Su, Grafikler, Eş eğri öğesini seçin. Eş eğri grafiği basıncı gösterir ve renk anahtarının altındaki satır 9 düğümü, 11 boruyu, yanlarında ortanca boru uzunluğunun 2,5 katı erişimi ve her 5 psi\'de çizgileri bildirir. Pompa, Hat 9, 11 borudan biri değildir. Düğümler, grafikten önce sahip oldukları renkleri ve Grafiği göster işareti kaldırıldıktan sonra da korur.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='Raporun içeriği';
 $ec_lang['lpn_guide_rr_what_def']='<p>Su, Raporlar, Çalıştırma öğesini seçin. Rapor, EPANET motorunun son uzun süreli benzetim için yazdığı metindir; sayfalara bölünmüştür. Başlık ve şebeke adıyla başlar, sonra düğümleri, rezervuarları, depoları, boruları, pompaları ve vanaları sayar, sonra analiz seçeneklerini bildirir ve sonra çalıştırmanın hidrolik durumunu uyarılarıyla birlikte listeler. Kopyala düğmesi metni kopyalar.</p>';
@@ -1150,7 +1150,7 @@ $ec_lang['lpn_guide_rr_example_def']='<p>Zaten hesaplanmış olan Net1 örneğin
 $ec_lang['lpn_guide_st_what_term']='Neler listelenir';
 $ec_lang['lpn_guide_st_what_def']='<p>Su, Raporlar, Durum değişiklikleri öğesini seçin. Her satır bir değişikliğin zamanını ve değişikliği verir: artık açık veya artık kapalı olan bir pompa, vana ya da boru ya da artık dolan, boşalan, dolu veya boş olan bir depo. Tam olarak yakınsamayan bir zaman adımı da listelenir. Liste zaman sırasındadır ve her adımı değil yalnızca değişiklikleri tutar. Tablolar paneli ve Tam rapor ile aynı uzun süreli çalıştırmadan okunur.</p>';
 $ec_lang['lpn_guide_st_example_def']='<p>Net1 örneğini açın ve Su, Raporlar, Durum değişiklikleri öğesini seçin. N2 deposu 1:00\'de dolmakta, 11:00\'de boşalmakta, 16:00\'da dolmakta ve 22:00\'de boşalmaktadır. L9 pompası 10:00\'da kapalı, 15:00\'te açık ve 21:00\'de kapalıdır.</p>';
-$ec_lang['lpn_guide_fr_what_def']='<p>Su, Raporlar, Tam öğesini seçin. Tablo, Tablolar panelinin birimlerinde, her raporlama zaman adımında her düğüm ve hat için bir satıra sahiptir. Sütunları Tür, ID, Talep, Yük, Basınç, Klor derişimi, Debi, Hız, Yük kaybı, Pompa yükü ve Durum\'dur ve varlığın böyle bir büyüklüğü olmayan yerde hücre boştur. Zaman adımı listesi gösterilen adımı seçer; CSV indir ve Raporu yazdır her adımı taşır. Uzun süreli benzetim olmadan tablo, geçerli çözümü tek bir anda gösterir.</p>';
+$ec_lang['lpn_guide_fr_what_def']='<p>Su, Raporlar, Tam öğesini seçin. Tablo, Tablolar panelinin birimlerinde, her raporlama zaman adımında her düğüm ve hat için bir satıra sahiptir. Sütunları Tür, ID, Talep, Yük, Basınç, Klor derişimi, Debi, Hız, Yük kaybı, Pompa yükü ve Durum\'dur ve varlığın böyle bir büyüklüğü olmayan yerde hücre boştur. Zaman adımı listesi gösterilen adımı seçer; CSV indir, HTML\'yi kopyala ve Raporu yazdır her adımı taşır. Uzun süreli simülasyon olmadan tablo, geçerli çözümü tek bir anda gösterir.</p>';
 $ec_lang['lpn_guide_fr_example_def']='<p>Net1 örneğini açın ve Su, Raporlar, Tam öğesini seçin. 24 varlık, 0:00\'dan 24:00\'a 25 raporlama adımında listelenir; bu 600 satırdır. 0:00\'da 11 düğümünün talebi 150 gpm, yükü 985,23 ft H2O ve basıncı 119,26 psi\'dir.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='Raporun karşılaştırdığı';
@@ -1239,23 +1239,23 @@ $ec_lang['lpn_map_unmeasurable']='Bu sayfa çizim alanının boyutunu hesaplayam
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 artı kural tabanlı kontroller';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1, senaryolar ve kontroller, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Klor içeren kurgusal bir EPANET örneği, 1 rezervuar ve 1 depo.';
-$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 artı kural tabanlı kontroller, L/s (SI)';
-$ec_lang['lpn_ex_net1_si_desc']='Saniyede litre, metre ve milimetre birimleriyle. Dakikada galon, fit ve inç biriminden dönüştürülmüş kurgusal bir EPANET örneği: klor, 1 rezervuar, 1 depo, 1 pompa ve iki kural tabanlı kontrol içerir.';
+$ec_lang['lpn_ex_net1_desc']='Temel, yani ortalama gün altında dört senaryo: En yüksek gün (talep çarpanı 1,5) ve Pik saat (2,25); her birinin bir ana boru kırılması çocuğu var. Klor, 1 rezervuar, 1 depo, 1 pompa ve kurala dayalı iki kontrol içeren kurgusal bir EPANET örneği. Dakikada galon, fit ve inç birimleriyle.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1, senaryolar ve kontroller, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Temel, yani ortalama gün altında dört senaryo: En yüksek gün (talep çarpanı 1,5) ve Pik saat (2,25); her birinin bir ana boru kırılması çocuğu var. Klor, 1 rezervuar, 1 depo, 1 pompa ve kurala dayalı iki kontrol içeren kurgusal bir EPANET örneği. Saniyede litre, metre ve milimetre birimleriyle.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/sn (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Saniyede litre, metre ve milimetre birimleriyle. Branford, Connecticut\'taki bir EPANET örneği; dakikada galon, fit ve inç biriminden dönüştürülmüştür: 35 düğüm ve 1 depo, rezervuar, pompa ve vana yok, yaklaşık 2 km × 4 km. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer.';
+$ec_lang['lpn_ex_net2_si_desc']='Branford, Connecticut\'taki bir EPANET örneği; dakikada galon, fit ve inçten dönüştürülmüştür: 35 düğüm ve 1 depo; rezervuar, pompa ve vana yok; yaklaşık 2 km × 4 km. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer. Saniyede litre, metre ve milimetre birimleriyle.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, g/d (ABD)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Dakikada galon, fit ve inç birimleriyle. Branford, Connecticut\'taki bir EPANET örneği: 35 düğüm ve 1 depo, rezervuar, pompa ve vana yok, yaklaşık 1 mil × 2 mil. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer.';
+$ec_lang['lpn_ex_net2_desc']='Branford, Connecticut\'taki bir EPANET örneği: 35 düğüm ve 1 depo; rezervuar, pompa ve vana yok; yaklaşık 1 mil × 2 mil. Tepkimeye girmeyen bir madde olan florür, bir kaynaktan girer. Dakikada galon, fit ve inç birimleriyle.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/sn (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Saniyede litre, metre ve milimetre birimleriyle. Novato, California\'daki bir EPANET örneği; dakikada galon, fit ve inç biriminden dönüştürülmüştür, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 8 km kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile.';
+$ec_lang['lpn_ex_net3_si_desc']='Novato, Kaliforniya\'daki bir EPANET örneği; dakikada galon, fit ve inçten dönüştürülmüştür, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 8 km kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile. Saniyede litre, metre ve milimetre birimleriyle.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, g/d (ABD)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Dakikada galon, fit ve inç birimleriyle. Novato, California\'daki bir EPANET örneği, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 5 mil kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile.';
+$ec_lang['lpn_ex_net3_desc']='Novato, Kaliforniya\'daki bir EPANET örneği, arkasında dünya haritasıyla: 92 düğüm, 3 depo ve 2 rezervuar, vana yok, yaklaşık 5 mil kare. 24 saatlik uzun süreli simülasyon, Göl\'den bir kaynak izleme ile. Dakikada galon, fit ve inç birimleriyle.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, g/d (ABD)';
-$ec_lang['lpn_ex_elm_street_desc']='Dakikada galon, fit ve inç birimleriyle. Prescott Valley, Arizona: 17 düğüm, 1 rezervuar ve 1 pompa. Bir vaziyet planı üzerine çizilmiş, tek bir anda maksimum gün talebine ek olarak yangın debisi için çözülmüş ticari bir alan.';
+$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley, Arizona: 17 düğüm, 1 rezervuar ve 1 pompa. Bir vaziyet planı üzerine çizilmiş, tek bir anda maksimum gün talebine ek olarak yangın debisi için çözülmüş ticari bir alan. Dakikada galon, fit ve inç birimleriyle.';
 $ec_lang['lpn_tool_undo']='Geri al';
 $ec_lang['lpn_confirm_example']='Bu, örneği mevcut şebekenize ekler. Devam edilsin mi?';
 $ec_lang['lpn_field_diameter']='Çap';
@@ -1440,7 +1440,7 @@ $ec_lang['lpn_convas_oneway']='Geri dönüştürmek ikinci bir dönüşümdür, 
 $ec_lang['lpn_convas_ok']='Dönüştür';
 // {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
 // 2026-09-25: "What, specifically, is 'that coordinate system'?").
-$ec_lang['lpn_convas_no_transform']='{crs}, kullanılabilir projeksiyon bilgisi olmayan birkaç listelenmiş koordinat sisteminden biri, bu yüzden ona veya ondan dönüştürülemez. Hiçbir şey dönüştürülmedi.';
+$ec_lang['lpn_convas_no_transform']='{crs}, kullanılabilir projeksiyon bilgisi olmayan birkaç listelenmiş koordinat sisteminden biridir; bu yüzden ona veya ondan dönüştürülemez. Hiçbir şey dönüştürülmedi.';
 // {name} is the new project's name.
 $ec_lang['lpn_convas_done']='Dönüştürülen kopya {name}. Orijinal proje değişmedi.';
 $ec_lang['lpn_convas_cancelled']='Hiçbir şey dönüştürülmedi. Kopya kapatıldı ve orijinal proje değişmedi.';
@@ -1456,7 +1456,7 @@ $ec_lang['lpn_georef_step1']='2 adımdan 1. adım — hızlı';
 $ec_lang['lpn_georef_step2']='2 adımdan 2. adım — hassas';
 $ec_lang['lpn_georef_step1_hint']='Projeniz ekranda olduğu yerde kalır. Arkasındaki zemin kabaca doğru yere ve kabaca doğru boyuta gelene kadar altındaki haritayı kaydırıp yakınlaştırın, sonra Modeli buraya koy düğmesine basın.';
 $ec_lang['lpn_georef_detach']='Tekrar al';
-$ec_lang['lpn_georef_size_prompt']='Saha, tüm proje boyunca yaklaşık ne kadar geniş?';
+$ec_lang['lpn_georef_size_prompt']='Projenin doğu-batı genişliği yaklaşık ne kadar?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -1875,7 +1875,7 @@ $ec_lang['lpn_find_no_value']='Aranacak şeyi yazın.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Bağlantı';
-$ec_lang['lpn_find_prop_demand_desc']='Bu talep kategorisinin açıklaması';
+$ec_lang['lpn_find_prop_demand_desc']='Talep kategorisi açıklaması';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2061,7 +2061,7 @@ $ec_lang['lpn_freq_axis_percent']='Altında kalan yüzde';
 $ec_lang['lpn_contour_menu']='Eş eğri';
 $ec_lang['lpn_contour_tip']='Haritada bir eş eğri grafiği gösterin: düğüm renkleri boruların boyunca ve yanlarında yayılır, etiketli eş eğri çizgileriyle birlikte. Ayarlamak veya kapatmak için bir kutu açar.';
 $ec_lang['lpn_contour_plot']='Eş eğri grafiği';
-$ec_lang['lpn_contour_show']='Eş eğrileri göster';
+$ec_lang['lpn_contour_show']='Grafiği göster';
 $ec_lang['lpn_contour_show_tip']='Dolguyu ve eş eğri çizgilerini gizlemek için işareti kaldırın; olduğu gibi geri getirmek için işaretleyin. Düğüm renkleri kalır.';
 $ec_lang['lpn_contour_fill']='Dolgu';
 $ec_lang['lpn_contour_fill_tip']='Yumuşak, renkleri bir sınıftan ötekine harmanlar. Bantlar, renk anahtarının her sınıfını düz boyar.';
@@ -2070,7 +2070,7 @@ $ec_lang['lpn_contour_fill_bands']='Bantlar';
 $ec_lang['lpn_contour_opacity']='Dolgu opaklığı';
 $ec_lang['lpn_contour_lines']='Eş eğri çizgileri';
 $ec_lang['lpn_contour_interval']='Aralık';
-$ec_lang['lpn_contour_buffer']='Tampon';
+$ec_lang['lpn_contour_buffer']='Tampon (× ortanca boru uzunluğu)';
 $ec_lang['lpn_contour_buffer_unit']='× ortanca boru uzunluğu';
 $ec_lang['lpn_contour_buffer_tip']='Rengin her borudan ne kadar uzağa ulaştığı, ortanca boru uzunluğunun katı olarak. Dış kısımda giderek solar.';
 $ec_lang['lpn_contour_few']='Eş eğri çizmek için çok az düğüm var.';
@@ -2141,16 +2141,16 @@ $ec_lang['lpn_new_coordsys_local_tip']='Coğrafi referanslı değildir. Kendi ar
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
 $ec_lang['lpn_crs_view']='Harita görünümüne göre filtrele';
-$ec_lang['lpn_crs_view_tip']='Yalnızca haritanın baktığı yeri kapsayan projeksiyonları sunar. Tüm listeyi görmek için kapatın.';
+$ec_lang['lpn_crs_view_tip']='Yalnızca haritanın baktığı yeri kapsayan koordinat sistemlerini sunar. Tüm listeyi görmek için işareti kaldırın.';
 $ec_lang['lpn_crs_place']='Yer adı arama';
 $ec_lang['lpn_crs_place_tip']='Aramalar OpenStreetMap yer adı hizmetine gönderilir ve ilk seferinde izin istenir. Yeni bir coğrafi proje de burada bulunan yerden başlar.';
 $ec_lang['lpn_crs_search']='Ara';
-$ec_lang['lpn_crs_name']='Projeksiyon adı filtresi';
+$ec_lang['lpn_crs_name']='Koordinat sistemi adı filtresi';
 $ec_lang['lpn_crs_name_tip']='Listeyi süzen metin: yalnızca adı veya EPSG kodu bunu içeren koordinat sistemleri gösterilir.';
-$ec_lang['lpn_crs_list_tip']='Yukarıdaki iki filtreden kalan projeksiyonlar. Birini seçin ve Seç’e basın.';
+$ec_lang['lpn_crs_list_tip']='Yukarıdaki filtrelerden geçen koordinat sistemleri. Birini seçin, sonra Tamam\'a basın.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Henüz bir yer aranmadı, bu yüzden tüm liste sunuluyor. Yukarıdan bir yer arayın veya listeyi daraltmak için haritayı yakınlaştırın.';
-$ec_lang['lpn_crs_count']='{total} projeksiyondan {n} tanesi listelendi.';
+$ec_lang['lpn_crs_count']='{total} koordinat sisteminden {n} tanesi listelendi.';
 // The same count when the list is filtered by the whole network's extent (File, Convert as, Tom
 // 2026-09-26: "should automatically filter EPSG CRSes for the displayed area or network extents"),
 // so the reader knows why the list is short. The Filter by map view box above still shows them all.
@@ -2163,7 +2163,7 @@ $ec_lang['lpn_crs_unplaceable_mark']='(harita yok)';
 $ec_lang['lpn_crs_suggested_mark']='(önerilen)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
-$ec_lang['lpn_crs_unplaceable']='{crs}, kullanılabilir projeksiyon bilgisi olmayan birkaç listelenmiş koordinat sisteminden biri. Bu, dünya haritasının, yer adı aramasının ve DEM kotlarının çalışmadığı anlamına gelir. Koordinatlarınız etkilenmez.';
+$ec_lang['lpn_crs_unplaceable']='{crs}, kullanılabilir projeksiyon bilgisi olmayan birkaç listelenmiş koordinat sisteminden biridir. Bu, dünya haritasının, yer adı aramasının ve DEM kotlarının çalışmadığı anlamına gelir. Koordinatlarınız etkilenmez.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 // **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
@@ -2222,9 +2222,9 @@ $ec_lang['lpn_dialog_ok']='Tamam';
 // fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
 // own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='İçe aktar…';
-$ec_lang['lpn_file_import_inp']='EPANET dosyası içe aktar…';
+$ec_lang['lpn_file_import_inp']='EPANET dosyası…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET\'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder.';
+$ec_lang['lpn_file_import_inp_tip']='Bir EPANET dosyasından yeni bir proje oluşturun veya bir proje açıksa onu dosyadan güncelleyin. Dosya ya .inp dışa aktarma biçimindedir (tercih edilir) ya da yerel .net biçimindedir (son çare). Bir EPANET-MSX modelini de açmak için aynı anda .msx dosyasını seçin.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2235,8 +2235,8 @@ $ec_lang['lpn_file_export_item_geojson']='GeoJSON dosyası…';
 $ec_lang['lpn_file_export_item_ods']='ODS dosyası…';
 $ec_lang['lpn_file_export_item_xlsx']='XLSX dosyası…';
 $ec_lang['lpn_file_export_item_csv']='CSV dosyası…';
-$ec_lang['lpn_file_export_tables_tip']='Tabloları Tablolar panelinin gösterdiği şekilde, her tablo için (ve seçtiğiniz her senaryo için) bir sayfa ve kimliklerinin (ID) başvurduğu her kitaplık için bir sayfa içeren tek bir çalışma kitabı olarak indirin: desenler, eğriler, boru türleri ve bağlantı parçaları. Sonuçlar yalnızca en son hesaplanan senaryo için eklenir.';
-$ec_lang['lpn_file_export_csv_tip']='Bir tabloyu Tablolar panelinin gösterdiği şekilde indirin. Tek bir tablo, kitaplık içermeyen tek bir CSV dosyası olarak gelir. Birden çok tablo veya senaryo, kimliklerinin (ID) başvurduğu her kitaplık için bir dosyayla birlikte, CSV dosyalarından oluşan tek bir zip dosyası olarak gelir. Sonuçlar yalnızca en son hesaplanan senaryo için eklenir.';
+$ec_lang['lpn_file_export_tables_tip']='Tabloları Tablolar panelinin gösterdiği şekilde, her tablo için (ve seçtiğiniz her senaryo için) bir sayfa ve girdisi olan her kitaplık için bir sayfa içeren tek bir çalışma kitabı olarak indirin: desenler, eğriler, boru türleri, bağlantı parçaları, kontroller ve kurallar. Sonuçlar yalnızca en son hesaplanan senaryo için eklenir.';
+$ec_lang['lpn_file_export_csv_tip']='Bir tabloyu Tablolar panelinin gösterdiği şekilde indirin. Tek bir tablo, kitaplık içermeyen tek bir CSV dosyası olarak gelir. Birden çok tablo veya senaryo, girdisi olan her kitaplık için bir dosyayla birlikte, CSV dosyalarından oluşan tek bir zip dosyası olarak gelir. Sonuçlar yalnızca en son hesaplanan senaryo için eklenir.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Bu şebekeyi bir EPANET .inp dosyası olarak indirir (varsa görüntüsüyle birlikte bir zip dosyası içinde). .inp biçiminin tutamadığı her şey sonrasında sizin için listelenir.';
 $ec_lang['lpn_status_inp_exported']='{file} dışa aktarıldı.';
@@ -2276,9 +2276,9 @@ $ec_lang['lpn_dxf_note_categories']='Birden fazla talep kategorisi olan düğüm
 $ec_lang['lpn_file_export_geojson_tip']='Bu şebekeyi QGIS, ArcGIS Pro ve diğer CBS programları için GeoJSON dosyası olarak indirin. Düğümler, depolar ve rezervuarlar noktadır; borular, pompalar ve vanalar köşe noktalarını izleyen çizgilerdir. Konumlar enlem ve boylamdır. Sonuçlar yalnızca şebeke çözüldüyse dahil edilir.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Çalışma alanı…';
-$ec_lang['lpn_file_export_workspace_tip']='Kutularınızın nerede durduğunu, boyutlarını, hangilerinin açık veya yerleştirilmiş olduğunu, panel ve sütun boyutlarınızı ve bu sayfanın görüntü seçeneklerini, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiğini tutan küçük bir dosya indirin. Projeleriniz, proje ayarlarınız ve çerezleriniz (dil, onay, birimler) içinde yer almaz. Başka bir ekranda veya tarayıcıda Dosya, İçe aktar, Çalışma alanı ile yükleyin.';
+$ec_lang['lpn_file_export_workspace_tip']='Bu sayfanın düzenini tutan küçük bir dosya indirin: panellerin, tablo sütunlarının ve kutuların nerede durduğu, boyutları, hangilerinin açık, yerleştirilmiş veya gizli olduğu; ayrıca bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projeleriniz, proje ayarlarınız ve çerezleriniz (dil, onay, birimler) içinde yer almaz. Başka bir ekranda veya tarayıcıda Dosya, İçe aktar, Çalışma alanı ile yükleyin.';
 $ec_lang['lpn_file_import_workspace']='Çalışma alanı…';
-$ec_lang['lpn_file_import_workspace_tip']='Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.';
+$ec_lang['lpn_file_import_workspace_tip']='Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: panellerin, tablo sütunlarının ve kutuların düzeni ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.';
 $ec_lang['lpn_workspace_exported']='Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.';
 $ec_lang['lpn_workspace_imported']='Çalışma alanı {file} dosyasından uygulandı. Uygulanan ayarlar: {n}. Varsayılanlarına döndürülenler: {r}.';
 $ec_lang['lpn_workspace_ignored']='Tanınmadığı için yok sayılan girdiler: {u}.';
@@ -2309,7 +2309,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Metin etiketleri, EPANET\'in yerleştir
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET dosyaları koordinat sistemi içermez, bu yüzden bu dosya başlangıçta coğrafi referanslı olmayacak. Bir dünya haritası üzerine yerleştirmek için Harita, Dünya haritası…\'nı kullanın. Koordinatlarını dönüştürmek için Dosya, Farklı dönüştür…\'ü kullanın.';
 $ec_lang['lpn_inp_backdrop_attach']='{file} dosyasını bağla…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='Bir web sayfası görüntüyü adıyla açamaz. Onu cihazınızda seçin; dosyanın belirttiği yere yerleştirilir.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Bir web sayfası ilişkili bir dosyayı kendiliğinden açamaz. Arka plan dosyasını seçin; dosyanın belirttiği yere yerleştirilir.';
 $ec_lang['lpn_inp_backdrop_attached']='{file} bağlandı, dosyanın belirttiği yere yerleştirildi.';
 $ec_lang['lpn_inp_backdrop_attached_other']='{picked} bağlandı, dosyanın belirttiği yere yerleştirildi. Dosya {file} adını veriyor, bu farklı bir ad.';
 $ec_lang['lpn_inp_report_lead']='Bu sayfa EPANET\'in kullandığı her şeyi kullanmaz, ama dosyanızdaki hiçbir şey atılmaz. Aşağıda, dosyanızın tuttuğu ve bu sayfanın kullanmadan koruduğu şeyler ile dosya okunurken neyin değiştiği var:';
@@ -2599,7 +2599,7 @@ $ec_lang['lpn_notes_1_term']='Nasıl çözüldüğü';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='Varsayılan olarak şebeke EPANET çözücüsüyle çözülür. Bir toplam çalışma süresi belirlendiğinde her raporlama zaman adımı sırayla hesaplanır: depolar dolar ve boşalır, talepler desenlerini izler ve araç çubuğu çalıştırmayı oynatır. Mümkün olduğunda yerleşik çözücüyü kullan işaretliyken tek anlık bir çözüm yerleşik çözücüyle çözülebilir; ancak uzun süreli bir benzetim veya bir basınç kırıcı ya da genel amaçlı vana (PBV, GPV) içeren bir şebeke her zaman EPANET çözücüsüyle çözülür.';
+$ec_lang['lpn_notes_1_def']='Varsayılan olarak şebeke EPANET çözücüsüyle çözülür. Bir toplam çalışma süresi belirlendiğinde her raporlama zaman adımı sırayla hesaplanır: depolar dolar ve boşalır, talepler desenlerini izler ve araç çubuğu çalıştırmayı oynatır. Mümkün olduğunda yerleşik çözücüyü kullan işaretliyken tek anlık bir çözüm yerleşik çözücüyle çözülebilir; ancak uzun süreli bir simülasyon her zaman EPANET çözücüsüyle çözülür.';
 $ec_lang['lpn_notes_2_term']='Ne yapmadığı';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Ne yapmadığı';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir.';
+$ec_lang['lpn_notes_2_def']='Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir. Çok türlü su kalitesi (EPANET-MSX) modellenmez. Su yaşı, kaynak izleme ve tepkimeye giren tek bir kimyasal modellenir.';
 $ec_lang['lpn_notes_3_term']='Projeleri kaydetme';
 $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme bu tarayıcıya kaydedilir. Tarayıcı verilerinin temizlenmesi hepsini siler; bu yüzden çalışma bir dosyada tutulmalıdır: Dosya, Farklı kaydet. Bir sekmedeki yıldız işareti, bir dosyada olmayan değişiklikler taşıdığı anlamına gelir ve o sekmeyi kapatmak önce sorar. Kaydet veya Farklı kaydet seçilmedikçe hiçbir şey asla bir dosyaya yazılmaz. Bazı tarayıcılarda bir proje, kaydedildiği dosyaya bağlanır ve Dosya, Kaydet bundan sonra o aynı dosyaya geri yazar; diğerlerinde bağlantı mümkün değildir, bu yüzden Kaydet devre dışıdır ve yalnızca Farklı kaydet kullanılabilir. Bu site, iki kişi birbirinin üzerine yazmasın diye bir proje dosyasını kimin açık tuttuğunu izler. Bir meslektaşın zaten açık tuttuğu bir dosyayı açmak Sor, Salt okunur aç ve Kilidi kır seçeneklerini sunar. Sunucuya ulaşılamazsa bir uyarı, başka bir kullanıcının aynı dosyayı aynı anda düzenleyebileceğini bildirir.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2623,7 +2623,7 @@ $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme 
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pompa eğrisi';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='Bir pompa H = H₀ − aQ^b denklemini izler; burada H pompanın eklediği yük, Q ise içinden geçen debidir. Eğrinin noktaları Su, Kitaplıklar içinde bir Pompa yükü eğrisi olarak girilir ve pompa o eğriyi Özelliklerde belirtir. Üç nokta — sıfır debideki yük, normal çalışma noktası ve en yüksek debi noktası — H₀, a ve b\'yi doğrudan belirler ve yayımlanmış bir eğriyi en yakından izler. İki nokta, tepe noktası sıfır debide olan bir parabole (b = 2) oturtulur. Tek nokta EPANET\'in kuralını kullanır: sıfır debideki yük girilen yükün 1,33334 katıdır ve en yüksek debi girilen debinin 2 katıdır; bu da yine b = 2 verir. Eğrisi belirtilmemiş bir pompa yük eklemez. Eğri, yükün sıfıra ulaştığı yerde kesilmez; bu yüzden eğrinin sağlayabileceğinden daha büyük bir debi negatif bir yük üretir. Çare daha büyük bir pompa veya daha küçük bir taleptir, farklı bir eğri uydurması değil. Bir eğri üçten fazla nokta tutabilir. EPANET çözücüsüne hepsi verilir ve aralarında enterpolasyon yapar; Denklem satırı ve yerleşik çözücü ise en düşük, orta ve en yüksek noktaları kullanır.';
+$ec_lang['lpn_notes_5_def']='Bir pompa eğrisi Su, Kitaplıklar içinde bir Pompa yükü eğrisi olarak girilir ve pompa o eğriyi Özelliklerde belirtir. İki çözücü de onu EPANET\'in okuduğu gibi okur. Tek nokta EPANET\'in kuralını kullanır: sıfır debideki yük girilen yükün 1,33334 katıdır ve en yüksek debi girilen debinin 2 katıdır. Tek noktalı bir eğri ve sıfır debide başlayan üç noktalı bir eğri H = H₀ − aQ^b olarak uydurulur; burada H pompanın eklediği yük, Q ise içinden geçen debidir ve Denklem satırı uydurmayı gösterir. Diğer her eğri (iki nokta, sıfır debide başlamayan üç nokta veya dört ya da daha fazla nokta) noktaları arasında düz çizgiler olarak kullanılır ve ilk ve son çizgiler eğrinin uçlarının ötesine uzatılır. Eğrisi belirtilmemiş bir pompa yük eklemez. Eğri, yükün sıfıra ulaştığı yerde kesilmez; bu yüzden eğrinin sağlayabileceğinden daha büyük bir debi negatif bir yük üretir. Çare daha büyük bir pompa veya daha küçük bir taleptir, farklı bir eğri değil.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2677,10 +2677,10 @@ $ec_lang['lpn_omitted_note']='Bu çalıştırmanın dışında bırakıldı, ç�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET çözücüsü alınıyor. Bir kez indirilir ve ardından bu cihazda tutulur, böylece daha sonra çevrimdışı çalışır.';
 $ec_lang['lpn_engine_ready']='EPANET çözücüsü artık bu cihazda ve çevrimdışı çalışıyor.';
-$ec_lang['lpn_engine_unavailable']='Basınç kırıcı ve genel amaçlı vanaları (PBV, GPV) çözmek için gerekli olan EPANET çözücüsü indirilemedi. İnternete bir kez bağlandıktan sonra çözücü bu cihazda saklanır.';
+$ec_lang['lpn_engine_unavailable']='Bu şebekeyi çözmek için gerekli olan EPANET çözücüsü indirilemedi. İnternete bir kez bağlandıktan sonra çözücü bu cihazda saklanır.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) EPANET çözücüsü olmadan çözülemez. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='Bu şebeke EPANET çözücüsü olmadan çözülemez. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Siz kurarken EPANET çözücüsü yükleniyor. Sonuçlar tamamen yüklendiğinde kullanılabilir olacak.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2942,7 +2942,7 @@ $ec_lang['lpn_field_text_size']='Boyut çarpanı';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='Tüm yakınlaştırma düzeylerinde göster';
-$ec_lang['lpn_field_text_all_zoom_tip']='Ne kadar uzaklaşırsanız uzaklaşın, bu metni çizimde tutar. İşareti kaldırırsanız, görünüm Harita ve sayfa altında ayarlanan etiketleme eşiğinden daha genişlediğinde metin, diğer etiketlerle birlikte gizlenir.';
+$ec_lang['lpn_field_text_all_zoom_tip']='Ne kadar uzaklaşırsanız uzaklaşın, bu metni çizimde tutar. İşareti kaldırırsanız, görünüm Harita altında ayarlanan etiketleme eşiğinden daha genişlediğinde metin, diğer etiketlerle birlikte gizlenir.';
 $ec_lang['lpn_tool_labels']='Etiketler';
 $ec_lang['lpn_labels_heading_node']='Düğüm etiketleri';
 $ec_lang['lpn_labels_heading_link']='Hat etiketleri';
@@ -2961,7 +2961,7 @@ $ec_lang['lpn_labels_separator_tip']='Bir etikette bir özellikle bir sonraki ar
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
 // crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Öncelik';
+$ec_lang['lpn_labels_priority']='Eleme sırası';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
@@ -3126,9 +3126,9 @@ $ec_lang['lpn_settings_hover_card_tip']='İşaretçiyi bir düğümün, hattın 
 $ec_lang['lpn_settings_override_marks']='Senaryo değeri işaretlerini haritada göster';
 $ec_lang['lpn_settings_override_marks_tip']='Açık senaryoda bir senaryo değeri olan varlıkta kehribar renkli halkayı ve bir tane devralan varlıkta kesikli gri halkayı gösterir. Tablolar paneli senaryo değerlerini her iki durumda da işaretler. Harita, Temiz harita işaretliyken halkaları gizler. Bu, proje için değil, bu tarayıcı için bir ayardır.';
 $ec_lang['lpn_clean_map']='Temiz harita';
-$ec_lang['lpn_clean_map_tip']='İşaretliyse: yakınlaştırma düğmeleri, sokak haritası ve uydu düğmesi, Mesajlar düğmesi ve bildirimler, seçim yardımı, geri bildirim düğmesi ve senaryo değeri halkaları gizlenir. İşaretsizse: gösterilir. Hatalar yine haritada gösterilir ve her bildirim yine Mesajlarda tutulur. Bu, proje için değil, bu tarayıcı için bir ayardır.';
+$ec_lang['lpn_clean_map_tip']='İşaretliyse: yakınlaştırma düğmeleri, sokak haritası ve uydu düğmesi, Mod satırı, mesajlar ve Mesajlar düğmesi, geri bildirim düğmesi ve senaryo değeri halkaları gizlenir. İşaretsizse: gösterilir. Yalnızca bir çalıştırmanın yanıt vermediğini söyleyen mesaj haritada kalır. Gizlenen mesajlar yine tutulur ve bu işaret kaldırıldığında Mesajlar onları yeniden gösterir. Bu, proje için değil, bu tarayıcı için bir ayardır.';
 $ec_lang['lpn_settings_theme']='Tema';
-$ec_lang['lpn_settings_theme_tip']='Sayfa için açık veya koyu renkleri seçin. Sistem, cihazınızın ayarını izler. Harita çizimi her temada aynı görünür. Bu, proje için değil, bu tarayıcı için bir ayardır.';
+$ec_lang['lpn_settings_theme_tip']='Sayfanın görünümünü seçin: renklerini ve bazı temalarda biçimlerini ve yazı tipini. Her kart, seçilmeden önce temayı bu sayfada gösterir. Sistem, cihazınızın ayarını izler. Ekranda harita da temayı izler; basılı sayfalar, ekran görüntüleri ve dışa aktarılan dosyalar her zaman Açık temayla çizilir. Bu, proje için değil, bu tarayıcı için bir ayardır.';
 $ec_lang['lpn_theme_system']='Sistem';
 $ec_lang['lpn_theme_light']='Açık';
 $ec_lang['lpn_theme_dark']='Koyu';
@@ -3276,7 +3276,7 @@ $ec_lang['lpn_scenario_only_deleted']='{id} silindi. Yalnızca {scenario} senary
 $ec_lang['lpn_scenario_delete_blocked']='{id} silinmedi, çünkü {link} hattı onda bitiyor ve bu hat {scenario} dışında da var. İkisini birden silmek için {base} senaryosunda silin.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Temel mod';
-$ec_lang['lpn_scenario_basic_tip']='İşaretliyse: alternatifler gizli ve otomatiktir, her senaryo senaryo değerlerini kendisine ait gösterir ve tüm yeni senaryolar Temel senaryonun alt senaryosudur; Senaryo yöneticisi ve Senaryolar tablosu gösterilmez. İşaretsizse: Senaryo yöneticisi ve Senaryolar tablosu gösterilir ve alternatifler senaryolar arasında paylaşılabilir. Temel mod açıkken Senaryo yöneticisi devre dışıdır. Temel mod, bir projenin Temel modun gösteremediği senaryo ve alternatif ilişkileri varsa devre dışıdır.';
+$ec_lang['lpn_scenario_basic_tip']='İşaretliyse: alternatifler gizli ve otomatiktir, her senaryo senaryo değerlerini kendisine ait gösterir ve tüm yeni senaryolar Temel senaryonun çocuğudur; Senaryo yöneticisi bir senaryo listesi gösterir ve Senaryolar tablosu gösterilmez. İşaretsizse: Senaryo yöneticisi ağacını gösterir, Senaryolar tablosu gösterilir ve alternatifler senaryolar arasında paylaşılabilir. Temel mod, bir projenin Temel modun gösteremediği senaryo ve alternatif ilişkileri varsa devre dışıdır.';
 $ec_lang['lpn_scenario_basic_misfit']='Bu projede Senaryolar Temel moduyla uyumlu olmayan senaryo ve alternatif ilişkileri var; bu nedenle Temel mod devre dışıdır.';
 $ec_lang['lpn_scenario_basic_misfit_base']='Temel senaryo, Temel dışında bir alternatif kullanıyor.';
 $ec_lang['lpn_scenario_copy']='Senaryoyu kopyala';
@@ -3331,7 +3331,7 @@ $ec_lang['lpn_ovl_col_inherited']='Devralınan değer';
 $ec_lang['lpn_ovl_col_inherited_tip']='Bu senaryonun senaryo değeri olmadan okuduğu değer: alternatifin üstünün değeri veya Temel değer.';
 $ec_lang['lpn_ovl_same']='(aynı)';
 $ec_lang['lpn_ovl_same_tip']='Devralınan değere eşit. Yine de bir senaryo değeridir ve sayılır.';
-$ec_lang['lpn_sm_help']='Senaryolar ve alternatifler nasıl çalışır:\n\nTemel modda alternatifler gizli ve otomatiktir ve tüm yeni senaryolar Temel senaryonun alt senaryosudur.\n\nTemel mod kapalıyken karmaşık bir devralma ağacı kullanılabilir ve alternatifler senaryolar arasında paylaşılabilir. Ancak yeni bir alternatif ilişkisi gerektiğinde (kullanıcı tarafından önceden yönetilmediğinde) düzenlemelerin varsayılan davranışı, geçerli senaryo gibi adlandırılmış bir alternatif oluşturmaktır; bu da her senaryoya kendine özgü bir alternatif kümesi verir.\n\nÖzellikler ve ayarlar, senaryolar ve alternatifler tablosunun sütunları olarak ve Senaryo yöneticisinde yönetim seçenekleri olarak görünen alternatif kategorilerine aittir.\n\nSenaryo değerleri senaryolarda oluşturulur, ancak gerçekte senaryoyla ilişkili alternatiflere aittir; yani bir senaryo, alternatiflerine açılan bir pencere gibidir. Alternatiflerin senaryolarla ilişkileri, Senaryo yöneticisinin sağ bölmesinde veya alt paneldeki Senaryolar tablosunda yönetilir. Yeni bir senaryo oluşturmak hiçbir alternatif oluşturmaz; yeni senaryo, yeni alternatifler gerektiren senaryo değerleri oluşturulana kadar üst senaryosunun alternatiflerini kullanır. Bir senaryoda senaryo değerleri oluşturulduğunda, senaryo için ilgili alternatiflerinde saklanırlar; senaryonun böyle bir alternatifi yoksa senaryonun adı kullanılarak yeni bir alternatif oluşturulur.\n\nÖrnek: "Şekil: Düğüm ve hat ID\'leri" adlı bir senaryo oluşturur ve bir Metni "Düğüm ve Hat ID\'leri" diyecek şekilde düzenlersiniz. Senaryoyu oluşturduğunuzda hiçbir alternatif oluşturulmaz. Ancak Metni kaydettiğiniz anda, Metin değeri senaryo değeriyle "Şekil: Düğüm ve hat ID\'leri" adlı bir Metin alternatifi oluşturulur. Temel modda bunu yalnızca senaryonun kendisinde bir senaryo değeri olarak görürsünüz.\n\nÖzellikleri kopyala yalnızca senaryo değerlerini kopyalar. Temel dışındaki herhangi bir senaryoda, yalnızca varlığın o senaryoda sahip olduğu senaryo değerlerini kopyalar.\n\nSenaryolar nasıl yönetilir:\n\n- Ağacını göstermek için en üstteki listeden Senaryolar\'ı veya bir alternatif kategorisini seçin.\n\n- Seçili öğenin bir alt öğesini Alt öğe ekle ile oluşturun. Temel ekle başka bir Temel ekler; bu, Temelin şimdiki halinin bir kopyası olarak başlar ve Temelde sonradan yapılan düzenlemeler onu değiştirmez. Yeni bir alt öğe üstünün adını alır; yeniden adlandırmak için bir ad yazın. Kopyala seçili alternatifi kopyalar. Yukarı birleştir, seçili alternatifin senaryo değerlerini adıyla seçilen üstündeki bir alternatife taşır ve seçili alternatif sonra bunları devralır; önce atladığı bir alternatifin de değiştirdiği, değişmeyecek bir değeri adlandırır. Bir senaryoyu kopyalamak için Temel modda Senaryolar menüsündeki Senaryoyu kopyala\'yı kullanın; senaryonun senaryo değerlerini, onları tutan alternatiflerle birlikte kopyalar. Temel ekle ve Senaryoyu kopyala her biri alternatif oluşturur: Temel ekle, değer tutan her kategoride yeni Temel için bir Temel alternatif oluşturur ve Senaryoyu kopyala, senaryonun senaryo değerlerini tutan her alternatif için kopya gibi adlandırılmış yeni bir alternatif oluşturur.\n\n- Bir öğeyi başka birinin üzerine sürüklemek onu o öğenin alt öğesi yapar. Yeni bir üste taşınan senaryo, senaryo değeri yapmadığı her şeyi ondan devralır; senaryo değeri yaptıkları değişmez. İki öğe arasına sürüklemek onları yeniden sıralar.\n\n- Seçmek için bir öğeye tıklayın. Seçili öğeyi yeniden adlandırmak için F2\'ye basın veya Yeniden adlandır\'ı seçin. Bir senaryoyu yeniden adlandırmak, adını taşıyan alternatiflerin yeniden adlandırılıp adlandırılmayacağını sorar; Temel modda sormadan onunla birlikte yeniden adlandırılırlar. Bir senaryoyu geçerli yapmak için çift tıklayın veya Enter\'a basın. Daraltmak veya genişletmek için öğenin yanındaki oka tıklayın veya Sol ya da Sağ\'a basın. Düğmelerle aynı komutlar için bir öğeye sağ tıklayın.\n\n- Seçili öğeyi silmek için Delete\'e basın veya eksi düğmesine tıklayın. Kullanımdaki bir öğe silinmez ve ileti onu neyin kullandığını adlandırır. Temel mod kapalıyken bir senaryoyu silmek kullandığı alternatifleri korur. Temel mod açıkken bir senaryoyu silmek, başka hiçbir senaryonun kullanmadığı alternatiflerini de siler.\n\n- Bir senaryoyu Temel dahil başka bir alternatifi kullandırmak için, onu Senaryo yöneticisinin sağ bölmesindeki veya Senaryolar tablosundaki senaryonun satırında seçin. Paylaşılan bir alternatifte yapılan senaryo değeri, onu kullanan her senaryoyu değiştirir.';
+$ec_lang['lpn_sm_help']='Senaryolar ve alternatifler nasıl çalışır:\n\nTemel modda alternatifler gizli ve otomatiktir ve tüm yeni senaryolar Temel senaryonun çocuğudur.\n\nTemel mod kapalıyken karmaşık bir miras ağacı, yani soy ağacı kullanılabilir ve alternatifler senaryolar arasında paylaşılabilir. Ancak yeni bir alternatif ilişkisi gerektiğinde (kullanıcı tarafından önceden yönetilmediğinde) düzenlemelerin varsayılan davranışı, geçerli senaryo gibi adlandırılmış bir alternatif oluşturmaktır; bu da her senaryoya kendine özgü bir alternatif kümesi verir.\n\nÖzellikler ve ayarlar, senaryolar ve alternatifler tablosunun sütunları olarak ve Senaryo yöneticisinde yönetim seçenekleri olarak görünen alternatif kategorilerine aittir.\n\nSenaryo değerleri senaryolarda oluşturulur, ancak gerçekte senaryoyla ilişkili alternatiflere aittir; yani bir senaryo, alternatiflerine açılan bir pencere gibidir. Alternatiflerin senaryolarla ilişkileri, Senaryo yöneticisinin ikinci bölmesinde veya alt paneldeki Senaryolar tablosunda yönetilir. Yeni bir senaryo oluşturmak hiçbir alternatif oluşturmaz; yeni senaryo, yeni alternatifler gerektiren senaryo değerleri oluşturulana kadar ebeveyninin alternatiflerini kullanır. Bir senaryoda senaryo değerleri oluşturulduğunda, senaryo için ilgili alternatiflerinde saklanırlar; senaryonun böyle bir alternatifi yoksa senaryonun adı kullanılarak yeni bir alternatif oluşturulur.\n\nÖrnek: "Şekil: Düğüm ve hat ID\'leri" adlı bir senaryo oluşturur ve bir Metni "Düğüm ve Hat ID\'leri" diyecek şekilde düzenlersiniz. Senaryoyu oluşturduğunuzda hiçbir alternatif oluşturulmaz. Ancak Metni kaydettiğiniz anda, Metin değeri için senaryo değeriyle birlikte "Şekil: Düğüm ve hat ID\'leri" adlı bir Metin alternatifi oluşturulur. Temel modda bunu yalnızca senaryonun kendisinde bir senaryo değeri olarak görürsünüz.\n\nÖzellikleri kopyala yalnızca senaryo değerlerini kopyalar. Temel dışındaki herhangi bir senaryoda, yalnızca varlığın o senaryoda sahip olduğu senaryo değerlerini kopyalar.\n\nSenaryolar nasıl yönetilir:\n\n- Ağacını göstermek için en üstteki listeden Senaryolar\'ı veya bir alternatif kategorisini seçin.\n\n- Seçili öğenin bir çocuğunu Alt öğe ekle ile oluşturun. Temel ekle başka bir Temel ekler; bu, Temelin şimdiki halinin bir kopyası olarak başlar ve Temelde sonradan yapılan düzenlemeler onu değiştirmez. Yeni bir çocuk ebeveyninin adını alır; yeniden adlandırmak için bir ad yazın. Kopyala seçili alternatifi kopyalar. Yukarı birleştir, seçili alternatifin senaryo değerlerini adıyla seçilen üstündeki bir alternatife taşır ve seçili alternatif sonra bunları miras alır; önce atladığı bir alternatifin de değiştirdiği, değişmeyecek bir değeri adlandırır. Bir senaryoyu kopyalamak için Temel modda Senaryolar menüsündeki Senaryoyu kopyala\'yı kullanın; senaryonun senaryo değerlerini, onları tutan alternatiflerle birlikte kopyalar. Temel ekle ve Senaryoyu kopyala her biri alternatif oluşturur: Temel ekle, değer tutan her kategoride yeni Temel için bir Temel alternatif oluşturur ve Senaryoyu kopyala, senaryonun senaryo değerlerini tutan her alternatif için kopya gibi adlandırılmış yeni bir alternatif oluşturur.\n\n- Bir öğeyi başka birinin üzerine sürüklemek onu o öğenin çocuğu yapar. Yeni bir ebeveyne taşınan senaryo, senaryo değeri yapmadığı her şeyi ondan miras alır; senaryo değeri yaptıkları değişmez. İki öğe arasına sürüklemek onları yeniden sıralar.\n\n- Seçmek için bir öğeye tıklayın. Seçili öğeyi yeniden adlandırmak için F2\'ye basın veya Yeniden adlandır\'ı seçin. Bir senaryoyu yeniden adlandırmak, adını taşıyan alternatiflerin yeniden adlandırılıp adlandırılmayacağını sorar; Temel modda sormadan onunla birlikte yeniden adlandırılırlar. Bir senaryoyu geçerli yapmak için çift tıklayın veya Enter\'a basın. Daraltmak veya genişletmek için öğenin yanındaki oka tıklayın veya Sol ya da Sağ\'a basın. Düğmelerle aynı komutlar için bir öğeye sağ tıklayın.\n\n- Seçili öğeyi silmek için Delete\'e basın veya eksi düğmesine tıklayın. Kullanımdaki bir öğe silinmez ve ileti onu neyin kullandığını adlandırır. Temel mod kapalıyken bir senaryoyu silmek kullandığı alternatifleri korur. Temel mod açıkken bir senaryoyu silmek, başka hiçbir senaryonun kullanmadığı alternatiflerini de siler.\n\n- Bir senaryoyu Temel dahil başka bir alternatifi kullandırmak için, onu Senaryo yöneticisinin ikinci bölmesindeki veya Senaryolar tablosundaki senaryonun satırında seçin. Paylaşılan bir alternatifte yapılan senaryo değeri, onu kullanan her senaryoyu değiştirir.';
 $ec_lang['lpn_sm_delete_alt_ask']='{name} alternatifi silinsin mi?';
 $ec_lang['lpn_sm_in_use']='{item}\nşu tarafından kullanıldığı sürece silinemez:\n{list}';
 $ec_lang['lpn_sm_alt_delete_has_children']='{name} alternatifi silinemez, çünkü alt öğeleri var: {list}. Önce onları silin veya başka bir üste taşıyın.';
@@ -3464,7 +3464,7 @@ $ec_lang['lpn_elev_dem_none']='DEM\'de bu düğüm için kot yok.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM kotu: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Kot kaynağı';
 $ec_lang['lpn_settings_elev_source_tip']='2026\'da Mapbox DEM doğruluğu, önce yatay sonra düşey: ABD\'de 1–10 m ve 1 m\'nin altı, Avrupa ve Japonya\'da 2–10 m ve 1–3 m, dünya genelinde 30 m ve 10–16 m, kutuplarda 90 m ve 16 m\'nin üzeri.';
-$ec_lang['lpn_settings_elev_source_typed']='Yukarıdaki';
+$ec_lang['lpn_settings_elev_source_typed']='Yazılan değer';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM verisi';
 $ec_lang['lpn_settings_accuracy']='Doğruluk';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -3533,7 +3533,7 @@ $ec_lang['lpn_settings_engine_native']='Mümkün olduğunda yerleşik çözücü
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Bunu etkinleştirirseniz yerleşik çözücü mümkün olduğunda kullanılır. Aksi halde ABD EPA\'dan EPANET çözücüsü her zaman kullanılır. Yerleşik çözücü, uzun süreli benzetimler veya basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) için kullanılmaz. EPANET çözücüsü ilk kez kullanıldığında yaklaşık 650 KB indirilir ve ardından bu cihazda tutulur. Bir boruda küçük (yerel) kayıp olduğunda, iki çözücü son basamaklarda farklılaşır: EPANET yer çekimi ivmesi için yuvarlatılmış bir değer kullandığından, onun küçük kayıpları tam ifadeye göre çok az daha düşük çıkar.';
+$ec_lang['lpn_settings_engine_native_tip']='Yerleşik çözücüyü mümkün olduğunda kullanmak için bunu etkinleştirin. Aksi halde ABD EPA\'dan EPANET çözücüsü her zaman kullanılır. Yerleşik çözücü, uzun süreli simülasyonlar için kullanılmaz. EPANET çözücüsü ilk kez kullanıldığında yaklaşık 650 KB indirilir ve ardından bu cihazda tutulur. Bir boruda küçük (yerel) kayıp olduğunda, iki çözücü son basamaklarda farklılaşır: EPANET yer çekimi ivmesi için yuvarlatılmış bir değer kullandığından, onun küçük kayıpları tam ifadeye göre çok az daha düşük çıkar.';
 $ec_lang['lpn_engine_loading']='EPANET çözücüsü yükleniyor…';
 $ec_lang['lpn_engine_failed']='EPANET çözücüsü yüklenemedi. Bunun yerine yerleşik çözücü gösteriliyor.';
 $ec_lang['lpn_engine_failed_why']='{reason} Bunun yerine yerleşik çözücü gösteriliyor.';
@@ -4005,8 +4005,8 @@ $ec_lang['lpn_energy_no_pumps']='Bu şebekede pompa yok, bu yüzden güç çeken
 // One row per scenario, solved from a copy. The two column headings this borrows rather than
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
-$ec_lang['lpn_scncmp_title']='Senaryo karşılaştırması';
-$ec_lang['lpn_scncmp_menu_tip']='Senaryo değeri sayısı, en düşük basınç ve en yüksek hız ile senaryoların tablosu';
+$ec_lang['lpn_scncmp_title']='Karşılaştırma: senaryolar';
+$ec_lang['lpn_scncmp_menu_tip']='Senaryo değeri sayısı, en düşük basınç ve en yüksek hız ile senaryoların tablosu ve bir elektronik tabloya kopyalanan, varlığa göre sonuçlar tablosu';
 $ec_lang['lpn_scncmp_running']='Her senaryo çözülüyor…';
 $ec_lang['lpn_scncmp_empty']='Henüz hiçbir şey çizilmedi, bu yüzden çözülecek bir şey yok.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='En yüksek hız';
@@ -4053,12 +4053,12 @@ $ec_lang['lpn_status_note']='Tablolar panosu ve Tam rapor ile aynı uzatılmış
 $ec_lang['lpn_reports_full']='Tam';
 $ec_lang['lpn_reports_full_tip']='Son çalışmanın her raporlama zaman adımındaki tüm düğümlerin ve hatların tablosu';
 $ec_lang['lpn_full_title']='Tam rapor';
-$ec_lang['lpn_full_needs_run']='Tam rapor, her raporlama zaman adımındaki her düğümü ve her hattı listeler. Hesapla\'ya basın, sonra Su, Raporlar, Tam rapor\'u açın.';
-$ec_lang['lpn_full_note']='Tablolar panosunda gösterilen birimlerde, düğüm veya hat başına raporlama zaman adımı başına bir satır. Boş bir hücre, o niceliğin sahip olmadığı bir sütundur. İndirme veya yazdırma her zaman adımını taşır; aşağıdaki tablo bir kerede bir tanesini gösterir.';
+$ec_lang['lpn_full_needs_run']='Tam rapor, her raporlama zaman adımındaki her düğümü ve her hattı listeler. Hesapla\'ya tıklayın, sonra Su, Raporlar, Tam öğesini açın.';
+$ec_lang['lpn_full_note']='Tablolar panelinde gösterilen birimlerde, her raporlama zaman adımında her düğüm veya hat için bir satır. Düğümün veya hattın böyle bir büyüklüğü olmayan yerde hücre boştur. İndirme, kopyalama veya yazdırma her zaman adımını taşır; aşağıdaki tablo her seferinde birini gösterir.';
 $ec_lang['lpn_full_step_label']='Zaman adımı';
 $ec_lang['lpn_full_download_csv']='CSV indir';
 $ec_lang['lpn_full_print']='Raporu yazdır';
-$ec_lang['lpn_full_col_time']='Zaman';
+$ec_lang['lpn_full_col_time']='Zaman (hr)';
 $ec_lang['lpn_full_col_type']='Tür';
 $ec_lang['lpn_heading_unit']='{label} ({unit})';
 $ec_lang['lpn_result_concentration_short']='Derişim';
@@ -4262,7 +4262,7 @@ $ec_lang['lpn_library_fittings_in_use']='Bu bağlantı parçası listesi borular
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
 // the FILE decides what is on offer rather than whatever section anybody was looking at.
-$ec_lang['lpn_library_import']='Kitaplıkları içe aktar…';
+$ec_lang['lpn_library_import']='Kitaplıklar…';
 $ec_lang['lpn_library_import_tip']='Başka bir proje dosyası seçin ve ondan bütün kitaplıkları bu projeye kopyalayın. Burada adı zaten kullanılan her şey atlanır ve listelenir, böylece sahip olduğunuz hiçbir şey değişmez.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
 // beside each name is the only thing on that screen that says what the file actually has in it.
@@ -4505,7 +4505,7 @@ $ec_lang['lpn_analyze_menu_tip']='Şebekeyi bir kopya üzerinde çalıştıran a
 $ec_lang['lpn_ff_menu']='Yangın debisi analizi…';
 $ec_lang['lpn_ff_menu_tip']='Seçili her düğümü yangın debisi için sınayın ve sistemin geri kalanı üzerindeki etkiyi kontrol edin';
 $ec_lang['lpn_ff_title']='Yangın debisi analizi';
-$ec_lang['lpn_ff_intro']='Her düğüm sırayla, mevcut talebinin üzerine bir yangın debisi çeker. Çalıştırma, ekrandaki zaman adımında şebekenin bir kopyasını kullanır, bu yüzden projenizde hiçbir şey değişmez.\n\nYangın debisi normalde en yüksek gün talebinde sınanır, bu yüzden önce şebekeyi o koşula ayarlayın.\n\nSınanan her düğüm, tüm şebekenin yaklaşık 16 çözümünü gerektirir, bu yüzden büyük bir sistem dakikalar sürer: çalıştırmadan önce düğümleri seçin ve kısmi sonuçları korumak için istediğiniz zaman durdurun.';
+$ec_lang['lpn_ff_intro']='Her düğüm sırayla, mevcut talebinin üzerine bir yangın debisi çeker. Çalıştırma, ekrandaki zaman adımında şebekenin bir kopyasını kullanır, bu yüzden projede hiçbir şey değişmez.\n\nProjede uzun süreli simülasyon varsa, Sınanan raporlama adımı koşulu seçer: ekrandaki zaman adımı, seçilen bir raporlama adımı, sınanan düğümler arasında en düşük basıncın olduğu raporlama adımı veya her raporlama adımı. Son seçenek taramayı her raporlama adımında, o adımın depo seviyeleri, talep desenleri ve hat durumlarıyla çalıştırır ve her düğümü kendi en kötü adımında, yani en düşük kullanılabilir debinin olduğu adımda, En düşük debili adım sütununda gösterir.\n\nYangın debisi normalde en yüksek gün talebinde sınanır, bu yüzden önce şebekeyi o koşula ayarlayın.\n\nSınanan her düğüm, tüm şebekenin yaklaşık 16 çözümünü gerektirir, bu yüzden büyük bir sistem dakikalar sürer: çalıştırmadan önce düğümleri seçin ve kısmi sonuçları korumak için istediğiniz zaman durdurun.';
 $ec_lang['lpn_ff_scope']='Sınanacak düğümler';
 $ec_lang['lpn_ff_all']='Tüm düğümler';
 $ec_lang['lpn_ff_selected']='Seçili düğümler';
@@ -4524,7 +4524,7 @@ $ec_lang['lpn_ff_design_off']='Yok';
 $ec_lang['lpn_ff_design_all']='Tümü';
 $ec_lang['lpn_ff_design_selected']='Seçili';
 $ec_lang['lpn_ff_design_no_selection']='Tasarım kontrolü Seçili olarak ayarlı, ama hiçbir öğe seçili değil. Öğeleri seçin veya Tümü seçeneğini seçin.';
-$ec_lang['lpn_ff_minpressure']='Başka yerde izin verilen en düşük basınç';
+$ec_lang['lpn_ff_minpressure']='İzin verilen en düşük sistem basıncı';
 $ec_lang['lpn_ff_minpressure_tip']='Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir.';
 $ec_lang['lpn_ff_maxvelocity']='İzin verilen en yüksek hız';
 $ec_lang['lpn_ff_maxvelocity_tip']='Bir yangın debisi çekilirken bunun üzerinde çalışan bir boru, tasarım sorunu olarak bildirilir.';
@@ -4654,13 +4654,13 @@ $ec_lang['lpn_ff_err_unknown']='Sonuç yok. Hata kodu: {code}';
 $ec_lang['lpn_crit_menu']='Kritiklik analizi…';
 $ec_lang['lpn_crit_menu_tip']='Her boruyu, pompayı ve vanayı sırayla şebekeden çıkarın ve sistem üzerindeki etkiyi bildirin.';
 $ec_lang['lpn_crit_title']='Kritiklik analizi';
-$ec_lang['lpn_crit_intro']='Her varlık sırayla şebekeden çıkarılır ve şebeke, etkin senaryoda ekrandaki zaman adımında çözülür. Projenizde hiçbir şey değişmez; çalıştırmanın tamamı bir kopya üzerinde yapılır.';
+$ec_lang['lpn_crit_intro']='Her varlık sırayla şebekeden çıkarılır ve şebeke, etkin senaryoda ekrandaki zaman adımında çözülür. Projede hiçbir şey değişmez; çalıştırmanın tamamı bir kopya üzerinde yapılır.\n\nProjede uzun süreli simülasyon varsa, Sınanan raporlama adımı Çalıştırmanın tamamı olarak ayarlanabilir. Her kesinti o zaman tam çalıştırma boyunca simüle edilir ve tablo en düşük basıncı ve oluştuğu raporlama adımını, herhangi bir düğümün İzin verilen en düşük basıncın altında geçirdiği saatleri, bir deponun ilk kez boşaldığı raporlama adımını ve çalıştırma boyunca karşılanmayan en büyük talebi bildirir. En düşük basınçlar yalnızca bir depo boşalmadan önce okunur.';
 $ec_lang['lpn_crit_scope']='Kırılacak hatlar';
 $ec_lang['lpn_crit_scope_tip']='Tüm borular, pompalar ve vanalar, ya da yalnızca haritada seçilenler. Çalıştırmadan önce kümeyi seçin.';
 $ec_lang['lpn_crit_scope_all']='Tüm hatlar';
 $ec_lang['lpn_crit_scope_selected']='Seçili hatlar';
 $ec_lang['lpn_crit_minpressure']='İzin verilen en düşük basınç';
-$ec_lang['lpn_crit_minpressure_tip']='Bu, Yangın debisi analizindeki İzin verilen en düşük basınç ile aynı sayıdır. Burada değiştirmek orada da değiştirir.';
+$ec_lang['lpn_crit_minpressure_tip']='Bu, Yangın debisi analizindeki İzin verilen en düşük sistem basıncı kutusuyla aynı sayıdır. Burada değiştirmek orada da değiştirir.';
 $ec_lang['lpn_crit_col_asset']='Varlık';
 $ec_lang['lpn_crit_col_unserved']='Karşılanmayan talep';
 $ec_lang['lpn_crit_col_cutoff']='Ayrılan düğümler';
@@ -4691,7 +4691,7 @@ $ec_lang['lpn_crit_skipped_dead']='Atlanan çıkmaz uçlu hatlar: {n}. Her biri 
 $ec_lang['lpn_ds_menu']='Talep ölçekleme…';
 $ec_lang['lpn_ds_menu_tip']='Şebekenin bir kopyasında talepleri çarpın ve basınçları ile hızları görün, ya da sistemin taşıyabileceği en büyük talep ölçeğini bulun.';
 $ec_lang['lpn_ds_title']='Talep ölçekleme';
-$ec_lang['lpn_ds_intro']='Seçili düğümlerdeki talepleri talep ölçeğiyle çarpmak ve basınçları ile hızları görmek için Çalıştır düğmesine basın.\n\nBu düğümlerin tümünün izin verilen en düşük basıncı koruduğu en büyük talep ölçeğini {step} yaklaşıklığıyla bulmak için Bul düğmesine basın; arama 0\'dan {max}\'a kadar yapılır.\n\nİkisi de şebekenin bir kopyası üzerinde çalışır; kopya, etkin senaryoda ekrandaki zaman adımında çözülür, bu yüzden projenizde hiçbir şey değişmez. Yalnızca o zaman adımı ölçeklenir, seviyeler ve durumlar ondan alınır; tepe talebi sınamak için çalıştırmadan önce saati tepe talebine getirin.';
+$ec_lang['lpn_ds_intro']='Seçili düğümlerdeki talepleri talep ölçeğiyle çarpmak ve basınçları ile hızları görmek için Çalıştır düğmesine tıklayın.\n\nBu düğümlerin tümünün izin verilen en düşük basıncı koruduğu en büyük talep ölçeğini {step} yaklaşıklığıyla bulmak için Bul düğmesine tıklayın; arama 0\'dan {max}\'a kadar yapılır.\n\nİkisi de şebekenin bir kopyası üzerinde çalışır; kopya, etkin senaryoda ekrandaki zaman adımında çözülür, bu yüzden projenizde hiçbir şey değişmez. Varsayılan olarak yalnızca ekrandaki zaman adımı ölçeklenir ve seviyeler ile durumlar ondan alınır. Projede uzun süreli simülasyon varsa, talepleri tüm çalıştırma boyunca ölçeklemek için Sınanan raporlama adımını Çalıştırmanın tamamı olarak ayarlayın: her raporlama adımı değerlendirilir, boşalan bir depo ölçeği başarısız kılar ve yanıt sınırlayıcı raporlama adımını adlandırır.';
 $ec_lang['lpn_ds_scope']='Ölçeklenecek düğümler';
 $ec_lang['lpn_ds_head_scale']='Talepleri ölçekle';
 $ec_lang['lpn_ds_multiplier']='Talep ölçeği';
@@ -4738,13 +4738,13 @@ $ec_lang['lpn_analyze_time_moved']='⚠ Bu {time} anında hesaplandı ve saat ş
 // probably a longitude in the wrong column, and this page says so and changes nothing, because it
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
-$ec_lang['lpn_file_import_survey']='Ölçülmüş noktaları içe aktar…';
+$ec_lang['lpn_file_import_survey']='Ölçülen noktalar…';
 $ec_lang['lpn_file_import_survey_tip']='Bir metin dosyasından ölçülmüş noktaların bir listesini okur ve her noktada bir düğüm oluşturur; dosyanın belirtmediği her şey için yeni varlık ayarlarını kullanır. Saha kodları olarak açıklamayı oku kutusunu işaretlemediğiniz sürece hiçbir boru çizilmez ve hiçbir satır adı belirtilmeden atlanmaz. Bu projenin zaten kullandığı koordinat sistemini okur, coğrafi referanslı olsun ya da olmasın.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='GeoJSON figürlerini içe aktar…';
-$ec_lang['lpn_file_import_shapes_tip']='Bir GeoJSON dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur. Dosyadaki şebeke varlıkları içe aktarılmaz; şebekeyi bir EPANET dosyasından veya GeoJSON şebekesini içe aktar ile içe aktarın. Proje coğrafi referanslı olmalı veya bir koordinat sistemi belirtmelidir.';
-$ec_lang['lpn_file_import_gjnet']='GeoJSON şebekesini içe aktar…';
+$ec_lang['lpn_file_import_shapes']='GeoJSON dosyası…';
+$ec_lang['lpn_file_import_shapes_tip']='Bir GeoJSON dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur. Dosyadaki şebeke varlıkları içe aktarılmaz; şebekeyi Dosya, İçe aktar, Şebeke, EPANET dosyası veya Dosya, İçe aktar, Şebeke, GeoJSON dosyası ile içe aktarın. Proje coğrafi referanslı olmalı veya bir koordinat sistemi belirtmelidir.';
+$ec_lang['lpn_file_import_gjnet']='GeoJSON dosyası…';
 $ec_lang['lpn_file_import_gjnet_tip']='Bir GeoJSON dosyasını yeni bir proje olarak açar. Noktalar düğüm, rezervuar veya depo olarak, çizgiler boru olarak içe aktarılır. Bu sayfadan dışa aktarılmış bir dosya yazıldığı gibi okunur; başka herhangi bir dosya için bir adım, alanlarını özelliklere ve birimlere eşler.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file}, {crs} koordinat sistemini belirtiyor. GeoJSON konumları WGS 84 enlem ve boylamıdır (RFC 7946) ve bu sayfa başka bir sistemdeki GeoJSON dosyasını dönüştürmez. Katmanı CBS\'den EPSG:4326 (WGS 84) olarak dışa aktarın, sonra o dosyayı içe aktarın.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} hiç nokta veya çizgi içermiyor.';
@@ -4811,7 +4811,7 @@ $ec_lang['lpn_gjnet_note_demand_rows']='Bu düğümlerin birden fazla talep sat�
 $ec_lang['lpn_gjnet_note_pipe_type']='Bu borular, tanımını bir GeoJSON dosyasının tutmadığı, parantez içinde gösterilen boru türünü belirtiyor. Boru türü içe aktarılmadı; dosyada belirtilen çap ve pürüzlülük içe aktarıldı.';
 $ec_lang['lpn_gjnet_note_pattern_conflict']='Bu desenler farklı nesnelerde farklı çarpanlarla belirtilmiş. İlki kullanıldı.';
 $ec_lang['lpn_gjnet_note_end_off_node']='Bu hatların her birinin çizgisi düğümünde başlamıyor veya bitmiyor. Düğüm konumu kullanıldı.';
-$ec_lang['lpn_gjnet_note_not_held']='Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, metin etiketlerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.';
+$ec_lang['lpn_gjnet_note_not_held']='Bir GeoJSON dosyası kontrolleri, kuralları, zaman ayarlarını, Metin öğelerini, EPANET seçeneklerini veya boru türü, bağlantı parçası ve verim eğrisi kitaplıklarını tutmaz; bu yüzden bunların hiçbiri içe aktarılmadı.';
 $ec_lang['lpn_geojson_import_done']='{n} Figür {file} dosyasından içe aktarıldı.';
 $ec_lang['lpn_geojson_import_done_one']='{file} dosyasından bir Figür içe aktarıldı.';
 $ec_lang['lpn_geojson_import_renamed']='{n} nesne adı Figür ID\'si olarak kullanılamaz. Her Figüre başka bir ID verildi ve nesne adı korundu: {list}.';
@@ -4827,7 +4827,7 @@ $ec_lang['lpn_geojson_import_parts']='{n} çok parçalı nesne, her parça için
 $ec_lang['lpn_geojson_import_parts_one']='Bir çok parçalı nesne, her parça için ayrı bir Figür olarak içe aktarıldı.';
 $ec_lang['lpn_geojson_import_local']='GeoJSON konumları enlem ve boylamdır ve bu projenin, bunların dönüştürülebileceği Dünya üzerinde bir yeri yoktur. Önce Harita, Dünya haritası, Ekle ile coğrafi referanslayın, sonra yeniden içe aktarın.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} bir GeoJSON dosyası değil: {detail}';
-$ec_lang['lpn_file_import_dxf']='DXF figürlerini içe aktar…';
+$ec_lang['lpn_file_import_dxf']='DXF dosyası…';
 $ec_lang['lpn_file_import_dxf_tip']='Bir ASCII DXF dosyasındaki noktaları, çizgileri ve çoklu çizgileri bu projeye Figür olarak okur; her katman adı bir özellik olarak korunur. Diğer öğeler sayılır ve listelenir, içe aktarılmaz. Koordinatlar dönüşüm yapılmadan bu projenin X ve Y değerleri olarak okunur.';
 $ec_lang['lpn_file_import_shp']='Shapefile figürlerini içe aktar…';
 $ec_lang['lpn_file_import_shp_tip']='Bir ESRI shapefile dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur; öznitelik sütunları özellik olarak korunur. .zip dosyasını ya da .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun). Projeden farklı bir koordinat sistemindeki koordinatlar dönüştürülür ve bildirimde bu belirtilir.';
@@ -4982,3 +4982,331 @@ $ec_lang['lpn_screenshot_scale_tip']='Görüntünün boyutu, ekrandaki alanın k
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
 $ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';
+$ec_lang['lpn_guide_page_open']='Uygulamayı aç';
+$ec_lang['lpn_guide_page_desc']='{name} kullanım kılavuzu: haritadan ve Özelliklerden senaryolara, yangın debisi analizine ve kritiklik analizine kadar her bölüm için bir sayfa.';
+$ec_lang['lpn_guide_page_what']='{name}, su dağıtım şebekelerini modellemek için ücretsiz bir web uygulamasıdır; EPANET\'in bir uzantısıdır.';
+$ec_lang['lpn_guide_page_missing']='Böyle bir bölüm yok. Bölümler aşağıda listelenmiştir.';
+$ec_lang['lpn_guide_text_demands_box']='Seçili düğümün talep kategorilerini, her biri için bir satır olacak şekilde, her kategorinin baz talebi ve talep deseniyle birlikte listeler. Artı düğmesi bir kategori ekler. Birden fazla kategori varsa Özelliklerdeki Baz talep bunların toplamıdır ve salt okunurdur. Düğümde toplu olarak bağlanan müşteriler talepleriyle birlikte listelenir. Bir senaryoda bir düzenleme senaryo değeridir ve Temel değişmez.';
+$ec_lang['lpn_guide_scn_move_term']='Senaryolar arasında taşıma veya birleştirme';
+$ec_lang['lpn_guide_scn_move_def']='<p>Öğeleri bir senaryodan diğerine taşımak veya birleştirmek için Tablolar\'ı açın, sağ tık bağlam menüsünden Senaryoları göster öğesini kullanın, sonra her senaryoda Etkin anahtarını ve Senaryo değerini temizle seçeneğini istediğiniz gibi ayarlayın.</p>';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Tablonun altında, Varlık türünde seçilen türdeki her varlık için bir satır olacak şekilde, Varlığa göre sonuçlar, her senaryoda işaretlenen her sonuç için bir sütun listeler; örneğin Temel, En yüksek gün ve Pik saatte her düğümdeki basınç. Toplam çalışma süresi olan bir senaryo, ekrandaki zaman adımında okunur; çalıştırması daha önce biterse son zaman adımında okunur ve her başlık okunan zamanı gösterir. Çözülemeyen bir senaryo boş sütunlar ve nedenini söyleyen bir not tutar; yakınsamayan bir senaryo ise başlıklarında (yakınsamadı) ile işaretlenir. Kopyala, tabloyu panoya sekmeyle ayrılmış metin olarak koyar ve bir elektronik tabloya yapıştırmaya hazırdır. CSV indir aynı tabloyu dosya olarak kaydeder. İkisi de birimleri başlıklarda ve sayıları kutuda gösterilen yuvarlama olmadan tam olarak taşır. Bir debinin işareti çözücünün iç yön işaretidir. Çözücünün dışında, bir debinin senaryolar arasında yön değiştirip değiştirmediğini bu tabloda göstermek dışında hiçbir işe yaramaz.</p>';
+$ec_lang['lpn_guide_ff_dur_def']='<p>Projede uzun süreli simülasyon varsa, Sınanan raporlama adımı altında Belirtilen süreli bir yangın seçeneğini seçin. Gereken yangın debisi o zaman haritada seçilen tek düğümden çekilir; Yangın başlangıcı alanındaki zamanda başlar ve Yangın süresi boyunca sürer, ikisi de desen zaman adımının tam katlarıdır. Simülasyonun tamamı şebekenin bir kopyasında çalıştırılır ve yangınsız aynı simülasyonla karşılaştırılır. Özet, düğümün yangın sırasında Korunacak kalıntı basıncı koruyup korumadığını, herhangi bir yerdeki en düşük basıncı, herhangi bir deponun boşalıp boşalmadığını ve sistemin yangından sonra toparlanıp toparlanmadığını bildirir. Bir tablo her deponun en düşük seviyesini, diğeri yangın düğümündeki basıncı her raporlama adımında verir.</p>';
+$ec_lang['lpn_ex_valves_title']='Vana türleri, gpm (US)';
+$ec_lang['lpn_ex_valves_desc']='Bir tepe rezervuarı, bir PBV üzerinden bir merkezi besler; ondan bir PRV, PSV, FCV, TCV ve GPV ayrılır ve her biri çözülen şebekede regüle eder. Dakikada galon, fit ve inç birimleriyle.';
+$ec_lang['lpn_ex_extension_si_title']='Johnson City uzatması, L/s (SI)';
+$ec_lang['lpn_ex_extension_si_desc']='Test kalibrasyon senaryoları olan bir ana boru uzatma modeli. Mevcut sistem, Johnson City, Teksas\'ta bir hidrant debi testine dayanarak bir rezervuar ve bir pompa olarak modellenmiştir. Ona 300 mm ve 200 mm\'lik yeni bir ana boru halkası bağlanır. Bir yangın hidrantı düğümü, 14 m kalıntı basınçla 95 L/s verir. Saniyede litre, metre ve milimetre birimleriyle.';
+$ec_lang['lpn_ex_extension_title']='Johnson City uzatması, gpm (US)';
+$ec_lang['lpn_ex_extension_desc']='Test kalibrasyon senaryoları olan bir ana boru uzatma modeli. Mevcut sistem, Johnson City, Teksas\'ta bir hidrant debi testine dayanarak bir rezervuar ve bir pompa olarak modellenmiştir. Ona 12 inç ve 8 inçlik yeni bir ana boru halkası bağlanır. Bir yangın hidrantı düğümü, 20 psi kalıntı basınçla 1.500 gpm verir. Dakikada galon, fit ve inç birimleriyle.';
+$ec_lang['lpn_ex_well_si_title']='Munday kuyusu ve deposu, L/s (SI)';
+$ec_lang['lpn_ex_well_si_desc']='Munday, Teksas\'ta bir kuyu, pompa, çek valf, halka ve yüksek depo; 24 saatlik uzun süreli simülasyon ile En yüksek gün ve Pik saat senaryoları. Bir yangın hidrantı düğümü, 14 m kalıntı basınçla 32 L/s verir. Saniyede litre, metre ve milimetre birimleriyle.';
+$ec_lang['lpn_ex_well_title']='Munday kuyusu ve deposu, gpm (US)';
+$ec_lang['lpn_ex_well_desc']='Munday, Teksas\'ta bir kuyu, pompa, çek valf, halka ve yüksek depo; 24 saatlik uzun süreli simülasyon ile En yüksek gün ve Pik saat senaryoları. Bir yangın hidrantı düğümü, 20 psi kalıntı basınçla 500 gpm verir. Dakikada galon, fit ve inç birimleriyle.';
+$ec_lang['lpn_result_status_cv']='CV';
+$ec_lang['lpn_ovm_dot_clear_one']='Bu senaryo değerini temizlemek için tıklayın.';
+$ec_lang['lpn_ovm_dot_alt']='Bu senaryo değeri "{alternative}" alternatifinde saklanır.';
+$ec_lang['lpn_ovm_dot_alt_shared']='Bu senaryo değeri "{alternative}" alternatifinde saklanır ve {list} tarafından da kullanılır; bu yüzden onu temizlemek veya düzenlemek onları da değiştirir.';
+$ec_lang['lpn_ovm_dot_set_from']='{name} senaryosundan miras alındı. Gösterilen değeri koruyarak bu senaryoda senaryo değeri yapmak için tıklayın.';
+$ec_lang['lpn_morph_vertex']='Kırılma noktası';
+$ec_lang['lpn_morph_vertex_base']='Bir düğüm yalnızca Temelde kırılma noktasına dönüştürülebilir, çünkü bir borunun kırılma noktaları her senaryoda aynıdır.';
+$ec_lang['lpn_morph_vertex_base_ask']='Bir düğüm yalnızca Temelde kırılma noktasına dönüştürülebilir, çünkü bir borunun kırılma noktaları her senaryoda aynıdır. Temele geçilip dönüştürülsün mü?';
+$ec_lang['lpn_morph_vertex_switch']='Temele geç ve dönüştür';
+$ec_lang['lpn_morph_vertex_type']='{id} kırılma noktasına dönüştürülmedi: yalnızca bir düğüm kırılma noktası olabilir.';
+$ec_lang['lpn_morph_vertex_links']='{id} kırılma noktasına dönüştürülmedi: {n} boruyu birleştiriyor ve bir kırılma noktası tam olarak tek bir boruya aittir; bu yüzden bir düğüm tam olarak iki boruyu birleştirmelidir.';
+$ec_lang['lpn_morph_vertex_kind']='{id} kırılma noktasına dönüştürülmedi: ona bir pompa veya vana bağlı ve bir kırılma noktası yalnızca bir boruya aittir.';
+$ec_lang['lpn_morph_vertex_loop']='{id} kırılma noktasına dönüştürülmedi: iki borusu aynı diğer düğümü birleştiriyor ve bir boru aynı düğümde başlayıp bitemez.';
+$ec_lang['lpn_morph_vertex_demand']='{id} kırılma noktasına dönüştürülmedi: talebi veya damlatıcı katsayısı var ve bir kırılma noktasında bunlar yoktur. Önce onları 0 yapın.';
+$ec_lang['lpn_morph_vertex_customers']='{id} kırılma noktasına dönüştürülmedi: ona Müşteriler bağlı ve bir kırılma noktasında müşteri yoktur.';
+$ec_lang['lpn_morph_vertex_text']='{id} kırılma noktasına dönüştürülmedi: ona bir Metin bağlı.';
+$ec_lang['lpn_morph_vertex_pipes']='{id} kırılma noktasına dönüştürülmedi: iki borusunun çapı veya pürüzlülüğü farklı ve bir boru ikisini birden taşıyamaz.';
+$ec_lang['lpn_morph_vertex_own']='{id} kırılma noktasına dönüştürülmedi: kendi kotu, künyesi, açıklaması veya başka verisi var ve bir kırılma noktasında bunlar yoktur. Önce bu veriyi temizleyin.';
+$ec_lang['lpn_morph_vertex_clear_both']='{id} üzerindeki {elev} kotu ve {demands} talepleri temizlensin mi?';
+$ec_lang['lpn_morph_vertex_clear_elev']='{id} üzerindeki {elev} kotu temizlensin mi?';
+$ec_lang['lpn_morph_vertex_clear_demand']='{id} üzerindeki {demands} talepleri temizlensin mi?';
+$ec_lang['lpn_morph_vertex_clear_quality']='{id} üzerindeki {quality} başlangıç kalitesi temizlensin mi?';
+$ec_lang['lpn_morph_vertex_clear_also']='{quality} başlangıç kalitesi de temizlenir.';
+$ec_lang['lpn_morph_vertex_done']='{n} düğüm kırılma noktasına dönüştürüldü. Her birinde iki boru artık tek bir borudur ve bu boru, ilkinin ID\'sini ve değerlerini korur.';
+$ec_lang['lpn_calc_hint']='“Otomatik olarak yeniden hesapla” açıkken bu komuta gerek yoktur.';
+$ec_lang['lpn_calc_hint_mute']='Bunu bir daha gösterme';
+$ec_lang['lpn_replace_selected_only']='Yalnızca seçili varlıklar';
+$ec_lang['lpn_dxf_note_headloss']='Yük kaybı formülü: {formula} ({code}). ROUGHNESS, o formülün pürüzlülük katsayısıdır.';
+$ec_lang['lpn_dxf_note_demand_multiplier']='Talep çarpanı: {n}.';
+$ec_lang['lpn_dxf_sections_header']='Bu şebekenin EPANET bölümleri: desenler, kontroller, kurallar, zamanlar, seçenekler ve blokların tutamadığı diğer ayarlar. EPANET++, DXF içe aktarıldığında bu metni geri okur. Bu metni taşıyabilir veya katmanını dondurabilirsiniz; onu {layer} katmanında tutun.';
+$ec_lang['lpn_dxf_curve_points']='Pompa yük eğrisi noktaları (debi, yük)';
+$ec_lang['lpn_file_import_msx']='EPANET-MSX dosyası…';
+$ec_lang['lpn_file_import_msx_tip']='Bu projeye bir EPANET-MSX dosyası (.msx) ekleyin veya zaten ekli olanı gösterin. Proje ile birlikte saklanır, değiştirilmeden geri yazılır ve uzun süreli simülasyonda EPANET-MSX motoru tarafından çalıştırılır.';
+$ec_lang['lpn_file_export_item_msx']='EPANET-MSX dosyası…';
+$ec_lang['lpn_file_export_msx_tip']='Ekli EPANET-MSX dosyasını, içe aktarıldığı haliyle aynen indirin.';
+$ec_lang['lpn_msx_report_heading']='Eklenen {file}';
+$ec_lang['lpn_msx_report_kept']='Bu EPANET-MSX dosyası proje ile birlikte saklanır ve EPANET-MSX dosyası dışa aktarıldığında değiştirilmeden geri yazılır. Su kalitesi, Ayarlar, Hesaplama, Su kalitesi altında Çok türlü (EPANET-MSX) olarak ayarlanır; böylece uzun süreli simülasyon dosyadaki her kimyasal türü çalıştırır.';
+$ec_lang['lpn_msx_report_species']='Dosyadaki kimyasal türler: {list}.';
+$ec_lang['lpn_msx_report_no_species']='Dosyada hiçbir kimyasal tür listelenmemiş.';
+$ec_lang['lpn_msx_too_big']='{file} tarayıcı depolamasında tutulamayacak kadar büyük olduğundan eklenmedi.';
+$ec_lang['lpn_msx_report_missing']='Dosyada bulunan ama bu şebekede bulunmayan ID\'ler: {ids}.';
+$ec_lang['lpn_msx_not_msx']='{file} bir EPANET-MSX dosyasına benzemiyor: [SPECIES] bölümü yok.';
+$ec_lang['lpn_msx_attached_heading']='Ekli EPANET-MSX dosyası: {file}';
+$ec_lang['lpn_msx_removed']='{file} bu projeden kaldırıldı.';
+$ec_lang['lpn_quality_msx']='Çok türlü (EPANET-MSX)';
+$ec_lang['lpn_quality_msx_species']='Kimyasal tür';
+$ec_lang['lpn_quality_msx_species_tip']='Haritanın renklerinin, Tablolar panelinin ve Grafik panelinin gösterdiği EPANET-MSX kimyasal türü. Dosyadaki her tür aynı çalıştırmada hesaplanır; bu yüzden bunu değiştirmek yeni bir çalıştırma gerektirmez. Değerler EPANET-MSX dosyasının bildirdiği birimlerdedir: kütle türü için litre başına kütle, duvar türü için birim alan başına kütle.';
+$ec_lang['lpn_quality_msx_none']='Bu projeye ekli bir EPANET-MSX dosyası yok. Dosya, İçe aktar, Şebeke, EPANET-MSX dosyası ile bir tane ekleyin.';
+$ec_lang['lpn_result_msx_tip']='Bu EPANET-MSX kimyasal türünün, EPANET-MSX motorunun hesapladığı ve EPANET-MSX dosyasının bildirdiği birimlerdeki değeri. Bir hat için hat boyunca ortalamadır.';
+$ec_lang['lpn_inpup_ask_title']='{file} dosyasını içe aktar';
+$ec_lang['lpn_inpup_lead']='Bu EPANET dosyasının nereye aktarılacağını seçin.\n\nİçe aktarmada varlıklar ID ile eşleştirilir. Eşleşen varlıklarda değerler değiştirilir, içe aktarmaya özgü varlıklar eklenir ve bu projeye özgü varlıklara dokunulmaz.';
+$ec_lang['lpn_inpup_how']='Bu projede varlıklar ID ile eşleştirilir. Eşleşen varlıklarda değerler değiştirilir, dosyaya özgü varlıklar eklenir ve bu projeye özgü varlıklara dokunulmaz.';
+$ec_lang['lpn_inpup_base_note']='Temeli seçmek hiçbir senaryo değerini temizlemez.';
+$ec_lang['lpn_inpup_btn_new']='Yeni bir proje';
+$ec_lang['lpn_inpup_btn_project']='Bu proje, {project}';
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, şu anda açık';
+$ec_lang['lpn_inpup_btn_newscn']='Yeni bir senaryo, {parent} senaryosunun çocuğu';
+$ec_lang['lpn_inpup_newscn_name']='Yeni bir senaryo seçerseniz adı';
+$ec_lang['lpn_inpup_new_scn']='{scenario} senaryosu, {parent} senaryosunun çocuğu olarak oluşturuldu ve açıldı.';
+$ec_lang['lpn_inpup_btn_newscn_basic']='Yeni bir senaryo';
+$ec_lang['lpn_inpup_new_scn_basic']='{scenario} senaryosu oluşturuldu ve açıldı.';
+$ec_lang['lpn_inpup_new_none']='Hiçbir senaryo oluşturulmadı.';
+$ec_lang['lpn_survey_where_title']='Ölçülen noktaları içe aktar';
+$ec_lang['lpn_survey_where_lead']='Her nokta bir düğüm olur. Düğümlerin nereye gideceğini seçin.';
+$ec_lang['lpn_survey_where_note']='Bir senaryoda düğümler Temelde etkin değildir ve yalnızca orada etkindir. Temeli seçmek onları Temele ekler; böylece her senaryo onları miras alır.';
+$ec_lang['lpn_inpup_title']='EPANET dosyasından güncelle';
+$ec_lang['lpn_gjup_lead']='Bu GeoJSON dosyasının nereye aktarılacağını seçin.\n\nİçe aktarmada varlıklar ID ile eşleştirilir. Eşleşen varlıklarda değerler değiştirilir, içe aktarmaya özgü varlıklar eklenir ve bu projeye özgü varlıklara dokunulmaz.';
+$ec_lang['lpn_gjup_title']='GeoJSON dosyasından güncelle';
+$ec_lang['lpn_gjup_h_notes']='İçe aktarma notları';
+$ec_lang['lpn_inpup_heading']='{file} dosyası, {project} projesinin {scenario} senaryosuna aktarıldı';
+$ec_lang['lpn_inpup_counts']='Değiştirilen değerler ({n}), varlıklarda ({m}). Eklenen varlıklar ({a}). Dosyada bulunmayıp korunan varlıklar ({k}).';
+$ec_lang['lpn_inpup_undo']='Geri al hepsini tek adımda geri alır.';
+$ec_lang['lpn_inpup_nothing']='Dosyada bir varlıkla eşleşen her değer, {scenario} senaryosunda zaten aynıdır.';
+$ec_lang['lpn_inpup_status']='{file} dosyası, {project} projesinin {scenario} senaryosuna aktarıldı. Değiştirilen değerler ({n}). Eklenen varlıklar ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Değiştirilen değerler';
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} değerinden {new} değerine';
+$ec_lang['lpn_inpup_more']='{n} tane daha';
+$ec_lang['lpn_inpup_blank']='boş';
+$ec_lang['lpn_inpup_h_added']='Eklenen varlıklar';
+$ec_lang['lpn_inpup_h_kept']='Korundu, dosyada yok';
+$ec_lang['lpn_inpup_h_na']='Uygulanmadı';
+$ec_lang['lpn_inpup_na_general']='Dosya ayrıca şunları da içeriyor: {items}. Bunlar uygulanmadı.';
+$ec_lang['lpn_inpup_na_type']='Dosya bu varlıklar için farklı bir tür belirtiyor; bu yüzden değerlerinin hiçbiri değiştirilmedi: {ids}';
+$ec_lang['lpn_inpup_na_owned']='Boru türü bu boruların bazı değerlerini belirtiyor; bu yüzden o değerler değiştirilmedi: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Pürüzlülük uygulanmadı, çünkü bu proje Darcy-Weisbach formülünü kullanıyor ve bu durumda pürüzlülük karşılaştırılmaz.';
+$ec_lang['lpn_inpup_na_geo']='Yalnızca dosyada bulunan varlıklar ({n}) eklenmedi, çünkü dosya ve bu proje farklı koordinat sistemleri kullanıyor.';
+$ec_lang['lpn_inpup_na_refs']='Eklenen bu varlıklar bu projede bulunmayan bir desene veya eğriye başvuruyor; bu yüzden başvuru dışarıda bırakıldı: {ids}';
+$ec_lang['lpn_inpup_na_msx']='Bu dosyayla birlikte seçilen .msx dosyası okunmadı. Onu bu projeye eklemek için tek başına seçin.';
+$ec_lang['lpn_inpup_refused_heading']='{project} içinde hiçbir şey değiştirilmedi.';
+$ec_lang['lpn_inpup_refused_lead']='Dosyanın birimleri bu projenin birimlerinden farklı ve bu sayfa bir dosyadaki sayıları dönüştürmez. Dosyayı yeni bir proje olarak içe aktarın veya aynı birimleri kullanan bir proje açın.';
+$ec_lang['lpn_inpup_unit_row']='{family}: dosya {file} kullanıyor, bu proje ise {project} kullanıyor.';
+$ec_lang['lpn_inpup_method_row']='Yük kaybı formülü: dosya {file} kullanıyor, bu proje ise {project} kullanıyor.';
+$ec_lang['lpn_inpup_refused_lead_formula']='Dosyanın yük kaybı formülü bu projenin formülünden farklı ve bu sayfa pürüzlülük değerlerini dönüştürmez. Dosyayı yeni bir proje olarak içe aktarın veya aynı formülü kullanan bir proje açın.';
+$ec_lang['lpn_inpup_refused_lead_both']='Dosyanın birimleri ve yük kaybı formülü bu projeninkilerden farklı ve bu sayfa bir dosyadaki sayıları dönüştürmez. Dosyayı yeni bir proje olarak içe aktarın veya aynı birimleri ve formülü kullanan bir proje açın.';
+$ec_lang['lpn_inpup_failed']='Güncelleme bitmeden durdu; bu yüzden {project} içinde hiçbir şey değiştirilmedi. Dosyayı açmak için yeni bir proje olarak içe aktarın. Neden: {reason}';
+$ec_lang['lpn_inpup_i_positions']='mevcut varlıkların konumları';
+$ec_lang['lpn_inpup_i_connections']='bağlantılar';
+$ec_lang['lpn_inpup_i_descriptions']='açıklamalar';
+$ec_lang['lpn_inpup_i_patterns']='desenler';
+$ec_lang['lpn_inpup_i_curves']='eğriler';
+$ec_lang['lpn_inpup_i_controls']='kontroller';
+$ec_lang['lpn_inpup_i_rules']='kurallar';
+$ec_lang['lpn_inpup_i_options']='seçenekler';
+$ec_lang['lpn_roughness_method_note']='⚠ {method} için normal aralığın dışında pürüzlülüğe sahip borular: {n}. Değerler değişmedi ve başka bir sürtünme yöntemi için girilmiş olabilir.';
+$ec_lang['lpn_field_cv']='Çek valf (CV)';
+$ec_lang['lpn_field_cv_tip']='Bu boru suyu bir çek valf gibi yalnızca başlangıç düğümünden bitiş düğümüne geçirir. Akış ters dönecek olursa boru, yeniden ileri akabilene kadar kapanır. EPANET bu duruma CV der.';
+$ec_lang['lpn_theme_hc']='Yüksek karşıtlık';
+$ec_lang['lpn_theme_amber']='Kehribar';
+$ec_lang['lpn_theme_green']='Yeşil';
+$ec_lang['lpn_theme_platinum']='Platin';
+$ec_lang['lpn_theme_rounded']='Yuvarlak';
+$ec_lang['lpn_theme_desktop']='Masaüstü';
+$ec_lang['lpn_theme_newspaper']='Gazete';
+$ec_lang['lpn_theme_arcade']='Atari salonu';
+$ec_lang['lpn_theme_space']='Uzay';
+$ec_lang['lpn_theme_prairie']='Bozkır';
+$ec_lang['lpn_ovl_clear_same']='Miras alınana eşit senaryo değerlerini temizle';
+$ec_lang['lpn_ovl_clear_same_ask']='{name} senaryosunun, miras alınan değere eşit senaryo değerleri ({n} tane) temizlensin mi? Her değer olduğu gibi kalır ve yeniden miras alınır. Geri al bunu geri alır.';
+$ec_lang['lpn_settings_held_item']='{setting}: {restores}';
+$ec_lang['lpn_ovm_restores']='Temizle, {value} değerini geri yükler, {source}.';
+$ec_lang['lpn_settings_held_from']='{parent} içindeki değer';
+$ec_lang['lpn_settings_held_default']='varsayılan değer';
+$ec_lang['lpn_settings_held_none']='metin yok';
+$ec_lang['lpn_dem_scenario']='Buraya yazılan kotlar, {scenario} senaryosunda senaryo değeridir.';
+$ec_lang['lpn_dem_base']='Buraya yazılan kotlar Temele girer; bu yüzden kotu değiştirmemiş her senaryo bunları miras alır.';
+$ec_lang['lpn_settings_grp_size']='Boyut';
+$ec_lang['lpn_settings_grp_angle']='Açı';
+$ec_lang['lpn_settings_grp_zoom']='Yakınlaştırma';
+$ec_lang['lpn_settings_grp_positions']='Konumlar';
+$ec_lang['lpn_settings_grp_thematic']='Tematik';
+$ec_lang['lpn_time_run_unbalanced']='Zaman adımları dengelenmedi ({n}).';
+$ec_lang['lpn_time_run_warnings']='Uyarılar ({n}).';
+$ec_lang['lpn_time_run_see_report']='Bkz. {report}.';
+$ec_lang['lpn_scncmp_progress']='{total} senaryodan {done}. çözülüyor…';
+$ec_lang['lpn_scncmp_stopped']='{total} senaryodan {done} tanesinden sonra durduruldu. Aşağıdaki sonuçlar zaten bitmiş olanlardır.';
+$ec_lang['lpn_scnres_title']='Varlığa göre sonuçlar';
+$ec_lang['lpn_scnres_col']='{quantity} ({unit}), {scenario}';
+$ec_lang['lpn_scnres_none']='Göstermek için en az bir sonucu işaretleyin.';
+$ec_lang['lpn_scnres_empty']='Bu projede bu varlıklardan hiç yok.';
+$ec_lang['lpn_scnres_time_note']='Toplam çalışma süresi olan bir senaryo, ekrandaki zaman adımında, {time}, okunur; çalıştırması daha önce biterse son zaman adımında okunur. Her başlık okunan zamanı gösterir.';
+$ec_lang['lpn_scnres_at_time']='({time})';
+$ec_lang['lpn_scnres_steady']='(daimi rejim)';
+$ec_lang['lpn_scnres_not_converged']='(yakınsamadı)';
+$ec_lang['lpn_scnres_not_converged_note']='{mark} ile işaretlenen bir sütun, çözücünün yakınsamadan durmadan önce ulaştığı son sonuçları gösterir.';
+$ec_lang['lpn_scnres_failed']='{scenario} çözülemedi; bu yüzden sütunları boştur. {why}';
+$ec_lang['lpn_scnres_flow_tip']='Bir debinin işareti çözücünün iç yön işaretidir. Çözücünün dışında, bir debinin senaryolar arasında yön değiştirip değiştirmediğini burada göstermek dışında hiçbir işe yaramaz.';
+$ec_lang['lpn_scnres_stale']='Yeniden hesaplama kapalı; bu yüzden haritadaki ve Tablolar panelindeki sonuçlar daha önceki bir çözümden. Buradaki {scenario} sütunları geçerli girdilerden çözülür ve onlardan farklı olabilir.';
+$ec_lang['lpn_report_copy_html']='HTML\'yi kopyala';
+$ec_lang['lpn_demand_cats']='Kategoriler: talep';
+$ec_lang['lpn_demand_total_tip']='Bu düğümdeki tüm talep kategorilerinin baz taleplerinin toplamı. Bir kategoriyi değiştirmek için Kategoriler: talep kutusunu açın.';
+$ec_lang['lpn_when']='Sınanan raporlama adımı';
+$ec_lang['lpn_when_now']='Ekrandaki raporlama adımı';
+$ec_lang['lpn_when_hour']='Seçilen bir raporlama adımı';
+$ec_lang['lpn_when_minp']='En düşük basıncın olduğu raporlama adımı';
+$ec_lang['lpn_when_all']='Her raporlama adımı, en kötü durum';
+$ec_lang['lpn_when_step']='Raporlama adımı';
+$ec_lang['lpn_when_run']='Çalıştırmanın tamamı';
+$ec_lang['lpn_dur_option']='Belirtilen süreli bir yangın';
+$ec_lang['lpn_dur_start']='Yangın başlangıcı';
+$ec_lang['lpn_dur_junction']='Yangın düğümü';
+$ec_lang['lpn_dur_junction_none']='Hiçbiri seçili değil. Haritada bir düğüm seçin.';
+$ec_lang['lpn_dur_junction_many']='Birkaçı seçili. Haritada bir düğüm seçin.';
+$ec_lang['lpn_dur_length']='Yangın süresi';
+$ec_lang['lpn_dur_length_tip']='Saat ve dakika, örneğin 2:00. Yangın debisi, Gereken yangın debisidir ve haritada seçilen tek düğümden başlangıç zamanından itibaren bu süre boyunca çekilir. Uzun süreli simülasyonun tamamı şebekenin bir kopyasında çalıştırılır ve yangınsız aynı çalıştırmayla karşılaştırılır. Başlangıç ve süre, desen zaman adımının tam katları olmalıdır. Son raporlama adımında hiçbir düğüm yangınsız çalıştırmadan yaklaşık 0,14 psi (1 kPa) ve hiçbir depo yaklaşık 0,3 ft (0,1 m) fazla farklı değilse sistem toparlanmış sayılır.';
+$ec_lang['lpn_dur_no_junction']='Yangın için bir düğüm seçin.';
+$ec_lang['lpn_dur_bad_time']='Başlangıç ve süre, desen zaman adımının, {step}, tam katları olmalıdır ve yangın çalıştırmanın içinde başlamalıdır.';
+$ec_lang['lpn_dur_head']='{id} düğümünde {flow} yangın debisi, {start} ile {end} arasında.';
+$ec_lang['lpn_dur_holds']='✓ {id} düğümü yangın sırasında en az {pressure} basıncı korur; bu, {residual} kalıntı basıncın üstündedir, {time} anında.';
+$ec_lang['lpn_dur_shortfall']='⚠ {id} düğümünde, {time} anında, {flow} yangın debisinin yalnızca {delivered} kadarı verilir; bu yüzden kalıntı basınç o yangın için bir sınav değildir.';
+$ec_lang['lpn_dur_fails']='⚠ {id} düğümü yangın sırasında {pressure} basınca düşer; bu, {residual} kalıntı basıncın altındadır, {time} anında.';
+$ec_lang['lpn_dur_lowest']='Herhangi bir yerdeki en düşük basınç {pressure} değeridir, {id} düğümünde, {time} anında.';
+$ec_lang['lpn_dur_no_empty']='✓ Hiçbir depo boşalmaz.';
+$ec_lang['lpn_dur_empties']='⚠ {id} deposu {time} anında boşalır. O adımdan sonraki basınçlar okunmaz.';
+$ec_lang['lpn_dur_recovers']='✓ Sistem yangından sonra toparlanır: son raporlama adımı olan {time} anında hiçbir düğüm yangınsız çalıştırmadan {pressure} değerinden ve hiçbir depo {level} değerinden fazla farklı değildir.';
+$ec_lang['lpn_dur_not_back_tank']='⚠ Son raporlama adımı olan {time} anında {id} deposu yangınsız seviyesine dönmemiştir. Fark {level} değerindedir; tolerans {tolerance} değerindedir.';
+$ec_lang['lpn_dur_not_back_junction']='⚠ Son raporlama adımı olan {time} anında {id} düğümü yangınsız basıncına dönmemiştir. Fark {pressure} değerindedir; tolerans {tolerance} değerindedir.';
+$ec_lang['lpn_dur_recovery_to_end']='Yangın çalıştırmanın sonuna kadar sürer; bu yüzden ondan sonraki toparlanma değerlendirilmez.';
+$ec_lang['lpn_dur_recovery_cut']='Çalıştırma sonundan önce durdu; bu yüzden yangından sonraki toparlanma değerlendirilmez.';
+$ec_lang['lpn_dur_col_pressure']='Yangın düğümündeki basınç';
+$ec_lang['lpn_dur_col_nofire']='Yangınsız basınç';
+$ec_lang['lpn_dur_col_low']='Ulaşılan en düşük seviye';
+$ec_lang['lpn_col_level']='Seviye';
+$ec_lang['lpn_dur_col_margin']='En düşük su derinliğinin üstünde';
+$ec_lang['lpn_dur_col_drop']='Başlangıçtan düşüş';
+$ec_lang['lpn_dur_col_end']='Sondaki seviye';
+$ec_lang['lpn_dur_col_end_nofire']='Yangınsız sondaki seviye';
+$ec_lang['lpn_crit_col_hours']='Asgarinin altındaki saatler';
+$ec_lang['lpn_crit_col_stopped']='Çalıştırmanın durduğu an';
+$ec_lang['lpn_crit_col_empty']='Depo boşalır';
+$ec_lang['lpn_ds_run_note']='Çalıştırmanın tamamı boyunca, her raporlama adımında değerlendirilir.';
+$ec_lang['lpn_ds_limit_at']='Sınırlayıcı raporlama adımı: {time}.';
+$ec_lang['lpn_ds_empties_at']='⚠ {m} talep ölçeğinde bir depo {time} anında boşalır.';
+$ec_lang['lpn_ds_lowest_at_time']='{m} talep ölçeğinde en düşük basınç {pressure} değeridir, {id} düğümünde, {time} anında.';
+$ec_lang['lpn_crit_run_note']='Her kesinti simülasyonun tamamı boyunca çalıştırıldı ({n} raporlama adımı).';
+$ec_lang['lpn_ff_working_steps']='Çalışıyor: {steps} raporlama adımından {step}., {total} düğümden {done}.';
+$ec_lang['lpn_ff_col_hour']='En düşük debili adım';
+$ec_lang['lpn_ds_col_hour']='En düşük basınçlı adım';
+$ec_lang['lpn_ff_no_steps']='Bir depo {time} anında boşalır, ilk raporlama adımı sınanamadan önce; bu yüzden hiçbir adım sınanmadı.';
+$ec_lang['lpn_ff_tank_empties']='Bir depo {time} anında boşalır; o andan sonraki adımlar sınanmadı.';
+$ec_lang['lpn_crit_col_lowest_tip']='Yalnızca bir depo boşalmadan önce okunur. O adımdan sonra kaynaksız kalan düğümler anlamsız basınçlar bildirir; adımı Depo boşalır sütunu verir.';
+$ec_lang['lpn_crit_empty_note']='En düşük basınçlar bir depo boşalmadan önce okunur. Asgarinin altındaki düğümler, o adımdan itibaren kaynaksız kalanları da içerir.';
+$ec_lang['lpn_ff_at_step']='{time} raporlama adımında sınandı.';
+$ec_lang['lpn_ff_at_minp']='{time} anında sınandı; bu, sınanan düğümler arasında en düşük basıncın olduğu raporlama adımıdır.';
+$ec_lang['lpn_ff_at_all']='{n} raporlama adımının en kötüsü. Her satır, o düğüm için en düşük kullanılabilir debinin olduğu adımı gösterir.';
+$ec_lang['lpn_ff_col_more']='Ve diğerleri';
+$ec_lang['lpn_crit_col_unserved_peak']='Karşılanmayan en büyük talep';
+$ec_lang['lpn_file_import_dxfnet']='DXF dosyası…';
+$ec_lang['lpn_file_import_dxfnet_tip']='Bu sayfanın dışa aktardığı bir DXF dosyasından yeni bir proje oluşturun. C-WATR-MODL- ile başlayan katmanlardaki bloklar ve çoklu çizgiler öznitelikleriyle birlikte okunur. Çizimdeki başka her şey listelenir ve okunmaz.';
+$ec_lang['lpn_dxfnet_note_layer_foreign']='Bu katmanlar {prefix} ile başlamıyor; bu yüzden üzerlerindeki hiçbir şey okunmadı.';
+$ec_lang['lpn_dxfnet_note_layer_unknown']='Bu katmanlar {prefix} ile başlıyor ama bu sayfanın yazdığı bir varlık koduyla (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) ve bir alternatifle devam etmiyor; bu yüzden üzerlerindeki hiçbir şey okunmadı.';
+$ec_lang['lpn_dxfnet_note_alternative']='Bu katmanlar, okunan alternatif olan {alt} dışında bir alternatife ait; bu yüzden üzerlerindeki hiçbir şey okunmadı.';
+$ec_lang['lpn_dxfnet_note_alt_read']='Çizimde BASE alternatifi yok. {alt} alternatifi okundu.';
+$ec_lang['lpn_dxfnet_note_curve_differs']='Bu pompalar, başka bir pompanın farklı noktalarla kullandığı bir eğri ID\'si belirtiyor. İlk eğri korundu.';
+$ec_lang['lpn_dxfnet_note_shapes']='Bu katmanlar, bu içe aktarmanın okumadığı Figürler içeriyor. Onlar için İçe aktar, Figürler, DXF dosyası öğesini kullanın.';
+$ec_lang['lpn_dxfnet_note_entity_unread']='Bu öğeler, bu içe aktarmanın katmanlarında okuduğu türden değil ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_paper_space']='Kağıt uzayındaki öğeler okunmadı: {n}.';
+$ec_lang['lpn_dxfnet_note_tag_unknown']='Bu öznitelik etiketleri, bu sayfanın kendi bloğu için yazdığı etiketlerden değil ve değerleri içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_block_unknown']='Bu bloklar, bu sayfanın kendi katmanı için yazdığı blok değil ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_bad_id']='Bu öğelerin ID\'si boş, 31 karakterden uzun veya bir boşluk, noktalı virgül ya da tırnak işareti içeriyor ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_dup_id']='Bu ID\'leri aynı türden birden fazla öğe belirtiyor. Yalnızca ilki içe aktarıldı.';
+$ec_lang['lpn_dxfnet_note_no_position']='Bu blokların kullanılabilir bir konumu yok ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_link_no_block']='Bu çoklu çizgilerin ortasında hattın ID\'sini ve özelliklerini belirtecek bir blok yok ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_block_no_line']='Bu hat bloklarının ortasından geçen bir çoklu çizgi yok ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_line_no_block']='Bu servis hatları, müşteri bloğu olmayan bir yerde bitiyor ve içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_note_end_ambiguous']='Bu hatların, iki düğümün aynı noktada durduğu bir ucu var; bu yüzden hattın hangi düğümde bittiği belirlenemez ve içe aktarılmadılar.';
+$ec_lang['lpn_dxfnet_note_end_no_node']='Bu hatların, düğüm olmayan bir yerde bir ucu var ve içe aktarılmadılar.';
+$ec_lang['lpn_dxfnet_note_end_loop']='Bu hatlar aynı düğümde başlıyor ve bitiyor ve içe aktarılmadılar.';
+$ec_lang['lpn_dxfnet_note_pump_no_curve']='Bu pompalar bir yük eğrisi belirtmiyor; bu yüzden her birine bir eğri verilene kadar Hesapla orijinal sonuçları vermeyecektir.';
+$ec_lang['lpn_dxfnet_note_crs_unknown']='Beni oku dosyası, bu sayfanın bilmediği bir koordinat sistemi belirtiyor; bu yüzden çizim, haritada yeri olmayan bir ızgara olarak açıldı.';
+$ec_lang['lpn_dxfnet_note_method']='Yük kaybı formülü dosyada yok; bu yüzden Hazen-Williams varsayıldı. Pürüzlülük değerleri Hazen-Williams C olarak okundu.';
+$ec_lang['lpn_dxfnet_note_geo_export']='Bu çizim bir enlem ve boylam projesinden dışa aktarıldı. {crs} sisteminde, metre cinsinden, haritadaki aynı yerde açılır.';
+$ec_lang['lpn_dxfnet_note_sections_read']='Çizime gömülü EPANET bölümleri okundu: {sections}.';
+$ec_lang['lpn_dxfnet_note_sections_unread']='Çizime gömülü EPANET bölümleri bir EPANET dosyası olarak okunamadı; bu yüzden hiçbiri içe aktarılmadı.';
+$ec_lang['lpn_dxfnet_count_nodes']='{n} düğüm, rezervuar ve depo.';
+$ec_lang['lpn_dxfnet_count_links']='{n} boru, pompa ve vana.';
+$ec_lang['lpn_dxfnet_count_customers']='{n} müşteri.';
+$ec_lang['lpn_dxfnet_held_custom']='özel özellikler';
+$ec_lang['lpn_dxfnet_held_text']='haritadaki Metin öğeleri ve elle yerleştirilmiş etiket konumları';
+$ec_lang['lpn_dxfnet_note_unit_unknown']='Çizim, bu sayfanın bilmediği şu birimleri belirtiyor. Bunlar için kullanılmakta olan birimler korundu.';
+$ec_lang['lpn_dxfnet_note_coord_unit']='Çizim koordinatlarını {coord} cinsinden ve uzunluklarını {length} cinsinden belirtiyor. Koordinatlar {length} olarak okundu.';
+$ec_lang['lpn_dxfnet_note_customer_loose']='Bu müşterilerin servis hatları bir boruda veya düğümde başlamıyor. Müşteriler bağlantısız yerleştirildi.';
+$ec_lang['lpn_dxfnet_note_not_held']='Bir DXF dosyası bunları tutmaz; bu yüzden hiçbiri içe aktarılmadı:';
+$ec_lang['lpn_dxfnet_none']='{file} dosyasından hiçbir şey içe aktarılmadı. {prefix} ile başlayan katmanlarda bu sayfanın okuyabileceği blok yok.';
+$ec_lang['lpn_dxfnet_report_lead']='Okunmayanlar ve içe aktarma sırasında yapılan her değişiklik, ilgili katman, blok veya ID ile birlikte aşağıda listelenmiştir:';
+$ec_lang['lpn_shapes_every_scenario']='Figürler her senaryoda görünür.';
+$ec_lang['lpn_shapes_this_scenario']='Figürler yalnızca {scenario} senaryosunda görünür.';
+$ec_lang['lpn_library_import_every_scenario']='Her senaryo bunları kullanabilir.';
+$ec_lang['lpn_menu_back']='Geri';
+$ec_lang['lpn_diag_valve_conflict']='Bu kontrol vanaları, EPANET\'in izin vermediği bir biçimde birbirine bağlı; örneğin seri bağlı iki basınç düşürme vanası. Aralarına kısa bir boru ekleyin:';
+$ec_lang['lpn_diag_gpv_curve_order']='Bu genel amaçlı vanaların yük kaybı eğrileri okunamıyor: her debi bir öncekinden büyük olmalıdır ve tek noktalı bir eğride debi sıfırın üstünde olmalıdır:';
+$ec_lang['lpn_gpv_one_point_note']='⚠ Bu genel amaçlı vanaların yük kaybı eğrisinde yalnızca bir nokta var; bu yüzden yük kayıpları, o noktadan geçen debiyle orantılı alındı: {ids}';
+$ec_lang['lpn_gis_title']='Bir GIS sunucusundan arka plan katmanları';
+$ec_lang['lpn_gis_unlocatable']='Arka plan katmanları, dünya üzerine yerleştirilmiş bir proje gerektirir.';
+$ec_lang['lpn_gis_kind']='Sunucu türü';
+$ec_lang['lpn_gis_kind_xyz']='Karo URL\'si';
+$ec_lang['lpn_gis_kind_wms']='WMS';
+$ec_lang['lpn_gis_kind_arcgis']='ArcGIS REST (MapServer)';
+$ec_lang['lpn_gis_url']='Sunucu adresi';
+$ec_lang['lpn_gis_wms_layers']='WMS katman adları (virgülle ayrılmış)';
+$ec_lang['lpn_gis_add']='Katman ekle';
+$ec_lang['lpn_gis_menu']='Katman ekle…';
+$ec_lang['lpn_gis_draw']='Göster';
+$ec_lang['lpn_gis_opacity']='Opaklık';
+$ec_lang['lpn_gis_note']='Bir katman eklemek, ekrandaki alanı ve IP adresinizi adını verdiğiniz sunucuya gönderir. Bir katman içeren bir projeyi açmak bunları yeniden gönderir.';
+$ec_lang['lpn_gis_err_address']='Sunucu adresi https:// ile başlamalıdır.';
+$ec_lang['lpn_gis_err_template']='Bir karo URL\'si {z}, {x} ve {y} içermelidir.';
+$ec_lang['lpn_gis_err_layers']='En az bir WMS katman adı girin.';
+$ec_lang['lpn_gis_err_mapserver']='Bir ArcGIS adresi /MapServer ile bitmelidir.';
+$ec_lang['lpn_gis_unreachable']='erişilemiyor';
+$ec_lang['lpn_gis_failed']='{host} bir harita görüntüsü döndürmedi. Katmanı çizilmedi.';
+$ec_lang['lpn_screenshot_no_gis']='Bir GIS sunucusundan gelen arka plan katmanı dahil edilemedi.';
+$ec_lang['lpn_export_holds_scenario']='Yalnızca {scenario} senaryosunu içerir.';
+$ec_lang['lpn_export_holds_base']='Yalnızca Temel senaryoyu içerir.';
+$ec_lang['lpn_geojson_results_other']='Sonuç dahil edilmedi, çünkü ekrandaki sonuçlar {scenario} senaryosuna ait.';
+$ec_lang['lpn_survey_added_scenario']='Düğümler {scenario} senaryosuna eklendi. Temelde etkin değiller.';
+$ec_lang['lpn_pane_pasted_scenario']='Bu değerler, {scenario} senaryosunda senaryo değerleridir.';
+$ec_lang['lpn_pane_pasted_overrides']='Yeni senaryo değerleri ({n}).';
+$ec_lang['lpn_run_of_scenario']='{scenario} senaryosunun sonuçları.';
+$ec_lang['lpn_calib_scenario']='{scenario} senaryosunun sonuçlarıyla karşılaştırıldı.';
+$ec_lang['lpn_export_leaves_alternatives']='Bu projede saklanan alternatifler dosyada yok.';
+$ec_lang['lpn_export_confirm_title']='Dışa aktar: {format}';
+$ec_lang['lpn_noscn_lead']='Bu projede {n} senaryo var, ancak {format} içinde senaryo veya alternatif yoktur.';
+$ec_lang['lpn_noscn_fmt_inp']='bir EPANET dosyası';
+$ec_lang['lpn_noscn_fmt_geojson']='bir GeoJSON dosyası';
+$ec_lang['lpn_noscn_fmt_dxf']='bir DXF dosyası';
+$ec_lang['lpn_export_goes_scenario']='"{scenario}" senaryosu benzersiz bir dosya adıyla dışa aktarılıyor.';
+$ec_lang['lpn_export_goes_base']='Temel senaryo dışa aktarılıyor.';
+$ec_lang['lpn_export_receipt_heading']='{file} dosyası, {project} projesinin {scenario} senaryosundan dışa aktarıldı.';
+$ec_lang['lpn_export_receipt_note']='Bu bir dışa aktarmadır, kaydetme değil: bu proje dosyaya bağlı değildir.';
+$ec_lang['lpn_dxf_exported_geo_tail']='Koordinatları {crs} sisteminde, metre cinsindendir; enlem ve boylam değildir.';
+$ec_lang['lpn_field_auto_length']='Otomatik uzunluk';
+$ec_lang['lpn_edit_pipetypes']='Türleri düzenle…';
+$ec_lang['lpn_edit_fittings']='Bağlantı parçalarını düzenle…';
+$ec_lang['lpn_edit_curves']='Eğrileri düzenle…';
+$ec_lang['lpn_field_tank_level_short']='Başlangıç derinliği';
+$ec_lang['lpn_field_tank_minlevel_short']='En düşük derinlik';
+$ec_lang['lpn_field_tank_maxlevel_short']='En yüksek derinlik';
+$ec_lang['lpn_field_active_short']='Etkin';
+$ec_lang['lpn_field_cv_short']='Çek valf';
+$ec_lang['lpn_field_km_short_tip']='Küçük (yerel) kayıp katsayısı, k: boru boyunca bağlantı parçalarında ve dirseklerde kaybedilen yük, hız yükünün katı olarak.';
+$ec_lang['lpn_field_km_fittings_tip']='Küçük (yerel) kayıp katsayısı, k: yukarıda seçilen bağlantı parçası listesindeki katsayıların toplamı. Bir değer yazmak için "Bağlantı parçası listesi seçilmedi" öğesini seçin.';
+$ec_lang['lpn_field_valve_km_short_tip']='Küçük (yerel) kayıp katsayısı, k: vana tam açıkken vana gövdesindeki kayıp, hız yükünün katı olarak; vana ayarından gelen herhangi bir kayba ek olarak. Yok saymak için 0 kullanın.';
+$ec_lang['lpn_reaction_bulk_pipe_tip']='Kütle tepkime katsayısı: bu borudaki suyun gövdesinde tepkime hızı (bkz. EPANET Yardım). Negatif bir sayı kimyasalı azaltır, pozitif bir sayı artırır. Boş bırakmak, Ayarlar, Hesaplama, Su kalitesi altında tüm şebeke için ayarlanan katsayıyı kullanmak demektir.';
+$ec_lang['lpn_reaction_wall_pipe_tip']='Cidar tepkime katsayısı: bu borunun cidarındaki tepkime hızı (bkz. EPANET Yardım). Negatif bir sayı kimyasalı azaltır. Boş bırakmak, Ayarlar, Hesaplama, Su kalitesi altında tüm şebeke için ayarlanan katsayıyı kullanmak demektir.';
+$ec_lang['lpn_reaction_tank_short_tip']='Tepkime katsayısı: bu depoda tutulan suyun içindeki tepkime hızı, 1/gün cinsinden. Negatif bir sayı kimyasalı azaltır, pozitif bir sayı artırır. Boş bırakmak, Ayarlar, Hesaplama, Su kalitesi altında tüm şebeke için ayarlanan kütle tepkime katsayısını kullanmak demektir.';
+$ec_lang['lpn_field_tank_level_short_tip']='Başlangıç derinliği: çalıştırmanın başında depodaki su derinliği, depo tabanından yukarı doğru ölçülür.';
+$ec_lang['lpn_field_tank_minlevel_short_tip']='En düşük derinlik: depodaki izin verilen en düşük su derinliği, depo tabanından yukarı doğru ölçülür.';
+$ec_lang['lpn_field_tank_maxlevel_short_tip']='En yüksek derinlik: depodaki izin verilen en yüksek su derinliği, depo tabanından yukarı doğru ölçülür.';
+$ec_lang['lpn_field_auto_length_tip']='Otomatik uzunluk: işaretliyse eğim uzunluğu çizilen çizgi boyunca hesaplanır ve bir düğüm taşındığında veya bir uç kotu değiştiğinde çizimi izler. Kendi uzunluğunuzu yazmak için işareti kaldırın.';
