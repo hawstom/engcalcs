@@ -66,31 +66,6 @@ the block.
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
-- 100|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
-  **SPRINT 737c DONE 2026-11-01** (Tom: *"Proceed."*; audit and `dev/english-friction/737c.json`): 625 keys in 25 languages. Status split from Scenario (am, my); Link split from Pipe (24 languages); Pattern split from Graphs/Mode (bg, ru, uk шаблон; zh EPANET's 时间模式); Source, Curve, Depth, HGL, Label, Demand unified where they varied. **Left, his call: Junction and Node share one word in 14 languages** (bg, cs, es, fa, he, hr, id, it, km, ru, sr, tr, uk, zh); Spanish EPANET itself says Nudo for a junction.
-  **Not done, 2026-10-18** (Tom asked "Done?"): the am and my Status words (terms entries written 2026-10-17) and the "labels, and Text" mode prompts reach those languages only through the next sprint.
-  Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
-  **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
-  concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
-  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. **SPRINT 737b DONE 2026-10-15**: the same sweep in am, bn, fa, hi, km, my, pt, ru, uk, zh (Head unified in bn, hi, km, my; HGL split from the gradient in ru, zh; `dev/english-friction/737b.json`). Tom, 2026-10-15: km Tag stays (*"a significant disambiguator"*); the mode prompts now say "labels, and Text" (master), so their translations are owed.
-  (Etichetta) and tr (Etiket); cs uses Zdroj for both Reservoir and Source.
-  | Concept | English |
-  |---|---|
-  | Dynamic asset property annotation | Label |
-  | Asset management key | Tag |
-  | Asset notes | Description |
-  | User map annotation | Text |
-  | Hydraulic z | Elevation |
-  | Hydraulic y | Depth |
-  | Hydraulic p | Pressure |
-  | Partial or incremental potential energy | Head |
-  | Total potential energy at a point | Head |
-  | Total potential energy as a line | HGL |
-  | Total energy as a line | EGL |
-  **Found by sprint 1017's QA (2026-10-17):** am (ሁኔታ) and my (အခြေအနေ) each use one word for both Scenario and Status, about 120 and 21 strings; three box titles begin alike. Needs a Status word in each.
-  The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
-  concept id and a definition, and payloads send the definition as the source). Head and HGL stay
-  split (Tom, 2026-09-30).
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
   **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
@@ -106,8 +81,10 @@ the block.
   **Tom, 2026-10-22: export, not import.** *"I am not convinced that importing wtg is feasible in the short term or maybe ever as long as we keep our EPANET paradigm. I think that the best we can hope to do is export to wtg. Can we use what we have learned to try to make an export of Net3 that will run in wtg?"* Feasibility spike: `feat/wtg-export`. `feat/sqlite-reader` stays as what we learned.
   **His test, 2026-10-22:** Net3 opens in his WaterGEMS and runs with the same results (*"Huge congratulations"*); symbols came in tiny (fixed). Next, one thing per file from him: tank-level controls first (`feat/wtg-export`, dev/wtg-export.md).
   **2026-11-01:** `feat/wtg-page-export` caught up with master and now writes several demands per junction, a pump efficiency curve and the report step; waits his WaterGEMS test and his letter to Bentley.
+  **Tom tested 2026-11-01**: Net3 and all six valve kinds open and compute in WaterGEMS. He scratched the letter (*"I will just take my chances"*); not merged yet (*"We aren't releasing yet"*). Left: shorten the "does not yet write" list.
   Tom, 2026-10-20: *"I found out that pumps and valves are nodes in WaterGEMS, and this is a major paradigm incompatibility that could prevent 1 to 1 conversion. That said, I like it better than the EPANET paradigm."* and *"Patterns can be continuous or stepwise ... Maybe we should not undertake to import WaterCAD. Maybe we should only try to export."* Undecided; he asked to be prompted later. Next step he approved: import the alternatives themselves.
 - 100|814| **Classify every import and export by its scenario awareness.**
+  **Tom approved every recommendation of the 11-01 report, 2026-11-01** (*"Proceed."*): rebuild the alternative question and the Tables-export sentence on a fresh branch from master (`feat/alternative-import`), kill `feat/import-alternative`, correct the inventory; no Scenario-to-export picker; the Tables-file import waits for Task 752; close 814 when that branch merges.
   **A new scenario as an import destination merged 2026-10-23 on his word** (`feat/import-new-scenario`), with the surveyed-points question.
   **Scenario in file names, receipts and "no scenarios" notices merged 2026-10-29 on his word** (`feat/scenario-io`); what is left is in the inventory.
   Comes before Task 752 goes on. Tom, 2026-10-17: *"We must get perfect clarity about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."* His three classes: current scenario, current project, separate project. For each command: how aware the format is of scenarios and alternatives, and how well it fits this project; an import from a less aware format asks where it goes (current or new scenario/alternative, current or new project); an export to one asks to confirm exporting part of the project; an equally aware one discloses that it is an export, not a save or a sync. Maybe one standard questionnaire or wizard.
