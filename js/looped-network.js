@@ -78991,7 +78991,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
 		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
-		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}

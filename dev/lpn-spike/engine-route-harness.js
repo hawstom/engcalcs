@@ -136,7 +136,7 @@ L.settings().engine = 'native';
 	ok('...and the answer is the built-in solver\'s, with a deficit it computed', !!r && r.engine !== 'epanet' && !!r.demandDeficits, r && r.engine);
 	ok('...and it converged', !!r && r.converged === true);
 	ok('the stored engine setting was not changed', L.settings().engine === 'native', L.settings().engine);
-	ok('the status bar names the built-in solver, not a switch to EPANET', status().indexOf(PC.lpn_engine_native_used) >= 0 && status().indexOf(PC.lpn_engine_pda_route) < 0, JSON.stringify(status()));
+	ok('the status bar names the built-in solver, not a switch to EPANET', status().indexOf(PC.lpn_engine_native_used) >= 0, JSON.stringify(status()));
 	L.settings().engine = 'epanet';
 	const was2 = epanetSolves(), r2 = await solved();
 	ok('with the EPANET solver chosen, EPANET answers it', epanetSolves() === was2 + 1 && !!r2 && r2.engine === 'epanet', r2 && r2.engine);

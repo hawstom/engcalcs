@@ -78,8 +78,7 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    `EngCalcs.lpnTimeNativePlan(model)` (js/lpn-time.js): the loop runs the period, quality included
    (`lpnNativeRun(model, {quality: true})`), when the open scenario's engine setting is the built-in solver and
    `lpnNativeRunRefusals(model, {quality: true})` names nothing; otherwise EPANET runs it as before and, if the
-   user had chosen the built-in solver, the status bar says so (`lpn_engine_native_route`, `..._ids`; a
-   pressure-driven model keeps `lpn_engine_pda_route`). `modelNeedsEpanet()` no longer calls a period EPANET's
+   user had chosen the built-in solver, the status bar says so (`lpn_engine_native_route`, `..._ids`). `modelNeedsEpanet()` no longer calls a period EPANET's
    when the plan says the loop runs it. Only the transport's run is wired: fire flow, criticality, demand
    scaling, the scenario comparison and the Alternatives preview still call `lpnEpanetRun`. The loop returns
    the convergence fields of the EPANET run. Test: `native-wire-harness.js` (Net1 chlorine, Net2 fluoride,
@@ -398,7 +397,7 @@ of zero or negative demand stay fixed. `MINPDIFF` is taken as 0.1 (feet), which 
 Minimum pressure is under 0.1 ft; it could not be read from the source fetched and is not tested. The result carries
 `demands` (delivered, emitter included, as EN_DEMAND) and `demandDeficits`; frames and the quality pass read them.
 `lpnDiagnose` no longer refuses PDA under the built-in setting; `pda-pressures` still does. The page no longer
-routes a PDA project to EPANET; the key `lpn_engine_pda_route` and `lpn_diag_pda_needs_epanet` are unrendered.
+routes a PDA project to EPANET; the keys `lpn_engine_pda_route` and `lpn_diag_pda_needs_epanet` were deleted in all 27 files (nothing rendered them).
 Held by `native-pda-harness.js` (23 checks): 11 constructed steady cases (exponents 0.5, 1, 1.5; a minimum
 pressure; defaults; pressure under the minimum; zero and negative demand; a tank; an emitter), Net1 and Net3 with
 PDA options and demands scaled until nodes starve (heads within 0.5 mm, flows within 0.02 L/s, delivered demand

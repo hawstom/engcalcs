@@ -1382,11 +1382,6 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
-        "lpn_diag_pda_needs_epanet": {
-            "on": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
-        },
         "lpn_diag_pda_pressures": {
             "on": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
             "ruled": "2026-10-05",
@@ -1972,11 +1967,6 @@
             "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
             "ruled": "2026-09-06",
             "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
-        },
-        "lpn_engine_pda_route": {
-            "on": "Solved with the EPANET solver, because the demand model is pressure driven.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
         },
         "lpn_engine_wait": {
             "on": "Loading solver. Results delayed momentarily. Continue working.",
