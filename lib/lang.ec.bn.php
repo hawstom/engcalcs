@@ -2584,6 +2584,7 @@ $ec_lang['lpn_storage_unreadable']='সংরক্ষণ করা হয়ন
 $ec_lang['lpn_about_credits']='কৃতজ্ঞতা';
 $ec_lang['lpn_help_welcome']='স্বাগত পাতা';
 $ec_lang['lpn_about_license']='GNU General Public License v3.0 বা পরবর্তী সংস্করণের অধীনে লাইসেন্সপ্রাপ্ত।';
+$ec_lang['lpn_about_dedication']='তুমি চিরকাল ভালোবাসার ও আদরের, তোমার ভয় পাওয়ার কিছু নেই, আর তুমি সবকিছু নষ্ট করে ফেলছ না।';
 $ec_lang['lpn_notes_1_term']='এটি কীভাবে সমাধান করা হয়';
 // **IT NAMED THE WRONG SOLVER** (Tom, 2026-09-10: *"Wrong facts."*). It said every moment "is
 // solved with the global gradient algorithm", which describes the BUILT-IN solver -- and Task 605
