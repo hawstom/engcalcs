@@ -1719,12 +1719,12 @@ echoHeader("EngCalcsApp", $html_title,
       // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
       // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
       // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
-<div id="lpn_convas_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+<div id="lpn_convas_panel" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<?php // The coordinate system and the units are Label | Value rows of the box's one grid, as in New project
 	      // (Task 828); the rounding table below is its own three-column table and stays one. ?>
-	<div class="lpn-popover-body lpn-gridhost" id="lpn_convas_body">
+	<div class="lpn-popover-body lpn-gridhost lpn-gsplit-all" id="lpn_convas_body">
 		<div class="lpn-ghead lpn-new-head"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_convas_coordsys_tip'])?></div>
 		<div id="lpn_convas_from" class="lpn-gspan"></div>
 		<div class="lpn-grid">
@@ -1822,7 +1822,7 @@ echoHeader("EngCalcsApp", $html_title,
       //
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
-<div id="lpn_crsbox" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+<div id="lpn_crsbox" class="d-print-none lpn-popover lpn-sheetbox" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_crsbox_title">
 	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired
@@ -1831,7 +1831,7 @@ echoHeader("EngCalcsApp", $html_title,
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<?php // Label | Value rows of the box's one sheet (round 10b, the sheet-style audit, A11); the register's list is a list, not a value, so it spans both columns. js/looped-network.js
 	      // (openCrsBox) makes the body the grid. ?>
-	<div class="lpn-popover-body" id="lpn_crsbox_body">
+	<div class="lpn-popover-body lpn-gsplit-all" id="lpn_crsbox_body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
 		      // MOVES the thing it filters by on the right. ?>
 		<div class="lpn-grid">
