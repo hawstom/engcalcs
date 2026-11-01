@@ -21,9 +21,39 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (3 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
+
+### from sprint 1101
+
+- **`lpn_field_auto_length_tip`**
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  *The finding:* 'slope length' for a pipe: unclear whether length along the slope or simply pipe length.
+  1. length along the drawn line, rendered as ঢাল বরাবর দৈর্ঘ্য
+  2. plain pipe length
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
+  @@ NEEDS RULING
+- **`lpn_field_auto_length_tip`**
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  *The finding:* "slope length" is not used elsewhere; the label is just Auto length, so it is unclear whether slope length differs from pipe length.
+  1. length measured along the sloping drawn line (duljina po nagibu)
+  2. a separate property called slope length
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
+  @@ NEEDS RULING
+- **`lpn_field_auto_length_tip`**
+  > Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.
+  *The finding:* 'the slope length' is unclear: length along the incline (true length) versus plan length, or the length of a pipe on a slope.
+  1. length measured along the sloping pipe line, as drawn
+  2. horizontal plan length
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* Tom set this English word for word on 2026-10-27, so it stays. The 26 translations now say the length is measured along the slope, including the rise or fall between the end elevations, which is what the code does (autoLenRise). Asked Tom 2026-11-01 whether the English should say so too.
+  @@ NEEDS RULING
 
 ## Plain sentences to check  (0, none are stale)
 
@@ -48,7 +78,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### box-design (`867b6ace9`) — adds no English strings
 
-### chore/sprint-1101 (`f31ed562d`) — adds no English strings
+### chore/sprint-1101 (`efe3f018a`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 

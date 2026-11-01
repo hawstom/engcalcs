@@ -6474,6 +6474,13 @@
                 "lpn_sm_help"
             ],
             "reason": "[--force] Sprint 1101 resynced all 73 CHANGED keys in 26 languages (payload english_changed), 2026-11-01"
+        },
+        {
+            "date": "2026-11-01",
+            "keys": [
+                "lpn_field_auto_length_tip"
+            ],
+            "reason": "English restored to Tom's 2026-10-27 wording; the 26 translations say the same thing, made explicit (sprint 1101)"
         }
     ],
     "hashes": {
@@ -7403,7 +7410,7 @@
         "lpn_field_active_short": "a733b809d2f1233496ab516eed0f3ef75cf3791a",
         "lpn_field_active_tip": "2c41af2c0e07b04e6e7f7839d184141b42f71238",
         "lpn_field_auto_length": "4e40ab44e30de28b75dbd38ef8f7079624db98c7",
-        "lpn_field_auto_length_tip": "ae6cc300588db45d14f472a90362eb2091bad704",
+        "lpn_field_auto_length_tip": "0dc5a80f55b420c944d39b2d0c59729aa15568d2",
         "lpn_field_base_demand": "02156cc25e5117a3ba01ba83b4d29cd569db4336",
         "lpn_field_closed": "88d86b7721d587644e9c4cf33a084202cb3b0ff0",
         "lpn_field_closed_tip": "218b39318ae56a256cf4d05b5f97a0079b0b316d",
