@@ -55,7 +55,7 @@
 //
 // THE REFUSALS. A network the slices cannot run (a rule, a speed pattern on a pump the page did not
 // model, a volume curve, water
-// quality, pump energy EPANET refuses, a control on a reservoir, a junction-pressure control on a valve) must come
+// quality, pump energy EPANET refuses, a control on a check-valve pipe) must come
 // back refused by name and run nothing, so the caller falls back to EPANET.
 //
 // TOLERANCE is native-valve-harness.js's: 0.8 mm of head (and of tank level), 0.002 L/s of flow or
@@ -171,7 +171,8 @@ function pumpedTank(o) {
 	return m;
 }
 // R (80 m) -> P1 -> J -> V (a valve) -> K (demand) -> P2 -> tank T. A valve control acts on V.
-function valveLine(vt, setting, controls, dia) {
+// `bypass` adds a narrow pipe PB from J to K, so a shut V leaves K fed rather than cut off.
+function valveLine(vt, setting, controls, dia, bypass) {
 	const m = constructed({
 		nodes: [reservoir('R', 100), jn('J', 10, 5, 'D'), jn('K', 5, 20, 'D'), tank('T', 50, 4, 0.5, 12, 15)],
 		links: [pipe('P1', 'R', 'J', 1200, 0.3), { id: 'V', type: 'valve', valveType: vt, from: 'J', to: 'K',
@@ -180,6 +181,7 @@ function valveLine(vt, setting, controls, dia) {
 		times: { duration: 24 * H, hydraulicStep: H, patternStep: H, reportStep: H }
 	});
 	m.time.controls = controls;
+	if (bypass) { m.links.push(pipe('PB', 'J', 'K', bypass.len || 600, bypass.dia || 0.15)); }
 	return m;
 }
 const CONTROL_CASES = [
@@ -237,7 +239,37 @@ const CONTROL_CASES = [
 		moves: 'T', minSwing: 0.5 },
 	{ name: 'PBV: 8 m at 3:00, CLOSED at 12:00, OPEN at 15:00',
 		model: valveLine('PBV', 4, [ctl('V', { setting: 8, settingUnit: 'press' }, at(3)), ctl('V', SHUT, at(12)), ctl('V', OPEN_, at(15))]),
-		statusOf: 'V', closedAt: [12, 14], openAt: [11, 15] }
+		statusOf: 'V', closedAt: [12, 14], openAt: [11, 15] },
+	// A control on a RESERVOIR: EPANET reads a reservoir as a tank of no area, so its volume is 0 at every
+	// level and the condition is met at every step whatever the level stated (hydraul.c controls()).
+	{ name: 'reservoir level: the second supply opened BELOW 70 m on R2 (met at every step), the pump shut ABOVE 500 m on R',
+		model: pumpedTank({ level: 5, q: 8, pu: 'open', p3: 'closed', controls: [ctl('P3', OPEN_, ifNode('R2', 'below', 70)), ctl('PU', SHUT, ifNode('R', 'above', 500))] }),
+		statusOf: 'P3', openAt: [1, 12, 30], closedAt: [] },
+	{ name: 'reservoir level: two controls on one pipe, the later line wins every step',
+		model: pumpedTank({ level: 5, q: 8, p3: 'open', controls: [ctl('P3', SHUT, ifNode('R2', 'above', 1)), ctl('P3', OPEN_, ifNode('R2', 'below', 1000))] }),
+		statusOf: 'P3', openAt: [1, 12, 30] },
+	{ name: 'reservoir level with a time control after it: AT TIME 10 shuts the pipe, the reservoir control opens it again next step',
+		model: pumpedTank({ level: 5, q: 8, p3: 'open', controls: [ctl('P3', OPEN_, ifNode('R2', 'below', 70)), ctl('P3', SHUT, at(10))] }),
+		statusOf: 'P3', openAt: [5, 12] },
+	{ name: 'reservoir level: pump speed 0.8 whenever R is ABOVE 1 m',
+		model: pumpedTank({ level: 4, p3: 'closed', controls: [ctl('PU', { setting: 0.8 }, ifNode('R', 'above', 1))] }), moves: 'T', minSwing: 0.2 },
+	// A control on a JUNCTION's pressure that acts on a VALVE (hydstatus.c pswitch()). A bypass keeps K fed.
+	{ name: 'junction pressure on a PRV: shut when K is ABOVE 60 m, open when K is BELOW 50 m',
+		model: valveLine('PRV', 30, [ctl('V', SHUT, ifNode('K', 'above', 60)), ctl('V', OPEN_, ifNode('K', 'below', 50))], 0.25, {}), statusOf: 'V', closedAt: [0, 10, 20] },
+	{ name: 'junction pressure on a PRV: its setting changed to 25 m when J is BELOW 70 m',
+		model: valveLine('PRV', 40, [ctl('V', { setting: 25, settingUnit: 'press' }, ifNode('J', 'below', 99))], 0.25, {}), statusOf: 'V' },
+	{ name: 'junction pressure on an FCV stated Closed: an OPEN control that fires opens it (the status differs, the settings are both MISSING)',
+		model: (() => { const m = valveLine('FCV', 0.025, [ctl('V', OPEN_, ifNode('K', 'below', 90))], 0.25, {}); m.links.find((l) => l.id === 'V').status = 'closed'; return m; })(),
+		statusOf: 'V', openAt: [0, 10, 20] },
+	{ name: 'junction pressure on a PRV stated Closed: a numeric control opens it (the setting differs)',
+		model: (() => { const m = valveLine('PRV', 30, [ctl('V', { setting: 30, settingUnit: 'press' }, ifNode('K', 'below', 90))], 0.25, {}); m.links.find((l) => l.id === 'V').status = 'closed'; return m; })(),
+		moves: 'T', minSwing: 0.5 },
+	{ name: 'junction pressure on an FCV: setting 30 L/s when J is BELOW 99 m (met at the first solve)',
+		model: valveLine('FCV', 0.04, [ctl('V', { setting: 0.03, settingUnit: 'flow' }, ifNode('J', 'below', 99))]), moves: 'T', minSwing: 0.5 },
+	{ name: 'junction pressure on a TCV: setting 0.6 when J is ABOVE 60 m',
+		model: valveLine('TCV', 0.2, [ctl('V', { setting: 0.6 }, ifNode('J', 'above', 60))], 0.4, {}), statusOf: 'V' },
+	{ name: 'junction pressure on a PBV: closed when K is ABOVE 70 m, open BELOW 40 m',
+		model: valveLine('PBV', 4, [ctl('V', SHUT, ifNode('K', 'above', 70)), ctl('V', OPEN_, ifNode('K', 'below', 40))], 0.25, {}), statusOf: 'V', closedAt: [0, 10, 20] },
 ];
 
 // ---- slice 3: pump speed patterns -------------------------------------------------------------------
@@ -723,11 +755,16 @@ async function run() {
 		ok('refuses ' + name, r.ok === false && r.refused === true && r.frames === undefined &&
 			r.issues.some((i) => i.code === code), JSON.stringify(r.issues || ''));
 	};
-	refusal('a control conditioned on a reservoir', (m) => { m.time.controls = [{ link: 'P1', action: { status: 'closed' }, condition: { kind: 'node', node: 'R', cmp: 'below', value: 1 } }]; }, 'native-run-control-unsupported');
-	refusal('a junction-pressure control on a valve', (m) => {
+	{
+		// Both were refused until the controls slice 2 follow-up; they run now (see the CONTROL_CASES).
+		const m = base();
 		m.links.push({ id: 'V9', type: 'valve', valveType: 'PRV', from: 'J', to: 'T', diameter: 0.2, setting: 20, k: 0, length: 0, status: 'open' });
-		m.time.controls = [{ link: 'V9', action: { status: 'closed' }, condition: { kind: 'node', node: 'J', cmp: 'below', value: 20 } }];
-	}, 'native-run-control-unsupported');
+		m.time.controls = [{ link: 'V9', action: { status: 'closed' }, condition: { kind: 'node', node: 'J', cmp: 'below', value: 20 } },
+			{ link: 'P1', action: { status: 'closed' }, condition: { kind: 'node', node: 'R', cmp: 'below', value: 1 } }];
+		ok('a control on a reservoir and a junction-pressure control on a valve are no longer refused',
+			!EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-control-unsupported'));
+	}
+	refusal('a control on a check-valve pipe (EPANET error 207)', (m) => { m.links.find((l) => l.id === 'P2').status = 'cv'; m.time.controls = [{ link: 'P2', action: { status: 'closed' }, condition: { kind: 'time', seconds: 3600 } }]; }, 'native-run-control-unsupported');
 	// a rule the loop does not copy, or that EPANET itself rejects on reading the file
 	const ruleRefusal = (name, text, mut, id) => {
 		const m = base();

@@ -113,7 +113,7 @@
 // GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
 // lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality
 // unless the caller asks for it (`{quality: true}`; then only what the pass cannot copy), EPANET-MSX, pump energy EPANET itself refuses to read (a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase), a
-// control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
+// control EPANET itself refuses (on a check valve, a GPV given a number), and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
 // awkward to copy exactly.
@@ -208,8 +208,6 @@
 		(time.controls || []).forEach(function (c) {
 			var cond = c.condition || {}, l = linkOf[String(c.link)], act = c.action || {};
 			if (!l) { return; }   // left out of the run, as js/lpn-epanet.js leaves it out
-			if (cond.kind === 'node' && nodeType[String(cond.node)] === 'reservoir') { ids.push(String(c.link)); return; }
-			if (cond.kind === 'node' && nodeType[String(cond.node)] === 'junction' && l.type === 'valve') { ids.push(String(c.link)); return; }
 			// EPANET refuses these when it reads the file (input3.c controldata(): error 207, 211).
 			if (!act.status && l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') { ids.push(String(c.link)); return; }
 			if (!act.status && l.type !== 'valve' && !(act.setting >= 0)) { ids.push(String(c.link)); return; }
@@ -384,14 +382,14 @@
 			return now >= times.reportStart && ((now - times.reportStart) % repStep) === 0 && now <= dur;
 		}
 		// hydsolver.c pswitch(): the controls on a junction's pressure, judged on a converged trial.
-		// Only pipes and pumps reach here (a valve under one is refused). EPANET compares the
-		// pipe's STATUS and the pump's SETTING, and changes both when either differs.
+		// Only pipes and pumps are judged inside the solve (valveSwitch() judges a valve's, between solves).
+		// EPANET compares a pipe's STATUS and a pump's SETTING, and changes both when either differs.
 		function pswitch(stepLinks) {
 			return function (headOf) {
 				var any = false;
 				ctl.forEach(function (c) {
 					var h, reset = false, st = ls[c.k], s;
-					if (c.on !== 'junction') { return; }
+					if (c.on !== 'junction' || st.kind === 'valve') { return; }   // a valve's is judged after the solve
 					h = headOf(c.node) / FT;
 					if (c.type === LOWLEVEL && h <= c.grade + HTOL) { reset = true; }
 					if (c.type === HILEVEL && h >= c.grade - HTOL) { reset = true; }
@@ -406,6 +404,28 @@
 				});
 				return any;
 			};
+		}
+		// hydstatus.c pswitch() for a VALVE: a valve (PRV and above) changes when its setting differs from the
+		// control's, else when its status does (measured: an OPEN control re-opens a valve stated Closed). The solver holds a valve's state in arrays it builds once, so
+		// the loop judges this between solves: solve, ask, and solve again from the same flows until nothing
+		// changes -- the fixed point EPANET's trials walk to inside one solve.
+		function valveSwitch(stepLinks, headOf) {
+			var any = false;
+			ctl.forEach(function (c) {
+				var h, reset = false, st = ls[c.k];
+				if (c.on !== 'junction' || st.kind !== 'valve') { return; }
+				h = headOf(c.node) / FT;
+				if (c.type === LOWLEVEL && h <= c.grade + HTOL) { reset = true; }
+				if (c.type === HILEVEL && h >= c.grade - HTOL) { reset = true; }
+				if (!reset) { return; }
+				if (st.k !== c.setting || st.s !== c.status) {
+					st.s = c.status;
+					st.k = c.setting;
+					applyLink(stepLinks[c.k], st);
+					any = true;
+				}
+			});
+			return any;
 		}
 		// hydraul.c tanklevels()
 		function tankLevels(dt) {
@@ -618,6 +638,7 @@
 		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [],
 			stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0, convAccuracy = null;
 
+		var vTrial;
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
 			// demands()' last loop, setlinksetting() on a pump: the multiplier IS the speed.
@@ -648,6 +669,11 @@
 			if (opts.warm !== false && res) { sOpts.flows0 = res.flows; }
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
+			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
+				sOpts.flows0 = res.flows;
+				res = EC.lpnSolve(stepModel, sOpts);
+				if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
+			}
 			// The run's convergence is a conjunction over its solves, as js/lpn-epanet.js noteStep() keeps it.
 			stepsRun++;
 			if (convAccuracy === null) { convAccuracy = res.accuracy; }
@@ -866,7 +892,7 @@
 				n = nodeById[String(cond.node)];
 				rec.type = cond.cmp === 'above' ? HILEVEL : LOWLEVEL;
 				rec.node = String(cond.node);
-				rec.on = tankById[rec.node] ? 'tank' : 'junction';
+				rec.on = tankById[rec.node] ? 'tank' : n.type === 'reservoir' ? 'reservoir' : 'junction';
 				// The control level as a head in feet: the node's elevation plus the level (a tank)
 				// or the pressure (a junction), both stated in metres in the LPS file.
 				rec.grade = (n.elev || 0) / FT + cond.value / FT;
@@ -890,6 +916,10 @@
 	function controls(ctl, ls, tankById, htime, tStart) {
 		ctl.forEach(function (c) {
 			var reset = false, tk, v1, v2, vplus, st = ls[c.k], s1, k2;
+			// hydraul.c controls() reads any node past the junctions as a tank. A reservoir is one of no
+			// area: tankvolume() gives 0 at the control level and at the node's head alike, so both
+			// LOWLEVEL (0 <= 0 + vplus) and HILEVEL (0 >= 0 - vplus) are met at every step.
+			if (c.on === 'reservoir') { reset = true; }
 			if (c.on === 'tank') {
 				tk = tankById[c.node];
 				vplus = Math.abs(tk.q || 0);
