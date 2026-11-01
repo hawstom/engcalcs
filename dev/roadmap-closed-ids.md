@@ -767,3 +767,8 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|835| CLOSED 2026-10-31 (`ddea93a80`, via box-design round 6): on a phone, Settings has a section bar under its search box.
 - 0|837| CLOSED 2026-10-31 (`66afa5074`, via box-design round 6): in Properties the input is the cell; a tick box toggles on one click or Space.
 - 0|846| CLOSED 2026-10-31 (via box-design round 6): the Basic mode tick stays in the Scenario manager either way.
+- 0|827| CLOSED 2026-11-01 (box-design merged on Tom's word): phones dock and autohide Properties; first-time view layout.
+- 0|828| CLOSED 2026-11-01 (box-design merged on Tom's word): one two-column style for every box's label and value rows.
+- 0|829| CLOSED 2026-11-01 (box-design merged on Tom's word): Download CSV, Copy HTML and Print report on every analysis box.
+- 0|842| CLOSED 2026-11-01 (box-design merged on Tom's word): one spreadsheet style for every box's rows, no first-column heading.
+- 0|845| CLOSED 2026-11-01 (box-design merged on Tom's word): report tables: economical width, adjustable columns, "And others", "Time (hr)".
