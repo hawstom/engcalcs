@@ -4875,3 +4875,11 @@ OBSERVED: Libraries Curves/Pipe types/Fittings ?: no title, aria "User manual: <
 OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 3/5, units-wrap es FAILs, sheet-style 85/86).
 SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
 Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.
+
+## 2026-11-01 -- feat/wtg-page-export (Task 749), one-click export (275d49f99)
+OBSERVED (re-verify before citing): wtg-export-harness all passed; wtg-page-export-harness 54/54; wtg-page-export-browser-harness all passed (Net3: box opens first, no file chooser, one Net3.wtg.zip holding .wtg + .wtg.sqlite, integrity ok, 220 live elements, template fetched only at Export, same-origin only, no new device storage).
+OBSERVED: template decompressed (6 MB sqlite, 65 KB .wtg): no author names, paths, machine names, project notes in text or table cells; HMISelectionSet and logical-control tables empty; ProjectOptions Title/Company/Engineer/Notes blank.
+OBSERVED: valve rows are inserted by build_wtg_template.js defaultRow() from column DEFAULT clauses; one row per table, no WaterGEMS has ever opened them (doc says so itself).
+OBSERVED: fact-check URLs on communities.bentley.com now 301 to bentleysystems.service-now.com; two of three titles resolve (water quality, pressure-dependent demand), the energy-cost URL redirects to the community root (dead).
+OBSERVED: the export zip holds only the two project files; the CC BY credit is on screen in the receipt, not inside the zip.
+Method: scratchpad t/ (decompressed template), br.txt.
