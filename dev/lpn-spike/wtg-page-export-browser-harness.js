@@ -142,7 +142,7 @@ async function main() {
 		fs.writeFileSync(path.join(tmp, 'Net3.wtg.sqlite'), files['Net3.wtg.sqlite']);
 		const pyOut = JSON.parse(execFileSync('python3', ['-I', '-c', "import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
 			+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'tables':db.execute(\"select count(*) from sqlite_master where type='table'\").fetchone()[0],'live':db.execute('select count(*) from HMIDomainElement where IsDeleted=0').fetchone()[0],'name':db.execute('select Name from HMIDomainDataSet').fetchone()[0]}))", path.join(tmp, 'Net3.wtg.sqlite')], { encoding: 'utf8' }));
-		ok('the database passes SQLite\'s integrity check, with 384 tables, 220 live elements, named Net3', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 384 && pyOut.live === 220 && pyOut.name === 'Net3', JSON.stringify(pyOut));
+		ok('the database passes SQLite\'s integrity check, with 406 tables, 220 live elements, named Net3', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220 && pyOut.name === 'Net3', JSON.stringify(pyOut));
 		const wtgText = files['Net3.wtg'];
 		ok('the .wtg keeps the byte order mark the template has, and a new identity',
 			wtgText[0] === 0xEF && wtgText[1] === 0xBB && wtgText[2] === 0xBF && tplW[0] === 0xEF && wtgText.toString('utf8') !== tplW.toString('utf8'));

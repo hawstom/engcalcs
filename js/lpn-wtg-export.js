@@ -9,10 +9,10 @@
  * dev/wtg-export.md. Tom's WaterGEMS 26.0.0.532 opened and ran the spike's files (his rounds 1 to 3,
  * 2026-10-22 and 23); this module is that writer moved out of dev/lpn-spike/ so the page can call it.
  *
- * **LICENCE LINE.** Built only from files an ordinary user or the public holds: the CC BY 4.0 Zenodo
- * 7162154 files, TSNet's MIT samples, a project saved by Tom's own WaterGEMS. No Bentley software or
+ * **LICENCE LINE.** Built only from files an ordinary user or the public holds: TSNet's MIT samples and
+ * a project saved by Tom's own WaterGEMS. No Bentley software or
  * DLL was looked inside, and no Bentley code is in this repository. THE TEMPLATE IS BUILT IN: js/data/
- * wtg-template/ is the Zenodo 7162154 project (schema 1.0.44.0) emptied to one prototype of each kind
+ * wtg-template/ is Tom's own saved project (schema 1.0.54.0) emptied to one prototype of each kind
  * by dev/scripts/build_wtg_template.js; this module copies it, removes the prototypes, and writes ours.
  * The visitor chooses no file. A caller may still pass any saved project's bytes (`o.sqlite`, `o.wtg`).
  *
@@ -954,7 +954,7 @@ function plan(doc, opts) {
 // also on the page, shares the global `initSqlJs` and nothing else).
 // ---------------------------------------------------------------------------------------------
 var SQLJS_VERSION = '1.14.2';
-var TEMPLATE_VERSION = '1';   // bumped when js/data/wtg-template/ is rebuilt
+var TEMPLATE_VERSION = '2';   // bumped when js/data/wtg-template/ is rebuilt
 var engine = null, injected = null;
 function base() { return EngCalcs.suiteBase || '/engcalcs/'; }
 function loadScript(src) {

@@ -157,7 +157,7 @@ function head(t) { console.log('\n' + t); }
 	const pageBytes = fs.readFileSync(sqlitePath), pageWtg = fs.readFileSync(wtgPath, 'utf8');
 	const pyOut = JSON.parse(py("import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
 		+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'tables':db.execute(\"select count(*) from sqlite_master where type='table'\").fetchone()[0],'live':db.execute('select count(*) from HMIDomainElement where IsDeleted=0').fetchone()[0]}))", sqlitePath));
-	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 384 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 384 && pyOut.live === 220, JSON.stringify(pyOut));
+	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 406 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220, JSON.stringify(pyOut));
 
 	// ---- 4. the same as the spike's known-good output ----
 	head('4. Identical to the frozen golden: this writer and the built-in template, Net3');
@@ -165,7 +165,7 @@ function head(t) { console.log('\n' + t); }
 	const golden = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), 'utf8'));
 	const D = digests(dump(SQL, pageBytes));
 	const noId = (s) => s.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1#$2');
-	if (process.env.WTG_WRITE_GOLDEN) { fs.writeFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), JSON.stringify({ note: golden.note, schema: '1.0.44.0', wtgSha256: require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex'), tables: D }, null, 1)); console.log('golden written'); }
+	if (process.env.WTG_WRITE_GOLDEN) { fs.writeFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), JSON.stringify({ note: golden.note, schema: '1.0.54.0', wtgSha256: require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex'), tables: D }, null, 1)); console.log('golden written'); }
 	const gNames = Object.keys(golden.tables);
 	const differing = gNames.filter((n) => !D[n] || D[n].sha256 !== golden.tables[n].sha256 || D[n].rows !== golden.tables[n].rows);
 	ok('all ' + gNames.length + ' tables hold the golden rows, by digest (identifiers, save times and the project Notes masked)', differing.length === 0 && Object.keys(D).length === gNames.length, differing.slice(0, 6).join(', '));
@@ -310,6 +310,30 @@ function head(t) { console.log('\n' + t); }
 	err = null;
 	try { await EngCalcs.lpnWtgExportBuild(planned, { sqlite: bareBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad() }); } catch (e) { err = e; }
 	ok('a saved project with no tank to copy is refused, naming the kind', !!err && err.code === 'template-kind' && JSON.stringify(err.ids) === '["tank"]', err && err.message);
+
+	// ---- 8. a network with one of each valve kind ----
+	head('8. dev/scripts/valve_example.inp (PBV, PRV, PSV, FCV, TCV, GPV) exports and reads back');
+	{
+		const VALVE_INP = fs.readFileSync(path.join(ROOT, 'dev', 'scripts', 'valve_example.inp'), 'utf8');
+		L.importInp({ name: 'Valves.inp', _text: VALVE_INP });
+		const vp = L.wtgPlan();
+		ok('the plan is made, with no refusal', vp.ok && vp.refused.length === 0, vp.ok ? '' : vp.detail);
+		const vw = await write();
+		ok('written', !!vw.out, vw.err);
+		if (vw.out) {
+			const vZip = path.join(tmp, 'valves.zip'), vDir = path.join(tmp, 'valves');
+			fs.mkdirSync(vDir);
+			fs.writeFileSync(vZip, Buffer.from(await vw.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", vZip, vDir);
+			ok('the zip holds the two files', fs.existsSync(path.join(vDir, vw.out.wtgName)) && fs.existsSync(path.join(vDir, vw.out.sqliteName)));
+			const vdb = await EngCalcs.lpnSqliteOpen(new Uint8Array(fs.readFileSync(path.join(vDir, vw.out.sqliteName))));
+			const vrb = EngCalcs.lpnWtgRead(vdb, { display: EngCalcs.lpnWtgDisplayUnits(fs.readFileSync(path.join(vDir, vw.out.wtgName), 'utf8')), flowUnits: 'GPM' });
+			ok('read back', vrb.ok, vrb.message);
+			const vb = EngCalcs.lpnInpParse(vrb.inp), vl = Object.fromEntries(vb.links.map((x) => [x.id, x]));
+			const want = { PBV1: 'PBV', PRV1: 'PRV', PSV1: 'PSV', FCV1: 'FCV', TCV1: 'TCV', GPV1: 'GPV' };
+			ok('all six valve kinds come back as their own kind', Object.keys(want).every((k) => vl[k] && vl[k].type === 'valve' && vl[k].valveType === want[k]), Object.keys(want).map((k) => k + ':' + (vl[k] && vl[k].valveType)).join(' '));
+		}
+	}
 
 	console.log(fails ? '\n' + fails + ' check(s) FAILED' : '\nall ' + checks + ' checks passed');
 	process.exit(fails ? 1 : 0);

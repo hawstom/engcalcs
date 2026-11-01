@@ -45038,8 +45038,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * **EXPORT .wtg.sqlite (ROADMAP Task 749; Tom, 2026-10-23: the menu names no program, *"We don't
 	 * have to name WaterGEMS. We mostly mean WaterCAD anyway, and they are ambiguous. So .wtg
 	 * works."*).** The writer is js/lpn-wtg-export.js and the record is dev/wtg-export.md. It writes a
-	 * `.wtg` and a `.wtg.sqlite` FROM A BUILT-IN TEMPLATE (js/data/wtg-template/, derived from the
-	 * CC BY 4.0 Zenodo 7162154 project by dev/scripts/build_wtg_template.js; Tom, 2026-11-01: *"Why are we asking user
+	 * `.wtg` and a `.wtg.sqlite` FROM A BUILT-IN TEMPLATE (js/data/wtg-template/, made from a project
+	 * saved in the owner's own WaterGEMS, by dev/scripts/build_wtg_template.js; Tom, 2026-11-01: *"Why are we asking user
 	 * to choose an existing file? That's bad UX."*). The visitor chooses no file. A
 	 * format that holds one scenario (level 1 of dev/import-export-scenarios.md): the open scenario's
 	 * resolved values, read through the .inp writer's own flattening, and the box says which.
@@ -45186,8 +45186,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setNotice(wtgFill('lpn_wtg_export_exported', 'Exported {zip}, holding {wtg} and {sqlite}.',
 			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + exportScenarioSentence());
 		left = wtgNotCarriedLines(out.planned.notCarried).join(' ');
-		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left }),
-			wtgFill('lpn_wtg_export_credit', 'The project layout is adapted from a CC BY 4.0 model by Sinha, Ghorpade, Damani, and Kalbar (IIT Bombay, 2022).', {})]);
+		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left })]);
 	}
 	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out

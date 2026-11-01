@@ -2343,7 +2343,6 @@ $ec_lang['lpn_wtg_export_failed']='The .wtg project was not written: {detail}';
 $ec_lang['lpn_wtg_export_exported']='Exported {zip}, holding {wtg} and {sqlite}.';
 $ec_lang['lpn_wtg_export_extract']='Extract both files into one folder, then open the .wtg.';
 $ec_lang['lpn_wtg_export_left_out']='Not written: {items}';
-$ec_lang['lpn_wtg_export_credit']='The project layout is adapted from the WaterGEMS models of Sinha, Ghorpade, Damani, and Kalbar (IIT Bombay, 2022), CC BY 4.0, https://doi.org/10.5281/zenodo.7162154.';
 // Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
 $ec_lang['lpn_file_export_item_dxf']='DXF file…';
 $ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: nodes as symbol blocks, pipes, pumps, and valves as polylines, and every asset as a block whose attributes carry its ID and property values in the project units.';

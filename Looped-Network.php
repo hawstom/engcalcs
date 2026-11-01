@@ -2378,7 +2378,6 @@ EngCalcs.pageConfig = {
 	lpn_wtg_export_exported: <?=json_encode($ec_lang['lpn_wtg_export_exported'])?>,
 	lpn_wtg_export_extract: <?=json_encode($ec_lang['lpn_wtg_export_extract'])?>,
 	lpn_wtg_export_left_out: <?=json_encode($ec_lang['lpn_wtg_export_left_out'])?>,
-	lpn_wtg_export_credit: <?=json_encode($ec_lang['lpn_wtg_export_credit'])?>,
 	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
 	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
 	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
