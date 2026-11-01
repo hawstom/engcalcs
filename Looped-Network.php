@@ -4835,6 +4835,7 @@ EngCalcs.pageConfig = {
       // lpn-solver.js and lpn-patterns.js, which it reads at call time; lpn-time.js asks for it
       // through EngCalcs.lpnNativeRun and works without it, so a failed load costs only the
       // built-in solver's periods, which then go to EPANET. ?>
+<script src="/engcalcs/js/lpn-native-msx.js?v=<?=filemtime(__DIR__.'/js/lpn-native-msx.js')?>"></script>
 <script src="/engcalcs/js/lpn-native-run.js?v=<?=filemtime(__DIR__.'/js/lpn-native-run.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <?php // Rule-based controls, the language (ROADMAP Task 248.03). Pure grammar and unit kinds, no
