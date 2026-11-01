@@ -128,6 +128,39 @@ function worst(framesA, framesB, which) {
 	return { d, at, big };
 }
 
+
+// ---- EVERY FIELD THE TABLES PANE READS, FOR EVERY KIND OF ELEMENT -----------------------------------------
+// The conventions are EPANET's, so the two settings show the same rows: a reservoir's pressure is 0, a pump
+// has no velocity, a shut link has no head loss, a reservoir's demand is minus what it supplies.
+const FIELD_TOL = { heads: HEAD_TOL, pressures: HEAD_TOL, levels: HEAD_TOL, headlosses: 2e-3, flows: 2e-5, demands: 2e-5, velocities: 1e-4 };
+function allFields(name, model, E, N) {
+	const kind = {};
+	model.nodes.forEach((n) => { kind['n:' + n.id] = n.type; });
+	model.links.forEach((l) => { kind['l:' + l.id] = l.type + (l.status === 'cv' ? '-cv' : '') + (l.status === 'closed' ? '-closed' : ''); });
+	const worstBy = {}, bad = [];
+	E.frames.forEach((fe, i) => {
+		const fn = N.frames[i] || {};
+		for (const fld of Object.keys(FIELD_TOL).concat(['statuses'])) {
+			const a = fe[fld] || {}, b = fn[fld] || {};
+			for (const id of new Set(Object.keys(a).concat(Object.keys(b)))) {
+				const isLink = fld === 'flows' || fld === 'velocities' || fld === 'headlosses' || fld === 'statuses';
+				const k = (isLink ? 'l:' : 'n:') + id, nk = kind[k] || kind['n:' + id] || kind['l:' + id];
+				const d = fld === 'statuses' ? (a[id] === b[id] ? 0 : 1) : Math.abs(a[id] - (b[id] === undefined ? NaN : b[id]));
+				const tol = fld === 'statuses' ? 0 : FIELD_TOL[fld], key = fld + ' of ' + nk;
+				if (!(d <= tol)) { bad.push(key + ' ' + id + '@' + fe.t / 3600 + 'h epanet ' + a[id] + ' native ' + b[id]); }
+				if (!(d <= (worstBy[key] || 0))) { worstBy[key] = d; }
+			}
+		}
+	});
+	ok(name + ': every frame field of every element kind agrees with EPANET\'s (' + Object.keys(worstBy).length + ' field/kind pairs)', bad.length === 0, bad.slice(0, 4).join(' | '));
+	// The conventions themselves, so a pass is not two engines agreeing on a wrong thing.
+	const res = model.nodes.filter((n) => n.type === 'reservoir').map((n) => n.id), pumps = model.links.filter((l) => l.type === 'pump').map((l) => l.id);
+	ok(name + ': reservoir pressure is 0, pump velocity is 0, a shut link\'s head loss is 0',
+		N.frames.every((f) => res.every((id) => f.pressures[id] === 0) && pumps.every((id) => f.velocities[id] === 0) &&
+			model.links.every((l) => f.statuses[l.id] !== 'closed' || f.headlosses[l.id] === 0)),
+		`reservoirs ${res.length}, pumps ${pumps.length}`);
+}
+
 async function compareNet(name, model, tol) {
 	// The reference is the EPANET engine called directly, so the page's 'epanet' path is checked against it too.
 	const direct = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
@@ -140,8 +173,9 @@ async function compareNet(name, model, tol) {
 		viaEpanet.routeNotes.every((t) => t === ''), `frames ${P.frames.length}`);
 	ok(name + ': engine setting built-in runs the built-in loop, and says nothing about EPANET',
 		N.engine === 'native' && viaNative.frames.length === E.frames.length && viaNative.frames.every((f) => f.engine === 'native') &&
-		viaNative.routeNotes.every((t) => t === '') && N.ok === true && N.report === '' && N.engineVersion === undefined,
+		viaNative.routeNotes.every((t) => !/EPANET solver/.test(t)) && N.ok === true && N.report === '' && N.engineVersion === undefined,
 		`engine=${N.engine} frames=${N.frames.length} notes=${JSON.stringify(viaNative.routeNotes)}`);
+	allFields(name, model, E, N);
 	const times = N.frames.every((f, i) => f.t === E.frames[i].t);
 	const hd = worst(E.frames, N.frames, 'heads'), lv = worst(E.frames, N.frames, 'levels'), fl = worst(E.frames, N.frames, 'flows');
 	const flowTol = Math.max(FLOW_TOL, FLOW_REL * fl.big);
@@ -157,10 +191,10 @@ async function compareNet(name, model, tol) {
 		ok(name + ': the page frame carries the quality, in the run\'s mode',
 			viaNative.frames.every((f) => f.qualities && f.linkQualities && f.qualityMode === model.quality.mode));
 		if (model.quality.mode === 'chemical') {
-			const said = viaNative.notices.some((n) => n[1] === 'time-native-no-rates');
-			ok(name + ': no reaction rates on a built-in run; the page says so the first time only',
+			const said = viaNative.routeNotes.some((t) => /does not report reaction rates/.test(t));
+			ok(name + ': no reaction rates on a built-in run; the status bar says why, every run, in the persistent slot',
 				viaNative.frames.every((f) => f.linkRates === undefined) && viaEpanet.frames.some((f) => f.linkRates) &&
-				said === !noRatesAlreadySaid, `said ${said}`);
+				said && viaNative.notices.length === 0 && !viaEpanet.routeNotes.some((t) => /reaction rates/.test(t)), `routeNotes ${JSON.stringify(viaNative.routeNotes)}`);
 			noRatesAlreadySaid = true;
 		}
 	}
@@ -198,6 +232,45 @@ async function run() {
 	// Net3 with no quality at all: hydraulics, controls and the pumps' energy only.
 	await compareNet('Net3 without quality', withAccuracy(loadEpa('Net3.inp').model), { node: 0, link: 0 });
 
+
+	console.log('-- a constructed network with every kind of link: pump, check valve, PRV, a pipe closed in the file, a control');
+	{
+		const H3 = 3600, LPS = 0.001;
+		const pipe = (id, from, to, len, d, extra) => Object.assign({ id, type: 'pipe', from, to, length: len, diameter: d, roughness: 130, k: 0, status: 'open' }, extra || {});
+		const jn = (id, elev, q, pattern) => ({ id, type: 'junction', elev, demand: q * LPS, demandBase: q * LPS, demandPattern: pattern || null });
+		const m = {
+			method: 'hw', visc: 1.007e-6,
+			nodes: [{ id: 'R', type: 'reservoir', elev: 40, head: 40, headBase: 40, headPattern: null }, { id: 'R2', type: 'reservoir', elev: 75, head: 75, headBase: 75, headPattern: null },
+				jn('J', 10, 25, 'D'), jn('K', 5, 8, 'D'), jn('L', 6, 4, 'D'),
+				{ id: 'T', type: 'tank', elev: 60, ground: 60, head: 63, level: 3, minLevel: 0.5, maxLevel: 10, diameter: 15 }],
+			links: [Object.assign({ id: 'PU', type: 'pump', from: 'R', to: 'J', diameter: 0.3, status: 'open', k: 0 }, EngCalcs.lpnPumpFromCurve([[0, 70], [0.06, 55], [0.12, 20]])),
+				pipe('P2', 'J', 'T', 800, 0.25), pipe('P3', 'R2', 'J', 2000, 0.25, { status: 'cv' }),
+				{ id: 'V', type: 'valve', valveType: 'PRV', from: 'J', to: 'K', diameter: 0.2, setting: 30, k: 0, length: 0, roughness: 130, status: 'open' },
+				pipe('PC', 'K', 'L', 500, 0.15, { status: 'closed' }), pipe('P5', 'J', 'L', 600, 0.15)],
+			time: { times: Object.assign(EngCalcs.lpnTimesDefaults(), { duration: 48 * H3, hydraulicStep: H3, patternStep: H3, reportStep: H3 }),
+				patterns: [{ id: 'D', multipliers: [0.2, 0.2, 0.2, 0.3, 0.5, 1, 1.6, 2, 1.8, 1.4, 1.2, 1.1, 1.2, 1.3, 1.2, 1.1, 1.3, 1.8, 2.2, 2, 1.4, 0.8, 0.4, 0.2] }],
+				defaultPattern: null, warnings: [],
+				controls: [{ link: 'PU', action: { status: 'closed' }, condition: { kind: 'node', node: 'T', cmp: 'above', value: 8 } }, { link: 'PU', action: { status: 'open' }, condition: { kind: 'node', node: 'T', cmp: 'below', value: 2 } }] },
+			hydraulics: { accuracy: 1e-5 }
+		};
+		const E = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(m))), via = await pagePath(m, 'native');
+		ok('the constructed network runs in the built-in loop', via.run.engine === 'native' && E.ok, via.run.engine);
+		allFields('constructed (pump, check valve, PRV, closed pipe, controls)', m, E, via.run);
+		ok('it exercised a shut pump and a closed pipe', E.frames.some((f) => f.statuses.PU === 'closed') && E.frames.every((f) => f.statuses.PC === 'closed'));
+	}
+
+
+	console.log('-- the single-instant solve shows the same rows in either setting');
+	{
+		const m = loadEpa('Net3.inp').model; delete m.time; m.hydraulics = { accuracy: 1e-5 };
+		const a = EngCalcs.lpnSolve(JSON.parse(JSON.stringify(m)), { tol: 1e-5 }), b = await EngCalcs.lpnSolveEpanet(JSON.parse(JSON.stringify(m)), { tol: 1e-5 });
+		const gap = (fld) => { let d = 0; Object.keys(b[fld] || {}).forEach((id) => { d = Math.max(d, Math.abs(a[fld][id] - b[fld][id])); }); return d; };
+		ok('steady: reservoir pressure 0, pump velocity 0 in the built-in solve', a.pressures.Lake === 0 && a.pressures.River === 0 && a.velocities['10'] === 0 && a.velocities['335'] === 0);
+		ok('steady: pressures, velocities and head losses of every node and link match the EPANET solve',
+			gap('pressures') <= 2e-3 && gap('velocities') <= 1e-4 && gap('headlosses') <= 2e-3 && gap('heads') <= 2e-3,
+			`p ${gap('pressures').toExponential(2)} v ${gap('velocities').toExponential(2)} hl ${gap('headlosses').toExponential(2)}`);
+	}
+
 	console.log('-- a case the loop refuses routes to EPANET and says so');
 	{
 		const m = withAccuracy(loadEpa('Net1.inp').model);
@@ -209,8 +282,8 @@ async function run() {
 		engine = 'native';
 		const routed = await pagePath(m, 'native');
 		ok('the run is EPANET\'s', routed.run.engine === 'epanet' && routed.frames.every((f) => f.engine === 'epanet') && routed.run.frames.length === 25);
-		ok('and the status sentence names the tank',
-			routed.routeNotes.some((t) => /EPANET solver/.test(t) && t.indexOf(tank) >= 0), JSON.stringify(routed.routeNotes));
+		ok('and the status sentence names the kind and the id (tank ' + tank + ')',
+			routed.routeNotes.some((t) => /EPANET solver/.test(t) && t.indexOf('tank ' + tank) >= 0), JSON.stringify(routed.routeNotes));
 		const chosen = await pagePath(m, 'epanet');
 		ok('with the EPANET engine chosen the same network is run by EPANET and nothing is said', chosen.run.engine === 'epanet' && chosen.routeNotes.every((t) => t === ''));
 		ok('the plan is not "wanted" when EPANET is chosen', EngCalcs.lpnTimeNativePlan(m).wanted === false);

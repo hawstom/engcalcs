@@ -11,6 +11,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
@@ -89,6 +90,36 @@ async function main() {
 			await a.settle(300);
 			r = await runIt();
 			ok(name + ': with the box unticked EPANET ran it', r.engine === 'epanet' && r.cur === 'epanet', JSON.stringify({ engine: r.engine, frames: r.frames }));
+		}
+			// ---- 600 junctions, 1000 pipes, a day: the page must stay alive while the built-in loop runs ----
+		console.log('\n--- 600 junctions, 1000 pipes, 24 h, built-in solver ---');
+		{
+			const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'plain-downtown-n600-seed71.lwn'), 'utf8'));
+			d.settings = Object.assign({}, d.settings, { engine: 'native' });
+			d.times = Object.assign({}, d.times || {}, { duration: 86400 });
+			const b = await Session.open(browser, 'native-wire-n600', { serviceWorkers: 'block' });
+			await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+			await b.goto('Looped-Network.php?ec_nolog=1');
+			await b.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_nwire', txt); }, JSON.stringify(d));
+			await b.reload();
+			await b.answerTrainingPanel().catch(() => {});
+			await b.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await b.settle(6000);
+			await b.page.evaluate(() => {
+				window.__gaps = { max: 0, last: performance.now(), fractions: [] };
+				window.__timer = setInterval(() => {
+					const n = performance.now(), bx0 = EngCalcs.lpnTimeRunBoxState && EngCalcs.lpnTimeRunBoxState(); if (bx0 && bx0.phase === 'done') { window.__gaps.last = n; return; } if (n - window.__gaps.last > 150) { (window.__gaps.big = window.__gaps.big || []).push([Math.round(n - window.__t0), Math.round(n - window.__gaps.last)]); } window.__gaps.max = Math.max(window.__gaps.max, n - window.__gaps.last); window.__gaps.last = n;
+					const bx = EngCalcs.lpnTimeRunBoxState && EngCalcs.lpnTimeRunBoxState(); if (bx && bx.open) { window.__gaps.fractions.push(bx.fraction); }
+				}, 20);
+				window.__before = EngCalcs.lpnTimeKeep(); window.__gaps.last = performance.now(); window.__t0 = performance.now(); EngCalcs.lpnTimeRunNow();
+			});
+			await b.waitFor(() => b.page.evaluate(() => { const r = EngCalcs.lpnTimeKeep(); return !!r && r.run !== (window.__before && window.__before.run) && r.run.frames.length > 1; }), 'the n600 run', 120000);
+			const g = await b.page.evaluate(() => { clearInterval(window.__timer); const k = EngCalcs.lpnTimeKeep(); return { big: window.__gaps.big, max: window.__gaps.max, fr: window.__gaps.fractions, engine: k.run.engine, frames: k.run.frames.length, ms: performance.now() - window.__t0 }; });
+			const mid = g.fr.filter((f) => f > 0 && f < 1).length;
+			ok('n600: the built-in loop ran it', g.engine === 'native' && g.frames === 25, JSON.stringify({ engine: g.engine, frames: g.frames, totalMs: Math.round(g.ms), gaps: g.big }));
+			ok('n600: a timer fired at least every 250 ms while the loop ran (the longest gap before the run box says done; drawing the result on the map afterwards is the page\'s work, not the loop\'s)', g.max < 250, Math.round(g.max) + ' ms');
+			ok('n600: the run box showed progress part-way, not only 0 and 100 percent', mid >= 2, mid + ' readings between 0 and 1');
+			await b.close();
 		}
 	} catch (e) {
 		console.error(e);

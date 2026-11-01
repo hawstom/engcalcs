@@ -812,6 +812,12 @@ EngCalcs.lpnSolve = function (model, options) {
 		Q[k] = links[k].status === 'closed'
 			? 0
 			: 0.3 * Math.PI * links[k].diameter * links[k].diameter / 4;
+		// **A START FROM THE LAST SOLUTION** (Task 733, slice 7), as EPANET's period loop starts every step
+		// from the flows of the one before. Only a closed link's 0 is kept; an open one with no usable
+		// previous flow keeps the seed above.
+		if (opts.flows0 && links[k].status !== 'closed' && typeof opts.flows0[links[k].id] === 'number' && opts.flows0[links[k].id] !== 0 && isFinite(opts.flows0[links[k].id])) {
+			Q[k] = opts.flows0[links[k].id];
+		}
 	}
 	// Junction heads start at their own elevation; only emitters read H before the
 	// first solve, and they need something physical rather than zero.
@@ -1761,6 +1767,10 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// surface's height above the street.
 			heads[model.nodes[i].id] = model.nodes[i].head;
 			pressures[model.nodes[i].id] = (model.nodes[i].head - EngCalcs.lpnPressureDatum(model.nodes[i])) * sg;
+			// **AS EPANET REPORTS IT** (Task 733, slice 7): EPANET keeps a reservoir's total head in its
+			// elevation, so its pressure is 0 whatever ground the page draws it on. Both settings show the
+			// same row.
+			if (model.nodes[i].type === 'reservoir') { pressures[model.nodes[i].id] = 0; }
 		}
 	}
 	for (i = 0; i < junctions.length; i++) {
@@ -1785,8 +1795,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			velocities[link.id] = vClosed || !(link.diameter > 0) ? 0
 				: Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4);
 			headlosses[link.id] = vClosed ? 0
-				: (junctionIndex[link.from] === undefined ? byId[link.from].head : H[junctionIndex[link.from]]) -
-				(junctionIndex[link.to] === undefined ? byId[link.to].head : H[junctionIndex[link.to]]);
+				: Math.abs((junctionIndex[link.from] === undefined ? byId[link.from].head : H[junctionIndex[link.from]]) -
+				(junctionIndex[link.to] === undefined ? byId[link.to].head : H[junctionIndex[link.to]]));
 			continue;
 		}
 		flows[link.id] = Q[k];
@@ -1797,10 +1807,13 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		// unsigned, so a signed velocity here makes the two engines disagree, and it breaks any
 		// "highest velocity" comparison by sorting a fast reverse flow to the BOTTOM of the range.
 		// Direction is already carried by the sign of the flow and by the arrow the map draws.
-		velocities[link.id] = link.diameter > 0
+		// A pump reports no velocity and a shut link no head loss, as EPANET's EN_getlinkvalue does.
+		velocities[link.id] = link.diameter > 0 && link.type !== 'pump'
 			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
-		if (link.type === 'pump') {
+		if (link.status === 'closed') {
+			headlosses[link.id] = 0;
+		} else if (link.type === 'pump') {
 			// Sign convention: a pump's head loss is the negation of its head gain, so a working
 			// pump reports a NEGATIVE head loss. There is no separate head-gain quantity anywhere on
 			// this page, and no floor/extrapolation check on the curve either: a pump has exactly
@@ -1822,7 +1835,9 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			m = kEff > 0
 				? kEff / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
 				: 0;
-			headlosses[link.id] = res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k];
+			// EPANET's EN_HEADLOSS on a pipe is the magnitude, whichever way the water runs (Task 733, slice 7);
+			// every display already reads the magnitude (shownHeadloss()), so the sign carried nothing.
+			headlosses[link.id] = Math.abs(res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k]);
 		}
 	}
 

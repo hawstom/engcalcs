@@ -281,8 +281,13 @@
 	 * solver refuses at any step (lpnDiagnose) comes back `{ok:false, issues}`.
 	 *
 	 * `options.tol` is the per-step solve tolerance (lpnSolve's own default when absent).
+	 *
+	 * **A GENERATOR, SO THE PAGE CAN BREATHE** (Task 733, slice 7). It yields `{phase, done, of}` after every
+	 * solve and every quality record, and returns the result above; js/lpn-time.js drives it in slices of
+	 * about 50 ms so a large network does not freeze the page, and stops driving it when the run is
+	 * superseded. EC.lpnNativeRun below drives it to the end at once, which is what every harness calls.
 	 */
-	EC.lpnNativeRun = function (model, options) {
+	EC.lpnNativeRunSteps = function* (model, options) {
 		var opts = options || {}, refusals = EC.lpnNativeRunRefusals(model, opts), tm, times, dur,
 			patStep, patStart, repStep, hydStep, tStart, byPat = {}, dm, tanks = [], frames = [], warnings = [], solveTimes = [],
 			htime = 0, rtime, guard = 0, res, stepModel, tstep, t, nextPat, dmult, levelNow = {}, cur,
@@ -640,6 +645,7 @@
 				if (st.s === XHEAD && st.kind === 'pump') { sOpts.xhead[links[k].id] = true; }
 				if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; }
 			});
+			if (opts.warm !== false && res) { sOpts.flows0 = res.flows; }
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			// The run's convergence is a conjunction over its solves, as js/lpn-epanet.js noteStep() keeps it.
@@ -692,11 +698,12 @@
 			htime += tstep;
 			if (htime >= rtime) { rtime += repStep; }
 			if (++guard >= 100000) { break; }
+			yield { phase: 'hydraulic', done: htime, of: dur };
 		}
 		// ---- WATER QUALITY (phase 4): EPANET's second pass, over the hydraulics just saved ----
 		if (qcfg.mode) {
 			tanks.forEach(function (tk) { tk.vEnd = tk.V; });
-			var qres = qualityPass(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
+			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
 		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes,
@@ -1291,7 +1298,7 @@
 	// hydraulic loop's tank states (EPANET's Tank[], ft3): V0 at the start, and `vEnd`, the volume the
 	// hydraulic run ended at, which is what tank->V still holds when EPANET's separate quality pass
 	// asks whether a FIFO or LIFO tank is full.
-	function qualityPass(model, cfg, recs, frames, tanks, times, byPat, hydStep) {
+	function* qualityPassSteps(model, cfg, recs, frames, tanks, times, byPat, hydStep) {
 		var net = qualityNet(model), nodes = net.nodes, links = net.links, N = nodes.length - 1, L = links.length - 1,
 			q = model.quality || {}, re = model.reactions || {}, hyd = model.hydraulics || {},
 			CHEM = cfg.mode === 'chemical', AGE = cfg.mode === 'age', TRACE = cfg.mode === 'trace',
@@ -1784,6 +1791,7 @@
 		// ---- quality.c runqual() / nextqual(), over the saved hydraulics ----
 		qtime = 0;
 		for (r = 0; r < recs.length; r++) {
+			yield { phase: 'quality', done: r, of: recs.length };
 			cur = recs[r];
 			var hstep = r + 1 < recs.length ? recs[r + 1].t - cur.t : 0, htime, err;
 			report(cur.t);                                                        // runQ(): the value at t
@@ -1815,6 +1823,13 @@
 	 * is held to EPANET apart from any difference between the two hydraulic solutions. Returns
 	 * `{ok, frames}`, one frame per report time carrying `qualities` and `linkQualities`.
 	 */
+	// Run a stepper to its end at once.
+	function drive(g) {
+		var r;
+		do { r = g.next(); } while (!r.done);
+		return r.value;
+	}
+	EC.lpnNativeRun = function (model, options) { return drive(EC.lpnNativeRunSteps(model, options)); };
 	EC.lpnNativeQualityOver = function (model, recs, vEnd) {
 		var times = Object.assign({}, EC.lpnTimesDefaults(), (model.time && model.time.times) || {}),
 			dur = times.duration > 0 ? times.duration : 0, repStep = times.reportStep > 0 ? times.reportStep : 3600,
@@ -1830,7 +1845,7 @@
 		recs.forEach(function (r) {
 			if (r.t >= times.reportStart && ((r.t - times.reportStart) % repStep) === 0 && r.t <= dur) { frames.push({ t: r.t }); }
 		});
-		res = qualityPass(model, cfg, recs, frames, tanks, times, byPat, hydStepOf(times));
+		res = drive(qualityPassSteps(model, cfg, recs, frames, tanks, times, byPat, hydStepOf(times)));
 		return res.ok ? { ok: true, frames: frames } : res;
 	};
 
@@ -1889,6 +1904,18 @@
 				return;
 			}
 			f.demands[n.id] = n.type === 'junction' ? (n.demand || 0) : 0;
+		});
+		// EPANET's demand at a reservoir is the water it takes from the network: negative while it supplies.
+		model.nodes.forEach(function (n) {
+			var s;
+			if (n.type !== 'reservoir') { return; }
+			s = 0;
+			model.links.forEach(function (l) {
+				var q = res.flows[l.id] || 0;
+				if (l.to === n.id) { s += q; }
+				if (l.from === n.id) { s -= q; }
+			});
+			f.demands[n.id] = s;
 		});
 		// epanet.c EN_getlinkvalue(EN_STATUS): anything `<= CLOSED` reads closed. A pump at speed 0
 		// reads OPEN when it is OPEN (a stated SPEED 0); one a control or a pattern set to 0 is CLOSED.

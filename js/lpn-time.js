@@ -564,7 +564,7 @@
 			// run, goes to EPANET; the status bar says so (Task 733, slice 7). Shared with no other file.
 			routeGeneric: pageConfig.lpn_engine_native_route || 'Solved with the EPANET solver, because the built-in solver does not run this simulation.',
 			routeIds: pageConfig.lpn_engine_native_route_ids || 'Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.',
-			// Said once after a chemical run by the built-in solver: that run has no reaction rates.
+			// Kept in the status bar after a chemical run by the built-in solver: that run has no reaction rates.
 			nativeNoRates: pageConfig.lpn_time_native_no_rates || 'The built-in solver does not report reaction rates. To see them, clear Use the built-in solver when possible in Settings.',
 			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver rejected this network, so the run did not start.',
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
@@ -971,6 +971,8 @@
 	 * `use` is true only when the loop will run it. `refusals` are the loop's `{code, ids}` records.
 	 * The setting is read through the host, so this file still knows nothing of `settings`.
 	 */
+	// How long the built-in loop runs before it hands the thread back to the page (ms).
+	EC.LPN_TIME_NATIVE_SLICE_MS = 50;
 	EC.lpnTimeNativePlan = function (model) {
 		var out = { use: false, wanted: false, pda: false, refusals: [] };
 		if (!host || typeof host.engine !== 'function' || host.engine() === 'epanet') { return out; }
@@ -989,15 +991,27 @@
 		if (model) { return EC.lpnTimeNativePlan(model).use; }
 		return !!(EC.lpnNativeRun && host && typeof host.engine === 'function' && host.engine() !== 'epanet');
 	}
-	function routeNoteText(plan) {
-		var S = strings(), ids = [];
+	// "pipe 330", "tank 1": the kind word is the one the Add tools already use (lowercased), looked up by the
+	// refusal's code where an id could be a node or a link, and left bare where it is no element's id (a
+	// rule's name, a setting such as Rule Timestep).
+	function routeNoteText(plan, model) {
+		var S = strings(), pc = EC.pageConfig || {}, items = [], seen = {}, nodeT = {}, linkT = {};
 		if (plan.pda) { return ''; }   // the page's own pressure-driven note speaks
-		plan.refusals.forEach(function (r) { (r.ids || []).forEach(function (id) { if (ids.indexOf(String(id)) < 0) { ids.push(String(id)); } }); });
-		if (!ids.length) {
-			return S.routeGeneric;
-		}
-		return S.routeIds
-			.replace('{ids}', ids.slice(0, 10).join(', ') + (ids.length > 10 ? ', …' : ''));
+		((model && model.nodes) || []).forEach(function (n) { nodeT[String(n.id)] = n.type; });
+		((model && model.links) || []).forEach(function (l) { linkT[String(l.id)] = l.type; });
+		plan.refusals.forEach(function (r) {
+			var linkFirst = /control-unsupported|speed-pattern|energy/.test(r.code || '');
+			(r.ids || []).forEach(function (id) {
+				var sid = String(id), type = linkFirst ? (linkT[sid] || nodeT[sid]) : (nodeT[sid] || linkT[sid]), word, text;
+				if (seen[(r.code || '') + sid]) { return; }
+				seen[(r.code || '') + sid] = true;
+				word = type ? (pc['lpn_tool_add_' + type] || type) : '';
+				text = word ? word.toLowerCase() + ' ' + sid : sid;
+				if (items.indexOf(text) < 0) { items.push(text); }
+			});
+		});
+		if (!items.length) { return S.routeGeneric; }
+		return S.routeIds.replace('{ids}', items.slice(0, 10).join(', ') + (items.length > 10 ? ', \u2026' : ''));
 	}
 	/**
 	 * The period, from whichever solver the plan names. Resolves to the shape lpnEpanetRun resolves to.
@@ -1010,25 +1024,47 @@
 			if (host.routeNote) { host.routeNote(note || ''); }
 			return EC.lpnEpanetRun ? EC.lpnEpanetRun(model, opts) : Promise.resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '' });
 		};
-		if (!plan.use) { return withEpanet(plan.wanted ? routeNoteText(plan) : ''); }
+		if (!plan.use) { return withEpanet(plan.wanted ? routeNoteText(plan, model) : ''); }
 		return new Promise(function (resolve) {
-			setTimeout(function () {
-				var t0 = nowMs(), run = null;
-				try { run = EC.lpnNativeRun(model, { quality: true }); } catch (e) { run = null; }
-				if (!run || !run.ok) { resolve(withEpanet(routeNoteText({ refusals: (run && run.issues) || [] }))); return; }
-				if (host.routeNote) { host.routeNote(''); }
-				if (model.quality && model.quality.mode === 'chemical') { run.noRatesNote = true; }
+			var busy = 0, gen, // The project's Accuracy, but never looser than 1e-5: measured on 600 junctions, 1e-3 and 1e-5 cost the same
+				// from a warm start, and 1e-5 is the tolerance the loop was held to EPANET at.
+				tol = model.hydraulics && model.hydraulics.accuracy > 0 ? Math.min(model.hydraulics.accuracy, 1e-5) : undefined,
+				onProgress = opts && typeof opts.onProgress === 'function' ? opts.onProgress : null,
+				withQuality = !!(model.quality && model.quality.mode && model.quality.mode !== 'none');
+			function finish(run) {
+				if (!run || !run.ok) { resolve(withEpanet(routeNoteText({ refusals: (run && run.issues) || [] }, model))); return; }
+				// A chemical run has no reaction rates, and the Reaction rate column is empty: the status bar
+				// keeps saying why, in the slot the routed-run note uses, until the next run replaces it.
+				if (host.routeNote) { host.routeNote(model.quality && model.quality.mode === 'chemical' ? strings().nativeNoRates : ''); }
 				run.engineVersion = undefined;
 				run.issues = [];
 				run.report = '';
-				run.busyMs = nowMs() - t0;
-				run.quality = (model.quality && model.quality.mode && model.quality.mode !== 'none') ? model.quality : null;
+				run.busyMs = busy;
+				run.quality = withQuality ? model.quality : null;
 				run.warnings = nativeWarnings(model, run.warnings);
-				if (opts && typeof opts.onProgress === 'function') {
-					opts.onProgress({ t: run.duration, duration: run.duration, fraction: 1, frames: run.frames.length });
-				}
+				if (onProgress) { onProgress({ t: run.duration, duration: run.duration, fraction: 1, frames: run.frames.length }); }
 				resolve(run);
-			}, 0);
+			}
+			// **A SLICE OF ABOUT 50 ms, THEN BACK TO THE EVENT LOOP**, so a large network neither freezes the
+			// page nor holds a bar still (600 junctions, a day: 2.7 s in one piece). The hydraulic walk is the
+			// first 60 percent of the bar when quality follows, all of it otherwise; the quality pass the rest.
+			// A run that has been superseded (an edit, a newer Run) stops where it is: nobody will read it.
+			function slice() {
+				var s0 = nowMs(), r = null, p = null, hyd = withQuality ? 0.6 : 1;
+				if (opts && typeof opts.superseded === 'function' && opts.superseded()) { resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '', superseded: true }); return; }
+				try {
+					do { r = gen.next(); if (!r.done) { p = r.value; } } while (!r.done && nowMs() - s0 < EC.LPN_TIME_NATIVE_SLICE_MS);
+				} catch (e) { finish(null); return; }
+				busy += nowMs() - s0;
+				if (r.done) { finish(r.value); return; }
+				if (onProgress && p) {
+					onProgress({ t: p.phase === 'hydraulic' ? p.done : 0, duration: p.phase === 'hydraulic' ? p.of : 0,
+						fraction: p.phase === 'hydraulic' ? hyd * (p.of > 0 ? p.done / p.of : 1) : hyd + (1 - hyd) * (p.of > 0 ? p.done / p.of : 1), frames: 0 });
+				}
+				setTimeout(slice, 0);
+			}
+			try { gen = EC.lpnNativeRunSteps(model, { quality: true, tol: tol }); } catch (e) { finish(null); return; }
+			setTimeout(slice, 0);
 		});
 	}
 	// The notes about what was left out of the run (a control naming a missing element, a GPV curve of
@@ -1051,7 +1087,6 @@
 			return true;
 		});
 	}
-	var noRatesSaid = false;
 	function startRun(model) {
 		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model),
 			shown = state.wantedByUser;
@@ -1063,6 +1098,7 @@
 		host.status(strings().running, 'time-running');
 		if (shown) { boxStart(token); }
 		periodRun(model, {
+			superseded: function () { return token !== state.token; },
 			onProgress: function (p) {
 				// **A SUPERSEDED RUN MAY NOT DRIVE THE BOX.** It is still running, and its bar
 				// would still be filling, and it is answering a network that no longer exists.
@@ -1115,11 +1151,6 @@
 			lastReportFrames = ((run && run.frames) || []).length;
 			boxDone(token, run, state.lastRunMs);
 			state.run = run;
-			// Once per page load: every automatic re-run would otherwise say it again.
-			if (run.noRatesNote && !noRatesSaid) {
-				noRatesSaid = true;
-				if (host.notice) { host.notice(strings().nativeNoRates, 'time-native-no-rates'); }
-			}
 			// The model these frames came out of, so a later edit can ask whether it changed.
 			// Taken from the model that was RUN, never from a fresh assembly at this moment.
 			state.runSig = sig;
