@@ -4868,3 +4868,10 @@ OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366 mouse, phone 390
 OBSERVED: the four new harnesses fail on the parent commit (units-wrap 12/16, library 4 FAIL + crash, scenario 3/5, resize 5/16). The units-wrap harness does not detect the overlap itself on the parent (no overlap reported), only the missing ellipsis styling.
 OBSERVED: pane-print-cell-wrap-harness 42/42 at HEAD.
 Method: scratchpad perry12 (u1 r2 s3 l4 l5 l6 ph t3 .js); shots _panel/www/img/box12-*.png.
+
+## 2026-11-01 -- box-design round 12c (c81d316da)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366 mouse, phone 390 touch, en/es): CONFIRMED. No text-overflow ellipsis remains on any scanned box row (Settings whole box, Scenario manager, Find, Contour, Fire flow, Libraries x6 sections, Properties, New project, Convert as); cut text clips plain; overlaps/clips scan identical to base 1e452bc44 apart from the ellipsis. Left in place: Settings theme-button name (.lpn-theme-btn-name), Reports .lpn-rpt-trunc, box title bars, dock tab titles, tsb title, GIS credit.
+OBSERVED: Libraries Curves/Pipe types/Fittings ?: no title, aria "User manual: <heading>"; real click (PC) and touchscreen tap (phone) open the manual with that entry's top at the pane top (hash #guide/term-lpn_guide_lib_*), entry text = old intro keys in order, en and es; User-Manual.php?chapter=libraries shows the three entries en/es. Patterns/Controls/Rules keep their heading tip. user-guide map/menus/tables/using/library/boxes/harness all pass.
+OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 3/5, units-wrap es FAILs, sheet-style 85/86).
+SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
+Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.
