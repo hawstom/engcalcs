@@ -82,7 +82,7 @@ $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 // EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
 // "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
 // their old sentence until the next translation sprint, under the same version.
-$ec_lang['consent_body']='Je, tunaweza kuhifadhi msimbo nasibu katika kivinjari hiki ili tuhesabu ni vivinjari vingapi vinatumia kila sehemu ya tovuti hii? Msimbo huundwa papo hapo, hauelezi chochote kukuhusu wewe wala kifaa chako, na hauhifadhi chochote unachoandika. Bila huo, hatuwezi kutofautisha ziara yako ya pili na ziara ya kwanza ya mtu mwingine.';
+$ec_lang['consent_body']='Je, tunaweza kuhifadhi msimbo nasibu katika kivinjari hiki ili tusikuhesabu tena? Msimbo huundwa papo hapo, hauelezi chochote kukuhusu wewe wala kifaa chako, na hauhifadhi chochote unachoandika.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Tatua mtandao huu kwa kila hatua ya wakati wa haidroliki, kutoka mwanzo wa uendeshaji hadi mwisho wake.';
 $ec_lang['consent_accept']='Kubali hili';
@@ -1016,29 +1016,29 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Thamani hulinganishwa kwa usahihi 
 $ec_lang['lpn_guide_scn_use_term']='Senario ni za nini';
 $ec_lang['lpn_guide_scn_use_def']='<p>Senario huhifadhi miundo mingi, mwonekano mwingi, au hali nyingi katika mradi mmoja, kama vile siku ya wastani, siku ya juu kabisa, saa ya kilele, picha ya kuwasilishwa kwenye ripoti, bomba kuu lililotolewa kwenye huduma, au badala inayopendekezwa. Mtandao huchorwa mara moja, katika senario ya Msingi. Kila senario nyingine hushikilia thamani zake maalum tu, yaani thamani zinazotofautiana na senario inayorithi kutoka kwake, na husoma kila kitu kingine kutoka kwa senario hiyo. Kwa hiyo uhariri wa Msingi hufikia kila senario ambayo haijabadilisha thamani hiyo.</p><p>Mradi mpya huanza na senario sita zilizotayarishwa: 1. Jaribio la mtiririko: Tuli, 2. Jaribio la mtiririko: Kati, 3. Jaribio la mtiririko: Upeo, 4. Siku ya wastani, 5. Siku ya upeo, na 6. Saa ya kilele. Ni senario za kawaida zinazoweza kubadilishwa jina, kuhaririwa, na kufutwa. Kila moja huanza na thamani moja maalum, kizidishi chake cha mahitaji: 1 kwa majaribio ya mtiririko na Siku ya wastani, 2 kwa Siku ya upeo, na 3 kwa Saa ya kilele. Vizidishi hivi ni vishikilia nafasi vya kubadilishwa na thamani za mfumo unaoigwa. Mradi uliofunguliwa kutoka faili, ikiwemo kila mfano, au ulioletwa kutoka faili la EPANET una Msingi pekee.</p><p>Mtiririko wa moto hukaguliwa kwa Mtiririko wa moto: uchambuzi, unaojaribu kila muunganiko au miunganiko iliyochaguliwa. Siku ya upeo ndiyo senario ambayo kwa kawaida huwa wazi inapoendeshwa.</p>';
 $ec_lang['lpn_guide_scn_open_term']='Senario iliyo wazi';
-$ec_lang['lpn_guide_scn_open_def']='<p>Kitufe cha Senario kwenye mstari wa hali chini ya ramani hutaja senario iliyo wazi na kuhesabu thamani zake maalum, kama katika Senario: Msingi | Idadi ya thamani maalum: 0. Kibofye, au chagua Maji, Senario, ili kubadili senario au kuongeza, kunakili, kubadilisha jina, au kufuta moja. Kila senario kwenye orodha huonyesha idadi ya thamani zake maalum kwenye mabano, na alama ya tiki iko kwenye ile iliyo wazi. Safu ya Msimamizi wa senario hufungua mti wa senario na mbadala. Hufifishwa wakati Hali ya msingi ina alama.</p><p>Mchoro, lebo, Sifa, Majedwali, na matokeo yote ni vya senario iliyo wazi, na ukurasa hutatua senario iliyo wazi tu. Ulinganisho wa senario, ulioelezwa kwenye ingizo lake, hutatua nyingine kutoka nakala. Senario iliyo wazi huhifadhiwa pamoja na mradi.</p>';
+$ec_lang['lpn_guide_scn_open_def']='<p>Kitufe cha Senario kwenye mstari wa hali chini ya ramani hutaja senario iliyo wazi na kuhesabu thamani zake maalum, kama katika Senario: Msingi | Idadi ya thamani maalum: 0. Kibofye, au chagua Maji, Senario, ili kubadili senario au kuongeza, kunakili, kubadilisha jina, au kufuta moja. Kila senario kwenye orodha huonyesha idadi ya thamani zake maalum kwenye mabano, na alama ya tiki iko kwenye ile iliyo wazi. Safu ya Senario: msimamizi hufungua mti wa senario na mbadala, au orodha ya senario pekee wakati Hali ya msingi ina alama.</p><p>Mchoro, lebo, Sifa, Majedwali, na matokeo yote ni vya senario iliyo wazi, na ukurasa hutatua senario iliyo wazi tu. Ulinganisho wa senario, ulioelezwa kwenye ingizo lake, hutatua nyingine kutoka nakala. Senario iliyo wazi huhifadhiwa pamoja na mradi.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Mahali thamani maalum zinapoonekana';
-$ec_lang['lpn_guide_scn_marks_def']='<p>Kwenye ramani, kipengele chenye thamani maalum katika senario iliyo wazi huzungushiwa pete ya rangi ya kaharabu, na kipengele kinachorithi thamani maalum kutoka senario mzazi au mbadala huzungushiwa pete ya mstari wa kijivu uliokatika. Kwa mahitaji, kipenyo, usuguo, mgawo wa upotevu mdogo (wa ndani), na urefu, pete huonekana tu wakati Mipangilio, Taswira, Lebo za vifundo au Lebo za viungo inaonyesha thamani hiyo kwenye ramani; thamani maalum ya sifa nyingine yoyote huwa na pete yake kila wakati. Katika Majedwali, seli yenye thamani iliyowekwa na senario iliyo wazi ina rangi ya kaharabu, na kidokezo chake hutaja mbadala unaoishikilia, kama katika Mbadala wa Kimwili: Bomba kuu kubwa. Onyesha senario, kwenye menyu ya seli ya jedwali, huorodhesha kila kipengele mara moja kwa kila senario.</p><p>Kila safu ya Sifa ambayo senario inaweza kuibadilisha ina alama upande wake wa kushoto. Nukta imara humaanisha senario iliyo wazi ina thamani maalum; ibofye ili kuiondoa. Nukta tupu humaanisha thamani imerithiwa; ibofye ili kuifanya thamani inayoonyeshwa kuwa thamani maalum. Pembetatu humaanisha senario zilizo chini ya hii zina thamani maalum; ibofye ili kuondoa thamani zake maalum, baada ya uthibitisho. Chini ya safu yenye thamani maalum kuna thamani iliyorithiwa inayoibadilisha, kama katika Senario ya Msingi: 18. Kisanduku cha Mipangilio kina nukta imara na pembetatu tu, kwa sababu kuandika thamani hapo ndiko kunakotengeneza thamani maalum.</p><p>Ili kuficha pete, ondoa alama ya Onyesha alama za thamani maalum kwenye ramani katika Mipangilio, Ramani na ukurasa, Ukurasa, au chagua Ramani, Ramani safi. Zote mbili huhifadhiwa kwenye kivinjari hiki, si kwenye mradi. Majedwali huashiria thamani maalum kwa vyovyote.</p>';
+$ec_lang['lpn_guide_scn_marks_def']='<p>Kwenye ramani, kipengele chenye thamani maalum katika senario iliyo wazi huzungushiwa pete ya rangi ya kaharabu, na kipengele kinachorithi thamani maalum kutoka senario mzazi au mbadala huzungushiwa pete ya mstari wa kijivu uliokatika. Kwa mahitaji, kipenyo, usuguo, mgawo wa upotevu mdogo (wa ndani), na urefu, pete huonekana tu wakati Mipangilio, Taswira, Lebo za vifundo au Lebo za viungo inaonyesha thamani hiyo kwenye ramani; thamani maalum ya sifa nyingine yoyote huwa na pete yake kila wakati. Katika Majedwali, seli yenye thamani iliyowekwa na senario iliyo wazi ina rangi ya kaharabu, na kidokezo chake hutaja mbadala unaoishikilia, kama katika Mbadala wa Kimwili: Bomba kuu kubwa. Onyesha senario, kwenye menyu ya seli ya jedwali, huorodhesha kila kipengele mara moja kwa kila senario.</p><p>Kila safu ya Sifa ambayo senario inaweza kuibadilisha ina alama upande wake wa kushoto. Nukta imara humaanisha senario iliyo wazi ina thamani maalum; ibofye ili kuiondoa. Nukta tupu humaanisha thamani imerithiwa; ibofye ili kuifanya thamani inayoonyeshwa kuwa thamani maalum. Pembetatu humaanisha senario zilizo chini ya hii zina thamani maalum; ibofye ili kuondoa thamani zake maalum, baada ya uthibitisho. Chini ya safu yenye thamani maalum kuna thamani iliyorithiwa inayoibadilisha, kama katika Ondoa hurejesha 18 in, thamani katika Msingi. Kisanduku cha Mipangilio kina nukta imara na pembetatu tu, kwa sababu kuandika thamani hapo ndiko kunakotengeneza thamani maalum.</p><p>Ili kuficha pete, ondoa alama ya Onyesha alama za thamani maalum kwenye ramani katika Mipangilio, Ukurasa, au chagua Ramani, Ramani safi. Zote mbili huhifadhiwa kwenye kivinjari hiki, si kwenye mradi. Majedwali huashiria thamani maalum kwa vyovyote.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Kutengeneza na kuondoa thamani maalum';
-$ec_lang['lpn_guide_scn_make_def']='<p>Senario isiyo Msingi ikiwa wazi, uhariri wa thamani ambayo senario zinaweza kuibadilisha huhifadhiwa kama thamani maalum katika senario iliyo wazi, bila kujali unafanyikaje: kuandika kwenye Sifa, kuhariri seli kwenye Majedwali, Badilisha kwenye Tafuta na ubadilishe, kuburuta kifundo au kuingiza viwianishi vyake, Badilisha aina (aina mpya ndiyo thamani maalum), au Bandika sifa kwenye uteuzi. Mpangilio ulioandikwa kwenye kisanduku cha Mipangilio huhifadhiwa kama thamani maalum senario zinapoweza kubadilisha mpangilio huo. Msingi haubadilishwi. Katika Msingi, uhariri huo huo hubadilisha mtandao wenyewe na kufikia kila senario ambayo haijabadilisha thamani hiyo.</p><p>Futa hufanya kazi tofauti. Katika senario, Futa haiondoi kipengele kilichopo katika Msingi. Hukifanya kipengele kisifanye kazi katika senario iliyo wazi, na kwa kifundo pia mabomba yake, na ujumbe unasema hivyo. Kipengele bado kiko kwenye mchoro na katika senario zingine. Kipengele kilichochorwa wakati senario iko wazi hakifanyi kazi katika Msingi na kinafanya kazi katika senario hiyo, na Futa katika senario hiyo hukiondoa. Kufuta kipengele katika Msingi pia hufuta thamani zake maalum katika kila senario, baada ya swali linalozihesabu. Wateja na Vielelezo si vya senario yoyote na hufutwa moja kwa moja.</p><p>Safu ya Kidhibiti cha thamani maalum katika orodha ya Senario hufungua orodha ya kila thamani maalum ya senario iliyo wazi kwa kategoria, kila moja kando ya thamani iliyorithiwa inayoibadilisha. Grafu ya mfululizo wa muda kwenye ramani ambayo senario ilifungua, ilihamisha, au ilibadilisha ni safu yake yenyewe. Weka alama kwenye safu kisha bofya Ondoa thamani maalum zilizochaguliwa, bofya Ondoa thamani maalum kwenye safu moja, au bofya Ondoa thamani zote maalum. Kila thamani kisha hurudi kwenye thamani iliyorithiwa, na Tengua hubatilisha. Chagua kitambulisho kwenye orodha ili kwenda kwenye kipengele kwenye ramani. Nukta kwenye Sifa na safu ya Ondoa thamani maalum kwenye menyu ya seli ya Majedwali huondoa thamani moja maalum kwa wakati mmoja.</p>';
+$ec_lang['lpn_guide_scn_make_def']='<p>Senario isiyo Msingi ikiwa wazi, uhariri wa thamani ambayo senario zinaweza kuibadilisha huhifadhiwa kama thamani maalum katika senario iliyo wazi, bila kujali unafanyikaje: kuandika kwenye Sifa, kuhariri seli kwenye Majedwali, Badilisha kwenye Tafuta na ubadilishe, kuburuta kifundo au kuingiza viwianishi vyake, Badilisha aina (aina mpya ndiyo thamani maalum), au Bandika sifa kwenye uteuzi. Mpangilio ulioandikwa kwenye kisanduku cha Mipangilio huhifadhiwa kama thamani maalum senario zinapoweza kubadilisha mpangilio huo. Msingi haubadilishwi. Katika Msingi, uhariri huo huo hubadilisha mtandao wenyewe na kufikia kila senario ambayo haijabadilisha thamani hiyo.</p><p>Futa hufanya kazi tofauti. Katika senario, Futa haiondoi kipengele kilichopo katika Msingi. Hukifanya kipengele kisifanye kazi katika senario iliyo wazi, na kwa kifundo pia mabomba yake, na ujumbe unasema hivyo. Kipengele bado kiko kwenye mchoro na katika senario zingine. Kipengele kilichochorwa wakati senario iko wazi hakifanyi kazi katika Msingi na kinafanya kazi katika senario hiyo, na Futa katika senario hiyo hukiondoa. Kufuta kipengele katika Msingi pia hufuta thamani zake maalum katika kila senario, baada ya swali linalozihesabu. Kielelezo hufuata kanuni ileile kama kipengele. Wateja si wa senario yoyote na hufutwa moja kwa moja.</p><p>Safu ya Kidhibiti cha thamani maalum katika orodha ya Senario hufungua orodha ya kila thamani maalum ya senario iliyo wazi kwa kategoria, kila moja kando ya thamani iliyorithiwa inayoibadilisha. Grafu ya mfululizo wa muda kwenye ramani ambayo senario ilifungua, ilihamisha, au ilibadilisha ni safu yake yenyewe. Weka alama kwenye safu kisha bofya Ondoa thamani maalum zilizochaguliwa, bofya Ondoa thamani maalum kwenye safu moja, au bofya Ondoa thamani zote maalum. Kila thamani kisha hurudi kwenye thamani iliyorithiwa, na Tengua hubatilisha. Chagua kitambulisho kwenye orodha ili kwenda kwenye kipengele kwenye ramani. Nukta kwenye Sifa na safu ya Ondoa thamani maalum kwenye menyu ya seli ya Majedwali huondoa thamani moja maalum kwa wakati mmoja.</p>';
 $ec_lang['lpn_guide_scn_scope_term']='Senario inachoweza na isichoweza kubadilisha';
-$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Sifa</td><td>Kila sifa ya kifundo au kiungo isipokuwa zilizoorodheshwa hapa chini, ikiwemo nafasi yake, kama inafanya kazi, na aina yake (Badilisha aina). Maandishi yanaweza kubadilisha maneno yake, nafasi, ukubwa, mpangilio, herufi nzito, pembe, na kama yanaonyeshwa. Sifa maalum inaweza kubadilishwa kila wakati. Sifa hushikiliwa katika kategoria Kimwili, Mahitaji, Uwashaji wa vipengele, Mipangilio ya awali, Kiambato, Mtiririko wa moto, Gharama ya nishati, Sifa maalum, Maandishi, Uwasilishaji, na Ukokotoaji.</td></tr><tr><td>Mipangilio</td><td>Mipangilio iliyohifadhiwa pamoja na mradi, isipokuwa iliyoorodheshwa hapa chini: chaguo za ukokotoaji (kwa mfano kizidishi cha mahitaji, muda wote wa kuendesha, hatua ya muda ya kihaidroliki, na njia ya msuguano), muundo wa mahitaji wa chaguo-msingi, thamani zinazopewa vipengele vipya, na mipangilio ya uwasilishaji (ukubwa, rangi, lebo, kontua, mwonekano wa ramani, na grafu za mfululizo wa muda kwenye ramani).</td></tr><tr><td>Sawa katika kila senario</td><td>Kitambulisho, Maelezo, na Tagi ya kipengele; vifundo vya mwisho na kona za kiungo; Wateja na Vielelezo; vipimo na mfumo wa viwianishi; na yaliyomo kwenye Maktaba (miundo, mikondo, aina za bomba, orodha za viungio, vidhibiti, na kanuni). Uhariri wa yoyote kati ya haya hubadilisha kila senario. Senario inaweza kukielekeza kipengele kwenye mkondo, aina ya bomba, orodha ya viungio, au muundo tofauti, lakini haiwezi kubadilisha kilichomo ndani yake.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Sifa</td><td>Kila sifa ya kifundo au kiungo isipokuwa zilizoorodheshwa hapa chini, ikiwemo nafasi yake, kama inafanya kazi, na aina yake (Badilisha aina). Maandishi yanaweza kubadilisha maneno yake, nafasi, ukubwa, mpangilio, herufi nzito, pembe, na kama yanaonyeshwa. Kielelezo kinaweza kubadilisha kama kinaonyeshwa. Sifa maalum inaweza kubadilishwa kila wakati. Sifa hushikiliwa katika kategoria Kimwili, Mahitaji, Uwashaji wa vipengele, Mipangilio ya awali, Kiambato, Mtiririko wa moto, Gharama ya nishati, Sifa maalum, Maandishi, Uwasilishaji, na Ukokotoaji.</td></tr><tr><td>Mipangilio</td><td>Mipangilio iliyohifadhiwa pamoja na mradi, isipokuwa iliyoorodheshwa hapa chini: chaguo za ukokotoaji (kwa mfano kizidishi cha mahitaji, muda wote wa kuendesha, hatua ya muda ya kihaidroliki, na njia ya msuguano), muundo wa mahitaji wa chaguo-msingi, thamani zinazopewa vipengele vipya, na mipangilio ya uwasilishaji (ukubwa, rangi, lebo, kontua, mwonekano wa ramani, na grafu za mfululizo wa muda kwenye ramani).</td></tr><tr><td>Sawa katika kila senario</td><td>Kitambulisho, Maelezo, na Tagi ya kipengele; vifundo vya mwisho na kona za kiungo; Wateja na Vielelezo; vipimo na mfumo wa viwianishi; na yaliyomo kwenye Maktaba (miundo, mikondo, aina za bomba, orodha za viungio, vidhibiti, na kanuni). Uhariri wa yoyote kati ya haya hubadilisha kila senario. Senario inaweza kukielekeza kipengele kwenye mkondo, aina ya bomba, orodha ya viungio, au muundo tofauti, lakini haiwezi kubadilisha kilichomo ndani yake.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_scn_example_term']='Mfano kwenye Net1';
-$ec_lang['lpn_guide_scn_example_def']='<p>Fungua mfano wa Net1. Chagua Maji, Senario, Senario mpya…, andika Bomba kuu kubwa, kisha bofya Sawa. Chagua Bomba 10 kwenye ramani na uingize 24 kwa Kipenyo kwenye Sifa; Msingi una inchi 18, zinazoonyeshwa chini ya sehemu kama Senario ya Msingi: 18. Chagua Msingi kwenye orodha ya Senario, chagua Senario mpya… tena, andika Siku ya juu, na uingize 1.8 kwa Kizidishi cha mahitaji katika Mipangilio, Ukokotoaji, Haidroliki. Kisha chagua Maji, Ripoti, Ulinganisho wa senario.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">Shinikizo la chini kabisa</td><td colspan="3">Kasi ya juu kabisa</td></tr><tr><td>Senario</td><td>Idadi ya thamani maalum</td><td>Kizidishi cha mahitaji</td><td>Muunganiko</td><td>Shinikizo (psi)</td><td>Muda (hr)</td><td>Kiungo</td><td>Kasi (ft/sec)</td><td>Muda (hr)</td></tr><tr><td>Msingi</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2.76</td><td>16:00</td></tr><tr><td>Bomba kuu kubwa</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2.87</td><td>16:00</td></tr><tr><td>Siku ya juu</td><td>1</td><td>1.8</td><td>N32</td><td>15.78</td><td>9:00</td><td>L10</td><td>3.49</td><td>9:00</td></tr></tbody></table><p>Muda wote wa kuendesha ni 24:00 katika zote tatu, kwa hiyo kila shinikizo la chini kabisa na kasi ya juu kabisa ni kiwango kikubwa au kidogo zaidi cha siku nzima, wakati unaoonyeshwa. Bomba kuu kubwa huongeza shinikizo la chini kabisa kwa takriban psi 1. Kizidishi cha 1.8 hulishusha hadi 15.78 psi saa 9:00, na kasi ya juu kabisa huhamia Bomba 10. Kila senario ina thamani moja maalum, na Msingi huhifadhi thamani zake.</p>';
+$ec_lang['lpn_guide_scn_example_def']='<p>Fungua mfano wa Net1. Ulinganisho ulio hapa chini pia huorodhesha senario za mfano wenyewe, Siku ya juu, Saa ya kilele, na watoto wao wa mpasuko wa bomba kuu, ambazo hazitumiki hapa. Chagua Maji, Senario, Senario mpya…, andika Bomba kuu kubwa, kisha bofya Sawa. Chagua Bomba 10 kwenye ramani na uingize 24 kwa Kipenyo kwenye Sifa; Msingi una inchi 18, zinazoonyeshwa chini ya sehemu kama Senario ya Msingi: 18. Chagua Msingi kwenye orodha ya Senario, chagua Senario mpya… tena, andika Siku ya juu 1.8, na uingize 1.8 kwa Kizidishi cha mahitaji katika Mipangilio, Ukokotoaji, Haidroliki. Kisha chagua Maji, Ripoti, Ulinganisho wa senario.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">Shinikizo la chini kabisa</td><td colspan="3">Kasi ya juu kabisa</td></tr><tr><td>Senario</td><td>Idadi ya thamani maalum</td><td>Kizidishi cha mahitaji</td><td>Muunganiko</td><td>Shinikizo (psi)</td><td>Muda (hr)</td><td>Kiungo</td><td>Kasi (ft/sec)</td><td>Muda (hr)</td></tr><tr><td>Msingi</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2.76</td><td>16:00</td></tr><tr><td>Bomba kuu kubwa</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2.87</td><td>16:00</td></tr><tr><td>Siku ya juu 1.8</td><td>1</td><td>1.8</td><td>N32</td><td>15.78</td><td>9:00</td><td>L10</td><td>3.49</td><td>9:00</td></tr></tbody></table><p>Muda wote wa kuendesha ni 24:00 katika zote, kwa hiyo kila shinikizo la chini kabisa na kasi ya juu kabisa ni kiwango kikubwa au kidogo zaidi cha siku nzima, wakati unaoonyeshwa. Bomba kuu kubwa huongeza shinikizo la chini kabisa kwa takriban psi 1. Kizidishi cha 1.8 hulishusha hadi 15.78 psi saa 9:00, na kasi ya juu kabisa huhamia Bomba 10. Kila senario ina thamani moja maalum, na Msingi huhifadhi thamani zake.</p>';
 $ec_lang['lpn_guide_scn_notes_term']='Mambo ya kuzingatia';
-$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Thamani maalum inayolingana na thamani iliyorithiwa bado ni thamani maalum. Inahesabiwa, na Kidhibiti cha thamani maalum huiashiria (sawa).</li><li>Hali ya msingi ni mpangilio wa kivinjari hiki, si wa mradi. Imezimwa kwa mradi ambao senario na mbadala zake haiwezi kuzionyesha. Mbadala na Senario: msimamizi zimeelezwa kwenye msaada ulio juu ya ingizo hili.</li><li>Tengua huhifadhi hatua 20. Kila hatua hurejesha senario na senario iliyo wazi pamoja na mchoro, kwa hiyo kuongeza, kubadilisha jina, na kufuta senario kunaweza kutenguliwa.</li><li>Kuhamisha faili la EPANET huandika senario iliyo wazi tu, pamoja na thamani na nafasi za vifundo ambazo senario hiyo husoma. Senario zenyewe hurekodiwa kwenye faili la mradi pekee.</li></ul>';
+$ec_lang['lpn_guide_scn_notes_def']='<ul><li>Thamani maalum inayolingana na thamani iliyorithiwa bado ni thamani maalum. Inahesabiwa, na Kidhibiti cha thamani maalum huiashiria (sawa).</li><li>Hali ya msingi ni mpangilio wa kivinjari hiki, si wa mradi. Imezimwa kwa mradi ambao senario na mbadala zake haiwezi kuzionyesha. Mbadala na Senario: msimamizi zimeelezwa chini ya Jinsi senario na mbadala zinavyofanya kazi na Jinsi ya kusimamia senario, juu ya ingizo hili.</li><li>Tengua huhifadhi hatua 20. Kila hatua hurejesha senario na senario iliyo wazi pamoja na mchoro, kwa hiyo kuongeza, kubadilisha jina, na kufuta senario kunaweza kutenguliwa.</li><li>Kuhamisha faili la EPANET huandika senario iliyo wazi tu, pamoja na thamani na nafasi za vifundo ambazo senario hiyo husoma. Senario zenyewe hurekodiwa kwenye faili la mradi pekee.</li></ul>';
 // The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
 // the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
 $ec_lang['lpn_guide_cmp_cols_term']='Jedwali lina nini';
-$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Senario</td><td>Jina la senario. Senario iliyo wazi huwekewa alama (iliyo wazi sasa).</td></tr><tr><td>Idadi ya thamani maalum</td><td>Thamani maalum za senario yenyewe, zilizohesabiwa kama kwenye orodha ya Senario. Chaguo la ukokotoaji kama kizidishi cha mahitaji huhesabiwa kama moja, na thamani maalum inayolingana na iliyorithiwa huhesabiwa.</td></tr><tr><td>Kizidishi cha mahitaji, Muda wote wa kuendesha, Hatua ya muda ya kihaidroliki</td><td>Thamani ambazo senario ilitatuliwa kwazo, zake yenyewe au za mradi. Senario ya hali thabiti huonyesha kistari kwa hatua ya muda.</td></tr><tr><td>Shinikizo la chini kabisa</td><td>Shinikizo la chini kabisa kwenye muunganiko, pamoja na kitambulisho chake na wakati linapotokea. Hifadhi za maji na matanki hazijumuishwi kwa sababu kila moja ina kimo kisichobadilika.</td></tr><tr><td>Kasi ya juu kabisa</td><td>Kasi ya juu kabisa katika bomba au vali, pamoja na kitambulisho chake na wakati inapotokea. Pampu hazijumuishwi.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Senario</td><td>Jina la senario. Senario iliyo wazi huwekewa alama (iliyo wazi sasa).</td></tr><tr><td>Idadi ya thamani maalum</td><td>Thamani maalum za senario yenyewe, zilizohesabiwa kama kwenye orodha ya Senario. Chaguo la ukokotoaji kama kizidishi cha mahitaji huhesabiwa kama moja, na thamani maalum inayolingana na iliyorithiwa huhesabiwa.</td></tr><tr><td>Kizidishi cha mahitaji, Muda wote wa kuendesha, Hatua ya muda ya kihaidroliki</td><td>Thamani ambazo senario ilitatuliwa kwazo, zake yenyewe au za mradi. Senario ya hali thabiti huonyesha kistari kwa hatua ya muda.</td></tr><tr><td>Shinikizo la chini kabisa: Muunganiko, Shinikizo, Muda (hr)</td><td>Shinikizo la chini kabisa kwenye muunganiko, katika safu tatu: kitambulisho cha muunganiko, shinikizo, na wakati linapotokea. Hifadhi za maji na matanki hazijumuishwi kwa sababu kila moja ina kimo kisichobadilika.</td></tr><tr><td>Kasi ya juu kabisa: Kiungo, Kasi, Muda (hr)</td><td>Kasi ya juu kabisa katika bomba au vali, katika safu tatu: kitambulisho cha kiungo, kasi, na wakati inapotokea. Pampu hazijumuishwi.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Senario za hali thabiti na za kipindi kirefu';
 $ec_lang['lpn_guide_cmp_run_def']='<p>Senario yenye Muda wote wa kuendesha mkubwa kuliko 0 huendeshwa katika kipindi chote kupitia injini ya EPANET. Shinikizo lake la chini kabisa na kasi yake ya juu kabisa ni viwango vikubwa na vidogo zaidi katika kila hatua ya muda, kila kimoja kikionyeshwa pamoja na wakati wake. Senario yenye Muda wote wa kuendesha wa 0 hutatuliwa kwa wakati mmoja. Muda wote wa kuendesha ni mojawapo ya chaguo ambazo senario inaweza kuzibadilisha, kwa hiyo jedwali moja linaweza kuwa na aina zote mbili.</p>';
-$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Senario isiyoweza kutatuliwa huonyesha sababu badala ya matokeo yake mawili, kwa mfano kwamba muunganiko hauna njia kuelekea chanzo baada ya bomba kufanywa lisilofanya kazi. Senario nyingine bado zinatatuliwa. Senario ambayo haikukaribia suluhisho huonyesha matokeo yake ya mwisho na ujumbe.</li><li>Kizuizi kilicho juu ya jedwali, Sawa katika kila senario, kinaeleza njia ya msuguano, vipimo, usahihi, na idadi ya juu kabisa ya majaribio. Mpangilio unaotofautiana kati ya senario huachwa nje ya kizuizi.</li><li>Hakuna kiwango cha kufaulu au kufeli. Soma namba kwa kulinganisha na vigezo vya ubunifu vya mfumo unaoigwa.</li><li>Mfano uliotolewa kwenye ingizo la Senario: msimamizi hulinganisha senario tatu kwenye Net1.</li></ul>';
+$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Senario isiyoweza kutatuliwa huonyesha sababu badala ya matokeo yake mawili, kwa mfano kwamba muunganiko hauna njia kuelekea chanzo baada ya bomba kufanywa lisilofanya kazi. Senario nyingine bado zinatatuliwa. Senario ambayo haikukaribia suluhisho huonyesha matokeo yake ya mwisho na ujumbe.</li><li>Kizuizi kilicho juu ya jedwali, Sawa katika kila senario, kinaeleza njia ya msuguano, vipimo, usahihi, na idadi ya juu kabisa ya majaribio. Mpangilio unaotofautiana kati ya senario huachwa nje ya kizuizi.</li><li>Hakuna kiwango cha kufaulu au kufeli. Soma namba kwa kulinganisha na vigezo vya ubunifu vya mfumo unaoigwa.</li><li>Mfano uliotolewa kwenye ingizo la Senario: msimamizi hulinganisha senario kwenye Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
 // dev/lpn-spike/user-guide-library-harness.js.
 $ec_lang['lpn_guide_lib_kinds_term']='Kila sehemu ina nini';
-$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Miundo</td><td>Orodha ya vizidishi inayojirudia kwa muda wote wa uendeshaji, kizidishi kimoja kwa kila hatua ya muda ya muundo. Muundo mpya ni vizidishi 24 vya 1. Kubandika safu wima ya lahajedwali hujaza kisanduku cha Vizidishi. Muundo wa mahitaji wa chaguo-msingi huwekewa alama (chaguo-msingi) na huchaguliwa katika Mipangilio, Ukokotoaji, Haidroliki.</td></tr><tr><td>Mikondo</td><td>Aina nne, zinazochaguliwa kama Aina ya mkondo: Kimo cha pampu, Ufanisi wa pampu, Ujazo wa tanki, na Upotevu wa kimo wa vali. Nukta huingizwa kwenye gridi inayokubali safu wima ya lahajedwali iliyobandikwa au mistari iliyonakiliwa kutoka faili la EPANET. Mkondo wa kimo cha pampu hupatanishwa kupitia nukta zake na mstari wa Mlingano huonyesha upatanisho; nukta moja husomwa kama nukta ya kubuni, ikiwa na kimo cha kuzima cha mara 1.33334 ya kimo chake na mtiririko wa juu kabisa wa mara 2 ya mtiririko wake, kama EPANET inavyoisoma. Aina zingine huunganisha nukta zake kwa mistari iliyonyooka. Pampu au vali hutaja mkondo wake kwenye Sifa, ambapo kiungo cha Mikondo hufungua sehemu hii.</td></tr><tr><td>Aina za bomba</td><td>Ufafanuzi wa kipenyo, usuguo, na migawo ya miitikio ambao mabomba kadhaa hurejelea. Sifa inaweza kuachwa tupu kwenye ufafanuzi kisha kuingizwa kwa kila bomba. Kwenye Sifa, thamani ambazo aina ya bomba hutaja zimezimwa, na Tenganisha na aina ya bomba huzinakili kwenye bomba na kuliacha bomba lisitumie aina hiyo.</td></tr><tr><td>Viungio</td><td>Orodha za viungio zenye idadi kwa kila kimoja, zinazojumlishwa kuwa mgawo mmoja wa upotevu mdogo (wa ndani), k, kwa bomba au aina ya bomba. Viungio vinavyotolewa ni kumi na vitatu vilivyo katika Jedwali 3.3 la mwongozo wa mtumiaji wa EPANET 2.2 na Kiungio kingine. Kuchagua kimoja hunakili mgawo wake kwenye safu, ambapo unaweza kubadilishwa.</td></tr><tr><td>Vidhibiti</td><td>Kauli moja kila kimoja, kwa sintaksia ya EPANET, kama <code>LINK id OPEN IF NODE id BELOW value</code>. Chini ya kila kimoja, kisanduku hueleza kama kimeeleweka.</td></tr><tr><td>Kanuni</td><td>Mistari kadhaa kila moja, kwa sintaksia ya EPANET: RULE, IF, AND, OR, THEN, ELSE, na PRIORITY. Chini ya kila moja, kisanduku hueleza kama imesomwa.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Miundo</td><td>Orodha ya vizidishi inayojirudia kwa muda wote wa uendeshaji, kizidishi kimoja kwa kila hatua ya muda ya muundo. Muundo mpya ni vizidishi 24 vya 1. Kubandika safu wima ya lahajedwali hujaza kisanduku cha Vizidishi. Muundo wa mahitaji wa chaguo-msingi huwekewa alama (chaguo-msingi) na huchaguliwa katika Mipangilio, Ukokotoaji, Haidroliki.</td></tr><tr><td>Mikondo</td><td>Aina nne, zinazochaguliwa kama Aina ya mkondo: Kimo cha pampu, Ufanisi wa pampu, Ujazo wa tanki, na Upotevu wa kimo wa vali. Nukta huingizwa kwenye gridi inayokubali safu wima ya lahajedwali iliyobandikwa au mistari iliyonakiliwa kutoka faili la EPANET. Mkondo wa kimo cha pampu wenye nukta moja au nukta tatu zinazoanza kwenye mtiririko sifuri hupatanishwa, na mstari wa Mlingano huonyesha upatanisho; nukta moja husomwa kama nukta ya kubuni, ikiwa na kimo cha kuzima cha mara 1.33334 ya kimo chake na mtiririko wa juu kabisa wa mara 2 ya mtiririko wake, kama EPANET inavyoisoma. Mkondo mwingine wowote wa kimo cha pampu, na kila aina nyingine, huunganisha nukta zake kwa mistari iliyonyooka. Pampu au vali hutaja mkondo wake kwenye Sifa, ambapo chaguo la mwisho katika orodha ya mikondo, Hariri mikondo…, hufungua sehemu hii.</td></tr><tr><td>Aina za bomba</td><td>Ufafanuzi wa kipenyo, usuguo, na migawo ya miitikio ambao mabomba kadhaa hurejelea. Sifa inaweza kuachwa tupu kwenye ufafanuzi kisha kuingizwa kwa kila bomba. Kwenye Sifa, thamani ambazo aina ya bomba hutaja zimezimwa, na Tenganisha na aina ya bomba huzinakili kwenye bomba na kuliacha bomba lisitumie aina hiyo.</td></tr><tr><td>Viungio</td><td>Orodha za viungio zenye idadi kwa kila kimoja, zinazojumlishwa kuwa mgawo mmoja wa upotevu mdogo (wa ndani), k, kwa bomba au aina ya bomba. Viungio vinavyotolewa ni kumi na vitatu vilivyo katika Jedwali 3.3 la mwongozo wa mtumiaji wa EPANET 2.2 na Kiungio kingine. Kuchagua kimoja hunakili mgawo wake kwenye safu, ambapo unaweza kubadilishwa.</td></tr><tr><td>Vidhibiti</td><td>Kauli moja kila kimoja, kwa sintaksia ya EPANET, kama <code>LINK id OPEN IF NODE id BELOW value</code>. Chini ya kila kimoja, kisanduku hueleza kama kimeeleweka.</td></tr><tr><td>Kanuni</td><td>Mistari kadhaa kila moja, kwa sintaksia ya EPANET: RULE, IF, AND, OR, THEN, ELSE, na PRIORITY. Chini ya kila moja, kisanduku hueleza kama imesomwa.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_lib_refs_term']='Kubadilisha jina, kufuta, na kinachorejelea kipengee';
 $ec_lang['lpn_guide_lib_refs_def']='<p>Kitambulisho hubadilishwa katika sehemu yake. Kitambulisho tupu, au kitambulisho kilichokwisha kutumika katika sehemu hiyo hiyo, hakikubaliwi. Kubadilisha jina la kipengee huhamisha kila marejeleo yake, katika Msingi na katika kila senario. Kwa muundo, marejeleo ni muundo wa mahitaji wa muunganiko na muundo wa kila kategoria yake ya mahitaji, muundo wa mahitaji wa Mteja, muundo wa kimo wa hifadhi ya maji, muundo wa kasi wa pampu, na muundo wa mahitaji wa chaguo-msingi.</p><p>Muundo unaotumika unaweza kufutwa, na kila marejeleo yake huondolewa. Ikiwa ulikuwa muundo wa mahitaji wa chaguo-msingi, taarifa inasema miunganiko isiyo na muundo sasa inatumia nini. Mkondo, aina ya bomba, au orodha ya viungio inayotumika haifutwi. Ujumbe hutaja vipengele vinavyoitumia, na kila kimoja lazima kipewe mkondo mwingine, au kitenganishwe na aina au orodha hiyo, kwanza.</p>';
 $ec_lang['lpn_guide_lib_scn_term']='Maktaba na senario';
@@ -1061,11 +1061,11 @@ $ec_lang['lpn_guide_prop_scn_term']='Katika senario';
 $ec_lang['lpn_guide_prop_scn_def']='<p>Katika senario isiyo Msingi, uhariri wa thamani ambayo senario zinaweza kuibadilisha huhifadhiwa kama thamani maalum ya senario iliyo wazi, na safu huwekewa alama upande wake wa kushoto. Ingizo la Senario: msimamizi linaeleza alama na kuorodhesha kilicho sawa katika kila senario: Kitambulisho, Maelezo, na Tagi ni vya aina hiyo. Mteja hana thamani za senario. Kubadili senario huacha Sifa wazi kwenye kipengele hicho hicho, ikionyesha thamani za senario iliyo wazi sasa.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Vipengele kadhaa vilivyochaguliwa';
 $ec_lang['lpn_guide_prop_multi_def']='<p>Kichwa husomeka, kwa mfano, 2 zimechaguliwa. Kisanduku kina sehemu moja kwa kila aina ya kipengele kilicho kwenye uteuzi, yenye jina la aina na idadi ya vipengele vyake, kama Mabomba (2), na kila sehemu inaweza kukunjwa. Sehemu huorodhesha sifa ambazo Majedwali ina kama safu wima na ambazo zinaweza kuwekwa kwa kila kipengele ndani yake. Matokeo na thamani ambazo aina ya bomba hutaja hazijaorodheshwa. Safu huonyesha thamani ambayo vipengele vinashiriki, au Mbalimbali pale vinapotofautiana.</p><p>Kuandika thamani kwenye safu huiweka kwa kila kipengele cha aina hiyo kwenye uteuzi. Safu isiyoguswa haiandiki chochote. Taarifa inaeleza idadi, kama Imeweka Kipenyo (in) kwa 2., na Tengua moja hubatilisha safu nzima. Katika senario isiyo Msingi thamani huhifadhiwa kama thamani maalum.</p>';
-$ec_lang['lpn_guide_prop_example_def']='<p>Fungua mfano wa Net1 na ubofye Bomba 10. Sifa huorodhesha ingizo zake, kutoka Maelezo hadi Linafanya kazi?, kisha matokeo yake wakati unaoonyeshwa: Mtiririko 1866.2 gpm, Kasi 2.4 ft/sec, na Upotevu wa Kimo 19.12 ft H2O.</p><p>Bofya Bomba 113 na Shift-bofya Bomba 31. Kichwa kinasomeka 2 zimechaguliwa, sehemu moja ni Mabomba (2), na Kipenyo kinaonyesha Mbalimbali, kwa sababu Bomba 31 ni in. 6 na Bomba 113 ni in. 8. Ingiza 10 kwa Kipenyo. Taarifa inasomeka Imeweka Kipenyo (in) kwa 2., mabomba yote mawili ni in. 10, na Tengua moja huyarudisha kuwa in. 6 na 8.</p>';
+$ec_lang['lpn_guide_prop_example_def']='<p>Fungua mfano wa Net1 na ubofye Bomba 10. Sifa huorodhesha ingizo kisha matokeo wakati unaoonyeshwa: Mtiririko 1866.2 gpm, Kasi 2.4 ft/sec, na Upotevu wa Kimo 19.12 ft H2O.</p><p>Bofya Bomba 113 na Shift-bofya Bomba 31. Kichwa kinasomeka 2 zimechaguliwa, sehemu moja ni Mabomba (2), na Kipenyo kinaonyesha Mbalimbali, kwa sababu Bomba 31 ni in. 6 na Bomba 113 ni in. 8. Ingiza 10 kwa Kipenyo. Taarifa inasomeka Imeweka Kipenyo (in) kwa 2., mabomba yote mawili ni in. 10, na Tengua moja huyarudisha kuwa in. 6 na 8.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sehemu, na mahali mipangilio inapohifadhiwa';
-$ec_lang['lpn_guide_set_where_def']='<p>Orodha iliyo upande wa kushoto wa kisanduku huruka hadi sehemu au kichwa kidogo. Sehemu ni Taswira (Lebo za vifundo, Rangi za vifundo, Lebo za viungo, Rangi za viungo, Mteja, na Vyote), Ramani na ukurasa (Mwonekano na Ukurasa), Vipengele (Viambishi vya kitambulisho, Thamani, na Sifa maalum), Ukokotoaji (Vipimo, Muda, Haidroliki, Nishati, na Ubora), na Shukrani. Kila kichwa kidogo hueleza kama mipangilio yake Imehifadhiwa pamoja na mradi au Imehifadhiwa kwenye kivinjari hiki. Kila kitu huhifadhiwa pamoja na mradi isipokuwa mipangilio iliyo chini ya Ukurasa na safu moja katika Haidroliki, Onyesha kisanduku cha maendeleo ya uendeshaji, ambayo yenyewe husema Imehifadhiwa kwenye kivinjari hiki.</p><p>Kichupo cha Mipangilio katika Majedwali huorodhesha mipangilio hiyo hiyo kama safu, zikiwa na Kategoria na Thamani yake, kwa hiyo mpangilio unaweza pia kupatikana na kukaguliwa huko.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>Orodha iliyo upande wa kushoto wa kisanduku huruka hadi sehemu au kichwa kidogo. Sehemu ni Taswira (Lebo za vifundo, Rangi za vifundo, Lebo za viungo, Rangi za viungo, Mteja, na Vyote), Ramani, Ukurasa, Vipengele (Viambishi vya kitambulisho, Thamani, na Sifa maalum), Ukokotoaji (Vipimo, Muda, Haidroliki, Nishati, na Ubora), na Shukrani. Kila kichwa kidogo hueleza kama mipangilio yake Imehifadhiwa pamoja na mradi au Imehifadhiwa kwenye kivinjari hiki. Kila kitu huhifadhiwa pamoja na mradi isipokuwa mipangilio iliyo chini ya Ukurasa na safu moja katika Haidroliki, Onyesha kisanduku cha maendeleo ya uendeshaji, ambayo yenyewe husema Imehifadhiwa kwenye kivinjari hiki.</p><p>Kichupo cha Mipangilio katika Majedwali huorodhesha mipangilio hiyo hiyo kama safu, zikiwa na Kategoria na Thamani yake, kwa hiyo mpangilio unaweza pia kupatikana na kukaguliwa huko.</p>';
 $ec_lang['lpn_guide_set_search_term']='Kutafuta';
 $ec_lang['lpn_guide_set_search_def']='<p>Andika neno moja au zaidi kwenye Tafuta mipangilio ili kuorodhesha mipangilio inayotaja maneno yote, kwenye jina au kwenye kidokezo. Neno linalolingana na kichwa huonyesha kila mpangilio ulio chini ya kichwa hicho. Kwa mfano, uwazi huorodhesha Uwazi wa alama (0 hadi 1) na Uwazi wa picha ya nyuma (0 hadi 1); uwazi alama huorodhesha ya kwanza pekee; na vinyunyizio huorodhesha Kipeo cha emitter, ambacho kidokezo chake kinataja vinyunyizio na jina lake halitaji. Utafutaji hauubadilishi mpangilio wowote.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Mipangilio katika senario';
@@ -1106,14 +1106,14 @@ $ec_lang['lpn_guide_tbl_fill_term']='Kujaza, vichujio, na senario';
 $ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D hujaza kuteremka masafa yaliyochaguliwa kutoka safu yake ya juu, na Ctrl+Enter huyajaza kwa thamani ya seli inayotumika. Zote mbili huacha safu wima ya Kitambulisho na seli za kusoma tu, na taarifa inasema seli ngapi zilijazwa na ngapi hazikubadilishwa. Ctrl+Shift+L huonyesha vipengele vilivyochaguliwa kwenye ramani tu. Kichujio kikiwa kimewashwa, Ctrl+A na Ctrl+D hufanya kazi kwenye safu zinazoonyeshwa tu, na safu iliyohaririwa hadi isilingane tena hubaki hadi kichujio kitumike tena.</p><p>Katika senario isiyo Msingi, uhariri wa seli, Ctrl+D, Ctrl+Enter, na ubandikaji huhifadhiwa kama thamani maalum za senario iliyo wazi.</p>';
 // The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
 $ec_lang['lpn_guide_bx_dock_term']='Kuweka kando ya ramani na vichupo';
-$ec_lang['lpn_guide_bx_dock_def']='<p>Kona ya upau wa kichwa wa kisanduku ina Weka upande wa kushoto wa ramani, Weka upande wa kulia wa ramani, na Elea, na, kisanduku kikishawekwa kando, Ficha kiotomatiki. Kisanduku kilichowekwa kando ni safu wima kando ya ramani. Kwa Ficha kiotomatiki, ni kichupo kwenye mstari mwembamba ukingoni mwa ramani. Kichupo hufungua kisanduku kielekezi kikikaa juu yake, baada ya ms 150 kwa kipanya au kalamu, au kwa kubofya au kugusa, na kisanduku hujirudisha kwenye kichupo chake kama ilivyoelezwa hapo juu. Kisanduku kilichofichwa bado kiko wazi. Safu ya menyu au kitufe cha upau wa zana kinachokifungua huking\'oa kutoka kwenye kichupo chake.</p><p>Kuburuta kisanduku kilichowekwa kando kwa upau wake wa kichwa huifanya kielee na kuzima ficha kiotomatiki. Visanduku vilivyowekwa upande mmoja hushiriki upana mmoja, na ramani hubaki na angalau px 320. Vichupo hupangwa upya kwa kuviburuta au kwa kubonyeza Alt+Juu au Alt+Chini kwenye kichupo chenye mwelekeo.</p>';
+$ec_lang['lpn_guide_bx_dock_def']='<p>Kona ya upau wa kichwa wa kisanduku ina Weka upande wa kushoto wa ramani, Weka upande wa kulia wa ramani, na Elea, na, kisanduku kikishawekwa kando, Ficha kiotomatiki. Kisanduku kilichowekwa kando ni safu wima kando ya ramani. Kwa Ficha kiotomatiki, ni kichupo kwenye mstari mwembamba ukingoni mwa ramani. Kichupo hufungua kisanduku kielekezi kikikaa juu yake, baada ya ms 150 kwa kipanya au kalamu, au kwa kubofya au kugusa. Kisanduku hujirudisha kwenye kichupo chake kielekezi kikiwa kimeondoka na kitovu cha uingizaji hakiko ndani yake, unapobonyeza mahali popote nje yake, au unapobonyeza Esc. Kisanduku kilichojirudisha bado kiko wazi. Safu ya menyu au kitufe cha upau wa zana kinachokifungua huking\'oa kutoka kwenye kichupo chake.</p><p>Kuburuta kisanduku kilichowekwa kando kwa upau wake wa kichwa huifanya kielee na kuzima ficha kiotomatiki. Visanduku vilivyowekwa upande mmoja hushiriki upana mmoja, na ramani hubaki na angalau px 320. Vichupo hupangwa upya kwa kuviburuta au kwa kubonyeza Alt+Juu au Alt+Chini kwenye kichupo chenye kitovu cha uingizaji.</p>';
 $ec_lang['lpn_guide_bx_keep_term']='Kisanduku kinachokumbuka';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Kila kisanduku huhifadhi kwenye kivinjari hiki mahali kinapoelea, ukubwa wake, kama kiko wazi, upande wake wa kuwekwa, kama kinajificha kiotomatiki, upana wake kikiwa kimewekwa kando, na mahali pa kichupo chake. Sifa, Umuhimu: uchambuzi, Mahitaji: upimaji, na Urekebishaji huhifadhi tu upande wao wa kuwekwa, ficha kiotomatiki, mahali pa kichupo, na kama viko wazi; mahali vinapoelea hudumu kwa upakiaji mmoja wa ukurasa. Kivinjari kisicho na mpangilio uliohifadhiwa huanza na visanduku vingine vimewekwa kando kama vichupo, na hakuna kinachohifadhiwa hadi kisanduku kibadilishwe.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='Kwenye simu';
-$ec_lang['lpn_guide_bx_phone_def']='<p>Kwa px 640 au chini, hakuna kisanduku kinachowekwa kando na kila kisanduku hujaza dirisha. Vitufe vya kuweka kando havitolewi. Mpangilio uliowekwa kando huhifadhiwa na hurudi dirisha likiwa pana zaidi.</p>';
+$ec_lang['lpn_guide_bx_phone_def']='<p>Kwa upana wa px 640 au chini, kisanduku kilichowekwa kando huwa kichupo cha kujificha kiotomatiki kila wakati, na hufunguka kama paneli juu ya ramani. Hakuna kinachobandikwa. Kisanduku ambacho hakijawekwa kando hujaza dirisha.</p>';
 // The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
 $ec_lang['lpn_guide_ff_asks_term']='Kinachoulizwa kwa kila muunganiko';
-$ec_lang['lpn_guide_ff_asks_def']='<p>Kila muunganiko unaojaribiwa hupata majaribio mawili, kwenye nakala ya mtandao katika hatua ya muda iliyo kwenye skrini na katika senario iliyo wazi. La kwanza huuliza muunganiko unaweza kutoa mtiririko kiasi gani huku ukishikilia shinikizo linalobaki. Mtiririko huchotwa kwenye muunganiko, na utatuzi unaorudiwa huupunguza, hadi kikomo sawa na 10000 gpm. Muunganiko unaoendelea kushikilia shinikizo linalobaki kwenye kikomo huripotiwa kama unaotoa zaidi ya kikomo. Jaribio la pili, ukaguzi wa kubuni, huchota mtiririko unaohitajika kwenye muunganiko na kuuliza kama muunganiko mwingine wowote ulio katika wigo wake unashuka chini ya Shinikizo la chini kabisa linaloruhusiwa mahali pengine, au bomba lolote lililo katika wigo wake linapita Kasi ya juu kabisa inayoruhusiwa. Ukaguzi wa kubuni haufanywi wigo wake ukiwa Hakuna.</p><p>Muunganiko wenye sifa yake yenyewe ya Mtiririko wa moto unaohitajika hujaribiwa dhidi ya thamani hiyo, na kila muunganiko mwingine dhidi ya thamani iliyo kwenye kisanduku.</p>';
+$ec_lang['lpn_guide_ff_asks_def']='<p>Kila muunganiko unaojaribiwa hupata majaribio mawili, kwenye nakala ya mtandao katika hatua ya muda iliyo kwenye skrini na katika senario iliyo wazi. La kwanza huuliza muunganiko unaweza kutoa mtiririko kiasi gani huku ukishikilia shinikizo linalobaki. Mtiririko huchotwa kwenye muunganiko, na utatuzi unaorudiwa huupunguza, hadi kikomo sawa na 10000 gpm. Muunganiko unaoendelea kushikilia shinikizo linalobaki kwenye kikomo huripotiwa kama unaotoa zaidi ya kikomo. Jaribio la pili, ukaguzi wa kubuni, huchota mtiririko unaohitajika kwenye muunganiko na kuuliza kama muunganiko mwingine wowote ulio katika wigo wake unashuka chini ya Shinikizo la chini kabisa la mfumo linaloruhusiwa, au bomba lolote lililo katika wigo wake linapita Kasi ya juu kabisa inayoruhusiwa. Ukaguzi wa kubuni haufanywi wigo wake ukiwa Hakuna.</p><p>Muunganiko wenye sifa yake yenyewe ya Mtiririko wa moto unaohitajika hujaribiwa dhidi ya thamani hiyo, na kila muunganiko mwingine dhidi ya thamani iliyo kwenye kisanduku.</p>';
 $ec_lang['lpn_guide_ff_result_term']='Kusoma matokeo';
 $ec_lang['lpn_guide_ff_result_def']='<p>Muhtasari huhesabu miunganiko iliyofaulu ukaguzi wote, miunganiko iliyofeli mtiririko wa moto, na miunganiko iliyoathiri sehemu nyingine ya mfumo. Jedwali huorodhesha, kwa kila muunganiko uliojaribiwa, Shinikizo tuli kabla ya mtiririko wowote wa moto kuchotwa, Mtiririko unaohitajika, Shinikizo kwa mtiririko unaohitajika, Mtiririko unaopatikana, Lililobaki, Athari mbaya zaidi na Kikomo cha kubuni cha ukaguzi wa kubuni, idadi ya Utatuzi, ambayo ni idadi ya utatuzi wa mtandao mzima, na Aina za kushindwa. Seli isiyo na namba huonyesha kistari, kamwe sifuri. Muunganiko ambao haukuweza kutatuliwa huonyesha sababu yake badala ya namba. Jedwali huchapisha miunganiko 200 kwa kiwango cha juu na kueleza ngapi haikuchapishwa.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Pete, Simamisha, na uchambuzi mmoja kwa wakati';
@@ -1121,13 +1121,13 @@ $ec_lang['lpn_guide_ff_marks_def']='<p>Baada ya uendeshaji, duara la kila muunga
 $ec_lang['lpn_guide_ff_example_def']='<p>Fungua mfano wa Net1, chagua Maji, Changanua, Uchambuzi wa mtiririko wa moto…, na ubofye Endesha ukiwa na kisanduku kama kilivyofunguka. Hatua ya muda ni 0:00, na uendeshaji hutatua mtandao mzima mara 135. Miunganiko minane kati ya tisa inafaulu ukaguzi wote. Muunganiko N32 unafeli mtiririko wa moto: shinikizo lake tuli ni 111 psi, 1.19 psi tu inabaki kwenye 1000 gpm zinazohitajika, na mtiririko wake unaopatikana ni 892 gpm. Muunganiko N31 unaweza kutoa 1339 gpm, na Muunganiko N12 zaidi ya 10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='Kila kisa kinafanya nini';
-$ec_lang['lpn_guide_cr_case_def']='<p>Kwa kila kiungo katika wigo, kiungo hufanywa kisichofanya kazi kwenye nakala ya mtandao, na nakala hutatuliwa katika hatua ya muda iliyo kwenye skrini katika senario iliyo wazi. Uendeshaji ni utatuzi mmoja kwa kila kiungo na mmoja zaidi bila kitu kilichovunjwa. Muunganiko uliobaki bila njia wazi kuelekea hifadhi ya maji au tanki umekatwa: huondolewa kabla ya utatuzi, na mahitaji yake huhesabiwa kama Mahitaji yasiyohudumiwa. Kati ya miunganiko ambayo bado imeunganika, Miunganiko chini ya kiwango cha chini huorodhesha ile ambayo shinikizo lake linashuka chini ya Shinikizo la chini kabisa linaloruhusiwa. Muunganiko ambao tayari uko chini yake bila kitu kilichovunjwa hauhesabiwi dhidi ya kiungo chochote, na muhtasari unasema wangapi. Shinikizo la chini kabisa linaloruhusiwa ni mpangilio uleule kama kisanduku cha Shinikizo la chini kabisa linaloruhusiwa mahali pengine cha Mtiririko wa moto: uchambuzi.</p>';
+$ec_lang['lpn_guide_cr_case_def']='<p>Kwa kila kiungo katika wigo, kiungo hufanywa kisichofanya kazi kwenye nakala ya mtandao, na nakala hutatuliwa katika hatua ya muda iliyo kwenye skrini katika senario iliyo wazi. Uendeshaji ni utatuzi mmoja kwa kila kiungo na mmoja zaidi bila kitu kilichovunjwa. Muunganiko uliobaki bila njia wazi kuelekea hifadhi ya maji au tanki umekatwa: huondolewa kabla ya utatuzi, na mahitaji yake huhesabiwa kama Mahitaji yasiyohudumiwa. Kati ya miunganiko ambayo bado imeunganika, Miunganiko chini ya kiwango cha chini huorodhesha ile ambayo shinikizo lake linashuka chini ya Shinikizo la chini kabisa linaloruhusiwa. Muunganiko ambao tayari uko chini yake bila kitu kilichovunjwa hauhesabiwi dhidi ya kiungo chochote, na muhtasari unasema wangapi. Shinikizo la chini kabisa linaloruhusiwa ni mpangilio uleule kama kisanduku cha Shinikizo la chini kabisa la mfumo linaloruhusiwa cha Mtiririko wa moto: uchambuzi.</p>';
 $ec_lang['lpn_guide_cr_dead_term']='Miisho iliyokufa, na orodha';
 $ec_lang['lpn_guide_cr_dead_def']='<p>Kiungo cha mwisho uliokufa ni kile ambacho kuondolewa kwake hukata miunganiko inayoweza kufikiwa kupitia kwacho tu. Kila kitu kilicho nyuma yake ni hasara yake, kwa hiyo Ruka miisho iliyokufa ikiwa na alama kiungo hakitatuliwi, na muhtasari unasema vingapi viliruka. Orodha huonyesha, kwa kila kiungo, Mahitaji yasiyohudumiwa, Miunganiko iliyokatwa, na Miunganiko chini ya kiwango cha chini, kila moja ikiwa na idadi na vitambulisho vitano vya kwanza, na kubofya kitambulisho huenda kwake kwenye ramani. Viungo vinavyoigharimu mfumo kitu huorodheshwa kwanza hadi kichwa cha safu wima kibofywe ili kupanga, na muhtasari huvihesabu dhidi ya idadi ya viungo vilivyojaribiwa. Chagua Viungo vilivyoteuliwa ili kuvunja tu viungo vilivyochaguliwa kwenye ramani.</p>';
 $ec_lang['lpn_guide_cr_example_def']='<p>Fungua mfano wa Net1, chagua Maji, Changanua, Uchambuzi wa umuhimu…, ingiza 116 kwa Shinikizo la chini kabisa linaloruhusiwa, na ubofye Endesha. Hatua ya muda ni 0:00, na uendeshaji hutatua mtandao mzima mara 14. Viungo vinne kati ya 13 hushusha muunganiko chini ya 116 psi vinapokuwa nje: L9 (N10, N11, na N21), L10 (N11 na N21), L111 (N21 na N22), na L112 (N21 na N22). Miunganiko miwili tayari iko chini ya 116 psi bila kitu kilichovunjwa na haihesabiwi. Kwa kuwa Net1 ina vitanzi, kupoteza kiungo kimoja hakuachi kamwe muunganiko bila usambazaji.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
 $ec_lang['lpn_guide_ds_run_def']='<p>Endesha huzidisha mahitaji kwenye miunganiko iliyochaguliwa kwa Kipimo cha mahitaji, kwenye nakala ya mtandao katika hatua ya muda iliyo kwenye skrini na katika senario iliyo wazi. Hufanya utatuzi mbili, mmoja ukiwa na mahitaji kama yalivyo na mmoja uliopimwa. Matokeo huorodhesha Shinikizo la chini kabisa na Kasi za juu kabisa, kila moja na thamani ya Imepimwa kando ya ile ya Haijapimwa, ambayo ni thamani ambayo ramani inaonyesha. Kila orodha ina safu kumi, na kisanduku kinasema viungo vingapi hakionyeshi. Kipimo cha mahitaji hutumiwa pamoja na kizidishi cha mahitaji cha senario iliyo wazi, na hakihifadhiwi kamwe kwenye mradi.</p>';
-$ec_lang['lpn_guide_ds_find_def']='<p>Tafuta hutafuta vipimo vya mahitaji kutoka 0 hadi 20, kwa 0.01 iliyo karibu zaidi, kwa kile kikubwa zaidi ambapo kila muunganiko uliochaguliwa hudumisha angalau Shinikizo la chini kabisa linaloruhusiwa. Huripoti kipimo na shinikizo la chini kabisa hapo, na vivyo hivyo kwa hatua inayofuata juu, ambapo shinikizo hushuka kwanza chini ya kikomo. Mahitaji kama yalivyoingizwa tayari yakimwacha muunganiko chini ya kikomo, jibu huwekewa alama ya onyo. Kila muunganiko ukidumisha kikomo katika 20, jibu linasema hivyo. Simamisha humaliza utafutaji bila jibu. Shinikizo la chini kabisa linaloruhusiwa ni mpangilio uleule kama kisanduku cha Shinikizo la chini kabisa linaloruhusiwa mahali pengine cha Mtiririko wa moto: uchambuzi.</p>';
+$ec_lang['lpn_guide_ds_find_def']='<p>Tafuta hutafuta vipimo vya mahitaji kutoka 0 hadi 20, kwa 0.01 iliyo karibu zaidi, kwa kile kikubwa zaidi ambapo kila muunganiko uliochaguliwa hudumisha angalau Shinikizo la chini kabisa linaloruhusiwa. Huripoti kipimo na shinikizo la chini kabisa hapo, na vivyo hivyo kwa hatua inayofuata juu, ambapo shinikizo hushuka kwanza chini ya kikomo. Mahitaji kama yalivyoingizwa tayari yakimwacha muunganiko chini ya kikomo, jibu huwekewa alama ya onyo. Kila muunganiko ukidumisha kikomo katika 20, jibu linasema hivyo. Simamisha humaliza utafutaji bila jibu. Shinikizo la chini kabisa linaloruhusiwa ni mpangilio uleule kama kisanduku cha Shinikizo la chini kabisa la mfumo linaloruhusiwa cha Mtiririko wa moto: uchambuzi.</p>';
 $ec_lang['lpn_guide_ds_scope_term']='Miunganiko, na hatua ya muda';
 $ec_lang['lpn_guide_ds_scope_def']='<p>Kwa Miunganiko iliyochaguliwa, miunganiko iliyochaguliwa kwenye ramani tu ndiyo hupimwa na kukaguliwa. Miunganiko mingine huachwa kama ilivyo, na ile inayoshuka chini ya kikomo huorodheshwa bila kupunguza jibu. Hatua ya muda iliyo kwenye skrini tu ndiyo hupimwa, na viwango na hali huchukuliwa kutoka kwake. Ili kujaribu kilele, hamisha saa hadi mahitaji ya kilele kabla ya kuendesha.</p>';
 $ec_lang['lpn_guide_ds_example_def']='<p>Fungua mfano wa Net1 na uchague Maji, Changanua, Upimaji wa mahitaji…. Katika hatua ya muda 0:00, bofya Tafuta ukiwa na kisanduku kama kilivyofunguka. Kila muunganiko hudumisha angalau 20 psi hadi kipimo cha mahitaji cha 5.76, ambapo shinikizo la chini kabisa ni 20.11 psi kwenye muunganiko N32. Kwa 5.77 ni 19.8 psi, na utafutaji ulichukua utatuzi 13. Ingiza 3 kwa Kipimo cha mahitaji na ubofye Endesha: Muunganiko N32 unashuka kutoka 111 psi, bila kupimwa, hadi 85.99 psi, na Kiungo L112 kinapanda kutoka 0.535 ft/sec hadi 3.13 ft/sec.</p>';
@@ -1141,8 +1141,8 @@ $ec_lang['lpn_guide_en_example_def']='<p>Fungua mfano wa Net1, ambao una muda wo
 $ec_lang['lpn_guide_ct_what_term']='Mchoro ni nini';
 $ec_lang['lpn_guide_ct_what_def']='<p>Chagua Maji, Grafu, Kontua. Safu huwasha mchoro katika senario iliyo wazi, kama kujaza laini na mistari yenye lebo, ikitumia shinikizo ikiwa vifundo bado havijapakwa rangi, na hufungua kisanduku. Mchoro husambaza rangi za vifundo kando ya mabomba na hadi kizidishi kilichowekwa cha urefu wa kati wa bomba kando yake, ukififia kwenye sehemu ya nje. Haupaki rangi kuvuka pampu, vali, au viungo vilivyofungwa. Mstari ulio chini ya kielelezo cha rangi unasema vifundo na mabomba mangapi mchoro unatumia, eneo la pembeni ya mabomba, na muda wa mistari. Vifundo vikiwa vichache mno, unasema hivyo.</p>';
 $ec_lang['lpn_guide_ct_box_term']='Kisanduku';
-$ec_lang['lpn_guide_ct_box_def']='<p>Onyesha kontua, ikiondolewa alama, huficha kujaza na mistari na kuhifadhi rangi za vifundo. Kisanduku pia kina Paka vifundo kwa na Mpango wa rangi, ambazo ni mipangilio miwili ileile kama katika Mipangilio, Taswira, Rangi za vifundo, Kujaza (Hakuna, Laini, au Bendi, ambayo hupaka kila daraja kwa rangi moja), Uwazi wa kujaza, Mistari ya kontua pamoja na Muda wake na Lebo, na Eneo la pembeni katika vizidishi vya urefu wa kati wa bomba. Katika mradi uliowekwa kwenye Dunia, kisanduku kinaweza pia kuchukua ardhi kati ya vifundo kutoka Mapbox DEM, baada ya mgeni kukubali kutuma namba za vigae za eneo la mtandao. Mipangilio hii huhifadhiwa pamoja na mradi na senario inaweza kuibadilisha. Mchoro hubadilisha tu onyesho, si mtandao.</p>';
-$ec_lang['lpn_guide_ct_example_def']='<p>Fungua mfano wa Net1 na uchague Maji, Grafu, Kontua. Vifundo vimepakwa rangi kwa shinikizo, na mstari ulio chini ya kielelezo cha rangi unasema vifundo 9, mabomba 11, eneo la pembeni la mara 2.5 ya urefu wa kati wa bomba kando yake, na mistari kila 5 psi. Pampu, Kiungo 9, si mojawapo ya mabomba 11. Onyesha kontua ikiwa imeondolewa alama, vifundo hubaki vimepakwa rangi kwa shinikizo.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>Onyesha mchoro, ikiondolewa alama, huficha kujaza na mistari na kuhifadhi rangi za vifundo. Kisanduku pia kina Paka vifundo kwa na Mpango wa rangi, ambazo ni mipangilio miwili ileile kama katika Mipangilio, Taswira, Rangi za vifundo, Kujaza (Hakuna, Laini, au Bendi, ambayo hupaka kila daraja kwa rangi moja thabiti), Uwazi wa kujaza, Mistari ya kontua pamoja na Muda na Lebo zake, na Eneo la pembeni (× urefu wa kati wa bomba). Katika mradi uliowekwa kwenye Dunia, kisanduku kinaweza pia kuchukua ardhi kati ya vifundo kutoka Mapbox DEM, baada ya mgeni kukubali kutuma namba za vigae za eneo la mtandao. Mipangilio hii huhifadhiwa pamoja na mradi na senario inaweza kuibadilisha. Mchoro hubadilisha onyesho tu, si mtandao.</p>';
+$ec_lang['lpn_guide_ct_example_def']='<p>Fungua mfano wa Net1 na uchague Maji, Grafu, Kontua. Mchoro wa kontua unaonyesha shinikizo, na mstari ulio chini ya kielelezo cha rangi unasema vifundo 9, mabomba 11, eneo la pembeni la mara 2.5 ya urefu wa kati wa bomba kando yake, na mistari kila psi 5. Pampu, Kiungo 9, si mojawapo ya mabomba 11. Vifundo hubaki na rangi zilizokuwa nazo kabla ya mchoro na baada ya Onyesha mchoro kuondolewa alama.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='Ripoti ina nini';
 $ec_lang['lpn_guide_rr_what_def']='<p>Chagua Maji, Ripoti, Uendeshaji. Ripoti ni maandishi ambayo injini ya EPANET iliandika kwa uigaji wa mwisho wa kipindi kirefu, katika kurasa. Huanza na bango na jina la mtandao, kisha huhesabu miunganiko, hifadhi za maji, matanki, mabomba, pampu, na vali, kisha hueleza chaguo za uchambuzi, kisha huorodhesha hali ya kihaidroliki ya uendeshaji pamoja na maonyo yake. Kitufe cha Nakili hunakili maandishi.</p>';
@@ -1150,7 +1150,7 @@ $ec_lang['lpn_guide_rr_example_def']='<p>Fungua mfano wa Net1, ambao tayari umek
 $ec_lang['lpn_guide_st_what_term']='Kinachoorodheshwa';
 $ec_lang['lpn_guide_st_what_def']='<p>Chagua Maji, Ripoti, Mabadiliko ya hali. Kila safu hutoa wakati wa badiliko na badiliko lenyewe: pampu, vali, au bomba sasa limefunguka au sasa limefungwa, au tanki sasa linajaa, linapungua, limejaa, au limekauka. Hatua ya muda ambayo haikukaribia suluhisho kikamilifu pia imeorodheshwa. Orodha iko kwa mpangilio wa wakati na ina mabadiliko tu, si kila hatua. Inasomwa kutoka uendeshaji huohuo wa kipindi kirefu kama kidirisha cha Majedwali na Taarifa kamili.</p>';
 $ec_lang['lpn_guide_st_example_def']='<p>Fungua mfano wa Net1 na uchague Maji, Ripoti, Mabadiliko ya hali. Tanki N2 sasa inajaa saa 1:00, inapungua saa 11:00, inajaa saa 16:00, na inapungua saa 22:00. Pampu L9 sasa imefungwa saa 10:00, sasa imefunguka saa 15:00, na sasa imefungwa saa 21:00.</p>';
-$ec_lang['lpn_guide_fr_what_def']='<p>Chagua Maji, Ripoti, Kamili. Jedwali lina safu moja kwa kila kifundo na kiungo katika kila hatua ya muda ya kuripoti, katika vipimo vya kidirisha cha Majedwali. Safu wima zake ni Aina, Kitambulisho, Mahitaji, Kimo, Shinikizo, Mkusanyiko wa klorini, Mtiririko, Kasi, Upotevu wa kimo, Kimo cha pampu, na Hali, na seli huachwa tupu pale kipengele kisipokuwa na kiasi hicho. Orodha ya Hatua ya muda huchagua hatua inayoonyeshwa, na Pakua CSV na Chapisha ripoti hubeba kila hatua. Bila uigaji wa kipindi kirefu, jedwali huonyesha suluhisho la sasa kwa wakati mmoja.</p>';
+$ec_lang['lpn_guide_fr_what_def']='<p>Chagua Maji, Ripoti, Kamili. Jedwali lina safu moja kwa kila kifundo na kiungo katika kila hatua ya muda ya kuripoti, katika vipimo vya kidirisha cha Majedwali. Safu wima zake ni Aina, Kitambulisho, Mahitaji, Kimo, Shinikizo, Mkusanyiko wa klorini, Mtiririko, Kasi, Upotevu wa kimo, Kimo cha pampu, na Hali, na seli huachwa tupu pale kipengele kisipokuwa na kiasi hicho. Orodha ya Hatua ya muda huchagua hatua inayoonyeshwa, na Pakua CSV, Nakili HTML, na Chapisha ripoti hubeba kila hatua. Bila uigaji wa kipindi kirefu, jedwali huonyesha suluhisho la sasa kwa wakati mmoja.</p>';
 $ec_lang['lpn_guide_fr_example_def']='<p>Fungua mfano wa Net1 na uchague Maji, Ripoti, Kamili. Vipengele 24 vimeorodheshwa katika hatua 25 za kuripoti, 0:00 hadi 24:00, ambazo ni safu 600. Saa 0:00, Muunganiko 11 una mahitaji ya 150 gpm, kimo cha 985.23 ft H2O, na shinikizo la 119.26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='Ripoti inalinganisha nini';
@@ -1239,23 +1239,23 @@ $ec_lang['lpn_map_unmeasurable']='Ukurasa huu haukuweza kubaini ukubwa wa eneo l
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 pamoja na vidhibiti vinavyotegemea kanuni';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1, senario na vidhibiti, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Mfano wa kubuni wa EPANET wenye klorini, hifadhi 1 ya maji na tanki 1.';
-$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 pamoja na vidhibiti vinavyotegemea kanuni, L/s (SI)';
-$ec_lang['lpn_ex_net1_si_desc']='Lita kwa sekunde, pamoja na mita na milimita. Mfano wa kubuni wa EPANET uliobadilishwa kutoka galoni kwa dakika, futi, na inchi, wenye klorini, hifadhi 1 ya maji, tanki 1, pampu 1, na vidhibiti viwili vinavyotegemea kanuni.';
+$ec_lang['lpn_ex_net1_desc']='Senario nne chini ya Msingi, siku ya wastani: Siku ya juu (kizidishi cha mahitaji 1.5) na Saa ya kilele (2.25), kila moja ikiwa na mtoto wa mpasuko wa bomba kuu. Mfano wa kubuni wa EPANET wenye klorini, hifadhi 1 ya maji, tanki 1, pampu 1, na vidhibiti viwili vinavyotegemea kanuni. Galoni kwa dakika, kwa futi na inchi.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1, senario na vidhibiti, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Senario nne chini ya Msingi, siku ya wastani: Siku ya juu (kizidishi cha mahitaji 1.5) na Saa ya kilele (2.25), kila moja ikiwa na mtoto wa mpasuko wa bomba kuu. Mfano wa kubuni wa EPANET wenye klorini, hifadhi 1 ya maji, tanki 1, pampu 1, na vidhibiti viwili vinavyotegemea kanuni. Lita kwa sekunde, kwa mita na milimita.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Lita kwa sekunde, kwa mita na milimita. Mfano wa EPANET huko Branford, Connecticut, uliobadilishwa kutoka galoni kwa dakika, futi, na inchi: miunganiko 35 na tanki 1, bila hifadhi ya maji, bila pampu, na bila vali, takriban kilomita 2 kwa kilomita 4. Floridi, dutu isiyotenda kikemikali, huingia kwenye chanzo kimoja.';
+$ec_lang['lpn_ex_net2_si_desc']='Mfano wa EPANET huko Branford, Connecticut, uliobadilishwa kutoka galoni kwa dakika, futi, na inchi: miunganiko 35 na tanki 1, bila hifadhi ya maji, bila pampu, na bila vali, takriban kilomita 2 kwa kilomita 4. Floridi, dutu isiyotenda kikemikali, huingia kwenye chanzo kimoja. Lita kwa sekunde, kwa mita na milimita.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Galoni kwa dakika, kwa futi na inchi. Mfano wa EPANET huko Branford, Connecticut: miunganiko 35 na tanki 1, bila hifadhi ya maji, bila pampu, na bila vali, takriban maili 1 kwa maili 2. Floridi, dutu isiyotenda kikemikali, huingia kwenye chanzo kimoja.';
+$ec_lang['lpn_ex_net2_desc']='Mfano wa EPANET huko Branford, Connecticut: miunganiko 35 na tanki 1, bila hifadhi ya maji, bila pampu, na bila vali, takriban maili 1 kwa maili 2. Floridi, dutu isiyotenda kikemikali, huingia kwenye chanzo kimoja. Galoni kwa dakika, kwa futi na inchi.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Lita kwa sekunde, kwa mita na milimita. Mfano wa EPANET huko Novato, California, uliobadilishwa kutoka galoni kwa dakika, futi, na inchi, ukiwa na ramani ya dunia nyuma yake: miunganiko 92, matanki 3, na hifadhi 2 za maji, bila vali, takriban kilomita 8 kwa kila upande. Uigaji wa kipindi kirefu cha muda wa saa 24, wenye ufuatiliaji wa chanzo kutoka Ziwa.';
+$ec_lang['lpn_ex_net3_si_desc']='Mfano wa EPANET huko Novato, California, uliobadilishwa kutoka galoni kwa dakika, futi, na inchi, ukiwa na ramani ya dunia nyuma yake: miunganiko 92, matanki 3, na hifadhi 2 za maji, bila vali, takriban kilomita 8 kwa kila upande. Uigaji wa kipindi kirefu wa saa 24, wenye ufuatiliaji wa chanzo kutoka Ziwa. Lita kwa sekunde, kwa mita na milimita.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Galoni kwa dakika, kwa futi na inchi. Mfano wa EPANET huko Novato, California, ukiwa na ramani ya dunia nyuma yake: miunganiko 92, matanki 3, na hifadhi 2 za maji, bila vali, takriban maili 5 kwa kila upande. Uigaji wa kipindi kirefu cha muda wa saa 24, wenye ufuatiliaji wa chanzo kutoka Ziwa.';
+$ec_lang['lpn_ex_net3_desc']='Mfano wa EPANET huko Novato, California, ukiwa na ramani ya dunia nyuma yake: miunganiko 92, matanki 3, na hifadhi 2 za maji, bila vali, takriban maili 5 kwa kila upande. Uigaji wa kipindi kirefu wa saa 24, wenye ufuatiliaji wa chanzo kutoka Ziwa. Galoni kwa dakika, kwa futi na inchi.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Galoni kwa dakika, kwa futi na inchi. Prescott Valley, Arizona: miunganiko 17, hifadhi 1 ya maji, na pampu 1. Eneo la kibiashara lililotatuliwa kwa mtiririko wa kuzimia moto juu ya mahitaji ya juu ya siku, kwa wakati mmoja, likichorwa juu ya ramani ya eneo.';
+$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley, Arizona: miunganiko 17, hifadhi 1 ya maji, na pampu 1. Eneo la kibiashara lililotatuliwa kwa mtiririko wa moto juu ya mahitaji ya siku ya juu, kwa wakati mmoja, likichorwa juu ya ramani ya eneo. Galoni kwa dakika, kwa futi na inchi.';
 $ec_lang['lpn_tool_undo']='Tengua';
 $ec_lang['lpn_confirm_example']='Hii inaongeza mfano kwenye mtandao ulio nao tayari. Endelea?';
 $ec_lang['lpn_field_diameter']='Kipenyo';
@@ -1456,7 +1456,7 @@ $ec_lang['lpn_georef_step1']='Hatua 1 ya 2 — haraka';
 $ec_lang['lpn_georef_step2']='Hatua 2 ya 2 — sahihi';
 $ec_lang['lpn_georef_step1_hint']='Mradi unabaki bila kusogea kwenye skrini. Sogeza na kuza ramani iliyo chini yake hadi ramani ionyeshe takriban mahali sahihi kwa kipimo kinachokaribia sahihi, kisha bonyeza kitufe cha Weka mchoro hapa.';
 $ec_lang['lpn_georef_detach']='Ichukue tena';
-$ec_lang['lpn_georef_size_prompt']='Eneo hili lina upana kiasi gani, kutoka ncha moja ya mradi hadi nyingine?';
+$ec_lang['lpn_georef_size_prompt']='Upana wa mradi kutoka mashariki hadi magharibi, takriban?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -1529,7 +1529,7 @@ $ec_lang['lpn_georef_scale']='Umbali wa ardhini kwa kila kitengo cha mchoro';
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
 // already lat/lon" button -- typing 1 here reaches the same result the button used to, for a file
 // whose own numbers should be used unchanged.
-$ec_lang['lpn_georef_scale_tip']='Hukokotolewa kiotomatiki. Hariri ili kubadilisha. Andika 1 ili kutumia kuratibu za faili bila mabadiliko kama umbali wa ardhini, kwa mchoro kwa faili isiyo na mfumo wa kuratibu.';
+$ec_lang['lpn_georef_scale_tip']='Hukokotolewa kiotomatiki. Hariri ili kubadilisha. Andika 1 ili kutumia viwianishi vya faili bila mabadiliko kama umbali wa ardhini, kwa mfano kwa faili isiyo na mfumo wa kuratibu.';
 $ec_lang['lpn_georef_rotation']='Zungusha kinyume cha saa (nyuzi)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_georef_rotation_tip']='Mzunguko wa mchoro mzima kinyume cha saa, ili kuulinganisha na mfumo mpya wa kuratibu.';
@@ -1875,7 +1875,7 @@ $ec_lang['lpn_find_no_value']='Andika unachotafuta.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Muunganisho';
-$ec_lang['lpn_find_prop_demand_desc']='Maelezo ya kundi hili la mahitaji';
+$ec_lang['lpn_find_prop_demand_desc']='Maelezo ya kategoria ya mahitaji';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2061,7 +2061,7 @@ $ec_lang['lpn_freq_axis_percent']='Asilimia iliyo chini ya';
 $ec_lang['lpn_contour_menu']='Kontua';
 $ec_lang['lpn_contour_tip']='Onyesha mchoro wa kontua kwenye ramani: rangi za vifundo zinaenea kando ya mabomba na pembeni mwake, pamoja na mistari ya kontua yenye lebo. Hufungua kisanduku cha kuurekebisha au kuuzima.';
 $ec_lang['lpn_contour_plot']='Kontua: mchoro';
-$ec_lang['lpn_contour_show']='Onyesha kontua';
+$ec_lang['lpn_contour_show']='Onyesha mchoro';
 $ec_lang['lpn_contour_show_tip']='Ondoa alama ili kuficha rangi ya kujaza na mistari ya kontua; chagua ili kuzirejesha kama zilivyokuwa. Rangi za vifundo hubaki.';
 $ec_lang['lpn_contour_fill']='Kujaza';
 $ec_lang['lpn_contour_fill_tip']='Laini huchanganya rangi kutoka daraja moja hadi jingine. Bendi hupaka kila daraja la ufunguo wa rangi rangi moja tambarare.';
@@ -2070,7 +2070,7 @@ $ec_lang['lpn_contour_fill_bands']='Bendi';
 $ec_lang['lpn_contour_opacity']='Uwazi wa kujaza';
 $ec_lang['lpn_contour_lines']='Mistari ya kontua';
 $ec_lang['lpn_contour_interval']='Muda';
-$ec_lang['lpn_contour_buffer']='Eneo la pembeni';
+$ec_lang['lpn_contour_buffer']='Eneo la pembeni (× urefu wa kati wa bomba)';
 $ec_lang['lpn_contour_buffer_unit']='× urefu wa kati wa bomba';
 $ec_lang['lpn_contour_buffer_tip']='Umbali wa rangi kutoka kila bomba, kama kizidishi cha urefu wa kati wa mabomba. Rangi hufifia katika sehemu ya nje.';
 $ec_lang['lpn_contour_few']='Vifundo ni vichache mno kuchora kontua.';
@@ -2145,12 +2145,12 @@ $ec_lang['lpn_crs_view_tip']='Toa tu mifumo ya kuratibu inayofunika mahali ambap
 $ec_lang['lpn_crs_place']='Tafuta jina la mahali';
 $ec_lang['lpn_crs_place_tip']='Utafutaji hutumwa kwenye huduma ya majina ya mahali ya OpenStreetMap, na idhini huombwa mara ya kwanza. Mradi mpya wa kijiografia pia huanzia mahali palipopatikana hapa.';
 $ec_lang['lpn_crs_search']='Tafuta';
-$ec_lang['lpn_crs_name']='Chuja jina la mchoro';
+$ec_lang['lpn_crs_name']='Chuja jina la mfumo wa kuratibu';
 $ec_lang['lpn_crs_name_tip']='Maandishi yanayochuja orodha: ni mifumo ya kuratibu tu ambayo jina au msimbo wake wa EPSG una maandishi hayo ndiyo huonyeshwa.';
 $ec_lang['lpn_crs_list_tip']='Mifumo ya kuratibu inayopita vichujio vilivyo hapo juu. Chagua mmoja, kisha bonyeza Sawa.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Hakuna mahali palipotafutwa bado, hivyo orodha nzima inatolewa. Tafuta mahali hapo juu au kuza ramani ili kupunguza orodha.';
-$ec_lang['lpn_crs_count']='Michoro {n} kati ya {total} imeorodheshwa.';
+$ec_lang['lpn_crs_count']='Mifumo ya kuratibu {n} kati ya {total} imeorodheshwa.';
 // The same count when the list is filtered by the whole network's extent (File, Convert as, Tom
 // 2026-09-26: "should automatically filter EPSG CRSes for the displayed area or network extents"),
 // so the reader knows why the list is short. The Filter by map view box above still shows them all.
@@ -2222,9 +2222,9 @@ $ec_lang['lpn_dialog_ok']='Sawa';
 // fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
 // own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='Leta…';
-$ec_lang['lpn_file_import_inp']='Leta Faili la EPANET…';
+$ec_lang['lpn_file_import_inp']='Faili la EPANET…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.';
+$ec_lang['lpn_file_import_inp_tip']='Unda mradi mpya kutoka faili la EPANET, au, mradi ukiwa wazi, uusasishe kutoka faili hilo. Faili ni umbizo la kuhamisha la .inp (linalopendekezwa) au umbizo asilia la .net (njia ya mwisho). Ili kufungua pia modeli ya EPANET-MSX, chagua faili lake la .msx kwa wakati mmoja.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2235,8 +2235,8 @@ $ec_lang['lpn_file_export_item_geojson']='Faili la GeoJSON…';
 $ec_lang['lpn_file_export_item_ods']='Faili la ODS…';
 $ec_lang['lpn_file_export_item_xlsx']='Faili la XLSX…';
 $ec_lang['lpn_file_export_item_csv']='Faili la CSV…';
-$ec_lang['lpn_file_export_tables_tip']='Pakua majedwali kama kidirisha cha Majedwali kinavyoyaonyesha, katika kitabu kimoja cha kazi chenye karatasi kwa kila jedwali (na kwa kila senario unayochagua), pamoja na karatasi kwa kila maktaba ambayo vitambulisho vyake vinarejelea: miundo, mikondo, aina za bomba na viungio. Matokeo yanajumuishwa kwa senario iliyokokotolewa mara ya mwisho pekee.';
-$ec_lang['lpn_file_export_csv_tip']='Pakua jedwali kama kidirisha cha Majedwali kinavyolionyesha. Jedwali moja huja kama faili moja la CSV bila maktaba. Majedwali au senario kadhaa huja kama faili moja la zip la mafaili ya CSV, pamoja na faili kwa kila maktaba ambayo vitambulisho vyake vinarejelea. Matokeo yanajumuishwa kwa senario iliyokokotolewa mara ya mwisho pekee.';
+$ec_lang['lpn_file_export_tables_tip']='Pakua majedwali kama kidirisha cha Majedwali kinavyoyaonyesha, katika kitabu kimoja cha kazi chenye karatasi kwa kila jedwali (na kwa kila senario unayochagua), pamoja na karatasi kwa kila maktaba yenye vipengee: miundo, mikondo, aina za bomba, viungio, vidhibiti, na kanuni. Matokeo yanajumuishwa kwa senario iliyokokotolewa mara ya mwisho pekee.';
+$ec_lang['lpn_file_export_csv_tip']='Pakua jedwali kama kidirisha cha Majedwali kinavyolionyesha. Jedwali moja huja kama faili moja la CSV bila maktaba. Majedwali au senario kadhaa huja kama faili moja la zip la mafaili ya CSV, pamoja na faili kwa kila maktaba yenye vipengee. Matokeo yanajumuishwa kwa senario iliyokokotolewa mara ya mwisho pekee.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Pakua mtandao huu kama faili la EPANET .inp (ndani ya faili la zip pamoja na picha yake ikiwa ipo). Chochote ambacho muundo wa .inp hauwezi kubeba kinaorodheshwa baadaye.';
 $ec_lang['lpn_status_inp_exported']='{file} imehamishwa.';
@@ -2276,9 +2276,9 @@ $ec_lang['lpn_dxf_note_categories']='Miunganiko yenye kategoria zaidi ya moja za
 $ec_lang['lpn_file_export_geojson_tip']='Pakua mtandao huu kama faili la GeoJSON kwa QGIS, ArcGIS Pro, na programu nyingine za GIS. Miunganiko, matanki, na hifadhi za maji ni nukta, na mabomba, pampu, na vali ni mistari inayofuata kona zake. Nafasi ni latitudo na longitudo. Matokeo yanajumuishwa tu mtandao ukiwa umetatuliwa.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Nafasi ya kazi…';
-$ec_lang['lpn_file_export_workspace_tip']='Pakua faili dogo lenye mahali visanduku vyako vilipo, ukubwa wake, vipi viko wazi au vimeegeshwa, na ukubwa wa vidirisha na safu wima zako, pamoja na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako, mipangilio ya mradi na vidakuzi (lugha, idhini, vitengo) haviko ndani yake. Lipakie kwenye skrini au kivinjari kingine kwa Faili, Ingiza, Nafasi ya kazi.';
+$ec_lang['lpn_file_export_workspace_tip']='Pakua faili dogo lenye mpangilio wa ukurasa huu: mahali vidirisha, safu wima za jedwali na visanduku vilipo, ukubwa wake, na vipi viko wazi, vimewekwa kando au vimefichwa, pamoja na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako, mipangilio ya mradi na vidakuzi (lugha, idhini, vitengo) haviko ndani yake. Lipakie kwenye skrini au kivinjari kingine kwa Faili, Leta, Nafasi ya kazi.';
 $ec_lang['lpn_file_import_workspace']='Nafasi ya kazi…';
-$ec_lang['lpn_file_import_workspace_tip']='Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.';
+$ec_lang['lpn_file_import_workspace_tip']='Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: mpangilio wa vidirisha, safu wima za jedwali na visanduku, na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.';
 $ec_lang['lpn_workspace_exported']='Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.';
 $ec_lang['lpn_workspace_imported']='Nafasi ya kazi imetumika kutoka {file}. Mipangilio iliyotumika: {n}. Iliyorudishwa kwenye chaguo-msingi: {r}.';
 $ec_lang['lpn_workspace_ignored']='Maingizo yaliyopuuzwa kwa kuwa hayakutambuliwa: {u}.';
@@ -2309,7 +2309,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Lebo za maandishi zimewekwa jinsi EPANE
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='Mafaili ya EPANET hayana mfumo wa kuratibu, hivyo faili hili halitakuwa na marejeleo ya kijiografia mwanzoni. Kuliweka kwenye ramani ya dunia, tumia Ramani, Ramani ya dunia… Kubadilisha kuratibu zake, tumia Faili, Badilisha kama…';
 $ec_lang['lpn_inp_backdrop_attach']='Ambatisha {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='Ukurasa wa wavuti hauwezi kufungua picha kwa jina lake. Ichague kwenye kifaa chako nayo huwekwa mahali faili linaposema ni pake.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Ukurasa wa wavuti hauwezi kufungua faili linalohusiana kiotomatiki. Chagua faili la picha ya nyuma ili liwekwe kama ilivyobainishwa.';
 $ec_lang['lpn_inp_backdrop_attached']='Imeambatisha {file}, na kuiweka mahali faili linaposema ni pake.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Imeambatisha {picked}, na kuiweka mahali faili linaposema ni pake. Faili linataja {file}, ambalo ni jina tofauti.';
 $ec_lang['lpn_inp_report_lead']='Ukurasa huu hautumii kila kipengele cha EPANET, lakini hakuna data kwenye faili inayotupwa. Orodha iliyo hapa chini inaonyesha data iliyo kwenye faili ambayo imehifadhiwa lakini haitumiki, na mabadiliko yoyote yaliyofanywa wakati wa kuingiza:';
@@ -2599,7 +2599,7 @@ $ec_lang['lpn_notes_1_term']='Jinsi linavyotatuliwa';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='Kwa chaguo-msingi mtandao hutatuliwa na kitatuzi cha EPANET. Muda wote wa uendeshaji ukiwekwa, kila hatua ya muda ya kuripoti hukokotolewa kwa mfuatano: matanki hujaa na kupungua, mahitaji hufuata miundo yake, na upau wa zana huchezesha uendeshaji. Kukiwa na Tumia kitatuzi kilichojengwa ndani inapowezekana kimewekewa alama, suluhisho la wakati mmoja linaweza kutatuliwa na kitatuzi kilichojengwa ndani badala yake, lakini uigaji wa kipindi kirefu au mtandao wenye vali ya kuvunja shinikizo au vali ya matumizi ya jumla (PBV, GPV) hutatuliwa kila wakati na kitatuzi cha EPANET.';
+$ec_lang['lpn_notes_1_def']='Kwa chaguo-msingi mtandao hutatuliwa na kitatuzi cha EPANET. Muda wote wa uendeshaji ukiwekwa, kila hatua ya muda ya kuripoti hukokotolewa kwa mfuatano: matanki hujaa na kupungua, mahitaji hufuata miundo yake, na upau wa zana huchezesha uendeshaji. Kukiwa na Tumia kitatuzi kilichojengwa ndani inapowezekana kimewekewa alama, suluhisho la wakati mmoja linaweza kutatuliwa na kitatuzi kilichojengwa ndani badala yake, lakini uigaji wa kipindi kirefu hutatuliwa kila wakati na kitatuzi cha EPANET.';
 $ec_lang['lpn_notes_2_term']='Kisichofanya';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2611,7 +2611,7 @@ $ec_lang['lpn_notes_2_term']='Kisichofanya';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Msukumo wa ghafla na nyundo ya maji havijaigwa: matokeo yote ni ya mtiririko thabiti au unaobadilika polepole, si ya wimbi la shinikizo la muda mfupi linalosababishwa na kufunga vali haraka.';
+$ec_lang['lpn_notes_2_def']='Msukumo wa ghafla na nyundo ya maji havijaigwa: matokeo yote ni ya mtiririko thabiti au unaobadilika polepole, si ya wimbi la shinikizo la muda mfupi linalosababishwa na kufunga vali haraka. Umri wa maji, ufuatiliaji wa chanzo, kemikali moja inayoitikia, na ubora wa maji wa spishi nyingi kutoka faili ya EPANET-MSX iliyoambatishwa vimeigwa.';
 $ec_lang['lpn_notes_3_term']='Kuhifadhi miradi';
 $ec_lang['lpn_notes_3_def']='Kila mradi ni kichupo, na kila kichupo huhifadhiwa kwenye kivinjari hiki kazi inapoendelea. Kufuta data ya kivinjari huvifuta vyote, kwa hiyo kazi ina mahali pake kwenye faili: Faili, Hifadhi kama. Nyota kwenye kichupo humaanisha kina mabadiliko ambayo hayamo kwenye faili, na kufunga kichupo hicho huuliza kwanza. Hakuna kinachoandikwa kwenye faili isipokuwa Hifadhi au Hifadhi kama ichaguliwe. Katika baadhi ya vivinjari mradi huunganika na faili ulilohifadhiwa, na Faili, Hifadhi huandika kwenye faili hilo hilo tangu wakati huo; katika vingine muunganiko hauwezekani, kwa hiyo Hifadhi imezimwa na Hifadhi kama pekee inapatikana. Tovuti hii hufuatilia nani ana faili la mradi wazi, ili watu wawili wasiandikiane kazi. Kufungua faili ambalo mwenzako tayari analo wazi hutoa Uliza, Fungua la kusoma tu, na Vunja mfungo. Seva isipoweza kufikiwa, onyo linasema kwamba mtumiaji mwingine anaweza kuhariri faili hilo hilo wakati huohuo.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2623,7 +2623,7 @@ $ec_lang['lpn_notes_3_def']='Kila mradi ni kichupo, na kila kichupo huhifadhiwa 
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Mkondo wa pampu';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='Pampu hufuata H = H₀ − aQ^b, ambapo H ni kimo ambacho pampu inaongeza na Q ni mtiririko unaopita ndani yake. Nukta za mkondo huingizwa katika Maji, Maktaba, kama mkondo wa Kimo cha pampu, na pampu hutaja mkondo huo kwenye Sifa. Nukta tatu, kimo katika mtiririko sifuri, nukta ya kawaida ya kufanya kazi, na nukta ya mtiririko wa juu kabisa, hupatanisha H₀, a, na b moja kwa moja, na kufuata mkondo uliochapishwa kwa karibu zaidi. Nukta mbili hupatanisha parabola (b = 2) yenye kilele chake kwenye mtiririko sifuri. Nukta moja hutumia kanuni ya EPANET: kimo katika mtiririko sifuri ni mara 1.33334 ya kimo kilichoingizwa, na mtiririko wa juu kabisa ni mara 2 ya mtiririko ulioingizwa, jambo ambalo tena hutoa b = 2. Pampu isiyo na mkondo ulioandikwa haiongezi kimo chochote. Mkondo hautengwi pale kimo kinapofika sifuri, hivyo mtiririko mkubwa kuliko mkondo unavyoweza kutoa hutoa kimo hasi. Suluhisho ni pampu kubwa zaidi au mahitaji madogo zaidi, si upatanishaji tofauti wa mkondo. Mkondo unaweza kuwa na nukta zaidi ya tatu. Kitatuzi cha EPANET hupewa zote na hukadiria kati yake, huku mstari wa Mlingano na kitatuzi kilichojengwa ndani hutumia nukta ya chini kabisa, ya kati, na ya juu kabisa.';
+$ec_lang['lpn_notes_5_def']='Mkondo wa pampu huingizwa katika Maji, Maktaba, kama mkondo wa Kimo cha pampu, na pampu hutaja mkondo huo kwenye Sifa. Vitatuzi vyote viwili huusoma kama EPANET inavyousoma. Nukta moja hutumia kanuni ya EPANET: kimo katika mtiririko sifuri ni mara 1.33334 ya kimo kilichoingizwa, na mtiririko wa juu kabisa ni mara 2 ya mtiririko ulioingizwa. Mkondo wa nukta moja na mkondo wa nukta tatu zinazoanza kwenye mtiririko sifuri hupatanishwa kama H = H₀ − aQ^b, ambapo H ni kimo ambacho pampu inaongeza na Q ni mtiririko unaopita ndani yake, na mstari wa Mlingano huonyesha upatanisho. Mkondo mwingine wowote (nukta mbili, nukta tatu ambazo hazianzi kwenye mtiririko sifuri, au nukta nne au zaidi) hutumika kama mistari iliyonyooka kati ya nukta zake, na mistari ya kwanza na ya mwisho hurefushwa zaidi ya ncha za mkondo. Pampu isiyo na mkondo ulioandikwa haiongezi kimo chochote. Mkondo hautengwi pale kimo kinapofika sifuri, hivyo mtiririko mkubwa kuliko mkondo unavyoweza kutoa hutoa kimo hasi. Suluhisho ni pampu kubwa zaidi au mahitaji madogo zaidi, si mkondo tofauti.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2677,10 +2677,10 @@ $ec_lang['lpn_omitted_note']='Viliachwa nje ya uendeshaji huu kwa sababu hakuna 
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Inapakua kitatuzi cha EPANET. Kinapakuliwa mara moja kisha kuhifadhiwa kwenye kifaa hiki, hivyo kinafanya kazi bila mtandao baadaye.';
 $ec_lang['lpn_engine_ready']='Kitatuzi cha EPANET sasa kimehifadhiwa kwenye kifaa hiki na kinafanya kazi bila mtandao.';
-$ec_lang['lpn_engine_unavailable']='Kitatuzi cha EPANET, kinachohitajika kutatua vali za kuvunja shinikizo na vali za matumizi ya jumla (PBV, GPV), hakikuweza kupakuliwa. Baada ya muunganisho mmoja wa intaneti, kitatuzi huhifadhiwa kwenye kifaa hiki.';
+$ec_lang['lpn_engine_unavailable']='Kitatuzi cha EPANET, kinachohitajika kutatua mtandao huu, hakikuweza kupakuliwa. Baada ya muunganisho mmoja wa intaneti, kitatuzi huhifadhiwa kwenye kifaa hiki.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Vali za kuvunja shinikizo na vali za matumizi ya jumla (PBV, GPV) haziwezi kutatuliwa bila kitatuzi cha EPANET. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='Mtandao huu hauwezi kutatuliwa bila kitatuzi cha EPANET. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Inapakia kitatuzi cha EPANET wakati unajenga. Matokeo yatapatikana kitatuzi kikisha kupakiwa kikamilifu.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2942,7 +2942,7 @@ $ec_lang['lpn_field_text_size']='Kizidishi cha ukubwa';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='Onyesha katika kukuza yoyote';
-$ec_lang['lpn_field_text_all_zoom_tip']='Weka maandishi haya kwenye mchoro bila kujali umepunguza kukuza kiasi gani. Ondoa alama ili kuyaficha pamoja na lebo nyingine mara mwonekano unapokuwa mpana kuliko kizingiti cha lebo kilichowekwa chini ya Ramani na ukurasa.';
+$ec_lang['lpn_field_text_all_zoom_tip']='Weka maandishi haya kwenye mchoro bila kujali umepunguza kukuza kiasi gani. Ondoa alama ili kuyaficha pamoja na lebo nyingine mara mwonekano unapokuwa mpana kuliko kizingiti cha lebo kilichowekwa chini ya Ramani.';
 $ec_lang['lpn_tool_labels']='Lebo';
 $ec_lang['lpn_labels_heading_node']='Lebo za vifundo';
 $ec_lang['lpn_labels_heading_link']='Lebo za viungo';
@@ -2961,7 +2961,7 @@ $ec_lang['lpn_labels_separator_tip']='Maandishi kati ya sifa moja na nyingine kw
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
 // crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Kipaumbele';
+$ec_lang['lpn_labels_priority']='Mpangilio wa kuacha lebo';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
@@ -3126,9 +3126,9 @@ $ec_lang['lpn_settings_hover_card_tip']='Weka kielekezi juu ya kifundo, kiungo a
 $ec_lang['lpn_settings_override_marks']='Onyesha alama za thamani maalum kwenye ramani';
 $ec_lang['lpn_settings_override_marks_tip']='Onyesha pete ya kaharabu kwenye kipengele chenye thamani maalum katika senario iliyo wazi, na pete ya mstari wa kijivu uliokatika kwenye kipengele kinachorithi thamani maalum. Kidirisha cha Majedwali huashiria thamani maalum kwa vyovyote. Ramani, Ramani safi huficha pete wakati imewekewa alama. Huu ni mpangilio wa kivinjari hiki, si wa mradi.';
 $ec_lang['lpn_clean_map']='Ramani safi';
-$ec_lang['lpn_clean_map_tip']='Imewekewa alama: vitufe vya kukuza, kitufe cha ramani ya barabara na satelaiti, kitufe cha Ujumbe na taarifa, msaada wa uteuzi, kitufe cha maoni, na pete za thamani maalum vimefichwa. Imeondolewa alama: vinaonyeshwa. Hitilafu bado zinaonyeshwa kwenye ramani, na kila taarifa bado huhifadhiwa kwenye Ujumbe. Huu ni mpangilio wa kivinjari hiki, si wa mradi.';
+$ec_lang['lpn_clean_map_tip']='Imewekewa alama: vitufe vya kukuza, kitufe cha ramani ya barabara na satelaiti, mstari wa Hali, ujumbe na kitufe cha Ujumbe, kitufe cha maoni, na pete za thamani maalum vimefichwa. Imeondolewa alama: vinaonyeshwa. Ujumbe unaosema uendeshaji haukutoa jibu pekee ndio hubaki kwenye ramani. Ujumbe uliofichwa bado huhifadhiwa, na Ujumbe huuonyesha tena hii ikiondolewa alama. Huu ni mpangilio wa kivinjari hiki, si wa mradi.';
 $ec_lang['lpn_settings_theme']='Mandhari';
-$ec_lang['lpn_settings_theme_tip']='Chagua rangi nyepesi au nyeusi kwa ukurasa. Mfumo hufuata mpangilio wa kifaa chako. Mchoro wa ramani unaonekana sawa katika kila mandhari. Huu ni mpangilio wa kivinjari hiki, si wa mradi.';
+$ec_lang['lpn_settings_theme_tip']='Chagua mwonekano wa ukurasa: rangi zake na, katika baadhi ya mandhari, maumbo na herufi zake. Kila kadi huonyesha mandhari kwenye ukurasa huu kabla ya kuchaguliwa. Mfumo hufuata mpangilio wa kifaa. Kwenye skrini ramani hufuata mandhari pia; kurasa zilizochapishwa, picha za skrini na faili zilizohamishwa huchorwa kila wakati katika Nyepesi. Huu ni mpangilio wa kivinjari hiki, si wa mradi.';
 $ec_lang['lpn_theme_system']='Mfumo';
 $ec_lang['lpn_theme_light']='Nyepesi';
 $ec_lang['lpn_theme_dark']='Nyeusi';
@@ -3276,14 +3276,14 @@ $ec_lang['lpn_scenario_only_deleted']='{id} kimefutwa. Kilikuwa sehemu ya {scena
 $ec_lang['lpn_scenario_delete_blocked']='{id} hakijafutwa, kwa sababu kiungo {link} kinaishia kwake, na kiungo hicho pia kipo nje ya {scenario}. Ili kufuta vyote viwili, vifute kwenye senario ya {base}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Hali ya msingi';
-$ec_lang['lpn_scenario_basic_tip']='Imewekewa alama: mbadala zimefichwa na ni za kiotomatiki, kila senario huonyesha thamani zake maalum kama zake yenyewe, na senario zote mpya ni watoto wa senario ya Msingi; kisanduku cha Senario: msimamizi na jedwali la Senario hazionyeshwi. Imeondolewa alama: kisanduku cha Senario: msimamizi na jedwali la Senario huonyeshwa, na mbadala zinaweza kushirikiwa kati ya senario. Msimamizi wa senario umezimwa wakati Hali ya msingi imewashwa. Hali ya msingi imezimwa wakati mradi una uhusiano wa senario na mbadala ambao Hali ya msingi haiwezi kuuonyesha.';
+$ec_lang['lpn_scenario_basic_tip']='Imewekewa alama: mbadala zimefichwa na ni za kiotomatiki, kila senario huonyesha thamani zake maalum kama zake yenyewe, na senario zote mpya ni watoto wa senario ya Msingi; Senario: msimamizi huonyesha orodha ya senario, na jedwali la Senario halionyeshwi. Imeondolewa alama: Senario: msimamizi huonyesha mti wake na jedwali la Senario huonyeshwa, na mbadala zinaweza kushirikiwa kati ya senario. Hali ya msingi imezimwa wakati mradi una uhusiano wa senario na mbadala ambao Hali ya msingi haiwezi kuuonyesha.';
 $ec_lang['lpn_scenario_basic_misfit']='Mradi huu una uhusiano wa senario na mbadala usiolingana na Hali ya msingi ya Senario, kwa hiyo Hali ya msingi imezimwa.';
 $ec_lang['lpn_scenario_basic_misfit_base']='Senario ya Msingi inatumia mbadala mwingine usio Msingi.';
 $ec_lang['lpn_scenario_copy']='Nakili senario';
 $ec_lang['lpn_scenario_copy_tip']='Hunakili senario iliyo wazi na thamani zake maalum, na kufungua nakala.';
 $ec_lang['lpn_scenario_copy_off']='Nakili senario hufanya kazi katika Hali ya msingi. Hali ya msingi ikizimwa, ongeza senario na uchague mbadala zake katika jedwali la Senario.';
 $ec_lang['lpn_sm_title']='Senario: msimamizi';
-$ec_lang['lpn_sm_menu']='Msimamizi wa senario…';
+$ec_lang['lpn_sm_menu']='Senario: msimamizi…';
 $ec_lang['lpn_pane_tab_scenarios']='Senario';
 $ec_lang['lpn_sm_col_parent']='Mzazi';
 $ec_lang['lpn_sm_add_child']='Ongeza mtoto';
@@ -3331,7 +3331,7 @@ $ec_lang['lpn_ovl_col_inherited']='Thamani iliyorithiwa';
 $ec_lang['lpn_ovl_col_inherited_tip']='Thamani ambayo senario hii inasoma bila thamani maalum: thamani ya mzazi wa mbadala, au thamani ya Msingi.';
 $ec_lang['lpn_ovl_same']='(sawa)';
 $ec_lang['lpn_ovl_same_tip']='Sawa na thamani iliyorithiwa. Bado ni thamani maalum, na inahesabiwa.';
-$ec_lang['lpn_sm_help']='Jinsi senario na mbadala zinavyofanya kazi:\n\nKatika Hali ya msingi, mbadala zimefichwa na ni za kiotomatiki, na senario zote mpya ni watoto wa senario ya Msingi.\n\nHali ya msingi ikizimwa, mti tata wa urithi unapatikana, na mbadala zinaweza kushirikiwa kati ya senario. Lakini tabia ya chaguo-msingi ya uhariri wakati uhusiano mpya wa mbadala unahitajika (bila usimamizi wa makusudi wa mtumiaji) ni kuunda mbadala unaoitwa kama senario ya sasa, jambo linalompa kila senario seti yake ya kipekee ya mbadala.\n\nSifa na mipangilio ni za kategoria za mbadala zinazoonekana kama safu wima za jedwali la senario na mbadala na kama chaguo za usimamizi katika Senario: msimamizi.\n\nThamani maalum huundwa katika senario, lakini kwa kweli ni za mbadala husika unaohusishwa na senario; kwa hiyo senario ni kama dirisha la mbadala wake. Uhusiano wa mbadala na senario husimamiwa kwenye kidirisha cha kulia cha Senario: msimamizi au kwenye jedwali la Senario kwenye kidirisha cha chini. Kuunda senario mpya hakuundi mbadala wowote; senario mpya hutumia mbadala wa mzazi wake hadi thamani maalum zinazohitaji mbadala mpya ziundwe. Thamani maalum zinapoundwa katika senario, huhifadhiwa katika mbadala wake husika kwa senario hiyo; senario isipokuwa na mbadala huo, mbadala mpya huundwa kwa kutumia jina la senario.\n\nMfano: Unaunda senario ya "Mchoro: Vitambulisho vya vifundo na viungo" na kuhariri Maandishi yaseme "Vitambulisho vya Vifundo na Viungo." Unapounda senario, hakuna mbadala unaoundwa. Lakini wakati unapohifadhi Maandishi, mbadala wa Maandishi unaoitwa "Mchoro: Vitambulisho vya vifundo na viungo" huundwa pamoja na thamani maalum ya thamani ya Maandishi. Katika Hali ya msingi, unaona hili kama thamani maalum katika senario yenyewe tu.\n\nNakili sifa hunakili thamani maalum tu. Katika senario yoyote isiyo Msingi, hunakili tu thamani maalum ambazo kipengele kina katika senario hiyo.\n\nJinsi ya kusimamia senario:\n\n- Chagua Senario au kategoria ya mbadala kwenye orodha iliyo juu ili kuonyesha mti wake.\n\n- Unda mtoto wa kipengee kilichochaguliwa kwa Ongeza mtoto. Ongeza msingi huongeza Msingi mwingine, unaoanza kama nakala ya Msingi ulivyo sasa; uhariri wa baadaye wa Msingi haubadilishi. Mtoto mpya hupewa jina la mzazi wake; andika jina ili kuubadilisha jina. Nakili hunakili mbadala uliochaguliwa. Unganisha juu huhamisha thamani maalum za mbadala uliochaguliwa kwenye mbadala ulio juu yake, unaochaguliwa kwa jina, na mbadala uliochaguliwa kisha huzirithi; kwanza hutaja thamani yoyote ambayo mbadala unaoruka pia huibadilisha, ambayo haibadilishwi. Ili kunakili senario, tumia Nakili senario kwenye menyu ya Senario, katika Hali ya msingi; hunakili thamani maalum za senario, pamoja na mbadala unaozishikilia. Ongeza msingi na Nakili senario kila moja huunda mbadala: Ongeza msingi huunda mbadala wa Msingi kwa Msingi mpya katika kila kategoria yenye thamani, na Nakili senario huunda mbadala mpya, unaoitwa kama nakala, kwa kila mbadala unaoshikilia thamani maalum za senario.\n\n- Buruta kipengee juu ya kingine ili kukifanya mtoto wa kipengee hicho. Senario iliyohamishiwa kwa mzazi mpya hurithi kutoka kwake kila kitu ambacho haijakibadilisha; kile ilichobadilisha hakibadiliki. Buruta kipengee kati ya vipengee viwili ili kuvipanga upya.\n\n- Bofya kipengee ili kukichagua. Bonyeza F2 au chagua Badilisha jina ili kubadilisha jina la kipengee kilichochaguliwa. Kubadilisha jina la senario huuliza kama kubadilisha jina la mbadala wanaobeba jina lake; katika Hali ya msingi hubadilishwa jina pamoja nayo, bila kuuliza. Bofya mara mbili senario au bonyeza Enter ili kuifanya ya sasa. Bofya mshale kando ya kipengee au bonyeza Kushoto au Kulia ili kukikunja au kukipanua. Bofya kulia kipengee kwa amri zilezile kama vitufe.\n\n- Bonyeza Delete au bofya kitufe cha kutoa ili kufuta kipengee kilichochaguliwa. Kipengee kinachotumika hakifutwi, na ujumbe hutaja kinachokitumia. Kufuta senario Hali ya msingi ikiwa imezimwa huhifadhi mbadala inazotumia. Kufuta senario Hali ya msingi ikiwa imewashwa pia hufuta kila mbadala wake ambao senario nyingine hazitumii.\n\n- Ili kufanya senario itumie mbadala mwingine, ikiwemo Msingi, uchague kwenye safu ya senario hiyo kwenye kidirisha cha kulia cha Senario: msimamizi au jedwali la Senario. Thamani maalum iliyofanywa katika mbadala unaoshirikiwa hubadilisha kila senario inayoutumia.';
+$ec_lang['lpn_sm_help']='Jinsi senario na mbadala zinavyofanya kazi:\n\nKatika Hali ya msingi, mbadala zimefichwa na ni za kiotomatiki, na senario zote mpya ni watoto wa senario ya Msingi.\n\nHali ya msingi ikizimwa, mti tata wa urithi unapatikana, na mbadala zinaweza kushirikiwa kati ya senario. Lakini tabia ya chaguo-msingi ya uhariri wakati uhusiano mpya wa mbadala unahitajika (bila usimamizi wa makusudi wa mtumiaji) ni kuunda mbadala unaoitwa kama senario ya sasa, jambo linalompa kila senario seti yake ya kipekee ya mbadala.\n\nSifa na mipangilio ni za kategoria za mbadala zinazoonekana kama safu wima za jedwali la senario na mbadala na kama chaguo za usimamizi katika Senario: msimamizi.\n\nThamani maalum huundwa katika senario, lakini kwa kweli ni za mbadala husika unaohusishwa na senario; kwa hiyo senario ni kama dirisha la mbadala wake. Uhusiano wa mbadala na senario husimamiwa kwenye kidirisha cha pili cha Senario: msimamizi au kwenye jedwali la Senario kwenye kidirisha cha chini. Kuunda senario mpya hakuundi mbadala wowote; senario mpya hutumia mbadala wa mzazi wake hadi thamani maalum zinazohitaji mbadala mpya ziundwe. Thamani maalum zinapoundwa katika senario, huhifadhiwa katika mbadala wake husika kwa senario hiyo; senario isipokuwa na mbadala huo, mbadala mpya huundwa kwa kutumia jina la senario.\n\nMfano: Unaunda senario ya "Mchoro: Vitambulisho vya vifundo na viungo" na kuhariri Maandishi yaseme "Vitambulisho vya Vifundo na Viungo." Unapounda senario, hakuna mbadala unaoundwa. Lakini wakati unapohifadhi Maandishi, mbadala wa Maandishi unaoitwa "Mchoro: Vitambulisho vya vifundo na viungo" huundwa pamoja na thamani maalum ya thamani ya Maandishi. Katika Hali ya msingi, unaona hili kama thamani maalum katika senario yenyewe tu.\n\nNakili sifa hunakili thamani maalum tu. Katika senario yoyote isiyo Msingi, hunakili tu thamani maalum ambazo kipengele kina katika senario hiyo.\n\nJinsi ya kusimamia senario:\n\n- Chagua Senario au kategoria ya mbadala kwenye orodha iliyo juu ili kuonyesha mti wake.\n\n- Unda mtoto wa kipengee kilichochaguliwa kwa Ongeza mtoto. Ongeza msingi huongeza Msingi mwingine, unaoanza kama nakala ya Msingi ulivyo sasa; uhariri wa baadaye wa Msingi haubadilishi. Mtoto mpya hupewa jina la mzazi wake; andika jina ili kuubadilisha jina. Nakili hunakili mbadala uliochaguliwa. Unganisha juu huhamisha thamani maalum za mbadala uliochaguliwa kwenye mbadala ulio juu yake, unaochaguliwa kwa jina, na mbadala uliochaguliwa kisha huzirithi; kwanza hutaja thamani yoyote ambayo mbadala unaoruka pia huibadilisha, ambayo haibadilishwi. Ili kunakili senario, tumia Nakili senario kwenye menyu ya Senario, katika Hali ya msingi; hunakili thamani maalum za senario, pamoja na mbadala unaozishikilia. Ongeza msingi na Nakili senario kila moja huunda mbadala: Ongeza msingi huunda mbadala wa Msingi kwa Msingi mpya katika kila kategoria yenye thamani, na Nakili senario huunda mbadala mpya, unaoitwa kama nakala, kwa kila mbadala unaoshikilia thamani maalum za senario.\n\n- Buruta kipengee juu ya kingine ili kukifanya mtoto wa kipengee hicho. Senario iliyohamishiwa kwa mzazi mpya hurithi kutoka kwake kila kitu ambacho haijakibadilisha; kile ilichobadilisha hakibadiliki. Buruta kipengee kati ya vipengee viwili ili kuvipanga upya.\n\n- Bofya kipengee ili kukichagua. Bonyeza F2 au chagua Badilisha jina ili kubadilisha jina la kipengee kilichochaguliwa. Kubadilisha jina la senario huuliza kama kubadilisha jina la mbadala wanaobeba jina lake; katika Hali ya msingi hubadilishwa jina pamoja nayo, bila kuuliza. Bofya mara mbili senario au bonyeza Enter ili kuifanya ya sasa. Bofya mshale kando ya kipengee au bonyeza Kushoto au Kulia ili kukikunja au kukipanua. Bofya kulia kipengee kwa amri zilezile kama vitufe.\n\n- Bonyeza Delete au bofya kitufe cha kutoa ili kufuta kipengee kilichochaguliwa. Kipengee kinachotumika hakifutwi, na ujumbe hutaja kinachokitumia. Kufuta senario Hali ya msingi ikiwa imezimwa huhifadhi mbadala inazotumia. Kufuta senario Hali ya msingi ikiwa imewashwa pia hufuta kila mbadala wake ambao senario nyingine hazitumii.\n\n- Ili kufanya senario itumie mbadala mwingine, ikiwemo Msingi, uchague kwenye safu ya senario hiyo kwenye kidirisha cha pili cha Senario: msimamizi au jedwali la Senario. Thamani maalum iliyofanywa katika mbadala unaoshirikiwa hubadilisha kila senario inayoutumia.';
 $ec_lang['lpn_sm_delete_alt_ask']='Kufuta mbadala {name}?';
 $ec_lang['lpn_sm_in_use']='{item}\nhaiwezi kufutwa wakati inatumiwa na\n{list}';
 $ec_lang['lpn_sm_alt_delete_has_children']='Mbadala {name} hauwezi kufutwa kwa sababu una watoto: {list}. Wafute kwanza, au uwahamishie kwa mzazi mwingine.';
@@ -3464,7 +3464,7 @@ $ec_lang['lpn_elev_dem_none']='DEM haina mwinuko kwa kifundo hiki.';
 $ec_lang['lpn_elev_dem_said']='Mwinuko wa DEM wa Mapbox: {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Chanzo cha mwinuko';
 $ec_lang['lpn_settings_elev_source_tip']='Usahihi wa DEM ya Mapbox mwaka 2026, wa mlalo kisha wima: 1–10 m na chini ya 1 m Marekani, 2–10 m na 1–3 m Ulaya na Japani, 30 m na 10–16 m duniani kote, na 90 m na zaidi ya 16 m kwenye ncha za dunia.';
-$ec_lang['lpn_settings_elev_source_typed']='Hapo juu';
+$ec_lang['lpn_settings_elev_source_typed']='Thamani iliyoandikwa';
 $ec_lang['lpn_settings_elev_source_dem']='DEM ya Mapbox';
 $ec_lang['lpn_settings_accuracy']='Usahihi';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -3533,7 +3533,7 @@ $ec_lang['lpn_settings_engine_native']='Tumia kitatuzi kilichojengwa ndani inapo
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Washa hii ili kutumia kitatuzi kilichojengwa ndani inapowezekana. Vinginevyo, kitatuzi cha EPANET cha EPA ya Marekani hutumika kila wakati. Kitatuzi kilichojengwa ndani hakitumiki kwa uigaji wa kipindi kirefu wala kwa vali za kuvunja shinikizo na vali za matumizi ya jumla (PBV, GPV). Mara ya kwanza kitatuzi cha EPANET kinapotumika, takriban KB 650 hupakuliwa kisha kuhifadhiwa kwenye kifaa hiki. Pale bomba lina upotevu mdogo (wa ndani), vitatuzi viwili hutofautiana kwenye tarakimu za mwisho: EPANET hutumia thamani iliyokadiriwa ya mvuto wa dunia, kwa hiyo upotevu wake mdogo ni chini kidogo sana kuliko fomu kamili.';
+$ec_lang['lpn_settings_engine_native_tip']='Washa hii ili kutumia kitatuzi kilichojengwa ndani inapowezekana. Vinginevyo, kitatuzi cha EPANET cha EPA ya Marekani hutumika kila wakati. Kitatuzi kilichojengwa ndani hakitumiki kwa uigaji wa kipindi kirefu. Mara ya kwanza kitatuzi cha EPANET kinapotumika, takriban KB 650 hupakuliwa kisha kuhifadhiwa kwenye kifaa hiki. Pale bomba lina upotevu mdogo (wa ndani), vitatuzi viwili hutofautiana kwenye tarakimu za mwisho: EPANET hutumia thamani iliyokadiriwa ya mvuto wa dunia, kwa hiyo upotevu wake mdogo ni chini kidogo sana kuliko fomu kamili.';
 $ec_lang['lpn_engine_loading']='Inapakia kitatuzi cha EPANET…';
 $ec_lang['lpn_engine_failed']='Imeshindwa kupakia kitatuzi cha EPANET. Inaonyesha kitatuzi cha ndani badala yake.';
 $ec_lang['lpn_engine_failed_why']='{reason} Inaonyesha kitatuzi kilichojengwa ndani badala yake.';
@@ -4006,7 +4006,7 @@ $ec_lang['lpn_energy_no_pumps']='Mtandao huu hauna pampu, hivyo hakuna kinachotu
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Ulinganisho wa senario';
-$ec_lang['lpn_scncmp_menu_tip']='Jedwali la senario lenye idadi ya thamani maalum, shinikizo la chini kabisa, na kasi ya juu kabisa';
+$ec_lang['lpn_scncmp_menu_tip']='Jedwali la senario lenye idadi ya thamani maalum, shinikizo la chini kabisa, na kasi ya juu kabisa, na jedwali la matokeo kwa kipengele linalonakiliwa kwenye lahajedwali';
 $ec_lang['lpn_scncmp_running']='Inakokotoa kila senario…';
 $ec_lang['lpn_scncmp_empty']='Hakuna kilichochorwa bado, hivyo hakuna cha kukokotoa.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Kasi ya juu kabisa';
@@ -4053,12 +4053,12 @@ $ec_lang['lpn_status_note']='Imesomwa kutoka kwa uendeshaji ule ule wa kipindi k
 $ec_lang['lpn_reports_full']='Kamili';
 $ec_lang['lpn_reports_full_tip']='Jedwali la vifundo na viungo vyote katika kila hatua ya muda ya kuripoti ya uendeshaji wa mwisho';
 $ec_lang['lpn_full_title']='Taarifa kamili';
-$ec_lang['lpn_full_needs_run']='Taarifa kamili huorodhesha kila kifundo na kila kiungo katika kila hatua ya muda ya taarifa. Bonyeza Kokotoa, kisha fungua Maji, Ripoti, Taarifa kamili.';
-$ec_lang['lpn_full_note']='Safu mlalo moja kwa kila kifundo au kiungo kwa kila hatua ya muda ya taarifa, katika vitengo vinavyoonyeshwa kwenye Kidirisha cha Majedwali. Seli wazi ni safu ambayo kiwango hicho hakina. Kupakua au kuchapisha hubeba kila hatua ya muda; jedwali lililo hapa chini linaonyesha moja kwa wakati mmoja.';
+$ec_lang['lpn_full_needs_run']='Taarifa kamili huorodhesha kila kifundo na kila kiungo katika kila hatua ya muda ya kuripoti. Bonyeza Kokotoa, kisha fungua Maji, Ripoti, Kamili.';
+$ec_lang['lpn_full_note']='Safu mlalo moja kwa kila kifundo au kiungo kwa kila hatua ya muda ya kuripoti, katika vitengo vinavyoonyeshwa kwenye kidirisha cha Majedwali. Seli ni tupu pale kifundo au kiungo kisipokuwa na kiasi hicho. Kupakua, kunakili au kuchapisha hubeba kila hatua ya muda; jedwali lililo hapa chini linaonyesha moja kwa wakati.';
 $ec_lang['lpn_full_step_label']='Hatua ya muda';
 $ec_lang['lpn_full_download_csv']='Pakua CSV';
 $ec_lang['lpn_full_print']='Chapisha taarifa';
-$ec_lang['lpn_full_col_time']='Muda';
+$ec_lang['lpn_full_col_time']='Muda (hr)';
 $ec_lang['lpn_full_col_type']='Aina';
 $ec_lang['lpn_heading_unit']='{label} ({unit})';
 $ec_lang['lpn_result_concentration_short']='Mkusanyiko';
@@ -4262,7 +4262,7 @@ $ec_lang['lpn_library_fittings_in_use']='Orodha hii ya viungio inatumiwa na mabo
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
 // the FILE decides what is on offer rather than whatever section anybody was looking at.
-$ec_lang['lpn_library_import']='Ingiza maktaba…';
+$ec_lang['lpn_library_import']='Maktaba…';
 $ec_lang['lpn_library_import_tip']='Chagua faili lingine la mradi kisha nakili maktaba nzima kutoka humo kwenda kwenye mradi huu. Chochote ambacho jina lake linatumika tayari hapa huruka na kuorodheshwa, hivyo hakuna kilicho tayari nacho kinachobadilika.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
 // beside each name is the only thing on that screen that says what the file actually has in it.
@@ -4505,7 +4505,7 @@ $ec_lang['lpn_analyze_menu_tip']='Uchambuzi unaoendesha mtandao kwenye nakala: m
 $ec_lang['lpn_ff_menu']='Uchambuzi wa mtiririko wa moto…';
 $ec_lang['lpn_ff_menu_tip']='Jaribu kila muunganiko uliochaguliwa kwa mtiririko wa moto, na kagua athari kwa mfumo uliobaki';
 $ec_lang['lpn_ff_title']='Mtiririko wa moto: uchambuzi';
-$ec_lang['lpn_ff_intro']='Kila muunganiko kwa zamu huchota mtiririko wa moto juu ya mahitaji yake yaliyopo. Uendeshaji hutumia nakala ya mtandao katika hatua ya muda iliyo kwenye skrini, hivyo hakuna kinachobadilika kwenye mradi.\n\nMtiririko wa moto kwa kawaida hujaribiwa kwa mahitaji ya siku ya juu kabisa, kwa hiyo weka mtandao katika hali hiyo kwanza.\n\nKila muunganiko unaojaribiwa huchukua takriban suluhisho 16 za mtandao mzima, kwa hiyo mfumo mkubwa huchukua dakika kadhaa: chagua miunganiko kabla ya kuendesha, na simamisha wakati wowote ili kuhifadhi matokeo ya sehemu.';
+$ec_lang['lpn_ff_intro']='Kila muunganiko kwa zamu huchota mtiririko wa moto juu ya mahitaji yake yaliyopo. Uendeshaji hutumia nakala ya mtandao katika hatua ya muda iliyo kwenye skrini, hivyo hakuna kinachobadilika kwenye mradi.\n\nMradi ukiwa na uigaji wa kipindi kirefu, Hatua ya kuripoti inayojaribiwa huchagua hali: hatua ya muda iliyo kwenye skrini, hatua ya kuripoti iliyochaguliwa, hatua ya kuripoti yenye shinikizo la chini kabisa kati ya miunganiko iliyojaribiwa, au kila hatua ya kuripoti. Chaguo la mwisho huendesha uchunguzi katika kila hatua ya kuripoti kwa viwango vya matanki, miundo ya mahitaji, na hali za viungo za hatua hiyo, na huonyesha kila muunganiko katika hatua yake mbaya zaidi, hatua yenye mtiririko wa chini kabisa unaopatikana, kwenye safu wima ya Hatua ya mtiririko wa chini kabisa.\n\nMtiririko wa moto kwa kawaida hujaribiwa kwa mahitaji ya siku ya juu kabisa, kwa hiyo weka mtandao katika hali hiyo kwanza.\n\nKila muunganiko unaojaribiwa huchukua takriban suluhisho 16 za mtandao mzima, kwa hiyo mfumo mkubwa huchukua dakika kadhaa: chagua miunganiko kabla ya kuendesha, na simamisha wakati wowote ili kuhifadhi matokeo ya sehemu.';
 $ec_lang['lpn_ff_scope']='Miunganiko ya kujaribu';
 $ec_lang['lpn_ff_all']='Miunganiko yote';
 $ec_lang['lpn_ff_selected']='Miunganiko iliyochaguliwa';
@@ -4524,7 +4524,7 @@ $ec_lang['lpn_ff_design_off']='Hakuna';
 $ec_lang['lpn_ff_design_all']='Yote';
 $ec_lang['lpn_ff_design_selected']='Iliyochaguliwa';
 $ec_lang['lpn_ff_design_no_selection']='Upeo wa ukaguzi wa muundo umewekwa kuwa Iliyochaguliwa, lakini hakuna vipengele vilivyochaguliwa. Chagua vipengele kwenye ramani au chagua Yote.';
-$ec_lang['lpn_ff_minpressure']='Shinikizo la chini kabisa linaloruhusiwa mahali pengine';
+$ec_lang['lpn_ff_minpressure']='Shinikizo la chini kabisa la mfumo linaloruhusiwa';
 $ec_lang['lpn_ff_minpressure_tip']='Muunganiko unaoshuka chini ya hili wakati mwingine unachota mtiririko wake wa moto huripotiwa kama tatizo la kubuni.';
 $ec_lang['lpn_ff_maxvelocity']='Kasi ya juu kabisa inayoruhusiwa';
 $ec_lang['lpn_ff_maxvelocity_tip']='Bomba linaloendesha juu ya hili wakati mtiririko wa moto unachotwa huripotiwa kama tatizo la kubuni.';
@@ -4654,13 +4654,13 @@ $ec_lang['lpn_ff_err_unknown']='Hakuna matokeo. Msimbo wa hitilafu: {code}';
 $ec_lang['lpn_crit_menu']='Uchambuzi wa umuhimu…';
 $ec_lang['lpn_crit_menu_tip']='Ondoa kila bomba, pampu, na vali kutoka kwenye mtandao kwa zamu na ripoti athari kwa mfumo.';
 $ec_lang['lpn_crit_title']='Umuhimu: uchambuzi';
-$ec_lang['lpn_crit_intro']='Kila kipengele huondolewa kwenye mtandao kwa zamu, na mtandao hutatuliwa katika hatua ya muda iliyo kwenye skrini kwenye senario inayotumika. Hakuna kinachobadilika kwenye mradi; uendeshaji wote hufanywa kwenye nakala.';
+$ec_lang['lpn_crit_intro']='Kila kipengele huondolewa kwenye mtandao kwa zamu, na mtandao hutatuliwa katika hatua ya muda iliyo kwenye skrini kwenye senario inayotumika. Hakuna kinachobadilika kwenye mradi; uendeshaji wote hufanywa kwenye nakala.\n\nMradi ukiwa na uigaji wa kipindi kirefu, Hatua ya kuripoti inayojaribiwa inaweza kuwekwa kuwa Uendeshaji mzima. Kila kukatika kisha huigwa katika uendeshaji mzima, na jedwali huripoti shinikizo la chini kabisa na hatua ya kuripoti linapotokea, saa ambazo muunganiko wowote hukaa chini ya shinikizo la chini linaloruhusiwa, hatua ya kuripoti ambapo tanki hukwisha maji kwanza, na mahitaji makubwa zaidi yasiyohudumiwa katika uendeshaji. Shinikizo la chini kabisa husomwa kabla ya tanki kukwisha maji tu.';
 $ec_lang['lpn_crit_scope']='Viungo vya kuvunja';
 $ec_lang['lpn_crit_scope_tip']='Mabomba, pampu, na vali zote, au zile zilizoteuliwa kwenye ramani pekee. Chagua kundi kabla ya kuendesha.';
 $ec_lang['lpn_crit_scope_all']='Viungo vyote';
 $ec_lang['lpn_crit_scope_selected']='Viungo vilivyoteuliwa';
 $ec_lang['lpn_crit_minpressure']='Shinikizo la chini kabisa linaloruhusiwa';
-$ec_lang['lpn_crit_minpressure_tip']='Hii ni namba ile ile ya Shinikizo la chini kabisa linaloruhusiwa mahali pengine katika Mtiririko wa moto: uchambuzi. Kuibadilisha hapa kunaibadilisha huko.';
+$ec_lang['lpn_crit_minpressure_tip']='Hii ni namba ileile ya kisanduku cha Shinikizo la chini kabisa la mfumo linaloruhusiwa cha Mtiririko wa moto: uchambuzi. Kuibadilisha hapa kunaibadilisha huko.';
 $ec_lang['lpn_crit_col_asset']='Kipengele';
 $ec_lang['lpn_crit_col_unserved']='Mahitaji yasiyohudumiwa';
 $ec_lang['lpn_crit_col_cutoff']='Miunganiko iliyokatwa';
@@ -4691,7 +4691,7 @@ $ec_lang['lpn_crit_skipped_dead']='Viungo vya mwisho uliokufa vilivyorukwa: {n}.
 $ec_lang['lpn_ds_menu']='Upimaji wa mahitaji…';
 $ec_lang['lpn_ds_menu_tip']='Zidisha mahitaji kwenye nakala ya mtandao na uone shinikizo na kasi, au tafuta kipimo kikubwa zaidi cha mahitaji ambacho mfumo unaweza kubeba.';
 $ec_lang['lpn_ds_title']='Mahitaji: upimaji';
-$ec_lang['lpn_ds_intro']='Bonyeza kitufe cha Endesha ili kuzidisha mahitaji kwenye miunganiko iliyochaguliwa kwa kipimo cha mahitaji na kuona shinikizo na kasi.\n\nBonyeza kitufe cha Tafuta ili kupata kipimo kikubwa zaidi cha mahitaji, hadi {step} iliyo karibu zaidi, ambacho miunganiko hii yote hudumisha angalau shinikizo la chini kabisa linaloruhusiwa; hutafuta kuanzia 0 hadi {max}.\n\nZote mbili hufanya kazi kwenye nakala ya mtandao, iliyotatuliwa katika hatua ya muda iliyo kwenye skrini katika senario inayotumika, kwa hiyo hakuna kinachobadilika kwenye mradi wako. Ni hatua hiyo ya muda pekee inayopimwa, na viwango na hali huchukuliwa kutoka kwake; ili kujaribu kilele, sogeza saa hadi mahitaji ya kilele kabla ya kuendesha.';
+$ec_lang['lpn_ds_intro']='Bonyeza kitufe cha Endesha ili kuzidisha mahitaji kwenye miunganiko iliyochaguliwa kwa kipimo cha mahitaji na kuona shinikizo na kasi.\n\nBonyeza kitufe cha Tafuta ili kupata kipimo kikubwa zaidi cha mahitaji, hadi {step} iliyo karibu zaidi, ambacho miunganiko hii yote hudumisha angalau shinikizo la chini kabisa linaloruhusiwa; hutafuta kuanzia 0 hadi {max}.\n\nZote mbili hufanya kazi kwenye nakala ya mtandao, iliyotatuliwa katika hatua ya muda iliyo kwenye skrini katika senario inayotumika, kwa hiyo hakuna kinachobadilika kwenye mradi wako. Kwa chaguo-msingi ni hatua ya muda iliyo kwenye skrini pekee inayopimwa, na viwango na hali huchukuliwa kutoka kwake. Mradi ukiwa na uigaji wa kipindi kirefu, weka Hatua ya kuripoti inayojaribiwa kuwa Uendeshaji mzima ili kupima mahitaji katika uendeshaji mzima: kila hatua ya kuripoti inahukumiwa, tanki linalokwisha maji hufeli kipimo, na jibu hutaja hatua ya kuripoti yenye kikomo.';
 $ec_lang['lpn_ds_scope']='Miunganiko ya kupimwa';
 $ec_lang['lpn_ds_head_scale']='Pima mahitaji';
 $ec_lang['lpn_ds_multiplier']='Kipimo cha mahitaji';
@@ -4738,13 +4738,13 @@ $ec_lang['lpn_analyze_time_moved']='⚠ Hii ilikokotolewa saa {time}, na saa sas
 // probably a longitude in the wrong column, and this page says so and changes nothing, because it
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
-$ec_lang['lpn_file_import_survey']='Ingiza vituo vilivyopimwa…';
+$ec_lang['lpn_file_import_survey']='Nukta zilizopimwa…';
 $ec_lang['lpn_file_import_survey_tip']='Soma orodha ya nukta zilizopimwa kutoka kwenye faili la maandishi na utengeneze muunganiko mmoja kwenye kila nukta, ukichukua mipangilio ya kipengele kipya kwa kila kitu ambacho faili halitaji. Hakuna mabomba yanayochorwa isipokuwa ukichagua Soma maelezo kama misimbo ya uwandani, na hakuna safu mlalo inayoachwa bila kutajwa. Husoma mfumo wa kuratibu ambao mradi huu tayari unautumia, wenye marejeleo ya kijiografia au la.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='Leta vielelezo vya GeoJSON…';
-$ec_lang['lpn_file_import_shapes_tip']='Soma nukta, mistari, na poligoni za faili la GeoJSON kwenye mradi huu kama Vielelezo. Vipengele vya mtandao vilivyomo kwenye faili haviletwi; leta mtandao kutoka faili la EPANET au kwa Leta mtandao wa GeoJSON. Mradi lazima uwe na marejeleo ya kijiografia au uwe na mfumo wa viwianishi ulioelezwa.';
-$ec_lang['lpn_file_import_gjnet']='Leta mtandao wa GeoJSON…';
+$ec_lang['lpn_file_import_shapes']='Faili la GeoJSON…';
+$ec_lang['lpn_file_import_shapes_tip']='Soma nukta, mistari, na poligoni za faili la GeoJSON kwenye mradi huu kama Vielelezo. Vipengele vya mtandao vilivyomo kwenye faili haviletwi; leta mtandao kwa Faili, Leta, Mtandao, Faili la EPANET au Faili, Leta, Mtandao, Faili la GeoJSON. Mradi lazima uwe umerejelewa kijiografia au uwe na mfumo wa kuratibu ulioelezwa.';
+$ec_lang['lpn_file_import_gjnet']='Faili la GeoJSON…';
 $ec_lang['lpn_file_import_gjnet_tip']='Fungua faili la GeoJSON kama mradi mpya. Nukta huletwa kama miunganiko, hifadhi za maji, au matanki, na mistari kama mabomba. Faili lililohamishwa kutoka ukurasa huu husomwa kama lilivyoandikwa; kwa faili lingine lolote, hatua moja huoanisha sehemu zake na sifa na vipimo.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} linataja mfumo wa viwianishi {crs}. Nafasi za GeoJSON ni latitudo na longitudo za WGS 84 (RFC 7946), na ukurasa huu haubadilishi faili la GeoJSON kutoka mfumo mwingine. Hamisha safu kutoka GIS katika EPSG:4326 (WGS 84), kisha uleta faili hilo.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} halina nukta wala mistari.';
@@ -4811,7 +4811,7 @@ $ec_lang['lpn_gjnet_note_demand_rows']='Miunganiko hii ilikuwa na zaidi ya safu 
 $ec_lang['lpn_gjnet_note_pipe_type']='Mabomba haya hutaja aina ya bomba iliyoonyeshwa kwenye mabano, ambayo ufafanuzi wake faili la GeoJSON halishikilii. Aina ya bomba haikuletwa; kipenyo na usuguo vilivyotajwa kwenye faili vililetwa.';
 $ec_lang['lpn_gjnet_note_pattern_conflict']='Miundo hii imetajwa kwa vizidishi tofauti kwenye vitu tofauti. Uliotajwa kwanza ulitumika.';
 $ec_lang['lpn_gjnet_note_end_off_node']='Mstari wa kila kimoja cha viungo hivi hauanzii wala hauishii kwenye kifundo chake. Nafasi ya kifundo ilitumika.';
-$ec_lang['lpn_gjnet_note_not_held']='Faili la GeoJSON halishikilii vidhibiti, kanuni, mipangilio ya muda, lebo za maandishi, chaguo za EPANET, wala maktaba za aina ya bomba, viungio, na mkondo wa ufanisi, kwa hiyo hakuna kati ya hivi kilicholetwa.';
+$ec_lang['lpn_gjnet_note_not_held']='Faili la GeoJSON halishikilii vidhibiti, kanuni, mipangilio ya muda, vipengee vya Maandishi, chaguo za EPANET, wala maktaba za aina ya bomba, viungio, na mkondo wa ufanisi, kwa hiyo hakuna kati ya hivi kilicholetwa.';
 $ec_lang['lpn_geojson_import_done']='Vielelezo {n} vimeletwa kutoka {file}.';
 $ec_lang['lpn_geojson_import_done_one']='Kielelezo kimoja kimeletwa kutoka {file}.';
 $ec_lang['lpn_geojson_import_renamed']='Majina ya vitu {n} hayawezi kutumika kama vitambulisho vya Vielelezo. Kila Kielelezo kilipewa kitambulisho kingine na kinabaki na jina la kitu chake: {list}.';
@@ -4827,9 +4827,9 @@ $ec_lang['lpn_geojson_import_parts']='Vitu {n} vya sehemu nyingi vimeletwa kama 
 $ec_lang['lpn_geojson_import_parts_one']='Kitu kimoja cha sehemu nyingi kimeletwa kama Kielelezo kimoja kwa kila sehemu.';
 $ec_lang['lpn_geojson_import_local']='Nafasi za GeoJSON ni latitudo na longitudo, na mradi huu hauna mahali duniani ambapo zinaweza kubadilishwa kwenda. Uwekee marejeleo ya kijiografia kwanza kwa Ramani, Ramani ya dunia, Ambatisha, kisha leta tena.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} si faili la GeoJSON: {detail}';
-$ec_lang['lpn_file_import_dxf']='Leta vielelezo vya DXF…';
+$ec_lang['lpn_file_import_dxf']='Faili la DXF…';
 $ec_lang['lpn_file_import_dxf_tip']='Soma nukta, mistari, na mistari mingi ya faili la DXF la ASCII kwenye mradi huu kama Vielelezo, huku jina la kila tabaka likihifadhiwa kama sifa. Huluki nyingine huhesabiwa na kuorodheshwa, haziletwi. Viwianishi husomwa kama X na Y za mradi huu, bila ubadilishaji.';
-$ec_lang['lpn_file_import_shp']='Leta vielelezo vya shapefile…';
+$ec_lang['lpn_file_import_shp']='Faili la shapefile…';
 $ec_lang['lpn_file_import_shp_tip']='Soma nukta, mistari, na poligoni za shapefile ya ESRI kwenye mradi huu kama Vielelezo, huku safu wima za sifa zikihifadhiwa kama sifa. Chagua .zip, au .shp pamoja na .shx, .dbf, na .prj zake (shikilia Ctrl au Shift ili kuchagua kadhaa). Viwianishi vilivyo katika mfumo wa kuratibu tofauti na wa mradi hubadilishwa, na taarifa inasema hivyo.';
 $ec_lang['lpn_dxf_import_skipped']='Huluki {n} hazikuletwa: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='Huluki moja haikuletwa: {list}.';
@@ -4982,3 +4982,331 @@ $ec_lang['lpn_screenshot_scale_tip']='Ukubwa wa picha kama kizidishi cha eneo li
 $ec_lang['lpn_prop_label_unit']='{label} ({unit})';
 $ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
 $ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';
+$ec_lang['lpn_guide_page_open']='Fungua programu';
+$ec_lang['lpn_guide_page_desc']='Mwongozo wa mtumiaji wa {name}: ukurasa mmoja kwa kila sura, kuanzia ramani na Sifa hadi senario, uchambuzi wa mtiririko wa moto, na uchambuzi wa umuhimu.';
+$ec_lang['lpn_guide_page_what']='{name} ni programu ya wavuti isiyolipishwa ya kuiga mitandao ya usambazaji wa maji, upanuzi wa EPANET.';
+$ec_lang['lpn_guide_page_missing']='Hakuna sura kama hiyo. Sura zimeorodheshwa hapa chini.';
+$ec_lang['lpn_guide_text_demands_box']='Huorodhesha kategoria za mahitaji za muunganiko uliochaguliwa, safu moja kwa kila kategoria, pamoja na mahitaji ya msingi na muundo wa mahitaji wa kila kategoria. Kitufe cha kuongeza hongeza kategoria. Kukiwa na kategoria zaidi ya moja, Mahitaji ya msingi kwenye Sifa ni jumla yake na yanasomwa tu. Wateja waliokusanywa kwenye muunganiko huorodheshwa pamoja na mahitaji yao. Katika senario, uhariri ni thamani maalum na Msingi haubadilishwi.';
+$ec_lang['lpn_guide_scn_move_term']='Kuhamisha au kuunganisha kati ya senario';
+$ec_lang['lpn_guide_scn_move_def']='<p>Ili kuhamisha au kuunganisha vipengele kutoka senario moja hadi nyingine, fungua Jedwali lao, tumia menyu ya muktadha ya kubofya kulia kuchagua Onyesha senario, kisha weka swichi yao ya Linafanya kazi? na Ondoa thamani maalum kama unavyotaka katika kila senario.</p>';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Chini ya jedwali, Matokeo kwa kipengele huorodhesha safu moja kwa kila kipengele cha aina iliyochaguliwa katika Aina ya kipengele, na safu wima moja kwa kila tokeo lililowekewa alama katika kila senario, kwa mfano shinikizo kwenye kila muunganiko katika Msingi, Siku ya juu, na Saa ya kilele. Senario yenye muda wote wa kuendesha husomwa katika hatua ya muda iliyo kwenye skrini, au katika hatua yake ya mwisho ikiwa uendeshaji wake unaisha mapema, na kila kichwa huonyesha wakati uliosomwa. Senario isiyoweza kutatuliwa huacha safu wima tupu na dokezo linalosema sababu, na senario ambayo haikukaribia suluhisho huwekewa alama (haikukaribia suluhisho) kwenye vichwa vyake. Nakili huweka jedwali kwenye ubao wa kunakili kama maandishi yaliyotenganishwa kwa tabo, tayari kubandikwa kwenye lahajedwali. Pakua CSV huhifadhi jedwali hilo hilo kama faili. Zote mbili hubeba vipimo kwenye vichwa na namba kamili, bila kuzungushwa kunakoonyeshwa kwenye kisanduku. Ishara ya mtiririko ni ishara ya mwelekeo wa ndani ya kitatuzi. Haina matumizi nje ya kitatuzi isipokuwa kuonyesha kwenye jedwali hili kama mtiririko ulibadilisha mwelekeo kati ya senario.</p>';
+$ec_lang['lpn_guide_ff_dur_def']='<p>Mradi unapokuwa na uigaji wa kipindi kirefu, chagua Moto wa muda uliotajwa chini ya Hatua ya kuripoti inayojaribiwa. Mtiririko wa moto unaohitajika kisha huchotwa kwenye muunganiko mmoja uliochaguliwa kwenye ramani, kuanzia wakati ulio katika Moto huanza saa na kudumu kwa Muda wa moto, vyote vikiwa vizidisho kamili vya hatua ya muda ya muundo. Uigaji mzima huendeshwa kwenye nakala ya mtandao na kulinganishwa na uigaji ule ule bila moto. Muhtasari unasema kama muunganiko unadumisha Shinikizo linalobaki la kudumishwa wakati wa moto, shinikizo la chini kabisa mahali popote, kama tanki lolote linakwisha maji, na kama mfumo unapona baada ya moto. Jedwali moja linaonyesha kiwango cha chini kabisa cha kila tanki, na jingine linaonyesha shinikizo kwenye muunganiko wa moto katika kila hatua ya kuripoti.</p>';
+$ec_lang['lpn_ex_valves_title']='Aina za vali, gpm (US)';
+$ec_lang['lpn_ex_valves_desc']='Hifadhi ya maji iliyo juu ya kilima hulisha kitovu kupitia PBV, na PRV, PSV, FCV, TCV, na GPV hutawanyika kutoka kwake, kila moja ikidhibiti katika mtandao uliotatuliwa. Galoni kwa dakika, kwa futi na inchi.';
+$ec_lang['lpn_ex_extension_si_title']='Upanuzi wa Johnson City, L/s (SI)';
+$ec_lang['lpn_ex_extension_si_desc']='Mfano wa upanuzi wa bomba kuu wenye senario za urekebishaji wa majaribio. Mfumo uliopo umeigwa kama hifadhi ya maji na pampu kwa msingi wa jaribio la mtiririko wa hidranti, huko Johnson City, Texas. Kitanzi kipya cha bomba kuu la mm 300 na mm 200 kimeunganishwa nao. Muunganiko wa hidranti ya moto hutoa L/s 95 kwa shinikizo linalobaki la m 14. Lita kwa sekunde, kwa mita na milimita.';
+$ec_lang['lpn_ex_extension_title']='Upanuzi wa Johnson City, gpm (US)';
+$ec_lang['lpn_ex_extension_desc']='Mfano wa upanuzi wa bomba kuu wenye senario za urekebishaji wa majaribio. Mfumo uliopo umeigwa kama hifadhi ya maji na pampu kwa msingi wa jaribio la mtiririko wa hidranti, huko Johnson City, Texas. Kitanzi kipya cha bomba kuu la inchi 12 na inchi 8 kimeunganishwa nao. Muunganiko wa hidranti ya moto hutoa gpm 1,500 kwa shinikizo linalobaki la psi 20. Galoni kwa dakika, kwa futi na inchi.';
+$ec_lang['lpn_ex_well_si_title']='Kisima na tanki la Munday, L/s (SI)';
+$ec_lang['lpn_ex_well_si_desc']='Kisima, pampu, vali ya kuzuia mtiririko kurudi nyuma, kitanzi, na tanki lililoinuliwa, pamoja na uigaji wa kipindi kirefu wa saa 24 na senario za Siku ya juu na Saa ya kilele, huko Munday, Texas. Muunganiko wa hidranti ya moto hutoa L/s 32 kwa shinikizo linalobaki la m 14. Lita kwa sekunde, kwa mita na milimita.';
+$ec_lang['lpn_ex_well_title']='Kisima na tanki la Munday, gpm (US)';
+$ec_lang['lpn_ex_well_desc']='Kisima, pampu, vali ya kuzuia mtiririko kurudi nyuma, kitanzi, na tanki lililoinuliwa, pamoja na uigaji wa kipindi kirefu wa saa 24 na senario za Siku ya juu na Saa ya kilele, huko Munday, Texas. Muunganiko wa hidranti ya moto hutoa gpm 500 kwa shinikizo linalobaki la psi 20. Galoni kwa dakika, kwa futi na inchi.';
+$ec_lang['lpn_result_status_cv']='CV';
+$ec_lang['lpn_ovm_dot_clear_one']='Bofya ili kuondoa thamani hii maalum.';
+$ec_lang['lpn_ovm_dot_alt']='Thamani hii maalum imehifadhiwa kwenye mbadala "{alternative}".';
+$ec_lang['lpn_ovm_dot_alt_shared']='Thamani hii maalum imehifadhiwa kwenye mbadala "{alternative}", unaotumiwa pia na {list}, kwa hiyo kuiondoa au kuihariri hubadilisha hizo pia.';
+$ec_lang['lpn_ovm_dot_set_from']='Imerithiwa kutoka {name}. Bofya ili kuifanya thamani maalum katika senario hii, ikishikilia thamani inayoonyeshwa.';
+$ec_lang['lpn_morph_vertex']='Kona';
+$ec_lang['lpn_morph_vertex_base']='Muunganiko unaweza kubadilishwa kuwa kona katika Msingi pekee, kwa sababu kona za bomba ni zilezile katika kila senario.';
+$ec_lang['lpn_morph_vertex_base_ask']='Muunganiko unaweza kubadilishwa kuwa kona katika Msingi pekee, kwa sababu kona za bomba ni zilezile katika kila senario. Hamia Msingi na ubadilishe aina?';
+$ec_lang['lpn_morph_vertex_switch']='Hamia Msingi na ubadilishe aina';
+$ec_lang['lpn_morph_vertex_type']='{id} haikubadilishwa kuwa kona: muunganiko pekee ndio unaweza kuwa kona.';
+$ec_lang['lpn_morph_vertex_links']='{id} haikubadilishwa kuwa kona: inaunganisha mabomba {n}, na kona ni ya bomba moja tu, kwa hiyo muunganiko lazima uunganishe mabomba mawili hasa.';
+$ec_lang['lpn_morph_vertex_kind']='{id} haikubadilishwa kuwa kona: pampu au vali imeunganishwa kwake, na kona ni ya bomba tu.';
+$ec_lang['lpn_morph_vertex_loop']='{id} haikubadilishwa kuwa kona: mabomba yake mawili yanaunganisha muunganiko mwingine ule ule, na bomba moja haliwezi kuanzia na kuishia kwenye muunganiko mmoja.';
+$ec_lang['lpn_morph_vertex_demand']='{id} haikubadilishwa kuwa kona: ina mahitaji au mgawo wa kituo cha maji, na kona haina. Viweke 0 kwanza.';
+$ec_lang['lpn_morph_vertex_customers']='{id} haikubadilishwa kuwa kona: Wateja wameunganishwa kwake, na kona haina.';
+$ec_lang['lpn_morph_vertex_text']='{id} haikubadilishwa kuwa kona: Maandishi yameambatishwa kwake.';
+$ec_lang['lpn_morph_vertex_pipes']='{id} haikubadilishwa kuwa kona: mabomba yake mawili yanatofautiana kwa kipenyo au usuguo, na bomba moja haliwezi kushikilia vyote viwili.';
+$ec_lang['lpn_morph_vertex_own']='{id} haikubadilishwa kuwa kona: ina mwinuko wake yenyewe, tagi, maelezo au data nyingine, na kona haina. Ondoa data hiyo kwanza.';
+$ec_lang['lpn_morph_vertex_clear_both']='Ondoa mwinuko {elev} na mahitaji {demands} kwenye {id}?';
+$ec_lang['lpn_morph_vertex_clear_elev']='Ondoa mwinuko {elev} kwenye {id}?';
+$ec_lang['lpn_morph_vertex_clear_demand']='Ondoa mahitaji {demands} kwenye {id}?';
+$ec_lang['lpn_morph_vertex_clear_quality']='Ondoa ubora wa awali {quality} kwenye {id}?';
+$ec_lang['lpn_morph_vertex_clear_also']='Ubora wa awali {quality} pia huondolewa.';
+$ec_lang['lpn_morph_vertex_done']='Imebadilisha {n} kuwa kona. Kwenye kila moja, mabomba mawili sasa ni bomba moja, linalobaki na kitambulisho na thamani za la kwanza kati yao.';
+$ec_lang['lpn_calc_hint']='Wakati “Kokotoa upya kiotomatiki” imewashwa, amri hii haihitajiki.';
+$ec_lang['lpn_calc_hint_mute']='Usionyeshe tena';
+$ec_lang['lpn_replace_selected_only']='Vipengele vilivyochaguliwa tu';
+$ec_lang['lpn_dxf_note_headloss']='Fomula ya upotevu wa kimo: {formula} ({code}). ROUGHNESS ni mgawo wa usuguo wa fomula hiyo.';
+$ec_lang['lpn_dxf_note_demand_multiplier']='Kizidishi cha mahitaji: {n}.';
+$ec_lang['lpn_dxf_sections_header']='Sehemu za EPANET za mtandao huu: miundo, vidhibiti, kanuni, nyakati, chaguo, na mipangilio mingine ambayo vizuizi haviwezi kushikilia. EPANET++ husoma maandishi haya tena DXF inapoletwa. Unaweza kuhamisha maandishi haya au kugandisha tabaka lake; yaweke kwenye tabaka {layer}.';
+$ec_lang['lpn_dxf_curve_points']='Nukta za mkondo wa kimo cha pampu (mtiririko, kimo)';
+$ec_lang['lpn_file_import_msx']='Faili la EPANET-MSX…';
+$ec_lang['lpn_file_import_msx_tip']='Ambatisha faili la EPANET-MSX (.msx) kwenye mradi huu, au onyesha lile lililoambatishwa tayari. Huhifadhiwa pamoja na mradi, huandikwa tena bila mabadiliko, na kuendeshwa na injini ya EPANET-MSX katika uigaji wa kipindi kirefu.';
+$ec_lang['lpn_file_export_item_msx']='Faili la EPANET-MSX…';
+$ec_lang['lpn_file_export_msx_tip']='Pakua faili la EPANET-MSX lililoambatishwa kama lilivyoletwa hasa.';
+$ec_lang['lpn_msx_report_heading']='Imeambatishwa {file}';
+$ec_lang['lpn_msx_report_kept']='Faili hili la EPANET-MSX huhifadhiwa pamoja na mradi na kuandikwa tena bila mabadiliko faili la EPANET-MSX linapohamishwa. Ubora wa maji umewekwa kuwa Spishi nyingi (EPANET-MSX) chini ya Mipangilio, Ukokotoaji, Ubora, kwa hiyo uigaji wa kipindi kirefu huendesha kila spishi iliyo kwenye faili.';
+$ec_lang['lpn_msx_report_species']='Spishi zilizo kwenye faili: {list}.';
+$ec_lang['lpn_msx_report_no_species']='Hakuna spishi zilizoorodheshwa kwenye faili.';
+$ec_lang['lpn_msx_too_big']='{file} ni kubwa mno kuhifadhiwa kwenye hifadhi ya kivinjari, kwa hiyo haikuambatishwa.';
+$ec_lang['lpn_msx_report_missing']='Vitambulisho vilivyo kwenye faili ambavyo mtandao huu hauna: {ids}.';
+$ec_lang['lpn_msx_not_msx']='{file} haionekani kama faili la EPANET-MSX: halina sehemu ya [SPECIES].';
+$ec_lang['lpn_msx_attached_heading']='Faili la EPANET-MSX lililoambatishwa: {file}';
+$ec_lang['lpn_msx_removed']='Imeondoa {file} kutoka mradi huu.';
+$ec_lang['lpn_quality_msx']='Spishi nyingi (EPANET-MSX)';
+$ec_lang['lpn_quality_msx_species']='Spishi';
+$ec_lang['lpn_quality_msx_species_tip']='Spishi ya EPANET-MSX ambayo rangi za ramani, kidirisha cha Majedwali na kidirisha cha Grafu huonyesha. Kila spishi iliyo kwenye faili hukokotolewa katika uendeshaji uleule, kwa hiyo kubadilisha hii hakuhitaji uendeshaji mpya. Thamani ziko katika vipimo ambavyo faili la EPANET-MSX hutangaza: uzito kwa lita kwa spishi ya wingi, uzito kwa kipimo cha eneo kwa spishi ya ukuta.';
+$ec_lang['lpn_quality_msx_none']='Hakuna faili la EPANET-MSX lililoambatishwa kwenye mradi huu. Ambatisha moja kwa Faili, Leta, Mtandao, Faili la EPANET-MSX.';
+$ec_lang['lpn_result_msx_tip']='Thamani ya spishi hii ya EPANET-MSX, iliyokokotolewa na injini ya EPANET-MSX, katika vipimo ambavyo faili la EPANET-MSX hutangaza. Kwa kiungo ni wastani kwenye kiungo.';
+$ec_lang['lpn_inpup_ask_title']='Leta {file}';
+$ec_lang['lpn_inpup_lead']='Chagua mahali pa kuleta faili hili la EPANET.\n\nUnapoleta, vipengele hulinganishwa kwa kitambulisho. Thamani hubadilishwa kwenye vipengele vinavyolingana, vipengele vya pekee vya kilicholetwa huongezwa, na vipengele vya pekee vya mradi huu huachwa bila kubadilishwa.';
+$ec_lang['lpn_inpup_how']='Katika mradi huu, vipengele hulinganishwa kwa kitambulisho. Thamani hubadilishwa kwenye vipengele vinavyolingana, vipengele vya pekee vya faili huongezwa, na vipengele vya pekee vya mradi huu huachwa bila kubadilishwa.';
+$ec_lang['lpn_inpup_base_note']='Kuchagua Msingi hakuondoi thamani maalum za senario yoyote.';
+$ec_lang['lpn_inpup_btn_new']='Mradi mpya';
+$ec_lang['lpn_inpup_btn_project']='Mradi huu, {project}';
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, iliyo wazi sasa';
+$ec_lang['lpn_inpup_btn_newscn']='Senario mpya, mtoto wa {parent}';
+$ec_lang['lpn_inpup_newscn_name']='Jina, ukichagua senario mpya';
+$ec_lang['lpn_inpup_new_scn']='Imeunda senario {scenario}, mtoto wa {parent}, na kuifungua.';
+$ec_lang['lpn_inpup_btn_newscn_basic']='Senario mpya';
+$ec_lang['lpn_inpup_new_scn_basic']='Imeunda senario {scenario} na kuifungua.';
+$ec_lang['lpn_inpup_new_none']='Hakuna senario iliyoundwa.';
+$ec_lang['lpn_survey_where_title']='Leta nukta zilizopimwa';
+$ec_lang['lpn_survey_where_lead']='Kila nukta inakuwa kifundo. Chagua mahali vifundo vinakoenda.';
+$ec_lang['lpn_survey_where_note']='Katika senario, vifundo havifanyi kazi katika Msingi na hufanya kazi huko tu. Kuchagua Msingi huviongeza kwenye Msingi, kwa hiyo kila senario huvirithi.';
+$ec_lang['lpn_inpup_title']='Sasisha kutoka faili la EPANET';
+$ec_lang['lpn_gjup_lead']='Chagua mahali pa kuleta faili hili la GeoJSON.\n\nUnapoleta, vipengele hulinganishwa kwa kitambulisho. Thamani hubadilishwa kwenye vipengele vinavyolingana, vipengele vya pekee vya kilicholetwa huongezwa, na vipengele vya pekee vya mradi huu huachwa bila kubadilishwa.';
+$ec_lang['lpn_gjup_title']='Sasisha kutoka faili la GeoJSON';
+$ec_lang['lpn_gjup_h_notes']='Madokezo ya uletaji';
+$ec_lang['lpn_inpup_heading']='Imeleta {file} kwenye {scenario} ya {project}';
+$ec_lang['lpn_inpup_counts']='Thamani zilizobadilishwa ({n}), kwenye vipengele ({m}). Vipengele vilivyoongezwa ({a}). Vipengele vilivyobaki ambavyo faili haina ({k}).';
+$ec_lang['lpn_inpup_undo']='Tengua hubatilisha yote kwa hatua moja.';
+$ec_lang['lpn_inpup_nothing']='Kila thamani iliyo kwenye faili inayolingana na kipengele hapa tayari ni ileile katika {scenario}.';
+$ec_lang['lpn_inpup_status']='Imeleta {file} kwenye {scenario} ya {project}. Thamani zilizobadilishwa ({n}). Vipengele vilivyoongezwa ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Thamani zilizobadilishwa';
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} hadi {new}';
+$ec_lang['lpn_inpup_more']='{n} zaidi';
+$ec_lang['lpn_inpup_blank']='tupu';
+$ec_lang['lpn_inpup_h_added']='Vipengele vilivyoongezwa';
+$ec_lang['lpn_inpup_h_kept']='Vimebaki, haviko kwenye faili';
+$ec_lang['lpn_inpup_h_na']='Havikutumika';
+$ec_lang['lpn_inpup_na_general']='Faili pia lina {items}. Havikutumika.';
+$ec_lang['lpn_inpup_na_type']='Faili linaeleza aina tofauti kwa vipengele hivi, kwa hiyo hakuna thamani zake zilizobadilishwa: {ids}';
+$ec_lang['lpn_inpup_na_owned']='Aina ya bomba hueleza baadhi ya thamani za mabomba haya, kwa hiyo thamani hizo hazikubadilishwa: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Usuguo haukutumika, kwa sababu mradi huu unatumia fomula ya Darcy-Weisbach na usuguo hauchunguzwi katika hali hiyo.';
+$ec_lang['lpn_inpup_na_geo']='Vipengele vilivyo kwenye faili pekee ({n}) havikuongezwa, kwa sababu faili na mradi huu hutumia mifumo tofauti ya kuratibu.';
+$ec_lang['lpn_inpup_na_refs']='Vipengele hivi vilivyoongezwa vinarejelea muundo au mkondo ambao mradi huu hauna, kwa hiyo rejeo liliachwa: {ids}';
+$ec_lang['lpn_inpup_na_msx']='Faili la .msx lililochaguliwa pamoja na faili hili halikusomwa. Ili kuliambatisha kwenye mradi huu, lichague peke yake.';
+$ec_lang['lpn_inpup_refused_heading']='Hakuna kilichobadilishwa katika {project}.';
+$ec_lang['lpn_inpup_refused_lead']='Vipimo vya faili vinatofautiana na vipimo vya mradi huu, na ukurasa huu haubadilishi namba za faili. Leta faili kama mradi mpya, au fungua mradi unaotumia vipimo vilevile.';
+$ec_lang['lpn_inpup_unit_row']='{family}: faili linatumia {file} na mradi huu unatumia {project}.';
+$ec_lang['lpn_inpup_method_row']='Fomula ya upotevu wa kimo: faili linatumia {file} na mradi huu unatumia {project}.';
+$ec_lang['lpn_inpup_refused_lead_formula']='Fomula ya upotevu wa kimo ya faili inatofautiana na fomula ya mradi huu, na ukurasa huu haubadilishi thamani za usuguo. Leta faili kama mradi mpya, au fungua mradi unaotumia fomula ileile.';
+$ec_lang['lpn_inpup_refused_lead_both']='Vipimo na fomula ya upotevu wa kimo ya faili vinatofautiana na vile vya mradi huu, na ukurasa huu haubadilishi namba za faili. Leta faili kama mradi mpya, au fungua mradi unaotumia vipimo na fomula vilevile.';
+$ec_lang['lpn_inpup_failed']='Usasishaji ulisimama kabla ya kukamilika, kwa hiyo hakuna kilichobadilishwa katika {project}. Leta faili kama mradi mpya ili kulifungua. Sababu: {reason}';
+$ec_lang['lpn_inpup_i_positions']='nafasi za vipengele vilivyopo';
+$ec_lang['lpn_inpup_i_connections']='miunganisho';
+$ec_lang['lpn_inpup_i_descriptions']='maelezo';
+$ec_lang['lpn_inpup_i_patterns']='miundo';
+$ec_lang['lpn_inpup_i_curves']='mikondo';
+$ec_lang['lpn_inpup_i_controls']='vidhibiti';
+$ec_lang['lpn_inpup_i_rules']='kanuni';
+$ec_lang['lpn_inpup_i_options']='chaguo';
+$ec_lang['lpn_roughness_method_note']='⚠ Mabomba yenye usuguo nje ya kiwango cha kawaida cha {method}: {n}. Thamani hazijabadilishwa na huenda ziliingizwa kwa njia nyingine ya msuguano.';
+$ec_lang['lpn_field_cv']='Vali ya kuzuia mtiririko kurudi nyuma (CV)';
+$ec_lang['lpn_field_cv_tip']='Bomba hili hupitisha maji kutoka kifundo chake cha mwanzo hadi kifundo chake cha mwisho tu, kama vali ya kuzuia mtiririko kurudi nyuma inavyofanya. Mtiririko ukitaka kugeuka, bomba hufungwa hadi liweze kutiririsha mbele tena. EPANET huita hali hii CV.';
+$ec_lang['lpn_theme_hc']='Utofautishaji wa juu';
+$ec_lang['lpn_theme_amber']='Kaharabu';
+$ec_lang['lpn_theme_green']='Kijani';
+$ec_lang['lpn_theme_platinum']='Platinamu';
+$ec_lang['lpn_theme_rounded']='Mviringo';
+$ec_lang['lpn_theme_desktop']='Eneo-kazi';
+$ec_lang['lpn_theme_newspaper']='Gazeti';
+$ec_lang['lpn_theme_arcade']='Ukumbi wa michezo';
+$ec_lang['lpn_theme_space']='Anga';
+$ec_lang['lpn_theme_prairie']='Nyika';
+$ec_lang['lpn_ovl_clear_same']='Ondoa thamani maalum zinazolingana na zilizorithiwa';
+$ec_lang['lpn_ovl_clear_same_ask']='Ondoa thamani maalum za {name} zinazolingana na thamani iliyorithiwa (jumla {n})? Kila thamani hubaki kama ilivyo na hurithiwa tena. Tengua hubatilisha hili.';
+$ec_lang['lpn_settings_held_item']='{setting}: {restores}';
+$ec_lang['lpn_ovm_restores']='Ondoa hurejesha {value}, {source}.';
+$ec_lang['lpn_settings_held_from']='thamani katika {parent}';
+$ec_lang['lpn_settings_held_default']='chaguo-msingi';
+$ec_lang['lpn_settings_held_none']='hakuna maandishi';
+$ec_lang['lpn_dem_scenario']='Miinuko iliyoandikwa hapa ni thamani maalum katika senario {scenario}.';
+$ec_lang['lpn_dem_base']='Miinuko iliyoandikwa hapa huingia kwenye Msingi, kwa hiyo kila senario ambayo haijabadilisha mwinuko huirithi.';
+$ec_lang['lpn_settings_grp_size']='Ukubwa';
+$ec_lang['lpn_settings_grp_angle']='Pembe';
+$ec_lang['lpn_settings_grp_zoom']='Kukuza';
+$ec_lang['lpn_settings_grp_positions']='Nafasi';
+$ec_lang['lpn_settings_grp_thematic']='Kimada';
+$ec_lang['lpn_time_run_unbalanced']='Hatua za muda hazijasawazishwa ({n}).';
+$ec_lang['lpn_time_run_warnings']='Maonyo ({n}).';
+$ec_lang['lpn_time_run_see_report']='Tazama {report}.';
+$ec_lang['lpn_scncmp_progress']='Inatatua senario {done} kati ya {total}…';
+$ec_lang['lpn_scncmp_stopped']='Imesimama baada ya senario {done} kati ya {total}. Matokeo yaliyo hapa chini ni yale yaliyokwisha kukamilika.';
+$ec_lang['lpn_scnres_title']='Matokeo kwa kipengele';
+$ec_lang['lpn_scnres_col']='{quantity} ({unit}), {scenario}';
+$ec_lang['lpn_scnres_none']='Weka alama kwenye angalau tokeo moja la kuonyesha.';
+$ec_lang['lpn_scnres_empty']='Mradi huu hauna vipengele hivi.';
+$ec_lang['lpn_scnres_time_note']='Senario yenye muda wote wa kuendesha husomwa katika hatua ya muda iliyo kwenye skrini, {time}, au katika hatua yake ya mwisho ikiwa uendeshaji wake unaisha mapema. Kila kichwa huonyesha wakati uliosomwa.';
+$ec_lang['lpn_scnres_at_time']='({time})';
+$ec_lang['lpn_scnres_steady']='(hali thabiti)';
+$ec_lang['lpn_scnres_not_converged']='(haikukaribia suluhisho)';
+$ec_lang['lpn_scnres_not_converged_note']='Safu wima iliyowekewa alama {mark} inaonyesha matokeo ya mwisho ambayo kitatuzi kilifikia kabla ya kusimama bila kukaribia suluhisho.';
+$ec_lang['lpn_scnres_failed']='{scenario} haikuweza kutatuliwa, kwa hiyo safu wima zake ni tupu. {why}';
+$ec_lang['lpn_scnres_flow_tip']='Ishara ya mtiririko ni ishara ya mwelekeo wa ndani ya kitatuzi. Haina matumizi nje ya kitatuzi isipokuwa kuonyesha hapa kama mtiririko ulibadilisha mwelekeo kati ya senario.';
+$ec_lang['lpn_scnres_stale']='Kokotoa upya kiotomatiki imezimwa, kwa hiyo matokeo kwenye ramani na kwenye kidirisha cha Majedwali ni ya utatuzi wa awali. Safu wima za {scenario} hapa zimetatuliwa kutoka ingizo za sasa na zinaweza kutofautiana nayo.';
+$ec_lang['lpn_report_copy_html']='Nakili HTML';
+$ec_lang['lpn_demand_cats']='Kategoria za mahitaji';
+$ec_lang['lpn_demand_total_tip']='Jumla ya mahitaji ya msingi ya kategoria zote za mahitaji kwenye muunganiko huu. Ili kubadilisha kategoria, fungua kisanduku cha Kategoria za mahitaji.';
+$ec_lang['lpn_when']='Hatua ya kuripoti inayojaribiwa';
+$ec_lang['lpn_when_now']='Hatua ya kuripoti iliyo kwenye skrini';
+$ec_lang['lpn_when_hour']='Hatua ya kuripoti iliyochaguliwa';
+$ec_lang['lpn_when_minp']='Hatua ya kuripoti yenye shinikizo la chini kabisa';
+$ec_lang['lpn_when_all']='Kila hatua ya kuripoti, hali mbaya zaidi';
+$ec_lang['lpn_when_step']='Hatua ya kuripoti';
+$ec_lang['lpn_when_run']='Uendeshaji mzima';
+$ec_lang['lpn_dur_option']='Moto wa muda uliotajwa';
+$ec_lang['lpn_dur_start']='Moto huanza saa';
+$ec_lang['lpn_dur_junction']='Muunganiko wa moto';
+$ec_lang['lpn_dur_junction_none']='Hakuna uliochaguliwa. Chagua muunganiko mmoja kwenye ramani.';
+$ec_lang['lpn_dur_junction_many']='Miunganiko kadhaa imechaguliwa. Chagua muunganiko mmoja kwenye ramani.';
+$ec_lang['lpn_dur_length']='Muda wa moto';
+$ec_lang['lpn_dur_length_tip']='Saa na dakika, kama 2:00. Mtiririko wa moto ni Mtiririko wa moto unaohitajika, unaochotwa kwenye muunganiko mmoja uliochaguliwa kwenye ramani kuanzia wakati wa kuanza kwa muda huu. Uigaji mzima wa kipindi kirefu huendeshwa kwenye nakala ya mtandao na kulinganishwa na uendeshaji uleule bila moto. Mwanzo na muda lazima ziwe vizidisho kamili vya hatua ya muda ya muundo. Mfumo huhesabiwa kuwa umepona wakati, katika hatua ya mwisho ya kuripoti, hakuna muunganiko unaotofautiana kwa zaidi ya takriban psi 0.14 (kPa 1) na hakuna tanki kwa zaidi ya takriban ft 0.3 (m 0.1) kutoka kwenye uendeshaji bila moto.';
+$ec_lang['lpn_dur_no_junction']='Chagua muunganiko mmoja kwa ajili ya moto.';
+$ec_lang['lpn_dur_bad_time']='Mwanzo na muda lazima ziwe vizidisho kamili vya hatua ya muda ya muundo, {step}, na moto lazima uanze ndani ya uendeshaji.';
+$ec_lang['lpn_dur_head']='Mtiririko wa moto wa {flow} kwenye muunganiko {id}, kuanzia {start} hadi {end}.';
+$ec_lang['lpn_dur_holds']='✓ Muunganiko {id} hudumisha angalau {pressure} wakati wa moto, juu ya shinikizo linalobaki la {residual}, saa {time}.';
+$ec_lang['lpn_dur_shortfall']='⚠ Ni {delivered} tu kati ya mtiririko wa moto wa {flow} inayotolewa kwenye muunganiko {id}, saa {time}, kwa hiyo shinikizo linalobaki si jaribio la moto huo.';
+$ec_lang['lpn_dur_fails']='⚠ Muunganiko {id} unashuka hadi {pressure} wakati wa moto, chini ya shinikizo linalobaki la {residual}, saa {time}.';
+$ec_lang['lpn_dur_lowest']='Shinikizo la chini kabisa mahali popote ni {pressure}, kwenye muunganiko {id}, saa {time}.';
+$ec_lang['lpn_dur_no_empty']='✓ Hakuna tanki linalokwisha maji.';
+$ec_lang['lpn_dur_empties']='⚠ Tanki {id} linakwisha maji saa {time}. Shinikizo la kuanzia hatua hiyo halisomwi.';
+$ec_lang['lpn_dur_recovers']='✓ Mfumo unapona baada ya moto: saa {time}, hatua ya mwisho ya kuripoti, hakuna muunganiko unaotofautiana na uendeshaji bila moto kwa zaidi ya {pressure} wala tanki kwa zaidi ya {level}.';
+$ec_lang['lpn_dur_not_back_tank']='⚠ Saa {time}, hatua ya mwisho ya kuripoti, tanki {id} halijarudi kwenye kiwango chake bila moto. Tofauti ni {level}, dhidi ya uvumilivu wa {tolerance}.';
+$ec_lang['lpn_dur_not_back_junction']='⚠ Saa {time}, hatua ya mwisho ya kuripoti, muunganiko {id} haujarudi kwenye shinikizo lake bila moto. Tofauti ni {pressure}, dhidi ya uvumilivu wa {tolerance}.';
+$ec_lang['lpn_dur_recovery_to_end']='Moto hudumu hadi mwisho wa uendeshaji, kwa hiyo kupona baada yake hakutathminiwi.';
+$ec_lang['lpn_dur_recovery_cut']='Uendeshaji ulisimama kabla ya mwisho wake, kwa hiyo kupona baada ya moto hakutathminiwi.';
+$ec_lang['lpn_dur_col_pressure']='Shinikizo kwenye muunganiko wa moto';
+$ec_lang['lpn_dur_col_nofire']='Shinikizo bila moto';
+$ec_lang['lpn_dur_col_low']='Kiwango cha chini kabisa kilichofikiwa';
+$ec_lang['lpn_col_level']='Kiwango';
+$ec_lang['lpn_dur_col_margin']='Juu ya kina cha chini kabisa cha maji';
+$ec_lang['lpn_dur_col_drop']='Kushuka tangu mwanzo';
+$ec_lang['lpn_dur_col_end']='Kiwango mwishoni';
+$ec_lang['lpn_dur_col_end_nofire']='Kiwango mwishoni bila moto';
+$ec_lang['lpn_crit_col_hours']='Saa chini ya kiwango cha chini';
+$ec_lang['lpn_crit_col_stopped']='Uendeshaji ulisimama saa';
+$ec_lang['lpn_crit_col_empty']='Tanki linakwisha maji';
+$ec_lang['lpn_ds_run_note']='Imehukumiwa katika uendeshaji mzima, kwenye kila hatua ya kuripoti.';
+$ec_lang['lpn_ds_limit_at']='Hatua ya kuripoti yenye kikomo: {time}.';
+$ec_lang['lpn_ds_empties_at']='⚠ Kwa kipimo cha mahitaji cha {m}, tanki linakwisha maji saa {time}.';
+$ec_lang['lpn_ds_lowest_at_time']='Kwa kipimo cha mahitaji cha {m}, shinikizo la chini kabisa ni {pressure}, kwenye muunganiko {id}, saa {time}.';
+$ec_lang['lpn_crit_run_note']='Kila kukatika kuliendeshwa katika uigaji mzima (hatua za kuripoti {n}).';
+$ec_lang['lpn_ff_working_steps']='Inafanya kazi: hatua ya kuripoti {step} kati ya {steps}, muunganiko {done} kati ya {total}.';
+$ec_lang['lpn_ff_col_hour']='Hatua ya mtiririko wa chini kabisa';
+$ec_lang['lpn_ds_col_hour']='Hatua ya shinikizo la chini kabisa';
+$ec_lang['lpn_ff_no_steps']='Tanki linakwisha maji saa {time}, kabla ya hatua ya kwanza ya kuripoti kujaribiwa, kwa hiyo hakuna hatua iliyojaribiwa.';
+$ec_lang['lpn_ff_tank_empties']='Tanki linakwisha maji saa {time}; hatua za kuanzia hapo hazikujaribiwa.';
+$ec_lang['lpn_crit_col_lowest_tip']='Husomwa kabla ya tanki kukwisha maji tu. Baada ya hatua hiyo, miunganiko iliyobaki bila chanzo huripoti shinikizo zisizo na maana; safu wima ya Tanki linakwisha maji hutoa hatua.';
+$ec_lang['lpn_crit_empty_note']='Shinikizo la chini kabisa husomwa kabla ya tanki kukwisha maji. Miunganiko chini ya kiwango cha chini inajumuisha ile iliyobaki bila chanzo kuanzia hatua hiyo.';
+$ec_lang['lpn_ff_at_step']='Imejaribiwa katika hatua ya kuripoti {time}.';
+$ec_lang['lpn_ff_at_minp']='Imejaribiwa saa {time}, hatua ya kuripoti yenye shinikizo la chini kabisa kati ya miunganiko iliyojaribiwa.';
+$ec_lang['lpn_ff_at_all']='Hali mbaya zaidi kati ya hatua {n} za kuripoti. Kila safu mlalo inaonyesha hatua yenye mtiririko wa chini kabisa unaopatikana kwa muunganiko huo.';
+$ec_lang['lpn_ff_col_more']='Ngapi zingine';
+$ec_lang['lpn_crit_col_unserved_peak']='Mahitaji makubwa zaidi yasiyohudumiwa';
+$ec_lang['lpn_file_import_dxfnet']='Faili la DXF…';
+$ec_lang['lpn_file_import_dxfnet_tip']='Unda mradi mpya kutoka faili la DXF ambalo ukurasa huu ulihamisha. Vizuizi na polilaini zilizo kwenye tabaka zinazoanza na C-WATR-MODL- husomwa pamoja na sifa zake. Chochote kingine kwenye mchoro huorodheshwa na hakisomwi.';
+$ec_lang['lpn_dxfnet_note_layer_foreign']='Tabaka hizi hazianzi na {prefix}, kwa hiyo hakuna kilichosomwa juu yake.';
+$ec_lang['lpn_dxfnet_note_layer_unknown']='Tabaka hizi zinaanza na {prefix} lakini hazifuatiwi na msimbo wa kipengele ambao ukurasa huu huandika (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) na mbadala, kwa hiyo hakuna kilichosomwa juu yake.';
+$ec_lang['lpn_dxfnet_note_alternative']='Tabaka hizi ni za mbadala mwingine isipokuwa {alt}, ule uliosomwa, kwa hiyo hakuna kilichosomwa juu yake.';
+$ec_lang['lpn_dxfnet_note_alt_read']='Mchoro hauna mbadala wa BASE. Mbadala {alt} ulisomwa.';
+$ec_lang['lpn_dxfnet_note_curve_differs']='Pampu hizi hutaja kitambulisho cha mkondo ambacho pampu nyingine hutumia kwa nukta tofauti. Mkondo wa kwanza ulihifadhiwa.';
+$ec_lang['lpn_dxfnet_note_shapes']='Tabaka hizi zina Vielelezo, ambavyo uletaji huu hausomi. Tumia Leta, Vielelezo, Faili la DXF kwa hivyo.';
+$ec_lang['lpn_dxfnet_note_entity_unread']='Huluki hizi si aina ambayo uletaji huu husoma kwenye tabaka lake, na hazikuletwa.';
+$ec_lang['lpn_dxfnet_note_paper_space']='Huluki zilizo kwenye nafasi ya karatasi hazikusomwa: {n}.';
+$ec_lang['lpn_dxfnet_note_tag_unknown']='Lebo hizi za sifa si zile ambazo ukurasa huu huandika kwa kizuizi chake, na thamani zake hazikuletwa.';
+$ec_lang['lpn_dxfnet_note_block_unknown']='Vizuizi hivi si kizuizi ambacho ukurasa huu huandika kwa tabaka lake, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_bad_id']='Vipengele hivi vina kitambulisho ambacho ni tupu, kirefu kuliko herufi 31, au kina nafasi, nukta-mkato au alama ya nukuu, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_dup_id']='Vitambulisho hivi vimetajwa na zaidi ya kipengele kimoja cha aina ileile. Cha kwanza tu kililetwa.';
+$ec_lang['lpn_dxfnet_note_no_position']='Vizuizi hivi havina nafasi inayoweza kutumika na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_link_no_block']='Polilaini hizi hazina kizuizi katikati yake cha kueleza kitambulisho na sifa za kiungo, na hazikuletwa.';
+$ec_lang['lpn_dxfnet_note_block_no_line']='Vizuizi hivi vya viungo havina polilaini inayopita katikati yake, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_line_no_block']='Mistari hii ya huduma inaishia pasipo kizuizi cha mteja, na haikuletwa.';
+$ec_lang['lpn_dxfnet_note_end_ambiguous']='Viungo hivi vina mwisho ambapo vifundo viwili viko kwenye nukta ileile, kwa hiyo haiwezekani kubaini kiungo kinaishia kwenye kifundo kipi, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_end_no_node']='Viungo hivi vina mwisho ambapo hakuna kifundo, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_end_loop']='Viungo hivi vinaanzia na kuishia kwenye kifundo kimoja, na havikuletwa.';
+$ec_lang['lpn_dxfnet_note_pump_no_curve']='Pampu hizi hazitaji mkondo wa kimo, kwa hiyo Kokotoa haitatoa matokeo ya awali hadi kila moja ipewe mkondo.';
+$ec_lang['lpn_dxfnet_note_crs_unknown']='Faili la maelezo linataja mfumo wa kuratibu ambao ukurasa huu haujui, kwa hiyo mchoro ulifunguliwa kama gridi, bila mahali kwenye ramani.';
+$ec_lang['lpn_dxfnet_note_method']='Fomula ya upotevu wa kimo haimo kwenye faili, kwa hiyo Hazen-Williams ilidhaniwa. Thamani za usuguo zilisomwa kama C ya Hazen-Williams.';
+$ec_lang['lpn_dxfnet_note_geo_export']='Mchoro huu ulihamishwa kutoka mradi wa latitudo na longitudo. Hufunguka katika {crs}, kwa mita, mahali pale pale kwenye ramani.';
+$ec_lang['lpn_dxfnet_note_sections_read']='Sehemu za EPANET zilizopachikwa kwenye mchoro zilisomwa: {sections}.';
+$ec_lang['lpn_dxfnet_note_sections_unread']='Sehemu za EPANET zilizopachikwa kwenye mchoro hazikuweza kusomwa kama faili la EPANET, kwa hiyo hakuna iliyoletwa.';
+$ec_lang['lpn_dxfnet_count_nodes']='Miunganiko, hifadhi za maji na matanki {n}.';
+$ec_lang['lpn_dxfnet_count_links']='Mabomba, pampu na vali {n}.';
+$ec_lang['lpn_dxfnet_count_customers']='Wateja {n}.';
+$ec_lang['lpn_dxfnet_held_custom']='sifa maalum';
+$ec_lang['lpn_dxfnet_held_text']='vipengee vya Maandishi vya ramani na nafasi za lebo zilizowekwa kwa mkono';
+$ec_lang['lpn_dxfnet_note_unit_unknown']='Mchoro unaeleza vipimo hivi, ambavyo ukurasa huu haujui. Vipimo vinavyotumika vilihifadhiwa badala yake.';
+$ec_lang['lpn_dxfnet_note_coord_unit']='Mchoro unaeleza viwianishi vyake katika {coord} na urefu wake katika {length}. Viwianishi vilisomwa kama {length}.';
+$ec_lang['lpn_dxfnet_note_customer_loose']='Mistari ya huduma ya wateja hawa haianzii kwenye bomba wala kwenye kifundo. Wateja waliwekwa bila muunganisho.';
+$ec_lang['lpn_dxfnet_note_not_held']='Faili la DXF halishikilii haya, kwa hiyo hakuna lililoletwa:';
+$ec_lang['lpn_dxfnet_none']='Hakuna kilicholetwa kutoka {file}. Haina vizuizi kwenye tabaka zinazoanza na {prefix} ambavyo ukurasa huu unaweza kusoma.';
+$ec_lang['lpn_dxfnet_report_lead']='Kile ambacho hakikusomwa, na kila badiliko lililofanywa wakati wa kuleta, kimeorodheshwa hapa chini pamoja na tabaka, kizuizi au kitambulisho husika:';
+$ec_lang['lpn_shapes_every_scenario']='Vielelezo huonekana katika kila senario.';
+$ec_lang['lpn_shapes_this_scenario']='Vielelezo huonekana katika {scenario} pekee.';
+$ec_lang['lpn_library_import_every_scenario']='Kila senario inaweza kuvitumia.';
+$ec_lang['lpn_menu_back']='Rudi';
+$ec_lang['lpn_diag_valve_conflict']='Vali hizi za kudhibiti zimeunganishwa kwa njia ambayo EPANET hairuhusu, kama vali mbili za kupunguza shinikizo mfululizo. Weka bomba fupi kati yake:';
+$ec_lang['lpn_diag_gpv_curve_order']='Mikondo ya upotevu wa kimo ya vali hizi za matumizi ya jumla haiwezi kusomwa: kila mtiririko lazima uwe mkubwa kuliko ule uliotangulia, na mkondo wa nukta moja unahitaji mtiririko juu ya sifuri:';
+$ec_lang['lpn_gpv_one_point_note']='⚠ Vali hizi za matumizi ya jumla zina mkondo wa upotevu wa kimo wenye nukta moja tu, kwa hiyo upotevu wake wa kimo ulichukuliwa kuwa sawia na mtiririko, kupitia nukta hiyo: {ids}';
+$ec_lang['lpn_gis_title']='Tabaka za nyuma kutoka seva ya GIS';
+$ec_lang['lpn_gis_unlocatable']='Tabaka za nyuma zinahitaji mradi uliowekwa kwenye dunia.';
+$ec_lang['lpn_gis_kind']='Aina ya seva';
+$ec_lang['lpn_gis_kind_xyz']='URL ya vigae';
+$ec_lang['lpn_gis_kind_wms']='WMS';
+$ec_lang['lpn_gis_kind_arcgis']='ArcGIS REST (MapServer)';
+$ec_lang['lpn_gis_url']='Anwani ya seva';
+$ec_lang['lpn_gis_wms_layers']='Majina ya tabaka za WMS (yametenganishwa kwa koma)';
+$ec_lang['lpn_gis_add']='Ongeza tabaka';
+$ec_lang['lpn_gis_menu']='Ongeza tabaka…';
+$ec_lang['lpn_gis_draw']='Onyesha';
+$ec_lang['lpn_gis_opacity']='Uwazi';
+$ec_lang['lpn_gis_note']='Kuongeza tabaka hutuma eneo lililo kwenye skrini, na anwani yako ya IP, kwa seva unayoitaja. Kufungua mradi wenye tabaka hutuma tena eneo hilo na anwani hiyo.';
+$ec_lang['lpn_gis_err_address']='Anwani ya seva lazima ianze na https://.';
+$ec_lang['lpn_gis_err_template']='URL ya vigae lazima iwe na {z}, {x} na {y}.';
+$ec_lang['lpn_gis_err_layers']='Ingiza angalau jina moja la tabaka la WMS.';
+$ec_lang['lpn_gis_err_mapserver']='Anwani ya ArcGIS lazima iishie na /MapServer.';
+$ec_lang['lpn_gis_unreachable']='haipatikani';
+$ec_lang['lpn_gis_failed']='{host} haikurudisha picha ya ramani. Tabaka lake halichorwi.';
+$ec_lang['lpn_screenshot_no_gis']='Tabaka la nyuma kutoka seva ya GIS halikuweza kujumuishwa.';
+$ec_lang['lpn_export_holds_scenario']='Inashikilia senario {scenario} pekee.';
+$ec_lang['lpn_export_holds_base']='Inashikilia senario ya Msingi pekee.';
+$ec_lang['lpn_geojson_results_other']='Hakuna matokeo yaliyojumuishwa, kwa sababu matokeo yaliyo kwenye skrini ni ya senario {scenario}.';
+$ec_lang['lpn_survey_added_scenario']='Vifundo viliongezwa kwenye {scenario}. Katika Msingi havifanyi kazi.';
+$ec_lang['lpn_pane_pasted_scenario']='Thamani hizi ni thamani maalum katika senario {scenario}.';
+$ec_lang['lpn_pane_pasted_overrides']='Thamani maalum mpya ({n}).';
+$ec_lang['lpn_run_of_scenario']='Matokeo ya senario {scenario}.';
+$ec_lang['lpn_calib_scenario']='Imelinganishwa na matokeo ya senario {scenario}.';
+$ec_lang['lpn_export_leaves_alternatives']='Mbadala zilizohifadhiwa katika mradi huu hazimo kwenye faili.';
+$ec_lang['lpn_export_confirm_title']='Hamisha {format}';
+$ec_lang['lpn_noscn_lead']='Mradi huu una senario {n}, lakini {format} halina senario wala mbadala.';
+$ec_lang['lpn_noscn_fmt_inp']='faili la EPANET';
+$ec_lang['lpn_noscn_fmt_geojson']='faili la GeoJSON';
+$ec_lang['lpn_noscn_fmt_dxf']='faili la DXF';
+$ec_lang['lpn_export_goes_scenario']='Inahamisha senario "{scenario}" kwa jina la kipekee la faili.';
+$ec_lang['lpn_export_goes_base']='Inahamisha senario ya Msingi.';
+$ec_lang['lpn_export_receipt_heading']='Imehamisha {file} kutoka {scenario} ya {project}.';
+$ec_lang['lpn_export_receipt_note']='Huu ni uhamishaji, si uhifadhi: mradi huu haujaunganishwa na faili.';
+$ec_lang['lpn_dxf_exported_geo_tail']='Viwianishi vyake ni {crs}, kwa mita, si latitudo na longitudo.';
+$ec_lang['lpn_field_auto_length']='Urefu wa kiotomatiki';
+$ec_lang['lpn_edit_pipetypes']='Hariri aina…';
+$ec_lang['lpn_edit_fittings']='Hariri viungio…';
+$ec_lang['lpn_edit_curves']='Hariri mikondo…';
+$ec_lang['lpn_field_tank_level_short']='Kina cha awali';
+$ec_lang['lpn_field_tank_minlevel_short']='Kina cha chini';
+$ec_lang['lpn_field_tank_maxlevel_short']='Kina cha juu';
+$ec_lang['lpn_field_active_short']='Hai';
+$ec_lang['lpn_field_cv_short']='Vali ya kuzuia mtiririko kurudi nyuma';
+$ec_lang['lpn_field_km_short_tip']='Mgawo wa upotevu mdogo (wa ndani), k: kimo kinachopotea kwenye viungio na mikunjo kando ya bomba, kama kizidisho cha kimo cha kasi.';
+$ec_lang['lpn_field_km_fittings_tip']='Mgawo wa upotevu mdogo (wa ndani), k: jumla ya migawo ya orodha ya viungio iliyochaguliwa hapo juu. Chagua "Hakuna orodha ya viungio iliyochaguliwa" ili kuandika thamani.';
+$ec_lang['lpn_field_valve_km_short_tip']='Mgawo wa upotevu mdogo (wa ndani), k: upotevu kupitia mwili wa vali wakati vali iko wazi kabisa, kama kizidisho cha kimo cha kasi, pamoja na upotevu wowote kutoka kwenye mpangilio wa vali. Tumia 0 kuupuuza.';
+$ec_lang['lpn_reaction_bulk_pipe_tip']='Mgawo wa mwitikio wa wingi: kiwango cha mwitikio ndani ya mwili wa maji katika bomba hili (tazama Msaada wa EPANET). Namba hasi hupunguza kemikali na chanya huiongeza. Tupu humaanisha kutumia mgawo uliowekwa kwa mtandao mzima chini ya Mipangilio, Ukokotoaji, Ubora.';
+$ec_lang['lpn_reaction_wall_pipe_tip']='Mgawo wa mwitikio wa ukuta: kiwango cha mwitikio kwenye ukuta wa bomba hili (tazama Msaada wa EPANET). Namba hasi hupunguza kemikali. Tupu humaanisha kutumia mgawo uliowekwa kwa mtandao mzima chini ya Mipangilio, Ukokotoaji, Ubora.';
+$ec_lang['lpn_reaction_tank_short_tip']='Mgawo wa mwitikio: kiwango cha mwitikio katika maji yaliyomo kwenye tanki hili, kwa 1/siku. Namba hasi hupunguza kemikali na chanya huiongeza. Tupu humaanisha kutumia mgawo wa mwitikio wa wingi uliowekwa kwa mtandao mzima chini ya Mipangilio, Ukokotoaji, Ubora.';
+$ec_lang['lpn_field_tank_level_short_tip']='Kina cha awali: kina cha maji kwenye tanki mwanzoni mwa uendeshaji, kinachopimwa kutoka chini ya tanki kwenda juu.';
+$ec_lang['lpn_field_tank_minlevel_short_tip']='Kina cha chini: kina cha chini kabisa kinachoruhusiwa cha maji kwenye tanki, kinachopimwa kutoka chini ya tanki kwenda juu.';
+$ec_lang['lpn_field_tank_maxlevel_short_tip']='Kina cha juu: kina cha juu kabisa kinachoruhusiwa cha maji kwenye tanki, kinachopimwa kutoka chini ya tanki kwenda juu.';
+$ec_lang['lpn_field_auto_length_tip']='Urefu wa kiotomatiki: ukiwa umewekewa alama, urefu hupimwa kando ya mteremko: kando ya mstari uliochorwa, pamoja na kupanda au kushuka kati ya miinuko ya ncha mbili, na hufuata mchoro kifundo kinapohamishwa au mwinuko wa mwisho unapobadilika. Ondoa alama kwenye kisanduku ili kuandika urefu wako mwenyewe.';

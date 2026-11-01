@@ -7554,7 +7554,7 @@ var EngCalcs = EngCalcs || {};
 		if (st && st.alt === scenarioDisplayName(activeScenario())) { st = null; }
 		if (!st) { return smSharedText(cats); }
 		return st.users.length
-			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
+			? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clearing or editing it changes them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
 			: (pc.lpn_ovm_dot_alt || 'This override is stored in alternative "{alternative}".').split('{alternative}').join(st.alt);
 	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
@@ -46299,7 +46299,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
 		// The head loss formula, named and then coded in brackets (HW, DW or MANNING) for the import to find.
-		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.')
+		readme.push((pc.lpn_dxf_note_headloss || 'Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula.')
 			.replace('{formula}', frictionMethodLabel()).replace('{code}', frictionMethod() === 'manning' ? 'MANNING' : frictionMethod().toUpperCase()));
 		// A scenario's demand multiplier is a calculation setting the file does not hold; the read-me states it
 		// when it is not 1, so a reader can enter it again.
@@ -47916,7 +47916,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				list(na);
 			}
 			if (plan.noteLines && plan.noteLines.length) {
-				p(pc.lpn_gjup_h_notes || 'Reading the file', true);
+				p(pc.lpn_gjup_h_notes || 'Import notes', true);
 				list(plan.noteLines);
 			}
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }],
@@ -64350,7 +64350,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				name.appendChild(bad);
 				grp.className = 'lpn-gis-controls';
 				on.type = 'checkbox'; on.className = 'lpn-gis-on'; on.checked = gisPermitted(l);
-				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Draw')));
+				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Show')));
 				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
 				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
 				op.setAttribute('inputmode', 'decimal');
@@ -87309,7 +87309,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		rows = fullReportRows();
 		if (!rows.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full.', host);
 			return;
 		}
 		frames = reportFrames();
@@ -87317,7 +87317,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (lastRunScenarioName()) {
 			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
 		}
-		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download, copy, or print carries every time step; the table below shows one at a time.', host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A cell is blank where the node or link has no such quantity. Download, copy, or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
