@@ -8526,6 +8526,11 @@
             "on": "<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>",
             "ruled": "2026-10-30",
             "answer": "Good."
+        },
+        "lpn_ff_col_more": {
+            "on": "How many others",
+            "ruled": "2026-11-01",
+            "answer": "I am the one who change \"And others\" to \"How many others\"."
         }
     }
 }

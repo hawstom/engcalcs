@@ -215,8 +215,8 @@
                 "other junctions that also fall below the limit",
                 "other pipes or steps"
             ],
-            "disposition": "english",
-            "resolution": "Restored \"And others\", the heading Tom named in Task 845; an agent had changed it to \"How many others\" without his word."
+            "disposition": "dismissed",
+            "resolution": "Tom chose \"How many others\" himself (2026-11-01); kept."
         },
         {
             "key": "lpn_guide_bx_dock_def",

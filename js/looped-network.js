@@ -82139,7 +82139,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
 			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
 		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time (hr)', null, false, worstG]] : []).concat([
-			[pc.lpn_ff_col_more || 'And others', null, false, worstG],
+			[pc.lpn_ff_col_more || 'How many others', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'

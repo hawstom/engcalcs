@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**167 still to read on master**, of 328 untranslated keys, of 3289 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**133 still to read on master**, of 287 untranslated keys, of 3289 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (328, 167 to read @@ NEEDS RULING)
+## lpn_  (287, 133 to read @@ NEEDS RULING)
 
 - **`lpn_calc_hint`**
   > When “Recalculate automatically” is on, this command is not needed.
@@ -313,36 +313,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_edit_pipetypes`**
   > Edit types…
   @@ NEEDS RULING
-- **`lpn_ex_extension_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_extension_si_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction delivers 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
-  @@ NEEDS RULING
-- **`lpn_ex_extension_si_title`**
-  > Johnson City extension, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_extension_title`**
-  > Johnson City extension, gpm (US)
-  @@ NEEDS RULING
-- **`lpn_ex_valves_desc`**
-  > A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one regulating in the solved network. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_valves_title`**
-  > Valve types, gpm (US)
-  _Ruled OK 2026-10-20._
-- **`lpn_ex_well_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
-  @@ NEEDS RULING
-- **`lpn_ex_well_si_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
-  @@ NEEDS RULING
-- **`lpn_ex_well_si_title`**
-  > Munday well and tank, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_ex_well_title`**
-  > Munday well and tank, gpm (US)
-  @@ NEEDS RULING
 - **`lpn_export_confirm_title`**
   > Export {format}
   @@ NEEDS RULING
@@ -380,7 +350,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Step of lowest flow
   _Ruled OK 2026-10-20._
 - **`lpn_ff_col_more`**
-  > And others
+  > How many others
   @@ NEEDS RULING
 - **`lpn_ff_no_steps`**
   > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
@@ -526,33 +496,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_gpv_one_point_note`**
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
-- **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_ff_dur_def`**
-  > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_page_desc`**
-  > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_page_missing`**
-  > There is no such chapter. The chapters are listed below.
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_page_open`**
-  > Open the application
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_page_what`**
-  > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_scn_move_def`**
-  > <p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_scn_move_term`**
-  > Moving or merging between scenarios
-  @@ NEEDS RULING
-- **`lpn_guide_text_demands_box`**
-  > Lists the demand categories of the selected junction, one row for each, with the base demand and the demand pattern of every category. The plus button adds a category. With more than one category, Base demand in Properties is their total and is read-only. Customers lumped at the junction are listed with their demand. In a scenario, an edit is an override and Base is not changed.
-  _Ruled 2026-10-30: Good._
 - **`lpn_inpup_ask_title`**
   > Import {file}
   _Ruled OK 2026-10-20._
@@ -703,62 +646,11 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_menu_back`**
   > Back
   @@ NEEDS RULING
-- **`lpn_morph_vertex`**
-  > Vertex
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_base`**
-  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_base_ask`**
-  > A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?
-  @@ NEEDS RULING
 - **`lpn_morph_vertex_clear_also`**
   > Initial quality {quality} is cleared too.
   @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_both`**
-  > Clear elevation {elev} and demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_demand`**
-  > Clear demands {demands} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_elev`**
-  > Clear elevation {elev} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_clear_quality`**
-  > Clear initial quality {quality} on {id}?
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_customers`**
-  > {id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_demand`**
-  > {id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.
-  @@ NEEDS RULING
 - **`lpn_morph_vertex_done`**
   > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_kind`**
-  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex belongs only to a pipe.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_links`**
-  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_loop`**
-  > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_own`**
-  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear that data first.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_pipes`**
-  > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_switch`**
-  > Switch to Base and morph
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_text`**
-  > {id} was not morphed into a vertex: a Text is attached to it.
-  @@ NEEDS RULING
-- **`lpn_morph_vertex_type`**
-  > {id} was not morphed into a vertex: only a junction can become one.
   @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
@@ -805,18 +697,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ovl_clear_same_ask`**
   > Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.
   @@ NEEDS RULING
-- **`lpn_ovm_dot_alt`**
-  > This override is stored in alternative "{alternative}".
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_alt_shared`**
-  > This override is stored in alternative "{alternative}", also used by {list}, so clearing or editing it changes them too.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_clear_one`**
-  > Click to clear this override.
-  @@ NEEDS RULING
-- **`lpn_ovm_dot_set_from`**
-  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
 - **`lpn_ovm_restores`**
   > Clear restores {value}, {source}.
   @@ NEEDS RULING
@@ -856,9 +736,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
-- **`lpn_result_status_cv`**
-  > CV
-  @@ NEEDS RULING
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
@@ -1031,9 +908,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`0f5f4e248`) — adds no English strings
+### box-design (`c3b978bb5`) — adds no English strings
 
-### chore/sprint-1101 (`91e6a3415`) — adds no English strings
+### chore/sprint-1101 (`7b1a8288e`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
