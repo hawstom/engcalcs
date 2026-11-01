@@ -180,6 +180,7 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// File, Convert as and the coordinate-system chooser (round 11b, dev/box-float-design.md): question boxes made movable and
 		// resizable through wireFloatBox(), and placed through the seam like every standing box, so a phone gets the whole window.
 		['openConvertAsBox', 'the Convert as box'],
+		['openNewProjectBox', 'the New project box (round 11d)'],
 		['openCrsBox', 'the coordinate-system chooser']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(|placeFloatBox\(/.test(body(p[0])));
