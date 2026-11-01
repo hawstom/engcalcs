@@ -39,10 +39,10 @@ an analysis box (Fire flow, Criticality, Demand scaling) after its own run, and 
 | Status changes | 320, floor | 832 | 382 | none |
 | Calibration report | 320, floor (was 496) | 832 | 382 | none |
 | Full report | 832, cap | 832 | 382 | none; scrolls sideways inside its table on a phone |
-| Scenario manager | own rule | 352 on Net3, 1050 on Net1 (widens to its table) | 382 | on a phone docked at 273: scenario names "Max day with main break", "Peak hour with main break" (Net1) |
-| Settings | 618 (38.6 rem; was 552) | 618 | 382 floating, 273 docked | **PC, both:** "Average Chlorine concentration", "Show labels when zoomed to this map width", "Text halo width (percent of text size)", "Label flip angle adjustment (degrees)", "Snap leader lines to set angles", "Prevent nodes from scaling larger than", "Draw link labels along the link line", "Solid background behind labels", "Time series graphs on the map", "Background image opacity (0 to 1)", "Show override markers on the map", "Use the built-in solver when possible", "Bulk reaction coefficient (1/day)", "Wall reaction coefficient (ft/day)" (Net3 lacks the first); the Before and unit boxes hold "Qb=", "Init.", "mg/L", "km=", "Cb=", "Cw=" slightly cut. **Phone:** more than sixty labels, among them "Head loss gradient", "Elevation and head", "Map coordinates", "Data classification method", "Friction method", "Demand model", "Pump efficiency (percent)" |
-| Properties | 320 (20 rem; was 416) | 413 on Net1, 402 on Net3 | 382 floating, 273 docked | PC none, except the Net3 junction's coordinates "2223768.890508" and "5968033.952953" at 320. Phone docked 273: "Emitter coefficient ()", "Chlorine concentration ()" and their unit "gpm/psi", "mg/L" |
-| Demand categories | 328 | 328 | 382 | docked on PC: "Demand categories (10)" (Net1 and Net3) |
+| Scenario manager | own rule | 352 on Net3, 1050 on Net1 (widens to its table) | 382 | none after wrapping (was: scenario names on a 273 px phone dock) |
+| Settings | 618 (38.6 rem; was 552) | 618 | 382 floating, 273 docked | no cut label after wrapping (was 14 on PC, 60+ on a phone); the unit cells "Qb=", "Init.", "mg/L", "km=", "Cb=", "Cw=" are cut values |
+| Properties | 320 (20 rem; was 416) | 413 on Net1, 402 on Net3 | 382 floating, 273 docked | none after wrapping (was: "Emitter coefficient ()", "Chlorine concentration ()" and their units on a 273 px phone dock); Net3 junction coordinates at 320 are values |
+| Demand categories | 328 | 328 | 382 | none; the title is clipped plain, never "Demand catego..." |
 | Find and replace | 368 (23 rem) | 352 | 382 | none |
 | Libraries | 432 (27 rem) | 704 | 382 floating, 273 docked | PC docked and phone: the curve-point lists in Net3's pattern and curve rows (values, e.g. "1.34 1.94 1.46 ..."), cut in their input field |
 | Contour plot | 320 (floor) | 408 | 382 | none |
@@ -80,26 +80,24 @@ Initial status, Status, Water age) up to 12 px left of the others.
 6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
    the window.
 
-## What Tom should look at with his own eyes
+## Result of the probe, after wrapping (branch `fix/name-wrap`, 2026-11-01)
 
-1. **Settings** is the one box with cut labels on a PC, at its own width, docked or floating: about a dozen
-   rows in the Map, Calculation and Quality sections (list in the table). They are clipped without an
-   ellipsis and without a tip, as box-design chose; Task 852 decides whether that is acceptable for a name
-   a visitor must read. The "Head loss gradient" label Tom found is cut on a phone only, at 273 docked
-   and at 382 floating.
-2. **Settings on a phone** (docked 273): more than sixty labels cut. The two-column row keeps the name column
-   at a fixed share, so the name is what is lost.
-3. **Properties on a phone, docked**, junction with Chlorine concentration or Emitter coefficient: the
-   labels and their units are cut. **Scenario manager on a phone, docked**: scenario names.
-4. **Libraries**, a curve's point list: it is cut inside its input; check whether that field scrolls or
-   can be widened.
-5. **Demand categories docked on a PC**: the button text "Demand categories (10)" is clipped at 328.
-6. The docked widths that changed since the last audit: Pump energy 496 to 416, Calibration 496 to 320,
-   Settings 552 to 618, Properties 416 to 320, Demand scaling 384 to 328. Check each feels right.
-7. In the probe's run with `EC_DEFAULT_DOCKS` on, these boxes opened floating from their menu rows, not docked (Pump energy, Scenario comparison, Run
-   report, Status changes, Calibration, Full report, Demand categories, Find, Contour plot, the analyses)
-   so their "Docked PC" widths above are the stored ones (`LPN_DOCK_OPTIMAL_REM`), not observed. If they should
-   open docked, that is a finding.
+A label or name now wraps as many lines as it needs, on one shared rule (`.lpn-gname`, the Settings row, the
+Scenario manager name, the theme button name, the "Saved in this browser" badge), over the Label column's
+floor. Nothing is clipped and no ellipsis is drawn anywhere in the box style; a box title too long for its
+bar is clipped plain, so the bar's buttons stay where they are.
+`box-label-wrap-browser-harness.js` opens Settings, Properties, Scenario manager and Demand categories in
+English and Spanish, on a PC (floating and docked) and a phone (floating and docked at 273) and finds no cut
+label, no ellipsis and, in Demand categories, exactly its four columns with no rule inside the last.
+
+- **Settings, Properties, Scenario manager on a phone dock (273):** no cut label (was 60+, two, two).
+- **Demand categories:** the stray vertical line was the border before the unlabeled delete column, drawn
+  even when a lone row has no button; it is gone, and the delete column is narrower so Description has room.
+  The title keeps its words and is clipped at the bar with no "...".
+- **What is still cut, as values and not labels:** the unit cells beside a number ("Qb=", "Init.",
+  "mg/L", "km=", "Cb=", "Cw=") and Libraries' curve-point lists, which are inside their own input.
+- **Docked widths** (table above) are unchanged; Properties 320 and Demand categories 328 hold their text by
+  wrapping now.
 
 ## What is not covered
 

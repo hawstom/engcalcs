@@ -330,12 +330,12 @@ async function main() {
 				const m = await S.page.evaluate(() => {
 					const c = document.getElementById('lpn_setbox_content'), rows = Array.from(c.querySelectorAll('.lpn-set-row')).filter((r) => r.getBoundingClientRect().width > 0);
 					const names = rows.map((r) => r.firstElementChild).filter((n) => n && n.getBoundingClientRect().width > 0);
-					const bad = names.filter((n) => { const cs = getComputedStyle(n), lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2; return cs.whiteSpace !== 'normal' || cs.textOverflow === 'ellipsis' || n.clientHeight > 2 * lh + 1; }).length;
+					const bad = names.filter((n) => { const cs = getComputedStyle(n); return cs.whiteSpace !== 'normal' || cs.textOverflow === 'ellipsis'; }).length;
 					const cols = rows[0] ? getComputedStyle(rows[0]).gridTemplateColumns : '';
 					const two = rows.filter((r) => getComputedStyle(r).gridTemplateColumns.split(' ').length > 1).length;
 					return { rows: rows.length, bad, two, cols, pageX: document.documentElement.scrollWidth - document.documentElement.clientWidth };
 				});
-				ok(mode + ' E1. Settings names wrap to at most two lines, no ellipsis, at 12 rem (Task 852)', m.rows > 3 && m.bad === 0, JSON.stringify(m));
+				ok(mode + ' E1. Settings names wrap as needed, no ellipsis, at 12 rem (Task 852)', m.rows > 3 && m.bad === 0, JSON.stringify(m));
 				ok(mode + ' E1b. its rows keep two columns', m.rows > 3 && m.two === m.rows, m.two + ' of ' + m.rows);
 				ok(mode + ' E2. the page does not scroll sideways', m.pageX <= 0, String(m.pageX));
 				ok(mode + ' E3. no page error', S.errors.length === 0, S.errors.join(' | '));
