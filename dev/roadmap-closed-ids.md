@@ -758,3 +758,9 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|836| CLOSED 2026-10-30 (found already fixed, `66b1d68c6`): Morph to vertex in a scenario asks "Switch to Base and morph?"; `morph-vertex-harness.js`.
 - 0|841| CLOSED 2026-10-30 (found already fixed, `045b75581`): `LPN_LABEL_STATIONS_MAX` caps label stations per pipe; `label-station-cap-harness.js`.
 - 0|843| CLOSED 2026-10-30 (`fix/p100-defects`): one global `option, optgroup` rule makes every pull-down readable in Dark; `select-dark-sheet-browser-harness.js` added.
+- 0|833| CLOSED 2026-10-31 (reached master through box-design round 6, `fix/fresh-freeze`, `fix/phone-open-freeze`): first open after Fresh docks the first-view boxes; Net3 no longer freezes.
+- 0|834| CLOSED 2026-10-31 (`feat/first-view`, via box-design round 6): every box docked and auto-hidden on first view; a pinned box keeps its tab.
+- 0|838| CLOSED 2026-10-31 (`6de3f9384`, via box-design round 6): "Edit curves…" is the last option of every curve pull-down.
+- 0|839| CLOSED 2026-10-31 (`6de3f9384`, via box-design round 6): Ida's short Properties labels, each with a tip that expands it.
+- 0|840| CLOSED 2026-10-31 (via box-design round 6): report cells mixing value, place and time are split into columns.
+- 0|844| CLOSED 2026-10-31 (`17413e4d7`, `fix/settings-fit`): Settings 618 px, the tick tight on its row, the phone bar as heading.
