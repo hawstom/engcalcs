@@ -4875,3 +4875,12 @@ OBSERVED: Libraries Curves/Pipe types/Fittings ?: no title, aria "User manual: <
 OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 3/5, units-wrap es FAILs, sheet-style 85/86).
 SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
 Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.
+
+## 2026-11-01 -- feat/native-wire, Task 733 slice 7 (bb5c8ab02)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3/n600 fixture): built-in solver ticked, Calculate runs the loop (engine native, 25 frames, no EPANET banner) on Net1 and Net3; unticked EPANET runs. native-wire-harness 50/50.
+OBSERVED: Net3 native vs EPANET, 25 frames: junction heads within 2.4e-4 m, flows 3e-5, tank levels 1.2e-4 m, trace quality 0.10; status words identical. BUT in the frames: reservoir pressure 67.06 / 50.90 native vs 0 EPANET; a running pump's velocity 1.82 native vs 0 EPANET; a closed pump or closed pipe headloss -60.96 / -31.70 native vs 0 EPANET (steady native solver, same as before the branch; the Tables pane can show them).
+OBSERVED: Net1 chemical native: notice shows once ("The built-in solver does not report reaction rates..."), not repeated on rerun, drawn over the map-tool hint line; frames carry no link rates.
+OBSERVED: refused case (control on reservoir Lake, link 330): runs in EPANET, status "...does not run this simulation for: 330." Bare link id.
+OBSERVED: 600-junction/1000-link n600 fixture with 24 h clock, no tanks: native run blocks the page 6.8 s (age quality 7.0 s); EPANET 1.2 s. No progress shown.
+OBSERVED: scenario comparison still always uses EPANET for a period (scenarioCompareRunsPeriod); fire flow/criticality/demand scaling use engineFor() (steady, native when engine setting native) unchanged by the branch.
+Method: scratchpad perry733 (a..i.js).
