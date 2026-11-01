@@ -74192,7 +74192,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// box opens** (Tom, 2026-10-03: *"initially no wider than needed to avoid all but the
 			// 5%-ile (1 line in 20 ...) wrapping"*). Selecting another element while it is open
 			// keeps the width it had, so it does not jump as he clicks around.
-			if (!(wasOpen && popupAutoW)) { popupAutoW = popupFitWidth(popup); }
+			// The Label column is fitted to its longest label first (gridFitNow, otherwise a frame later), so the width asked for is the grid's own and not 11 px short of it.
+			if (!(wasOpen && popupAutoW)) {
+				var fitHost = document.getElementById('lpn_popup_fields'), fitBody = fitHost && fitHost.parentNode;
+				if (fitBody && fitBody.classList.contains('lpn-popover-body') && fitHost.classList.contains('lpn-gprops')) {
+					fitBody.__lpnScaled = false; fitBody.__lpnFrac = 0; fitBody.__lpnW = 0; gridFitNow(fitBody);
+				}
+				popupAutoW = popupFitWidth(popup);
+			}
 			popup.style.width = Math.min(popupAutoW, window.innerWidth - 2 * POPUP_EDGE) + 'px';
 			popup.style.left = sx + 'px';
 		}
