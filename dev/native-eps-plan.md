@@ -373,8 +373,8 @@ stated; the loop copies that (`rec.on = 'reservoir'`, `reset = true`). hydstatus
 above) changes it when its setting differs from the control's, else when its status does (measured: an OPEN
 control re-opens a valve stated Closed; two contradicting controls on one valve flip each trial in EPANET and
 the case is not held). The solver builds its valve arrays once, so the loop judges a valve between solves
-(`valveSwitch()`) and solves again from the same flows until nothing changes. Held by 12 cases in
-`native-eps-harness.js` (PRV, PSV-style fixed, FCV, TCV, PBV; setting and status changes).
+(`valveSwitch()`) and solves again from the same flows until nothing changes. Held by 11 cases in
+`native-eps-harness.js` (a reservoir; PRV, FCV, TCV and PBV; setting and status changes).
 Known and not part of this: an FCV at its limit in parallel with a narrow bypass differs by 0.02 L/s from EPANET
 (a plain-solver gap, with or without a control).
 
