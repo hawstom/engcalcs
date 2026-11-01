@@ -343,7 +343,7 @@ named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 | Falls back for | Where it is decided | Why it stays |
 |---|---|---|
 | EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | A separate extension: a multi-species reaction network with its own integrator and segment transport. Left on EPANET by decision. |
-| A [RULES] premise on a pipe's roughness, a reservoir's level or pressure, or a GPV's setting; a hydraulic step under 10 s with any rule | `native-run-rules` | EPANET reads these; the loop does not copy them. Roughness and GPV settings are not state the loop holds. Not built. |
+| A hydraulic step under 10 s with any rule | `native-run-rules` | EPANET's rule step is the hydraulic step over ten in whole seconds, so under 10 s it is zero and `% 0` stops the engine (measured: `lpnEpanetRun` returns not-ok with no issues). There is no answer to match. |
 | A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
 | A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
 | A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | A real failure, shown as EPANET's answer. |
@@ -418,3 +418,12 @@ flow). EPANET's tank lands 6.7e-7 m above the minimum, so `tankstatus()` (strict
 open for the next 3124 s and `tanklevels()` clamps the volume it cannot supply; the loop lands 8e-7 m below and shuts
 it. Tighter EPANET convergence (FlowChange 1e-12) moves EPANET's side by 3e-7 m, not across the line. 1.5 is held to its
 event (`native-analysis-wire-harness.js`), and 1.45, 1.48, 1.52, 1.55, 1.6 and 2 are held for the whole run.
+
+## The rule premises that fell back (native-wire, slice 3)
+
+Copied now, from rules.c `checkvalue()` and input1.c/input3.c: a pipe's SETTING (LinkSetting is Kc, which inithyd() fills;
+rules.c converts it for PRV, PSV, PBV and FCV only, so a Darcy-Weisbach roughness is held in feet and compared with the number
+as typed in millimetres); a GPV's SETTING (the index of its curve, read from the file the bridge writes, or the 0 of the
+throttle a curveless GPV is written as); and a reservoir's LEVEL and PRESSURE (its head less its base head, which EPANET
+keeps in the node's elevation, so 0 until a head pattern moves it). Held by 8 cases in `native-eps-harness.js` and by
+`native-rules-refusal-harness.js`, which now says the loop copies them.

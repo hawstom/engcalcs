@@ -455,6 +455,50 @@ const RULE_CASES = [
 			rhm: [1, 1, 0.97, 0.94, 0.9, 0.9, 0.94, 0.98, 1.02, 1.04, 1.04, 1.02] }),
 			'RULE H1\nIF RESERVOIR R HEAD BELOW 76\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
 		statusOf: 'P2', switches: 2 },
+	{ name: 'a reservoir\'s LEVEL as a premise, on a head pattern (its head less its base head)',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18, rPattern: 'RH',
+			rhm: [1, 1, 0.97, 0.94, 0.9, 0.9, 0.94, 0.98, 1.02, 1.04, 1.04, 1.02] }),
+			'RULE H1\nIF RESERVOIR R LEVEL BELOW -4\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', closedAt: [4, 5, 6, 7], openAt: [0, 1, 2, 3, 8] },
+	{ name: 'a reservoir\'s PRESSURE as a premise, on a head pattern',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18, rPattern: 'RH',
+			rhm: [1, 1, 0.97, 0.94, 0.9, 0.9, 0.94, 0.98, 1.02, 1.04, 1.04, 1.02] }),
+			'RULE H1\nIF RESERVOIR R PRESSURE ABOVE 2\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', closedAt: [10, 11], openAt: [9, 12] },
+	{ name: 'a reservoir with no head pattern: LEVEL is 0 all run',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE H1\nIF RESERVOIR R LEVEL ABOVE 0.5\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', openAt: [0, 5] },
+	{ name: 'a pipe\'s roughness (SETTING) as a premise, Hazen-Williams C 130, true',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE N1\nIF PIPE P1 SETTING ABOVE 100\nAND SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', closedAt: [6, 7], openAt: [4, 9] },
+	{ name: 'a pipe\'s roughness (SETTING) as a premise, false: the rule never fires',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE N1\nIF PIPE P1 SETTING BELOW 100\nAND SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', openAt: [4, 6, 7, 9] },
+	{ name: 'a pipe\'s roughness (SETTING) as a premise, Darcy-Weisbach: EPANET holds it in feet, compared with the number as typed in mm',
+		model: (() => {
+			const m = ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+				'RULE N1\nIF PIPE P1 SETTING ABOVE 0.0004\nAND SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN',
+				(v, kind) => (kind === 'flow' ? v / 1000 : kind === 'roughness' ? v / 1000 : v));
+			m.method = 'dw';
+			m.links.forEach((l) => { if (l.type === 'pipe') { l.roughness = 0.00015; } });
+			return m;
+		})(),
+		statusOf: 'P2', closedAt: [6, 7], openAt: [4, 9], headTol: 2e-3, flowTol: 2e-5 },
+	{ name: 'a GPV\'s SETTING as a premise is the index of its curve (1), so ABOVE 0 is true and ABOVE 1 is not',
+		model: (() => {
+			const m = ruled(valveLine('GPV', 0, [], 0.25, { len: 600, dia: 0.15 }),
+				'RULE G1\nIF VALVE V SETTING ABOVE 0\nAND SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE PB STATUS IS CLOSED\nELSE PIPE PB STATUS IS OPEN\nRULE G2\nIF VALVE V SETTING ABOVE 1\nTHEN PIPE P2 STATUS IS CLOSED');
+			m.links.find((l) => l.id === 'V').curvePoints = [[0, 0], [0.02, 5], [0.05, 20]];
+			return m;
+		})(),
+		statusOf: 'PB', closedAt: [6, 7], openAt: [4, 9] },
+	{ name: 'a GPV with no curve is written as a throttle at zero loss; its SETTING is 0',
+		model: ruled(valveLine('GPV', 0, [], 0.25, { len: 600, dia: 0.15 }),
+			'RULE G1\nIF VALVE V SETTING BELOW 0.5\nAND SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE PB STATUS IS CLOSED\nELSE PIPE PB STATUS IS OPEN'),
+		statusOf: 'PB', closedAt: [6, 7], openAt: [4, 9] },
 	{ name: 'hydraulic step 30 min (rule step 3 min), report 30 min: tank-level rule on a pump', offGrid: true,
 		model: ruled(pumpedTank({ level: 3, p3: 'closed', controls: [], times: { hydraulicStep: H / 2, reportStep: H / 2, patternStep: H } }),
 			'RULE 1\nIF TANK T LEVEL ABOVE 8\nTHEN PUMP PU STATUS IS CLOSED\nRULE 2\nIF TANK T LEVEL BELOW 4\nTHEN PUMP PU STATUS IS OPEN'),
@@ -612,7 +656,7 @@ async function compare(c) {
 			}
 		});
 	}
-	const qTol = Math.max(FLOW_TOL, FLOW_REL * qMax);
+	const qTol = c.flowTol || Math.max(FLOW_TOL, FLOW_REL * qMax), hTol = c.headTol || HEAD_TOL;
 	let exercised = true, why = '';
 	if (c.moves) {
 		const sw = range[c.moves === '*' ? tankIds[0] : c.moves].hi - range[c.moves === '*' ? tankIds[0] : c.moves].lo;
@@ -664,7 +708,7 @@ async function compare(c) {
 		exercised = exercised && (c.spillsNot ? !spilling : spilling) && (c.spillsNot ? qN < 1e-4 : qN > 1e-4);
 		why += `${why ? '; ' : ''}${c.spills} carries ${(q * 1000).toFixed(2)} L/s into the full tank at the end`;
 	}
-	ok(c.name, sameSteps && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && unconv === 0 && exercised && stDiff === 0,
+	ok(c.name, sameSteps && dH <= hTol && dL <= hTol && dQ <= qTol && unconv === 0 && exercised && stDiff === 0,
 		`steps ${nat.frames.length}/${epa.frames.length}${sameSteps ? '' : ' DIFFER'}  ` +
 		`dH=${dH.toExponential(2)} m @${atH}  dLevel=${dL.toExponential(2)} m @${atL || '-'}  ` +
 		`dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})` +
@@ -793,9 +837,6 @@ async function run() {
 			r.issues.some((i) => i.code === 'native-run-rules' && i.ids.indexOf(id || 'Q') >= 0), JSON.stringify(r.issues || ''));
 	};
 	const gpv = (m) => { m.links.push({ id: 'G', type: 'valve', valveType: 'GPV', from: 'J', to: 'K', diameter: 0.1, setting: 1, k: 0, length: 0, status: 'open' }); };
-	ruleRefusal('a premise on a pipe\'s roughness', 'RULE Q\nIF PIPE P1 SETTING ABOVE 100\nTHEN PIPE P9 STATUS IS CLOSED');
-	ruleRefusal('a premise on a reservoir\'s pressure', 'RULE Q\nIF RESERVOIR R PRESSURE ABOVE 1\nTHEN PIPE P9 STATUS IS CLOSED');
-	ruleRefusal('a premise on a GPV\'s setting', 'RULE Q\nIF VALVE G SETTING ABOVE 1\nTHEN PIPE P9 STATUS IS CLOSED', gpv);
 	ruleRefusal('FILLTIME on a junction (EPANET error 201)', 'RULE Q\nIF NODE J FILLTIME BELOW 1\nTHEN PIPE P9 STATUS IS CLOSED');
 	ruleRefusal('a time EPANET cannot read (error 202)', 'RULE Q\nIF SYSTEM TIME > 25 PM\nTHEN PIPE P9 STATUS IS CLOSED');
 	ruleRefusal('a negative setting in an action (error 202)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN PUMP PU SETTING IS -1',

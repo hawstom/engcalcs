@@ -58,7 +58,7 @@ const REFUSED = [
 	['an action on a link that does not exist (error 204)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN PIPE NOSUCH STATUS IS CLOSED'],
 	['a premise on a node that does not exist (error 203)', 'RULE Q\nIF NODE NOSUCH PRESSURE BELOW 10\nTHEN PIPE P9 STATUS IS CLOSED']
 ];
-// Rules EPANET reads and runs, which the built-in loop does not copy: not named here.
+// Rules EPANET reads and runs (the loop copies them now: slice 3 of native-wire): not named here.
 const READ = [
 	['a premise on a pipe\'s roughness', 'RULE Q\nIF PIPE P1 SETTING ABOVE 100\nTHEN PIPE P9 STATUS IS CLOSED'],
 	['a premise on a reservoir\'s pressure', 'RULE Q\nIF RESERVOIR R PRESSURE ABOVE 1\nTHEN PIPE P9 STATUS IS CLOSED']
@@ -82,7 +82,7 @@ async function run() {
 	for (const [name, text] of READ) {
 		const m = ruled(text);
 		ok(name + ': lpnDiagnose does not name it (EPANET reads it)', unreadable(m).length === 0);
-		ok(name + ': the built-in loop leaves it to EPANET', EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-rules'));
+		ok(name + ': the built-in loop copies it now, so it does not leave it to EPANET', !EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-rules'));
 		const r = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(m)));
 		ok(name + ': EPANET runs it', r.ok === true);
 	}

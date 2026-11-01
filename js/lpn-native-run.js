@@ -273,7 +273,7 @@
 		if (!model || !model.rules || !model.rules.length || !times || !(times.duration > 0)) { return []; }
 		(model.nodes || []).forEach(function (n) { nodeType[String(n.id)] = n.type; });
 		(model.links || []).forEach(function (l) { linkOf[String(l.id)] = l; });
-		return parseRules(model, nodeType, linkOf).refused;
+		return parseRules(model, nodeType, linkOf, true).refused;
 	};
 	/**
 	 * The reasons the built-in solver cannot run this model's period, as `{code, ids}` records, or
@@ -532,6 +532,7 @@
 			if (p.link) {
 				i = linkIxById[p.link];
 				if (p.attr === 'FLOW') { return Math.abs(res.flows[p.link] || 0) * 1000; }
+				if (p.constX !== undefined) { return p.constX; }
 				x = ls[i].k;                                      // SETTING
 				return x === MISSING ? null : x * p.scale;
 			}
@@ -548,7 +549,7 @@
 				});
 				return q * 1000;
 			case 'HEAD': case 'GRADE': return headNow(p.node);
-			case 'LEVEL': case 'PRESSURE': return headNow(p.node) - (n.elev || 0);
+			case 'LEVEL': case 'PRESSURE': return headNow(p.node) - (p.baseHead !== undefined ? p.baseHead : (n.elev || 0));
 			case 'FILLTIME':
 				if (!tk || !(tk.q > 1e-6)) { return null; }       // TINY, consts.h; a reservoir has no area
 				return (tk.Vmax - tk.V) / tk.q;
@@ -1100,7 +1101,28 @@
 	 * assembleModel() hands both engines, SI values) as EPANET holds them. `bad` lists the names of
 	 * the rules this loop does not copy exactly, or that EPANET would reject on reading the file.
 	 */
-	function parseRules(model, nodeType, linkOf) {
+	// What rules.c reads as a GPV's SETTING: LinkSetting holds the GPV's Kc, which input3.c valvedata() sets to the
+	// INDEX of its head-loss curve, in the order EPANET first meets a curve id in [CURVES]. The bridge's own file
+	// is the authority on both that order and which GPVs went out as one (a GPV with no points is written as a
+	// TCV at zero loss, and its setting is that 0), so it is read from there. null when the bridge is not loaded.
+	function gpvSettingOf(model, id) {
+		var inp, order = [], seen = {}, sec = '', hit = null;
+		if (typeof EC.lpnToInp !== 'function') { return null; }
+		try { inp = EC.lpnToInp(model, { eps: true }); } catch (e) { return null; }
+		inp = inp && inp.inp !== undefined ? inp.inp : inp;
+		if (typeof inp !== 'string') { return null; }
+		inp.split('\n').forEach(function (line) {
+			var t = line.replace(/;.*$/, '').trim().split(/\s+/), m = /^\[(\w+)\]/.exec(line.trim());
+			if (m) { sec = m[1].toUpperCase(); return; }
+			if (!t[0]) { return; }
+			if (sec === 'CURVES' && !seen[t[0]]) { seen[t[0]] = true; order.push(t[0]); }
+			if (sec === 'VALVES' && t[0] === String(id)) { hit = t; }
+		});
+		if (!hit) { return null; }
+		if (String(hit[4]).toUpperCase() === 'GPV') { return order.indexOf(hit[5]) + 1 || null; }
+		return Number(hit[5]);
+	}
+	function parseRules(model, nodeType, linkOf, refusalOnly) {
 		var rules = [], bad = [], refused = [];
 		(model.rules || []).forEach(function (b, ri) {
 			var name = b && b.name ? String(b.name) : '#' + (ri + 1), r, state = 'cond', fail = false, copyFail = false, nPrem = 0, nThen = 0;
@@ -1133,10 +1155,21 @@
 						} else if (c.attr === 'FLOW') {
 							p.value = c.value * 1000;
 						} else {
-							// A setting: a pump's speed, a valve's setting. A pipe's is its roughness
-							// and a GPV's a curve, neither copied.
-							if (l.type === 'pipe' || (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV')) { copyFail = true; nPrem++; return; }
+							// A setting: a pump's speed, a valve's setting. A pipe's is its roughness (rules.c
+							// checkvalue() reads LinkSetting, which inithyd() fills from Kc, and converts it
+							// only for a PRV, PSV, PBV or FCV) and a GPV's is the INDEX of its curve; neither
+							// moves during a run, so each is a number read once (`constX`).
+							if (l.type === 'pipe') {
+								// input1.c: a Darcy-Weisbach roughness is held in feet, from the millimetres the file states.
+								p.constX = model.method === 'dw' ? (l.roughness || 0) * 1000 / (1000 * FT) : l.roughness;
+								if (!isFinite(p.constX)) { copyFail = true; nPrem++; return; }
+							} else if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') {
+								p.constX = refusalOnly ? 0 : gpvSettingOf(model, l.id);   // the refusal check must not write the file it is part of
+								if (p.constX === null) { copyFail = true; nPrem++; return; }
+							}
 							p.value = c.kind === 'flow' ? c.value * 1000 : c.value;
+							// the file states a Darcy-Weisbach roughness in millimetres, the model holds metres
+							if (c.kind === 'roughness' && model.method === 'dw') { p.value = c.value * 1000; }
 							p.scale = c.kind === 'flow' ? 1000 : 1;
 						}
 					} else {
@@ -1149,7 +1182,14 @@
 							p.value = c.value * 3600;
 						} else {
 							if (!isFinite(c.value)) { fail = true; return; }
-							if (nodeType[p.node] === 'reservoir' && (c.attr === 'LEVEL' || c.attr === 'PRESSURE')) { copyFail = true; nPrem++; return; }
+							// A reservoir's level and pressure are its head less its elevation, and EPANET keeps a
+							// reservoir's base head in its elevation (input3.c reservdata()): 0, until a head pattern
+							// moves the head.
+							if (nodeType[p.node] === 'reservoir' && (c.attr === 'LEVEL' || c.attr === 'PRESSURE')) {
+								x = (model.nodes || []).filter(function (nn) { return String(nn.id) === p.node; })[0];
+								p.baseHead = x ? (typeof x.headBase === 'number' ? x.headBase : x.head) : undefined;
+								if (!isFinite(p.baseHead)) { copyFail = true; nPrem++; return; }
+							}
 							p.value = c.attr === 'DEMAND' ? c.value * 1000 : c.value;
 						}
 					}
