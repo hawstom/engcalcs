@@ -859,7 +859,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	// velocity-scaled seed simply starts closer than a constant would.
 	for (k = 0; k < links.length; k++) {
 		Q[k] = links[k].status === 'closed'
-			? 0
+			? (opts.epAcc ? 1e-6 * 0.3048 * 0.3048 * 0.3048 : 0)   // inithyd(): a closed link starts at QZERO, 1e-6 cfs
 			: (opts.epAcc ? 0.3048 : 0.3) * Math.PI * links[k].diameter * links[k].diameter / 4;
 		// hydraul.c initlinkflow(): a pump starts at its setting times its design flow, every other link at a
 		// velocity of 1 ft/s. Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
@@ -869,7 +869,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// **A START FROM THE LAST SOLUTION** (Task 733, slice 7), as EPANET's period loop starts every step
 		// from the flows of the one before. Only a closed link's 0 is kept; an open one with no usable
 		// previous flow keeps the seed above.
-		if (opts.flows0 && links[k].status !== 'closed' && typeof opts.flows0[links[k].id] === 'number' && opts.flows0[links[k].id] !== 0 && isFinite(opts.flows0[links[k].id])) {
+		if (opts.flows0 && (links[k].status !== 'closed' || opts.closedLeak) && typeof opts.flows0[links[k].id] === 'number' && opts.flows0[links[k].id] !== 0 && isFinite(opts.flows0[links[k].id])) {
 			Q[k] = opts.flows0[links[k].id];
 		}
 	}
@@ -1382,7 +1382,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	// The pump branch of the iteration below sends a custom-curve pump through customPumpCoeffs()
 	// in both directions. The XHEAD test (pumpLinkStatus) reads link.h0, which for a custom curve is
 	// the shutoff head at speed (EPANET's Hmax, the curve's first head).
-	var pCurve = [], pSpeed = [], pcFit;
+	var pCurve = [], pSpeed = [], pcFit, epRelErr = 0;
 	for (k = 0; k < links.length; k++) {
 		pCurve[k] = null;
 		if (links[k].type !== 'pump' || !links[k].curveSI || !links[k].curveSI.length) { continue; }
@@ -1431,7 +1431,9 @@ EngCalcs.lpnSolve = function (model, options) {
 				y[k] = q;
 			} else if (link.type === 'pump') {
 				// Head GAIN: H_to - H_from = H0 - a Q^b, so h = -(H0 - a Q^b).
-				var qp = Math.max(aq, qMin);
+				// hydcoeffs.c pumpcoeff() reads |LinkFlow| as it stands (no floor), and a gradient under RQtol is a straight
+				// line through the shutoff head, h0 + hgrad q. Only the extended-period loop asks (`opts.epAcc`).
+				var qp = opts.epAcc ? aq : Math.max(aq, qMin);
 				if (!(link.h0 > 0) && !(link.a > 0)) {
 					// NO CURVE ENTERED -- the state every newly drawn pump is in, since nothing
 					// assigns a pump a curve it was not given. It neither adds nor loses head, in
@@ -1471,7 +1473,7 @@ EngCalcs.lpnSolve = function (model, options) {
 					p = link.a * link.b * Math.pow(qp, link.b - 1);
 					// Same floor again, for a degenerate curve (e.g. a shutoff head with no droop):
 					// p = 0 would otherwise give an infinite conductance.
-					if (!(p > gradMin)) { p = gradMin; h = p * q; }
+					if (!(p > gradMin)) { p = gradMin; h = opts.epAcc ? -link.h0 + p * q : p * q; }
 					G[k] = 1 / p;
 					y[k] = h / p;
 				}
@@ -1647,7 +1649,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// absolute change is held to that however loose `tol` is (the convergence test below).
 		maxFlowChange = demandScale > 0 ? sumAbsDq / demandScale : sumAbsDq;
 
-		if (opts.onIteration) { opts.onIteration(iter, maxFlowChange, Q, H); }
+		if (opts.onIteration) { opts.onIteration(iter, maxFlowChange, Q, H, sumAbsQ > 0 ? sumAbsDq / sumAbsQ : sumAbsDq); }
 
 		// absTol catches the no-flow network, where demandScale is zero and
 		// maxFlowChange is therefore already an absolute quantity. 1e-12 m3/s is a
@@ -1668,6 +1670,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 
 		if (maxFlowChange < (demandScale > 0 ? tol : Math.min(tol, 1e-9)) || sumAbsDq < absTol) { done = true; }
+		epRelErr = sumAbsQ > 0 ? sumAbsDq / sumAbsQ : sumAbsDq;   // hydsolver.c hasconverged()'s relerr
 		if (opts.epAcc && sumAbsQ > 0 && sumAbsDq / sumAbsQ <= opts.epAcc) { done = true; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
@@ -1815,6 +1818,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			if (links[k].status === 'closed' || tClosed[k] || pX[k] || cvShut[k]) { report.leakFlows[links[k].id] = Q[k]; }
 		}
 	}
+	report.epRelErr = epRelErr;   // EPANET's relative flow change at the last trial
 	report.tankClosed = [];
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
 	// And the pumps the solve ended with shut because they cannot lift (EPANET's XHEAD), likewise.

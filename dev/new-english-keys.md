@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 5 untranslated keys, of 3295 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 5 untranslated keys, of 3293 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -51,7 +51,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**70 still to read**, of 113 new keys across 7 unmerged branch(es).
+**56 still to read**, of 99 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -62,45 +62,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/alternative-import (`ddb3fb14f`) — 11 new, 11 to read @@ NEEDS RULING
-
-- **`lpn_export_table_scn_keeps`**
-  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
-  @@ NEEDS RULING
-- **`lpn_inpalt_base`**
-  > The Base alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_base_note`**
-  > Every scenario inherits the Base alternative, so choosing it changes them all.
-  @@ NEEDS RULING
-- **`lpn_inpalt_cancelled`**
-  > Nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_inpalt_go`**
-  > Import
-  @@ NEEDS RULING
-- **`lpn_inpalt_heading`**
-  > Alternative for {category}
-  @@ NEEDS RULING
-- **`lpn_inpalt_lead`**
-  > This file changes values in the categories below. Choose the alternative that receives the values of each.
-  @@ NEEDS RULING
-- **`lpn_inpalt_name`**
-  > Name of the new alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_new`**
-  > A new alternative, child of {parent}
-  @@ NEEDS RULING
-- **`lpn_inpalt_own`**
-  > {scenario}'s own alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_receipt`**
-  > Alternatives that received the values: {list}
-  @@ NEEDS RULING
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/alternative-import (`f0772a4e1`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_export_table_scn_keeps`**
   > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
@@ -139,7 +101,15 @@ build for that would be a gate nobody keeps. Refresh it with
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
-### feat/native-wire (`aeb168911`) — adds no English strings
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/native-wire (`1be1c6973`) — adds no English strings
+
+### feat/settings-solver (`b9f7aa5ad`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_settings_solver`**
+  > Solver
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -305,7 +275,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`f31efad2e`) — 37 new, 37 to read @@ NEEDS RULING
+### feat/wtg-page-export (`1885014b5`) — 33 new, 33 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -331,14 +301,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_export_lost_controls_pressure`**
   > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
   @@ NEEDS RULING
-- **`lpn_wtg_export_lost_demand_category`**
-  > Demand category names (junctions {ids}). The flows are written; the names are not.
-  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_model`**
   > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_multiplier`**
-  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
+  > Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_emitters`**
   > Emitter coefficients: {ids}.
@@ -348,9 +315,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_lead`**
   > This export does not yet write the following:
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_material`**
-  > Pipe material and installation year. Every pipe is written with the default material.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_positions`**
   > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
@@ -363,12 +327,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_rules`**
   > Rule-based controls.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tags`**
-  > Tags.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tank_minvol`**
-  > Tank minimum volume (tanks {ids}).
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_tank_mixing`**
   > Tank mixing model (tanks {ids}). Tanks are written fully mixed.

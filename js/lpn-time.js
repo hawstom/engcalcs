@@ -1037,7 +1037,7 @@
 				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(strings().nativeUsed); }
 				run.engineVersion = undefined;
 				run.issues = [];
-				run.report = '';
+				run.report = run.report || '';   // the loop writes EPANET's report in EPANET's words (lpn-native-run.js)
 				run.busyMs = busy;
 				run.quality = withQuality ? model.quality : null;
 				run.warnings = nativeWarnings(model, run.warnings);

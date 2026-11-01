@@ -1799,7 +1799,7 @@ $ec_lang['lpn_calc_hint_mute']='Don’t show this again';
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
-$ec_lang['lpn_time_no_report']='There is no run report. The report is the EPANET text report, so it appears after the EPANET solver has calculated this network. The built-in solver does not write one.';
+$ec_lang['lpn_time_no_report']='There is no run report. The report is the EPANET text report, so it appears after a run has calculated this network over time.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

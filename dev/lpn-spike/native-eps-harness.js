@@ -85,7 +85,7 @@ const FLOW_REL = 1e-5;      // of the largest flow
 const LPS = 0.001;
 const H = 3600;
 
-let pass = 0, fail = 0;
+let pass = 0, fail = 0, gaps = 0;
 function ok(name, cond, extra) {
 	console.log((cond ? 'PASS ' : 'FAIL ') + name + (extra ? '   ' + extra : ''));
 	if (cond) { pass++; } else { fail++; }
@@ -714,6 +714,31 @@ async function compare(c) {
 		`dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})` +
 		(unconv ? ` ${unconv} UNCONVERGED` : '') + (stDiff ? ` ${stDiff} STATUS DIFFERENCES` : '') +
 		(c.moves || c.reaches || c.statusOf || c.offGrid || c.spills ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
+	// THE RUN REPORT (native-wire slice 4): EPANET's own text, line for line, the clock stamps aside. The flow balance's
+	// numbers are compared to 0.0015 L/s, because the two hydraulics differ by 3e-5 L/s and a third decimal can fall either side.
+	// Known gaps, said where they are: a case with a pressure or flow control valve, a pressure control on a junction, a
+	// Darcy-Weisbach project, a general purpose valve or an overflowing tank counts a different number of trials (the built-in
+	// solver decides a valve's state between solves, EPANET inside one) and is reported as a gap, not held.
+	if (!process.env.NOREPORT) {
+		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>');
+		const a = stamp(epa.report).split('\n'), b = stamp(nat.report).split('\n');
+		const bal = /^(\s+)(Total Inflow|Consumer Demand|Demand Deficit|Emitter Flow|Leakage Flow|Total Outflow|Storage Flow|Flow Ratio):\s+(-?[0-9.]+)$/;
+		let first = -1;
+		for (let i = 0; i < Math.max(a.length, b.length); i++) {
+			if (a[i] === b[i]) { continue; }
+			const x = bal.exec(a[i] || ''), y = bal.exec(b[i] || '');
+			if (x && y && x[2] === y[2] && Math.abs(Number(x[3]) - Number(y[3])) <= 0.0015) { continue; }
+			first = i; break;
+		}
+		const gap = /\b(PRV|PSV|FCV|PBV|TCV|GPV)\b|junction pressure|Darcy-Weisbach|overflow|SPEED 1\.3/.test(c.name);
+		const held = first < 0 && a.length > 40;
+		if (held || !gap) {
+			ok(c.name + ': the run report is EPANET\'s', held, held ? a.length + ' lines' : `line ${first + 1}: EPANET "${a[first]}" built-in "${b[first]}"`);
+		} else {
+			console.log(`GAP  ${c.name}: the run report differs   line ${first + 1}: EPANET "${a[first]}" built-in "${b[first]}"`);
+			gaps++;
+		}
+	}
 	return { dH, dL, dQ };
 }
 
@@ -878,7 +903,7 @@ async function run() {
 		ok('the page loads lpnNativeRun, and only lpn-time.js calls it, after the plan', /js\/lpn-native-run\.js/.test(php) && /lpnNativeRunRefusals\(model, \{ quality: true \}\)/.test(tsrc) &&
 			!/lpnNativeRun/.test(fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8')));
 	}
-	console.log(`\n${pass} passed, ${fail} failed`);
+	console.log(`\n${pass} passed, ${fail} failed` + (gaps ? `, ${gaps} run reports not held (valve and Darcy-Weisbach trial counts)` : ''));
 	process.exit(fail ? 1 : 0);
 }
 run().catch((e) => { console.error(e); process.exit(2); });

@@ -219,6 +219,33 @@
 		return r;
 	}
 
+
+	// ---- THE RUN REPORT (Task 733, native-wire slice 4) ---------------------------------------------
+	//
+	// EPANET writes a text report as it runs (report.c, epanet.c, hydraul.c); the built-in loop writes the same words
+	// in the same order from the same moments. It is held to EPANET 2.3.5's own report, line for line, on Net1, Net2
+	// and Net3 (dev/lpn-spike/native-report-harness.js), only the three clock stamps differing. The strings are
+	// text.h's: FMT18 to FMT69, WARN01 to WARN06, and enumstxt.h's StatTxt/LinkTxt.
+	var STAT_TXT = ['closed because cannot deliver head', 'temporarily closed', 'closed', 'open', 'active',
+			'open but exceeds maximum flow', 'open but cannot deliver flow', 'open but cannot deliver pressure',
+			'filling', 'emptying', 'overflowing'],
+		EN_FILLING = 8, EN_EMPTYING = 9, EN_OVERFLOWING = 10,
+		DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+		MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	function two(n) { return (n < 10 ? '0' : '') + n; }
+	// C's ctime(): "Sun Nov  1 16:13:38 2026" (the newline it ends with is added by the caller).
+	function ctimeText(d) {
+		return DAY_NAMES[d.getDay()] + ' ' + MONTH_NAMES[d.getMonth()] + ' ' + (d.getDate() < 10 ? ' ' : '') + d.getDate() + ' ' +
+			two(d.getHours()) + ':' + two(d.getMinutes()) + ':' + two(d.getSeconds()) + ' ' + d.getFullYear();
+	}
+	// report.c clocktime(): "%01d:%02d:%02d" from seconds.
+	function clockText(sec) {
+		var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+		return h + ':' + two(m) + ':' + two(sec - 3600 * h - 60 * m);
+	}
+	function padLeft(str, n) { str = String(str); while (str.length < n) { str = ' ' + str; } return str; }
+	function fmtF(x, d) { return x.toFixed(d); }   // C's "%.<d>f"
+
 	function tankHasArea(n) { return n.type === 'tank' && n.diameter > 0; }
 	// The rows of a tank's volume curve, [[level m, volume m3], ...], exactly as the bridge writes them
 	// (js/lpn-epanet.js: a curve goes out only with a name AND rows), or null.
@@ -664,7 +691,7 @@
 					else if (st.vt === 'FCV') { x = x * 1000 / LPS_PER_CFS; v = v * 1000 / LPS_PER_CFS; }
 					if (Math.abs(x - v) > RTOL) { setSetting(st, a.setting); flag = true; }
 				}
-				if (flag) { taken++; }
+				if (flag) { taken++; reportRule(t2, linkIxById[a.link], list[q].r.name); }
 			}
 			return taken;
 		}
@@ -724,6 +751,301 @@
 		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [],
 			stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0, convAccuracy = null;
 
+
+		// ---- THE RUN REPORT: what report.c, epanet.c and hydraul.c write as the run goes ----
+		var repOn = opts.report !== false, repOut = [], repStamp = new Date(), oldLink = [], oldTank = [], tankLikes = [],
+			linkGroup = [], fb = { inflow: 0, outflow: 0, consumer: 0, emitter: 0, deficit: 0, storage: 0 },
+			hy = model.hydraulics || {}, qlt = model.quality || {}, nodeIx = {}, nodeList = [], adj = [], repNj = 0;
+		function rline(x) { if (repOn) { repOut.push(x); } }
+		function linkTxt(k) {
+			var st = ls[k];
+			if (st.kind === 'cv') { return 'CV'; }
+			if (st.kind === 'pump') { return 'Pump'; }
+			if (st.kind === 'valve') { return st.vt === 'GPV' && !(links[k].curvePoints || []).length ? 'TCV' : st.vt; }
+			return 'Pipe';
+		}
+		// EPANET's node numbering (junctions, reservoirs, tanks) and link numbering ([PIPES] with the pump that has no
+		// curve among them, [PUMPS], [VALVES]), 1-based; the adjacency lists are built by prepending, link by link.
+		if (repOn) {
+			['junction', 'reservoir', 'tank'].forEach(function (ty) {
+				model.nodes.forEach(function (n) {
+					var t = n.type === 'reservoir' || n.type === 'tank' ? n.type : 'junction';
+					if (t === ty) { nodeList.push(n); nodeIx[String(n.id)] = nodeList.length; if (ty === 'junction') { repNj++; } }
+				});
+			});
+			[0, 1, 2].forEach(function (g) {
+				links.forEach(function (l, k) {
+					var kd = ls[k].kind, gg = kd === 'valve' ? 2 : kd === 'pump' ? 1 : 0;
+					if (gg === g) { linkGroup.push(k); }
+				});
+			});
+			for (var ni = 0; ni <= nodeList.length; ni++) { adj.push([]); }
+			linkGroup.forEach(function (k, j) {
+				var a = nodeIx[String(links[k].from)], b = nodeIx[String(links[k].to)];
+				if (a === undefined || b === undefined) { return; }
+				adj[a].unshift({ node: b, link: k, ix: j });
+				adj[b].unshift({ node: a, link: k, ix: j });
+			});
+			links.forEach(function (l, k) { oldLink[k] = ls[k].s; });
+			model.nodes.forEach(function (n) { if (n.type === 'reservoir') { tankLikes.push(n); } });
+			model.nodes.forEach(function (n) { if (n.type === 'tank') { tankLikes.push(n); } });
+			tankLikes.forEach(function (n, i) { oldTank[i] = 1; });   // inithyd(): OldStatus starts TEMPCLOSED
+		}
+		function netInflowCfs(id) {
+			var q = 0;
+			links.forEach(function (l) {
+				var f = (res.leakFlows && typeof res.leakFlows[l.id] === 'number') ? res.leakFlows[l.id] : (res.flows[l.id] || 0);
+				if (l.to === id) { q += f; }
+				if (l.from === id) { q -= f; }
+			});
+			return q * 1000 / LPS_PER_CFS;
+		}
+		// the emitter's outflow at a junction, m3/s (hydcoeffs.c emitter coefficient: Ke (h - El)^(1/n))
+		function emitterOut(n) {
+			var dh;
+			if (!(n.emitter > 0)) { return 0; }
+			dh = res.heads[n.id] - (n.elev || 0);
+			return (dh < 0 ? -1 : 1) * n.emitter * Math.pow(Math.abs(dh), model.emitterExponent || 0.5);
+		}
+		function demandOut(n, id) {   // the delivered consumer demand, m3/s (EPANET's DemandFlow)
+			return res.demands && typeof res.demands[id] === 'number' ? res.demands[id] - emitterOut(n) : (n.demand || 0);
+		}
+		function reportHeader() {
+			var nj = 0, nres = 0, ntk = 0, np = 0, npu = 0, nv = 0, q, tol, units, ds;
+			model.nodes.forEach(function (n) {
+				if (n.type === 'reservoir' || (n.type === 'tank' && !tankHasArea(n))) { nres++; }
+				else if (n.type === 'tank') { ntk++; } else { nj++; }
+			});
+			links.forEach(function (l, k) { var kd = ls[k].kind; if (kd === 'valve') { nv++; } else if (kd === 'pump') { npu++; } else { np++; } });
+			['******************************************************************',
+				'*                           E P A N E T                          *',
+				'*                   Hydraulic and Water Quality                  *',
+				'*                   Analysis for Pipe Networks                   *',
+				'*                          Version 2.3.05                        *',
+				'******************************************************************', '',
+				'EngCalcs looped network', ' ',
+				'    Input Data File ................... temp.inp',
+				'    Number of Junctions................ ' + nj,
+				'    Number of Reservoirs............... ' + nres,
+				'    Number of Tanks ................... ' + ntk,
+				'    Number of Pipes ................... ' + np,
+				'    Number of Pumps ................... ' + npu,
+				'    Number of Valves .................. ' + nv,
+				'    Headloss Formula .................. ' + (model.method === 'dw' ? 'Darcy-Weisbach' : model.method === 'cm' ? 'Chezy-Manning' : 'Hazen-Williams'),
+				'    Nodal Demand Model ................ ' + (String(hy.demandModel || '').toUpperCase() === 'PDA' ? 'PDA' : 'DDA'),
+				'    Hydraulic Timestep ................ ' + fmtF(hydStep / 3600, 2) + ' hrs',
+				'    Hydraulic Accuracy ................ ' + fmtF(epAcc, 6)].forEach(rline);
+			if (hy.headError > 0) { rline('    Headloss Error Limit .............. ' + fmtF(hy.headError, 6) + ' m'); }
+			if (hy.flowChange > 0) { rline('    Flow Change Limit ................. ' + fmtF(hy.flowChange * 1000, 6) + ' L/s'); }
+			rline('    Status Check Frequency ............ ' + (hy.checkFreq !== undefined ? hy.checkFreq : 2));
+			rline('    Maximum Trials Checked ............ ' + (hy.maxCheck !== undefined ? hy.maxCheck : 10));
+			rline('    Damping Limit Threshold ........... ' + fmtF(hy.dampLimit !== undefined ? hy.dampLimit : 0, 6));
+			rline('    Maximum Trials .................... ' + (hy.trials !== undefined ? hy.trials : 200));
+			q = qualityConfig(model);
+			if (!q.mode || dur === 0) { rline('    Quality Analysis .................. None'); }
+			else if (q.mode === 'chemical') { rline('    Quality Analysis .................. ' + String(qlt.chemical || 'CHEMICAL').split(/\s+/)[0]); }
+			else if (q.mode === 'trace') { rline('    Quality Analysis .................. Trace From Node ' + q.traceNode); }
+			else { rline('    Quality Analysis .................. Age'); }
+			if (q.mode && dur > 0) {
+				ds = times.qualityStep > 0 ? times.qualityStep : (hydStep >= 3600 ? 300 : Math.floor(hydStep / 10));
+				rline('    Water Quality Time Step ........... ' + fmtF(ds / 60, 2) + ' min');
+				units = q.mode === 'age' ? 'hrs' : q.mode === 'trace' ? '%' : String(qlt.chemical || 'CHEMICAL').split(/\s+/)[1] || 'mg/L';
+				tol = typeof qlt.tolerance === 'number' && isFinite(qlt.tolerance) ? qlt.tolerance : (q.mode === 'age' ? 900 / 3600 : 0.01);
+				rline('    Water Quality Tolerance ........... ' + fmtF(tol, 2) + ' ' + units);
+			}
+			[ '    Specific Gravity .................. ' + fmtF(typeof hy.specificGravity === 'number' ? hy.specificGravity : 1, 2),
+				'    Relative Kinematic Viscosity ...... ' + fmtF(typeof hy.viscosity === 'number' ? hy.viscosity : 1, 2),
+				'    Relative Chemical Diffusivity ..... ' + fmtF(typeof qlt.diffusivity === 'number' ? qlt.diffusivity : 1, 2),
+				'    Demand Multiplier ................. ' + fmtF(dm, 2),
+				'    Total Duration .................... ' + fmtF(dur / 3600, 2) + ' hrs',
+				'    Reporting Criteria:', '       No Nodes', '       No Links', ' ',
+				'Analysis begun ' + ctimeText(repStamp) + '\n', ' ', 'Hydraulic Status:',
+				'-----------------------------------------------------------------------'].forEach(rline);
+		}
+		// hydraul.c controls() -> report.c writecontrolaction()
+		function reportControl(c, k) {
+			var n;
+			if (c.type === LOWLEVEL || c.type === HILEVEL) {
+				n = nodeById[c.node];
+				rline(padLeft(clockText(htime), 10) + ': ' + linkTxt(k) + ' ' + links[k].id + ' changed by ' +
+					(n.type === 'tank' && tankHasArea(n) ? 'Tank' : n.type === 'tank' || n.type === 'reservoir' ? 'Reservoir' : 'Junction') + ' ' + c.node + ' control');
+			} else {
+				rline(padLeft(clockText(htime), 10) + ': ' + linkTxt(k) + ' ' + links[k].id + ' changed by timer control');
+			}
+		}
+		// rules.c takeactions() -> report.c writeruleaction(); `now` is the clock inside the rule step
+		function reportRule(now, k, name) {
+			rline(padLeft(clockText(now), 10) + ': ' + linkTxt(k) + ' ' + links[k].id + ' changed by rule ' + name);
+		}
+		// report.c writehydstat(), then writehydwarn() (the warnings the report keeps)
+		function reportStep() {
+			var atime = padLeft(clockText(htime), 10), relerr = res.epRelErr, flag = 0, i, count, firstNode = 0, marked, stack, top, j;
+			if (!repOn) { return; }
+			rline(atime + ': ' + (relerr <= epAcc ? 'Balanced after ' + res.iterations + ' trials'
+				: 'Unbalanced after ' + res.iterations + ' trials (flow change = ' + fmtF(relerr, 6) + ')'));
+			if (String(hy.demandModel || '').toUpperCase() === 'PDA') {
+				var nd = 0, tdem = 0, tred = 0;
+				cur.forEach(function (n) {
+					var full, got;
+					if (n.type !== 'junction' || !(n.demand > 0)) { return; }
+					full = n.demand * 1000 / LPS_PER_CFS; got = demandOut(n, n.id) * 1000 / LPS_PER_CFS;
+					if (got + 0.0001 < full) { nd++; tdem += full; tred += full - got; }
+				});
+				if (nd > 0) {
+					rline(nd === 1 ? '            1 node had its demand reduced by a total of ' + fmtF(tred / tdem * 100, 2) + '%'
+						: '            ' + nd + ' nodes had demands reduced by a total of ' + fmtF(tred / tdem * 100, 2) + '%');
+				}
+			}
+			tankLikes.forEach(function (n, i) {
+				var tk = tankById[String(n.id)], q = tk ? tk.q : netInflowCfs(n.id), nw;
+				if (Math.abs(q) < 0.001) { nw = CLOSED; }
+				else if (q < 0) { nw = EN_EMPTYING; }
+				else if (tk && Math.abs(tk.h - tk.Hmax) < 0.001) { nw = EN_OVERFLOWING; }
+				else { nw = EN_FILLING; }
+				if (nw === oldTank[i]) { return; }
+				rline(tk ? atime + ': Tank ' + n.id + ' is ' + STAT_TXT[nw] + ' at ' + fmtF((tk.h - tk.El) * FT, 2) + ' m'
+					: atime + ': Reservoir ' + n.id + ' is ' + STAT_TXT[nw]);
+				oldTank[i] = nw;
+			});
+			linkGroup.forEach(function (k) {
+				if (ls[k].s === oldLink[k]) { return; }
+				rline(htime === 0 ? atime + ': ' + linkTxt(k) + ' ' + links[k].id + ' ' + STAT_TXT[ls[k].s]
+					: atime + ': ' + linkTxt(k) + ' ' + links[k].id + ' changed from ' + STAT_TXT[oldLink[k]] + ' to ' + STAT_TXT[ls[k].s]);
+				oldLink[k] = ls[k].s;
+			});
+			rline(' ');
+			// ---- report.c writehydwarn(), in its order ----
+			var maxIter = hy.trials !== undefined ? hy.trials : 200;
+			if (res.iterations > maxIter && relerr <= epAcc) {
+				rline('WARNING: Maximum trials exceeded at ' + clockText(htime) + ' hrs. System may be unstable.'); flag = 2;
+			}
+			if (String(hy.demandModel || '').toUpperCase() !== 'PDA') {
+				count = 0;
+				cur.forEach(function (n) {
+					if (n.type === 'junction' && res.heads[n.id] < (n.elev || 0) && demandOut(n, n.id) + emitterOut(n) > 0) { count++; }
+				});
+				if (count > 0) { rline('WARNING: Negative pressures at ' + clockText(htime) + ' hrs.'); flag = 6; }
+			}
+			linkGroup.forEach(function (k) {
+				if (ls[k].kind === 'valve' && ls[k].s >= XFCV) {
+					rline('WARNING: ' + linkTxt(k) + ' ' + links[k].id + ' ' + STAT_TXT[ls[k].s] + ' at ' + clockText(htime) + ' hrs.'); flag = 5;
+				}
+			});
+			linkGroup.forEach(function (k) {
+				var st = ls[k], sx, f, qmax, pc;
+				if (st.kind !== 'pump') { return; }
+				sx = st.s;
+				f = (res.flows[links[k].id] || 0) * 1000;
+				if (st.s >= OPEN) {
+					pc = links[k].curveSI && links[k].curveSI.length ? EC.lpnPumpFromCurve(links[k].curveSI) : null;
+					qmax = pc && pc.custom ? pc.x[pc.x.length - 1] * 1000 : Math.pow(st.h0 / st.a, 1 / st.b) * 1000;
+					if (f > st.k * qmax) { sx = 5; }
+					if (f < 0) { sx = 0; }
+				}
+				if (sx === 0 || sx === 5) { rline('WARNING: Pump ' + links[k].id + ' ' + STAT_TXT[sx] + ' at ' + clockText(htime) + ' hrs.'); flag = 4; }
+			});
+			if (res.iterations > maxIter && relerr > epAcc) {
+				rline('WARNING: System unbalanced at ' + clockText(htime) + ' hrs.' + (hy.unbalanced === 'stop' ? ' EXECUTION HALTED.' : '')); flag = 1;
+			}
+			if (flag > 0) {
+				// report.c disconnected()
+				marked = []; stack = [];
+				tankLikes.forEach(function (n) { var ix = nodeIx[String(n.id)]; marked[ix] = 1; stack.push(ix); });
+				nodeList.forEach(function (n, ix) {
+					var id = ix + 1, q;
+					if (n.type !== 'junction') { return; }
+					q = demandOut(cur[model.nodes.indexOf(n)], n.id) + emitterOut(cur[model.nodes.indexOf(n)]);
+					if (q < 0) { marked[id] = 1; stack.push(id); }
+				});
+				for (i = 0; i < stack.length; i++) {
+					adj[stack[i]].forEach(function (a) {
+						var l = links[a.link], kd = ls[a.link].kind, n1 = nodeIx[String(l.from)];
+						if (marked[a.node]) { return; }
+						if ((kd === 'cv' || (kd === 'valve' && (ls[a.link].vt === 'PRV' || ls[a.link].vt === 'PSV'))) && a.node === n1) { return; }
+						if (ls[a.link].s > CLOSED) { marked[a.node] = 1; stack.push(a.node); }
+					});
+				}
+				count = 0;
+				for (i = 1; i <= repNj; i++) {
+					var jn = nodeList[i - 1], jq = demandOut(cur[model.nodes.indexOf(jn)], jn.id) + emitterOut(cur[model.nodes.indexOf(jn)]);
+					if (!marked[i] && jq !== 0) {
+						count++;
+						if (count <= 10) { rline('WARNING: Node ' + jn.id + ' disconnected at ' + clockText(htime) + ' hrs'); }
+						firstNode = i;
+					}
+				}
+				if (count > 0) {
+					if (count > 10) { rline('WARNING: ' + (count - 10) + ' additional nodes disconnected at ' + clockText(htime) + ' hrs'); }
+					// getclosedlink(): from the last unmarked node, the first closed link met on the way to a marked one
+					var seen = [], st2 = [firstNode], hit = null;
+					seen[firstNode] = 2;
+					while (st2.length && !hit) {
+						i = st2.pop();
+						adj[i].forEach(function (a) {
+							if (hit || seen[a.node] === 2) { return; }
+							if (marked[a.node] === 1) { hit = links[a.link].id; return; }
+							seen[a.node] = 2; st2.push(a.node);
+						});
+					}
+					if (hit !== null) { rline('WARNING: System disconnected because of Link ' + hit); }
+				}
+				rline(' ');
+			}
+		}
+		// flowbalance.c updateflowbalance(): the step just solved, weighted by its length
+		function reportBalance(hstep) {
+			var dt, inflow = 0, outflow = 0, cons = 0, em = 0, def = 0, stor = 0;
+			if (!repOn) { return; }
+			dt = dur === 0 ? 1 : hstep;
+			cur.forEach(function (n) {
+				var d, e;
+				if (n.type !== 'junction') { return; }
+				d = demandOut(n, n.id) * 1000; e = emitterOut(n) * 1000;
+				if (d < 0) { inflow += -d; } else { cons += d; outflow += d; }
+				em += e; outflow += e;
+				if (String(hy.demandModel || '').toUpperCase() === 'PDA' && n.demand > 0 && n.demand * 1000 - d > 0) { def += n.demand * 1000 - d; }
+			});
+			tankLikes.forEach(function (n) {
+				var tk = tankById[String(n.id)], v = (tk ? tk.q : netInflowCfs(n.id)) * LPS_PER_CFS;
+				if (tk) { stor += v; }
+				else if (v >= 0) { outflow += v; } else { inflow += -v; }
+			});
+			fb.inflow += inflow * dt; fb.outflow += outflow * dt; fb.consumer += cons * dt; fb.emitter += em * dt;
+			fb.deficit += def * dt; fb.storage += stor * dt;
+		}
+		function reportEnd(endTime) {
+			var sec = endTime > 0 ? endTime : 1, qin = fb.inflow / sec, qout = fb.outflow / sec, qs = fb.storage / sec, r;
+			if (!repOn) { return ''; }
+			if (qs > 0) { qout += qs; } else { qin -= qs; }
+			r = qin === qout ? 1 : qin > 0 ? qout / qin : 0;
+			['Hydraulic Flow Balance (L/s)', '================================',
+				'Total Inflow:      ' + padLeft(fmtF(fb.inflow / sec, 3), 12), 'Consumer Demand:   ' + padLeft(fmtF(fb.consumer / sec, 3), 12),
+				'Demand Deficit:    ' + padLeft(fmtF(fb.deficit / sec, 3), 12), 'Emitter Flow:      ' + padLeft(fmtF(fb.emitter / sec, 3), 12),
+				'Leakage Flow:      ' + padLeft(fmtF(0, 3), 12), 'Total Outflow:     ' + padLeft(fmtF(fb.outflow / sec, 3), 12),
+				'Storage Flow:      ' + padLeft(fmtF(fb.storage / sec, 3), 12), 'Flow Ratio:        ' + padLeft(fmtF(r, 3), 12),
+				'================================\n', 'Analysis ended ' + ctimeText(new Date()) + '\n'].forEach(rline);
+			return '  Page 1                                    ' + ctimeText(repStamp) + '\n' + repOut.map(function (x) { return '\n  ' + x; }).join('');
+		}
+		if (repOn) { reportHeader(); }
+
+		// hydraul.c inithyd()/initlinkflow(): the flows the FIRST solve starts from, by each link's state before anything
+		// has been applied to it. A closed link starts at QZERO (1e-6 cfs), a pump at its speed times its design flow,
+		// every other link at 1 ft/s. In the file's flow scale (see FLOW_G): a flow of the area times 1 ft/s is 1/g of it.
+		var initFlows = {};
+		links.forEach(function (l, k) {
+			var st = ls[k], area = Math.PI * l.diameter * l.diameter / 4, pc, q0, qmax;
+			if (st.s <= CLOSED) { initFlows[l.id] = 1e-6 * FT3 / FLOW_G; return; }
+			if (st.kind === 'pump') {
+				pc = l.curveSI && l.curveSI.length ? EC.lpnPumpFromCurve(l.curveSI) : null;
+				if (pc && pc.custom) { q0 = (pc.x[0] + pc.x[pc.x.length - 1]) / 2; }
+				else if (st.a > 0 && st.b > 0 && st.h0 > 0) { qmax = Math.pow(st.h0 / st.a, 1 / st.b); q0 = qmax / 2; }
+				else { q0 = FT * area / FLOW_G; }
+				initFlows[l.id] = (st.k > 0 ? st.k : 1) * q0;
+				return;
+			}
+			initFlows[l.id] = FT * area / FLOW_G;
+		});
+
 		var vTrial;
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
@@ -734,7 +1056,7 @@
 				if (v > 0 && st.s <= CLOSED) { st.s = OPEN; }
 				if (v === 0 && st.s > CLOSED) { st.s = CLOSED; }
 			});
-			controls(ctl, ls, tankById, htime, tStart);
+			controls(ctl, ls, tankById, htime, tStart, function (c) { reportControl(c, c.k); });
 			cur = stepNodes(htime);
 			cur.forEach(function (n) { curById[String(n.id)] = n; });
 			var stepLinks = links.map(function (l, k) { return applyLink(Object.assign({}, l), ls[k]); });
@@ -755,6 +1077,7 @@
 				if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; }
 			});
 			if (opts.warm !== false && res) { sOpts.flows0 = Object.assign({}, res.flows, res.leakFlows || {}); }
+			else if (!res) { sOpts.flows0 = initFlows; }
 			res = solveInFeet(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
@@ -781,12 +1104,13 @@
 				});
 				tk.q = s * 1000 / LPS_PER_CFS;   // cfs, as EPANET holds it
 			});
+			reportStep();
 			if (isReportTime(htime)) {
 				frames.push(frameOf(model, cur, res, htime, tanks, ls));
 			}
 			// hydraul.c nexthyd(): getallpumpsenergy() reads the solve just made, before the step is chosen
 			pumpsEnergyNow();
-			if (!(htime < dur)) { if (dur === 0) { addEnergy(0); } break; }
+			if (!(htime < dur)) { if (dur === 0) { addEnergy(0); reportBalance(0); } break; }
 			// ---- hydraul.c timestep() ----
 			tstep = hydStep;
 			nextPat = (Math.floor((htime + patStart) / patStep) + 1) * patStep - htime;
@@ -807,6 +1131,7 @@
 			tstep = controlTimestep(ctl, ls, tankById, htime, tStart, tstep);
 			// hydraul.c timestep(): rules, when there are any, move the tanks themselves
 			if (rules.length) { tstep = ruleTimestep(tstep); } else { tankLevels(tstep); }
+			reportBalance(tstep);   // flowbalance.c updateflowbalance(), with the step actually taken
 			addEnergy(tstep);   // nexthyd(): addenergy(hydstep), with the clock not yet moved
 			tanks.forEach(function (tk) { levelNow[tk.id] = solverLevel(tk); });
 			htime += tstep;
@@ -820,7 +1145,7 @@
 			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes,
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur),
 			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
 			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
 			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,
@@ -1001,7 +1326,7 @@
 
 	
 	// hydraul.c controls(): the tank, time and time-of-day controls, before the step's solve.
-	function controls(ctl, ls, tankById, htime, tStart) {
+	function controls(ctl, ls, tankById, htime, tStart, onChange) {
 		ctl.forEach(function (c) {
 			var reset = false, tk, v1, v2, vplus, st = ls[c.k], s1, k2;
 			// hydraul.c controls() reads any node past the junctions as a tank. A reservoir is one of no
@@ -1021,7 +1346,7 @@
 			if (!reset) { return; }
 			s1 = st.s <= CLOSED ? CLOSED : OPEN;
 			k2 = st.kind !== 'pipe' ? c.setting : st.k;
-			if (s1 !== c.status || st.k !== k2) { st.s = c.status; st.k = k2; }
+			if (s1 !== c.status || st.k !== k2) { st.s = c.status; st.k = k2; if (onChange) { onChange(c); } }
 		});
 	}
 

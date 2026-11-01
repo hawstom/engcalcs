@@ -180,7 +180,7 @@ async function compareNet(name, model, tol) {
 		viaEpanet.routeNotes.every((t) => t === ''), `frames ${P.frames.length}`);
 	ok(name + ': engine setting built-in runs the built-in loop, and says nothing about EPANET',
 		N.engine === 'native' && viaNative.frames.length === E.frames.length && viaNative.frames.every((f) => f.engine === 'native') &&
-		viaNative.routeNotes.every((t) => !/EPANET solver/.test(t)) && N.ok === true && N.report === '' && N.engineVersion === undefined,
+		viaNative.routeNotes.every((t) => !/EPANET solver/.test(t)) && N.ok === true && /Hydraulic Flow Balance/.test(N.report) && N.engineVersion === undefined,
 		`engine=${N.engine} frames=${N.frames.length} notes=${JSON.stringify(viaNative.routeNotes)}`);
 	allFields(name, model, E, N);
 	const times = N.frames.every((f, i) => f.t === E.frames[i].t);
