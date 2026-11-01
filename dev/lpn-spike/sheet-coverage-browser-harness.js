@@ -101,8 +101,7 @@ async function main() {
 				if (m.missing) { ok(tag + ': opened', false, 'no ' + root); return; }
 				if (SHOT) { await a.page.locator(shotSel || root).screenshot({ path: path.join(SHOT, 'sheetcov-' + tag.replace(/\W+/g, '-') + '-' + mode + '.png') }).catch(() => {}); }
 				if (sheet) { ok(tag + ': every row is in a sheet', m.grow.length === 0, JSON.stringify(m.grow)); }
-				// Convert as shrink-wraps to its content, as New project did; it takes boxOpenWidthFitted(box, host) when the box-float branch makes it a fixed-width box (round 11a hand-off), so it is not held to this yet.
-				if (sheet && tag !== 'convert as') { ok(tag + ': no label is cut (the Label column fits the longest label)', m.cut.length === 0, JSON.stringify(m.cut)); }
+				if (sheet) { ok(tag + ': no label is cut (the Label column fits the longest label)', m.cut.length === 0, JSON.stringify(m.cut)); }
 				ok(tag + ': no "Label | Value" heading band', m.band === 0, String(m.band));
 				if (sheet) { ok(tag + ': no button row or note confined to one column', m.oneCol.length === 0, JSON.stringify(m.oneCol)); }
 				ok(tag + ': does not scroll sideways', m.over <= 1, String(m.over));

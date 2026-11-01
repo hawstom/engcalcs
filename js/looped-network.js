@@ -25507,7 +25507,7 @@ var EngCalcs = EngCalcs || {};
 		// A sheet's input, select, text area or button fills its cell (css, .lpn-sheet .lpn-grow > .lpn-gval): it is whatever the Value column is, so measuring it would only cap the Label column at the track it already has.
 		// What keeps a width of its own (a tick, a button, a read-out, a radio with its button) is measured, with the 6 px margin either side a control carries in its cell.
 		for (i = 0; i < vals.length; i++) {
-			if (sheetFit && ((/^(input|select|textarea|button)$/i.test(vals[i].tagName) && !/^(checkbox|radio)$/i.test(vals[i].type || '')) || vals[i].classList.contains('lpn-ramp-picker'))) { continue; }
+			if (sheetFit && ((/^(input|select|textarea|button)$/i.test(vals[i].tagName) && !/^(checkbox|radio)$/i.test(vals[i].type || '')) || vals[i].classList.contains('lpn-ramp-picker') || (vals[i].classList.contains('lpn-gwrap') && /^span$/i.test(vals[i].tagName)))) { continue; }   // a wrap of controls fills its cell too: its width is the track's, not a want
 			valW = Math.max(valW, vals[i].getBoundingClientRect().width + (sheetFit && !/^span$/i.test(vals[i].tagName) ? 12 : 0));
 		}
 		if (sheetFit) { valW = Math.max(valW, LPN_GVAL_FIT_REM * px); }   // however long the longest label, the Value column keeps room for a value
@@ -53725,6 +53725,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		short = (host.__lpnWantPx || 0) - parseFloat(host.style.getPropertyValue('--lpn-g-name')) * gridRem();
 		if (short > 0.5 && w < avail) {
 			box.style.width = Math.ceil(Math.min(w + short, avail)) + 'px';
+			host.__lpnScaled = false; host.__lpnFrac = 0; host.__lpnW = 0;   // the first fit noted a share; this one is a fresh fit, not a scaling of it
 			gridFitNow(host);
 		}
 	}
@@ -67134,13 +67135,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function placeFloatBox(box) {
 		box.__lpnFloatHeld = false;
 		return placePanelForScreen(box, function () {
-			var mem = box.__lpnFloatMem || {}, floor = chromeFloor(), iw = window.innerWidth, ih = window.innerHeight, room, r, h, at;
+			var mem = box.__lpnFloatMem || {}, floor = chromeFloor(), iw = window.innerWidth, ih = window.innerHeight, room, r, h, at, host;
 			resetPanelHeight(box, panelBody(box));
 			box.style.width = mem.w ? mem.w + 'px' : '';
 			box.style.height = mem.h ? mem.h + 'px' : '';
 			box.classList.toggle('lpn-float-sized', !!mem.w);   // the 40 rem opening cap lifted (css/engcalcs.css)
+			if (!mem.w) {
+				// It opens wide enough for its longest label (boxOpenWidthFitted), the 40 rem cap lifted for the measuring; a phone is filled by the seam.
+				box.classList.add('lpn-float-sized');
+				host = panelBody(box);
+				if (host && host.querySelector('.lpn-grid')) { boxOpenWidthFitted(box, host); } else { box.style.width = Math.ceil(box.getBoundingClientRect().width) + 'px'; }
+			}
 			r = box.getBoundingClientRect();
-			if (!mem.w) { box.style.width = Math.ceil(r.width) + 'px'; box.classList.add('lpn-float-sized'); }
 			room = Math.max(80, ih - floor - POPUP_EDGE);
 			h = r.height;
 			if (!mem.h && h > room) { box.style.height = room + 'px'; h = room; }

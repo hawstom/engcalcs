@@ -32,8 +32,9 @@ panels shown by their own openers, centred, raised by `raisePanel()`, and **alre
    CSS gives both boxes the Find box's shell: `display: flex; flex-direction: column; resize: both;
    overflow: hidden`, the body `flex: 1 1 auto; min-height: 0`, Convert as's OK/Cancel footer a
    fixed flex item (so it is always in view without the old footer arithmetic). The 40 rem cap
-   moves from the inline style into CSS; once open, the box's width is fixed at what it opened
-   at so a drag of its corner can make it wider than 40 rem.
+   moves from the inline style into CSS. It opens wide enough for its longest label
+   (`boxOpenWidthFitted`, the cap lifted while measuring; a phone fills the window), then the
+   width is fixed at what it opened at so a drag of its corner can make it wider than 40 rem.
 3. **Placement goes through `placePanelForScreen()`**: on a PC, centred under the chrome (or where
    it was last left this session); **on a phone it fills the window**, like every standing box,
    and can still be dragged by its title and sized by the grip.
@@ -49,9 +50,9 @@ panels shown by their own openers, centred, raised by `raisePanel()`, and **alre
    line between Round to and Suffix in each rounding row; it becomes a draggable divider of its
    own (the sheet's `.lpn-gsplit` look, pointer and keyboard, double-click resets), moving only that
    line; its place rides in the existing `lpn_gcols` record (window furniture, no new key). The
-   chooser's Name row is a one-row run, and the sheet draws a divider only on runs of two or more
-   (`gridHeadersSync`). A host marked `lpn-gsplit-all` now gets one on a one-row run too; both
-   boxes are marked. `gridFitNow`'s API and the `lpn-sheet` CSS are unchanged.
+   chooser's Name row is a one-row run; the sheet used to draw a divider only on runs of two or more.
+   Now every sheet run, one row included, carries one (`gridHeadersSync`; Tom: a last row without one
+   "seems a little like a bug"), so no host needs a marker. `gridFitNow`'s API and the `lpn-sheet` CSS are unchanged.
 
 ## Other dialogs this affects
 None of `openDialog()`'s callers. `gridHeadersSync()` changes only for a host carrying the new
