@@ -183,7 +183,7 @@ async function main() {
 		await page.evaluate(() => { document.getElementById('lpn_demands_close').click(); });
 		await a.settle(250);
 		ok('C the Time series row is ruled and its Label rule stands under the one above', /rgb/.test(j.graphRule || '') && j.graphEdge === j.rowEdge, JSON.stringify({ rule: j.graphRule, graphEdge: j.graphEdge, rowEdge: j.rowEdge }));
-		// D: the box shrinks to its floor; the Value column shrinks with it and cuts with an ellipsis, never wraps, never pushes past the box.
+		// D: the box shrinks to its floor; the Value column shrinks with it and clips plain (no ellipsis), never wraps, never pushes past the box.
 		await closeBox('lpn_popup'); await a.settle(250);
 		await openPipe();
 		const dm = await page.evaluate(() => {
@@ -198,7 +198,7 @@ async function main() {
 				res({
 					boxW: Math.round(R(box).width), floor: parseFloat(getComputedStyle(box).minWidth), sw: body.scrollWidth - body.clientWidth,
 					past: vals.filter((e) => R(e).right > br.right + 1).length, minVal: Math.round(Math.min.apply(null, vals.filter((e) => e.type !== "checkbox").map((e) => R(e).width))),
-					ell: txt.every((e) => getComputedStyle(e).textOverflow === 'ellipsis') && ro.every((e) => getComputedStyle(e).textOverflow === 'ellipsis' && getComputedStyle(e).whiteSpace === 'nowrap'),
+					ell: txt.every((e) => getComputedStyle(e).textOverflow === 'clip') && ro.every((e) => getComputedStyle(e).textOverflow === 'clip' && getComputedStyle(e).whiteSpace === 'nowrap'),
 					cut: li ? li.scrollWidth > li.clientWidth : null, n: vals.length
 				});
 			}, 400));
@@ -206,8 +206,8 @@ async function main() {
 		ok('D the Properties box can be made narrow (floor 12 rem)', dm.boxW <= 200, JSON.stringify(dm));
 		ok('D at its floor nothing scrolls sideways and no Value cell passes the right edge', dm.sw <= 1 && dm.past === 0, JSON.stringify({ scroll: dm.sw, past: dm.past }));
 		ok('D the Value column is allowed down to a few characters (at least 30 px, at most 90 px held)', dm.minVal >= 30 && dm.minVal <= 90, String(dm.minVal));
-		// Round 9/10: the box floor is one 5 rem for every box and the Label column has no floor, so at the floor even a short number may be cut; what holds is that every Value cell ellipsizes (a cut value shows the ellipsis) and never wraps.
-		ok('D every Value cell ellipsizes and does not wrap, so a value the narrow box cuts shows an ellipsis', dm.ell === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
+		// Round 9/10: the box floor is one 5 rem for every box and the Label column has no floor, so at the floor even a short number may be cut; what holds is that every Value cell clips plain (text-overflow: clip) and never wraps.
+		ok('D every Value cell clips plain and does not wrap (no ellipsis)', dm.ell === true, JSON.stringify({ ell: dm.ell, cut: dm.cut }));
 		await page.evaluate(() => { document.querySelector('.lpn-propbox').style.width = ''; });
 
 		console.log('\n--- The lighter sheet, 2026-10-28 (L1-L6 at PC width, L7 on a phone) ---');
