@@ -458,8 +458,13 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const circle = (d) => Math.PI * d * d / 4;
 	let nJ = 0, nR = 0, nT = 0;
 	// A junction's demands: row 0 is its own demand, the rest are `extraDemands`. A row that states no flow is not written.
+	// The file's Demand Multiplier is applied here: every base demand is written already multiplied by it, which is what
+	// EPANET does to each demand before the pattern (no field for the multiplier itself has a stated place in a saved project).
+	const dmRaw = parsed.hydraulics && parsed.hydraulics.demandMultiplier;
+	const demandMult = (dmRaw !== undefined && isFinite(Number(dmRaw))) ? Number(dmRaw) : 1;
+	report.demandMultiplier = demandMult;
 	function demandRows(n) {
-		return [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base);
+		return [{ base: n.demand, pattern: n.demandPattern }].concat(n.extraDemands || []).filter((d) => d.base).map((d) => ({ base: d.base * demandMult, pattern: d.pattern }));
 	}
 	nodes.forEach((n) => {
 		const id = newId(); elId['n:' + n.id] = id;

@@ -62,7 +62,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_multiplier`**
-  > Demand multiplier {value}. Every demand is written at its stated value, as if the multiplier were 1.
+  > Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_emitters`**
   > Emitter coefficients: {ids}.
@@ -147,7 +147,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**37 still to read**, of 80 new keys across 7 unmerged branch(es).
+**39 still to read**, of 82 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -158,7 +158,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/alternative-import (`e82c51502`) — 10 new, 10 to read @@ NEEDS RULING
+### chore/roadmap-1101d (`bfe18f2fe`) — adds no English strings
+
+### feat/alternative-import (`c8be0f791`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_export_table_scn_keeps`**
   > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
@@ -178,6 +180,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inpalt_lead`**
   > This file changes values in the categories below. Choose the alternative that receives the values of each.
   @@ NEEDS RULING
+- **`lpn_inpalt_more`**
+  > and others ({n})
+  @@ NEEDS RULING
 - **`lpn_inpalt_name`**
   > Name of the new alternative
   @@ NEEDS RULING
@@ -189,6 +194,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_inpalt_receipt`**
   > Alternatives that received the values: {list}
+  @@ NEEDS RULING
+- **`lpn_inpalt_shared`**
+  > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
@@ -414,4 +422,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`f31efad2e`) — adds no English strings
+### feat/wtg-page-export (`3b798fb34`) — adds no English strings

@@ -391,6 +391,26 @@ function head(t) { console.log('\n' + t); }
 		dd.close();
 	}
 
+	// ---- 11. the Demand Multiplier is written into the demands ----
+	head('11. Demand Multiplier 1.5: each demand is written already multiplied');
+	const mulText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-multiplier.inp'), 'utf8');
+	const mp = EngCalcs.lpnInpParse(mulText);
+	ok('the parser holds the multiplier 1.5', mp.hydraulics.demandMultiplier === 1.5, String(mp.hydraulics.demandMultiplier));
+	// EPANET runs the original WITH its multiplier against the read-back WITHOUT one (the file holds none): same heads and flows.
+	await compareToEpanet('multiplier', mulText, 'multiplier', function (pp, bp, rbk, R2) {
+		ok('the report states the multiplier it applied', R2.demandMultiplier === 1.5, String(R2.demandMultiplier));
+		ok('the read-back states no multiplier of its own', !bp.hydraulics || bp.hydraulics.demandMultiplier === undefined || bp.hydraulics.demandMultiplier === 1);
+	});
+	{
+		const mw = lib.writeWtg(SQL, tplBytes, mp, { initial: {}, changes: [] }, { name: 'multiplier', efficiency: 75 });
+		const md = new SQL.Database(mw.bytes);
+		const mq = (sql) => { const r = md.exec(sql); return r.length ? r[0].values : []; };
+		const j1 = mq("SELECT ElementID FROM HMIModelingElement WHERE Label = 'J1'")[0][0];
+		const flows = mq('SELECT DemandCollection_BaseFlow FROM IdahoDemandNode_Demand_DemandCollection WHERE DomainElementID = ' + j1 + ' ORDER BY ItemID').map((r) => r[0] / lib.GPM_TO_CFS);
+		ok('the three demand rows of J1 hold 150, 60 and 37.5 gpm (100, 40, 25 times 1.5)', flows.length === 3 && [150, 60, 37.5].every((v, i) => Math.abs(flows[i] - v) < 1e-9), flows.join(', '));
+		md.close();
+	}
+
 	console.log(fails ? '\n' + fails + ' check(s) FAILED:' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });
