@@ -113,7 +113,7 @@ ok('the status bar warns that the engines differ on Manning',
 	/manning/i.test(status()), JSON.stringify(status()));
 
 // ------------------------------------------------------------------------------------------
-// 2. A NETWORK ONLY EPANET CAN ANSWER ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
+// 2. A PRESSURE-DRIVEN NETWORK IS SOLVED BY THE ENGINE THE SETTING NAMES
 // ------------------------------------------------------------------------------------------
 // **A PRESSURE-DRIVEN DEMAND MODEL, SINCE NO VALVE ROUTES ANY MORE** (Task 733; Tom, 2026-10-18).
 // Every valve type is the built-in solver's; what still sends a single-instant solve to EPANET by
@@ -125,21 +125,22 @@ function pdaLine() {
 	L.settings().hydraulics = Object.assign({}, PDA);
 	return doc;
 }
-console.log('\n--- a pressure-driven network takes itself to EPANET ---');
+console.log('\n--- a pressure-driven network stays on the engine the setting names (Task 733) ---');
 L.settings().method = 'hw';
 L.settings().engine = 'native';
 {
 	pdaLine();
 	const was = epanetSolves();
 	const r = await solved();
-	ok('the demand model alone sent it to EPANET, with the setting still on the built-in solver',
-		epanetSolves() === was + 1, epanetSolves() - was + ' calls');
-	ok('...and the answer really is EPANET\'s', !!r && r.engine === 'epanet', r && r.engine);
-	ok('...and it converged rather than being quietly dropped', !!r && r.converged === true);
-	// THE HALF THAT IS ABOUT HONESTY: the setting is a preference, the routing is a fact about this
-	// network, so the setting must survive untouched and the reader must be told.
-	ok('the stored engine setting was NOT rewritten', L.settings().engine === 'native', L.settings().engine);
-	ok('the status bar says why it switched', status().indexOf(PC.lpn_engine_pda_route) >= 0, JSON.stringify(status()));
+	ok('the built-in solver was chosen, and EPANET was not handed the network', epanetSolves() === was, epanetSolves() - was + ' calls');
+	ok('...and the answer is the built-in solver\'s, with a deficit it computed', !!r && r.engine !== 'epanet' && !!r.demandDeficits, r && r.engine);
+	ok('...and it converged', !!r && r.converged === true);
+	ok('the stored engine setting was not changed', L.settings().engine === 'native', L.settings().engine);
+	ok('the status bar names the built-in solver, not a switch to EPANET', status().indexOf(PC.lpn_engine_native_used) >= 0 && status().indexOf(PC.lpn_engine_pda_route) < 0, JSON.stringify(status()));
+	L.settings().engine = 'epanet';
+	const was2 = epanetSolves(), r2 = await solved();
+	ok('with the EPANET solver chosen, EPANET answers it', epanetSolves() === was2 + 1 && !!r2 && r2.engine === 'epanet', r2 && r2.engine);
+	L.settings().engine = 'native';
 	L.settings().hydraulics = {};
 }
 
@@ -235,7 +236,7 @@ nativeValve({ valveType: 'GPV', _setting: 0, _curveId: 'GL1' }, (r) => {
 // ------------------------------------------------------------------------------------------
 // The other half of the same rule, and the state the stub used to be in permanently. Removing
 // lpnSolveEpanet is exactly what an offline first visit looks like to runSolve().
-console.log('\n--- and with EPANET unreachable, the refusal says what needs it ---');
+console.log('\n--- and with EPANET unreachable, a pressure-driven network still solves in the built-in solver ---');
 {
 	pdaLine();
 	const keep = EngCalcs.lpnSolveEpanet;
@@ -244,15 +245,8 @@ console.log('\n--- and with EPANET unreachable, the refusal says what needs it -
 		const was = epanetSolves();
 		L.runSolve();
 		ok('nothing was handed to an engine that is not there', epanetSolves() === was);
-		ok('no numbers were produced', L.lastResult() === null, JSON.stringify(L.lastResult()));
-		ok('the refusal is the pressure-driven one', status().indexOf(PC.lpn_diag_pda_needs_epanet) >= 0,
-			JSON.stringify(status()));
+		ok('numbers were produced', !!L.lastResult() && L.lastResult().converged === true, JSON.stringify(L.lastResult() && L.lastResult().issues));
 	} finally { EngCalcs.lpnSolveEpanet = keep; }
-
-	// Put it back and the same network solves again -- so the refusal is about the engine being
-	// absent, not about the network being bad.
-	const r = await solved();
-	ok('the engine returning revives the same network', !!r && r.engine === 'epanet', r && r.engine);
 	L.settings().hydraulics = {};
 }
 

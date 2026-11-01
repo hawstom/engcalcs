@@ -174,8 +174,9 @@ async function main() {
 		d.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
 		d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
 		d.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [], _diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
-		// Pressure-driven: since Task 733 no valve is EPANET's alone (Tom, 2026-10-18).
-		L3.settings().hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
+		// A period with an EPANET-MSX input: the one thing the built-in loop leaves to EPANET (Task 733).
+		d.times = EC.lpnTimesDefaults(); d.times.duration = 86400;
+		d.msx = { text: '[TITLE]' };
 		EC.lpnEpanetLoad = () => Promise.reject(new Error('Failed to fetch dynamically imported module'));
 		banner.textContent = '';
 		L3.warmEpanetEngine('background');
