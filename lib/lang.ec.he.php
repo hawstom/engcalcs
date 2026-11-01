@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='מקרא סרגל הכלים';
 $ec_lang['lpn_pane_right_toggle']='נראות';
 $ec_lang['lpn_color_legend_open_tip']='לחצו כדי לפתוח את הגדרות הצביעה ולשנות צבעים אלה.';
 $ec_lang['lpn_color_node_field']='צביעת צמתים לפי';
-$ec_lang['lpn_color_link_field']='צביעת צינורות לפי';
+$ec_lang['lpn_color_link_field']='צביעת קישורים לפי';
 $ec_lang['lpn_color_ramp_sequential']='רציף';
 $ec_lang['lpn_color_ramp_diverging']='מתפצל';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='גודל טקסט (פיקסלים)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='גודל סמל (פיקסלים)';
-$ec_lang['lpn_settings_link_width']='רוחב קו הצינור (פיקסלים)';
+$ec_lang['lpn_settings_link_width']='רוחב קו הקישור (פיקסלים)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='חצי כיוון זרימה';
 $ec_lang['lpn_settings_show_arrows_tip']='ציור חץ על כל צינור המראה לאיזה כיוון המים זורמים. החצים מופיעים לאחר הרצה, וכיבוים משאיר את התוצאות ללא שינוי.';
-$ec_lang['lpn_settings_align_labels']='יישר תוויות צינורות עם הצינורות';
+$ec_lang['lpn_settings_align_labels']='יישר תוויות קישורים לאורך קו הקישור';
 $ec_lang['lpn_settings_readability_bias']='מעלות משמאל לאנך לפני שתווית מתהפכת';
 $ec_lang['lpn_settings_readability_bias_tip']='הפוך תווית כדי לשמור עליה זקופה כאשר היא נוטה יותר ממספר המעלות הזה משמאל לאנך.';
 $ec_lang['lpn_settings_mask_labels']='רקע אטום מאחורי תוויות';

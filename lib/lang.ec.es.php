@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Barra de herramientas';
 $ec_lang['lpn_pane_right_toggle']='Visibilidad';
 $ec_lang['lpn_color_legend_open_tip']='Presione para abrir la configuración de colores y cambiar estos colores.';
 $ec_lang['lpn_color_node_field']='Colorear nodos por';
-$ec_lang['lpn_color_link_field']='Colorear tuberías por';
+$ec_lang['lpn_color_link_field']='Colorear líneas por';
 $ec_lang['lpn_color_ramp_sequential']='Secuencial';
 $ec_lang['lpn_color_ramp_diverging']='Divergente';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Tamaño del texto (píxeles)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Tamaño del símbolo (píxeles)';
-$ec_lang['lpn_settings_link_width']='Grosor de la línea de tubería (píxeles)';
+$ec_lang['lpn_settings_link_width']='Grosor del trazo de las líneas (píxeles)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Flechas de dirección del caudal';
 $ec_lang['lpn_settings_show_arrows_tip']='Dibuja una flecha en cada tubería que muestra en qué sentido corre el agua. Las flechas aparecen después de una ejecución, y desactivarlas no cambia los resultados.';
-$ec_lang['lpn_settings_align_labels']='Alinear las etiquetas de tubería con las tuberías';
+$ec_lang['lpn_settings_align_labels']='Alinear las etiquetas de línea con las líneas';
 $ec_lang['lpn_settings_readability_bias']='Voltear una etiqueta boca abajo cuando se inclina más de esta cantidad de grados a la izquierda de la vertical';
 $ec_lang['lpn_settings_readability_bias_tip']='Voltea una etiqueta para mantenerla derecha cuando se inclina más de esta cantidad de grados a la izquierda de la vertical.';
 $ec_lang['lpn_settings_mask_labels']='Fondo sólido detrás de las etiquetas';

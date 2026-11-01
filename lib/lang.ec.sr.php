@@ -943,7 +943,7 @@ $ec_lang['lpn_examples_blank']='Или почните овде';
 // reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
 // "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
 // project either way.
-$ec_lang['lpn_examples_size']='Чворова: {nodes}, цеви: {links}';
+$ec_lang['lpn_examples_size']='Чворова: {nodes}, веза: {links}';
 $ec_lang['lpn_examples_failed']='Примери нису могли да се учитају. Користите Датотека, Нови пројекат да бисте почели цртеж.';
 $ec_lang['lpn_examples_loading']='Учитавање примера…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Трака алата';
 $ec_lang['lpn_pane_right_toggle']='Видљивост';
 $ec_lang['lpn_color_legend_open_tip']='Притисните да отворите подешавања бојења и промените ове боје.';
 $ec_lang['lpn_color_node_field']='Обој чворове према';
-$ec_lang['lpn_color_link_field']='Обој цеви према';
+$ec_lang['lpn_color_link_field']='Обој везе према';
 $ec_lang['lpn_color_ramp_sequential']='Секвенцијална';
 $ec_lang['lpn_color_ramp_diverging']='Дивергентна';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Величина текста (пиксел�
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Величина симбола (пиксели)';
-$ec_lang['lpn_settings_link_width']='Дебљина линије цеви (пиксели)';
+$ec_lang['lpn_settings_link_width']='Дебљина линије везе (пиксели)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Стрелице смера протока';
 $ec_lang['lpn_settings_show_arrows_tip']='Исцртава стрелицу на свакој цеви која показује на коју страну вода тече. Стрелице се појављују после прорачуна, а њихово искључивање не мења резултате.';
-$ec_lang['lpn_settings_align_labels']='Поравнај ознаке цеви са цевима';
+$ec_lang['lpn_settings_align_labels']='Поравнај ознаке веза са везама';
 $ec_lang['lpn_settings_readability_bias']='Окрени ознаку наопако када се нагне више од овог броја степени лево од вертикале';
 $ec_lang['lpn_settings_readability_bias_tip']='Окреће ознаку да остане усправна када се нагне више од овог броја степени лево од вертикале.';
 $ec_lang['lpn_settings_mask_labels']='Пуна позадина иза ознака';

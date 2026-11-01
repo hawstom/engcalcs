@@ -2907,13 +2907,15 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body { overflow: auto; }
 #lpn_demands_body .lpn-demand-table { display: table; width: 100%; margin: 0; border-collapse: collapse; }
 #lpn_demands_body > .lpn-demand-table { table-layout: fixed; }
-#lpn_demands_body > .lpn-demand-table th:nth-child(1) { width: 7.5em; }
-#lpn_demands_body > .lpn-demand-table th:nth-child(2) { width: 9em; }
-#lpn_demands_body > .lpn-demand-table th:last-child { width: 2.4em; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(1) { width: 7em; }
+#lpn_demands_body > .lpn-demand-table th:nth-child(2) { width: 8em; }
+#lpn_demands_body > .lpn-demand-table th:last-child { width: 2em; }
 #lpn_demands_body .lpn-demand-table :is(th, td) { padding: 0; border: 0; border-bottom: 1px solid var(--ec-hairline); font-size: .85em; text-align: start; }
 #lpn_demands_body .lpn-demand-table :is(th, td) + :is(th, td) { border-inline-start: 1px solid var(--ec-hairline); }
 #lpn_demands_body .lpn-demand-table th { padding: 4px 6px; font-weight: 600; opacity: .8; }
 #lpn_demands_body > .lpn-demand-table td:last-child { text-align: center; white-space: nowrap; }
+/* The last column is the unlabeled delete column: no rule before it (a lone row has no button, and the rule read as a stray line inside Description). */
+#lpn_demands_body > .lpn-demand-table :is(th, td):last-child { border-inline-start: 0; }
 #lpn_demands_body .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
 	display: block; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px; box-sizing: border-box;
 	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em;
@@ -5163,7 +5165,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-setbox-title {
 	position: absolute; top: 0; left: 0; right: 0; height: 39px; box-sizing: border-box;
 	padding: 10px 12px 0; font-weight: bold; pointer-events: none;
-	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap;   /* a title too long for its bar is clipped, never an ellipsis (Tom, 2026-11-01); the bar stays 39 px so the buttons beside it stay usable */
 	font-family: var(--ec-font-title); font-weight: var(--ec-title-weight); color: var(--ec-title-ink); text-transform: var(--ec-title-case); letter-spacing: var(--ec-title-tracking);
 	background-image: var(--ec-titlebar-image); text-shadow: var(--ec-title-halo);
 	background-position: var(--ec-titlebar-pos); background-size: var(--ec-titlebar-size); background-repeat: var(--ec-titlebar-repeat);
@@ -5234,7 +5236,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 	writing-mode: vertical-rl; flex: 0 1 auto; min-height: 0; max-height: 14em;
 	padding: 8px 2px; margin: 0 1px; border: 1px solid var(--ec-border-strong); border-radius: var(--ec-radius-s);
 	background: var(--ec-bg); color: var(--ec-ink); font-size: 12px; line-height: 1.2;
-	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+	white-space: nowrap; overflow: hidden; cursor: pointer;
 }
 .lpn-dock-tab.lpn-dock-tab-drag { cursor: grabbing; box-shadow: 0 0 0 2px var(--ec-hover-border); }
 .lpn-dock-tab:hover, .lpn-dock-tab:focus-visible, .lpn-dock-tab[aria-expanded="true"] {
@@ -5483,7 +5485,7 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 @media (max-width: 600px) {
 	.lpn-saved { display: inline-block; max-width: 100%; white-space: normal; }
 }
-.lpn-saved-row { display: block; margin-inline-start: 0; }
+.lpn-saved-row { display: block; margin-inline-start: 0; white-space: normal; overflow-wrap: anywhere; }   /* wraps, never cut (Task 852) */
 .lpn-managecols-width { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .lpn-managecols-width input { width: 6em; }
 /* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
@@ -5633,9 +5635,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
-/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, clipped at the column edge, the full label in its tip. */
+/* **THE NAME WRAPS AS NEEDED AND THE COLUMN HAS A FLOOR** (Task 852; Tom, 2026-11-01: "I would rather that they kept wrapping as needed"; Ida's design dev/agents/interface-designer/truncation-852-2026-11-01.md; this reverses the 2026-10-30 one-line clip). Both columns keep a floor (6rem and 6rem, which with the gap fits a 320 px phone) so neither a name nor a value is squeezed to nothing; a box narrower than the two floors scrolls its content pane sideways. A name takes as many lines as it needs; nothing is clipped, no ellipsis, no tip. */
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
+	display: grid; grid-template-columns: minmax(var(--lpn-set-name-min, 6rem), var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
@@ -5649,7 +5651,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the treatment Tom named twice as the one he likes and the one to converge on. It was the only
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
-.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
+.lpn-set-row > :first-child, .lpn-set-name { white-space: normal; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
 /* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
 .lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
@@ -7613,7 +7615,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 2px 0 8px; cursor: move; touch-action: none;
 	background: var(--ec-gray-f6f6f6); border-bottom: 1px solid var(--ec-border); user-select: none;
 }
-.lpn-tsb-title { flex: 1; min-width: 0; font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpn-tsb-title { flex: 1; min-width: 0; font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; }
 .lpn-tsb-q { flex: 0 1 auto; min-width: 0; max-width: 60%; height: 20px; padding: 0 2px; font: inherit; font-size: 12px; cursor: pointer; }
 .lpn-tsb-close {
 	flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: var(--ec-radius-pill); background: none; font: inherit;
@@ -7727,7 +7729,7 @@ textarea.lpn-desc-ta {
 .lpn-theme-btn .ec-tc-menu { height: 10px; padding: 1px 3px 0; }
 .lpn-theme-btn .ec-tc-menu i { width: 12px; height: 6px; }
 .lpn-theme-btn .ec-tc-map { left: 3px; right: 3px; top: 13px; bottom: 3px; }
-.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; }
+.lpn-theme-btn-name { white-space: normal; overflow-wrap: anywhere; min-width: 0; }   /* wraps, never cut (Task 852) */
 /* The gallery: fixed over the page, above the boxes (1200-1799) and the menu pop-up (1850), under the modal. */
 .lpn-theme-gallery {
 	position: fixed; z-index: 1855; box-sizing: border-box;

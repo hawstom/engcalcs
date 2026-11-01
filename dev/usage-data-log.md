@@ -1600,3 +1600,23 @@ written in; read them through this table.
 The said-yes bucket keeps its name ("dwells, said yes"). The daily mail reads production's
 `lang-log-stats.sh`, which lags master, so it recognises the old header ("RANK BY SHOPPING", "said yes
 / page loads") as well as the new ("RANK BY DWELLS", "dwells, said yes / dwells, others").
+
+## 2026-11-01 — the chain audit's first "hole" was the offline queue
+
+The daily `archive_logs.php --verify` mailed one unexplained finding: the 2026-11-01 archive's
+first row is 2026-09-21, inside the window the 2026-10-01 archive already covers. Tom ran the
+checks on production. Every one of the six files starts at the rotation (2026-10-01T05:06Z, eleven
+minutes after the 05:05 move), and only **four rows** predate it: one in `engcalcs-human-view.log`,
+three in `engcalcs-signal.log`. The 2026-10-01 manifest shows that archive closed cleanly at
+05:04:49Z with 266,715 rows.
+
+**Nothing was lost and nothing overlaps.** `log-human-view.php`, `log-signal-event.php`,
+`log-calc-event.php` and `log-title-event.php` accept a beacon's `offline_ts` (Task 119): a beacon
+queued while a browser was offline is logged at the time it was first attempted, up to 90 days
+back. A browser offline around 2026-09-21 flushed its queue after 10-01, so four September-stamped
+rows landed in the October window. **Read those four as late arrivals; the September archive is
+complete as it stands**, and no report for either window changes by more than four rows.
+
+The audit now says so itself: rows predating the previous archive's end are a note when every one
+of them sits in those four logs and is within the queue's 90 days; anywhere else (the language or
+contact log, which never backdate) they are still an unexplained overlap.
