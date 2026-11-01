@@ -184,6 +184,29 @@ see its row). The "Yes" in a row below is Tom's reading of the product, not a qu
 Two rows say "not found": tags and demand category names. The strings make no claim about WaterGEMS
 for them either; they say only that this export does not write them.
 
+## Shortening the list, 2026-11-01
+
+Tom: *"Work not done?"* The box's list is now the items below that the saved project and public documentation
+cannot place. Ranked by what a WaterGEMS user loses without the item:
+
+| Rank | Item | Placeable now? | State |
+|---|---|---|---|
+| 1 | Demand multiplier | Yes, as arithmetic: no field for it has a seen value (`EpaNetEngine_NormalDemandAdjustmentsCollection` is empty in Tom's file) | **Written**: each base demand is stored already multiplied. The box still says the setting itself is not written |
+| 2 | Water quality, reactions, sources, tank mixing | No: every constituent table is empty in Tom's file; `TankMixingModel` is 1 in every row | Stays. Needs a saved example |
+| 3 | Emitter coefficients | No: the column exists, all zero; its storage unit code (28) is unmeasured | Stays (Ask 2) |
+| 4 | Pump speed pattern | Partly: `PatternBasedType_Pattern` holds a pattern id, but `VSPType` and `Physical_IsVariableSpeedPump` have only ever been seen as 0 | Stays; needs a pump set to a speed pattern |
+| 5 | Energy price, price pattern, demand charge | No: `EnergyPricing` is empty | Stays |
+| 6 | Controls on a pressure or other condition; rule-based controls | No: `IdahoControl_ControlType_LogicalType` is empty; the only condition codes seen are clock time and tank level | Stays (written as the clock times EPANET switched them) |
+| 7 | Pressure-driven demand model | No | Stays |
+| 8 | Description, tag, demand category names | Yes: `HMIModelingElement.Notes` is a field of every element | **Written** into Notes (`Tag: x`, `Demand categories: Residential 100 gpm; ...`). No tag or category field was seen, so the lines left the box |
+| 9 | Text on the map, background picture, true positions | No: no sample states a map text, a backdrop path or a spatial reference | Stay |
+| 10 | Tank minimum volume | Nothing to write: the page keeps no minimum volume, so the box line could never apply | Line removed |
+| 11 | Pipe material, installation year | Nothing to write: an EPANET project states neither | Line removed |
+
+Test files for Tom: `wtg_multiplier_example.inp`, `wtg_notes_example.inp` (copies of
+`dev/lpn-spike/reference/wtg-export-multiplier.inp` and `wtg-export-notes.inp`). Harness sections: 11 and 12 of
+`wtg-export-harness.js`, 9 of `wtg-page-export-harness.js`.
+
 ## What the tests show
 
 `node dev/lpn-spike/wtg-export-harness.js` (needs Tom's fixture and the reader from `feat/sqlite-reader`;
