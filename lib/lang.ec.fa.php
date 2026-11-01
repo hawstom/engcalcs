@@ -224,7 +224,7 @@ $ec_lang['mphl_junction_loss']='افت موضعی (جزئی)، h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='افت کل، h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='خط انرژی پایین‌دست (EGL)';
 $ec_lang['mphl_egl_2']='خط انرژی بالادست (EGL)';
-$ec_lang['mphl_hgl_egl_tip']='این نتیجه ممکن است در جایی که لوله بالاتر از خط شیب هیدرولیکی می‌رود معتبر نباشد.';
+$ec_lang['mphl_hgl_egl_tip']='این نتیجه ممکن است در جایی که لوله بالاتر از خط فشار هیدرولیکی می‌رود معتبر نباشد.';
 $ec_lang['mphl_note_1']='<dl><dt>این ماشین‌حساب نیمرخ (پروفیل) لوله بین دو انتها را مدل‌سازی نمی‌کند.</dt><dd>اگر HGL در هر نقطه پایین‌تر از سقف لوله برود، ممکن است این محاسبه معتبر نباشد.</dd><dt>برای شرایط ورودی باز (کالورت)، بررسی شرایط کنترل ورودی ضروری است.</dt><dd>۱. HGL بالادست باید بالاتر از تراز جریان با عمق نرمال بالادست باشد (و بالاتر از خود لوله!).</dd><dd>۲. آب بالادست کالورت بهتر است با EGL بالادست نشان داده شود نه HGL بالادست.</dd><dd>۳. برای محاسبات ساده استاندارد آب بالادست کالورت با استفاده از <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>، برنامه رایگان کالورت اداره بزرگراه‌های فدرال آمریکا، <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">آموزش ۲ دقیقه‌ای من</a> را ببینید.</dd><dd>۴. این صفحه فقط حالت کنترل خروجی را حل می‌کند: لوله‌ای که کاملاً پر جریان دارد و شرایط پایین‌دست تعیین‌کننده هد آن است. طراحی کالورت یعنی تصمیم‌گیری در مورد اینکه کنترل ورودی یا کنترل خروجی حاکم است، پس هر جا احتمال هرکدام وجود دارد از HY-8 استفاده کنید.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='کانال ذوزنقه‌ای Manning';
@@ -768,8 +768,8 @@ $ec_lang['lpn_pane_paste_id_taken']='ردیف {row}: شناسهٔ {id} از پی
 $ec_lang['lpn_pane_paste_id_twice']='ردیف {row}: شناسهٔ {id} دوبار در این چسباندن استفاده شده.';
 // {first} and {second} are the project's two coordinate names, such as Latitude and Longitude.
 $ec_lang['lpn_pane_paste_no_position']='ردیف {row}: یک گرهٔ تازه به هر دوی {first} و {second} نیاز دارد.';
-$ec_lang['lpn_pane_paste_no_ends']='ردیف {row}: یک لولهٔ تازه به یک گرهٔ «از» و یک گرهٔ «به» نیاز دارد.';
-$ec_lang['lpn_pane_paste_no_node']='ردیف {row}: گرهٔ {id} هنوز وجود ندارد. نخست گره‌هایتان را بچسبانید، سپس لوله‌هایتان را.';
+$ec_lang['lpn_pane_paste_no_ends']='ردیف {row}: یک اتصال تازه به یک گرهٔ «از» و یک گرهٔ «به» نیاز دارد.';
+$ec_lang['lpn_pane_paste_no_node']='ردیف {row}: گرهٔ {id} هنوز وجود ندارد. نخست گره‌هایتان را بچسبانید، سپس اتصال‌هایتان را.';
 $ec_lang['lpn_pane_paste_same_ends']='ردیف {row}: «از» و «به» یک گره هستند.';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='ردیف {row}: {text} یک {col} معتبر نیست.';
@@ -839,7 +839,7 @@ $ec_lang['lpn_field_text_valign_top']='بالا';
 $ec_lang['lpn_field_text_valign_middle']='میان';
 $ec_lang['lpn_field_text_valign_bottom']='پایین';
 $ec_lang['lpn_field_text_rotation']='زاویه (درجه)';
-$ec_lang['lpn_field_text_match_pipe']='چرخش به زاویهٔ نزدیک‌ترین لوله';
+$ec_lang['lpn_field_text_match_pipe']='چرخش به زاویهٔ نزدیک‌ترین اتصال';
 $ec_lang['lpn_field_text_flip']='چرخش 180 درجه';
 // A Text object may follow a junction, reservoir or tank, or a station along a pipe, pump or
 // valve (Task 502). This row names what it is following. OUR VOCABULARY: the element is a Text.
@@ -943,7 +943,7 @@ $ec_lang['lpn_examples_blank']='یا از این‌جا شروع کنید';
 // reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
 // "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
 // project either way.
-$ec_lang['lpn_examples_size']='گره‌ها: {nodes}، لوله‌ها: {links}';
+$ec_lang['lpn_examples_size']='گره‌ها: {nodes}، اتصال‌ها: {links}';
 $ec_lang['lpn_examples_failed']='نمونه‌ها بارگیری نشدند. برای شروع یک ترسیم تازه، از منوی فایل، پروژهٔ جدید را انتخاب کنید.';
 $ec_lang['lpn_examples_loading']='در حال بارگیری نمونه‌ها…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
@@ -1500,7 +1500,7 @@ $ec_lang['lpn_help_icons']='راهنمای نمادهای نوار ابزار';
 $ec_lang['lpn_pane_right_toggle']='نمایان‌سازی';
 $ec_lang['lpn_color_legend_open_tip']='برای باز کردن تنظیمات رنگ‌بندی و تغییر این رنگ‌ها، فشار دهید.';
 $ec_lang['lpn_color_node_field']='رنگ گره‌ها بر اساس';
-$ec_lang['lpn_color_link_field']='رنگ لوله‌ها بر اساس';
+$ec_lang['lpn_color_link_field']='رنگ اتصال‌ها بر اساس';
 $ec_lang['lpn_color_ramp_sequential']='ترتیبی';
 $ec_lang['lpn_color_ramp_diverging']='واگرا';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1976,7 +1976,7 @@ $ec_lang['lpn_profile_summary']='گره‌ها: {n}، طول: {len} {u}';
 $ec_lang['lpn_profile_axis_station']='فاصله در طول مسیر ({u})';
 $ec_lang['lpn_profile_axis_elev']='تراز و هد ({u})';
 $ec_lang['lpn_profile_ground']='سطح زمین';
-$ec_lang['lpn_profile_hgl']='خط شیب هیدرولیکی';
+$ec_lang['lpn_profile_hgl']='خط فشار هیدرولیکی';
 // ---- Task 509: the two operations the control column took with it ----------------------------
 // Task 506 removed the From/To pull-downs and the waypoint chips, and with them the only way to
 // change ONE end of a path or take ONE node off it. They come back in an overlay box over the map,
@@ -2021,7 +2021,7 @@ $ec_lang['lpn_ts_menu']='سری زمانی';
 $ec_lang['lpn_ts_tip']='یک یا چند المان را در طول یک شبیه‌سازی بازهٔ زمانی نمودار می‌کند.';
 $ec_lang['lpn_ts_title']='مقادیر در برابر زمان';
 $ec_lang['lpn_ts_group_nodes']='گره‌ها';
-$ec_lang['lpn_ts_group_links']='لوله‌ها';
+$ec_lang['lpn_ts_group_links']='اتصال‌ها';
 $ec_lang['lpn_pgraph_none']='این المان در اجرای کنونی نتیجه‌ای ندارد.';
 // The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
 // 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
@@ -2697,7 +2697,7 @@ $ec_lang['lpn_engine_wait_pct']='حل‌کننده {percent}٪ بارگذاری 
 $ec_lang['lpn_engine_wait_bytes']='تاکنون {kb} کیلوبایت از حل‌کننده بارگذاری شده. مجموع در دسترس نیست، پس درصد تکمیل نامشخص است.';
 $ec_lang['lpn_engine_needed_failed']='حل‌گر EPANET هنوز بارگذاری نشده، نمی‌تواند بارگذاری شود، و این شبکه تنها با آن قابل حل است. هنگامی‌که به اینترنت متصل باشید بارگذاری خواهد شد.';
 $ec_lang['lpn_engine_needed_failed_why']='این شبکه را فقط حل‌کنندهٔ EPANET می‌تواند حل کند. {reason}';
-$ec_lang['lpn_diag_valve_on_fixed_head']='این شیرها مستقیماً به یک مخزن یا تانک متصل‌اند، که خط تراز هیدرولیکی را در آن گره ثابت می‌کند، پس شیر چیزی برای کنترل ندارد. یک لولهٔ کوتاه میان شیر و مخزن یا تانک قرار دهید:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='این شیرها مستقیماً به یک مخزن یا تانک متصل‌اند، که خط فشار هیدرولیکی را در آن گره ثابت می‌کند، پس شیر چیزی برای کنترل ندارد. یک لولهٔ کوتاه میان شیر و مخزن یا تانک قرار دهید:';
 $ec_lang['lpn_diag_not_converged']='هیچ جوابی یافت نشد. مقدارهایی را که از نظر فیزیکی ناممکن‌اند بررسی کنید، مانند قطر صفر.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -2990,7 +2990,7 @@ $ec_lang['lpn_labels_init_status']='وضعیت آغازین';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
 // Customer"). The two label entries reuse lpn_labels_heading_node/_link.
 $ec_lang['lpn_settings_sym_node_colors']='رنگ‌های گره';
-$ec_lang['lpn_settings_sym_link_colors']='رنگ‌های لوله';
+$ec_lang['lpn_settings_sym_link_colors']='رنگ‌های اتصال';
 $ec_lang['lpn_field_id']='شناسه';
 $ec_lang['lpn_backdrop_menu']='تصویر پس‌زمینه…';
 $ec_lang['lpn_backdrop_add']='افزودن';
@@ -3587,14 +3587,14 @@ $ec_lang['lpn_settings_text_size']='اندازهٔ متن (پیکسل)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='اندازهٔ نماد (پیکسل)';
-$ec_lang['lpn_settings_link_width']='عرض خط لوله (پیکسل)';
+$ec_lang['lpn_settings_link_width']='عرض خط اتصال (پیکسل)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='پیکان‌های جهت دبی';
 $ec_lang['lpn_settings_show_arrows_tip']='روی هر لوله پیکانی ترسیم می‌کند که نشان می‌دهد آب به کدام سو جریان دارد. پیکان‌ها پس از یک اجرا نمایان می‌شوند، و خاموش کردن آن‌ها نتیجه‌ها را تغییر نمی‌دهد.';
-$ec_lang['lpn_settings_align_labels']='هم‌راستاسازی برچسب‌های لوله با لوله‌ها';
+$ec_lang['lpn_settings_align_labels']='هم‌راستاسازی برچسب‌های اتصال با خط اتصال';
 $ec_lang['lpn_settings_readability_bias']='وقتی یک برچسب بیش از این مقدار درجه به چپِ عمود کج شود، آن را وارونه کن';
 $ec_lang['lpn_settings_readability_bias_tip']='وقتی برچسبی بیش از این مقدار درجه به چپِ عمود کج شود، آن را وارونه می‌کند تا درست بایستد.';
 $ec_lang['lpn_settings_mask_labels']='پس‌زمینهٔ توپر پشت برچسب‌ها';

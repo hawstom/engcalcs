@@ -1008,7 +1008,7 @@ $ec_lang['lpn_guide_find_results_term']='Resultados, a seleção e as Tabelas';
 $ec_lang['lpn_guide_find_results_def']='<p>Os elementos correspondentes são listados abaixo do botão Localizar. Maior que e n maiores listam o maior valor primeiro, menor que e n menores listam o menor valor primeiro, e as outras condições listam pelo valor encontrado e depois pelo ID. Uma consulta com E ou OU lista os nós e depois os trechos, cada grupo por ID. Uma única correspondência é mostrada no mapa imediatamente. Selecione uma linha para centralizar o mapa nesse elemento. Se nada estiver selecionado, o elemento também é selecionado; se algo estiver, o elemento é destacado e a seleção não é alterada. Shift+clique ou Ctrl+clique em uma linha para adicioná-la à seleção ou removê-la. Localizar não seleciona todas as correspondências por si só.</p><p>O botão Filtrar na tabela atual aplica a mesma consulta ao painel Tabelas. Cada tabela a que a consulta se aplica mostra somente as linhas correspondentes, com a consulta e a contagem de linhas acima delas. Para selecionar todas as correspondências no mapa, selecione essas linhas e escolha Selecionar no mapa no menu de clique com o botão direito. Um filtro de tabela não é salvo com o projeto e termina quando a página é recarregada. Uma linha editada de modo que deixe de corresponder permanece na tabela, esmaecida e marcada com um sinal de aviso, até que o botão Filtrar na tabela atual seja pressionado novamente.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Substituir e Desfazer';
 $ec_lang['lpn_guide_find_replace_def']='<p>A parte Alterar o que foi encontrado da caixa grava uma propriedade em todos os elementos que a consulta encontrou. Escolha a propriedade na lista Propriedade a alterar, digite o novo valor na caixa Novo valor na unidade exibida e pressione o botão Substituir. A caixa então informa quantos elementos seriam alterados, sem contar os que já têm o novo valor. Pressione o botão Alterar para aplicar a alteração, ou Cancelar. Um Desfazer reverte a substituição inteira.</p><p>Exemplo na Net1: <code>Pipe.Diameter below 10</code> encontra os tubos 31, 122, 113 e 121. Escolha Diâmetro, digite 10 e pressione Substituir; a caixa mostra "Alterar 4 elementos?". Pressione Alterar para definir os quatro tubos como 10 pol. Um Desfazer os devolve a 6 e 8 pol.</p><p>Exemplo na Net3: <code>Pipe.ID equal to \'247\'</code> encontra o tubo 247. Escolha Fechado, escolha Fechado novamente na lista Novo valor e pressione Substituir e depois Alterar, para fechar o tubo para o exemplo de conectividade acima. Desfazer o abre novamente.</p><p>Substituir exige um único tipo de elemento; portanto, em Tudo, escolha primeiro um tipo de elemento na lista O que pesquisar. Em um cenário diferente de Base, a substituição é armazenada nesse cenário, como seria a mesma edição em Propriedades. Onde há elevações do Mapbox disponíveis, a Elevação pode ser substituída pelo DEM do Mapbox em vez de um valor digitado.</p>';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>Os valores são comparados com precisão total e listados com quatro casas decimais. Igual a raramente corresponde a um resultado calculado; use maior que e menor que.</li><li>Pressão, carga, vazão, velocidade e os demais resultados são os do último cálculo. Com a configuração Recalcular automaticamente desmarcada, eles descrevem a rede como estava no último Calcular.</li><li>Maior que e menor que aplicados a texto usam a ordem de dicionário, com os números em ordem numérica: na Net1, <code>Junction.ID above \'20\'</code> encontra as junções 21, 22, 23, 31 e 32.</li><li>Em Tudo, só são oferecidos ID, Descrição, Etiqueta e Conectividade. Escolha um tipo de elemento na lista O que pesquisar para ver a lista completa de propriedades.</li><li>Um item de Texto não tem ID. Pesquise-o pelas suas palavras, como em <code>Text.Text contains \'pump\'</code>.</li><li>As quatro condições de Conectividade para um nó são sem trechos no nó, sem trechos abertos no nó, sem caminho de trechos até uma origem e sem caminho aberto até uma origem. Uma origem é um reservatório ou um tanque.</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>Os valores são comparados com precisão total e listados com quatro casas decimais. Igual a raramente corresponde a um resultado calculado; use maior que e menor que.</li><li>Pressão, carga, vazão, velocidade e os demais resultados são os do último cálculo. Com a configuração Recalcular automaticamente desmarcada, eles descrevem a rede como estava no último Calcular.</li><li>Maior que e menor que aplicados a texto usam a ordem de dicionário, com os números em ordem numérica: na Net1, <code>Junction.ID above \'20\'</code> encontra as junções 21, 22, 23, 31 e 32.</li><li>Em Tudo, só são oferecidos ID, Descrição, Etiqueta e Conectividade. Escolha um tipo de elemento na lista O que pesquisar para ver a lista completa de propriedades.</li><li>Um item de Texto não tem ID. Pesquise-o pelas suas palavras, como em <code>Text.Text contains \'pump\'</code>.</li><li>As quatro condições de Conectividade para um nó são sem trechos no nó, sem trechos abertos no nó, sem caminho de trechos até uma fonte e sem caminho aberto até uma fonte. Uma fonte é um reservatório ou um tanque.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
 // (lpn_sm_help, Tom's wording of 2026-10-16) comes first in the entry; nothing here restates or
@@ -1307,15 +1307,15 @@ $ec_lang['lpn_result_gradient']='Gradiente de perda de carga';
 $ec_lang['lpn_result_gradient_tip']='Perda de carga dividida pelo comprimento do tubo. Use-a para comparar tubos de comprimentos diferentes com um único limite de projeto.';
 $ec_lang['lpn_result_water_age']='Idade da água';
 $ec_lang['lpn_result_water_age_tip']='Tempo que a água que chega a este ponto passou no sistema. Onde vazões se encontram, o número é a média das idades que chegam, ponderada pela vazão. Em um tanque é a idade média da água contida, então um tanque que se renova lentamente costuma conter a água mais antiga de uma rede. Não há limite regulatório com que compará-la, então avalie-a em relação às condições do sistema que está sendo modelado.';
-$ec_lang['lpn_result_source_share']='Parcela de origem';
-$ec_lang['lpn_result_source_share_tip']='Parcela da água que chega a este ponto que veio do nó de rastreamento. É o que a análise Rastreamento de origem informa.';
+$ec_lang['lpn_result_source_share']='Parcela de fonte';
+$ec_lang['lpn_result_source_share_tip']='Parcela da água que chega a este ponto que veio do nó de rastreamento. É o que a análise Rastreamento de fonte informa.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
 // take different words. Three whole names rather than one name built from a word and a heading: a
 // label composed at render time breaks in a gendered, a word-order and a right-to-left language,
 // which is the rule in CLAUDE.md under Concept-level label reuse.
 $ec_lang['lpn_result_avg_water_age']='Idade média da água';
-$ec_lang['lpn_result_avg_source_share']='Parcela média de origem';
+$ec_lang['lpn_result_avg_source_share']='Parcela média de fonte';
 $ec_lang['lpn_result_avg_concentration']='Concentração média';
 // EPANET's own two link report columns, in EPANET's own words. A friction factor is the
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Legenda da barra de ferramentas';
 $ec_lang['lpn_pane_right_toggle']='Visibilidade';
 $ec_lang['lpn_color_legend_open_tip']='Pressione para abrir as configurações de coloração e alterar estas cores.';
 $ec_lang['lpn_color_node_field']='Colorir nós por';
-$ec_lang['lpn_color_link_field']='Colorir tubos por';
+$ec_lang['lpn_color_link_field']='Colorir trechos por';
 $ec_lang['lpn_color_ramp_sequential']='Sequencial';
 $ec_lang['lpn_color_ramp_diverging']='Divergente';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1885,8 +1885,8 @@ $ec_lang['lpn_find_prop_demand_desc']='Descrição da categoria de demanda';
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
 $ec_lang['lpn_find_op_conn_unlinked']='sem trechos no nó';
 $ec_lang['lpn_find_op_conn_noopen']='sem trechos abertos no nó';
-$ec_lang['lpn_find_op_conn_nolinksource']='sem caminho de trechos até uma origem';
-$ec_lang['lpn_find_op_conn_noopensource']='sem caminho aberto até uma origem';
+$ec_lang['lpn_find_op_conn_nolinksource']='sem caminho de trechos até uma fonte';
+$ec_lang['lpn_find_op_conn_noopensource']='sem caminho aberto até uma fonte';
 // A result row prints the NARROWEST condition true of that node beside its id, because "no links"
 // says more than "no open path to a source" and both are true of the same node. It prints the
 // SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
@@ -1894,7 +1894,7 @@ $ec_lang['lpn_find_op_conn_noopensource']='sem caminho aberto até uma origem';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Todos os nós estão conectados.';
-$ec_lang['lpn_find_conn_no_fixed']='Esta rede não tem reservatório nem tanque, então não há origem a alcançar. Só é possível buscar por sem trechos no nó e sem trechos abertos no nó.';
+$ec_lang['lpn_find_conn_no_fixed']='Esta rede não tem reservatório nem tanque, então não há fonte a alcançar. Só é possível buscar por sem trechos no nó e sem trechos abertos no nó.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -2025,7 +2025,7 @@ $ec_lang['lpn_pgraph_none']='Este elemento não tem resultados na execução atu
 // 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
-$ec_lang['lpn_pgraph_source_share_from']='Parcela de origem de {node}';
+$ec_lang['lpn_pgraph_source_share_from']='Parcela de fonte de {node}';
 $ec_lang['lpn_result_pump_head_tip']='A carga que a bomba acrescenta da sucção à descarga, mostrada como um número positivo. O solucionador e os arquivos do EPANET a registram como uma perda de carga negativa.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2343,7 +2343,7 @@ $ec_lang['lpn_inp_drop_tags']='Este arquivo atribui etiquetas a algumas junçõe
 $ec_lang['lpn_inp_drop_report']='Este arquivo contém configurações de formato de relatório do EPANET. O relatório da execução está disponível em Relatórios, Execução, mas usa o formato padrão do EPANET, e não o formato que estas configurações especificam. As linhas são mantidas e são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_sections']='Este arquivo tem uma seção que esta página não lê. Nada aqui a usa. Ela é mantida inteira, e é gravada de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_comments']='Estas linhas de comentário nos padrões ou nos controles simples deste arquivo não foram importadas, porque esta página não tem onde guardá-las (por exemplo, entre as linhas de um padrão). Todos os padrões e controles foram importados por inteiro.';
-$ec_lang['lpn_inp_drop_quality_options']='Este arquivo indica opções de qualidade da água do EPANET: a opção Quality, que nomeia o tipo de análise de qualidade da água, e duas configurações associadas a um produto químico, Relative diffusivity e Quality tolerance. As três são mantidas e usadas. Idade da água, rastreamento de origem e um produto químico são calculados aqui, e as duas configurações do produto químico são usadas quando um produto químico é executado. Todas elas são gravadas de volta se você salvar um arquivo EPANET.';
+$ec_lang['lpn_inp_drop_quality_options']='Este arquivo indica opções de qualidade da água do EPANET: a opção Quality, que nomeia o tipo de análise de qualidade da água, e duas configurações associadas a um produto químico, Relative diffusivity e Quality tolerance. As três são mantidas e usadas. Idade da água, rastreamento de fonte e um produto químico são calculados aqui, e as duas configurações do produto químico são usadas quando um produto químico é executado. Todas elas são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='Este arquivo referencia um arquivo auxiliar: Map, que contém coordenadas, ou Hydraulics, que contém a hidráulica já calculada. Esta página não pode abrir nenhum dos dois, então as linhas são mantidas como estão e gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='Este arquivo define opções que esta página não lê. Nada aqui as usa. Elas são mantidas e são gravadas de volta se você salvar um arquivo EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Este arquivo .net do EPANET define configurações para as quais esta página não tem controle, então seus valores são listados aqui em vez de transportados. Todo o resto foi importado. Se precisar delas, abra o arquivo no EPANET e use Arquivo, Exportar, Rede para salvá-lo como um arquivo .inp, depois importe esse.';
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Tamanho do texto (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Tamanho do símbolo (pixels)';
-$ec_lang['lpn_settings_link_width']='Espessura da linha do tubo (pixels)';
+$ec_lang['lpn_settings_link_width']='Espessura da linha do trecho (pixels)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Setas de direção de vazão';
 $ec_lang['lpn_settings_show_arrows_tip']='Desenha uma seta em cada tubo mostrando para onde a água está correndo. As setas aparecem depois de uma execução, e desativá-las deixa os resultados inalterados.';
-$ec_lang['lpn_settings_align_labels']='Alinhar rótulos dos tubos com os tubos';
+$ec_lang['lpn_settings_align_labels']='Alinhar rótulos dos trechos com os trechos';
 $ec_lang['lpn_settings_readability_bias']='Virar um rótulo de cabeça para baixo quando ele inclinar mais que este número de graus à esquerda da vertical';
 $ec_lang['lpn_settings_readability_bias_tip']='Vira um rótulo para mantê-lo na posição correta quando ele inclinar mais que este número de graus à esquerda da vertical.';
 $ec_lang['lpn_settings_mask_labels']='Fundo sólido atrás dos rótulos';
@@ -3838,7 +3838,7 @@ $ec_lang['lpn_settings_quality_track_tip']='Escolha o que a execução deve acom
 $ec_lang['lpn_settings_quality_source']='Nó de rastreamento';
 $ec_lang['lpn_settings_quality_source_tip']='O nó cuja água é rastreada. Todo outro nó então mostra a parcela de sua água que veio desse nó.';
 $ec_lang['lpn_quality_none']='Nenhum';
-$ec_lang['lpn_quality_trace']='Rastreamento de origem';
+$ec_lang['lpn_quality_trace']='Rastreamento de fonte';
 $ec_lang['lpn_quality_chemical']='Um produto químico que reage';
 $ec_lang['lpn_quality_needs_run']='A qualidade da água é transportada pelos trechos conforme a água viaja, então precisa de uma simulação de período estendido: o motor EPANET e uma duração total da simulação. Defina uma Duração total da simulação em Tempo, depois pressione o botão Executar.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words

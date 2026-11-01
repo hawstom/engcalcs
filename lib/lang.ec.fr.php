@@ -258,7 +258,7 @@ $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Selon Maynord, Ruff et Abt
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
 $ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
-$ec_lang['mtc_vel_high']='La vitesse est élevée et peut ne pas être réaliste : vérifier l\'érosion du revêtement du canal, le tirant d\'eau supplémentaire dans les coudes et la perte d\'énergie aux élargissements ou obstacles.';
+$ec_lang['mtc_vel_high']='La vitesse est élevée et peut ne pas être réaliste : vérifier l\'érosion du revêtement du canal, la profondeur d\'eau supplémentaire dans les coudes et la perte d\'énergie aux élargissements ou obstacles.';
 $ec_lang['mtc_iteration_tip']='Choisissez une option de rugosité (B/B pour Blodgett–Bathurst est recommandée) et une option de taille d\'enrochement (Isbash recommandée) pour itérer automatiquement vers une taille d\'enrochement uniforme adaptée à votre débit cible. Voir les notes ci-dessous pour la méthode complète. Pour ne pas itérer, saisissez votre propre valeur de rugosité (suivez le lien pour des conseils) et ignorez la taille d\'enrochement.';
 $ec_lang['mtc_note_1']='<dl><dt>Itération automatique de la taille des enrochements et de la rugosité</dt><dd>Choisissez une option de rugosité (B/B pour Blodgett–Bathurst est recommandée) et une option de taille d\'enrochement de calcul (Isbash recommandée). Ajustez la profondeur et le coefficient de sécurité sur la taille des enrochements pour atteindre votre débit cible avec une taille d\'enrochement uniforme. À chaque modification d\'une saisie, le calculateur répète ces étapes : 1. La rugosité est calculée à partir de la taille d\'enrochement de calcul. 2. La valeur de rugosité issue de la méthode choisie est copiée dans la saisie de rugosité. 3. Le débit du canal et la taille d\'enrochement requise sont calculés. 4. La taille d\'enrochement de calcul est ajustée. 5. Les étapes sont répétées jusqu\'à ce que l\'erreur sur la taille d\'enrochement de calcul soit très faible.</dd><dt>Calculateur simple (sans itération)</dt><dd>Saisissez la valeur de rugosité souhaitée. Ignorez la zone de saisie de la taille d\'enrochement de calcul.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Vérification de la vitesse';
@@ -465,7 +465,7 @@ $ec_lang['rc_qt']='<span class="ec-help" title="Débit par unité de largeur à 
 $ec_lang['rc_np']='Porosité de l\'enrochement, n<sub>p</sub>';
 $ec_lang['rc_sg']='<span class="ec-help" title="Densité relative à l\'eau. Granit concassé ou basalte typique ≈ 2,65. Plage valide de Robinson : 2,54 à 2,82.">Densité relative du matériau, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Écart-type granulométrique. Enrochement uniforme ≈ 1,25. Plage valide Robinson : 1,15 à 1,47.">Granulométrie SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
-$ec_lang['rc_yn']='<span class="ec-help" title="La mise en charge (Hp > yn) est favorable, car elle réduit l\'érosion en amont. (USDA)">Tirant d\'eau normal dans le canal amont, y<sub>n</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['rc_yn']='<span class="ec-help" title="La mise en charge (Hp > yn) est favorable, car elle réduit l\'érosion en amont. (USDA)">Profondeur d\'eau normale dans le canal amont, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Éq. 1 (S0 < 0,10) ou Éq. 2 (0,10–0,40). Valide : D50 15–278 mm, S0 0,02–0,40. Hors plage : extrapolé.">Taille médiane requise des blocs, D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_eq_used']='Équation appliquée';
 $ec_lang['rc_sg_check']='Vérification de la densité relative';
@@ -510,7 +510,7 @@ $ec_lang['rc_notes_5_def']='Les équations ont été développées pour une plag
 $ec_lang['rc_notes_6_term']='Cote du radier de sortie';
 $ec_lang['rc_notes_6_def']='La cote du dessus de l\'enrochement dans le tronçon de sortie doit être égale ou inférieure à la cote du fond du canal aval. Si elle est plus haute, l\'enrochement de sortie sera instable.';
 $ec_lang['rc_notes_7_term']='Mise en charge à l\'entrée';
-$ec_lang['rc_notes_7_def']='Lorsque le tirant d\'eau normal dans le canal d\'entrée est inférieur à la charge de déversoir (H<sub>p</sub>) nécessaire pour transiter q<sub>t</sub>, un écoulement limité ou une mise en charge se produit en amont de l\'entrée du coursier. Ceci est généralement acceptable — la mise en charge réduit la vitesse et prévient l\'érosion en amont. Pour vérifier : utiliser un calculateur d\'écoulement de déversoir pour trouver H<sub>p</sub> pour le q<sub>t</sub> et la largeur de crête donnés, puis comparer au tirant d\'eau normal du canal d\'entrée. Si H<sub>p</sub> dépasse le tirant d\'eau normal, une mise en charge se produira.';
+$ec_lang['rc_notes_7_def']='Lorsque la profondeur d\'eau normale dans le canal d\'entrée est inférieur à la charge de déversoir (H<sub>p</sub>) nécessaire pour transiter q<sub>t</sub>, un écoulement limité ou une mise en charge se produit en amont de l\'entrée du coursier. Ceci est généralement acceptable — la mise en charge réduit la vitesse et prévient l\'érosion en amont. Pour vérifier : utiliser un calculateur d\'écoulement de déversoir pour trouver H<sub>p</sub> pour le q<sub>t</sub> et la largeur de crête donnés, puis comparer à la profondeur d\'eau normale du canal d\'entrée. Si H<sub>p</sub> dépasse la profondeur d\'eau normale, une mise en charge se produira.';
 $ec_lang['rc_notes_4_term']='Référence';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., et Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. L\'USDA ARS publie également un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tableur Excel</a> basé sur la même méthode.';
 // Sketch labels
@@ -884,24 +884,24 @@ $ec_lang['lpn_field_head_tip']='Niveau de la surface libre dans le réservoir, e
 // junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
 // volume are measured.
 $ec_lang['lpn_field_tank_base_elev']='Cote du fond';
-$ec_lang['lpn_field_tank_base_elev_tip']='Cote du fond de la bâche, à partir de laquelle la hauteur d\'eau et le volume sont mesurés. Laissée vide, la cote du fond est la cote du terrain.';
+$ec_lang['lpn_field_tank_base_elev_tip']='Cote du fond de la bâche, à partir de laquelle la profondeur d\'eau et le volume sont mesurés. Laissée vide, la cote du fond est la cote du terrain.';
 $ec_lang['lpn_tank_ground_elev_tip']='Cote du terrain au droit de la bâche. La pression dans la bâche est mesurée à partir de ce niveau, comme à une jonction.';
-$ec_lang['lpn_field_tank_level']='Hauteur d\'eau';
+$ec_lang['lpn_field_tank_level']='Profondeur d\'eau';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tank_level_tip']='Hauteur d\'eau présente dans la bâche, mesurée à partir du fond de la bâche. La surface de l\'eau est la cote du fond de la bâche plus cette hauteur.';
-$ec_lang['lpn_field_tank_minlevel']='Hauteur d\'eau minimale';
+$ec_lang['lpn_field_tank_level_tip']='Profondeur d\'eau présente dans la bâche, mesurée à partir du fond de la bâche. La surface de l\'eau est la cote du fond de la bâche plus cette hauteur.';
+$ec_lang['lpn_field_tank_minlevel']='Profondeur d\'eau minimale';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tank_minlevel_tip']='Hauteur d\'eau à laquelle la bâche est considérée comme vide, mesurée à partir du fond de la bâche.';
-$ec_lang['lpn_field_tank_maxlevel']='Hauteur d\'eau maximale';
+$ec_lang['lpn_field_tank_minlevel_tip']='Profondeur d\'eau à laquelle la bâche est considérée comme vide, mesurée à partir du fond de la bâche.';
+$ec_lang['lpn_field_tank_maxlevel']='Profondeur d\'eau maximale';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tank_maxlevel_tip']='Hauteur d\'eau à laquelle la bâche est pleine, mesurée à partir du fond de la bâche.';
+$ec_lang['lpn_field_tank_maxlevel_tip']='Profondeur d\'eau à laquelle la bâche est pleine, mesurée à partir du fond de la bâche.';
 $ec_lang['lpn_field_tank_diameter']='Diamètre de la bâche';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_diameter_tip']='Largeur de la bâche d\'un côté à l\'autre. Elle est exprimée dans les mêmes unités que la cote, pas dans les unités de diamètre des conduites. Elle détermine le volume d\'eau que contient une hauteur donnée.';
 // 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
 // same guard lpn_field_head_tip carries for the reservoir.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tank_head_tip']='Cote de la surface de l\'eau dans la bâche : la cote du fond plus la hauteur d\'eau.';
+$ec_lang['lpn_tank_head_tip']='Cote de la surface de l\'eau dans la bâche : la cote du fond plus la profondeur d\'eau.';
 $ec_lang['lpn_close']='Fermer';
 // The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
 // value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
@@ -1336,10 +1336,10 @@ $ec_lang['lpn_result_head_tip']='Énergie potentielle de l\'eau à ce nœud, exp
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
 // Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
 // counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
-$ec_lang['lpn_result_depth']='Hauteur d\'eau';
-$ec_lang['lpn_result_depth_tip']='Hauteur d\'eau dans la bâche à l\'instant affiché, mesurée à partir du fond de la bâche : la charge moins la cote de la bâche.';
+$ec_lang['lpn_result_depth']='Profondeur d\'eau';
+$ec_lang['lpn_result_depth_tip']='Profondeur d\'eau dans la bâche à l\'instant affiché, mesurée à partir du fond de la bâche : la charge moins la cote de la bâche.';
 $ec_lang['lpn_result_tank_volume']='Volume disponible';
-$ec_lang['lpn_result_tank_volume_tip']='Volume d\'eau au-dessus de la hauteur d\'eau minimale ; il est donc nul à cette hauteur. Le volume de bâche d\'EPANET comprend aussi l\'eau sous la hauteur d\'eau minimale, qui compte encore pour le mélange et l\'âge de l\'eau ; la cote de la bâche reste donc au fond de la bâche.';
+$ec_lang['lpn_result_tank_volume_tip']='Volume d\'eau au-dessus de la profondeur d\'eau minimale ; il est donc nul à cette hauteur. Le volume de bâche d\'EPANET comprend aussi l\'eau sous la profondeur d\'eau minimale, qui compte encore pour le mélange et l\'âge de l\'eau ; la cote de la bâche reste donc au fond de la bâche.';
 $ec_lang['lpn_result_pressure']='Pression';
 $ec_lang['lpn_result_flow']='Débit';
 $ec_lang['lpn_result_velocity']='Vitesse';
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Légende de la barre d\'outils';
 $ec_lang['lpn_pane_right_toggle']='Visibilité';
 $ec_lang['lpn_color_legend_open_tip']='Appuyez pour ouvrir les paramètres de coloration et modifier ces couleurs.';
 $ec_lang['lpn_color_node_field']='Colorer les nœuds selon';
-$ec_lang['lpn_color_link_field']='Colorer les conduites selon';
+$ec_lang['lpn_color_link_field']='Colorer les liaisons selon';
 $ec_lang['lpn_color_ramp_sequential']='Séquentielle';
 $ec_lang['lpn_color_ramp_diverging']='Divergente';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1713,7 +1713,7 @@ $ec_lang['lpn_change_type_line_alternative']='{id} : {property} {value}, dans l\
 $ec_lang['lpn_change_type_more']='Et {n} autres.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
-$ec_lang['lpn_change_type_surface']='Ceux-ci conservent la surface de l\'eau à son niveau actuel. La charge d\'un réservoir est la cote de la bâche plus sa hauteur d\'eau, et la hauteur d\'eau d\'une bâche est la charge du réservoir moins sa cote :';
+$ec_lang['lpn_change_type_surface']='Ceux-ci conservent la surface de l\'eau à son niveau actuel. La charge d\'un réservoir est la cote de la bâche plus sa profondeur d\'eau, et la profondeur d\'eau d\'une bâche est la charge du réservoir moins sa cote :';
 $ec_lang['lpn_change_type_meaning']='Ces commandes et règles testent un nœud en cours de changement et le liront différemment : une jonction est testée par sa pression, et une bâche ou un réservoir par son niveau d\'eau.';
 // The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
 $ec_lang['lpn_change_type_born']='Ces valeurs sont nouvelles, définies comme pour un élément qui vient d\'être dessiné :';
@@ -3215,7 +3215,7 @@ $ec_lang['lpn_valwarn_manning']='Un n de Manning est normalement compris entre {
 $ec_lang['lpn_valwarn_dw']='Une rugosité de Darcy-Weisbach est normalement supérieure à 0 et au plus égale à {max} {unit}. Un nombre plus grand est souvent un C de Hazen-Williams ou un n de Manning.';
 $ec_lang['lpn_valwarn_positive']='EPANET n\'accepte ici ni zéro ni un nombre négatif.';
 $ec_lang['lpn_valwarn_negative']='EPANET n\'accepte pas ici de nombre négatif.';
-$ec_lang['lpn_valwarn_tank_levels']='EPANET n\'accepte pas cette bâche. La hauteur d\'eau minimale ne doit pas dépasser la hauteur d\'eau, et la hauteur d\'eau ne doit pas dépasser la hauteur d\'eau maximale.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET n\'accepte pas cette bâche. La profondeur d\'eau minimale ne doit pas dépasser la profondeur d\'eau, et la profondeur d\'eau ne doit pas dépasser la profondeur d\'eau maximale.';
 $ec_lang['lpn_cp_bad_number']='Cette valeur n\'est pas un nombre, comme l\'exige cette propriété.';
 $ec_lang['lpn_cp_bad_integer']='Cette valeur n\'est pas un nombre entier, comme l\'exige cette propriété.';
 $ec_lang['lpn_cp_bad_case']='Cette valeur n\'est pas en MAJUSCULES, comme l\'exige cette propriété.';
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Taille du texte (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Taille des symboles (pixels)';
-$ec_lang['lpn_settings_link_width']='Épaisseur des conduites (pixels)';
+$ec_lang['lpn_settings_link_width']='Épaisseur des liaisons (pixels)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Flèches de sens d\'écoulement';
 $ec_lang['lpn_settings_show_arrows_tip']='Dessine une flèche sur chaque conduite indiquant le sens d\'écoulement de l\'eau. Les flèches apparaissent après un calcul, et les désactiver ne modifie pas les résultats.';
-$ec_lang['lpn_settings_align_labels']='Aligner les étiquettes de conduites sur les conduites';
+$ec_lang['lpn_settings_align_labels']='Aligner les étiquettes de liaisons sur les liaisons';
 $ec_lang['lpn_settings_readability_bias']='Retourner une étiquette à l\'envers lorsqu\'elle penche de plus de ce nombre de degrés à gauche de la verticale';
 $ec_lang['lpn_settings_readability_bias_tip']='Retourne une étiquette pour la garder à l\'endroit lorsqu\'elle penche de plus de ce nombre de degrés à gauche de la verticale.';
 $ec_lang['lpn_settings_mask_labels']='Fond opaque derrière les étiquettes';
@@ -4171,7 +4171,7 @@ $ec_lang['lpn_library_patterns']='Courbes de modulation';
 // a program run would have named the wrong thing. Tom: *"Yes. It's not the best term."*
 $ec_lang['lpn_library_patterns_tip']='Une courbe de modulation est une liste de coefficients multiplicateurs qui se répète. Chacun s\'applique pendant un pas de temps de la courbe, donc 24 nombres avec un pas d\'une heure forment une journée qui se répète. Une demande de 10 avec un coefficient de 1,5 vaut 15 à cet instant.';
 $ec_lang['lpn_library_curves']='Courbes';
-$ec_lang['lpn_library_curves_tip']='Charge ou rendement d\'une pompe en fonction du débit, perte d\'une vanne en fonction du débit, ou volume d\'une bâche en fonction de la hauteur d\'eau';
+$ec_lang['lpn_library_curves_tip']='Charge ou rendement d\'une pompe en fonction du débit, perte d\'une vanne en fonction du débit, ou volume d\'une bâche en fonction de la profondeur d\'eau';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
@@ -5297,9 +5297,9 @@ $ec_lang['lpn_field_auto_length_tip']='Longueur auto : lorsque la case est coch�
 $ec_lang['lpn_edit_pipetypes']='Modifier les types…';
 $ec_lang['lpn_edit_fittings']='Modifier les raccords…';
 $ec_lang['lpn_edit_curves']='Modifier les courbes…';
-$ec_lang['lpn_field_tank_level_short']='Hauteur d\'eau initiale';
-$ec_lang['lpn_field_tank_minlevel_short']='Hauteur d\'eau minimale';
-$ec_lang['lpn_field_tank_maxlevel_short']='Hauteur d\'eau maximale';
+$ec_lang['lpn_field_tank_level_short']='Profondeur d\'eau initiale';
+$ec_lang['lpn_field_tank_minlevel_short']='Profondeur d\'eau minimale';
+$ec_lang['lpn_field_tank_maxlevel_short']='Profondeur d\'eau maximale';
 $ec_lang['lpn_field_active_short']='Actif ?';
 $ec_lang['lpn_field_cv_short']='Clapet anti-retour';
 $ec_lang['lpn_field_km_short_tip']='Coefficient de perte de charge singulière (locale), k : la charge perdue dans les raccords et les coudes le long de la conduite, en multiple de la hauteur de vitesse.';
@@ -5308,6 +5308,6 @@ $ec_lang['lpn_field_valve_km_short_tip']='Coefficient de perte de charge singuli
 $ec_lang['lpn_reaction_bulk_pipe_tip']='Coefficient de réaction dans la masse d\'eau : la vitesse de réaction dans la masse d\'eau de cette conduite (voir l\'aide d\'EPANET). Un nombre négatif fait décroître le produit chimique et un nombre positif l\'augmente. Vide signifie utiliser le coefficient défini pour tout le réseau sous Paramètres, Calcul, Qualité de l\'eau.';
 $ec_lang['lpn_reaction_wall_pipe_tip']='Coefficient de réaction à la paroi : la vitesse de réaction à la paroi de cette conduite (voir l\'aide d\'EPANET). Un nombre négatif fait décroître le produit chimique. Vide signifie utiliser le coefficient défini pour tout le réseau sous Paramètres, Calcul, Qualité de l\'eau.';
 $ec_lang['lpn_reaction_tank_short_tip']='Coefficient de réaction : la vitesse de réaction dans l\'eau contenue dans cette bâche, en 1/jour. Un nombre négatif fait décroître le produit chimique et un nombre positif l\'augmente. Vide signifie utiliser le coefficient de réaction dans la masse d\'eau défini pour tout le réseau sous Paramètres, Calcul, Qualité de l\'eau.';
-$ec_lang['lpn_field_tank_level_short_tip']='Hauteur d\'eau initiale : la hauteur d\'eau dans la bâche au début de la simulation, mesurée depuis le fond de la bâche.';
-$ec_lang['lpn_field_tank_minlevel_short_tip']='Hauteur d\'eau minimale : la plus faible hauteur d\'eau admissible dans la bâche, mesurée depuis le fond de la bâche.';
-$ec_lang['lpn_field_tank_maxlevel_short_tip']='Hauteur d\'eau maximale : la plus forte hauteur d\'eau admissible dans la bâche, mesurée depuis le fond de la bâche.';
+$ec_lang['lpn_field_tank_level_short_tip']='Profondeur d\'eau initiale : la profondeur d\'eau dans la bâche au début de la simulation, mesurée depuis le fond de la bâche.';
+$ec_lang['lpn_field_tank_minlevel_short_tip']='Profondeur d\'eau minimale : la plus petite profondeur d\'eau admissible dans la bâche, mesurée depuis le fond de la bâche.';
+$ec_lang['lpn_field_tank_maxlevel_short_tip']='Profondeur d\'eau maximale : la plus grande profondeur d\'eau admissible dans la bâche, mesurée depuis le fond de la bâche.';

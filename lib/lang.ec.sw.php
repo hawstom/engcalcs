@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Alama za upau wa zana';
 $ec_lang['lpn_pane_right_toggle']='Uonekanaji';
 $ec_lang['lpn_color_legend_open_tip']='Bonyeza ili kufungua mipangilio ya rangi na kubadilisha rangi hizi.';
 $ec_lang['lpn_color_node_field']='Paka rangi vifundo kwa';
-$ec_lang['lpn_color_link_field']='Paka rangi mabomba kwa';
+$ec_lang['lpn_color_link_field']='Paka rangi viungo kwa';
 $ec_lang['lpn_color_ramp_sequential']='Mfululizo';
 $ec_lang['lpn_color_ramp_diverging']='Inayotofautiana';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Ukubwa wa maandishi (pikseli)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Ukubwa wa alama (pikseli)';
-$ec_lang['lpn_settings_link_width']='Upana wa mstari wa bomba (pikseli)';
+$ec_lang['lpn_settings_link_width']='Upana wa mstari wa kiungo (pikseli)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Mishale ya mwelekeo wa mtiririko';
 $ec_lang['lpn_settings_show_arrows_tip']='Chora mshale kwenye kila bomba unaoonyesha upande ambao maji yanatiririka. Mishale huonekana baada ya uendeshaji, na kuizima hakubadilishi matokeo.';
-$ec_lang['lpn_settings_align_labels']='Lainisha lebo za bomba na mabomba';
+$ec_lang['lpn_settings_align_labels']='Lainisha lebo za viungo kando ya mstari wa kiungo';
 $ec_lang['lpn_settings_readability_bias']='Geuza lebo chini juu ikiwa imeinama zaidi ya nyuzi hizi kushoto ya wima';
 $ec_lang['lpn_settings_readability_bias_tip']='Geuza lebo ili ibaki sawa juu wakati imeinama zaidi ya nyuzi hizi kushoto ya wima.';
 $ec_lang['lpn_settings_mask_labels']='Mandharinyuma imara nyuma ya lebo';

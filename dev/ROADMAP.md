@@ -68,6 +68,7 @@ the block.
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
 - 100|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
+  **SPRINT 737c DONE 2026-11-01** (Tom: *"Proceed."*; audit and `dev/english-friction/737c.json`): 625 keys in 25 languages. Status split from Scenario (am, my); Link split from Pipe (24 languages); Pattern split from Graphs/Mode (bg, ru, uk шаблон; zh EPANET's 时间模式); Source, Curve, Depth, HGL, Label, Demand unified where they varied. **Left, his call: Junction and Node share one word in 14 languages** (bg, cs, es, fa, he, hr, id, it, km, ru, sr, tr, uk, zh); Spanish EPANET itself says Nudo for a junction.
   **Not done, 2026-10-18** (Tom asked "Done?"): the am and my Status words (terms entries written 2026-10-17) and the "labels, and Text" mode prompts reach those languages only through the next sprint.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two

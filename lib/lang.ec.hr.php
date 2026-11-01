@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Legenda alatne trake';
 $ec_lang['lpn_pane_right_toggle']='Vidljivost';
 $ec_lang['lpn_color_legend_open_tip']='Pritisnite da otvorite postavke bojenja i promijenite ove boje.';
 $ec_lang['lpn_color_node_field']='Boji čvorove prema';
-$ec_lang['lpn_color_link_field']='Boji cijevi prema';
+$ec_lang['lpn_color_link_field']='Boji vodove prema';
 $ec_lang['lpn_color_ramp_sequential']='Sekvencijalna';
 $ec_lang['lpn_color_ramp_diverging']='Divergentna';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Veličina teksta (pikseli)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Veličina simbola (pikseli)';
-$ec_lang['lpn_settings_link_width']='Širina crte cijevi (pikseli)';
+$ec_lang['lpn_settings_link_width']='Širina crte voda (pikseli)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Strelice smjera protoka';
 $ec_lang['lpn_settings_show_arrows_tip']='Crtajte strelicu na svakoj cijevi koja pokazuje u kojem smjeru voda teče. Strelice se prikazuju nakon pokretanja, a njihovo isključivanje ne mijenja rezultate.';
-$ec_lang['lpn_settings_align_labels']='Poravnaj oznake cijevi s cijevima';
+$ec_lang['lpn_settings_align_labels']='Poravnaj oznake vodova s vodovima';
 $ec_lang['lpn_settings_readability_bias']='Okreni oznaku naopako kada je nagnuta više od ovoliko stupnjeva lijevo od okomice';
 $ec_lang['lpn_settings_readability_bias_tip']='Okreće oznaku da ostane uspravna kad je nagnuta više od ovoliko stupnjeva lijevo od okomice.';
 $ec_lang['lpn_settings_mask_labels']='Neprozirna pozadina iza oznaka';

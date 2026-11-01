@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='د ټول‌بار آیکونونه';
 $ec_lang['lpn_pane_right_toggle']='لیدنه';
 $ec_lang['lpn_color_legend_open_tip']='د رنګ کولو تنظیمات پرانیستلو او دا رنګونه بدلولو لپاره فشار کړئ.';
 $ec_lang['lpn_color_node_field']='نقطې د دې له مخې رنګه کول';
-$ec_lang['lpn_color_link_field']='پایپونه د دې له مخې رنګه کول';
+$ec_lang['lpn_color_link_field']='تړاونه د دې له مخې رنګه کول';
 $ec_lang['lpn_color_ramp_sequential']='ترتیبي';
 $ec_lang['lpn_color_ramp_diverging']='دوه اړخیزه';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='د متن اندازه (پیکسلونه)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='د نښې اندازه (پیکسلونه)';
-$ec_lang['lpn_settings_link_width']='د پایپ کرښې پلنوالی (پیکسلونه)';
+$ec_lang['lpn_settings_link_width']='د تړاو کرښې پلنوالی (پیکسلونه)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='د بهاو لوري غشي';
 $ec_lang['lpn_settings_show_arrows_tip']='په هر پایپ یو غشی رسم کړئ چې ښیي اوبه کوم لوري ته بهیږي. غشي د چلولو وروسته ښکاره کیږي، او بندول یې پایلې نه بدلوي.';
-$ec_lang['lpn_settings_align_labels']='د پایپ لیبلونه له پایپونو سره برابرول';
+$ec_lang['lpn_settings_align_labels']='د تړاو لیبلونه د تړاو کرښې سره برابرول';
 $ec_lang['lpn_settings_readability_bias']='کله چې لیبل د عمودي حالت نه کیڼ لور ته له دومره درجو زیات کوږ شي، لیبل کوز-پاس کول';
 $ec_lang['lpn_settings_readability_bias_tip']='کله چې یو لیبل له عمودي حالت نه کیڼ لور ته له دې شمېر درجو زیات کوږ شي، هغه دوباره کوز-پاس کړئ ترڅو سمه ولاړ پاتې شي.';
 $ec_lang['lpn_settings_mask_labels']='د لیبلونو شاته کلک شاليد';

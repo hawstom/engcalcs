@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Legende der Symbolleiste';
 $ec_lang['lpn_pane_right_toggle']='Sichtbarkeit';
 $ec_lang['lpn_color_legend_open_tip']='Drücken, um die Farbeinstellungen zu öffnen und diese Farben zu ändern.';
 $ec_lang['lpn_color_node_field']='Knoten einfärben nach';
-$ec_lang['lpn_color_link_field']='Rohre einfärben nach';
+$ec_lang['lpn_color_link_field']='Verbindungen einfärben nach';
 $ec_lang['lpn_color_ramp_sequential']='Sequenziell';
 $ec_lang['lpn_color_ramp_diverging']='Divergierend';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -2314,20 +2314,20 @@ $ec_lang['lpn_inp_backdrop_attached']='{file} angeheftet, platziert dort, wo die
 $ec_lang['lpn_inp_backdrop_attached_other']='{picked} angeheftet, platziert dort, wo die Datei es vorsieht. Die Datei nennt {file}, was ein anderer Name ist.';
 $ec_lang['lpn_inp_report_lead']='Diese Seite verwendet nicht jede EPANET-Funktion, aber keine Daten der Datei werden verworfen. Die folgende Liste zeigt Daten der Datei, die beibehalten, aber nicht verwendet werden, sowie alle beim Import vorgenommenen Änderungen:';
 $ec_lang['lpn_inp_drop_headloss']='Diese Datei verwendet nicht die Hazen-Williams-Formel. Diese Seite rechnet mit Hazen-Williams, daher wurden die Rauheitswerte der Rohre genau wie geschrieben übernommen, aber die hier angezeigten Ergebnisse stimmen nicht mit den Ergebnissen in EPANET überein.';
-$ec_lang['lpn_inp_drop_tank_curve']='Diese Tanks haben keine geraden Seitenwände: Die Datei gibt ihre Form als Volumenkurve an. Die Kurve wird im Bibliotheken-Feld beibehalten, der Tank verweist weiterhin auf sie, und eine Simulation mit erweitertem Zeitraum verwendet sie, um den Wasserstand beim Füllen und Entleeren des Tanks zu berechnen. Eine Analyse mit einem einzelnen Zeitpunkt ist nicht betroffen, da der Wasserspiegel auf dem in der Datei angegebenen Stand liegt. Der in der Datei angegebene Durchmesser wird neben der Kurve beibehalten und dient zum Zeichnen und Lösen eines Tanks ohne Kurve.';
+$ec_lang['lpn_inp_drop_tank_curve']='Diese Tanks haben keine geraden Seitenwände: Die Datei gibt ihre Form als Volumenkennlinie an. Die Kennlinie wird im Bibliotheken-Feld beibehalten, der Tank verweist weiterhin auf sie, und eine Simulation mit erweitertem Zeitraum verwendet sie, um den Wasserstand beim Füllen und Entleeren des Tanks zu berechnen. Eine Analyse mit einem einzelnen Zeitpunkt ist nicht betroffen, da der Wasserspiegel auf dem in der Datei angegebenen Stand liegt. Der in der Datei angegebene Durchmesser wird neben der Kennlinie beibehalten und dient zum Zeichnen und Lösen eines Tanks ohne Kennlinie.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
 $ec_lang['lpn_inp_drop_tcv']='Diese Drosselventile wurden als Drosselventile übernommen, mit dem in der Datei angegebenen Verlust.';
 $ec_lang['lpn_inp_drop_valve_active']='Diese Ventile regeln Druck oder Durchfluss, und ihr Zustand ändert sich mit den hydraulischen Bedingungen. Sie wurden ohne Datenverlust übernommen, und diese Seite berechnet sie.';
-$ec_lang['lpn_inp_drop_valve']='Diese Ventile werden durch eine Kurve oder einen festen Druckabfall beschrieben, und diese Seite hat keine solche Anlage. Sie wurden als offene Rohre übernommen, sodass das Netz verbunden bleibt, aber Druck und Durchfluss an diesen Stellen nicht mehr geregelt werden.';
+$ec_lang['lpn_inp_drop_valve']='Diese Ventile werden durch eine Kennlinie oder einen festen Druckabfall beschrieben, und diese Seite hat keine solche Anlage. Sie wurden als offene Rohre übernommen, sodass das Netz verbunden bleibt, aber Druck und Durchfluss an diesen Stellen nicht mehr geregelt werden.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET lassen diese Rohre den Durchfluss nur in eine Richtung zu (Rückschlagventile). Sie wurden als gewöhnliche Rohre übernommen, sodass der Durchfluss jetzt in beide Richtungen möglich ist.';
 $ec_lang['lpn_inp_drop_demands']='Diese Entnahmeknoten hatten mehr als eine Entnahme. Die Entnahmen wurden zu der einzelnen Entnahme addiert, die diese Seite führt.';
 $ec_lang['lpn_inp_drop_patterns']='Diese Seite hat die Entnahmemuster nicht gelesen, weil der Teil, der eine Simulation mit erweitertem Zeitraum durchführt, nicht geladen wurde. Jede Entnahme ist die in der Datei geschriebene Zahl.';
 $ec_lang['lpn_inp_drop_demand_pattern']='Diese Entnahmeknoten ändern ihre Entnahme im Lauf der Zeit. Ihre Muster wurden vollständig übernommen, und die angezeigte Entnahme ist die für den Zeitpunkt, den die Uhr gerade zeigt.';
 $ec_lang['lpn_inp_drop_emitters']='Diese Entnahmeknoten haben einen Sprüh- oder Leckagekoeffizienten. Er wurde übernommen und wird berechnet, aber es gibt auf dieser Seite noch keine Stelle, um ihn anzuzeigen oder zu ändern.';
-$ec_lang['lpn_inp_drop_curve_long']='Diese Pumpenkennlinie hatte mehr als drei Punkte. Ihr niedrigster, mittlerer und höchster Punkt wurden übernommen, denn diese Seite passt eine Kurve an höchstens drei Punkte an.';
-$ec_lang['lpn_inp_drop_curve_missing']='Diese Pumpe verweist auf eine Kurve, die nicht in der Datei enthalten ist. Die Pumpe wurde ohne Kurve übernommen und fügt daher keine Druckhöhe hinzu.';
+$ec_lang['lpn_inp_drop_curve_long']='Diese Pumpenkennlinie hatte mehr als drei Punkte. Ihr niedrigster, mittlerer und höchster Punkt wurden übernommen, denn diese Seite passt eine Kennlinie an höchstens drei Punkte an.';
+$ec_lang['lpn_inp_drop_curve_missing']='Diese Pumpe verweist auf eine Kennlinie, die nicht in der Datei enthalten ist. Die Pumpe wurde ohne Kennlinie übernommen und fügt daher keine Druckhöhe hinzu.';
 $ec_lang['lpn_inp_drop_pump_other']='Diese Pumpe wird über die von ihr aufgenommene Leistung beschrieben statt über eine Kennlinie. Sie wurde ohne Kennlinie übernommen und fügt daher keine Druckhöhe hinzu.';
 $ec_lang['lpn_inp_drop_head_pattern']='Diese Reservoire haben eine Druckhöhe, die sich im Lauf verändert. Ihre Muster wurden vollständig übernommen, und der angezeigte Wasserspiegel ist der Wert zum Zeitpunkt der Uhr.';
 $ec_lang['lpn_inp_drop_pump_speed']='Diese Pumpen laufen mit einer anderen Drehzahl als der, bei der ihre Kennlinie gemessen wurde, oder ändern ihre Drehzahl im Lauf der Zeit. Die Drehzahl und ihr Muster wurden vollständig übernommen, und die angezeigte Druckhöhe ist die für den Zeitpunkt, den die Uhr gerade zeigt.';
@@ -2761,10 +2761,10 @@ $ec_lang['lpn_valve_type_gpv']='Allzweck (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Druckabfall';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='Der Druck, den das Ventil abbaut. Ein Druckabbau-Ventil nimmt immer genau diesen Druck weg, unabhängig von der Fließrichtung des Wassers. Es handelt sich um einen Abfall über das Ventil, nicht um einen zu haltenden Druck.';
-$ec_lang['lpn_inp_drop_gpv_curve']='Dieses Ventil verweist auf eine Druckverlustkurve, die nicht in der Datei enthalten ist. Das Ventil wurde ohne Kurve importiert und bleibt daher vollständig offen, bis eine Kurve gewählt wird.';
+$ec_lang['lpn_inp_drop_gpv_curve']='Dieses Ventil verweist auf eine Druckverlustkennlinie, die nicht in der Datei enthalten ist. Das Ventil wurde ohne Kennlinie importiert und bleibt daher vollständig offen, bis eine Kennlinie gewählt wird.';
 $ec_lang['lpn_gpv_curve_source']='Ventil-Druckverlustkurve';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='Die Kurve im Bibliotheken-Feld, die den Druckverlust durch dieses Ventil bei jedem Durchfluss angibt. Mehrere Ventile können dieselbe Kurve verwenden, und eine dortige Änderung wirkt sich auf alle aus.';
+$ec_lang['lpn_gpv_curve_source_tip']='Die Kennlinie im Bibliotheken-Feld, die den Druckverlust durch dieses Ventil bei jedem Durchfluss angibt. Mehrere Ventile können dieselbe Kennlinie verwenden, und eine dortige Änderung wirkt sich auf alle aus.';
 $ec_lang['lpn_field_valve_setting_pressure']='Solldruck';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='Ein druckminderndes Ventil hält den Druck auf seiner stromabwärtigen Seite bei oder unter diesem Wert. Ein druckhaltendes Ventil hält den Druck auf seiner stromaufwärtigen Seite bei oder über diesem Wert.';
 $ec_lang['lpn_field_valve_setting_flow']='Solldurchfluss';
@@ -2788,7 +2788,7 @@ $ec_lang['lpn_field_km_short']='Einzelverlust, k';
 // one curve name the same curve now, so there is no borrow to describe.
 $ec_lang['lpn_pump_curve_source']='Pumpenkennlinie';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='Die Kurve im Bibliotheken-Feld, die die von dieser Pumpe bei jedem Durchfluss hinzugefügte Druckhöhe angibt. Mehrere Pumpen können dieselbe Kurve verwenden, und eine dortige Änderung wirkt sich auf alle aus.';
+$ec_lang['lpn_pump_curve_source_tip']='Die Kennlinie im Bibliotheken-Feld, die die von dieser Pumpe bei jedem Durchfluss hinzugefügte Druckhöhe angibt. Mehrere Pumpen können dieselbe Kennlinie verwenden, und eine dortige Änderung wirkt sich auf alle aus.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2830,10 +2830,10 @@ $ec_lang['lpn_field_tag']='Tag';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tag_tip']='Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.';
 $ec_lang['lpn_pump_effic_curve']='Pumpenwirkungsgradkurve';
-$ec_lang['lpn_pump_effic_curve_tip']='Die Kurve im Bibliotheken-Feld, die angibt, wie effizient diese Pumpe bei jedem Durchfluss ist. Mehrere Pumpen können dieselbe Kurve verwenden, und eine Änderung dort wirkt sich auf alle aus. Diese Pumpe enthält nur den Verweis; die Punkte selbst werden unter Bibliotheken, Kurven gelesen und bearbeitet.';
+$ec_lang['lpn_pump_effic_curve_tip']='Die Kennlinie im Bibliotheken-Feld, die angibt, wie effizient diese Pumpe bei jedem Durchfluss ist. Mehrere Pumpen können dieselbe Kennlinie verwenden, und eine Änderung dort wirkt sich auf alle aus. Diese Pumpe enthält nur den Verweis; die Punkte selbst werden unter Bibliotheken, Kennlinien gelesen und bearbeitet.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
 // pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
-$ec_lang['lpn_curve_none']='Keine Kurve gewählt';
+$ec_lang['lpn_curve_none']='Keine Kennlinie gewählt';
 // **THE CHOOSER OFFERS NO WAY TO MAKE A CURVE** (Tom, 2026-09-05: *"Pump properties has no 'New
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
@@ -3592,7 +3592,7 @@ $ec_lang['lpn_settings_link_width']='Verbindungslinienbreite (Pixel)';
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Durchflussrichtungspfeile';
 $ec_lang['lpn_settings_show_arrows_tip']='Auf jedem Rohr einen Pfeil zeichnen, der zeigt, in welche Richtung das Wasser fließt. Die Pfeile erscheinen nach einem Lauf, und das Ausschalten lässt die Ergebnisse unverändert.';
-$ec_lang['lpn_settings_align_labels']='Rohrbeschriftungen an Rohren ausrichten';
+$ec_lang['lpn_settings_align_labels']='Verbindungsbeschriftungen an Verbindungen ausrichten';
 $ec_lang['lpn_settings_readability_bias']='Beschriftung auf den Kopf stellen, wenn sie mehr als so viele Grad links von der Senkrechten geneigt ist';
 $ec_lang['lpn_settings_readability_bias_tip']='Dreht eine Beschriftung um, damit sie aufrecht bleibt, wenn sie mehr als so viele Grad links von der Senkrechten geneigt ist.';
 $ec_lang['lpn_settings_mask_labels']='Deckender Hintergrund hinter Beschriftungen';
@@ -3880,7 +3880,7 @@ $ec_lang['lpn_result_concentration_tip']='Menge des Stoffs, die an diesem Punkt 
 // because an engineer choosing between them is choosing between real pieces of equipment and real
 // tank behaviour. A source strength has no unit family for the same reason an initial quality has
 // none: it is written in the units named beside the chemical, and nobody converts it.
-$ec_lang['lpn_source_type']='Dosierungsart';
+$ec_lang['lpn_source_type']='Quellenart';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_source_type_tip']='Welche Art von Dosierung dieser Knoten dem durchfließenden Wasser zufügt. Konzentration behandelt das hier ins Netz eintretende Wasser so, als käme es mit dem Wert Quellkonzentration an. Massendosierung fügt jede Minute eine Stoffmasse hinzu, unabhängig vom Durchfluss. Sollwertdosierung hebt die den Knoten verlassende Konzentration auf den Wert Quellkonzentration an, aber nicht darüber hinaus. Durchflussproportionale Dosierung addiert den Wert Quellkonzentration zu dem, was bereits im Wasser enthalten ist.';
 // R-350: "Source type should default to none... it's ignored if Source Quality is blank." The
@@ -3893,7 +3893,7 @@ $ec_lang['lpn_source_type_flowpaced']='Durchflussproportionale Dosierung';
 $ec_lang['lpn_source_quality']='Quellkonzentration';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_source_quality_tip']='Stärke der Dosierung. Für jede Art außer der Massendosierung ist dies eine Konzentration, in den Einheiten, die unter Einstellungen, Berechnung, Wasserqualität neben der Chemikalie genannt sind; für eine Massendosierung ist es ein Massenstrom pro Minute. Leer bedeutet keine Chemikalienquelle, funktional gleichbedeutend mit 0.';
-$ec_lang['lpn_source_pattern']='Dosierungsmuster';
+$ec_lang['lpn_source_pattern']='Quellenmuster';
 $ec_lang['lpn_source_pattern_tip']='Ein Zeitmuster, das die Dosierung im Lauf der Zeit skaliert, für eine Dosierung, die nicht konstant ist. Kein Muster bedeutet, dass die Dosierung bei jedem Zeitschritt gleich ist.';
 $ec_lang['lpn_mixing_model']='Mischungsmodell';
 $ec_lang['lpn_mixing_model_tip']='Modell dafür, wie sich das bereits im Tank befindliche Wasser mit dem Zufluss vermischt. Vollständige Durchmischung vermischt den gesamten Zufluss sofort mit dem gesamten Tankvolumen. Zweikammer-Mischung füllt zuerst eine Einlaufzone und leitet den Überlauf an die Hauptzone weiter. FIFO-Kolbenströmung gibt das Wasser in der Reihenfolge ab, in der es eintraf. LIFO-Kolbenströmung stapelt es, sodass das zuletzt eingetretene Wasser als Erstes wieder austritt. Die Wahl beeinflusst Wasseralter und Restgehalt, nicht Druck oder Durchfluss.';
@@ -4176,25 +4176,25 @@ $ec_lang['lpn_library_curves_tip']='Pumpendruckhöhe oder Wirkungsgrad über Dur
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curves_note']='Kurven sind Pumpen und Ventilen zugeordnet. Für eine Pumpenkennlinie verwendet der Lauf eine wie angezeigt durch die Punkte gelegte Kurve; für jede andere Art verbindet er die Punkte wie angezeigt mit geraden Linien.';
-$ec_lang['lpn_library_curve_add']='Kurve hinzufügen';
+$ec_lang['lpn_library_curves_note']='Kennlinien sind Pumpen und Ventilen zugeordnet. Für eine Pumpenkennlinie verwendet der Lauf eine wie angezeigt durch die Punkte gelegte Kennlinie; für jede andere Art verbindet er die Punkte wie angezeigt mit geraden Linien.';
+$ec_lang['lpn_library_curve_add']='Kennlinie hinzufügen';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
 // what it is called here; `lpn_library_curve_type_tip` above stays as its tip, where the longer sentence
 // belongs.
-$ec_lang['lpn_library_curve_type']='Kurventyp';
+$ec_lang['lpn_library_curve_type']='Kennlinientyp';
 // **THE FIT, WRITTEN OUT, AND IT IS DERIVED AND STORED NOWHERE.** EPANET's curve editor prints the
 // fitted equation under the type; this one prints the same thing for a pump head curve and nothing
 // at all for a kind that has no equation, because a placeholder there would be a promise of an
 // answer that does not exist.
 $ec_lang['lpn_library_curve_equation']='Gleichung';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curve_equation_tip']='Die durch die Punkte gelegte Kurve, wie sie im Diagramm unten gezeichnet ist. Sie wird jedes Mal, wenn sie angezeigt wird, aus den Punkten neu berechnet und nie gespeichert, und ihre Werte stehen in den Einheiten der obigen Tabelle. Der eingebaute Solver rechnet mit dieser Gleichung; der EPANET-Solver liest die Punkte selbst.';
+$ec_lang['lpn_library_curve_equation_tip']='Die durch die Punkte gelegte Kennlinie, wie sie im Diagramm unten gezeichnet ist. Sie wird jedes Mal, wenn sie angezeigt wird, aus den Punkten neu berechnet und nie gespeichert, und ihre Werte stehen in den Einheiten der obigen Tabelle. Der eingebaute Solver rechnet mit dieser Gleichung; der EPANET-Solver liest die Punkte selbst.';
 // **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
 // worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
 // heading rather than once per curve, so it is a note and no longer a tip.
-$ec_lang['lpn_library_curve_values_tip']='Wählen Sie in einer Tabellenkalkulation eine oder zwei Spalten aus, kopieren Sie sie, und fügen Sie sie in die erste Zielzelle ein. Zeilen werden nach Bedarf hinzugefügt. Direkt aus einer EPANET-Datei kopierte Zeilen, einschließlich des Kurvennamens, können ebenfalls eingefügt werden.';
+$ec_lang['lpn_library_curve_values_tip']='Wählen Sie in einer Tabellenkalkulation eine oder zwei Spalten aus, kopieren Sie sie, und fügen Sie sie in die erste Zielzelle ein. Zeilen werden nach Bedarf hinzugefügt. Direkt aus einer EPANET-Datei kopierte Zeilen, einschließlich des Kennliniennamens, können ebenfalls eingefügt werden.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_remove_point']='Diesen Punkt entfernen';
@@ -4203,13 +4203,13 @@ $ec_lang['lpn_library_curve_remove_point']='Diesen Punkt entfernen';
 $ec_lang['lpn_library_curve_copy']='Punkte kopieren';
 $ec_lang['lpn_library_curve_copy_tip']='Jeden Punkt als zwei Spalten kopieren, bereit zum Einfügen in eine Tabellenkalkulation.';
 $ec_lang['lpn_library_curve_copy_manual']='Diese Punkte kopieren';
-$ec_lang['lpn_library_curve_used_by']='Anlagen, die diese Kurve verwenden';
-$ec_lang['lpn_library_curve_unused']='Nichts verwendet diese Kurve.';
+$ec_lang['lpn_library_curve_used_by']='Anlagen, die diese Kennlinie verwenden';
+$ec_lang['lpn_library_curve_unused']='Nichts verwendet diese Kennlinie.';
 // **A CURVE IN USE IS NOT DELETED.** A junction with no pattern still has a steady demand, so
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='Diese Kurve wird von Elementen verwendet ({count}): {ids}. Weisen Sie ihnen zuerst eine andere Kurve zu, und löschen Sie dann diese.';
+$ec_lang['lpn_library_curve_in_use']='Diese Kennlinie wird von Elementen verwendet ({count}): {ids}. Weisen Sie ihnen zuerst eine andere Kennlinie zu, und löschen Sie dann diese.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -4278,7 +4278,7 @@ $ec_lang['lpn_library_import_conflict']='Übersprungen, weil dieses Projekt bere
 // Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
 // case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
 $ec_lang['lpn_library_import_none']='Diese Projektdatei hat nichts davon zum Kopieren.';
-$ec_lang['lpn_library_import_curve_shape']='Diese Kurven wurden genau so übernommen, wie die Datei sie geschrieben hat, und ein Lauf kann eine davon erst verwenden, wenn ihre erste Spalte von Punkt zu Punkt ansteigt: {names}';
+$ec_lang['lpn_library_import_curve_shape']='Diese Kennlinien wurden genau so übernommen, wie die Datei sie geschrieben hat, und ein Lauf kann eine davon erst verwenden, wenn ihre erste Spalte von Punkt zu Punkt ansteigt: {names}';
 $ec_lang['lpn_library_import_needs_fittings']='Diese Rohrtypen verweisen auf eine Formstückliste, die dieses Projekt nicht hat: {names}. Importieren Sie die Formstück-Bibliothek aus derselben Datei, um diese Verweise aufzulösen.';
 // Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
 // before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
@@ -4950,7 +4950,7 @@ $ec_lang['lpn_settings_min_pressure_tip']='Geben Sie den Druck ein, bei dem oder
 $ec_lang['lpn_settings_req_pressure']='Erforderlicher Druck';
 $ec_lang['lpn_settings_req_pressure_tip']='Geben Sie den Druck ein, bei dem oder oberhalb dessen ein Entnahmeknoten seine volle Entnahme erhält. Er muss größer als der Mindestdruck sein. Verwenden Sie die Druckeinheit dieses Projekts. Leer lassen, um den EPANET-Standardwert zu verwenden, der bei US-Durchflusseinheiten in psi und sonst in Metern angegeben ist.';
 $ec_lang['lpn_settings_pressure_exponent']='Druckexponent';
-$ec_lang['lpn_settings_pressure_exponent_tip']='Geben Sie den Exponenten der Kurve ein, die vom Durchfluss null beim Mindestdruck auf die volle Entnahme beim erforderlichen Druck ansteigt.';
+$ec_lang['lpn_settings_pressure_exponent_tip']='Geben Sie den Exponenten der Kennlinie ein, die vom Durchfluss null beim Mindestdruck auf die volle Entnahme beim erforderlichen Druck ansteigt.';
 $ec_lang['lpn_engine_pda_route']='Mit dem EPANET-Löser berechnet, weil das Entnahmemodell druckgesteuert ist.';
 $ec_lang['lpn_diag_pda_needs_epanet']='Das Entnahmemodell ist druckgesteuert, und nur der EPANET-Löser kann es berechnen. Der EPANET-Löser konnte nicht geladen werden, daher fehlen diese Ergebnisse.';
 $ec_lang['lpn_result_delivered_demand']='Gelieferte Entnahme';
