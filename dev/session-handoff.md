@@ -95,6 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-11-01 morning (fifty-seventh session, Opus main, Sonnet agents)
+
+- **box-design merged on his word** with the roadmap closures (827, 828, 829, 842, 845), tier 95 retired (its six tasks back at 100), Task 852 opened. Also merged on green: `fix/about-dedication` (the About dedication was hard-coded English; now `lpn_about_dedication` in 27 languages, translated by CC as a defect fix, not a sprint) and `chore/box-width-remeasure` (Task 825).
+- **Waiting his pass:** `fix/name-wrap` (8103, Task 852), `feat/native-wire` (8110, Task 733 slice 7, Perry reviewed twice over; its English keys need his reading). `feat/wtg-page-export` (8102) waits his WaterGEMS test. On merging native-wire: rewrite CLAUDE.md's EPS bullet and key-files row, `dev/lpn-rulings.md`, `dev/positioning.md`, and tell him of the landing-page claims it falsifies (librewaternet.org disclosures.html, index.html, citations.html rows 2.3/2.4).
+- **His theme question:** the theme of the day is per browser and decided at page load; the day runs noon UTC to noon UTC (5 AM Arizona), so a PC tab loaded Friday shows Rounded while a phone loaded Saturday-UTC shows Space. Not a defect unless he says so.
+- **Trap met:** the first full run failed one timing check (`user-guide-search-hit-harness` key "e", 374 ms vs 150) while agents ran browsers; 74 ms alone. Run the full suite with no agent browsers live.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/ac1729a6-b228-4512-a691-0fb398fbb350/scratchpad (briefs, ida-852.md).
+
 ## STATE — 2026-11-01 (fifty-sixth session, Opus main, Sonnet agents)
 
 - **Sprint 1101 merged on master** (Tom: *"Proceed with a translation sprint now."*): 401 keys x 26 languages, Wave 0 (21 English rewrites, `dev/english-friction/1101-wave0.json`), a fix pass after QA, cognate exemptions, drift re-baselined, zero keys left. Most files still said *projection* in the CRS chooser (`lpn_crs_name`, `lpn_crs_count`); all fixed (glossary note on `projection (map)`). Box titles checked in all 26 (Task 809 half done). Notes now say EPANET-MSX is modeled. **Open friction entry:** `lpn_field_auto_length_tip` is Tom's word-for-word English (2026-10-27, `properties-tip-words-harness.js`); three translators queried "slope length"; Tom 11-01: *"Slope length is a standard engineering term. Translators should not be confused by it."* English stays; translations already say "along the slope, with the rise or fall". `lpn_ff_col_more` "How many others" is HIS wording (ruling recorded).
