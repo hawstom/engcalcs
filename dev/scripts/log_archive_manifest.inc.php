@@ -111,6 +111,33 @@ function ec_days_between($a, $b) {
 }
 
 /**
+ * The logs whose writers accept a beacon's `offline_ts` (log-calc-event.php, log-signal-event.php,
+ * log-title-event.php, log-human-view.php): a beacon queued while the browser was offline is logged
+ * at the time it was first attempted, up to 90 days back. So a row in one of these may predate the
+ * rotation that opened its archive without being an overlap. 2026-11-01 met it: four rows from
+ * 2026-09-21 flushed after the 10-01 rotation and the audit called it a hole.
+ */
+define('EC_OFFLINE_QUEUE_LOGS', ['engcalcs-calc-usage.log', 'engcalcs-signal.log',
+    'engcalcs-title.log', 'engcalcs-human-view.log']);
+define('EC_OFFLINE_QUEUE_MAX_DAYS', 90);
+
+/**
+ * Names the logs holding rows earlier than $boundary when every one of them is an offline-queue log
+ * and none is older than the queue's 90-day limit; null when anything else predates it.
+ */
+function ec_offline_queue_stragglers(array $perLog, $boundary) {
+    $names = [];
+    foreach ($perLog as $name => $s) {
+        $day = ec_manifest_day($s['first_row']);
+        if ($day === null || ec_days_between($boundary, $day) >= 0) continue;
+        if (!in_array($name, EC_OFFLINE_QUEUE_LOGS, true)) return null;
+        if (ec_days_between($day, $boundary) > EC_OFFLINE_QUEUE_MAX_DAYS) return null;
+        $names[] = $name;
+    }
+    return $names ?: null;
+}
+
+/**
  * THE ONE QUESTION THIS WHOLE FILE EXISTS TO ANSWER: is a hole in the record an archive boundary,
  * an explained deletion, or something nobody wrote down?
  *
@@ -161,7 +188,12 @@ function ec_archive_findings(array $state, array $prevState = null) {
         $firstDay = ec_manifest_day($now['first_row']);
         if ($firstDay !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $boundary)) {
             $gap = ec_days_between($boundary, $firstDay);
-            if ($gap < 0) {
+            $late = ($gap < 0) ? ec_offline_queue_stragglers($now['logs'], $boundary) : null;
+            if ($late !== null) {
+                $out[] = ['level' => 'note', 'text' => sprintf(
+                    'earliest row %s predates %s, but only in %s, which log an offline beacon at its original time (Task 119): a late flush, not an overlap',
+                    $firstDay, $boundary, implode(', ', $late))];
+            } elseif ($gap < 0) {
                 $out[] = ['level' => 'unexplained', 'text' => sprintf(
                     'overlaps %s: its first row (%s) predates that archive\'s ending date -- two archives cover one window',
                     $boundary, $firstDay)];
