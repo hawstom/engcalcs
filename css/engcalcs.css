@@ -5633,9 +5633,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
-/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, clipped at the column edge, the full label in its tip. */
+/* **THE NAME WRAPS TO TWO LINES AND THE COLUMN HAS A FLOOR** (Task 852; Tom, 2026-11-01: cut text needs a way to reveal, "Wrapping could be"; Ida's design dev/agents/interface-designer/truncation-852-2026-11-01.md; this reverses the 2026-10-30 one-line clip). Both columns keep a floor (7rem and 6rem) so neither a name nor a value is squeezed to nothing; a box narrower than the two floors scrolls its content pane sideways, which reveals, where a clip does not. The name takes at most two lines and is clipped after that, no ellipsis, no tip. */
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
+	display: grid; grid-template-columns: minmax(var(--lpn-set-name-min, 7rem), var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
@@ -5649,7 +5649,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the treatment Tom named twice as the one he likes and the one to converge on. It was the only
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
-.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
+.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; white-space: normal; overflow-wrap: anywhere; max-height: 2.6em; max-height: 2lh; font-size: .85em; opacity: .8; }
 /* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
 .lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
