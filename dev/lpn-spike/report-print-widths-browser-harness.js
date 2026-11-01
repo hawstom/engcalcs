@@ -10,7 +10,7 @@
 //
 // Task 829 (Tom, 2026-10-26) adds, for every report table on SCREEN and on PAPER: a column whose figures
 // share one unit has bare numbers and "Heading (unit)" (units in the heading, not the cells); every asset
-// id column is as wide as N9999 and holds it on one line; Type and Status may be cut with an ellipsis,
+// id column is as wide as N9999 and holds it on one line; Type and Status may be cut (clipped, no ellipsis),
 // the whole text in the cell's title.
 //
 // Copyright 2009 Thomas Gail Haws

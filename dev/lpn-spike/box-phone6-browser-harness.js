@@ -97,6 +97,7 @@ async function main() {
 				ok(dev.n + ' ' + what + ': only a row whose label wraps to two lines is taller than ' + (MAX_PITCH + 4) + ' px (at most a quarter of them)', !!m && m.over * 4 <= m.of && m.max <= 50, m && (m.over + ' of ' + m.of + ', tallest ' + m.max));
 				ok(dev.n + ' ' + what + ': inputs are still at least ' + MIN_INPUT + ' px tall', !!m && m.minInput !== null && m.minInput >= MIN_INPUT, m && String(m.minInput));
 				await shot(S, 'box6-props-' + what + '-' + dev.tag + '.png');
+				await openNet1(S, true);   // a full-height flyout covers the next element, so start the page again
 			}
 			ok(dev.n + ': no page error', S.errors.length === 0, S.errors.join(' | '));
 			await S.close();
@@ -206,8 +207,13 @@ async function main() {
 			await drag(cx, g.y, cx + (g.right ? 50 : -50), g.y);
 			const w3 = (await boxSize()).w;
 			ok(dev.n + ': a drag starting on the pill resizes it (the column limit may stop it short of the full 50 px)', Math.abs(w3 - w2) >= 10, w2 + ' -> ' + w3);
-			// the bottom pill
+			// the bottom pill: a flyout opens at the column's full height now, so pull it up first to leave map beneath it
 			await reopen();
+			{
+				const b0 = await bottom();
+				await drag(b0.x, (b0.t + b0.b) / 2, b0.x, (b0.t + b0.b) / 2 - 300);
+				await reopen();
+			}
 			const bg = await bottom();
 			ok(dev.n + ': the bottom pill is there', !!bg);
 			if (bg) {
@@ -247,11 +253,11 @@ async function main() {
 				const cdp = await P.context().newCDPSession(P);
 				const tp = (type, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: z.hg.x, y, id: 1 }] });
 				await tp('touchStart', z.hg.y);
-				for (let i = 1; i <= 6; i++) { await tp('touchMove', z.hg.y + i * 30); await S.settle(30); }
+				for (let i = 1; i <= 6; i++) { await tp('touchMove', z.hg.y - i * 30); await S.settle(30); }
 				await tp('touchEnd', 0);
 				await S.settle(400);
 				const z2 = await sz();
-				ok(dev.n + ': the drag made it taller', z2.h > z.h + 100, z.h + ' -> ' + z2.h);
+				ok(dev.n + ': the drag made it shorter, and that height is its own', z2.h < z.h - 100, z.h + ' -> ' + z2.h);
 				const kept = await P.evaluate(() => Object.keys(localStorage).filter((k) => /dockH/.test(localStorage.getItem(k) || '')));
 				ok(dev.n + ': the height is written to a browser key, not the project', kept.length > 0 && kept.every((k) => !/^lpn_project/.test(k)), JSON.stringify(kept));
 				await S.reload();

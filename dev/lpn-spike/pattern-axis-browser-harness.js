@@ -119,10 +119,13 @@ async function main() {
 					count.push(row.labels.filter((l) => !/xtitle/.test(l.cls)).length);
 				});
 				const first = rows.map((row) => row.labels[0] && row.labels[0].t);
-				ok(tag + ' @' + w + 'px (axis ' + rows[0].rowW + 'px): no labels touch, ' + count.join('/') + ' ticks per row',
-					bad.length === 0 && count[0] === count[1] && count[0] >= 1, bad.join(' '));
-				ok(tag + ' @' + w + 'px: first step labelled (' + expectFirst + ', 1)',
-					rows[0].labels.some((l) => l.t === expectFirst) && rows[1].labels.some((l) => l.t === '1'));
+				// A row too narrow to hold a tick beside its title draws no title, and one too narrow for a single label draws none (round 10c): what may never happen is a label touching
+				// another or leaving the row, and from 60 px up the first step is labelled on both rows.
+				const room = rows[0].rowW >= 60;
+				ok(tag + ' @' + w + 'px (axis ' + rows[0].rowW + 'px): no labels touch or leave the row, ' + count.join('/') + ' ticks per row',
+					bad.length === 0 && count[0] === count[1] && (!room || count[0] >= 1), bad.join(' '));
+				ok(tag + ' @' + w + 'px: first step labelled (' + expectFirst + ', 1)' + (room ? '' : ' where the row has room'),
+					!room || (rows[0].labels.some((l) => l.t === expectFirst) && rows[1].labels.some((l) => l.t === '1')));
 			}
 		};
 		const titles = () => P(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-plot .lpn-lib-xtitle')).map((e) => e.textContent));

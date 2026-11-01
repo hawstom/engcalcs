@@ -123,7 +123,7 @@ async function main() {
 		ok('Length carries its unit and has no Auto toggle beside it', /^Length \(ft\)\s*\??$/.test(m.lenName || ''), m.lenName);
 		ok('Auto length is its own row above Length', m.autoAbove, '');
 		ok('...with its toggle in the value column', m.autoInValueCol, '');
-		ok('the Label column is fitted: no wider than the widest label or the 140 px floor (LPN_GFIT_FLOOR), wider than the median', m.labelCol <= Math.max(m.widest, 140) + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
+		ok('the Label column is fitted to the longest label (round 11a, 100%): no wider than the widest label plus its padding, wider than the median', m.labelCol <= m.widest + 14.5 && m.labelCol > m.median, JSON.stringify({ col: m.labelCol, widest: Math.round(m.widest), median: Math.round(m.median) }));
 		ok('nothing is cut at the right edge', m.cut === 0 && m.scroll <= 1, JSON.stringify({ cut: m.cut, scroll: m.scroll }));
 
 		const glue = await page.evaluate(() => {
@@ -136,11 +136,11 @@ async function main() {
 					const rects = Array.from(r.getClientRects()).filter((x) => x.width > 0), last = Math.max.apply(null, rects.map((x) => x.top)), g = tip.getBoundingClientRect();
 					if (Math.abs(g.top - last) > 6) { out.strayed.push(t); }
 				}
-				n.querySelectorAll('bdi').forEach((b) => { if (Array.from(b.getClientRects()).filter((x) => x.width > 0).length > 1) { out.broken.push(b.textContent); } });
+				if (n.getBoundingClientRect().height > 2.4 * parseFloat(getComputedStyle(n).fontSize)) { out.broken.push(t); }   // round 9: a label never wraps, so a unit cannot break either; a name that is tall has wrapped
 			});
 			return out;
 		});
-		ok('a "?" stays with its label\'s last line and a unit never breaks inside its brackets', glue.strayed.length === 0 && glue.broken.length === 0 && glue.names > 10, JSON.stringify(glue));
+		ok('a "?" stays with its label\'s line and no label wraps, so no unit breaks (round 9)', glue.strayed.length === 0 && glue.broken.length === 0 && glue.names > 10, JSON.stringify(glue));
 
 		// The divider: drag, remembered per box, kept across a reload, reset by a double-click.
 		console.log('\n--- the divider ---');
@@ -273,7 +273,7 @@ async function main() {
 				unitRows: b.querySelectorAll('#lpn_convas_units_fields .lpn-grow').length, scroll: b.scrollWidth - b.clientWidth };
 		});
 		ok('Convert as is a box of Label | Value rows: the coordinate system and the units', !!cv && cv.grid && cv.unitRows >= 8, JSON.stringify(cv));
-		ok('...a run of two or more rows has a header and a run of one has none', !!cv && cv.runs.every((g) => g.hdr === (g.rows >= 2)), JSON.stringify(cv && cv.runs));
+		ok('...it is a sheet: no "Label | Value" heading band over any run of rows (round 10b, Task 842)', !!cv && cv.runs.every((g) => !g.hdr), JSON.stringify(cv && cv.runs));
 		ok('...and it does not scroll sideways', !!cv && cv.scroll <= 1, String(cv && cv.scroll));
 		const cv2 = await c.page.evaluate(() => {
 			const b = document.getElementById('lpn_convas_body'), ok = document.getElementById('lpn_convas_ok'), R = (e) => e.getBoundingClientRect(), vh = window.innerHeight;
@@ -284,6 +284,12 @@ async function main() {
 		ok('...and OK and Cancel are in a footer outside the scrolling body, always in view', !cv2.okInBody && cv2.okVisible && cv2.cancelVisible, JSON.stringify(cv2));
 		const rd = await selectShowsText(c.page, '#lpn_convas_round_diameter');
 		ok('"No rounding" is whole in its dropdown', rd.ok, JSON.stringify(rd));
+		// Tom, 2026-09-23 (restored round 10c): one list, the step to round to and the suffix SIDE BY SIDE on each quantity's row.
+		const sb = await c.page.evaluate(() => ['diameter', 'depth', 'flow', 'head'].map((k) => {
+			const s = document.getElementById('lpn_convas_round_' + k), i = document.getElementById('lpn_convas_suffix_' + k), a = s.getBoundingClientRect(), b = i.getBoundingClientRect();
+			return { k, sameRow: Math.abs(a.top - b.top) < 3 && a.width > 0 && b.width > 0, rightOf: b.left >= a.right - 1, rowCells: s.closest('.lpn-grow').children.length };
+		}));
+		ok('Convert as: each quantity has the rounding step and its suffix side by side on one row, one Label cell', sb.every((r) => r.sameRow && r.rightOf && r.rowCells === 2), JSON.stringify(sb));
 		await c.close();
 		const f = await start(false);
 		await openBox(f, 'lpn_full_box');

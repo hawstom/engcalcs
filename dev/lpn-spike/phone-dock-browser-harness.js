@@ -107,7 +107,7 @@ async function main() {
 		const tab = await rect(a.page, '.lpn-dock-tab[aria-controls="lpn_popup"]');
 		await tapXY(a, cdp, tab.l + tab.w / 2, tab.t + tab.h / 2);
 		const fly = await rect(a.page, '#lpn_popup');
-		ok('b.2 tapping the tab flies the box out at least 240 px wide', fly && fly.w >= 240 && fly.l >= 0, JSON.stringify(fly));
+		ok('b.2 tapping the tab flies the box out, a saved 60 px lifted to the 80 px floor (was 240 until Tom, 2026-10-30)', fly && fly.w >= 80 && fly.l >= 0, JSON.stringify(fly));
 		ok('b.3 ...and it leaves part of the map to look at', fly && fly.w <= 390 - 24 - 40, JSON.stringify(fly));
 		const dockBtns = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-box-corner [data-dock]')).map((b) => b.getAttribute('data-dock')));
 		ok('b.4 a phone offers no pin button (nothing there can be pinned)', !dockBtns.includes('autohide') && dockBtns.includes('float'), JSON.stringify(dockBtns));

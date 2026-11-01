@@ -127,7 +127,7 @@ async function main() {
 			const e = document.querySelector('#lpn_libbox_content .lpn-lib-entry');
 			const i = e && e.querySelector('textarea.lpn-lib-desc');
 			if (!i) { return null; }
-			const head = i.closest('label').querySelector('.lpn-lib-fieldname');
+			const head = i.closest('.lpn-grow').querySelector('.lpn-gname');
 			return { value: i.value, head: head ? head.textContent : null };
 		});
 		const exportInp = async () => {
@@ -261,7 +261,7 @@ async function main() {
 			await b.settle(300);
 			const h = await b.page.evaluate(() => {
 				const i = document.querySelector('#lpn_libbox_content .lpn-lib-entry textarea.lpn-lib-desc');
-				return i ? i.closest('label').querySelector('.lpn-lib-fieldname').textContent : null;
+				return i ? i.closest('.lpn-grow').querySelector('.lpn-gname').textContent : null;
 			});
 			ok('es ' + sec + ': the field is headed "' + esWord + '"', h === esWord && esWord !== word, JSON.stringify(h));
 		}

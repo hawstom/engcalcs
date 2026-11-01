@@ -273,7 +273,8 @@ async function sectionFit(Session, browser) {
 			ok(tag + ': all rows shown', f.rows >= 8, f.rows);
 			ok(tag + ': no vertical or horizontal scroll', g.vScroll <= 0 && g.hScroll <= 0, g.vScroll + ' / ' + g.hScroll);
 			ok(tag + ': within 600 x 600 and on screen', g.w <= 600 && g.h <= 600 && g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5, JSON.stringify(g));
-			ok(tag + ': not squat (height >= 0.9 x width)', g.h >= 0.9 * g.w, g.w + ' x ' + g.h);
+			// Task 828 put the rows on the sheet grid (24 px a row): the box is the height of its rows and no longer needs to be 0.9 x its width. What must hold is that it is not squashed: every row at its own height.
+			ok(tag + ': not squashed (every row at its sheet height)', g.h >= g.rows * 24, g.w + ' x ' + g.h + ', ' + g.rows + ' rows');
 		} finally { await a.close(); }
 	}
 	// A TALL LEGEND must not squash the box (Tom, 2026-10-03: ~120 px tall and scrolling).
@@ -296,7 +297,7 @@ async function sectionFit(Session, browser) {
 			console.log('         ' + tag + ': box ' + g.w + ' x ' + g.h + ' px with the DEM row; legend ' + JSON.stringify(lg));
 			ok(tag + ': a legend is showing', !!lg && lg.h > 100, JSON.stringify(lg));
 			ok(tag + ': all rows, no vertical or horizontal scroll', g.rows >= 8 && g.vScroll <= 0 && g.hScroll <= 0, g.rows + ' rows ' + g.vScroll + ' / ' + g.hScroll);
-			ok(tag + ': on screen and not wide and squat (height >= 0.9 x width)', g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5 && g.h >= 0.9 * g.w, JSON.stringify(g));
+			ok(tag + ': on screen and not squashed (every row at its sheet height)', g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5 && g.h >= g.rows * 24, JSON.stringify(g));
 			ok(tag + ': where it overlaps the legend, the box is on top', !!lg && lg.boxOnTop, JSON.stringify(lg));
 		} finally { await t.close(); }
 	}

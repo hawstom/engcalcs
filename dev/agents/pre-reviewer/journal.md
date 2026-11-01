@@ -4698,6 +4698,14 @@ NOT CHECKED: how the new click-to-open Shape box FEELS; mutation test of the har
 - Method: the page's own dialogs are auto-answered by the Session until `delete window.lpnDialogAnswerer`; a test that never deletes it never sees a dialog. Scenario manager menu rows are disabled in the way unless a scenario exists.
 - NOT CHECKED: Google Docs; phone Properties; Tables headings in a browser; mutation of the new harnesses.
 
+# Perry, feat/report-widths 4650ca130, 2026-10-28 night (Task 848, adjustable report columns)
+- OBSERVED (real Chromium, real mouse, Net3 + a second scenario): builder's harness passes (15 ok). Fire flow, Criticality, Demand scaling, Energy, Status, Full report, Scenario comparison, floating AND docked right: every column has a divider; automatic widths show no sideways scroll; a drag sets the width, the others keep theirs, it survives reopen and reload; double-click resets and clears the key. Calibration not run (needs a file).
+- OBSERVED DEFECT: press on any divider while the table is scrolled sideways and the scroll snaps to 0 (rptColStartDrag clears the table width first). Double-click on a divider that needed scrolling to reach (Status, last column widened +300 past the box) does NOT reset: stored key stays. Not covered by the harness.
+- OBSERVED: after a drag the table freezes at its widths; enlarging the box leaves it 694 px in a 1114 px box (blank right); shrinking scrolls. Automatic tables still refit. Units are not in the key (heading "demand not served", not "(gpm)"), so a unit change keeps widths.
+- OBSERVED: the 7 px divider covers the right half of the 15 px sort arrow; a click on it neither sorts nor resizes. Click on heading body and arrow centre sort; a sorted table keeps its dragged widths. Touch: no touch handler on the divider (mouse only). Phone 390: Fire flow, Full report, Scenario comparison scroll sideways at automatic widths, identical on 4650ca130^ (pre-existing).
+- OBSERVED: Copy HTML, Copy text, Print and CSV byte-identical before and after a drag on all seven reports. lpn_rptcols is in the inventory and the furniture/storage checks pass.
+- Method: ad-hoc Playwright scripts in the session scratchpad; the box title buttons relabel to "Copied" after a click.
+
 # Perry, feat/sheet-light b53d074ab, 2026-10-28 night (light sheet, Demand as rows)
 - OBSERVED (real Chromium, 1366x768 and 390 touch, light and dark): hairline sheet is consistent across Properties (junction, pipe, tank, pump, PRV), Find, Contour, Fire flow, Criticality, Demand scaling, Scenario comparison, floating and docked. No sideways scroll anywhere.
 - OBSERVED: the Demand categories box opens 618x615 (CSS asks 432x352): `.lpn-setbox` is declared later in the file than `.lpn-demandsbox` and wins. Docked it is 618 wide.
@@ -4785,6 +4793,36 @@ a finger tap at centre and +-9 px focuses the input, typed value takes (verified
 OBSERVED MISSED (partly): the side pill's strip is 12 px (was 19) but a touch tap on the map beside the flyout is still eaten out to 14 px from the box edge (r5: 16 px); 8 px and 12 px beside do not act as a map tap. Mouse click at the same spot acts as a map tap. A touch drag starting 8 px outside the strip still resizes. Cause not found (not the element: elementFromPoint says canvas); Chromium touch handling, not shown to be this branch.
 OBSERVED: dockH saved in lpn_dockbox; reload reopens at dragged height (672); 360x740 clamps to 621; 360x500 clamps to 381; landscape 740x360 gives 174. PC identical to r5 (pane grip, side drag).
 Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 symlinked node_modules. A tap on empty map tucks the flyout, a useful proxy for "was a map tap".
+
+## 2026-10-30 -- box-design round 7 (606a749a3, 63a38fe95, 69bf45b31, vs round 6 7b62eb90b)
+OBSERVED (re-verify before citing; real Chromium touch emulation, Net1 and Net3): the round-6 tree REPRODUCES Tom's crushed Settings names (name column 20 px at 360 wide, 41 px at 390, rows 100-124 px tall); round 7 gives 106-117 px, rows 20-30 px. Fixed after dropdown-to-Page, after reload and after Start fresh (Start fresh reopens a 352 px wide box at 360, fine).
+OBSERVED MISSED (minor): at 360 wide the Settings pane still scrolls sideways 12 px (Symbology group, Customer: .lpn-set-part and column-head stick out 12 px); at 320 wide 4 px (a text input). Same 12 px in round 6. No overflow at 390. box-phone7 does not measure it.
+OBSERVED: full-height flyouts leave a 92 px strip of map at 390 (83 at 360, 55 at 320). On Net1 after tapping J22 only 2-3 elements stay tappable; box-phone6 had to reload Net1 between its element taps for this reason. Dragging the bottom pill up works at 390x844, 360x740/640, 340, 330, and survives reload.
+OBSERVED MISSED: bottom pill drag up does nothing at 320x640 and 320x700 (works at 320x844). Cause not found.
+OBSERVED: PC 1366x768 and landscape 844x390 identical to round 6. Find, Fire flow, Criticality open 382 px wide, full height on a 390 phone (cover whole map; not changed by this round).
+Harness edits: box-phone5/6 dropped the "map stays visible under the box" check, replaced by a shorter-than-default check; no other check weakened. box-phone 38 px -> 23-32 px matches round 6.
+Harnesses re-run green: box-phone7 14, box-phone6 67, box-phone5 52, box-phone 17, settings-phone-jump 104, settings-phone-width 24.
+Method: probe*.js in session scratchpad perry7; base tree via git archive 7b62eb90b. Shots: _panel/www/img/perry7-*.png.
+
+## 2026-10-30 -- box-design round 8 (55a756466, 0ab6ce3f5 vs 42dbd7128)
+OBSERVED (re-verify before citing; real Chromium, Net1/Net3, 390/360/320 touch + 1280 PC): Close in the Select area help hides only the bubble, mode stays on, a window drag then selects (18 on Net1 phone, 25/212 on PC); 390 Net3 and 320 windows selected 0 (my window clamped to a clipped network, not a Close defect). Mode is left by the tool button/Esc only now.
+OBSERVED MISSED (moderate): Properties shrinks to 80 px freely, no page sideways scroll, close button stays. But below ~130 px every value is pushed out of sight (inside-box sideways scroll, 0 of 13 inputs in view at 120/100/80); header title overlaps buttons below ~150; at 120 and under the dock/float/help buttons slip off the left edge. 150 px is usable (values truncate "10..."). Net3 shows 17-82 px of in-box sideways scroll from 180 px.
+OBSERVED PRE-EXISTING (same on master): on a phone, Properties docked -> tap Float gives a 382 px wide floating box at left 113, so its right 105 px incl. Close, dock and help buttons are off screen; no touch grip. Not caused by round 8.
+OBSERVED: settings-fit 17/18 fails on PC 580 px narrowing (gap above name line 0 vs 2 px below); phone passes. Invisible to Tom. box-narrow 22/22, phone-select 20/20, phone-dock 22/22, small-screen pass.
+Method: probes in session scratchpad p8probe; shots _panel/www/img/perry8-*.png.
+
+## 2026-10-30 -- box-design round 8b (efb086597)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, 390/320 touch docked + floated, 1280 PC floating, 180..80 px): every Properties value inside the box, 0 sideways scroll (page or body), 4 of 4 header buttons inside, at every width; Float on phone lands wholly on screen (l 4, r 386 / 316), has a 28 px grip, finger shrinks it to ~100 px with all values visible. Round-8 defect 1 and 2 FIXED.
+OBSERVED MISSED (minor, visual): the Properties title is not kept clear of the header buttons: title text right edge is 701 px against button left edges 695 (150 px wide), 645 (100), 625 (80), so "Properties" is drawn over the buttons from 150 down (screenshots perry8b-phone-docked-80/150, float-shrunk). The harness titleOverlap check reads 0, so it is blind to this. Stacked rows: the ID value "10" collides with the "From" label at 80-150 px.
+OBSERVED MISSED: Find and Fire flow (not fixed by this round) at 100/80 px: no input visible (0 of 5, 0 of 7), 2-3 header buttons off the box; at 150 px 2 buttons off. 200 px and up fine. Phone default widths 382/312 fine, 28 px grip present.
+OBSERVED: harnesses green: box-narrow 148/148, settings-phone-width 24/24, box-phone7 26/26.
+Method: p8probe/sweep2.js, ff.js, ti.js; shots _panel/www/img/perry8b-*.png.
+
+## 2026-10-30 -- box-design round 8c (87c9abd0a)
+OBSERVED (re-verify before citing; Chromium, Net1): Find, Fire flow, Properties at 150/100/80 px (PC floating; Properties also phone docked): every input and every header button incl. Close inside the box, no page or body sideways scroll, no text drawn over an input, stacked ID/From rows clear. Title is hidden at narrow widths, not overlapping (screenshots). Default widths two columns (PC 500, phone 273). 8b defects 1-3 FIXED.
+OBSERVED (minor): a finger drag on the phone Find/Fire flow grip goes to 70 px, below the 80 px floor, with 5-9 px in-box sideways scroll; one Find text input shows "Everythin" clipped at 100 px (clip, not scroll). My title-overlap range metric is unreliable under ellipsis; judged by eye.
+Method: p8probe/c.js, d.js; shots perry8c-*.png.
+
 # Perry, feat/dxf-import round 3 a970103df, 2026-10-30 (embedded .inp sections)
 - OBSERVED (real Chrome): dxf-roundtrip-calc-harness 107/107. My own runs: Net3, Net2, Net1 Base, Net1-Scenarios s1 (Max day) and Net3-Novato lat/lon export then import: heads and flows identical (diff 0); patterns, controls, rules counts match; s1 comes back with Demand Multiplier 1.5. Receipt line "The EPANET sections embedded in the drawing were read: ..." true on desktop and phone width. Export with the layer removed imports with no sections line (0 patterns). Pipe diameter edited to 777 with ezdxf wins on import.
 - OBSERVED: ezdxf 1.4.5 recover + audit: 0 errors on all five exports. Layer C-WATR-EPANET-INP, white, plot flag 0, not frozen.
@@ -4799,3 +4837,41 @@ Method: p*.js in session scratchpad perry6; base tree via git archive 36fa47163 
 - OBSERVED: mutation (header strip removed from the reader) turns dxf-import-reader-harness red (2 FAIL); restored the file.
 - OBSERVED: Net3 sections text is ~98 wrapped lines = ~163 units tall against a 31-unit network; Net1 and Net2 ~157 and ~213 against 80 and 83. Read-me bottom is 3 to 4 units above the network top at a 0.9-per-character estimate.
 - Scratch: scratchpad/p4 (rt.js, var.js, mk.py, aud.py).
+
+## 2026-10-31 -- box-design round 9 (79f765c61)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366x768 mouse, phone 390x844 touch, docks on): box-round9 harness 118/118. Labels one line with ellipsis in Properties, multi, Find, Fire flow; multi-selection sections do not overlap, share one divider, mouse and finger drag it; Find is sheet style with divider at natural width. First open: single Properties cuts 1/14..4/23 labels (the unit-bearing ones), multi cuts 13/69 (Net1) and 21/50 (Net3, 42%), multi Label column 85 px vs 161 single.
+OBSERVED MISSED: Fire flow RESULTS columns cannot be dragged by finger: grip code listens to mousedown only, grip is 4 px wide; phone drag changed nothing. PC drag works and is stored in lpn_rptcols.
+OBSERVED MISSED (minor): Fire flow control label "Lowest system pressure allowed (psi)?" is cut at first open with no tip (PC and phone); the harness flags cutNoTitle 5 and passes anyway because it asserts only for Properties.
+OBSERVED PRE-EXISTING (same on master): phone, docked Properties, a finger divider drag ends and the flyout retracts ~200 ms later; the next drag then pans the map. May be a CDP-touch artifact.
+Method: scratchpad p9 (fit, ff, multi, find, mp*.js); shots _panel/www/img/perry9-*.png.
+
+## 2026-10-31 -- box-design round 9b (e2a7bf8fd)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC mouse, phone touch, docks on): all four round-9 findings FIXED. Phone finger drag of a Fire flow result column: 66 -> 126 px, stored `lpn_rptcols` 8.78 em, squeeze to 29 px; PC mouse 71 -> 151 still fine. Multi first Label column 153-165 px vs single 154-161 (was 85-124), cut labels 3-5 (was 13-21), `?` markers present as in single. Cut Fire flow control label has its full tip at rest (my first reading missed it: an armed tip sits in data-bs-original-title, not title). Phone docked Properties stays after a finger divider drag; four successive drags moved the divider (153->98->190->156->207). PC multi divider drags 154->94->194, 165->105->205.
+Method: scratchpad p9 (ff, multi, fit, mp, mp4, tips, find); shots perry9b-*.png. LESSON: read data-bs-original-title as well as title when checking tips.
+
+## 2026-10-31 -- box-design round 10 (b8e1956f7)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366x900, phone 390x844 touch): box-round9 harness 153/153 and sheet-coverage 112/112 pass; my own sweep of Properties, Find, Fire flow, Criticality, Demand scaling, Scenario comparison, Calibration, Full report, Libraries sections, Settings, New project, CRS chooser, Convert as, Export tables found no ellipsis on any name, no heading band, no sideways scroll, Find buttons and help reaching both edges (L0 R0) on PC and phone. Phone tap on a divider-covered radio or checkbox still toggles it.
+OBSERVED MISSED: Settings names the column cuts (14 at PC default on Net1, 26 on phone) carry no tip with the full name: real hover over "Snap leader lines to set angles" gives nothing; over a `?` row it gives the explanation, not the name. Cause: the Settings name cell is a plain span in a label, not `.lpn-set-name`, so the tip delegation never arms it. The labels harness passes because it checks only the Labels tables and dispatches a synthetic event.
+OBSERVED: Convert as rounding is now two stacked lists (Round converted values, then Suffix), no longer the two side-by-side columns Tom asked for 2026-09-23 (R-217); the box is taller.
+OBSERVED: Settings still `.lpn-set-row` not `.lpn-sheet`: no ruled cells; Fire flow/Criticality/Demand scaling number inputs fill the Value cell (Task 828 text says sized to content).
+Method: scratchpad/perry probe*.js; shots _panel/www/img/perry10-*.png.
+
+## 2026-10-31 -- box-design round 11 (71e8c3123)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366x900 mouse, phone 390x844 CDP touch): sheet-coverage 153/153 and box-spreadsheet 41/41 pass; my own probes agree with them on the headline items. Convert as: opens, drags by title, resizes by corner (PC mouse, phone finger), second divider (Round to | Suffix) drags and moves all four rows equally (mouse and finger), first-column dividers drag. Chooser: opens above Convert as, drags, resizes, last-row divider drags (mouse and finger), Esc closes only the chooser. New project: dragging the divider right or left leaves the width at 337 px. No Label cut in any sheet box at opening width on PC, Net1 and Net3 (16 openers scanned); phone Contour on Net3 cuts "Ground between nodes from Mapbox".
+OBSERVED MISSED: 11c's nowrap on every `.lpn-pane-table tbody td` also hits the PRINT tables, defeating the `overflow-wrap: anywhere` last resort: pane-print-cell-wrap-harness fails 2 (an overlong value no longer wraps, it is clipped at 54.7 px) and passes 42/42 at base 71ee9394f.
+OBSERVED: chooser opening width follows its list (Net1 871 px, Net3 from Convert as 411 px with the list scrolling sideways by 153 px, from New project 567 px). New project: Friction method select shows "Hazen-Willia..." on PC (122 px) but whole on phone; box not movable or resizable. Convert as at 1366x900: body scrolls at first open, closing note cut mid-line.
+SPECULATION: Tom's "Controls columns are not sizeable" probably is not the Controls/Rules entries (one Description row each, text input unaffected); curve point table columns are the other candidate.
+Method: scratchpad conv.js crs2.js ph.js cut.js np.js td.js; shots _panel/www/img/perry11-*.png.
+
+## 2026-11-01 -- box-design round 12 (867b6ace9)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366 mouse, phone 390 touch, en/es): (1) Settings > Units with the real Spanish "Pie topografico de EE. UU." text: no row overlaps at 600, 440 and 390 px; value clipped with ellipsis and tip at 440. (2) Settings resize, real mouse drag of the floating corner and the docked grip, Spanish: section stays at the top on box-design (docked exact; floating drifts up to 72 px at 168 px wide, still visible); on parent 59c58df9a AND on master the section scrolls off (1724..3953 px, master 5883..24927). So not a regression from master; both lose it, round 12 fixes it. (3) Scenario manager: Scenario column drags 183 -> 28 px, ellipsis, full name in tip (real hover shows it); heading wraps "Sc/en-/ari/o". (4) Libraries: intros gone, tip on the `?` opens on click (not hover) with the intro text; the heading is a Bootstrap-default blue (13,110,253) underlined bold link, not an --ec token and unlike any other heading; the `?` itself does not open the manual, the heading does, to the whole Libraries entry. Patterns heading also became a link.
+OBSERVED: the four new harnesses fail on the parent commit (units-wrap 12/16, library 4 FAIL + crash, scenario 3/5, resize 5/16). The units-wrap harness does not detect the overlap itself on the parent (no overlap reported), only the missing ellipsis styling.
+OBSERVED: pane-print-cell-wrap-harness 42/42 at HEAD.
+Method: scratchpad perry12 (u1 r2 s3 l4 l5 l6 ph t3 .js); shots _panel/www/img/box12-*.png.
+
+## 2026-11-01 -- box-design round 12c (c81d316da)
+OBSERVED (re-verify before citing; Chromium, Net1/Net3, PC 1366 mouse, phone 390 touch, en/es): CONFIRMED. No text-overflow ellipsis remains on any scanned box row (Settings whole box, Scenario manager, Find, Contour, Fire flow, Libraries x6 sections, Properties, New project, Convert as); cut text clips plain; overlaps/clips scan identical to base 1e452bc44 apart from the ellipsis. Left in place: Settings theme-button name (.lpn-theme-btn-name), Reports .lpn-rpt-trunc, box title bars, dock tab titles, tsb title, GIS credit.
+OBSERVED: Libraries Curves/Pipe types/Fittings ?: no title, aria "User manual: <heading>"; real click (PC) and touchscreen tap (phone) open the manual with that entry's top at the pane top (hash #guide/term-lpn_guide_lib_*), entry text = old intro keys in order, en and es; User-Manual.php?chapter=libraries shows the three entries en/es. Patterns/Controls/Rules keep their heading tip. user-guide map/menus/tables/using/library/boxes/harness all pass.
+OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 3/5, units-wrap es FAILs, sheet-style 85/86).
+SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
+Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.

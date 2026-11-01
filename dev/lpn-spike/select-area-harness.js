@@ -446,10 +446,15 @@ console.log('\n--- the bubble ---');
 	}
 	L.setAreaShape('lasso');
 	const exitBtn = findExit(L.hintBox());
-	report(!!exitBtn, 'the bubble carries an Exit control', exitBtn ? exitBtn.textContent : '');
+	report(!!exitBtn, 'the bubble carries a Close control, labelled Close', exitBtn ? exitBtn.textContent : '');
 	if (exitBtn) {
+		report(exitBtn.textContent === 'Close', 'the control says Close, not Exit', exitBtn.textContent);
 		fire(exitBtn, 'click');
-		report(L.mode() === 'select', 'pressing Exit returns to the normal Select mode', L.mode());
+		report(L.mode() === 'select-area', 'pressing Close keeps Select area active', L.mode());
+		report(L.hintText() === null, 'ONLY the bubble is closed', String(L.hintText()));
+		L.setMode('select');
+		L.setMode('select-area');
+		report(L.hintText() !== null, 'the bubble returns the next time the mode is entered', String(L.hintText()));
 	}
 	L.setAreaShape('window');
 	// A finger's window or lasso is press-drag-lift, and the bubble says so.

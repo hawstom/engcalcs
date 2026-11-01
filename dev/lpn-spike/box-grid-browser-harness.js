@@ -124,9 +124,12 @@ async function main() {
 		await a.settle(400);
 		const ex = await a.page.evaluate(() => !!document.querySelector('#lpn_dialog input[name="lpn_export_tables"]'));
 		if (ex) {
-			await auditBox(a.page, { root: '#lpn_dialog_body' }, ok, 'export tables');
-			const ec = await columns(a.page, '#lpn_dialog_body');
-			ok('export tables: one set of columns', ec.name.length <= 1 && ec.val.length <= 1, JSON.stringify(ec));
+			// Round 10b: each choice is a row of its own spanning the box (radio, then its words), so no name is cut; it is not a Label | Value grid.
+			const ec = await a.page.evaluate(() => {
+				const rows = Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-export-choice')).filter((r) => r.getBoundingClientRect().width > 0);
+				return { n: rows.length, cut: rows.filter((r) => r.scrollWidth > r.clientWidth + 1).length, scroll: document.getElementById('lpn_dialog_body').scrollWidth - document.getElementById('lpn_dialog_body').clientWidth };
+			});
+			ok('export tables: each choice is a full-width row and none is cut', ec.n >= 2 && ec.cut === 0 && ec.scroll <= 1, JSON.stringify(ec));
 			await shot(a, '#lpn_dialog', 'exporttables');
 		} else { ok('export tables: the dialog opened', false, 'could not open it'); }
 		await a.close();

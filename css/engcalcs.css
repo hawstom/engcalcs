@@ -2521,7 +2521,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-hide-titles { font-size: .6em; font-weight: normal; white-space: nowrap; }
 /* A collapsible heading per type in the multi-properties box. Open by default and the reader
    closes what they are not using, never the other way round. */
-.lpn-multi-section { margin: 0 0 .5em; }
+.lpn-multi-section { margin: 0 0 .5em; grid-column: 1 / -1; min-width: 0; }
+/* Each section is its own two-column block with the box's tracks (Tom, 2026-10-30); sections stack one after another and never share a row. */
+.lpn-multi-section > .lpn-gprops { row-gap: 0; }
 .lpn-multi-section > summary { font-weight: bold; cursor: pointer; padding: 2px 0; }
 .lpn-multi-note { margin: .2em 0 .4em; font-size: .9em; }
 .lpn-tool-more { position: relative; }
@@ -2899,7 +2901,7 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-add { font: inherit; margin: 2px 0; }
 /* THE DEMAND CATEGORIES BOX (sheet-light). The list Properties no longer draws: the same light sheet as the other boxes (hairline rules, no box
    round a cell, an editable cell filled on hover and outlined on focus, an empty one underlined faintly), as a table of one row per category. */
-.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: min(20rem, 94vw); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
+.lpn-setbox.lpn-demandsbox { width: min(20.5rem, 94vw); height: auto; max-height: min(32rem, 92dvh); min-width: var(--lpn-box-min-w, 5rem); min-height: 0; }   /* (.lpn-setbox's own width and height come later in the file; this is the more specific rule) */
 .lpn-demands-ov { display: flex; align-items: center; gap: 4px; padding: 4px 6px; font-size: .85em; color: var(--ec-ink-muted); border-bottom: 1px solid var(--ec-hairline); }
 .lpn-demands-ov .lpn-ovm-cell { position: static; margin: 0; }
 #lpn_demands_body { overflow: auto; }
@@ -2914,7 +2916,7 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body > .lpn-demand-table td:last-child { text-align: center; white-space: nowrap; }
 #lpn_demands_body .lpn-demand-table :is(input[type="text"], input[type="number"], select) {
 	display: block; width: 100%; max-width: none; min-width: 0; margin: 0; padding: 4px 6px; box-sizing: border-box;
-	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em; text-overflow: ellipsis;
+	border: 0; border-radius: 0; background: transparent; font: inherit; font-size: 1em;
 }
 #lpn_demands_body .lpn-demand-table input[type="number"] { text-align: end; font-variant-numeric: tabular-nums; }
 #lpn_demands_body .lpn-demand-table :is(input, select):hover:not(:focus) { background: var(--ec-hover-bg); }
@@ -3373,8 +3375,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    `resize: both` needs a non-visible overflow to be drawn at all, and it costs nothing: the
    scrolling already lives on `.lpn-popover-body`, which takes the height a drag gave the box. The
    floor is a width, as it is on every other box here -- the property rows stop fitting first. */
-.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
-@media (min-width: 30.01rem) { .lpn-propbox { min-width: 12rem; } }   /* the Value column shrinks and truncates (Tom, 2026-10-28), so the box may be narrow; a phone keeps 17 rem, which its demand table needs */
+/* **NO BOX HAS A LOWER WIDTH LIMIT WORTH THE NAME** (Tom, 2026-10-30, phone: "The Properties box has an inappropriate lower width limit. Remove that limit."). Every box floor is the one token --lpn-box-min-w, 5 rem: room for the close button and a few characters, so a box shrunk that far can still be found and dragged back. Content inside wraps, truncates or scrolls within the box; the page never scrolls sideways. */
+.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
 .lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 /* A Text's words in Properties fill the box's width and follow it when the box is dragged wider;
    the words box itself drags taller only (R-394). A short number (the Text's Size multiplier) gets
@@ -3404,7 +3406,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    fitting first, and everything below the floor is a sideways scrollbar. */
 .lpn-findbox {
 	width: min(22rem, calc(100vw - 8px));
-	min-width: min(16rem, 94vw);
+	min-width: var(--lpn-box-min-w, 5rem);
 	flex-direction: column;
 	resize: both;
 	overflow: hidden;
@@ -3811,16 +3813,16 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
-.lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-namemax: 11rem; --lpn-g-valmax: 9.5rem; }   /* a box of fixed width: a longer name wraps at a space, never widens it */
-.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
+.lpn-contourbox { width: min(25.5rem, calc(100vw - 8px)); --lpn-g-valmax: 9.5rem; }
+.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: var(--lpn-box-min-w, 5rem); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
 .lpn-snipbox .lpn-set-row { margin: 7px 0; }
 /* ==== THE SPREADSHEET BOX ROW (Task 828; Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET
    and WaterGEMS"; Ida, dev/agents/interface-designer/standard-box-rows-2026-10-24.md)
    One grid of two columns, Label | Value, built by lpnGridRow() in js/looped-network.js. A unit is
    part of its Label ("Diameter (mm)"), so there is no third column. A header row names the two
    columns and carries the divider the reader drags (--lpn-g-name on the host, remembered per box in
-   `lpn_gcols`). The Label column is FITTED to the 80th percentile of its labels' natural widths, so
-   one long label wraps (even mid-word) instead of widening the column for all the rest; the Value
+   `lpn_gcols`). The Label column is FITTED to the LONGEST label (one rule, gridFitNow; Tom, 2026-10-31), capped by the
+   box, with a label the column cuts clipped; the Value
    column takes what is left and its controls hug the Label column's edge. Gridlines are
    --ec-border-strong, the header's fill --ec-chrome-bg. The host is the grid and every run of rows in it
    is a subgrid of it, so a heading, a note or a button row between two rows never starts a second
@@ -3830,20 +3832,21 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 @supports (grid-template-columns: subgrid) {
 	.lpn-gridhost {
 		display: grid; align-content: start; column-gap: 0; row-gap: 0;
-		grid-template-columns: minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr);   /* the Value column gives way to a few characters and truncates; the Label column wraps */
+		grid-template-columns: minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);   /* the Value column gives way to a few characters and truncates; the Label column wraps */
 	}
 	.lpn-gridhost > * { grid-column: 1 / -1; min-width: 0; }
-	/* Contour plot is a box of fixed width, docked at the 20 rem floor: its Label column gives way before the box scrolls sideways. */
-	.lpn-contourbox .lpn-gridhost { grid-template-columns: minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr); }
 	.lpn-gridhost > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	.lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 	.lpn-gsub { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > * { grid-column: 1 / -1; min-width: 0; }
 	.lpn-gsub > .lpn-grid { display: grid; grid-template-columns: subgrid; }
 	/* What stands in the value column when it is not a row's control: a button row, a lone button, a run of ticks. */
-	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: start; }
+	.lpn-gridhost > .lpn-gcol2, .lpn-gsub > .lpn-gcol2, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 2 / -1; justify-self: stretch; min-width: 0; overflow-wrap: anywhere; }   /* stretch, not start: a block narrower than its words wraps them instead of leaving the box (round 9, no stacking) */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-gcol2, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gsub > .lpn-gcol2,
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { margin-inline-start: 6px; margin-block: 4px; }
+	/* A BUTTON ROW OR A HELP LINE SPANS BOTH COLUMNS (Tom, 2026-10-31, of Find: "The buttons and the complex query help should span both columns"). It is not a value, so it does not sit under the Value column. */
+	.lpn-gridhost > .lpn-gfull, .lpn-gsub > .lpn-gfull, .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { grid-column: 1 / -1; justify-self: stretch; min-width: 0; margin-inline-start: 0; overflow-wrap: anywhere; }
+	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-gfull, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-gsub > .lpn-gfull, .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-run), .lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) > .lpn-ff-buttons:has(> .lpn-ff-stopbtn) { margin-inline-start: 0; margin-block: 4px; }
 	/* The header row. */
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-ghdr {
 		display: grid; grid-template-columns: subgrid; align-items: stretch;
@@ -3867,7 +3870,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	.lpn-gridhost:not(.lpn-gplain):not(.lpn-gnarrow) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
 }
 /* A box that wraps its content is no narrower than a Label column and a Value column need. */
-#lpn_new_panel, #lpn_convas_panel { min-width: min(26rem, 94vw); }
+#lpn_new_panel, #lpn_convas_panel { min-width: var(--lpn-box-min-w, 5rem); }
 .lpn-convas-foot { padding-top: 8px; border-top: 1px solid var(--ec-border-strong); }
 /* THE CHOICES OF EVERY PULL-DOWN HAVE PAPER OF THEIR OWN, IN EVERY THEME (Tom, 2026-10-24 and again 2026-10-27: "The
    invisibility in Dark mode bug hit again for all selectors ... use global styles"). A pull-down in the standard
@@ -3888,9 +3891,8 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gplain .lpn-grid { row-gap: 6px; }
 .lpn-grow, .lpn-gspan-row { display: contents; }
 .lpn-grow > * { min-width: 0; }
-/* A label wraps at a space, and mid-word when a word is longer than the column (Tom, 2026-10-26: wrap,
-   even mid-word, is fine). The words and the `?` (the tip's target) stay together. */
-.lpn-gname { min-width: 0; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A label never wraps: one line, clipped at the column edge, the full label in its tip (Tom, 2026-10-30: "truncate instead of wrapping"; gridTitlesNow()). */
+.lpn-gname { min-width: 0; overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* The `?` follows the label's last word in the text flow, so a wrapped label never strands it at the far edge; a unit
    (in <bdi>) never breaks inside its brackets. */
 .lpn-gname.ec-help { display: block; }
@@ -3919,7 +3921,7 @@ option:disabled { color: var(--ec-ink-muted); }
    cannot stretch the box. */
 .lpn-gprops {
 	display: grid; align-content: start; align-items: stretch; justify-content: start; row-gap: 4px; column-gap: 0;
-	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
+	grid-template-columns: var(--lpn-g-gutw, 0px) minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; padding-inline-start: 0; }
@@ -3950,7 +3952,7 @@ option:disabled { color: var(--ec-ink-muted); }
 @supports (grid-template-columns: subgrid) {
 	.lpn-propbox .lpn-popover-body {
 		display: grid; align-content: start; justify-content: start; align-items: start; column-gap: 0; row-gap: 0;
-		grid-template-columns: var(--lpn-g-gutw, 0px) minmax(4em, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
+		grid-template-columns: var(--lpn-g-gutw, 0px) minmax(0, var(--lpn-g-name, max-content)) minmax(3em, 1fr);
 	}
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut, .lpn-propbox .lpn-popover-body.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; }
 	.lpn-propbox .lpn-popover-body.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; }
@@ -3967,6 +3969,14 @@ option:disabled { color: var(--ec-ink-muted); }
 	#lpn_popup_graph .lpn-pgraph-row > select { grid-column: 3 / -1; justify-self: start; }
 	#lpn_popup_graph > .lpn-pgraph-chart, #lpn_popup_graph > .lpn-profile-say { grid-column: 1 / -1; }
 }
+/* **A NARROW BOX NEVER STACKS** (Tom, 2026-10-30: two columns at every width, both truncate). `lpn-box-stack` (set by wireNarrowStack() in js/looped-network.js) now only keeps the title and the X reachable. */
+/* The corner buttons share what room the title and the X leave, and the title gives way first (a box 80 px wide still shows its X and docking buttons). */
+.lpn-box-stack > .lpn-box-corner { max-width: calc(100% - 28px); right: 28px; }
+.lpn-box-stack > .lpn-box-corner > .lpn-corner-btn { flex: 0 1 28px; min-width: 0; width: auto; }
+.lpn-box-stack > .lpn-popover-x { width: 28px; }
+/* The title's own box ends where the buttons begin (its overflow clips there), so even a zero-width text area draws nothing over them. */
+.lpn-box-stack.lpn-has-corner > :is(.lpn-setbox-title) { right: min(calc(28px + var(--lpn-corner-w, 0px)), calc(100% - 2px)); padding-right: 0; padding-left: 6px; }
+.lpn-box-stack:not(.lpn-has-corner) > :is(.lpn-setbox-title) { right: min(28px, calc(100% - 2px)); padding-right: 0; padding-left: 6px; }
 /* Spreadsheet look: the header, the ruled rows. A phone has the same grid as a PC (Tom, 2026-10-29); only a touch pointer changes sizes (below). */
 @media all {
 	@supports (grid-template-columns: subgrid) {
@@ -3977,7 +3987,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-propbox .lpn-gprops .lpn-gname, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding: 4px 6px; border-inline-end: 1px solid var(--ec-hairline); }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gval, .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gval { margin: 2px 6px; align-self: start; }
 		.lpn-propbox .lpn-gprops .lpn-grow > .lpn-gw-fill { width: calc(100% - 12px); }
-		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; }
+		.lpn-propbox .lpn-gprops .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { padding-block: 2px; max-width: calc(100% - 12px); min-width: 0; }   /* a read-out narrower than its words is cut, never drawn past the box (round 9) */
 		/* The Time series row is ruled like the rows above it (B, C). */
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row {
 			display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; column-gap: 0; align-items: center; min-height: 1.75rem;
@@ -4009,9 +4019,8 @@ option:disabled { color: var(--ec-ink-muted); }
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]) {
 			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
 			padding: 4px 6px; box-sizing: border-box; align-self: stretch; text-align: start; font-size: .85em;   /* the Label cell's size: 13.6 px text and 8 px of padding, a 28 px row */
-			text-overflow: ellipsis;   /* a Value shorter than its text is cut with an ellipsis, never wraps and never widens the box (Tom, 2026-10-28) */
+			/* A Value longer than its cell is clipped plain, with no ellipsis; it never wraps and never widens the box (Tom asked to truncate, 2026-10-28). */
 		}
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > select.lpn-gval { text-overflow: ellipsis; }
 		:is(.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow, #lpn_popup_title.lpn-gtitle-id.lpn-sheet) > :is(input, select, textarea).lpn-gval:not([type="checkbox"]):not([type="radio"]):focus {
 			outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px;
 		}
@@ -4019,10 +4028,12 @@ option:disabled { color: var(--ec-ink-muted); }
 		/* An empty editable cell is plain: the hover fill and the focus outline are what say it can be typed in (Tom, 2026-10-29). */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; white-space: nowrap; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
 			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
 		}
+		/* A radio that stands beside a button in a value cell (the projection chooser) is the same size as a lone one. */
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-gwrap > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0 6px 0 0; }
 		/* A ramp picker is a cell too: its left edge is the Value column's. */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker { margin: 2px 0; width: 100%; min-width: 0; }
 		/* The colour-scheme bar and the Time series pull-down at the foot of Properties are cells too, the same as the sheet's other pull-downs (Tom, 2026-10-29). */
@@ -4033,7 +4044,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > .lpn-ramp-picker > .lpn-ramp-btn:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick {
 			width: 100%; max-width: none; min-width: 0; margin: 0; border: 0; border-radius: 0; background: transparent;
-			padding: 4px 6px; box-sizing: border-box; align-self: stretch; font-size: .85em; text-overflow: ellipsis;
+			padding: 4px 6px; box-sizing: border-box; align-self: stretch; font-size: .85em;
 		}
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:hover:not(:focus) { background: var(--ec-hover-bg); }
 		.lpn-propbox #lpn_popup_graph .lpn-pgraph-row > select.lpn-ts-pick:focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
@@ -4073,7 +4084,7 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gdlg-wide { min-width: 19rem; }
 .lpn-gridhost.lpn-gnarrow, .lpn-contourbox .lpn-gridhost.lpn-gnarrow { grid-template-columns: minmax(0, 1fr); }
 .lpn-gnarrow .lpn-gw-fill { max-width: none; }
-.lpn-gnarrow .lpn-gcol2, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }
+.lpn-gnarrow .lpn-gcol2, .lpn-gnarrow .lpn-gfull, .lpn-gnarrow > .lpn-ff-buttons { grid-column: 1 / -1 !important; }
 .lpn-gnarrow .lpn-grow > .lpn-gval { max-width: 100%; }
 .lpn-gnarrow > .lpn-grid { grid-template-columns: minmax(0, 1fr); }
 @supports (grid-template-columns: subgrid) { .lpn-gnarrow > .lpn-grid { grid-template-columns: subgrid; } }
@@ -4590,6 +4601,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
+/* The Scenarios table's plain-text cells are cut like the inputs and selects beside them: one line, clipped plain with no ellipsis, the column as wide as the reader drags it (Tom, 2026-10-31: *"limited on sizing that column... truncating the contents per the global style convention"*). A table cell cannot be narrower than its text unless its own max-width is 0; the column's <col> width then decides. Only this table: the printed tables wrap. */
+.lpn-pane-scntable tbody td:not(:has(input, select)) { max-width: 0; white-space: nowrap; }
 /* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
    highlight cells, not characters. But I see characters highlighting as in Entry mode."*). Every
    editable cell here is an <input>, and dragging across one leaves the browser's own text
@@ -5088,7 +5101,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	box-sizing: border-box;
 	resize: both;
 	overflow: hidden;
-	min-width: min(25rem, 94vw);
+	min-width: var(--lpn-box-min-w, 5rem);
 	min-height: min(18rem, 92vh);
 	max-width: 98vw;
 	max-height: 96vh;
@@ -5277,25 +5290,36 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 .lpn-new-crs-name { margin-left: .5em; overflow-wrap: anywhere; }
 .lpn-new-crs-name.lpn-dim { opacity: .55; }
 #lpn_convas_panel .lpn-dim { opacity: .7; margin: 2px 0 4px; }
-#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; }
-/* **THE LABEL COLUMN TAKES THE FLEXIBLE SPACE, THE OTHER TWO ARE FIXED-WIDTH** (R-217, Tom,
-   2026-09-24: "All the rounding selectors are misaligned with each other and their label
-   heading."). `justify-content: space-between` on a row whose first child sizes to its own text
-   put a different amount of space in front of the select on every row -- Diameter, Depth, Flow and
-   Head are not the same width -- so the select's left edge moved row to row and never lined up
-   under its heading. Matching the header's own layout (label flexes, the two value columns are a
-   fixed width) fixes both at once: every select's left edge sits at the same x, and so does every
-   suffix box's. */
-.lpn-convas-round-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
-.lpn-convas-round-row label { flex: 1 1 auto; }
-.lpn-convas-round-row select { flex: 0 0 auto; width: 8.5rem; }
-.lpn-convas-suffix { flex: 0 0 auto; width: 5rem; box-sizing: border-box; padding: 2px 4px; }
-/* The two column headings over the rounding selects and the suffix boxes (Tom, 2026-09-23):
-   same widths as the row cells below them, so the two columns line up. */
-.lpn-convas-round-head { display: flex; align-items: flex-end; gap: 8px; font-size: .85em; margin: 2px 0; }
-.lpn-convas-round-head span:first-child { flex: 1 1 auto; }
-.lpn-convas-round-head .lpn-convas-round-col:nth-child(2) { width: 8.5rem; flex: 0 0 auto; }
-.lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
+/* The rounding step and the suffix share a row's Value cell, drawn as two sheet cells: the input is the cell, a hairline between them, and the heading row names the second. */
+#lpn_convas_panel .lpn-grow > .lpn-gwrap { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; margin: 0; padding: 0; align-self: stretch; justify-self: stretch; box-sizing: border-box; width: auto; max-width: none; min-width: 0; }   /* the whole Value cell, so the Round to | Suffix line and its divider share one measure */
+#lpn_convas_panel .lpn-gwrap > :is(select, input) {
+	margin: 0; border: 0; border-radius: 0; background: transparent; padding: 2px 6px; box-sizing: border-box; font: inherit; font-size: .85rem; line-height: 1.3; min-width: 0; align-self: stretch;
+}
+/* The EPSG row's radio keeps its own size beside the ... button (a narrow phone cell shrank it to nothing, and a tap on it fell through) and sits on the button's middle line. */
+#lpn_convas_panel .lpn-gwrap > input[type="radio"] { flex: none; align-self: center; padding: 0; margin: 0 6px; }
+/* The chosen system's name stands on the same middle line as the radio and the button (round 11d). */
+#lpn_convas_panel .lpn-gwrap > .lpn-new-crs-name { align-self: center; }
+#lpn_convas_panel .lpn-gwrap > :is(select, input):hover:not(:focus) { background: var(--ec-hover-bg); }
+#lpn_convas_panel .lpn-gwrap > :is(select, input):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
+/* The Round to | Suffix line is a divider of its own (round 11b): --lpn-convas-c1 is where the reader dragged it, else 8.5 rem or 63% of a narrow cell; the Suffix cell keeps at least 2 rem. */
+#lpn_convas_panel .lpn-convas-c1 { flex: 0 0 min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem); width: auto; }
+#lpn_convas_panel .lpn-convas-c2 { flex: 1 1 0; width: auto; border-inline-start: 1px solid var(--ec-hairline); }
+#lpn_convas_panel .lpn-grid > .lpn-convas-split { display: block; grid-column: 2 / 3; grid-row: auto; inset-inline-end: auto; inset-inline-start: calc(min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem) - 3px); }
+@media (pointer: coarse) { #lpn_convas_panel .lpn-grid > .lpn-convas-split { inset-inline-start: calc(min(var(--lpn-convas-c1, min(8.5rem, 63%)), 100% - 2rem) - 8px); } }
+#lpn_convas_panel .lpn-convas-colhead { font-size: .85em; }
+#lpn_convas_panel .lpn-sheet .lpn-grow.lpn-convas-colhead, #lpn_convas_panel .lpn-convas-colhead.lpn-grow { min-height: 1.1rem; }   /* the column heading is a heading, not a 28 px row (round 11d) */
+#lpn_convas_panel .lpn-convas-colhead > .lpn-gname { padding-block: 0; }
+#lpn_convas_panel .lpn-convas-colhead > .lpn-gval { margin-block: 0; }
+#lpn_convas_panel .lpn-convas-colhead .lpn-gwrap > span { box-sizing: border-box; padding: 1px 6px; min-width: 0; line-height: 1.3; }
+#lpn_convas_panel .lpn-convas-colhead .lpn-convas-c2 { overflow: hidden; white-space: nowrap; }
+#lpn_convas_panel p.lpn-dim { font-size: .9em; max-width: 36rem; margin-block: 2px 0; }
+/* **CONVERT AS AND THE COORDINATE-SYSTEM CHOOSER MOVE AND RESIZE** (Tom, 2026-10-31; dev/box-float-design.md): the Find box's shell. They open
+   at most 40 rem wide; once open the width is the box's own (js wireFloatBox), so a drag of the corner can widen it past that. The body scrolls
+   and Convert as's OK and Cancel stay under it, always in view. */
+#lpn_convas_panel, #lpn_crsbox, #lpn_new_panel { max-width: min(40rem, calc(100vw - 8px)); flex-direction: column; resize: both; overflow: hidden; min-width: var(--lpn-box-min-w, 5rem); }
+#lpn_convas_panel.lpn-float-sized, #lpn_crsbox.lpn-float-sized, #lpn_new_panel.lpn-float-sized { max-width: calc(100vw - 8px); }   /* once open, its width is its own */
+#lpn_convas_panel > .lpn-popover-body, #lpn_crsbox > .lpn-popover-body, #lpn_new_panel > .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
+#lpn_convas_panel > .lpn-convas-foot { flex: none; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
 .lpn-new-block > input[type="text"]:disabled { background: var(--ec-gray-f2f2f2); color: var(--ec-gray-777); cursor: not-allowed; }
@@ -5609,8 +5633,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
 	--lpn-set-numsm: 3.125rem;
 }
+/* **THE NAME COLUMN HAS NO FLOOR AND TRUNCATES** (Tom, 2026-10-30: "no lower limit and truncate instead of wrapping"). The control column keeps a 6rem floor so a value is never lost; the name takes what is left, one line, clipped at the column edge, the full label in its tip. */
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) var(--lpn-set-col, 9rem);
+	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) minmax(var(--lpn-set-col-min, 6rem), var(--lpn-set-col, 9rem));
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
@@ -5624,7 +5649,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    the treatment Tom named twice as the one he likes and the one to converge on. It was the only
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
-.lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+.lpn-set-row > :first-child, .lpn-set-name { overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* A name that holds a link is not dimmed: the blue link at 80% opacity read 4.27:1 on the box, under the 4.5:1 a theme owes (theme-contrast-browser-harness.js). */
 .lpn-set-row > :first-child:has(a), .lpn-set-name:has(a) { opacity: 1; }
 /* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
@@ -5668,6 +5693,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    is honest. A browser without container queries keeps the two columns, which is where this
    shipped. */
 /* NEVER STACKED (Tom, 2026-10-29: a stacked box is rejected, on a phone above all): the name column shrinks and wraps, the control group wraps its button under its box. */
+/* Settings rows never stack, at any width (Tom, 2026-10-30, round 9): the name column clips and the control column keeps its 6 rem floor. */
 .lpn-rp-credit { margin-top: 6px; }
 /* **THE ACKNOWLEDGEMENT IS REACHABLE FROM THE PICKER IT IS ABOUT** (Tom, 2026-08-20: "Were we going
    to put a Credits link near the color pickers? Maybe under the Color scheme label?"). A POINTER,
@@ -6174,7 +6200,7 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    and which is the correct last resort. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields,
-#lpn_labels_customer_fields { min-width: 14.88rem; }   /* 15.3rem less the three narrowed columns, 3 x 0.14rem (Tom, 2026-10-27: 0.000, Show and Drop to the heading's width) */
+#lpn_labels_customer_fields { min-width: min(14.88rem, 100%); }   /* 15.3rem less the three narrowed columns, 3 x 0.14rem (Tom, 2026-10-27: 0.000, Show and Drop to the heading's width) */
 /* No spinner on the two-digit boxes: its hover arrows covered the digits of a 35 px box. Arrow keys still step. */
 #lpn_labels_node_fields input.lpn-digit,
 #lpn_labels_link_fields input.lpn-digit,
@@ -6560,7 +6586,7 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-row.lpn-sm-into { outline: 2px solid var(--ec-ink); outline-offset: -2px; }
 .lpn-sm-row.lpn-sm-before { border-top-color: var(--ec-ink); }
 .lpn-sm-row.lpn-sm-after { border-bottom-color: var(--ec-ink); }
-.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
 .lpn-sm-name input { width: 100%; box-sizing: border-box; }
 .lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
 /* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
@@ -6688,8 +6714,20 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    column can be as narrow as its figures; an id and a figure in a cell still never break. */
 .lpn-ff-table th.lpn-ff-grouphead, .lpn-print-grouphead { text-align: center; }
 .lpn-rpt-id { min-width: 7.5ch; overflow-wrap: normal; word-break: normal; }
+/* Report column dividers (Task 848): the Tables pane's grip on each heading, a 4 px strip at the very edge so
+   the whole sort arrow (moved 5 px in) stays clickable. A dragged column is fixed on screen only (Print and
+   Copy HTML are built from text); its cells break at the character. Undragged columns keep automatic layout. */
+.lpn-ff-table th.lpn-rpt-gripth { position: relative; }
+.lpn-rpt-colgrip { width: 4px; touch-action: none; }
+/* A finger: the same 24 px hit area as the Properties divider (Perry, 2026-10-31); the sort arrow moves out of its way. */
+@media (pointer: coarse) {
+	.lpn-rpt-colgrip { width: 24px; }
+	.lpn-ff-table th.lpn-rpt-gripth .lpn-ff-sortarrow { inset-inline-end: 26px; }
+}
+.lpn-ff-table th.lpn-rpt-gripth .lpn-ff-sortarrow { inset-inline-end: 5px; }
+.lpn-ff-table .lpn-rpt-dc { overflow: hidden; overflow-wrap: anywhere; white-space: normal; min-width: 0; }
 /* A short localized noun (Type, Status) that may be cut with an ellipsis, its whole text in `title`. */
-.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.lpn-rpt-trunc { display: inline-block; max-width: 5.5em; overflow: hidden; white-space: nowrap; vertical-align: bottom; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
    words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its
@@ -6772,6 +6810,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only
    one section is on screen at a time, so there is nothing to lose track of. */
 .lpn-lib-sec { margin: 0; }
+.lpn-lib-manual { border: 0; background: transparent; padding: 0 2px; font: inherit; font-size: 0.9em; color: var(--ec-help-ink); cursor: pointer; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong); }
 
 /* THE FIELDS AN INPUT UNIT DECIDES, ONE PER LINE (ROADMAP Task 425). Tom asked for a column rather
@@ -7203,7 +7242,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields .lpn-lblgroup > :nth-child(3) { width: 1.85rem !important; }
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_link_fields,
-		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields { min-width: 14.88rem; }
+		html:has(#lpn_canvas) #lpn_settings_box #lpn_labels_customer_fields { min-width: min(14.88rem, 100%); }
 	}
 
 	/* **AND BELOW 340px THE COLUMNS NARROW AGAIN** (Task 760): at 320px the pane is 170px, and 11.4rem
@@ -7688,7 +7727,7 @@ textarea.lpn-desc-ta {
 .lpn-theme-btn .ec-tc-menu { height: 10px; padding: 1px 3px 0; }
 .lpn-theme-btn .ec-tc-menu i { width: 12px; height: 6px; }
 .lpn-theme-btn .ec-tc-map { left: 3px; right: 3px; top: 13px; bottom: 3px; }
-.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; }
 /* The gallery: fixed over the page, above the boxes (1200-1799) and the menu pop-up (1850), under the modal. */
 .lpn-theme-gallery {
 	position: fixed; z-index: 1855; box-sizing: border-box;
@@ -7712,3 +7751,27 @@ textarea.lpn-desc-ta {
 .lpn-theme-choice-name { max-width: 132px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
 @keyframes lpn-theme-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .lpn-theme-choice { animation: none; } }
+
+/* A drawn chart never widens a narrow box (Tom, 2026-10-30). */
+.lpn-box-stack #lpn_popup_graph svg { overflow: hidden; max-width: 100%; }
+.lpn-box-stack .lpn-pgraph-chart, .lpn-box-stack #lpn_popup_graph { overflow: hidden; }
+.lpn-box-stack button, .lpn-box-stack .lpn-rptbox-copy { max-width: 100%; min-width: 0; box-sizing: border-box; }
+
+/* **A LABEL COLUMN CAN BE DRAGGED TO NEARLY NOTHING** (Tom, 2026-10-30: "no lower limit"). A cell cannot be narrower than its own padding, so the padding shrinks with the
+   column (a percentage is of the column), and a column of a few pixels is a few pixels, not 13 lying over the Value column. */
+:root:root .lpn-gridhost .lpn-gname, :root:root .lpn-propbox .lpn-gprops .lpn-gname, :root:root .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-start: min(6px, 20%); padding-inline-end: min(6px, 20%); }
+@media (pointer: coarse) {
+	:root:root .lpn-gridhost .lpn-gname, :root:root .lpn-propbox .lpn-gprops .lpn-gname, :root:root .lpn-propbox #lpn_popup_title.lpn-gtitle-id > .lpn-gname { padding-inline-end: min(8px, 20%); }
+}
+/* Export tables dialog: a choice between radios is a row of its own, the radio then its words, across the whole box (round 10b). */
+.lpn-export-choice { display: flex; align-items: center; gap: 6px; padding: 3px 6px; cursor: pointer; }
+.lpn-export-choice > input[type="radio"] { width: 1.125rem; height: 1.125rem; margin: 0; }
+/* A Library entry's Delete button and "(default)" mark: one row of their own under the entry's fields (round 10b). */
+.lpn-lib-actions { display: flex; align-items: center; gap: 8px; margin-block: 4px; }
+/* The projection box: the Search button sits at the left under the place field; the register's list fills the box (round 10b). */
+.lpn-crs-search { margin-block: 4px; }
+.lpn-crs-list > select { width: 100%; box-sizing: border-box; }
+/* Settings > Units: each unit is a `.lpn-set-row` (js, rebuildSettingsFieldsNow), one per line instead of the strip's flex-wrap. */
+#lpn_set_units_fields .lpn-units-group { display: block; }
+/* The derived Map coordinates value is as tall as the select beside every other unit's name, so its row has its neighbours' spacing (round 10c, Perry). */
+#lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; overflow: hidden; white-space: nowrap; }

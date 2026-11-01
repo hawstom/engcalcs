@@ -161,7 +161,7 @@ async function main() {
 			i.focus(); i.value = '10'; i.dispatchEvent(new Event('change', { bubbles: true })); i.blur();
 		}, [await T('lpn_multi_varies'), DIA]);
 		await settle(900);
-		const wantNote = (await T('lpn_multi_applied')).replace('{prop}', dRow.text).replace('{n}', '2');
+		const wantNote = (await T('lpn_multi_applied')).replace('{prop}', dRow.text.replace(/\s*\?$/, '')).replace('{n}', '2');
 		ok('entering 10 sets both and the notice reads "' + wantNote + '"', (await a.notice()) === wantNote, await a.notice());
 		ok('...and the chapter quotes the notice', plain(enString('lpn_guide_prop_multi_def')).indexOf(wantNote.replace(/\.$/, '')) >= 0 && ex.indexOf(wantNote) >= 0);
 		const b31 = await diam('31'), b113 = await diam('113');

@@ -124,7 +124,7 @@ console.log('\n-- the box\'s initial width is derived from that new index and th
 console.log('\n-- the box\'s hard minimum (25rem) and the phone override are both untouched --');
 {
 	const body = ruleBody('.lpn-setbox');
-	ok('min-width is still the existing 25rem floor', /min-width:\s*min\(25rem,\s*94vw\)/.test(body || ''), body);
+	ok('min-width is the shared box floor token (Tom, 2026-10-30: the old 25rem floor is gone)', /min-width:\s*var\(--lpn-box-min-w,\s*5rem\)/.test(body || ''), body);
 
 	// The phone rule derives its OWN figure from its OWN 4.5rem baseline (Task 527's transfer
 	// arithmetic) and must still be there, untouched by anything above.

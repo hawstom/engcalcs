@@ -729,8 +729,8 @@ const TOUCH = true;
 	ok('...11.4rem on a touch screen too',
 		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '11.4rem');
 	ok('...and 14.88rem on the desktop, whatever the pointer',
-		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '14.88rem' &&
-		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '14.88rem');
+		/^(14\.88rem|min\(14\.88rem, 100%\))$/.test(winning(RULES, list, WIDE, DOC_IDS, false, 'min-width')) &&
+		/^(14\.88rem|min\(14\.88rem, 100%\))$/.test(winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width')));
 });
 
 console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---');
