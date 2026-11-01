@@ -151,6 +151,74 @@
 		CBIG = 1e8,                        // consts.h, the conductance pumpcoeff() gives a pump at setting 0
 		EPUMP = 75;                        // input1.c / types.h EPUMP, the default pump efficiency (percent)
 
+
+	// **FLOWS IN EPANET'S OWN CUBIC FEET** (Task 733, native-wire). The bridge hands EPANET an LPS file and
+	// EPANET divides every flow in it by 28.317 to get cfs, though a cubic foot is 28.3168466 L. Its
+	// hydraulics are therefore the physical problem with every flow (demands, emitter and curve flows,
+	// an FCV setting) 5.4e-6 smaller than exact SI says, and it reports them back times the same 28.317.
+	// An hourly tank level differs by that and a control or a tank limit decides on it, so a network
+	// near an event (Net3 with demands at 1.5, pumps past their curves) lands the event seconds
+	// apart and carries the gap into every later step. The loop solves in EPANET's flows and reports
+	// the file's: inputs times FLOW_G, outputs divided by it. The pump curve is a head against flow, so
+	// its power-law coefficient takes the same factor to the power b.
+	var FLOW_G = 28.316846592 / LPS_PER_CFS;
+	function scaleFlowIn(m) {
+		var g = FLOW_G;
+		return Object.assign({}, m, {
+			nodes: m.nodes.map(function (n) {
+				var c;
+				if (!(n.demand || n.emitter)) { return n; }
+				c = Object.assign({}, n);
+				if (c.demand) { c.demand *= g; }
+				if (c.emitter) { c.emitter *= g; }
+				return c;
+			}),
+			links: m.links.map(function (l) {
+				var c = l;
+				if (l.type === 'pump') {
+					c = Object.assign({}, l);
+					if (c.a) { c.a *= Math.pow(g, -(c.b || 1)); }
+					if (c.curveSI && c.curveSI.length) { c.curveSI = c.curveSI.map(function (pt) { return [pt[0] * g, pt[1]]; }); }
+				} else if (l.type === 'valve') {
+					c = Object.assign({}, l);
+					if (String(c.valveType).toUpperCase() === 'FCV' && c.setting) { c.setting *= g; }
+					if (c.curvePoints && c.curvePoints.length) { c.curvePoints = c.curvePoints.map(function (pt) { return [pt[0] * g, pt[1]]; }); }
+				}
+				return c;
+			})
+		});
+	}
+	function scaleFlowMap(o, f) {
+		var r = {};
+		if (!o) { return o; }
+		Object.keys(o).forEach(function (k) { r[k] = o[k] * f; });
+		return r;
+	}
+	function solveInFeet(stepModel, sOpts) {
+		var o = Object.assign({}, sOpts), r;
+		if (o.flows0) { o.flows0 = scaleFlowMap(o.flows0, FLOW_G); }
+		var scaled = scaleFlowIn(stepModel), orig = o.pswitch;
+		// A control on a junction's pressure changes the original link objects inside the solve
+		// (pswitch() above); the solver holds the scaled copies, so they follow.
+		if (orig) {
+			o.pswitch = function (headOf) {
+				var any = orig(headOf), fresh;
+				if (any) {
+					fresh = scaleFlowIn(stepModel).links;
+					scaled.links.forEach(function (l, k) { if (l !== stepModel.links[k]) { Object.assign(l, fresh[k]); } });
+				}
+				return any;
+			};
+		}
+		r = EC.lpnSolve(scaled, o);
+		if (!r.ok) { return r; }
+		r.flows = scaleFlowMap(r.flows, 1 / FLOW_G);
+		if (r.leakFlows) { r.leakFlows = scaleFlowMap(r.leakFlows, 1 / FLOW_G); }
+		if (r.demands) { r.demands = scaleFlowMap(r.demands, 1 / FLOW_G); }
+		if (r.demandDeficits) { r.demandDeficits = scaleFlowMap(r.demandDeficits, 1 / FLOW_G); }
+		return r;
+	}
+
 	function tankHasArea(n) { return n.type === 'tank' && n.diameter > 0; }
 	// The rows of a tank's volume curve, [[level m, volume m3], ...], exactly as the bridge writes them
 	// (js/lpn-epanet.js: a curve goes out only with a name AND rows), or null.
@@ -669,6 +737,7 @@
 			delete stepModel.time;
 			var sOpts = {};
 			if (opts.tol) { sOpts.tol = opts.tol; }
+			sOpts.closedLeak = true;
 			if (ctl.some(function (c) { return c.on === 'junction'; })) { sOpts.pswitch = pswitch(stepLinks); }
 			sOpts.tempClosed = {};
 			sOpts.xhead = {};   // and a pump that could not lift starts the next solve shut, as XHEAD does
@@ -680,11 +749,11 @@
 				if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; }
 			});
 			if (opts.warm !== false && res) { sOpts.flows0 = res.flows; }
-			res = EC.lpnSolve(stepModel, sOpts);
+			res = solveInFeet(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
 				sOpts.flows0 = res.flows;
-				res = EC.lpnSolve(stepModel, sOpts);
+				res = solveInFeet(stepModel, sOpts);
 				if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			}
 			// The run's convergence is a conjunction over its solves, as js/lpn-epanet.js noteStep() keeps it.
@@ -700,7 +769,7 @@
 			tanks.forEach(function (tk) {
 				var s = 0;
 				links.forEach(function (l) {
-					var q = res.flows[l.id] || 0;
+					var q = (res.leakFlows && typeof res.leakFlows[l.id] === 'number') ? res.leakFlows[l.id] : (res.flows[l.id] || 0);
 					if (l.to === tk.id) { s += q; }
 					if (l.from === tk.id) { s -= q; }
 				});

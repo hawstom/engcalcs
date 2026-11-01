@@ -1400,14 +1400,16 @@ EngCalcs.lpnSolve = function (model, options) {
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
-			if (link.status === 'closed') { G[k] = 0; y[k] = 0; continue; }
+			// hydcoeffs.c pipecoeff(), pumpcoeff(): a closed link is P = 1/CBIG, Y = its flow, so it still
+			// leaks (head difference / CBIG). Only the extended-period loop asks for that (`opts.closedLeak`).
+			if (link.status === 'closed' && !opts.closedLeak) { G[k] = 0; y[k] = 0; continue; }
 			// A control valve is assembled after everything else -- see valveCoeffs().
 			if (vStat[k] !== undefined) { continue; }
 
 			q = Q[k];
 			aq = Math.abs(q);
 
-			if (tClosed[k] || pX[k] || cvShut[k]) {
+			if (tClosed[k] || pX[k] || cvShut[k] || link.status === 'closed') {
 				// hydcoeffs.c: a closed link's coefficients are P = 1/CBIG, Y = its flow.
 				G[k] = V_CBIG_INV;
 				y[k] = q;
@@ -1581,7 +1583,7 @@ EngCalcs.lpnSolve = function (model, options) {
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
-			if (link.status === 'closed') { continue; }
+			if (link.status === 'closed' && !opts.closedLeak) { continue; }
 			iIdx = junctionIndex[link.from];
 			jIdx = junctionIndex[link.to];
 			var hi = iIdx === undefined ? byId[link.from].head : Hnew[iIdx],
@@ -1789,6 +1791,13 @@ EngCalcs.lpnSolve = function (model, options) {
 	if (onePoint.length > 0) { report.warnings = [{ code: 'gpv-one-point', ids: onePoint }]; }
 	// The links a full or empty tank shut for this answer (EPANET's TEMPCLOSED), by id: the
 	// extended-period loop needs them, because a simple control compares against that status.
+	// What the links EPANET holds closed (P = 1/CBIG) still carry, by id, m3/s; the loop adds it to a tank's net inflow.
+	if (opts.closedLeak) {
+		report.leakFlows = {};
+		for (k = 0; k < links.length; k++) {
+			if (links[k].status === 'closed' || tClosed[k] || pX[k] || cvShut[k]) { report.leakFlows[links[k].id] = Q[k]; }
+		}
+	}
 	report.tankClosed = [];
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
 	// And the pumps the solve ended with shut because they cannot lift (EPANET's XHEAD), likewise.

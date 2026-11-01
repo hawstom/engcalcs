@@ -108,6 +108,37 @@ async function run() {
 		sc.hydraulics = Object.assign({}, sc.hydraulics, { demandMultiplier: mult });
 		compare(tag + ' demand scaling (x' + mult + ')', sc, await both(sc));
 	}
+	// Net3 with the demands pushed until the pumps run past their curves (EPANET warning 4). The gap that
+	// used to be 17 mm here (Task 733) had two parts. EPANET divides an LPS file's flows by 28.317 although
+	// a cubic foot is 28.3168466 L, so its hydraulics are the physical problem with every flow 5.4e-6
+	// smaller, and the loop now solves in those flows (js/lpn-native-run.js solveInFeet()); a closed link
+	// carries head difference over CBIG as hydcoeffs.c says, and a tank's net inflow counts it. Base Net3
+	// is then within 0.005 mm of EPANET at every node (it was 0.13 mm). The multiplier 1.5 exactly is a
+	// knife edge: tank 2 reaches its minimum level at 15:07:56 to within 1.5e-6 m (0.1 s of its flow),
+	// EPANET lands a hair above it and leaves the pipe open for the next 3124 s, the loop lands a hair below
+	// and shuts it, so every later step differs (35 mm at one node). Tighter convergence in EPANET
+	// moves its side by 3e-7 m, not across. Held: the 1.5 run up to that event, and every neighbour.
+	{
+		const net3 = load('Net3.inp');
+		const scaled = (mult) => { const m = copy(net3); m.hydraulics = Object.assign({}, m.hydraulics, { demandMultiplier: mult }); return m; };
+		const worst = (r, upTo) => {
+			let w = 0, at = '';
+			r.e.frames.forEach((fe, i) => {
+				const fn = r.n.frames[i];
+				if (!fn || fn.t !== fe.t || fe.t > upTo) { return; }
+				Object.keys(fe.pressures).forEach((id) => { const d = Math.abs(fe.pressures[id] - fn.pressures[id]); if (d > w) { w = d; at = id + '@' + fe.t; } });
+			});
+			return { w, at };
+		};
+		const base = worst(await both(scaled(1)), Infinity);
+		ok('Net3 base run: pressure of every node at every step within 0.005 mm of EPANET (was 0.13 mm before the flow constant)', base.w <= 5e-6, `worst ${(base.w * 1000).toFixed(4)} mm at ${base.at}`);
+		for (const mult of [1.45, 1.48, 1.52, 1.55, 1.6, 2]) {
+			const r = await both(scaled(mult)), w = worst(r, Infinity);
+			ok(`Net3 demands x${mult} (pumps past their curves): every step within 0.8 mm of EPANET`, w.w <= 8e-4 && r.e.frames.length === r.n.frames.length, `worst ${(w.w * 1000).toFixed(4)} mm at ${w.at}`);
+		}
+		const r15 = await both(scaled(1.5)), w15 = worst(r15, 54000);
+		ok('Net3 demands x1.5: every step up to the 15:07:56 event within 0.8 mm of EPANET (the knife edge after it is not held)', w15.w <= 8e-4, `worst ${(w15.w * 1000).toFixed(4)} mm at ${w15.at}`);
+	}
 	// A refusal falls back to EPANET, quietly: the analysis is not the transport's status bar.
 	{
 		const m = load('Net1.inp');

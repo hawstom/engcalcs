@@ -361,9 +361,8 @@ Scenario comparison, fire flow over a duration, criticality, demand scaling, the
 a model the loop refuses runs on EPANET exactly as before. Held by `native-analysis-wire-harness.js` on Net1 and
 Net3: the models those analyses build (a fire demand on a pattern, a pipe closed, a demand multiplier) run both
 ways and agree on the lowest pressure of every node (1 mm), the highest velocity of every link (1e-4 m/s), the
-tank-empty verdict, and every number the fire-flow digest reports. One measured limit: Net3 with demands scaled
-by 1.5 (pumps past their curves, EPANET warning 4) differs by 17 mm in a node's lowest pressure; at 1.4 and below
-the gap is 0.2 mm. A project that overloads its pumps is outside what the harness holds.
+tank-empty verdict, and every number the fire-flow digest reports. Net3 with demands scaled to 1.5 (pumps past their curves, EPANET warning 4) had differed by 17 mm in a node's lowest pressure; the cause is
+below (`## Flows in EPANET's cubic feet`). Every neighbouring multiplier now holds to 0.11 mm; 1.5 exactly is a knife edge held only up to its event.
 
 ## Controls on a reservoir and on a junction pressure at a valve
 
@@ -405,3 +404,18 @@ pressure; defaults; pressure under the minimum; zero and negative demand; a tank
 PDA options and demands scaled until nodes starve (heads within 0.5 mm, flows within 0.02 L/s, delivered demand
 within 0.0001 L/s), two 24 h periods, and water age over a starved period (nodes 0.06 s). Not held: PDA with
 [RULES] that read a node's DEMAND (the rule reads the step's full demand, as for a demand-driven run).
+
+## Flows in EPANET's cubic feet (the 17 mm gap)
+
+EPANET divides every flow of an LPS file by 28.317 although a cubic foot is 28.3168466 L, so its hydraulics are the
+physical problem with every flow (demands, emitter and curve flows, an FCV setting) 5.4e-6 smaller than exact SI. The
+loop solves in those flows and reports the file's (`solveInFeet()` in js/lpn-native-run.js: inputs times
+28.316846592/28.317, a pump's power-law coefficient times that to the power minus b, outputs divided back). Base Net3
+went from 0.13 mm to 0.0014 mm of EPANET at every node. A closed link also carries head difference over CBIG
+(hydcoeffs.c pipecoeff(), pumpcoeff()), and a tank's net inflow counts it (`opts.closedLeak`, `leakFlows`).
+
+What is left at 1.5 is not a model error. Tank 2 reaches its minimum level at 15:07:56 within 1.5e-6 m (0.1 s of its
+flow). EPANET's tank lands 6.7e-7 m above the minimum, so `tankstatus()` (strictly `head <= Hmin`) leaves its pipe
+open for the next 3124 s and `tanklevels()` clamps the volume it cannot supply; the loop lands 8e-7 m below and shuts
+it. Tighter EPANET convergence (FlowChange 1e-12) moves EPANET's side by 3e-7 m, not across the line. 1.5 is held to its
+event (`native-analysis-wire-harness.js`), and 1.45, 1.48, 1.52, 1.55, 1.6 and 2 are held for the whole run.
