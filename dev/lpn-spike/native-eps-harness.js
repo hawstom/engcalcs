@@ -287,6 +287,15 @@ function patternedPump(o) {
 	pageLikePump(m.links.find((l) => l.id === 'PU'), o.speed, o.mults ? 'S' : null);
 	return m;
 }
+// The page's model of a drawn pump that has no curve yet: nothing but a speed and a pattern.
+function curvelessPump(closedAtStart) {
+	const m = patternedPump({ level: 4, mults: closedAtStart ? NIGHT_OFF : SPD, p3: 'open' });
+	const pu = m.links.find((l) => l.id === 'PU');
+	delete pu.h0; delete pu.a; delete pu.b; delete pu.h0Base; delete pu.aBase; delete pu.curveSI; delete pu.curvePoints;
+	pu.speed = 1; pu.speedPattern = 'S';
+	pu.status = closedAtStart ? 'closed' : 'open'; pu.statusBase = 'open';
+	return m;
+}
 const SPD = [1, 1, 0.9, 0.85, 0.8, 0.9, 1, 1.1, 1.15, 1.2, 1.1, 1, 1, 0.95, 0.9, 0.95, 1, 1.1, 1.2, 1.15, 1.05, 1, 0.95, 0.9];
 const NIGHT_OFF = [0, 0, 0, 0, 0, 1, 1, 1.1, 1.1, 1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.1, 1, 1, 1, 0, 0];
 const PATTERN_CASES = [
@@ -315,6 +324,13 @@ const PATTERN_CASES = [
 		times: { duration: 0 } }), statusOf: 'PU', closedAt: [0] },
 	{ name: 'a stated SPEED 0, no pattern: OPEN at speed 0, no flow', model: patternedPump({ level: 5, q: 8, speed: 0, p3: 'open' }),
 		statusOf: 'PU', openAt: [0, 12, 47], moves: 'T', minSwing: 0.1 },
+	// A pump with NO curve is a lossless connection: the bridge writes it as a short wide pipe and states no
+	// speed or pattern for it, so a speed pattern on it does nothing, and a pump the document closed at the
+	// instant the model was assembled (its pattern's first value 0) is a pipe written Closed for the whole run.
+	{ name: 'a pump with no curve on a speed pattern is a pipe: the pattern does nothing', model: curvelessPump(false),
+		statusOf: 'PU', openAt: [0, 5, 30], moves: 'T', minSwing: 0.5 },
+	{ name: 'a pump with no curve whose pattern reads 0 at the start: assembled Closed, a closed pipe all run', model: curvelessPump(true),
+		statusOf: 'PU', closedAt: [0, 5, 30], moves: 'T', minSwing: 0.2 },
 	{ name: 'a stated SPEED 0.85, no pattern', model: patternedPump({ level: 4, speed: 0.85 }), moves: 'T', minSwing: 0.5 }
 ];
 
