@@ -25382,7 +25382,7 @@ var EngCalcs = EngCalcs || {};
 	// `Label | Value`, two tracks shared by all rows of a grid, under a header row that names them and
 	// carries the divider (Tom, 2026-10-26: "Make it look like a spreadsheet"). A unit stands in its
 	// label ("Diameter (mm)", lpnLabelWithUnit), so there is no third column. The Label track is
-	// FITTED (gridFitNow: the 80th, with a floor percentile of the labels' natural widths) and a user drag of the
+	// FITTED (gridFitNow: the longest label's natural width, capped by the box) and a user drag of the
 	// divider overrides it, remembered in `lpn_gcols` (window furniture, browser only, never in
 	// serializeProject(); Tom, 2026-10-24: "lpn_gcols is fine; go ahead.").
 	//
@@ -25424,10 +25424,8 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE SPREADSHEET HEADER (Tom, 2026-10-26: "Make it look like a spreadsheet, as in EPANET and
 	// WaterGEMS"): a header row with two cells, Label and Value, and a divider between them the reader
 	// drags. The divider writes --lpn-g-name on the host and remembers it per box in `lpn_gcols`.
-	// With no remembered width the label column is FITTED: wide enough for most labels (the 80th
-	// percentile of their natural widths), so one long label wraps instead of widening the whole
-	// column for the rest (Tom, 2026-10-26: the column was "50% wider than 94% of the labels").
-	// (The Label column's fit is the longest label: one rule, no percentile, no floor; see gridFitNow.)
+	// With no remembered width the label column is FITTED: wide enough for the longest label (Tom, 2026-10-31: "100% for all of them ... a single control"; it was the 80th
+	// percentile). The box caps it, keeping 6 rem for the Value column; a label past the cap is clipped, no ellipsis. See gridFitNow.
 	// A host NEVER stacks its names above its values (Tom, 2026-10-29: "TOM REJECTS THE STACKED LAYOUT"): the name column shrinks and wraps, the value column keeps a floor.
 	function gridNarrowRem() { return 0; }
 	function gridRem() { return parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16; }

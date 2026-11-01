@@ -3821,8 +3821,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    One grid of two columns, Label | Value, built by lpnGridRow() in js/looped-network.js. A unit is
    part of its Label ("Diameter (mm)"), so there is no third column. A header row names the two
    columns and carries the divider the reader drags (--lpn-g-name on the host, remembered per box in
-   `lpn_gcols`). The Label column is FITTED to the 80th percentile of its labels' natural widths, so
-   one long label wraps (even mid-word) instead of widening the column for all the rest; the Value
+   `lpn_gcols`). The Label column is FITTED to the LONGEST label (one rule, gridFitNow; Tom, 2026-10-31), capped by the
+   box, with a label the column cuts clipped; the Value
    column takes what is left and its controls hug the Label column's edge. Gridlines are
    --ec-border-strong, the header's fill --ec-chrome-bg. The host is the grid and every run of rows in it
    is a subgrid of it, so a heading, a note or a button row between two rows never starts a second

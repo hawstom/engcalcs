@@ -6,8 +6,11 @@
 //   - a `.lpn-grow` row outside a `.lpn-sheet` (the old grid),
 //   - a "Label | Value" heading band (`.lpn-ghdr`; Task 842: no first-column heading),
 //   - a button row or a note confined to the Value column (`.lpn-gcol2`, or a button standing in the Value column that is not in a row),
-//   - horizontal overflow of the box.
-// Settings uses its own `.lpn-set-row` rows and is checked for the heading band and overflow only. Tables, the Screenshot box, Scenario manager,
+//   - horizontal overflow of the box,
+//   - a label the Label column cuts, when the box is as wide as it opened (round 11a, Tom 2026-10-31: the column fits the LONGEST label, one rule).
+// Round 11a also holds: New project keeps its width when its divider is dragged; the entries of a Libraries box share one divider position; a Controls entry
+// carries a draggable divider; the Scenarios table's Scenario column does not wrap; Settings > Units rows are Settings rows (`.lpn-set-row`).
+// Settings is exempt from the sheet (Tom, 2026-10-31: "Settings should be a reserved space for the other style"): it uses its own `.lpn-set-row` rows and is checked for the heading band and overflow only. Tables, the Screenshot box, Scenario manager,
 // import mapping tables and prose dialogs are rightly not sheets (the audit's section C) and are not opened here.
 //
 //   node dev/lpn-spike/sheet-coverage-browser-harness.js   (takes the browser lock itself)
@@ -50,6 +53,7 @@ function inspect(spec) {
 	const out = { grow: [], band: 0, oneCol: [], over: Math.max(box.scrollWidth - box.clientWidth, root.scrollWidth - root.clientWidth) };
 	out.band = Array.from(root.querySelectorAll('.lpn-ghdr')).filter(vis).length;
 	if (!spec.sheet) { return out; }
+	out.cut = Array.from(root.querySelectorAll('.lpn-gname')).filter(vis).filter((n) => n.scrollWidth > n.clientWidth + 1).map((n) => n.textContent.trim().slice(0, 28) + ' ' + n.scrollWidth + '/' + n.clientWidth);
 	out.grow = Array.from(root.querySelectorAll('.lpn-grow')).filter(vis).filter((r) => !r.closest('.lpn-sheet') && !r.closest('.lpn-gplain'))
 		.map((r) => (r.querySelector('.lpn-gname') || r).textContent.trim().slice(0, 24));
 	out.oneCol = Array.from(root.querySelectorAll('.lpn-gcol2')).filter(vis).map((e) => 'gcol2 ' + (e.id || e.className).toString().slice(0, 40));
@@ -97,6 +101,7 @@ async function main() {
 				if (m.missing) { ok(tag + ': opened', false, 'no ' + root); return; }
 				if (SHOT) { await a.page.locator(shotSel || root).screenshot({ path: path.join(SHOT, 'sheetcov-' + tag.replace(/\W+/g, '-') + '-' + mode + '.png') }).catch(() => {}); }
 				if (sheet) { ok(tag + ': every row is in a sheet', m.grow.length === 0, JSON.stringify(m.grow)); }
+				if (sheet) { ok(tag + ': no label is cut (the Label column fits the longest label)', m.cut.length === 0, JSON.stringify(m.cut)); }
 				ok(tag + ': no "Label | Value" heading band', m.band === 0, String(m.band));
 				if (sheet) { ok(tag + ': no button row or note confined to one column', m.oneCol.length === 0, JSON.stringify(m.oneCol)); }
 				ok(tag + ': does not scroll sideways', m.over <= 1, String(m.over));
@@ -117,15 +122,62 @@ async function main() {
 				await a.page.click('#lpn_libbox_link_' + sec);
 				await check('libraries ' + sec, '#lpn_libbox_content', true, '#lpn_library_box');
 			}
+			// One Label width for every entry of the box: Add a second pattern, drag the divider of the first, and both move; a Controls entry (one row) carries a divider too.
+			await a.page.click('#lpn_libbox_link_patterns');
+			await a.page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_libbox_content button')).find((x) => /pattern/i.test(x.textContent)); if (b) { b.click(); } });
+			await a.settle(500);
+			{
+				const g = () => a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).map((e) => e.style.getPropertyValue('--lpn-g-name')));
+				const sp = await a.page.evaluate(() => { const s = document.querySelector('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit'), r = s && s.getBoundingClientRect(); return r ? { x: r.left + r.width / 2, y: r.top + 10 } : null; });
+				const before = await g();
+				ok('libraries: two or more pattern entries, one Label width', before.length >= 2 && before.every((v) => v === before[0]), JSON.stringify(before));
+				if (mode === 'PC' && sp && before.length >= 2) {
+					await a.page.mouse.move(sp.x, sp.y); await a.page.mouse.down(); await a.page.mouse.move(sp.x + 50, sp.y, { steps: 4 }); await a.page.mouse.up();
+					await a.settle(300);
+					const after = await g();
+					ok('libraries: dragging one entry\'s divider moves them all, equally', after.length === before.length && after.every((v) => v === after[0]) && after[0] !== before[0], JSON.stringify(after));
+					await a.page.click('#lpn_libbox_link_curves'); await a.settle(500);
+					const c = await g();
+					ok('libraries: a section of the same box opens at the same Label width', c.length >= 1 && c.every((v) => v === after[0]), JSON.stringify(c) + ' vs ' + after[0]);
+				}
+			}
+			for (const sec of ['controls', 'rules']) {
+				await a.page.click('#lpn_libbox_link_' + sec); await a.settle(500);
+				const n = await a.page.evaluate(() => ({ entries: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry').length, splits: document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry .lpn-gsplit').length }));
+				ok('libraries ' + sec + ': every entry has a draggable divider', n.entries >= 1 && n.splits >= n.entries, JSON.stringify(n));
+			}
 			await close('lpn_library_box');
+			// Scenario manager: the Scenario column's names do not wrap, as every selector beside them does not.
+			await openBox(a, 'lpn_sm_box');
+			await a.settle(500);
+			{
+				const m = await a.page.evaluate(() => { const c = Array.from(document.querySelectorAll('#lpn_sm_table .lpn-pane-col-sc_name.lpn-pane-first')); return { n: c.length, ws: c.map((x) => getComputedStyle(x).whiteSpace), hs: c.map((x) => Math.round(x.getBoundingClientRect().height)) }; });
+				ok('scenario manager: the Scenario names do not wrap', (mode === 'phone' && m.n === 0) || (m.n > 0 && m.ws.every((w) => w === 'nowrap') && m.hs.every((h) => h === m.hs[0])), JSON.stringify(m));
+			}
+			await close('lpn_sm_box');
 			// Settings: its own rows; no heading band, no overflow.
 			await openBox(a, 'lpn_settings_box');
 			await check('settings', '#lpn_settings_box .lpn-popover-body', false, '#lpn_settings_box');
+			// Settings > Units: each unit is a Settings row, not a sheet row.
+			const u = await a.page.evaluate(() => ({ set: document.querySelectorAll('#lpn_set_units_fields .lpn-units-item.lpn-set-row').length, items: document.querySelectorAll('#lpn_set_units_fields .lpn-units-item').length, grow: document.querySelectorAll('#lpn_set_units_fields .lpn-grow, #lpn_settings_box .lpn-sheet').length }));
+			ok('settings units: every unit is a `.lpn-set-row`', u.items >= 8 && u.set === u.items && u.grow === 0, JSON.stringify(u));
 			await close('lpn_settings_box');
 			// New project and the projection chooser it opens; Convert as; Export tables.
 			await a.menuClick(await a.lang('lpn_file_new'), 'file');
 			await a.page.waitForSelector('#lpn_new_panel', { state: 'visible', timeout: 4000 }).catch(() => {});
 			await check('new project', '#lpn_new_body', true, '#lpn_new_panel');
+			// Dragging the divider moves the divider and nothing else: the box keeps its width.
+			{
+				const before = await a.page.evaluate(() => { const b = document.getElementById('lpn_new_panel'), s = document.querySelector('#lpn_new_body .lpn-gsplit'), r = s && s.getBoundingClientRect(); return { w: b.getBoundingClientRect().width, left: b.getBoundingClientRect().left, g: parseFloat(document.getElementById('lpn_new_body').style.getPropertyValue('--lpn-g-name')), x: r ? r.left + r.width / 2 : 0, y: r ? r.top + 14 : 0 }; });
+				if (mode === 'PC' && before.x) {
+					await a.page.mouse.move(before.x, before.y); await a.page.mouse.down(); await a.page.mouse.move(before.x - 40, before.y, { steps: 4 }); await a.page.mouse.up();
+					await a.settle(300);
+					const after = await a.page.evaluate(() => ({ w: document.getElementById('lpn_new_panel').getBoundingClientRect().width, g: parseFloat(document.getElementById('lpn_new_body').style.getPropertyValue('--lpn-g-name')) }));
+					ok('new project: the divider moved (' + before.g + ' to ' + after.g + ' rem)', after.g < before.g - 1);
+					ok('new project: dragging the divider leaves the box width alone', Math.abs(after.w - before.w) < 0.6, before.w + ' to ' + after.w);
+				}
+				if (mode === 'phone') { ok('new project: on a phone the box takes the width the screen allows', before.w >= 390 - 2 * 4 - 1, String(before.w)); }
+			}
 			await a.page.click('#lpn_new_coords_geo').catch(() => {});
 			await a.page.click('#lpn_new_crs_pick').catch(() => {});
 			await a.page.waitForSelector('#lpn_crsbox', { state: 'visible', timeout: 4000 }).catch(() => {});

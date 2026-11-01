@@ -293,6 +293,8 @@ async function main() {
 					}
 				}
 				const sing = Array.from(singles.values());
+				// Close the last single's Properties by its X: Escape closes it only while the pointer is over it, which depends on where the box happened to open.
+				await P.evaluate(() => { const x = document.querySelector('#lpn_popup .lpn-popover-x'); if (x && getComputedStyle(document.getElementById('lpn_popup')).display !== 'none') { x.click(); } });
 				await P.keyboard.press('Escape'); await S.settle(300);
 				await P.keyboard.press('a'); await S.settle(300);
 				await P.evaluate(() => { const h = document.getElementById('lpn_area_hint'); if (h) { const b = h.querySelector('button'); if (b) { b.click(); } } });
@@ -304,12 +306,12 @@ async function main() {
 					const b = document.getElementById('lpn_popup');
 					const names = Array.from(b.querySelectorAll('.lpn-multi-section .lpn-gname')).filter((n) => n.getBoundingClientRect().height > 0);
 					const lab = (n) => (n.textContent || '').replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim();
-					return { w: names.length ? names[0].getBoundingClientRect().width : 0, sections: b.querySelectorAll('.lpn-multi-section').length, tipped: names.filter((n) => n.querySelector('.ec-tip') || n.classList.contains('ec-help')).map(lab), all: names.map(lab) };
+					return { cut: names.filter((n) => n.scrollWidth > n.clientWidth + 1).map(lab), w: names.length ? names[0].getBoundingClientRect().width : 0, sections: b.querySelectorAll('.lpn-multi-section').length, tipped: names.filter((n) => n.querySelector('.ec-tip') || n.classList.contains('ec-help')).map(lab), all: names.map(lab) };
 				});
 				const maxSingle = Math.max.apply(null, sing.map((x) => x.w));
 				console.log('  ' + netName + ' ' + mode + ': single label widths ' + JSON.stringify(sing.map((x) => Math.round(x.w))) + ', multi ' + Math.round(multi.w) + ', ' + sing.length + ' singles sampled, ' + multi.sections + ' sections');
 				ok(mode + ' F. ' + netName + ': ' + sing.length + ' kinds of element opened singly', sing.length >= 3, Array.from(singles.keys()).join(','));
-				ok(mode + ' F. ' + netName + ': multi\'s first Label column (' + Math.round(multi.w) + ' px) matches the widest single fit (' + Math.round(maxSingle) + ' px): at least it, and at most 12 px more (the Text section is not sampled singly)', multi.w >= maxSingle - 6 && multi.w <= maxSingle + 12, multi.w + ' vs ' + maxSingle);
+				ok(mode + ' F. ' + netName + ': multi\'s Label column fits its longest label (the one rule, round 11a: ' + Math.round(multi.w) + ' px, widest single ' + Math.round(maxSingle) + ' px) and no label of it is cut', multi.w > 0 && multi.cut.length === 0, JSON.stringify(multi.cut));
 				const needTip = new Set(); sing.forEach((x) => x.tipped.forEach((t) => { if (multi.all.indexOf(t) >= 0) { needTip.add(t); } }));
 				const missing = Array.from(needTip).filter((t) => multi.tipped.indexOf(t) < 0);
 				ok(mode + ' F. ' + netName + ': every label single Properties marks with a `?` (' + needTip.size + ') is marked in multi too', needTip.size >= 3 && missing.length === 0, 'missing: ' + JSON.stringify(missing));
