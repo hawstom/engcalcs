@@ -64872,10 +64872,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// *"I am not sure it's right to disable the checkbox"*, then *"You are right about 'the truth
 		// was already being told without disabling'. I agree."*). It shipped disabled for one round on
 		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
-		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
+		// -- turned out to rest on a false premise. TWO THINGS ALREADY TELL THE TRUTH: this row's own
 		// tip names the case permanently ("an extended period run always does"; until Task 733 it named
-		// a PBV or GPV too); `lpn_engine_pda_route` says it again at the moment of
-		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
+		// a PBV or GPV too); and the banner says it while the engine loads. A fourth telling was a conditional
 		// duplicate of a permanent one.
 		//
 		// **AND THE COST WAS A CONTROL THAT FLICKERS AS YOU DRAW.** Add a PRV and the box greys; delete
@@ -81088,15 +81087,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// network this page has had until now.
 		if (EngCalcs.lpnTimeRun && EngCalcs.lpnTimeRun(model)) { return; }
 
-		var pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 		engineRouteNote = '';
 		var engine = scnSetting('engine');
-		if ((engine === 'epanet' || pdaRoute) && EngCalcs.lpnSolveEpanet) {
-			if (pdaRoute && engine !== 'epanet') {
-				// Task 762: the one thing that routes a network to EPANET by its own contents.
-				engineRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
-					'Solved with the EPANET solver, because the demand model is pressure driven.';
-			}
+		if (engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
 			runSolveEpanet(model);
 			return;
 		}
@@ -81339,7 +81332,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// before any solve has run: opening a file with a PRV in it is exactly the moment the
 			// built-in solver stops being available for it.
 			syncEpanetNeed(model);
-			if (EngCalcs.lpnDemandModelIsPda(model)) { warmEpanetEngine('needed'); }
+			if (EngCalcs.lpnDemandModelIsPda(model) && scnSetting('engine') === 'epanet') { warmEpanetEngine('needed'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 
@@ -81359,7 +81352,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return !(EngCalcs.lpnTimeNativePlan && EngCalcs.lpnTimeNativePlan(model).use);
 			}
 		} else if (effectiveTimesExtended()) { return true; }
-		return !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
+		return false;   // a pressure-driven demand model is solved by the built-in solver too (Task 733)
 	}
 	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
 	// A half-built document is not an answer of "yes", so it answers no rather than throwing.
@@ -81693,8 +81686,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario comparison run asks the same question of the same model, and two functions choosing
 	// an engine is two answers to "which engine solves this network" waiting to disagree.
 	function engineFor(model) {
-		var useEpanet = (scnSetting('engine') === 'epanet'
-				|| (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model))) && !!EngCalcs.lpnSolveEpanet;
+		var useEpanet = scnSetting('engine') === 'epanet' && !!EngCalcs.lpnSolveEpanet;
 		return {
 			epanet: useEpanet,
 			solve: useEpanet

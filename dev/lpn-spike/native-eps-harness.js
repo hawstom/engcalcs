@@ -828,7 +828,7 @@ async function run() {
 	{
 		const m = base(); m.hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20 };
 		const r = EngCalcs.lpnNativeRun(m);
-		ok('a pressure-driven demand model is refused by name (lpnDiagnose)', r.ok === false && (r.issues || []).some((i) => i.code === 'pda-needs-epanet'), JSON.stringify(r.issues || ''));
+		ok('a pressure-driven demand model is run (dev/lpn-spike/native-pda-harness.js holds it to EPANET)', r.ok === true && !EngCalcs.lpnNativeRunRefusals(m).length);
 	}
 	{
 		// Slice 7 wired this file to the page: Looped-Network.php loads it, and js/lpn-time.js asks for it only

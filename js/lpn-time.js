@@ -967,8 +967,7 @@
 	 * nothing in the model is one the loop refuses (EngCalcs.lpnNativeRunRefusals, asked with
 	 * `quality: true`: the loop carries water age, a source trace and one chemical, but never
 	 * EPANET-MSX). Otherwise the EPANET engine runs it exactly as before, and the status bar says
-	 * why when the user had asked for the built-in solver. A pressure-driven demand model is
-	 * EPANET's already, and has its own note (lpn_engine_pda_route) that the steady path writes.
+	 * why when the user had asked for the built-in solver.
 	 *
 	 * `use` is true only when the loop will run it. `refusals` are the loop's `{code, ids}` records.
 	 * The setting is read through the host, so this file still knows nothing of `settings`.
@@ -980,7 +979,6 @@
 		if (!host || typeof host.engine !== 'function' || host.engine() === 'epanet') { return out; }
 		if (!EC.lpnNativeRun || !EC.lpnNativeRunRefusals || !model) { return out; }
 		out.wanted = true;
-		if (EC.lpnDemandModelIsPda && EC.lpnDemandModelIsPda(model)) { out.pda = true; return out; }
 		out.refusals = EC.lpnNativeRunRefusals(model, { quality: true });
 		out.use = out.refusals.length === 0;
 		return out;

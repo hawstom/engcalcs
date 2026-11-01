@@ -1334,6 +1334,7 @@
 			var x;
 			if (n.type !== 'junction' && n.type !== undefined) { return; }
 			x = n.demand || 0;
+			if (res.demands && res.demands[String(n.id)] !== undefined) { d[String(n.id)] = Math.fround(res.demands[String(n.id)] * 1000 / LPS_PER_CFS); return; }   // pressure-driven: what was delivered, emitter included
 			// hydraul.c: a junction's NodeDemand is its demand plus what its emitter discharges.
 			if (n.emitter > 0) { x += n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), exp); }
 			d[String(n.id)] = Math.fround(x * 1000 / LPS_PER_CFS);
@@ -1967,8 +1968,10 @@
 				f.heads[n.id] = tk.h * FT;
 				return;
 			}
-			f.demands[n.id] = n.type === 'junction' ? (n.demand || 0) : 0;
+			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id] : (n.demand || 0)) : 0;
 		});
+		// A pressure-driven run also reports what each junction asked for and did not get (EN_DEMANDDEFICIT).
+		if (res.demandDeficits) { f.demandDeficits = Object.assign({}, res.demandDeficits); }
 		// EPANET's demand at a reservoir is the water it takes from the network: negative while it supplies.
 		model.nodes.forEach(function (n) {
 			var s;

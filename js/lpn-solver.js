@@ -650,9 +650,6 @@ EngCalcs.lpnDiagnose = function (model, options) {
 			issues.push({ code: 'pda-pressures', ids: [] });
 		}
 	}
-	if (opts.engine === 'native' && EngCalcs.lpnDemandModelIsPda(model)) {
-		issues.push({ code: 'pda-needs-epanet', ids: [] });
-	}
 
 	if (fixed.length === 0) {
 		issues.push({ code: 'no-fixed-head', ids: [] });
@@ -811,6 +808,41 @@ EngCalcs.lpnSolve = function (model, options) {
 	nn = junctions.length;
 
 	for (i = 0; i < nn; i++) { demandScale += Math.abs(junctions[i].demand || 0); }
+
+	// ---- PRESSURE-DRIVEN DEMAND (Task 733), EPANET 2.3.5 hydcoeffs.c demandcoeffs()/demandheadloss() and
+	// hydsolver.c newdemandflows()/pdaconverged() ----
+	//
+	// A junction with a positive full demand is modelled like an emitter: it delivers D, 0 <= D <= Dfull, and the
+	// head across it is Hloss = dP (D/Dfull)^(1/Pexp) above its elevation plus Pmin, with a smooth barrier at each
+	// end (the 1e9 and 1e-6 are EPANET's, in ft and cfs). D starts at the full demand every solve, is stepped
+	// toward the head the matrix gives (limited to 0.4 Dfull a trial), and the solve is not converged until D
+	// agrees with the demand function at the solved pressure to 0.0001 cfs. A junction of zero or negative demand
+	// keeps its demand as a fixed outflow.
+	var pdaOn = EngCalcs.lpnDemandModelIsPda(model), pdaD = null, pdaFull = null,
+		pdaPmin = 0, pdaPreq = 0.1, pdaExp = 0.5;
+	if (pdaOn) {
+		var pdaIn = model.hydraulics;
+		if (typeof pdaIn.minPressure === 'number') { pdaPmin = pdaIn.minPressure; }
+		if (typeof pdaIn.reqPressure === 'number') { pdaPreq = pdaIn.reqPressure; }
+		if (typeof pdaIn.pressureExponent === 'number') { pdaExp = pdaIn.pressureExponent; }
+		pdaD = new Float64Array(nn);
+		pdaFull = new Float64Array(nn);
+		for (i = 0; i < nn; i++) { pdaFull[i] = junctions[i].demand || 0; pdaD[i] = pdaFull[i]; }
+	}
+	// hydcoeffs.c demandheadloss(): [head loss (m), gradient (m per m3/s)] for junction i at its current D.
+	function pdaHeadloss(i2, dp2, n2) {
+		var d = pdaD[i2], dfull = pdaFull[i2], r = Math.abs(d) / dfull,
+			hg = n2 * dp2 * Math.pow(r, n2 - 1) / dfull, hl = hg * d / n2, a, b;
+		a = 1e9 * (d / VCFS);                    // addlowerbarrier(d)
+		b = Math.sqrt(a * a + 1e-6);
+		hl += (a - b) / 2 * VFT;
+		hg += (1e9 / 2) * (1 - a / b) * VFT / VCFS;
+		a = 1e9 * ((d - dfull) / VCFS);          // addupperbarrier(d - dfull)
+		b = Math.sqrt(a * a + 1e-6);
+		hl += (a + b) / 2 * VFT;
+		hg += (1e9 / 2) * (1 + a / b) * VFT / VCFS;
+		return [hl, hg];
+	}
 
 	// Initial guess. Any nonzero flow works because of the gradient floor; a
 	// velocity-scaled seed simply starts closer than a constant would.
@@ -1503,7 +1535,18 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 
 		for (i = 0; i < nn; i++) {
-			F[i] -= (junctions[i].demand || 0);
+			if (pdaOn) {
+				if (pdaFull[i] > 0) {
+					var pdl = pdaHeadloss(i, pdaPreq - pdaPmin, 1 / pdaExp);
+					if (pdl[1] > 0) {
+						M[envDiag[i]] += 1 / pdl[1];
+						F[i] += (pdl[0] + (junctions[i].elev || 0) + pdaPmin) / pdl[1];
+					}
+				}
+				F[i] -= pdaD[i];
+			} else {
+				F[i] -= (junctions[i].demand || 0);
+			}
 			if (junctions[i].emitter > 0) {
 				// Outflow C (H - z)^gamma, linearized about the current head.
 				var dh = Math.max(H[i] - (junctions[i].elev || 0), 0),
@@ -1515,7 +1558,7 @@ EngCalcs.lpnSolve = function (model, options) {
 				F[i] += ge * H[i] - qe;
 				if (X !== null) { X[i] -= qe; }
 			}
-			if (X !== null) { X[i] -= (junctions[i].demand || 0); }
+			if (X !== null) { X[i] -= (pdaOn ? pdaD[i] : (junctions[i].demand || 0)); }
 		}
 		if (X !== null) { valveCoeffs(); }
 
@@ -1554,6 +1597,22 @@ EngCalcs.lpnSolve = function (model, options) {
 			Q[k] = qNew;
 		}
 
+		// hydsolver.c newdemandflows(): step each pressure-driven demand toward the head just solved.
+		if (pdaOn) {
+			var pdp = Math.max(pdaPreq - pdaPmin, 0.1 * VFT),   // MINPDIFF (0.1, compared with a pressure in ft)
+				pn = 1 / pdaExp, pdq, pdh, pdl2;
+			for (i = 0; i < nn; i++) {
+				if (pdaFull[i] <= 0) { continue; }
+				pdl2 = pdaHeadloss(i, pdp, pn);
+				pdh = Hnew[i] - (junctions[i].elev || 0) - pdaPmin;
+				pdq = (pdl2[0] - pdh) / pdl2[1];
+				pdq *= relax;
+				if (Math.abs(pdq) > 0.4 * pdaFull[i]) { pdq = 0.4 * (pdq < 0 ? -1 : 1) * pdaFull[i]; }
+				pdaD[i] -= pdq;
+				sumAbsQ += Math.abs(pdaD[i]);
+				sumAbsDq += Math.abs(pdq);
+			}
+		}
 		H = Hnew;
 		// Normalised by the network's TOTAL DEMAND, not by the current total flow.
 		// Total flow is the wrong yardstick twice over: it grows with the number of
@@ -1660,6 +1719,17 @@ EngCalcs.lpnSolve = function (model, options) {
 			}
 		}
 
+		// hydsolver.c pdaconverged(): the demands must also agree with the demand function at the solved pressure.
+		if (done && pdaOn) {
+			for (i = 0; i < nn; i++) {
+				if (pdaFull[i] <= 0) { continue; }
+				var pp = H[i] - (junctions[i].elev || 0), pq;
+				if (pp <= pdaPmin) { pq = 0; }
+				else if (pp >= pdaPreq) { pq = pdaFull[i]; }
+				else { pq = pdaFull[i] * Math.pow((pp - pdaPmin) / (pdaPreq - pdaPmin), pdaExp); }
+				if (Math.abs(pq - pdaD[i]) > 0.0001 * VCFS) { done = false; break; }
+			}
+		}
 		if (done) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
@@ -1724,6 +1794,17 @@ EngCalcs.lpnSolve = function (model, options) {
 	// And the pumps the solve ended with shut because they cannot lift (EPANET's XHEAD), likewise.
 	report.pumpXhead = [];
 	for (k = 0; k < pumps.length; k++) { if (pX[pumps[k]]) { report.pumpXhead.push(links[pumps[k]].id); } }
+	if (pdaOn) {
+		// What each junction receives, and what it asked for and did not get (EN_DEMAND and EN_DEMANDDEFICIT), m3/s.
+		report.demands = {};
+		report.demandDeficits = {};
+		for (i = 0; i < nn; i++) {
+			// EN_DEMAND is the delivered demand plus what the junction's emitter discharges (hydraul.c NodeDemand).
+			report.demands[junctions[i].id] = pdaD[i] + (junctions[i].emitter > 0
+				? junctions[i].emitter * Math.pow(Math.max(H[i] - (junctions[i].elev || 0), 0), emitterExp) : 0);
+			report.demandDeficits[junctions[i].id] = Math.max(0, pdaFull[i] - pdaD[i]);
+		}
+	}
 	report.cvClosed = [];
 	report.statuses = {};
 	for (k = 0; k < cvk.length; k++) {

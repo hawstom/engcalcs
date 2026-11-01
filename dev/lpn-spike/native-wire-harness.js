@@ -301,6 +301,17 @@ async function run() {
 		ok('the plan is not "wanted" when EPANET is chosen', EngCalcs.lpnTimeNativePlan(m).wanted === false);
 	}
 	{
+		// A pressure-driven demand model is the built-in loop's too (Task 733): planned, run, and not routed to EPANET.
+		const m = withAccuracy(loadEpa('Net1.inp').model);
+		m.hydraulics = Object.assign({}, m.hydraulics, { demandModel: 'PDA', minPressure: 10, reqPressure: 80, pressureExponent: 0.5 });
+		m.nodes.forEach((n) => { if (n.type === 'junction') { n.demand *= 2.5; if (n.demandBase !== undefined) { n.demandBase *= 2.5; } } });
+		engine = 'native';
+		const plan = EngCalcs.lpnTimeNativePlan(m), via = await pagePath(m, 'native');
+		ok('a pressure-driven model is planned for the built-in loop', plan.use === true && plan.pda === false, JSON.stringify(plan.refusals));
+		ok('...and run by it, with a delivered demand and a deficit in the frames', via.run.engine === 'native' && via.frames.every((f) => f.demandDeficits) &&
+			via.frames.some((f) => Object.keys(f.demandDeficits).some((id) => f.demandDeficits[id] > 1e-6)), via.run.engine);
+	}
+	{
 		const m = withAccuracy(loadEpa('Net1.inp').model);
 		m.msx = { text: '[TITLE]' };
 		const plan = (engine = 'native', EngCalcs.lpnTimeNativePlan(m));
