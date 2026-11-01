@@ -5295,6 +5295,8 @@ html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-r
 #lpn_convas_panel .lpn-gwrap > :is(select, input) {
 	margin: 0; border: 0; border-radius: 0; background: transparent; padding: 2px 6px; box-sizing: border-box; font: inherit; font-size: .85rem; line-height: 1.3; text-overflow: ellipsis; min-width: 0; align-self: stretch;
 }
+/* The EPSG row's radio keeps its own size beside the ... button (a narrow phone cell shrank it to nothing, and a tap on it fell through) and sits on the button's middle line. */
+#lpn_convas_panel .lpn-gwrap > input[type="radio"] { flex: none; align-self: center; padding: 0; margin: 0 6px; }
 #lpn_convas_panel .lpn-gwrap > :is(select, input):hover:not(:focus) { background: var(--ec-hover-bg); }
 #lpn_convas_panel .lpn-gwrap > :is(select, input):focus { outline: var(--ec-focus-w) solid var(--ec-accent); outline-offset: -2px; }
 /* The Round to | Suffix line is a divider of its own (round 11b): --lpn-convas-c1 is where the reader dragged it, else 8.5 rem or 63% of a narrow cell; the Suffix cell keeps at least 2 rem. */
