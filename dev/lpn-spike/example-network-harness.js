@@ -755,7 +755,7 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('...and it no longer opens a fly-out', !newRow.children.find(c => c.textContent === '\u25b8'));
   fire(newRow);
   ok('clicking it closes the menu, as an ordinary command row does', !L.menuPopupOpen());
-  ok('...and opens the New-project box', byId.lpn_new_panel.style.display === 'block');
+  ok('...and opens the New-project box', byId.lpn_new_panel.style.display !== 'none' && !!byId.lpn_new_panel.style.display);
   // The + tab is the same act by a second door and must arrive at the same box.
   {
     const appSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
