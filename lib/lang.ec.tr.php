@@ -710,7 +710,7 @@ $ec_lang['lpn_customer_fixed_head']='⚠ O borunun yakın ucu sabit bir su yüze
 $ec_lang['lpn_customer_node_inactive']='Bu müşteri, bu senaryoda etkin olmayan bir düğüme atanmıştır; bu nedenle talebi çözüme dahil değildir.';
 $ec_lang['lpn_customer_detached_count']='Bir boruya bağlı olmayan müşteriler ({n}). Talepleri hesaba katılmıyor.';
 $ec_lang['lpn_meter_pick_pipe']='Şimdi bu müşteriyi besleyen boruyu veya düğümü seçin. Müşteri, koyduğunuz yerde kalır. İptal etmek için Esc tuşuna basın.';
-$ec_lang['lpn_inp_export_flat_customers']='Bir EPANET dosyasında müşteri yoktur. Bu projedeki müşterilerin ({n}) talebi, her birinin atandığı düğüm üzerinde bir talep satırı olarak yazılır ve müşterinin etiketiyle adlandırılır. Dosya müşterinin kendisini kaydetmez: konumunu, onu besleyen boruyu, servisin bu boru boyunca nerede bağlandığını veya kaç servisi temsil ettiğini. Bu bilgi projede kalır; korumak için proje dosyasını kaydedin.';
+$ec_lang['lpn_inp_export_flat_customers']='Bir EPANET dosyasında müşteri yoktur. Bu projedeki müşterilerin ({n}) talebi, her birinin atandığı düğüm üzerinde bir talep satırı olarak yazılır ve müşterinin künyesiyle adlandırılır. Dosya müşterinin kendisini kaydetmez: konumunu, onu besleyen boruyu, servisin bu boru boyunca nerede bağlandığını veya kaç servisi temsil ettiğini. Bu bilgi projede kalır; korumak için proje dosyasını kaydedin.';
 
 $ec_lang['lpn_area_hint_window_start']='Pencerenin bir köşesini belirtin.';
 $ec_lang['lpn_area_hint_window_go']='Bitirmek için karşı köşeyi belirtin.';
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Araç çubuğu';
 $ec_lang['lpn_pane_right_toggle']='Görünürlük';
 $ec_lang['lpn_color_legend_open_tip']='Renklendirme ayarlarını açıp bu renkleri değiştirmek için basın.';
 $ec_lang['lpn_color_node_field']='Düğümleri şuna göre renklendir';
-$ec_lang['lpn_color_link_field']='Boruları şuna göre renklendir';
+$ec_lang['lpn_color_link_field']='Hatları şuna göre renklendir';
 $ec_lang['lpn_color_ramp_sequential']='Sıralı';
 $ec_lang['lpn_color_ramp_diverging']='Iraksak';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -3592,7 +3592,7 @@ $ec_lang['lpn_settings_link_width']='Hat çizgisi genişliği (piksel)';
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Debi yönü okları';
 $ec_lang['lpn_settings_show_arrows_tip']='Her boruda suyun hangi yöne aktığını gösteren bir ok çizer. Oklar bir çalıştırmadan sonra görünür, kapatmak sonuçları değiştirmez.';
-$ec_lang['lpn_settings_align_labels']='Boru etiketlerini borularla hizala';
+$ec_lang['lpn_settings_align_labels']='Hat etiketlerini hatlarla hizala';
 $ec_lang['lpn_settings_readability_bias']='Etiketin ters çevrilmeden önce dikeyden sola kayabileceği derece';
 $ec_lang['lpn_settings_readability_bias_tip']='Bir etiket, dikeyden sola bu kadar dereceden fazla yatarsa, doğru yönde durması için ters çevrilir.';
 $ec_lang['lpn_settings_mask_labels']='Etiketlerin arkasında dolgu arka plan';

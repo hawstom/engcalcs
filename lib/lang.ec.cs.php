@@ -943,7 +943,7 @@ $ec_lang['lpn_examples_blank']='Nebo začněte zde';
 // reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
 // "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
 // project either way.
-$ec_lang['lpn_examples_size']='{nodes} uzlů, {links} potrubí';
+$ec_lang['lpn_examples_size']='{nodes} uzlů, {links} spojů';
 $ec_lang['lpn_examples_failed']='Příklady se nepodařilo načíst. Použijte Soubor, Nový projekt pro zahájení kreslení.';
 $ec_lang['lpn_examples_loading']='Načítání příkladů…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
@@ -1307,7 +1307,7 @@ $ec_lang['lpn_result_gradient']='Gradient ztráty tlakové výšky';
 $ec_lang['lpn_result_gradient_tip']='Ztráta tlakové výšky dělená délkou potrubí. Použijte ji k porovnání potrubí různých délek podle jednoho návrhového limitu.';
 $ec_lang['lpn_result_water_age']='Stáří vody';
 $ec_lang['lpn_result_water_age_tip']='Doba, kterou voda dosahující tohoto bodu strávila v systému. Kde se průtoky setkávají, je číslo průměrem stáří přitékající vody vážených průtokem. V nádrži je to průměrné stáří uložené vody, takže nádrž, která se obměňuje pomalu, obvykle drží nejstarší vodu v síti. Neexistuje žádný předpisový limit, s nímž by se dalo porovnat, proto jej posuzujte podle poměrů v modelovaném systému.';
-$ec_lang['lpn_result_source_share']='Podíl původu';
+$ec_lang['lpn_result_source_share']='Podíl dávkování';
 $ec_lang['lpn_result_source_share_tip']='Podíl vody dosahující tohoto bodu, který pocházel ze sledovaného uzlu. To udává analýza Sledování původu.';
 // **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
 // value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
@@ -1315,7 +1315,7 @@ $ec_lang['lpn_result_source_share_tip']='Podíl vody dosahující tohoto bodu, k
 // label composed at render time breaks in a gendered, a word-order and a right-to-left language,
 // which is the rule in CLAUDE.md under Concept-level label reuse.
 $ec_lang['lpn_result_avg_water_age']='Průměrné stáří vody';
-$ec_lang['lpn_result_avg_source_share']='Průměrný podíl původu';
+$ec_lang['lpn_result_avg_source_share']='Průměrný podíl dávkování';
 $ec_lang['lpn_result_avg_concentration']='Průměrná koncentrace';
 // EPANET's own two link report columns, in EPANET's own words. A friction factor is the
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='Legenda panelu nástrojů';
 $ec_lang['lpn_pane_right_toggle']='Viditelnost';
 $ec_lang['lpn_color_legend_open_tip']='Stisknutím otevřete nastavení barvení a změníte tyto barvy.';
 $ec_lang['lpn_color_node_field']='Barvit uzly podle';
-$ec_lang['lpn_color_link_field']='Barvit potrubí podle';
+$ec_lang['lpn_color_link_field']='Barvit spoje podle';
 $ec_lang['lpn_color_ramp_sequential']='Sekvenční';
 $ec_lang['lpn_color_ramp_diverging']='Divergentní';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1883,8 +1883,8 @@ $ec_lang['lpn_find_prop_demand_desc']='Popis kategorie odběru';
 // searcher wants: pick how wide to cast. Earlier wordings ("is cut off for any reason", "is
 // behind closed links", "reaches no source") presented four mutually exclusive cases he did not
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
-$ec_lang['lpn_find_op_conn_unlinked']='u uzlu nejsou žádná potrubí';
-$ec_lang['lpn_find_op_conn_noopen']='u uzlu nejsou žádná otevřená potrubí';
+$ec_lang['lpn_find_op_conn_unlinked']='u uzlu nejsou žádné spoje';
+$ec_lang['lpn_find_op_conn_noopen']='u uzlu nejsou žádné otevřené spoje';
 $ec_lang['lpn_find_op_conn_nolinksource']='k uzlu nevede žádná cesta ke zdroji';
 $ec_lang['lpn_find_op_conn_noopensource']='k uzlu nevede žádná otevřená cesta ke zdroji';
 // A result row prints the NARROWEST condition true of that node beside its id, because "no links"
@@ -1894,7 +1894,7 @@ $ec_lang['lpn_find_op_conn_noopensource']='k uzlu nevede žádná otevřená ces
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Každý uzel je propojen.';
-$ec_lang['lpn_find_conn_no_fixed']='Tato síť nemá žádný zdroj ani nádrž, takže není žádný zdroj, ke kterému by cesta vedla. Lze hledat pouze u uzlu nejsou žádná potrubí a u uzlu nejsou žádná otevřená potrubí.';
+$ec_lang['lpn_find_conn_no_fixed']='Tato síť nemá žádný zdroj ani nádrž, takže není žádný zdroj, ke kterému by cesta vedla. Lze hledat pouze u uzlu nejsou žádné spoje a u uzlu nejsou žádné otevřené spoje.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -2025,7 +2025,7 @@ $ec_lang['lpn_pgraph_none']='Tento prvek nemá v aktuálním výpočtu žádné 
 // 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
-$ec_lang['lpn_pgraph_source_share_from']='Podíl původu z uzlu {node}';
+$ec_lang['lpn_pgraph_source_share_from']='Podíl dávkování z uzlu {node}';
 $ec_lang['lpn_result_pump_head_tip']='Tlaková výška, kterou čerpadlo přidává mezi sáním a výtlakem, zobrazená jako kladné číslo. Řešič a soubory EPANET ji nesou jako zápornou ztrátu tlakové výšky.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='Velikost textu (v pixelech)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Velikost symbolu (v pixelech)';
-$ec_lang['lpn_settings_link_width']='Šířka čáry potrubí (v pixelech)';
+$ec_lang['lpn_settings_link_width']='Šířka čáry spoje (v pixelech)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='Šipky směru průtoku';
 $ec_lang['lpn_settings_show_arrows_tip']='Nakreslí na každé potrubí šipku ukazující směr proudění vody. Šipky se zobrazí po výpočtu a jejich vypnutí výsledky nemění.';
-$ec_lang['lpn_settings_align_labels']='Zarovnat popisky potrubí s potrubím';
+$ec_lang['lpn_settings_align_labels']='Zarovnat popisky spojů se spojem';
 $ec_lang['lpn_settings_readability_bias']='Otočit popisek vzhůru nohama, když je nakloněný o víc než tolik stupňů vlevo od svislice';
 $ec_lang['lpn_settings_readability_bias_tip']='Otočí popisek, aby zůstal čitelný vzhůru, když je nakloněný o víc než tolik stupňů vlevo od svislice.';
 $ec_lang['lpn_settings_mask_labels']='Plné pozadí za popisky';
@@ -3838,7 +3838,7 @@ $ec_lang['lpn_settings_quality_track_tip']='Zvolte, co má výpočet sledovat v 
 $ec_lang['lpn_settings_quality_source']='Sledovaný uzel';
 $ec_lang['lpn_settings_quality_source_tip']='Uzel, jehož voda se sleduje. Každý ostatní uzel pak ukazuje podíl své vody, který pochází z tohoto uzlu.';
 $ec_lang['lpn_quality_none']='Nic';
-$ec_lang['lpn_quality_trace']='Sledování původu';
+$ec_lang['lpn_quality_trace']='Sledování dávkování';
 $ec_lang['lpn_quality_chemical']='Chemická látka, která reaguje';
 $ec_lang['lpn_quality_needs_run']='Kvalita vody se přenáší podél potrubí v čase, takže potřebuje řešič EPANET a celkovou dobu běhu. Nastavte Celkovou dobu běhu v části Čas, poté stiskněte tlačítko Vypočítat.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words

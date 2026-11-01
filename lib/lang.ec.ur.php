@@ -1008,7 +1008,7 @@ $ec_lang['lpn_guide_find_results_term']='نتائج، انتخاب اور جدو
 $ec_lang['lpn_guide_find_results_def']='<p>مطابقت رکھنے والے عناصر تلاش کریں بٹن کے نیچے درج ہوتے ہیں۔ زیادہ ترین n اور سے بڑا ہو سب سے زیادہ قدر پہلے درج کرتے ہیں، سے چھوٹا ہو اور کم ترین n سب سے کم قدر پہلے، اور دوسری شرائط ملی ہوئی قدر کے مطابق، پھر ID کے مطابق۔ "اور" یا "یا" والی کوئری پہلے نوڈز، پھر لنکس درج کرتی ہے، ہر ایک ID کے مطابق۔ ایک ہی مطابقت نقشے پر فوراً دکھائی جاتی ہے۔ نقشے کو اس عنصر پر مرکوز کرنے کے لیے قطار منتخب کریں۔ اگر کچھ منتخب نہ ہو تو وہ عنصر بھی منتخب ہو جاتا ہے؛ اگر کچھ منتخب ہو تو عنصر نمایاں ہوتا ہے اور انتخاب تبدیل نہیں ہوتا۔ انتخاب میں شامل کرنے یا ہٹانے کے لیے قطار پر Shift+کلک یا Ctrl+کلک کریں۔ تلاش خود تمام مطابقتوں کو منتخب نہیں کرتی۔</p><p>موجودہ جدول میں فلٹر کریں بٹن وہی کوئری جدولوں کے پینل پر لاگو کرتا ہے۔ جس جدول پر کوئری لاگو ہوتی ہے وہ صرف مطابق قطاریں دکھاتا ہے، ان کے اوپر کوئری اور قطاروں کی تعداد کے ساتھ۔ نقشے پر تمام مطابقتوں کو منتخب کرنے کے لیے وہ قطاریں منتخب کریں اور رائٹ کلک مینو سے نقشے پر منتخب کریں چنیں۔ جدول کا فلٹر پراجیکٹ کے ساتھ محفوظ نہیں ہوتا اور صفحہ دوبارہ لوڈ ہونے پر ختم ہو جاتا ہے۔ جس قطار میں ایسی ترمیم کی جائے کہ وہ مزید مطابقت نہ رکھے، وہ جدول میں مدھم اور انتباہی نشان کے ساتھ رہتی ہے جب تک موجودہ جدول میں فلٹر کریں بٹن دوبارہ نہ دبایا جائے۔</p>';
 $ec_lang['lpn_guide_find_replace_term']='بدلیں اور کالعدم کریں';
 $ec_lang['lpn_guide_find_replace_def']='<p>باکس کا جو ملا اسے بدلیں حصہ کوئری کو ملنے والے ہر عنصر پر ایک خاصیت لکھتا ہے۔ بدلنے کے لیے خاصیت کی فہرست میں خاصیت چنیں، نئی قدر کے خانے میں نئی قدر دکھائی گئی اکائی میں درج کریں، اور بدلیں بٹن دبائیں۔ باکس پھر بتاتا ہے کہ کتنے عناصر بدلیں گے، ان کو شمار کیے بغیر جن کی قدر پہلے ہی نئی قدر ہے۔ تبدیلی لاگو کرنے کے لیے انہیں بدلیں بٹن دبائیں، یا منسوخ کریں۔ ایک بار کالعدم کرنے سے پوری تبدیلی واپس ہو جاتی ہے۔</p><p>Net1 پر مثال: <code>Pipe.Diameter below 10</code> پائپ 31، 122، 113 اور 121 تلاش کرتا ہے۔ قطر چنیں، 10 درج کریں، اور بدلیں دبائیں؛ باکس "4 عناصر بدلیں؟" دکھاتا ہے۔ چاروں پائپ 10 in. پر مقرر کرنے کے لیے انہیں بدلیں دبائیں۔ ایک بار کالعدم کرنے سے وہ 6 اور 8 in. پر واپس آ جاتے ہیں۔</p><p>Net3 پر مثال: <code>Pipe.ID equal to \'247\'</code> پائپ 247 تلاش کرتا ہے۔ بند چنیں، نئی قدر کی فہرست میں بھی بند چنیں، اور بدلیں، پھر انہیں بدلیں دبائیں، تاکہ اوپر کی رابطے کی مثال کے لیے پائپ بند ہو جائے۔ کالعدم کرنے سے وہ دوبارہ کھل جاتا ہے۔</p><p>بدلنے کے لیے ایک ہی قسم کا عنصر درکار ہے، اس لیے سب کچھ کے تحت پہلے کیا تلاش کرنا ہے کی فہرست میں عنصر کی قسم چنیں۔ بنیاد کے علاوہ کسی منظرنامے میں تبدیلی اسی منظرنامے میں محفوظ ہوتی ہے، جیسے خصوصیات میں وہی ترمیم ہوتی۔ جہاں Mapbox بلندیاں دستیاب ہوں، بلندی کو ٹائپ کی گئی قدر کے بجائے Mapbox DEM سے بدلا جا سکتا ہے۔</p>';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>قدروں کا موازنہ پوری درستگی سے ہوتا ہے اور چار اعشاریہ تک درج کی جاتی ہیں۔ کے برابر ہو حساب شدہ نتیجے سے شاذ ہی مطابقت رکھتا ہے؛ سے بڑا ہو اور سے چھوٹا ہو استعمال کریں۔</li><li>دباؤ، ہیڈ، بہاؤ، رفتار اور دوسرے نتائج آخری حساب کے ہیں۔ خود بخود دوبارہ حل کریں ترتیب بند ہو تو وہ نیٹ ورک کو ویسا ہی بیان کرتے ہیں جیسا آخری حل کریں پر تھا۔</li><li>متن پر سے بڑا ہو اور سے چھوٹا ہو لغت کی ترتیب استعمال کرتے ہیں، اعداد عددی ترتیب میں: Net1 پر <code>Junction.ID above \'20\'</code> جنکشن 21، 22، 23، 31 اور 32 تلاش کرتا ہے۔</li><li>سب کچھ کے تحت صرف ID، تفصیل، ٹیگ اور رابطہ پیش کیے جاتے ہیں۔ پوری فہرست دیکھنے کے لیے کیا تلاش کرنا ہے کی فہرست میں عنصر کی قسم چنیں۔</li><li>متن کے آئٹم کی کوئی ID نہیں ہوتی۔ اسے اس کے الفاظ سے تلاش کریں، جیسے <code>Text.Text contains \'pump\'</code>۔</li><li>نوڈ کے لیے رابطے کی چار شرطیں یہ ہیں: نوڈ پر کوئی لنک نہیں، نوڈ پر کوئی کھلا لنک نہیں، کسی ذریعہ تک لنک کا کوئی راستہ نہیں، اور کسی ذریعہ تک کوئی کھلا راستہ نہیں۔ ذریعہ ریزروائر یا ٹینک ہے۔</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>قدروں کا موازنہ پوری درستگی سے ہوتا ہے اور چار اعشاریہ تک درج کی جاتی ہیں۔ کے برابر ہو حساب شدہ نتیجے سے شاذ ہی مطابقت رکھتا ہے؛ سے بڑا ہو اور سے چھوٹا ہو استعمال کریں۔</li><li>دباؤ، ہیڈ، بہاؤ، رفتار اور دوسرے نتائج آخری حساب کے ہیں۔ خود بخود دوبارہ حل کریں ترتیب بند ہو تو وہ نیٹ ورک کو ویسا ہی بیان کرتے ہیں جیسا آخری حل کریں پر تھا۔</li><li>متن پر سے بڑا ہو اور سے چھوٹا ہو لغت کی ترتیب استعمال کرتے ہیں، اعداد عددی ترتیب میں: Net1 پر <code>Junction.ID above \'20\'</code> جنکشن 21، 22، 23، 31 اور 32 تلاش کرتا ہے۔</li><li>سب کچھ کے تحت صرف ID، تفصیل، ٹیگ اور رابطہ پیش کیے جاتے ہیں۔ پوری فہرست دیکھنے کے لیے کیا تلاش کرنا ہے کی فہرست میں عنصر کی قسم چنیں۔</li><li>متن کے آئٹم کی کوئی ID نہیں ہوتی۔ اسے اس کے الفاظ سے تلاش کریں، جیسے <code>Text.Text contains \'pump\'</code>۔</li><li>نوڈ کے لیے رابطے کی چار شرطیں یہ ہیں: نوڈ پر کوئی لنک نہیں، نوڈ پر کوئی کھلا لنک نہیں، کسی سورس تک لنک کا کوئی راستہ نہیں، اور کسی سورس تک کوئی کھلا راستہ نہیں۔ سورس ریزروائر یا ٹینک ہے۔</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
 // (lpn_sm_help, Tom's wording of 2026-10-16) comes first in the entry; nothing here restates or
@@ -1245,10 +1245,10 @@ $ec_lang['lpn_ex_net1_desc']='بنیاد، اوسط دن، کے تحت چار م
 $ec_lang['lpn_ex_net1_si_title']='EPANET Net1، منظرنامے اور کنٹرولز، L/s (SI)';
 $ec_lang['lpn_ex_net1_si_desc']='بنیاد، اوسط دن، کے تحت چار منظرنامے: Max day (طلب کا ضرب 1.5) اور Peak hour (2.25)، ہر ایک کے ساتھ مین ٹوٹنے والا بچہ منظرنامہ۔ کلورین، 1 ریزروائر، 1 ٹینک، 1 پمپ اور قواعد پر مبنی دو کنٹرولز کے ساتھ ایک فرضی EPANET مثال۔ لیٹر فی سیکنڈ، میٹر اور ملی میٹر کے ساتھ۔';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='برانفورڈ، کنیکٹی کٹ کی ایک EPANET مثال، جسے گیلن فی منٹ، فٹ اور انچ سے تبدیل کیا گیا ہے: 35 جنکشنز اور 1 ٹینک، بغیر ریزروائر، بغیر پمپ اور بغیر والوز کے، تقریباً 2 کلومیٹر ضرب 4 کلومیٹر۔ فلورائیڈ، ایک غیر تعاملی مادہ، ایک ماخذ پر داخل ہوتا ہے۔ لیٹر فی سیکنڈ، میٹر اور ملی میٹر کے ساتھ۔';
+$ec_lang['lpn_ex_net2_si_desc']='برانفورڈ، کنیکٹی کٹ کی ایک EPANET مثال، جسے گیلن فی منٹ، فٹ اور انچ سے تبدیل کیا گیا ہے: 35 جنکشنز اور 1 ٹینک، بغیر ریزروائر، بغیر پمپ اور بغیر والوز کے، تقریباً 2 کلومیٹر ضرب 4 کلومیٹر۔ فلورائیڈ، ایک غیر تعاملی مادہ، ایک سورس پر داخل ہوتا ہے۔ لیٹر فی سیکنڈ، میٹر اور ملی میٹر کے ساتھ۔';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='برانفورڈ، کنیکٹی کٹ کی ایک EPANET مثال: 35 جنکشنز اور 1 ٹینک، بغیر ریزروائر، بغیر پمپ اور بغیر والوز کے، تقریباً 1 میل ضرب 2 میل۔ فلورائیڈ، ایک غیر تعاملی مادہ، ایک ماخذ پر داخل ہوتا ہے۔ گیلن فی منٹ، فٹ اور انچ کے ساتھ۔';
+$ec_lang['lpn_ex_net2_desc']='برانفورڈ، کنیکٹی کٹ کی ایک EPANET مثال: 35 جنکشنز اور 1 ٹینک، بغیر ریزروائر، بغیر پمپ اور بغیر والوز کے، تقریباً 1 میل ضرب 2 میل۔ فلورائیڈ، ایک غیر تعاملی مادہ، ایک سورس پر داخل ہوتا ہے۔ گیلن فی منٹ، فٹ اور انچ کے ساتھ۔';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
 $ec_lang['lpn_ex_net3_si_desc']='نووٹو، کیلیفورنیا کی ایک EPANET مثال، جسے گیلن فی منٹ، فٹ اور انچ سے تبدیل کیا گیا ہے، جس کے پیچھے دنیا کا نقشہ ہے: 92 جنکشنز، 3 ٹینک اور 2 ریزروائرز، بغیر والوز کے، تقریباً 8 کلومیٹر مربع۔ 24 گھنٹے کا توسیعی مدت کا سمولیشن، جھیل سے ایک سورس ٹریس کے ساتھ۔ لیٹر فی سیکنڈ، میٹر اور ملی میٹر کے ساتھ۔';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
@@ -1498,7 +1498,7 @@ $ec_lang['lpn_help_icons']='ٹول بار';
 $ec_lang['lpn_pane_right_toggle']='نمائش';
 $ec_lang['lpn_color_legend_open_tip']='رنگ بندی کی ترتیبات کھولنے اور یہ رنگ بدلنے کے لیے دبائیں۔';
 $ec_lang['lpn_color_node_field']='نوڈز کو اس کے مطابق رنگ دیں';
-$ec_lang['lpn_color_link_field']='پائپوں کو اس کے مطابق رنگ دیں';
+$ec_lang['lpn_color_link_field']='لنکس کو اس کے مطابق رنگ دیں';
 $ec_lang['lpn_color_ramp_sequential']='ترتیب وار';
 $ec_lang['lpn_color_ramp_diverging']='دو رخا';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1885,8 +1885,8 @@ $ec_lang['lpn_find_prop_demand_desc']='طلب کے زمرے کی تفصیل';
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
 $ec_lang['lpn_find_op_conn_unlinked']='نوڈ پر کوئی لنک نہیں';
 $ec_lang['lpn_find_op_conn_noopen']='نوڈ پر کوئی کھلا لنک نہیں';
-$ec_lang['lpn_find_op_conn_nolinksource']='کسی ذریعہ تک لنک کا کوئی راستہ نہیں';
-$ec_lang['lpn_find_op_conn_noopensource']='کسی ذریعہ تک کوئی کھلا راستہ نہیں';
+$ec_lang['lpn_find_op_conn_nolinksource']='کسی سورس تک لنک کا کوئی راستہ نہیں';
+$ec_lang['lpn_find_op_conn_noopensource']='کسی سورس تک کوئی کھلا راستہ نہیں';
 // A result row prints the NARROWEST condition true of that node beside its id, because "no links"
 // says more than "no open path to a source" and both are true of the same node. It prints the
 // SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
@@ -1894,7 +1894,7 @@ $ec_lang['lpn_find_op_conn_noopensource']='کسی ذریعہ تک کوئی کھ�
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='ہر نوڈ منسلک ہے۔';
-$ec_lang['lpn_find_conn_no_fixed']='اس نیٹ ورک میں کوئی ریزروائر یا ٹینک نہیں، اس لیے پہنچنے کے لیے کوئی ذریعہ نہیں۔ صرف نوڈ پر کوئی لنک نہیں اور نوڈ پر کوئی کھلا لنک نہیں تلاش کیے جا سکتے ہیں۔';
+$ec_lang['lpn_find_conn_no_fixed']='اس نیٹ ورک میں کوئی ریزروائر یا ٹینک نہیں، اس لیے پہنچنے کے لیے کوئی سورس نہیں۔ صرف نوڈ پر کوئی لنک نہیں اور نوڈ پر کوئی کھلا لنک نہیں تلاش کیے جا سکتے ہیں۔';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -2988,7 +2988,7 @@ $ec_lang['lpn_labels_init_status']='ابتدائی حالت';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
 // Customer"). The two label entries reuse lpn_labels_heading_node/_link.
 $ec_lang['lpn_settings_sym_node_colors']='نوڈ کے رنگ';
-$ec_lang['lpn_settings_sym_link_colors']='پائپ کے رنگ';
+$ec_lang['lpn_settings_sym_link_colors']='لنک کے رنگ';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='پس منظر کی تصویر…';
 $ec_lang['lpn_backdrop_add']='شامل کریں';
@@ -3387,7 +3387,7 @@ $ec_lang['lpn_settings_row_pda_src']='فائل میں بتائے گئے دباؤ
 $ec_lang['lpn_settings_row_quality_option']='پانی کے معیار کا آپشن جیسا فائل بتاتی ہے';
 $ec_lang['lpn_settings_row_tolerance']='درستگی (پرانے پراجیکٹ)';
 $ec_lang['lpn_settings_row_emitter_exponent_old']='ایمیٹر کا ایکسپوننٹ (پرانے پراجیکٹ)';
-$ec_lang['lpn_settings_row_elev_source_old']='بلندی کا ماخذ (پرانے پراجیکٹ)';
+$ec_lang['lpn_settings_row_elev_source_old']='بلندی کا ذریعہ (پرانے پراجیکٹ)';
 $ec_lang['lpn_settings_row_basemap']='بیس میپ';
 $ec_lang['lpn_settings_row_basemap_last']='جس بیس میپ پر لوٹنا ہے';
 $ec_lang['lpn_settings_row_customer_max_width']='گاہک کے لیبلز تب دکھائیں جب نقشے کی چوڑائی اتنی یا اس سے کم ہو';
@@ -3585,14 +3585,14 @@ $ec_lang['lpn_settings_text_size']='متن کا سائز (پکسلز)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='علامت کا سائز (پکسلز)';
-$ec_lang['lpn_settings_link_width']='پائپ لائن کی موٹائی (پکسلز)';
+$ec_lang['lpn_settings_link_width']='لنک لائن کی موٹائی (پکسلز)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
 // setting travels with the project.
 $ec_lang['lpn_settings_show_arrows']='بہاؤ کی سمت کے تیر';
 $ec_lang['lpn_settings_show_arrows_tip']='ہر پائپ پر تیر بنائیں جو دکھاتا ہے کہ پانی کس طرف بہہ رہا ہے۔ تیر رن کے بعد ظاہر ہوتے ہیں، اور انہیں بند کرنے سے نتائج تبدیل نہیں ہوتے۔';
-$ec_lang['lpn_settings_align_labels']='پائپ لیبلز کو پائپوں کے ساتھ سیدھا کریں';
+$ec_lang['lpn_settings_align_labels']='لنک لیبلز کو لنک لائن کے ساتھ سیدھا کریں';
 $ec_lang['lpn_settings_readability_bias']='عمودی سے کتنے درجے بائیں طرف ہونے پر لیبل الٹا دیا جاتا ہے';
 $ec_lang['lpn_settings_readability_bias_tip']='جب لیبل عمودی سے اتنے درجے زیادہ بائیں طرف جھکا ہو تو اسے سیدھا رکھنے کے لیے الٹ دیں۔';
 $ec_lang['lpn_settings_mask_labels']='لیبلز کے پیچھے ٹھوس پس منظر';

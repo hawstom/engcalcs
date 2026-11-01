@@ -55,11 +55,10 @@ the block.
 
 ## 100 — Next.
 
-- 100|852| **Re-evaluate truncation in boxes: cut text needs a way to reveal.** Tom, 2026-11-01: *"It may need some form of mitigation. Ellipsis is not a mitigation. Tip could be. Wrapping could be. Guaranteed resizing could be. This may be an issue only with Settings, which has its own styling. I find that Head loss gradient, if truncated, has no way for a user-forced reveal."*
-  **BUILT on `fix/name-wrap`, 2026-11-01** (Ida, `dev/agents/interface-designer/truncation-852-2026-11-01.md` there): Settings names wrap to two lines over a 7rem floor; English 0 cut on PC and phone, Spanish 7 longest still lose a tail. Reverses his 10-30 "truncate instead of wrapping" for Settings. Waits his pass.
 - 75|847| **The built-in solver leaves flow circulating in a loop with no demand.** Perry, 2026-10-27, on the starter extension's Static scenario: 3.18 gpm round a closed loop with zero demand (EPANET 0.07 gpm). Likely a convergence tolerance; a loop with no source or sink must carry zero.
 
 - 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Slice 2 (simple controls) merged. Slice 3 (pump speed patterns, stated SPEED 0, and a pump that cannot lift (XHEAD), which the built-in solver lacked even for one instant) merged 2026-10-22 on his word (`feat/native-eps-3`), within 0.8 mm of EPANET 2.3.5 on 12 constructed cases, Net3 with patterns and five examples; not wired to the page (slice 7, on his word). Slices 4 ([RULES]), 5 (tank volume curves, minimum volume, overflow) and 6 (pump energy) merged 2026-10-22 on his word (`feat/native-eps-6`), each within EPANET 2.3.5's tolerance. **Quality phase merged 2026-10-30 on his word** (`feat/native-quality`, unwired): age, trace and one chemical (four source types, bulk and wall reactions, MIXED/2COMP/FIFO/LIFO) match EPANET 2.3.5 on 49 cases. Next: slice 7, wiring to the page, on his word; it owes reaction rates for the page's column. Slice 6 found the page's own energy summary departs from EPANET's `addenergy()` (Task 821). Tom, 2026-09-26
+  **Tom, 2026-11-01:** never merge until finished; when it merges, rewrite the landing pages' "one instant only" claims on librewaternet.org and not-epanet.org (his yes). Slice 7 round 3 (11-01): the status bar names the solver, reaction rates computed; slice 8 (the remaining fallbacks) under way.
   **Slice 7 BUILT on `feat/native-wire`, 2026-11-01**: the built-in setting runs periods and quality natively (Net1/2/3 within the plan's tolerances), sliced with progress, EPANET's row conventions; reaction rates not computed (a status line says so). Perry reviewed; round 2 fixed his findings. Merges on his word; then CLAUDE.md, `dev/lpn-rulings.md`, `dev/positioning.md` and the landing pages' "one instant only" claims change with it.
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
@@ -68,6 +67,7 @@ the block.
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
 - 100|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
+  **SPRINT 737c DONE 2026-11-01** (Tom: *"Proceed."*; audit and `dev/english-friction/737c.json`): 625 keys in 25 languages. Status split from Scenario (am, my); Link split from Pipe (24 languages); Pattern split from Graphs/Mode (bg, ru, uk шаблон; zh EPANET's 时间模式); Source, Curve, Depth, HGL, Label, Demand unified where they varied. **Left, his call: Junction and Node share one word in 14 languages** (bg, cs, es, fa, he, hr, id, it, km, ru, sr, tr, uk, zh); Spanish EPANET itself says Nudo for a junction.
   **Not done, 2026-10-18** (Tom asked "Done?"): the am and my Status words (terms entries written 2026-10-17) and the "labels, and Text" mode prompts reach those languages only through the next sprint.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
@@ -91,58 +91,6 @@ the block.
   The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
-- 100|681| **Economize the label layout: it is half the cost of a project switch.**
-  **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-15 merged (`perf/switch-cost`, `perf/cross-shed`):**
-  a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
-  `switch-cost-browser-harness.js`): Net3 geographic 311 -> 184 ms, the 600-junction generated network 3.2 -> 1.3 s.
-  **Left, and his call:** the node shed's re-fits (~250 ms on n600, ~74 ms on Net3); cheaper means re-fitting only
-  each rung's affected area, which changes the layout. An exact memo was tried and saved only 28 ms.
-  **DEMOTED TO 75 by Tom, 2026-10-11.**
-  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
-  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
-  burst). **(b) on `perf/label-pass`, 2026-10-07:** the same layout, labelPass 254 -> 98 ms (Novato, every field
-  on, Chrome); certain shed rungs not drawn, ring search cut to the grid. `label-pass-economy-browser-harness.js`.
-  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
-  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
-    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
-    306 ms.
-  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
-    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
-    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
-    and DOM writes, not layout reads.
-  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
-    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
-    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
-    pass ZERO times.
-    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
-    approximation before any search, and we have the search without it. (c) A label whose content
-    and scale have not changed since the last pass could keep its placement, which is the same
-    "keep what you already worked out" argument as Task 680.
-  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
-    save label position and shedding state for every node at every zoom level. And I assume that
-    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
-    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
-    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
-    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
-    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
-    to happen is the last half-second before a tap, which is the worst instant for a label to
-    relocate in a tight cluster.
-    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
-      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
-      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
-      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
-      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
-      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
-      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
-      as a view snap** (Task 683 rules the view out).
-  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
-    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
-    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
-    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
-    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
-    burst actually costs before adding a second timer.
-  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
-    `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
   **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
@@ -183,8 +131,6 @@ the block.
   Tom's pass of `feat/label-beside` (2026-10-17): no difference from master seen on Net3 or Novato; not one level label seen; the page reports no zoom factor, so "at 2x" cannot be followed; he could not reach the 600-junction network. Short pipes should also try the level spot.
   Tom's pass of round 2 (2026-10-18, step 3 of the port plan): *"I can confirm that pipe labels on master have hidden more than desirable ... I find no regressions, though it doesn't reach out and ask me to shout and dance for joy."* What he looks for: *"Node labels that go inline instead of stacked and pipe labels that go out on a leader inline or stacked"*, each form chosen by *"Whichever shows more"*: `feat/label-form`, built on `feat/label-beside`.
   Tom merged `feat/label-leader` 2026-10-20 with three lessons for the study (fit more; look like your neighbors; leaders a person would draw): `dev/label-trials/tom-1020/lessons.md`.
-- 100|825| **Audit every dockable box's width, with a checklist.** Tom, 2026-10-24: the first-visit docks gave every box one width, 360 px, and Settings cut off its label rows (*"a very embarrassing bug"*). `fix/dock-widths` makes a docked box keep its own optimal width; the audit is Tom's browser pass over each box, docked and floating, listed in `dev/box-width-audit.md`. Done when every row there is ticked or a tweak is made.
-  **Re-measured 2026-11-01** after box-design merged (`dev/box-width-audit.md`, `dev/lpn-spike/box-cut-label-probe.js`): Settings cuts 14 labels on PC and 60+ on a phone; Properties and Scenario manager cut on a 273 px phone dock. Waits his pass.
 - 75|822| **Pump and valve assemblies: one point on the map, two nodes underneath.** Tom, 2026-10-23: a + button (toolbar) or Plus (menu) where Chain junction and pipe is, opening pumps, valves, a system (reservoir and pump), a virtual pipe, a well and a well with pressure tank, each managed as a group and explodable. Still being negotiated: his interview answers and open questions in `dev/assemblies.md`. Priority set by CC; his to change.
   Tom, 2026-10-25: a Map > Insert menu, Basic and ++, and well assemblies with a pressure tank curve from Boyle's law; his notes are in `dev/assemblies.md`.
 - 75|823| **Starter examples a new user can build from.** Tom, 2026-10-23: *"What if we curate/create some of our examples better to be good simple starting points for new users?"* His two: an extension design (a system reservoir and pump, a test pressure hydrant, a test flow hydrant, one loop and a fire hydrant junction); a small community well and tank system (one external tank connection, internal circulation check valves assumed). Read `dev/examples-audit.md` first. Priority set by CC.

@@ -772,3 +772,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|829| CLOSED 2026-11-01 (box-design merged on Tom's word): Download CSV, Copy HTML and Print report on every analysis box.
 - 0|842| CLOSED 2026-11-01 (box-design merged on Tom's word): one spreadsheet style for every box's rows, no first-column heading.
 - 0|845| CLOSED 2026-11-01 (box-design merged on Tom's word): report tables: economical width, adjustable columns, "And others", "Time (hr)".
+- 0|852| CLOSED 2026-11-01 (`fix/name-wrap`, merged on Tom's word): Settings names wrap onto as many lines as they need; every other box keeps the global truncation (clip, no ellipsis, no tip) by design.
+- 0|825| CLOSED 2026-11-01 (`fix/name-wrap`): the width audit answered by design rather than a checklist: Settings wraps, the global style truncates, `box-label-wrap-browser-harness.js` holds both.
+- 0|681| CLOSED 2026-11-01 on Tom's word (*"I agree. Do that."*): the label layout economies shipped ((a)-(e), switch-cost, cross-shed); the last idea, a local re-fit of the node shed, moved no label and saved 3% on n600, so it was not merged (tag `archive/label-refit`).

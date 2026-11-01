@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 3 untranslated keys, of 3292 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 3290 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,23 +29,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
-
-- **`lpn_engine_native_route`**
-  > Solved with the EPANET solver, because the built-in solver does not run this simulation.
-  @@ NEEDS RULING
-- **`lpn_engine_native_route_ids`**
-  > Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.
-  @@ NEEDS RULING
-- **`lpn_time_native_no_rates`**
-  > The built-in solver does not report reaction rates. To see them, clear Use the built-in solver when possible in Settings.
-  @@ NEEDS RULING
+None on master. Every English key here is present in at least one other language.
 
 ---
 
 # Strings waiting on a branch
 
-**66 still to read**, of 109 new keys across 9 unmerged branch(es).
+**69 still to read**, of 112 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -55,8 +45,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/box-width-remeasure (`d06e00fbc`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -99,7 +87,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
-### feat/native-wire (`970425556`) — adds no English strings
+### feat/native-wire (`154abbde9`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_engine_epanet_used`**
+  > Solved with the EPANET solver.
+  @@ NEEDS RULING
+- **`lpn_engine_native_route`**
+  > Solved with the EPANET solver, because the built-in solver does not run this simulation.
+  @@ NEEDS RULING
+- **`lpn_engine_native_route_ids`**
+  > Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.
+  @@ NEEDS RULING
+- **`lpn_engine_native_used`**
+  > Solved with the built-in solver.
+  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -265,7 +266,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`b619a3e0b`) — 43 new, 43 to read @@ NEEDS RULING
+### feat/wtg-page-export (`acfffb1df`) — 43 new, 43 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -397,10 +398,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Writing the .wtg project…
   @@ NEEDS RULING
 
-### fix/about-dedication (`50b78bcc4`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_about_dedication`**
-  > You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.
-  @@ NEEDS RULING
-
-### fix/name-wrap (`79e775081`) — adds no English strings
+### fix/name-wrap (`0f47d9ff2`) — adds no English strings
