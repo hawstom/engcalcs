@@ -108,7 +108,7 @@ function head(t) { console.log('\n' + t); }
 	ok('it names the water quality analysis (Net3 traces Lake), pipe material and map positions',
 		codes.indexOf('quality') >= 0 && codes.indexOf('material') >= 0 && codes.indexOf('positions') >= 0, codes.join(','));
 	ok('it names no emitters, no rules and no pressure controls (Net3 has none)',
-		['emitters', 'rules', 'controls_pressure', 'demand_category', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
+		['emitters', 'rules', 'controls_pressure', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
 	ok('the plan reads 92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps',
 		planned.parsed.nodes.filter((n) => n.type === 'junction').length === 92 && planned.parsed.nodes.filter((n) => n.type === 'reservoir').length === 2
 		&& planned.parsed.nodes.filter((n) => n.type === 'tank').length === 3 && planned.parsed.links.filter((l) => l.type === 'pipe').length === 117
@@ -272,8 +272,8 @@ function head(t) { console.log('\n' + t); }
 		const px = EngCalcs.lpnWtgExportPlan(L.getDoc(), {});
 		EngCalcs.lpnInpParse = origParse; EngCalcs.lpnExportInp = origExport;
 		px.notCarried.forEach((x) => codesExtras.push(x.code));
-		ok('map Text, tags and a backdrop are each named when the project has them', ['texts', 'tags', 'backdrop'].every((c) => codesExtras.indexOf(c) >= 0), codesExtras.join(','));
-		ok('...each with a sentence of its own', L.wtgLines(px.notCarried.filter((x) => ['texts', 'tags', 'backdrop'].indexOf(x.code) >= 0)).join('|') === [PC.lpn_wtg_export_lost_texts, PC.lpn_wtg_export_lost_tags, PC.lpn_wtg_export_lost_backdrop].join('|'));
+		ok('map Text and a backdrop are each named when the project has them; tags are written into Notes, so not named', ['texts', 'backdrop'].every((c) => codesExtras.indexOf(c) >= 0) && codesExtras.indexOf('tags') < 0, codesExtras.join(','));
+		ok('...each with a sentence of its own', L.wtgLines(px.notCarried.filter((x) => ['texts', 'backdrop'].indexOf(x.code) >= 0)).join('|') === [PC.lpn_wtg_export_lost_texts, PC.lpn_wtg_export_lost_backdrop].join('|'));
 	}
 	L.importInp({ name: 'Net3.inp', _text: NET3 });
 
@@ -332,6 +332,27 @@ function head(t) { console.log('\n' + t); }
 			const vb = EngCalcs.lpnInpParse(vrb.inp), vl = Object.fromEntries(vb.links.map((x) => [x.id, x]));
 			const want = { PBV1: 'PBV', PRV1: 'PRV', PSV1: 'PSV', FCV1: 'FCV', TCV1: 'TCV', GPV1: 'GPV' };
 			ok('all six valve kinds come back as their own kind', Object.keys(want).every((k) => vl[k] && vl[k].type === 'valve' && vl[k].valveType === want[k]), Object.keys(want).map((k) => k + ':' + (vl[k] && vl[k].valveType)).join(' '));
+		}
+	}
+
+	// ---- 9. the page's own route carries description, tag and demand category into Notes ----
+	head('9. dev/lpn-spike/reference/wtg-export-notes.inp: description, tag and categories reach the Notes');
+	{
+		L.importInp({ name: 'Notes.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-notes.inp'), 'utf8') });
+		const np = L.wtgPlan();
+		ok('the plan is made, and names neither tags nor demand category names as left out', np.ok && !np.notCarried.some((x) => x.code === 'tags' || x.code === 'demand_category'), np.ok ? np.notCarried.map((x) => x.code).join(',') : np.detail);
+		const nwr = await write();
+		ok('written', !!nwr.out, nwr.err);
+		if (nwr.out) {
+			const nZip = path.join(tmp, 'notes.zip'), nDir = path.join(tmp, 'notes');
+			fs.mkdirSync(nDir);
+			fs.writeFileSync(nZip, Buffer.from(await nwr.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", nZip, nDir);
+			const ndb = new SQL.Database(new Uint8Array(fs.readFileSync(path.join(nDir, nwr.out.sqliteName))));
+			const nn = (label) => { const r = ndb.exec("SELECT Notes FROM HMIModelingElement WHERE Label = '" + label + "'"); return r.length ? r[0].values[0][0] : null; };
+			ok('junction J1 holds its description, tag and both category names', nn('J1') === 'Corner of Elm and Main\nTag: Zone3\nDemand categories: Residential 100 gpm; Commercial 40 gpm', JSON.stringify(nn('J1')));
+			ok('pipe 2 holds its description and tag, tank T1 its tag, pump PU1 its description', nn('2') === 'Main trunk, cement lined 1974\nTag: Trunk' && nn('T1') === 'Tag: Hilltop' && nn('PU1') === 'Lake pump');
+			ndb.close();
 		}
 	}
 

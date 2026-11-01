@@ -411,6 +411,30 @@ function head(t) { console.log('\n' + t); }
 		md.close();
 	}
 
+	// ---- 12. description, tag and demand category names are written into each element's Notes ----
+	head('12. Descriptions, tags and demand category names go into the Notes of each element');
+	const notesText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-notes.inp'), 'utf8');
+	const np = EngCalcs.lpnInpParse(notesText);
+	const nw = lib.writeWtg(SQL, tplBytes, np, { initial: {}, changes: [] }, { name: 'notes', efficiency: 75 });
+	ok('written, integrity ok', nw.report.integrity === 'ok' && nw.report.foreignKeyViolations === 0);
+	{
+		const nd = new SQL.Database(nw.bytes);
+		const nq = (sql) => { const r = nd.exec(sql); return r.length ? r[0].values : []; };
+		const note = (label) => { const r = nq("SELECT Notes FROM HMIModelingElement m JOIN HMIDomainElement d ON d.DomainElementID = m.ElementID WHERE m.Label = '" + label + "'"); return r.length ? r[0][0] : null; };
+		const want = {
+			J0: 'Pump discharge node',
+			J1: 'Corner of Elm and Main\nTag: Zone3\nDemand categories: Residential 100 gpm; Commercial 40 gpm',
+			'2': 'Main trunk, cement lined 1974\nTag: Trunk',
+			PU1: 'Lake pump',
+			T1: 'Tag: Hilltop',
+			R: '', '3': ''
+		};
+		Object.keys(want).forEach((k) => { ok('Notes of ' + k + ' reads ' + JSON.stringify(want[k]), note(k) === want[k], JSON.stringify(note(k))); });
+		ok('the report counts what it wrote: 4 descriptions, 3 tags, 2 category names',
+			nw.report.notesFrom.descriptions === 4 && nw.report.notesFrom.tags === 3 && nw.report.notesFrom.categories === 2, JSON.stringify(nw.report.notesFrom));
+		nd.close();
+	}
+
 	console.log(fails ? '\n' + fails + ' check(s) FAILED:' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });

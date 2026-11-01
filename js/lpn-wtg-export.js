@@ -330,6 +330,23 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const nodeById = {};
 	nodes.forEach((n) => { nodeById[n.id] = n; });
 
+	// An element's Notes (the Notes field every element of a saved project has) carries what the file states about it that
+	// the project has no field of its own for: the description, the tag, and the names of the demand categories.
+	const tagMaps = (EngCalcs.lpnTagsParse && (parsed.inpSections || {}).TAGS) ? EngCalcs.lpnTagsParse(parsed.inpSections.TAGS) : { node: {}, link: {} };
+	function notesOf(kind, el) {
+		const out = [];
+		if (el.desc && String(el.desc).trim()) { out.push(String(el.desc).trim()); report.notesFrom.descriptions++; }
+		const tag = (tagMaps[kind] || {})[el.id];
+		if (tag) { out.push('Tag: ' + tag); report.notesFrom.tags++; }
+		if (kind === 'node' && el.type === 'junction') {
+			const cats = [{ base: el.demand, category: el.demandCategory }].concat(el.extraDemands || []).filter((d) => d.base && d.category)
+				.map((d) => d.category + ' ' + d.base + ' gpm');
+			if (cats.length) { out.push('Demand ' + (cats.length > 1 ? 'categories' : 'category') + ': ' + cats.join('; ')); report.notesFrom.categories += cats.length; }
+		}
+		return out.join('\n');
+	}
+	report.notesFrom = { descriptions: 0, tags: 0, categories: 0 };
+
 	// Drawing scale: EPANET map units -> feet. One number for the whole map, the median of
 	// (pipe length / drawn distance) over pipes that state both. Lengths do NOT depend on it: every
 	// pipe is written with its stated length as a user-defined length.
@@ -471,7 +488,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const xy = P(n);
 		const geo = { BaseIdahoNode_HmiDataSetGeometry_Data: { HMIGeometry: wkbPoint(xy[0], xy[1]) } };
 		if (n.type === 'junction') {
-			domainElement(id, 55, n.id);
+			domainElement(id, 55, n.id, notesOf('node', n));
 			const ov = Object.assign({}, geo, {
 				BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.elev },
 				IdahoDemandNode_Demand_Data: { DemandCollectionCount: demandRows(n).length, UnitDemandLoadCollectionCount: 0 },
@@ -491,7 +508,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			});
 			nJ++;
 		} else if (n.type === 'reservoir') {
-			domainElement(id, 56, n.id);
+			domainElement(id, 56, n.id, notesOf('node', n));
 			const resOv = Object.assign({}, geo, { BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.head } });
 			if (n.headPattern) {
 				if (patId[n.headPattern] === undefined) { throw fail('data', 'Reservoir ' + n.id + ' names head pattern ' + n.headPattern + ', which the project does not define.', [n.id], 'head_pattern', { id: n.id }); }
@@ -500,7 +517,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			cloneRows(proto.reservoir, id, null, resOv);
 			nR++;
 		} else if (n.type === 'tank') {
-			domainElement(id, 52, n.id);
+			domainElement(id, 52, n.id, notesOf('node', n));
 			// A volume curve: EPANET gives depth above the tank bottom and volume (ft3). WaterGEMS holds
 			// the active range as depth ratio and volume ratio (OBSERVED in Tom's saved TGH-1 scenario
 			// against its .inp: depth 16.2 of 1..20 is ratio 0.8; volume / total active volume), the total
@@ -539,8 +556,8 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const pipeElId = {};        // EPANET link id -> ElementID of the pipe that carries its status
 	const pumpNodeId = {};
 	let nPipe = 0, nPump = 0, nAdded = 0;
-	function pipeRows(id, label, startEl, stopEl, pts, lengthFt, diaIn, C, minorK, closed, checkValve) {
-		domainElement(id, 69, label);
+	function pipeRows(id, label, startEl, stopEl, pts, lengthFt, diaIn, C, minorK, closed, checkValve, notes) {
+		domainElement(id, 69, label, notes);
 		cloneRows(proto.pipe, id, null, {
 			BaseLink_HMIDataSetTopology_Data: { HMITopologyStartNodeID: startEl, HMITopologyStopNodeID: stopEl },
 			BaseLink_HmiDataSetGeometry_Data: { HMIGeometry: wkbLine(pts), HMIGeometryScaledLength: polyLength(pts) },
@@ -583,7 +600,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			if (!(l.curveId && gpvCurveId[l.curveId])) { throw fail('data', 'GPV ' + l.id + ' has no headloss curve.', [l.id], 'gpv_curve', { id: l.id }); }
 			ov.GPV_Physical_Data = { Physical_GpvHeadlossCurveID: gpvCurveId[l.curveId] };
 		}
-		domainElement(valveId, VALVE_TYPE_ID[vt], l.id);
+		domainElement(valveId, VALVE_TYPE_ID[vt], l.id, notesOf('link', l));
 		cloneRows(valveProto[vt], valveId, null, ov);
 		const closed = String(l.status || '').toUpperCase() === 'CLOSED';
 		pipeRows(aId, l.id + '-A', elId['n:' + l.from], valveId, [P(a), mid], 1, 99, 130, 0, closed, false);
@@ -600,7 +617,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const pts = [P(a)].concat((l.verts || []).map((v) => [v.x !== undefined ? v.x * coordScale : v[0] * coordScale, v.y !== undefined ? v.y * coordScale : v[1] * coordScale])).concat([P(b)]);
 		const st = String(l.status || 'open').toUpperCase();
 		const closedAtStart = initialStatus[l.id] ? initialStatus[l.id] === 'closed' : st === 'CLOSED';
-		pipeRows(id, l.id, elId['n:' + l.from], elId['n:' + l.to], pts, l.length, l.diameter, l.roughness, l.k || 0, closedAtStart, st === 'CV');
+		pipeRows(id, l.id, elId['n:' + l.from], elId['n:' + l.to], pts, l.length, l.diameter, l.roughness, l.k || 0, closedAtStart, st === 'CV', notesOf('link', l));
 		nPipe++;
 	});
 	links.forEach((l) => {
@@ -615,7 +632,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const mid = [(P(a)[0] + P(b)[0]) / 2, (P(a)[1] + P(b)[1]) / 2];
 		const pumpId = newId(), aId = newId(), bId = newId();
 		pumpNodeId[l.id] = pumpId;
-		domainElement(pumpId, 68, l.id);
+		domainElement(pumpId, 68, l.id, notesOf('link', l));
 		cloneRows(proto.pump, pumpId, null, {
 			BaseDirectedNode_HmiDataSetGeometry_Data: { HMIGeometry: wkbPoint(mid[0], mid[1]) },
 			BaseDirectedNode_HMIDataSetTopology_Data: { HMITopologyDownstreamLinkID: bId },
@@ -904,8 +921,6 @@ function plan(doc, opts) {
 	});
 	if (badPumps.length) { refused.push({ code: 'pump_curve', ids: badPumps }); }
 
-	const cat = idsOf(nodes, (n) => n.type === 'junction' && ((n.demandCategory) || (n.extraDemands || []).some((d) => d.category)));
-	if (cat.length) { notCarried.push({ code: 'demand_category', ids: cat }); }
 	const emit = idsOf(nodes, (n) => n.type === 'junction' && n.emitter);
 	if (emit.length) { notCarried.push({ code: 'emitters', ids: emit }); }
 	// A water quality analysis asked for ([OPTIONS] Quality other than None), or a source, a mixing model or a reaction stated.
@@ -945,7 +960,6 @@ function plan(doc, opts) {
 	if (hy.demandMultiplier !== undefined && Number(hy.demandMultiplier) !== 1) { notCarried.push({ code: 'demand_multiplier', ids: [], value: String(hy.demandMultiplier) }); }
 	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA') { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
 	if ((parsed.labels || []).length) { notCarried.push({ code: 'texts', ids: [] }); }
-	if ((secs.TAGS || []).length) { notCarried.push({ code: 'tags', ids: [] }); }
 	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
 	// Always: these have no place in the file, whatever the network.
 	notCarried.push({ code: 'material', ids: [] });

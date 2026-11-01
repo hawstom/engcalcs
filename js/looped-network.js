@@ -45068,7 +45068,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wtgNotCarriedLines(items) {
 		var texts = {
 			emitters: 'Emitter coefficients: {ids}.',
-			demand_category: 'Demand category names (junctions {ids}). The flows are written; the names are not.',
 			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
 			energy_price: 'Energy price, price pattern, and demand charge.',
 			rules: 'Rule-based controls.',
@@ -45080,7 +45079,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			demand_multiplier: 'Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.',
 			demand_model: 'Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.',
 			texts: 'Text on the map.',
-			tags: 'Tags.',
 			backdrop: 'The background picture.',
 			positions: 'True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.'
 		};

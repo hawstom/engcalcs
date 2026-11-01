@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**37 still to read on master**, of 37 untranslated keys, of 3327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 35 untranslated keys, of 3325 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (37, 37 to read @@ NEEDS RULING)
+## lpn_  (35, 35 to read @@ NEEDS RULING)
 
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
@@ -54,9 +54,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_controls_pressure`**
   > Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_demand_category`**
-  > Demand category names (junctions {ids}). The flows are written; the names are not.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_demand_model`**
   > Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.
@@ -87,9 +84,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_rules`**
   > Rule-based controls.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_tags`**
-  > Tags.
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_tank_minvol`**
   > Tank minimum volume (tanks {ids}).
@@ -422,4 +416,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`3b798fb34`) — adds no English strings
+### feat/wtg-page-export (`e3d85d685`) — adds no English strings
