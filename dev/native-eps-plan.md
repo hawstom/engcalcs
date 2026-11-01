@@ -332,32 +332,76 @@ ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine
 `lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`, `lpn_time_no_report`. What stays
 true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.
 
-## What still falls back to EPANET under the built-in setting (2026-11-01)
+## What still falls back to EPANET under the built-in setting (updated 2026-11-01)
 
-Nothing here is built; it is the next slice's list. Cost is an engineering estimate in working days, from
-the size of the matching EPANET 2.3.5 source and the slices already done.
+Built on `feat/native-wire` after the first inventory: every run path asks one door (`EngCalcs.lpnTimeRunModel`,
+the engine choice the transport uses); a control on a reservoir and a junction-pressure control on a valve; a
+pump with no curve on a speed pattern (already a pipe in both engines; now held); the rules EPANET refuses,
+named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 
 **A period the transport runs** (`lpnTimeNativePlan()`; the status bar names the element or setting):
 
-| Falls back for | Where it is decided | Estimate |
+| Falls back for | Where it is decided | Why it stays |
 |---|---|---|
-| A pressure-driven demand model (steady and period) | `lpnDemandModelIsPda`; its own note `lpn_engine_pda_route` | 3 days: the demand function and its derivative enter the global gradient solve (hydraul.c `demandheadloss()`, `pda` in `netsolve`), then the quality pass reads the delivered demand |
-| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | 10 or more days: a multi-species reaction network with an RK5 or Rosenbrock integrator and its own segment transport; the least likely to be worth copying |
-| A simple control on a reservoir level, on a junction pressure that switches a valve, on a GPV status, a setting-less control on a non-valve, or any control on a check-valve pipe | `native-run-control-unsupported` | 1 day for the reservoir and junction-pressure conditions (controls.c `controlcondition()`); the rest are inputs EPANET itself refuses (errors 207 and 211), so the right answer is the same refusal in both engines, not a copy |
-| A [RULES] block the rule parser cannot read, or a hydraulic step under 10 s with rules | `native-run-rules` | 1 day for the unread grammar |
-| A pump speed pattern on a pump with no curve, or a speed pattern with a negative multiplier | `native-run-speed-pattern` | under 1 day; the first is a pump EPANET reads as a pipe |
-| A tank volume curve the model carries no usable rows for | `native-run-volume-curve` | none: EPANET refuses it too (error 225); route the refusal, do not copy it |
-| A tank whose initial level lies outside its limits | `native-run-tank-levels` | none: EPANET refuses it (error 225) |
-| Quality: a trace on a node out of the run, a tank with no area, an unknown source type or mixing model, a source on a pattern the model lacks, a hydraulic step under 10 s with no quality step | `native-run-quality` | none: each is an input EPANET errors on or does not advance |
-| Energy: a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase | `native-run-energy` | none: EPANET refuses each |
-| A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | none: a real failure, shown as EPANET's answer |
+| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | A separate extension: a multi-species reaction network with its own integrator and segment transport. Left on EPANET by decision. |
+| A [RULES] premise on a pipe's roughness, a reservoir's level or pressure, or a GPV's setting; a hydraulic step under 10 s with any rule | `native-run-rules` | EPANET reads these; the loop does not copy them. Roughness and GPV settings are not state the loop holds. Not built. |
+| A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
+| A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
+| A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | A real failure, shown as EPANET's answer. |
 
-**Everything that is not the transport's run** still calls `lpnEpanetRun` whatever the setting says:
+**Not a run, and not changed**: the EPANET text run report (Project, EPANET run report; no report exists on a
+built-in run and `lpn_time_no_report` says so) and the run's warnings in EPANET's words (`nativeWarnings()`
+carries only the bridge's notes). A later slice.
 
-| Falls back for | Where | Estimate |
-|---|---|---|
-| The scenario comparison, for a scenario with a total run time | `scenarioCompareRunsPeriod()`, `runScenarioCompare()` | 0.5 day: call `periodRun()`'s plan per scenario and keep the one-engine-at-a-time chain |
-| Fire flow over a duration (`runDurationFire`), criticality (`runCriticality`) and demand scaling (`demandScaleCase`) when the project has a total run time | `lpnEpanetRun(m, {})` at each | 1 day for the three: one shared helper that asks the plan and runs the loop in slices, then `lpnEpsRunResult()` on the frames |
-| The Alternatives preview and the analysis run (`analysisRun`, `analysisCanRun`) | `lpnEpanetRun(model, ...)` | 0.5 day, same helper |
-| The run report (Project, EPANET run report) | no report exists on a built-in run; `lpn_time_no_report` says so | 2 days to compose one from the loop's own warnings and step statistics, or none if the report is declared EPANET's by definition |
-| The run's warnings in EPANET's words (negative pressure, disconnected, unbalanced) | `nativeWarnings()` carries only the bridge's notes | 1 day: hydraul.c `writehydwarn()` is short |
+## Analysis runs (this slice)
+
+Scenario comparison, fire flow over a duration, criticality, demand scaling, the Alternatives preview and
+`analysisRun` no longer call `lpnEpanetRun`. They call `EngCalcs.lpnTimeRunModel(model, opts)`, which is
+`periodRun()` with the status-bar note switched off (the transport owns that slot). The setting decides, and
+a model the loop refuses runs on EPANET exactly as before. Held by `native-analysis-wire-harness.js` on Net1 and
+Net3: the models those analyses build (a fire demand on a pattern, a pipe closed, a demand multiplier) run both
+ways and agree on the lowest pressure of every node (1 mm), the highest velocity of every link (1e-4 m/s), the
+tank-empty verdict, and every number the fire-flow digest reports. One measured limit: Net3 with demands scaled
+by 1.5 (pumps past their curves, EPANET warning 4) differs by 17 mm in a node's lowest pressure; at 1.4 and below
+the gap is 0.2 mm. A project that overloads its pumps is outside what the harness holds.
+
+## Controls on a reservoir and on a junction pressure at a valve
+
+hydraul.c `controls()` reads every node past the junctions as a tank. A reservoir has no area, so the volume at
+the control level and at the node's head are both 0 and the condition is met at every step, whatever level is
+stated; the loop copies that (`rec.on = 'reservoir'`, `reset = true`). hydstatus.c `pswitch()` for a valve (PRV and
+above) changes it when its setting differs from the control's, else when its status does (measured: an OPEN
+control re-opens a valve stated Closed; two contradicting controls on one valve flip each trial in EPANET and
+the case is not held). The solver builds its valve arrays once, so the loop judges a valve between solves
+(`valveSwitch()`) and solves again from the same flows until nothing changes. Held by 12 cases in
+`native-eps-harness.js` (PRV, PSV-style fixed, FCV, TCV, PBV; setting and status changes).
+Known and not part of this: an FCV at its limit in parallel with a narrow bypass differs by 0.02 L/s from EPANET
+(a plain-solver gap, with or without a control).
+
+## [RULES] EPANET refuses
+
+`EngCalcs.lpnDiagnose` returns `rules-refused` with the rule names for a project that runs a period, whichever
+engine is chosen: FILLTIME on a junction, a time EPANET cannot read, an action on a check valve, a link or node
+that does not exist, a negative setting, a numeric action on a GPV, no premise or no THEN action. (A rule the
+page's grammar cannot read is dropped by `assembleModel()` and said as a warning in both engines; it never
+reaches either.) `native-rules-refusal-harness.js` runs each text through EPANET itself with the check off to
+show EPANET refuses it, and shows a rule EPANET reads but the loop does not copy is not named.
+
+## Pressure-driven demand (PDA)
+
+Transcribed from OWA-EPANET 2.3.5 hydcoeffs.c (`demandcoeffs`, `demandheadloss`, `addlowerbarrier`,
+`addupperbarrier`) and hydsolver.c (`newdemandflows`, `pdaconverged`, `hasconverged`). A junction of positive full
+demand is an emitter-like element with head loss `dP (D/Dfull)^(1/Pexp)` and EPANET's smooth barriers at both
+ends (constants 1e9 and 1e-6, in ft and cfs, converted); the delivered demand D starts at the full demand each
+solve, is stepped toward the matrix head (clamped to 0.4 Dfull a trial, scaled by the damping factor), and the
+solve is not converged until every D is within 0.0001 cfs of the demand function at the solved pressure. Junctions
+of zero or negative demand stay fixed. `MINPDIFF` is taken as 0.1 (feet), which only matters when Required minus
+Minimum pressure is under 0.1 ft; it could not be read from the source fetched and is not tested. The result carries
+`demands` (delivered, emitter included, as EN_DEMAND) and `demandDeficits`; frames and the quality pass read them.
+`lpnDiagnose` no longer refuses PDA under the built-in setting; `pda-pressures` still does. The page no longer
+routes a PDA project to EPANET; the key `lpn_engine_pda_route` and `lpn_diag_pda_needs_epanet` are unrendered.
+Held by `native-pda-harness.js` (23 checks): 11 constructed steady cases (exponents 0.5, 1, 1.5; a minimum
+pressure; defaults; pressure under the minimum; zero and negative demand; a tank; an emitter), Net1 and Net3 with
+PDA options and demands scaled until nodes starve (heads within 0.5 mm, flows within 0.02 L/s, delivered demand
+within 0.0001 L/s), two 24 h periods, and water age over a starved period (nodes 0.06 s). Not held: PDA with
+[RULES] that read a node's DEMAND (the rule reads the step's full demand, as for a demand-driven run).
