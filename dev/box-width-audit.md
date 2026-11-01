@@ -39,10 +39,10 @@ an analysis box (Fire flow, Criticality, Demand scaling) after its own run, and 
 | Status changes | 320, floor | 832 | 382 | none |
 | Calibration report | 320, floor (was 496) | 832 | 382 | none |
 | Full report | 832, cap | 832 | 382 | none; scrolls sideways inside its table on a phone |
-| Scenario manager | own rule | 352 on Net3, 1050 on Net1 (widens to its table) | 382 | none after wrapping (was: scenario names on a 273 px phone dock) |
-| Settings | 618 (38.6 rem; was 552) | 618 | 382 floating, 273 docked | no cut label after wrapping (was 14 on PC, 60+ on a phone); the unit cells "Qb=", "Init.", "mg/L", "km=", "Cb=", "Cw=" are cut values |
-| Properties | 320 (20 rem; was 416) | 413 on Net1, 402 on Net3 | 382 floating, 273 docked | none after wrapping (was: "Emitter coefficient ()", "Chlorine concentration ()" and their units on a 273 px phone dock); Net3 junction coordinates at 320 are values |
-| Demand categories | 328 | 328 | 382 | none; the title is clipped plain, never "Demand catego..." |
+| Scenario manager | own rule | 352 on Net3, 1050 on Net1 (widens to its table) | 382 | on a phone docked at 273: scenario names "Max day with main break", "Peak hour with main break" (Net1) |
+| Settings | 618 (38.6 rem; was 552) | 618 | 382 floating, 273 docked | wraps now: no cut label on PC or phone; the unit cells "Qb=", "Init.", "mg/L", "km=", "Cb=", "Cw=" are cut values |
+| Properties | 320 (20 rem; was 416) | 413 on Net1, 402 on Net3 | 382 floating, 273 docked | PC none, except the Net3 junction's coordinates "2223768.890508" and "5968033.952953" at 320. Phone docked 273: "Emitter coefficient ()", "Chlorine concentration ()" and their unit "gpm/psi", "mg/L" |
+| Demand categories | 328 | 328 | 382 | the title is clipped plain, never "Demand catego..." |
 | Find and replace | 368 (23 rem) | 352 | 382 | none |
 | Libraries | 432 (27 rem) | 704 | 382 floating, 273 docked | PC docked and phone: the curve-point lists in Net3's pattern and curve rows (values, e.g. "1.34 1.94 1.46 ..."), cut in their input field |
 | Contour plot | 320 (floor) | 408 | 382 | none |
@@ -80,24 +80,21 @@ Initial status, Status, Water age) up to 12 px left of the others.
 6. Narrow the window to about 1100 px and fly out Full report. It is capped to the room, never past
    the window.
 
-## Result of the probe, after wrapping (branch `fix/name-wrap`, 2026-11-01)
+## Result of the probe (branch `fix/name-wrap`, 2026-11-01)
 
-A label or name now wraps as many lines as it needs, on one shared rule (`.lpn-gname`, the Settings row, the
-Scenario manager name, the theme button name, the "Saved in this browser" badge), over the Label column's
-floor. Nothing is clipped and no ellipsis is drawn anywhere in the box style; a box title too long for its
-bar is clipped plain, so the bar's buttons stay where they are.
-`box-label-wrap-browser-harness.js` opens Settings, Properties, Scenario manager and Demand categories in
-English and Spanish, on a PC (floating and docked) and a phone (floating and docked at 273) and finds no cut
-label, no ellipsis and, in Demand categories, exactly its four columns with no rule inside the last.
+**Settings wraps by its own style; the global box style truncates by design** (clip, no ellipsis, no tip,
+from box-design). In Settings a name takes as many lines as it needs over a column floor, so no Settings
+label is cut on a PC or a phone, in English or Spanish. Every other box keeps the global truncation, so
+the cut text in the table below for Properties, Scenario manager and Libraries is by design, not a defect.
+No box draws an ellipsis: a title too long for its bar is clipped plain, so the bar's buttons stay put.
+`box-label-wrap-browser-harness.js` holds Settings and the no-ellipsis rule, in English and Spanish, on a
+PC and a phone, docked and floating (273).
 
-- **Settings, Properties, Scenario manager on a phone dock (273):** no cut label (was 60+, two, two).
 - **Demand categories:** the stray vertical line was the border before the unlabeled delete column, drawn
   even when a lone row has no button; it is gone, and the delete column is narrower so Description has room.
   The title keeps its words and is clipped at the bar with no "...".
-- **What is still cut, as values and not labels:** the unit cells beside a number ("Qb=", "Init.",
-  "mg/L", "km=", "Cb=", "Cw=") and Libraries' curve-point lists, which are inside their own input.
-- **Docked widths** (table above) are unchanged; Properties 320 and Demand categories 328 hold their text by
-  wrapping now.
+- **Still clipped by design:** Properties labels and units, Scenario manager names (273 px dock), the unit
+  cells beside a number in Settings ("Qb=", "mg/L"), and Libraries' curve-point lists.
 
 ## What is not covered
 

@@ -2910,7 +2910,6 @@ html[lang="zh"] .ec-welcome {
 #lpn_demands_body > .lpn-demand-table th:nth-child(1) { width: 7em; }
 #lpn_demands_body > .lpn-demand-table th:nth-child(2) { width: 8em; }
 #lpn_demands_body > .lpn-demand-table th:last-child { width: 2em; }
-#lpn_demands_body > .lpn-demand-table th { overflow-wrap: anywhere; }
 #lpn_demands_body .lpn-demand-table :is(th, td) { padding: 0; border: 0; border-bottom: 1px solid var(--ec-hairline); font-size: .85em; text-align: start; }
 #lpn_demands_body .lpn-demand-table :is(th, td) + :is(th, td) { border-inline-start: 1px solid var(--ec-hairline); }
 #lpn_demands_body .lpn-demand-table th { padding: 4px 6px; font-weight: 600; opacity: .8; }
@@ -3894,8 +3893,8 @@ option:disabled { color: var(--ec-ink-muted); }
 .lpn-gplain .lpn-grid { row-gap: 6px; }
 .lpn-grow, .lpn-gspan-row { display: contents; }
 .lpn-grow > * { min-width: 0; }
-/* A label wraps as many lines as it needs and is never cut (Task 852; Tom, 2026-11-01: "I would rather that they kept wrapping as needed"; this reverses 2026-10-30 "truncate instead of wrapping"). The Label column keeps a floor (LPN_GNAME_MIN, gridFitNow), so wrapping never leaves a sliver; a word longer than the column breaks mid-word. */
-.lpn-gname { min-width: 0; white-space: normal; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A label never wraps: one line, clipped at the column edge, the full label in its tip (Tom, 2026-10-30: "truncate instead of wrapping"; gridTitlesNow()). */
+.lpn-gname { min-width: 0; overflow: hidden; white-space: nowrap; font-size: .85em; opacity: .8; }
 /* The `?` follows the label's last word in the text flow, so a wrapped label never strands it at the far edge; a unit
    (in <bdi>) never breaks inside its brackets. */
 .lpn-gname.ec-help { display: block; }
@@ -4031,7 +4030,7 @@ option:disabled { color: var(--ec-ink-muted); }
 		/* An empty editable cell is plain: the hover fill and the focus outline are what say it can be typed in (Tom, 2026-10-29). */
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > :is(input, select, textarea).lpn-gval:disabled { color: var(--ec-ink-muted); }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > textarea.lpn-gval { resize: vertical; }
-		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; white-space: normal; overflow-wrap: anywhere; }
+		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > span.lpn-gval:not(.lpn-gw-num) { color: var(--ec-ink-muted); padding: 4px 6px; margin: 0; align-self: stretch; font-size: .85em; overflow: hidden; white-space: nowrap; }
 		.lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="checkbox"].lpn-gval, .lpn-sheet:not(.lpn-gnarrow):not(.lpn-gplain) .lpn-grow > input[type="radio"].lpn-gval {
 			width: 1.125rem; height: 1.125rem; margin: 5px 6px; align-self: start;
 		}
@@ -6589,7 +6588,7 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 .lpn-sm-row.lpn-sm-into { outline: 2px solid var(--ec-ink); outline-offset: -2px; }
 .lpn-sm-row.lpn-sm-before { border-top-color: var(--ec-ink); }
 .lpn-sm-row.lpn-sm-after { border-bottom-color: var(--ec-ink); }
-.lpn-sm-name { flex: 1 1 auto; min-width: 3rem; white-space: normal; overflow-wrap: anywhere; }   /* a scenario name wraps, never cut (Task 852) */
+.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; }
 .lpn-sm-name input { width: 100%; box-sizing: border-box; }
 .lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
 /* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
