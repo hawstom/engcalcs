@@ -861,7 +861,7 @@ console.log('\n--- the bubble is dismissable, and the choice is the browser\'s -
 console.log('\n--- the bubble\'s "Show this" and the Settings row are one switch ---');
 {
 	['lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-		'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
+		'lpn_set_hydraulics_fields', 'lpn_set_solver_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
 		'lpn_set_page_fields'].forEach(ensure);
 	L.setHintShown(true);
 	L.setAreaShape('window');

@@ -155,7 +155,8 @@ function inputsUnder(node, out) {
 	L.rebuildSettings();
 	const comp = document.getElementById('lpn_set_hydraulics_fields');
 	ok('the stub has the Hydraulics field host, or this section is vacuous', !!comp);
-	const compText = textOf(comp);
+	// Solver (the first three rows) sits above Hydraulics since 2026-11-01; their order is read across both.
+	const compText = textOf(document.getElementById('lpn_set_solver_fields')) + ' ' + textOf(comp);
 	// **ALL FIVE, BECAUSE HALF AN INSTRUCTION READS AS AN INSTRUCTION IGNORED.** The first pass held
 	// only the two switches Tom named first and left Friction method and Default demand pattern at
 	// the foot of the section, where build order had put them. He gave the whole order twice

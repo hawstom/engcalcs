@@ -31429,7 +31429,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (m === 'defaults' || m === 'nodeElevSource') { return 'lpn_set_sub_defaults'; }
 		if (/^(quality|qualityOptions|reactions)$/.test(m)) { return 'lpn_set_sub_quality'; }
 		if (m === 'energy') { return 'lpn_set_sub_energy'; }
-		if (/^(method|engine|autoRun|hydraulics|emitterExponent|tolerance)$/.test(m)) { return 'lpn_set_sub_hydraulics'; }
+		if (/^(engine|autoRun)$/.test(m)) { return 'lpn_set_sub_solver'; }
+		if (/^(method|hydraulics|emitterExponent|tolerance)$/.test(m)) { return 'lpn_set_sub_hydraulics'; }
 		if (m === 'colorBreaks' || m === 'colorModes') { return /^link/.test(String(p[2])) ? 'lpn_set_sub_linkColors' : 'lpn_set_sub_nodeColors'; }
 		if (/^color.*Node$/.test(m)) { return 'lpn_set_sub_nodeColors'; }
 		if (/^color.*Link$/.test(m)) { return 'lpn_set_sub_linkColors'; }
@@ -63630,17 +63631,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var idBody = byId('lpn_set_id_fields'), defBody = byId('lpn_set_default_fields'),
 			customBody = byId('lpn_set_custom_fields'),
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
-			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
+			compBody = byId('lpn_set_hydraulics_fields'), solverBody = byId('lpn_set_solver_fields'), qualBody = byId('lpn_set_quality_fields'),
 			energyBody = byId('lpn_set_energy_fields'),
 			pageBody = byId('lpn_set_page_fields'),
 			posBody = byId('lpn_set_pos_fields'), posBody2 = byId('lpn_set_pos_fields2'),
 			mapBody2 = byId('lpn_set_map_fields2');
-		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody || !posBody || !posBody2 || !mapBody2) { return; }
+		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !solverBody || !qualBody || !energyBody || !pageBody || !posBody || !posBody2 || !mapBody2) { return; }
 		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
 		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
 		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
 		// the day it was added -- seven Track rows after four switches.
-		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(clearFields);
+		[idBody, defBody, customBody, mapBody, unitsBody, compBody, solverBody, qualBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -64836,7 +64837,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			clearSlowAdvice();
 			saveToStorage();
 		});
-		setboxTag(row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip), [['settings', 'autoRun']]);
+		setboxTag(row(solverBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip), [['settings', 'autoRun']]);
 		// **THE ONE FURNITURE ROW IN THIS BOX, and it says so in its own tip** (Tom, 2026-09-12).
 		// Every other row here writes `settings`, which is PROJECT data and rides in
 		// serializeProject(). This one writes a browser key and must never touch `settings`: see
@@ -64847,7 +64848,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		runBoxInput.type = 'checkbox';
 		runBoxInput.checked = !runBoxHidden;
 		runBoxInput.addEventListener('change', function () { setRunBoxHidden(!runBoxInput.checked); });
-		row(compBody, pc.lpn_settings_runbox || 'Show the run progress box', runBoxInput, pc.lpn_settings_runbox_tip,
+		row(solverBody, pc.lpn_settings_runbox || 'Show the run progress box', runBoxInput, pc.lpn_settings_runbox_tip,
 			undefined, 'browser');
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
@@ -64899,7 +64900,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		setboxTag(row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
+		setboxTag(row(solverBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET

@@ -1266,6 +1266,11 @@ echoHeader("EngCalcsApp", $html_title,
 						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_time" data-saved="project"><?=$ec_lang['lpn_time_menu']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
+						<?php // Solver: which solver answers, and when it runs (Tom, 2026-11-01: *"Shouldn't the first
+						      // three settings under Calculation, Hydraulics be directly under Calculation or
+						      // Calculation, Solver?"*). EPANET's and Bentley's word. Hydraulics keeps the model. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_solver" data-saved="project"><?=$ec_lang['lpn_settings_solver']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_solver_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics" data-saved="project"><?=$ec_lang['lpn_settings_hydraulics']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
 						<?php // Energy after Hydraulics: it is the one section here whose answer is money,
@@ -4310,6 +4315,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_sym_customer: <?=json_encode($ec_lang['lpn_settings_sym_customer'])?>,
 	lpn_settings_sym_node_colors: <?=json_encode($ec_lang['lpn_settings_sym_node_colors'])?>,
 	lpn_settings_sym_link_colors: <?=json_encode($ec_lang['lpn_settings_sym_link_colors'])?>,
+	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
 	lpn_settings_hydraulics: <?=json_encode($ec_lang['lpn_settings_hydraulics'])?>,
 	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
 	lpn_settings_energy: <?=json_encode($ec_lang['lpn_settings_energy'])?>,

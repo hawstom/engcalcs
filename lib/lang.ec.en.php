@@ -1078,7 +1078,7 @@ $ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sections, and where settings are saved';
-$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Solver, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
 $ec_lang['lpn_guide_set_search_term']='Searching';
 $ec_lang['lpn_guide_set_search_def']='<p>Type one or more words in Search settings to list only the settings that mention all of them, in the name or in the tip. A word that matches a heading shows every setting under that heading. For example, opacity lists Symbol opacity (0 to 1) and Background image opacity (0 to 1); opacity symbol lists the first alone; and sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not. The search changes no setting.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Settings in a scenario';
@@ -1779,7 +1779,7 @@ $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate automatically" is on in Settings, Calculation, Hydraulics. When Recalculate is off, a toolbar Calculate button appears.';
+$ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate automatically" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
@@ -1798,7 +1798,7 @@ $ec_lang['lpn_calc_hint_mute']='Don’t show this again';
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
-$ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
+$ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
@@ -4011,6 +4011,7 @@ $ec_lang['lpn_saved_project']='Saved with the project';
 $ec_lang['lpn_saved_browser']='Saved in this browser';
 $ec_lang['lpn_saved_session']='Not saved';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
+$ec_lang['lpn_settings_solver']='Solver';
 $ec_lang['lpn_settings_quality']='Quality';
 $ec_lang['lpn_settings_quality_track']='Quality parameter';
 // Edited by TGH 2026-09-07

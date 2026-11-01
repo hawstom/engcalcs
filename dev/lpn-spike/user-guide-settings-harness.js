@@ -28,8 +28,7 @@ const QUOTES = {
 	lpn_guide_text_settings_box: ['lpn_menu_project', 'lpn_tool_settings', 'calc_defaults', 'lpn_settings_wipe_btn', 'lpn_settings_search'],
 	lpn_guide_set_where_def: ['lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_settings_sym_node_colors', 'lpn_labels_heading_link', 'lpn_settings_sym_link_colors',
 		'lpn_settings_sym_customer', 'lpn_settings_sym_all', 'lpn_menu_map', 'lpn_settings_page', 'lpn_settings_sec_assets',
-		'lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props', 'lpn_settings_sec_calculation', 'lpn_view_units', 'lpn_time_menu',
-		'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality', 'lpn_settings_color_credits', 'lpn_saved_project', 'lpn_saved_browser',
+		'lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props', 'lpn_settings_sec_calculation', 'lpn_view_units', 'lpn_time_menu', 'lpn_settings_solver', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality', 'lpn_settings_color_credits', 'lpn_saved_project', 'lpn_saved_browser',
 		'lpn_settings_runbox', 'lpn_tool_settings', 'lpn_settings_table_category', 'lpn_find_value'],
 	lpn_guide_set_search_def: ['lpn_settings_search', 'lpn_settings_symbol_opacity', 'lpn_settings_backdrop_opacity', 'lpn_settings_emitter_exponent'],
 	lpn_guide_set_scn_def: ['calc_defaults', 'lpn_settings_push_btn'],
@@ -45,7 +44,7 @@ const STRUCTURE = [
 	['lpn_menu_map', ['lpn_menu_map']],
 	['lpn_settings_page', ['lpn_settings_page']],
 	['lpn_settings_sec_assets', ['lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props']],
-	['lpn_settings_sec_calculation', ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
+	['lpn_settings_sec_calculation', ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_solver', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
 	['lpn_settings_color_credits', []]
 ];
 // The numbers the units example states, read out of the chapter so a changed example is re-measured.
@@ -141,8 +140,8 @@ async function main() {
 			return { sub: sub ? sub.childNodes[0].textContent.trim() : '', row: row ? row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) : '' };
 		}));
 		const outsidePage = marks.filter((m) => m.sub !== pageName);
-		ok('outside Page, one row says Saved in this browser: Show the run progress box, in Hydraulics',
-			outsidePage.length === 1 && outsidePage[0].sub === await T('lpn_settings_hydraulics') && outsidePage[0].row.indexOf(await T('lpn_settings_runbox')) === 0, JSON.stringify(outsidePage));
+		ok('outside Page, one row says Saved in this browser: Show the run progress box, in Solver',
+			outsidePage.length === 1 && outsidePage[0].sub === await T('lpn_settings_solver') && outsidePage[0].row.indexOf(await T('lpn_settings_runbox')) === 0, JSON.stringify(outsidePage));
 		await closeBox('lpn_setbox_close');
 		await settle(300);
 		await P.evaluate(() => document.getElementById('lpn_pane_btn').click());
