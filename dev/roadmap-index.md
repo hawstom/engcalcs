@@ -7,23 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**103 open tasks.** Next (100): 15 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
+**97 open tasks.** Next (100): 9 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19 · priority 95 (95): 6
 
-## 100 — Next (15)
+## 100 — Next (9)
 
 - Task 825 — Audit every dockable box's width, with a checklist.
 - Task 827 — Phones dock and autohide Properties by default; first-time view layout.
 - Task 828 — One standard two-column style for every box's label and value rows.
 - Task 829 — Every analysis box gets Download CSV, Copy HTML and Print report.
-- Task 833 — First open after Fresh: no docks, and Net3 freezes for 20 s.
-- ! Task 834 — Every box docked and auto-hidden on first view; a pinned box keeps its tab.
 - Task 835 — Settings on a phone: a top menu for its sections, narrower columns.
 - Task 837 — Spreadsheet cells: the input is the cell, and toggles follow 2026 practice.
-- Task 838 — "Edit curves…" as the last option of every curve selector.
-- Task 839 — Ida's short Properties labels, each with a tip that expands it.
-- Task 840 — Report cells that mix a value, place and time become columns.
 - Task 842 — One spreadsheet style for every box's rows, no first-column heading.
-- ! Task 844 — Settings: 618 px, the tick tight on its own row, the phone bar as heading.
 - Task 845 — Report tables: economical width, adjustable columns, "And others", "Time (hr)".
 - ! Task 846 — The Basic mode toggle stays in the Scenario manager when Basic is off.
 
@@ -134,5 +128,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-92 of 103 titles are within 4–12 words. `!` marks the rest;
+88 of 97 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

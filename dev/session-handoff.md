@@ -95,13 +95,13 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-31 small hours (fifty-third session, Opus main, Sonnet agents)
+## STATE — 2026-10-31 afternoon (fifty-fourth session, Opus main, Sonnet agents)
 
-- **Pushed with this handoff:** `feat/dxf-import` (his word) and `fix/p100-defects` (on green): phone menu-bar icons centred, the bar kept at 32 px (a desktop toolbar rule reflowed the toolbar and broke label-drag-track, so desktop icons stay 3.2 px off); a Dark pull-down harness; Tasks 836, 841, 843 closed as found fixed. The dxf merge broke three harnesses, none a visitor defect: Import now has two "DXF file…" rows (Network and Shapes), so a harness must name the group (`importVia`); `lib/lpn-commands.json` regenerated.
-- **box-design round 9** (his round-8 notes, *"Give the user control."*): no automatic stacking at any width; no label floor, labels one line with ellipsis and full text as tip; multi-selection Properties sections no longer overlap and share one divider; Find in sheet style when narrow. `feat/report-widths` merged INTO box-design (his "Merge" stands; it brings Fire flow's draggable result columns, Task 848, and localStorage `lpn_rptcols`). Perry's round-9 review is in that worktree's journal; Tom's pass on 8103 is next. box-design still owes a `git merge master` (guide sentence, dxf).
-- **His answer owed:** the default label fit is the 80th percentile, so about one label in five is cut at first open; or fit the longest.
-- **Roadmap lags:** Tasks 838, 839, 840 were built and reached master through box-design round 6; close them when he has seen them.
-- **Known on box-design, not fixed:** `settings-box-held-browser-harness` wheel-zoom fails since round 8's keep-on-screen float.
+- **Tom's calls 10-31 on box-design:** round 9 passed (*"All good"*). Labels: *"I didn't ask for an ellipsis. Remove it."*, then *"I'd prefer you don't add a 'Show extra tip when truncated' system"*, and he chose removing the round-9 cut-label tip everywhere: a cut label is simply clipped, no ellipsis, no tip; `?` tips and Task 839's short-name tips stay. Value cells keep their ellipsis. The Label column keeps opening at the 80th percentile (his "No" to fit-the-longest; *"I may change my decision before or after release"*). Of the style: *"I probably want to run with it for deployment ... audit the entire app to be sure that it is applied cleanly and systematically wherever appropriate."*
+- **box-design round 10 built** (10a clip and Find spans, 10b the audit's boxes moved onto the sheet, 10c Perry's findings and six stale harnesses). Audit and Perry's review: this session's scratch `sheet-style-audit.md` and the worktree's Perry journal. Guard: `sheet-coverage-browser-harness.js`. Open for Tom: Settings stays on `.lpn-set-row`, not `.lpn-sheet`; Fire flow / Criticality / Demand scaling number inputs fill the Value cell (as Properties) though Task 828 says "sized to content". box-design waits his pass and his merge word.
+- **Tasks 835, 837, 846 were built 10-27 (`ddea93a80`, `66afa5074`) and are on master**; the 10-31 small-hours report wrongly called them new design work. Close on his look.
+- **Task 825**: the widths in `dev/box-width-audit.md` predate box-design; re-measure after box-design merges, then his six-step pass.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/883ed6c1-d8db-4144-9cea-516129ed966e/scratchpad.
 
 ## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
 
