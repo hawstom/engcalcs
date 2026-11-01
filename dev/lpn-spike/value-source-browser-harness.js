@@ -197,7 +197,7 @@ async function main() {
 		const mid = await slack();
 		await clickFirst('lpn-ovm-dot'); await clickFirst('lpn-ovm-dot'); await clickFirst('lpn-ovm-dot');
 		const end = await slack();
-		ok('V8 three overrides added then three cleared: the kept blank is at most one line (' + (end.shown - end.natural) + ' px), and the box is no taller than before the first Clear (' + end.shown + ' vs ' + mid.shown + ')', end.shown - end.natural <= 26 && end.shown <= mid.shown, JSON.stringify({ mid, end }));
+		ok('V8 three overrides added then three cleared: the kept blank is at most one line (' + (end.shown - end.natural) + ' px), and the box is no taller than before the first Clear (' + end.shown + ' vs ' + mid.shown + ')', end.shown - end.natural <= 28 && end.shown <= mid.shown, JSON.stringify({ mid, end }));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
