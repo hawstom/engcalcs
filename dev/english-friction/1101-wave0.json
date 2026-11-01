@@ -11,8 +11,8 @@
                 "a vertex belongs to one pipe as one of its bends",
                 "a vertex resides (lives) on a pipe, as a person lives in a house"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: {id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two."
         },
         {
             "key": "lpn_morph_vertex_kind",
@@ -23,8 +23,8 @@
                 "a vertex can be only a bend of a pipe",
                 "a vertex resides on a pipe"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex can be only a bend of a pipe."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex can be only a bend of a pipe."
         },
         {
             "key": "lpn_morph_vertex_own",
@@ -35,8 +35,8 @@
                 "it has an elevation, tag or description of its own that differs from a default",
                 "it has elevation, tag, description or other data entered, which must be cleared"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: {id} was not morphed into a vertex: it has an elevation, tag, description or other data, and a vertex has none. Clear that data first."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: it has an elevation, tag, description or other data, and a vertex has none. Clear that data first."
         },
         {
             "key": "lpn_ovm_dot_alt_shared",
@@ -47,8 +47,8 @@
                 "clearing the override, or editing it, changes the others too",
                 "\"clear\" as an adjective: a clear or edits (changes) change them"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: This override is stored in alternative \"{alternative}\", also used by {list}, so clearing it or editing it changes them too."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). This override is stored in alternative \"{alternative}\", also used by {list}, so clearing it or editing it changes them too."
         },
         {
             "key": "lpn_ex_valves_desc",
@@ -59,8 +59,8 @@
                 "each valve is regulating (active) in the solution",
                 "each valve is acting as a control rule or being controlled"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: each valve regulating in the solution."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). each valve regulating in the solution."
         },
         {
             "key": "lpn_ex_extension_si_desc",
@@ -71,8 +71,8 @@
                 "the junction delivers that flow while holding that residual pressure",
                 "the junction passes a fire flow test at that flow and pressure"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: A fire hydrant junction delivers 95 L/s with 14 m of residual pressure."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 95 L/s with 14 m of residual pressure."
         },
         {
             "key": "lpn_ex_extension_desc",
@@ -83,8 +83,8 @@
                 "the junction delivers that flow while holding that residual pressure",
                 "the junction passes a fire flow test at that flow and pressure"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure."
         },
         {
             "key": "lpn_ex_well_si_desc",
@@ -95,8 +95,8 @@
                 "the junction delivers that flow while holding that residual pressure",
                 "the junction passes a fire flow test at that flow and pressure"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: A fire hydrant junction delivers 32 L/s with 14 m of residual pressure."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 32 L/s with 14 m of residual pressure."
         },
         {
             "key": "lpn_ex_well_desc",
@@ -107,8 +107,8 @@
                 "the junction delivers that flow while holding that residual pressure",
                 "the junction passes a fire flow test at that flow and pressure"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure."
         },
         {
             "key": "lpn_contour_buffer",
@@ -119,8 +119,8 @@
                 "a margin of ground added around the network's extent, in median pipe lengths",
                 "a GIS buffer zone around each pipe"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Margin around the network (× median pipe length). Also a proposal for dev/terms.md: Buffer (contour) = the extra distance beyond the outermost nodes over which the fill and lines are drawn."
+            "disposition": "dismissed",
+            "resolution": "\"Buffer\" is the GIS industry term for this margin (conventional wording rule); the label carries its unit, and the payload context gives the tip."
         },
         {
             "key": "lpn_dxf_note_headloss",
@@ -131,8 +131,8 @@
                 "the ROUGHNESS value is on the scale of that formula's coefficient",
                 "ROUGHNESS is worded or described using that formula"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula."
         },
         {
             "key": "lpn_full_needs_run",
@@ -143,8 +143,8 @@
                 "press a keyboard key named Calculate",
                 "click the Calculate button"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full."
         },
         {
             "key": "lpn_ds_intro",
@@ -155,8 +155,8 @@
                 "press a key",
                 "click a button"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Replace both \"Press\" with \"Click\" (Click the Run button ... Click the Find button ...)."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Replace both \"Press\" with \"Click\" (Click the Run button ... Click the Find button ...)."
         },
         {
             "key": "lpn_full_note",
@@ -167,8 +167,8 @@
                 "a blank cell means the column's quantity does not apply to that node or link",
                 "a blank cell is itself a column the quantity lacks"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: A cell is blank where the node or link has no such quantity."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A cell is blank where the node or link has no such quantity."
         },
         {
             "key": "lpn_menu_back",
@@ -179,8 +179,8 @@
                 "return to the previous menu level",
                 "go back in browser history, or the rear side"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Previous menu (or \"Back to previous menu\"; narrow menu, so the short form is preferred)."
+            "disposition": "dismissed",
+            "resolution": "\"Back\" on a phone menu is the standard UI word every locale already has; the row is narrow, and key_context names the call site."
         },
         {
             "key": "lpn_gis_draw",
@@ -191,8 +191,8 @@
                 "show this layer on the map",
                 "draw (create) a layer by hand"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Show"
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Show"
         },
         {
             "key": "lpn_gjup_h_notes",
@@ -203,8 +203,8 @@
                 "notes about what was read from the file",
                 "how to read the file (instructions)"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Import notes"
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Import notes"
         },
         {
             "key": "lpn_ff_col_more",
@@ -215,8 +215,8 @@
                 "other junctions that also fall below the limit",
                 "other pipes or steps"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Other junctions affected"
+            "disposition": "english",
+            "resolution": "Restored \"And others\", the heading Tom named in Task 845; an agent had changed it to \"How many others\" without his word."
         },
         {
             "key": "lpn_guide_bx_dock_def",
@@ -227,8 +227,8 @@
                 "the box collapses to its tab and is still open",
                 "the box is put away/closed"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Replace \"tucks back into its tab\" with \"collapses to its tab\", \"A tucked box\" with \"A collapsed box\", \"brings it out of its tab\" with \"expands it from its tab\"."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Replace \"tucks back into its tab\" with \"collapses to its tab\", \"A tucked box\" with \"A collapsed box\", \"brings it out of its tab\" with \"expands it from its tab\"."
         },
         {
             "key": "lpn_guide_bx_phone_def",
@@ -239,8 +239,8 @@
                 "the box opens as a panel over the map",
                 "the box flies/moves out"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: At 640 px or narrower, a docked box is always an auto-hide tab, and it opens as a panel over the map."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). At 640 px or narrower, a docked box is always an auto-hide tab, and it opens as a panel over the map."
         },
         {
             "key": "lpn_guide_ct_box_def",
@@ -251,8 +251,8 @@
                 "each class is painted in one solid color",
                 "each class is painted level/without relief"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Bands, which paints each class in one solid color"
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Bands, which paints each class in one solid color"
         },
         {
             "key": "lpn_dxfnet_note_end_ambiguous",
@@ -263,8 +263,8 @@
                 "it cannot be determined which of the two nodes the link ends at",
                 "the node cannot be informed/instructed"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: These links have an end where two nodes lie on the same point, so which node the link ends at cannot be determined, and they were not imported."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). These links have an end where two nodes lie on the same point, so which node the link ends at cannot be determined, and they were not imported."
         },
         {
             "key": "lpn_file_import_dxfnet_tip",
@@ -275,8 +275,8 @@
                 "open the file, as a new project",
                 "the page exported the file as a new project"
             ],
-            "disposition": "open",
-            "resolution": "PROPOSED: Create a new project from a DXF file that this page exported. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read."
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Create a new project from a DXF file that this page exported. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read."
         }
     ]
 }

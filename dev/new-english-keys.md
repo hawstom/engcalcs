@@ -191,7 +191,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Demand multiplier: {n}.
   @@ NEEDS RULING
 - **`lpn_dxf_note_headloss`**
-  > Head loss formula: {formula} ({code}). ROUGHNESS is stated in the terms of that formula.
+  > Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula.
   @@ NEEDS RULING
 - **`lpn_dxf_sections_header`**
   > EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.
@@ -245,7 +245,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > These IDs are stated by more than one element of the same kind. Only the first was imported.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_end_ambiguous`**
-  > These links have an end where two nodes lie on the same point, so the node cannot be told, and they were not imported.
+  > These links have an end where two nodes lie on the same point, so which node the link ends at cannot be determined, and they were not imported.
   @@ NEEDS RULING
 - **`lpn_dxfnet_note_end_loop`**
   > These links start and end at the same node, and were not imported.
@@ -314,10 +314,10 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Edit types…
   @@ NEEDS RULING
 - **`lpn_ex_extension_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
+  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_desc`**
-  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction passes 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
+  > A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction delivers 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_extension_si_title`**
   > Johnson City extension, L/s (SI)
@@ -326,16 +326,16 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Johnson City extension, gpm (US)
   @@ NEEDS RULING
 - **`lpn_ex_valves_desc`**
-  > A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state. Gallons per minute, with feet and inches.
+  > A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one regulating in the solved network. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
 - **`lpn_ex_well_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
+  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_desc`**
-  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction passes 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
+  > A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.
   @@ NEEDS RULING
 - **`lpn_ex_well_si_title`**
   > Munday well and tank, L/s (SI)
@@ -380,7 +380,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Step of lowest flow
   _Ruled OK 2026-10-20._
 - **`lpn_ff_col_more`**
-  > How many others
+  > And others
   @@ NEEDS RULING
 - **`lpn_ff_no_steps`**
   > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
@@ -446,7 +446,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > DXF file…
   @@ NEEDS RULING
 - **`lpn_file_import_dxfnet_tip`**
-  > Open a DXF file that this page exported as a new project. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
+  > Create a new project from a DXF file that this page exported. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.
   @@ NEEDS RULING
 - **`lpn_file_import_msx`**
   > EPANET-MSX file…
@@ -461,7 +461,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Add layer
   @@ NEEDS RULING
 - **`lpn_gis_draw`**
-  > Draw
+  > Show
   @@ NEEDS RULING
 - **`lpn_gis_err_address`**
   > The server address must start with https://.
@@ -515,7 +515,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > WMS layer names (comma separated)
   @@ NEEDS RULING
 - **`lpn_gjup_h_notes`**
-  > Reading the file
+  > Import notes
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
   > Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
@@ -737,16 +737,16 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_kind`**
-  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex lives only on a pipe.
+  > {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex belongs only to a pipe.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_links`**
-  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex lives on exactly one pipe, so a junction must join exactly two.
+  > {id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_loop`**
   > {id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_own`**
-  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear it first.
+  > {id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear that data first.
   @@ NEEDS RULING
 - **`lpn_morph_vertex_pipes`**
   > {id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.
@@ -809,7 +809,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > This override is stored in alternative "{alternative}".
   @@ NEEDS RULING
 - **`lpn_ovm_dot_alt_shared`**
-  > This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.
+  > This override is stored in alternative "{alternative}", also used by {list}, so clearing or editing it changes them too.
   @@ NEEDS RULING
 - **`lpn_ovm_dot_clear_one`**
   > Click to clear this override.
@@ -1031,11 +1031,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### box-design (`33665636e`) — adds no English strings
+### box-design (`0f5f4e248`) — adds no English strings
+
+### chore/sprint-1101 (`91e6a3415`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/dxf-import (`7f73816d2`) — adds no English strings
 
 ### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
 
@@ -1076,7 +1076,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {alternative}, also used by {scenarios}
   @@ NEEDS RULING
 
-### feat/report-widths (`5058a668e`) — adds no English strings
+### feat/report-widths (`5058a668e`) — already merged into box-design; its strings are listed there
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 

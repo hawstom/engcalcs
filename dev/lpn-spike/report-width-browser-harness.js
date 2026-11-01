@@ -8,7 +8,7 @@
 // (the box grid's `minmax(max-content, 1fr)` track took the one-line width of a table and of its long
 // notes), Fire flow 1018 px (an 18 px sort gutter on each of 13 headings). Now Scenario comparison
 // fills the box (642 px at its narrowest), Fire flow needs 787 px at its narrowest, Criticality 814.
-// Also: "Time (hr)" and "How many others" headings; "Static failed, so not checked" is one cell across
+// Also: "Time (hr)" and "And others" headings; "Static failed, so not checked" is one cell across
 // its three columns; and Copy HTML says every weight (Tom's paste into Google Docs came out all bold).
 //
 // Copyright 2009 Thomas Gail Haws

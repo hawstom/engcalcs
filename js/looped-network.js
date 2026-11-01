@@ -47916,7 +47916,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				list(na);
 			}
 			if (plan.noteLines && plan.noteLines.length) {
-				p(pc.lpn_gjup_h_notes || 'Reading the file', true);
+				p(pc.lpn_gjup_h_notes || 'Import notes', true);
 				list(plan.noteLines);
 			}
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }],
@@ -64350,7 +64350,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				name.appendChild(bad);
 				grp.className = 'lpn-gis-controls';
 				on.type = 'checkbox'; on.className = 'lpn-gis-on'; on.checked = gisPermitted(l);
-				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Draw')));
+				onL.appendChild(on); onL.appendChild(document.createTextNode(' ' + (pc.lpn_gis_draw || 'Show')));
 				op.type = 'number'; op.step = '0.05'; op.min = '0.05'; op.max = '1'; op.className = 'lpn-gis-opacity';
 				op.value = String(l.opacity > 0 && l.opacity <= 1 ? l.opacity : 1);
 				op.setAttribute('inputmode', 'decimal');
@@ -82139,7 +82139,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[pc.lpn_result_pressure || 'Pressure', null, false, worstG],
 			[pc.lpn_result_velocity || 'Velocity', null, false, worstG]
 		].concat(allSteps ? [[pc.lpn_full_col_time || 'Time (hr)', null, false, worstG]] : []).concat([
-			[pc.lpn_ff_col_more || 'How many others', null, false, worstG],
+			[pc.lpn_ff_col_more || 'And others', null, false, worstG],
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
@@ -87309,7 +87309,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		rows = fullReportRows();
 		if (!rows.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full.', host);
 			return;
 		}
 		frames = reportFrames();
