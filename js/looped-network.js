@@ -66040,6 +66040,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The row tapped stays the current one until the reader scrolls by hand (see setboxSpy()).
 				setboxSpyPinned = true;
 				setboxSpyPinTop = (document.getElementById('lpn_setbox_content') || {}).scrollTop;
+				setboxAnchor = null;
+				noteSetboxAnchor();
 			});
 			index.appendChild(b);
 			return b;
@@ -66111,6 +66113,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			? index.querySelector('[data-sec="' + best.id + '"]') : index.querySelector('[data-sub="' + best.id + '"]');
 		if (b && b.getAttribute('aria-current') !== 'true') { setSetboxCurrent(b); }
 	}
+	var setboxAnchor = null;
+	function setboxAnchorTarget() {
+		var index = document.getElementById('lpn_setbox_index'), cur = index && index.querySelector('[aria-current="true"]'), id, el;
+		if (!cur) { return null; }
+		id = cur.getAttribute('data-sec') || cur.getAttribute('data-sub');
+		el = id && document.getElementById(id);
+		// A section heading is sticky: its section's top edge is where it begins.
+		return el && el.classList.contains('lpn-set-head') ? el.parentNode : el;
+	}
+	function noteSetboxAnchor() {
+		var content = document.getElementById('lpn_setbox_content'), el;
+		if (!content || !setboxIsOpen()) { return; }
+		// A scroll the browser made because the pane changed size is not the reader's: the observer puts that right.
+		if (setboxAnchor && (setboxAnchor.w !== content.clientWidth || setboxAnchor.h !== content.clientHeight)) { return; }
+		el = setboxAnchorTarget();
+		if (!el || !el.getClientRects().length) { return; }
+		setboxAnchor = { el: el, off: el.getBoundingClientRect().top - content.getBoundingClientRect().top, w: content.clientWidth, h: content.clientHeight };
+	}
+	function restoreSetboxAnchor() {
+		var content = document.getElementById('lpn_setbox_content'), a = setboxAnchor, d;
+		if (!content || !a || !setboxIsOpen() || !a.el.isConnected || !a.el.getClientRects().length) { return; }
+		if (a.w !== content.clientWidth || a.h !== content.clientHeight) {
+			d = (a.el.getBoundingClientRect().top - content.getBoundingClientRect().top) - a.off;
+			if (Math.abs(d) > 0.5) { content.scrollTop += d; }
+			if (setboxSpyPinned) { setboxSpyPinTop = content.scrollTop; }
+			a.w = content.clientWidth; a.h = content.clientHeight;
+		}
+	}
 	var setboxJumpWired = false;
 	function wireSetboxJump() {
 		var jump = document.getElementById('lpn_setbox_jump'), content = document.getElementById('lpn_setbox_content'), queued = false;
@@ -66123,8 +66153,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		content.addEventListener('scroll', function () {
 			if (queued) { return; }
 			queued = true;
-			(window.requestAnimationFrame || setTimeout)(function () { queued = false; setboxSpy(); });
+			(window.requestAnimationFrame || setTimeout)(function () { queued = false; setboxSpy(); noteSetboxAnchor(); });
 		}, { passive: true });
+		// **A RESIZE KEEPS THE HIGHLIGHTED SECTION WHERE IT WAS IN THE PANE** (Tom, round 11: "Units is highlighted in the index. But when I resize, scrolling changes; the units section goes off the screen"). Narrowing re-wraps rows and changes the content's height while scrollTop stays put, so the section drifts. The offset of the current index row's section below the pane's top edge is noted at every scroll and put back after every change of the pane's size.
+		if (window.ResizeObserver) { new window.ResizeObserver(function () { restoreSetboxAnchor(); }).observe(content); }
 		document.addEventListener('pointerdown', function (e) {
 			var t = e.target;
 			if (!setboxJumpIsOpen() || !t || !t.closest) { return; }
