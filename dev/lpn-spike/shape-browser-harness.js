@@ -441,18 +441,28 @@ async function main() {
 			ok('the Point carries the stored longitude and latitude', !!byType.Point &&
 				byType.Point.geometry.coordinates[0] === g2.shapes[0].pts[0].x && byType.Point.geometry.coordinates[1] === g2.shapes[0].pts[0].y);
 
+			// A project with a second scenario answers an import with a dialog (Task 814); read it and press OK.
+			const receipt = async () => {
+				await h.settle(600);
+				const dlg = await a.dialog();
+				if (!dlg) { return a.notice(); }
+				await a.dialogClick((await a.lang('lpn_dialog_ok')).trim());
+				return dlg.text;
+			};
 			// Into a fresh geographic project, through the real menu row and file chooser.
 			await a.newGeoProject('us');
 			await a.dismissGallery();
 			await h.settle(500);
 			await h.esc();
+			// The new project installs an auto-answerer; the receipt dialog is wanted on screen.
+			await P.evaluate(() => { delete window.lpnDialogAnswerer; });
 			const [chooser] = await Promise.all([
 				P.waitForEvent('filechooser', { timeout: 10000 }),
 				a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_shapes'), 'file', 'lpn_pane_tab_shapes')
 			]);
 			await chooser.setFiles({ name: 'shapes.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(gjText) });
 			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the import', 8000).catch(() => {});
-			const g3 = await h.stored(), note = await a.notice();
+			const g3 = await h.stored(), note = await receipt();
 			ok('the import makes three Shapes', (g3.shapes || []).length === 3, JSON.stringify((g3.shapes || []).map((s) => s.id)));
 			const src = {}; g2.shapes.forEach((s) => { src[s.id] = s; });
 			const back = {}; (g3.shapes || []).forEach((s) => { back[s.id] = s; });
@@ -495,7 +505,7 @@ async function main() {
 			] });
 			await P.setInputFiles('#lpn_geojson_file', { name: 'odd.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(odd) });
 			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the second import', 8000).catch(() => {});
-			const g4 = await h.stored(), note4 = await a.notice();
+			const g4 = await h.stored(), note4 = await receipt();
 			const byDesc = (d) => (g4.shapes || []).filter((x) => x.desc === d);
 			ok('"Lot A", which cannot be an ID, is kept as its Shape\'s description', byDesc('Lot A').length === 1, JSON.stringify((g4.shapes || []).map((x) => [x.id, x.desc])));
 			ok('...and each part of the multipoint "Wells" keeps the name', byDesc('Wells').length === 2);
@@ -510,7 +520,7 @@ async function main() {
 			const one = JSON.stringify({ type: 'Feature', properties: { name: 'P1' }, geometry: { type: 'Point', coordinates: [10, 20] } });
 			await P.setInputFiles('#lpn_geojson_file', { name: 'one.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(one) });
 			await a.waitFor(async () => ((await h.stored()).shapes || []).length > 0, 'the one-Shape import', 8000).catch(() => {});
-			const note5 = await a.notice();
+			const note5 = await receipt();
 			ok('one Shape imported is said in the singular', note5.indexOf((await a.lang('lpn_geojson_import_done_one')).replace('{file}', 'one.geojson')) === 0, note5);
 		}
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

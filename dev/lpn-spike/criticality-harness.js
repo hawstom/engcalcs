@@ -119,7 +119,7 @@ const GPM = 3.785411784e-3 / 60;
 
 function openNet1() {
 	L.reset();
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	if (!saved) { throw new Error('Net1.lwn did not open'); }
 	L.applySaved(saved);
 	L.buildDom();

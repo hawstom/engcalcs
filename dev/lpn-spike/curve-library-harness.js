@@ -545,19 +545,32 @@ const FIVE = [
 		'by name as well as by value');
 	check(opts.some((o) => o.value === 'C1') && opts.some((o) => o.value === ''),
 		'and still offers every head curve the Library holds, plus "no curve"');
-	// **FOUND BY THE LABEL THE LANGUAGE FILE HOLDS, NOT BY ONE TYPED HERE.** The wording has moved
-	// three times in as many days -- 'Curves library', then Wave 0's 'Libraries, Curves', then Tom's
-	// own 'Curves' on 2026-09-06 -- and each move red-lighted this line for a reason that has
-	// nothing to do with what the check is about, which is the CLICK below. The stub already reads
-	// the real `lib/lang.ec.en.php` into pageConfig, so the label is available and a copy of it here
-	// is a second source of truth that can only ever go stale.
-	const linkLabel = (global.EngCalcs.pageConfig || {}).lpn_curve_library_link || 'Curves';
-	const link = buttonsIn(fields, []).filter((b) => String(b.textContent) === linkLabel)[0];
-	check(!!link, 'a link into the Library stands beside it');
-	if (link) {
-		fire(link, 'click');
+	// **THE LAST OPTION IS "Edit curves…"** (Tom, 2026-10-27; it replaces the separate Curves link,
+	// as Edit types… replaced the Pipe types link). Found by the text the language file holds, and
+	// the thing proved is the CLICK: the box goes to its Curves section and the pull-down goes
+	// back to the curve it held.
+	const editLabel = (global.EngCalcs.pageConfig || {}).lpn_edit_curves || 'Edit curves…';
+	check(buttonsIn(fields, []).length === 0, 'no separate Curves link stands beside the chooser');
+	const selEl = (function find(el) {
+		if (el._tag === 'select') { return el; }
+		for (const ch of (el.children || [])) { const r = find(ch); if (r) { return r; } }
+		return null;
+	}(fields));
+	const lastOpt = opts[opts.length - 1];
+	check(!!lastOpt && lastOpt.textContent === editLabel && lastOpt.value === '__edit__',
+		`the chooser ends with "${editLabel}": ${lastOpt && lastOpt.textContent}`);
+	if (selEl && lastOpt) {
+		const heldBefore = selEl.value, refBefore = JSON.stringify([L.linkById('P1')._curveId, L.linkById('P1').curveId]);
+		selEl.value = lastOpt.value;
+		// The stub's fire() ignores stopImmediatePropagation(); a real browser does not, so honour it.
+		let stopped2 = false;
+		(selEl._listeners.change || []).forEach((f) => { if (!stopped2) { f({ stopImmediatePropagation: () => { stopped2 = true; } }); } });
 		check(L.getLibSection() === 'curves',
-			`and it is real navigation: the box is put on its Curves section (${L.getLibSection()})`);
+			`choosing it is real navigation: the box is put on its Curves section (${L.getLibSection()})`);
+		check(selEl.value === heldBefore,
+			`and the pull-down goes back to what it held ("${heldBefore}"): "${selEl.value}"`);
+		check(JSON.stringify([L.linkById('P1')._curveId, L.linkById('P1').curveId]) === refBefore,
+			'and the pump keeps its stored reference: ' + refBefore);
 	}
 
 	// =========================================================================================

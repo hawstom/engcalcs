@@ -48,7 +48,7 @@ function ok(name, cond, extra) {
 
 async function setup(a, page, netKey) {
 	await a.goto(a.__url);
-	await a.openExampleCard(await a.lang(netKey));
+	await (netKey === 'lpn_ex_net1_title' ? a.openNet1Plain(await a.lang(netKey)) : a.openExampleCard(await a.lang(netKey)));
 	await a.settle(1500);
 	await page.evaluate(() => {
 		let e = document.querySelector('.ec-consent-actions');
@@ -138,7 +138,8 @@ async function main() {
 		const iconColours = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-icon')).map((i) => getComputedStyle(i).color));
 		ok('1.6 the Base icon is drawn in a different token colour from a child\'s', iconColours[0] !== iconColours[1], JSON.stringify(iconColours));
 		// **THE FOOTER MOVED INTO THE "?"** (Tom, 2026-10-11: "Move the footer text to the tip.").
-		ok('1.7 nothing sits under the tree any more (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'); return !t.nextElementSibling; })));
+		// Tom, 2026-10-27: the Basic mode tick stays in the box in both modes ("persistent across modes"), so under the tree sits that one tick and nothing else (still no footer hint).
+		ok('1.7 under the tree sits only the Basic mode tick (no footer hint)', !(await page.$('#lpn_sm_body .lpn-sm-hint')) && (await page.evaluate(() => { const t = document.getElementById('lpn_sm_tree'), n = t.nextElementSibling; return !!n && n.className === 'lpn-sm-basic-tick' && !n.nextElementSibling; })));
 		const tipParas = (await L('lpn_sm_help')).split('\\n\\n');
 		// Tom's draft of 2026-10-11, finished: his two headings, his model, his example named after its scenario.
 		ok('1.8 the tip is in two parts, each under a heading line of its own', tipParas.filter((t) => /:$/.test(t)).length === 2 && /:$/.test(tipParas[0]), JSON.stringify(tipParas));
@@ -211,7 +212,7 @@ async function main() {
 
 		console.log('\n--- 4. one command list: the buttons and the right-click menu ---');
 		const want = ['current', 'overrides', 'add', 'addbase', 'rename', 'copy', '|', 'del'];
-		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '|', await L('lpn_tool_delete')];
+		const wantText = [await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), '|', await L('lpn_tool_delete')];
 		await h.rowOf('Night').locator('.lpn-sm-name').click({ button: 'right' });
 		await a.settle(300);
 		let m = await h.menu();

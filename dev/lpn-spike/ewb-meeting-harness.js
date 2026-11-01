@@ -221,7 +221,7 @@ async function main() {
 
 	console.log('\n--- 5. a normal network is unchanged: Net1 ---');
 	{
-		const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+		const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 		L.applySaved(saved); L.buildDom();
 		const out = {};
 		for (const engine of ['native', 'epanet']) {

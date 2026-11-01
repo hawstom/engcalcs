@@ -104,7 +104,7 @@ async function main() {
 			await b.openExampleCard(await b.lang(ex[1]));
 			await b.settle(1800);
 			const p = await probe(b.page);
-			const f = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', ex[0] + '.lwn'), 'utf8'));
+			const f = JSON.parse(fs.readFileSync(path.join(REPO, ex[0] === 'Net1' ? 'dev/water-network-examples' : 'examples', ex[0] + '.lwn'), 'utf8'));
 			const byId = {}; f.nodes.forEach((n) => { byId[n.id] = n; });
 			const lens = f.links.map((l) => Math.hypot(byId[l.to].x - byId[l.from].x, byId[l.to].y - byId[l.from].y));
 			const oldCap = 0.5 * percentile(lens, 20);

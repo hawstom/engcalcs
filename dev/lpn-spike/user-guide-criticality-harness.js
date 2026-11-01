@@ -22,7 +22,7 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, dialogP
 const NAME = 'user-guide-criticality-harness';
 U.takeBrowserLock(NAME, 'EC_UGCR_LOCKED');
 
-const TERMS = ['lpn_guide_cr_case_term', 'lpn_guide_cr_dead_term', 'lpn_guide_cr_example_term'];
+const TERMS = ['lpn_guide_cr_case_term', 'lpn_guide_cr_dead_term', 'lpn_guide_scn_example_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));

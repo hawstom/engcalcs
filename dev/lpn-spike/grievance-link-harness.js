@@ -131,7 +131,7 @@ const cap = capMatch ? parseInt(capMatch[1], 10) : 80;
 console.log('\n---- 3. the transport ----');
 const calcLib = fs.readFileSync(path.join(ROOT, 'js', 'Calculators.lib.js'), 'utf8');
 const start = calcLib.indexOf('EngCalcs._signalSent = {};');
-const end = calcLib.indexOf('\n};', start);
+const end = calcLib.indexOf('\n};', calcLib.indexOf('EngCalcs.logSignal = function', start));
 ok('EngCalcs.logSignal could be lifted out of js/Calculators.lib.js', start >= 0 && end > start);
 const posts = [];
 // The lpn event carries three kinds of row and only one of them is a person speaking. Task 200's
@@ -146,6 +146,19 @@ global.EngCalcs.cookieName = 'Looped-Network';
 global.EngCalcs._sendOrQueue = function (url, params) { posts.push({ url: url, params: params }); };
 ok('...and it is the shipped one, posting to the shipped endpoint',
 	typeof global.EngCalcs.logSignal === 'function');
+
+// A use is a use (Tom, 2026-10-29): a command used 20 times is 20 rows; a fact about the page load is one.
+{
+	const before = posts.length;
+	for (let k = 0; k < 20; k++) { global.EngCalcs.logSignal('lpn', 'cmd:draw/junction'); }
+	const cmdRows = posts.slice(before).filter((p) => p.params.detail === 'cmd:draw/junction').length;
+	ok('a toolbar command used 20 times logs 20 rows', cmdRows === 20, cmdRows);
+	const b2 = posts.length;
+	for (let k = 0; k < 20; k++) { global.EngCalcs.logSignal('touch', 'input'); }
+	ok('while the first touch of a page load logs once', posts.length - b2 === 1, posts.length - b2);
+	posts.splice(before, posts.length - before);
+	global.EngCalcs._signalSent = {};
+}
 
 // ================================================================================================
 // 4. ONE PRESS, ONE ROW, AND NOTHING OUT OF THE DOCUMENT

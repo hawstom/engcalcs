@@ -47,7 +47,7 @@ const INJECT =
 // The guard, as it stands in the shipped source. loadLoopedNetwork() throws when a mutation matches
 // nothing, so rewording the guard cannot quietly turn the mutation below into a no-op.
 const GUARD = "\t\tif (escapeOwnsBox('lpn_popup')) { closePopup(true); }\n" +
-	"\t\tif (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }\n" +
+	"\t\tif (escapeOwnsBox('lpn_settings_box')) { if (setboxJumpIsOpen()) { setboxJumpOpen(false); } else { closeSettingsBox(); } }   // the phone's open jump list is inner to the box: it closes first\n" +
 	"\t\tif (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }\n";
 const PAGE_WIDE = "\t\tclosePopup(true);\n\t\tcloseSettingsBox();\n\t\tcloseLibraryBox();\n";
 // The POINTER half of the guard, on its own, so it can be removed without removing the focus half

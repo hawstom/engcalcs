@@ -59,7 +59,7 @@ const ROUNDS = [];
 function importText(text, name) { clearDialog(); L.land(text, name, (r) => ROUNDS.push(r)); }
 
 // ---- the file: this page's own export of the geographic Net3, edited -----------------------------
-L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'examples/Net3-Novato-CA-World.lwn', 'utf8'))); L.buildDom();
+L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8'))); L.buildDom();
 const out = global.EngCalcs.lpnExportGeoJson(L.serialize(), L.geoOptions());
 ok('the page writes a GeoJSON network', out.ok);
 const base = JSON.parse(out.text);
@@ -114,6 +114,8 @@ console.log('\n--- a child scenario is open: it receives the values, Base is unt
 	importText(TEXT, 'edited.geojson');
 	const names = dialogButtons();
 	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[3] === PC.lpn_scenario_base && names[2] === PC.lpn_inpup_btn_newscn_basic, JSON.stringify(names));
+	ok('with 2 scenarios the box opens with Tom\'s notice (2026-10-25), then the question',
+		dialogText().indexOf('This project has 2 scenarios, but a GeoJSON file has no scenarios or alternatives.') === 0 && dialogText().indexOf(PC.lpn_gjup_lead.split(/\\n\\n|\n\n/)[0]) > 0, dialogText().slice(0, 200));
 	press(names[1]);
 	ok('Base holds the old value', L.nodeById('20').elev === baseElev20);
 	ok('the scenario reads the file value', L.effective(L.nodeById('20'), 'elev') === oldElev + 7);

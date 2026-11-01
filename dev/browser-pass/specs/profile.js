@@ -449,7 +449,7 @@ exports.run = async function ({ browser, report }) {
 		await a.page.click('#lpn_pane_close');
 		await a.settle(300);
 		const closed = await a.page.evaluate(() => ({
-			hidden: document.getElementById('lpn_pane').style.display === 'none',
+			hidden: document.getElementById('lpn_pane').classList.contains('lpn-pane-shut'),
 			route: document.querySelectorAll('#lpn_canvas .lpn-profile-path').length,
 			canvas: document.getElementById('lpn_canvas').getBoundingClientRect().height,
 			bodyBottom: document.body.getBoundingClientRect().bottom, vh: window.innerHeight

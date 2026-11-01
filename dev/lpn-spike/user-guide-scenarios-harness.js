@@ -33,11 +33,12 @@ const QUOTES = {
 		'lpn_tool_settings', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
 	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
+	lpn_guide_scn_move_def: ['lpn_pane_scn_show', ['lpn_field_active', 'Is active']],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
-		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_alt_cat_userdata', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_alt_cat_calculation',
+		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_settings_custom_props', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_settings_sec_calculation',
 		'lpn_field_desc'],
 	lpn_guide_scn_example_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_new', 'lpn_dialog_ok', 'lpn_field_diameter', 'lpn_scenario_base',
-		'bpn_demand_mult', 'lpn_tool_settings', 'lpn_alt_cat_calculation', 'lpn_settings_hydraulics', 'lpn_reports_menu', 'lpn_scncmp_title',
+		'bpn_demand_mult', 'lpn_tool_settings', 'lpn_settings_sec_calculation', 'lpn_settings_hydraulics', 'lpn_reports_menu', 'lpn_scncmp_title',
 		'lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
 	lpn_guide_scn_notes_def: [['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_same', 'lpn_scenario_basic', 'lpn_sm_title'],
 	lpn_guide_text_scncmp_box: ['lpn_sm_title', 'lpn_menu_project', 'lpn_reports_menu', 'lpn_scncmp_title'],
@@ -45,12 +46,12 @@ const QUOTES = {
 		'lpn_time_hyd_step', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
 	lpn_guide_cmp_run_def: ['lpn_time_duration'],
 	lpn_guide_cmp_notes_def: ['lpn_scncmp_same', 'lpn_sm_title'],
-	lpn_guide_cmp_byasset_def: ['lpn_scnres_title', 'lpn_survey_codes_col_type', 'lpn_time_run_report_copy', 'lpn_full_download_csv']
+	lpn_guide_cmp_byasset_def: ['lpn_scnres_title', 'lpn_survey_codes_col_type', 'points_data_copy', 'lpn_full_download_csv']
 };
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
-	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
-const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_cmp_notes_term'];
+	'lpn_guide_scn_move_term', 'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
+const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_scn_notes_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -64,7 +65,7 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found. SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	try {
-		const ctx = await U.openNet1(browser, NAME);
+		const ctx = await U.openNet1(browser, NAME, { shipped: true });
 		const { a, P } = ctx;
 		// pageConfig carries what the script needs; a heading written in the PHP is read from the English file (this page is English).
 		const T = async (k) => { try { return await U.lang(ctx, k); } catch (e) { return enString(k); } };
@@ -97,11 +98,18 @@ async function main() {
 			await settle(1000);
 		};
 		const closeBox = (id) => P.evaluate((i) => { const x = document.getElementById(i); if (x) { x.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }, id);
+		// Task 840: Lowest pressure and Highest velocity are compound headings (asset, value, time), so the
+		// head has two rows. The table is returned as the chapter shows it: one heading row of column names
+		// ("Lowest pressure: Pressure (psi)") and rows of cells.
 		const compareTable = async (want) => {
 			await a.menuClickSub(await T('lpn_reports_menu'), await T('lpn_scncmp_title'), 'project');
-			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 1; }, want), 'comparison table', 90000);
+			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 2; }, want), 'comparison table', 90000);
 			await settle(300);
-			const rows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_scncmp_report > .lpn-ff-tablewrap table tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			const rows = await P.evaluate(() => {
+				const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'), hs = Array.from(t.tHead.rows), sec = Array.from(hs[1].cells).map((c) => c.textContent.trim()), head = []; let k = 0;
+				Array.from(hs[0].cells).forEach((th) => { if (th.colSpan > 1) { for (let i = 0; i < th.colSpan; i++) { head.push(th.textContent.trim() + ': ' + sec[k++]); } } else { head.push(th.textContent.trim()); } });
+				return [head].concat(Array.from(t.tBodies[0].rows).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			});
 			await closeBox('lpn_scncmp_close');
 			await settle(300);
 			return rows;
@@ -144,12 +152,13 @@ async function main() {
 		ok('the strip reads "' + baseStrip + '"', (await stripText()) === baseStrip, await stripText());
 		ok('...and the chapter quotes that line', plain(enString('lpn_guide_scn_open_def')).indexOf(baseStrip) >= 0);
 		let rows = await listRows();
-		ok('the list holds Base alone (an opened example has no ready-made scenarios)', rows.filter((r) => /\(\d+\)$/.test(r.text)).length === 0 && rows.some((r) => r.text === 'Base' && r.on), JSON.stringify(rows.map((r) => r.text)));
+		ok('the list holds Base and the card\'s own four scenarios (Max day, Peak hour, and their main break children)', rows.filter((r) => /\(\d+\)$/.test(r.text)).length === 4 && rows.some((r) => r.text === 'Base' && r.on), JSON.stringify(rows.map((r) => r.text)));
 		const wantRows = [await T('lpn_sm_menu'), await T('lpn_scenario_basic'), NEW, await T('lpn_scenario_copy'), await T('lpn_scenario_rename'),
 			await T('lpn_scenario_delete'), await T('lpn_sm_list_overrides')];
 		ok('...above Base the list has the rows the chapter names (Scenario manager, Basic mode, New, Copy, Rename, Delete, and the override list), in any order',
 			wantRows.every((w) => rows.slice(0, 7).some((r) => r.text === w)), JSON.stringify(rows.slice(0, 7).map((r) => r.text)));
-		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === true);
+		// A project that holds scenarios opens with Basic mode off, so the row is dimmed exactly when Basic mode is checked.
+		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === !!rows.filter((r) => r.text === wantRows[1])[0].on);
 
 		// ---- 4. the worked example, performed ----------------------------------------------------
 		console.log('\n4. The worked example: Larger main and Max day on Net1');
@@ -167,10 +176,13 @@ async function main() {
 				notes: Array.from(f.querySelectorAll('.lpn-ov-base')).map((n) => n.textContent.trim()) };
 		});
 		ok('Properties marks the overridden Diameter with one solid dot, and the other rows with hollow dots', marks.dots === 1 && marks.hollow > 3, JSON.stringify({ d: marks.dots, h: marks.hollow }));
-		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_settings_held_in')).replace('{scenario}', 'Larger main') + ' ' + (await T('lpn_ovm_dot_clear')), marks.dotTip);
-		ok('...the hollow dot says what clicking it does', marks.hollowTip === await T('lpn_ovm_dot_set'), marks.hollowTip);
-		const baseLine = (await T('lpn_scenario_base_value')).replace('{value}', '18');
-		ok('...the inherited value shows beneath the row, as the chapter quotes it: ' + baseLine, marks.notes.indexOf(baseLine) >= 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(baseLine) >= 0, JSON.stringify(marks.notes));
+		ok('...the solid dot says what clicking it does', marks.dotTip === (await T('lpn_ovm_dot_clear_one')), marks.dotTip);
+		// feat/value-source: the hollow dot also names where the inherited value comes from.
+		const fromTip = (await T('lpn_ovm_dot_set_from')).split('{name}');
+		ok('...the hollow dot says where the value comes from and what clicking it does', !!marks.hollowTip && marks.hollowTip.startsWith(fromTip[0]) && marks.hollowTip.endsWith(fromTip[1])
+			&& marks.hollowTip.length > fromTip[0].length + fromTip[1].length, marks.hollowTip);
+		const baseLine = (await T('lpn_ovm_restores')).replace('{value}', '18 in').replace('{source}', (await T('lpn_settings_held_from')).replace('{parent}', await T('lpn_scenario_base')));
+		ok('...what Clear restores shows beneath the row, as the chapter quotes it: ' + baseLine, marks.notes.indexOf(baseLine) >= 0 && plain(enString('lpn_guide_scn_marks_def')).indexOf(baseLine) >= 0, JSON.stringify(marks.notes));
 		await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
 		await settle(300);
 		const rings = () => P.evaluate(() => ({ amber: document.querySelectorAll('#lpn_canvas .lpn-override').length, gray: document.querySelectorAll('#lpn_canvas .lpn-override-inh').length }));
@@ -238,7 +250,7 @@ async function main() {
 
 		// Max day: the multiplier, typed in Settings.
 		await chooseScenario(await T('lpn_scenario_base'));
-		await newScenario('Max day');
+		await newScenario('Max day 1.8');
 		await a.menuClick(await T('lpn_tool_settings'), 'project');
 		await settle(900);
 		const dmName = await T('bpn_demand_mult');
@@ -254,26 +266,32 @@ async function main() {
 		await closeBox('lpn_setbox_close');
 		await settle(300);
 		const doc = await U.storedProject(ctx);
-		ok('Max day holds the multiplier 1.8 and the project\'s own stays 1', JSON.stringify(doc.calcSets.map((c) => c.demandMultiplier)) === '[1.8]' && doc.settings.hydraulics.demandMultiplier === 1, JSON.stringify(doc.calcSets));
+		ok('Max day 1.8 holds the multiplier 1.8 (after the example own 1.5 and 2.25) and the project\'s own stays 1', JSON.stringify(doc.calcSets.map((c) => c.demandMultiplier)) === '[1.5,2.25,1.8]' && doc.settings.hydraulics.demandMultiplier === 1, JSON.stringify(doc.calcSets));
 
 		// The comparison, cell for cell against the chapter's table.
 		const table = await compareTable(3);
 		const heading = table[0];
 		const ex = (await entryTable(P, 'lpn_sm_box', 1));
+		// The chapter's table has the comparison's own two heading rows (Tom, 2026-10-27: asset, value and time are three columns each,
+		// no sentence cells): group names over Junction/Pressure/Time and Link/Velocity/Time, then the column names, then one row per scenario.
 		const colKeys = ['lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_demand_mult', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'];
 		const wantHead = [];
 		for (const k of colKeys) { wantHead.push(await T(k)); }
-		ok('the chapter\'s example table has the comparison\'s own column names', JSON.stringify(ex[0]) === JSON.stringify(wantHead), JSON.stringify(ex[0]));
+		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]),
+			p: heading.findIndex((h) => h.indexOf(wantHead[3] + ': ') === 0), v: heading.findIndex((h) => h.indexOf(wantHead[4] + ': ') === 0) };
+		const subHead = (h) => h.slice(h.indexOf(': ') + 2);
+		const liveCols = [heading[idx.name], heading[idx.ov], heading[idx.dm]].concat([0, 1, 2].map((i) => subHead(heading[idx.p + i])), [0, 1, 2].map((i) => subHead(heading[idx.v + i])));
+		ok('the chapter\'s example table has the comparison\'s own group headings', JSON.stringify(ex[0]) === JSON.stringify(['', '', '', wantHead[3], wantHead[4]]), JSON.stringify(ex[0]));
+		ok('...and the comparison\'s own column names', JSON.stringify(ex[1]) === JSON.stringify(liveCols), JSON.stringify(ex[1]) + ' vs ' + JSON.stringify(liveCols));
 		ok('the comparison has the columns the chapter lists (Total run time, Hydraulic time step among them)', heading.indexOf(await T('lpn_time_duration')) > 0 && heading.indexOf(await T('lpn_time_hyd_step')) > 0, JSON.stringify(heading));
-		const idx = { name: heading.indexOf(wantHead[0]), ov: heading.indexOf(wantHead[1]), dm: heading.indexOf(wantHead[2]), p: heading.indexOf(wantHead[3]), v: heading.indexOf(wantHead[4]) };
 		const cur = ' ' + (await T('lpn_scncmp_current'));
-		for (const row of ex.slice(1)) {
+		for (const row of ex.slice(2)) {
 			const got = table.slice(1).filter((t) => t[idx.name].replace(cur, '') === row[0])[0];
-			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '),
-				!!got && got[idx.ov] === row[1] && got[idx.dm] === row[2] && got[idx.p] === row[3] && got[idx.v] === row[4], got && JSON.stringify([got[idx.ov], got[idx.dm], got[idx.p], got[idx.v]]));
+			const live = got && [got[idx.name].replace(cur, ''), got[idx.ov], got[idx.dm]].concat([0, 1, 2].map((i) => got[idx.p + i]), [0, 1, 2].map((i) => got[idx.v + i]));
+			ok('comparison row ' + row[0] + ' = chapter: ' + row.slice(1).join(' | '), !!live && JSON.stringify(live) === JSON.stringify(row), JSON.stringify(live));
 		}
-		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day' + cur));
-		ok('the comparison lists exactly the three scenarios of the example', table.length === 4, String(table.length - 1));
+		ok('...and the open scenario is marked "(currently open)"', table.slice(1).some((t) => t[idx.name] === 'Max day 1.8' + cur));
+		ok('the comparison lists the three scenarios of the example and the card\'s own four others', table.length === 8, String(table.length - 1));
 		const durCol = heading.indexOf(await T('lpn_time_duration'));
 		ok('the chapter says the total run time is 24:00 in all three', table.slice(1).every((t) => t[durCol] === '24:00') && plain(enString('lpn_guide_scn_example_def')).indexOf('24:00') >= 0);
 
@@ -283,10 +301,10 @@ async function main() {
 		await P.keyboard.press('Delete');
 		await settle(1300);
 		const base = await T('lpn_scenario_base');
-		const wantNotice = (await T('lpn_scenario_deactivated')).replace('{id}', '22').replace('{scenario}', 'Max day') + ' ' + (await T('lpn_scenario_delete_in_base')).split('{base}').join(base);
+		const wantNotice = (await T('lpn_scenario_deactivated')).replace('{id}', '22').replace('{scenario}', 'Max day 1.8') + ' ' + (await T('lpn_scenario_delete_in_base')).split('{base}').join(base);
 		ok('Delete on Junction 22 in Max day says what it did', (await a.notice()) === wantNotice, await a.notice());
 		const doc2 = await U.storedProject(ctx);
-		const topo = (doc2.alternatives || []).filter((x) => x.category === 'topology')[0];
+		const topo = (doc2.alternatives || []).filter((x) => x.category === 'topology' && x.values['n:22'])[0];
 		ok('...it made the node and its four pipes inactive in Max day (five overrides), and Base still has them',
 			!!topo && Object.keys(topo.values).sort().join() === ['l:112', 'l:122', 'l:21', 'l:22', 'n:22'].sort().join() && topo.values['n:22'].active === false && doc2.nodes.some((x) => String(x.id) === '22'),
 			topo && Object.keys(topo.values).join());

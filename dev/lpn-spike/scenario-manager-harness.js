@@ -292,11 +292,8 @@ async function run(mutate, quiet) {
 	L.setBasicMode(true);
 	const row = () => L.scenarioMenuRows().filter((r) => r.label === PC.lpn_sm_menu)[0];
 	ok('8.1 the Scenario manager row is present with Basic mode ticked', !!row() && L.basicMode() === true);
-	row().fn();
-	ok('8.2 the row is disabled while Basic mode is on (Tom, 2026-10-13), and says why', row().disabled === true && row().tip === PC.lpn_sm_basic_on && /Basic mode/.test(PC.lpn_sm_basic_on), JSON.stringify([row().disabled, row().tip]));
-	const before8 = L.lastNotice();
-	row().fn();
-	ok('8.3 ...and no door through it turns Basic mode off', L.basicMode() === true && L.lastNotice() === before8);
+	ok('8.2 the row is enabled with Basic mode on (Tom, 2026-10-25: Basic mode has a face of the box of its own)', row().disabled !== true && row().tip === undefined, JSON.stringify([row().disabled, row().tip]));
+	ok('8.3 ...and the key that said it was disabled is gone', PC.lpn_sm_basic_on === undefined);
 	L.setBasicMode(false);
 	ok('8.3a with Basic mode off the row is enabled', !row().disabled && L.basicMode() === false);
 	ok('8.4 the row is still there with Basic mode off', !!row());
@@ -307,9 +304,7 @@ async function run(mutate, quiet) {
 	const noPair = (t) => !/, or [^,.;:]*, to /.test(t) && !/, or [^,.;:]*, (?:and )?(?:then )?(?:to|you) /.test(t);
 	ok('8b.1 no sentence of the help sets an "or" clause off with a pair of commas, "Do this, or do that, to make this"', noPair(PC.lpn_sm_help), (PC.lpn_sm_help.match(/[^.]*, or [^.]*, to [^.]*\./) || [''])[0]);
 	ok('8b.2 the Example paragraph is in the help (Tom: "Example is good and important.")', helpParas.some((p) => /^Example: /.test(p)));
-	const tipSentences = PC.lpn_scenario_basic_tip.split(/(?<=\.) /);
-	ok('8b.4 the Basic mode tip says the manager is disabled with Basic mode on, next to its last sentence (Tom, 2026-10-13)',
-		tipSentences.length >= 2 && tipSentences[tipSentences.length - 2] === PC.lpn_sm_basic_on, JSON.stringify(tipSentences.slice(-2)));
+	ok('8b.4 the Basic mode tip no longer says the manager is disabled with Basic mode on', !/disabled when Basic mode is on/.test(PC.lpn_scenario_basic_tip) && !/not shown\./.test(PC.lpn_scenario_basic_tip.split('Cleared')[0].replace('the Scenarios table is not shown', '')), PC.lpn_scenario_basic_tip);
 	ok('8b.5 the singular override key and the notice Choosing-turns-it-off are gone', PC.lpn_scenario_delete_goes_one === undefined && PC.lpn_sm_basic_off === undefined);
 	ok('8b.6 the deletion line has one form, "Its overrides ({n}) are deleted with it."', PC.lpn_scenario_delete_goes.indexOf('{n}') > 0 && /overrides \(\{n\}\)/.test(PC.lpn_scenario_delete_goes));
 
@@ -616,7 +611,7 @@ const MUTATIONS = [
 	['only-in-this-scenario reads the scenario\'s own values alone', (src) => src.replace("var ov = (!scn || plainBase(scn)) ? null : resolvedOverrides(scn)[ovKey(el)];", "var ov = (!scn || plainBase(scn)) ? null : (scn.overrides || {})[ovKey(el)];"), true],
 	['a scenario\'s own alternative is not an item of its tree', (src) => src.replace("		}).map(function (s) { return smImplicitRecord(s, tree); });", "		}).map(function (s) { return smImplicitRecord(s, tree); }).slice(0, 0);")],
 	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n", "		if (writeTargetFor(activeScenario(), categoryOf(prop, elGroup(el))).kind === 'scn') { askDialog({ kind: 'alert', text: 'x' }); }\n		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n"), true],
-	['the manager row is enabled in Basic mode', (src) => src.replace("label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,", "label: pc.lpn_sm_menu || 'Scenario manager…', disabled: false,")]
+	['the manager row is greyed in Basic mode', (src) => src.replace("label: pc.lpn_sm_menu || 'Scenario manager…',\n\t\t\tfn: function () { openScenarioManager(); }", "label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,\n\t\t\tfn: function () { openScenarioManager(); }")]
 ];
 // **A RUN'S PAGES ARE LET GO BEFORE THE NEXT RUN LOADS ITS OWN**, as a browser drops a page's
 // listeners when the next page loads. Each load hangs listeners on the stub's one window and

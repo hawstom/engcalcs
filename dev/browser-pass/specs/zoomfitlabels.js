@@ -163,7 +163,7 @@ async function showAllLabels(a) {
 }
 
 exports.run = async function ({ browser, report }) {
-	const list = [['lpn_ex_net1_title'], ['lpn_ex_basic_us_title'], ['lpn_ex_basic_si_title', dragLabels],
+	const list = [['lpn_ex_net1_title'], ['lpn_ex_net1_si_title', dragLabels],
 		['lpn_ex_net2_title'], ['lpn_ex_net3_title', showAllLabels], ['lpn_ex_elm_street_title'],
 		['lpn_ex_net3_title', null, false]];
 	for (const [key, prep, strict] of list) {

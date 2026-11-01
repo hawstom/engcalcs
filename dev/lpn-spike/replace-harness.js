@@ -53,6 +53,7 @@ const L = loadLoopedNetwork(
 	"\t\tlabelById: labelById,\n" +
 	"\t\tgeomLength: function (id) { return linkGeomLength(linkById(id)); },\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
+	"\t\tsetSelectionList: setSelectionList,\n" +
 	"\t\tundo: undo, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tclearUndo: clearUndo,\n" +
 	// The query and the write, driven through the same state the pull-downs write.
@@ -481,6 +482,35 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	L.preview();
 	ok('an empty box refuses rather than blanking the Text', L.pending() === null &&
 		L.effective(L.labelById(t2id), 'text') === 'Valve vault');
+}
+
+// ---- ONLY THE SELECTED ASSETS (Tom, 2026-10-24: "a way to set all selected elevations from DEM") ----
+{
+	console.log('\n--- only the selected assets ---');
+	const n = build();
+	L.query('junction', 'id', 'contains', '');
+	L.setReplace('elev', '555');
+	L.replaceState().selOnly = false;
+	L.preview();
+	ok('with the box clear, all four junctions would change', L.pending() && L.pending().length === 4, JSON.stringify(L.pending()));
+	L.cancel();
+	L.setSelectionList([{ kind: 'node', id: n.nodes[1] }, { kind: 'node', id: n.nodes[2] }]);
+	L.replaceState().selOnly = true;
+	L.preview();
+	ok('with it checked, only the two selected junctions would change',
+		L.pending() && L.pending().length === 2 && L.pending().indexOf('node:' + n.nodes[1]) >= 0 && L.pending().indexOf('node:' + n.nodes[2]) >= 0,
+		JSON.stringify(L.pending()));
+	L.apply();
+	ok('...and only those two are written', nodeOf(n.nodes[1]).elev === 555 && nodeOf(n.nodes[2]).elev === 555 && nodeOf(n.nodes[0]).elev !== 555 && nodeOf(n.nodes[3]).elev !== 555,
+		[0, 1, 2, 3].map((i) => nodeOf(n.nodes[i]).elev).join(','));
+	L.setSelectionList([]);
+	L.cancel();
+	L.setReplace('elev', '777');
+	L.preview();
+	ok('with it checked and nothing selected, nothing would change', L.pending() === null, JSON.stringify(L.pending()));
+	L.buildForm();
+	ok('...and the form still offers the property list and the box', L.specFields('junction').indexOf('elev') >= 0);
+	L.replaceState().selOnly = false;
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

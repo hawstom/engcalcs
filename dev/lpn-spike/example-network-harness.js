@@ -755,7 +755,7 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('...and it no longer opens a fly-out', !newRow.children.find(c => c.textContent === '\u25b8'));
   fire(newRow);
   ok('clicking it closes the menu, as an ordinary command row does', !L.menuPopupOpen());
-  ok('...and opens the New-project box', byId.lpn_new_panel.style.display === 'block');
+  ok('...and opens the New-project box', byId.lpn_new_panel.style.display !== 'none' && !!byId.lpn_new_panel.style.display);
   // The + tab is the same act by a second door and must arrive at the same box.
   {
     const appSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
@@ -774,7 +774,8 @@ console.log('\n--- Settings panel stays in sync ---');
   // of somebody choosing units for a project that does not exist yet.
   {
     const host = byId.lpn_new_units_fields;
-    const items = host.children;
+    // The header row (Label | Value) stands above the rows and is not a unit control.
+    const items = host.children.filter(c => String(c.className || c['class'] || '').indexOf('lpn-ghdr') < 0);
     // NINE since the water-age selector joined the strip. The count is read from the strip rather
     // than typed twice, so the next selector to arrive needs no edit here -- the property under test
     // is that the box mirrors the strip, not that either holds a particular number.

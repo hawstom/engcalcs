@@ -25,10 +25,10 @@ const QUOTES = {
 	lpn_guide_prop_open_def: ['lpn_tool_select', 'lpn_copy_props_menu', 'lpn_paste_props_menu', 'lpn_tsb_menu'],
 	lpn_guide_prop_edit_def: ['lpn_pipetype_detach', 'lpn_settings_auto_run'],
 	lpn_guide_prop_multi_def: ['lpn_multi_varies'],
-	lpn_guide_prop_example_def: ['lpn_field_desc', 'lpn_field_active', 'lpn_field_diameter', 'lpn_multi_varies']
+	lpn_guide_prop_example_def: ['lpn_field_diameter', 'lpn_multi_varies']
 };
 const TERMS = ['lpn_guide_prop_open_term', 'lpn_guide_prop_edit_term', 'lpn_guide_prop_id_term', 'lpn_guide_prop_scn_term',
-	'lpn_guide_prop_multi_term', 'lpn_guide_prop_example_term'];
+	'lpn_guide_prop_multi_term', 'lpn_guide_scn_example_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -49,7 +49,10 @@ async function main() {
 		const closePopup = async () => { await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }); await settle(400); };
 		const popupRows = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => {
 			const i = l.querySelector('input,select,textarea');
-			return { text: l.textContent.replace(/\s+/g, ' ').trim(), input: !!i, value: i ? i.value : null, ph: i ? i.placeholder : null, off: i ? !!(i.disabled || i.readOnly) : null };
+			// The row as the reader reads it, left to right: label (the unit stands in it), value.
+			const n = l.querySelector('.lpn-gname'), v = l.querySelector('.lpn-gval');
+			const text = n ? [n.textContent, i ? '' : (v ? v.textContent : '')].join(' ').replace(/\s+/g, ' ').trim() : l.textContent.replace(/\s+/g, ' ').trim();
+			return { text: text, input: !!i, value: i ? i.value : null, ph: i ? i.placeholder : null, off: i ? !!(i.disabled || i.readOnly) : null };
 		}));
 		// The middle of the asset's hit area. A vertical pipe has a bounding box of no width, so the hit
 		// polyline is asked for by its class rather than by a positive width.
@@ -84,10 +87,12 @@ async function main() {
 		await settle(500);
 		let rows = await popupRows();
 		const idx = (rows, start) => rows.findIndex((r) => r.text.indexOf(start) === 0);
-		const lastInput = idx(rows, await T('lpn_field_active'));
+		// Row order since 99e9b4292 (Tom, 2026-10-29): From and To right after the ID, Active near the top, every input, then the calculated rows last.
+		const lastInput = rows.map((r) => r.input).lastIndexOf(true);
 		const flow = idx(rows, await T('lpn_result_flow')), vel = idx(rows, await T('lpn_result_velocity'));
-		ok('Pipe 10: Description is the first row and Is active? the last input; the calculated rows follow it', idx(rows, await T('lpn_field_desc')) === 0 && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
-		ok('...the calculated rows have no box to type in', rows.slice(lastInput + 1).every((r) => !r.input), JSON.stringify(rows.slice(lastInput + 1).map((r) => r.input)));
+		const act = idx(rows, await T('lpn_field_active_short')), desc = idx(rows, await T('lpn_field_desc')), tag = idx(rows, await T('lpn_field_tag'));
+		ok('Pipe 10: From, To and Active lead, then Description and Tag; every input comes before the calculated rows', idx(rows, await T('lpn_field_from')) === 0 && act > 0 && act < desc && desc < tag && lastInput > 0 && flow > lastInput && vel > flow, JSON.stringify(rows.map((r) => r.text.slice(0, 18))));
+		ok('...the calculated rows have no box to type in', rows.slice(flow).every((r) => !r.input), JSON.stringify(rows.slice(flow).map((r) => r.input)));
 		const ex = plain(enString('lpn_guide_prop_example_def'));
 		const val = (i) => rows[i].text.replace(/[^0-9.]+$/, '').split(' ').pop();
 		const HL = rows[idx(rows, await T('lpn_result_headloss'))].text;
@@ -98,9 +103,10 @@ async function main() {
 		await U.openProperties(ctx, 'node', '11');
 		await settle(500);
 		rows = await popupRows();
-		const head = idx(rows, await T('lpn_result_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
-		ok('Junction 11: Head and Pressure are read-only rows that sit before its last inputs', head > 0 && pressure > head && initq > pressure && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
-		ok('...and the last row is an input again, Is active?', rows[rows.length - 1].text.indexOf(await T('lpn_field_active')) === 0 && rows[rows.length - 1].input);
+		const head = idx(rows, await T('lpn_field_head')), pressure = idx(rows, await T('lpn_result_pressure')), initq = idx(rows, await T('lpn_quality_initial'));
+		const lastIn11 = rows.map((r) => r.input).lastIndexOf(true);
+		ok('Junction 11: Head and Pressure are read-only rows that sit after its inputs', head > 0 && pressure > head && initq > 0 && head > lastIn11 && !rows[head].input && !rows[pressure].input, JSON.stringify(rows.map((r) => r.text.slice(0, 14))));
+		ok('...and Is active? is the first row, an input', rows[0].text.indexOf(await T('lpn_field_active_short')) === 0 && rows[0].input);
 
 		// ---- 4. the ID ------------------------------------------------------------------------------
 		console.log('\n4. The ID');
@@ -155,7 +161,7 @@ async function main() {
 			i.focus(); i.value = '10'; i.dispatchEvent(new Event('change', { bubbles: true })); i.blur();
 		}, [await T('lpn_multi_varies'), DIA]);
 		await settle(900);
-		const wantNote = (await T('lpn_multi_applied')).replace('{prop}', dRow.text).replace('{n}', '2');
+		const wantNote = (await T('lpn_multi_applied')).replace('{prop}', dRow.text.replace(/\s*\?$/, '')).replace('{n}', '2');
 		ok('entering 10 sets both and the notice reads "' + wantNote + '"', (await a.notice()) === wantNote, await a.notice());
 		ok('...and the chapter quotes the notice', plain(enString('lpn_guide_prop_multi_def')).indexOf(wantNote.replace(/\.$/, '')) >= 0 && ex.indexOf(wantNote) >= 0);
 		const b31 = await diam('31'), b113 = await diam('113');

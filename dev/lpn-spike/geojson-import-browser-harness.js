@@ -12,6 +12,7 @@
 // another coordinate system is refused with a message naming it, and imports nothing.
 // The reader and builder alone: geojson-import-harness.js.
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -47,7 +48,8 @@ function ok(label, cond, detail) {
 }
 
 async function open(browser) {
-	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
+	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+	await serveLatLonNet3(a.page);
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
@@ -82,12 +84,22 @@ const featuresOf = (t) => t.slice(t.indexOf('\n"features":')).replace(RESULT, ''
 function helpers(a) {
 	const P = a.page;
 	const settle = (ms) => a.settle(ms || 300);
+	const readStored = () => P.evaluate(() => {
+		const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+		return { id: idx.openId, count: (idx.projects || []).length, doc: JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') };
+	});
+	// STILL, NOT MERELY WAITED FOR: the page saves on a debounce, which a loaded machine can run late
+	// past any fixed wait. Read until two readings 300 ms apart agree (at most 20 s more).
 	const stored = async () => {
 		await settle(450);
-		return P.evaluate(() => {
-			const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
-			return { id: idx.openId, count: (idx.projects || []).length, doc: JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null') };
-		});
+		let v = await readStored();
+		for (let t = 0; t < 66; t++) {
+			await P.waitForTimeout(300);
+			const w = await readStored();
+			if (JSON.stringify(w) === JSON.stringify(v)) { return w; }
+			v = w;
+		}
+		return v;
 	};
 	const importVia = async (file) => {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
@@ -352,6 +364,10 @@ async function main() {
 		console.log('\n--- 7. a 6,589-feature layer: the working notice, and the time it takes ---');
 		{
 			const e = await open(browser), he = helpers(e), Pe = he.P;
+			// The click that starts this import waits while the page parses 6,589 features; on a busy
+			// machine that outlasted Playwright's 30 s default (2026-10-29). The timing check below is
+			// the guard; the click only needs to land.
+			e.page.setDefaultTimeout(180000);
 			await e.newProject('si'); await e.dismissGallery().catch(() => {}); await he.settle(400);
 			await he.importVia({ name: 'grid.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(bigGrid()) });
 			await e.waitDialog(10000);

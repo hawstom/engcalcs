@@ -65,9 +65,10 @@ function popupFor(id) {
 	return byId.lpn_popup_fields.children;
 }
 function demandInputOf(id) {
+	// sheet-light: Base demand is a row of Properties (a one-category junction's own number).
 	const kids = popupFor(id);
-	const table = kids.filter((c) => c.tagName === 'TABLE')[0];
-	return findAll([table], 'INPUT').filter((i) => i.type === 'number')[0];
+	const row = kids.filter((c) => c.tagName === 'LABEL' && /^Base demand/.test(c.textContent))[0];
+	return findAll([row], 'INPUT').filter((i) => i.type === 'number')[0];
 }
 function demandColGet(id) {
 	const n = L.nodeById(id);

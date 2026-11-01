@@ -1,4 +1,5 @@
-// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 6 (Task 733, phase 3).
+// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 6 (Task 733, phase 3),
+// AND ITS WATER-QUALITY PASS (phase 4; see the WATER QUALITY section below).
 //
 // js/lpn-solver.js solves ONE INSTANT. This file walks the clock around it, the way EPANET's own
 // runH()/nextH() loop does (hydraul.c), and holds the one piece of state an instant does not have:
@@ -110,7 +111,8 @@
 // does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): a rule the
 // loop does not copy exactly (a rule on a pipe's roughness, a reservoir's level or pressure, a
 // GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
-// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality, EPANET-MSX, pump energy EPANET itself refuses to read (a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase), a
+// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality
+// unless the caller asks for it (`{quality: true}`; then only what the pass cannot copy), EPANET-MSX, pump energy EPANET itself refuses to read (a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase), a
 // control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
@@ -194,7 +196,7 @@
 	 * The reasons the built-in solver cannot run this model's period, as `{code, ids}` records, or
 	 * an empty list when it can. Pure: nothing is solved.
 	 */
-	EC.lpnNativeRunRefusals = function (model) {
+	EC.lpnNativeRunRefusals = function (model, options) {
 		var out = [], time = (model && model.time) || {}, ids, q;
 		function add(code, list, always) { if (always || list.length) { out.push({ code: code, ids: list }); } }
 		ids = [];
@@ -248,9 +250,23 @@
 			}
 		});
 		add('native-run-tank-levels', ids);
+		// WATER QUALITY (phase 4) runs only when the caller asks for it (`options.quality`): the page
+		// keeps every quality run on EPANET until slice 7's wiring says otherwise, exactly as before.
+		// Asked for, what the pass cannot copy is refused by name; EPANET-MSX always is.
 		q = model.quality;
-		if (q && q.mode && q.mode !== 'none') { add('native-run-quality', [], true); }
-		if (model.msx) { add('native-run-quality', [], true); }
+		if (model.msx || (q && q.mode === 'msx')) { add('native-run-quality', [], true); }
+		else if (q && q.mode && q.mode !== 'none') {
+			if (!(options && options.quality)) { add('native-run-quality', [], true); }
+			else {
+				var qc = qualityConfig(model);
+				if (qc.bad.length) { add('native-run-quality', qc.bad); }
+				// input1.c: the quality step defaults to a tenth of the hydraulic step, in whole seconds;
+				// under 10 s that is 0 and EPANET's own walk never advances.
+				else if (qc.mode && !((time.times && time.times.qualityStep > 0) || hydStepOf(time.times) >= 10)) {
+					add('native-run-quality', ['Quality Timestep']);
+				}
+			}
+		}
 		add('native-run-energy', energyConfig(model).bad);
 		return out;
 	};
@@ -265,7 +281,7 @@
 	 * `options.tol` is the per-step solve tolerance (lpnSolve's own default when absent).
 	 */
 	EC.lpnNativeRun = function (model, options) {
-		var opts = options || {}, refusals = EC.lpnNativeRunRefusals(model), tm, times, dur,
+		var opts = options || {}, refusals = EC.lpnNativeRunRefusals(model, opts), tm, times, dur,
 			patStep, patStart, repStep, hydStep, tStart, byPat = {}, dm, tanks = [], frames = [], warnings = [], solveTimes = [],
 			htime = 0, rtime, guard = 0, res, stepModel, tstep, t, nextPat, dmult, levelNow = {}, cur,
 			links, ls, ctl, tankById = {}, nodeById = {};
@@ -290,6 +306,7 @@
 			nodeById[String(n.id)] = n;
 			if (tankHasArea(n)) {
 				tanks.push(tankState(n));
+				tanks[tanks.length - 1].V0 = tanks[tanks.length - 1].V;
 				tankById[String(n.id)] = tanks[tanks.length - 1];
 				levelNow[n.id] = solverLevel(tanks[tanks.length - 1]);
 			}
@@ -591,6 +608,7 @@
 			emax = Math.max(emax, psum);
 		}
 		rtime = repStep;
+		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [];
 
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
@@ -623,6 +641,7 @@
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			readBack(stepModel, stepLinks, ls, res);
 			solveTimes.push(htime);
+			if (qcfg.mode) { hydRecs.push(hydRecord(model, cur, res, ls, htime)); }   // savehyd()
 			// A tank's net inflow, from the link flows the solve returned (a link a full or empty tank
 			// shut reports no flow, which is what keeps the level from passing its limits).
 			tanks.forEach(function (tk) {
@@ -665,6 +684,12 @@
 			htime += tstep;
 			if (htime >= rtime) { rtime += repStep; }
 			if (++guard >= 100000) { break; }
+		}
+		// ---- WATER QUALITY (phase 4): EPANET's second pass, over the hydraulics just saved ----
+		if (qcfg.mode) {
+			tanks.forEach(function (tk) { tk.vEnd = tk.V; });
+			var qres = qualityPass(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
+			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
 		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes,
 			// What the pumps used and cost, or null for a model with no pump (the page's own rule,
@@ -1134,6 +1159,668 @@
 		out.totalCostPerDay = out.costPerDay + out.demandCharge;
 		return out;
 	}
+
+	// ---- WATER QUALITY (phase 4 of Task 733: Q1 water age, Q2 source trace, Q3 one chemical) -------
+	//
+	// EPANET runs quality as a SECOND PASS over the hydraulics it saved (js/lpn-epanet.js: closeH(),
+	// then openQ()/initQ()/runQ()/nextQ()), and so does this: the hydraulic loop above keeps one record
+	// per solve, as savehyd() writes one, and qualityPass() walks them afterwards. A record holds what
+	// the hydraulics file holds and in its precision: each link's flow in cfs as a 4-byte float, zero
+	// for a link at or below CLOSED, and each junction's demand the same way (output.c savehyd(),
+	// readhyd()). Transcribed, function by function, from OWA-EPANET 2.3.5:
+	//   quality.c   initqual(), runqual(), nextqual(), flowdirchanged(), avgqual(), findsourcequal(),
+	//               sourcequal();
+	//   qualroute.c transport(), evalnodeinflow(), findnodequal(), noflowqual(), evalnodeoutflow(),
+	//               sortnodes(), selectnonstacknode(), initsegs(), reversesegs(), addseg();
+	//   qualreact.c setreactflag(), getucf(), ratecoeffs(), reactpipes(), reacttanks(), piperate(),
+	//               pipereact(), tankreact(), bulkrate(), wallrate(), mixtank(), tankmix1() to tankmix4();
+	//   input1.c    adjustdata() (the quality step, the tolerance, viscosity and diffusivity, the default
+	//               and roughness-correlated coefficients) and convertunits() (a concentration is held
+	//               per cubic foot, x 28.317; a coefficient per second);
+	//   project.c   buildadjlists(), whose list order decides the node sort and so the answer.
+	// Mass balance and the average reaction rates are not kept: they change no value a frame carries.
+	var Q_STAGNANT = 0.005 / 448.831,      // cfs (quality.c, 0.005 gpm)
+		LPERFT3 = 28.317,                  // L per ft3 (types.h LperFT3)
+		Q_BIGNUM = 1e10,                   // types.h BIG
+		Q_TINY = 1e-6,                     // types.h TINY
+		VISCOS = 1.1e-5,                   // ft2/s (types.h), the default kinematic viscosity
+		DIFFUS = 1.3e-8,                   // ft2/s (types.h), the default diffusivity (chlorine)
+		Q_PI = Math.PI,
+		MIX1 = 0, MIX2 = 1, FIFO = 2, LIFO = 3,
+		SRC_TYPES = ['CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'],
+		MIX_TYPES = ['MIXED', '2COMP', 'FIFO', 'LIFO'];
+	function sgn(x) { return x < 0 ? -1 : 1; }   // types.h SGN: SGN(0) is 1
+	// input2.c match(): the keyword is matched against the start of the token, ignoring case.
+	function keywordOf(token, list) {
+		var t = String(token === undefined || token === null ? '' : token).trim().toUpperCase(), i;
+		for (i = 0; i < list.length; i++) { if (t.indexOf(list[i]) === 0) { return i; } }
+		return -1;
+	}
+
+	// What the model asks of the quality pass, as js/lpn-epanet.js writes it to EPANET, and what of it
+	// the loop cannot run (`bad`, ids for native-run-quality). `mode` is null for no analysis.
+	function qualityConfig(model) {
+		var q = model.quality || {}, bad = [], pats = {}, cfg = { mode: null, bad: bad }, inNode = {};
+		(model.nodes || []).forEach(function (n) { inNode[String(n.id)] = n; });
+		((model.time && model.time.patterns) || []).forEach(function (p) { pats[String(p.id)] = true; });
+		if (q.mode === 'age') { cfg.mode = 'age'; }
+		else if (q.mode === 'trace') {
+			// The bridge writes no Quality line for a trace on a node out of the run, and EPANET then
+			// runs no analysis while the page still reads a quality column: not ours to invent.
+			if (!q.traceNode || !inNode[String(q.traceNode)]) { bad.push(String(q.traceNode || 'TRACE')); return cfg; }
+			cfg.mode = 'trace'; cfg.traceNode = String(q.traceNode);
+		} else if (q.mode === 'chemical') { cfg.mode = 'chemical'; }
+		else { return cfg; }
+		(model.nodes || []).forEach(function (n) {
+			var s = n.source, m = n.mixing;
+			// A tank with no area is a reservoir to EPANET's quality code and something else to the
+			// built-in solver; nobody has asked for it.
+			if (n.type === 'tank' && !tankHasArea(n)) { bad.push(String(n.id)); }
+			if (cfg.mode === 'chemical' && s && typeof s.quality === 'number' && isFinite(s.quality)) {
+				if (keywordOf(s.type || 'CONCEN', SRC_TYPES) < 0) { bad.push(String(n.id)); }          // input3.c error 213
+				if (s.pattern && !pats[String(s.pattern)]) { bad.push(String(n.id)); }                  // error 205
+			}
+			if (n.type === 'tank' && m && m.model && keywordOf(m.model, MIX_TYPES) < 0) { bad.push(String(n.id)); }   // error 213
+		});
+		return cfg;
+	}
+
+	// Build the pass's network in EPANET's own indexing: junctions, then reservoirs, then tanks (the
+	// order the bridge writes [JUNCTIONS], [RESERVOIRS], [TANKS]), and links as [PIPES] (a pump with no
+	// curve among them, the bridge's 0.01 m by 1000 mm pipe), [PUMPS], [VALVES]. 1-based, as in C.
+	function qualityNet(model) {
+		var nodes = [null], links = [null], ix = {}, method = model.method || 'hw';
+		['junction', 'reservoir', 'tank'].forEach(function (ty) {
+			model.nodes.forEach(function (n) {
+				var t = n.type === 'junction' || n.type === 'reservoir' || n.type === 'tank' ? n.type : 'junction';
+				if (t === ty) { ix[String(n.id)] = nodes.length; nodes.push(n); }
+			});
+		});
+		['pipe', 'pump', 'valve'].forEach(function (ty) {
+			model.links.forEach(function (l, k) {
+				var asPipe = l.type === 'pump' && !(l.h0 > 0 || l.a > 0), t = asPipe ? 'pipe' : l.type === 'pump' || l.type === 'valve' ? l.type : 'pipe';
+				if (t !== ty) { return; }
+				links.push({
+					k: k, l: l, id: l.id, n1: ix[String(l.from)], n2: ix[String(l.to)],
+					// types.h LinkType: CVPIPE (0) and PIPE (1) are "<= PIPE"; only a PIPE reacts or ages.
+					type: t === 'pipe' ? (l.type === 'pipe' && l.status === 'cv' ? 'cv' : 'pipe') : t,
+					len: asPipe ? 0.01 / FT : (l.length || 0) / FT,                 // ft
+					diam: asPipe ? 1 / FT : (l.diameter || 0) / FT,                // ft
+					kc: asPipe ? (method === 'dw' ? 0.0000015 / 1000 / FT : method === 'manning' ? 0.008 : 150)
+						: (method === 'dw' ? (l.roughness || 0) / FT : l.roughness)
+				});
+			});
+		});
+		return { nodes: nodes, links: links, ix: ix, nj: nodes.filter(function (n) { return n && n.type !== 'reservoir' && n.type !== 'tank'; }).length };
+	}
+
+	// One saved hydraulic solution (output.c savehyd()): link flows and junction demands in cfs as
+	// 4-byte floats, a link at or below CLOSED saved with no flow. Keyed by the model's own link order.
+	function hydRecord(model, cur, res, ls, t) {
+		var q = new Array(model.links.length), closed = new Array(model.links.length), d = {}, exp = model.emitterExponent || 0.5;
+		model.links.forEach(function (l, k) {
+			closed[k] = ls[k].s <= CLOSED;
+			q[k] = closed[k] ? 0 : Math.fround((res.flows[l.id] || 0) * 1000 / LPS_PER_CFS);
+		});
+		cur.forEach(function (n) {
+			var x;
+			if (n.type !== 'junction' && n.type !== undefined) { return; }
+			x = n.demand || 0;
+			// hydraul.c: a junction's NodeDemand is its demand plus what its emitter discharges.
+			if (n.emitter > 0) { x += n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), exp); }
+			d[String(n.id)] = Math.fround(x * 1000 / LPS_PER_CFS);
+		});
+		return { t: t, q: q, closed: closed, d: d };
+	}
+
+	// The quality pass. `recs` are the hydraulic records in time order (each step is the gap to the
+	// next, the last 0); `frames` gain `qualities` and `linkQualities` at the times they are report
+	// times, in the bridge's units (seconds of age, percent, the chemical's own unit). `tanks` are the
+	// hydraulic loop's tank states (EPANET's Tank[], ft3): V0 at the start, and `vEnd`, the volume the
+	// hydraulic run ended at, which is what tank->V still holds when EPANET's separate quality pass
+	// asks whether a FIFO or LIFO tank is full.
+	function qualityPass(model, cfg, recs, frames, tanks, times, byPat, hydStep) {
+		var net = qualityNet(model), nodes = net.nodes, links = net.links, N = nodes.length - 1, L = links.length - 1,
+			q = model.quality || {}, re = model.reactions || {}, hyd = model.hydraulics || {},
+			CHEM = cfg.mode === 'chemical', AGE = cfg.mode === 'age', TRACE = cfg.mode === 'trace',
+			ucfQ = CHEM ? 1 / LPERFT3 : 1,                                    // input1.c Ucf[QUALITY]
+			ucfElev = FT,                                                     // an SI file: Ucf[ELEV] is MperFT
+			patStep = times.patternStep > 0 ? times.patternStep : 3600, patStart = times.patternStart > 0 ? times.patternStart : 0,
+			dur = times.duration > 0 ? times.duration : 0,
+			qstep, ctol, viscos, diffus, sc, bulkOrder, wallOrder, tankOrder, kbulk, kwall, climit, rfactor, bucf, tucf,
+			nodeQual = new Array(N + 1), sourceQual = 0, flowDir = new Array(L + 1), rc = new Array(L + 1),
+			first = [], last = [], adj = [], sorted = new Array(N + 1), reactflag,
+			tk = [], tankOfNode = {}, srcOf = new Array(N + 1), kb = new Array(L + 1), kw = new Array(L + 1),
+			cur = null, i, j, k, n, r, frameAt = {}, traceIx = cfg.traceNode ? net.ix[cfg.traceNode] : 0, qtime;
+		function num(v, dflt) { return typeof v === 'number' && isFinite(v) ? v : dflt; }
+
+		// ---- input1.c adjustdata() and convertunits(), as the bridge's LPS file states them ----
+		qstep = times.qualityStep > 0 ? times.qualityStep : Math.floor(hydStep / 10);
+		qstep = Math.min(qstep, hydStep);
+		ctol = CHEM && typeof q.tolerance === 'number' && isFinite(q.tolerance) ? q.tolerance : 0.01;   // AGETOL, CHEMTOL
+		ctol /= ucfQ;
+		viscos = hyd.viscosity !== undefined ? Number(hyd.viscosity) : null;
+		viscos = viscos === null ? VISCOS : viscos > 1e-3 ? viscos * VISCOS : viscos / (FT * FT);
+		diffus = CHEM && typeof q.diffusivity === 'number' && isFinite(q.diffusivity) ? q.diffusivity : null;
+		diffus = diffus === null ? DIFFUS : diffus > 1e-4 ? diffus * DIFFUS : diffus / (FT * FT);
+		sc = diffus > 0 ? viscos / diffus : 0;
+		// [REACTIONS] goes out for a chemical only (js/lpn-epanet.js), so an age or a trace has EPANET's defaults.
+		if (!CHEM) { re = {}; }
+		bulkOrder = num(re.orderBulk, 1); tankOrder = num(re.orderTank, 1);
+		wallOrder = num(re.orderWall, 1); wallOrder = wallOrder === 0 ? 0 : 1;        // input3.c: 0 or 1, anything else 1
+		kbulk = num(re.globalBulk, 0) / SEC_PER_DAY; kwall = num(re.globalWall, 0) / SEC_PER_DAY;
+		climit = num(re.limitingPotential, 0) / ucfQ;
+		rfactor = num(re.roughnessCorrelation, 0);
+		function getucf(order) { if (order < 0) { order = 0; } return order === 1 ? 1 : 1 / Math.pow(LPERFT3, order - 1); }
+		bucf = getucf(bulkOrder); tucf = getucf(tankOrder);
+		for (k = 1; k <= L; k++) {
+			r = links[k];
+			kb[k] = 0; kw[k] = 0;
+			if (r.type !== 'pipe' && r.type !== 'cv') { continue; }               // pumpdata()/valvedata(): 0
+			// A per-pipe row goes out for a real pipe only (js/lpn-epanet.js), never for a curveless pump.
+			kb[k] = r.l.type === 'pipe' && re.bulk && num(re.bulk[r.id], null) !== null ? re.bulk[r.id] / SEC_PER_DAY : kbulk;
+			if (r.l.type === 'pipe' && re.wall && num(re.wall[r.id], null) !== null) { kw[k] = re.wall[r.id] / SEC_PER_DAY; }
+			else if (rfactor === 0) { kw[k] = kwall; }
+			else if (r.kc > 0 && r.diam > 0) {
+				var m = model.method || 'hw';
+				if (m === 'hw') { kw[k] = rfactor / r.kc; }
+				if (m === 'dw') { kw[k] = rfactor / Math.abs(Math.log(r.kc / r.diam)); }
+				if (m === 'manning') { kw[k] = rfactor * r.kc; }
+				kw[k] /= SEC_PER_DAY;
+			}
+		}
+		// The tanks: EPANET's Tank[] holds reservoirs too (A = 0, no segments).
+		for (n = 1; n <= N; n++) {
+			var nd = nodes[n];
+			if (nd.type === 'reservoir' || nd.type === 'tank') {
+				var ts = nd.type === 'tank' ? tanks.filter(function (x) { return x.id === nd.id; })[0] : null, mx = nd.mixing || {}, mm, v1;
+				mm = nd.type === 'tank' && mx.model ? keywordOf(mx.model, MIX_TYPES) : MIX1;
+				// input3.c mixingdata(): the fraction is read for 2COMP only, and 0 is taken as 1.
+				v1 = mm === MIX2 && typeof mx.fraction === 'number' && isFinite(mx.fraction) ? mx.fraction : 1;
+				if (v1 === 0) { v1 = 1; }
+				tk.push({ node: n, A: ts ? 1 : 0, V0: ts ? ts.V0 : 0, Vmax: ts ? ts.Vmax : 0, V: ts ? ts.vEnd : 0,
+					mix: mm, v1frac: v1, C: 0, chain: L + tk.length + 1,
+					kb: nd.type === 'tank' && re.tank && num(re.tank[nd.id], null) !== null ? re.tank[nd.id] / SEC_PER_DAY : kbulk });
+				tankOfNode[n] = tk[tk.length - 1];
+			}
+			srcOf[n] = null;
+			if (CHEM && nd.source && typeof nd.source.quality === 'number' && isFinite(nd.source.quality)) {
+				srcOf[n] = { c0: nd.source.quality, type: keywordOf(nd.source.type || 'CONCEN', SRC_TYPES), pat: nd.source.pattern ? byPat[String(nd.source.pattern)] : null };
+			}
+		}
+		// project.c buildadjlists(): each link is pushed on the FRONT of both end nodes' lists.
+		for (n = 0; n <= N; n++) { adj[n] = []; }
+		for (k = 1; k <= L; k++) {
+			adj[links[k].n1].unshift({ node: links[k].n2, link: k });
+			adj[links[k].n2].unshift({ node: links[k].n1, link: k });
+		}
+		frames.forEach(function (f) { frameAt[f.t] = f; });
+
+		// ---- segments (qualroute.c addseg(), reversesegs()) ----
+		function addseg(c, v, cc) {
+			var s = { v: v, c: cc, prev: null };
+			if (!first[c]) { first[c] = s; }
+			if (last[c]) { last[c].prev = s; }
+			last[c] = s;
+		}
+		function reversesegs(c) {
+			var s = first[c], ns, ps = null;
+			first[c] = last[c]; last[c] = s;
+			while (s) { ns = s.prev; s.prev = ps; ps = s; s = ns; }
+		}
+		function linkflow(k2) { var x = links[k2]; return cur.closed[x.k] ? 0 : cur.q[x.k]; }
+		function linkvol(k2) { return 0.785398 * links[k2].len * links[k2].diam * links[k2].diam; }
+
+		// ---- quality.c initqual() ----
+		for (n = 1; n <= N; n++) {
+			nodeQual[n] = TRACE ? 0 : (CHEM ? num(nodes[n].initQuality, 0) / ucfQ : 0);   // [QUALITY] goes out for a chemical only
+		}
+		tk.forEach(function (t) { t.C = nodeQual[t.node]; });
+		if (TRACE) { nodeQual[traceIx] = 100; }
+		// qualreact.c setreactflag()
+		if (TRACE) { reactflag = false; }
+		else if (AGE) { reactflag = true; }
+		else {
+			reactflag = false;
+			for (k = 1; k <= L; k++) { if ((links[k].type === 'pipe' || links[k].type === 'cv') && (kb[k] !== 0 || kw[k] !== 0)) { reactflag = true; } }
+			tk.forEach(function (t) { if (t.kb !== 0) { reactflag = true; } });
+		}
+		// qualroute.c initsegs()
+		for (k = 1; k <= L; k++) {
+			first[k] = null; last[k] = null;
+			if (links[k].type === 'pipe') { addseg(k, linkvol(k), nodeQual[links[k].n2]); }
+		}
+		tk.forEach(function (t) {
+			var c0, v, v1;
+			first[t.chain] = null; last[t.chain] = null;
+			if (t.A === 0) { return; }
+			c0 = CHEM ? num(nodes[t.node].initQuality, 0) / ucfQ : 0;              // Node C0, not NodeQual
+			v = t.V0;
+			addseg(t.chain, v, c0);
+			if (t.mix === MIX2) {
+				v1 = Math.max(0, v - t.v1frac * t.Vmax);
+				first[t.chain].v = v1;
+				addseg(t.chain, v - v1, c0);
+			}
+		});
+		for (k = 1; k <= L; k++) { flowDir[k] = 0; rc[k] = 0; }
+
+		// ---- qualreact.c ----
+		function piperate(k2) {
+			var r2 = links[k2], d = r2.diam, a, u, qq, kf, kk, y, re2, sh;
+			if (sc === 0) {
+				if (wallOrder === 0) { return Q_BIGNUM; }
+				return kw[k2] * (4 / d) / ucfElev;
+			}
+			qq = linkflow(k2);
+			a = Q_PI * d * d / 4;
+			u = Math.abs(qq) / a;
+			re2 = u * d / viscos;
+			if (re2 < 1) { sh = 2; }
+			else if (re2 >= 2300) { sh = 0.0149 * Math.pow(re2, 0.88) * Math.pow(sc, 0.333); }
+			else {
+				y = d / r2.len * re2 * sc;
+				sh = 3.65 + 0.0668 * y / (1 + 0.04 * Math.pow(y, 0.667));
+			}
+			kf = sh * diffus / d;
+			if (wallOrder === 0) { return kf; }
+			kk = kw[k2] / ucfElev;
+			return (4 / d) * kk * kf / (kf + Math.abs(kk));
+		}
+		function ratecoeffs() {
+			for (var k2 = 1; k2 <= L; k2++) { rc[k2] = kw[k2] !== 0 ? piperate(k2) : 0; }
+		}
+		function bulkrate(c, kk, order) {
+			var c1;
+			if (order === 0) { c = 1; }
+			else if (order < 0) {
+				c1 = climit + sgn(kk) * c;
+				if (Math.abs(c1) < Q_TINY) { c1 = sgn(c1) * Q_TINY; }
+				c = c / c1;
+			} else {
+				c1 = climit === 0 ? c : Math.max(0, sgn(kk) * (climit - c));
+				if (order === 1) { c = c1; }
+				else if (order === 2) { c = c1 * c; }
+				else { c = c1 * Math.pow(Math.max(0, c), order - 1); }
+			}
+			if (c < 0) { c = 0; }
+			return kk * c;
+		}
+		function wallrate(c, d, kk, kf) {
+			if (kk === 0 || d === 0) { return 0; }
+			if (wallOrder === 0) {
+				kf = sgn(kk) * c * kf;
+				kk = kk * ucfElev * ucfElev;
+				if (Math.abs(kf) < Math.abs(kk)) { kk = kf; }
+				return kk * 4 / d;
+			}
+			return c * kf;
+		}
+		function pipereact(k2, c, dt) {
+			var cnew;
+			if (AGE) { cnew = c + dt / 3600; return Math.max(0, cnew); }
+			cnew = c + bulkrate(c, kb[k2], bulkOrder) * bucf * dt + wallrate(c, links[k2].diam, kw[k2], rc[k2]) * dt;
+			return Math.max(0, cnew);
+		}
+		function tankreact(c, kk, dt) {
+			var dc = AGE ? dt / 3600 : bulkrate(c, kk, tankOrder) * tucf * dt;
+			return Math.max(0, c + dc);
+		}
+		function reactpipes(dt) {
+			for (var k2 = 1; k2 <= L; k2++) {
+				if (links[k2].type !== 'pipe') { continue; }
+				for (var s = first[k2]; s; s = s.prev) { s.c = pipereact(k2, s.c, dt); }
+			}
+		}
+		function reacttanks(dt) {
+			tk.forEach(function (t) {
+				if (t.A === 0) { return; }
+				for (var s = first[t.chain]; s; s = s.prev) { s.c = tankreact(s.c, t.kb, dt); }
+			});
+		}
+		// tankmix1(): complete mixing
+		function tankmix1(t, vin, win, vnet) {
+			var s = first[t.chain], vnew;
+			if (!s) { return; }
+			vnew = s.v + vin;
+			if (vnew > 0) { s.c = (s.c * s.v + win) / vnew; }
+			s.v += vnet;
+			s.v = Math.max(0, s.v);
+			t.C = s.c;
+			if (s.v > t.Vmax) { s.v = t.Vmax; }
+		}
+		// tankmix2(): two compartments
+		function tankmix2(t, vin, win, vnet) {
+			var mz = last[t.chain], sz = first[t.chain], vt = 0, vmz, vsz;
+			if (!mz || !sz) { return; }
+			vmz = t.v1frac * t.Vmax;
+			if (vnet > 0) {
+				vt = Math.max(0, mz.v + vnet - vmz);
+				if (vin > 0) { mz.c = (mz.c * mz.v + win) / (mz.v + vin); }
+				if (vt > 0) { sz.c = (sz.c * sz.v + mz.c * vt) / (sz.v + vt); }
+			} else if (vnet < 0) {
+				if (sz.v > 0) { vt = Math.min(sz.v, -vnet); }
+				if (vin + vt > 0) { mz.c = (mz.c * mz.v + win + sz.c * vt) / (mz.v + vin + vt); }
+			}
+			if (vt > 0) {
+				if (vnet > 0) {
+					mz.v = vmz;
+					sz.v += vt;
+					vsz = t.Vmax - vmz;
+					if (sz.v > vsz) { sz.v = vsz; }
+				} else {
+					sz.v = Math.max(0, sz.v - vt);
+					mz.v = vmz + vt + vnet;
+				}
+			} else {
+				mz.v += vnet;
+				mz.v = Math.min(mz.v, vmz);
+				mz.v = Math.max(0, mz.v);
+				if (vmz - mz.v > 0) { sz.v = 0; }
+			}
+			t.C = mz.c;
+		}
+		// tankmix3(): first in, first out
+		function tankmix3(t, vin, win, vnet) {
+			var c = t.chain, vout, vseg, cin, vsum = 0, wsum = 0, s;
+			if (!last[c] || !first[c]) { return; }
+			if (vin > 0) {
+				cin = win / vin;
+				s = last[c];
+				if (Math.abs(s.c - cin) < ctol) { s.v += vin; } else { addseg(c, vin, cin); }
+			}
+			vout = vin - vnet;
+			if (t.V >= t.Vmax && vnet > 0) { vout = vin; }
+			while (vout > 0) {
+				s = first[c];
+				if (!s) { break; }
+				vseg = Math.min(s.v, vout);
+				if (s === last[c]) { vseg = vout; }
+				vsum += vseg; wsum += s.c * vseg;
+				vout -= vseg;
+				if (vout >= 0 && vseg >= s.v) { if (s.prev) { first[c] = s.prev; } }
+				else { s.v -= vseg; }
+			}
+			if (vsum > 0) { t.C = wsum / vsum; }
+			else if (!first[c]) { t.C = 0; }
+			else { t.C = first[c].c; }
+		}
+		// tankmix4(): last in, first out
+		function tankmix4(t, vin, win, vnet) {
+			var c = t.chain, cin, vsum, wsum, vseg, s;
+			if (!last[c] || !first[c]) { return; }
+			cin = vin > 0 ? win / vin : 0;
+			t.C = last[c].c;
+			s = last[c];
+			if (vnet > 0) {
+				if (Math.abs(s.c - cin) < ctol) { s.v += vnet; } else { addseg(c, vnet, cin); }
+				t.C = last[c].c;
+				if (t.V >= t.Vmax) {
+					while (vnet > 0) {
+						s = first[c];
+						if (!s) { break; }
+						vseg = Math.min(s.v, vnet);
+						if (s === last[c]) { vseg = vnet; }
+						vnet -= vseg;
+						if (vnet >= 0 && vseg >= s.v) { if (s.prev) { first[c] = s.prev; } }
+						else { s.v -= vseg; }
+					}
+				}
+			} else if (vnet < 0) {
+				vsum = 0; wsum = 0; vnet = -vnet;
+				reversesegs(c);
+				while (vnet > 0) {
+					s = first[c];
+					if (!s) { break; }
+					vseg = Math.min(s.v, vnet);
+					if (s === last[c]) { vseg = vnet; }
+					vsum += vseg; wsum += s.c * vseg;
+					vnet -= vseg;
+					if (vnet >= 0 && vseg >= s.v) { if (s.prev) { first[c] = s.prev; } }
+					else { s.v -= vseg; }
+				}
+				reversesegs(c);
+				t.C = (wsum + win) / (vsum + vin);
+			}
+		}
+		function mixtank(n2, vin, win, vout) {
+			var t = tankOfNode[n2], vnet = vin - vout;
+			if (t.mix === MIX1) { tankmix1(t, vin, win, vnet); }
+			else if (t.mix === MIX2) { tankmix2(t, vin, win, vnet); }
+			else if (t.mix === FIFO) { tankmix3(t, vin, win, vnet); }
+			else { tankmix4(t, vin, win, vnet); }
+			return t.C;
+		}
+
+		// ---- quality.c sourcequal(), findsourcequal() ----
+		function sourcequal(src) {
+			var c = src.c0;
+			if (src.type === 1) { c /= 60; } else { c /= ucfQ; }                  // MASS per minute; a concentration per ft3
+			if (!src.pat) { return c; }
+			return c * EC.lpnPatternValue(src.pat, qtime, patStep, patStart);
+		}
+		function findsourcequal(n2, volout, tstep) {
+			var src = srcOf[n2], c;
+			if (!CHEM || !src) { return 0; }
+			if (src.c0 === 0) { return 0; }
+			if (volout / tstep <= Q_STAGNANT) { return 0; }
+			c = sourcequal(src);
+			switch (src.type) {
+			case 0:                                                               // CONCEN
+				if (nodes[n2].type !== 'reservoir' && nodes[n2].type !== 'tank') {
+					var dn = cur.d[String(nodes[n2].id)] || 0;
+					c = dn < 0 ? -c * dn * tstep / volout : 0;
+				}
+				break;
+			case 1: c = c * tstep / volout; break;                               // MASS
+			case 2: c = Math.max(c - nodeQual[n2], 0); break;                    // SETPOINT
+			default: break;                                                       // FLOWPACED
+			}
+			return c;
+		}
+
+		// ---- qualroute.c ----
+		function isJunction(n2) { return nodes[n2].type !== 'reservoir' && nodes[n2].type !== 'tank'; }
+		function noflowqual(n2) {
+			var c = 0, kount = 0;
+			adj[n2].forEach(function (a) {
+				var k2 = a.link, dir = flowDir[k2], inflow;
+				if (links[k2].n2 === n2 && dir >= 0) { inflow = true; }
+				else if (links[k2].n1 === n2 && dir < 0) { inflow = true; }
+				else { inflow = false; }
+				if (inflow && first[k2]) { c += first[k2].c; kount++; }
+				else if (!inflow && last[k2]) { c += last[k2].c; kount++; }
+			});
+			return kount > 0 ? c / kount : c;
+		}
+		function findnodequal(n2, volin, massin, volout, tstep) {
+			var ty = nodes[n2].type;
+			if (isJunction(n2)) {
+				volin -= Math.min(0, cur.d[String(nodes[n2].id)] || 0) * tstep;
+				if (volin > 0) { nodeQual[n2] = massin / volin; }
+				else if (reactflag) { nodeQual[n2] = noflowqual(n2); }
+			} else if (ty === 'tank') {
+				nodeQual[n2] = mixtank(n2, volin, massin, volout);
+			}
+			sourceQual = 0;
+			if (TRACE) {
+				if (n2 === traceIx) {
+					sourceQual = ty === 'reservoir' ? 100 : Math.max(100 - nodeQual[n2], 0);
+					nodeQual[n2] = 100;
+				}
+				return nodeQual[n2];
+			}
+			sourceQual = findsourcequal(n2, volout, tstep);
+			if (sourceQual === 0) { return nodeQual[n2]; }
+			if (isJunction(n2)) { nodeQual[n2] += sourceQual; return nodeQual[n2]; }
+			if (ty === 'tank') { return nodeQual[n2] + sourceQual; }
+			nodeQual[n2] = sourceQual;                                             // a reservoir
+			return sourceQual;
+		}
+		function evalnodeinflow(k2, tstep, acc) {
+			var v = Math.abs(linkflow(k2)) * tstep, s, vseg;
+			while (v > 0) {
+				s = first[k2];
+				if (!s) { break; }
+				vseg = Math.min(s.v, v);
+				acc.volin += vseg;
+				acc.massin += vseg * s.c;
+				v -= vseg;
+				if (v >= 0 && vseg >= s.v) {
+					first[k2] = s.prev;
+					if (!first[k2]) { last[k2] = null; }
+				} else { s.v -= vseg; }
+			}
+		}
+		function evalnodeoutflow(k2, c, tstep) {
+			var v = Math.abs(linkflow(k2)) * tstep, s;
+			if (v === 0) { return; }
+			s = last[k2];
+			if (s && Math.abs(s.c - c) < ctol) {
+				s.c = (s.c * s.v + c * v) / (s.v + v);
+				s.v += v;
+			} else { addseg(k2, v, c); }
+		}
+		function transport(tstep) {
+			var jj, n2, acc, volout, nodequal;
+			if (reactflag) { reactpipes(tstep); reacttanks(tstep); }
+			for (jj = 1; jj <= N; jj++) {
+				n2 = sorted[jj];
+				acc = { volin: 0, massin: 0 };
+				volout = 0;
+				adj[n2].forEach(function (a) {
+					var k2 = a.link, m2 = flowDir[k2] < 0 ? links[k2].n1 : links[k2].n2;
+					if (m2 === n2) { evalnodeinflow(k2, tstep, acc); }
+					else { volout += Math.abs(linkflow(k2)); }
+				});
+				if (isJunction(n2)) { volout += Math.max(0, cur.d[String(nodes[n2].id)] || 0); }
+				volout *= tstep;
+				nodequal = findnodequal(n2, acc.volin, acc.massin, volout, tstep);
+				adj[n2].forEach(function (a) {
+					var k2 = a.link, m2 = flowDir[k2] < 0 ? links[k2].n2 : links[k2].n1;
+					if (m2 === n2) { evalnodeoutflow(k2, nodequal, tstep); }
+				});
+			}
+		}
+		function selectnonstacknode(numsorted, indegree) {
+			var ii, m2, aa;
+			for (ii = numsorted; ii > 0; ii--) {
+				m2 = sorted[ii];
+				for (aa = 0; aa < adj[m2].length; aa++) { if (indegree[adj[m2][aa].node] > 0) { return adj[m2][aa].node; } }
+			}
+			for (ii = 1; ii <= N; ii++) { if (indegree[ii] > 0) { return ii; } }
+			return 0;
+		}
+		function sortnodes() {
+			var indegree = new Array(N + 1).fill(0), stack = new Array(N + 1).fill(0), stacksize = 0, numsorted = 0, k2, n2, ii, jj, aa, a;
+			for (k2 = 1; k2 <= L; k2++) {
+				if (flowDir[k2] > 0) { n2 = links[k2].n2; } else if (flowDir[k2] < 0) { n2 = links[k2].n1; } else { continue; }
+				indegree[n2]++;
+			}
+			for (ii = 1; ii <= N; ii++) { if (indegree[ii] === 0) { stacksize++; stack[stacksize] = ii; } }
+			while (numsorted < N) {
+				if (stacksize === 0) {
+					jj = selectnonstacknode(numsorted, indegree);
+					if (jj === 0) { break; }
+					indegree[jj] = 0;
+					stacksize++; stack[stacksize] = jj;
+				}
+				ii = stack[stacksize];
+				stacksize--;
+				numsorted++;
+				sorted[numsorted] = ii;
+				for (aa = 0; aa < adj[ii].length; aa++) {
+					a = adj[ii][aa]; k2 = a.link;
+					if (flowDir[k2] === 0) { continue; }
+					n2 = flowDir[k2] < 0 ? links[k2].n1 : links[k2].n2;
+					if (n2 !== ii && indegree[n2] > 0) {
+						indegree[n2]--;
+						if (indegree[n2] === 0) { stacksize++; stack[stacksize] = n2; }
+					}
+				}
+			}
+			return numsorted < N ? 120 : 0;
+		}
+		function flowdirchanged() {
+			var result = false, k2, olddir, newdir, qq;
+			for (k2 = 1; k2 <= L; k2++) {
+				olddir = flowDir[k2];
+				qq = linkflow(k2);
+				newdir = sgn(qq);
+				if (Math.abs(qq) < Q_STAGNANT) { newdir = 0; }
+				if (newdir * olddir < 0) { reversesegs(k2); }
+				if (newdir !== olddir) { result = true; }
+				flowDir[k2] = newdir;
+			}
+			return result;
+		}
+		// quality.c avgqual()
+		function avgqual(k2) {
+			var vsum = 0, msum = 0, s;
+			for (s = first[k2]; s; s = s.prev) { vsum += s.v; msum += s.c * s.v; }
+			if (vsum > 0) { return msum / vsum; }
+			return (nodeQual[links[k2].n1] + nodeQual[links[k2].n2]) / 2;
+		}
+		function report(t) {
+			var f = frameAt[t], scale = AGE ? 3600 : ucfQ, n2, k2;
+			if (!f) { return; }
+			f.qualities = {}; f.linkQualities = {};
+			for (n2 = 1; n2 <= N; n2++) { f.qualities[nodes[n2].id] = nodeQual[n2] * scale; }
+			for (k2 = 1; k2 <= L; k2++) { f.linkQualities[links[k2].id] = avgqual(k2) * scale; }
+		}
+
+		// ---- quality.c runqual() / nextqual(), over the saved hydraulics ----
+		qtime = 0;
+		for (r = 0; r < recs.length; r++) {
+			cur = recs[r];
+			var hstep = r + 1 < recs.length ? recs[r + 1].t - cur.t : 0, htime, err;
+			report(cur.t);                                                        // runQ(): the value at t
+			if (qtime < dur) {
+				if (reactflag && !AGE) { ratecoeffs(); }
+				if (flowdirchanged()) {
+					err = sortnodes();
+					if (err) { return { ok: false, issues: [{ code: 'native-run-quality-sort', ids: [], t: cur.t }] }; }
+				}
+			}
+			htime = cur.t + hstep;
+			if (!(htime <= dur) || hstep <= 0) { break; }
+			var qt = 0, dt;
+			while (qt < hstep) {
+				dt = Math.min(qstep, hstep - qt);
+				qt += dt;
+				transport(dt);
+			}
+			qtime += hstep;
+		}
+		return { ok: true };
+	}
+
+	/**
+	 * The quality pass alone, over hydraulics handed in rather than solved: `recs` are records in the
+	 * shape the loop keeps (`{t, q, closed, d}`: flows by the model's link order and junction demands by
+	 * id, both in cfs) and `vEnd` maps a tank's id to the volume (ft3) its hydraulic run ended at. For
+	 * a harness that hands it EPANET's own saved hydraulics, so the transcription of the quality code
+	 * is held to EPANET apart from any difference between the two hydraulic solutions. Returns
+	 * `{ok, frames}`, one frame per report time carrying `qualities` and `linkQualities`.
+	 */
+	EC.lpnNativeQualityOver = function (model, recs, vEnd) {
+		var times = Object.assign({}, EC.lpnTimesDefaults(), (model.time && model.time.times) || {}),
+			dur = times.duration > 0 ? times.duration : 0, repStep = times.reportStep > 0 ? times.reportStep : 3600,
+			cfg = qualityConfig(model), tanks = [], byPat = {}, frames = [], res;
+		if (!cfg.mode || cfg.bad.length) { return { ok: false, issues: [{ code: 'native-run-quality', ids: cfg.bad }] }; }
+		((model.time && model.time.patterns) || []).forEach(function (p) { byPat[String(p.id)] = p; });
+		model.nodes.forEach(function (n) {
+			var tk;
+			if (!tankHasArea(n)) { return; }
+			tk = tankState(n); tk.V0 = tk.V; tk.vEnd = vEnd && vEnd[n.id] !== undefined ? vEnd[n.id] : tk.V;
+			tanks.push(tk);
+		});
+		recs.forEach(function (r) {
+			if (r.t >= times.reportStart && ((r.t - times.reportStart) % repStep) === 0 && r.t <= dur) { frames.push({ t: r.t }); }
+		});
+		res = qualityPass(model, cfg, recs, frames, tanks, times, byPat, hydStepOf(times));
+		return res.ok ? { ok: true, frames: frames } : res;
+	};
 
 	// One tank in EPANET's internal units (input1.c, input3.c).
 	function tankState(n) {

@@ -71,7 +71,7 @@ function dsHost(which) {
 	setUnitSet('us');
 	L.buildLayers();
 	await warmEpanet();
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	L.applySaved(saved);
 	L.buildDom();
 	L.applyMethodUI();

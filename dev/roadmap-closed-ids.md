@@ -750,3 +750,25 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|819| CLOSED 2026-10-21 (merged on Tom's word, `feat/import-export-menu`): Import and Export grouped into Network, Shapes and Tables submenus; libraries in the tables export.
 - 0|821| CLOSED 2026-10-22 (Tom: "Count as EPANET does", `fix/energy-count`): the energy summary counts an open pump and a single instant (one hour) as EPANET does.
 - 0|811| CLOSED 2026-10-23 (merged on Tom's word, `feat/theme-whimsy`): ten colour themes, the better default, Newspaper and Arcade design themes, the dark-paper ramp casing.
+- 0|831| CLOSED 2026-10-29 (merged on Tom's word, `feat/shape-scenario`): a Shape honours Is active per scenario, in the Presentation category, with the override dot; manual entry "Moving or merging between scenarios".
+- 0|830| CLOSED 2026-10-25 (merged on Tom's word, `fix/dock-widths`): a flown-out box soft-pins when a button in it is clicked, until the map, another tab or Escape.
+- 0|826| CLOSED 2026-10-24 (`fix/example-crs`): no shipped example is lat/lon; Net3 US is on EPSG:2227 and Net3 SI on EPSG:26910 (later EPSG:26943, Task 826 follow-up); `examples-crs-harness.js` holds it.
+- 0|820| CLOSED 2026-10-28 (`fix/label-snapshot-demand`): with Recalculate off a map label's Demand (Q) follows the kept run, Base demand (Qb) the open scenario; `label-snapshot-demand-browser-harness.js`.
+- 0|720| CLOSED 2026-10-30 (merged on Tom's word, `feat/gis-background`): background layers from a GIS server (XYZ, WMS, ArcGIS MapServer), stored in the project, with a privacy.php paragraph; `gis-background-browser-harness.js`.
+- 0|836| CLOSED 2026-10-30 (found already fixed, `66b1d68c6`): Morph to vertex in a scenario asks "Switch to Base and morph?"; `morph-vertex-harness.js`.
+- 0|841| CLOSED 2026-10-30 (found already fixed, `045b75581`): `LPN_LABEL_STATIONS_MAX` caps label stations per pipe; `label-station-cap-harness.js`.
+- 0|843| CLOSED 2026-10-30 (`fix/p100-defects`): one global `option, optgroup` rule makes every pull-down readable in Dark; `select-dark-sheet-browser-harness.js` added.
+- 0|833| CLOSED 2026-10-31 (reached master through box-design round 6, `fix/fresh-freeze`, `fix/phone-open-freeze`): first open after Fresh docks the first-view boxes; Net3 no longer freezes.
+- 0|834| CLOSED 2026-10-31 (`feat/first-view`, via box-design round 6): every box docked and auto-hidden on first view; a pinned box keeps its tab.
+- 0|838| CLOSED 2026-10-31 (`6de3f9384`, via box-design round 6): "Edit curves…" is the last option of every curve pull-down.
+- 0|839| CLOSED 2026-10-31 (`6de3f9384`, via box-design round 6): Ida's short Properties labels, each with a tip that expands it.
+- 0|840| CLOSED 2026-10-31 (via box-design round 6): report cells mixing value, place and time are split into columns.
+- 0|844| CLOSED 2026-10-31 (`17413e4d7`, `fix/settings-fit`): Settings 618 px, the tick tight on its row, the phone bar as heading.
+- 0|835| CLOSED 2026-10-31 (`ddea93a80`, via box-design round 6): on a phone, Settings has a section bar under its search box.
+- 0|837| CLOSED 2026-10-31 (`66afa5074`, via box-design round 6): in Properties the input is the cell; a tick box toggles on one click or Space.
+- 0|846| CLOSED 2026-10-31 (via box-design round 6): the Basic mode tick stays in the Scenario manager either way.
+- 0|827| CLOSED 2026-11-01 (box-design merged on Tom's word): phones dock and autohide Properties; first-time view layout.
+- 0|828| CLOSED 2026-11-01 (box-design merged on Tom's word): one two-column style for every box's label and value rows.
+- 0|829| CLOSED 2026-11-01 (box-design merged on Tom's word): Download CSV, Copy HTML and Print report on every analysis box.
+- 0|842| CLOSED 2026-11-01 (box-design merged on Tom's word): one spreadsheet style for every box's rows, no first-column heading.
+- 0|845| CLOSED 2026-11-01 (box-design merged on Tom's word): report tables: economical width, adjustable columns, "And others", "Time (hr)".

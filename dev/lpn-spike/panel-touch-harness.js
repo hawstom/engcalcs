@@ -139,12 +139,15 @@ console.log('\n--- a panel that opens comes to the front ---');
 	let m;
 	while ((m = re.exec(code)) !== null) {
 		const fn = coveringFn(m.index);
-		if (/__lpnRaise|raisePanel\(|placePanelForScreen\(/.test(fn)) { continue; }
+		// placeFloatBox() is placePanelForScreen() for Convert as and the coordinate-system chooser (round 11b).
+		if (/__lpnRaise|raisePanel\(|placePanelForScreen\(|placeFloatBox\(/.test(fn)) { continue; }
 		shows.push(m[1] + ' @' + code.slice(0, m.index).split('\n').length);
 	}
 	// Declared: what is made visible that is NOT a draggable panel. A row here is a sentence somebody
 	// had to write, exactly as in section 2's NOT_A_PANEL.
 	const NOT_A_PANEL_SHOW = [
+		[/^pane @/, 'applyPaneLayout(): the bottom panel stays displayed and is shut or opened by the lpn-pane-shut class, '
+			+ 'which keeps the shown table\'s layout between opens; section 2c below holds that seam to being the only door'],
 		[/^lab @/, 'a node data label on the map'],
 		[/^valLab @/, 'a valve data label on the map'],
 		[/^qLab @/, 'a water-quality label on the map'],
@@ -310,6 +313,9 @@ const CONDITIONAL_DISPLAY = [
 	[/^updateOffscreenNotice$/, /^el$/, 'the one-line "something is off screen" notice on the map'],
 	[/^refreshBasemapTeaser$/, /^b$/, 'the satellite toggle button'],
 	[/^refreshBasemapCredit$/, /^(?:c|el2)$/, 'a basemap attribution line in the map footer, required by the tile licences'],
+	[/^refreshBasemapCredit$/, /^gisSpan$/, 'the attribution a GIS background layer states, in the same footer line'],
+	[/^paintGisLayers$/, /^g$/, 'a GIS background layer, hidden by its Draw box'],
+	[/^showLayersRow$/, /^layersRow$/, 'the WMS layer names row, shown only for a WMS server'],
 	[/^georefRefreshBar$/, /^bar$/, 'the georeference bar across the map: a fixed strip, not a draggable box'],
 	[/^georefRefreshBar$/, /^georefBarEl\('lpn_georef_\w+'\)$/, 'a control inside the georeference bar'],
 	[/^paintZoomWin$/, /^zoomWinEl$/, 'the Zoom Window drag box on the map'],
@@ -378,6 +384,7 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /lpn-lbl-hidden|lpn-labels-hidden/, 'a CSS class that blanks the map\'s data labels'],
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
+		[/^dockOptimalW$/, /^\.style\.cssText\s*=\s*'display:flex;visibility:hidden/, 'a hidden off-screen probe that measures a box\'s natural width; never shown'],
 		[/^guideApplyRail$/, /lpn-guide-rail-collapsed/, 'the Guide\'s Contents rail folding to a strip (or, on a phone, closing its disclosure); '
 			+ 'the Guide box itself stays open and keeps its display'],
 		[/^guideApplyNavFold$/, /lpn-guide-nav-folded/, 'an entry of the Guide\'s contents rail folding away under its folded parent (Tom, 2026-10-10); the Guide box stays open and keeps its display'],

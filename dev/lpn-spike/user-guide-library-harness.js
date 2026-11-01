@@ -3,7 +3,7 @@
 //
 // The chapter is the entry for the Libraries box. Real Chromium:
 //   1. Every interface name the chapter quotes is the language file's own, read from it.
-//   2. The entry renders in the Guide with its seven terms and its table, and a search finds it.
+//   2. The entry renders in the Guide with its ten terms and its table, and a search finds it.
 //   3. The worked example is performed on Net1 as the chapter says: what each section holds, and the
 //      times of the Status changes before and after the control is edited.
 //   4. The behaviour the chapter states: a blank or duplicate ID snaps back, a rename moves the
@@ -28,14 +28,14 @@ const QUOTES = {
 	lpn_guide_lib_kinds_def: ['lpn_library_patterns', 'lpn_library_curves', 'lpn_library_pipetypes', 'lpn_library_fittings', 'lpn_library_controls',
 		'lpn_library_rules', 'lpn_library_pattern_default_mark', 'lpn_settings_sec_calculation', 'lpn_settings_hydraulics', 'lpn_curve_kind_head',
 		'lpn_curve_kind_effic', 'lpn_curve_kind_volume', 'lpn_curve_kind_headloss', 'lpn_library_curve_type', 'lpn_library_curve_equation',
-		'lpn_curve_library_link', 'lpn_pipetype_detach', 'lpn_fitting_other', 'lpn_library_pattern_values'],
+		'lpn_edit_curves', 'lpn_pipetype_detach', 'lpn_fitting_other', 'lpn_library_pattern_values'],
 	lpn_guide_lib_ctl_def: ['lpn_library_control_add', 'lpn_time_duration'],
 	lpn_guide_lib_import_def: ['lpn_file_import_menu', 'lpn_library_import'],
 	lpn_guide_lib_example_def: ['lpn_menu_project', 'lpn_library_menu', 'lpn_library_patterns', 'lpn_library_pattern_default_mark', 'lpn_library_curves',
 		'lpn_curve_kind_head', 'lpn_library_controls', 'lpn_library_rules', 'lpn_time_run', 'lpn_reports_menu', 'lpn_reports_status']
 };
-const TERMS = ['lpn_guide_lib_kinds_term', 'lpn_guide_lib_refs_term', 'lpn_guide_lib_scn_term', 'lpn_guide_lib_ctl_term', 'lpn_guide_lib_import_term',
-	'lpn_guide_lib_example_term', 'lpn_guide_lib_notes_term'];
+const TERMS = ['lpn_guide_lib_kinds_term', 'lpn_library_curves', 'lpn_library_pipetypes', 'lpn_library_fittings', 'lpn_guide_lib_refs_term', 'lpn_guide_lib_scn_term', 'lpn_guide_lib_ctl_term', 'lpn_guide_lib_import_term',
+	'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
 // The chapter's own sentences about the times, read out of it so a reworded sentence is re-measured.
 function exampleTimes() {
 	const t = plain(enString('lpn_guide_lib_example_def'));
@@ -109,7 +109,7 @@ async function main() {
 		const en = await entry(P, 'lpn_library_box');
 		ok('the Libraries entry is in the Guide, titled by the box', !!en && en.title.trim() === await T('lpn_library_menu'), en && en.title);
 		ok('...it opens with the box\'s paragraph', !!en && en.text.indexOf(plain(enString('lpn_guide_text_library_box')).slice(0, 24)) === 0 || en.text.indexOf(plain(enString('lpn_guide_text_library_box')).slice(0, 24)) > 0);
-		ok('...and carries the seven terms of the chapter, in order', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)), en && JSON.stringify(en.dts));
+		ok('...and carries the ten terms of the chapter, in order', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)), en && JSON.stringify(en.dts));
 		ok('...and the table of what each section holds, one row for each of the six sections, in the order of the box\'s list',
 			!!en && en.tables.length === 1 && en.tables[0].length === 6 && JSON.stringify(en.tables[0].map((r) => r[0])) === JSON.stringify(await Promise.all(['lpn_library_patterns', 'lpn_library_curves', 'lpn_library_pipetypes', 'lpn_library_fittings', 'lpn_library_controls', 'lpn_library_rules'].map(T))), en && JSON.stringify(en.tables[0].map((r) => r[0])));
 		ok('a search for "Table 3.3" shows the Libraries entry', await searchFinds(a, 'lpn_library_box', 'Table 3.3'));
@@ -295,7 +295,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await entry(b.page, 'lpn_library_box');
-		ok('the Spanish page shows the Libraries entry with its seven terms and its table', !!es && TERMS.every((k, i) => es.dts[i] === esString(k)) && es.tables.length === 1, es && JSON.stringify(es.dts.slice(0, 2)));
+		ok('the Spanish page shows the Libraries entry with its ten terms and its table', !!es && TERMS.every((k, i) => es.dts[i] === esString(k)) && es.tables.length === 1, es && JSON.stringify(es.dts.slice(0, 2)));
 		ok('...titled by the Spanish box title', !!es && es.title.trim() === await b.lang('lpn_library_menu'), es && es.title);
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});

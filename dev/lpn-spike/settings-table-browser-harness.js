@@ -156,7 +156,7 @@ async function main() {
 		const H = helpers(a);
 		const L = async (k) => a.lang(k);
 		await a.goto('Looped-Network.php');
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await a.settle(1500);
 		await H.hideConsent();
 		await a.toolbarClick(await L('lpn_pane_toggle'));
@@ -174,7 +174,7 @@ async function main() {
 				await L('lpn_find_value')]), JSON.stringify(heads));
 		let rows = await H.settingRows();
 		const FM = await L('bpn_method'), DM = await L('bpn_demand_mult'), DUR = await L('lpn_time_duration'),
-			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_alt_cat_calculation'), PRES = await L('lpn_alt_cat_presentation');
+			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_settings_sec_calculation'), PRES = await L('lpn_alt_cat_presentation');
 		const fm = rows.filter((r) => r.cells.st_setting === FM)[0];
 		ok('Friction method is a row, in Calculation, reading Hazen-Williams',
 			fm && fm.cells.st_category === CALC && fm.cells.st_value === await L('bpn_method_hw'), JSON.stringify(fm));
@@ -427,8 +427,9 @@ async function main() {
 		await page.evaluate(() => { const x = document.getElementById('lpn_contour_close'); if (x) { x.click(); } });
 		const NC = await L('lpn_settings_color_node_field');
 		const ncP = await H.findRow(NC, 'Peak');
-		ok('Graphs > Contour in Peak: Peak colours nodes by Pressure (in the box\'s words), marked', ncP && ncP.local &&
-			ncP.cells.st_value === await L('lpn_result_pressure'), JSON.stringify(ncP && ncP.cells));
+		// Graphs > Contour never writes the node colouring since e1aaca674 (Tom, 2026-10-29): the plot spreads pressure, the nodes stay as they were.
+		ok('Graphs > Contour in Peak: the nodes\' own colouring is left alone (not marked, still No color)', ncP && !ncP.local &&
+			ncP.cells.st_value === await L('lpn_color_none'), JSON.stringify(ncP && ncP.cells));
 		ok('...and turns its contours on, there', (await H.findRow(await L('lpn_settings_row_contour_fill'), 'Peak')).local);
 		ok('...and Base is unchanged, row for row', JSON.stringify((await H.settingRows()).filter((r) => r.cells.scn_name === base)
 			.filter((r) => JSON.parse(baseRowsBefore).some((b) => b[0] === r.key)).map((r) => [r.key, r.cells.st_value])) === baseRowsBefore);

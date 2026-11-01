@@ -29,7 +29,15 @@ function ok(cond, label, detail) {
 	if (!cond) { failures++; }
 	console.log(`${cond ? '  ok  ' : ' FAIL '} ${label}${detail === undefined ? '' : '   ' + detail}`);
 }
-function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+// **SETTLE, NOT SLEEP.** The page schedules a label pass as requestAnimationFrame (the stub's is
+// setTimeout 0) then setTimeout 0. Timers of equal length run first-in, first-out whatever the load,
+// so ten hops of setTimeout 0 always outlast that chain; a wall-clock sleep did not, because a busy
+// machine let a long timer overtake the second link of the chain.
+function sleep() {
+	let p = Promise.resolve();
+	for (let i = 0; i < 10; i++) { p = p.then(function () { return new Promise(function (r) { setTimeout(r, 0); }); }); }
+	return p;
+}
 
 // A LABEL PASS is one run of refreshLabelText()'s content pass, counted where the page's own
 // ?debug=perf instrument counts it -- so a pass the page skips (labels hidden) is not counted

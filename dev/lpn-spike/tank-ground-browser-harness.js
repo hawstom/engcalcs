@@ -83,7 +83,7 @@ async function main() {
 		}
 		const fields = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields label')).map((l) => {
 			const i = l.querySelector('input');
-			return { text: l.textContent.replace(/­/g, '').trim(), value: i ? i.value : null, ph: i ? i.placeholder : null };
+			return { text: l.textContent.replace(/­/g, '').trim(), value: i ? i.value : null, ph: i ? i.placeholder : null, read: (l.querySelector('.lpn-gval') || {}).textContent };
 		}));
 		let f = await fields();
 		const fBase = f.find((x) => x.text.indexOf(esBase) === 0),
@@ -115,7 +115,8 @@ async function main() {
 			JSON.stringify({ fElev2, fBase2 }));
 		const pAfter = f.find((x) => x.text.indexOf(esPressure) === 0);
 		// A read-only row is text, not an input: its number is the last one on the line.
-		const lastNum = (x) => { const m = x && /(-?[\d.]+)\s*$/.exec(x.text); return m ? parseFloat(m[1]) : NaN; };
+		// The value cell holds the number (Task 828): the unit has its own cell.
+		const lastNum = (x) => { const m = x && /(-?[\d.]+)\s*$/.exec(x.read !== undefined ? x.read : x.text); return m ? parseFloat(m[1]) : NaN; };
 		const pv0 = lastNum(pBefore), pv1 = lastNum(pAfter);
 		// 20 m of water is 28.4 psi.
 		ok('the tank pressure rose by 20 m of water, about 28.4 psi (' + pv0 + ' -> ' + pv1 + ')',

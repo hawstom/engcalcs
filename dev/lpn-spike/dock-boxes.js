@@ -14,6 +14,7 @@ const OPENERS = {
 	lpn_sm_box: ['project', 'lpn_scenario_menu', 'lpn_sm_menu'],
 	lpn_settings_box: ['project', null, 'lpn_tool_settings'],
 	lpn_popup: 'node',
+	lpn_demands_box: 'demands',   // opened by the "..." in a junction's Properties (sheet-light)
 	lpn_find_popup: ['edit', null, 'lpn_find_menu'],
 	lpn_library_box: ['project', null, 'lpn_library_menu'],
 	lpn_contour_box: ['project', 'lpn_graphs_menu', 'lpn_contour_menu'],
@@ -31,7 +32,7 @@ async function clickNode(a) {
 		const ns = Array.from(document.querySelectorAll('#lpn_canvas .lpn-symbols circle:not(.lpn-node-hit)')).filter((c) => {
 			const r = c.getBoundingClientRect();
 			const e = r.width > 0 ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null;
-			return !!e && !e.closest('.lpn-dock-strip, .lpn-popover');
+			return !!e && !e.closest('.lpn-dock-strip, .lpn-popover, .lpn-color-legend');   // the colour legend (shown while a contour plot is open) also sits over the map and swallows a click
 		});
 		const r = ns[Math.floor(ns.length / 2)].getBoundingClientRect();
 		return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -42,6 +43,22 @@ async function clickNode(a) {
 async function openBox(a, id) {
 	const o = OPENERS[id];
 	if (o === 'node') { await clickNode(a); return; }
+	if (o === 'demands') {
+		// Select each node in turn until one is a junction whose Properties carries the Demand categories button, and press it.
+		const n = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas .lpn-symbols circle:not(.lpn-node-hit)')).length);
+		for (let i = 0; i < n; i++) {
+			const at = await a.page.evaluate((i) => {
+				const c = Array.from(document.querySelectorAll('#lpn_canvas .lpn-symbols circle:not(.lpn-node-hit)'))[i], r = c.getBoundingClientRect();
+				const e = r.width > 0 ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null;
+				return e && !e.closest('.lpn-dock-strip, .lpn-popover, .lpn-color-legend') ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+			}, i);
+			if (!at) { continue; }
+			await a.page.mouse.click(at.x, at.y);
+			await a.settle(500);
+			if (await a.page.evaluate(() => { const b = document.getElementById('lpn_demand_more'); if (b && b.getBoundingClientRect().width > 0) { b.click(); return true; } return false; })) { await a.settle(500); return; }
+		}
+		return;
+	}
 	if (o[1]) { await a.menuClickSub(await a.lang(o[1]), await a.lang(o[2]), o[0]); }
 	else { await a.menuClick(await a.lang(o[2]), o[0]); }
 	await a.settle(500);

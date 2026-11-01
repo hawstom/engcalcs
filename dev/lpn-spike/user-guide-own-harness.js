@@ -20,7 +20,7 @@ const { U, ok, enString, plain, checkQuotes, openGuide, entry, esEntryCheck, dia
 const NAME = 'user-guide-own-harness';
 U.takeBrowserLock(NAME, 'EC_UGOW_LOCKED');
 
-const TERMS = ['lpn_guide_own_example_term'];
+const TERMS = ['lpn_guide_scn_example_term'];
 const SECTIONS = [['using', 'lpn_guide_using_heading'], ['toolbar', 'lpn_help_icons'], ['menus', 'lpn_hotkeys_menu_heading'], ['map', 'lpn_hotkeys_map_heading'],
 	['snip', 'lpn_hotkeys_snip_heading'], ['tables', 'lpn_hotkeys_tables_heading'], ['boxes', 'lpn_guide_boxes_heading'], ['about', 'lpn_guide_about_heading'], ['notes', 'lpn_help_notes']];
 async function main() {

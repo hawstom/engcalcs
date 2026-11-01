@@ -169,7 +169,7 @@ console.log('\n--- and no published example is touched by the repair ---');
 let touched = [];
 ['Basic-example-SI-units', 'Basic-example-US-units', 'Elm-Street-Center', 'Net1', 'Net2', 'Net3',
  'Net3-Novato-CA-World'].forEach(function (name) {
-	const f = path.join(ROOT, 'dev/water-network-examples/' + name + '.lwn');
+	const f = path.join(ROOT, (/^Basic/.test(name) ? 'dev/lpn-spike/fixtures/' : 'dev/water-network-examples/') + name + '.lwn');
 	if (!fs.existsSync(f)) { return; }
 	const src = JSON.parse(fs.readFileSync(f, 'utf8'));
 	const had = (src.nodes || []).filter(n => n.lx !== undefined || n.ly !== undefined).length

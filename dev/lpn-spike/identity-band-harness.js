@@ -318,8 +318,8 @@ function ok(name, cond, extra) {
 	ok('Description comes before Tag', iDesc >= 0 && iTag > iDesc);
 	// **THE HALF THAT WAS EMBARRASSING**: Tag used to be at the bottom, below the solved results.
 	ok('Tag comes before Elevation', iTag >= 0 && iElev > iTag, labs.join(' | '));
-	// The coordinates keep slots 2-3, which is the previous ruling this one extends.
-	ok('the coordinate rows still come first', iDesc >= 2, 'desc at ' + iDesc);
+	// Row order, 2026-10-29: Active and the identity rows come first; the coordinates stand in the Physical group after Elevation.
+	ok('Active stands ahead of Description, and the coordinates after Elevation', firstIndexOf(labs, PC.lpn_field_active_short) >= 0 && firstIndexOf(labs, PC.lpn_field_active_short) < iDesc, 'desc at ' + iDesc);
 
 	// **THE TYPED VALUE REACHES THE DOCUMENT, THROUGH THE REAL FIELD'S OWN LISTENER.** A harness
 	// that assigned n.desc directly would pass with the field unwired.
@@ -353,8 +353,8 @@ function ok(name, cond, extra) {
 	labs = labelsOf();
 	iDesc = firstIndexOf(labs, PC.lpn_field_desc); iTag = firstIndexOf(labs, PC.lpn_field_tag);
 	ok('a link popup has a Description row', iDesc >= 0, labs.join(' | '));
-	ok('a link popup puts Description first, with no coordinates before it', iDesc === 0, 'desc at ' + iDesc);
-	ok('a link popup puts Tag second', iTag === 1);
+	ok('a link popup puts From, To and Active first, then Description, with no coordinates before it', iDesc === 3, 'desc at ' + iDesc);
+	ok('a link popup puts Tag right after Description', iTag === 4);
 	ok('a link popup has exactly one Description row', labs.filter((t) => t.indexOf(PC.lpn_field_desc) === 0).length === 1);
 	ok('a link popup has exactly one Tag row', labs.filter((t) => t.indexOf(PC.lpn_field_tag) === 0).length === 1);
 }

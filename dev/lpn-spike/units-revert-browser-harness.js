@@ -142,7 +142,7 @@ async function main() {
 		page = a.page;
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.openExampleCard(await S('lpn_ex_basic_si_title'));
+		await a.openExampleCard(await S('lpn_ex_net1_si_title'));
 		const base = (await stored()).find((p) => p.open);
 		ok('a metric grid project is open', !!base && base.units.lpn_u_length === 'm', base && brief(base.units));
 		const rowClick = (re) => page.evaluate((r) => {

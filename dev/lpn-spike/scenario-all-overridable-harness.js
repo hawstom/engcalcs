@@ -52,7 +52,7 @@ function ok(name, cond, extra) {
 const NEW = { node: ['elev', 'bottomElev', 'minLevel', 'maxLevel', 'tankDiameter', 'volCurve', 'mixingModel', 'mixingFraction', 'headPattern'], link: ['speed', 'speedPattern'] };
 
 function open() {
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')));
+	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8')));
 	L.buildDom();
 	L.applyMethodUI();
 }

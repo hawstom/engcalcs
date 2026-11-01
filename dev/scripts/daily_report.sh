@@ -231,7 +231,7 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
         echo ""
         echo " $2 (${dur:-?} days, $win):"
         printf '%s\n' "$1" | awk '
-            /RANK BY SHOPPING/         {r=1; next}
+            /RANK BY (SHOPPING|DWELLS)/ {r=1; next}
             r && /^ *rank[[:space:]]/  {print; next}
             r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
             r && k>0 && /^ *$/         {exit}
@@ -244,30 +244,41 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             [ -n "$day" ] && rank_table "$day" "Top pages, LAST 24 HOURS"
             rank_table "$out" "Top pages, WHOLE LOG, which restarts on the 1st"
             echo ""
-            # R-121/122/123: "people" is the CONSENTED bucket (one row per person per page, by
-            # cookie, nothing to do with dwell time); "page loads" is everybody else, one row per
-            # page view. Both columns come from the >=10s-dwell "shopping" beacon, so robots are
-            # nearly all excluded by behaviour; there is no robot list in this codebase.
+            # R-121/122/123: "said yes" is the CONSENTED bucket (one row per visit per page);
+            # "others" is everybody else. Both columns come from the page-dwell beacon (written at
+            # least 10 seconds after the page load, presumed human), so robots are nearly all
+            # excluded by behaviour; there is no robot list in this codebase.
             # THE LEGEND FOLLOWS THE HEADER PRODUCTION PRINTED, not the one master prints: the
             # report reads production's lang-log-stats.sh, which can lag master by a release
-            # (Tom, 2026-10-13: the descriptions "do not match the headings").
-            if printf '%s\n' "$out" | grep -qE '^ *rank +page +browsers'; then
+            # (Tom, 2026-10-13: the descriptions "do not match the headings"). Three headers exist:
+            # "browsers dwells, said yes" (2026-10-28), "browsers said yes" and "people".
+            if printf '%s\n' "$out" | grep -qE '^ *rank +page +browsers +dwells'; then
+                echo " The columns are different units; never add them:"
+                echo "   browsers          different browsers that accepted the consent banner"
+                echo "                     (distinct random codes, since 2026-10-08)"
+                echo "   dwells, said yes  page dwells by those browsers, once per page per visit"
+                echo "   dwells, others    page dwells by everyone else, one row per dwell"
+                echo " A page dwell is written at least 10 seconds after the page load and is"
+                echo " presumed human, so robots are nearly all excluded."
+            elif printf '%s\n' "$out" | grep -qE '^ *rank +page +browsers'; then
                 echo " The columns are different units; never add them:"
                 echo "   browsers    different browsers that accepted the consent banner"
                 echo "               (distinct random codes, since 2026-10-08)"
                 echo "   said yes    views by those browsers, once per page per visit"
                 echo "   page loads  everyone else, one row per page view"
+                echo "   Both count only after 10+ seconds on the page, so robots are"
+                echo "   nearly all excluded."
             else
                 echo " The two counts are different units; never add them:"
                 echo "   people      views by browsers that accepted the consent banner,"
                 echo "               once per page per visit"
                 echo "   page loads  everyone else, one row per page view"
+                echo "   Both count only after 10+ seconds on the page, so robots are"
+                echo "   nearly all excluded."
             fi
-            echo "   Both count only after 10+ seconds on the page, so robots are"
-            echo "   nearly all excluded."
             printf '%s\n' "$out" | awk '
-                /reach rows:/ && $NF+0 > 0 {
-                    print "   Log check: " $NF " rows of the reach log are in the old format and"
+                /(reach|page load) rows:/ && $NF+0 > 0 {
+                    print "   Log check: " $NF " rows of the page load log are in the old format and"
                     print "   could not be classified by language served."
                 }'
             printf '%s\n' "$out" | grep -E '^ +FINGERPRINT ' | head -1 | sed 's/^ *FINGERPRINT */ For comparing two reports only: /'

@@ -279,7 +279,6 @@ $ec_icons = array(
 	// ---- Insert, misc ----
 	// A little network, not a sparkle: the command draws a network, so the icon draws one.
 	'example'    => '<circle cx="5" cy="6" r="2"/><circle cx="19" cy="9" r="2"/><circle cx="10" cy="19" r="2"/><path d="M6.9 6.4l10.2 2.2M5.6 8l3.8 9"/>',
-	'devtest'    => '<path d="M10 3v6.5L4.5 20h15L14 9.5V3"/><path d="M9 3h6"/><path d="M7.6 15h8.8"/>',
 
 	// ---- View ----
 	// Zoom to fit: four corner brackets opening outward around the content. Tom flagged the

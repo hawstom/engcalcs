@@ -9,7 +9,9 @@
 //   C1  the Map menu has a Clean map row, unchecked; every control in the list is shown first (each
 //       one forced on where the page had no reason to show it), and the rings are drawn;
 //   C2  checking it hides every listed control with display:none (not opacity), takes every ring
-//       class off the drawing, and leaves the standing error (#lpn_status) and the toolbar alone;
+//       class off the drawing, and leaves the toolbar and the selection help (its own checkbox,
+//       Tom 2026-10-24) alone; the Mode line, the messenger and an ordinary status are hidden, and
+//       a status that says a run gave no answer (not-converged, a diagnostic) stays shown;
 //   C3  only lpn_cleanmap=on is written, and the project text is byte-identical to before;
 //   C4  a reload keeps it clean; the Map menu, opened from the keyboard (Alt+Shift+M), shows the row
 //       checked, and Enter on it clears it;
@@ -47,8 +49,8 @@ function ok(label, cond, detail) {
 }
 // The list css/engcalcs.css hides under .lpn-clean-map. Kept in step with that rule by hand: a
 // control added there and not here is simply not tested, never falsely passed.
-const HIDDEN = ['lpn_zoom_control', 'lpn_map_notice', 'lpn_msglog_btn', 'lpn_area_hint', 'lpn_basemap_teaser', 'lpn_wrong_btn'];
-const KEPT = ['lpn_status', 'lpn_scenario_btn', 'lpn_map_status', 'lpn_menu_map'];
+const HIDDEN = ['lpn_zoom_control', 'lpn_map_notice', 'lpn_msglog_btn', 'lpn_mode_hint', 'lpn_status', 'lpn_basemap_teaser', 'lpn_wrong_btn'];
+const KEPT = ['lpn_area_hint', 'lpn_scenario_btn', 'lpn_map_status', 'lpn_menu_map'];
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -117,7 +119,7 @@ async function main() {
 					if (!e.textContent) { e.textContent = 'x'; }
 				}
 			});
-		}, HIDDEN);
+		}, HIDDEN.concat(['lpn_area_hint']));
 		const before = await look(HIDDEN.concat(KEPT));
 		HIDDEN.concat(KEPT).forEach((id) => ok('C1 #' + id + ' is shown', before[id] && before[id].display !== 'none' && before[id].box, JSON.stringify(before[id])));
 		const ringsBefore = await rings();
@@ -132,6 +134,15 @@ async function main() {
 		const clean = await look(HIDDEN.concat(KEPT));
 		HIDDEN.forEach((id) => ok('C2 #' + id + ' is hidden (display:none, no box)', clean[id] && clean[id].display === 'none' && !clean[id].box, JSON.stringify(clean[id])));
 		KEPT.forEach((id) => ok('C2 #' + id + ' is still shown', clean[id] && clean[id].display !== 'none' && clean[id].box, JSON.stringify(clean[id])));
+		// A status that says a run gave no answer stays; a progress line or a note does not.
+		const statusShown = (text, code, diag) => page.evaluate((a) => {
+			EngCalcs.lpnCleanMap.setStatus(a[0], a[1], a[2]);
+			const e = document.getElementById('lpn_status'), r = e.getBoundingClientRect();
+			return getComputedStyle(e).display !== 'none' && r.width > 0;
+		}, [text, code, diag]);
+		ok('C2 an ordinary status (a run summary) is hidden', !(await statusShown('Harness note', 'solve-notes', false)));
+		ok('C2 "no solution" stays shown', await statusShown('Harness no solution', 'not-converged', false));
+		ok('C2 a diagnostic that refuses to solve stays shown', await statusShown('Harness add a reservoir', 'no-source', true));
 		ok('C2 no override ring is left on the drawing', (await rings()) === 0, String(await rings()));
 		ok('C2 ...and no ring keeps its explaining title', await page.evaluate(() => !Array.from(document.querySelectorAll('#lpn_canvas title')).some((t) => /amber ring|dashed gray ring/.test(t.textContent))));
 		ok('C2 the Tab order cannot reach a hidden button', await page.evaluate(() => { const b = document.getElementById('lpn_zoom_in'); b.focus(); return document.activeElement !== b; }));

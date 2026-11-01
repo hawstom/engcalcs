@@ -55,7 +55,7 @@ async function main() {
 		const settle = (ms) => a.settle(ms);
 		await page.setViewportSize({ width: 1600, height: 1000 });
 		await a.goto('Looped-Network.php');
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await settle(1500);
 		await page.evaluate(() => {
 			let e = document.querySelector('.ec-consent-actions');
@@ -130,7 +130,7 @@ async function main() {
 			await settle(900);
 			return hit;
 		};
-		const ACTIVE = await L('lpn_field_active');
+		const ACTIVE = await L('lpn_field_active_short');
 
 		console.log('--- 1. Morph in scenario B ---');
 		a.answerPromptWith('B');

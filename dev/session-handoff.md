@@ -95,15 +95,63 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-23 afternoon (thirty-seventh session)
+## STATE — 2026-11-01 (fifty-sixth session, Opus main, Sonnet agents)
 
-- **Interview "Pump and Valve Assemblies"** (16 calls: assemblies, expert levels, WaterGEMS naming and licence): https://claude.ai/artifact/9fmKVp5sBuRjwuQvnn72R8 . Read his answers with ArtifactData list, collection `answers`; write rules from his free text, never the option label. Seats' answers: `dev/agents/*/assemblies-2026-10-23.md`; Mary's licence review: `dev/agents/market-researcher/wtg-legal.md`.
-- **Three branches green and waiting on his browser pass** (each suite's only failure is the expected `payload freshness`): `feat/value-source` (8105, 23aa4ccf1: his item 3, the line under the row restored with his alternative sentences, pane scroll held, short dot tip, Settings overrides listed one by one; Perry passed it after the Labels-list fix); `feat/import-new-scenario` (8101, Task 814, 8a8d8178a: a new scenario as an import destination, the survey question; Perry passed it, his five points fixed); `feat/theme-whimsy` (8102, Task 811, 5cc3fc78a: the darkest ramp class outlined on dark papers; Newspaper and Arcade were already on master, so Task 811's design themes are done apart from this). Merge each on his word only.
-- **`feat/wtg-export`**: real tank-level controls in an assigned control set (8edd6369b). **The push was refused by the classifier**; push it. Tom's round 3: `~/tom-files/2026-10-23/wtg-export-3/`.
-- Tasks 733 slice 7, 737 sprint, 681 wait on his word. 812 not touched this session.
-- **Trap met:** a Settings Labels list built as `div > span` was hidden by that box's positional CSS (`> div > span:first-child { display:none }`); the harness checked text only and passed. Perry caught it. A harness for anything drawn checks visibility and width, not text.
-- **Trap met:** a usage limit killed three agents mid-task; their detached suites survived and their commits held. Resume from `git log` and the logs, not by relaunching.
-- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/aaf154be-77c7-4d38-b977-59110ebc67e4/scratchpad
+- **Sprint 1101 merged on master** (Tom: *"Proceed with a translation sprint now."*): 401 keys x 26 languages, Wave 0 (21 English rewrites, `dev/english-friction/1101-wave0.json`), a fix pass after QA, cognate exemptions, drift re-baselined, zero keys left. Most files still said *projection* in the CRS chooser (`lpn_crs_name`, `lpn_crs_count`); all fixed (glossary note on `projection (map)`). Box titles checked in all 26 (Task 809 half done). Notes now say EPANET-MSX is modeled. **Open friction entry:** `lpn_field_auto_length_tip` is Tom's word-for-word English (2026-10-27, `properties-tip-words-harness.js`); three translators queried "slope length"; Tom 11-01: *"Slope length is a standard engineering term. Translators should not be confused by it."* English stays; translations already say "along the slope, with the rise or fall". `lpn_ff_col_more` "How many others" is HIS wording (ruling recorded).
+- **Tom 11-01:** keep **Click** for on-screen buttons, Press for keys (he weighed Use). Box-design changes no English, so the sprint did not pre-empt it.
+- **box-design round 12** (Tom's round-11 notes), commits 0f5f4e248..fe5f43c7a: Units Map-coordinates value clipped with ellipsis; Settings resize keeps the index's section in place (NOT a regression: master loses it too; Perry measured); Scenario names truncate with ellipsis and tip; Libraries Curves/Pipe types/Fittings intros moved into a `?` that opens the manual on click (12b, after Perry found a blue link heading). Perry's review: journal 1ee72f240. **Tom's round-12 notes (11-01):** no ellipsis anywhere in the box style (his 10-28 word was *truncate*; an agent added the ellipsis and credited him), no new tips on cut cells, nothing hover-only (*"On phone, there is no hover"*), and the ? must land on the exact manual entry in the same words. **Round 12c** (91a4a11a4..c81d316da) did all four: clip, tips removed, three Libraries manual entries rendered from the box's own keys, ? opens that entry on click and tap. `adhoc_style_check.php` now also counts CSS ellipses (6), per-box overrides of the shared style (18) and cell/row tips (17), as ratchets (3f0c1b393, on box-design; Tom: *"It shouldn't need a rule if it's in the style and a script checks for ad hoc styling"*). **Merged to master 11-01 on his word** (*"Merge now. I am eager to deploy to production and keep testing this."*); Tasks 827, 828, 829, 842, 845 closed; tier 95 retired, its tasks back at 100; Task 852 (truncation needs a reveal) opened.
+- Still true from 10-31: leftover override `.lpn-contourbox { --lpn-g-valmax: 9.5rem }`; Task 825 re-measures now that box-design has merged.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/21898008-86a0-4f41-8525-5b6c135ed7c9/scratchpad (briefs 12a, 12b, wave0, translate, fix; qa.php).
+
+## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
+
+- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task waits on him or a sprint; do not start a fresh slice.
+- **Merged on his typed word 10-30:** `feat/theme-of-day` and `feat/gis-background` (Task 720 closed). **gis-background carried 197 box-design commits (round 6)**, so master now holds box-design minus its round-7 and round-8 commits. Tasks 827/828/829 finish when box-design merges.
+- **box-design round 8, built this session from his round-7 phone pass** (*"Make the "Exit" button in the Select area help box exit only the box, not the mode ... Maybe the button needs to say "Close""*; *"The Properties box has an inappropriate lower width limit. Remove that limit ... this applies to the global style"*). He answered Yes to full-height phone boxes and readable Settings names. Read `git log master..box-design` and Perry's journal there before reporting on it; it waits his pass (port 8103).
+- **Master's suite after the two merges failed 17 harnesses**, all from box-design round 6 riding in on gis-background (its own tip failed them; agents never run the full suite). `fix/master-after-gis` fixed them: mostly harnesses following round 6's design, plus the lost 9-column scenarios table in all 27 guide files, a settings-wrap breakpoint, the GIS form marked session, `lpn_guide_text_demands_box` (new, English only) and a corrected contour example. 
+- **Merged on his typed word 10-30 evening:** `feat/dxf-import` (Task 772 slice 1); his Properties example sentence ("Properties lists inputs and then results") and his "Good" on the demands-box and contour-example strings recorded.
+- **RULING (Tom, 10-30):** *"You should not have built it on box-design. This puts us in a pickle because box-design is a long-term project. We will stay the course."* Never cut a branch from a capability branch; cut it from master.
+- **Waiting his word:** `feat/report-widths` (8110, his "Merge" stands) rides on box-design. **Parked on his word:** `feat/import-alternative` (8107): *"Ask me later."* Do not touch or re-ask unprompted.
+- **CC shells (Tom asked 10-30 that the count be accurate):** before saying done, every background shell and agent this session started has exited or been stopped (TaskStop), and `ps` shows no `sleep` loop, `php -S`, or harness left by it. Agent briefs forbid polling loops and leftover servers. The final report states the count.
+- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any merge, run a three-way key-set comparison (master, branch, merge base) per language.
+- **Trap met (10-30):** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content.
+- **Trap met (10-30):** `git merge` on master takes the author from the environment only for the commit it makes itself; a conflicted merge committed later in another shell call is authored as Tom. Export `GIT_AUTHOR_*` in the same call as the commit.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/9eca90e2-5a59-420c-8f3e-01d61c7e6527/scratchpad.
+
+## STATE — 2026-10-30 small hours (forty-ninth session)
+
+- He wants to proofread spock.php once deployed. Task 824 holds his theme-of-the-day words.
+- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
+- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master.
+
+## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
+
+- **Merged on green with this handoff:** `fix/manual-search` (User Manual: every hit marked, a chapter result opens on its first hit, heading hits indented under their chapter) and `chore/test-trim` (pass 3: four pixel/timing harnesses on demand via `dev/scripts/on_demand_harnesses.txt`, `run_harnesses.sh --all` runs them; the selftest and doc-bookkeeping check lines retired, scripts kept on disk and listed in `dev/automated-checks.md`; new ratchet `adhoc_style_check.php`, baseline 137 lines, 122 in looped-network.js). The four visitor-string checks (struck public claims, em dash, plain-English swaps, select/choose) stay live.
+- **Test-trim pass 2** (merge harness families: user-guide, pane, scenario, label) is approved by Tom and waits until `box-design` merges: box-design edits those same harnesses.
+- **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
+- **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
+- **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
+- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch.
+- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
+- **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
+- **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
+- **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
+- **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
+- **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
+- Unchanged wait: Task 825, his audit pass.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/4e77bea5-26bf-421e-a279-762cbbbddc50/scratchpad (brief-common.md, ida-phone-boxes.md, test-trim-proposal.md).
+
+## STATE — 2026-10-24 (thirty-eighth session)
+
+- **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
+- **His interview answers are in `dev/assemblies.md`** (Task 822, still negotiating; his questions are answered in messenger.md). Expert levels: *"Day 1 must be pure joy and fun"*; he wants a coach-marks mockup. WaterGEMS menu name: "Export > .wtg.sqlite file…". **Nag him to write to Bentley** before any public release of the export (his ask).
+- **`feat/wtg-page-export`** (no port yet): File > Export > .wtg.sqlite file from the page, built on `feat/wtg-export`; never merges before his word and his letter to Bentley. Its suite was unfinished at /clear: read `git log` in its worktree and the log `feat-wtg-page-export-full*.log` in this session's scratch.
+- Task 812 Step 2 (`fix/label-last-pad`) measured and rejected; what is left is design work, not a port.
+- Tasks 733 slice 7, 737 sprint, 681 wait on his word.
+- **Trap met:** a harness DOM stub lacks `hasAttribute`; page code using it threw in 150 harnesses. Use `getAttribute`.
+- **Trap met:** a Settings list built as `div > span` was hidden by the box's positional CSS; a harness for anything drawn checks visibility and width.
+- **Trap met:** a usage limit kills every agent; detached suites and commits survive. Resume with SendMessage, not a new agent.
+- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1a7bdf36-0009-45e7-8601-e5252dbb9d6a/scratchpad
 
 ## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
 
@@ -116,7 +164,6 @@ lines rather than appending corrections.
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/value-source` (8105): his item 4 built as he wrote it: the filled dot's tip says what Clear restores and from where, plus (Basic mode off) the alternative and who shares it; the note line under a row is gone. Perry passed it. Two guide strings rewritten (their 26 translations now stale). Merge on his word.
 - `feat/wtg-export` (no port; a spike, dev scripts only): see above.
 - `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
 - `feat/desktop`, `fix/bottom-pane-lag`: untouched.

@@ -27,6 +27,97 @@
 	var INSUNITS_NAME = { 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm', 7: 'km', 10: 'yd' };
 
 	/**
+	 * **THE ONE DXF READER'S FIRST PASS**, shared by the Shape import above and the network import
+	 * (js/lpn-dxf-read.js): a DXF is a list of code/value pairs, and this turns it into the entities
+	 * of its ENTITIES and BLOCKS sections, each a type and its (code, value) groups, in file order
+	 * (an INSERT's ATTRIBs follow it, then its SEQEND). `raw` keeps every value exactly as written;
+	 * otherwise values are trimmed. Returns { ok: true, ents, insunits, header, sawEnt } or
+	 * { ok: false, detail }. `header` holds the first group after each HEADER variable ($ACADVER,
+	 * $DWGCODEPAGE, ...).
+	 */
+	function dxfEntities(text, raw) {
+		var lines, i, code, val, section = '', want = false, ents = [], cur = null, insunits = null, hdr = '', header = {}, sawEnt = false;
+		text = String(text);
+		if (text.slice(0, 18) === 'AutoCAD Binary DXF') { return { ok: false, detail: 'binary' }; }
+		lines = text.split(/\r\n|\n|\r/);
+		if (lines.length < 4) { return { ok: false, detail: 'empty' }; }
+		for (i = 0; i + 1 < lines.length; i += 2) {
+			code = parseInt(lines[i].trim(), 10);
+			val = raw ? lines[i + 1] : lines[i + 1].trim();
+			if (!isFinite(code)) { return { ok: false, detail: 'pairs' }; }
+			if (code === 0) {
+				cur = null;
+				if (val.trim() === 'SECTION') { want = true; sawEnt = true; continue; }
+				if (val.trim() === 'ENDSEC') { section = ''; continue; }
+				if (val.trim() === 'EOF') { sawEnt = true; break; }
+				if (section === 'ENTITIES' || section === 'BLOCKS') { cur = { type: val.trim(), g: [], blocks: section === 'BLOCKS' }; ents.push(cur); }
+				continue;
+			}
+			if (want && code === 2) { section = val.trim(); want = false; continue; }
+			if (section === 'HEADER') {
+				if (code === 9) { hdr = val.trim(); }
+				else if (hdr) {
+					if (!Object.prototype.hasOwnProperty.call(header, hdr)) { header[hdr] = val; }
+					if (hdr === '$INSUNITS' && code === 70) { insunits = parseInt(val, 10); }
+					hdr = '';
+				}
+				continue;
+			}
+			if (cur) { cur.g.push([code, val]); }
+		}
+		return { ok: true, ents: ents, insunits: insunits, header: header, sawEnt: sawEnt };
+	}
+	function num(t) { return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(t) ? parseFloat(t) : NaN; }
+
+	function group(e, c) { var k; for (k = 0; k < e.g.length; k++) { if (e.g[k][0] === c) { return e.g[k][1]; } } return undefined; }
+
+	// Vertices of an LWPOLYLINE: each group 10 starts one, the next 20 completes it.
+	function lwVerts(e) {
+		var out = [], k, c, t, p;
+		for (k = 0; k < e.g.length; k++) {
+			c = e.g[k][0]; t = e.g[k][1];
+			if (c === 10) { p = { x: num(t), y: NaN, tok: { x: t, y: undefined } }; out.push(p); }
+			else if (c === 20 && p) { p.y = num(t); p.tok.y = t; }
+			else if (c === 42 && num(t) !== 0 && !isNaN(num(t))) { e.bulge = true; }
+		}
+		return out;
+	}
+
+	function pointOf(e, cx, cy) {
+		var x = group(e, cx), y = group(e, cy);
+		return { x: num(x), y: num(y), tok: { x: x, y: y } };
+	}
+
+	function good(p) { return isFinite(p.x) && isFinite(p.y); }
+
+	// **OBJECT COORDINATE SYSTEM** (DXF reference, "Arbitrary Axis Algorithm"): the vertices of an
+	// LWPOLYLINE and of a 2D POLYLINE are in a plane whose normal is the extrusion direction
+	// (groups 210, 220, 230; default 0,0,1), at the elevation given. A mirrored drawing (0,0,-1) or
+	// an inclined plane puts them elsewhere in the world. Returns null where the plane is the
+	// ordinary one, so the file's own characters are kept; else a function (x, y, z) -> {x, y}.
+	function ocsOf(e) {
+		var nx = num(group(e, 210) || '0'), ny = num(group(e, 220) || '0'), nz = num(group(e, 230) || '1'), l, ax, ay, az, bx, by, bz;
+		if (!isFinite(nx) || !isFinite(ny) || !isFinite(nz)) { return null; }
+		l = Math.sqrt(nx * nx + ny * ny + nz * nz);
+		if (!l) { return null; }
+		nx /= l; ny /= l; nz /= l;
+		if (nx === 0 && ny === 0 && nz === 1) { return null; }
+		if (Math.abs(nx) < 1 / 64 && Math.abs(ny) < 1 / 64) { ax = nz; ay = 0; az = -nx; }   // Wy x N
+		else { ax = -ny; ay = nx; az = 0; }                                                              // Wz x N
+		l = Math.sqrt(ax * ax + ay * ay + az * az); ax /= l; ay /= l; az /= l;
+		bx = ny * az - nz * ay; by = nz * ax - nx * az; bz = nx * ay - ny * ax;                                                    // N x Ax
+		return function (x, y, z) { return { x: x * ax + y * bx + z * nx, y: x * ay + y * by + z * ny }; };
+	}
+	function toWorld(pts, f, z) {
+		if (!f) { return pts; }
+		return pts.map(function (p) {
+			var w = f(p.x, p.y, z);
+			return { x: w.x, y: w.y, tok: { x: undefined, y: undefined }, computed: true };
+		});
+	}
+
+	EngCalcs.lpnDxfRead = { entities: dxfEntities, num: num, group: group, lwVerts: lwVerts, ocsOf: ocsOf, toWorld: toWorld, pointOf: pointOf, good: good };
+	/**
 	 * Read the points, lines and polylines of an ASCII DXF as Shapes.
 	 *   POINT -> one point; LINE -> two points, open; LWPOLYLINE and POLYLINE -> the vertices in order,
 	 *   closed when group 70 bit 1 is set (a closed one with fewer than three vertices stays open).
@@ -35,77 +126,11 @@
 	 *           insunits: code | null, unit: 'ft' | ... | '' }  or { ok: false, detail }.
 	 */
 	EngCalcs.lpnDxfShapes = function (text) {
-		var lines, i, code, val, section = '', want = false, ents = [], cur = null, insunits = null, hdr = '',
-			shapes = [], skipped = {}, order = [], bulged = 0, inBlocks = 0, paper = 0, sawEnt = false;
-		text = String(text);
-		if (text.slice(0, 18) === 'AutoCAD Binary DXF') { return { ok: false, detail: 'binary' }; }
-		lines = text.split(/\r\n|\n|\r/);
-		if (lines.length < 4) { return { ok: false, detail: 'empty' }; }
-		// Pass 1: the file as entities, each a type and its (code, value) groups.
-		for (i = 0; i + 1 < lines.length; i += 2) {
-			code = parseInt(lines[i].trim(), 10);
-			val = lines[i + 1].trim();
-			if (!isFinite(code)) { return { ok: false, detail: 'pairs' }; }
-			if (code === 0) {
-				cur = null;
-				if (val === 'SECTION') { want = true; sawEnt = true; continue; }
-				if (val === 'ENDSEC') { section = ''; continue; }
-				if (val === 'EOF') { sawEnt = true; break; }
-				if (section === 'ENTITIES' || section === 'BLOCKS') { cur = { type: val, g: [], blocks: section === 'BLOCKS' }; ents.push(cur); }
-				continue;
-			}
-			if (want && code === 2) { section = val; want = false; continue; }
-			if (section === 'HEADER') {
-				if (code === 9) { hdr = val; }
-				else if (hdr === '$INSUNITS' && code === 70) { insunits = parseInt(val, 10); hdr = ''; }
-				continue;
-			}
-			if (cur) { cur.g.push([code, val]); }
-		}
+		var i, e, ents, insunits, shapes = [], skipped = {}, order = [], bulged = 0, inBlocks = 0, paper = 0, sawEnt;
+		var rd = dxfEntities(text, false);
+		if (!rd.ok) { return rd; }
+		ents = rd.ents; insunits = rd.insunits; sawEnt = rd.sawEnt;
 		function skip(name, n) { if (!skipped[name]) { skipped[name] = 0; order.push(name); } skipped[name] += n || 1; }
-		function num(t) { return /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(t) ? parseFloat(t) : NaN; }
-		function group(e, c) { var k; for (k = 0; k < e.g.length; k++) { if (e.g[k][0] === c) { return e.g[k][1]; } } return undefined; }
-		// Vertices of an LWPOLYLINE: each group 10 starts one, the next 20 completes it.
-		function lwVerts(e) {
-			var out = [], k, c, t, p;
-			for (k = 0; k < e.g.length; k++) {
-				c = e.g[k][0]; t = e.g[k][1];
-				if (c === 10) { p = { x: num(t), y: NaN, tok: { x: t, y: undefined } }; out.push(p); }
-				else if (c === 20 && p) { p.y = num(t); p.tok.y = t; }
-				else if (c === 42 && num(t) !== 0 && !isNaN(num(t))) { e.bulge = true; }
-			}
-			return out;
-		}
-		function pointOf(e, cx, cy) {
-			var x = group(e, cx), y = group(e, cy);
-			return { x: num(x), y: num(y), tok: { x: x, y: y } };
-		}
-		function good(p) { return isFinite(p.x) && isFinite(p.y); }
-		// **OBJECT COORDINATE SYSTEM** (DXF reference, "Arbitrary Axis Algorithm"): the vertices of an
-		// LWPOLYLINE and of a 2D POLYLINE are in a plane whose normal is the extrusion direction
-		// (groups 210, 220, 230; default 0,0,1), at the elevation given. A mirrored drawing (0,0,-1) or
-		// an inclined plane puts them elsewhere in the world. Returns null where the plane is the
-		// ordinary one, so the file's own characters are kept; else a function (x, y, z) -> {x, y}.
-		function ocsOf(e) {
-			var nx = num(group(e, 210) || '0'), ny = num(group(e, 220) || '0'), nz = num(group(e, 230) || '1'), l, ax, ay, az, bx, by, bz;
-			if (!isFinite(nx) || !isFinite(ny) || !isFinite(nz)) { return null; }
-			l = Math.sqrt(nx * nx + ny * ny + nz * nz);
-			if (!l) { return null; }
-			nx /= l; ny /= l; nz /= l;
-			if (nx === 0 && ny === 0 && nz === 1) { return null; }
-			if (Math.abs(nx) < 1 / 64 && Math.abs(ny) < 1 / 64) { ax = nz; ay = 0; az = -nx; }   // Wy x N
-			else { ax = -ny; ay = nx; az = 0; }                                                              // Wz x N
-			l = Math.sqrt(ax * ax + ay * ay + az * az); ax /= l; ay /= l; az /= l;
-			bx = ny * az - nz * ay; by = nz * ax - nx * az; bz = nx * ay - ny * ax;                                                    // N x Ax
-			return function (x, y, z) { return { x: x * ax + y * bx + z * nx, y: x * ay + y * by + z * ny }; };
-		}
-		function toWorld(pts, f, z) {
-			if (!f) { return pts; }
-			return pts.map(function (p) {
-				var w = f(p.x, p.y, z);
-				return { x: w.x, y: w.y, tok: { x: undefined, y: undefined }, computed: true };
-			});
-		}
 		function emit(type, layer, flags, pts, bulge) {
 			if (!pts.length || !pts.every(good)) { skip(type + ' (no usable position)'); return; }
 			if (bulge) { bulged++; }

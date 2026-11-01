@@ -263,7 +263,7 @@ console.log('\n--- (d) a drawing that comes back is sized for its OWN view, not 
 		const j = JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples/' + file), 'utf8'));
 		L.newProject(); const id = L.openId(); L.applySaved(j); L.refreshAll(); L.saveToStorage(); return id;
 	}
-	const grid = load('Net1.lwn'), geo = load('Net3-Novato-CA-World.lwn');
+	const grid = load('Net1.lwn'), geo = load('latlon-originals/Net3-Novato-CA-World.lwn');
 	// The same view, built from nothing: what the returned drawing must equal, element for element.
 	function fresh() { L.buildDom(); L.refreshFontSizes(true); return L.sizes(); }
 	function diff(a, b) {

@@ -211,7 +211,7 @@ async function main() {
 		await a.answerTrainingPanel().catch(() => {});
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
-		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.openNet1Plain(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1500);
 		await page.click('#lpn_pane_btn');
 		await a.settle(500);
@@ -419,7 +419,7 @@ async function main() {
 		const pat = byName[libLbl.pat], crv = f.sheets.find((x) => x.name.indexOf(libLbl.cur + '-') === 0),
 			typ = byName[libLbl.typ], fit = byName[libLbl.fit];
 		ok('the workbook carries a sheet per library: patterns, curves by type, pipe types, fittings', !!pat && !!crv && !!typ && !!fit, Object.keys(byName).join(', '));
-		ok('Patterns: Net1 pattern 1, its Description, then its 12 multipliers across, as numbers', !!pat && pat.rows[1][0] === '1' && pat.rows[0][1] === (await a.lang('lpn_library_curve_note_label')) && pat.rows[1][1] === 'Demand Pattern' && pat.rows[1].slice(2).map(Number).join() === '1,1.2,1.4,1.6,1.4,1.2,1,0.8,0.6,0.4,0.6,0.8' && pat.floats[1][2] !== null, pat && JSON.stringify(pat.rows[1]));
+		ok('Patterns: Net1 pattern 1, its Description, then its 12 multipliers across, as numbers', !!pat && pat.rows[1][0] === '1' && pat.rows[0][1] === (await a.lang('lpn_field_desc')) && pat.rows[1][1] === 'Demand Pattern' && pat.rows[1].slice(2).map(Number).join() === '1,1.2,1.4,1.6,1.4,1.2,1,0.8,0.6,0.4,0.6,0.8' && pat.floats[1][2] !== null, pat && JSON.stringify(pat.rows[1]));
 		ok('Curves: Net1 curve 1, one point 1500 by 250, headed as the Library heads a pump head curve', !!crv && crv.rows.length === 2 && crv.rows[1][0] === '1' && crv.rows[1][2] === '1500' && crv.rows[1][3] === '250' && /\(/.test(crv.rows[0][2]), crv && JSON.stringify(crv.rows));
 		ok('Pipe types: the type added in the Library, its diameter 8, blank where it states nothing', !!typ && typ.rows.length === 2 && typ.rows[1][2] === '8' && typ.rows[1].slice(3).every((v) => v === ''), typ && JSON.stringify(typ.rows));
 		ok('Fittings: the list added, one row per fitting, named as the Library names it, quantity 1', !!fit && fit.rows.length === 2 && fit.rows[1][2] === fitRow && fit.rows[1][3] === '1' && fit.floats[1][4] !== null, fit && JSON.stringify(fit.rows) + ' vs ' + fitRow);
@@ -500,14 +500,14 @@ async function main() {
 		ok('XLSX, current table, all scenarios: a sheet per scenario', f.sheets.length === 2 && /Peak/.test(f.sheets.map((s) => s.name).join()) && f.sheets.some((s) => /Base/.test(s.name)), f.sheets.map((s) => s.name).join(', '));
 		ok('each scenario sheet has the table\'s rows and no Scenario column', f.sheets.every((s) => s.rows.length === before.rows.length + 1 && s.rows[0].join() === before.heads.join()), JSON.stringify(f.sheets.map((s) => [s.rows.length, s.rows[0].length])) + ' ' + before.rows.length);
 		r = await runExport('csv', 'current', 'current');
-		ok('CSV, current scenario: one file named with the scenario', /Junctions-A_B__C__Peak\.csv$/.test(r.name), r.name);
+		ok('CSV, current scenario: one file named with the scenario', /A_B__C__Peak-Junctions\.csv$/.test(r.name), r.name);
 		r = await runExport('xlsx', 'all', 'all');
 		f = inspect(r.file, 'xlsx');
 		f.sheets = f.sheets.filter((x) => !LIBS.test(x.name));
 		ok('workbook sheet names keep the scenario (the Scenarios table is one sheet of its own) and stay within 31 characters, unique', f.sheets.every((x) => x.name.length <= 31 && /Peak/.test(x.name) || /Base/.test(x.name) || x.name === 'Scenarios') && new Set(f.sheets.map((x) => x.name.toLowerCase())).size === f.sheets.length, f.sheets.map((x) => x.name).join(' | '));
 		r = await runExport('csv', 'all', 'all');
 		f = inspect(r.file, 'zip');
-		const nJ = f.names.filter((n) => /Junctions-/.test(n));
+		const nJ = f.names.filter((n) => /-Junctions\.csv$/.test(n));
 		ok('CSV of all tables and all scenarios: a zip with a file per table and scenario', f.bad === null && nJ.length === 2 && f.names.length >= 8 && f.names.includes('Patterns.csv') && f.names.every((n) => !/[\/\\:*?"<>|]/.test(n)), f.names.join(', '));
 		ok('the table on screen keeps its order, and still shows no scenario column', (await idOrder()) === orderBefore && !(await screen()).heads.includes(await a.lang('lpn_scenario_label')));
 		ok('no page errors', a.errors.length === 0, a.errors.join(' | ').slice(0, 300));

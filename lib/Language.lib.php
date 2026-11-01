@@ -156,13 +156,11 @@ function chooseLanguage($all_language_settings) {
                 // on a language they chose before. Once per visit, which is what makes the
                 // "retains users across sessions" number in lang-log-stats.sh mean anything.
                 ecMarkSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND);
-                ecMarkSeen($page, EC_SEEN_LANG_VIEW);
                 logLanguageSelection($cookieLang, 'cookie', $cookieLang);
-            } elseif (!ecSeen($page, EC_SEEN_LANG_VIEW)) {
-                // A later page in the same visit. Logged so LANG_LOG's page breakdown covers every
-                // page visited rather than only the entry page, and excluded from the demand
-                // sections so it cannot double-count the visit's language.
-                ecMarkSeen($page, EC_SEEN_LANG_VIEW);
+            } else {
+                // A later page in the same visit, and every reload. Every page load is logged
+                // (Tom, 2026-10-29), and the 'view' source keeps it out of the demand sections
+                // so it cannot double-count the visit's language.
                 logLanguageSelection($cookieLang, 'view', $cookieLang);
             }
         } else {
@@ -287,6 +285,7 @@ function chooseLanguage($all_language_settings) {
             // Filtered -- see the note on the 'anon' call above. Same defect, same fix.
             $rawLang = ecBrowserLangTag();
             logLanguageSelection($rawLang, 'browser', isset($winningLanguage) ? $winningLanguage : '');
+            $loggedThisLoad = true;
             // VALUE IS A LITERAL 1 as of Task 288. It was the raw language tag, but every use site
             // is isset() -- the value was written and never read once. Storing a tag we do not read
             // made the banner's "a single digit" claim false for no benefit whatever.
@@ -299,7 +298,12 @@ function chooseLanguage($all_language_settings) {
             ]);
         }
         ecMarkSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND);
-        ecMarkSeen($page, EC_SEEN_LANG_VIEW);
+        // Every page load is logged (Tom, 2026-10-29). The first load of a browser was the
+        // 'browser' row above; every other load, with the language chosen by the browser, is a
+        // 'view' row, which the demand sections leave out so the browser is not counted twice.
+        if (empty($loggedThisLoad) && !(function_exists('ecIsPrecacheRequest') && ecIsPrecacheRequest())) {
+            logLanguageSelection(ecBrowserLangTag(), 'view', isset($winningLanguage) ? $winningLanguage : '');
+        }
     } else {
         logAnonymousView($winningLanguage);
     }

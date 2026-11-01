@@ -745,8 +745,8 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		subRows[3].indexOf(String(pc.lpn_library_import)) >= 0 &&
 		subRows[4].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
 		`the import rows stand in order: Network, Shapes, surveyed points, libraries, workspace: ${JSON.stringify(subRows)}`);
-	check(netRows.length === 3 && netRows[0] === String(pc.lpn_file_import_inp) && netRows[1] === String(pc.lpn_file_import_msx) &&
-		netRows[2] === String(pc.lpn_file_import_gjnet), `Network holds the EPANET file, EPANET-MSX file and GeoJSON file: ${JSON.stringify(netRows)}`);
+	check(netRows.length === 4 && netRows[0] === String(pc.lpn_file_import_inp) && netRows[1] === String(pc.lpn_file_import_msx) &&
+		netRows[2] === String(pc.lpn_file_import_gjnet) && netRows[3] === String(pc.lpn_file_import_dxfnet), `Network holds the EPANET file, EPANET-MSX file, GeoJSON file and DXF file: ${JSON.stringify(netRows)}`);
 	check(shapeRows.length === 3 && shapeRows[0] === String(pc.lpn_file_import_shapes) && shapeRows[1] === String(pc.lpn_file_import_dxf) &&
 		shapeRows[2] === String(pc.lpn_file_import_shp), `Shapes holds the GeoJSON, DXF and Shapefile rows: ${JSON.stringify(shapeRows)}`);
 }());

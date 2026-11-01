@@ -79,6 +79,7 @@ async function main() {
 
 		for (const size of [{ w: 1440, h: 900, tag: 'desktop' }, { w: 390, h: 844, tag: 'phone' }]) {
 			const context = await browser.newContext({ viewport: { width: size.w, height: size.h } });
+			await context.addInitScript('window.EC_NOW = ' + Date.UTC(2026, 9, 28, 15) + ';'); // Task 824: pin the theme of the day to Wednesday, System
 			const page = await context.newPage();
 			await page.goto(env.pageUrl('Looped-Network.php?ec_nolog=1'), { waitUntil: 'load' });
 			await page.waitForSelector('#lpn_menubar .lpn-menubar-item');

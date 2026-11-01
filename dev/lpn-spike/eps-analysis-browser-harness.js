@@ -81,6 +81,28 @@ async function main() {
 			return !!r && r.textContent.length > 20 && (!box || box.style.display === 'none');
 		}, reportSel), what, 300000);
 		const heads = (reportSel) => a.page.$$eval(reportSel + ' th', (ths) => ths.map((t) => t.textContent.trim()));
+		// The leaf columns, left to right, each with the group heading above it (''): the report tables carry compound headings
+		// since 6a7bce3ca (840), so a cell's column is its leaf's position, not its th's position in the flat list.
+		const leaves = (reportSel) => a.page.$$eval(reportSel + ' thead tr', (trs) => {
+			const taken = [], cells = [];
+			trs.forEach((tr, ri) => {
+				let ci = 0;
+				Array.from(tr.children).forEach((th) => {
+					while (taken[ri] && taken[ri][ci]) { ci++; }
+					const cs = th.colSpan || 1, rs = th.rowSpan || 1;
+					for (let r = ri; r < ri + rs; r++) { taken[r] = taken[r] || []; for (let c = ci; c < ci + cs; c++) { taken[r][c] = true; } }
+					cells.push({ text: th.textContent.trim(), ri, ci, cs, rs });
+					ci += cs;
+				});
+			});
+			const width = Math.max.apply(null, cells.map((c) => c.ci + c.cs)), out = [];
+			for (let c = 0; c < width; c++) {
+				const cover = cells.filter((x) => x.ci <= c && c < x.ci + x.cs).sort((x, y) => x.ri - y.ri);
+				const leaf = cover[cover.length - 1], group = cover.length > 1 ? cover[0].text : '';
+				out.push({ text: leaf.text, group });
+			}
+			return out;
+		});
 		const runLabel = await a.lang('lpn_ff_calculate');
 
 		console.log('\n--- Fire flow on the step on screen ---');
@@ -97,7 +119,7 @@ async function main() {
 		await a.settle(200);
 		await pressRun('#lpn_ff_controls', runLabel);
 		await waitDone('#lpn_ff_report', 'the every-step answer');
-		const h = await heads('#lpn_ff_report');
+		const h = (await leaves('#lpn_ff_report')).map((l) => l.text);
 		ok('the table has a "' + hourHead + '" column', h.indexOf(hourHead) >= 0, h.join(' | '));
 		const rows = await a.page.$$eval('#lpn_ff_report tbody tr', (trs) => trs.map((tr) => [...tr.children].map((c) => c.textContent.trim())));
 		const col = h.indexOf(hourHead);
@@ -115,12 +137,14 @@ async function main() {
 		await a.settle(200);
 		await pressRun('#lpn_crit_controls', runLabel);
 		await waitDone('#lpn_crit_report', 'the whole-run Criticality answer');
-		const ch = await heads('#lpn_crit_report');
-		const emptyHead = await a.lang('lpn_crit_col_empty');
+		const chL = await leaves('#lpn_crit_report'), ch = (await heads('#lpn_crit_report'));
+		const emptyHead = await a.lang('lpn_crit_col_empty'), timeHead = await a.lang('lpn_full_col_time');
 		ok('the table has the columns "' + emptyHead + '" and "' + await a.lang('lpn_crit_col_hours') + '"',
 			ch.indexOf(emptyHead) >= 0 && ch.indexOf(await a.lang('lpn_crit_col_hours')) >= 0, ch.join(' | '));
 		const crows = await a.page.$$eval('#lpn_crit_report tbody tr', (trs) => trs.map((tr) => [...tr.children].map((c) => c.textContent.trim())));
-		const ec = ch.indexOf(emptyHead);
+		// "Tank empties" is a group over Tank | Time (6a7bce3ca); the time is the Time leaf under it.
+		const ec = chL.findIndex((l) => l.group === emptyHead && l.text === timeHead);
+		ok('Tank empties has a Time column under it', ec >= 0, JSON.stringify(chL));
 		const emptied = crows.filter((r) => /\d+:\d\d/.test(r[ec]));
 		ok('some outage empties the tank, with the time (such as "2 at 5:00")', emptied.length >= 1, JSON.stringify(emptied.slice(0, 2)));
 		await closeTool('lpn_crit_close');

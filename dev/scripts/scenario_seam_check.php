@@ -110,7 +110,7 @@ foreach (explode("\n", $src) as $i => $line) {
     $exempt = false;
     foreach ($exemptFns as $fn) { if (strpos($line, $fn) !== false) { $exempt = true; break; } }
     if ($exempt) { continue; }
-    if (preg_match("/'(?:n|l|t):'/", $line)) { $prefixLines[] = ($i + 1) . ': ' . trim($line); }
+    if (preg_match("/'(?:n|l|t|s):'/", $line)) { $prefixLines[] = ($i + 1) . ': ' . trim($line); }
 }
 if ($prefixLines) {
     fwrite(STDERR, "FAIL: the override key format is spelled outside ovKeyFor():\n");

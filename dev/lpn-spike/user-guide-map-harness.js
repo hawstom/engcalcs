@@ -21,7 +21,7 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, dialogPress, f
 const NAME = 'user-guide-map-harness';
 U.takeBrowserLock(NAME, 'EC_UGMAP_LOCKED');
 
-const TERMS = ['lpn_hotkeys_map_term', 'lpn_guide_map_undo_term', 'lpn_guide_map_del_term', 'lpn_guide_map_esc_term', 'lpn_guide_map_letters_term'];
+const TERMS = ['lpn_hotkeys_map_term', 'lpn_guide_map_undo_term', 'lpn_tool_delete', 'lpn_guide_map_esc_term', 'lpn_guide_map_letters_term'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));

@@ -323,7 +323,6 @@ $ec_lang['mhp_main_title']='Free Online Micro-Hydro Power Calculator';
 $ec_lang['mhp_main_desc']='Run-of-River Micro-Hydro Power Output Calculator';
 $ec_lang['mhp_gross_head']='Gross head, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="Penstock (supply pipe) diameter">Penstock diameter, D <span class="ec-tip">?</span></span>';
-$ec_lang['mhp_length']='Length, L';
 $ec_lang['mhp_efficiency']='Plant efficiency, η (0–1)';
 $ec_lang['mhp_vel_check']='Velocity check';
 $ec_lang['mhp_hl_check']='Head loss check';
@@ -478,13 +477,11 @@ $ec_lang['rc_SD_check']='Gradation SD check';
 $ec_lang['rc_sg_ok']   ='sg in valid range';
 $ec_lang['rc_sg_ok_tip']='2.54–2.82 (Robinson)';
 $ec_lang['rc_sg_low']  ='sg below Robinson range';
-$ec_lang['rc_sg_low_tip']='Valid range: 2.54–2.82';
 $ec_lang['rc_sg_high'] ='sg above Robinson range';
 $ec_lang['rc_sg_high_tip']='Valid range: 2.54–2.82';
 $ec_lang['rc_SD_ok']   ='SD in valid range';
 $ec_lang['rc_SD_ok_tip']='1.15–1.47 (Robinson)';
 $ec_lang['rc_SD_low']  ='SD below Robinson range';
-$ec_lang['rc_SD_low_tip']='Valid range: 1.15–1.47';
 $ec_lang['rc_SD_high'] ='SD above Robinson range';
 $ec_lang['rc_SD_high_tip']='Valid range: 1.15–1.47';
 $ec_lang['rc_layer']='Rock lining thickness (2 × D<sub>50</sub>)';
@@ -593,7 +590,6 @@ $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
 $ec_lang['bpn_line_table_heading']='Pipe lines';
-$ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Name of this pipe line. Other lines refer to it in the Upstream column.';
 $ec_lang['bpn_upstream']='Upstream ID';
 // Edited by TGH 2026-09-07
@@ -1005,8 +1001,9 @@ $ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the m
 $ec_lang['lpn_guide_text_scncmp_box']='Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\n\nIt does not change the project, and the scenario that is open is left as it was.';
 $ec_lang['lpn_guide_text_rptbox']='Shows the text report written by the EPANET engine for the last extended period simulation, including its warnings and the network summary. Each extended period simulation replaces it; a solve at a single instant does not, and an edit leaves the previous report in place.';
 $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.';
-$ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
+$ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download, copy, or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
+$ec_lang['lpn_guide_text_demands_box']='Lists the demand categories of the selected junction, one row for each, with the base demand and the demand pattern of every category. The plus button adds a category. With more than one category, Base demand in Properties is their total and is read-only. Customers lumped at the junction are listed with their demand. In a scenario, an edit is an override and Base is not changed.';
 $ec_lang['lpn_guide_text_hotkeys_popup']='The user manual. Its sections are Using the user manual, Toolbar, Menus, Map, Screenshot, Tables, Boxes, About this calculator, and Notes on this page. Toolbar and Menus list every toolbar button and menu row with its keyboard shortcut, Boxes has an entry for each box, and the other sections state what the page does. Choosing a row shows where that control is; it never runs it. Press Ctrl+K to search, or press / while the user manual has focus. Ctrl+K does not search while a question is open.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
@@ -1021,7 +1018,6 @@ $ec_lang['lpn_guide_find_results_term']='Results, the selection, and Tables';
 $ec_lang['lpn_guide_find_results_def']='<p>The matching assets are listed below the Find button. Above and n highest list the highest value first, below and n lowest the lowest value first, and other conditions list by the value found, then by ID. A query with AND or OR lists nodes, then links, each by ID. A single match is shown on the map immediately. Select a row to center the map on that asset. If nothing is selected, the asset is also selected; if something is, the asset is highlighted and the selection is not changed. Shift+click or Ctrl+click a row to add it to the selection or remove it. Find does not select all matches by itself.</p><p>The Filter in table button applies the same query to the Tables pane. Each table that the query applies to shows only the matching rows, with the query and the row count above them. To select all matches on the map, select those rows and choose Select on map from the right-click menu. A table filter is not saved with the project and ends when the page is reloaded. A row edited so that it no longer matches stays in the table, dimmed and marked with a warning sign, until the Filter in table button is pressed again.</p>';
 $ec_lang['lpn_guide_find_replace_term']='Replace and Undo';
 $ec_lang['lpn_guide_find_replace_def']='<p>The Change what was found part of the box writes one property on every asset the query found. Choose the property in the Property to change list, enter the new value in the New value box in the displayed unit, and press the Replace button. The box then states how many assets would change, not counting those that already have the new value. Press the Change them button to apply the change, or Cancel. One Undo reverses the whole replacement.</p><p>Example on Net1: <code>Pipe.Diameter below 10</code> finds Pipes 31, 122, 113, and 121. Choose Diameter, enter 10, and press Replace; the box shows "Change 4 assets?". Press Change them to set all four pipes to 10 in. One Undo returns them to 6 and 8 in.</p><p>Example on Net3: <code>Pipe.ID equal to \'247\'</code> finds Pipe 247. Choose Closed, choose Closed again in the New value list, and press Replace, then Change them, to close the pipe for the connectivity example above. Undo opens it again.</p><p>Replace requires one kind of asset, so under Everything, first choose a kind of asset in the What to search list. In a scenario other than Base, a replacement is stored in that scenario, as the same edit in Properties would be. Where Mapbox elevations are available, Elevation can be replaced from the Mapbox DEM instead of a typed value.</p>';
-$ec_lang['lpn_guide_find_notes_term']='Points to note';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precision and listed to four decimal places. Equal to rarely matches a calculated result; use above and below.</li><li>Pressure, head, flow, velocity, and the other results are those of the last calculation. With the Recalculate automatically setting cleared, they describe the network as it was at the last Calculate.</li><li>Above and below on text use dictionary order, with numbers in numeric order: on Net1, <code>Junction.ID above \'20\'</code> finds Junctions 21, 22, 23, 31, and 32.</li><li>Under Everything, only ID, Description, Tag, and Connectivity are offered. Choose a kind of asset in the What to search list to see its full list of properties.</li><li>A Text item has no ID. Search it by its words, as in <code>Text.Text contains \'pump\'</code>.</li><li>The four Connectivity conditions for a node are no links at node, no open links at node, no link path to a source, and no open path to a source. A source is a reservoir or a tank.</li></ul>';
 // The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
 // feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
@@ -1030,31 +1026,32 @@ $ec_lang['lpn_guide_find_notes_def']='<ul><li>Values are compared at full precis
 $ec_lang['lpn_guide_scn_use_term']='What a scenario is for';
 $ec_lang['lpn_guide_scn_use_def']='<p>Scenarios save many designs, views, or situations in the same project, such as average day, maximum day, peak hour, a report presentation figure, a main out of service, or a proposed replacement. The network is drawn once, in the Base scenario. Every other scenario holds only its overrides, the values that differ from the scenario it inherits from, and reads everything else from that scenario. An edit to Base therefore reaches every scenario that has not overridden that value.</p><p>A new project starts with six ready-made scenarios: 1. Flow test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, and 6. Peak hour. They are ordinary scenarios that can be renamed, edited, and deleted. Each starts with one override, its demand multiplier: 1 for the flow tests and Average Day, 2 for Max Day, and 3 for Peak hour. The multipliers are placeholders to be replaced with values for the system being modeled. A project opened from a file, including each example, or imported from an EPANET file has Base alone.</p><p>Fire flow is checked with the Fire flow analysis, which tests every junction or the selected junctions. Max Day is the scenario normally open when it is run.</p>';
 $ec_lang['lpn_guide_scn_open_term']='The open scenario';
-$ec_lang['lpn_guide_scn_open_def']='<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives. It is dimmed while Basic mode is checked.</p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.</p>';
+$ec_lang['lpn_guide_scn_open_def']='<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives, or only the list of scenarios while Basic mode is checked.</p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Where overrides show';
-$ec_lang['lpn_guide_scn_marks_def']='<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.</p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.</p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.</p>';
+$ec_lang['lpn_guide_scn_marks_def']='<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.</p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.</p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Making and clearing overrides';
-$ec_lang['lpn_guide_scn_make_def']='<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>';
+$ec_lang['lpn_guide_scn_make_def']='<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. A Shape follows the same rule as an asset. Customers belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>';
+$ec_lang['lpn_guide_scn_move_term']='Moving or merging between scenarios';
+$ec_lang['lpn_guide_scn_move_def']='<p>To move or merge elements from one scenario to another, open their Table, use the right-click context menu to Show scenarios, then set their Is active toggle and Clear override as desired in each scenario.</p>';
 $ec_lang['lpn_guide_scn_scope_term']='What a scenario can and cannot override';
-$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Properties</td><td>Every property of a node or link except those listed below, including its position, whether it is active, and its type (Morph). A Text can override its words, position, size, alignment, bold, angle, and whether it is shown. A custom property can always be overridden. The properties are held in the categories Physical, Demand, Active topology, Initial settings, Constituent, Fire flow, Energy cost, Custom properties, Text, Presentation, and Calculation.</td></tr><tr><td>Settings</td><td>The settings saved with the project, except those listed below: the calculation options (for example the demand multiplier, total run time, hydraulic time step, and friction method), the default demand pattern, the values given to new assets, and the presentation settings (sizes, colors, labels, contours, the map view, and the time series graphs on the map).</td></tr><tr><td>The same in every scenario</td><td>The ID, Description, and Tag of an asset; the end nodes and bends of a link; Customers and Shapes; the units and the coordinate system; and the contents of the Libraries (patterns, curves, pipe types, fittings lists, controls, and rules). An edit to any of these changes every scenario. A scenario can point an asset at a different curve, pipe type, fittings list, or pattern, but cannot change what is in them.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Properties</td><td>Every property of a node or link except those listed below, including its position, whether it is active, and its type (Morph). A Text can override its words, position, size, alignment, bold, angle, and whether it is shown. A Shape can override whether it is shown. A custom property can always be overridden. The properties are held in the categories Physical, Demand, Active topology, Initial settings, Constituent, Fire flow, Energy cost, Custom properties, Text, Presentation, and Calculation.</td></tr><tr><td>Settings</td><td>The settings saved with the project, except those listed below: the calculation options (for example the demand multiplier, total run time, hydraulic time step, and friction method), the default demand pattern, the values given to new assets, and the presentation settings (sizes, colors, labels, contours, the map view, and the time series graphs on the map).</td></tr><tr><td>The same in every scenario</td><td>The ID, Description, and Tag of an asset; the end nodes and bends of a link; Customers and the points of a Shape; the units and the coordinate system; and the contents of the Libraries (patterns, curves, pipe types, fittings lists, controls, and rules). An edit to any of these changes every scenario. A scenario can point an asset at a different curve, pipe type, fittings list, or pattern, but cannot change what is in them.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_scn_example_term']='Example on Net1';
-$ec_lang['lpn_guide_scn_example_def']='<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Lowest pressure</td><td>Highest velocity</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>108 psi at N32, 14:00</td><td>2.76 ft/sec at L11, 16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>109 psi at N32, 14:00</td><td>2.87 ft/sec at L11, 16:00</td></tr><tr><td>Max day</td><td>1</td><td>1.8</td><td>15.78 psi at N32, 9:00</td><td>3.49 ft/sec at L10, 9:00</td></tr></tbody></table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.</p>';
+$ec_lang['lpn_guide_scn_example_def']='<p>Open the Net1 example. The comparison below also lists the example’s own scenarios, Max day, Peak hour, and their main break children, which are not used here. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day 1.8, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td></td><td></td><td></td><td colspan="3">Lowest pressure</td><td colspan="3">Highest velocity</td></tr><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Junction</td><td>Pressure (psi)</td><td>Time (hr)</td><td>Link</td><td>Velocity (ft/sec)</td><td>Time (hr)</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>N32</td><td>108</td><td>14:00</td><td>L11</td><td>2.76</td><td>16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>N32</td><td>109</td><td>14:00</td><td>L11</td><td>2.87</td><td>16:00</td></tr><tr><td>Max day 1.8</td><td>1</td><td>1.8</td><td>N32</td><td>15.78</td><td>9:00</td><td>L10</td><td>3.49</td><td>9:00</td></tr></tbody></table><p>The total run time is 24:00 in all of them, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario made here holds one override, and Base keeps its values.</p>';
 $ec_lang['lpn_guide_scn_notes_term']='Points to note';
 $ec_lang['lpn_guide_scn_notes_def']='<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).</li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.</li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.</li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.</li></ul>';
 // The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
 // the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
 $ec_lang['lpn_guide_cmp_cols_term']='What the table holds';
-$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure: Junction, Pressure, Time (hr)</td><td>The lowest pressure at a junction, in three columns: the ID of the junction, the pressure, and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity: Link, Velocity, Time (hr)</td><td>The highest velocity in a pipe or valve, in three columns: the ID of the link, the velocity, and the time it occurs. Pumps are left out.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Steady-state and extended-period scenarios';
 $ec_lang['lpn_guide_cmp_run_def']='<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>';
 $ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver\'s internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>';
-$ec_lang['lpn_guide_cmp_notes_term']='Points to note';
-$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>';
+$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares scenarios on Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
 // dev/lpn-spike/user-guide-library-harness.js.
 $ec_lang['lpn_guide_lib_kinds_term']='What each section holds';
-$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Patterns</td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.</td></tr><tr><td>Curves</td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.</td></tr><tr><td>Pipe types</td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.</td></tr><tr><td>Fittings</td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.</td></tr><tr><td>Controls</td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value</code>. Under each, the box states whether it was understood.</td></tr><tr><td>Rules</td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Patterns</td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.</td></tr><tr><td>Curves</td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the last option in the curve list, Edit curves…, opens this section.</td></tr><tr><td>Pipe types</td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.</td></tr><tr><td>Fittings</td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.</td></tr><tr><td>Controls</td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value</code>. Under each, the box states whether it was understood.</td></tr><tr><td>Rules</td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_lib_refs_term']='Renaming, deleting, and what refers to an item';
 $ec_lang['lpn_guide_lib_refs_def']='<p>An ID is changed in its section. A blank ID, or an ID already used in the same section, is not accepted. Renaming an item moves every reference to it, in Base and in every scenario. For a pattern, the references are a junction\'s demand pattern and the pattern of each of its demand categories, a Customer\'s demand pattern, a reservoir\'s head pattern, a pump\'s speed pattern, and the default demand pattern.</p><p>A pattern that is in use can be deleted, and each reference to it is cleared. If it was the default demand pattern, a notice states what junctions with no pattern use now. A curve, pipe type, or fittings list that is in use is not deleted. The message names the assets that use it, and each must be given another curve, or detached from the type or list, first.</p>';
 $ec_lang['lpn_guide_lib_scn_term']='Libraries and scenarios';
@@ -1063,9 +1060,7 @@ $ec_lang['lpn_guide_lib_ctl_term']='Controls and rules in a run';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>A control is one statement. A rule is several lines that begin with RULE. Keywords are typed in English whatever the language of the page, and numbers are in the units of the project. Add a control starts from a statement built from the network, which is then edited into the one intended.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when Total run time is greater than 0. A steady-state solution is not changed by either. Rules are applied by the EPANET engine only. Both are saved with the project and written to an EPANET file.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Importing libraries from another project';
 $ec_lang['lpn_guide_lib_import_def']='<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.</p>';
-$ec_lang['lpn_guide_lib_example_term']='Example on Net1';
 $ec_lang['lpn_guide_lib_example_def']='<p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.</p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.</p>';
-$ec_lang['lpn_guide_lib_notes_term']='Points to note';
 $ec_lang['lpn_guide_lib_notes_def']='<ul><li>A pattern repeats for as long as a run lasts, so it need not cover the whole run.</li><li>An EPANET file has no place for a pipe type or a fittings list. The file carries the numbers each pipe reads, and the export says which pipes were flattened.</li><li>The position and size of the Libraries box are kept in this browser. The items are saved with the project.</li></ul>';
 // The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
@@ -1079,8 +1074,7 @@ $ec_lang['lpn_guide_prop_scn_term']='In a scenario';
 $ec_lang['lpn_guide_prop_scn_def']='<p>In a scenario other than Base, an edit to a value that scenarios can override is stored as an override of the open scenario, and the row is marked at its left. The Scenario manager entry describes the marks and lists what is the same in every scenario: the ID, Description, and Tag are. A Customer has no scenario values. Switching scenarios leaves Properties open on the same asset, showing the values of the scenario that is now open.</p>';
 $ec_lang['lpn_guide_prop_multi_term']='Several assets selected';
 $ec_lang['lpn_guide_prop_multi_def']='<p>The title reads, for example, 2 selected. The box has one section for each type of asset in the selection, headed by the name of the type and the number of assets of it, as in Pipes (2), and each section can be collapsed. A section lists the properties that Tables has as columns and that can be set on every asset in it. Results and values that a pipe type states are not listed. A row shows the value the assets share, or Various where they differ.</p><p>Typing a value into a row sets it on every asset of that type in the selection. A row that is not touched writes nothing. A notice states the count, as in Set Diameter (in) on 2., and one Undo reverses the whole row. In a scenario other than Base the values are stored as overrides.</p>';
-$ec_lang['lpn_guide_prop_example_term']='Example on Net1';
-$ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Is active?, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>';
+$ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 10. Properties lists inputs and then results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>';
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sections, and where settings are saved';
@@ -1111,7 +1105,6 @@ $ec_lang['lpn_guide_mn_kbd_def']='<p>The letters after Alt+Shift are keys at fix
 // The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
 $ec_lang['lpn_guide_map_undo_term']='Undo and Redo';
 $ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z undoes the last change, and Ctrl+Y or Ctrl+Shift+Z redoes it. In a Tables cell, the keys belong to the project while the cell is only selected, and to the text of the cell once typing has begun. The page keeps the last 20 steps, in memory only, and switching projects clears them. A step restores the scenarios, the open scenario, and the units along with the drawing.</p>';
-$ec_lang['lpn_guide_map_del_term']='Delete';
 $ec_lang['lpn_guide_map_del_def']='<p>Delete or Backspace deletes the selection, except while typing in a field, where the key belongs to the field. With nothing selected, Delete says so, and Backspace does nothing. One Undo reverses the deletion of several assets. In a scenario other than Base, Delete does not remove an asset that exists in Base; the Scenario manager entry describes what it does.</p>';
 $ec_lang['lpn_guide_map_esc_term']='Esc';
 $ec_lang['lpn_guide_map_esc_def']='<p>An Esc that closes a menu, a pull-down, or a box does nothing else. The Properties, Settings, and Libraries boxes close only when focus is in the box and the pointer is over it. With none of those open, Esc returns the active tool to Select, and in Select it clears the selection. A half-drawn pipe takes one Esc to abandon and a second to return to Select. In a field, Esc belongs to the field.</p>';
@@ -1126,11 +1119,11 @@ $ec_lang['lpn_guide_tbl_fill_term']='Filling, filters, and scenarios';
 $ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D fills a selected range down from its top row, and Ctrl+Enter fills it with the value of the active cell. Both leave the ID column and read-only cells alone, and a notice states how many cells were filled and how many were not changed. Ctrl+Shift+L shows only the assets selected on the map. With a filter on, Ctrl+A and Ctrl+D act on the rows shown only, and a row edited so that it no longer matches stays until the filter is applied again.</p><p>In a scenario other than Base, a cell edit, Ctrl+D, Ctrl+Enter, and a paste are stored as overrides of the open scenario.</p>';
 // The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
 $ec_lang['lpn_guide_bx_dock_term']='Docking and tabs';
-$ec_lang['lpn_guide_bx_dock_def']='<p>The corner of a box\'s title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>';
+$ec_lang['lpn_guide_bx_dock_def']='<p>The corner of a box\'s title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap. The box collapses to its tab when the pointer has left it and focus is not inside it, when you press anywhere outside it, or when you press Esc. A collapsed box is still open. A menu row or toolbar button that opens it expands it from its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>';
 $ec_lang['lpn_guide_bx_keep_term']='What a box remembers';
 $ec_lang['lpn_guide_bx_keep_def']='<p>Each box keeps in this browser where it floats, its size, whether it is open, its dock side, whether it auto-hides, its docked width, and the place of its tab. Properties, Criticality analysis, Demand scaling, and Calibration keep only their dock side, auto-hide, tab place, and whether they are open; where they float lasts for one page load. A browser with no saved layout starts with some boxes docked as tabs, and nothing is stored until a box is changed.</p>';
 $ec_lang['lpn_guide_bx_phone_term']='On a phone';
-$ec_lang['lpn_guide_bx_phone_def']='<p>At 640 px or narrower, no box docks and every box fills the window. The dock buttons are not offered. A docked layout is kept and returns on a wider window.</p>';
+$ec_lang['lpn_guide_bx_phone_def']='<p>At 640 px or narrower, a docked box is always an auto-hide tab, and it opens as a panel over the map. Nothing is pinned. A box that is not docked fills the window.</p>';
 // The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
 $ec_lang['lpn_guide_ff_asks_term']='What is asked of each junction';
 $ec_lang['lpn_guide_ff_asks_def']='<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.</p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.</p>';
@@ -1139,57 +1132,45 @@ $ec_lang['lpn_guide_ff_result_def']='<p>The summary counts the junctions that pa
 $ec_lang['lpn_guide_ff_marks_term']='Rings, Stop, and one analysis at a time';
 $ec_lang['lpn_guide_ff_marks_def']='<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.</p>';
 $ec_lang['lpn_guide_ff_dur_def']='<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>';
-$ec_lang['lpn_guide_ff_example_term']='Example on Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>Open the Net1 example, choose Water, Analyze, Fire flow analysis…, and click Run with the box as it opens. The time step is 0:00, and the run solves the whole network 135 times. Eight of the nine junctions pass all checks. Junction N32 fails the fire flow: its static pressure is 111 psi, only 1.19 psi remains at the required 1000 gpm, and its available flow is 892 gpm. Junction N31 can deliver 1339 gpm, and Junction N12 more than 10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
 $ec_lang['lpn_guide_cr_case_term']='What each case does';
 $ec_lang['lpn_guide_cr_case_def']='<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.</p>';
 $ec_lang['lpn_guide_cr_dead_term']='Dead ends, and the list';
 $ec_lang['lpn_guide_cr_dead_def']='<p>A dead-end link is one whose removal cuts off junctions that can be reached only through it. Everything beyond it is its loss, so with Skip dead ends checked the link is not solved, and the summary states how many were skipped. The list shows, for each link, the Demand not served, the Junctions cut off, and the Junctions below minimum, each with the number and the first five IDs, and a click on an ID goes to it on the map. Links that cost the system something are listed first until a column heading is clicked to sort, and the summary counts them against the number of links tested. Choose Selected links to break only the links selected on the map.</p>';
-$ec_lang['lpn_guide_cr_example_term']='Example on Net1';
 $ec_lang['lpn_guide_cr_example_def']='<p>Open the Net1 example, choose Water, Analyze, Criticality analysis…, enter 116 for Lowest pressure allowed, and click Run. The time step is 0:00, and the run solves the whole network 14 times. Four of the 13 links drop a junction below 116 psi when they are out: L9 (N10, N11, and N21), L10 (N11 and N21), L111 (N21 and N22), and L112 (N21 and N22). Two junctions are already below 116 psi with nothing broken and are not counted. Because Net1 is looped, losing one link never leaves a junction without supply.</p>';
 // The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
-$ec_lang['lpn_guide_ds_run_term']='Run';
 $ec_lang['lpn_guide_ds_run_def']='<p>Run multiplies the demands at the chosen junctions by the Demand scale, on a copy of the network at the time step on screen and in the open scenario. It makes two solves, one with the demands as they are and one scaled. The result lists the Lowest pressures and the Highest velocities, each with the Scaled value beside the Unscaled one, which is the value the map shows. Each list holds ten rows, and the box states how many links it does not show. The Demand scale is applied in addition to the demand multiplier of the open scenario, and it is never saved in the project.</p>';
-$ec_lang['lpn_guide_ds_find_term']='Find';
 $ec_lang['lpn_guide_ds_find_def']='<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.</p>';
 $ec_lang['lpn_guide_ds_scope_term']='Junctions, and the time step';
 $ec_lang['lpn_guide_ds_scope_def']='<p>With Selected junctions, only the junctions selected on the map are scaled and checked. Other junctions are left as they are, and those that fall below the limit are listed without limiting the answer. Only the time step on screen is scaled, and levels and statuses are taken from it. To test the peak, move the clock to the peak demand before running.</p>';
-$ec_lang['lpn_guide_ds_example_term']='Example on Net1';
 $ec_lang['lpn_guide_ds_example_def']='<p>Open the Net1 example and choose Water, Analyze, Demand scaling…. At the time step 0:00, click Find with the box as it opens. Every junction keeps at least 20 psi up to a demand scale of 5.76, where the lowest pressure is 20.11 psi at junction N32. At 5.77 it is 19.8 psi, and the search took 13 solves. Enter 3 for Demand scale and click Run: Junction N32 falls from 111 psi, unscaled, to 85.99 psi, and Link L112 rises from 0.535 ft/sec to 3.13 ft/sec.</p>';
 // The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
 $ec_lang['lpn_guide_en_read_term']='Reading the report';
 $ec_lang['lpn_guide_en_read_def']='<p>Choose Water, Reports, Pump energy. The report integrates the power of each pump over the last extended period simulation, so it needs a Total run time greater than 0 and a calculation. For each pump it lists the % of run, the Effic., the Avg. kW, the Peak kW, the kWh, and the Cost. The Avg. kW is the average while the pump was running, not over idle periods. Below the table are the Energy used, the Cost of energy, the Peak power usage, the Cost of peak demand, and the Total cost. A network with no pumps has nothing to report.</p>';
 $ec_lang['lpn_guide_en_set_term']='What sets the numbers';
 $ec_lang['lpn_guide_en_set_def']='<p>Settings, Energy holds the Pump efficiency (percent), used for every pump that has no efficiency curve, the Price of power for one kilowatt hour, a Price pattern that multiplies the price at each pattern step, the Peak demand charge per kW, and a Currency text that is printed beside the costs and does not convert the costs. A pump can have its own price, price pattern, and efficiency curve in Properties. The prices, the pattern, the peak demand charge, the Pump efficiency (percent), and a pump\'s own values are in the Energy cost category, so a scenario can override them. When no price is stated, or the price is zero, every cost is zero and the report says so. The application suggests no price.</p>';
-$ec_lang['lpn_guide_en_example_term']='Example on Net1';
 $ec_lang['lpn_guide_en_example_def']='<p>Open the Net1 example, which has a total run time of 24:00, and calculate. Choose Water, Reports, Pump energy. Pump L9 runs for 65.71% of the run at an efficiency of 75%, and uses 96.22 kW on average, 96.71 kW at the peak, and 1518 kWh. No price is stated, so the cost is 0 and the report says so. Enter 0.12 for Price of power in Settings, Energy, and calculate again: the cost of L9 is 182, the Total cost.</p>';
 // The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
 $ec_lang['lpn_guide_ct_what_term']='What the plot is';
 $ec_lang['lpn_guide_ct_what_def']='<p>Choose Water, Graphs, Contour. The row turns the plot on in the open scenario, as a smooth fill with labeled lines, using the pressure if the nodes are not colored yet, and opens the box. The plot spreads the node colors along the pipes and up to a set multiple of the median pipe length beside them, fading out over the outer part. It does not color across pumps, valves, or closed links. The line under the color key states how many nodes and pipes the plot uses, the reach beside the pipes, and the interval of the lines. With too few nodes, it says so.</p>';
 $ec_lang['lpn_guide_ct_box_term']='The box';
-$ec_lang['lpn_guide_ct_box_def']='<p>Show contours, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class flat), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer in multiples of the median pipe length. In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
-$ec_lang['lpn_guide_ct_example_term']='Example on Net1';
-$ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.</p>';
+$ec_lang['lpn_guide_ct_box_def']='<p>Show plot, when cleared, hides the fill and the lines and keeps the node colors. The box also holds Color nodes by and Color scheme, which are the same two settings as in Settings, Symbology, Node colors, the Fill (None, Smooth, or Bands, which paints each class in one solid color), the Fill opacity, the Contour lines with their Interval and Labels, and the Buffer (× median pipe length). In a project placed on the Earth, the box can also take the ground between nodes from Mapbox DEM, after the visitor agrees to send the tile numbers of the network\'s area. These settings are saved with the project and can be overridden by a scenario. The plot changes only the display, not the network.</p>';
+$ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='What the report holds';
 $ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Run. The report is the text that the EPANET engine wrote for the last extended period simulation, in pages. It starts with the banner and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
-$ec_lang['lpn_guide_rr_example_term']='Example on Net1';
 $ec_lang['lpn_guide_rr_example_def']='<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Run. The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.</p>';
 $ec_lang['lpn_guide_st_what_term']='What is listed';
 $ec_lang['lpn_guide_st_what_def']='<p>Choose Water, Reports, Status changes. Each row gives the time of a change and the change: a pump, valve, or pipe now open or now closed, or a tank now filling, emptying, full, or empty. A time step that did not fully converge is listed too. The list is in time order and holds only changes, not every step. It is read from the same extended period run as the Tables pane and the Full report.</p>';
-$ec_lang['lpn_guide_st_example_term']='Example on Net1';
 $ec_lang['lpn_guide_st_example_def']='<p>Open the Net1 example and choose Water, Reports, Status changes. Tank N2 is now filling at 1:00, emptying at 11:00, filling at 16:00, and emptying at 22:00. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00.</p>';
-$ec_lang['lpn_guide_fr_what_term']='What the table holds';
-$ec_lang['lpn_guide_fr_what_def']='<p>Choose Water, Reports, Full. The table has one row for each node and link at each reporting time step, in the units of the Tables pane. Its columns are Type, ID, Demand, Head, Pressure, Chlorine concentration, Flow, Velocity, Head loss, Pump head, and Status, and a cell is blank where the asset has no such quantity. The Time step list chooses the step shown, and Download CSV and Print report carry every step. Without an extended period simulation, the table shows the current solution at one instant.</p>';
-$ec_lang['lpn_guide_fr_example_term']='Example on Net1';
+$ec_lang['lpn_guide_fr_what_def']='<p>Choose Water, Reports, Full. The table has one row for each node and link at each reporting time step, in the units of the Tables pane. Its columns are Type, ID, Demand, Head, Pressure, Chlorine concentration, Flow, Velocity, Head loss, Pump head, and Status, and a cell is blank where the asset has no such quantity. The Time step list chooses the step shown, and Download CSV, Copy HTML, and Print report carry every step. Without an extended period simulation, the table shows the current solution at one instant.</p>';
 $ec_lang['lpn_guide_fr_example_def']='<p>Open the Net1 example and choose Water, Reports, Full. The 24 assets are listed at 25 reporting steps, 0:00 to 24:00, which is 600 rows. At 0:00, Junction 11 has a demand of 150 gpm, a head of 985.23 ft H2O, and a pressure of 119.26 psi.</p>';
 // The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
 $ec_lang['lpn_guide_cal_what_term']='What the report compares';
 $ec_lang['lpn_guide_cal_what_def']='<p>Choose Water, Reports, Calibration. The Parameter list chooses what the file measures: Demand, Head, Pressure, Chlorine concentration, Flow, or Velocity. One file is held for each parameter, and the Load calibration file… button opens a file chooser. The report has three pages. Statistics gives, for each location, the number of observations, the observed mean, the computed mean, the mean error, and the RMS error, then a Network row for all locations together and the correlation between the means. Correlation plot puts each measurement at its observed value across and its computed value up, with a diagonal line where the two agree. Mean comparisons draws the observed and computed means as a pair of bars for each location.</p><p>The computed value is read from the extended period run, and a measurement between two reporting steps is compared with the value interpolated between them. A measurement outside the times the run reported is skipped and counted. With a single instant solution, every measurement is compared with that one result, whatever time the file gives. The report fills in after the network is calculated.</p>';
 $ec_lang['lpn_guide_cal_file_term']='The calibration file';
 $ec_lang['lpn_guide_cal_file_def']='<p>A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it. The values are read in the project\'s units, and the report says which unit. A location that is not in the network is listed and its measurements are counted as skipped, a line that cannot be read is listed by line number, and the rest of the file is used. A file is held in memory for the open project and this page load only. It is not saved with the project or on this device. When the Time series chart shows the same quantity, the measured values are drawn on it as rings.</p>';
-$ec_lang['lpn_guide_cal_example_term']='Example on Net1';
 $ec_lang['lpn_guide_cal_example_def']='<p>Open the Net1 example, calculate it, and choose Water, Reports, Calibration. With Pressure chosen, load a file that gives Junction 11 as 118.5 psi at 0:00 and 121.0 psi at 12:00, Junction 31 as 110.2 psi at 6:00 and 108.7 psi at 18:00, and Junction 99 as 50 psi at 0:00, followed by a line that is not data. The report says the file has 5 measurements at 3 locations, names Junction 99 as not in the network with 1 measurement skipped, and lists the unreadable line. Statistics shows Junction 11 with 2 observations, an observed mean of 119.75 psi, a computed mean of 116.53 psi, a mean error of 3.98, and an RMS error of 5.12. Junction 31 has 109.45, 118.71, 9.26, and 9.79. The Network row has 4 observations, a mean error of 6.62, and an RMS error of 7.81.</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Using the user manual';
@@ -1234,7 +1215,6 @@ $ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
 // The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
 // message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
-$ec_lang['lpn_status_dismiss']='Hide this message';
 $ec_lang['lpn_msglog_hidden']='Hidden';
 $ec_lang['lpn_msglog_unhide']='Show';
 $ec_lang['lpn_status_hidden_tip']='Show the hidden message on the map again.';
@@ -1270,34 +1250,37 @@ $ec_lang['lpn_map_unmeasurable']='This page could not determine the size of the 
 // EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
-$ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Two reservoirs, a pump, and a small loop. Liters per second, with meters and millimeters.';
-$ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
-$ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump, and a small loop. Gallons per minute, with feet and inches.';
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls, gpm (US)';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1, scenarios and controls, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
-$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
-$ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
-$ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
-$ec_lang['lpn_ex_net1_scn_desc']='Gallons per minute, with feet and inches. EPANET\'s Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.';
+$ec_lang['lpn_ex_net1_desc']='Four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1, scenarios and controls, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_valves_title']='Valve types, gpm (US)';
-$ec_lang['lpn_ex_valves_desc']='Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.';
+$ec_lang['lpn_ex_valves_desc']='A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one regulating in the solved network. Gallons per minute, with feet and inches.';
+// Starter examples (Task 823, Tom 2026-10-23). Not translated yet, like the Valves card: the other 26 files fall back to this English.
+$ec_lang['lpn_ex_extension_si_title']='Johnson City extension, L/s (SI)';
+$ec_lang['lpn_ex_extension_si_desc']='A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 300 mm and 200 mm main is tied into it. A fire hydrant junction delivers 95 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.';
+$ec_lang['lpn_ex_extension_title']='Johnson City extension, gpm (US)';
+$ec_lang['lpn_ex_extension_desc']='A main extension model with test calibration scenarios. The existing system is modeled as a reservoir and a pump based on a hydrant flow test, in Johnson City, Texas. A new loop of 12 inch and 8 inch main is tied into it. A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_well_si_title']='Munday well and tank, L/s (SI)';
+$ec_lang['lpn_ex_well_si_desc']='A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 32 L/s with 14 m of residual pressure. Liters per second, with meters and millimeters.';
+$ec_lang['lpn_ex_well_title']='Munday well and tank, gpm (US)';
+$ec_lang['lpn_ex_well_desc']='A well, pump, check valve, loop, and elevated tank, with a 24-hour extended period simulation and scenarios for Max day and Peak hour, in Munday, Texas. A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
-$ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_si_desc']='An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net2_desc']='Gallons per minute, with feet and inches. An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source.';
+$ec_lang['lpn_ex_net2_desc']='An EPANET example at Branford, Connecticut: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 1 mile by 2 miles. Fluoride, a non-reactive substance, enters at one source. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_net3_si_title']='EPANET Net3, L/s (SI)';
-$ec_lang['lpn_ex_net3_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_si_desc']='An EPANET example at Novato, California, converted from gallons per minute, feet, and inches, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 8 km square. A 24-hour extended-period simulation, with a source trace from the Lake. Liters per second, with meters and millimeters.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net3_desc']='Gallons per minute, with feet and inches. An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake.';
+$ec_lang['lpn_ex_net3_desc']='An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Gallons per minute, with feet and inches. Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
+$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1374,7 +1357,6 @@ $ec_lang['lpn_result_status']='Status';
 $ec_lang['lpn_result_status_open']='Open';
 $ec_lang['lpn_result_status_closed']='Closed';
 $ec_lang['lpn_result_status_cv']='CV';
-$ec_lang['lpn_result_head']='Head';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.';
 // A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
@@ -1500,7 +1482,7 @@ $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — precise';
 $ec_lang['lpn_georef_step1_hint']='The project stays fixed on the screen. Pan and zoom the map underneath it until the map shows approximately the right location at approximately the right scale, then press the Put the model here button.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
-$ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
+$ec_lang['lpn_georef_size_prompt']='Approximate project width east to west?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
@@ -1675,7 +1657,11 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
 $ec_lang['lpn_ovm_child_ask']='Clear child overrides ({n} total)?';
 $ec_lang['lpn_ovm_child_tip']='Child scenarios override this value ({n} total). Click to clear their overrides.';
 $ec_lang['lpn_ovm_dot_clear']='Click to clear it.';
+$ec_lang['lpn_ovm_dot_clear_one']='Click to clear this override.';
+$ec_lang['lpn_ovm_dot_alt']='This override is stored in alternative "{alternative}".';
+$ec_lang['lpn_ovm_dot_alt_shared']='This override is stored in alternative "{alternative}", also used by {list}, so clearing or editing it changes them too.';
 $ec_lang['lpn_ovm_dot_set']='Inherited. Click to make it an override in this scenario, holding the value shown.';
+$ec_lang['lpn_ovm_dot_set_from']='Inherited from {name}. Click to make it an override in this scenario, holding the value shown.';
 $ec_lang['lpn_pane_clear_override']='Clear override';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1742,12 +1728,33 @@ $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_morph_menu']='Morph';
 $ec_lang['lpn_morph_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.';
 $ec_lang['lpn_morph_ok']='Morph';
+// Morph, Vertex (Tom, 2026-10-24: "It would be nice to be able to Morph a Junction into a vertex."). {id} is the
+// junction's ID, {n} a count. A vertex lives on exactly one pipe, so only a junction that joins exactly two
+// pipes and holds nothing of its own can become one.
+$ec_lang['lpn_morph_vertex']='Vertex';
+$ec_lang['lpn_morph_vertex_base']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario.';
+$ec_lang['lpn_morph_vertex_base_ask']='A junction can be morphed into a vertex only in Base, because the bends of a pipe are the same in every scenario. Switch to Base and morph?';
+$ec_lang['lpn_morph_vertex_switch']='Switch to Base and morph';
+$ec_lang['lpn_morph_vertex_type']='{id} was not morphed into a vertex: only a junction can become one.';
+$ec_lang['lpn_morph_vertex_links']='{id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two.';
+$ec_lang['lpn_morph_vertex_kind']='{id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex belongs only to a pipe.';
+$ec_lang['lpn_morph_vertex_loop']='{id} was not morphed into a vertex: its two pipes join the same other junction, and one pipe cannot start and end at the same junction.';
+$ec_lang['lpn_morph_vertex_demand']='{id} was not morphed into a vertex: it has demand or an emitter coefficient, and a vertex has none. Set them to 0 first.';
+$ec_lang['lpn_morph_vertex_customers']='{id} was not morphed into a vertex: Customers are connected to it, and a vertex has none.';
+$ec_lang['lpn_morph_vertex_text']='{id} was not morphed into a vertex: a Text is attached to it.';
+$ec_lang['lpn_morph_vertex_pipes']='{id} was not morphed into a vertex: its two pipes differ in diameter or roughness, and one pipe cannot hold both.';
+$ec_lang['lpn_morph_vertex_own']='{id} was not morphed into a vertex: it has its own elevation, tag, description or other data, and a vertex has none. Clear that data first.';
+$ec_lang['lpn_morph_vertex_clear_both']='Clear elevation {elev} and demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_elev']='Clear elevation {elev} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_demand']='Clear demands {demands} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_quality']='Clear initial quality {quality} on {id}?';
+$ec_lang['lpn_morph_vertex_clear_also']='Initial quality {quality} is cleared too.';
+$ec_lang['lpn_morph_vertex_done']='Morphed {n} into vertices. At each, the two pipes are now one pipe, which keeps the ID and the values of the first of them.';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
 $ec_lang['lpn_morph_other_kind']='A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-$ec_lang['lpn_field_type']='Type';
 $ec_lang['lpn_field_type_tip']='The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario\'s type.';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -1922,7 +1929,7 @@ $ec_lang['lpn_find_no_value']='Enter what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_desc']='Description of this demand category';
+$ec_lang['lpn_find_prop_demand_desc']='Demand category description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -1979,6 +1986,7 @@ $ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two search
 // says what the section does to the list above it rather than naming a second tool. "Assets" is the
 // word this page already uses for its nodes and pipes.
 $ec_lang['lpn_replace_title']='Change what was found';
+$ec_lang['lpn_replace_selected_only']='Only the selected assets';
 $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
 $ec_lang['lpn_replace_source']='New value source';
@@ -2073,7 +2081,6 @@ $ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
 // labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='Source share from {node}';
-$ec_lang['lpn_result_pump_head']='Head';
 $ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
 // The Full report puts every node and link in one table, where a node's Head column already sits, so a
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
@@ -2103,13 +2110,13 @@ $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
 // own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
-// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// distance in metres; all substituted. The Buffer label carries its own unit; lpn_contour_buffer_unit is the Tables settings row's unit text.
 // lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
 // plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
-$ec_lang['lpn_contour_show']='Show contours';
+$ec_lang['lpn_contour_show']='Show plot';
 $ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
@@ -2118,7 +2125,7 @@ $ec_lang['lpn_contour_fill_bands']='Bands';
 $ec_lang['lpn_contour_opacity']='Fill opacity';
 $ec_lang['lpn_contour_lines']='Contour lines';
 $ec_lang['lpn_contour_interval']='Interval';
-$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer']='Buffer (× median pipe length)';
 $ec_lang['lpn_contour_buffer_unit']='× median pipe length';
 $ec_lang['lpn_contour_buffer_tip']='Reach of the color from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
 $ec_lang['lpn_contour_few']='Too few nodes to contour.';
@@ -2163,7 +2170,6 @@ $ec_lang['lpn_file_new']='New project…';
 //
 // **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
 // somebody who just wants a blank sheet.
-$ec_lang['lpn_new_title']='New project';
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
 // **TWO ANSWERS, NOT THREE**: an EPSG coordinate system (lat/lon, WGS 84 EPSG:4326, is one of
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
@@ -2361,6 +2367,11 @@ $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in
 // {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
 // C-WATR-MODL-NODE-BASE.
 $ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.';
+$ec_lang['lpn_dxf_note_headloss']='Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula.';
+$ec_lang['lpn_dxf_note_demand_multiplier']='Demand multiplier: {n}.';
+// {layer} is the layer name C-WATR-MODL-EPAN. This is the header at the top of the text on that layer.
+$ec_lang['lpn_dxf_sections_header']='EPANET sections of this network: patterns, controls, rules, times, options, and other settings the blocks cannot hold. EPANET++ reads this text back when the DXF is imported. You may move this text or freeze its layer; keep it on layer {layer}.';
+$ec_lang['lpn_dxf_curve_points']='Pump head curve points (flow, head)';
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.';
 // {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
@@ -2422,7 +2433,7 @@ $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
 $ec_lang['lpn_inp_backdrop_attach']='Attach {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+$ec_lang['lpn_inp_backdrop_attach_tip']='A web page cannot automatically open an associated file. Choose the backdrop file to have it placed as specified.';
 $ec_lang['lpn_inp_backdrop_attached']='Attached {file}, placed where the file says it belongs.';
 $ec_lang['lpn_inp_backdrop_attached_other']='Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.';
 $ec_lang['lpn_inp_report_lead']='This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
@@ -2474,7 +2485,7 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
 // {file} is a file name.
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
-$ec_lang['lpn_inpup_lead']='Choose where to import this file. Note that EPANET files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_lead']='Choose where to import this EPANET file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_inpup_base_note']='Choosing Base doesn\'t clear any scenario overrides.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
@@ -2492,9 +2503,9 @@ $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
 $ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
-$ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_gjup_lead']='Choose where to import this GeoJSON file.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
 $ec_lang['lpn_gjup_title']='Update from GeoJSON file';
-$ec_lang['lpn_gjup_h_notes']='Reading the file';
+$ec_lang['lpn_gjup_h_notes']='Import notes';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
 $ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
 $ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
@@ -2714,7 +2725,6 @@ $ec_lang['lpn_file_training_permission']='The first time you save, the browser a
 // false -- the name is never written into the project file. It is held in this browser and on this
 // site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
 // saying, so the warning stays and only the claim changes.
-$ec_lang['lpn_file_training_continue']='Continue';
 // Recovery when the linked file has moved, been renamed, or been deleted. The button does the
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choose the file again';
@@ -2787,7 +2797,7 @@ $ec_lang['lpn_notes_2_term']='What it does not do';
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
 // MSX added on Tom's word, 2026-10-18 (Task 717): "I agree."
-$ec_lang['lpn_notes_2_def']='Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.';
+$ec_lang['lpn_notes_2_def']='Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Water age, source trace, one reacting chemical, and multi-species water quality from an attached EPANET-MSX file are modeled.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as the work proceeds. Clearing the browser\'s data deletes them all, so the work belongs in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file, and closing that tab asks first. Nothing is ever written to a file unless Save or Save as is chosen. In some browsers a project connects to the file it is saved to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. This site keeps track of who has a project file open, so that two people do not write over each other. Opening a file that a colleague already has open offers Ask, Open read-only, and Break lock. If the server cannot be reached, a warning states that another user can edit the same file at the same time.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2827,7 +2837,6 @@ $ec_lang['lpn_notes_engine_def']='The EPANET solver on this page is OWA-EPANET 2
 $ec_lang['lpn_guide_nt_example_term']='Example on Net1: a pump past its curve';
 $ec_lang['lpn_guide_nt_example_def']='Open the Net1 example and choose Water, Libraries. Curve 1, Pump Curve for Pump 9, has one point, 1500 gpm at 250 ft. The head at zero flow is 333.3 ft and the highest flow is 3000 gpm. At 3500 gpm, which is past the end of the curve, the curve gives a head of −120.4 ft. The EPANET solver reports that same head, a loss of 120.4 ft across the pump, and warns that pumps cannot deliver enough flow or head.';
 // The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
-$ec_lang['lpn_guide_own_example_term']='Example on Net1';
 $ec_lang['lpn_guide_own_example_def']='<p>Open the Net1 example, press Ctrl+K, and type critical. Menus shows the row Criticality analysis… under Water, Analyze. Boxes shows the entries that mention it, among them Find and replace, Fire flow analysis, and Criticality analysis, and this entry. Choosing the row shows where Criticality analysis… is in the Analyze menu, and does not run it.</p>';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
@@ -2901,8 +2910,6 @@ $ec_lang['lpn_link_end_same']='From and To must be different nodes.';
 // Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
 // because No is not a cancel: it places the node where it was pressed, joined to nothing.
 $ec_lang['lpn_split_pipe_ask']='Split pipe {id} at this node?';
-$ec_lang['lpn_split_yes']='Yes';
-$ec_lang['lpn_split_no']='No';
 // Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
 // or a pipe is named by its type word and ID alone.
 $ec_lang['lpn_snap_vertex']='{link}, vertex {n}';
@@ -3017,8 +3024,6 @@ $ec_lang['lpn_curve_none']='No curve chosen';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curves';
-$ec_lang['lpn_curve_library_link_tip']='Open the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -3078,7 +3083,6 @@ $ec_lang['lpn_mode_add_shape']='Mode: Add Shape. Specify each point. Specify the
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
 // What are the translators supposed to do? EPANET says Closed. So we purge Shut."). "Shut" had been
@@ -3144,9 +3148,9 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
-// crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
+// crowded row. 'lpn_labels_priority' is the tips' heading, "Drop order" (Tom, 2026-10-24: priority 1 reads as top priority here, and 1 is lowest) --
 // the column itself is headed by the word below.
-$ec_lang['lpn_labels_priority']='Priority';
+$ec_lang['lpn_labels_priority']='Drop order';
 // Edited by TGH 2026-09-07
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
@@ -3162,7 +3166,6 @@ $ec_lang['lpn_labels_col_decimals']='Decimals';
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
 // display first, but also may need to drop first."). As short as "Drop" and for the same reason:
 // it heads a box about three characters wide, and its tip carries the whole meaning.
-$ec_lang['lpn_labels_col_show']='Show';
 $ec_lang['lpn_labels_show_tip']='The order in which values appear on a label. The value numbered 1 comes first: at the top of a stacked label, and at the start of a label on one line.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
@@ -3312,7 +3315,7 @@ $ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or cus
 $ec_lang['lpn_settings_override_marks']='Show override markers on the map';
 $ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_clean_map']='Clean map';
-$ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Mode line, the messages and the Messages button, the feedback button, and the override rings are hidden. Cleared: they are shown. Only a message that says a run gave no answer stays on the map. Hidden messages are still kept, and Messages shows them again when this is cleared. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_theme']='Theme';
 $ec_lang['lpn_settings_theme_tip']='Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_theme_system']='System';
@@ -3474,14 +3477,13 @@ $ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be dele
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Base scenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} is excluded from the network in {scenario}. It remains in the drawing and in the other scenarios.';
 $ec_lang['lpn_scenario_delete_in_base']='To remove it from the drawing, delete it in the {base} scenario.';
 $ec_lang['lpn_scenario_only_deleted']='{id} is deleted. It was part of {scenario} only.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} is not deleted, because link {link} ends on it, and that link also exists outside {scenario}. To delete both, delete them in the {base} scenario.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: the Scenario manager and the Scenarios table are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.';
+$ec_lang['lpn_scenario_basic_tip']='Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager shows a list of scenarios, and the Scenarios table is not shown. Cleared: the Scenario manager shows its tree and the Scenarios table is shown, and alternatives can be shared among scenarios. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.';
 $ec_lang['lpn_scenario_basic_misfit']='This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.';
 $ec_lang['lpn_scenario_basic_misfit_base']='The Base scenario uses an alternative other than Base.';
 $ec_lang['lpn_scenario_copy']='Copy scenario';
@@ -3489,7 +3491,6 @@ $ec_lang['lpn_scenario_copy_tip']='Copies the open scenario and its overrides, a
 $ec_lang['lpn_scenario_copy_off']='Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.';
 $ec_lang['lpn_sm_title']='Scenario manager';
 $ec_lang['lpn_sm_menu']='Scenario manager…';
-$ec_lang['lpn_sm_basic_on']='Scenario manager is disabled when Basic mode is on.';
 $ec_lang['lpn_pane_tab_scenarios']='Scenarios';
 $ec_lang['lpn_sm_col_parent']='Parent';
 $ec_lang['lpn_sm_add_child']='Add child';
@@ -3505,7 +3506,6 @@ $ec_lang['lpn_sm_make_current']='Make current';
 $ec_lang['lpn_sm_current_already']='This scenario is already the current scenario.';
 $ec_lang['lpn_sm_none_selected']='Select an item in the tree first.';
 $ec_lang['lpn_sm_base_named']='The Base of a tree is not renamed.';
-$ec_lang['lpn_sm_copy']='Copy';
 $ec_lang['lpn_sm_merge_up']='Merge upward';
 $ec_lang['lpn_sm_merge_up_tip']='Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.';
 $ec_lang['lpn_sm_merge_up_root']='A Base alternative has nothing above it to merge into.';
@@ -3611,7 +3611,11 @@ $ec_lang['lpn_settings_row_new_asset']='New assets: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (default)';
 $ec_lang['lpn_settings_row_view_value']='Center {x}, {y}; scale {s}';
 $ec_lang['lpn_settings_held_in']='Override in {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
+$ec_lang['lpn_settings_held_item']='{setting}: {restores}';
+$ec_lang['lpn_ovm_restores']='Clear restores {value}, {source}.';
+$ec_lang['lpn_settings_held_from']='the value in {parent}';
+$ec_lang['lpn_settings_held_default']='the default';
+$ec_lang['lpn_settings_held_none']='no text';
 $ec_lang['lpn_settings_view_center']='Map center';
 $ec_lang['lpn_settings_view_scale']='Map scale';
 $ec_lang['lpn_settings_view_scale_tip']='The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.';
@@ -3632,10 +3636,8 @@ $ec_lang['lpn_alt_cat_initial']='Initial settings';
 $ec_lang['lpn_alt_cat_constituent']='Constituent';
 $ec_lang['lpn_alt_cat_fireflow']='Fire flow';
 $ec_lang['lpn_alt_cat_energy']='Energy cost';
-$ec_lang['lpn_alt_cat_userdata']='Custom properties';
 $ec_lang['lpn_alt_cat_text']='Text';
 $ec_lang['lpn_alt_cat_presentation']='Presentation';
-$ec_lang['lpn_alt_cat_calculation']='Calculation';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3674,9 +3676,11 @@ $ec_lang['lpn_elev_dem_use']='Use DEM';
 $ec_lang['lpn_elev_dem_use_tip']='Put the elevation of the DEM at this node into the Elevation box above, replacing what is there. The DEM is read first if it has not been read yet. One Undo puts it back.';
 $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM elevation: {v} {u}.';
+$ec_lang['lpn_dem_scenario']='Elevations written here are overrides in the scenario {scenario}.';
+$ec_lang['lpn_dem_base']='Elevations written here go into Base, so every scenario that has not overridden an elevation inherits them.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
 $ec_lang['lpn_settings_elev_source_tip']='Mapbox DEM accuracy in 2026, horizontal then vertical: 1–10 m and under 1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and over 16 m at the poles.';
-$ec_lang['lpn_settings_elev_source_typed']='Above';
+$ec_lang['lpn_settings_elev_source_typed']='Typed value';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -3992,7 +3996,6 @@ $ec_lang['lpn_settings_runbox']='Show the run progress box';
 $ec_lang['lpn_settings_runbox_tip']='A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
 $ec_lang['lpn_time_run_report']='Run report';
-$ec_lang['lpn_time_run_report_copy']='Copy';
 $ec_lang['lpn_time_run_report_copied']='Copied';
 $ec_lang['lpn_time_run_report_tip']='The report EPANET wrote for the last run, verbatim: whether it converged, and any warnings. The text is produced by the EPANET solver, not by this page.';
 
@@ -4172,7 +4175,6 @@ $ec_lang['lpn_reaction_order_wall']='Wall reaction order';
 // R-324: "Our Wall reaction order tip is wrong. We need to say '1 means that the wall reaction is
 // dependent on the concentration in the bulk flow. 0 means it is not.'" His exact words.
 $ec_lang['lpn_reaction_order_wall_tip']='1 means that the wall reaction is dependent on the concentration in the bulk flow. 0 means it is not.';
-$ec_lang['lpn_reaction_order_unstated']='Not stated';
 $ec_lang['lpn_reaction_order_zero']='0, zero order';
 $ec_lang['lpn_reaction_order_first']='1, first order';
 // **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
@@ -4234,8 +4236,6 @@ $ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of overrides, low
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
-$ec_lang['lpn_scncmp_at']='{value} at {id}';
-$ec_lang['lpn_scncmp_at_time']='{value} at {id}, {time}';
 $ec_lang['lpn_scncmp_same']='The same in every scenario';
 $ec_lang['lpn_scncmp_period_note']='Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.';
 $ec_lang['lpn_scncmp_current']='(currently open)';
@@ -4249,7 +4249,6 @@ $ec_lang['lpn_scnres_title']='Results by asset';
 $ec_lang['lpn_scnres_col']='{quantity} ({unit}), {scenario}';
 $ec_lang['lpn_scnres_none']='Check at least one result to show.';
 $ec_lang['lpn_scnres_empty']='This project has none of these assets.';
-$ec_lang['lpn_scnres_copy_tip']='Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
 $ec_lang['lpn_scnres_time_note']='A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.';
 $ec_lang['lpn_scnres_at_time']='({time})';
 $ec_lang['lpn_scnres_steady']='(steady state)';
@@ -4266,7 +4265,6 @@ $ec_lang['lpn_energy_col_avg_kw']='Avg. kW';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_energy_col_avg_kw_tip']='The average power used when this pump was running. It is not averaged over idle periods so that a pump that was idle for much of the extended period simulation still reports the power it used while it ran.';
 $ec_lang['lpn_energy_col_peak_kw']='Peak kW';
-$ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='Cost';
 $ec_lang['lpn_energy_total_kwh']='Energy used';
 $ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
@@ -4298,14 +4296,17 @@ $ec_lang['lpn_status_note']='Read from the same extended period run as the Table
 $ec_lang['lpn_reports_full']='Full';
 $ec_lang['lpn_reports_full_tip']='Table of all nodes and links at every reporting time step of the last run';
 $ec_lang['lpn_full_title']='Full report';
-$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
-$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.';
+$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full.';
+$ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A cell is blank where the node or link has no such quantity. Download, copy, or print carries every time step; the table below shows one at a time.';
 $ec_lang['lpn_full_step_label']='Time step';
 $ec_lang['lpn_full_download_csv']='Download CSV';
 $ec_lang['lpn_full_print']='Print report';
-$ec_lang['lpn_full_col_time']='Time';
+$ec_lang['lpn_report_copy_html']='Copy HTML';
+$ec_lang['lpn_full_col_time']='Time (hr)';
 $ec_lang['lpn_full_col_type']='Type';
-$ec_lang['lpn_full_col_id']='ID';
+$ec_lang['lpn_heading_unit']='{label} ({unit})';
+$ec_lang['lpn_result_concentration_short']='Conc.';
+$ec_lang['lpn_quality_named_concentration_short']='{chemical} conc.';
 $ec_lang['lpn_full_row_count']='Rows ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
@@ -4439,7 +4440,6 @@ $ec_lang['lpn_library_curve_equation_tip']='The curve fitted through the given p
 $ec_lang['lpn_library_curve_values_tip']='Select one or two columns in a spreadsheet, copy them, and paste into the first target cell. Rows are added as needed. Lines copied directly from an EPANET file, including the curve name, can also be pasted.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
-$ec_lang['lpn_library_curve_note_label']='Description';
 $ec_lang['lpn_library_curve_remove_point']='Remove this point';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -4640,9 +4640,11 @@ $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Description';
 $ec_lang['lpn_demand_add']='Add demand category';
 $ec_lang['lpn_demand_remove']='Remove this demand';
+// sheet-light: Properties shows a junction's demand as Base demand plus a count of categories; the box behind the "..." button is titled with this.
+$ec_lang['lpn_demand_cats']='Demand categories';
+$ec_lang['lpn_demand_total_tip']='The total of the base demands of all demand categories at this junction. To change a category, open the Demand categories box.';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='Head pattern';
@@ -4833,12 +4835,13 @@ $ec_lang['lpn_dur_recovery_cut']='The run stopped before its end, so recovery af
 $ec_lang['lpn_dur_col_pressure']='Pressure at the fire junction';
 $ec_lang['lpn_dur_col_nofire']='Pressure without the fire';
 $ec_lang['lpn_dur_col_low']='Lowest level reached';
+$ec_lang['lpn_col_level']='Level';
 $ec_lang['lpn_dur_col_margin']='Above lowest water depth';
 $ec_lang['lpn_dur_col_drop']='Drop from start';
 $ec_lang['lpn_dur_col_end']='Level at end';
 $ec_lang['lpn_dur_col_end_nofire']='Level at end without the fire';
-$ec_lang['lpn_at_time']='{value} at {time}';
 $ec_lang['lpn_crit_col_hours']='Hours below minimum';
+$ec_lang['lpn_crit_col_stopped']='Run stopped at';
 $ec_lang['lpn_crit_col_empty']='Tank empties';
 $ec_lang['lpn_ds_run_note']='Judged over the whole run, at every reporting step.';
 $ec_lang['lpn_ds_limit_at']='Limiting reporting step: {time}.';
@@ -4852,7 +4855,6 @@ $ec_lang['lpn_ff_no_steps']='A tank empties at {time}, before the first reportin
 $ec_lang['lpn_ff_tank_empties']='A tank empties at {time}; steps from then on were not tested.';
 $ec_lang['lpn_crit_col_lowest_tip']='Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
 $ec_lang['lpn_crit_empty_note']='Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.';
-$ec_lang['lpn_crit_stopped_at']='run stopped at {time}';
 $ec_lang['lpn_ff_at_step']='Tested at reporting step {time}.';
 $ec_lang['lpn_ff_at_minp']='Tested at {time}, the reporting step with the lowest pressure among the junctions tested.';
 $ec_lang['lpn_ff_at_all']='Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.';
@@ -4888,6 +4890,7 @@ $ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';
 $ec_lang['lpn_ff_col_atrequired']='Pressure at required flow';
 $ec_lang['lpn_ff_col_affected']='Worst effect';
+$ec_lang['lpn_ff_col_more']='How many others';
 $ec_lang['lpn_ff_col_limit']='Design limit';
 // **THE CELL THAT SAYS THE QUESTION WAS NEVER ASKED.** A junction that cannot deliver the required
 // flow is never checked for what it would pull down, because the design question is not asked at a
@@ -4914,8 +4917,6 @@ $ec_lang['lpn_ff_col_solves']='Runs';
 // shows a dash, never one of these words.
 $ec_lang['lpn_ff_limit_both']='Pressure and velocity';
 $ec_lang['lpn_ff_atleast']='more than {flow}';
-$ec_lang['lpn_ff_affect_node']='{id} drops to {pressure}';
-$ec_lang['lpn_ff_affect_link']='{id} reaches {velocity}';
 $ec_lang['lpn_ff_more']='and {n} more affected';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
@@ -4996,16 +4997,11 @@ $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts of
 $ec_lang['lpn_ds_menu']='Demand scaling…';
 $ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
 $ec_lang['lpn_ds_title']='Demand scaling';
-$ec_lang['lpn_ds_intro']='Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.';
+$ec_lang['lpn_ds_intro']='Click the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nClick the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.';
 $ec_lang['lpn_ds_scope']='Junctions to scale';
-$ec_lang['lpn_ds_scope_all']='All junctions';
-$ec_lang['lpn_ds_scope_selected']='Selected junctions';
-$ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
-$ec_lang['lpn_ds_minpressure_tip']='This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.';
 $ec_lang['lpn_ds_head_scale']='Scale the demands';
 $ec_lang['lpn_ds_multiplier']='Demand scale';
 $ec_lang['lpn_ds_multiplier_tip']='The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.';
-$ec_lang['lpn_ds_run']='Run';
 $ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
 $ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
 $ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
@@ -5027,7 +5023,6 @@ $ec_lang['lpn_ds_col_scaled_tip']='With the demands multiplied by the demand sca
 $ec_lang['lpn_ds_col_unscaled']='Unscaled';
 $ec_lang['lpn_ds_col_unscaled_tip']='With the demands as they are in the active scenario at this time step, the same value the map shows.';
 $ec_lang['lpn_ds_no_junctions']='This project has no junctions yet, so there are no demands to scale.';
-$ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions or choose All junctions.';
 $ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Enter a demand scale of zero or more, such as 1.5.';
 $ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
@@ -5057,6 +5052,8 @@ $ec_lang['lpn_file_import_shapes']='GeoJSON file…';
 $ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.';
 $ec_lang['lpn_file_import_gjnet']='GeoJSON file…';
 $ec_lang['lpn_file_import_gjnet_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
+$ec_lang['lpn_file_import_dxfnet']='DXF file…';
+$ec_lang['lpn_file_import_dxfnet_tip']='Create a new project from a DXF file that this page exported. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} contains no points or lines.';
 $ec_lang['lpn_gjnet_target_node_type']='Node type';
@@ -5123,8 +5120,47 @@ $ec_lang['lpn_gjnet_note_pipe_type']='These pipes state the pipe type shown in p
 $ec_lang['lpn_gjnet_note_pattern_conflict']='These patterns are stated with different multipliers on different features. The first was used.';
 $ec_lang['lpn_gjnet_note_end_off_node']='The line of each of these links does not start or end at its node. The node position was used.';
 $ec_lang['lpn_gjnet_note_not_held']='A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.';
+$ec_lang['lpn_dxfnet_note_layer_foreign']='These layers do not begin with {prefix}, so nothing on them was read.';
+$ec_lang['lpn_dxfnet_note_layer_unknown']='These layers begin with {prefix} but do not continue with an asset code this page writes (NODE, LINK, RESV, TANK, PUMP, VALV, CUST) and an alternative, so nothing on them was read.';
+$ec_lang['lpn_dxfnet_note_alternative']='These layers belong to an alternative other than {alt}, the one that was read, so nothing on them was read.';
+$ec_lang['lpn_dxfnet_note_alt_read']='The drawing has no BASE alternative. The alternative {alt} was read.';
+$ec_lang['lpn_dxfnet_note_curve_differs']='These pumps state a curve ID that another pump uses with different points. The first curve was kept.';
+$ec_lang['lpn_dxfnet_note_shapes']='These layers hold Shapes, which this import does not read. Use Import, Shapes, DXF file for them.';
+$ec_lang['lpn_dxfnet_note_entity_unread']='These entities are not a kind this import reads on their layer, and were not imported.';
+$ec_lang['lpn_dxfnet_note_paper_space']='Entities in paper space were not read: {n}.';
+$ec_lang['lpn_dxfnet_note_tag_unknown']='These attribute tags are not ones this page writes for their block, and their values were not imported.';
+$ec_lang['lpn_dxfnet_note_block_unknown']='These blocks are not the block this page writes for their layer, and were not imported.';
+$ec_lang['lpn_dxfnet_note_bad_id']='These elements have an ID that is blank, longer than 31 characters, or contains a space, a semicolon or a quotation mark, and were not imported.';
+$ec_lang['lpn_dxfnet_note_dup_id']='These IDs are stated by more than one element of the same kind. Only the first was imported.';
+$ec_lang['lpn_dxfnet_note_no_position']='These blocks have no usable position and were not imported.';
+$ec_lang['lpn_dxfnet_note_link_no_block']='These polylines have no block at their middle to state the link\'s ID and properties, and were not imported.';
+$ec_lang['lpn_dxfnet_note_block_no_line']='These link blocks have no polyline through their middle, and were not imported.';
+$ec_lang['lpn_dxfnet_note_line_no_block']='These service lines end where there is no customer block, and were not imported.';
+$ec_lang['lpn_dxfnet_note_end_ambiguous']='These links have an end where two nodes lie on the same point, so which node the link ends at cannot be determined, and they were not imported.';
+$ec_lang['lpn_dxfnet_note_end_no_node']='These links have an end where there is no node, and were not imported.';
+$ec_lang['lpn_dxfnet_note_end_loop']='These links start and end at the same node, and were not imported.';
+$ec_lang['lpn_dxfnet_note_pump_no_curve']='These pumps state no head curve, so Calculate will not give the original results until each is given a curve.';
+$ec_lang['lpn_dxfnet_note_crs_unknown']='The read-me states a coordinate system this page does not know, so the drawing was opened as a grid, with no place on a map.';
+$ec_lang['lpn_dxfnet_note_method']='The head loss formula is not in the file, so Hazen-Williams was assumed. Roughness values were read as Hazen-Williams C.';
+$ec_lang['lpn_dxfnet_note_geo_export']='This drawing was exported from a latitude and longitude project. It opens in {crs}, in meters, at the same place on the map.';
+$ec_lang['lpn_dxfnet_note_sections_read']='The EPANET sections embedded in the drawing were read: {sections}.';
+$ec_lang['lpn_dxfnet_note_sections_unread']='The EPANET sections embedded in the drawing could not be read as an EPANET file, so none was imported.';
+$ec_lang['lpn_dxfnet_count_nodes']='{n} junctions, reservoirs and tanks.';
+$ec_lang['lpn_dxfnet_count_links']='{n} pipes, pumps and valves.';
+$ec_lang['lpn_dxfnet_count_customers']='{n} customers.';
+$ec_lang['lpn_dxfnet_held_custom']='custom properties';
+$ec_lang['lpn_dxfnet_held_text']='map Text items and hand-placed label positions';
+$ec_lang['lpn_dxfnet_note_unit_unknown']='The drawing states these units, which this page does not know. The units in use were kept for them.';
+$ec_lang['lpn_dxfnet_note_coord_unit']='The drawing states its coordinates in {coord} and its lengths in {length}. The coordinates were read as {length}.';
+$ec_lang['lpn_dxfnet_note_customer_loose']='The service lines of these customers do not start on a pipe or at a node. The customers were placed with no connection.';
+$ec_lang['lpn_dxfnet_note_not_held']='A DXF file does not hold these, so none was imported:';
+$ec_lang['lpn_dxfnet_none']='Nothing was imported from {file}. It has no blocks on layers beginning {prefix} that this page can read.';
+$ec_lang['lpn_dxfnet_report_lead']='What was not read, and each change made during import, is listed below with the layer, block or ID concerned:';
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
 $ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
+$ec_lang['lpn_shapes_every_scenario']='Shapes appear in every scenario.';
+$ec_lang['lpn_shapes_this_scenario']='Shapes appear in {scenario} only.';
+$ec_lang['lpn_library_import_every_scenario']='Every scenario can use them.';
 $ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.';
 $ec_lang['lpn_geojson_import_renamed_one']='One feature name cannot be used as a Shape ID. The Shape was given another ID and keeps its feature name: {list}.';
 $ec_lang['lpn_geojson_import_skipped']='{n} features not imported: {list}.';
@@ -5188,8 +5224,6 @@ $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
 // page's own axisNames() answers this for a project that is open; these two are the fallback for a
 // reading done before there is one, and they are the surveyor's own words rather than the map's.
-$ec_lang['lpn_survey_axis_north']='Northing';
-$ec_lang['lpn_survey_axis_east']='Easting';
 // A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
 $ec_lang['lpn_survey_err_empty']='That file has nothing in it.';
 $ec_lang['lpn_survey_err_unreadable']='That file could not be read as a surveyed point list.';
@@ -5285,6 +5319,26 @@ $ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the
 $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
 $ec_lang['lpn_screenshot_no_basemap']='The street map or satellite image could not be included.';
+$ec_lang['lpn_gis_title']='Background layers from a GIS server';
+$ec_lang['lpn_gis_unlocatable']='Background layers need a project that is placed on the earth.';
+$ec_lang['lpn_gis_kind']='Kind of server';
+$ec_lang['lpn_gis_kind_xyz']='Tile URL';
+$ec_lang['lpn_gis_kind_wms']='WMS';
+$ec_lang['lpn_gis_kind_arcgis']='ArcGIS REST (MapServer)';
+$ec_lang['lpn_gis_url']='Server address';
+$ec_lang['lpn_gis_wms_layers']='WMS layer names (comma separated)';
+$ec_lang['lpn_gis_add']='Add layer';
+$ec_lang['lpn_gis_menu']='Add layer…';
+$ec_lang['lpn_gis_draw']='Show';
+$ec_lang['lpn_gis_opacity']='Opacity';
+$ec_lang['lpn_gis_note']='Adding a layer sends the area on screen, and your IP address, to the server you name. Opening a project that holds a layer sends them again.';
+$ec_lang['lpn_gis_err_address']='The server address must start with https://.';
+$ec_lang['lpn_gis_err_template']='A tile URL must contain {z}, {x} and {y}.';
+$ec_lang['lpn_gis_err_layers']='Enter at least one WMS layer name.';
+$ec_lang['lpn_gis_err_mapserver']='An ArcGIS address must end with /MapServer.';
+$ec_lang['lpn_gis_unreachable']='not reachable';
+$ec_lang['lpn_gis_failed']='{host} did not return a map image. Its layer is not drawn.';
+$ec_lang['lpn_screenshot_no_gis']='A background layer from a GIS server could not be included.';
 $ec_lang['lpn_screenshot_failed']='The screenshot could not be made.';
 $ec_lang['lpn_snip_hint_free']='Drag around the area to snip, or click for the whole map. Esc cancels.';
 $ec_lang['lpn_snip_tip_rect']='Snip a rectangle (S)';
@@ -5307,7 +5361,35 @@ $ec_lang['lpn_run_of_scenario']='Results of the scenario {scenario}.';
 $ec_lang['lpn_calib_scenario']='Compared with the results of the scenario {scenario}.';
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
 $ec_lang['lpn_export_confirm_title']='Export {format}';
-$ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';
+// {format} is the file kind with its article ("an EPANET file", "a GeoJSON file", "a DXF file").
+$ec_lang['lpn_noscn_lead']='This project has {n} scenarios, but {format} has no scenarios or alternatives.';
+$ec_lang['lpn_noscn_fmt_inp']='an EPANET file';
+$ec_lang['lpn_noscn_fmt_geojson']='a GeoJSON file';
+$ec_lang['lpn_noscn_fmt_dxf']='a DXF file';
+$ec_lang['lpn_export_goes_scenario']='Exporting the scenario "{scenario}" to a unique file name.';
+$ec_lang['lpn_export_goes_base']='Exporting the Base scenario.';
 $ec_lang['lpn_export_receipt_heading']='Exported {file} from {scenario} of {project}.';
 $ec_lang['lpn_export_receipt_note']='This is an export, not a save: this project is not connected to the file.';
 $ec_lang['lpn_dxf_exported_geo_tail']='Its coordinates are {crs}, in meters, not latitude and longitude.';
+$ec_lang['lpn_prop_label_unit']='{label} ({unit})';
+$ec_lang['lpn_prop_label_symbol_unit']='{label}, {symbol} ({unit})';
+$ec_lang['lpn_field_auto_length']='Auto length';
+$ec_lang['lpn_edit_pipetypes']='Edit types…';
+$ec_lang['lpn_edit_fittings']='Edit fittings…';
+$ec_lang['lpn_edit_curves']='Edit curves…';
+$ec_lang['lpn_field_tank_level_short']='Initial depth';
+$ec_lang['lpn_field_tank_minlevel_short']='Minimum depth';
+$ec_lang['lpn_field_tank_maxlevel_short']='Maximum depth';
+$ec_lang['lpn_field_active_short']='Active';
+$ec_lang['lpn_field_cv_short']='Check valve';
+$ec_lang['lpn_field_km_short_tip']='Minor (local) loss coefficient, k: the head lost to fittings and bends along the pipe, as a multiple of the velocity head.';
+$ec_lang['lpn_field_km_fittings_tip']='Minor (local) loss coefficient, k: the sum of the coefficients of the fittings list chosen above. Choose "No fittings list chosen" to type a value.';
+$ec_lang['lpn_field_valve_km_short_tip']='Minor (local) loss coefficient, k: the loss through the valve body when the valve is fully open, as a multiple of the velocity head, in addition to any loss from the valve setting. Use 0 to ignore it.';
+$ec_lang['lpn_reaction_bulk_pipe_tip']='Bulk reaction coefficient: the rate of reaction in the body of the water in this pipe (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.';
+$ec_lang['lpn_reaction_wall_pipe_tip']='Wall reaction coefficient: the rate of reaction at the wall of this pipe (see EPANET Help). A negative number decays the chemical. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.';
+$ec_lang['lpn_reaction_tank_short_tip']='Reaction coefficient: the rate of reaction in the water held in this tank, in 1/day. A negative number decays the chemical and a positive one increases it. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.';
+$ec_lang['lpn_field_tank_level_short_tip']='Initial depth: the depth of water in the tank at the start of the run, measured up from the tank bottom.';
+$ec_lang['lpn_field_tank_minlevel_short_tip']='Minimum depth: the lowest allowable depth of water in the tank, measured up from the tank bottom.';
+$ec_lang['lpn_field_tank_maxlevel_short_tip']='Maximum depth: the highest allowable depth of water in the tank, measured up from the tank bottom.';
+$ec_lang['lpn_field_auto_length_tip']='Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.';
+$ec_lang['lpn_prop_label_symbol']='{label}, {symbol}';

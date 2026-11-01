@@ -233,7 +233,7 @@ async function main() {
 			ok('7. after a reload Platinum stands, on <html> before the page is used', st.theme === 'platinum' && st.stored === 'platinum', JSON.stringify(st));
 			await a.goto('Looped-Network.php?theme=system');
 			st = await state(a);
-			ok('7. ?theme=system clears the choice: nothing stored, System (light here)', st.stored === null && st.theme === 'light', JSON.stringify(st));
+			ok('7. ?theme=system keeps System: "system" stored (Task 824), light here', st.stored === 'system' && st.theme === 'light', JSON.stringify(st));
 			await a.page.evaluate(() => localStorage.setItem('lpn_theme', 'sepia-retired'));
 			await a.reload();
 			st = await state(a);

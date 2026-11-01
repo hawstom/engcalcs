@@ -20,7 +20,7 @@
 //
 // **THE SPEC RECORDS A DELIBERATE DEVIATION FROM THE WRITTEN BRIEF.** Ida's brief called for
 // `preventDefault()` on `mousedown` itself. Measured directly against a real `<input
-// class="ec-spin" type="number">` (the only calculator number fields with a VISIBLE spin button --
+// class="lpn-digit" type="number">` (the only calculator number fields with a VISIBLE spin button --
 // css/engcalcs.css hides it suite-wide otherwise): `preventDefault()` on `mousedown` also cancels
 // the spinner's own increment, because Chromium resolves the step against that same event.
 // Deferring the `preventDefault()`/`select()` pair to `mouseup` instead reproduces every externally
@@ -186,7 +186,7 @@ exports.run = async function ({ browser, report }) {
 			}
 
 			// The Map appearance section's Text size / Symbol size fields are the suite's own
-			// `.ec-spin` fields -- the one place a calculator-style number field keeps a VISIBLE
+			// `.lpn-digit` fields -- the one place a calculator-style number field keeps a VISIBLE
 			// spin button (css/engcalcs.css hides it everywhere else). This is the field the
 			// deviation in the file header is measured against.
 			await a.page.evaluate(() => {
@@ -195,24 +195,14 @@ exports.run = async function ({ browser, report }) {
 				if (row) { row.click(); }
 			});
 			await a.settle(400);
-			const spinSel = '#lpn_set_map_fields input.ec-spin';
+			const spinSel = '#lpn_set_map_fields input.lpn-digit';
 			const spinRect = await rectOf(a.page, spinSel);
-			report.ok(!!spinRect, 'the Map appearance section offers an .ec-spin field (Text size)');
+			report.ok(!!spinRect, 'the Map appearance section offers a digit field (Text size)');
 			if (spinRect) {
 				await a.page.evaluate(() => document.getElementById('lpn_settings_box').focus());
 				const s1 = await typeAfterClick(a.page, spinSel, spinRect.x, spinRect.y, '12345');
-				report.eq(s1, '9', 'Settings: the .ec-spin field selects all on first click too');
+				report.eq(s1, '9', 'Settings: the Text size field selects all on first click too');
 
-				// **THE SPINNER.** preventDefault() on the wrong event breaks this; see file header.
-				await a.page.evaluate((s) => { document.querySelector(s).blur(); document.querySelector(s).value = '5'; }, spinSel);
-				const sr = await rectOf(a.page, spinSel);
-				// The spin buttons occupy the input's own right edge in Chromium; the up half is
-				// the top quarter of the control's height.
-				await a.page.mouse.click(sr.left + sr.w - 6, sr.top + sr.h * 0.25);
-				await a.settle(100);
-				const afterSpin = await a.page.$eval(spinSel, (el) => el.value);
-				report.ok(afterSpin !== '5', 'the .ec-spin field\'s own spin button still changes its value',
-					`5 -> ${afterSpin}`);
 			}
 
 			// ---- Find and replace ------------------------------------------------------------

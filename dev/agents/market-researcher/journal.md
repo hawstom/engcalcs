@@ -2939,3 +2939,16 @@ Full document: dev/agents/market-researcher/ai-agent-interface.md (placed by the
 - **OBSERVED.** dev/positioning.md bans live commercial trademarks (WaterGEMS, Bentley) in titles/menus (Task 296): a menu row naming the product needs Tom's exception.
 - **NOT FOUND.** Any vendor objection to third-party reading/writing of Bentley/Innovyze project files; any other tool writing .wtg.sqlite.
 - **SPECULATION.** Ranking: Tom saving test files lowest; user-supplied template design cleanest; never ship a Bentley-generated template. Ask Bentley first; a lawyer for ~1 hour before public ship.
+
+## 2026-10-25 -- Pan map to uncover selected element under a phone panel (Tom's question)
+- **CITED.** QField does NOT auto-pan: feature request "Keep selected feature visible when opening attribute form" (2025-11-18, 1 vote, no status) says the clicked feature may end up under the form. https://ideas.qfield.org/app-feature-requests/p/keep-selected-feature-visible-when-opening-attribute-form . QField docs offer a manual centre button after identify. https://docs.qfield.org/how-to/map-interaction
+- **CITED.** Mapbox ships padding so floating UI does not cover the area of interest: https://docs.mapbox.com/mapbox-gl-js/example/offset-vanishing-point-with-padding/ . A toolkit affordance, not evidence any app does it on select.
+- **NOT FOUND.** Any doc or observation for Google Maps, Apple Maps, Field Maps, Collector, Mergin Maps, utility GIS viewers. Not tested on a device (I have none).
+- **SPECULATION.** Google/Apple Maps likely pan so the pin clears the sheet (from memory of use); re-derive by testing before quoting.
+
+## 2026-10-29 -- Properties row order, outside evidence (Tom: From/To after ID? Active near top?). Table: scratchpad mary-row-order.md
+- **CITED.** epanet-js asset-panel.tsx (main, fetched today) https://github.com/epanet-js/epanet-js/blob/main/apps/app/src/panels/asset-panel/asset-panel.tsx : Pipe/Pump/Valve = Connections (start,end), Active topology (isActive), Model attributes, [Demands], [Quality], [Controls/Energy for pump], Simulation results last. Node = Active topology first, Model attributes, Demands, Quality, Simulation results last. Reservoir/Tank have no Connections. Label sits outside the sections.
+- **CITED.** EPANET 2.2 Property Editor: ID, Start/End Node (links) or X/Y (nodes), Description, Tag, data (entry of 2026-09-15, 6_objects.rst). No Active field.
+- **CITED.** Autodesk WSPro Basic Pipe Data Fields (https://help.autodesk.com/cloudhelp/2026/ENU/WSPro-Help/files/GUID-EA252BC3-E324-40E0-BE9D-1ABBE49CB67E.htm): From Node ID, To Node ID are fields 1-2; closure lives on a separate Control page; results on a separate page. Bentley "Is active?" is a True/False in the property grid (docs.bentley.com WaterGEMS SS6 GUID-2D9E71F577204BAC9089D58AB66EEA6A).
+- **NOT FOUND.** WaterGEMS/WaterCAD property-grid category order (4 searches); InfoWater Pro Attribute-tab order; QWAT form layout; Giswater tab names for arc/node.
+- **SPECULATION.** Consensus: topology right after ID (Tom right); Active near the top is supported by epanet-js only (and Bentley treats it as topology); results last and separate. Re-derive before relying.

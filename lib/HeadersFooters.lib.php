@@ -72,8 +72,11 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 // THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, dev/themes-plan.md). The visitor's
 // choice is System (the default), Light, Dark, High contrast, Rounded, Platinum, Desktop, Newspaper, Amber,
 // Green, Arcade, Space or Prairie, kept in this browser alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`,
-// `rounded`, `platinum`, `desktop`, `newspaper`, `amber`, `green`, `arcade`, `space` or `prairie`, and is absent for System. Anything else
-// stored there is read as System, so a theme retired later strands nobody.
+// `rounded`, `platinum`, `desktop`, `newspaper`, `amber`, `green`, `arcade`, `space` or `prairie`, and is `system` for System. A browser with NO key sees the
+// theme of the day (Task 824): the UTC weekday of (now minus 12 hours), so a day runs noon UTC to noon UTC; Sunday
+// Newspaper, Monday Desktop, Tuesday Prairie, Wednesday System, Thursday Platinum, Friday Rounded, Saturday Space,
+// decided once at load (window.EC_NOW, milliseconds, is the test clock). Any pick, System included, stores the
+// key and ends the show. Anything else stored there is read as System, so a theme retired later strands nobody.
 // <html data-theme> carries the RESOLVED theme, the one css/engcalcs.css paints: System becomes light,
 // dark (prefers-color-scheme) or high contrast (prefers-contrast: more), and High contrast becomes `hc` or
 // `hc-dark` by the colour scheme; both follow a change of the device setting while the page is open.
@@ -84,22 +87,25 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 // window.ecTheme.set() is the one writer; preview() repaints without storing anything (the gallery in
 // Settings), and preview(null) returns to the stored choice. Every repaint fires `ec-theme` on window, which
 // the map listens to (its lettering may change face, js/looped-network.js mapFollowTheme()). `?theme=system` in the address is the rescue
-// for a visitor who chose a theme they cannot read: it clears the choice (any other listed name sets it).
+// for a visitor who chose a theme they cannot read: it stores System (any other listed name sets it).
 // With storage blocked the choice still holds until the page is closed. No consent is needed: a
 // preference the visitor set (dev/cookie-storage-inventory.md).
 if ($type === 'EngCalcsApp') :
 ?>
 	<script>(function(){var d=document.documentElement,w=window,mq=function(s){return w.matchMedia?w.matchMedia(s):null;},
 	qd=mq('(prefers-color-scheme: dark)'),qc=mq('(prefers-contrast: more)'),
-	T=['system','light','dark','hc','rounded','platinum','desktop','newspaper','amber','green','arcade','space','prairie'],K={dark:1,'hc-dark':1,amber:1,green:1,arcade:1,space:1},m=null,p=null;
+	T=['system','light','dark','hc','rounded','platinum','desktop','newspaper','amber','green','arcade','space','prairie'],K={dark:1,'hc-dark':1,amber:1,green:1,arcade:1,space:1},m=null,p=null,
+	D=['newspaper','desktop','prairie','system','platinum','rounded','space'],dy0=null;
 	function ok(t){return T.indexOf(t)>=0;}
-	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return ok(t)?t:'system';}catch(e){return 'system';}}
+	function dy(n){var t=(typeof n==='number'?n:(typeof w.EC_NOW==='number'?w.EC_NOW:Date.now()));return D[new Date(t-432e5).getUTCDay()];}
+	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');if(t===null){return dy0;}return ok(t)?t:'system';}catch(e){return dy0;}}
 	function r(t){var k=!!(qd&&qd.matches);t=ok(t)?t:'system';if(t==='system'){t=qc&&qc.matches?'hc':(k?'dark':'light');}return t==='hc'&&k?'hc-dark':t;}
 	function a(){var t=r(p||g());d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',K[t]?'dark':'light');try{w.dispatchEvent(new Event('ec-theme'));}catch(e){}}
-	function s(t){m=ok(t)?t:'system';try{if(m!=='system'){localStorage.setItem('lpn_theme',m);}else{localStorage.removeItem('lpn_theme');}}catch(e){}p=null;a();}
+	function s(t){m=ok(t)?t:'system';try{localStorage.setItem('lpn_theme',m);}catch(e){}p=null;a();}
+	dy0=dy();
 	try{var u=/[?&]theme=([a-z]+)/.exec(location.search);if(u&&ok(u[1])){s(u[1]);}}catch(e){}
 	a();[qd,qc].forEach(function(q){if(q&&q.addEventListener){q.addEventListener('change',a);}});
-	w.ecTheme={list:T.slice(),get:g,set:s,resolve:r,preview:function(t){p=ok(t)?t:null;a();},previewing:function(){return p;}};})();</script>
+	w.ecTheme={list:T.slice(),get:g,set:s,day:dy,picked:function(){try{return localStorage.getItem('lpn_theme')!==null;}catch(e){return !!m;}},resolve:r,preview:function(t){p=ok(t)?t:null;a();},previewing:function(){return p;}};})();</script>
 <?php endif; ?>
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 <?php

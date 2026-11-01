@@ -581,7 +581,7 @@
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
 			// page has to be one press (Tom, 2026-09-04, having just had to retype one by hand: *"A
 			// copy to clipboard button on the report would be nice."*).
-			reportCopy: pageConfig.lpn_time_run_report_copy || 'Copy',
+			reportCopy: pageConfig.points_data_copy || 'Copy',
 			reportCopied: pageConfig.lpn_time_run_report_copied || 'Copied'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and
@@ -643,6 +643,10 @@
 	 * the built-in solver has no time dimension, so a page whose engine was unreachable holds one
 	 * instant and has nothing to plot against time.
 	 */
+	// Who the run in hand is, so a reader that scans every frame (the Frequency and Profile axes)
+	// can keep its answer until the run is replaced. Null with no run. Opaque: compare, never read.
+	EC.lpnTimeRunToken = function () { return state.run || null; };
+
 	EC.lpnTimeRunFrames = function () {
 		var run = state.run;
 		if (!run || !run.frames || !run.frames.length) { return []; }

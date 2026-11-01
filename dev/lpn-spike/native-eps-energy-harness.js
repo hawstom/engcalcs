@@ -293,7 +293,7 @@ async function run() {
 
 	console.log('-- Net1 with its controls and the gallery rules');
 	{
-		const text = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8')).rules.join('\n');
+		const text = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).rules.join('\n');
 		const a = loadEpa('Net1.inp', false);
 		a.model.time.patterns.push(pat('TARIFF', TARIFF));
 		a.model.energy = Object.assign({}, a.model.energy, { globalPrice: 0.11, globalPattern: 'TARIFF', demandCharge: 6 });

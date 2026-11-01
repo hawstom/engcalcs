@@ -22,13 +22,15 @@ const {
 const fs = require('fs');
 const path = require('path');
 
-const EXAMPLE_URL = '/engcalcs/examples/Basic-example-US-units.lwn';
-const EXAMPLE_TEXT = fs.readFileSync(path.join(ROOT, 'examples/Basic-example-US-units.lwn'), 'utf8');
+const EXAMPLE_URL = '/engcalcs/examples/Valves.lwn';
+const EXAMPLE_TEXT = fs.readFileSync(path.join(ROOT, 'examples/Valves.lwn'), 'utf8');
 
-let fails = 0, checks = 0;
+let fails = 0, checks = 0, mutating = false;
+// Under a deliberate mutation a red check is the point, so it prints CAUGHT, not FAIL: a log grep
+// for FAIL then finds only real failures (it used to report this harness as red in half of all runs).
 function ok(name, cond, extra) {
 	checks++;
-	console.log((cond ? 'PASS  ' : 'FAIL  ') + name + (extra === undefined ? '' : '   ' + extra));
+	console.log((cond ? 'PASS  ' : (mutating ? 'CAUGHT ' : 'FAIL  ')) + name + (extra === undefined ? '' : '   ' + extra));
 	if (!cond) { fails++; }
 }
 
@@ -82,10 +84,11 @@ function makeL(mutate) {
 }
 
 function run(label, mutate) {
+	mutating = !!mutate;
 	console.log('\n=== ' + label + ' ===');
 	const before = fails;
 	const L = makeL(mutate);
-	const ex = { file: 'Basic-example-US-units.lwn' };
+	const ex = { file: 'Valves.lwn' };
 	// Collect EVERY resolver, not just the last -- so that with the guard removed, resolving all
 	// five in-flight fetches actually proves five imports would have landed, rather than the test
 	// merely happening to only ever settle the one promise a naive mock kept a handle to.
@@ -183,7 +186,7 @@ run('real source', null).then(function (newFailsReal) {
 	// (it has happened). Say the verdict in one unambiguous line rather than a raw tally that
 	// mixes real-source checks with checks the mutations were deliberately built to break.
 	console.log('\n' + (checks - fails) + '/' + checks +
-		' checks accounted for (6 real-source checks pass; the FAIL lines under "mutated:" are the' +
+		' checks accounted for (6 real-source checks pass; the CAUGHT lines under "mutated:" are the' +
 		' intended positive control, not a regression). PASS.');
 	process.exit(0);
 }).catch(function (e) {

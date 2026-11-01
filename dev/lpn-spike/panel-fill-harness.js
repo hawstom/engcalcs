@@ -165,6 +165,8 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Calibration report (Task 601): a six-column statistics table and two charts, the
 		// same report-box family as Status and Full, so a phone wants the whole window for it.
 		['openCalibBox', 'the calibration report box'],
+		// The junction demands box (sheet-light): Properties' Demand categories row opens it, on the Calibration box's shell.
+		['openDemandsBox', 'the junction demands box'],
 		// The Contour plot box (Task 600): the Find box's shell and the same rule as Find -- a
 		// column of controls that is unreadable at a third of a phone's width.
 		['openContourBox', 'the contour plot box'],
@@ -174,10 +176,16 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openSnipBox', 'the Screenshot box'],
 		// A bottom-pane tab opened as a box (option branch, Task 799): one wireBoxMemory() call for all
 		// of them, placed through the seam like the rest.
-		['paneBoxPop', 'a bottom-pane tab opened as a box']];
+		['paneBoxPop', 'a bottom-pane tab opened as a box'],
+		// File, Convert as and the coordinate-system chooser (round 11b, dev/box-float-design.md): question boxes made movable and
+		// resizable through wireFloatBox(), and placed through the seam like every standing box, so a phone gets the whole window.
+		['openConvertAsBox', 'the Convert as box'],
+		['openNewProjectBox', 'the New project box (round 11d)'],
+		['openCrsBox', 'the coordinate-system chooser']];
 	FILLS.forEach(function (p) {
-		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
+		ok(p[1] + ' opens through the seam', /placePanelForScreen\(|placeFloatBox\(/.test(body(p[0])));
 	});
+	ok('placeFloatBox() is the seam too', /placePanelForScreen\(/.test(body('placeFloatBox')));
 
 	// **AND THE TWO THAT DELIBERATELY DO NOT**, declared with the reason, so exempting a third is
 	// a sentence somebody has to write rather than a call somebody forgot.
@@ -212,8 +220,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 	// The four report boxes drag through wireBoxMemory() since 2026-09-08, which holds ONE
 	// makePanelDraggable() call for all four: each wireBoxMemory() call is a wired panel, and the
 	// call inside its own body is not.
+	// wireFloatBox() likewise: each call is a wired panel; its definition and the one makePanelDraggable() call inside it are not.
 	const wired = (codeOnly.match(/makePanelDraggable\(/g) || []).length - 1 +
-		(codeOnly.match(/wireBoxMemory\(/g) || []).length - 2;
+		(codeOnly.match(/wireBoxMemory\(/g) || []).length - 2 +
+		(codeOnly.match(/wireFloatBox\(/g) || []).length - 2;
 	ok('every draggable panel is either filled or declared exempt', wired === FILLS.length + EXEMPT.length,
 		wired + ' draggable panels, ' + FILLS.length + ' filled + ' + EXEMPT.length + ' exempt');
 	EXEMPT.forEach(function (e) {

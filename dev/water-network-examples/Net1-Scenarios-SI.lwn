@@ -1,11 +1,12 @@
 {
 	"format": "hawsedc-lpn",
 	"app": "https://librewaternet.org/app/",
-	"v": 6,
+	"v": 13,
 	"project": {
-		"name": "Net1 SI",
+		"name": "Net1 with scenarios SI",
 		"activeScenario": "base",
-		"gallery": "Net1-SI.lwn"
+		"docId": "dms4ZF3mWBpeQLxl9",
+		"gallery": "Net1-Scenarios-SI.lwn"
 	},
 	"scenarios": [
 		{
@@ -13,6 +14,36 @@
 			"name": "Base",
 			"isBase": true,
 			"overrides": {}
+		},
+		{
+			"id": "s1",
+			"name": "Max day",
+			"overrides": {},
+			"calc": "c1"
+		},
+		{
+			"id": "s2",
+			"name": "Max day with main break",
+			"overrides": {},
+			"parent": "s1",
+			"alternatives": {
+				"topology": "a1"
+			}
+		},
+		{
+			"id": "s3",
+			"name": "Peak hour",
+			"overrides": {},
+			"calc": "c2"
+		},
+		{
+			"id": "s4",
+			"name": "Peak hour with main break",
+			"overrides": {},
+			"parent": "s3",
+			"alternatives": {
+				"topology": "a1"
+			}
 		}
 	],
 	"nodes": [
@@ -25,7 +56,8 @@
 			"_demand": 0,
 			"lx": 0.841621904,
 			"ly": 3.23359204,
-			"_initQuality": 0.5
+			"_initQuality": 0.5,
+			"lside": "right"
 		},
 		{
 			"id": "11",
@@ -36,7 +68,8 @@
 			"_demand": 9.464,
 			"lx": 1.3606889,
 			"ly": 2.99851669,
-			"_initQuality": 0.5
+			"_initQuality": 0.5,
+			"lside": "right"
 		},
 		{
 			"id": "12",
@@ -109,7 +142,8 @@
 			"_head": 243.84,
 			"lx": -0.668658774,
 			"ly": -1.11369803,
-			"_initQuality": 1
+			"_initQuality": 1,
+			"lside": "left"
 		},
 		{
 			"id": "2",
@@ -121,7 +155,8 @@
 			"minLevel": 30.48,
 			"maxLevel": 45.72,
 			"tankDiameter": 15.392,
-			"_initQuality": 1
+			"_initQuality": 1,
+			"bottomElev": 259.08
 		}
 	],
 	"links": [
@@ -290,43 +325,37 @@
 			"_diameter": 450,
 			"lenAuto": false,
 			"_k": 0,
-			"curvePoints": [
-				[
-					94.635,
-					76.2
-				]
-			],
-			"curveRef": null,
 			"lx": -0.485151183,
 			"ly": 2.48656489,
-			"curveId": "1"
+			"_curveId": "1",
+			"lside": "left"
 		}
 	],
 	"labels": [
 		{
 			"id": "X1",
-			"text": "Source",
 			"x": 0.89545323,
 			"y": 21.5289783,
 			"anchorNode": null,
 			"sizeMult": 2,
-			"allZoom": true
+			"allZoom": true,
+			"_text": "Source"
 		},
 		{
 			"id": "X2",
-			"text": "Pump",
 			"x": 4.65598125,
 			"y": 20.2320985,
 			"anchorNode": null,
-			"sizeMult": 2
+			"sizeMult": 2,
+			"_text": "Pump"
 		},
 		{
 			"id": "X3",
-			"text": "Tank",
 			"x": 15.0399894,
 			"y": 29.0653459,
 			"anchorNode": null,
-			"sizeMult": 2
+			"sizeMult": 2,
+			"_text": "Tank"
 		}
 	],
 	"nextId": {
@@ -337,6 +366,11 @@
 		"P": 1,
 		"V": 1,
 		"X": 4
+	},
+	"customers": [],
+	"origin": {
+		"x": 0,
+		"y": 0
 	},
 	"labelSettings": {
 		"node": {
@@ -377,8 +411,11 @@
 			"L": "L",
 			"P": "P",
 			"V": "V",
-			"X": "X"
+			"X": "X",
+			"M": "C",
+			"S": "S"
 		},
+		"customProps": [],
 		"emitterExponent": 0.5,
 		"hydraulics": {
 			"specificGravity": 1,
@@ -393,7 +430,20 @@
 			"demandMultiplier": 1,
 			"emitterExponent": 0.5
 		},
+		"qualityOptions": {
+			"quality": "Chlorine mg/L",
+			"diffusivity": "1.0",
+			"tolerance": "0.01"
+		},
+		"quality": {
+			"mode": "chemical",
+			"traceNode": "",
+			"src": "Chlorine mg/L"
+		},
+		"fileOptions": {},
 		"engine": "epanet",
+		"autoRun": true,
+		"nodeElevSource": "value",
 		"defaults": {
 			"nodeElev": 0,
 			"demand": 0,
@@ -409,6 +459,7 @@
 			"idPrefixes": false,
 			"defaults": false,
 			"mapDisplay": true,
+			"colors": false,
 			"computation": true,
 			"files": false
 		},
@@ -416,24 +467,39 @@
 		"symbolSize": 12,
 		"linkWidth": 4,
 		"symbolOpacity": 1,
+		"labelMaxWidth": null,
+		"symbolCapMultiple": 0.5,
+		"symbolCapPercentile": 20,
+		"basemapStyle": "normal",
 		"backdropOpacity": 0.5,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,
+		"textHalo": 40,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
 		"legendPosition": "top-right",
+		"colorNodeField": "",
+		"colorLinkField": "",
+		"colorRampNode": "viridis",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 5,
+		"colorClassesLink": 5,
+		"colorReverseNode": false,
+		"colorReverseLink": false,
+		"contourFill": "",
+		"contourLines": false,
+		"contourLabels": true,
+		"contourOpacity": 0.6,
+		"contourInterval": {},
+		"contourBuffer": 2.5,
+		"contourTerrain": false,
+		"colorLegendPosition": "bottom-right",
+		"colorBreaks": {},
+		"colorModes": {},
 		"labelReadabilityBias": 110,
 		"mapHeight": 900,
 		"method": "hw",
-		"qualityOptions": {
-			"quality": "Chlorine mg/L",
-			"diffusivity": "1.0",
-			"tolerance": "0.01"
-		},
-		"quality": {
-			"mode": "chemical",
-			"traceNode": "",
-			"src": "Chlorine mg/L"
-		},
 		"reactions": {
 			"orderBulk": 1,
 			"orderTank": 1,
@@ -449,21 +515,16 @@
 			"globalPrice": 0,
 			"demandCharge": 0,
 			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
 		}
-	},
-	"view": {
-		"cx": 11.5557746,
-		"cy": 15.5995675,
-		"s": 23.3777796
-	},
-	"units": {
-		"lpn_u_length": "m",
-		"lpn_u_elevhead": "mh2o",
-		"lpn_u_pressure": "mh2o",
-		"lpn_u_diameter": "mm",
-		"lpn_u_flow": "lps",
-		"lpn_u_velocity": "mps",
-		"lpn_u_gradient": "gradePercent"
 	},
 	"patterns": [
 		{
@@ -510,6 +571,9 @@
 			"note": "Pump Curve for Pump 9"
 		}
 	],
+	"pipeTypes": [],
+	"fittingSets": [],
+	"profiles": [],
 	"times": {
 		"duration": 86400,
 		"hydraulicStep": 3600,
@@ -615,5 +679,48 @@
 			" Summary            \tNo",
 			" Page               \t0"
 		]
-	}
+	},
+	"view": {
+		"cx": 11.5557746,
+		"cy": 15.5995675,
+		"s": 23.3777796
+	},
+	"units": {
+		"lpn_u_length": "m",
+		"lpn_u_elevhead": "mh2o",
+		"lpn_u_pressure": "mh2o",
+		"lpn_u_diameter": "mm",
+		"lpn_u_flow": "lps",
+		"lpn_u_velocity": "mps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "mm",
+		"lpn_u_age": "hr"
+	},
+	"alternatives": [
+		{
+			"id": "a1",
+			"category": "topology",
+			"name": "Main break, pipe 112 closed",
+			"parent": null,
+			"values": {
+				"l:112": {
+					"active": false
+				}
+			}
+		}
+	],
+	"calcSets": [
+		{
+			"id": "c1",
+			"name": "Max day",
+			"parent": null,
+			"demandMultiplier": 1.5
+		},
+		{
+			"id": "c2",
+			"name": "Peak hour",
+			"parent": null,
+			"demandMultiplier": 2.25
+		}
+	]
 }

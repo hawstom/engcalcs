@@ -142,7 +142,7 @@ async function main() {
 		const grp = (await L('lpn_ovl_group'));
 		const head = async (catKey, alt, n) => grp.replace('{category}', await L(catKey)).replace('{alternative}', alt) + ' (' + n + ')';
 		const wantHeads = [await head('lpn_alt_cat_physical', ONE_HR, 13), await head('lpn_alt_cat_demand', '1-hr drain w pumps off', 2),
-			await head('lpn_alt_cat_text', ONE_HR, 1), await head('lpn_alt_cat_calculation', ONE_HR, 1)];
+			await head('lpn_alt_cat_text', ONE_HR, 1), await head('lpn_settings_sec_calculation', ONE_HR, 1)];
 		ok('O3 four groups, in category order, named by category and alternative', JSON.stringify(got.heads) === JSON.stringify(wantHeads), JSON.stringify(got.heads));
 		ok('O3 ...their rows add up to the count', got.groups.reduce((s, g) => s + g.rows.length, 0) === 17, JSON.stringify(got.groups.map((g) => g.rows.length)));
 		ok('O3 the columns: Asset, Property, Override, Inherited value', JSON.stringify(got.cols) === JSON.stringify([await L('lpn_crit_col_asset'), await L('lpn_find_property'), await L('lpn_ovl_col_override'), await L('lpn_ovl_col_inherited')]), JSON.stringify(got.cols));

@@ -111,7 +111,7 @@ async function centre(a) {
 }
 
 exports.run = async function ({ browser, report }) {
-	const list = ['lpn_ex_net1_title', 'lpn_ex_basic_us_title', 'lpn_ex_basic_si_title', 'lpn_ex_net2_title',
+	const list = ['lpn_ex_net1_title', 'lpn_ex_net1_si_title', 'lpn_ex_net2_title',
 		'lpn_ex_elm_street_title', 'lpn_ex_net3_title'];
 	for (const key of list) {
 		for (const vp of [null, { width: 1000, height: 650 }, { width: 700, height: 800 }]) {

@@ -352,7 +352,7 @@ console.log('\n6. A shipped example states what its own source .inp states');
 			path.join(ROOT, 'dev', 'water-network-examples', name + '.inp'), 'utf8');
 		const src = sectionLines(srcText);
 		const carried = Object.keys(src).filter((n) => !SECTIONS_READ[n] && src[n].length);
-		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', file + '.lwn'), 'utf8'));
+		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, file === 'Net1' ? 'dev/water-network-examples' : 'examples', file + '.lwn'), 'utf8'));
 
 		byId.lpn_dialog_body.children.length = 0;
 		L.importInp({ name: name + '.inp', _text: srcText });

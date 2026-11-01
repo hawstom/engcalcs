@@ -46,8 +46,11 @@ ok('lib/lang.ec.en.php states lpn_new_coordsys_local', typeof wantLocal === 'str
 
 console.log('\n--- New project wizard: coordinate-system radios ---');
 {
-	const geoRow = (html.match(/<label><input type="radio" name="lpn_new_coords" value="geo">[\s\S]*?<\/label>/) || [''])[0];
-	const localRow = (html.match(/<label><input type="radio" name="lpn_new_coords" value="local"[^>]*>[\s\S]*?<\/label>/) || [''])[0];
+	// Task 828: each radio is a row of the box's grid, its words in a label naming it (for=) and the
+	// radio in the value track, so the words are the label and the radio is found by its name.
+	const hasRadio = (v) => new RegExp('<input type="radio"[^>]*name="lpn_new_coords"[^>]*value="' + v + '"').test(html);
+	const geoRow = hasRadio('geo') ? (html.match(/<label for="lpn_new_coords_geo">[\s\S]*?<\/label>/) || [''])[0] : '';
+	const localRow = hasRadio('local') ? (html.match(/<label for="lpn_new_coords_local">[\s\S]*?<\/label>/) || [''])[0] : '';
 
 	ok('radio 1 exists', !!geoRow);
 	ok('radio 1 reads exactly what lpn_convas_epsg says, today',

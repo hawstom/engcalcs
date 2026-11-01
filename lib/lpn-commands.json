@@ -35,6 +35,11 @@
      "parent": "Import…"
     },
     {
+     "id": "file/file_import_menu/file_import_dxfnet",
+     "label": "DXF file…",
+     "parent": "Import…"
+    },
+    {
      "id": "file/file_import_menu/file_import_shapes",
      "label": "GeoJSON file…",
      "parent": "Import…"
@@ -267,6 +272,11 @@
      "parent": "World map…"
     },
     {
+     "id": "map/gis_menu",
+     "label": "Add layer…",
+     "parent": ""
+    },
+    {
      "id": "map/clean_map",
      "label": "Clean map",
      "parent": ""
@@ -490,6 +500,11 @@
     {
      "id": "project/morph_menu/tool_add_valve",
      "label": "Valve",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/morph_vertex",
+     "label": "Vertex",
      "parent": "Morph"
     }
    ]

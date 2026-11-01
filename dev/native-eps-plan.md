@@ -1,4 +1,4 @@
-# Native extended-period simulation: phase plan (Task 733, phase 3)
+# Native extended-period simulation and water quality: phase plan (Task 733, phases 3 and 4)
 
 Tom: "slow and careful". Each slice is its own branch, matched against EPANET 2.3.5 (the vendored
 engine) at every reporting step on every shipped example it touches, before it merges. A gap is
@@ -76,8 +76,8 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    through `assembleModel()`, with and without a speed pattern, in US and SI units).
 7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
    engine setting is built-in and nothing is refused; the transport, frames and Run box are
-   unchanged because the frames have the shape `lpnEpanetRun` resolves to. Water quality and
-   EPANET-MSX are not planned for the built-in solver; they stay on EPANET.
+   unchanged because the frames have the shape `lpnEpanetRun` resolves to. Water quality is built
+   (phase 4, below) and is wired the same way, on his word; EPANET-MSX stays on EPANET.
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -237,6 +237,77 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
 - **Not copied, by design.** A pump with no curve is a pipe to EPANET and is not listed in the loop's
   energy (the page lists it with a pipe's kW); `Global Efficiency` and prices are read as the bridge
   writes them (a value only when stated). The page cannot state a rule step, so it stays EPANET's default.
+
+## Water quality (phase 4)
+
+Tom, 2026-09-26: build the native solver out "to do everything that the EPANET solver does".
+Built, unwired: `lpnNativeRunRefusals(model)` still refuses every quality run (`native-run-quality`);
+`lpnNativeRun(model, {quality: true})` runs it, and `lpnNativeRunRefusals(model, {quality: true})`
+then names only what the pass cannot copy. Slice 7 passes the option when he says so.
+
+**How.** EPANET runs quality as a second pass over the hydraulics it saved (the bridge: `closeH()`,
+then `openQ()`/`runQ()`/`nextQ()`), and so does the loop: one record per solve, as `savehyd()` writes
+it (link flows and junction demands in cfs as 4-byte floats, a link at or below CLOSED with no flow),
+then `qualityPass()`, transcribed function by function from quality.c, qualroute.c and qualreact.c
+(OWA-EPANET 2.3.5, MIT): Lagrangian segments per link and per tank, the quality step (stated, or a
+tenth of the hydraulic step), the merge tolerance `Ctol` (stated for a chemical, else 0.01 h of age,
+0.01 percent, 0.01 of the chemical's unit), the topological node sort and its order from
+`buildadjlists()`. Frames gain `qualities` and `linkQualities` in the bridge's units (age in seconds).
+`lpnNativeQualityOver(model, recs, vEnd)` runs the pass over hydraulics handed in.
+
+**Reached.** Q1 water age; Q2 source trace (from a reservoir, a junction, a tank); Q3 one chemical:
+initial quality, sources of all four types (CONCEN at a reservoir, at a tank and at a junction drawing
+a negative demand; MASS; SETPOINT; FLOWPACED; each on a pattern), bulk and wall reactions (order 1 and
+the [REACTIONS] globals, per-pipe and per-tank coefficients, the roughness correlation, a limiting
+potential; order 0 wall and order 2 bulk also copied and tested), mass transfer (diffusivity stated,
+default, and 0), and all four tank mixing models: MIXED, 2COMP, FIFO, LIFO.
+
+**Refused by name** (`native-run-quality`): EPANET-MSX; a trace on a node out of the run (the bridge
+writes no Quality line); a tank with no area in a quality run; a source type or mixing model EPANET
+does not know (error 213); a source on a pattern the model lacks (error 205); a quality step that
+comes to 0 (hydraulic step under 10 s, none stated: EPANET's walk never advances).
+
+**Not copied.** The mass balance and the average reaction rates (the page's reaction-rate column reads
+EPANET's binary output): they change no value a frame carries. A pump at speed 0 left OPEN, which
+EPANET carries a flow of 1e-8 x its head difference through and the loop carries 0.
+
+Test: `native-eps-quality-harness.js`, 106 checks. Every case is run three ways: EPANET; the pass over
+EPANET's OWN saved hydraulics (`native-eps-quality-truth.js` reads the engine's hydraulics file); and
+the loop end to end. Tolerances, at every node and link at every reporting time:
+
+- **Over EPANET's hydraulics: 1e-8 x max(1, |value|)** on every case. Measured worst: 1.4e-9 s of age on
+  Net2 (an age of 114 000 s), 5e-13 percent, 1e-14 mg/L. This is the transcription.
+- **End to end, age:** 1 s on the constructed cases (2 s on a tank's own pipe, 60 s on a dead-end pipe,
+  10 s with a 30-minute hydraulic step at a reversal); Net1 1 s (0.21 measured), Net2 3 s (1.6), Net3
+  25 s on nodes and 100 s on links (15.8 and 65).
+- **End to end, trace:** 0.01 percentage point (0.05 on the dead end); Net3 0.1 (0.070 and 0.094).
+- **End to end, chemical:** 1e-4 mg/L (5e-4 on the dead end); Net1 as shipped 1e-4 (6e-6 measured);
+  Net3 with chlorine at both sources 1e-3 (6e-4); Net2 as shipped 5e-3 (2.8e-3).
+
+## What phase 4 learned
+
+- **The transcription is exact; every end-to-end gap is hydraulic.** Over EPANET's own hydraulics the
+  pass agrees to roundoff on all 49 cases, so the gaps above are the two hydraulic solutions' (flows
+  1e-5 of the largest apart, small flows up to 0.5 percent) carried along a path. EPANET against
+  itself at Accuracy 1e-5 and 2e-5 moves Net3's ages by 0.5 s; the loop's 15.8 s is the solver
+  difference, not the quality code.
+- **A control time a second apart shows in quality.** Net3's tank-1 control fires at 21:19:39 here and
+  21:19:40 in EPANET (slice 5's rounding). Pipe 133 reverses at 22:00 onto water 50 000 s older, and
+  one second of 100 L/s is its 65 s.
+- **EPANET's numerical noise in a stagnant pipe is a flow to the quality pass.** A dead end carries
+  about 3e-8 m3/s in EPANET and 0 here; `transport()` moves volume through any link with a nonzero flow
+  whatever its direction flag says, so a dead-end pipe's average drifts by seconds a day.
+- **Net2's fluoride is a knife edge.** Its source steps by exactly 0.01 mg/L, which is its own Tolerance,
+  so `evalnodeoutflow()`'s merge test `|0.09 - 0.08| < 0.01` is decided in the last bit of a double:
+  0.09000000000000001 in one run, 0.08999999999999998 in the other. One merges, pipe 1 averages
+  0.0028 mg/L apart from 32:00. Any one of three hydraulic records, swapped in alone, flips it.
+- **Things EPANET does that look like slips and are copied:** a check-valve pipe neither ages nor reacts
+  and starts empty of segments (reactpipes(), initsegs() take PIPE only); pumps and valves hold
+  segments once water passes them (evalnodeoutflow()); a FIFO or LIFO tank asks whether it is full of
+  the volume the HYDRAULIC run ended at (tank->V is not moved by the separate quality pass); a tank
+  starts from its node's initial quality but a pipe from its downstream node's; SGN(0) is +1.
+- **Flows enter as 4-byte floats** because the hydraulics file stores them so; the pass over EPANET's
+  hydraulics only agrees to roundoff because the records are read that way too.
 
 ## Wording
 

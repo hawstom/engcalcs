@@ -408,8 +408,10 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR A TEXT'S POSITION IN A SCENARIO** (Tom, 2026-10-12): textCoordOut()
 	// stores a free Text's override outward, as a node's position override is. Its inverse,
 	// textCoordIn(), took the place of setLabelCoordAxis()'s own inward pair, so inward is unchanged.
-	ok('outwardX has one definition and 43 call sites', count(/outwardX\(/g) === 44, count(/outwardX\(/g));
-	ok('outwardY has one definition and 43 call sites', count(/outwardY\(/g) === 44, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR THE GIS BACKGROUND WINDOW** (Task 720): paintGisLayers() brings the screen
+	// corners out once, for the geographic and the projected branch alike.
+	ok('outwardX has one definition and 43 call sites', count(/outwardX\(/g) === 46, count(/outwardX\(/g));
+	ok('outwardY has one definition and 43 call sites', count(/outwardY\(/g) === 46, count(/outwardY\(/g));
 	// **TASK 772 ADDED ONE SITE PER AXIS: THE DXF EXPORT.**
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
@@ -499,8 +501,9 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW COMING BACK IN** (inwardViewOf()).
 	// +1 each: the GeoJSON Shape import's one crossing (Task 779, landGeoJsonShapes()).
 	// +1 each in gisPlanarPoint() and +1 each in landShapefileShapes(): the DXF and shapefile Shape imports (Task 779).
-	ok('inwardX has one definition and 51 call sites', count(/inwardX\(/g) === 52, count(/inwardX\(/g));
-	ok('inwardY has one definition and 52 call sites', count(/inwardY\(/g) === 53, count(/inwardY\(/g));
+	// +2 each: the DXF network import places a customer's block point and its service line's first point (Task 772, placeDxfCustomers()).
+	ok('inwardX has one definition and 53 call sites', count(/inwardX\(/g) === 54, count(/inwardX\(/g));
+	ok('inwardY has one definition and 54 call sites', count(/inwardY\(/g) === 55, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-421. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-428. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -157,3 +157,12 @@ judgement and does not belong to a script.
 - [ ] R-418 feat/label-leader | (round 5) "(1) ... Please see issues at /tmp/labels*.png (2) Even so, I think this is a noticeable improvement on what is on production. (3) ... the pipe labels on leaders are costly. I am very happy to learn that the one-line labels are not costly, because they are a great trick that could be leveraged more as you see in the images I shared. (4) The justification helps. Thanks. (5) Leader trade acceptable? I guess not since I can't see it honored anywhere. A cost for no benefit is pointless. Revert." Images copied to dev/label-trials/tom-1020/: a leader running off the screen; one-line labels stacked in a column beside a crowd, each on a leader; "Leaders wanted" on Novato. -- round 6 on the branch
 - [ ] R-419 fix/examples-guide | "The re-ordering isn't better. We have to start with Basic mode because that's all a beginner wants to read. Restore the order at production with the headings formatting upgrade." -- round 2 on the branch
 - [ ] R-420 feat/theme-tank | "(1) I think there is promise in this direction. But the menus look more like brushed stainless steel buttons than like galvanized steel water tanks; maybe the brightest surface is too white and in general it comes across too shiny, where galvanized steel is usually perceive as a gray. ... with this aspect ratio, the mind says "Tank on hill", which is okay, but with that subconscious messaging, the bottom shading "feels" out of place. Also, I can see horizontal seams and several rivets, but I don't detect (a few or one or two per row?) vertical seams in a brickwork-like pattern. (2) The time series bubbles fit now on all themes." -- round 2 on the branch
+
+## 2026-10-24 afternoon (reply to the five-branch report)
+
+- [ ] R-422 fix/dock-widths | "Settings, Water age columns are misaligned ... several link and customer label rows' columns are misaligned, possibly related to whether or not they have a Decimals input. There seems to be a single 'wide' width applied without discretion ... This is not the individualized optimization I requested."
+- [ ] R-423 fix/phone-select | "I asked that phones dock and autohide the properties box automatically ... make it the initial default for Properties." Water menu order: "Properties, Settings, and Libraries may be a better order." Selected Customer glow: "I don't see it." "What does 'New value source: Above' mean?"
+- [ ] R-424 fix/phone-select | Morph a Junction into a vertex: "Refuse when it's not a simple merge/drop."
+- [ ] R-425 fix/browser-pass-a | ROAD text: "Probably C or revert the hiding decision and leave the overlap in the user's hands." Clean map: "is not for clicking, it's for IO." Customers table: put "Node" in the Connected asset column; "'Added to node' is confusingly too much."
+- [ ] R-426 feat/scenario-io | "I am startled by the message 'A DXF drawing is planar, and this project is in latitude and longitude...' In the past, EPP would try to import the shapefile." "Am I hearing that shapes have no alternative or scenarios? ... Don't we need to design them to use our scenario system with respect to 'Is active'?"
+- [ ] R-427 feat/first-view | "Go on the layout." Only Settings pinned; examples: "Maybe try creating a new design."; logging which example: "Does this mean yes, we can?"; workspaces: "Can it use the same paradigm [as the workspace export/import]?"

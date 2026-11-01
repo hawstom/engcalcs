@@ -310,8 +310,8 @@ head('6. THE POPUP: a property the type states renders DISABLED at its inherited
 	// ID" meant when the band was the ID alone, and is asserted that way rather than as slot 0,
 	// because a fixed slot is a number somebody has to re-count every time the band changes.
 	const controls = walk(pf).filter((e) => e._tag === 'select' || e._tag === 'input' || e._tag === 'textarea');
-	const afterBand = controls.slice(2);
-	check(controls.length > 2 && /^(input|textarea)$/.test(controls[0]._tag) && /^(input|textarea)$/.test(controls[1]._tag) &&
+	const afterBand = controls.slice(5);   // From, To, Active, Description, Tag (row order, 2026-10-29)
+	check(controls.length > 5 && controls.slice(0, 5).every((c) => /^(input|textarea)$/.test(c._tag)) &&
 		afterBand[0]._tag === 'select',
 		`the identity band's two text boxes come first and then the pipe type selector: ` +
 		controls.slice(0, 3).map((e) => e._tag).join(','));

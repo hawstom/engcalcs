@@ -69,6 +69,17 @@
 	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
 	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.
 	var README_LAYER = 'C-WATR-RDME';
+	// **THE .INP SECTIONS A BLOCK ATTRIBUTE CANNOT CARRY** (patterns, controls, rules, times, options...)
+	// ride as MTEXT on this ordinary, visible layer, outside the model prefix so an import never
+	// reads them as an asset (Tom, 2026-10-30: *"Why hidden? User can freeze."*). Not plotted.
+	var SECTIONS_LAYER = 'C-WATR-MODL-EPAN';
+	var SECTIONS_MARK = 'EPANET-INP';
+	// The embedded text is ONE MTEXT. Its header (what it is, and that it may be moved or frozen but
+	// not re-layered) ends at this line, which the import cuts through; the .inp text follows it.
+	var SECTIONS_BEGIN = ';' + SECTIONS_MARK + ' BEGIN';
+	// Reference width (group 41) of the read-me and of the embedded text, in text heights: the
+	// network's width, held between these, so a long line wraps in CAD instead of running off.
+	var WRAP_MIN = 80, WRAP_MAX = 160, CHAR_W = 0.9;
 	/**
 	 * An alternative's name as the part of a layer name after the asset code: capitals in the
 	 * page's locale, letters and digits of ANY script kept (pre-review 2026-10-07: "Пожар" fell back
@@ -247,11 +258,30 @@
 		(model.customers || []).forEach(function (c) { grow(c.x, c.y); });
 		(model.shapes || []).forEach(function (sh) { (sh.pts || []).forEach(function (p) { grow(p.x, p.y); }); });
 		if (!isFinite(ext.x0)) { ext = { x0: 0, y0: 0, x1: 1, y1: 1 }; }
+		// Both MTEXTs wrap at one reference width (group 41), the network's width held between WRAP_MIN
+		// and WRAP_MAX text heights. A line takes about CHAR_W per character (a high estimate), so the
+		// wrapped line count, and with it the height, is never under what a CAD program draws.
 		// The read-me's top-left corner sits above the top-left of the network, 3 units up and clear
-		// of its own height: a line of MTEXT is 5/3 of the text height from the next (the Reference's
-		// default line spacing factor of 1).
-		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + (5 / 3) * readme.length };
+		// of its own wrapped height: a line of MTEXT is 5/3 of the text height from the next (the
+		// Reference's default line spacing factor of 1).
+		var wrapW = Math.round(Math.min(WRAP_MAX, Math.max(WRAP_MIN, ext.x1 - ext.x0)));
+		function wrapped(lines) {
+			return lines.reduce(function (n, ln) { return n + Math.max(1, Math.ceil(String(ln).length * CHAR_W / wrapW)); }, 0);
+		}
+		var netTop = ext.y1, readmeH = (5 / 3) * wrapped(readme);
+		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + readmeH };
 		if (readme.length) { grow(readmeAt.x, readmeAt.y); }
+		var netRight = ext.x1, readmeRight = readme.length ? readmeAt.x + wrapW : ext.x1;
+		// The embedded text is one MTEXT, to the right of the network AND of the read-me's width, its top
+		// at the network's top. It starts with a header, a blank line and the BEGIN line.
+		var secLines = null, secAt = null;
+		if (model.sections !== undefined && model.sections !== null && String(model.sections) !== '') {
+			secLines = String(model.sections).replace(/\r\n?/g, '\n').split('\n');
+			if (model.sectionsHeader) { secLines = [String(model.sectionsHeader).replace(/\s+/g, ' '), ''].concat([SECTIONS_BEGIN], secLines); }
+			else { secLines = [SECTIONS_BEGIN].concat(secLines); }
+			secAt = { x: Math.max(netRight, readmeRight) + 10, y: netTop };
+			grow(secAt.x + wrapW, netTop - (5 / 3) * wrapped(secLines));
+		}
 		ext.x0 -= 2; ext.y0 -= 2; ext.x1 += 2; ext.y1 += 2;
 
 		// Handles are fixed for the structural objects, then counted up for everything else.
@@ -259,7 +289,7 @@
 			'ltByBlock', 'ltByLayer', 'ltCont', 'layer0', 'style', 'appAcad', 'dimStd', 'vpActive',
 			'brModel', 'brPaper', 'blkModel', 'endModel', 'blkPaper', 'endPaper',
 			'dictRoot', 'dictGroup', 'dictLayout', 'dictPsn', 'psnNormal', 'layoutModel', 'layoutPaper',
-			'layerReadme'
+			'layerReadme', 'layerSections'
 		].forEach(function (k) { H[k] = w.handle(); });
 		var hasCustomers = !!(model.customers || []).length;
 		var hasShapes = !!(model.shapes || []).length;
@@ -336,8 +366,7 @@
 		// left; 72 drawing direction, 5 = by style; 7 text style name, Standard; 1 the text, or its
 		// LAST chunk; 3 each earlier chunk, in order, of at most 250 characters (the Reference's
 		// limit for group 1 and 3 in an MTEXT). Layer, colour and plotting are the layer's (group 8):
-		// C-WATR-RDME, white, non-plotting. Group 41 (reference width) is left out, so a line is not
-		// wrapped. Within the text, "\P" ends a paragraph, and a literal backslash, "{" or "}" in a
+		// C-WATR-RDME, white, non-plotting. Group 41 (reference width) is wrapW, so a long line wraps. Within the text, "\P" ends a paragraph, and a literal backslash, "{" or "}" in a
 		// line (a project name) is written with MTEXT's own escapes, "\\", "\{" and "\}" (the
 		// Reference's MTEXT formatting codes), never a lookalike. Everything else goes through the one
 		// escape above, run by run, so the specials are never seen by it.
@@ -356,7 +385,26 @@
 			flush();
 			return out;
 		}
-		function mtext(lines, x, y, layer) {
+		// The embedded text goes out exactly as it is (no capitals, no cap on length), as ONE MTEXT with
+		// the same MTEXT escapes, however many 250-character chunks (group 3) it takes. The Reference's
+		// 2049-character limit is for a single group-code string; the chunks are how an MTEXT goes past it.
+		function mtextRaw(lines, x, y, layer, width) {
+			var chunks = [], cur = '', size = 0, parts = [];
+			lines.forEach(function (ln, n) {
+				if (n) { parts.push('\\P'); }
+				mtextParts(ln).forEach(function (q) { parts.push(q); });
+			});
+			parts.forEach(function (q) {
+				if (size + q.length > 250) { chunks.push(cur); cur = ''; size = 0; }
+				cur += q; size += q.length;
+			});
+			entity('MTEXT', layer);
+			body.g(100, 'AcDbMText').g(10, num(x)).g(20, num(y)).g(30, '0.0').g(40, '1.0').g(41, num(width))
+				.g(71, 1).g(72, 5);
+			chunks.forEach(function (c) { body.g(3, c); });
+			body.g(1, cur).g(7, 'Standard');
+		}
+		function mtext(lines, x, y, layer, width) {
 			var parts = [], chunks = [], cur = '', size = 0, k, j, per = lines.map(mtextParts), rest = 0, budget, sz;
 			function len(ps) { return ps.reduce(function (t, q) { return t + q.length; }, 0); }
 			for (k = 1; k < per.length; k++) { rest += 2 + len(per[k]); }
@@ -379,7 +427,7 @@
 			}
 			if (capped) { if (size + ELLIPSIS.length > 250) { chunks.push(cur); cur = ''; } cur += ELLIPSIS; }
 			entity('MTEXT', layer);
-			body.g(100, 'AcDbMText').g(10, num(x)).g(20, num(y)).g(30, '0.0').g(40, '1.0')
+			body.g(100, 'AcDbMText').g(10, num(x)).g(20, num(y)).g(30, '0.0').g(40, '1.0').g(41, num(width))
 				.g(71, 1).g(72, 5);
 			chunks.forEach(function (c) { body.g(3, c); });
 			body.g(1, cur).g(7, 'Standard');
@@ -465,7 +513,8 @@
 			}
 			lwpoly(sh.pts, lay, !!sh.closed);
 		});
-		if (readme.length) { mtext(readme, readmeAt.x, readmeAt.y, README_LAYER); }
+		if (readme.length) { mtext(readme, readmeAt.x, readmeAt.y, README_LAYER, wrapW); }
+		if (secLines) { mtextRaw(secLines, secAt.x, secAt.y, SECTIONS_LAYER, wrapW); }
 		// ---- BLOCKS, built next for the same reason ----
 		var blk = new Writer();
 		blk.next = body.next;
@@ -522,7 +571,7 @@
 				w.g(2, lt[1]).g(70, 0).g(3, lt[2]).g(72, 65).g(73, 0).g(40, '0.0');
 			});
 		w.g(0, 'ENDTAB');
-		table('LAYER', H.layerT, layerTypes.length + 2);
+		table('LAYER', H.layerT, layerTypes.length + 2 + (secLines ? 1 : 0));
 		rec('LAYER', H.layer0, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, '0').g(70, 0).g(62, 7).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
 		layerTypes.forEach(function (T) {
@@ -532,6 +581,10 @@
 		// Group 290 = 0: not plotted (the DXF Reference's LAYER plotting flag).
 		rec('LAYER', H.layerReadme, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, README_LAYER).g(70, 0).g(62, 7).g(6, 'Continuous').g(290, 0).g(370, -3).g(390, H.psnNormal);
+		if (secLines) {
+			rec('LAYER', H.layerSections, H.layerT, 'AcDbLayerTableRecord');
+			w.g(2, SECTIONS_LAYER).g(70, 0).g(62, 7).g(6, 'Continuous').g(290, 0).g(370, -3).g(390, H.psnNormal);
+		}
 		w.g(0, 'ENDTAB');
 		// **STYLE Standard ON txt, THE FONT AUTOCAD ITSELF GIVES IT** (Tom, 2026-10-06: *"Use
 		// 'Standard' style."*). Group 3 is the STYLE record's primary font file name (DXF Reference,
@@ -641,6 +694,9 @@
 	EngCalcs.lpnDxfWrite = writeDxf;
 	EngCalcs.lpnDxfModelPrefix = MODEL_PREFIX;
 	EngCalcs.lpnDxfReadmeLayer = README_LAYER;
+	EngCalcs.lpnDxfSectionsLayer = SECTIONS_LAYER;
+	EngCalcs.lpnDxfSectionsMark = SECTIONS_MARK;
+	EngCalcs.lpnDxfSectionsBegin = SECTIONS_BEGIN;
 	EngCalcs.lpnDxfAssetCodes = ASSET_CODE;
 	EngCalcs.lpnDxfAlternative = alternativeCode;
 	EngCalcs.lpnDxfTag = tagName;

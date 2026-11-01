@@ -143,7 +143,7 @@ async function main() {
 		const askOf = () => (a.dialogs.filter((x) => x.type === 'confirm')[0] || {}).message || '';
 		const plain = (d) => { d.scenarios = d.scenarios.filter((s) => s.id !== 'f4' && s.id !== 'f5'); d.project.activeScenario = d.scenarios[0].id; };
 		const pane = async () => {
-			if (!(await page.evaluate(() => { const p = document.getElementById('lpn_pane_tab_junctions'); return !!p && !!p.offsetParent; }))) {
+			if (!(await page.evaluate(() => { const p = document.getElementById('lpn_pane_tab_junctions'); return !!p && !!p.offsetParent && !p.closest('.lpn-pane-shut'); }))) {
 				await a.toolbarClick(await L('lpn_pane_toggle'));
 				await a.settle(500);
 			}
@@ -363,10 +363,10 @@ async function main() {
 		// ---- M6: Base's gutter, and the ID line ----
 		console.log('\n--- M6. the gutter in Base, and the ID line ---');
 		const lefts = () => page.evaluate(() => {
-			const t = document.querySelector('#lpn_popup_title input'), f = Array.from(document.querySelectorAll('#lpn_popup_fields > label')).filter((l) => l.offsetParent)[0];
+			const t = document.querySelector('#lpn_popup_title input'), f = Array.from(document.querySelectorAll('#lpn_popup_fields > label')).filter((l) => l.querySelector('.lpn-gname') || l.offsetParent)[0];   // a row is display: contents (Task 828): its name cell starts it
 			const g = document.querySelector('#lpn_popup_fields .lpn-ovm');
-			return { id: t ? Math.round(t.parentElement.getBoundingClientRect().left + parseFloat(getComputedStyle(t.parentElement).paddingInlineStart)) : null,
-				row: f ? Math.round(f.getBoundingClientRect().left) : null, gutter: !!g, cells: g ? g.children.length : 0,
+			return { id: t ? Math.round((t.parentElement.querySelector('.lpn-gname') || t.parentElement).getBoundingClientRect().left) : null,   // the ID row is on the grid: its name sits in the name track
+				row: f ? Math.round((f.querySelector('.lpn-gname') || f).getBoundingClientRect().left) : null, gutter: !!g, cells: g ? g.children.length : 0,
 				tcls: t ? t.parentElement.className + '/' + getComputedStyle(t.parentElement).paddingInlineStart + '/' + Math.round(t.parentElement.getBoundingClientRect().left) : '',
 				fcls: document.getElementById('lpn_popup_fields').className + '/' + getComputedStyle(document.getElementById('lpn_popup_fields')).paddingInlineStart + '/' + Math.round(document.getElementById('lpn_popup_fields').getBoundingClientRect().left) };
 		});

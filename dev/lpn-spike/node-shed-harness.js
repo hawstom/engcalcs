@@ -117,7 +117,7 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 L.setCanvas(1400, 900);
 L.applySaved(JSON.parse(fsmod.readFileSync(
-	ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8')));
+	ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8')));
 L.buildDom();
 L.setView(L.geoHome());
 L.noteMapSized();
@@ -538,7 +538,7 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	// Opened the way a project is opened -- applySaved() then buildDom() -- rather than by writing
 	// into `doc` behind the page's back, which leaves the element maps holding the previous network.
 	const saved = JSON.parse(fsmod.readFileSync(
-		ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8'));
+		ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8'));
 	saved.nodes = nodes; saved.links = links; saved.labels = [];
 	saved.nextId = nodes.length + links.length + 10;
 	delete saved.view; delete saved.origin; delete saved.controls;

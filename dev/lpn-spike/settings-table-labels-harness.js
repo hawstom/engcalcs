@@ -70,7 +70,7 @@ const files = ['Net1.lwn', 'Net3-Novato-CA-World.lwn', 'Net3-Novato-CA-World-SI.
 	'Basic-example-US-units.lwn', 'Basic-example-SI-units.lwn'];
 files.forEach(function (f) {
 	console.log('--- ' + f + ' ---');
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + f, 'utf8')));
+	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + (/^Basic-/.test(f) ? 'dev/lpn-spike/fixtures/' : f === 'Net1.lwn' ? 'dev/water-network-examples/' : 'examples/') + f, 'utf8')));
 	const shipped = L.labels().filter((r) => CODE.test(r.label.split(r.cpKey || '\u0000').join('')));
 	ok(f + ' as shipped: no Setting cell reads as a stored name', shipped.length === 0,
 		JSON.stringify(shipped.slice(0, 12).map((r) => r.label)));
@@ -91,7 +91,7 @@ files.forEach(function (f) {
 });
 // Tom's own examples, row for row: Node labels.ID.Is active / Show order / Drop order, a label's Before
 // and After stated or not (his "Bef. and Aft."), and a custom property's design owned by its key.
-L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8')));
+L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8')));
 L.addCustomProp();
 {
 	const rows = L.labels(), pick = (id) => rows.filter((r) => r.id === JSON.stringify(id))[0];

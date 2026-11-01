@@ -82,8 +82,8 @@ async function main() {
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		const L = {};
-		for (const k of ['lpn_units_warn_title', 'lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_ex_basic_us_title']) { L[k] = await a.lang(k); }
-		await a.openExampleCard(L.lpn_ex_basic_us_title);
+		for (const k of ['lpn_units_warn_title', 'lpn_units_nondestructive', 'lpn_units_destructive', 'lpn_cancel', 'lpn_ex_valves_title']) { L[k] = await a.lang(k); }
+		await a.openExampleCard(L.lpn_ex_valves_title);
 		await a.settle(600);
 		const p0 = await open();
 		ok('a US project with numbers in it is open', brief(p0.units) === 'ft / in / fth2o / gpm' && !!p0.pipe, brief(p0.units));

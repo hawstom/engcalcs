@@ -67,7 +67,7 @@ const L = loadLoopedNetwork(
 const EC = global.EngCalcs;
 
 function open(file) {
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + (/^Net[23]\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + (/^Net[123]\.lwn$/.test(file) ? 'dev/water-network-examples/' : 'examples/') + file, 'utf8'));
 	if (!saved) { throw new Error('did not open ' + file); }
 	L.applySaved(saved);
 	L.buildDom();

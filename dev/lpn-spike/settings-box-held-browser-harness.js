@@ -25,6 +25,7 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
+const { serveLatLonNet3 } = require('./latlon-net3-route.js');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const REPO = path.resolve(__dirname, '..', '..');
@@ -384,7 +385,15 @@ async function main() {
 		// Panning (a wheel zoom) writes nothing: the held view stays what was held.
 		const box = await page.$('#lpn_canvas');
 		const bb = await box.boundingBox();
-		await page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2);
+		// The wheel goes to a point of the map that no box covers: the Settings box floats over the canvas (round 8), and a wheel over a box is the box's, not the map's.
+		const open = await page.evaluate((r) => {
+			for (const fx of [0.5, 0.25, 0.75, 0.1, 0.9]) { for (const fy of [0.5, 0.8, 0.2, 0.9]) {
+				const x = r.x + r.width * fx, y = r.y + r.height * fy, t = document.elementFromPoint(x, y);
+				if (t && t.closest('#lpn_canvas')) { return { x, y }; }
+			} }
+			return null;
+		}, bb);
+		await page.mouse.move(open ? open.x : bb.x + bb.width / 2, open ? open.y : bb.y + bb.height / 2);
 		await page.mouse.wheel(0, -400);
 		await a.settle(1500);
 		await openBox();
@@ -423,7 +432,8 @@ async function main() {
 		ok('released, Peak follows Base\'s view again', (await view()).scale === '1:' + NB3, (await view()).scale);
 
 		console.log('\n--- 7. a geographic project: the centre is a latitude and a longitude ---');
-		const b = await Session.open(browser, 'B');
+		const b = await Session.open(browser, 'B', { serviceWorkers: 'block' });
+		await serveLatLonNet3(b.page);
 		await b.goto('Looped-Network.php');
 		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
 		await b.settle(1500);

@@ -56,9 +56,8 @@ if (isset($_POST['offline_ts'])) {
 // With a session, dedupe per (session, page) exactly as before. Without one there is nothing to
 // dedupe against and nothing may be stored to make one, so the event is written to the 'visit'
 // bucket instead of being thrown away.
-$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, EC_SEEN_CALC);
-if (!$alreadyLogged) {
-    ecMarkSeen($page, EC_SEEN_CALC);
+// Every row is a use and is logged (Tom, 2026-10-29). Nothing is de-duplicated and nothing is stored.
+{
 
     // Task 319: filtered and length-capped like the two columns above -- see ecBrowserLangTag().
     $browserLang = ecBrowserLangTag();

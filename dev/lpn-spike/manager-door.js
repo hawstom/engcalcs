@@ -1,5 +1,5 @@
-// The Scenario manager row of the Scenarios menu is greyed while Basic mode is on (Tom, 2026-10-13).
-// A browser harness that needs the manager open calls ensure(page, label) first: when `label` is the
+// Since 2026-10-25 the Scenario manager opens in Basic mode too, but with only a flat list. A browser
+// harness that needs the FULL manager calls ensure(page, label) first: when `label` is the
 // manager's own, it unticks Basic mode through the menu's Basic mode row, as a person would. Language-free:
 // Basic mode is the third row, after the two managers (the menu's order is Tom's, 2026-10-16).
 //
@@ -12,7 +12,7 @@ async function ensure(page, label) {
 	await page.click('#lpn_scenario_btn');
 	await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 	const rows = await page.$$('#lpn_menu_list button.lpn-menu-row');
-	if (rows.length > 2 && await rows[0].isDisabled()) {
+	if (rows.length > 2 && /^\s*✓/.test(await rows[2].textContent())) {
 		await rows[2].click();
 		await page.waitForTimeout(700);
 	} else {

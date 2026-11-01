@@ -24,6 +24,21 @@
         "below even carry the tag. An explicit list is the honest mechanism."
     ],
     "exempt": {
+        "lpn_prop_label_unit": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label} ({unit}) -- a punctuation template; English is the neutral form and a language changes it only to use its own comma or brackets."
+        },
+        "lpn_prop_label_symbol": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label}, {symbol} -- a punctuation template; see lpn_prop_label_unit."
+        },
+        "lpn_prop_label_symbol_unit": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "{label}, {symbol} ({unit}) -- a punctuation template; see lpn_prop_label_unit."
+        },
         "bpn_id": {
             "category": "symbol",
             "languages": "*",
@@ -258,11 +273,6 @@
             ],
             "reason": "Effic. -- the pump-energy efficiency column heading. Italian abbreviates 'efficienza' the same way; its agent was forced to 'Rend.' (rendimento) purely to clear the gate. Listed for it alone, because only its agent reported the collision."
         },
-        "lpn_energy_col_kwh": {
-            "category": "symbol",
-            "languages": "*",
-            "reason": "kWh -- same, as a column heading, where the bare symbol is exactly what is wanted. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
-        },
         "lpn_energy_kw": {
             "category": "symbol",
             "languages": "*",
@@ -292,16 +302,6 @@
             "category": "brand",
             "languages": "*",
             "reason": "EPANET Net3 is the sample network's own name, and the rest of the title is the project-mode name. Where a language keeps 'lat/lon' literal the whole title is legitimately identical to English; where it translates the mode name (10 of 26 files do) the value differs on its own. Exempt means identical is permanently CORRECT here, not that it must be identical. Added 2026-08-19 after the gate pushed three agents into distorting a correct title to defeat it -- an invented phrase, an em dash for a comma, and a coinage inconsistent with the same file's other mode-name strings."
-        },
-        "lpn_field_auto": {
-            "category": "cognate",
-            "languages": [
-                "es",
-                "fr",
-                "it",
-                "sw"
-            ],
-            "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13. Added sw, Task 251 wave 3, 2026-08-13: Latin script, so this is NOT the script-contamination defect that made hi and de fail here, and Swahili has no false-friend collision (a car is gari, not auto). The sw agent declared the choice explicitly as asked, reasoning that Otomatiki does not fit a narrow toggle and that Auto is the field register -- consistent with this project's finding that Tanzanian engineering practice is English-medium. Flag for native review; a native reader could still prefer Otomatiki."
         },
         "lpn_field_desc": {
             "category": "cognate",
@@ -401,38 +401,17 @@
             ],
             "reason": "Coefficient -- the correct French word is the English word. Tom, 2026-09-08, on the fr agent disambiguating it to 'Coefficient k' to clear the identical-to-English gate: 'That is the tail wagging the dog. The right answer is to add a standard comment flag to the French.' A gate that makes a translator write worse French than French has is a gate mis-set, not a translation problem."
         },
-        "lpn_full_col_id": {
-            "category": "symbol",
-            "languages": [
-                "bg",
-                "bn",
-                "cs",
-                "de",
-                "es",
-                "fr",
-                "hi",
-                "hr",
-                "id",
-                "it",
-                "my",
-                "ps",
-                "pt",
-                "ro",
-                "ru",
-                "sr",
-                "tr",
-                "uk",
-                "ur",
-                "zh"
-            ],
-            "reason": "ID -- identifier column heading, used as a symbol."
-        },
         "lpn_full_col_type": {
             "category": "cognate",
             "languages": [
                 "fr"
             ],
             "reason": "Type -- the French word is Type."
+        },
+        "lpn_heading_unit": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "{label} ({unit}) -- the template that puts a unit in a column heading, English order and ASCII brackets. A language may choose its own bracket (Chinese full-width) or order; identical is allowed, never required."
         },
         "lpn_geomap": {
             "category": "symbol",
@@ -443,13 +422,6 @@
             "category": "number-format",
             "languages": "*",
             "reason": "0.000 -- an example of how many decimals a map label shows, so it is a NUMBER FORMAT rather than a phrase. The suite splits 14 to 14 between the decimal point and the decimal comma, and both are right for their own readers, so neither can be the single correct value and identical-to-English is correct wherever the point is used."
-        },
-        "lpn_library_curve_note_label": {
-            "category": "cognate",
-            "languages": [
-                "fr"
-            ],
-            "reason": "Description -- identical in French. Its agent wrote 'Note descriptive' to clear the gate."
         },
         "lpn_library_curve_x": {
             "category": "symbol",
@@ -585,15 +557,6 @@
                 "pt"
             ],
             "reason": "'Base' is a real word in each of these, with this exact sense, and it is a scenario's proper NAME on screen. Sprint 316 (2026-08-14): four Romance agents arrived at it independently."
-        },
-        "lpn_scenario_base_value": {
-            "category": "cognate",
-            "languages": [
-                "es",
-                "it",
-                "pt"
-            ],
-            "reason": "'Base: {value}' -- follows lpn_scenario_base, since it reuses that scenario's name verbatim. Only the punctuation and placeholder surround it."
         },
         "lpn_scenario_label": {
             "category": "cognate",
@@ -893,14 +856,6 @@
             ],
             "reason": "'Export…' is the Romanian word. Sprint 1008."
         },
-        "lpn_split_no": {
-            "category": "cognate",
-            "languages": [
-                "es",
-                "it"
-            ],
-            "reason": "'No' is the Spanish and Italian word. Sprint 1012."
-        },
         "lpn_time_stat_minimum": {
             "category": "cognate",
             "languages": [
@@ -961,13 +916,6 @@
             ],
             "reason": "'{shape}, point {n}': 'point' is the French word, spelled identically."
         },
-        "lpn_field_demand_category": {
-            "category": "cognate",
-            "languages": [
-                "fr"
-            ],
-            "reason": "Description -- the French word is Description (sprint 737, 2026-10-14, replacing Libellé, which collided with the map Label)."
-        },
         "lpn_sm_merge_line": {
             "category": "placeholder",
             "languages": "*",
@@ -992,11 +940,6 @@
             "category": "placeholder",
             "languages": "*",
             "reason": "Placeholders and punctuation only ('{labels}: {field}, {part}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
-        },
-        "lpn_settings_held_base": {
-            "category": "placeholder",
-            "languages": "*",
-            "reason": "Placeholders and punctuation only ('{base}: {value}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
         },
         "lpn_field_type": {
             "category": "cognate",
@@ -1062,6 +1005,250 @@
                 "it"
             ],
             "reason": "No -- the word for no in Spanish and Italian (sprint 1017)."
+        },
+        "lpn_settings_held_item": {
+            "category": "symbol",
+            "languages": [
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_scnres_col": {
+            "category": "symbol",
+            "languages": [
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_scnres_at_time": {
+            "category": "symbol",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk"
+            ],
+            "reason": "Identical to English is correct: a placeholder-only template (sprint 1101, translators filed it)."
+        },
+        "lpn_gis_kind_arcgis": {
+            "category": "brand",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "pt",
+                "ro",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur"
+            ],
+            "reason": "Identical to English is correct: the ArcGIS REST (MapServer) service type, a product name (sprint 1101, translators filed it)."
+        },
+        "lpn_gis_kind_wms": {
+            "category": "brand",
+            "languages": [
+                "am",
+                "ar",
+                "bg",
+                "bn",
+                "cs",
+                "de",
+                "es",
+                "fa",
+                "fr",
+                "he",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ro",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur",
+                "zh"
+            ],
+            "reason": "Identical to English is correct: WMS, the OGC standard name (sprint 1101, translators filed it)."
+        },
+        "lpn_result_status_cv": {
+            "category": "symbol",
+            "languages": [
+                "am",
+                "ar",
+                "bn",
+                "cs",
+                "es",
+                "fa",
+                "fr",
+                "hi",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "ps",
+                "pt",
+                "ru",
+                "sr",
+                "sw",
+                "tr",
+                "uk",
+                "ur"
+            ],
+            "reason": "Identical to English is correct: CV, the EPANET status code for a check valve (sprint 1101, translators filed it)."
+        },
+        "lpn_file_import_shp": {
+            "category": "brand",
+            "languages": [
+                "es",
+                "hr",
+                "id",
+                "it",
+                "km",
+                "my",
+                "tr"
+            ],
+            "reason": "Identical to English is correct: Shapefile, the ESRI format name (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_zoom": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "fr",
+                "id",
+                "it",
+                "pt",
+                "ro"
+            ],
+            "reason": "Identical to English is correct: Zoom is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_desktop": {
+            "category": "cognate",
+            "languages": [
+                "id",
+                "it",
+                "ro"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_arcade": {
+            "category": "cognate",
+            "languages": [
+                "fr",
+                "it"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_theme_prairie": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the theme name is the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_angle": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_settings_grp_positions": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_inpup_i_descriptions": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
+        },
+        "lpn_inpup_i_options": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Identical to English is correct: the ordinary word in this language (sprint 1101, translators filed it)."
         }
     }
 }

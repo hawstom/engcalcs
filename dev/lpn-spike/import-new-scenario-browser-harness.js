@@ -46,7 +46,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const errors = [];
 	try {
-		const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net3-Novato-CA-World.lwn'), 'utf8'));
+		const d = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'latlon-originals', 'Net3-Novato-CA-World.lwn'), 'utf8'));
 		d.scenarios.push({ id: 's1', name: 'Peak hour', overrides: {}, demandMultiplier: 3 });
 		d.project = Object.assign({}, d.project, { name: 'Elm Street', activeScenario: 'base' });
 		d.settings.engine = 'native';

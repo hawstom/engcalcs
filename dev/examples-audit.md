@@ -57,8 +57,6 @@ was hard to see, because the migration ran, produced a curve, and produced it fr
 | `Net2.inp` → `Net2.lwn` | as above plus SOURCES (a real fluoride dose at node 1), PATTERNS×36 | all of it; the dose is recovered onto node 1 by `applySaved()`'s once-only `[SOURCES]` read | none |
 | `Net3.inp` → `Net3.lwn` | as Net1 plus STATUS, two pump curves | all of it | **both pump curves' names, and EPA's `104.` / `2000.` tokens rewritten as `104` / `2000`.** FIXED |
 | `Net3.inp` → `Net3-Novato-CA-World.lwn` | same source; the geographic placement is the curation | as Net3 | the two curves as above, **plus the `Quality Timestep 0:05` its source states.** BOTH FIXED |
-| `Basic-example-SI-units.lwn` | — | authored in metres on this page | no source to be behind |
-| `Basic-example-US-units.lwn` | — | authored, the teaching starter | no source to be behind |
 | `Elm-Street-Center.lwn` | — | Tom's own design snapshot with a CAD backdrop | no source to be behind |
 
 `[TAGS]`, `[MIXING]` and (in Net1 and Net3) `[SOURCES]` are stated as a bare header in all three EPA

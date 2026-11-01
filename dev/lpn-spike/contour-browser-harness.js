@@ -247,13 +247,13 @@ function boxFacts(page, withDem) {
 		const b = document.getElementById('lpn_contour_box'), body = document.getElementById('lpn_contour_body');
 		if (dem) {
 			// The DEM row is offered only with a located project and a token; stand one in, labelled as the page words it.
-			const rows = body.querySelectorAll('.lpn-set-row'), c = rows[rows.length - 1].cloneNode(true);
+			const rows = body.querySelectorAll('.lpn-grow'), c = rows[rows.length - 1].cloneNode(true);
 			c.firstChild.textContent = EngCalcs.pageConfig.lpn_contour_dem;
-			body.appendChild(c);
+			rows[rows.length - 1].parentNode.appendChild(c);
 		}
 		const r = b.getBoundingClientRect();
 		return { w: Math.round(r.width), h: Math.round(r.height), l: r.left, t: r.top, rt: r.right, bt: r.bottom, vw: window.innerWidth, vh: window.innerHeight,
-			rows: body.querySelectorAll('.lpn-set-row').length, vScroll: body.scrollHeight - body.clientHeight, hScroll: body.scrollWidth - body.clientWidth,
+			rows: body.querySelectorAll('.lpn-grow').length, vScroll: body.scrollHeight - body.clientHeight, hScroll: body.scrollWidth - body.clientWidth,
 			saved: localStorage.getItem('lpn_contourbox') };
 	}, !!withDem);
 }
@@ -273,7 +273,8 @@ async function sectionFit(Session, browser) {
 			ok(tag + ': all rows shown', f.rows >= 8, f.rows);
 			ok(tag + ': no vertical or horizontal scroll', g.vScroll <= 0 && g.hScroll <= 0, g.vScroll + ' / ' + g.hScroll);
 			ok(tag + ': within 600 x 600 and on screen', g.w <= 600 && g.h <= 600 && g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5, JSON.stringify(g));
-			ok(tag + ': not squat (height >= 0.9 x width)', g.h >= 0.9 * g.w, g.w + ' x ' + g.h);
+			// Task 828 put the rows on the sheet grid (24 px a row): the box is the height of its rows and no longer needs to be 0.9 x its width. What must hold is that it is not squashed: every row at its own height.
+			ok(tag + ': not squashed (every row at its sheet height)', g.h >= g.rows * 24, g.w + ' x ' + g.h + ', ' + g.rows + ' rows');
 		} finally { await a.close(); }
 	}
 	// A TALL LEGEND must not squash the box (Tom, 2026-10-03: ~120 px tall and scrolling).
@@ -296,7 +297,7 @@ async function sectionFit(Session, browser) {
 			console.log('         ' + tag + ': box ' + g.w + ' x ' + g.h + ' px with the DEM row; legend ' + JSON.stringify(lg));
 			ok(tag + ': a legend is showing', !!lg && lg.h > 100, JSON.stringify(lg));
 			ok(tag + ': all rows, no vertical or horizontal scroll', g.rows >= 8 && g.vScroll <= 0 && g.hScroll <= 0, g.rows + ' rows ' + g.vScroll + ' / ' + g.hScroll);
-			ok(tag + ': on screen and not wide and squat (height >= 0.9 x width)', g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5 && g.h >= 0.9 * g.w, JSON.stringify(g));
+			ok(tag + ': on screen and not squashed (every row at its sheet height)', g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5 && g.h >= g.rows * 24, JSON.stringify(g));
 			ok(tag + ': where it overlaps the legend, the box is on top', !!lg && lg.boxOnTop, JSON.stringify(lg));
 		} finally { await t.close(); }
 	}
@@ -332,7 +333,7 @@ async function sectionPhone(Session, browser) {
 		await contourFromMenu(a);
 		const fit = await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_contour_box'), r = b.getBoundingClientRect(), body = document.getElementById('lpn_contour_body');
-			const wide = Array.from(b.querySelectorAll('input, select, button, .lpn-set-row')).filter((e) => {
+			const wide = Array.from(b.querySelectorAll('input, select, button, .lpn-grid')).filter((e) => {
 				const q = e.getBoundingClientRect();
 				return q.width > 0 && (q.right > r.right + 0.5 || q.left < r.left - 0.5);
 			}).map((e) => e.id || e.className);

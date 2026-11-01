@@ -76,7 +76,7 @@ function helpers(a) {
 	const getClip = () => P.evaluate(() => navigator.clipboard.readText());
 	// The Shapes tab, by its own button.
 	const showTable = async () => {
-		const open = await P.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && p.offsetParent !== null && getComputedStyle(p).display !== 'none'; });
+		const open = await P.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && p.offsetParent !== null && getComputedStyle(p).display !== 'none' && !p.classList.contains('lpn-pane-shut'); });
 		if (!open) { await a.toolbarClick(await a.lang('lpn_pane_toggle')); await settle(400); }
 		await P.click('#lpn_pane_tab_shapes');
 		await settle(400);

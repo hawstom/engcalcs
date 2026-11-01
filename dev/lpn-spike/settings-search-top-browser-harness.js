@@ -49,7 +49,7 @@ function ok(label, cond, detail) {
 function view(page) {
 	return page.evaluate(() => {
 		const c = document.getElementById('lpn_setbox_content'), cr = c.getBoundingClientRect();
-		const rows = [...c.querySelectorAll('.lpn-set-row')].filter((e) => {
+		const rows = [...c.querySelectorAll('.lpn-set-row, [data-lpn-setting]')].filter((e) => {
 			if (!e.offsetParent) { return false; }
 			const b = e.getBoundingClientRect();
 			return b.height > 0 && b.bottom > cr.top + 2 && b.top < cr.bottom - 2;
@@ -65,7 +65,7 @@ async function walk(Session, browser, extra, tag) {
 		await a.goto('Looped-Network.php');
 		await a.answerTrainingPanel().catch(() => {});
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.openExampleCard(await a.lang('lpn_ex_basic_us_title'));
+		await a.openExampleCard(await a.lang('lpn_ex_valves_title'));
 		await a.settle(800);
 		await a.menuClick('Settings', 'project');
 		await a.settle(700);

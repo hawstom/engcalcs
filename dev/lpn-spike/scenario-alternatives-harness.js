@@ -261,7 +261,7 @@ console.log('\n--- no file changes ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- Basic mode ---');
 {
-	const s = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const s = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	L.applySaved(s);
 	L.buildDom();
 	const pk = L.createScenario('Peak Hour');
@@ -300,8 +300,8 @@ console.log('\n--- Basic mode ---');
 		L.deleteScenario(ownMult.id); L.deleteScenario(seeded.id);
 	}
 	basicRow().fn();
-	ok('ticking it again removes the stored key and closes the box',
-		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.smBoxIsOpen());
+	ok('ticking it again removes the stored key (the box stays, in its Basic face)',
+		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null);
 }
 
 // ---------------------------------------------------------------------------
@@ -312,7 +312,7 @@ console.log('\n--- Basic mode ---');
 // (it would vary by nothing, or by accident); a file changing because the store exists; a
 // scenario's setting leaking into Base, or Base's object being written through the seam.
 console.log('\n--- settings: every stored setting is named, once ---');
-const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8'));
+const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name, 'utf8'));
 const exampleFiles = fs.readdirSync(ROOT + 'examples/').filter(function (f) { return /\.lwn$/.test(f); });
 {
 	const CONTAINERS = ['settings', 'labelSettings', 'project', 'times'];

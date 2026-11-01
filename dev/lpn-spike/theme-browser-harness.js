@@ -17,7 +17,7 @@
 //      System under a dark device draws exactly what Dark draws (theme-design-browser-harness.js proves the
 //      print and the exported files stay Light).
 //   5. The chrome DOES change: the page, the Settings box and the menu popup compute different colours.
-//   6. Browser furniture only: `lpn_theme` is the one key, System removes it, and the stored project
+//   6. Browser furniture only: `lpn_theme` is the one key, System stores "system", and the stored project
 //      holds no theme (nothing in it says "theme" or "dark"), saved while Dark was chosen.
 //   7. The other calculator pages are NOT themed (decided with the plan: they carry a light Bootstrap navbar
 //      and the parent site's stylesheet, which are not tokens): no attribute, light, under a dark OS too.
@@ -130,6 +130,9 @@ async function main() {
 	// visible text element whose centre is over the canvas, walk up to the element that holds the canvas and
 	// composite the backgrounds met on the way; an element on no background of its own is on the paper. A
 	// themed panel (an overlay with its own background) is judged against that panel.
+	// The gallery is a scrolling panel; its foot (the Privacy link) is below a 1200 px window since the
+	// welcome line was moved clear of the Mode line, so the scan scrolls the foot into view first.
+	const scrollGalleryToEnd = () => { const l = Array.from(document.querySelectorAll('#lpn_empty_hint a')).filter((e) => /Privacy/.test(e.textContent))[0]; if (l) { l.scrollIntoView({ block: 'end' }); } };
 	const mapText = (page) => page.evaluate(() => {
 		const cv = document.getElementById('lpn_canvas'), cr = cv.getBoundingClientRect();
 		const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) { return [0, 0, 0, 0]; } const p = m[1].split(/[ ,\/]+/).map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
@@ -212,6 +215,7 @@ async function main() {
 			ok('1. first load: no stored choice, so System (resolved to data-theme=dark here), nothing stored', first.choice === 'system' && first.theme === 'dark' && first.stored === null, JSON.stringify(first));
 			ok('1. ...and Bootstrap is told dark', first.bs === 'dark', first.bs);
 			await a.settle(1200);
+			await a.page.evaluate(scrollGalleryToEnd);
 			checkMapText('9. gallery, dark', await mapText(a.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			const thumb = await a.page.evaluate(() => { const t = document.querySelector('.lpn-example-thumb'); return t ? getComputedStyle(t).backgroundColor : null; });
 			ok('10. an example thumbnail keeps its white paper in dark', thumb === LIGHT_BG, String(thumb));
@@ -332,7 +336,7 @@ async function main() {
 			ok('7. ...it keeps its light form surface under a dark OS with Dark chosen', other.form === 'rgb(247, 249, 255)', JSON.stringify(other));
 			await shot(a.page, 'calculator-dark.png');
 
-			// back to System: the key is removed and the OS rules again
+			// back to System: "system" is stored and the OS rules again
 			await a.goto('Looped-Network.php');
 			// The Settings box remembers that it was open (lpn_setbox), so a fresh page may already show it.
 			if (!(await a.page.isVisible('#lpn_settings_box'))) { await a.toolbarClick(await a.lang('lpn_tool_settings')); }
@@ -343,7 +347,7 @@ async function main() {
 			await choose(a.page, 'system');
 			await a.settle(300);
 			t = await attrs(a.page);
-			ok('1. back to System: the key is gone and the dark device decides', t.stored === null && t.choice === 'system' && t.theme === 'dark' && t.bs === 'dark', JSON.stringify(t));
+			ok('1. back to System: "system" is stored and the dark device decides', t.stored === 'system' && t.choice === 'system' && t.theme === 'dark' && t.bs === 'dark', JSON.stringify(t));
 
 			// 1. a scheme change while open repaints with no reload
 			await a.page.emulateMedia({ colorScheme: 'light' });
@@ -367,6 +371,7 @@ async function main() {
 			const sysTok = await b.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ec-bg').trim());
 			ok('1. System under a light OS paints light', t.choice === 'system' && t.theme === 'light' && t.bs === 'light' && sysTok === '#fff', JSON.stringify(t) + ' ' + sysTok);
 			await b.settle(1200);
+			await b.page.evaluate(scrollGalleryToEnd);
 			checkMapText('9. gallery, light', await mapText(b.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
 			checkMapText('9. Net1 open, light', await mapText(b.page), [/Something wrong/]);

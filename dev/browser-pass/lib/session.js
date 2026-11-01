@@ -30,6 +30,7 @@ class Session {
 	// and nothing happens, silently. Nothing is stubbed or hidden to fix that: the window is simply
 	// big enough for the page it is showing, which is also the window this page is designed for
 	// (a full-window drawing surface; see CLAUDE.md on not reasoning about it from a phone).
+	static FIXED_NOW = Date.UTC(2026, 9, 28, 15, 0, 0); // Wednesday 15:00 UTC: System
 	static VIEWPORT = { width: 1400, height: 1200 };
 
 	// **`extra` REACHES newContext AND NOTHING ELSE.** It exists for one property that cannot be set
@@ -39,6 +40,9 @@ class Session {
 	// 1.4-million-sample island hunt could not reproduce (specs/nodehit.js).
 	static async open(browser, name, extra) {
 		const context = await browser.newContext(Object.assign({ viewport: Session.VIEWPORT }, extra || {}));
+		// Task 824: a browser with no stored theme opens in the theme of the day. A fixed Wednesday (System)
+		// keeps every spec on the plain default; a spec that wants another day sets window.EC_NOW itself.
+		await context.addInitScript('if (typeof window.EC_NOW === "undefined") { window.EC_NOW = ' + Session.FIXED_NOW + '; }');
 		await context.addInitScript(INIT_SCRIPT);
 		await context.addInitScript(NATIVE_DIALOG_SEAM);
 		const page = await context.newPage();
@@ -519,6 +523,20 @@ class Session {
 			return n;
 		}
 		throw new Error(`${this.name}: no "${title}" card on the wall — it holds ${JSON.stringify(seen)}`);
+	}
+	// The Net1 card carries a scenario tree and rule-based controls (Tom, 2026-10-28). A harness that needs
+	// Net1 as EPA ships it with rules, one scenario (Base) alone, is handed the plain file in place of the card's:
+	// the page fetches examples/Net1-Scenarios.lwn and gets dev/water-network-examples/Net1.lwn instead.
+	async openNet1Plain(title) {
+		const fs = require('fs'), path = require('path');
+		const body = fs.readFileSync(path.join(__dirname, '..', '..', 'water-network-examples', 'Net1.lwn'), 'utf8');
+		await this.page.evaluate((text) => {
+			const real = window.fetch;
+			window.fetch = function (url, opts) {
+				return /examples\/Net1-Scenarios\.lwn/.test(String(url)) ? Promise.resolve(new Response(text, { status: 200 })) : real.call(window, url, opts);
+			};
+		}, body);
+		return this.openExampleCard(title);
 	}
 	// File ▸ New project… — which opens the NEW-PROJECT BOX.
 	//

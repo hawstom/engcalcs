@@ -48,9 +48,6 @@
         "lpn_result_pressure": [
             "pressure"
         ],
-        "lpn_result_head": [
-            "hydraulic-head"
-        ],
         "lpn_field_head": [
             "hydraulic-head"
         ],
@@ -180,9 +177,6 @@
             "gross-head"
         ],
         "mhp_diameter": [
-            "penstock"
-        ],
-        "mhp_length": [
             "penstock"
         ],
         "mhp_efficiency": [
@@ -411,6 +405,9 @@
         ],
         "lpn_sm_inherited": [
             "family-tree-inherit"
+        ],
+        "mphl_pipe_length": [
+            "penstock"
         ]
     }
 }

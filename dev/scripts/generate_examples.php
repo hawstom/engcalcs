@@ -105,13 +105,14 @@ function publishedExamples($srcDir, $metaFile) {
  * data such a filter would be built on, landed first and guarded, at the cost of no new lang key. */
 function exampleWork($name) {
 	$work = array(
-		'Basic-example-SI-units.lwn' => 'design',
-		'Basic-example-US-units.lwn' => 'design',
 		'Elm-Street-Center.lwn' => 'design',
 		'Valves.lwn' => 'design',
-		'Net1.lwn' => 'maintenance',
-		'Net1-SI.lwn' => 'maintenance',
+		'Fire-flow-extension.lwn' => 'design',
+		'Fire-flow-extension-SI.lwn' => 'design',
+		'Community-well-tank.lwn' => 'design',
+		'Community-well-tank-SI.lwn' => 'design',
 		'Net1-Scenarios.lwn' => 'maintenance',
+		'Net1-Scenarios-SI.lwn' => 'maintenance',
 		'Net2-Branford-CT.lwn' => 'maintenance',
 		'Net2-Branford-CT-SI.lwn' => 'maintenance',
 		'Net3-Novato-CA-World.lwn' => 'maintenance',

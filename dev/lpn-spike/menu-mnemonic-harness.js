@@ -270,7 +270,7 @@ async function preReviewSuite(browser, open) {
 	const openNet1 = async (pg) => {
 		await pg.evaluate(() => {
 			const cards = [...document.querySelectorAll('#lpn_examples_pane .lpn-example-card')];
-			const card = cards.find((c) => ((c.querySelector('.lpn-example-title') || c).textContent || '').trim() === 'EPANET Net1') || cards[0];
+			const card = cards.find((c) => ((c.querySelector('.lpn-example-title') || c).textContent || '').trim().indexOf('EPANET Net3') === 0) || cards[0];
 			card.click();
 		});
 		await pg.waitForTimeout(1500);

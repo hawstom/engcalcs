@@ -109,11 +109,11 @@ const pipe2 = L.addLink('pipe', jun.id, tank.id);
 head('1. The pipe pair is on all three screens, not just the popup');
 // =================================================================================================
 const linkPopup = textOf(L.popupLink(pipe.id));
-ok('the pipe popup still asks for both', linkPopup.indexOf(PC.lpn_reaction_bulk) >= 0
-	&& linkPopup.indexOf(PC.lpn_reaction_wall) >= 0);
-ok('the bulk one names its unit', linkPopup.indexOf(PC.lpn_reaction_bulk + ' (1/day)') >= 0);
+ok('the pipe popup still asks for both', linkPopup.indexOf(PC.lpn_reaction_bulk_short) >= 0
+	&& linkPopup.indexOf(PC.lpn_reaction_wall_short) >= 0);
+ok('the bulk one names its unit', linkPopup.indexOf(PC.lpn_reaction_bulk_short + ' (1/day)') >= 0);
 ok('and the wall one is a length per day, in the project\'s length unit',
-	linkPopup.indexOf(PC.lpn_reaction_wall + ' (ft/day)') >= 0);
+	linkPopup.indexOf(PC.lpn_reaction_wall_short + ' (ft/day)') >= 0);
 
 const pipeCols = L.paneCols('pipes');
 ok('the Pipes table has a column for each', pipeCols.indexOf('bulkCoeff') >= 0
@@ -157,8 +157,8 @@ ok('neither is a starting value nor a scenario push', L.pushShown('bulkCoeff') =
 head('3. The tank coefficient has a control, where the tank\'s other properties live');
 // =================================================================================================
 const tankPopup = textOf(L.popupNode(tank.id));
-ok('the tank popup asks for it', tankPopup.indexOf(PC.lpn_reaction_tank) >= 0);
-ok('and states the rate per day', tankPopup.indexOf(PC.lpn_reaction_tank + ' (1/day)') >= 0);
+ok('the tank popup asks for it', tankPopup.indexOf(PC.lpn_reaction_tank_short) >= 0);
+ok('and states the rate per day', tankPopup.indexOf(PC.lpn_reaction_tank_short + ' (1/day)') >= 0);
 const tankCols = L.paneCols('tanks');
 ok('the Tanks table has a column for it', tankCols.indexOf('tankCoeff') >= 0, tankCols.join(','));
 ok('headed by the word without the tab\'s own noun repeated in it',
@@ -214,9 +214,9 @@ head('6. None of it is offered while the analysis is not a chemical');
 // =================================================================================================
 L.setQuality({ mode: 'age' });
 ok('the pipe popup drops both rows',
-	textOf(L.popupLink(pipe.id)).indexOf('reaction coefficient') < 0);
+	textOf(L.popupLink(pipe.id)).indexOf(PC.lpn_reaction_bulk_short) < 0);
 ok('the tank popup drops its row',
-	textOf(L.popupNode(tank.id)).indexOf('Reaction coefficient') < 0);
+	textOf(L.popupNode(tank.id)).indexOf(PC.lpn_reaction_tank_short + ' (1/day)') < 0);
 ok('the Pipes table drops both columns', L.paneCols('pipes').indexOf('bulkCoeff') < 0
 	&& L.paneCols('pipes').indexOf('wallCoeff') < 0);
 ok('the Tanks table drops its column', L.paneCols('tanks').indexOf('tankCoeff') < 0);

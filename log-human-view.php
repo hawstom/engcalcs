@@ -86,8 +86,9 @@ if (isset($_POST['offline_ts'])) {
 // carried in the digit's page slot, and a visitor who switches language mid-page is one human
 // looking at one page -- counting them twice was always the weaker reading, and one digit per page
 // cannot express it anyway.
-$alreadyLogged = ecAnalyticsConsented() && ecSeen($page, EC_SEEN_HUMAN_VIEW);
-if (!$alreadyLogged) {
+// Every view is a use and is logged (Tom, 2026-10-29). The mark is no longer a de-duplication: it
+// only tells the next page this browser has already dwelt long enough (ecSessionAgeMs()).
+{
     ecMarkSeen($page, EC_SEEN_HUMAN_VIEW);
 
     // Task 319: filtered and length-capped like the two columns above -- see ecBrowserLangTag().

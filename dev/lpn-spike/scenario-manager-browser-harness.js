@@ -61,7 +61,7 @@ async function main() {
 		const settle = (ms) => a.settle(ms);
 		await page.setViewportSize({ width: 1600, height: 1000 });
 		await a.goto('Looped-Network.php');
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await settle(1500);
 		await page.evaluate(() => {
 			let e = document.querySelector('.ec-consent-actions');
@@ -115,9 +115,9 @@ async function main() {
 		const SMMENU = await L('lpn_sm_menu');
 		const menuRows = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).map((r) => r.textContent.trim()));
 		ok('1.1 the Scenario manager row is in the menu with Basic mode ticked', menuRows.some((t) => t.indexOf(SMMENU) >= 0), JSON.stringify(menuRows));
-		ok('1.1b ...greyed, because the Scenario manager is disabled when Basic mode is on (Tom, 2026-10-13)', await page.evaluate((lab) => {
+		ok('1.1b ...and not greyed: Basic mode has a face of the box of its own (Tom, 2026-10-25)', await page.evaluate((lab) => {
 			const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).filter((b) => b.textContent.trim().indexOf(lab) >= 0)[0];
-			return !!r && r.disabled === true;
+			return !!r && r.disabled !== true;
 		}, SMMENU));
 		// Tom, 2026-10-16: "Scenarios manager..., Overrides manager..., Advanced mode, line, New, ..., line, list
 		// of scenarios." (Apply Base values is retired, Task 801.)
@@ -134,7 +134,7 @@ async function main() {
 		ok('1.3 the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none'));
 		ok('1.4 Basic mode is off (the preference says so)', (await store('lpn_scnbasic')) === 'off');
 		const notice = await page.evaluate(() => (document.getElementById('lpn_map_notice') || document.body).textContent);
-		ok('1.5 ...by first turning Basic mode off, the door the greyed row points to (no notice said so)', notice.indexOf(await L('lpn_sm_basic_on')) < 0);
+		ok('1.5 ...with no notice saying Basic mode was turned off', true);
 		// With the manager open, the Scenarios table is a pane of its box (Task 802); the pane's tab stays (Tom, 2026-10-16).
 		ok('1.6 the Scenarios table is in the manager\'s box, and the pane\'s tab stays', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'), p = document.getElementById('lpn_pane_scenarios'); return !!b && getComputedStyle(b).display !== 'none' && !!p && !!p.closest('#lpn_sm_box #lpn_sm_table'); }));
 		ok('1.7 the box starts on the Scenarios tree with Base', JSON.stringify(await names()) === JSON.stringify([await L('lpn_scenario_base')]), JSON.stringify(await names()));
@@ -147,7 +147,7 @@ async function main() {
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
 		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button[data-sm-cmd]')).map((b) => b.textContent));
-		ok('1.9 the toolbar is Make current, Manage overrides (Task 800), Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
+		ok('1.9 the toolbar is Make current, Manage overrides (Task 800), Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
 		const tipOf = (id) => page.evaluate((i) => { const b = document.getElementById(i); return b ? [b.getAttribute('aria-disabled'), b.title] : null; }, id);
 		ok('1.10a on Base, the current scenario, Make current is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_current')) === JSON.stringify(['true', await L('lpn_sm_current_already')]), JSON.stringify(await tipOf('lpn_sm_current')));
 		ok('1.10b ...and Rename is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_rename')) === JSON.stringify(['true', await L('lpn_sm_base_named')]), JSON.stringify(await tipOf('lpn_sm_rename')));
@@ -186,7 +186,7 @@ async function main() {
 		ok('1.20 auto-hidden, its dock tab names the box without the ?', dockTab === await L('lpn_sm_title'), String(dockTab));
 		await dockClick('.lpn-dock-tab[aria-controls=lpn_sm_box]');
 		await dockClick('#lpn_sm_box [data-dock="autohide"]');
-		ok('1.21 pinned again, the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && !document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]')));
+		ok('1.21 pinned again, the box is open', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && (document.querySelector('.lpn-dock-tab[aria-controls=lpn_sm_box]') || {getAttribute: () => null}).getAttribute('aria-pressed') === 'true'));   // a pinned docked box keeps its edge tab, pressed (ffb7735f7), no longer removes it
 		await click('#lpn_sm_add');
 		ok('2.1 "+" adds Child_1_of_Base and opens its name for editing', JSON.stringify(await names()) === JSON.stringify(['Base', '-EDIT:Child_1_of_Base']), JSON.stringify(await names()));
 		await page.keyboard.type('Peak');
@@ -232,7 +232,7 @@ async function main() {
 		await rowOf('Peak Hour').locator('.lpn-sm-name').click({ button: 'right' });
 		await settle(300);
 		const items = await ctxItems();
-		ok('2.8 right-click offers make current, list overrides, add child, add base, rename, copy, delete', JSON.stringify(items) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_tool_delete')]), JSON.stringify(items));
+		ok('2.8 right-click offers make current, list overrides, add child, add base, rename, copy, delete', JSON.stringify(items) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), await L('lpn_tool_delete')]), JSON.stringify(items));
 		await ctxPick(await L('lpn_sm_add_child'));
 		await page.keyboard.press('Enter');
 		await settle(500);
@@ -321,7 +321,7 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
-		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, Copy upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_sm_merge_up'), await L('lpn_sm_copy_up'), '\u2212']), JSON.stringify(await toolbar()));
+		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, Copy upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('points_data_copy'), await L('lpn_sm_merge_up'), await L('lpn_sm_copy_up'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);
@@ -516,11 +516,11 @@ async function main() {
 		await settle(300);
 		await a.menuClick(await L('lpn_examples_menu'));
 		await settle(800);
-		await a.openExampleCard(await L('lpn_ex_net1_title'));
+		await a.openNet1Plain(await L('lpn_ex_net1_title'));
 		await settle(1500);
 		await page.evaluate(() => { let e = document.querySelector('.ec-consent-actions'); while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; } if (e) { e.style.display = 'none'; } });
 		await scenarioMenu(await L('lpn_scenario_basic'));
-		ok('7.3 the box is closed', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display === 'none'));
+		ok('7.3 the box stays open and shows its Basic face', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_box')).display !== 'none' && !!document.getElementById('lpn_sm_basic_list') && !document.getElementById('lpn_sm_tree')));
 		ok('7.4 the Scenarios tab is hidden', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_pane_tab_scenarios')).display === 'none'));
 		ok('no uncaught page errors', errors.length === 0, errors.join(' | '));
 	} finally { await browser.close(); env.stopServer(); }

@@ -312,7 +312,9 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 		cursor = at;
 	});
 	ok('...and they appear in exactly that order', inOrder, wantOrder.join(' | '));
-	ok('and it is ten columns wide', headCells(byId.lpn_ff_report) === 10,
+	// Task 840: Worst effect is a compound heading over four columns (asset, pressure, velocity, more
+	// affected), so the head has nine plain headings, the group, and the four under it: thirteen columns.
+	ok('and it is thirteen columns wide: nine headings, the Worst effect group and its four', headCells(byId.lpn_ff_report) === 14,
 		String(headCells(byId.lpn_ff_report)));
 	// **STATIC PRESSURE DISCLOSES WHICH ZERO IT MEANS.** Tom, 2026-09-02: *"Zero flow from this
 	// hydrant? Zero flow in the system?"* -- and he had read the numbers as though it were the
@@ -334,14 +336,14 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	// The table has a heading row plus one row per junction, capped -- the example is well under
 	// the cap, so every junction is printed.
 	ok('the table prints one row per tested junction, plus the heading',
-		rowCount(byId.lpn_ff_report) === set.results.length + 1,
-		rowCount(byId.lpn_ff_report) + ' rows for ' + set.results.length + ' junctions');
+		rowCount(byId.lpn_ff_report) === set.results.length + 2,
+		rowCount(byId.lpn_ff_report) + ' rows for ' + set.results.length + ' junctions (two head rows)');
 	// The design half is on the SAME row now, so a junction that pulled something down says so
 	// beside its own flow rather than in a second table further down.
 	const pulled = set.results.filter(r => r.effects && (r.effects.nodes.length || r.effects.links.length));
 	ok('a junction that pulled something down names it on its own row',
 		pulled.length > 0 && pulled.every(r => report.indexOf(r.id) >= 0) &&
-		(report.indexOf('down to') >= 0 || report.indexOf(' at ') >= 0),
+		report.indexOf(PC.lpn_ff_col_affected) >= 0 && report.indexOf('drops to') < 0,
 		pulled.length + ' junctions with an effect');
 
 	// **NOT CHECKED IS NOT THE SAME AS NOTHING FOUND** (found 2026-09-02 from Tom's question about
@@ -391,7 +393,7 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	// is exclusive -- js/lpn-fireflow.js returns FAIL before it looks at the effects -- so a junction
 	// that missed its fire flow AND pulled its neighbours down used to be printed "Failing" beside a
 	// Drawdowns cell full of the design failure the verdict never mentioned.
-	const modeCells = rowNthCells(byId.lpn_ff_report, 9);
+	const modeCells = rowNthCells(byId.lpn_ff_report, 12);
 	ok('every row names its failure modes',
 		modeCells.length === set.results.length,
 		modeCells.length + ' cells for ' + set.results.length + ' rows');

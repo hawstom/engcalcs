@@ -53,8 +53,7 @@ const ROWS = [
 	['#lpn_tabs .lpn-tab-current', 'background-color', 'ec-bg'],
 	['.lpn-pane', 'background-color', 'ec-bg'],
 	['.lpn-pane', 'border-top-color', 'ec-border-strong'],
-	['.lpn-pane-grip', 'background-color', 'ec-gray-f2f2f2'],
-	['.lpn-pane-grip', 'border-bottom-color', 'ec-gray-e0e0e0'],
+	// .lpn-pane-grip is a transparent hit strip since b1c19252c (pill grabber, no grey slab): nothing of its own to follow a token.
 	['.lpn-pane-head', 'border-bottom-color', 'ec-border'],
 	['.lpn-pane-tab:not([aria-selected="true"])', 'background-color', 'ec-gray-f0f0f0'],
 	['#lpn_settings_box', 'background-color', 'ec-bg'],

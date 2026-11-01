@@ -186,7 +186,7 @@ async function main() {
 		const none = await a.page.$eval('#lpn_ds_controls [data-ds="search"]', (h) => h.textContent);
 		console.log('  answer: ' + none.slice(0, 160) + '\n  notice: ' + await notice());
 		ok('nothing selected: the All answer is not left standing as if it were the Selected one', none.indexOf(all.slice(0, 40)) < 0, none.slice(0, 120));
-		ok('...and the refusal is said in the box, under Find', none === await a.lang('lpn_ds_no_selection'), none.slice(0, 120));
+		ok('...and the refusal is said in the box, under Find', none === await a.lang('lpn_ff_no_selection'), none.slice(0, 120));
 
 		await a.context.close();
 	} finally {

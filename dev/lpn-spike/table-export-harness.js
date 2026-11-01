@@ -105,7 +105,7 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 (async function () {
 	setUnitSet('us');
 	L.reset();
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	L.applySaved(saved);
 	L.buildDom();
 	L.runSolve();
@@ -181,7 +181,7 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 	// The stub fills an <input>'s value only for typed cells: a computed result, a yes/no and a
 	// pull-down read blank here, where a browser shows 150, a tick and the option's label. Those
 	// four columns are held to what the screen shows by name instead.
-	const SHOWN_BLANK = { [PC.lpn_field_active]: /^[01]$/, 'Demand (gpm)': /^-?[\d.]+$/, 'Source type': /^None$/, 'Source pattern': /^No pattern$/, 'Demand pattern': /^\((default: .+|constant)\)$/ };
+	const SHOWN_BLANK = { [PC.lpn_field_active_short]: /^[01]$/, 'Demand (gpm)': /^-?[\d.]+$/, 'Source type': /^None$/, 'Source pattern': /^No pattern$/, 'Demand pattern': /^\((default: .+|constant)\)$/ };
 	const diffs = [];
 	parsed.slice(1).forEach((r, i) => r.forEach((t, j) => {
 		if (t === live[i][j]) { return; }

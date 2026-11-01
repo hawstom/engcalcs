@@ -175,14 +175,14 @@ async function main() {
 		};
 		const popupField = (label) => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0)[0];
+				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0).sort((x, y) => !!x.querySelector('input[type="checkbox"]') - !!y.querySelector('input[type="checkbox"]'))[0];   // "Longitud" also begins "Longitud automática": the value field wins over the Auto checkbox
 			if (!l) { return null; }
 			const i = l.querySelector('input'), h = l.querySelector('.ec-help');
 			return { value: i ? i.value : null, tip: h ? (h.title || h.getAttribute('data-bs-original-title') || '') : null };
 		}, label);
 		const typePopup = (label, v) => page.evaluate(([t, val]) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0)[0];
+				.filter((x) => x.textContent.replace(/­/g, '').trim().indexOf(t) === 0).sort((x, y) => !!x.querySelector('input[type="checkbox"]') - !!y.querySelector('input[type="checkbox"]'))[0];   // "Longitud" also begins "Longitud automática": the value field wins over the Auto checkbox
 			const i = l.querySelector('input');
 			i.focus(); i.value = val;
 			i.dispatchEvent(new Event('input', { bubbles: true }));
@@ -335,10 +335,8 @@ async function main() {
 			ok(id + ' opens in Properties', await clickEl('#lpn_canvas [data-link="' + id + '"]'));
 			await page.evaluate((t) => {
 				const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
-					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf(t) === 0)[0];
-				let n = l.nextElementSibling;
-				while (n && !(n.querySelector && n.querySelector('input[type="checkbox"]'))) { n = n.nextElementSibling; }
-				const box = n.querySelector('input[type="checkbox"]');
+					.filter((x) => x.textContent.replace(/\u00ad/g, '').trim().indexOf(((window.EngCalcs && EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_field_auto_length) || 'Auto length').trim()) === 0)[0];   // the page's own word, so a translated page is found
+				const box = l.querySelector('input[type="checkbox"]');   // Auto length is a row of its own above Length (Task 828)
 				box.checked = false; box.dispatchEvent(new Event('change', { bubbles: true }));
 				box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true }));
 			}, esLen);
@@ -360,9 +358,9 @@ async function main() {
 		await closePopup();
 
 		// ---- 7 ------------------------------------------------------------------------------------
-		console.log('\n7. THE SHIPPED BASIC EXAMPLES (reported, not asserted)');
+		console.log('\n7. THE SHIPPED NET1 EXAMPLES (reported, not asserted)');
 		const fs = require('fs');
-		for (const [file, key] of [['Basic-example-US-units.lwn', 'lpn_ex_basic_us_title'], ['Basic-example-SI-units.lwn', 'lpn_ex_basic_si_title']]) {
+		for (const [file, key] of [['Net1-Scenarios.lwn', 'lpn_ex_net1_title'], ['Net1-Scenarios-SI.lwn', 'lpn_ex_net1_si_title']]) {
 			const was = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', file), 'utf8'));
 			const b = await Session.open(browser, 'slopelen-ex', { viewport: { width: 1500, height: 950 } });
 			await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
@@ -381,9 +379,7 @@ async function main() {
 				if (Math.abs(pct) > Math.abs(worst.pct)) { worst = { id: l.id, pct }; }
 			});
 			console.log('       largest: ' + worst.id + ' ' + worst.pct.toFixed(2) + '%');
-			// L6 runs from R2 (200) to J4 (60): 140 ft or m of rise over 420 of drawing.
-			ok(file + ' is brought to slope distance on open: L6 = sqrt(420^2 + 140^2 or 42^2)',
-				near(now.L6.len, slope(420, file.indexOf('US') >= 0 ? 140 : 42), 1e-6), now.L6.len);
+			ok(file + ' opens with every pipe at its stored length (no auto length is re-derived)', worst.pct === 0 || Math.abs(worst.pct) < 1e-9, worst.pct.toFixed(4) + '%');
 			ok('...and stamped as the current version', bDoc.v >= 13, String(bDoc.v));
 			ok(file + ' opens with no unsaved-work mark', !(await b.currentTabDirty()));
 			await b.close();

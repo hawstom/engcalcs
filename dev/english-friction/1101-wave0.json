@@ -1,0 +1,282 @@
+{
+    "sprint": "1101-wave0",
+    "description": "Wave 0 adversarial English pass over the 236 keys wave0_keyset.php --new-and-changed leaves for review (407 in scope, 171 already ruled by Tom). Each was read in its call-site context where the string alone was unclear and asked for every reading a careful non-native translator could take. 23 entries filed, all open with a PROPOSED rewrite (nothing written to lib/lang.ec.en.php). The other keys read one way only.",
+    "entries": [
+        {
+            "key": "lpn_morph_vertex_links",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"a vertex lives on exactly one pipe\": \"lives\" is the everyday verb for residing, and a translator renders it that way or as \"exists\".",
+            "readings": [
+                "a vertex belongs to one pipe as one of its bends",
+                "a vertex resides (lives) on a pipe, as a person lives in a house"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: it joins {n} pipes, and a vertex belongs to exactly one pipe, so a junction must join exactly two."
+        },
+        {
+            "key": "lpn_morph_vertex_kind",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"a vertex lives only on a pipe\": same everyday-verb \"lives\".",
+            "readings": [
+                "a vertex can be only a bend of a pipe",
+                "a vertex resides on a pipe"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: a pump or a valve is connected to it, and a vertex can be only a bend of a pipe."
+        },
+        {
+            "key": "lpn_morph_vertex_own",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"it has its own elevation, tag, description or other data\": \"its own\" reads as possession (it owns) or as a contrast with some shared value; \"Clear it first\" has no clear referent (the junction, or the data).",
+            "readings": [
+                "it has an elevation, tag or description of its own that differs from a default",
+                "it has elevation, tag, description or other data entered, which must be cleared"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). {id} was not morphed into a vertex: it has an elevation, tag, description or other data, and a vertex has none. Clear that data first."
+        },
+        {
+            "key": "lpn_ovm_dot_alt_shared",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"so clear or edits change them too\": \"clear\" parses as an adjective (transparent, plain) beside \"edits\" as a noun.",
+            "readings": [
+                "clearing the override, or editing it, changes the others too",
+                "\"clear\" as an adjective: a clear or edits (changes) change them"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). This override is stored in alternative \"{alternative}\", also used by {list}, so clearing it or editing it changes them too."
+        },
+        {
+            "key": "lpn_ex_valves_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"each one controlling at the solved state\": \"controlling\" can mean exerting control (regulating, EPANET Active) or being a control (a [CONTROLS] rule); \"the solved state\" is not a defined term.",
+            "readings": [
+                "each valve is regulating (active) in the solution",
+                "each valve is acting as a control rule or being controlled"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). each valve regulating in the solution."
+        },
+        {
+            "key": "lpn_ex_extension_si_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A fire hydrant junction passes 95 L/s with 14 m of residual pressure\": \"passes\" reads as passes a test (meets a requirement) or as flows through.",
+            "readings": [
+                "the junction delivers that flow while holding that residual pressure",
+                "the junction passes a fire flow test at that flow and pressure"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 95 L/s with 14 m of residual pressure."
+        },
+        {
+            "key": "lpn_ex_extension_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A fire hydrant junction passes 1,500 gpm with 20 psi of residual pressure\": \"passes\" reads as passes a test (meets a requirement) or as flows through.",
+            "readings": [
+                "the junction delivers that flow while holding that residual pressure",
+                "the junction passes a fire flow test at that flow and pressure"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 1,500 gpm with 20 psi of residual pressure."
+        },
+        {
+            "key": "lpn_ex_well_si_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A fire hydrant junction passes 32 L/s with 14 m of residual pressure\": \"passes\" reads as passes a test (meets a requirement) or as flows through.",
+            "readings": [
+                "the junction delivers that flow while holding that residual pressure",
+                "the junction passes a fire flow test at that flow and pressure"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 32 L/s with 14 m of residual pressure."
+        },
+        {
+            "key": "lpn_ex_well_desc",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A fire hydrant junction passes 500 gpm with 20 psi of residual pressure\": \"passes\" reads as passes a test (meets a requirement) or as flows through.",
+            "readings": [
+                "the junction delivers that flow while holding that residual pressure",
+                "the junction passes a fire flow test at that flow and pressure"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A fire hydrant junction delivers 500 gpm with 20 psi of residual pressure."
+        },
+        {
+            "key": "lpn_contour_buffer",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Buffer\": a translator renders it as a GIS buffer polygon, a memory buffer, or a shock absorber, and the unit \"× median pipe length\" does not settle which.",
+            "readings": [
+                "a margin of ground added around the network's extent, in median pipe lengths",
+                "a GIS buffer zone around each pipe"
+            ],
+            "disposition": "dismissed",
+            "resolution": "\"Buffer\" is the GIS industry term for this margin (conventional wording rule); the label carries its unit, and the payload context gives the tip."
+        },
+        {
+            "key": "lpn_dxf_note_headloss",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"ROUGHNESS is stated in the terms of that formula\": \"terms\" reads as wording, conditions, or the units and meaning of a formula.",
+            "readings": [
+                "the ROUGHNESS value is on the scale of that formula's coefficient",
+                "ROUGHNESS is worded or described using that formula"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Head loss formula: {formula} ({code}). ROUGHNESS is the roughness coefficient of that formula."
+        },
+        {
+            "key": "lpn_full_needs_run",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Press Calculate\": \"press\" is the keyboard/hardware sense; Calculate is a button, which Tom's word call says is clicked.",
+            "readings": [
+                "press a keyboard key named Calculate",
+                "click the Calculate button"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). The full report lists every node and every link at every reporting time step. Click Calculate, then open Water, Reports, Full."
+        },
+        {
+            "key": "lpn_ds_intro",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Press the Run button\" and \"Press the Find button\": buttons are clicked, and \"press\" reads as a keyboard action.",
+            "readings": [
+                "press a key",
+                "click a button"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Replace both \"Press\" with \"Click\" (Click the Run button ... Click the Find button ...)."
+        },
+        {
+            "key": "lpn_full_note",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A blank cell is a column that quantity does not have\": says a cell is a column, and \"that quantity\" has no antecedent.",
+            "readings": [
+                "a blank cell means the column's quantity does not apply to that node or link",
+                "a blank cell is itself a column the quantity lacks"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). A cell is blank where the node or link has no such quantity."
+        },
+        {
+            "key": "lpn_menu_back",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Back\" alone: a translator may take it as the rear/body part, or as returning to the previous page rather than the previous menu level.",
+            "readings": [
+                "return to the previous menu level",
+                "go back in browser history, or the rear side"
+            ],
+            "disposition": "dismissed",
+            "resolution": "\"Back\" on a phone menu is the standard UI word every locale already has; the row is narrow, and key_context names the call site."
+        },
+        {
+            "key": "lpn_gis_draw",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Draw\" beside a checkbox: the verb reads as an instruction to draw (create) something; it means display the layer on the map. Tom's word call: a single checkbox says Check/Show, not an action verb.",
+            "readings": [
+                "show this layer on the map",
+                "draw (create) a layer by hand"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Show"
+        },
+        {
+            "key": "lpn_gjup_h_notes",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Reading the file\" as a heading above a list of import notes: reads as instructions for how to read the file, or as the act of reading in progress.",
+            "readings": [
+                "notes about what was read from the file",
+                "how to read the file (instructions)"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Import notes"
+        },
+        {
+            "key": "lpn_ff_col_more",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"How many others\": others of what is not stated (junctions, pipes, steps).",
+            "readings": [
+                "other junctions that also fall below the limit",
+                "other pipes or steps"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom chose \"How many others\" himself (2026-11-01); kept."
+        },
+        {
+            "key": "lpn_guide_bx_dock_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"tucks back into its tab\", \"A tucked box\": idiom; a translator renders it literally (folded, hidden away) and may conclude the box is closed.",
+            "readings": [
+                "the box collapses to its tab and is still open",
+                "the box is put away/closed"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Replace \"tucks back into its tab\" with \"collapses to its tab\", \"A tucked box\" with \"A collapsed box\", \"brings it out of its tab\" with \"expands it from its tab\"."
+        },
+        {
+            "key": "lpn_guide_bx_phone_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"it flies out over the map\": idiom for a flyout panel, read literally as flying.",
+            "readings": [
+                "the box opens as a panel over the map",
+                "the box flies/moves out"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). At 640 px or narrower, a docked box is always an auto-hide tab, and it opens as a panel over the map."
+        },
+        {
+            "key": "lpn_guide_ct_box_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Bands, which paints each class flat\": \"flat\" reads as level, smooth-surfaced or dull, not one solid color.",
+            "readings": [
+                "each class is painted in one solid color",
+                "each class is painted level/without relief"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Bands, which paints each class in one solid color"
+        },
+        {
+            "key": "lpn_dxfnet_note_end_ambiguous",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"so the node cannot be told\": \"told\" is an idiom (distinguished) that reads as informed.",
+            "readings": [
+                "it cannot be determined which of the two nodes the link ends at",
+                "the node cannot be informed/instructed"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). These links have an end where two nodes lie on the same point, so which node the link ends at cannot be determined, and they were not imported."
+        },
+        {
+            "key": "lpn_file_import_dxfnet_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Open a DXF file that this page exported as a new project\": \"as a new project\" can attach to \"exported\" or to \"Open\".",
+            "readings": [
+                "open the file, as a new project",
+                "the page exported the file as a new project"
+            ],
+            "disposition": "english",
+            "resolution": "English rewritten as proposed (orchestrator, 2026-11-01). Create a new project from a DXF file that this page exported. The blocks and polylines on layers beginning C-WATR-MODL- are read with their attributes. Anything else in the drawing is listed and not read."
+        }
+    ]
+}

@@ -127,7 +127,7 @@ async function main() {
 		await settle(900);
 		await P.evaluate(() => { const b = document.querySelector('#lpn_popup .lpn-box-corner'); return b; });
 		const phone = await P.evaluate(() => ({ btns: document.querySelectorAll('#lpn_popup .lpn-box-corner button[data-dock]').length, w: document.getElementById('lpn_popup').getBoundingClientRect().width, iw: window.innerWidth }));
-		ok('no dock button is offered, and the open box fills the window', phone.btns === 0 && phone.w >= phone.iw - 20, JSON.stringify(phone));
+		ok('a phone offers the side and float buttons and no pin, and the open box is a flyout over the map, not the whole window', phone.btns === 2 && phone.w < phone.iw - 20, JSON.stringify(phone));
 		await a.context.close().catch(() => {});
 
 		console.log('\n6. Another language');

@@ -135,15 +135,15 @@ async function main() {
 		ok('R1 GeoJSON notice names the scenario', /It holds the scenario Peak hour only\./.test(gp.notice), gp.notice);
 		ok('R2 stale results are not attached to Peak hour', gp.text && !/"has_results":\s*true/.test(gp.text) && !/"head":/.test(gp.text.replace(/"has_results"/g, '')), gp.text && String(/"has_results":\s*true/.test(gp.text)));
 		ok('R2 the notice names Base as the results\' scenario', gp.notice.indexOf((await L('lpn_geojson_results_other')).replace('{scenario}', base).trim()) >= 0, gp.notice);
-		ok('R1 the GeoJSON export from Peak hour is asked first, naming the scenario', gp.asked && gp.asked.indexOf('It holds the scenario Peak hour only') >= 0, gp.asked);
-		ok('R1 Base export is asked first while Peak hour exists', gb.asked && gb.asked.indexOf((await L('lpn_export_holds_base')).trim()) >= 0, gb.asked);
+		ok('R1 the GeoJSON export from Peak hour is asked first, naming the scenario', gp.asked && gp.asked.indexOf('Exporting the scenario "Peak hour" to a unique file name.') >= 0, gp.asked);
+		ok('R1 Base export is asked first while Peak hour exists', gb.asked && gb.asked.indexOf((await L('lpn_export_goes_base')).trim()) >= 0, gb.asked);
 		const ip = await doExport('lpn_file_export_item_inp');
 		ok('R1 EPANET file name carries the scenario', ip.name === 'Elm-Street-Peak-hour.inp', ip.name);
-		ok('R1 the EPANET export is asked first', ip.asked && ip.asked.indexOf('It holds the scenario Peak hour only') >= 0, ip.asked);
+		ok('R1 the EPANET export is asked first', ip.asked && ip.asked.indexOf('Exporting the scenario "Peak hour" to a unique file name.') >= 0, ip.asked);
 		ok('R1 EPANET notice names the scenario', /It holds the scenario Peak hour only\./.test(ip.notice), ip.notice);
 		const dp = await doExport('lpn_file_export_item_dxf');
 		ok('R1 DXF file name carries the scenario', dp.name === 'Elm-Street-Peak-hour.dxf', dp.name);
-		ok('R1 the DXF export is asked first', dp.asked && dp.asked.indexOf('It holds the scenario Peak hour only') >= 0, dp.asked);
+		ok('R1 the DXF export is asked first', dp.asked && dp.asked.indexOf('Exporting the scenario "Peak hour" to a unique file name.') >= 0, dp.asked);
 		ok('R1 DXF notice names the scenario', /It holds the scenario Peak hour only\./.test(dp.notice), dp.notice);
 
 		console.log('--- R3. survey points in Peak hour ---');
@@ -210,7 +210,7 @@ async function main() {
 		await reopen(d6);
 		const e0 = await doExport('lpn_file_export_item_inp');
 		// Task 814: a receipt dialog now ends every export, but with Base alone it claims nothing is left behind.
-		ok('R6 Base alone, no alternatives: no question, a receipt, no sentence about what is left', !(e0.asked && e0.asked.indexOf((await L('lpn_export_confirm_lead')).split('{format}')[1].split('{n}')[0]) >= 0) && !!e0.dialog && /Elm-Street\.inp/.test(e0.dialog) && !/It holds/.test(e0.dialog) && !/It holds/.test(e0.notice), e0.dialog + ' | ' + e0.notice);
+		ok('R6 Base alone, no alternatives: no question, a receipt, no sentence about what is left', !(e0.asked && e0.asked.indexOf((await L('lpn_noscn_lead')).split('{format}')[1].split('{n}')[0]) >= 0) && !!e0.dialog && /Elm-Street\.inp/.test(e0.dialog) && !/It holds/.test(e0.dialog) && !/It holds/.test(e0.notice), e0.dialog + ' | ' + e0.notice);
 		d6.alternatives = [{ id: 'a1', category: 'physical', name: 'A', parent: null }, { id: 'a2', category: 'physical', name: 'B', parent: 'a1', values: {} }];
 		await reopen(d6);
 		const e1 = await doExport('lpn_file_export_item_geojson');

@@ -70,7 +70,7 @@ async function main() {
 			delete window.lpnDialogAnswerer;
 		});
 		await clearSeams();
-		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.openNet1Plain(await a.lang('lpn_ex_net1_title'));
 		await a.settle(1500);
 		await clearSeams();
 

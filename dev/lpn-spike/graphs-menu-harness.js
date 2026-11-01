@@ -58,7 +58,7 @@ async function main() {
 			await page.waitForTimeout(300);
 			const sel = await page.$eval('#lpn_pane_tab_' + id, (e) => e.getAttribute('aria-selected'));
 			ok(label + ' opens its tab', sel === 'true', sel);
-			const open = await page.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && getComputedStyle(p).display !== 'none'; });
+			const open = await page.evaluate(() => { const p = document.getElementById('lpn_pane'); return !!p && getComputedStyle(p).display !== 'none' && !p.classList.contains('lpn-pane-shut'); });
 			ok('...with the pane open', open);
 		}
 	} finally { await browser.close(); env.stopServer(); }

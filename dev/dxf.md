@@ -9,7 +9,7 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 
 ## Rules
 
-- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB, SEQEND and the one MTEXT read-me, nothing else: every link a
+- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB, SEQEND, the MTEXT read-me and the MTEXT pieces of the embedded .inp sections (below), nothing else: every link a
   polyline through every bend, every element an attributed block (a link's at mid-run), a
   customer's service line a two-point polyline. No TEXT, LINE or MULTILEADER. Tom allowed
   annotation only as MLEADER; MULTILEADER is an AutoCAD 2008 entity (in the AutoCAD 2008 DXF
@@ -24,7 +24,8 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
     CUST (customer; our choice, Tom named none).
   - The alternative is `BASE` on Base; on another scenario it is that scenario's name in capitals
     (page locale), letters and digits of any script kept, every other run made `_`, and the whole
-    network as that scenario has it is written. A character Windows-1252 lacks goes out as
+    network as that scenario has it is written, and ONLY that alternative's layers, so a scenario's
+    export has no BASE layers (an element a scenario takes out of the network is written IS_ACTIVE NO). A character Windows-1252 lacks goes out as
     `\U+XXXX` (ezdxf, "DXF File Encoding": the R2000-R2004 schema, which the R2000 extended symbol
     names take; AutoCAD EXTNAMES = 1 allows any character "not used by Microsoft Windows and AutoCAD
     for other purposes"). Every scenario is coded in project order, so two names that encode alike
@@ -41,7 +42,11 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   refuses spaces and `!` in a tag): ELEVATION (the ground, a tank's too), BASE_ELEVATION (a tank's
   bottom, EPANET's tank Elevation; Tom, 2026-10-11), BASE_DEMAND, HEAD, WATER_DEPTH, LOWEST_WATER_DEPTH,
   HIGHEST_WATER_DEPTH, TANK_DIAMETER, DIAMETER, LENGTH, ROUGHNESS, VALVE_TYPE, SETTING,
-  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. A clash within one block gets `_2`. The visible
+  NUMBER_OF_SERVICES, TAG, DESCRIPTION, plus ID. Round 2 added what a solve needs and a block can hold:
+  INITIAL_QUALITY (every node), MINOR_LOSS and STATUS (pipes and valves; STATUS is the EPANET word OPEN,
+  CLOSED or CV, in any language), IS_ACTIVE (YES or NO, every element), and on a pump STATUS, RELATIVE_SPEED,
+  PUMP_HEAD_CURVE (the curve ID) and PUMP_HEAD_CURVE_POINTS (`flow,head` pairs, space separated, as typed).
+  A Darcy-Weisbach project's ROUGHNESS prompt states its length unit; C and n state none. A clash within one block gets `_2`. The visible
   ID attribute is found by property, never by the text "ID", which a translation changes. The prompt is
   the label with its unit. No solve results (an import has no property for them).
 - **Values verbatim** in the project's display units, as typed: `EngCalcs.lpnNumText()` hands back
@@ -61,7 +66,8 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   block."*; R2000 groups 100 AcDbMText, 10/20/30, 40 height 1, 71 top left, 72, 3 and 1 text in
   chunks of 250, 7 Standard), one paragraph per line: project name; the
   coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 note; and, if any, how many values
-  were shortened, and how many junctions have more than one demand category. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
+  were shortened, how many junctions have more than one demand category, and the head loss formula as
+  `Head loss formula: <name> (HW)`, `(DW)` or `(MANNING)` (the code in brackets is what the import reads). Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
 - **Text style Standard on `txt`** (group 3, the STYLE record's primary font file). It was blank,
   and AutoCAD showed the text in Arial while editing (Tom, 2026-10-07, TEDIT); `txt` is what
   AutoCAD writes for Standard. Only the read-me MTEXT names a style (group 7, Standard).
@@ -83,9 +89,68 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 
 ## Not in this cut
 
-DXF import (the Interface Manager's other half); a layer-prefix control; overrides-only alternative
+a layer-prefix control; reading a stranger's drawing (slice 2 of the import: tag matching and the Interface Manager's editable translation table); overrides-only alternative
 layers (Task 721); the menu move to File > Export… (`feat/geojson`'s `exportMenuRows()`, which
 renames this row's key to `lpn_file_export_item_dxf` at its merge); XDATA.
+
+## Import (Task 772, slice 1)
+
+File > Import > Network > DXF file… reads **only what this export writes**, as a new project, with a receipt
+dialog like the `.inp` import's. Reader: `js/lpn-dxf-read.js` (pure), on the Shape import's first pass
+(`EngCalcs.lpnDxfRead` in `js/lpn-gisread.js`); page half: `landDxfNetwork()` in `js/looped-network.js`.
+Harnesses: `dev/lpn-spike/dxf-import-reader-harness.js` (no page) and `dxf-import-roundtrip-harness.js`
+(Net1, Net2, Net3 and a project with a pump, a PRV, a tank and customers: export .inp and DXF, import, export
+.inp again, compare).
+
+- **What is read:** layers `C-WATR-MODL-<ASSET>-BASE`; a link is its LWPOLYLINE, its ID and properties are
+  the block at the polyline's mid-run (matched by position); a node is its block; a customer is its block and
+  the two-point service line ending on it. A link's ends are the nodes at its end vertices, by exact position.
+- **Properties are found by the file's own block definitions** (the ATTDEFs run in the writer's fixed order), so
+  a drawing exported in another language reads in this one. Values are taken as typed, with their own
+  characters kept (`4530.` stays `4530.`); the DXF string escapes are undone.
+- **Units are in the ATTDEF prompts** ("ELEVATION (FT)"): head, flow, diameter and length. Pressure and
+  velocity are not in the file and follow the head unit. The symbols are the exporting page's language, so a
+  unit this page cannot match keeps the strip as it was and the receipt names it.
+- **A coordinate system the read-me states** (`(EPSG:32610)`, written for a latitude-and-longitude project and
+  for a projected one) opens the import as a projected project in that system, so the network lands where it was;
+  a drawing whose read-me states none is a grid in the length unit. A code this page does not know is named and
+  the drawing opens as a grid.
+- **Which alternative is read:** BASE where the file has it; otherwise the first alternative in the file (this
+  page's own export of a scenario has only that scenario's layers), with a line saying which was read. Layers of any
+  other alternative are named and not read (Task 721 owns reading several).
+- **The .inp sections a block cannot hold ride in the drawing as text** (Tom, 2026-10-30: asked whether to
+  hide them, *"Why hidden? User can freeze."*): MTEXT on the ordinary, visible layer `C-WATR-MODL-EPAN`
+  (white, not plotted, outside the model prefix), to the right of the network and of the read-me's width, with its top at
+  the network's top, as ONE MTEXT. The earlier cut into pieces of 2000 characters read the Reference's 2049-character
+  limit, which is for one group-code string, as a limit on a whole MTEXT; an MTEXT goes past it in 250-character
+  chunks (group 3), so there is no limit to honour. **Width**: the read-me and this text both carry a reference width
+  (group 41), the network's width held between 80 and 160 text heights, so long lines wrap in CAD (display only: no
+  line break enters the text, `\P` stays the only paragraph code); the read-me sits high enough for its wrapped height
+  (0.9 of a text height a character, a high estimate). **Header**: the text opens with a paragraph (key
+  `lpn_dxf_sections_header`: what it is; move it or freeze its layer, never change its layer), a blank line and the
+  line `;EPANET-INP BEGIN`; the import cuts through that line and ignores the header. The text is the .inp export's own sections for the scenario on screen, as typed,
+  not capitalized: PATTERNS, CURVES, CONTROLS, RULES, TIMES, OPTIONS (a scenario's Demand Multiplier among them),
+  ENERGY, REACTIONS, QUALITY, SOURCES, MIXING, REPORT, DEMANDS (several categories; customers excluded, the import
+  places them itself) and EMITTERS, plus a section of this page's own, `[ASSIGNMENTS]` (`DEMAND j pattern`,
+  `HEAD r pattern`, `SPEED p pattern`, `VOLUME t curve`), for the references the element rows hold and the blocks
+  do not. On import the drawing's own network is written as an .inp, these sections replace the sections of the
+  same name, and the whole is read by the .inp reader (`embedDxfSections()`), so a section means what it means in
+  an .inp. **What the blocks state wins**: an element keeps every value its block gave, a pump curve the blocks
+  gave keeps its points, and only a junction the embedded DEMANDS itemizes takes its demand list from the text.
+  A drawing with no such layer imports as before. Receipt: one line, "The EPANET sections embedded in the drawing
+  were read: ...", or one saying they could not be read as an EPANET file.
+- **Round trip (`dxf-roundtrip-calc-harness.js`):** Net1, Net2, Net3, Net1 with a closed pipe and a minor loss,
+  Net1 as Darcy-Weisbach, and Net1-Scenarios with Max day on screen (demand multiplier 1.5) export to DXF and
+  import back with the same heads (1e-6) and flows (1 percent of the largest) from Calculate, nothing taken away
+  first; Net2 and Net3 are also run through the EPANET engine over time and agree at 0, 3, 6, 12 and 24 hours.
+  The writer and reader alone, with escapes, a 5000-character line, the width and the header: `dxf-import-reader-harness.js`.
+- **Not carried, and why:** custom properties; map Text and hand-placed label positions; pipe types and fitting
+  lists (the minor loss sum is written instead); a pump defined by power rather than a head curve (it is named
+  as a pump with no head curve); other scenarios' overrides (one alternative is read); a unit the drawing cannot
+  state (pressure and velocity follow the head unit, so embedded pressure-bearing numbers are read in that unit).
+- **Reported, never dropped:** foreign layers (with entity counts), unknown asset codes, alternatives not read, Shape layers, entities of a kind not read, paper space, unknown attribute tags,
+  non-numeric values, bad or repeated IDs, links with no block / no node at an end, and one standing line for
+  what a DXF cannot hold (the list above). A pump that states no head curve is named.
 
 ## Validation
 

@@ -106,7 +106,7 @@ async function main() {
 		ok('a new box opens docked at the right, 480 px wide, not over the strip it came from', st && st.docked &&
 			Math.abs(await page.evaluate(() => document.getElementById('lpn_panebox_pipes').getBoundingClientRect().width) - 480) <= 2);
 		ok('Pipes left the strip', !(await stripHas('pipes')));
-		ok('the pane moved to another tab and still works', await page.evaluate(() => document.getElementById('lpn_pane').style.display !== 'none' &&
+		ok('the pane moved to another tab and still works', await page.evaluate(() => !document.getElementById('lpn_pane').classList.contains('lpn-pane-shut') &&
 			!!document.querySelector('#lpn_pane .lpn-pane-panel.on') && !document.getElementById('lpn_pane_pipes').closest('#lpn_pane')));
 		ok('the table is drawn in the box', (await roughness()).length > 5);
 
@@ -156,7 +156,7 @@ async function main() {
 		console.log('\n--- a menu door that names the table shows the box, not the pane ---');
 		await a.menuClickSub(await L('lpn_tables_menu'), await L('lpn_tables_menu'), 'project').catch(() => {});
 		await page.keyboard.press('Escape');
-		await page.evaluate(() => { window.__paneBefore = document.getElementById('lpn_pane').style.display; });
+		await page.evaluate(() => { window.__paneBefore = document.getElementById('lpn_pane').classList.contains('lpn-pane-shut'); });
 		await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_pipes'); b.click(); });
 		await a.settle(300);
 		ok('pressing the hidden tab changes nothing in the pane', !(await stripHas('pipes')));
@@ -224,7 +224,7 @@ async function main() {
 		await a.settle(400);
 		await page.click('#lpn_pane_popout');
 		await a.settle(800);
-		ok('popping the tab in use closes the pane (window under 800 px tall)', await page.evaluate(() => document.getElementById('lpn_pane').style.display === 'none'));
+		ok('popping the tab in use closes the pane (window under 800 px tall)', await page.evaluate(() => document.getElementById('lpn_pane').classList.contains('lpn-pane-shut')));
 		await page.click('#lpn_panebox_pipes .lpn-popover-x');
 		await page.setViewportSize({ width: 1600, height: 1000 });
 		await a.toolbarClick(await L('lpn_pane_toggle'));

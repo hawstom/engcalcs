@@ -75,7 +75,7 @@ const L = loadLoopedNetwork(
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
 	"\t\tprepareDocument: prepareDocument,\n" +
 	"\t\tsetSelection: setSelection, selectionCount: selectionCount,\n" +
-	"\t\trenderCustomerFields: renderCustomerFields, renderNodeFields: renderNodeFields,\n" +
+	"\t\trenderCustomerFields: renderCustomerFields, renderNodeFields: renderNodeFields, demandsFor: function (id) { demandsBoxNode = id; rebuildDemandsBox(); return document.getElementById('lpn_demands_body'); }, \n" +
 	"\t\tcustomersAtNode: customersAtNode, unitLabel: unitLabel,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tpaneTables: paneTables, paneCols: paneCols,\n" +
@@ -467,14 +467,17 @@ ok('3.7 a pipe rename carries its meters', m1.link === 'MAIN-1' && L.customerNod
 //
 // Dragging a meter past the middle of its pipe silently moves flow from one junction to the other,
 // so a reader who cannot see which junction it lumps at has no way to know that happened.
-function popupText() {
+function textOf(root) {
 	let out = '';
 	(function walk(el) {
 		if (el.textContent) { out += ' ' + el.textContent; }
 		(el.children || []).forEach(walk);
-	})(L.popupFields());
+	})(root);
 	return out;
 }
+function popupText() { return textOf(L.popupFields()); }
+// What a junction's Demand categories box says (sheet-light): its customers are listed there, not in Properties.
+function boxText(id) { return textOf(L.demandsFor(id)); }
 // The first element in a subtree that answers a predicate, and whether one element is under
 // another. Structure rather than text: section 5C's question is which side of a disclosure the
 // meter rows are built on, and a text walk cannot tell -- a shut <details> still holds every word
@@ -489,6 +492,8 @@ function findIn(root, pred) {
 	return null;
 }
 function findInPopup(pred) { return findIn(L.popupFields(), pred); }
+// The junction's customers are in the Demand categories box (sheet-light), not in Properties.
+function findInDemands(id, pred) { return findIn(L.demandsFor(id), pred); }
 function isInside(root, el) { return !!findIn(root, e => e === el); }
 function flowUnitLabel() { return L.unitLabel('lpn_u_flow'); }
 L.renderCustomerFields(m1.id);
@@ -575,7 +580,7 @@ L.renderCustomerFields(m1.id);
 	const m5 = (L.getDoc().customers || [])[0];
 	const nid = L.customerNodeId(m5);
 	L.renderNodeFields(nid);
-	const txt = popupText();
+	const txt = boxText(nid);
 	ok('5B.1 the junction names the meter that is adding to it', txt.indexOf(m5.id) >= 0);
 	ok('5B.2 ...and its description, which is the column the account number used to hold',
 		txt.indexOf(PC.lpn_field_desc) >= 0, txt.slice(0, 120));
@@ -588,14 +593,14 @@ L.renderCustomerFields(m1.id);
 	{
 		const other = L.getDoc().nodes.filter(n => n.type === 'junction' && n.id !== nid)[0];
 		ok('5B.5 the other junction says nothing about it yet',
-			(L.renderNodeFields(other.id), popupText().indexOf(m5.id) < 0));
+			(L.renderNodeFields(other.id), boxText(other.id).indexOf(m5.id) < 0));
 		L.setCustomerStation(m5, 0.9);
 		L.customerEdited(m5);
 		ok('5B.6 the meter moved to the other junction', L.customerNodeId(m5) === other.id);
 		ok('5B.7 ...and it is the other junction that now names it',
-			(L.renderNodeFields(other.id), popupText().indexOf(m5.id) >= 0));
+			(L.renderNodeFields(other.id), boxText(other.id).indexOf(m5.id) >= 0));
 		ok('5B.8 ...and the first one has stopped',
-			(L.renderNodeFields(nid), popupText().indexOf(m5.id) < 0));
+			(L.renderNodeFields(nid), boxText(nid).indexOf(m5.id) < 0));
 		L.setCustomerStation(m5, 0.2);
 		L.customerEdited(m5);
 	}
@@ -636,7 +641,7 @@ L.renderCustomerFields(m1.id);
 		L.customerNodeId(second) === nid);
 
 	L.renderNodeFields(nid);
-	const box = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+	const box = findInDemands(nid, e => e._tag === 'details' && e.className === 'lpn-node-customers');
 	ok('5C.1 the junction draws the meters as one expandable line', !!box);
 	ok('5C.2 ...and it is shut, so forty services cost one line and not forty', !box.open);
 	// **THE ROWS ARE BEHIND THE LINE AND NOT BESIDE IT.** This is the assertion that fails if the
@@ -645,7 +650,7 @@ L.renderCustomerFields(m1.id);
 	ok('5C.3 every meter is inside the expansion, not beside it',
 		!!findIn(box, e => e.textContent === m.id) && !!findIn(box, e => e.textContent === second.id));
 	ok('5C.4 ...and nothing about the individual meters is outside it',
-		!findInPopup(e => e !== box && !isInside(box, e) && e.textContent === second.id));
+		!findInPopup(e => e.textContent === second.id));   // Properties itself carries none of them
 
 	// **THE LINE CARRIES THE COUNT AND THE TOTAL**, which are exactly the two things the expansion
 	// would otherwise have to be opened for. Asserted against the language key, never the English.
@@ -670,7 +675,7 @@ L.renderCustomerFields(m1.id);
 	box.open = true;
 	(box._listeners.toggle || []).forEach(f => f({}));
 	L.renderNodeFields(nid);
-	const again = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+	const again = findInDemands(nid, e => e._tag === 'details' && e.className === 'lpn-node-customers');
 	ok('5C.7 a list the reader opened is still open after the box is rebuilt', !!again && !!again.open);
 	// **AND NONE OF IT REACHES THE FILE.** Which box somebody has open is a fact about the screen
 	// they are sitting at, so CLAUDE.md's project-versus-browser rule keeps it out of
@@ -688,7 +693,7 @@ L.renderCustomerFields(m1.id);
 		const other = L.customerNodeId(far);
 		ok('5C.8a the far meter lumps at the other end of the pipe', other !== nid, other + ' vs ' + nid);
 		L.renderNodeFields(other);
-		const ob = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+		const ob = findInDemands(other, e => e._tag === 'details' && e.className === 'lpn-node-customers');
 		ok('5C.8b another junction opened nothing of its own', !!ob && !ob.open, other);
 		L.deleteElement('customer', far.id);
 	}

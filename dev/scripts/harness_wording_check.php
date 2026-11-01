@@ -73,6 +73,14 @@ const EC_HARNESS_WORDING_BASELINE = 43;   // 47 -> 43 on 2026-10-07: check label
  * stale exemption is a hole waiting for the next literal that happens to read the same way.
  */
 const EC_HARNESS_WORDING_EXCEPT = [
+    'dev/lpn-spike/starter-examples-browser-harness.js' => [
+        'Johnson City extension' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+        'Munday well and tank' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+    ],
+    'dev/lpn-spike/starter-examples-harness.js' => [
+        'Johnson City extension' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+        'Munday well and tank' => '(a) Tom worded these two card titles himself (Task 823, round 2); the equality IS the assertion.',
+    ],
     'dev/lpn-spike/backdrop-scale-harness.js' => [
         'Scale by picking' =>
             '(a) this harness exists to hold the two backdrop labels at the English Tom approved '
@@ -98,13 +106,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
         'THEN PUMP 9 STATUS IS OPEN' =>
             '(b) a line of EPANET [RULES] grammar in the Net1 fixture. It is EPANET\'s language, '
             . 'not ours; lpn_library_rule_tip quotes a rule of the same shape as an example.',
-    ],
-    'dev/lpn-spike/examples-gallery-harness.js' => [
-        'liters per second' =>
-            '(a) the assertion is that the FLOW unit is named before the length units inside the '
-            . 'example description, so the two unit words are the specification being held.',
-        'gallons per minute' =>
-            '(a) the US half of the same ordering.',
     ],
     'dev/lpn-spike/file-naming-harness.js' => [
         'Elm Street Center' =>

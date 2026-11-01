@@ -83,7 +83,7 @@ function ecVenueCase(string $name, $got, $want): void
         . "\t\tout.push(['desc', pc.lpn_field_desc || 'Description', 'Description']);\n"
         . "\t\tvar BAND_NODE = [['elev', 'lpn_field_elev', 'Elevation']];\n"
         . "\t\tvar BAND_LINK = [['diameter', 'lpn_field_diameter', 'Diameter']];\n"
-        . "\t\tvar RESULT_NODE = [['head', 'lpn_result_head', 'Head']];\n"
+        . "\t\tvar RESULT_NODE = [['head', 'lpn_field_head', 'Head']];\n"
         . "\t\tvar RESULT_LINK = [['flow', 'lpn_result_flow', 'Flow']];\n"
         . "\t\toffer(d.group === 'node' ? BAND_NODE : BAND_LINK);\n"
         . "\t\toffer(d.group === 'node' ? RESULT_NODE : RESULT_LINK);\n"

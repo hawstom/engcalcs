@@ -121,9 +121,10 @@ const sameSet = (a, b) => a.length === b.length && a.slice().sort().join('|') ==
 async function replaceControl(a, labelKey, tag) {
 	const label = await a.lang(labelKey);
 	return a.page.evaluateHandle(([l, t]) => {
-		const labs = Array.from(document.querySelectorAll('#lpn_find_popup label'));
-		const lab = labs.filter(x => x.textContent.trim().indexOf(l) === 0 && x.querySelector(t)).pop();
-		return lab ? lab.querySelector(t) : null;
+		// A row of the box's grid (Task 828): its name, then its control.
+		const rows = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow'));
+		const row = rows.filter(x => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(l) === 0 && x.querySelector(t)).pop();
+		return row ? row.querySelector(t) : null;
 	}, [label, tag]);
 }
 async function pressButton(a, key) {
@@ -194,7 +195,7 @@ async function orderAndKeys(browser, Session) {
 		return e ? { codes: e.querySelectorAll('code').length, dts: Array.from(e.querySelectorAll('dt')).map(d => d.textContent.trim()), paras: e.querySelectorAll(':scope > p').length } : null;
 	});
 	const terms = [];
-	for (const k of ['lpn_guide_find_query_term', 'lpn_guide_find_examples_term', 'lpn_guide_find_results_term', 'lpn_guide_find_replace_term', 'lpn_guide_find_notes_term']) { terms.push(await a.lang(k).catch(() => enString(k))); }
+	for (const k of ['lpn_guide_find_query_term', 'lpn_guide_find_examples_term', 'lpn_guide_find_results_term', 'lpn_guide_find_replace_term', 'lpn_guide_scn_notes_term']) { terms.push(await a.lang(k).catch(() => enString(k))); }
 	ok('the Find and replace entry carries its five terms', !!ch && terms.every(t => ch.dts.indexOf(t) >= 0), JSON.stringify(ch && ch.dts));
 	ok('...its two opening paragraphs and its queries', !!ch && ch.paras === 2 && ch.codes >= exampleQueries().length, JSON.stringify(ch));
 	await page.fill('#lpn_guide_search', 'criticality');
@@ -346,8 +347,9 @@ async function choiceControls(browser, Session) {
 	const pick = async (labelKey, value) => {
 		const label = await a.lang(labelKey);
 		const sel = await a.page.evaluateHandle((l) => {
-			const lab = Array.from(document.querySelectorAll('#lpn_find_popup label')).filter(x => x.textContent.trim().indexOf(l) === 0 && x.querySelector('select'))[0];
-			return lab ? lab.querySelector('select') : null;
+			// A row of the box's grid (Task 828): its name, then its pull-down.
+			const row = Array.from(document.querySelectorAll('#lpn_find_popup .lpn-grow')).filter(x => x.firstElementChild && x.firstElementChild.textContent.trim().indexOf(l) === 0 && x.querySelector('select'))[0];
+			return row ? row.querySelector('select') : null;
 		}, label);
 		await sel.asElement().selectOption(value);
 		await a.settle(200);

@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 6 · Soon (75): 11 · Someday (50): 28 · Maybe (25): 16 · Parked (5): 20
+**90 open tasks.** Next (100): 8 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (6)
+## 100 — Next (8)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
@@ -17,22 +17,29 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
+- Task 825 — Audit every dockable box's width, with a checklist.
+- Task 852 — Re-evaluate truncation in boxes: cut text needs a way to reveal.
 
-## 75 — Soon (11)
+## 75 — Soon (16)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 676 — Watch the sites, and send a derived weekly report.
-- Task 720 — Background layers from a GIS server.
+- ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 818 — An MCP server, so an AI agent can run a network.
-- Task 820 — Map labels mix scenarios with Recalculate off.
+- Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
+- Task 823 — Starter examples a new user can build from.
+- Task 847 — The built-in solver leaves flow circulating in a loop with no demand.
+- Task 848 — Report column widths a reader can drag, kept per browser.
+- Task 849 — Every place uses the short Properties name for a field.
+- Task 851 — Net1's legend box covers the Tank label on a phone.
 
-## 50 — Someday (28)
+## 50 — Someday (30)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -62,8 +69,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 817 — Sketch a network that arrives without coordinates.
+- Task 832 — Compare Google Docs' Help menu with ours.
+- Task 850 — A master Demands table, one row per demand.
 
-## 25 — Maybe (16)
+## 25 — Maybe (17)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
@@ -81,8 +90,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 729 — Type a node's location in State Plane or UTM.
 - ! Task 731 — At whole-world zoom the map drags past the 180th meridian and a continent-sized model tears across it.
 - Task 778 — Read pipe size and material from survey field codes.
+- Task 824 — Randomly vary a new browser's theme and expert level, and log engagement.
 
-## 5 — Parked (20)
+## 5 — Parked (19)
 
 *Ruled against, or set aside, and kept here for documentation. A row is alive only so that it is not re-proposed from scratch.*
 
@@ -105,9 +115,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 537 — [H] · PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.
 - Task 616 — Visual feedback: a prompt history in the banner area.
 - Task 730 — Ctrl+Space selects the current column in the Tables pane.
-- ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 
 ---
 
-73 of 81 titles are within 4–12 words. `!` marks the rest;
+82 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

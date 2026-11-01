@@ -106,10 +106,9 @@ async function main() {
 				};
 				if (expectAsk) {
 					const r = await attempt(cancelBtn);
-					const lead = (await L('lpn_export_confirm_lead')).replace('{format}', kind).replace('{n}', '2');
+					const lead = (await L('lpn_noscn_lead')).replace('{format}', await L('lpn_noscn_fmt_' + f.ext)).replace('{n}', '2');
 					ok(`${tag} ${kind}: asks first, with ${goBtn} and ${cancelBtn}`, !!r.asked && r.asked.buttons.join('|') === goBtn + '|' + cancelBtn, JSON.stringify(r.asked));
-					ok(`${tag} ${kind}: the question names the scenario and what is left`, !!r.asked && r.asked.text.indexOf(lead) >= 0
-						&& r.asked.text.indexOf((await L('lpn_export_holds_scenario')).replace('{scenario}', scn).trim()) >= 0, r.asked && r.asked.text);
+					ok(`${tag} ${kind}: the question names the scenario and what is left`, !!r.asked && r.asked.text === lead + ' ' + (await L('lpn_export_goes_scenario')).replace('{scenario}', scn), r.asked && r.asked.text);
 					ok(`${tag} ${kind}: Cancel writes nothing`, !r.got());
 					const after = await a.dialog();
 					ok(`${tag} ${kind}: Cancel leaves no receipt`, !after, after && after.text.slice(0, 80));

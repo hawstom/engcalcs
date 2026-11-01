@@ -28,7 +28,7 @@ function ok(name, cond, extra) {
 	if (!cond) { fails++; }
 	console.log((cond ? 'PASS  ' : 'FAIL  ') + name + (extra === undefined ? '' : '   ' + extra));
 }
-const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8'));
+const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + (/^Net1(-SI)?\.lwn$/.test(name) ? 'dev/water-network-examples/' : 'examples/') + name, 'utf8'));
 const files = fs.readdirSync(ROOT + 'examples/').filter((f) => /\.lwn$/.test(f));
 
 ok('the key is in the English strings', /\{n\}/.test(PC.lpn_roughness_method_note || '') && /^⚠/.test(PC.lpn_roughness_method_note));

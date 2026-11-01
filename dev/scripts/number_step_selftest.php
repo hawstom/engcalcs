@@ -72,8 +72,8 @@ ecNsJs('A STEP SET FAR BELOW but still inside the same function -- what unitNumb
     "function f() {\n\tvar input = mk();\n\tinput.type = 'number';\n"
     . str_repeat("\t// a long argument about something else\n", 30)
     . "\tinput.step = 'any';\n}", false);
-ecNsJs('a small bounded integer, which correctly declares step 1 and opts back into the spinner',
-    "function f() { var s = mk(); s.type = 'number'; s.className = 'ec-spin';\n\ts.step = '1'; s.min = '1'; }", false);
+ecNsJs('a small bounded integer, which correctly declares step 1',
+    "function f() { var s = mk(); s.type = 'number'; s.className = 'lpn-digit';\n\ts.step = '1'; s.min = '1'; }", false);
 ecNsJs('the step written with setAttribute, which is the same declaration',
     "function f() { var x = mk(); x.type = 'number'; x.setAttribute('step', 'any'); }", false);
 ecNsJs('A TYPE SET FROM A VARIABLE -- no literal to follow, so it is turned away and counted rather '

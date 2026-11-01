@@ -227,7 +227,7 @@ async function main() {
 			await P.mouse.click(on.x, on.y);
 			const dlgB = await a.waitDialog(4000).catch(() => null);
 			ok('...the split question is asked', !!dlgB && /Split pipe 10/.test(dlgB.text), JSON.stringify(dlgB));
-			await answer(await a.lang('lpn_split_no')); await settle(500);
+			await answer(await a.lang('lpn_settings_table_no')); await settle(500);
 			const d3b = await stored(), nB = d3b.nodes.find((n) => !ids(d2).has(n.id));
 			ok('No: the junction is at the press, not snapped onto the line, and pipe 10 is whole',
 				!!nB && Math.abs(crossOf(d3b, nB)) > 1e-6 && linkOf(d3b, '10').to === p10.to, nB && crossOf(d3b, nB));
@@ -239,7 +239,7 @@ async function main() {
 			await P.mouse.click(on.x, on.y);
 			const dlg = await a.waitDialog(4000).catch(() => null);
 			ok('Yes: the split question again', !!dlg && /Split pipe 10/.test(dlg.text), JSON.stringify(dlg));
-			await answer(await a.lang('lpn_split_yes')); await settle(500);
+			await answer(await a.lang('lpn_settings_table_yes')); await settle(500);
 			const d3 = await stored();
 			const nj = d3.nodes.find((n) => !ids(d2).has(n.id));
 			const q10 = linkOf(d3, '10');
@@ -284,7 +284,7 @@ async function main() {
 			await P.evaluate((yes) => {
 				const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === yes);
 				if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); }
-			}, await a.lang('lpn_split_yes'));
+			}, await a.lang('lpn_settings_table_yes'));
 			await settle(500);
 			const dv = await stored(), nvj = dv.nodes.find((n) => !ids(d6).has(n.id)), p21 = linkOf(dv, '21');
 			ok('the new junction stands exactly on the bend', !!nvj && nvj.x === v.x && nvj.y === v.y, nvj && JSON.stringify([nvj.x, nvj.y, v.x, v.y]));

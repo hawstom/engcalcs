@@ -39,7 +39,7 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 L.setCanvas(1000, 500);
 const NET3W = () => JSON.parse(fs.readFileSync(
-	ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8'));
+	ROOT + 'dev/water-network-examples/latlon-originals/Net3-Novato-CA-World.lwn', 'utf8'));
 
 function fire(el, type) { (el._listeners[type] || []).forEach(f => f({ preventDefault() {} })); }
 function find(id) {

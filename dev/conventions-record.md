@@ -245,6 +245,9 @@ expand an abbreviation. English column-heading abbreviations are **not** a trans
 verified against wave-1 output in 14 languages, every one produced its own natural short form. Do not
 re-flag a `layout: column heading` abbreviation merely for looking terse.
 
+A heading's unit may split across lines too: "(m H2O)" breaking after "m" is acceptable (Tom,
+2026-10-27: *"splitting would be acceptable"*). Never spend column width to hold a unit whole.
+
 ---
 
 ## Language Keys

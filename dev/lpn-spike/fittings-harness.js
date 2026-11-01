@@ -301,7 +301,7 @@ head('6. THE POPUP: A DERIVED k IS DISABLED, A TYPED ONE IS EDITABLE');
 	function kBox() {
 		const fields = document.getElementById('lpn_popup_fields');
 		return walk(fields).filter((e) => e.tagName === 'INPUT'
-			&& ((e.parentNode && e.parentNode.textContent) || '').indexOf(PC.lpn_field_km) >= 0)[0];
+			&& ((e.parentNode && e.parentNode.textContent) || '').indexOf(PC.lpn_field_km_short) >= 0)[0];
 	}
 	L.renderLinkFields('P2');
 	check(kBox() && kBox().disabled !== true, 'a typed k stays editable');

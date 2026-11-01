@@ -65,6 +65,7 @@ const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootst
  */
 const EC_UNREFERENCED_MODULES = [
     'lpn-native-run.js' => 'Task 733 phase 3, slices 1-2: the built-in solver\'s period loop with simple controls, held to EPANET by dev/lpn-spike/native-eps-harness.js and not yet called by the page (dev/native-eps-plan.md)',
+    'no-form-restore.js' => 'inlined into Looped-Network.php\'s <head> by file_get_contents(), because it must run before the body parses; held by dev/lpn-spike/form-restore-browser-harness.js',
 ];
 
 /**
@@ -98,6 +99,9 @@ const EC_HARNESS_LAZY_MODULES = [
                          . '658 KB wasm on first use, so booting it in the shared stub would buy nothing. The editor '
                          . 'calls it when File > Export > .wtg.sqlite file is chosen, and '
                          . 'dev/lpn-spike/wtg-page-export-harness.js loads it.',
+    'lpn-dxf-read.js' => 'reading a DXF file this page wrote, as a network. Pure text, no DOM and no request; the '
+                       . 'editor calls it when File > Import > Network > DXF file is chosen, not during boot, and '
+                       . 'dev/lpn-spike/dxf-import-roundtrip-harness.js loads the page it runs in.',
     'lpn-crs.js' => 'the projected-coordinate transform. It fetches js/vendor/proj4.js and 62 KB '
                   . 'of definitions on first use, so booting it in the shared stub would make '
                   . 'every harness pay for a library almost none of them touch; the projection '

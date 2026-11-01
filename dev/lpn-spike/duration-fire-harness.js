@@ -72,7 +72,7 @@ const PSI = 0.70307;                // m of head per psi
 const NET1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8');
 
 function openLwn() {
-	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'dev/water-network-examples/Net1.lwn', 'utf8'));
 	if (!saved) { throw new Error('Net1.lwn did not open'); }
 	L.applySaved(saved);
 	L.buildDom();
