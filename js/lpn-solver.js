@@ -638,6 +638,12 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	var badCurves = EngCalcs.lpnGpvsWith(model, 'gpv-order');
 	if (badCurves.length > 0) { issues.push({ code: 'gpv-curve-order', ids: badCurves }); }
 
+	// A [RULES] BLOCK EPANET WOULD REFUSE TO READ is named, by rule, whichever engine is chosen: it is a fact
+	// about the text, and EPANET would answer with an error number and no rule attached. Only a project that
+	// runs a period ever runs its rules (js/lpn-native-run.js lpnRulesRefused).
+	var badRules = EngCalcs.lpnRulesRefused ? EngCalcs.lpnRulesRefused(model) : [];
+	if (badRules.length > 0) { issues.push({ code: 'rules-refused', ids: badRules }); }
+
 	if (EngCalcs.lpnDemandModelIsPda(model)) {
 		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
 		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {

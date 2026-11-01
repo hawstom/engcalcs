@@ -195,6 +195,19 @@
 	}
 
 	/**
+	 * The rules EPANET itself refuses to read (errors 201 to 207: a clause it cannot parse, a node or link
+	 * the file lacks, a time it cannot read, FILLTIME on a junction, a negative setting, an action on a check
+	 * valve, no premise or no THEN action), as rule names, for a project that runs a period.
+	 * EngCalcs.lpnDiagnose asks it, so both engines name the same rules before either runs.
+	 */
+	EC.lpnRulesRefused = function (model) {
+		var times = model && model.time && model.time.times, nodeType = {}, linkOf = {};
+		if (!model || !model.rules || !model.rules.length || !times || !(times.duration > 0)) { return []; }
+		(model.nodes || []).forEach(function (n) { nodeType[String(n.id)] = n.type; });
+		(model.links || []).forEach(function (l) { linkOf[String(l.id)] = l; });
+		return parseRules(model, nodeType, linkOf).refused;
+	};
+	/**
 	 * The reasons the built-in solver cannot run this model's period, as `{code, ids}` records, or
 	 * an empty list when it can. Pure: nothing is solved.
 	 */
@@ -1019,10 +1032,10 @@
 	 * the rules this loop does not copy exactly, or that EPANET would reject on reading the file.
 	 */
 	function parseRules(model, nodeType, linkOf) {
-		var rules = [], bad = [];
+		var rules = [], bad = [], refused = [];
 		(model.rules || []).forEach(function (b, ri) {
-			var name = b && b.name ? String(b.name) : '#' + (ri + 1), r, state = 'cond', fail = false;
-			if (!b || !b.name || !Array.isArray(b.clauses)) { bad.push(name); return; }
+			var name = b && b.name ? String(b.name) : '#' + (ri + 1), r, state = 'cond', fail = false, copyFail = false, nPrem = 0, nThen = 0;
+			if (!b || !b.name || !Array.isArray(b.clauses)) { bad.push(name); refused.push(name); return; }
 			r = { name: name, prem: [], then: [], els: [], priority: 0 };
 			b.clauses.forEach(function (c) {
 				var p, a, l, x, s, v, w;
@@ -1053,7 +1066,7 @@
 						} else {
 							// A setting: a pump's speed, a valve's setting. A pipe's is its roughness
 							// and a GPV's a curve, neither copied.
-							if (l.type === 'pipe' || (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV')) { fail = true; return; }
+							if (l.type === 'pipe' || (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV')) { copyFail = true; nPrem++; return; }
 							p.value = c.kind === 'flow' ? c.value * 1000 : c.value;
 							p.scale = c.kind === 'flow' ? 1000 : 1;
 						}
@@ -1067,11 +1080,12 @@
 							p.value = c.value * 3600;
 						} else {
 							if (!isFinite(c.value)) { fail = true; return; }
-							if (nodeType[p.node] === 'reservoir' && (c.attr === 'LEVEL' || c.attr === 'PRESSURE')) { fail = true; return; }
+							if (nodeType[p.node] === 'reservoir' && (c.attr === 'LEVEL' || c.attr === 'PRESSURE')) { copyFail = true; nPrem++; return; }
 							p.value = c.attr === 'DEMAND' ? c.value * 1000 : c.value;
 						}
 					}
 					r.prem.push(p);
+					nPrem++;
 					state = 'cond';
 					return;
 				}
@@ -1091,11 +1105,15 @@
 					else { a.setting = v; }
 				}
 				(state === 'else' ? r.els : r.then).push(a);
+				if (state !== 'else') { nThen++; }
 			});
-			if (fail || !r.prem.length || !r.then.length) { bad.push(name); return; }
+			// EPANET reads a rule with no premise or no THEN action as a syntax error (201); a premise this loop does
+			// not copy (copyFail) is a rule EPANET reads and runs.
+			if (fail || !nPrem || !nThen) { bad.push(name); refused.push(name); return; }
+			if (copyFail) { bad.push(name); return; }
 			rules.push(r);
 		});
-		return { rules: rules, bad: bad };
+		return { rules: rules, bad: bad, refused: refused };
 	}
 
 

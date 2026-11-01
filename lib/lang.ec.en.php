@@ -5264,6 +5264,7 @@ $ec_lang['lpn_engine_native_route_ids']='Solved with the EPANET solver, because 
 $ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
 $ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
 $ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
+$ec_lang['lpn_diag_rules_refused']='EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:';
 $ec_lang['lpn_gpv_one_point_note']='⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}';
 $ec_lang['lpn_diag_pda_needs_epanet']='The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';
