@@ -1,7 +1,7 @@
 // SETTINGS FIT (Tom, 2026-10-27): the box is no wider than its content needs; a label row's name line sits tight on
 // its own inputs with the larger gap above it; on a phone the jump bar IS the section heading.
 // Real Chromium, Settings > Symbology > Node/Link/Customer labels:
-//   1. PC (1600 px): Settings opens at 618 px (<= 625), no label row clipped, no sideways scroll, English and German;
+//   1. PC (1600 px): Settings opens at 618 px (<= 625), no label row cut without its tip, no sideways scroll, English and German;
 //   2. in every state where a row's inputs wrap under its name (a narrowed PC box, a phone) the gap above the name line
 //      is larger than the gap between that line and its own inputs; swept over widths so the wrap threshold is exact;
 //   3. at 390 px exactly one visible element names the current section (the jump bar; the in-content section heading
@@ -63,7 +63,17 @@ function clip(page) {
 		lists.forEach((id) => {
 			const list = document.getElementById(id);
 			if (!list) { return; }
-			list.querySelectorAll('label').forEach((l) => { if (l.offsetParent && l.scrollWidth > l.clientWidth + 1) { bad.push('name cut: ' + l.textContent.trim().slice(0, 20)); } });
+			// Round 9/10 (Tom, 2026-10-30/31: no label floor, "truncate instead of wrapping", "clipped, no ellipsis"): a name the column cuts is allowed when it is one line,
+			// clipped with no ellipsis, and carries its full text as a tip. The tip is written when a pointer arrives, so arrive first.
+			list.querySelectorAll('label').forEach((l) => {
+				if (!l.offsetParent) { return; }
+				const cell = l.closest('.lpn-set-name') || l;
+				if (!(l.scrollWidth > l.clientWidth + 1 || cell.scrollWidth > cell.clientWidth + 1)) { return; }
+				l.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+				const words = l.textContent.replace(/\s*\?\s*$/, '').replace(/\s+/g, ' ').trim(), cs = getComputedStyle(cell);
+				const tip = [l, cell, l.closest('[title], [data-bs-original-title]')].filter(Boolean).map((x) => x.getAttribute('data-bs-original-title') || x.title || '').join(' ');
+				if (cs.textOverflow === 'ellipsis' || cs.whiteSpace !== 'nowrap' || tip.indexOf(words) < 0) { bad.push('name cut without a tip, or wrapped, or ellipsized: ' + words.slice(0, 20)); }
+			});
 			list.querySelectorAll(':scope > div .lpn-lblgroup').forEach((g) => {
 				const r = g.getBoundingClientRect();
 				if (g.offsetParent && (r.right > cr.right + 1 || r.left < cr.left - 1)) { bad.push(id + ' group right ' + Math.round(r.right) + ' > pane ' + Math.round(cr.right)); }
@@ -105,7 +115,7 @@ async function main() {
 			ok(lab + ': Settings opens no wider than 625 px', w <= 625, w + ' px');
 			ok(lab + ': Settings is not narrower than the 618 px Tom measured', w >= 610, w + ' px');
 			const bad = await clip(a.page);
-			ok(lab + ': no label row clipped, no sideways scroll', bad.length === 0, bad.slice(0, 3).join(' | '));
+			ok(lab + ': no label row cut without its tip, no sideways scroll', bad.length === 0, bad.slice(0, 3).join(' | '));
 			if (!lang) {
 				const g0 = await gaps(a.page);
 				console.log('  at the default width: ' + g0.oneLine + ' one-line rows, ' + g0.wrapped + ' wrapped');

@@ -40,6 +40,22 @@ function measure(page, boxPx) {
 		if (arg.px) { box.style.width = arg.px + 'px'; }
 		const out = { listOver: lists.filter((id) => { const e = document.getElementById(id); return e && e.scrollWidth > e.clientWidth + 1; }), wide: Array.from(c.querySelectorAll('*')).filter((e) => e.offsetParent && e.getBoundingClientRect().right > c.getBoundingClientRect().left + c.clientWidth + 2).slice(0, 4).map((e) => e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 24) + ':' + String(e.textContent).trim().slice(0, 20)), rows: 0, bad: [], states: {}, pane: c.clientWidth, scroll: c.scrollWidth, over: 0 };
 		const cr = c.getBoundingClientRect();
+		// The group of six controls cannot shrink or break. When the pane is narrower than it (a box dragged below ~360 px, which the track now allows), the pane scrolls sideways
+		// and the group stays reachable: no ancestor between it and the pane clips it. out.groupW is the widest group; out.unreachable lists clippers.
+		out.groupW = 0; out.unreachable = [];
+		lists.forEach((id) => {
+			const l = document.getElementById(id);
+			if (!l) { return; }
+			Array.from(l.querySelectorAll(':scope > div > .lpn-lblgroup')).forEach((g) => {
+				if (!g.offsetParent) { return; }
+				out.groupW = Math.max(out.groupW, Math.round(g.getBoundingClientRect().width));
+				for (let e = g.parentElement; e && e !== c; e = e.parentElement) {
+					const o = getComputedStyle(e);
+					if ((o.overflowX === 'hidden' || o.overflowX === 'clip') && e.scrollWidth > e.clientWidth + 1) { out.unreachable.push(e.id || e.className); }
+				}
+			});
+		});
+		out.paneScrolls = /auto|scroll/.test(getComputedStyle(c).overflowX);
 		lists.forEach((id) => {
 			const list = document.getElementById(id);
 			if (!list) { return; }
@@ -101,7 +117,11 @@ async function run(browser, Session, label, viewport, touch, lang, widths) {
 			ok(t + ': rows were found', m2.rows > 15, String(m2.rows));
 			ok(t + ': every row is one or two lines, its controls on one top, group beside or wholly below the name, headings over controls', m2.bad.length === 0, m2.bad.slice(0, 4).join(' | '));
 			ok(t + ': all rows of a list are in one state, and the heading row is in it', Object.values(m2.states).every((s) => s === 'below' || s === 'beside'), JSON.stringify(m2.states));
-			ok(t + ': no control is past the pane and no list overflows sideways', m2.over === 0 && m2.listOver.length === 0, 'wide ' + m2.wide.join(';') + ' over ' + m2.over + ', scroll ' + m2.scroll + ' pane ' + m2.pane);
+			if (m2.pane >= m2.groupW + 8) {
+				ok(t + ': no control is past the pane and no list overflows sideways', m2.over === 0 && m2.listOver.length === 0, 'wide ' + m2.wide.join(';') + ' over ' + m2.over + ', scroll ' + m2.scroll + ' pane ' + m2.pane);
+			} else {
+				ok(t + ': the pane (' + m2.pane + ' px) is narrower than the six-control group (' + m2.groupW + ' px), so it scrolls sideways and nothing clips the group', m2.paneScrolls && m2.unreachable.length === 0, 'scrolls ' + m2.paneScrolls + ', clipped by ' + m2.unreachable.join(';'));
+			}
 		}
 	} finally { await a.close(); }
 }

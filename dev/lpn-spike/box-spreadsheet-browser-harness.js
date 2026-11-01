@@ -284,6 +284,12 @@ async function main() {
 		ok('...and OK and Cancel are in a footer outside the scrolling body, always in view', !cv2.okInBody && cv2.okVisible && cv2.cancelVisible, JSON.stringify(cv2));
 		const rd = await selectShowsText(c.page, '#lpn_convas_round_diameter');
 		ok('"No rounding" is whole in its dropdown', rd.ok, JSON.stringify(rd));
+		// Tom, 2026-09-23 (restored round 10c): one list, the step to round to and the suffix SIDE BY SIDE on each quantity's row.
+		const sb = await c.page.evaluate(() => ['diameter', 'depth', 'flow', 'head'].map((k) => {
+			const s = document.getElementById('lpn_convas_round_' + k), i = document.getElementById('lpn_convas_suffix_' + k), a = s.getBoundingClientRect(), b = i.getBoundingClientRect();
+			return { k, sameRow: Math.abs(a.top - b.top) < 3 && a.width > 0 && b.width > 0, rightOf: b.left >= a.right - 1, rowCells: s.closest('.lpn-grow').children.length };
+		}));
+		ok('Convert as: each quantity has the rounding step and its suffix side by side on one row, one Label cell', sb.every((r) => r.sameRow && r.rightOf && r.rowCells === 2), JSON.stringify(sb));
 		await c.close();
 		const f = await start(false);
 		await openBox(f, 'lpn_full_box');
