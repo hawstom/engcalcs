@@ -9,11 +9,12 @@
  * dev/wtg-export.md. Tom's WaterGEMS 26.0.0.532 opened and ran the spike's files (his rounds 1 to 3,
  * 2026-10-22 and 23); this module is that writer moved out of dev/lpn-spike/ so the page can call it.
  *
- * **LICENCE LINE.** Built only from files an ordinary user or the public holds: a project saved by
- * the user's own WaterGEMS, the CC BY 4.0 Zenodo 7162154 files, TSNet's MIT samples. No Bentley
- * software or DLL was looked inside, and none of Bentley's schema, defaults or code is in this
- * repository. THE SCHEMA COMES FROM THE USER: the page asks for a project the user saved from their
- * own copy, and this module copies that project, empties its elements, and writes ours into it.
+ * **LICENCE LINE.** Built only from files an ordinary user or the public holds: the CC BY 4.0 Zenodo
+ * 7162154 files, TSNet's MIT samples, a project saved by Tom's own WaterGEMS. No Bentley software or
+ * DLL was looked inside, and no Bentley code is in this repository. THE TEMPLATE IS BUILT IN: js/data/
+ * wtg-template/ is the Zenodo 7162154 project (schema 1.0.44.0) emptied to one prototype of each kind
+ * by dev/scripts/build_wtg_template.js; this module copies it, removes the prototypes, and writes ours.
+ * The visitor chooses no file. A caller may still pass any saved project's bytes (`o.sqlite`, `o.wtg`).
  *
  * **NO DOM.** The caller supplies everything that is not arithmetic: the open document (as
  * `EngCalcs.lpnExportInp` takes it) and the options the page passes the .inp export, the template's
@@ -953,6 +954,7 @@ function plan(doc, opts) {
 // also on the page, shares the global `initSqlJs` and nothing else).
 // ---------------------------------------------------------------------------------------------
 var SQLJS_VERSION = '1.14.2';
+var TEMPLATE_VERSION = '1';   // bumped when js/data/wtg-template/ is rebuilt
 var engine = null, injected = null;
 function base() { return EngCalcs.suiteBase || '/engcalcs/'; }
 function loadScript(src) {
@@ -992,20 +994,54 @@ function getEngine() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// The built-in template: two gzip files fetched from this site only when an export runs, never
+// precached, unpacked with the browser's own DecompressionStream.
+// ---------------------------------------------------------------------------------------------
+var templatePromise = null, templateInjected = null;
+function gunzip(buf) {
+	if (typeof DecompressionStream !== 'function') { return Promise.reject(new Error('no DecompressionStream')); }
+	const ds = new DecompressionStream('gzip');
+	const stream = new Response(new Blob([buf]).stream().pipeThrough(ds));
+	return stream.arrayBuffer().then((b) => new Uint8Array(b));
+}
+function loadTemplate() {
+	if (templateInjected) { return Promise.resolve(templateInjected); }
+	if (templatePromise) { return templatePromise; }
+	if (typeof fetch !== 'function') { return Promise.reject(fail('template-load', 'No way to fetch the template.', null, 'offline')); }
+	const dir = base() + 'js/data/wtg-template/';
+	function get(name) {
+		return fetch(dir + name + '?v=' + TEMPLATE_VERSION, { credentials: 'same-origin' }).then((r) => {
+			if (!r.ok) { throw new Error('HTTP ' + r.status); }
+			return r.arrayBuffer();
+		}).then(gunzip);
+	}
+	templatePromise = Promise.all([get('wtg-template.wtg.sqlite.gz'), get('wtg-template.wtg.gz')]).then((got) => ({
+		sqlite: got[0], wtg: new TextDecoder('utf-8', { ignoreBOM: true }).decode(got[1])
+	})).catch((e) => {
+		templatePromise = null;   // a failed fetch may succeed on the next attempt
+		throw fail('template-load', 'The export template could not be loaded (' + (e && e.message) + ').', null, 'offline');
+	});
+	return templatePromise;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Build: the plan, a template, the engines -> the two files.
 // ---------------------------------------------------------------------------------------------
 /**
  * @param planned  lpnWtgExportPlan()'s result (ok, no refusals)
- * @param o        { sqlite: Uint8Array (the user's saved project), wtg: string (its .wtg XML),
- *                   name: the project's name, epanet: the epanet-js module namespace,
- *                   allowUntestedSchema }
+ * @param o        { name: the project's name, epanet: the epanet-js module namespace, allowUntestedSchema,
+ *                   sqlite, wtg: a template to use in place of the built-in one (bytes, XML text) }
  * @returns Promise of { sqlite: Uint8Array, wtg: string, report }
  * Rejects with an Error whose `.code` names the cause: 'engine', 'template', 'template-kind',
  * 'schema', 'pump-curve', 'data'... and `.ids` where there are elements to name.
  */
 async function build(planned, o) {
 	if (!planned || !planned.ok || planned.refused.length) { throw fail('refused', 'The plan was refused.'); }
-	if (!o || !o.sqlite || typeof o.wtg !== 'string') { throw fail('template', 'Both files of the saved project are needed: the .wtg and the .wtg.sqlite.', null, 'need_both'); }
+	o = o || {};
+	if (!o.sqlite || typeof o.wtg !== 'string') {
+		const tpl = await loadTemplate();
+		o = Object.assign({}, o, { sqlite: tpl.sqlite, wtg: tpl.wtg });
+	}
 	if (!o.epanet) { throw fail('engine', 'The EPANET engine is needed to find when each pump switches.', null, 'offline'); }
 	const SQL = await getEngine();
 	const parsed = planned.parsed;
@@ -1024,6 +1060,7 @@ async function build(planned, o) {
 
 EngCalcs.lpnWtgExportPlan = plan;
 EngCalcs.lpnWtgExportBuild = build;
+EngCalcs.lpnWtgExportSetTemplate = function (sqliteBytes, wtgText) { templateInjected = sqliteBytes ? { sqlite: sqliteBytes, wtg: wtgText } : null; };
 EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = { init: initSqlJs, wasmBinary: wasmBinary }; engine = null; };
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.

@@ -1,8 +1,8 @@
 // A WaterGEMS project database as comparable text, for dev/lpn-spike/wtg-page-export-harness.js:
 // every table's rows, each row as JSON with identifiers and save times masked, sorted; and one
-// digest per table. The golden digests in reference/wtg-net3-golden.json were made by the spike
-// writer BEFORE it moved into js/lpn-wtg-export.js (commit 8edd6369b), so a later change to the
-// writer that changes what lands in a table fails the harness instead of agreeing with itself.
+// digest per table. The golden digests in reference/wtg-net3-golden.json are frozen, so a later change to
+// the writer or the template that changes what lands in a table fails the harness instead of agreeing
+// with itself (regenerate with WTG_WRITE_GOLDEN=1, see wtg-page-export-harness.js).
 'use strict';
 const crypto = require('crypto');
 

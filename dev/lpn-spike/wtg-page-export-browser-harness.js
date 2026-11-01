@@ -6,16 +6,14 @@
 //   1. an ordinary page load fetches nothing of sql.js; the export fetches js/vendor/sql-wasm.js and
 //      its wasm from this site, once each, and nothing from anywhere else;
 //   2. File > Export > Network offers the row, and the row opens the box BEFORE anything is written,
-//      with the list of what the files cannot carry and a button that opens the file picker;
-//   3. choosing the saved project's two files downloads ONE .zip, whose database passes SQLite's
-//      integrity check (Python's, a different build), holds Net3's 220 elements, and whose .wtg opens
-//      with the byte order mark the saved project's had;
+//      with the list of what the export does not write and an Export button (no file is chosen);
+//   3. Export downloads ONE .zip, whose database passes SQLite's integrity check (Python's, a
+//      different build), holds Net3's 220 elements, and whose .wtg opens with the byte order mark the
+//      template has; the built-in template (js/data/wtg-template/) is fetched from this site then, not before;
 //   4. the receipt names the zip and what was left out; the scenario is named when the project has
 //      more than Base; nothing is stored on the device by it (Exporting is not saving).
 //
-// NEEDS the saved project (Tom's, outside the repo): $WTG_TEMPLATE_DIR, default
-// ~/webdev/fixtures/wtg-tgh-1 (WTG-tgh-1.wtg + .wtg.sqlite). Absent, it prints NOT RUN and exits 0.
-//
+
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
@@ -30,12 +28,7 @@ const REPO = path.resolve(__dirname, '..', '..');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_WTGEXP_LOCKED';
 
-const TEMPLATE_DIR = process.env.WTG_TEMPLATE_DIR || path.join(os.homedir(), 'webdev', 'fixtures', 'wtg-tgh-1');
-const TPL_SQLITE = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg.sqlite'), TPL_WTG = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg');
-if (!fs.existsSync(TPL_SQLITE) || !fs.existsSync(TPL_WTG)) {
-	console.log('NOT RUN: needs ' + TPL_SQLITE + ' and its .wtg (a project saved from WaterGEMS).');
-	process.exit(0);
-}
+const TPL_WTG = path.join(REPO, 'js', 'data', 'wtg-template', 'wtg-template.wtg.gz');
 
 if (process.env[LOCK_ENV] !== '1') {
 	let hasFlock = false;
@@ -94,7 +87,7 @@ async function main() {
 	try {
 		const s = await Session.open(browser, 'wtgexp', { serviceWorkers: 'block', viewport: { width: 1400, height: 900 }, acceptDownloads: true });
 		const seen = [];
-		s.context.on('request', (r) => { if (/sql-wasm|sql\.js|sqljs/i.test(r.url())) { seen.push(r.url()); } });
+		s.context.on('request', (r) => { if (/sql-wasm|sql\.js|sqljs|wtg-template/i.test(r.url())) { seen.push(r.url()); } });
 		await s.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await s.goto('Looped-Network.php');
 		await s.answerTrainingPanel().catch(() => {});
@@ -114,8 +107,7 @@ async function main() {
 
 		console.log('2. File > Export > Network > the row, and its box');
 		const labels = await s.page.evaluate(() => ({
-			file: EngCalcs.pageConfig.lpn_file_export_menu, row: EngCalcs.pageConfig.lpn_file_export_item_wtg, choose: EngCalcs.pageConfig.lpn_wtg_export_choose,
-			need: EngCalcs.pageConfig.lpn_wtg_export_need, cancel: EngCalcs.pageConfig.lpn_cancel
+			file: EngCalcs.pageConfig.lpn_file_export_menu, row: EngCalcs.pageConfig.lpn_file_export_item_wtg, go: EngCalcs.pageConfig.lpn_export_table_go, lead: EngCalcs.pageConfig.lpn_wtg_export_lost_lead, cancel: EngCalcs.pageConfig.lpn_cancel
 		}));
 		await s.page.click('#lpn_menu_file');
 		await s.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
@@ -128,20 +120,19 @@ async function main() {
 		await s.page.evaluate((l) => { const r = Array.from(document.querySelectorAll('#lpn_menu_list3 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0); if (r) { r.click(); } }, labels.row);
 		const box = await s.waitDialog(4000);
 		ok('a box opens before any file is made', !!box && seen.length === 0, box && box.text.slice(0, 60));
-		ok('it holds the instruction to choose a saved project, and names no program', !!box && box.text.indexOf(labels.need) >= 0 && !/water(cad|gems)|bentley/i.test(box.text));
+		ok('it leads with "does not yet write the following", asks for no file, and names no program', !!box && box.text.indexOf(labels.lead) >= 0 && !/choose|water(cad|gems)|bentley/i.test(box.text));
 		const items = await s.page.$$eval('#lpn_dialog_body li', (els) => els.map((e) => e.textContent));
 		const wantItems = await s.page.evaluate(() => ['quality', 'texts', 'material', 'positions'].map((c) => EngCalcs.pageConfig['lpn_wtg_export_lost_' + c]));
-		ok('it lists what the files cannot carry, as list entries (water quality, map Text, pipe material, map positions)', JSON.stringify(items) === JSON.stringify(wantItems), JSON.stringify(items));
+		ok('it lists what the export does not write, as list entries (water quality, map Text, pipe material, map positions)', JSON.stringify(items) === JSON.stringify(wantItems), JSON.stringify(items));
 		const dlgW = await s.page.evaluate(() => { const b = document.getElementById('lpn_dialog_body'), r = b.getBoundingClientRect(); return { w: r.width, h: r.height, sw: b.scrollWidth, cw: b.clientWidth }; });
 		ok('the box is visible and its text does not overflow sideways', dlgW.w > 200 && dlgW.h > 100 && dlgW.sw <= dlgW.cw + 1, JSON.stringify(dlgW));
-		ok('its buttons are Choose the saved project and Cancel', JSON.stringify(box.buttons) === JSON.stringify([labels.choose, labels.cancel]), JSON.stringify(box.buttons));
+		ok('its buttons are Export and Cancel', JSON.stringify(box.buttons) === JSON.stringify([labels.go, labels.cancel]), JSON.stringify(box.buttons));
 
-		console.log('3. Choosing the saved project downloads one .zip');
-		const tplS = fs.readFileSync(TPL_SQLITE), tplW = fs.readFileSync(TPL_WTG);
-		const [chooser] = await Promise.all([s.page.waitForEvent('filechooser'), s.dialogClick(labels.choose)]);
-		ok('the button opens the file picker, for both files at once', chooser.isMultiple());
+		console.log('3. Export downloads one .zip');
+		const tplW = zlib.gunzipSync(fs.readFileSync(TPL_WTG));
+		ok('nothing of the template was fetched before Export', seen.filter((u) => /wtg-template/.test(u)).length === 0, JSON.stringify(seen));
 		const dlP = s.page.waitForEvent('download', { timeout: 120000 });
-		await chooser.setFiles([{ name: 'Saved.wtg', mimeType: 'application/xml', buffer: tplW }, { name: 'Saved.wtg.sqlite', mimeType: 'application/octet-stream', buffer: tplS }]);
+		await s.dialogClick(labels.go);
 		const dl = await dlP;
 		const name = dl.suggestedFilename();
 		ok('one download, a .zip named for the project: ' + name, name === 'Net3.wtg.zip', name);
@@ -151,9 +142,9 @@ async function main() {
 		fs.writeFileSync(path.join(tmp, 'Net3.wtg.sqlite'), files['Net3.wtg.sqlite']);
 		const pyOut = JSON.parse(execFileSync('python3', ['-I', '-c', "import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
 			+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'tables':db.execute(\"select count(*) from sqlite_master where type='table'\").fetchone()[0],'live':db.execute('select count(*) from HMIDomainElement where IsDeleted=0').fetchone()[0],'name':db.execute('select Name from HMIDomainDataSet').fetchone()[0]}))", path.join(tmp, 'Net3.wtg.sqlite')], { encoding: 'utf8' }));
-		ok('the database passes SQLite\'s integrity check, with 406 tables, 220 live elements, named Net3', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220 && pyOut.name === 'Net3', JSON.stringify(pyOut));
+		ok('the database passes SQLite\'s integrity check, with 384 tables, 220 live elements, named Net3', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 384 && pyOut.live === 220 && pyOut.name === 'Net3', JSON.stringify(pyOut));
 		const wtgText = files['Net3.wtg'];
-		ok('the .wtg keeps the byte order mark the saved project\'s had, and a new identity',
+		ok('the .wtg keeps the byte order mark the template has, and a new identity',
 			wtgText[0] === 0xEF && wtgText[1] === 0xBB && wtgText[2] === 0xBF && tplW[0] === 0xEF && wtgText.toString('utf8') !== tplW.toString('utf8'));
 
 		console.log('4. The receipt, the requests, the device');
@@ -162,6 +153,8 @@ async function main() {
 		ok('a receipt names the zip and what was left out', !!rc && rc.text.indexOf('Net3.wtg.zip') >= 0 && rc.text.indexOf(rcLeft) >= 0, rc && rc.text.slice(0, 160));
 		const origin = env.origin();
 		const sqlReqs = seen.filter((u) => /\/js\/vendor\/sql-wasm\.(js|wasm)/.test(u));
+		const tplReqs = seen.filter((u) => /\/js\/data\/wtg-template\//.test(u));
+		ok('the template (two gzip files) was fetched once each, now, from this site', tplReqs.length === 2, JSON.stringify(tplReqs));
 		ok('sql.js and its wasm were fetched once each, now', sqlReqs.length === 2 && sqlReqs.some((u) => /\.js\?/.test(u)) && sqlReqs.some((u) => /\.wasm\?/.test(u)), JSON.stringify(seen));
 		ok('every such request went to this site', seen.every((u) => u.indexOf(origin + '/') === 0), JSON.stringify(seen));
 		const after = await s.page.evaluate(() => JSON.stringify(Object.keys(localStorage).sort().map((k) => [k, (localStorage.getItem(k) || '').length])));

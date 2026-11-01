@@ -7,19 +7,17 @@
 // inpExportOptions(), then wtgExportWrite() with the two files a visitor chooses -- makes the
 // .zip it would download. The database inside is then
 //   1. identical, table by table and row by row (random identifiers and the save time masked), to the
-//      one the spike's writer makes straight from Net3.inp, which Tom's WaterGEMS opened and ran
-//      (dev/wtg-export.md, rounds 1 to 3). The page's route and the spike's route must not drift;
+//      frozen golden (reference/wtg-net3-golden.json), so a change to the writer or the template that
+//      changes what lands in a table fails here instead of agreeing with itself;
 //   2. read back by the WaterGEMS reader (js/lpn-sqlite.js and js/lpn-wtg.js, branch
 //      feat/sqlite-reader): 97 nodes, 117 pipes, both pump curves, five patterns, EPS times;
 //   3. solved by EPANET from the read-back network: heads agree with Net3's own run.
 // It also holds the refusals (a flow unit other than gpm, a pump with a four-point curve), the
-// schema-version gate, the list of what the file cannot carry, the menu row, and that the box
+// schema-version gate, the list of what the file does not write, the menu row, and that the box
 // the visitor sees names every item on that list.
 //
-// NEEDS the saved project the writer takes its schema from (Tom's, outside the repo):
-//   $WTG_TEMPLATE_DIR, default ~/webdev/fixtures/wtg-tgh-1  (WTG-tgh-1.wtg.sqlite + WTG-tgh-1.wtg)
-// and the reader files from branch feat/sqlite-reader (dev/lpn-spike/wtg-sqljs.js finds them).
-// Missing either, it prints NOT RUN and exits 0, as wtg-export-harness.js does.
+// The template is the one the page ships (js/data/wtg-template/). NEEDS the reader files from branch
+// feat/sqlite-reader (dev/lpn-spike/wtg-sqljs.js finds them); missing, it prints NOT RUN and exits 0.
 'use strict';
 
 const fs = require('fs');
@@ -30,8 +28,9 @@ const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const helper = require('./wtg-sqljs.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
-const TEMPLATE_DIR = process.env.WTG_TEMPLATE_DIR || path.join(os.homedir(), 'webdev', 'fixtures', 'wtg-tgh-1');
-const TPL_SQLITE = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg.sqlite'), TPL_WTG = path.join(TEMPLATE_DIR, 'WTG-tgh-1.wtg');
+const zlib = require('zlib');
+const TPL_DIR = path.join(ROOT, 'js', 'data', 'wtg-template');
+const loadTpl = () => ({ sqlite: zlib.gunzipSync(fs.readFileSync(path.join(TPL_DIR, 'wtg-template.wtg.sqlite.gz'))), wtg: zlib.gunzipSync(fs.readFileSync(path.join(TPL_DIR, 'wtg-template.wtg.gz'))) });
 
 let fails = 0, checks = 0;
 function ok(name, cond, extra) {
@@ -44,8 +43,8 @@ function head(t) { console.log('\n' + t); }
 (async function () {
 	let readerPaths = null;
 	try { readerPaths = helper.readerPaths(); helper.sqlJsPath(); } catch (e) { readerPaths = null; }
-	if (!fs.existsSync(TPL_SQLITE) || !fs.existsSync(TPL_WTG) || !readerPaths) {
-		console.log('NOT RUN: needs ' + TPL_SQLITE + ' and its .wtg (a project saved from WaterGEMS) and the reader from branch feat/sqlite-reader.');
+	if (!readerPaths) {
+		console.log('NOT RUN: needs the reader from branch feat/sqlite-reader.');
 		process.exit(0);
 	}
 
@@ -94,9 +93,10 @@ function head(t) { console.log('\n' + t); }
 	const NET3 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
 	setUnitSet('us');
 	L.importInp({ name: 'Net3.inp', _text: NET3 });
-	const tplBytes = fs.readFileSync(TPL_SQLITE), tplWtg = fs.readFileSync(TPL_WTG);
-	const fileOf = (name, bytes) => ({ name: name, arrayBuffer: () => Promise.resolve(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)) });
-	const write = (files) => new Promise((resolve) => L.wtgWrite(files, (out, err) => resolve({ out: out, err: err })));
+	const tpl = loadTpl(), tplBytes = tpl.sqlite, tplWtg = tpl.wtg;
+	const write = () => new Promise((resolve) => L.wtgWrite((out, err) => resolve({ out: out, err: err })));
+	// The page fetches the template from this site; here it is handed over the way Node has it.
+	EngCalcs.lpnWtgExportSetTemplate(tplBytes, tplWtg.toString('utf8'));
 	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-page-export-'));
 	const py = (code, ...args) => execFileSync('python3', ['-I', '-c', code, ...args], { encoding: 'utf8' });
 
@@ -130,22 +130,22 @@ function head(t) { console.log('\n' + t); }
 	const dlgBody = global.document.getElementById('lpn_dialog_body'), dlgBar = global.document.getElementById('lpn_dialog_buttons');
 	const walk = (e, f) => { f(e); (e.children || []).forEach((c) => walk(c, f)); };
 	const texts = []; walk(dlgBody, (e) => { if (e._tag === 'li' || e._tag === 'p') { texts.push(e.textContent || e._text || ''); } });
-	ok('it says the layout comes from a project the visitor saved, and names no program', texts.indexOf(PC.lpn_wtg_export_need) >= 0 && !texts.some((s) => /water(cad|gems)|bentley/i.test(s)));
-	ok('it lists every item the plan cannot carry (' + lines.length + '), each as a list entry', lines.every((l) => texts.indexOf(l) >= 0), texts.length + ' lines');
+	ok('it leads with the sentence "This export does not yet write the following:", and names no program', texts.indexOf(PC.lpn_wtg_export_lost_lead) >= 0 && PC.lpn_wtg_export_lost_lead === 'This export does not yet write the following:' && !texts.some((s) => /water(cad|gems)|bentley/i.test(s)));
+	ok('no item says the file or the program "cannot" carry a thing', !/cannot/i.test(Object.keys(PC).filter((k) => /^lpn_wtg_export_lost_/.test(k)).map((k) => PC[k]).join(' ')));
+	ok('it asks the visitor to choose no file', !(dlgBar.children || []).some((b) => /choose/i.test(b.textContent || b._text || '')) && !global.document.getElementById('lpn_wtg_template_file'));
+	ok('it lists every item the plan does not write (' + lines.length + '), each as a list entry', lines.every((l) => texts.indexOf(l) >= 0), texts.length + ' lines');
 	const btns = (dlgBar.children || []).map((b) => b.textContent || b._text);
-	ok('its buttons are "Choose the saved project…" and Cancel', JSON.stringify(btns) === JSON.stringify([PC.lpn_wtg_export_choose, PC.lpn_cancel]), JSON.stringify(btns));
+	ok('its buttons are Export and Cancel', JSON.stringify(btns) === JSON.stringify([PC.lpn_export_table_go, PC.lpn_cancel]), JSON.stringify(btns));
 	const cancel = (dlgBar.children || [])[1];
 	if (cancel && cancel.click) { cancel.click(); }
 
 	// ---- 3. the files, as the page makes them ----
-	head('3. The page writes Net3 into the saved project and zips the pair');
-	const bad = await write([fileOf('only.wtg', tplWtg)]);
-	ok('one file alone is refused with the "choose both" message', !bad.out && bad.err === PC.lpn_wtg_export_need_both, bad.err);
-	const wrote = await write([fileOf('WTG-tgh-1.wtg', tplWtg), fileOf('WTG-tgh-1.wtg.sqlite', tplBytes)]);
+	head('3. The page writes Net3 into the built-in template and zips the pair, with no file chosen');
+	const wrote = await write();
 	ok('written', !!wrote.out, wrote.err);
 	if (!wrote.out) { console.log('\n' + fails + ' check(s) FAILED:'); process.exit(1); }
 	const out = wrote.out;
-	ok('the template bytes are not modified', Buffer.compare(tplBytes, fs.readFileSync(TPL_SQLITE)) === 0);
+	ok('the template bytes are not modified', Buffer.compare(tplBytes, loadTpl().sqlite) === 0);
 	ok('the download is one .zip named for the project and holding the two files',
 		out.zipName === 'Net3.wtg.zip' && out.wtgName === 'Net3.wtg' && out.sqliteName === 'Net3.wtg.sqlite', out.zipName + ' / ' + out.wtgName + ' / ' + out.sqliteName);
 	const zipPath = path.join(tmp, out.zipName);
@@ -157,19 +157,20 @@ function head(t) { console.log('\n' + t); }
 	const pageBytes = fs.readFileSync(sqlitePath), pageWtg = fs.readFileSync(wtgPath, 'utf8');
 	const pyOut = JSON.parse(py("import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
 		+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'tables':db.execute(\"select count(*) from sqlite_master where type='table'\").fetchone()[0],'live':db.execute('select count(*) from HMIDomainElement where IsDeleted=0').fetchone()[0]}))", sqlitePath));
-	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 406 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220, JSON.stringify(pyOut));
+	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 384 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 384 && pyOut.live === 220, JSON.stringify(pyOut));
 
 	// ---- 4. the same as the spike's known-good output ----
-	head('4. Identical to the frozen golden: the spike writer\'s output for Net3, before it moved into js/lpn-wtg-export.js');
+	head('4. Identical to the frozen golden: this writer and the built-in template, Net3');
 	const { dump, digests } = require('./wtg-dump.js');
 	const golden = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), 'utf8'));
 	const D = digests(dump(SQL, pageBytes));
+	const noId = (s) => s.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1#$2');
+	if (process.env.WTG_WRITE_GOLDEN) { fs.writeFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), JSON.stringify({ note: golden.note, schema: '1.0.44.0', wtgSha256: require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex'), tables: D }, null, 1)); console.log('golden written'); }
 	const gNames = Object.keys(golden.tables);
 	const differing = gNames.filter((n) => !D[n] || D[n].sha256 !== golden.tables[n].sha256 || D[n].rows !== golden.tables[n].rows);
 	ok('all ' + gNames.length + ' tables hold the golden rows, by digest (identifiers, save times and the project Notes masked)', differing.length === 0 && Object.keys(D).length === gNames.length, differing.slice(0, 6).join(', '));
 	let rowCount = 0; gNames.forEach((n) => { rowCount += golden.tables[n].rows; });
 	ok('...and that is not an empty comparison: ' + rowCount + ' rows', rowCount > 3000);
-	const noId = (s) => s.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1#$2');
 	ok('the .wtg matches the golden digest, apart from its new identity', require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex') === golden.wtgSha256);
 	ok('the .wtg\'s identity is new, not the template\'s', !pageWtg.includes((/<StorageFileHeader [^>]*\bId="([0-9a-f-]{36})"/.exec(tplWtg.toString('utf8')) || [])[1]));
 	ok('the project name written is the project\'s own', (() => {
@@ -239,7 +240,7 @@ function head(t) { console.log('\n' + t); }
 	const p4 = L.wtgPlan();
 	ok('a pump with a four-point head curve is refused, naming pump 10 and no other', p4.ok && p4.refused.length === 1 && p4.refused[0].code === 'pump_curve' && JSON.stringify(p4.refused[0].ids) === '["10"]', JSON.stringify(p4.refused));
 	ok('...in the sentence the language file gives, naming the pump', L.wtgRefusal(p4.refused[0]) === fillP('lpn_wtg_export_no_pump_curve', { ids: '10' }), L.wtgRefusal(p4.refused[0]));
-	const w4 = await write([fileOf('a.wtg', tplWtg), fileOf('a.wtg.sqlite', tplBytes)]);
+	const w4 = await write();
 	ok('...and the write is refused with the same reason, no file made', !w4.out && w4.err === fillP('lpn_wtg_export_failed', { detail: L.wtgRefusal(p4.refused[0]) }), w4.err);
 	// Emitters and a second demand are carried nowhere, so the plan names them. Net3 again, with an emitter on junction 15.
 	const EMIT = NET3.replace(/\[EMITTERS\][^\[]*/, '').replace(/\[PATTERNS\]/, '[EMITTERS]\n 15  2.5\n\n[PATTERNS]');
@@ -276,27 +277,19 @@ function head(t) { console.log('\n' + t); }
 	}
 	L.importInp({ name: 'Net3.inp', _text: NET3 });
 
-	// ---- 6c. a refusal of the saved project reads plainly: no program, no column ----
-	head('6c. The saved project is refused in plain words');
-	const tKeys = Object.keys(PC).filter((k) => /^lpn_wtg_export_(t_|no_|failed|need)/.test(k));
-	ok('no refusal sentence names a program, a vendor, a column or a table', tKeys.length >= 14 && tKeys.every((k) => !/water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])), tKeys.filter((k) => /water(cad|gems)|bentley|HMI|Idaho|column|table/i.test(PC[k])).join());
-	const junk = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', Uint8Array.from([1, 2, 3, 4]))]);
-	ok('a file that is not a saved project: the "not a saved project" sentence', junk.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_not_project }), junk.err);
-	const odd2 = new SQL.Database(new Uint8Array(tplBytes));
-	odd2.run("UPDATE HMISchemaVersionInfo SET Value = '1.0.99.0' WHERE Name = 'HMICoreSchemaVersion'");
-	const oddB = odd2.export(); odd2.close();
-	const sch = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', oddB)]);
-	ok('a schema version not tested: the version found and the one tested are in the sentence',
-		sch.err === fillP('lpn_wtg_export_failed', { detail: fillP('lpn_wtg_export_t_schema', { found: '1.0.99.0', tested: EngCalcs.lpnWtgExportTestedSchemas.join(', ') }) }), sch.err);
-	const bare2 = new SQL.Database(new Uint8Array(tplBytes));
-	bare2.run('UPDATE HMIDomainElement SET IsDeleted = 1 WHERE DomainElementTypeID = 52');
-	const bareB = bare2.export(); bare2.close();
-	const kd = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', bareB)]);
-	ok('a saved project with no tank: the sentence names the tank', kd.err === fillP('lpn_wtg_export_failed', { detail: fillP('lpn_wtg_export_t_kind', { kind: 'tank' }) }), kd.err);
+	// ---- 6c. a refusal reads plainly: no program, no column ----
+	head('6c. A refusal reads plainly');
+	const tKeys = Object.keys(PC).filter((k) => /^lpn_wtg_export_(t_|no_|failed)/.test(k));
+	ok('no refusal sentence names a program, a vendor, a column or a table', tKeys.length >= 10 && tKeys.every((k) => !/water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])), tKeys.filter((k) => /water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])).join(','));
+	ok('no key asks the visitor for a saved project (the template is built in)', !PC.lpn_wtg_export_choose && !PC.lpn_wtg_export_need && !PC.lpn_wtg_export_need_both && !PC.lpn_wtg_export_t_schema && !PC.lpn_wtg_export_t_kind && !PC.lpn_wtg_export_t_not_project);
 	EngCalcs.lpnWtgExportSetEngine(() => Promise.reject(new Error('Failed to fetch')), wasm);
-	const off = await write([fileOf('x.wtg', tplWtg), fileOf('x.wtg.sqlite', tplBytes)]);
+	const off = await write();
 	ok('the SQLite engine cannot be fetched (offline): the sentence says the first use needs a connection', off.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_offline }), off.err);
 	EngCalcs.lpnWtgExportSetEngine(initSqlJs, wasm);
+	EngCalcs.lpnWtgExportSetTemplate(null);
+	const off2 = await write();
+	ok('the template cannot be fetched (no site to fetch from here): the same sentence', off2.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_offline }), off2.err);
+	EngCalcs.lpnWtgExportSetTemplate(tplBytes, tplWtg.toString('utf8'));
 
 	// ---- 7. the schema gate and the template checks ----
 	head('7. The template is checked before anything is written');

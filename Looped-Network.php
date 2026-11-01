@@ -225,9 +225,6 @@ echoHeader("EngCalcsApp", $html_title,
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,.msx,text/plain" multiple style="display:none">
 	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
-	<?php // File > Export > .wtg.sqlite file (Task 749). The saved project the export is written into: its
-	      // .wtg and its .wtg.sqlite, chosen together. Its own input, as every picker here is. ?>
-	<input type="file" id="lpn_wtg_template_file" accept=".wtg,.sqlite" multiple style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
@@ -2346,8 +2343,6 @@ EngCalcs.pageConfig = {
 	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
 	lpn_file_export_item_wtg: <?=json_encode($ec_lang['lpn_file_export_item_wtg'])?>,
 	lpn_file_export_wtg_tip: <?=json_encode($ec_lang['lpn_file_export_wtg_tip'])?>,
-	lpn_wtg_export_choose: <?=json_encode($ec_lang['lpn_wtg_export_choose'])?>,
-	lpn_wtg_export_need: <?=json_encode($ec_lang['lpn_wtg_export_need'])?>,
 	lpn_wtg_export_lost_lead: <?=json_encode($ec_lang['lpn_wtg_export_lost_lead'])?>,
 	lpn_wtg_export_lost_emitters: <?=json_encode($ec_lang['lpn_wtg_export_lost_emitters'])?>,
 	lpn_wtg_export_lost_demand_category: <?=json_encode($ec_lang['lpn_wtg_export_lost_demand_category'])?>,
@@ -2365,9 +2360,6 @@ EngCalcs.pageConfig = {
 	lpn_wtg_export_lost_texts: <?=json_encode($ec_lang['lpn_wtg_export_lost_texts'])?>,
 	lpn_wtg_export_lost_tags: <?=json_encode($ec_lang['lpn_wtg_export_lost_tags'])?>,
 	lpn_wtg_export_lost_backdrop: <?=json_encode($ec_lang['lpn_wtg_export_lost_backdrop'])?>,
-	lpn_wtg_export_t_not_project: <?=json_encode($ec_lang['lpn_wtg_export_t_not_project'])?>,
-	lpn_wtg_export_t_schema: <?=json_encode($ec_lang['lpn_wtg_export_t_schema'])?>,
-	lpn_wtg_export_t_kind: <?=json_encode($ec_lang['lpn_wtg_export_t_kind'])?>,
 	lpn_wtg_export_t_layout: <?=json_encode($ec_lang['lpn_wtg_export_t_layout'])?>,
 	lpn_wtg_export_t_gpv_curve: <?=json_encode($ec_lang['lpn_wtg_export_t_gpv_curve'])?>,
 	lpn_wtg_export_t_vol_range: <?=json_encode($ec_lang['lpn_wtg_export_t_vol_range'])?>,
@@ -2381,12 +2373,12 @@ EngCalcs.pageConfig = {
 	lpn_wtg_export_no_headloss: <?=json_encode($ec_lang['lpn_wtg_export_no_headloss'])?>,
 	lpn_wtg_export_no_pump_curve: <?=json_encode($ec_lang['lpn_wtg_export_no_pump_curve'])?>,
 	lpn_wtg_export_refused: <?=json_encode($ec_lang['lpn_wtg_export_refused'])?>,
-	lpn_wtg_export_need_both: <?=json_encode($ec_lang['lpn_wtg_export_need_both'])?>,
 	lpn_wtg_export_working: <?=json_encode($ec_lang['lpn_wtg_export_working'])?>,
 	lpn_wtg_export_failed: <?=json_encode($ec_lang['lpn_wtg_export_failed'])?>,
 	lpn_wtg_export_exported: <?=json_encode($ec_lang['lpn_wtg_export_exported'])?>,
 	lpn_wtg_export_extract: <?=json_encode($ec_lang['lpn_wtg_export_extract'])?>,
 	lpn_wtg_export_left_out: <?=json_encode($ec_lang['lpn_wtg_export_left_out'])?>,
+	lpn_wtg_export_credit: <?=json_encode($ec_lang['lpn_wtg_export_credit'])?>,
 	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
 	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
 	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,

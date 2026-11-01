@@ -111,6 +111,26 @@
         "unknown code is shown exactly as it stands. The harmful direction is a code DEPRECATED",
         "since v12.029 that we still offer. Re-run the generator on a newer wheel to refresh."
       ]
+    },
+    {
+      "name": "WaterGEMS models for flow starved water transmission network (Zenodo 7162154), as the .wtg export template",
+      "path": "js/data/wtg-template/wtg-template.wtg.sqlite.gz",
+      "digest": "vqTgKKZqcvAUXjAb9DdTGSGWiMP3UmeRqkWkojuAxR8qklQ4bjN466XX8aOIkUl9",
+      "also": "js/data/wtg-template/wtg-template.wtg.gz, sha384 urVA5QsKyoO0zbx9WzN37IqP6rsWVKO5QNixhWWae0akpAuuusLp+Vvq0d5c77rX",
+      "licence": "CC-BY-4.0",
+      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Sinha, Ghorpade, Damani, and Kalbar (Indian Institute of Technology Bombay), 2022, doi:10.5281/zenodo.7162154",
+      "upstream": "https://zenodo.org/records/7162154",
+      "generated_by": "dev/scripts/build_wtg_template.js",
+      "checked_by": "dev/lpn-spike/wtg-page-export-harness.js (golden digests) and wtg-export-harness.js",
+      "input": {
+        "file": "Supplementry information-2.rar",
+        "md5": "769380840daf14dd0e4f358394503554",
+        "committed": false
+      },
+      "_comment": [
+        "DERIVED DATA under CC BY 4.0, not code: a Bentley project database emptied to one prototype of each element kind. What was changed is in js/data/wtg-template/README.md. vendor_integrity_check.php does not read this list; the digest is for a person checking the bytes at rest."
+      ]
     }
   ],
   "packages": [

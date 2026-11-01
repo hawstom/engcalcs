@@ -10,7 +10,10 @@ reader: `dev/sqlite-reader.md` and `dev/bentley-interop.md` on `feat/sqlite-read
 **Licence line, kept.** Built only from files an ordinary user or the public holds: Tom's own saved
 project `~/webdev/fixtures/wtg-tgh-1/` (WaterGEMS 26.0.0.532, schema 1.0.54.0), the CC BY 4.0 Zenodo
 7162154 files, TSNet's MIT samples, and what they show. No Bentley software or DLL was looked inside.
-The only thing the writer takes from Bentley's side is a project the user saved with their own copy.
+**Licence rule, Tom 2026-10-20:** *"Reverse engineering is prohibited ... Let's stay right."* Nobody
+decompiles or probes Bentley software; evidence is openly licensed sample files and public
+documentation. The writer's template is the CC BY 4.0 sample (see "The route, and why"); Tom's project
+is evidence for codes and a regression fixture, and none of it is in the repository.
 
 **Status: tested against our own reader and EPANET, not against WaterGEMS.** Whether WaterGEMS opens
 the files is the one open question that matters, and only Tom's copy can answer it.
@@ -23,25 +26,52 @@ Three routes were weighed.
    Rejected: the tables, their order and every default row (the 19 default alternatives, the ten
    calculation-option rows, the scenario tree, the 133 element-type counters, the schema blob that
    states each field's storage unit) would all be our reconstruction, and one wrong default is a file
-   WaterGEMS refuses with no message that names it. It would also mean shipping a copy of Bentley's
-   schema in our source.
-2. **Take an openly licensed sample as the template** (Zenodo 7162154, schema 1.0.44, WaterGEMS 10.1.1;
-   or TSNet's, 1.0.38). Rejected as the primary route: both are years older than Tom's WaterGEMS
-   (26.0.0.532 writes 1.0.54), and an old schema opened by a new version is an upgrade path, an extra
-   thing that could go wrong. They are the evidence for codes, not the template.
-3. **Take a project saved by the user's own WaterGEMS as the template, empty its elements, write ours.**
-   **Chosen.** The schema, every default row and the version stamp are exactly what that WaterGEMS
-   writes, so the file is the right version by construction. The writer clones: the template holds one
-   live element of every kind, and the writer copies that element's rows (every table that keys on
-   `DomainElementID` or `SupportElementID`, in the Base alternatives only) under a new ID and overwrites
-   the fields the EPANET network states, by column name. A column the writer does not know keeps what
-   WaterGEMS wrote itself. A template with no prototype of a kind it needs is refused by name.
+   WaterGEMS refuses with no message that names it.
+2. **Take an openly licensed sample as the built-in template. CHOSEN (2026-11-01).** Zenodo 7162154
+   (CC BY 4.0, schema 1.0.44.0, WaterGEMS 10.1.1), emptied to one prototype of each kind by
+   `dev/scripts/build_wtg_template.js` and shipped as two gzip files in `js/data/wtg-template/` (160 KB
+   and 7 KB), fetched only when an export runs. Export is one click and the visitor chooses no file.
+   Tom's verdict, on trying the page route: *"Why are we asking user to choose an existing file?
+   That's bad UX. This seems useless."* The spike had succeeded with his own saved project as the
+   template, by hand; the page then made every visitor supply one.
+3. **Take a project saved by the user's own WaterGEMS as the template. REJECTED as the default, and
+   dropped from the page** (its box, picker, and six language keys are gone). It gives the version
+   by construction, but it asks for a file nobody has to hand, and the 1.0.44 template covers every
+   kind. The writer still accepts any saved project's bytes (`o.sqlite`, `o.wtg`; schema versions
+   1.0.44.0 and 1.0.54.0 are tested), and `wtg-export-harness.js` still runs against Tom's fixture when
+   `WTG_TEMPLATE_DIR` names it, which is how the 1.0.54 path stays proved.
 
-**For a real product the template must come from the user**, not from us: the export dialog would ask
-for a blank project the user saved from their own WaterGEMS ("New project, Save, drop the `.wtg.sqlite`
-here"), read its schema version, and refuse a version not on a tested list. That keeps Bentley's schema
-and defaults out of our source and out of our repository, and it keeps the file in step with the user's
-version. The spike's template is Tom's fixture; nothing of it is in the repository.
+**The one open risk of route 2 is the schema's age:** the template is 1.0.44.0 (2017 layout, written by
+WaterGEMS 10.1.1), and Tom's WaterGEMS 26.0.0.532 writes 1.0.54.0. An older file opened by a newer
+version is an upgrade path, an extra thing that could go wrong. **Tom's test answers it:** does his
+WaterGEMS open the file, does it offer to upgrade or compact, and does the run match? If it refuses,
+the fallback is route 3 for the schema alone (a 1.0.54 blank from a user who has one). The 1.0.54
+columns that 1.0.44 lacks are additions (22 tables, such as SCADA, transient and performance-study
+tables, and about 70 columns). The one the writer would set is the "continue if unbalanced" option and
+its extra iterations (`EpaNetEngine_ContinueIfUnbalanced`, `EpaNetEngine_ExtraIterations`); it has no
+column in 1.0.44, so a 1.0.44 file cannot state it (the writer skips any column the template lacks and
+names it in `report.skippedColumns`). The harness compares EPANET runs with
+`Unbalanced Continue 10` added to the read-back network for that reason.
+
+**What was built into the template.** From the EPS model of the sample: one junction, reservoir,
+circular tank (the sample's was variable-area with an inlet pipe; made plain), pipe, standard pump and
+its pump definition. A pattern from the sample's second model (same schema). **Added because the
+sample lacks them: the six valve kinds and the valve headloss curve**, each as one row per table
+holding the schema's own `DEFAULT` clauses (the `CREATE TABLE` statements carry them), with the key
+columns, the alternative the pump's rows use for the same topic (Physical, InitialSettings,
+Hammer), and the pump's node-level rows. Which tables a valve has rows in is the table list of the
+valve element types, as a saved file shows it. This is the template's one invented part: the defaults
+are the schema's, but no WaterGEMS wrote a valve into it, so a valve is the thing Tom's test should
+look at first. Also removed: the authors' edit log (a user name and each edit), selection sets, a
+graph of one tank, the project name and notes. The `.wtg` display units were set to US customary
+(the sample's were SI) because the export writes US and gpm only; the unit names are the ones a saved
+project spells. Attribution (CC BY 4.0) is in `js/data/wtg-template/README.md`, in
+`dev/vendor-manifest.json`, and in the export's receipt (`lpn_wtg_export_credit`).
+
+**Whether shipping a sample-derived template is acceptable to Bentley belongs in Tom's letter to
+Bentley, which comes before any public release.** The CC BY 4.0 licence is the authors'; the file is
+a Bentley-format database, and the question of what Bentley's terms say about a third party's
+published data file was never answered (`dev/bentley-interop.md`).
 
 **What the `.wtg` holds, and whether WaterGEMS needs it.** The `.sqlite` holds the model: elements,
 values, scenarios, alternatives, calculation options, patterns, controls. The `.wtg` is an XML
@@ -129,25 +159,42 @@ The older clock controls kept `ControlType` 1, which they were first written wit
 `ControlType` 0, which is the schema default. If a clock control fails to fire while a level control does,
 try 0.
 
-## What cannot be carried, and how a product would say so
+## What this export does not write, fact-checked
 
-A product reports each of these by element ID in an export report ("nothing dropped silently", the rule the
-import already keeps). In the spike they are in `report.notCarried`.
+**Tom, 2026-11-01:** *"On export, why do we say that the file cannot carry water quality? I can't
+believe that is true."* He was right. The box said the file "cannot carry" each item, which claimed
+more than we know: WaterGEMS holds nearly all of them, and the export simply does not write them yet.
+**Every `lpn_wtg_export_lost_*` string now states what THIS EXPORT does not write**, under one lead,
+"This export does not yet write the following:", and none says the file or the program cannot hold a
+thing (the page harness checks the word). The spike's `report.notCarried` keeps its internal
+wording; the page never shows it.
 
-| Not carried | Why | Net3 |
-|---|---|---|
-| Rule-based and pressure-condition controls | condition codes unseen (tank level is now known) | none in Net3 |
-| `[RULES]` | logical-control codes unseen | none in Net3 |
-| Water quality: trace, age, reactions, mixing, sources | not written, not studied | Net3 traces Lake |
-| Energy price and price pattern | not written | price 0 |
-| Pipe material, install year | no EPANET field | every pipe keeps the template's default material (Ductile Iron) |
-| Emitter coefficient | storage unit not measured | none in Net3 |
-| Tank minimum volume (a volume curve is carried), mixing model | the minimum-volume column is not kept by our `.inp` reader; mixing codes unseen | none in Net3 |
-| Pump speed pattern, constant-power and multiple-point pumps (head curve) | tables exist, no sample states them | none in Net3 |
-| Pumps other than three-point (power, multiple point, custom) | tables exist | none in Net3 |
-| Non-US units | storage units measured for US only | |
-| Scenarios and their overrides | not written (see below) | Net3 has none |
-| Geographic coordinates | the spatial reference is blank in every file seen | Net3 has map units only |
+Each item against Bentley's public documentation (checked 2026-11-01; community-wiki pages are
+version-specific):
+
+| Item | Does WaterGEMS hold it? | Source | Table that would hold it (sample or schema) |
+|---|---|---|---|
+| Water quality: age, constituent, trace | Yes | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/57532/workflow-for-age-constituent-and-trace-analyses-using-watergems-and-watercad | `Age_`, `Constituent_`, `Trace_SystemData`; nothing stored in any file seen |
+| Tank mixing models (completely mixed, 2-compartment, LIFO, FIFO) | Yes | same page | `ConventionalTank_Constituent_Data.TankMixingModel`, `..._TwoCompartmentType` |
+| Rule-based (logical) controls, IF/THEN/ELSE, priority | Yes | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/24267/using-controls-conditions-actions-and-control-sets-in-watergems-and-watercad and .../8983/simple-controls-vs-logical-controls | `IdahoControl_ControlType_LogicalType` (priority, ELSE); no composite-condition sample |
+| Energy price, price pattern, demand charge | Yes (four pricing types; peak demand charges; block rates in the Energy Management tool) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/7242.energy-cost-and-energy-management | `EnergyPricing` (a support element, with `EnergyPriceCurve`, `PeakDemandCharge`), pointed at by `BasePump_EnergyCost_Data.EnergyCost_EnergyPricingID`: the table shape is in every file; no sample states a row |
+| Pump speed pattern | Yes (relative speed factor pattern; it overrides controls) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/23673/can-you-run-a-vsp-with-a-control-node-and-logical-controls-at-the-same-time | `StandardPump_Physical_VSPType_PatternBasedType`; the pump rows already carry an empty one |
+| Emitter coefficient | Yes (k per node, exponent n in the options) | https://DOCS.BENTLEY.COM/LiveContent/web/Bentley WaterGEMS SS6-v1/en/GUID-FB7909636F314666BC10208A44ACC843.html | `IdahoFireFlowNode_Physical_Data.Physical_EmitterCoefficient`; storage unit unmeasured (Ask 2) |
+| Pressure-driven demand | Yes (pressure dependent demand, modified GGA) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/2671/using-pressure-dependent-demands | `EpaNetEngine_UsePressureDependentDemand`, `PressureDependentDemand_SystemData`; no non-empty row seen |
+| Demand multiplier | Yes (demand adjustments in the calculation options, applied before the pattern) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/35021/multiple-demand-adjustments | `EpaNetEngine_NormalDemandAdjustmentsCollection`: **the Zenodo EPS model holds one row (value 1.0, an order index, a scope id), so its shape is seen and a multiplier is a candidate for a later round**; the scope code for "entire network" is not yet decoded |
+| Tank minimum volume | Yes (inactive volume) | the schema; not found on a public page | `ConventionalTank_Physical_Data.Physical_InactiveVolume` (a volume curve already writes it; a plain minimum volume does not) |
+| Pipe material | Yes | https://DOCS.BENTLEY.COM/LiveContent/web/Bentley WaterGEMS SS6-v1/en/GUID-7E022352A26641E7860CC5BFCDBA312B.html | the pipe's material column; the template's default (ductile iron) stays |
+| Installation year | Yes, as information that does not affect the calculation (same page) | same page | `Physical_InstallationYear` on nodes and pipes |
+| True map positions | Yes (a spatial reference is stored per project) | the schema; not found on a public page | `IdahoDataSet.HMIDataSetGeometrySpatialReference` is blank in every file seen; drawing is written in feet at one scale. Needs a file with the field set |
+| Text on the map | Yes (annotation) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/18067.how-do-i-annotate-model-elements | lives in the `.wtg` or a drawing layer; no sample |
+| Background picture | Yes (background layers) | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/8892/displaying-shapefile-labels-text-as-a-background | a path in the `.wtg`; the picture itself would travel as a third file |
+| Tags | **Not found in Bentley's public pages**; EPANET's `[TAGS]` may have no equivalent | | none found |
+| Demand category names | **Not found in Bentley's public pages**; WaterGEMS stores several demands per node (a collection) but no category name was seen | https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/51561/working-with-demands-in-watergems-and-watercad | `IdahoDemandNode_Demand_DemandCollection` has no name column |
+| Non-US units | n/a | | storage units measured for US only |
+| Scenarios and overrides | Yes | Tom's own file | not written (see below) |
+
+Two rows say "not found": tags and demand category names. The strings make no claim about WaterGEMS
+for them either; they say only that this export does not write them.
 
 ## What the tests show
 
@@ -217,22 +264,23 @@ mostly data entry rather than discovery.
 2. **Built on `feat/wtg-page-export` (2026-10-23, not merged until Tom says).** The writer is `js/lpn-wtg-export.js`
    (DOM-free; `dev/lpn-spike/wtg-export.js` is now only the command line). File > Export > Network >
    `.wtg.sqlite file…` (key `lpn_file_export_item_wtg`; no program named, Tom's call) asks a box BEFORE writing: the
-   scenario, the instruction to choose a project the visitor saved, and what the files cannot carry by asset ID.
-   The visitor then chooses the saved project's `.wtg` and `.wtg.sqlite` together; one `.zip` of the pair
-   downloads. The document is read through `lpnExportInp` and `lpnInpParse` (the .inp is built in memory and
+   scenario, and "This export does not yet write the following:" with each item by asset ID. The visitor
+   clicks Export (no file is chosen: the template is built in, 2026-11-01); one `.zip` of the pair
+   downloads, and the receipt credits the sample. The document is read through `lpnExportInp` and `lpnInpParse` (the .inp is built in memory and
    never offered), so the open scenario's resolved values and the flattening are the .inp export's own. The schema
-   version is read from the user's file and refused unless on `TESTED_SCHEMAS` (1.0.54.0). SQLite is sql.js 1.14.2
+   version is read from the template and refused unless on `TESTED_SCHEMAS` (1.0.44.0 for the built-in
+   template, 1.0.54.0 for a saved project passed in). SQLite is sql.js 1.14.2
    (MIT, 46 KB script + 658 KB wasm), fetched from this site only when the command is used. Harnesses:
    `wtg-page-export-harness.js` (page route against the spike's known-good database, table by table) and
    `wtg-page-export-browser-harness.js`. **Refused by name:** a flow unit other than gpm, a head loss formula other
-   than Hazen-Williams, a pump without a three-point head curve (asks 2 and 3 stay open). **The saved project must
-   already hold one of every element kind the network uses** (the writer clones prototypes), so a brand-new empty
-   project does not work; the box says so, and a missing kind is refused by name.
-   **Left out and named in the box with their value:** a Demand Multiplier other than 1 and a pressure-driven demand
+   than Hazen-Williams, a pump without a three-point head curve (asks 2 and 3 stay open). The template holds a
+   prototype of every element kind the writer clones.
+   **Not written, and named in the box with their value:** a Demand Multiplier other than 1 and a pressure-driven demand
    model (the schema has `NormalDemandAdjustments` and `PressureDependentDemand` tables, but no sample file states a
-   non-empty row, so no code is known), map Text, tags and a backdrop. Refusals of the saved project are language
-   keys (`lpn_wtg_export_t_*`) that name no program and no column. `wtg-page-export-harness.js` compares every table to
-   `reference/wtg-net3-golden.json`, digests of the spike writer's output at 8edd6369b (`wtg-dump.js` makes them).
+   non-empty row, so no code is known), map Text, tags and a backdrop. Refusals are language keys
+   (`lpn_wtg_export_t_*`) that name no program and no column. `wtg-page-export-harness.js` compares every table to
+   `reference/wtg-net3-golden.json`, digests of this writer's output for Net3 into the built-in template (`wtg-dump.js`
+   makes them; regenerate with `WTG_WRITE_GOLDEN=1`).
 3. Samples for each unseen code, saved by Tom once: time-from-start and pressure conditions; pump
    status, speed and target-head actions; each valve kind with a setting; a pump with a multipoint curve and one
    with constant power; a tank with a volume curve; a reservoir with a head pattern. The template already holds
@@ -329,6 +377,13 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[COORDINATES]`, `[VERTICES]` | yes, in feet at one scale | | done |
 | `[LABELS]`, `[BACKDROP]`, `[TAGS]` | no | | no equivalent worth the effort |
 | Units other than US/GPM | refused | storage units measured for US only | yes in principle: SI conversions are the schema's own storage units |
+
+**Candidates for a later round**, where the sample files already show the table that would hold the item
+(fact-check table above): the demand multiplier (`EpaNetEngine_NormalDemandAdjustmentsCollection`, one row in
+the Zenodo EPS model, scope code still to decode), energy pricing (`EnergyPricing` and its curves, pointed at
+by the pump), pump speed pattern (`StandardPump_Physical_VSPType_PatternBasedType`), tank mixing
+(`TankMixingModel`; 1 = mixed is the only value seen), emitters (the table exists; the storage unit is
+Ask 2). Each needs a saved example with a non-empty row before it is written.
 
 **Control sets.** Resolved in form by Tom's `wtg-control-1`: controls belong to a control set, and the set is
 assigned to an alternative in `Operational_SystemData`. The writer now does both (see "Tank-level controls: the
