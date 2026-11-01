@@ -81767,7 +81767,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// only where the project has a clock and the EPANET engine can be reached; anywhere else the
 	// step on screen is the only condition, as it always was.
 	function analysisCanRun() {
-		return effectiveTimesExtended() && !!EngCalcs.lpnEpanetRun;
+		return effectiveTimesExtended() && !!EngCalcs.lpnTimeCanRun();
 	}
 	// **A FIRE FOR A STATED DURATION IS A CHOICE BESIDE "REPORTING STEP TESTED"**, not a box of its
 	// own: it needs the same clock, the same Required fire flow and Residual pressure to hold, and
@@ -81784,7 +81784,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function analysisRun(onProgress) {
 		var model = assembleModel(), fresh = EngCalcs.lpnTimeFreshRun ? EngCalcs.lpnTimeFreshRun(model) : null;
 		if (fresh) { return Promise.resolve(fresh); }
-		return EngCalcs.lpnEpanetRun(model, { onProgress: onProgress });
+		return EngCalcs.lpnTimeRunModel(model, { onProgress: onProgress });
 	}
 	function analysisSteps(run, times) {
 		return times.map(function (t) {
@@ -83033,7 +83033,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return analysisRun(function (p) { updateEpsRunBox((p && p.fraction || 0) / 2); }).then(function (run) {
 			baseRun = run;
-			return EngCalcs.lpnEpanetRun(built.model, { onProgress: function (p) { updateEpsRunBox(0.5 + (p && p.fraction || 0) / 2); } });
+			return EngCalcs.lpnTimeRunModel(built.model, { onProgress: function (p) { updateEpsRunBox(0.5 + (p && p.fraction || 0) / 2); } });
 		}).then(function (fired) {
 			var d = (fired && baseRun) ? EngCalcs.lpnDurFireDigest({
 				model: model, fire: built.fire, residual: residual > 0 ? residual : 0, base: baseRun, fired: fired
@@ -83488,7 +83488,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		engine = engineFor(model);
 		// One EPANET run per outage, as every run is; the answer is handed to the sweep whole.
 		sweepSolve = whole ? function (m) {
-			return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
+			return EngCalcs.lpnTimeRunModel(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
 		} : engine.solve;
 		before = JSON.stringify(doc);
 		critRunT = whole ? null : modelTimeSeconds();
@@ -83976,7 +83976,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// run, and whether a tank emptied.
 		return { model: model, ids: ids, whole: whole, time: whole ? null : dsNow(),
 			engine: whole ? { epanet: true, solve: function (m) {
-				return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
+				return EngCalcs.lpnTimeRunModel(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
 			} } : engineFor(model) };
 	}
 	function dsBegin() {
@@ -84374,7 +84374,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// EPANET engine only, as every run on this page is; with no engine, the one moment is solved
 	// and the row says nothing it cannot back.
 	function scenarioCompareRunsPeriod(model) {
-		return !!(EngCalcs.lpnEpanetRun && EngCalcs.lpnTimeIsExtended &&
+		return !!(EngCalcs.lpnTimeCanRun && EngCalcs.lpnTimeCanRun() && EngCalcs.lpnTimeIsExtended &&
 			EngCalcs.lpnTimeIsExtended(model && model.time && model.time.times));
 	}
 	// **THE SCENARIOS ARE SOLVED ONE AFTER ANOTHER, NEVER ALL AT ONCE.** The EPANET bridge is one
@@ -84430,7 +84430,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					return null;
 				}
 				if (scenarioCompareRunsPeriod(pair.model)) {
-					return EngCalcs.lpnEpanetRun(pair.model).then(function (run) {
+					return EngCalcs.lpnTimeRunModel(pair.model).then(function (run) {
 						var ext = null, converged = true;
 						if (!run || !run.ok || !(run.frames || []).length) {
 							rows.push({

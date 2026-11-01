@@ -1023,7 +1023,7 @@
 	 */
 	function periodRun(model, opts) {
 		var plan = EC.lpnTimeNativePlan(model), withEpanet = function (note) {
-			if (host.routeNote) { host.routeNote(note || ''); }
+			if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(note || ''); }
 			return EC.lpnEpanetRun ? EC.lpnEpanetRun(model, opts) : Promise.resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '' });
 		};
 		if (!plan.use) { return withEpanet(plan.wanted ? routeNoteText(plan, model) : ''); }
@@ -1036,7 +1036,7 @@
 			function finish(run) {
 				if (!run || !run.ok) { resolve(withEpanet(routeNoteText({ refusals: (run && run.issues) || [] }, model))); return; }
 				// The status bar names the solver, in the slot the routed-run note uses, until the next run replaces it.
-				if (host.routeNote) { host.routeNote(strings().nativeUsed); }
+				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(strings().nativeUsed); }
 				run.engineVersion = undefined;
 				run.issues = [];
 				run.report = '';
@@ -1088,6 +1088,21 @@
 			return true;
 		});
 	}
+	/**
+	 * **THE ENGINE CHOICE FOR EVERY RUN THAT IS NOT THE TRANSPORT'S** (Task 733): scenario comparison, fire
+	 * flow over a duration, criticality, demand scaling, the Alternatives preview and the analysis run all
+	 * come here instead of calling EngCalcs.lpnEpanetRun, so the project's engine setting decides for them
+	 * as for the transport. It is quiet: it never writes the status bar's solver note (the transport's run
+	 * owns that slot). Resolves to the shape lpnEpanetRun resolves to.
+	 */
+	EC.lpnTimeRunModel = function (model, opts) {
+		var o = {};
+		Object.keys(opts || {}).forEach(function (k) { o[k] = opts[k]; });
+		o.quiet = true;
+		return periodRun(model, o);
+	};
+	// Can a period be run for this model by either engine?
+	EC.lpnTimeCanRun = function (model) { return periodEngineHere(model); };
 	function startRun(model) {
 		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model),
 			shown = state.wantedByUser;
