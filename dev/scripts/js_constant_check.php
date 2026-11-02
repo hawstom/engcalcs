@@ -106,6 +106,11 @@ function ecJsConstantQuantities(float $g): array
 function ecJsConstantExceptions(): array
 {
     return [
+        'lpn-native-msx.js' => [
+            '0.028317' => "EPANET-MSX's own msxtypes.h M3perFT3, which it divides a tank's volume by (and EPANET writes the volume "
+                . "times the exact 0.3048 cubed), so a tank's volume is 5.4e-6 smaller in MSX than in EPANET. Copied so the built-in "
+                . "run is the same 5.4e-6 smaller.",
+        ],
         'PipeHydraulics.lib.js' => [
             '0.4333' => "EPANET's types.h PSIperFT, adopted on purpose for the Looped Network page "
                 . "(Tom, 2026-10-03) so its psi reads as EPANET's report does. lib/Units.lib.php "

@@ -342,7 +342,7 @@ named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 
 | Falls back for | Where it is decided | Why it stays |
 |---|---|---|
-| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality`, no ids | In scope since Tom, 2026-11-01 ("I'd prefer to implement EPANET-MSX even if it causes us a delay"). Built slice by slice (`## EPANET-MSX in the built-in solver`); falls back to EPANET until a slice runs the whole file. |
+| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality` | Slices 1 to 5 are built (`## EPANET-MSX in the built-in solver`); the loop runs a file it can read, and leaves to EPANET: a file with a line it cannot read or an expression missing (named by line and code), a tank that is a 2-compartment or last-in-first-out tank (named by tank), a tank with no area. |
 | A hydraulic step under 10 s with any rule | `native-run-rules` | EPANET's rule step is the hydraulic step over ten in whole seconds, so under 10 s it is zero and `% 0` stops the engine (measured: `lpnEpanetRun` returns not-ok with no issues). There is no answer to match. |
 | A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
 | A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
@@ -513,3 +513,33 @@ mixing model, a pattern, per-pipe parameters.
 4. **Wall species**, the arsenic example against its published report and the engine.
 5. **Tank models 2COMP, FIFO, LIFO**, per-element parameters, patterns on sources.
 6. **Wiring.** The run no longer falls back to EPANET for a file the slices cover; `lpnNativeRunRefusals` names what is not covered.
+
+### Built so far (native-wire, 2026-11-01), and what it found
+
+`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done:
+2-compartment and last-in-first-out tanks under MSX (left to EPANET, by tank name), and exact parity on a network that moves
+several of its pipe volumes in a quality step (Net3).
+
+Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
+the arsenic example, 1 525 on Net1):
+
+| Case | Worst gap |
+|---|---|
+| EPA's arsenic example (equilibrium, formula and wall species, term with Av), EUL, RK5, ROS2, coupling NONE and FULL | 7e-14 (EUL, RK5); **7e-7 (ROS2)** |
+| Net1 with a decaying chlorine, RK5 | 3.2e-4 mg/L |
+| Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
+| Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
+| Net3 (pumps closing, three tanks, two reservoirs), three species | **3.0e-2** in the first hour after the Lake pump opens, mean 5e-4 |
+
+Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
+a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
+no more than the flow volume (a pump or valve always) passes all it holds and the rest of the flow volume as the upstream node's own
+water, and is emptied; a reservoir's formula species are evaluated; a tank's rate species start from the SEGMENT's concentration, not
+the tank's (the main branch makes every segment of a FIFO, LIFO or 2COMP tank follow one curve); LIFO removes the newest
+segment by `next`, not `prev`. And one defect in this repository's bridge, corrected: `lpnToInp` did not write `[MIXING]` for an
+MSX run, so every tank mixed completely in the EPANET engine whatever the page said; it does now.
+
+The Net3 gap is the open one. Its cause is in how a pipe that moves several volumes per step hands water to its downstream node
+(the variant tried that sub-steps a quality step so no pipe moves more than its volume is far slower and was not completed). It is
+held by the harness at 0.035 so a change cannot widen it unseen. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
+gap (0.009) are measured the same way and not claimed.

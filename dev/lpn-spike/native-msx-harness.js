@@ -22,7 +22,11 @@ const EngCalcs = require(path.join(ROOT, 'js', 'lpn-solver.js'));
 global.EngCalcs = EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-patterns.js'));
 Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
-['lpn-inp', 'lpn-epanet', 'lpn-time', 'lpn-native-msx', 'lpn-native-run'].forEach((f) => require(path.join(ROOT, 'js', f + '.js')));
+require(path.join(ROOT, 'js', 'lpn-inp.js'));
+require(path.join(ROOT, 'js', 'lpn-epanet.js'));
+require(path.join(ROOT, 'js', 'lpn-time.js'));
+require(path.join(ROOT, 'js', 'lpn-native-msx.js'));
+require(path.join(ROOT, 'js', 'lpn-native-run.js'));
 const { buildModel } = require('./net3-model.js');
 
 let pass = 0, fail = 0;
@@ -266,6 +270,41 @@ async function slices2to5() {
 	await against('Net1, SETPOINT, FLOWPACED (with a pattern), MASS and CONCEN sources', loadNet('Net1.inp', null, SRC), 5e-4);
 	for (const mix of ['MIXED', 'FIFO']) {
 		await against(`Net1, tank mixing model ${mix}`, loadNet('Net1.inp', (m) => { m.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix }; } }); }, NET1_MSX), 5e-4);
+	}
+	// Net3: fast flows (a pipe moves several times its volume in a quality step), a pump that opens and closes, two reservoirs, three
+	// tanks. The gap here is the largest in the file and is HELD, not hidden: no value is further than 0.035 mg/L from the engine's
+	// (5 percent of the starting 0.5 at the worst, in the first hours after the Lake pump opens), the mean is 5e-4.
+	{
+		const n3 = NET1_MSX.replace('CONC 10 CL2 1.5 P1', 'CONC 15 CL2 1.5 P1').replace('MASS 13 TOT 20', 'MASS 20 TOT 20').replace('NODE 9 CL2 1.0\n', '');
+		await against('Net3 (pumps, three tanks, two reservoirs), the three species, RK5', loadNet('Net3.inp', null, n3), 0.035);
+	}
+	// THE PAGE'S OWN RUN PATH (lpnTimeRunModel, the engine setting built-in) takes an MSX project now, and says so in the run: the
+	// species the file declares, the frames carrying them, the report EPANET writes, and no fall back.
+	{
+		let engineName = 'native';
+		EngCalcs.lpnTimeInit({
+			tabs: [], doc: () => null, apply: () => {}, status: () => {}, notice: () => {},
+			routeNote: () => {}, engine: () => engineName,
+			solve: () => {}, solveNow: () => {}, native: () => ({ ok: true, converged: true, heads: {}, flows: {} }),
+			snapshot: () => {}, save: () => {},
+			toSI: (v) => v, toDisplay: (v) => v, unitLabel: () => ''
+		});
+		const m = loadNet('Net1.inp', null, NET1_MSX);
+		const viaPage = await EngCalcs.lpnTimeRunModel(copy(m), {});
+		ok('the page\'s run path with the built-in setting runs an MSX project in the loop (not EPANET)', viaPage.ok && viaPage.engine === 'native' && viaPage.frames.length === 25 && viaPage.frames.every((f) => f.msxNodes && f.msxLinks),
+			`engine ${viaPage.engine}, ${viaPage.frames.length} frames`);
+		const viaEngine0 = await EngCalcs.lpnEpanetRun(copy(m));
+		ok('...and names the species exactly as the engine run does (id, wall, units, unit text)', viaPage.msxSpecies && viaPage.msxSpecies.length === 3 &&
+			JSON.stringify(viaPage.msxSpecies) === JSON.stringify(viaEngine0.msxSpecies), JSON.stringify(viaPage.msxSpecies) + ' / ' + JSON.stringify(viaEngine0.msxSpecies));
+		ok('...and writes EPANET\'s run report', /Hydraulic Flow Balance/.test(viaPage.report));
+		engineName = 'epanet';
+		const viaEpanet = await EngCalcs.lpnTimeRunModel(copy(m), {});
+		ok('the EPANET setting still runs EPANET', viaEpanet.ok && viaEpanet.engine === 'epanet', viaEpanet.engine);
+		// a file the loop cannot read is refused by name and falls back to EPANET, which refuses it too
+		engineName = 'native';
+		const bad = loadNet('Net1.inp', null, NET1_MSX.replace('RATE CL2 -Rate1', 'RATE CL2 -Rate1*'));
+		const refs = EngCalcs.lpnNativeRunRefusals(copy(bad), { quality: true });
+		ok('an expression it cannot read is refused by the line, not run', refs.some((r) => r.code === 'native-run-quality' && r.ids.some((x) => /^line \d+ \(408\)$/.test(x))), JSON.stringify(refs));
 	}
 	// what is NOT yet claimed: named, and the gap measured
 	for (const mix of ['2COMP', 'LIFO']) {

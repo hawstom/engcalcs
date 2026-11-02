@@ -1155,7 +1155,7 @@
 				mtanks[tk.id] = { V0: tk.V0, Vmax: tk.Vmax, v1frac: f1, mix: mmx === MIX1 ? 0 : mmx === MIX2 ? 1 : mmx === FIFO ? 2 : 3 };
 			});
 			var mqs = times.qualityStep > 0 ? times.qualityStep : Math.floor(hydStep / 10);
-			var mres = yield* EC.lpnMsxPassSteps({ spec: msxCfg.spec, net: mnet, recs: hydRecs, tanks: mtanks, tankCount: mnet.nodes.filter(function (nd) { return nd && (nd.type === 'reservoir' || nd.type === 'tank'); }).length,
+			var mres = yield* EC.lpnMsxPassSteps({ text: model.msx.text, spec: msxCfg.spec, net: mnet, recs: hydRecs, tanks: mtanks, tankCount: mnet.nodes.filter(function (nd) { return nd && (nd.type === 'reservoir' || nd.type === 'tank'); }).length,
 				method: model.method || 'hw', dur: dur, qstep: Math.min(mqs, hydStep), patStep: patStep, patStart: patStart, isReportTime: isReportTime, frames: frames });
 			if (!mres.ok) { return { ok: false, issues: mres.issues }; }
 			msxSpecies = mres.species;

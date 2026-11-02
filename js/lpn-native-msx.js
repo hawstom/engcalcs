@@ -1133,22 +1133,25 @@
 			}
 		}
 		function accumulate(dt) {
-			var kk, ii, jj, mm, v, sg, cseg, vseg;
+			var kk, ii, jj, mm, v, sg, cseg, vseg, vsegSum;
 			getIncidentConcen();
 			volIn.fill(0);
 			for (ii = 1; ii <= N; ii++) { massIn[ii].fill(0); }
 			for (kk = 1; kk <= L; kk++) {
 				ii = upNode(kk); jj = downNode(kk);
 				v = Math.abs(st.Q[kk]) * dt;
-				if (linkVol(kk) < v) {
+				if (linkVol(kk) <= v) {
+					// More water leaves than the link holds (a link of no volume, a pump or a valve, always): all of what it holds goes,
+					// and the rest of the flow volume is the upstream node's own water. epanet-msx's main branch sends the first segment's
+					// quality for all of it and compares with `<`; this is the form that fits the engine on Net3 (native-msx-harness.js
+					// holds the remaining gap there).
 					volIn[jj] += v;
-					sg = st.first[kk];
-					for (mm = 1; mm <= S; mm++) {
-						if (wall[mm - 1]) { continue; }
-						cseg = node[ii][mm];
-						if (sg) { cseg = sg.c[mm]; }
-						massIn[jj][mm] += v * cseg;
+					vsegSum = 0;
+					for (sg = st.first[kk]; sg; sg = sg.prev) {
+						vsegSum += sg.v;
+						for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { massIn[jj][mm] += sg.v * sg.c[mm]; } }
 					}
+					for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { massIn[jj][mm] += (v - vsegSum) * node[ii][mm]; } }
 					removeAllSegs(kk);
 				} else {
 					while (v > 0) {
@@ -1417,7 +1420,7 @@
 			yield { phase: 'msx', done: Qtime, of: dur };
 			if (dur === 0) { break; }
 		}
-		result = { ok: true, species: spec.species.map(function (sp) { return { id: sp.id, wall: sp.type === 'WALL', units: sp.units, unitText: sp.units + '/' + (sp.type === 'WALL' ? opt.areaUnits : 'L') }; }) };
+		result = { ok: true, species: spec.species.map(function (sp) { return { id: sp.id, wall: sp.type === 'WALL', units: sp.units, unitText: sp.units + '/' + (sp.type === 'WALL' ? (typeof EC.lpnMsxAreaUnits === 'function' && ctx.text ? EC.lpnMsxAreaUnits(ctx.text) : opt.areaUnits) : 'L') }; }) };
 		return result;
 	};
 
