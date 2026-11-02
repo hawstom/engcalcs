@@ -85076,7 +85076,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
-		else if (EngCalcs.lpnTimeReportAsync) {
+		// An open box follows a run, but a run never starts the EPANET download for a report: only a warm engine writes it here.
+		else if (EngCalcs.lpnTimeReportAsync && epanetWarmState === 'ready') {
 			var later = EngCalcs.lpnTimeReportAsync();
 			if (later) { later.then(function () { if (lastRunReportText() && rptBoxIsOpen()) { pre.textContent = lastRunReportText(); } }); }
 		}
