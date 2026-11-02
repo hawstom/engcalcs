@@ -547,6 +547,13 @@
 			});
 			return any;
 		}
+		// The pressure valves carry on from the status the trials reached; valveSwitch() then re-states the ones a control changed.
+		function syncValves(stepLinks2, r) {
+			stepLinks2.forEach(function (sl) {
+				var vs2 = sl.valveStart !== undefined && r.valveStatus && r.valveStatus[sl.id];
+				if (vs2) { sl.valveStart = vs2; }
+			});
+		}
 		// hydraul.c tanklevels()
 		function tankLevels(dt) {
 			tanks.forEach(function (tk) {
@@ -1089,8 +1096,14 @@
 			res = solveInFeet(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			trialsSoFar = res.iterations;
-			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
+			for (vTrial = 0; vTrial < 20 && (syncValves(stepLinks, res), valveSwitch(stepLinks, function (id) { return res.heads[id]; })); vTrial++) {
 				sOpts.flows0 = Object.assign({}, res.flows, res.leakFlows || {});
+				// and goes on from the statuses the trials had reached (a link a full tank shut, a pump that could not lift, a check
+				// valve, a pressure valve), not the ones the step began with
+				sOpts.tempClosed = {}; sOpts.xhead = {}; sOpts.cvClosed = {};
+				(res.tankClosed || []).forEach(function (id) { sOpts.tempClosed[String(id)] = true; });
+				(res.pumpXhead || []).forEach(function (id) { sOpts.xhead[String(id)] = true; });
+				(res.cvClosed || []).forEach(function (id) { sOpts.cvClosed[String(id)] = true; });
 				res = solveInFeet(stepModel, sOpts);
 				if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 				// EPANET carries on counting trials after a control changes a valve (hydsolve() continues; it does not start again)

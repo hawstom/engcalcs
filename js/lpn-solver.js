@@ -861,7 +861,9 @@ EngCalcs.lpnSolve = function (model, options) {
 	function valveFlow0(k2) {
 		var f0 = opts.flows0 && opts.flows0[links[k2].id];
 		if (typeof f0 === 'number' && f0 !== 0 && isFinite(f0)) { return f0; }
-		if (opts.epAcc && links[k2].valveStart === 'closed' && !links[k2].valveFixed) { return 1e-6 * 0.3048 * 0.3048 * 0.3048; }
+		// a valve the last solve reported with no flow was shut (or at rest): EPANET still holds the leak it had, about QZERO,
+		// whatever the valve is now told (a control that opens it too)
+		if (opts.epAcc && ((opts.flows0 && f0 === 0) || (links[k2].valveStart === 'closed' && !links[k2].valveFixed))) { return 1e-6 * 0.3048 * 0.3048 * 0.3048; }
 		return Math.PI * links[k2].diameter * links[k2].diameter / 4 * VFT;
 	}
 	// Initial guess. Any nonzero flow works because of the gradient floor; a
