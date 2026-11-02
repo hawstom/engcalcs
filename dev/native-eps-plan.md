@@ -460,9 +460,25 @@ valve's flow of 0 was thrown away as "no previous flow"). The loop now hands the
 counts now equal EPANET's: PRV, PSV, FCV (twice) and a GPV's setting as a premise (at the first step that
 differed the loop took 5, 5, 2, 2 and 2 trials against EPANET's 1, 3, 1, 1 and 1; now equal); a PBV that EPANET balanced in 6 trials and the loop called "Unbalanced after 13" is now balanced in 8.
 
-**Not held**, said where they are (11 constructed cases print `GAP`): a PBV stopped by a control (8 trials against 6), a
-pressure control on a junction (every case: the first solve of the run takes 2 to 7 trials where EPANET takes 4 to 20), a
-Darcy-Weisbach project and a pump speed pattern that discards a stated speed (one trial apart at the first step). The flow balance's numbers agree to 2e-5 of themselves.
+**Round 3 (trial counts, found by running EPANET at status report level 2, which prints every trial's relative flow change, beside the
+loop's own trace).** Causes and fixes: (1) a valve a control changed was re-solved as a new solve, so its trials were counted from 1
+again where EPANET goes on counting (`hydsolve()` continues): now added up; (2) the control's test on a valve compared the status
+as well as the setting every step (`pswitch()` compares the setting, and the status only when the setting is MISSING): fixed;
+(3) after the change the next trials started from the step's first statuses (a link a full tank shut, a pump that could not lift,
+a pressure valve's state), not those the trials reached: fixed, and a valve reported with no flow starts from QZERO whatever it is
+then told; (4) a pump on a speed pattern starts its first solve at speed 1 (its stated SPEED is discarded); (5) Darcy-Weisbach
+used a frozen friction factor and a quadratic law at every Reynolds number, where EPANET uses a straight line below Re 2000 and
+adds the friction factor's own derivative in the gradient: now EPANET's. Trial counts then equal EPANET's on every constructed case
+but three, from 11 cases that differed: junction-pressure controls on a PRV (three cases), an FCV (two), a TCV and a PBV, the
+pump speed pattern and the Darcy-Weisbach case now agree.
+
+**Still not held** (3 cases print `GAP`): (a) a PBV at 2:46:53, 8 trials against 6: after a full tank shuts the pipe below it the
+PBV's forced drop leaves a relative flow change of about 1e-5 at the convergence threshold, 6e-5 for the loop and 1e-5 for the
+engine in the trial after, and the count follows which side of 1e-5 each lands on; (b) the Darcy-Weisbach case differs by one
+second in the time a tank fills (11:23:40 against 11:23:41), the two flows differing in the fifth digit, not in a count; (c) a
+GPV with no curve (an open TCV in the engine's file) at 8:00:00, 14 trials against 15: both fall by the same factor of 0.46 a
+trial, the engine starting from a relative flow change of 0.95 where the loop starts from 0.56 after a rule re-opens the bypass
+pipe; not found (starting the valve from 1 ft/s moves the loop's figure to 0.32, not 0.95). The flow balance's numbers agree to 2e-5 of themselves.
 Quality runs write the summary lines for the analysis but not EPANET's "Water Quality Mass Balance" block.
 
 ## EPANET-MSX in the built-in solver
