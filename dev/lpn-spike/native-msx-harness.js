@@ -8,8 +8,7 @@
 //            (lpnEpanetRun) and through the built-in loop (lpnNativeRun with quality) and every species at every node and
 //            link at every reporting time is compared: each solver (EUL, RK5, ROS2), coupling NONE and FULL, equilibrium and
 //            formula species, a wall species, every source type, a pattern, per-pipe parameters, a term using Av, and the
-//            tank models MIXED and FIFO. A 2-compartment or last-in-first-out tank under MSX is left to EPANET by name
-//            (the gap is measured and held below), not claimed.
+//            tank models MIXED, 2COMP, FIFO and LIFO.
 //   Slice 1: the file and the expressions. The .msx parser (js/lpn-native-msx.js lpnMsxParse) reads the fixtures to the
 //            same species, units, tolerances, constants, parameters, sources and initial qualities the engine reads from
 //            the same text, and the expression evaluator gives MSX's own answers, quirks included.
@@ -333,11 +332,19 @@ async function slices2to5() {
 		const refs = EngCalcs.lpnNativeRunRefusals(copy(bad), { quality: true });
 		ok('an expression it cannot read is refused by the line, not run', refs.some((r) => r.code === 'native-run-quality' && r.ids.some((x) => /^line \d+ \(408\)$/.test(x))), JSON.stringify(refs));
 	}
-	// what is NOT yet claimed: named, and the gap measured
-	for (const mix of ['2COMP', 'LIFO']) {
-		const m = loadNet('Net1.inp', (mm) => { mm.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix, fraction: 0.3 }; } }); }, NET1_MSX);
-		const refs = EngCalcs.lpnNativeRunRefusals(copy(m), { quality: true });
-		ok(`Net1, tank mixing model ${mix}: the built-in loop leaves it to EPANET, by tank name`, refs.some((r) => r.code === 'native-run-quality' && r.ids.indexOf('2') >= 0), JSON.stringify(refs));
+	// the other two tank models, which the loop used to leave to EPANET: a last-in-first-out tank, and a two-compartment tank at
+	// three mixing-zone fractions. Net1's tank, and Net3's three. (The first run of these was 1.7e-2 and 1.8e-2 off the engine:
+	// a pipe sends beyond what it holds the tank's concentration as the tank leaves the step, and the mixing zone starts first.)
+	{
+		const setMix = (mix, fr) => (mm) => { mm.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix, fraction: fr }; } }); };
+		await against('Net1, tank mixing model LIFO', loadNet('Net1.inp', setMix('LIFO', 0.3), NET1_MSX), 5e-4);
+		await against('Net1, tank mixing model 2COMP, mixing zone 0.3 of the tank', loadNet('Net1.inp', setMix('2COMP', 0.3), NET1_MSX), 5e-4);
+		await against('Net1, tank mixing model 2COMP, mixing zone the whole tank', loadNet('Net1.inp', setMix('2COMP', 1), NET1_MSX), 5e-4);
+		// a small mixing zone is stiff (the inflow of a step is a large share of it) and the two solvers' last digits show: HELD, not hidden
+		await against('Net1, tank mixing model 2COMP, mixing zone 0.05 of the tank', loadNet('Net1.inp', setMix('2COMP', 0.05), NET1_MSX), 3e-3);
+		const n3 = NET1_MSX.replace('CONC 10 CL2 1.5 P1', 'CONC 15 CL2 1.5 P1').replace('MASS 13 TOT 20', 'MASS 20 TOT 20').replace('NODE 9 CL2 1.0\n', '');
+		await against('Net3, tank mixing model LIFO', loadNet('Net3.inp', setMix('LIFO', 0.4), n3), 0.0012);
+		await against('Net3, tank mixing model 2COMP', loadNet('Net3.inp', setMix('2COMP', 0.4), n3), 0.0012);
 	}
 }
 

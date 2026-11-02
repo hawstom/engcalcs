@@ -533,8 +533,14 @@ mixing model, a pattern, per-pipe parameters.
 
 ### Built so far (native-wire, 2026-11-01), and what it found
 
-`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done:
-2-compartment and last-in-first-out tanks under MSX (left to EPANET, by tank name), and one dead-end node on Net3 (below).
+`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done: one dead-end node
+on Net3 (below), a 2-compartment tank with a mixing zone of 0.05 (2.6e-3 off), and the engine's mass balance blocks.
+**2-compartment and last-in-first-out tanks are in the loop** (they were left to EPANET by tank name; the first run of both was
+1.7e-2 and 1.8e-2 off the engine). Two causes, both found by running the engine: a pipe that sends more than it holds sends
+its upstream tank's concentration as the tank leaves the step (after this step's mix, run on a copy of the tank's segments), not
+as it entered it; and the mixing zone starts first and holds up to its own volume, where epanet-msx's main branch starts the
+first segment with the volume above it. Now: LIFO 7.7e-5, 2COMP 1.3e-4 (zone 0.3 of the tank) and 6.7e-5 (the whole tank) on
+Net1; MIXED and FIFO moved from 2.6e-4 to under 7.5e-5 as well. Net3 with either model holds the same 1.15e-3 at node 15.
 
 Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
 the arsenic example, 1 525 on Net1):
@@ -546,6 +552,7 @@ the arsenic example, 1 525 on Net1):
 | Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
 | Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
 | Net3 (pumps closing, three tanks, two reservoirs), three species | **1.2e-3**; every value but one dead-end node is within 4e-4 |
+| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 1.3e-4, 6.7e-5, **2.6e-3**; 1.15e-3 (the dead end) |
 
 Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
 a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
@@ -559,7 +566,7 @@ The Net3 gap was how a pipe that moves several of its volumes in one quality ste
 sends the water a pipe cannot hold (flow volume past link volume) from the upstream node's concentration AS THAT NODE WILL MIX IT
 THIS STEP: everything the links into it bring, so they are taken first (the loop sorts the links in flow order each hydraulic
 step), mixed with any external inflow as `updateNodes()` does, and the average of the segments around the node when nothing flows
-in; a reservoir or tank sends the concentration it has. Found by two small chains of short pipes in `native-msx-harness.js`
+in; a reservoir sends the concentration it has, a tank the one it ends the step with. Found by two small chains of short pipes in `native-msx-harness.js`
 (exact to 1e-15 whichever way the links are numbered), not by reading the source: epanet-msx's main branch sends the first
 segment's quality for all of it and does not fit. A pump or valve holds no segment at all, so none is averaged at the node it
 feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness holds it at 0.0012. What is left is node 15, a dead end
@@ -570,5 +577,4 @@ engine to six digits at every hour (so the segments hold the same water), and no
 by the concentration of the pipe's third segment against the loop's first (0.05825 against 0.05710 mg/L at 8 h); giving the loop
 EPANET's flows at every reporting time, zeroing every flow under 1e-5 cfs, and forcing the noise flows positive, each left
 node 15 at 0.057105 to five digits, so the loop's value does not depend on the sign or size of the noise. What stays unknown
-is the engine's segment order at its unreported hydraulic steps. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
-gap (0.009) are measured the same way and not claimed.
+is the engine's segment order at its unreported hydraulic steps. 

@@ -1048,7 +1048,9 @@
 				kk = L + jj;
 				st.last[kk] = null; st.first[kk] = null;
 				if (tk.mix === 1) {
-					v = Math.max(0, tk.v - tk.vMix);
+					// the mixing zone first, holding up to its own volume; the engine starts it so (epanet-msx's main branch gives it
+					// the volume above the mixing zone's, which fits nothing the engine does: native-msx-harness.js)
+					v = Math.min(tk.v, tk.vMix);
 					addSeg(kk, getSeg(v, C1));
 					addSeg(kk, getSeg(tk.v - v, C1));
 				} else { addSeg(kk, getSeg(tk.v, C1)); }
@@ -1153,9 +1155,39 @@
 		// average of the segments around it when nothing flows in. A reservoir or tank sends the concentration it has. The engine does
 		// this in whatever order the links are numbered (native-msx-harness.js, the chain of short pipes below).
 		var accOrder = [];
+		// What a tank's concentration WILL BE once it has mixed this step's inflow: the water a pipe sends beyond what it holds is
+		// the tank's water as the tank leaves the step (measured against the engine on Net1, where a last-in-first-out tank changes
+		// by 0.03 mg/L in a step and the pipe below it by 4 percent of the value if it is sent the concentration the tank had
+		// before: 0.3917 against 0.4093, now equal). The mix is run on a copy of the tank's segments and put back, once per step.
+		var tankNext = {};
+		function copyChain(kk) {
+			var sg = st.first[kk], out = { first: null, last: null }, prevCopy = null, cp;
+			while (sg) {
+				cp = { v: sg.v, c: Float64Array.from(sg.c), hstep: sg.hstep, prev: null, next: null };
+				if (prevCopy) { prevCopy.prev = cp; cp.next = prevCopy; } else { out.first = cp; }
+				out.last = cp; prevCopy = cp;
+				sg = sg.prev;
+			}
+			return out;
+		}
+		function tankNextC(jj, dt) {
+			var tk, kk, nn, saveF, saveL, saveC, cp, c1v, res;
+			if (tankNext[jj]) { return tankNext[jj]; }
+			tk = st.tanks[jj]; kk = L + jj; nn = tk.node;
+			if (tk.a === 0) { return (tankNext[jj] = node[nn]); }   // a reservoir sends its own
+			saveF = st.first[kk]; saveL = st.last[kk]; saveC = Float64Array.from(tk.c);
+			cp = copyChain(kk); st.first[kk] = cp.first; st.last[kk] = cp.last;
+			c1v = new Float64Array(S + 1);
+			if (volIn[nn] > 0) { for (var m3 = 1; m3 <= S; m3++) { c1v[m3] = massIn[nn][m3] / volIn[nn]; } }
+			if (tk.mix === 0) { mix1(jj, volIn[nn], c1v); } else if (tk.mix === 1) { mix2(jj, volIn[nn], c1v, dt); }
+			else if (tk.mix === 2) { mix3(jj, volIn[nn], c1v, dt); } else { mix4(jj, volIn[nn], c1v, dt); }
+			res = Float64Array.from(tk.c);
+			st.first[kk] = saveF; st.last[kk] = saveL; tk.c.set(saveC);
+			return (tankNext[jj] = res);
+		}
 		function upConc(ii, mm, dt) {
 			var vol;
-			if (tankOfNode[ii] > 0) { return node[ii][mm]; }
+			if (tankOfNode[ii] > 0) { return tankNextC(tankOfNode[ii], dt)[mm]; }
 			vol = volIn[ii] + (st.D[ii] < 0 ? -st.D[ii] * dt : 0);
 			return vol > 0 ? massIn[ii][mm] / vol : X[ii][mm];
 		}
@@ -1180,6 +1212,7 @@
 		}
 		function accumulate(dt) {
 			var kk, ii, jj, mm, v, sg, cseg, vseg, vsegSum;
+			tankNext = {};
 			getIncidentConcen();
 			volIn.fill(0);
 			for (ii = 1; ii <= N; ii++) { massIn[ii].fill(0); }

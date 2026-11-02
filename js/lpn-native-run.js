@@ -1750,9 +1750,6 @@
 		}
 		(model.nodes || []).forEach(function (n) {
 			if (n.type === 'tank' && !tankHasArea(n)) { bad.push(String(n.id)); }
-			// a 2-compartment or last-in-first-out tank under MSX is not yet copied to the engine's answer (native-msx-harness.js
-			// holds the gap at 1e-2 and 3e-2 of the concentration); the run is left to EPANET, by tank name
-			if (n.type === 'tank' && n.mixing && n.mixing.model && /^(2COMP|LIFO)$/i.test(String(n.mixing.model))) { bad.push(String(n.id)); }
 		});
 		return { spec: r.spec, bad: bad };
 	}
