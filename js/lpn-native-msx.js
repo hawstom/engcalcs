@@ -23,6 +23,7 @@
 	// ---- constants of msxtypes.h --------------------------------------------------------------------------
 	var MISSING = -1e10,
 		TINY = 1e-6,
+		Q_STAGNANT = 0.005 / 448.831,   // msxqual.c: 0.005 gpm in cfs
 		VISCOS = 1.1e-5,          // kinematic viscosity of water, ft2/s
 		LPERFT3 = 28.317,         // litres per cubic foot, as EPANET and MSX both round it
 		MPERFT = 0.3048,
@@ -986,8 +987,8 @@
 		// ---- msxqual.c helpers ----
 		var C1 = chem.C1;
 		function linkVol(k) { return 0.785398 * links[k].len * links[k].diam * links[k].diam; }
-		function upNode(k) { return flowDir[k] === '+' ? links[k].n1 : links[k].n2; }
-		function downNode(k) { return flowDir[k] === '+' ? links[k].n2 : links[k].n1; }
+		function upNode(k) { return flowDir[k] !== '-' ? links[k].n1 : links[k].n2; }
+		function downNode(k) { return flowDir[k] !== '-' ? links[k].n2 : links[k].n1; }
 		function getSeg(v, c) { var sg = { v: v, c: new Float64Array(S + 1), hstep: 0, prev: null, next: null }, mm; for (mm = 1; mm <= S; mm++) { sg.c[mm] = c[mm]; } return sg; }
 		function addSeg(k2, sg) {
 			sg.prev = null; sg.next = null;
@@ -1029,12 +1030,13 @@
 				st.D[nn] = nodes[nn].type === 'junction' || nodes[nn].type === undefined ? (r.d[id] || 0) : (r.dn[id] || 0);
 				st.H[nn] = r.h[id] || 0;
 			}
-			for (kk = 1; kk <= L; kk++) { st.Q[kk] = r.q[links[kk].k]; }
+			// msxqual.c getHydVars(): a flow under 0.005 gpm (Q_STAGNANT, 1.114e-5 cfs) is no flow at all
+			for (kk = 1; kk <= L; kk++) { st.Q[kk] = r.q[links[kk].k]; if (Math.abs(st.Q[kk]) < Q_STAGNANT) { st.Q[kk] = 0; } }
 		}
 		function initSegs() {
 			var kk, jj, mm, v, nn, tk;
 			for (kk = 1; kk <= L; kk++) {
-				flowDir[kk] = st.Q[kk] < 0 ? '-' : '+';
+				flowDir[kk] = st.Q[kk] === 0 ? '0' : st.Q[kk] < 0 ? '-' : '+';
 				st.last[kk] = null; st.first[kk] = null; newSeg[kk] = null;
 				for (mm = 1; mm <= S; mm++) { C1[mm] = linkC0[kk][mm]; }
 				v = linkVol(kk);
@@ -1059,14 +1061,15 @@
 		function reorientSegs() {
 			var kk, newdir, sg, pseg, nseg;
 			for (kk = 1; kk <= L; kk++) {
-				newdir = '+';
-				if (st.Q[kk] === 0) { newdir = flowDir[kk]; } else if (st.Q[kk] < 0) { newdir = '-'; }
-				if (newdir !== flowDir[kk]) {
+				// msxqual.c flowdirchanged(): three states; the segments are turned over only when the flow goes from one way
+				// to the other (positive to negative or back), not when it stops or starts
+				newdir = st.Q[kk] === 0 ? '0' : st.Q[kk] < 0 ? '-' : '+';
+				if ((newdir === '+' && flowDir[kk] === '-') || (newdir === '-' && flowDir[kk] === '+')) {
 					sg = st.first[kk]; st.first[kk] = st.last[kk]; st.last[kk] = sg;
 					pseg = null;
 					while (sg) { nseg = sg.prev; sg.prev = pseg; sg.next = nseg; pseg = sg; sg = nseg; }
-					flowDir[kk] = newdir;
 				}
+				flowDir[kk] = newdir;
 			}
 		}
 		function getHydVars() {
