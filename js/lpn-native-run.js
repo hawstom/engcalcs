@@ -771,6 +771,12 @@
 		var repOn = opts.report !== false, repOut = [], repStamp = new Date(), oldLink = [], oldTank = [], tankLikes = [],
 			linkGroup = [], fb = { inflow: 0, outflow: 0, consumer: 0, emitter: 0, deficit: 0, storage: 0 },
 			hy = model.hydraulics || {}, qlt = model.quality || {}, nodeIx = {}, nodeList = [], adj = [], repNj = 0;
+		// report.c reports in the project's units (EngCalcs.lpnReportUnits, the same answer the EPANET run is switched by): a flow in
+		// the project's flow unit, a length in feet or metres, the unit words as text.h writes them
+		var repU = EC.lpnReportUnits ? EC.lpnReportUnits(model.reportUnits) : null,
+			repFlowDiv = repU ? repU.flow : 1, repLenDiv = repU ? repU.head : 1,
+			repFlowTxt = repU ? ['cfs', 'gpm', 'mgd', 'Imgd', 'a-f/d', 'L/s', 'Lpm', 'ML/d', 'm3/h', 'm3/d'][repU.code] : 'L/s',
+			repLenTxt = repU && repU.head !== 1 ? 'ft' : 'm';
 		function rline(x) { if (repOn) { repOut.push(x); } }
 		function linkTxt(k) {
 			var st = ls[k];
@@ -850,8 +856,8 @@
 				'    Nodal Demand Model ................ ' + (String(hy.demandModel || '').toUpperCase() === 'PDA' ? 'PDA' : 'DDA'),
 				'    Hydraulic Timestep ................ ' + fmtF(hydStep / 3600, 2) + ' hrs',
 				'    Hydraulic Accuracy ................ ' + fmtF(epAcc, 6)].forEach(rline);
-			if (hy.headError > 0) { rline('    Headloss Error Limit .............. ' + fmtF(hy.headError, 6) + ' m'); }
-			if (hy.flowChange > 0) { rline('    Flow Change Limit ................. ' + fmtF(hy.flowChange * 1000, 6) + ' L/s'); }
+			if (hy.headError > 0) { rline('    Headloss Error Limit .............. ' + fmtF(hy.headError / repLenDiv, 6) + ' ' + repLenTxt); }
+			if (hy.flowChange > 0) { rline('    Flow Change Limit ................. ' + fmtF(hy.flowChange * 1000 / repFlowDiv, 6) + ' ' + repFlowTxt); }
 			rline('    Status Check Frequency ............ ' + (hy.checkFreq !== undefined ? hy.checkFreq : 2));
 			rline('    Maximum Trials Checked ............ ' + (hy.maxCheck !== undefined ? hy.maxCheck : 10));
 			rline('    Damping Limit Threshold ........... ' + fmtF(hy.dampLimit !== undefined ? hy.dampLimit : 0, 6));
@@ -918,7 +924,7 @@
 				else if (tk && Math.abs(tk.h - tk.Hmax) < 0.001) { nw = EN_OVERFLOWING; }
 				else { nw = EN_FILLING; }
 				if (nw === oldTank[i]) { return; }
-				rline(tk ? atime + ': Tank ' + n.id + ' is ' + STAT_TXT[nw] + ' at ' + fmtF((tk.h - tk.El) * FT, 2) + ' m'
+				rline(tk ? atime + ': Tank ' + n.id + ' is ' + STAT_TXT[nw] + ' at ' + fmtF((tk.h - tk.El) * FT / repLenDiv, 2) + ' ' + repLenTxt
 					: atime + ': Reservoir ' + n.id + ' is ' + STAT_TXT[nw]);
 				oldTank[i] = nw;
 			});
@@ -1033,11 +1039,11 @@
 			if (!repOn) { return ''; }
 			if (qs > 0) { qout += qs; } else { qin -= qs; }
 			r = qin === qout ? 1 : qin > 0 ? qout / qin : 0;
-			['Hydraulic Flow Balance (L/s)', '================================',
-				'Total Inflow:      ' + padLeft(fmtF(fb.inflow / sec, 3), 12), 'Consumer Demand:   ' + padLeft(fmtF(fb.consumer / sec, 3), 12),
-				'Demand Deficit:    ' + padLeft(fmtF(fb.deficit / sec, 3), 12), 'Emitter Flow:      ' + padLeft(fmtF(fb.emitter / sec, 3), 12),
-				'Leakage Flow:      ' + padLeft(fmtF(0, 3), 12), 'Total Outflow:     ' + padLeft(fmtF(fb.outflow / sec, 3), 12),
-				'Storage Flow:      ' + padLeft(fmtF(fb.storage / sec, 3), 12), 'Flow Ratio:        ' + padLeft(fmtF(r, 3), 12),
+			['Hydraulic Flow Balance (' + repFlowTxt + ')', '================================',
+				'Total Inflow:      ' + padLeft(fmtF(fb.inflow / sec / repFlowDiv, 3), 12), 'Consumer Demand:   ' + padLeft(fmtF(fb.consumer / sec / repFlowDiv, 3), 12),
+				'Demand Deficit:    ' + padLeft(fmtF(fb.deficit / sec / repFlowDiv, 3), 12), 'Emitter Flow:      ' + padLeft(fmtF(fb.emitter / sec / repFlowDiv, 3), 12),
+				'Leakage Flow:      ' + padLeft(fmtF(0, 3), 12), 'Total Outflow:     ' + padLeft(fmtF(fb.outflow / sec / repFlowDiv, 3), 12),
+				'Storage Flow:      ' + padLeft(fmtF(fb.storage / sec / repFlowDiv, 3), 12), 'Flow Ratio:        ' + padLeft(fmtF(r, 3), 12),
 				'================================\n'].concat(msxText === null ? [] : ['Processing MSX input file temp.msx\n'], ['Analysis ended ' + ctimeText(new Date()) + '\n']).forEach(rline);
 			return '  Page 1                                    ' + ctimeText(repStamp) + '\n' + repOut.map(function (x) { return '\n  ' + x; }).join('') + (msxText ? '\n' + msxText : '');
 		}
