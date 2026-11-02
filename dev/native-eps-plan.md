@@ -534,12 +534,12 @@ mixing model, a pattern, per-pipe parameters.
 ### Built so far (native-wire, 2026-11-01), and what it found
 
 `js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done: one dead-end node
-on Net3 (below), a 2-compartment tank with a mixing zone of 0.05 (2.6e-3 off), and the engine's mass balance blocks.
+on Net3 (below), and the engine's mass balance blocks.
 **2-compartment and last-in-first-out tanks are in the loop** (they were left to EPANET by tank name; the first run of both was
 1.7e-2 and 1.8e-2 off the engine). Two causes, both found by running the engine: a pipe that sends more than it holds sends
 its upstream tank's concentration as the tank leaves the step (after this step's mix, run on a copy of the tank's segments), not
 as it entered it; and the mixing zone starts first and holds up to its own volume, where epanet-msx's main branch starts the
-first segment with the volume above it. Now: LIFO 7.7e-5, 2COMP 1.3e-4 (zone 0.3 of the tank) and 6.7e-5 (the whole tank) on
+first segment with the volume above it. Now: LIFO 7.7e-5, 2COMP 6.7e-5 at every zone size on
 Net1; MIXED and FIFO moved from 2.6e-4 to under 7.5e-5 as well. Net3 with either model: 2.5e-4 (the dead end below is fixed).
 
 Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
@@ -552,7 +552,7 @@ the arsenic example, 1 525 on Net1):
 | Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
 | Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
 | Net3 (pumps closing, three tanks, two reservoirs), three species | **2.5e-4** (1.2e-3 before the stagnant-flow rule below) |
-| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 1.3e-4, 6.7e-5, **2.6e-3**; 2.5e-4, 2.6e-4 |
+| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 6.7e-5 at 0.3, 1 and 0.05 (it was 2.6e-3 at 0.05); 2.8e-4, 2.6e-4 |
 
 Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
 a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
@@ -576,3 +576,10 @@ three states (positive, negative, zero); its segments are turned over only when 
 when it stops or starts; and a node with no inflow takes the average of the first segment of each link flowing into it and
 the last segment of each link flowing out, a pipe at zero flow counting as flowing from its first node. So the noise pipe
 kept its old orientation in the loop and read the wrong end. Net3 went from 1.15e-3 to 2.45e-4 (3e-4 held). 
+
+**The tank models are epanet-msx 2.0's, not 1.1's** (USEPA/EPANETMSX, src/solver/msxtank.c and msxqual.c, LGPL v3; the rules are
+written again in `js/lpn-native-msx.js`, no code carried). The 2-compartment cause of the 2.6e-3 at a mixing zone of 0.05: 2.0
+keeps the mixing zone as the tank's LAST segment and moves a transferred volume between the zones each step (where 1.1 steps
+each zone's concentration by an Euler step through the inflow), and starts the stagnant zone first with the volume above the
+mixing zone's. Now 6.7e-5 at zones of 0.05, 0.3 and the whole tank. LIFO and FIFO follow 2.0's order (the new segment is added
+before the withdrawal, and a tank's only segment keeps its volume when it is emptied, as the engine's does).

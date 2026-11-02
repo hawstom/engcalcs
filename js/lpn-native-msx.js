@@ -1050,9 +1050,8 @@
 				kk = L + jj;
 				st.last[kk] = null; st.first[kk] = null;
 				if (tk.mix === 1) {
-					// the mixing zone first, holding up to its own volume; the engine starts it so (epanet-msx's main branch gives it
-					// the volume above the mixing zone's, which fits nothing the engine does: native-msx-harness.js)
-					v = Math.min(tk.v, tk.vMix);
+					// msxqual.c initSegs(): the stagnant zone is the first segment, the mixing zone (up to its own volume) the last
+					v = Math.max(0, tk.v - tk.vMix);
 					addSeg(kk, getSeg(v, C1));
 					addSeg(kk, getSeg(tk.v - v, C1));
 				} else { addSeg(kk, getSeg(tk.v, C1)); }
@@ -1180,10 +1179,7 @@
 			if (tk.a === 0) { return (tankNext[jj] = node[nn]); }   // a reservoir sends its own
 			saveF = st.first[kk]; saveL = st.last[kk]; saveC = Float64Array.from(tk.c);
 			cp = copyChain(kk); st.first[kk] = cp.first; st.last[kk] = cp.last;
-			c1v = new Float64Array(S + 1);
-			if (volIn[nn] > 0) { for (var m3 = 1; m3 <= S; m3++) { c1v[m3] = massIn[nn][m3] / volIn[nn]; } }
-			if (tk.mix === 0) { mix1(jj, volIn[nn], c1v); } else if (tk.mix === 1) { mix2(jj, volIn[nn], c1v, dt); }
-			else if (tk.mix === 2) { mix3(jj, volIn[nn], c1v, dt); } else { mix4(jj, volIn[nn], c1v, dt); }
+			mixTank(jj, nn, dt);
 			res = Float64Array.from(tk.c);
 			st.first[kk] = saveF; st.last[kk] = saveL; tk.c.set(saveC);
 			return (tankNext[jj] = res);
@@ -1254,125 +1250,139 @@
 			}
 		}
 		// ---- msxtank.c ----
-		function mix1(ti, vIn, cIn) {
-			var kk = L + ti, sg = st.first[kk], tk = st.tanks[ti], mm, c;
-			for (mm = 1; mm <= S; mm++) {
-				if (wall[mm - 1]) { continue; }
-				c = sg.c[mm];
-				if (tk.v > 0) { c += (cIn[mm] - c) * vIn / tk.v; } else { c = cIn[mm]; }
-				c = Math.max(0, c);
-				sg.c[mm] = c; tk.c[mm] = c;
-			}
-			if (vIn > 0) { chem.equil('node', tk.c); }
+		// ---- msxtank.c (EPANET-MSX 2.0): the four tank models. `vin` is the volume that flowed into the tank this step, `massin`
+		// the mass it carried (a concentration times a volume, in the volume units of the segments), `vnet` inflow less outflow.
+		function reverseChain(kk) {
+			var sg = st.first[kk], pseg = null, nseg;
+			st.first[kk] = st.last[kk]; st.last[kk] = sg;
+			while (sg) { nseg = sg.prev; sg.prev = pseg; sg.next = nseg; pseg = sg; sg = nseg; }
 		}
-		function mix2(ti, vIn, cIn, dt) {
-			var tk = st.tanks[ti], nn = tk.node, qNet = st.D[nn], qIn = vIn / dt, qOut = qIn - qNet, kk = L + ti, seg1 = st.first[kk], seg2 = st.last[kk],
-				tstep, tstar, mm, c, c1, c2;
-			if (Math.abs(qNet) < TINY) { return; }
-			else if (qNet > 0) {
-				if (seg2.v <= 0) {
-					tstar = Math.trunc((tk.vMix - seg1.v) / qNet);
-					tstep = Math.min(dt, tstar);
-					for (mm = 1; mm <= S; mm++) {
-						if (wall[mm - 1]) { continue; }
-						c = seg1.c[mm];
-						if (seg1.v > 0) { seg1.c[mm] += qIn * tstep * (cIn[mm] - c) / seg1.v; } else { seg1.c[mm] = cIn[mm]; }
-						seg1.c[mm] = Math.max(0, seg1.c[mm]);
-						seg2.c[mm] = 0;
-					}
-					seg1.v += qNet * tstep;
-					dt -= tstep;
+		function mix1(ti, vin, massin, vnet) {
+			var tk = st.tanks[ti], kk = L + ti, sg = st.first[kk], mm, c, vnew;
+			if (sg) {
+				vnew = sg.v + vin;
+				for (mm = 1; mm <= S; mm++) {
+					if (wall[mm - 1]) { continue; }
+					c = sg.c[mm];
+					if (vnew > 0) { c = (c * sg.v + massin[mm]) / vnew; }
+					c = Math.max(0, c);
+					sg.c[mm] = c; tk.c[mm] = c;
 				}
-				if (dt > 1) {
-					for (mm = 1; mm <= S; mm++) {
-						if (wall[mm - 1]) { continue; }
-						c1 = seg1.c[mm];
-						seg1.c[mm] += qIn * dt * (cIn[mm] - c1) / seg1.v;
-						seg1.c[mm] = Math.max(0, seg1.c[mm]);
-						c2 = seg2.c[mm];
-						if (seg2.v <= 0) { seg2.c[mm] = seg1.c[mm]; } else { seg2.c[mm] += qNet * dt * (seg1.c[mm] - c2) / seg2.v; }
-						seg2.c[mm] = Math.max(0, seg2.c[mm]);
-					}
-					seg2.v += qNet * dt;
-				}
-				if (seg1.v > 0) { chem.equil('node', seg1.c); }
-				if (seg2.v > 0) { chem.equil('node', seg2.c); }
-			} else if (qNet < 0 && seg1.v > 0) {
-				if (seg2.v > 0) {
-					tstar = Math.trunc(seg2.v / -qNet);
-					tstep = Math.min(dt, tstar);
-					for (mm = 1; mm <= S; mm++) {
-						if (wall[mm - 1]) { continue; }
-						c1 = seg1.c[mm]; c2 = seg2.c[mm];
-						seg1.c[mm] += (qIn * cIn[mm] - qNet * c2 - qOut * c1) * tstep / seg1.v;
-						seg1.c[mm] = Math.max(0, seg1.c[mm]);
-					}
-					seg2.v += qNet * tstep;
-					seg2.v = Math.max(0, seg2.v);
-					dt -= tstep;
-				}
-				if (dt > 1) {
-					for (mm = 1; mm <= S; mm++) {
-						if (wall[mm - 1]) { continue; }
-						c = seg1.c[mm];
-						seg1.c[mm] += qIn * dt * (cIn[mm] - c) / seg1.v;
-						seg1.c[mm] = Math.max(0, seg1.c[mm]);
-						seg2.c[mm] = 0;
-					}
-					seg1.v += qNet * dt;
-					seg1.v = Math.max(0, seg1.v);
-				}
-				if (seg1.v > 0) { chem.equil('node', seg1.c); }
+				sg.v += vnet; sg.v = Math.max(0, sg.v);
 			}
-			for (mm = 1; mm <= S; mm++) { tk.c[mm] = seg1.c[mm]; }
+			if (vin > 0) { chem.equil('node', tk.c); }
 		}
-		function mix3(ti, vIn, cIn, dt) {
-			var tk = st.tanks[ti], kk = L + ti, nn = tk.node, vNet = st.D[nn] * dt, vOut = vIn - vNet, vSum = 0, sg, vSeg, mm;
-			for (mm = 1; mm <= S; mm++) { C1[mm] = 0; }
-			while (vOut > 0) {
+		// two compartments: the mixing zone is the LAST segment, the stagnant zone the first
+		function mix2(ti, vin, massin, vnet) {
+			var tk = st.tanks[ti], kk = L + ti, mix = st.last[kk], stag = st.first[kk], vt = 0, vmz = tk.vMix, mm;
+			if (!mix || !stag) { return; }
+			if (vnet > 0) {
+				vt = Math.max(0, mix.v + vnet - vmz);
+				if (vin > 0) {
+					for (mm = 1; mm <= S; mm++) {
+						if (wall[mm - 1]) { continue; }
+						mix.c[mm] = Math.max(0, (mix.c[mm] * mix.v + massin[mm]) / (mix.v + vin));
+					}
+				}
+				if (vt > 0) {
+					for (mm = 1; mm <= S; mm++) {
+						if (wall[mm - 1]) { continue; }
+						stag.c[mm] = Math.max(0, (stag.c[mm] * stag.v + mix.c[mm] * vt) / (stag.v + vt));
+					}
+				}
+			} else if (vnet < 0) {
+				if (stag.v > 0) { vt = Math.min(stag.v, -vnet); }
+				if (vin + vt > 0) {
+					for (mm = 1; mm <= S; mm++) {
+						if (wall[mm - 1]) { continue; }
+						mix.c[mm] = Math.max(0, (mix.c[mm] * mix.v + massin[mm] + stag.c[mm] * vt) / (mix.v + vin + vt));
+					}
+				}
+			}
+			if (vt > 0) {
+				mix.v = vmz;
+				if (vnet > 0) { stag.v += vt; } else { stag.v = Math.max(0, stag.v - vt); }
+			} else {
+				mix.v += vnet; mix.v = Math.min(mix.v, vmz); mix.v = Math.max(0, mix.v);
+				stag.v = 0;
+			}
+			if (mix.v > 0) { chem.equil('node', mix.c); }
+			if (stag.v > 0) { chem.equil('node', stag.c); }
+			for (mm = 1; mm <= S; mm++) { tk.c[mm] = mix.c[mm]; }
+		}
+		// first in, first out
+		function mix3(ti, vin, massin, vnet) {
+			var tk = st.tanks[ti], kk = L + ti, vout = vin - vnet, vseg, vsum = 0, sg, mm, cv = new Float64Array(S + 1), cm = new Float64Array(S + 1);
+			if (!st.last[kk] || !st.first[kk]) { return; }
+			if (vin > 0) {
+				sg = st.last[kk];
+				for (mm = 1; mm <= S; mm++) { cv[mm] = massin[mm] / vin; }
+				if (sg && isSame(sg.c, cv)) {
+					for (mm = 1; mm <= S; mm++) { sg.c[mm] = (sg.c[mm] * sg.v + cv[mm] * vin) / (sg.v + vin); }
+					sg.v += vin;
+				} else { addSeg(kk, getSeg(vin, cv)); }
+			}
+			while (vout > 0) {
 				sg = st.first[kk];
 				if (!sg) { break; }
-				vSeg = Math.min(sg.v, vOut);
-				if (sg === st.last[kk]) { vSeg = vOut; }
-				vSum += vSeg;
-				for (mm = 1; mm <= S; mm++) { C1[mm] += sg.c[mm] * vSeg; }
-				vOut -= vSeg;
-				if (vOut >= 0 && vSeg >= sg.v) { st.first[kk] = sg.prev; if (st.first[kk] === null) { st.last[kk] = null; } }
-				else { sg.v -= vSeg; }
+				vseg = Math.min(sg.v, vout);
+				if (sg === st.last[kk]) { vseg = vout; }
+				vsum += vseg;
+				for (mm = 1; mm <= S; mm++) { cm[mm] += sg.c[mm] * vseg; }
+				vout -= vseg;
+				if (vout >= 0 && vseg >= sg.v) {
+					if (sg.prev) { st.first[kk] = sg.prev; }   // the only segment left keeps its volume, as the engine's does
+				} else { sg.v -= vseg; }
 			}
-			for (mm = 1; mm <= S; mm++) { tk.c[mm] = vSum > 0 ? C1[mm] / vSum : st.first[kk].c[mm]; }
-			if (vIn > 0) {
-				sg = st.last[kk];
-				if (sg && isSame(sg.c, cIn)) { sg.v += vIn; } else { addSeg(kk, getSeg(vIn, cIn)); }
+			for (mm = 1; mm <= S; mm++) {
+				if (vsum > 0) { tk.c[mm] = cm[mm] / vsum; }
+				else if (!st.first[kk]) { tk.c[mm] = 0; }
+				else { tk.c[mm] = st.first[kk].c[mm]; }
 			}
 		}
-		function mix4(ti, vIn, cIn, dt) {
-			var tk = st.tanks[ti], kk = L + ti, nn = tk.node, vNet = st.D[nn] * dt, vSum = 0, sg, vSeg, mm;
-			for (mm = 1; mm <= S; mm++) { C1[mm] = 0; }
-			if (vNet > 0) {
-				sg = st.last[kk];
-				if (sg && isSame(sg.c, cIn)) { sg.v += vNet; } else { addSeg(kk, getSeg(vNet, cIn)); }
-				for (mm = 1; mm <= S; mm++) { tk.c[mm] = cIn[mm]; }
-			} else if (vNet < 0) {
-				vNet = -vNet;
-				while (vNet > 0) {
-					sg = st.last[kk];
+		// last in, first out
+		function mix4(ti, vin, massin, vnet) {
+			var tk = st.tanks[ti], kk = L + ti, sg, mm, vsum = 0, vseg, cv = new Float64Array(S + 1), cm = new Float64Array(S + 1);
+			if (!st.last[kk] || !st.first[kk]) { return; }
+			if (vin > 0) { for (mm = 1; mm <= S; mm++) { cv[mm] = massin[mm] / vin; } }
+			for (mm = 1; mm <= S; mm++) { tk.c[mm] = st.last[kk].c[mm]; }
+			sg = st.last[kk];
+			if (vnet > 0) {
+				if (sg && isSame(sg.c, cv)) {
+					for (mm = 1; mm <= S; mm++) { sg.c[mm] = (sg.c[mm] * sg.v + cv[mm] * vnet) / (sg.v + vnet); }
+					sg.v += vnet;
+				} else { addSeg(kk, getSeg(vnet, cv)); }
+				for (mm = 1; mm <= S; mm++) { tk.c[mm] = st.last[kk].c[mm]; }
+			} else if (vnet < 0) {
+				vnet = -vnet;
+				reverseChain(kk);
+				while (vnet > 0) {
+					sg = st.first[kk];
 					if (!sg) { break; }
-					vSeg = Math.min(sg.v, vNet);
-					if (sg === st.first[kk]) { vSeg = vNet; }
-					vSum += vSeg;
-					for (mm = 1; mm <= S; mm++) { C1[mm] += sg.c[mm] * vSeg; }
-					vNet -= vSeg;
-					// the newest segment is gone: the one before it (`next`, the older side of the chain) is the last. epanet-msx's main
-					// branch writes `seg->prev` here, which is nothing, and loses every older segment of the tank; the engine does not.
-					if (vNet >= 0 && vSeg >= sg.v) { st.last[kk] = sg.next; if (st.last[kk] === null) { st.first[kk] = null; } else { st.last[kk].prev = null; } }
-					else { sg.v -= vSeg; }
+					vseg = Math.min(sg.v, vnet);
+					if (sg === st.last[kk]) { vseg = vnet; }
+					vsum += vseg;
+					for (mm = 1; mm <= S; mm++) { cm[mm] += sg.c[mm] * vseg; }
+					vnet -= vseg;
+					if (vnet >= 0 && vseg >= sg.v) {
+						if (sg.prev) { st.first[kk] = sg.prev; }
+					} else { sg.v -= vseg; }
 				}
-				for (mm = 1; mm <= S; mm++) {
-					vSum = vSum + vIn;
-					if (vSum > 0) { tk.c[mm] = (C1[mm] + cIn[mm] * vIn) / vSum; }
-				}
+				reverseChain(kk);
+				vsum += vin;
+				for (mm = 1; mm <= S; mm++) { if (vsum > 0) { tk.c[mm] = (cm[mm] + massin[mm]) / vsum; } }
 			}
+		}
+		// the volume that leaves a node through its links this step
+		function outVol(ii, dt) {
+			var kk, v = 0;
+			for (kk = 1; kk <= L; kk++) { if (upNode(kk) === ii) { v += Math.abs(st.Q[kk]) * dt; } }
+			return v;
+		}
+		function mixTank(jj, ii, dt) {
+			var tk = st.tanks[jj], vnet = volIn[ii] - outVol(ii, dt);
+			if (tk.mix === 0) { mix1(jj, volIn[ii], massIn[ii], vnet); } else if (tk.mix === 1) { mix2(jj, volIn[ii], massIn[ii], vnet); }
+			else if (tk.mix === 2) { mix3(jj, volIn[ii], massIn[ii], vnet); } else { mix4(jj, volIn[ii], massIn[ii], vnet); }
 		}
 		function updateNodes(dt) {
 			var ii, jj, mm, tk, c1v = new Float64Array(S + 1);
@@ -1391,12 +1401,7 @@
 						chem.equil('node', node[ii]);
 					}
 					else {
-						if (volIn[ii] > 0) { for (mm = 1; mm <= S; mm++) { c1v[mm] = massIn[ii][mm] / volIn[ii]; } }
-						else { for (mm = 1; mm <= S; mm++) { c1v[mm] = 0; } }
-						if (tk.mix === 0) { mix1(jj, volIn[ii], c1v); }
-						else if (tk.mix === 1) { mix2(jj, volIn[ii], c1v, dt); }
-						else if (tk.mix === 2) { mix3(jj, volIn[ii], c1v, dt); }
-						else { mix4(jj, volIn[ii], c1v, dt); }
+						mixTank(jj, ii, dt);
 						for (mm = 1; mm <= S; mm++) { node[ii][mm] = tk.c[mm]; }
 						tk.v += st.D[ii] * dt;
 					}

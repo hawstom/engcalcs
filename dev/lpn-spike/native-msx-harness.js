@@ -340,8 +340,8 @@ async function slices2to5() {
 		await against('Net1, tank mixing model LIFO', loadNet('Net1.inp', setMix('LIFO', 0.3), NET1_MSX), 5e-4);
 		await against('Net1, tank mixing model 2COMP, mixing zone 0.3 of the tank', loadNet('Net1.inp', setMix('2COMP', 0.3), NET1_MSX), 5e-4);
 		await against('Net1, tank mixing model 2COMP, mixing zone the whole tank', loadNet('Net1.inp', setMix('2COMP', 1), NET1_MSX), 5e-4);
-		// a small mixing zone is stiff (the inflow of a step is a large share of it) and the two solvers' last digits show: HELD, not hidden
-		await against('Net1, tank mixing model 2COMP, mixing zone 0.05 of the tank', loadNet('Net1.inp', setMix('2COMP', 0.05), NET1_MSX), 3e-3);
+		// a small mixing zone was 2.6e-3 off while the tank models were epanet-msx 1.1's; they are 2.0's (msxtank.c) now
+		await against('Net1, tank mixing model 2COMP, mixing zone 0.05 of the tank', loadNet('Net1.inp', setMix('2COMP', 0.05), NET1_MSX), 5e-4);
 		const n3 = NET1_MSX.replace('CONC 10 CL2 1.5 P1', 'CONC 15 CL2 1.5 P1').replace('MASS 13 TOT 20', 'MASS 20 TOT 20').replace('NODE 9 CL2 1.0\n', '');
 		await against('Net3, tank mixing model LIFO', loadNet('Net3.inp', setMix('LIFO', 0.4), n3), 0.0003);
 		await against('Net3, tank mixing model 2COMP', loadNet('Net3.inp', setMix('2COMP', 0.4), n3), 0.0003);
