@@ -254,7 +254,7 @@ async function pageSection() {
 	Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
 	status = ''; routeNote = '';
 	EngCalcs.lpnTimeRunNow();
-	await wait(120);
+	for (let i = 0; i < 100 && !routeNote; i++) { await wait(50); }
 	check(langRe('lpn_time_epanet_fallback').test(routeNote),
 		'an unreachable engine says so, and that the built-in solver ran the period', routeNote);
 	check(!langRe('lpn_engine_refused').test(status), '...and is never reported as a refusal');
