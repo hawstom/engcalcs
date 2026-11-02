@@ -505,7 +505,11 @@ notice. The vendored epanet-js build already runs it (the page's Phase 2); that 
 - **Outputs the page shows.** Per reporting time, per node and per link, one number per species in the file's order, in the
   species' units (wall species per AREA_UNITS, none at a node): a node's concentration (a tank's own) and a link's volume-weighted
   mean over its segments, as `MSXqual_getNodeQual()` and `MSXqual_getLinkQual()` give them (`frames[].msxNodes`, `.msxLinks`,
-  `msxSpecies`). The MSX text report is not produced.
+  `msxSpecies`). **The MSX text report is produced** (msxrpt.c, in the vendored engine's 2.0.0 words) by both solvers when the
+  file's `[REPORT]` section flags a node or a link: after "Analysis ended", a logo, the title and one series table per flagged
+  node and link (species YES/NO and precision, PAGESIZE), held to the engine line for line by `native-msx-report-harness.js`.
+  The engine ignores `[TIMES] Statistic` here (it prints series for all four values), so the loop does. The engine's
+  "Water Quality Mass Balance" blocks after the tables are not written by the loop.
 
 ### Test cases
 
@@ -561,5 +565,10 @@ segment's quality for all of it and does not fit. A pump or valve holds no segme
 feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness holds it at 0.0012. What is left is node 15, a dead end
 whose pipe carries 1e-8 L/s of noise in both hydraulic runs (opposite signs): the same quality hour differs by 1.3 per cent
 there, 1e-3 of a milligram per litre. Feeding the loop's quality pass EPANET's own flows did not move it, so it is in the
-transport of a near-stopped pipe, not in the flows; not found. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
+transport of a near-stopped pipe, not in the flows; not found. Narrowed 2026-11-01: the pipe's own mean quality agrees with the
+engine to six digits at every hour (so the segments hold the same water), and node 15's value is the engine's alone to differ,
+by the concentration of the pipe's third segment against the loop's first (0.05825 against 0.05710 mg/L at 8 h); giving the loop
+EPANET's flows at every reporting time, zeroing every flow under 1e-5 cfs, and forcing the noise flows positive, each left
+node 15 at 0.057105 to five digits, so the loop's value does not depend on the sign or size of the noise. What stays unknown
+is the engine's segment order at its unreported hydraulic steps. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
 gap (0.009) are measured the same way and not claimed.

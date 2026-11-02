@@ -277,7 +277,7 @@
 			sources: {},          // node id -> [{species, type, c0, pattern}], newest first as MSX keeps them
 			quality: [],          // {scope: 'global'|'node'|'link', id, species, value} in file order
 			paramOps: [],         // {scope: 'all'|'pipe'|'tank', id, param, value} in file order
-			reported: { nodes: [], links: [] }
+			report: { ops: [], species: {}, pageSize: 0, file: '' }   // [REPORT]: node and link lists in file order, each species' YES/NO and precision
 		};
 		function err(c, line, lineNo) {
 			errors.push({ section: SECT_WORDS[sect] ? SECT_WORDS[sect].slice(1) : '', line: lineNo, code: c, message: 'Error ' + c + ': ' + (ERR_TEXT[c] || 'a line that cannot be read'), text: line });
@@ -438,12 +438,27 @@
 				k = findMatch(toks[0], ['NODE', 'LINK', 'SPECIE', 'FILE', 'PAGESIZE']);
 				if (k < 0) { code = 406; break; }
 				if (k === 0 || k === 1) {
-					for (var t = 1; t < toks.length; t++) {
-						if (toks[t].toUpperCase() === 'ALL' || toks[t].toUpperCase() === 'NONE') { continue; }
-						if (k === 0 && ids.node && !ids.node(toks[t])) { code = 402; }
-						if (k === 1 && ids.link && !ids.link(toks[t])) { code = 402; }
+					var rop = { link: k === 1 };
+					if (toks[1].toUpperCase() === 'ALL') { rop.all = true; }
+					else if (toks[1].toUpperCase() === 'NONE') { rop.none = true; }
+					else {
+						rop.ids = [];
+						for (var t = 1; t < toks.length; t++) {
+							if (k === 0 && ids.node && !ids.node(toks[t])) { code = 402; }
+							if (k === 1 && ids.link && !ids.link(toks[t])) { code = 402; }
+							rop.ids.push(toks[t]);
+						}
 					}
-				} else if (k === 2) { if (!speciesIx[toks[1]]) { code = 402; } }
+					spec.report.ops.push(rop);
+				} else if (k === 2) {
+					if (!speciesIx[toks[1]]) { code = 402; break; }
+					var rsp = spec.report.species[toks[1]] || (spec.report.species[toks[1]] = { rpt: false, precision: 2 });
+					if (toks.length >= 3) {
+						if (toks[2].toUpperCase() === 'YES') { rsp.rpt = true; } else if (toks[2].toUpperCase() === 'NO') { rsp.rpt = false; } else { code = 406; break; }
+					}
+					if (toks.length >= 4) { if (/^[+-]?\d+$/.test(toks[3])) { rsp.precision = parseInt(toks[3], 10); } else { code = 405; } }
+				} else if (k === 3) { spec.report.file = toks[1]; }
+				else if (/^[+-]?\d+$/.test(toks[1])) { spec.report.pageSize = parseInt(toks[1], 10); } else { code = 405; }
 				break;
 			default: break;
 			}
@@ -1453,8 +1468,113 @@
 			yield { phase: 'msx', done: Qtime, of: dur };
 			if (dur === 0) { break; }
 		}
+		// ---- msxrpt.c: the text report, written after the run (MSXrpt_write()) ----
+		// Series tables (a time column and one column per reported species, for each reported node and link), in the engine's own
+		// words, page by page. The statistic tables (EPANET's [TIMES] Statistic) are not written: the page's runs print series.
+		// The values are the 4-byte floats the engine's output file holds.
+		function reportText() {
+			var rp = spec.report, out = [], lineNum = 1, pageNum = 1, pageSize = rp.pageSize > 0 ? rp.pageSize : 0, nodeRpt = new Uint8Array(N + 1), linkRpt = new Uint8Array(L + 1),
+				idIx = { n: {}, l: {} },
+				rstart = ctx.repStart || 0, rstep = ctx.repStep > 0 ? ctx.repStep : 3600, times = [], hdr = ['', '', '', '', ''], cols = [], sp, any = false, nn, kk, mm, ti;
+			for (nn = 1; nn <= N; nn++) { idIx.n[String(nodes[nn].id)] = nn; }
+			for (kk = 1; kk <= L; kk++) { idIx.l[String(links[kk].id)] = kk; }
+			rp.ops.forEach(function (op) {
+				var flags = op.link ? linkRpt : nodeRpt, cnt = op.link ? L : N, ix = op.link ? idIx.l : idIx.n, q;
+				if (op.all) { for (q = 1; q <= cnt; q++) { flags[q] = 1; } }
+				else if (op.none) { for (q = 1; q <= cnt; q++) { flags[q] = 0; } }
+				else { op.ids.forEach(function (id) { if (ix[id]) { flags[ix[id]] = 1; } }); }
+			});
+			for (nn = 1; nn <= N; nn++) { any = any || !!nodeRpt[nn]; }
+			for (kk = 1; kk <= L; kk++) { any = any || !!linkRpt[kk]; }
+			if (!any) { return ''; }   // nothing was asked for: no logo over an empty report
+			Object.keys(frameAt).map(Number).sort(function (a2, b2) { return a2 - b2; }).forEach(function (t2) { if (frameAt[t2].msxNodes) { times.push(t2); } });
+			if (times.length < 1) { return ''; }
+			function fmt(x, prec) {
+				var f = Math.fround(x), t, d, base;
+				if (prec < 0) { prec = 0; }
+				t = f.toFixed(Math.min(prec + 30, 100)); d = t.indexOf('.');
+				if (d >= 0 && /^50*$/.test(t.slice(d + 1 + prec))) {   // an exact tie: C's printf rounds it to even, toFixed() up
+					base = t.slice(0, d + 1 + prec);
+					if (prec === 0) { base = base.slice(0, -1); }
+					if ((Number(base.slice(-1)) % 2) === 0) { return base; }
+				}
+				return f.toFixed(prec);
+			}
+			function pad(str, w) { str = String(str); while (str.length < w) { str = ' ' + str; } return str; }
+			function padR(str, w) { str = String(str); while (str.length < w) { str += ' '; } return str; }
+			function writeLine(line) {
+				if (lineNum === pageSize) { newPage(); }
+				out.push('  ' + line);
+				lineNum++;
+			}
+			function newPage() {
+				lineNum = 1;
+				writeLine('\nPage ' + padR(pageNum, 3) + '                                             EPANET-MSX 2.0.0');
+				writeLine('');
+				if (pageNum > 1) { writeTableHdr(); }
+				pageNum++;
+			}
+			function writeTableHdr() {
+				if (pageSize > 0 && pageSize - lineNum < 6) { newPage(); }
+				writeLine(''); writeLine(hdr[1]); writeLine(''); writeLine(hdr[2]); writeLine(hdr[3]); writeLine(hdr[4]);
+			}
+			function tableHdr(link, id) {
+				var m2;
+				hdr[1] = (link ? '<<< Link ' : '<<< Node ') + id + ' >>>';
+				hdr[2] = 'Time   '; hdr[3] = 'hr:min '; hdr[4] = '-------';
+				for (m2 = 1; m2 <= S; m2++) {
+					if (!rptSp[m2].rpt || (!link && wall[m2 - 1])) { continue; }
+					hdr[2] += '  ' + pad(spec.species[m2 - 1].id, 10);
+					hdr[4] += '  ----------';
+					hdr[3] += '  ' + pad(result.species[m2 - 1].unitText, 10);
+				}
+				if (pageSize > 0 && pageSize - lineNum < 8) { newPage(); } else { writeTableHdr(); }
+			}
+			function valueAt(link, ix, m2, ti2) {
+				var f = frameAt[times[ti2]], r = link ? f.msxLinks[String(links[ix].id)] : f.msxNodes[String(nodes[ix].id)];
+				return r[m2 - 1];
+			}
+			function hrsMins(k2) { var mn = Math.floor((rstart + k2 * rstep) / 60), h = Math.floor(mn / 60); return pad(h, 4) + ':' + ('0' + (mn - 60 * h)).slice(-2); }
+			function table(link, ix) {
+				var k2, m2, line;
+				for (k2 = 0; k2 < times.length; k2++) {
+					line = hrsMins(k2);
+					for (m2 = 1; m2 <= S; m2++) {
+						if (!rptSp[m2].rpt || (!link && wall[m2 - 1])) { continue; }
+						line += '  ' + pad(fmt(valueAt(link, ix, m2, k2), rptSp[m2].precision), 10);
+					}
+					writeLine(line);
+				}
+			}
+			var rptSp = [null], cnt;
+			spec.species.forEach(function (sp2) { rptSp.push(rp.species[sp2.id] || { rpt: false, precision: 2 }); });
+			newPage();
+			['******************************************************************', '*                      E P A N E T  -  M S X                     *', '*                   Multi-Species Water Quality                  *',
+				'*                   Analysis for Pipe  Networks                  *', '*                           Version 2.0.0                        *', '******************************************************************'].forEach(writeLine);
+			writeLine('');
+			writeLine(spec.title + '\n');   // the engine keeps the newline fgets() read with the title line
+			for (nn = 1; nn <= N; nn++) { if (nodeRpt[nn]) { tableHdr(false, nodes[nn].id); table(false, nn); } }
+			for (kk = 1; kk <= L; kk++) { if (linkRpt[kk]) { tableHdr(true, links[kk].id); table(true, kk); } }
+			writeLine('');
+			return out.join('\n') + '\n';
+		}
 		result = { ok: true, species: spec.species.map(function (sp) { return { id: sp.id, wall: sp.type === 'WALL', units: sp.units, unitText: sp.units + '/' + (sp.type === 'WALL' ? (typeof EC.lpnMsxAreaUnits === 'function' && ctx.text ? EC.lpnMsxAreaUnits(ctx.text) : opt.areaUnits) : 'L') }; }) };
+		result.report = reportText();
 		return result;
+	};
+
+	/**
+	 * Does this .msx ask for a report: a [REPORT] section that leaves at least one node or link flagged? Both solvers write
+	 * EPANET-MSX's report only then (a file with none would print a logo over nothing).
+	 */
+	EC.lpnMsxReportWanted = function (text) {
+		var spec = EC.lpnMsxParse(text, {}).spec, flagged = { n: {}, l: {} }, all = { n: false, l: false };
+		if (!spec) { return false; }
+		spec.report.ops.forEach(function (op) {
+			var kind = op.link ? 'l' : 'n';
+			if (op.all) { all[kind] = true; } else if (op.none) { all[kind] = false; flagged[kind] = {}; } else { op.ids.forEach(function (id) { flagged[kind][id] = true; }); }
+		});
+		return all.n || all.l || Object.keys(flagged.n).length > 0 || Object.keys(flagged.l).length > 0;
 	};
 
 	// Constants other slices need, exported so one source holds them.

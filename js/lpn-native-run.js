@@ -1020,7 +1020,7 @@
 			fb.inflow += inflow * dt; fb.outflow += outflow * dt; fb.consumer += cons * dt; fb.emitter += em * dt;
 			fb.deficit += def * dt; fb.storage += stor * dt;
 		}
-		function reportEnd(endTime) {
+		function reportEnd(endTime, msxText) {
 			var sec = endTime > 0 ? endTime : 1, qin = fb.inflow / sec, qout = fb.outflow / sec, qs = fb.storage / sec, r;
 			if (!repOn) { return ''; }
 			if (qs > 0) { qout += qs; } else { qin -= qs; }
@@ -1030,8 +1030,8 @@
 				'Demand Deficit:    ' + padLeft(fmtF(fb.deficit / sec, 3), 12), 'Emitter Flow:      ' + padLeft(fmtF(fb.emitter / sec, 3), 12),
 				'Leakage Flow:      ' + padLeft(fmtF(0, 3), 12), 'Total Outflow:     ' + padLeft(fmtF(fb.outflow / sec, 3), 12),
 				'Storage Flow:      ' + padLeft(fmtF(fb.storage / sec, 3), 12), 'Flow Ratio:        ' + padLeft(fmtF(r, 3), 12),
-				'================================\n', 'Analysis ended ' + ctimeText(new Date()) + '\n'].forEach(rline);
-			return '  Page 1                                    ' + ctimeText(repStamp) + '\n' + repOut.map(function (x) { return '\n  ' + x; }).join('');
+				'================================\n'].concat(msxText === null ? [] : ['Processing MSX input file temp.msx\n'], ['Analysis ended ' + ctimeText(new Date()) + '\n']).forEach(rline);
+			return '  Page 1                                    ' + ctimeText(repStamp) + '\n' + repOut.map(function (x) { return '\n  ' + x; }).join('') + (msxText ? '\n' + msxText : '');
 		}
 		if (repOn) { reportHeader(); }
 
@@ -1149,7 +1149,7 @@
 			yield { phase: 'hydraulic', done: htime, of: dur };
 		}
 		// ---- EPANET-MSX: its own pass, over the same records ----
-		var msxSpecies;
+		var msxSpecies, msxReport = null;
 		if (msxCfg) {
 			var mnet = qualityNet(model), mtanks = {};
 			tanks.forEach(function (tk) {
@@ -1158,9 +1158,10 @@
 			});
 			var mqs = times.qualityStep > 0 ? times.qualityStep : Math.floor(hydStep / 10);
 			var mres = yield* EC.lpnMsxPassSteps({ text: model.msx.text, spec: msxCfg.spec, net: mnet, recs: hydRecs, tanks: mtanks, tankCount: mnet.nodes.filter(function (nd) { return nd && (nd.type === 'reservoir' || nd.type === 'tank'); }).length,
-				method: model.method || 'hw', dur: dur, qstep: Math.min(mqs, hydStep), patStep: patStep, patStart: patStart, isReportTime: isReportTime, frames: frames });
+				method: model.method || 'hw', dur: dur, qstep: Math.min(mqs, hydStep), patStep: patStep, patStart: patStart, isReportTime: isReportTime, frames: frames,
+				repStart: times.reportStart || 0, repStep: repStep });
 			if (!mres.ok) { return { ok: false, issues: mres.issues }; }
-			msxSpecies = mres.species;
+			msxSpecies = mres.species; msxReport = mres.report || '';
 		}
 		// ---- WATER QUALITY (phase 4): EPANET's second pass, over the hydraulics just saved ----
 		if (qcfg.mode) {
@@ -1168,7 +1169,7 @@
 			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur), msxSpecies: msxSpecies,
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur, msxReport), msxSpecies: msxSpecies,
 			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
 			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
 			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,

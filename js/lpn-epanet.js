@@ -2131,7 +2131,7 @@
 					 * numbers"); dev/lpn-spike/msx-run-harness.js anchors them.
 					 */
 					msxOn = !qualOn && (model.quality || {}).mode === 'msx' && !!(model.msx && model.msx.text),
-					msxOpened = false, msxSpecies = null,
+					msxOpened = false, msxSpecies = null, msxReportOn = false,
 					/**
 					 * **THE REACTION RATE IS EPANET'S OWN NUMBER, READ OUT OF EPANET'S OWN BINARY
 					 * OUTPUT FILE** (ROADMAP Task 652). Nothing on this page computes it, and
@@ -2201,6 +2201,9 @@
 					try { p.closeQ(); } catch (e) { /* no quality pass, or already shut */ }
 					// MSX state is the engine's own global, not the Project's, so a run that opened
 					// it must close it or the next run inherits a half-finished one.
+					// EPANET-MSX's own text report, into the run report, when the file's [REPORT] section asks for one (it needs
+					// the results file, which msxInit(1) keeps).
+					if (msxOpened && msxReportOn) { try { p.msxReport(); } catch (e) { /* no report this time */ } }
 					if (msxOpened) { try { p.msxClose(); } catch (e) { /* already shut */ } msxOpened = false; }
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
@@ -2593,7 +2596,8 @@
 								msxSpecies.push({ id: id, wall: sp.type === MSX_WALL, units: sp.units,
 									unitText: String(sp.units) + '/' + (sp.type === MSX_WALL ? EngCalcs.lpnMsxAreaUnits(model.msx.text) : 'L') });
 							}
-							p.msxInit(0);
+							msxReportOn = !!(EngCalcs.lpnMsxReportWanted && EngCalcs.lpnMsxReportWanted(String(model.msx.text)));
+							p.msxInit(msxReportOn ? 1 : 0);
 						} catch (e) { failed(e); return; }
 						phase0 = runSpan / 2; phaseSpan = runSpan / 2; t = 0; guard = 0;
 						try { msxRead(0); } catch (e) { failed(e); return; }
