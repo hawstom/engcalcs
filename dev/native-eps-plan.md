@@ -524,8 +524,7 @@ mixing model, a pattern, per-pipe parameters.
 ### Built so far (native-wire, 2026-11-01), and what it found
 
 `js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done:
-2-compartment and last-in-first-out tanks under MSX (left to EPANET, by tank name), and exact parity on a network that moves
-several of its pipe volumes in a quality step (Net3).
+2-compartment and last-in-first-out tanks under MSX (left to EPANET, by tank name), and one dead-end node on Net3 (below).
 
 Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
 the arsenic example, 1 525 on Net1):
@@ -536,7 +535,7 @@ the arsenic example, 1 525 on Net1):
 | Net1 with a decaying chlorine, RK5 | 3.2e-4 mg/L |
 | Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
 | Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
-| Net3 (pumps closing, three tanks, two reservoirs), three species | **3.0e-2** in the first hour after the Lake pump opens, mean 5e-4 |
+| Net3 (pumps closing, three tanks, two reservoirs), three species | **1.2e-3**; every value but one dead-end node is within 4e-4 |
 
 Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
 a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
@@ -546,7 +545,15 @@ the tank's (the main branch makes every segment of a FIFO, LIFO or 2COMP tank fo
 segment by `next`, not `prev`. And one defect in this repository's bridge, corrected: `lpnToInp` did not write `[MIXING]` for an
 MSX run, so every tank mixed completely in the EPANET engine whatever the page said; it does now.
 
-The Net3 gap is the open one. Its cause is in how a pipe that moves several volumes per step hands water to its downstream node
-(the variant tried that sub-steps a quality step so no pipe moves more than its volume is far slower and was not completed). It is
-held by the harness at 0.035 so a change cannot widen it unseen. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
+The Net3 gap was how a pipe that moves several of its volumes in one quality step hands water downstream. The vendored engine
+sends the water a pipe cannot hold (flow volume past link volume) from the upstream node's concentration AS THAT NODE WILL MIX IT
+THIS STEP: everything the links into it bring, so they are taken first (the loop sorts the links in flow order each hydraulic
+step), mixed with any external inflow as `updateNodes()` does, and the average of the segments around the node when nothing flows
+in; a reservoir or tank sends the concentration it has. Found by two small chains of short pipes in `native-msx-harness.js`
+(exact to 1e-15 whichever way the links are numbered), not by reading the source: epanet-msx's main branch sends the first
+segment's quality for all of it and does not fit. A pump or valve holds no segment at all, so none is averaged at the node it
+feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness holds it at 0.0012. What is left is node 15, a dead end
+whose pipe carries 1e-8 L/s of noise in both hydraulic runs (opposite signs): the same quality hour differs by 1.3 per cent
+there, 1e-3 of a milligram per litre. Feeding the loop's quality pass EPANET's own flows did not move it, so it is in the
+transport of a near-stopped pipe, not in the flows; not found. The 2COMP gap (0.017, a tank's own concentration) and the LIFO
 gap (0.009) are measured the same way and not claimed.

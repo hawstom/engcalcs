@@ -205,7 +205,7 @@ function loadNet(file, edit, msxText) {
 	return m;
 }
 // every value of every species at every node and link at every report time: the largest gap, and where
-async function against(name, m, tol) {
+async function against(name, m, tol, minMoved) {
 	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
 	const e = await EngCalcs.lpnEpanetRun(copy(m)), refs = EngCalcs.lpnNativeRunRefusals(copy(m), { quality: true });
 	if (!e.ok) { ok(name + ': the engine ran', false, JSON.stringify(e.issues || '')); return null; }
@@ -227,7 +227,7 @@ async function against(name, m, tol) {
 			});
 		});
 	});
-	ok(`${name}: ${cnt} values within ${tol}, and they move (${moved} changes) so agreement is not two constants`, e.frames.length === n.frames.length && worst <= tol && moved > 20,
+	ok(`${name}: ${cnt} values within ${tol}, and they move (${moved} changes) so agreement is not two constants`, e.frames.length === n.frames.length && worst <= tol && moved > (minMoved || 20),
 		`worst ${worst.toExponential(2)} ${at}`);
 	return { e, n };
 }
@@ -251,6 +251,23 @@ RATE CL2 -Kb*CL2
 [QUALITY]
 GLOBAL CL2 0.5
 NODE 9 CL2 1.2
+`;
+const CHAIN_MSX = `[OPTIONS]
+AREA_UNITS FT2
+RATE_UNITS HR
+SOLVER EUL
+TIMESTEP 300
+[SPECIES]
+BULK TR MG
+[COEFFICIENTS]
+CONSTANT K 3
+[PIPES]
+RATE TR -K*TR
+[TANKS]
+RATE TR -K*TR
+[QUALITY]
+GLOBAL TR 0.4
+NODE R TR 1.0
 `;
 async function slices2to5() {
 	console.log('-- slices 2 to 5: the chemistry and the transport, against the engine');
@@ -276,7 +293,17 @@ async function slices2to5() {
 	// (5 percent of the starting 0.5 at the worst, in the first hours after the Lake pump opens), the mean is 5e-4.
 	{
 		const n3 = NET1_MSX.replace('CONC 10 CL2 1.5 P1', 'CONC 15 CL2 1.5 P1').replace('MASS 13 TOT 20', 'MASS 20 TOT 20').replace('NODE 9 CL2 1.0\n', '');
-		await against('Net3 (pumps, three tanks, two reservoirs), the three species, RK5', loadNet('Net3.inp', null, n3), 0.035);
+		await against('Net3 (pumps, three tanks, two reservoirs), the three species, RK5', loadNet('Net3.inp', null, n3), 0.0012);
+	}
+	// A pipe that moves several of its volumes in a quality step hands the water it cannot hold from its upstream node, as that node
+	// will mix it this step, whichever way the links are numbered (a reservoir feeding two short pipes in a row, a decaying species).
+	for (const order of ['1 2 3', '3 2 1']) {
+		const pipes = { 1: ' 1\tR\tA\t100\t12\t130\t0\tOpen', 2: ' 2\tA\tB\t100\t12\t130\t0\tOpen', 3: ' 3\tB\tC\t3000\t12\t130\t0\tOpen' };
+		const inp = '[JUNCTIONS]\n A\t0\t0\n B\t0\t0\n C\t0\t900\n[RESERVOIRS]\n R\t150\n[PIPES]\n' + order.split(' ').map((k) => pipes[k]).join('\n') +
+			'\n[TIMES]\n Duration\t2:00\n Hydraulic Timestep\t1:00\n Quality Timestep\t0:05\n Report Timestep\t0:05\n[OPTIONS]\n Units\tGPM\n Headloss\tH-W\n[END]\n';
+		const tmp = path.join(require('os').tmpdir(), 'msx-chain-' + order.replace(/ /g, '') + '.inp');
+		fs.writeFileSync(tmp, inp);
+		await against('three pipes in a row, 7.7 volumes a step, links numbered ' + order, loadNet(tmp, null, CHAIN_MSX), 1e-9, 10);
 	}
 	// THE PAGE'S OWN RUN PATH (lpnTimeRunModel, the engine setting built-in) takes an MSX project now, and says so in the run: the
 	// species the file declares, the frames carrying them, the report EPANET writes, and no fall back.

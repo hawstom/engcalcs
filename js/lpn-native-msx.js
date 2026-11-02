@@ -1060,6 +1060,7 @@
 			readRec(r);
 			Htime = r.t + (next ? next.t - r.t : 0);
 			if (Qtime < dur) { if (Qtime === 0) { initSegs(); } else { reorientSegs(); } }
+			sortLinks();
 			return 0;
 		}
 		// ---- wall species advection ----
@@ -1132,26 +1133,57 @@
 				if (volIn[nn] > 0) { for (mm = 1; mm <= S; mm++) { X[nn][mm] = massIn[nn][mm] / volIn[nn]; } }
 			}
 		}
+		// The water a link sends beyond what it holds is its upstream node's water AS THE NODE WILL HAVE IT THIS STEP: everything the
+		// links into that node bring (so they are taken first, accOrder), mixed with any external inflow as updateNodes() does it, and the
+		// average of the segments around it when nothing flows in. A reservoir or tank sends the concentration it has. The engine does
+		// this in whatever order the links are numbered (native-msx-harness.js, the chain of short pipes below).
+		var accOrder = [];
+		function upConc(ii, mm, dt) {
+			var vol;
+			if (tankOfNode[ii] > 0) { return node[ii][mm]; }
+			vol = volIn[ii] + (st.D[ii] < 0 ? -st.D[ii] * dt : 0);
+			return vol > 0 ? massIn[ii][mm] / vol : X[ii][mm];
+		}
+		function sortLinks() {
+			var kk, nn, out = [], indeg = new Int32Array(N + 1), done = new Uint8Array(L + 1), queue = [], head = 0, q0, outs = [];
+			for (nn = 0; nn <= N; nn++) { outs.push([]); }
+			for (kk = 1; kk <= L; kk++) {
+				if (st.Q[kk] === 0) { continue; }
+				indeg[downNode(kk)]++;
+				outs[upNode(kk)].push(kk);
+			}
+			for (nn = 1; nn <= N; nn++) { if (indeg[nn] === 0) { queue.push(nn); } }
+			while (head < queue.length) {
+				q0 = queue[head++];
+				outs[q0].forEach(function (k2) {
+					done[k2] = 1; out.push(k2);
+					if (--indeg[downNode(k2)] === 0) { queue.push(downNode(k2)); }
+				});
+			}
+			for (kk = 1; kk <= L; kk++) { if (!done[kk]) { out.push(kk); } }
+			accOrder = out;
+		}
 		function accumulate(dt) {
 			var kk, ii, jj, mm, v, sg, cseg, vseg, vsegSum;
 			getIncidentConcen();
 			volIn.fill(0);
 			for (ii = 1; ii <= N; ii++) { massIn[ii].fill(0); }
-			for (kk = 1; kk <= L; kk++) {
+			for (var oi = 0; oi < accOrder.length; oi++) {
+				kk = accOrder[oi];
 				ii = upNode(kk); jj = downNode(kk);
 				v = Math.abs(st.Q[kk]) * dt;
 				if (linkVol(kk) <= v) {
 					// More water leaves than the link holds (a link of no volume, a pump or a valve, always): all of what it holds goes,
-					// and the rest of the flow volume is the upstream node's own water. epanet-msx's main branch sends the first segment's
-					// quality for all of it and compares with `<`; this is the form that fits the engine on Net3 (native-msx-harness.js
-					// holds the remaining gap there).
+					// and the rest of the flow volume is the upstream node's own water, as that node will mix it this step (upConc()).
+					// epanet-msx's main branch sends the first segment's quality for all of it and compares with `<`; the vendored engine
+					// does not (native-msx-harness.js, the chains of short pipes).
 					volIn[jj] += v;
 					vsegSum = 0;
 					for (sg = st.first[kk]; sg; sg = sg.prev) {
 						vsegSum += sg.v;
 						for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { massIn[jj][mm] += sg.v * sg.c[mm]; } }
 					}
-					for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { massIn[jj][mm] += (v - vsegSum) * node[ii][mm]; } }
+					for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { massIn[jj][mm] += (v - vsegSum) * upConc(ii, mm, dt); } }
 					removeAllSegs(kk);
 				} else {
 					while (v > 0) {
@@ -1362,6 +1394,7 @@
 				// the link's volume (epanet-msx's main branch allows more, "Flow volume is allowed to be > link volume", and a pipe
 				// then carries a surplus). Measured on Net1's pipe 110, whose flow is 1.5 times its volume per step for two hours.
 				if (v > linkVol(kk)) { v = linkVol(kk); }
+				if (v === 0) { continue; }   // a pump or valve holds no segment: none to average at the node it feeds when it stops
 				for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { newSeg[kk].c[mm] = node[nn][mm]; } }
 				useNew = 0;
 				sg = st.last[kk];
