@@ -411,13 +411,20 @@ physical problem with every flow (demands, emitter and curve flows, an FCV setti
 loop solves in those flows and reports the file's (`solveInFeet()` in js/lpn-native-run.js: inputs times
 28.316846592/28.317, a pump's power-law coefficient times that to the power minus b, outputs divided back). Base Net3
 went from 0.13 mm to 0.0014 mm of EPANET at every node. A closed link also carries head difference over CBIG
-(hydcoeffs.c pipecoeff(), pumpcoeff()), and a tank's net inflow counts it (`opts.closedLeak`, `leakFlows`).
+(hydcoeffs.c pipecoeff(), pumpcoeff()) (`opts.closedLeak`, `leakFlows`), which starts the next step but is not a tank's inflow.
 
-What is left at 1.5 is not a model error. Tank 2 reaches its minimum level at 15:07:56 within 1.5e-6 m (0.1 s of its
-flow). EPANET's tank lands 6.7e-7 m above the minimum, so `tankstatus()` (strictly `head <= Hmin`) leaves its pipe
-open for the next 3124 s and `tanklevels()` clamps the volume it cannot supply; the loop lands 8e-7 m below and shuts
-it. Tighter EPANET convergence (FlowChange 1e-12) moves EPANET's side by 3e-7 m, not across the line. 1.5 is held to its
-event (`native-analysis-wire-harness.js`), and 1.45, 1.48, 1.52, 1.55, 1.6 and 2 are held for the whole run.
+Tank 2 at 1.5 reaches its minimum level at 15:07:56 to within 1.5e-6 m. `tanklevels()` snaps a draining tank to its
+minimum only when `V - q <= Vmin` (a full second of flow below it), so EPANET leaves tank 2 a hair below the minimum for
+hours and `tankstatus()` (`head <= Hmin`) calls it empty; its solve uses that head. The loop used to hand the solver the
+limit itself (`solverLevel()`), 7.9e-6 m too high, which moved the tank's pipe flow by 2.5e-4 of itself and landed the
+tank 1.8e-6 m on the wrong side of the line. The true head goes to the solver now, and the shut-tank test accepts a level
+below the minimum. Neighbouring multipliers, 1.5 itself and the base run are held for the whole run to 0.004 mm
+(`native-analysis-wire-harness.js`). Also copied from the source here: only a link above CLOSED adds to a tank's net
+inflow (newlinkflows()). Tried and left out because nothing it touches is measurable: a pipe's friction gradient under RQtol
+becoming RQtol / Hexp (pipecoeff()), RQtol 1e-7 rather than 1e-6 for pipes and pumps, and EPANET's PI (3.141592654) in the
+first flows; together they push Net2's water age 3.95 s from EPANET's, past its 3 s tolerance (of 190 000 s). The pipe to Tank 2 is in that low-flow line, so its
+flow is the leftover of the network around it: a one-ulp change to one pipe's roughness moves the loop's tank landing by 4e-7 m
+and EPANET's by the same, which is why the landing must be decided by the head handed to the solver and not by luck.
 
 ## The rule premises that fell back (native-wire, slice 3)
 

@@ -1105,7 +1105,9 @@
 			tanks.forEach(function (tk) {
 				var s = 0;
 				links.forEach(function (l) {
-					var q = (res.leakFlows && typeof res.leakFlows[l.id] === 'number') ? res.leakFlows[l.id] : (res.flows[l.id] || 0);
+					// hydsolver.c newlinkflows(): only a link above CLOSED adds to a fixed-grade node's net flow, so a shut
+					// link's leak is not a tank's inflow (res.flows is 0 for it).
+					var q = res.flows[l.id] || 0;
 					if (l.to === tk.id) { s += q; }
 					if (l.from === tk.id) { s -= q; }
 				});
@@ -2446,7 +2448,10 @@
 	function solverLevel(tk) {
 		var n = tk.node, lvl = (tk.h - tk.El) * FT;
 		if (tk.h >= tk.Hmax) { return n.maxLevel; }
-		if (tk.h <= tk.Hmin) { return n.minLevel; }
+		// hydraul.c tanklevels() clamps a draining tank to Vmin only when it is a full second of flow below,
+		// so a tank can sit a hair BELOW its minimum, and tankstatus() still calls it empty. EPANET solves with
+		// that head, not the limit.
+		if (tk.h <= tk.Hmin) { return Math.min(lvl, n.minLevel); }
 		return Math.min(n.maxLevel - EDGE, Math.max(n.minLevel + EDGE, lvl));
 	}
 

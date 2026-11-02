@@ -1184,7 +1184,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		var tn = nodes[i];
 		if (tn.type !== 'tank' || !(tn.diameter > 0) || typeof tn.level !== 'number' ||
 			typeof tn.minLevel !== 'number' || typeof tn.maxLevel !== 'number' ||
-			tn.minLevel > tn.level || tn.level > tn.maxLevel) { continue; }
+			(tn.minLevel > tn.level && !opts.epAcc) || tn.level > tn.maxLevel) { continue; }
 		// A tank that CAN OVERFLOW takes inflow at its limit (`overflow`, the .inp's ninth column):
 		// tankstatus() skips the full-tank closure when CanOverflow is set. Only a hand-built model
 		// states it (the page has no such field), and the built-in loop then spills the excess.
@@ -1811,7 +1811,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	if (onePoint.length > 0) { report.warnings = [{ code: 'gpv-one-point', ids: onePoint }]; }
 	// The links a full or empty tank shut for this answer (EPANET's TEMPCLOSED), by id: the
 	// extended-period loop needs them, because a simple control compares against that status.
-	// What the links EPANET holds closed (P = 1/CBIG) still carry, by id, m3/s; the loop adds it to a tank's net inflow.
+	// What the links EPANET holds closed (P = 1/CBIG) still carry, by id, m3/s; the loop starts the next step from them.
 	if (opts.closedLeak) {
 		report.leakFlows = {};
 		for (k = 0; k < links.length; k++) {
