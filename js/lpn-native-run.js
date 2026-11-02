@@ -1055,7 +1055,8 @@
 				if (pc && pc.custom) { q0 = (pc.x[0] + pc.x[pc.x.length - 1]) / 2; }
 				else if (st.a > 0 && st.b > 0 && st.h0 > 0) { qmax = Math.pow(st.h0 / st.a, 1 / st.b); q0 = qmax / 2; }
 				else { q0 = FT * area / FLOW_G; }
-				initFlows[l.id] = (st.k > 0 ? st.k : 1) * q0;
+				// a pump on a speed pattern starts from speed 1: its stated SPEED is discarded by the pattern (measured on EPANET's first trial)
+				initFlows[l.id] = (l.speedPattern ? 1 : (st.k > 0 ? st.k : 1)) * q0;
 				return;
 			}
 			initFlows[l.id] = FT * area / FLOW_G;
