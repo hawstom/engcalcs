@@ -19289,9 +19289,22 @@ var EngCalcs = EngCalcs || {};
 	}
 	function planeUnitsPerMetre() {
 		if (!projectLocatable() || !isProjectedProject()) { return 0; }
-		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b;
-		if (!c) { return 0; }
-		lat = (c.s + c.n) / 2; lon = (c.w + c.e) / 2;
+		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b, e, ll;
+		if (c) {
+			lat = (c.s + c.n) / 2; lon = (c.w + c.e) / 2;
+		} else {
+			// **THE AREA OF USE IS NOT ALWAYS KNOWN, AND THAT USED TO MEAN NO WORLD-WIDE FLOOR.** The
+			// full register is fetched only when the projection chooser opens, so a shipped example
+			// on a State Plane zone (Net3, EPSG:2227) has no extent when it opens, and the floor fell
+			// back to "the drawing is a four-pixel mark" (Tom, 2026-11-01: zoom-out stopped on part of
+			// one ocean). The drawing's own centre sits inside the zone by construction, so measure
+			// the plane unit there.
+			e = modelExtent();
+			if (!e) { return 0; }
+			ll = EngCalcs.lpnCrsInverse(code, { x: outwardX((e.minx + e.maxx) / 2), y: outwardY((e.miny + e.maxy) / 2) });
+			if (!ll) { return 0; }
+			lat = ll.lat; lon = ll.lon;
+		}
 		a = EngCalcs.lpnCrsForward(code, { lon: lon, lat: lat });
 		// One kilometre north, which needs no cos(latitude) and works at any longitude.
 		b = EngCalcs.lpnCrsForward(code, { lon: lon, lat: lat + 1 / 111.132 });
