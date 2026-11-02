@@ -453,9 +453,16 @@ last flows, a closed link's being its leak), and a pump's flow is read as it sta
 **This changes the answer the page gives under the built-in setting:** it is now EPANET's trial's, not a tighter one, so at
 the page's default Accuracy of 0.001 the heads are EPANET's, to the last digit, and equally loose.
 
-**Not held**, said where they are (17 constructed cases print `GAP`): a pressure or flow control valve, a pressure control
-on a junction, a general purpose valve and a Darcy-Weisbach project count a different number of trials, because the loop
-decides a valve's state between solves and EPANET inside one. The flow balance's numbers agree to 2e-5 of themselves.
+**Valve status is carried, as EPANET carries it.** The solver started every solve with each pressure or flow valve ACTIVE and
+with the valve's flow at 1 ft/s, so a step after a valve had gone open or closed took 5 trials where EPANET took 1 (a closed
+valve's flow of 0 was thrown away as "no previous flow"). The loop now hands the next solve the status the last one ended in
+(`valveStart`) and the flow it ended with (a closed valve's being EPANET's leak, QZERO). Constructed valve cases whose trial
+counts now equal EPANET's: PRV, PSV, FCV (twice) and a GPV's setting as a premise (at the first step that
+differed the loop took 5, 5, 2, 2 and 2 trials against EPANET's 1, 3, 1, 1 and 1; now equal); a PBV that EPANET balanced in 6 trials and the loop called "Unbalanced after 13" is now balanced in 8.
+
+**Not held**, said where they are (11 constructed cases print `GAP`): a PBV stopped by a control (8 trials against 6), a
+pressure control on a junction (every case: the first solve of the run takes 2 to 7 trials where EPANET takes 4 to 20), a
+Darcy-Weisbach project and a pump speed pattern that discards a stated speed (one trial apart at the first step). The flow balance's numbers agree to 2e-5 of themselves.
 Quality runs write the summary lines for the analysis but not EPANET's "Water Quality Mass Balance" block.
 
 ## EPANET-MSX in the built-in solver

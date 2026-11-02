@@ -855,6 +855,15 @@ EngCalcs.lpnSolve = function (model, options) {
 		return sp * q0;
 	}
 
+	// A valve's first flow: the last solution's where an extended-period run passes one (`opts.flows0`), as for every other
+	// link; a valve the last solve left CLOSED keeps the leak EPANET keeps for it (QZERO, 1e-6 cfs), not a velocity of
+	// 1 ft/s; otherwise EPANET's first guess, the flow at 1 ft/s (hydraul.c initlinkflow()).
+	function valveFlow0(k2) {
+		var f0 = opts.flows0 && opts.flows0[links[k2].id];
+		if (typeof f0 === 'number' && f0 !== 0 && isFinite(f0)) { return f0; }
+		if (opts.epAcc && links[k2].valveStart === 'closed' && !links[k2].valveFixed) { return 1e-6 * 0.3048 * 0.3048 * 0.3048; }
+		return Math.PI * links[k2].diameter * links[k2].diameter / 4 * VFT;
+	}
 	// Initial guess. Any nonzero flow works because of the gradient floor; a
 	// velocity-scaled seed simply starts closer than a constant would.
 	for (k = 0; k < links.length; k++) {
@@ -1001,7 +1010,10 @@ EngCalcs.lpnSolve = function (model, options) {
 		// input3.c controldata() setting MISSING for a valve). It is a plain minor loss and its
 		// state is never re-decided: hydstatus.c valvestatus() and linkstatus() both skip a valve
 		// whose setting is MISSING. Only js/lpn-native-run.js sets it; nothing on the page does.
-		vStat[k] = links[k].valveFixed === 'open' ? 'open' : 'active';
+		// A valve's status is carried from solve to solve by an extended-period run (`valveStart`), as EPANET carries
+		// LinkStatus; a run's first solve and the single instant start it ACTIVE, as inithyd() does.
+		vStat[k] = links[k].valveFixed === 'open' ? 'open' :
+			(links[k].valveStart && !links[k].valveFixed ? links[k].valveStart : 'active');
 		if (links[k].valveFixed === 'open') { vFixed[k] = true; }
 		vc.push(k);
 		vSet[k] = links[k].setting || 0;
@@ -1014,7 +1026,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		if (vt0 === 'PRV') { vHset[k] = (byId[links[k].to].elev || 0) + vSet[k]; }
 		if (vt0 === 'PSV') { vHset[k] = (byId[links[k].from].elev || 0) + vSet[k]; }
 		// EPANET's first guess for a valve: the flow at 1 ft/s (hydraul.c initlinkflow()).
-		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+		Q[k] = valveFlow0(k);
 	}
 	if (vc.length) { X = new Float64Array(nn); }
 
@@ -1047,7 +1059,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			fStat[k] = 'active';
 		}
 		// The same first guess as every EPANET valve: 1 ft/s (hydraul.c initlinkflow()).
-		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+		Q[k] = valveFlow0(k);
 	}
 
 	// hydcoeffs.c pbvcoeff(). A setting of zero is EPANET's "fixed OPEN or CLOSED" branch and an

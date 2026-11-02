@@ -1262,6 +1262,11 @@
 			}
 			c.status = 'open';
 			c.setting = st.k;
+			// hydraul.c: a valve's status is carried from solve to solve, so the next solve starts from the state the
+			// last one ended in (readBack()), not from ACTIVE as inithyd() starts a run.
+			if (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV') {
+				c.valveStart = st.s === OPEN ? 'open' : st.s === CLOSED ? 'closed' : st.s === XPRESSURE ? 'xpressure' : st.s === XFCV ? 'xfcv' : 'active';
+			}
 			return c;
 		}
 		if (st.kind === 'cv') { c.status = 'cv'; return c; }

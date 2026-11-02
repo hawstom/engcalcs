@@ -717,8 +717,8 @@ async function compare(c) {
 	// THE RUN REPORT (native-wire slice 4): EPANET's own text, line for line, the clock stamps aside. The flow balance's
 	// numbers are compared to 0.0015 L/s, because the two hydraulics differ by 3e-5 L/s and a third decimal can fall either side.
 	// Known gaps, said where they are: a case with a pressure or flow control valve, a pressure control on a junction, a
-	// Darcy-Weisbach project, a general purpose valve or an overflowing tank counts a different number of trials (the built-in
-	// solver decides a valve's state between solves, EPANET inside one) and is reported as a gap, not held.
+	// Darcy-Weisbach project, a PBV stopped by a control or a speed pattern that discards a stated speed counts a different number of
+	// trials and is reported as a gap, not held (the periodic PRV, PSV, FCV and GPV cases are held).
 	if (!process.env.NOREPORT) {
 		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>');
 		const a = stamp(epa.report).split('\n'), b = stamp(nat.report).split('\n');
