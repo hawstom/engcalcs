@@ -93,9 +93,10 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
+| `lpn_set_sub_solver` | 3 | 2 | 1 | 0 |
 | `lpn_set_sub_units` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_time` | 8 | 8 | 0 | 0 |
-| `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
+| `lpn_set_sub_hydraulics` | 14 | 14 | 0 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
 | **Total** | 133 | 126 | 4 | 3 |
@@ -108,5 +109,5 @@ Controls whose home is not their heading's default, as observed:
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show all properties on hover -- browser
 - `lpn_set_sub_page`: Show override markers on the map -- browser
-- `lpn_set_sub_hydraulics`: Show the run progress box -- browser
+- `lpn_set_sub_solver`: Show the run progress box -- browser
 <!-- INVENTORY:END -->
