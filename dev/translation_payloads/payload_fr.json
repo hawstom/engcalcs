@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 3302,
-        "delta_key_count": 13,
-        "english_changed_key_count": 1,
+        "expected_key_count": 3303,
+        "delta_key_count": 17,
+        "english_changed_key_count": 4,
         "exempt_key_count": 80,
         "exempt_keys": [
             "u_depthFrac",
@@ -111,10 +111,13 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: débit\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demande\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: jonction\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: réservoir\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: image de fond\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: scénario\n    Definition: Project state as a collection of contributing overrides.\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: débit d'incendie\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: débit\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demande\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: jonction\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: réservoir\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nœud\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: liaison\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: image de fond\n- water network project, file, or model\n    English: project (saved network)\n    Your language: projet\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: scénario\n    Definition: Project state as a collection of contributing overrides.\n- solver or the part that works out the answer\n    English: solver\n    Your language: solveur\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: débit d'incendie\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Client\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: étiquette\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
+        "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
+        "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -125,11 +128,15 @@
         "lpn_inpalt_name": "Name of the new alternative",
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
-        "lpn_inpalt_cancelled": "Nothing was changed."
+        "lpn_inpalt_cancelled": "Nothing was changed.",
+        "lpn_settings_solver": "Solver"
     },
     "keys": {
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
+        "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
+        "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -140,9 +147,26 @@
         "lpn_inpalt_name": "Name of the new alternative",
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
-        "lpn_inpalt_cancelled": "Nothing was changed."
+        "lpn_inpalt_cancelled": "Nothing was changed.",
+        "lpn_settings_solver": "Solver"
     },
     "key_context": {
+        "lpn_guide_set_where_def": {
+            "reason": "english_changed",
+            "current_value": "<p>La liste à gauche de la boîte permet d'accéder à une section ou à un sous-titre. Les sections sont Visualisation (Étiquettes des nœuds, Couleurs des nœuds, Étiquettes des liaisons, Couleurs des liaisons, Client et Nœud et liaison), Carte, Page, Éléments (Préfixes d'identifiant, Valeurs de création et Propriétés personnalisées), Calcul (Unités, Temps, Hydraulique, Énergie et Qualité de l'eau) et Crédits. Chaque sous-titre indique si ses paramètres sont Enregistrés avec le projet ou Enregistrés dans ce navigateur. Tout est enregistré avec le projet, sauf les paramètres sous Page et une ligne de Hydraulique, Afficher la boîte de progression du calcul, qui indique elle-même Enregistré dans ce navigateur.<\/p><p>L'onglet Paramètres de Tableaux liste les mêmes paramètres en lignes, avec leur Catégorie et leur Valeur, de sorte qu'un paramètre peut aussi y être trouvé et vérifié.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "Sections, et où les paramètres sont enregistrés",
+                    "english": "Sections, and where settings are saved"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_search_term",
+                    "value": "Rechercher",
+                    "english": "Searching"
+                }
+            }
+        },
         "lpn_ex_elm_street_desc": {
             "reason": "english_changed",
             "current_value": "Prescott Valley, en Arizona : 17 jonctions, 1 réservoir et 1 pompe. Un site commercial résolu pour la lutte contre l'incendie en plus de la demande du jour de pointe, à un instant donné, dessiné sur un plan de site. Gallons par minute, avec pieds et pouces.",
@@ -172,6 +196,38 @@
                     "key": "lpn_menu_project",
                     "value": "Eau",
                     "english": "Water"
+                }
+            }
+        },
+        "lpn_run_menu_tip": {
+            "reason": "english_changed",
+            "current_value": "Lancer la simulation. Inutile lorsque « Recalculer automatiquement » est activé dans Paramètres, Calcul, Hydraulique. Lorsque Recalculer est désactivé, un bouton Calculer apparaît dans la barre d'outils.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "Afficher et modifier les éléments dans des tableaux du panneau inférieur.",
+                    "english": "View and edit assets in tables in bottom panel."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_auto_run",
+                    "value": "Calculer automatiquement",
+                    "english": "Recalculate automatically"
+                }
+            }
+        },
+        "lpn_time_run_slow": {
+            "reason": "english_changed",
+            "current_value": "Ce réseau a mis {secs} s à se calculer, et il est réglé pour se recalculer après chaque modification. Pour arrêter cela et retrouver un bouton Calculer, désactivez « Calculer automatiquement » dans Paramètres, sous Calcul, Hydraulique.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_calc_hint_mute",
+                    "value": "Ne plus afficher",
+                    "english": "Don’t show this again"
+                },
+                "next_translated": {
+                    "key": "lpn_time_no_report",
+                    "value": "Il n'y a pas encore de rapport de calcul. Ce rapport est le texte propre d'EPANET ; il apparaît donc une fois ce réseau calculé avec le solveur EPANET.",
+                    "english": "There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated."
                 }
             }
         },
@@ -350,6 +406,22 @@
                     "english": "Import surveyed points"
                 }
             }
+        },
+        "lpn_settings_solver": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Hydraulique",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_quality",
+                    "value": "Qualité de l'eau",
+                    "english": "Quality"
+                }
+            }
         }
     },
     "key_plain": [],
@@ -367,6 +439,36 @@
                 {
                     "plain_name": "state of a link at a moment, open, closed, or active",
                     "english_rendering": "status",
+                    "preferred_translation": ""
+                }
+            ]
+        },
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "Balise"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": "étiquette"
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": "description"
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
                     "preferred_translation": ""
                 }
             ]
