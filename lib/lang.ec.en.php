@@ -1686,6 +1686,7 @@ $ec_lang['lpn_export_table_current']='Current';
 $ec_lang['lpn_export_table_all']='All';
 $ec_lang['lpn_export_table_go']='Export';
 $ec_lang['lpn_export_table_scn_note']='Results are exported only for the scenario last calculated.';
+$ec_lang['lpn_export_table_scn_keeps']='All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -2452,6 +2453,24 @@ $ec_lang['lpn_inpup_new_scn']='Created the scenario {scenario}, a child of {pare
 $ec_lang['lpn_inpup_btn_newscn_basic']='A new scenario';
 $ec_lang['lpn_inpup_new_scn_basic']='Created the scenario {scenario} and opened it.';
 $ec_lang['lpn_inpup_new_none']='No scenario was created.';
+// Question 3 of an import into the open scenario (Basic mode off): which alternative receives the values.
+$ec_lang['lpn_inpalt_lead']='This file changes values in the categories below. Choose the alternative that receives the values of each.';
+$ec_lang['lpn_inpalt_base_note']='Every scenario inherits the Base alternative, so choosing it changes them all.';
+// {category} is an alternative category, such as Physical or Demand; it heads one choice.
+$ec_lang['lpn_inpalt_heading']='Alternative for {category}';
+// {scenario} is a scenario name; it labels a choice.
+$ec_lang['lpn_inpalt_own']='{scenario}\'s own alternative';
+// {parent} is an alternative name; it labels a choice.
+// {alternative} is an alternative name and {scenarios} the other scenarios that use it, such as "Off peak, Fire flow".
+$ec_lang['lpn_inpalt_shared']='{alternative}, also used by {scenarios}';
+// {n} is a count of further scenarios.
+$ec_lang['lpn_inpalt_more']='and others ({n})';
+$ec_lang['lpn_inpalt_new']='A new alternative, child of {parent}';
+$ec_lang['lpn_inpalt_name']='Name of the new alternative';
+$ec_lang['lpn_inpalt_base']='The Base alternative';
+// {list} is a list such as "Physical: Peak; Demand: Base"; each item is a category and the alternative that took the values.
+$ec_lang['lpn_inpalt_receipt']='Alternatives that received the values: {list}';
+$ec_lang['lpn_inpalt_cancelled']='Nothing was changed.';
 $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
 $ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';

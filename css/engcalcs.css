@@ -7788,3 +7788,9 @@ textarea.lpn-desc-ta {
 #lpn_set_units_fields .lpn-units-group { display: block; }
 /* The derived Map coordinates value is as tall as the select beside every other unit's name, so its row has its neighbours' spacing (round 10c, Perry). */
 #lpn_set_units_fields .lpn-units-derived { padding: 0 2px; min-height: 0; line-height: 21px; height: 21px; box-sizing: border-box; overflow: hidden; white-space: nowrap; }
+/* The import's alternative question (Task 814, question 3): one paragraph, one group of choices, one indented name field. */
+.lpn-dlg-p { margin: 0 0 8px; }
+.lpn-dlg-strong { font-weight: bold; }
+.lpn-dlg-group { margin: 0 0 10px; }
+.lpn-dlg-opt { display: block; }
+.lpn-dlg-indent { margin: 2px 0 0 20px; }

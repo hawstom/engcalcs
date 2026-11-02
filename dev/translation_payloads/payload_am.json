@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 3290,
-        "delta_key_count": 1,
+        "expected_key_count": 3302,
+        "delta_key_count": 13,
         "english_changed_key_count": 1,
         "exempt_key_count": 43,
         "exempt_keys": [
@@ -74,12 +74,36 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ፍሰት\n- flow used, taken, or consumed\n    English: demand\n    Your language: ፍላጎት\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
-        "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches."
+        "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
+        "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
+        "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
+        "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
+        "lpn_inpalt_heading": "Alternative for {category}",
+        "lpn_inpalt_own": "{scenario}'s own alternative",
+        "lpn_inpalt_shared": "{alternative}, also used by {scenarios}",
+        "lpn_inpalt_more": "and others ({n})",
+        "lpn_inpalt_new": "A new alternative, child of {parent}",
+        "lpn_inpalt_name": "Name of the new alternative",
+        "lpn_inpalt_base": "The Base alternative",
+        "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
+        "lpn_inpalt_cancelled": "Nothing was changed."
     },
     "keys": {
-        "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches."
+        "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
+        "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
+        "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
+        "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
+        "lpn_inpalt_heading": "Alternative for {category}",
+        "lpn_inpalt_own": "{scenario}'s own alternative",
+        "lpn_inpalt_shared": "{alternative}, also used by {scenarios}",
+        "lpn_inpalt_more": "and others ({n})",
+        "lpn_inpalt_new": "A new alternative, child of {parent}",
+        "lpn_inpalt_name": "Name of the new alternative",
+        "lpn_inpalt_base": "The Base alternative",
+        "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
+        "lpn_inpalt_cancelled": "Nothing was changed."
     },
     "key_context": {
         "lpn_ex_elm_street_desc": {
@@ -97,10 +121,218 @@
                     "english": "Undo"
                 }
             }
+        },
+        "lpn_export_table_scn_keeps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_export_table_scn_note",
+                    "value": "ውጤቶች የሚላኩት ለመጨረሻ ጊዜ ለተሰላው ሁኔታ ብቻ ነው።",
+                    "english": "Results are exported only for the scenario last calculated."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_project",
+                    "value": "ውሃ",
+                    "english": "Water"
+                }
+            }
+        },
+        "lpn_inpalt_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_base_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_own": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_shared": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_receipt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
+        },
+        "lpn_inpalt_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inpup_new_none",
+                    "value": "ምንም ሁኔታ አልተፈጠረም።",
+                    "english": "No scenario was created."
+                },
+                "next_translated": {
+                    "key": "lpn_survey_where_title",
+                    "value": "የተቀየሱ ነጥቦችን አስገባ",
+                    "english": "Import surveyed points"
+                }
+            }
         }
     },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "what-if version, case, scenario, or arrangement of circumstances",
+                    "english_rendering": "scenario",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "state of a link at a moment, open, closed, or active",
+                    "english_rendering": "status",
+                    "preferred_translation": "አቋም"
+                }
+            ]
+        }
+    ]
 }
