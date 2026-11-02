@@ -346,8 +346,28 @@ async function slices2to5() {
 		await against('Net3, tank mixing model LIFO', loadNet('Net3.inp', setMix('LIFO', 0.4), n3), 0.0003);
 		await against('Net3, tank mixing model 2COMP', loadNet('Net3.inp', setMix('2COMP', 0.4), n3), 0.0003);
 	}
+	{
+		const REP = NET1_MSX + '\n[REPORT]\n  NODES ALL\n  SPECIE CL2 YES\n';
+		const setMix = (mix) => (mm) => { mm.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix, fraction: 0.3 }; } }); };
+		for (const mix of ['MIXED', '2COMP', 'FIFO', 'LIFO']) { await massBalance('Net1 with a ' + mix + ' tank (a wall species, two sources)', loadNet('Net1.inp', setMix(mix), REP), 5e-5); }
+	}
 }
 
+// the engine's "Water Quality Mass Balance" blocks (msxrpt.c) against the loop's, on networks with tanks, a wall species and sources
+async function massBalance(name, m, tol) {
+	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	const e = await EngCalcs.lpnEpanetRun(copy(m)), n = EngCalcs.lpnNativeRun(copy(m), { quality: true });
+	if (!e.ok || !n.ok) { ok(name + ': both ran', false, JSON.stringify(e.issues || n.issues)); return; }
+	const pick = (r) => String(r.report).split('\n').filter((l) => /Water Quality Mass Balance|^\s+(Initial Mass|Mass Inflow|Mass Outflow|Mass Reacted|Final Mass|Mass Ratio)/.test(l)).map((l) => l.trim());
+	const a = pick(e), b = pick(n);
+	let worst = 0, at = '';
+	a.forEach((l, i) => {
+		const x = Number(l.split(/:\s+/).pop()), y = Number((b[i] || '').split(/:\s+/).pop());
+		if (!isFinite(x) && l !== b[i]) { worst = Infinity; at = l + ' / ' + b[i]; return; }
+		if (isFinite(x)) { const sc = Math.max(Math.abs(x), Math.abs(y), 1e3), d = Math.abs(x - y) / sc; if (d > worst) { worst = d; at = l + ' / ' + b[i]; } }
+	});
+	ok(`${name}: ${a.length} mass balance lines, each within ${tol} of the engine's (of the larger of itself and 1e3)`, a.length > 8 && a.length === b.length && worst <= tol, `worst ${worst.toExponential(2)} ${at}`);
+}
 async function run() {
 	await slice1();
 	await slices2to5();

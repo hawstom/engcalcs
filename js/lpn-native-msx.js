@@ -834,8 +834,8 @@
 		}
 		// the common reaction of one segment: `src` is the vector the rate species start from (the segment's own for a pipe, the
 		// TANK's for a tank, msxchem.c evalTankReactions()), `holder` carries the integrator's remembered step.
-		function reactSeg(seg, dt, list, deriv, zone, src, hstepOf, setHstep, errCode) {
-			var i2, m2, tstep = dt / st.ucfRate, c, ierr = 0, hp;
+		function reactSeg(seg, dt, list, deriv, zone, src, hstepOf, setHstep, linkDiam) {
+			var i2, m2, tstep = dt / st.ucfRate, c, ierr = 0, hp, c0 = Float64Array.from(seg.c), e2;
 			for (m2 = 1; m2 <= S; m2++) { C1[m2] = seg.c[m2]; }
 			if (dt > 0) {
 				for (i2 = 1; i2 <= list.length; i2++) { Yrate[i2] = src[list[i2 - 1]]; }
@@ -856,7 +856,19 @@
 				}
 				if (ierr < 0) { return 513; }
 			}
-			return chem.equil(zone, seg.c);
+			// msxchem.c: the mass a segment reacted is its volume times the change in concentration over the step (a pipe's is taken
+			// before the new equilibrium, a tank's after it; a wall species is per unit of pipe area)
+			if (linkDiam !== undefined) { reactedMass(seg, c0, linkDiam); }
+			e2 = chem.equil(zone, seg.c);
+			if (linkDiam === undefined) { reactedMass(seg, c0, undefined); }
+			return e2;
+		}
+		function reactedMass(seg, c0, diam) {
+			var m3;
+			for (m3 = 1; m3 <= S; m3++) {
+				if (spec.species[m3 - 1].type === 'BULK') { st.massReacted[m3] += seg.v * (seg.c[m3] - c0[m3]) * LPERFT3; }
+				else if (diam !== undefined && diam > 0) { st.massReacted[m3] += seg.v * 4.0 / diam * st.ucfArea * (seg.c[m3] - c0[m3]); }
+			}
 		}
 		// msxchem.c MSXchem_react(): every pipe, then every tank
 		chem.react = function (dt) {
@@ -867,7 +879,7 @@
 				chem.evalHyd(k);
 				theLink = k;
 				for (seg = st.first[k]; seg; seg = seg.prev) {
-					e = reactSeg(seg, dt, pipeRate, pipeDcDt, 'link', seg.c, function () { return seg.hstep; }, function (v) { seg.hstep = v; });
+					e = reactSeg(seg, dt, pipeRate, pipeDcDt, 'link', seg.c, function () { return seg.hstep; }, function (v) { seg.hstep = v; }, st.links[k].diam);
 					if (e) { return e; }
 				}
 			}
@@ -938,6 +950,8 @@
 			linkParam: new Array(L + 1), tankParam: [null], T: 0,
 			ucfLength: MPERFT, ucfFlow: LPS_PER_CFS, ucfArea: ucfArea, ucfRate: ucfRate
 		};
+		st.massReacted = new Float64Array(S + 1); st.massInflow = new Float64Array(S + 1); st.massOutflow = new Float64Array(S + 1);
+		st.massInitial = new Float64Array(S + 1); st.massFinal = new Float64Array(S + 1);
 		for (n = 1; n <= N; n++) {
 			node[n] = new Float64Array(S + 1); nodeC0[n] = new Float64Array(S + 1); massIn[n] = new Float64Array(S + 1); X[n] = new Float64Array(S + 1); tankOfNode[n] = 0;
 		}
@@ -1071,6 +1085,25 @@
 				flowDir[kk] = newdir;
 			}
 		}
+		// msxqual.c findstoredmass(): the mass in every pipe (a wall species per unit of pipe area) and in every tank
+		function findStored(mass) {
+			var kk, jj, sg, mm;
+			for (mm = 1; mm <= S; mm++) { mass[mm] = 0; }
+			for (kk = 1; kk <= L; kk++) {
+				for (sg = st.first[kk]; sg; sg = sg.prev) {
+					for (mm = 1; mm <= S; mm++) {
+						if (!wall[mm - 1]) { mass[mm] += sg.c[mm] * sg.v * LPERFT3; }
+						else { mass[mm] += sg.c[mm] * sg.v * 4.0 / links[kk].diam * st.ucfArea; }
+					}
+				}
+			}
+			for (jj = 1; jj <= st.T; jj++) {
+				if (st.tanks[jj].a === 0) { continue; }
+				for (sg = st.first[L + jj]; sg; sg = sg.prev) {
+					for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { mass[mm] += sg.c[mm] * sg.v * LPERFT3; } }
+				}
+			}
+		}
 		function getHydVars() {
 			var r = recs[recIx], next;
 			if (!r) { return 505; }
@@ -1078,7 +1111,7 @@
 			next = recs[recIx];
 			readRec(r);
 			Htime = r.t + (next ? next.t - r.t : 0);
-			if (Qtime < dur) { if (Qtime === 0) { initSegs(); } else { reorientSegs(); } }
+			if (Qtime < dur) { if (Qtime === 0) { initSegs(); findStored(st.massInitial); } else { reorientSegs(); } }
 			sortLinks();
 			return 0;
 		}
@@ -1385,7 +1418,7 @@
 			else if (tk.mix === 2) { mix3(jj, volIn[ii], massIn[ii], vnet); } else { mix4(jj, volIn[ii], massIn[ii], vnet); }
 		}
 		function updateNodes(dt) {
-			var ii, jj, mm, tk, c1v = new Float64Array(S + 1);
+			var ii, jj, mm, tk, vres;
 			for (ii = 1; ii <= N; ii++) {
 				jj = tankOfNode[ii];
 				if (jj <= 0) {
@@ -1399,6 +1432,9 @@
 						for (mm = 1; mm <= S; mm++) { node[ii][mm] = nodeC0[ii][mm]; }
 						// the vendored engine evaluates a reservoir's formula species as well (As5Adsorb's total arsenic at its source)
 						chem.equil('node', node[ii]);
+						// a reservoir feeds the network (its quality times what leaves it) and takes back what flows into it
+						vres = outVol(ii, dt);
+						for (mm = 1; mm <= S; mm++) { st.massInflow[mm] += node[ii][mm] * vres * LPERFT3; st.massOutflow[mm] += massIn[ii][mm] * LPERFT3; }
 					}
 					else {
 						mixTank(jj, ii, dt);
@@ -1436,6 +1472,7 @@
 						else if (src.type === 'SETPOINT') { if (s2 > node[nn][mm]) { massadded = (s2 - node[nn][mm]) * volout; } }
 						else if (src.type === 'FLOWPACED') { massadded = s2 * volout; }
 						node[nn][mm] += massadded / volout;
+						st.massInflow[mm] += massadded * LPERFT3;
 					}
 				}
 				chem.equil('node', node[nn]);
@@ -1459,6 +1496,15 @@
 				else { newSeg[kk].v = v; addSeg(kk, newSeg[kk]); }
 			}
 		}
+		// msxqual.c findnodequal(): the mass a junction's demand carries out of the network
+		function demandOutflow(dt) {
+			var ii, mm, d;
+			for (ii = 1; ii <= N; ii++) {
+				if (tankOfNode[ii] !== 0) { continue; }
+				d = Math.max(0, st.D[ii]) * dt;
+				for (mm = 1; mm <= S; mm++) { if (!wall[mm - 1]) { st.massOutflow[mm] += d * node[ii][mm] * LPERFT3; } }
+			}
+		}
 		function transport(tstep) {
 			var qtime = 0, dt, err = 0;
 			while (!err && qtime < tstep) {
@@ -1466,7 +1512,7 @@
 				qtime += dt;
 				err = chem.react(dt);
 				if (err) { return err; }
-				advectSegs(dt); accumulate(dt); updateNodes(dt); sourceInput(dt); release(dt);
+				advectSegs(dt); accumulate(dt); updateNodes(dt); sourceInput(dt); demandOutflow(dt); release(dt);
 			}
 			return err;
 		}
@@ -1508,6 +1554,14 @@
 			readFrame(Qtime);
 			yield { phase: 'msx', done: Qtime, of: dur };
 			if (dur === 0) { break; }
+		}
+		// msxqual.c MSXqual_step(): when the run is over, the mass left in the network, the mass reacted and the ratio
+		findStored(st.massFinal);
+		var massRatio = new Float64Array(S + 1);
+		for (m = 1; m <= S; m++) {
+			var smassin = st.massInitial[m] + st.massInflow[m], smassout = st.massOutflow[m] + st.massFinal[m];
+			if (st.massReacted[m] < 0) { smassout -= st.massReacted[m]; } else { smassin += st.massReacted[m]; }
+			massRatio[m] = smassin === 0 ? 1.0 : smassout / smassin;
 		}
 		// ---- msxrpt.c: the text report, written after the run (MSXrpt_write()) ----
 		// Series tables (a time column and one column per reported species, for each reported node and link), in the engine's own
@@ -1596,6 +1650,24 @@
 			writeLine(spec.title + '\n');   // the engine keeps the newline fgets() read with the title line
 			for (nn = 1; nn <= N; nn++) { if (nodeRpt[nn]) { tableHdr(false, nodes[nn].id); table(false, nn); } }
 			for (kk = 1; kk <= L; kk++) { if (linkRpt[kk]) { tableHdr(true, links[kk].id); table(true, kk); } }
+			// msxrpt.c writemassbalance(): a block for every species with a rate expression in pipes
+			function sciE(x) {
+				var t = x.toExponential(5), ix = t.indexOf('e'), ex = t.slice(ix + 2);
+				return pad(t.slice(0, ix + 2) + (ex.length < 2 ? '0' + ex : ex), 12);
+			}
+			for (mm = 1; mm <= S; mm++) {
+				if (!spec.species[mm - 1].pipe || spec.species[mm - 1].pipe.kind !== 'RATE') { continue; }
+				writeLine('\n');
+				writeLine('Water Quality Mass Balance: ' + spec.species[mm - 1].id + ' (' + spec.species[mm - 1].units + ')');
+				writeLine('================================');
+				writeLine('Initial Mass:      ' + sciE(st.massInitial[mm]));
+				writeLine('Mass Inflow:       ' + sciE(st.massInflow[mm]));
+				writeLine('Mass Outflow:      ' + sciE(st.massOutflow[mm]));
+				writeLine('Mass Reacted:      ' + sciE(st.massReacted[mm]));
+				writeLine('Final Mass:        ' + sciE(st.massFinal[mm]));
+				writeLine('Mass Ratio:         ' + massRatio[mm].toFixed(5));
+				writeLine('================================\n');
+			}
 			writeLine('');
 			return out.join('\n') + '\n';
 		}

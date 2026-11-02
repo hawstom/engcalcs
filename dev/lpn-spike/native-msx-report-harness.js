@@ -7,7 +7,7 @@
 // compares the two texts from "Analysis ended" to the end of the MSX tables: every word and heading must be equal;
 // the numbers are the two solvers' own (they differ by 2.6e-4 of the value at worst, native-msx-harness.js), so a printed
 // number may differ in its last digit. The engine prints series tables whatever [TIMES] Statistic says (measured, four values), so
-// the loop does too. The mass balance blocks the engine adds after the tables are not written (said in the plan).
+// the loop does too. The "Water Quality Mass Balance" blocks after the tables are compared too: each mass to 2e-3 of itself.
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -31,10 +31,10 @@ function example(msxText) {
 	m.hydraulics = Object.assign({ accuracy: 1e-5 }, m.hydraulics || {});
 	return m;
 }
-// The part of a run report this harness compares: from the MSX heading line to the first mass balance block.
+// The part of a run report this harness compares: everything after "Analysis ended" (the MSX tables and the mass balance blocks).
 function tail(report) {
-	const lines = String(report || '').split('\n'), i = lines.findIndex((l) => /Analysis ended/.test(l)), j = lines.findIndex((l) => /Water Quality Mass Balance/.test(l));
-	return lines.slice(i + 1, j < 0 ? lines.length : j).map((l) => l.replace(/\s+$/, ''));
+	const lines = String(report || '').split('\n'), i = lines.findIndex((l) => /Analysis ended/.test(l));
+	return lines.slice(i + 1).map((l) => l.replace(/\s+$/, ''));
 }
 // a printed number may differ in its last digit; everything else must be identical
 function lineMatch(a, b) {
@@ -42,6 +42,11 @@ function lineMatch(a, b) {
 	const ta = a.trim().split(/\s+/), tb = b.trim().split(/\s+/);
 	for (let i = 0; i < ta.length; i++) {
 		if (ta[i] === tb[i]) { continue; }
+		if (/^-?\d\.\d+e[+-]\d+$/.test(ta[i]) && /^-?\d\.\d+e[+-]\d+$/.test(tb[i])) {   // a mass in the balance blocks: 2e-3 of itself, or noise
+			const x = Number(ta[i]), y = Number(tb[i]);
+			if (Math.abs(x - y) <= 2e-3 * Math.max(Math.abs(x), Math.abs(y)) || Math.max(Math.abs(x), Math.abs(y)) < 1e-5) { continue; }
+			return false;
+		}
 		if (!/^-?\d+\.?\d*$/.test(ta[i]) || !/^-?\d+\.?\d*$/.test(tb[i])) { return false; }
 		const dec = (ta[i].split('.')[1] || '').length, unit = Math.pow(10, -dec);
 		if (Math.abs(Number(ta[i]) - Number(tb[i])) > 1.0001 * unit + 5e-4 * Math.max(Math.abs(Number(ta[i])), Math.abs(Number(tb[i])))) { return false; }

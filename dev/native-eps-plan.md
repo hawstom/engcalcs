@@ -509,7 +509,9 @@ notice. The vendored epanet-js build already runs it (the page's Phase 2); that 
   file's `[REPORT]` section flags a node or a link: after "Analysis ended", a logo, the title and one series table per flagged
   node and link (species YES/NO and precision, PAGESIZE), held to the engine line for line by `native-msx-report-harness.js`.
   The engine ignores `[TIMES] Statistic` here (it prints series for all four values), so the loop does. The engine's
-  "Water Quality Mass Balance" blocks after the tables are not written by the loop.
+  "Water Quality Mass Balance" blocks after the tables (one per species with a pipe RATE expression) are written too, from
+  msxqual.c's own accounting (initial and final stored mass, source and reservoir inflow, demand and reservoir outflow, mass
+  reacted by segment): equal to the engine to six printed digits on the arsenic example, and within 1.4e-5 on Net1 with each tank model.
 
 ### Test cases
 
@@ -533,8 +535,8 @@ mixing model, a pattern, per-pipe parameters.
 
 ### Built so far (native-wire, 2026-11-01), and what it found
 
-`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done: one dead-end node
-on Net3 (below), and the engine's mass balance blocks.
+`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done: nothing
+known (the Net3 dead end and the mass balance blocks are done, below).
 **2-compartment and last-in-first-out tanks are in the loop** (they were left to EPANET by tank name; the first run of both was
 1.7e-2 and 1.8e-2 off the engine). Two causes, both found by running the engine: a pipe that sends more than it holds sends
 its upstream tank's concentration as the tank leaves the step (after this step's mix, run on a copy of the tank's segments), not
