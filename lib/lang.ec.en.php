@@ -5274,15 +5274,21 @@ $ec_lang['lpn_settings_req_pressure']='Required pressure';
 $ec_lang['lpn_settings_req_pressure_tip']='Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project\'s pressure unit. Leave it blank to use EPANET\'s default, which is in psi for US flow units and meters otherwise.';
 $ec_lang['lpn_settings_pressure_exponent']='Pressure exponent';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.';
-// An extended period simulation that the user asked the built-in solver to run, and that the built-in solver does
-// not run (Task 733, slice 7). {ids} are the controls, rules, tanks, pumps or settings it names.
-$ec_lang['lpn_engine_native_route']='Solved with the EPANET solver, because the built-in solver does not run this simulation.';
 $ec_lang['lpn_engine_native_used']='Solved with the built-in solver.';
 $ec_lang['lpn_engine_epanet_used']='Solved with the EPANET solver.';
-$ec_lang['lpn_engine_native_route_ids']='Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.';
 $ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
 $ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
 $ec_lang['lpn_diag_rules_refused']='EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:';
+$ec_lang['lpn_diag_control_refused']='EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:';
+$ec_lang['lpn_diag_rule_step_refused']='Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.';
+$ec_lang['lpn_diag_speed_pattern_refused']='These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:';
+$ec_lang['lpn_diag_tank_curve_refused']='The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:';
+$ec_lang['lpn_diag_tank_levels_refused']='The initial level of these tanks is not between the minimum level and the maximum level:';
+$ec_lang['lpn_diag_quality_refused']='EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:';
+$ec_lang['lpn_diag_energy_refused']='EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:';
+$ec_lang['lpn_diag_builtin_stopped']='The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.';
+$ec_lang['lpn_diag_builtin_stopped_at']='The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.';
+$ec_lang['lpn_diag_builtin_error']='An error occurred in the built-in solver: {message}';
 $ec_lang['lpn_gpv_one_point_note']='⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';
 $ec_lang['lpn_result_delivered_demand_tip']='The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.';

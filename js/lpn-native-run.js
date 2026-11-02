@@ -303,6 +303,44 @@
 		return parseRules(model, nodeType, linkOf, true).refused;
 	};
 	/**
+	 * **WHAT EPANET ITSELF WILL NOT RUN IN A PERIOD, NAMED, WHICHEVER ENGINE IS CHOSEN** (Task 733). Each
+	 * record is `{code, ids}` in lpnDiagnose's vocabulary, for a project that runs a period (Duration above 0):
+	 * input EPANET refuses to read (errors 205, 207, 211, 213, 217, 225, 230), an EPANET-MSX file it cannot read,
+	 * a rule step or a quality step that comes to 0 s (EPANET's walk then fails or never ends), and a pump speed
+	 * pattern with a negative multiplier or a pattern the model lacks. EngCalcs.lpnDiagnose asks it, so the
+	 * built-in setting and the EPANET setting say the same thing before either runs. The rules EPANET refuses are
+	 * lpnRulesRefused's. Every case here is held against EPANET itself by dev/lpn-spike/native-refusal-harness.js.
+	 */
+	var REFUSED_CODES = { 'native-run-control-unsupported': 'control-refused', 'native-run-speed-pattern': 'speed-pattern-refused',
+		'native-run-volume-curve': 'tank-curve-refused', 'native-run-tank-levels': 'tank-levels-refused',
+		'native-run-quality': 'quality-refused', 'native-run-energy': 'energy-refused' };
+	// What the loop refuses and lpnDiagnose does NOT name: the records left, as `{code, ids}`. Empty for every model
+	// the page can build; a rule the bridge could not read back, or the MSX parser not loaded, would show here.
+	EC.lpnNativeRunGaps = function (model, options) {
+		var named = {}, out = [];
+		(EC.lpnRulesRefused(model) || []).forEach(function (id) { named[id] = true; });
+		named['Rule Timestep'] = true;
+		EC.lpnNativeRunRefusals(model, options).forEach(function (r) {
+			if (r.code === 'native-run-rules') {
+				var rest = r.ids.filter(function (id) { return !named[id]; });
+				if (rest.length) { out.push({ code: r.code, ids: rest }); }
+			} else if (!(REFUSED_CODES[r.code] && r.ids.length)) { out.push(r); }
+		});
+		return out;
+	};
+	EC.lpnPeriodRefused = function (model) {
+		var times = model && model.time && model.time.times, out = [];
+		if (!model || !times || !(times.duration > 0)) { return out; }
+		EC.lpnNativeRunRefusals(model, { quality: true }).forEach(function (r) {
+			if (r.code === 'native-run-rules') {
+				if (r.ids.length === 1 && r.ids[0] === 'Rule Timestep') { out.push({ code: 'rule-step-refused', ids: ['Rule Timestep'] }); }
+			} else if (REFUSED_CODES[r.code] && r.ids.length) {
+				out.push({ code: REFUSED_CODES[r.code], ids: r.ids.slice() });
+			}
+		});
+		return out;
+	};
+	/**
 	 * The reasons the built-in solver cannot run this model's period, as `{code, ids}` records, or
 	 * an empty list when it can. Pure: nothing is solved.
 	 */
@@ -331,29 +369,31 @@
 		}
 		// A speed pattern is run only on the page's own model of a pump: the curve at speed 1 beside
 		// it (h0Base/aBase), which is also the only pump js/lpn-epanet.js writes a PATTERN for
-		// (pumpEps). A pump with no curve is a pipe to both engines and its pattern means nothing.
+		// (pumpEps). A pump without it, or with no curve, is run at the speed its curve states, with its
+		// pattern ignored, as both engines do. What is refused is what EPANET fails on: a pattern the
+		// model lacks (error 205) and a negative multiplier (a power of a negative speed is NaN for
+		// most curves).
 		ids = [];
 		(model.links || []).forEach(function (l) {
 			var p;
-			if (l.type !== 'pump' || !l.speedPattern || !(l.h0 > 0 || l.a > 0)) { return; }
+			if (l.type !== 'pump' || !l.speedPattern || !(l.h0 > 0 || l.a > 0) || l.h0Base === undefined) { return; }
 			p = ((model.time && model.time.patterns) || []).filter(function (x) { return String(x.id) === String(l.speedPattern); })[0];
-			if (l.h0Base === undefined || !p || (p.multipliers || []).some(function (v) { return !(v >= 0); })) { ids.push(l.id); }
+			if (!p || (p.multipliers || []).some(function (v) { return !(v >= 0); })) { ids.push(l.id); }
 		});
 		add('native-run-speed-pattern', ids);
 		ids = [];
 		(model.nodes || []).forEach(function (n) {
 			// SLICE 5 RUNS A VOLUME CURVE THE PAGE HANDED OVER (`volCurve` with `volCurveSI`, the
 			// level in metres and the volume in cubic metres, js/lpn-time.js lpnTankVolumeAttach). A
-			// tank that NAMES a curve the model carries no usable rows for is refused: the bridge
-			// would write it as a cylinder, which of the two was meant is not ours to say. So is a
-			// curve EPANET itself will not run (fewer than two rows, X not increasing, not reaching
-			// from MinLvl to MaxLvl: validate.c error 225).
-			if (n.type === 'tank' && (n.volCurveName || n.volCurve) && !curveRows(n)) { ids.push(n.id); }
+			// tank that names a curve with NO rows is written by the bridge as a cylinder, and the loop
+			// runs it as one, as EPANET does. A curve EPANET itself will not run (one row, X not
+			// increasing, not reaching from MinLvl to MaxLvl: validate.c error 225) is refused.
+			if (n.type === 'tank' && n.volCurve && n.volCurveSI && n.volCurveSI.length && !curveRows(n)) { ids.push(n.id); }
 		});
 		add('native-run-volume-curve', ids);
 		ids = [];
 		(model.nodes || []).forEach(function (n) {
-			if (tankHasArea(n) && !(n.minLevel <= n.level && n.level <= n.maxLevel && n.minLevel < n.maxLevel)) {
+			if (tankHasArea(n) && !(n.minLevel <= n.level && n.level <= n.maxLevel)) {
 				ids.push(n.id);
 			}
 		});
@@ -362,11 +402,13 @@
 		// keeps every quality run on EPANET until slice 7's wiring says otherwise, exactly as before.
 		// Asked for, what the pass cannot copy is refused by name; EPANET-MSX always is.
 		q = model.quality;
-		if (model.msx || (q && q.mode === 'msx')) {
+		if (q && q.mode === 'msx') {
 			// EPANET-MSX: run when the caller asks for quality and the file reads and its expressions are complete
-			// (js/lpn-native-msx.js); what it cannot copy is refused by name, as for a chemical.
+			// (js/lpn-native-msx.js); what it cannot read is refused by name. With no file attached EPANET runs no
+			// analysis (js/lpn-epanet.js msxOn), and neither does the loop. An attached file under another mode is unused.
 			var mc = (options && options.quality) ? msxConfig(model) : null;
-			if (!mc) { add('native-run-quality', [], true); }
+			if (!(model.msx && model.msx.text)) { /* no analysis */ }
+			else if (!mc) { add('native-run-quality', [], true); }
 			else if (mc.bad.length) { add('native-run-quality', mc.bad); }
 			else if (!((time.times && time.times.qualityStep > 0) || mc.spec.options.qstep > 0 || hydStepOf(time.times) >= 10)) { add('native-run-quality', ['Quality Timestep']); }
 		}
@@ -439,7 +481,7 @@
 		ls = links.map(linkState);
 		ctl = compileControls(model, links, nodeById, tankById, warnings);
 		var speedPat = [];   // [k, pattern id] of each pump on a speed pattern (slice 3)
-		links.forEach(function (l, k) { if (ls[k].kind === 'pump' && l.speedPattern) { speedPat.push([k, l.speedPattern]); } });
+		links.forEach(function (l, k) { if (ls[k].kind === 'pump' && l.speedPattern && l.h0Base !== undefined) { speedPat.push([k, l.speedPattern]); } });
 
 		// ---- PUMP ENERGY (slice 6): the pumps EPANET would list, in file order, with their sums ----
 		var ecfg = energyConfig(model), epumps = [], emax = 0, anyPumpLink = false;
@@ -1076,7 +1118,7 @@
 				else if (st.a > 0 && st.b > 0 && st.h0 > 0) { qmax = Math.pow(st.h0 / st.a, 1 / st.b); q0 = qmax / 2; }
 				else { q0 = FT * area / FLOW_G; }
 				// a pump on a speed pattern starts from speed 1: its stated SPEED is discarded by the pattern (measured on EPANET's first trial)
-				initFlows[l.id] = (l.speedPattern ? 1 : (st.k > 0 ? st.k : 1)) * q0;
+				initFlows[l.id] = (l.speedPattern && l.h0Base !== undefined ? 1 : (st.k > 0 ? st.k : 1)) * q0;
 				return;
 			}
 			initFlows[l.id] = FT * area / FLOW_G;
@@ -1202,6 +1244,14 @@
 			msxSpecies = mres.species; msxReport = mres.report || '';
 		}
 		// ---- WATER QUALITY (phase 4): EPANET's second pass, over the hydraulics just saved ----
+		if (qcfg.zero) {
+			// a trace named for a node out of the run: no analysis, and EPANET's quality is its initial 0 everywhere
+			frames.forEach(function (f) {
+				f.qualities = {}; f.linkQualities = {};
+				model.nodes.forEach(function (n) { f.qualities[n.id] = 0; });
+				model.links.forEach(function (l) { f.linkQualities[l.id] = 0; });
+			});
+		}
 		if (qcfg.mode) {
 			tanks.forEach(function (tk) { tk.vEnd = tk.V; });
 			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
@@ -1209,6 +1259,8 @@
 			qualMass = qres.massBalance;
 		}
 		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur, msxReport, qualMass), msxSpecies: msxSpecies,
+			// whether a quality analysis ran at all (a trace on a node out of the run is no analysis, in either engine)
+			qualityRan: !!(qcfg.mode || qcfg.zero || msxCfg),
 			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
 			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
 			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,
@@ -1787,9 +1839,6 @@
 			var code = EC.lpnMsxCheck(r.spec);
 			if (code) { bad.push('expressions (' + code + ')'); }
 		}
-		(model.nodes || []).forEach(function (n) {
-			if (n.type === 'tank' && !tankHasArea(n)) { bad.push(String(n.id)); }
-		});
 		return { spec: r.spec, bad: bad };
 	}
 	function qualityConfig(model) {
@@ -1798,17 +1847,15 @@
 		((model.time && model.time.patterns) || []).forEach(function (p) { pats[String(p.id)] = true; });
 		if (q.mode === 'age') { cfg.mode = 'age'; }
 		else if (q.mode === 'trace') {
-			// The bridge writes no Quality line for a trace on a node out of the run, and EPANET then
-			// runs no analysis while the page still reads a quality column: not ours to invent.
-			if (!q.traceNode || !inNode[String(q.traceNode)]) { bad.push(String(q.traceNode || 'TRACE')); return cfg; }
+			// The bridge writes no Quality line for a trace on a node out of the run (EPANET would refuse
+			// the file), so EPANET runs no analysis and reports a quality of 0 everywhere; the loop does the
+			// same (`zero`, `mode` stays null).
+			if (!q.traceNode || !inNode[String(q.traceNode)]) { cfg.zero = !!q.traceNode; return cfg; }
 			cfg.mode = 'trace'; cfg.traceNode = String(q.traceNode);
 		} else if (q.mode === 'chemical') { cfg.mode = 'chemical'; }
 		else { return cfg; }
 		(model.nodes || []).forEach(function (n) {
 			var s = n.source, m = n.mixing;
-			// A tank with no area is a reservoir to EPANET's quality code and something else to the
-			// built-in solver; nobody has asked for it.
-			if (n.type === 'tank' && !tankHasArea(n)) { bad.push(String(n.id)); }
 			if (cfg.mode === 'chemical' && s && typeof s.quality === 'number' && isFinite(s.quality)) {
 				if (keywordOf(s.type || 'CONCEN', SRC_TYPES) < 0) { bad.push(String(n.id)); }          // input3.c error 213
 				if (s.pattern && !pats[String(s.pattern)]) { bad.push(String(n.id)); }                  // error 205
@@ -1826,7 +1873,8 @@
 		['junction', 'reservoir', 'tank'].forEach(function (ty) {
 			model.nodes.forEach(function (n) {
 				var t = n.type === 'junction' || n.type === 'reservoir' || n.type === 'tank' ? n.type : 'junction';
-				if (t === ty) { ix[String(n.id)] = nodes.length; nodes.push(n); }
+				// A tank with no area is a reservoir to EPANET's quality code (Tank[].A = 0), in its place among the tanks.
+				if (t === ty) { ix[String(n.id)] = nodes.length; nodes.push(n.type === 'tank' && !tankHasArea(n) ? Object.assign({}, n, { type: 'reservoir' }) : n); }
 			});
 		});
 		['pipe', 'pump', 'valve'].forEach(function (ty) {
@@ -2536,6 +2584,8 @@
 				f.heads[n.id] = tk.h * FT;
 				return;
 			}
+			// A tank with no area is a reservoir to EPANET: its level is its head less its elevation, and it reports the water it takes out of the network.
+			if (n.type === 'tank') { f.levels[n.id] = ((res.heads[n.id] || 0) - (n.elev || 0)); }
 			f.demands[n.id] = n.type === 'junction' ? (res.demands && res.demands[n.id] !== undefined ? res.demands[n.id] : (n.demand || 0)) : 0;
 		});
 		// A pressure-driven run also reports what each junction asked for and did not get (EN_DEMANDDEFICIT).
@@ -2543,7 +2593,7 @@
 		// EPANET's demand at a reservoir is the water it takes from the network: negative while it supplies.
 		model.nodes.forEach(function (n) {
 			var s;
-			if (n.type !== 'reservoir') { return; }
+			if (n.type !== 'reservoir' && !(n.type === 'tank' && !byTank[n.id])) { return; }
 			s = 0;
 			model.links.forEach(function (l) {
 				var q = res.flows[l.id] || 0;

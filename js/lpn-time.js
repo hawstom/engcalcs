@@ -560,10 +560,6 @@
 			// and "it said this" are the same two facts whether one moment was asked for or a whole
 			// period. Only the third differs, because only a RUN has a moment and a tank level to
 			// name -- which is where whole-label reuse stops.
-			// A period the user asked the built-in solver to run, and that the built-in solver does not
-			// run, goes to EPANET; the status bar says so (Task 733, slice 7). Shared with no other file.
-			routeGeneric: pageConfig.lpn_engine_native_route || 'Solved with the EPANET solver, because the built-in solver does not run this simulation.',
-			routeIds: pageConfig.lpn_engine_native_route_ids || 'Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.',
 			// Which solver answered, said in the status bar after a built-in run (the routed run above says
 			// EPANET) and in the run summary after either (Tom, 2026-11-01: nothing said what was done differently).
 			nativeUsed: pageConfig.lpn_engine_native_used || 'Solved with the built-in solver.',
@@ -962,24 +958,26 @@
 		if (host.solveNow) { host.solveNow(); } else { host.solve(); }
 	}
 	/**
-	 * **WHICH SOLVER RUNS THIS PERIOD** (Task 733, slice 7). The built-in solver's own time loop
-	 * (js/lpn-native-run.js) runs it when the project's engine setting is the built-in solver and
-	 * nothing in the model is one the loop refuses (EngCalcs.lpnNativeRunRefusals, asked with
-	 * `quality: true`: the loop carries water age, a source trace and one chemical, but never
-	 * EPANET-MSX). Otherwise the EPANET engine runs it exactly as before, and the status bar says
-	 * why when the user had asked for the built-in solver.
+	 * **WHICH SOLVER RUNS THIS PERIOD** (Task 733). The engine setting decides, and nothing else does: the
+	 * built-in solver's own time loop (js/lpn-native-run.js) runs every period when the setting is the
+	 * built-in solver, and the EPANET engine runs it when the setting is EPANET. What EPANET itself will not
+	 * run is refused by name in both (EngCalcs.lpnDiagnose); there is no feature that is left to the other
+	 * engine. `refusals` is therefore empty for every model the page can build; a record in it would be a
+	 * defect, and the run says that the built-in solver could not run it instead of changing engines.
 	 *
-	 * `use` is true only when the loop will run it. `refusals` are the loop's `{code, ids}` records.
-	 * The setting is read through the host, so this file still knows nothing of `settings`.
+	 * `use` is true when the loop will run it. The setting is read through the host, so this file still
+	 * knows nothing of `settings`.
 	 */
 	// How long the built-in loop runs before it hands the thread back to the page (ms).
 	EC.LPN_TIME_NATIVE_SLICE_MS = 50;
 	EC.lpnTimeNativePlan = function (model) {
-		var out = { use: false, wanted: false, pda: false, refusals: [] };
+		var out = { use: false, wanted: false, refusals: [] };
 		if (!host || typeof host.engine !== 'function' || host.engine() === 'epanet') { return out; }
-		if (!EC.lpnNativeRun || !EC.lpnNativeRunRefusals || !model) { return out; }
+		if (!EC.lpnNativeRun || !EC.lpnNativeRunGaps || !model) { return out; }
 		out.wanted = true;
-		out.refusals = EC.lpnNativeRunRefusals(model, { quality: true });
+		// What the loop refuses and lpnDiagnose names (input EPANET itself refuses) is not a gap: the run reports it
+		// by name and does not start, in either engine. Anything else would be a feature the loop lacks.
+		out.refusals = EC.lpnNativeRunGaps(model, { quality: true });
 		out.use = out.refusals.length === 0;
 		return out;
 	};
@@ -991,40 +989,41 @@
 		if (model) { return EC.lpnTimeNativePlan(model).use; }
 		return !!(EC.lpnNativeRun && host && typeof host.engine === 'function' && host.engine() !== 'epanet');
 	}
-	// "pipe 330", "tank 1": the kind word is the one the Add tools already use (lowercased), looked up by the
-	// refusal's code where an id could be a node or a link, and left bare where it is no element's id (a
-	// rule's name, a setting such as Rule Timestep).
-	function routeNoteText(plan, model) {
-		var S = strings(), pc = EC.pageConfig || {}, items = [], seen = {}, nodeT = {}, linkT = {};
-		if (plan.pda) { return ''; }   // the page's own pressure-driven note speaks
-		((model && model.nodes) || []).forEach(function (n) { nodeT[String(n.id)] = n.type; });
-		((model && model.links) || []).forEach(function (l) { linkT[String(l.id)] = l.type; });
-		plan.refusals.forEach(function (r) {
-			var linkFirst = /control-unsupported|speed-pattern|energy/.test(r.code || '');
-			(r.ids || []).forEach(function (id) {
-				var sid = String(id), type = linkFirst ? (linkT[sid] || nodeT[sid]) : (nodeT[sid] || linkT[sid]), word, text;
-				if (seen[(r.code || '') + sid]) { return; }
-				seen[(r.code || '') + sid] = true;
-				word = type ? (pc['lpn_tool_add_' + type] || type) : '';
-				text = word ? word.toLowerCase() + ' ' + sid : sid;
-				if (items.indexOf(text) < 0) { items.push(text); }
-			});
-		});
-		if (!items.length) { return S.routeGeneric; }
-		return S.routeIds.replace('{ids}', items.slice(0, 10).join(', ') + (items.length > 10 ? ', \u2026' : ''));
+	/**
+	 * **THE BUILT-IN SOLVER FAILED: SAY SO, AND DO NOT CHANGE ENGINES** (Task 733). A step it could not solve
+	 * (a node cut off from every reservoir and tank when a control closes a pipe, say) or a loop that threw
+	 * comes back as a run with no frames and these issues, which the page prints in its status bar. The
+	 * numbers of the other engine are not substituted: EPANET's answer to a step like that is a head of
+	 * millions of metres, and a quiet swap would put numbers on screen that nobody chose. The EPANET
+	 * setting is one click away.
+	 */
+	function builtinStopped(issues, t, opts) {
+		if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(''); }
+		var list = [];
+		issues.forEach(function (i) { if (i && i.code) { list.push(i); } });
+		list.push({ code: 'builtin-stopped', ids: [], t: typeof t === 'number' ? t : null });   // last: the reasons read first
+		if (root.console && console.warn) { console.warn('The built-in solver stopped:', JSON.stringify(issues)); }
+		return { ok: false, engine: 'native', issues: list, frames: [], report: '' };
 	}
 	/**
 	 * The period, from whichever solver the plan names. Resolves to the shape lpnEpanetRun resolves to.
 	 * The loop is synchronous, so it runs in a task of its own after the "Running" status has had a
-	 * chance to paint. A loop that fails to solve some step (lpnDiagnose) hands the network to EPANET
-	 * as a refusal would, and so does a loop that throws.
+	 * chance to paint. A loop that fails to solve some step, or that throws, is reported as the built-in
+	 * solver's failure (builtinStopped()); the other engine is never run in its place.
 	 */
 	function periodRun(model, opts) {
-		var plan = EC.lpnTimeNativePlan(model), withEpanet = function (note) {
-			if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(note || ''); }
-			return EC.lpnEpanetRun ? EC.lpnEpanetRun(model, opts) : Promise.resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '' });
-		};
-		if (!plan.use) { return withEpanet(plan.wanted ? routeNoteText(plan, model) : ''); }
+		var plan = EC.lpnTimeNativePlan(model), issues;
+		if (!plan.use) {
+			if (!plan.wanted) {
+				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(''); }
+				return EC.lpnEpanetRun ? EC.lpnEpanetRun(model, opts) : Promise.resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '' });
+			}
+			return Promise.resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: plan.refusals.map(function (r) { return r.code + ' ' + r.ids.join(', '); }).join('; ') }], null, opts));
+		}
+		// Input EPANET itself refuses (and a network that cannot be solved at all) is named before either engine
+		// runs, with the same words in both (lpnDiagnose).
+		issues = EC.lpnDiagnose(model);
+		if (issues.length) { return Promise.resolve({ ok: false, engine: 'native', issues: issues, frames: [], report: '' }); }
 		return new Promise(function (resolve) {
 			var busy = 0, gen, // The project's Accuracy, but never looser than 1e-5: measured on 600 junctions, 1e-3 and 1e-5 cost the same
 				// from a warm start, and 1e-5 is the tolerance the loop was held to EPANET at.
@@ -1032,14 +1031,14 @@
 				onProgress = opts && typeof opts.onProgress === 'function' ? opts.onProgress : null,
 				withQuality = !!(model.quality && model.quality.mode && model.quality.mode !== 'none');
 			function finish(run) {
-				if (!run || !run.ok) { resolve(withEpanet(routeNoteText({ refusals: (run && run.issues) || [] }, model))); return; }
+				if (!run || !run.ok) { resolve(builtinStopped((run && run.issues) || [], run && run.t, opts)); return; }
 				// The status bar names the solver, in the slot the routed-run note uses, until the next run replaces it.
 				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(strings().nativeUsed); }
 				run.engineVersion = undefined;
 				run.issues = [];
 				run.report = run.report || '';   // the loop writes EPANET's report in EPANET's words (lpn-native-run.js)
 				run.busyMs = busy;
-				run.quality = withQuality ? model.quality : null;
+				run.quality = run.qualityRan ? model.quality : null;
 				run.warnings = nativeWarnings(model, run.warnings);
 				if (onProgress) { onProgress({ t: run.duration, duration: run.duration, fraction: 1, frames: run.frames.length }); }
 				resolve(run);
@@ -1053,7 +1052,7 @@
 				if (opts && typeof opts.superseded === 'function' && opts.superseded()) { resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '', superseded: true }); return; }
 				try {
 					do { r = gen.next(); if (!r.done) { p = r.value; } } while (!r.done && nowMs() - s0 < EC.LPN_TIME_NATIVE_SLICE_MS);
-				} catch (e) { finish(null); return; }
+				} catch (e) { resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: String(e && e.message || e) }], null, opts)); return; }
 				busy += nowMs() - s0;
 				if (r.done) { finish(r.value); return; }
 				if (onProgress && p) {
@@ -1062,7 +1061,7 @@
 				}
 				setTimeout(slice, 0);
 			}
-			try { gen = EC.lpnNativeRunSteps(model, { quality: true, tol: tol }); } catch (e) { finish(null); return; }
+			try { gen = EC.lpnNativeRunSteps(model, { quality: true, tol: tol }); } catch (e) { resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: String(e && e.message || e) }], null, opts)); return; }
 			setTimeout(slice, 0);
 		});
 	}
