@@ -494,7 +494,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				IdahoDemandNode_Demand_Data: { DemandCollectionCount: demandRows(n).length, UnitDemandLoadCollectionCount: 0 },
 				IdahoFireFlowNode_Physical_Data: { Physical_EmitterCoefficient: 0 }
 			});
-			if (n.emitter) { lost('emitter on ' + n.id + ' (storage unit of the emitter coefficient is not measured)'); }
+			if (n.emitter && !(opts.candidate && opts.candidate.emitter)) { lost('emitter on ' + n.id + ' (storage unit of the emitter coefficient is not measured)'); }
 			cloneRows(proto.junction, id, { IdahoDemandNode_Demand_DemandCollection: 1 }, ov);
 			// One row per demand, in the order the junction states them (EPANET's [DEMANDS] lines).
 			demandRows(n).forEach((d) => {
@@ -640,7 +640,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[defKey(l)] },
 			BasePump_InitialSettings_Data: { InitialSettings_RelativeSpeedFactor: l.speed > 0 ? l.speed : 1 }
 		});
-		if (l.speedPattern) { lost('speed pattern ' + l.speedPattern + ' on pump ' + l.id + ' (the table exists, no sample states it)'); }
+		if (l.speedPattern && !(opts.candidate && opts.candidate.vsp !== undefined)) { lost('speed pattern ' + l.speedPattern + ' on pump ' + l.id + ' (the table exists, no sample states it)'); }
 		if (l.power) { lost('constant power on pump ' + l.id); }
 		const closed = (initialStatus[l.id] || (String(l.status || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open')) === 'closed';
 		pipeRows(aId, l.id + '-A', elId['n:' + l.from], pumpId, [P(a), mid], 1, 99, 130, 0, closed, false);
@@ -764,6 +764,134 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	}
 	report.counts.controls = nCtl; report.counts.levelControls = nLevel;
 	carried('controls: ' + nLevel + ' tank-level controls and ' + (nCtl - nLevel) + ' clock-time pipe-status controls, in one control set assigned to the Base operational alternative');
+
+	// ---- CANDIDATE FEATURES (Task 749, 2026-11-02): written ONLY when the caller passes `opts.candidate`. ----
+	// Each states a guess at a column or a code that no saved project has ever shown (dev/wtg-export.md, "Candidates under test").
+	// The page never passes it, so the shipped export and its list of what is not written are unchanged until Tom's
+	// WaterGEMS has confirmed a candidate.
+	if (opts.candidate) { writeCandidates(opts.candidate); }
+	function writeCandidates(cand) {
+		const secs = parsed.inpSections || {};
+		const isNum = (v) => typeof v === 'number' && isFinite(v);
+		// -- emitters. [EMITTERS] gives k in flow per psi^n (US); the parser keeps it in SI, so it is turned back here.
+		if (cand.emitter) {
+			const expo = (parsed.hydraulics && parsed.hydraulics.emitterExponent) || 0.5;
+			const PSI_PER_FT = EngCalcs.EPANET_PSI_PER_FT, M_PER_PSI_HEAD = 0.3048 / PSI_PER_FT;       // metres of head in one psi
+			const kOf = (n) => n.emitter * Math.pow(M_PER_PSI_HEAD, expo) / 6.30901964e-5;
+			const perFt = Math.pow(PSI_PER_FT, expo);                               // gpm per psi^n -> gpm per ft^n
+			nodes.filter((n) => n.type === 'junction' && n.emitter).forEach((n) => {
+				const k = kOf(n);
+				const v = { A: k, B: k * GPM_TO_CFS, C: k * perFt * GPM_TO_CFS, D: k * perFt }[cand.emitter];
+				db.run('UPDATE IdahoFireFlowNode_Physical_Data SET Physical_EmitterCoefficient = ? WHERE DomainElementID = ?', [v, elId['n:' + n.id]]);
+				carried('emitter on ' + n.id + ': k = ' + k.toFixed(6) + ' stored as ' + v + ' (candidate ' + cand.emitter + ')');
+				report.candidateWritten = (report.candidateWritten || 0) + 1;
+			});
+		}
+		// -- a pump speed pattern
+		if (cand.vsp !== undefined) {
+			links.filter((l) => l.type === 'pump' && l.speedPattern).forEach((l) => {
+				if (patId[l.speedPattern] === undefined) { throw fail('data', 'Pump ' + l.id + ' names speed pattern ' + l.speedPattern + ', which the project does not define.', [l.id], 'data'); }
+				const id = pumpNodeId[l.id];
+				db.run('UPDATE StandardPump_Physical_Data SET Physical_IsVariableSpeedPump = 1, VSPType = ? WHERE DomainElementID = ?', [cand.vsp, id]);
+				const have = rowsOf(db, 'SELECT COUNT(*) AS c FROM StandardPump_Physical_VSPType_PatternBasedType WHERE DomainElementID = ?', [id])[0].c;
+				if (have) { db.run('UPDATE StandardPump_Physical_VSPType_PatternBasedType SET PatternBasedType_Pattern = ? WHERE DomainElementID = ?', [patId[l.speedPattern], id]); }
+				else {
+					const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM StandardPump_Physical_Data WHERE DomainElementID = ?', [id])[0].a;
+					insert(db, 'StandardPump_Physical_VSPType_PatternBasedType', { DomainElementID: id, AlternativeID: alt, PatternBasedType_Pattern: patId[l.speedPattern] });
+				}
+				carried('pump ' + l.id + ' speed pattern ' + l.speedPattern + ' (candidate VSPType ' + cand.vsp + ')');
+				report.candidateWritten = (report.candidateWritten || 0) + 1;
+			});
+		}
+		// -- tank mixing. cand.mixCode: code for every model but MIXED; cand.mixFraction: 'fraction' | 'percent'
+		if (cand.mixCode !== undefined) {
+			const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
+			Object.keys(mixMap).forEach((tid) => {
+				const m = mixMap[tid];
+				if (!nodeById[tid] || nodeById[tid].type !== 'tank' || m.model === 'MIXED') { return; }
+				const id = elId['n:' + tid];
+				const code = cand.mixCode;
+				db.run('UPDATE ConventionalTank_Constituent_Data SET TankMixingModel = ? WHERE DomainElementID = ?', [code, id]);
+				if (m.model === '2COMP') {
+					const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [id])[0].a;
+					const f = isNum(m.fraction) ? m.fraction : 0.5;
+					const scale = cand.mixFraction === 'percent' ? 100 : 1;
+					db.run('DELETE FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType WHERE DomainElementID = ?', [id]);
+					insert(db, 'ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType', { DomainElementID: id, AlternativeID: alt, TwoCompartmentType_Compartment1: f * scale, TwoCompartmentType_Compartment2: (1 - f) * scale });
+				}
+				carried('tank ' + tid + ' mixing ' + m.model + (m.fraction !== undefined ? ' ' + m.fraction : '') + ' (candidate TankMixingModel ' + code + ')');
+				report.candidateWritten = (report.candidateWritten || 0) + 1;
+			});
+		}
+		// -- water quality
+		if (cand.wq) {
+			const w = cand.wq;
+			const qo = parsed.qualityOptions || {};
+			const q = EngCalcs.lpnQualityParse(qo.quality || '');
+			const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
+			const calcTypes = Object.assign({ chemical: 1, age: 0, trace: 7 }, w.calcTypes || {});
+			const calcType = w.calcType !== undefined ? w.calcType : calcTypes[q.mode];
+			if (q.mode !== 'none' && calcType !== undefined) {
+				db.run('UPDATE EpaNetEngine SET CalculationType = ?', [calcType]);
+				const tol = parseFloat(qo.tolerance), tv = isFinite(tol) ? tol : 0.01;
+				if (q.mode === 'chemical') { insert(db, 'EpaNetEngine_CalculationType_ConstituentAnalysisType', { CalculationOptionsID: calcId, ConstituentAnalysisType_ConstituentTolerance: tv }); }
+				if (q.mode === 'age') { insert(db, 'EpaNetEngine_CalculationType_AgeAnalysisType', { CalculationOptionsID: calcId, AgeAnalysisType_AgeTolerance: tv }); }
+				if (q.mode === 'trace') { insert(db, 'EpaNetEngine_CalculationType_TraceAnalysisType', { CalculationOptionsID: calcId, TraceAnalysisType_TraceTolerance: tv }); }
+				carried('calculation type ' + calcType + ' for a ' + q.mode + ' run (candidate)');
+			}
+			if (q.mode === 'trace' && q.traceNode && elId['n:' + q.traceNode] !== undefined) {
+				db.run('UPDATE Trace_SystemData SET Trace_TraceElement = ?', [elId['n:' + q.traceNode]]);
+			}
+			if (q.mode === 'chemical') {
+				const chem = String(qo.quality || '').replace(/^chemical\s+/i, '').split(/\s+/)[0] || 'Chemical';
+				const R = EngCalcs.lpnReactionsParse(secs.REACTIONS || []);
+				const perDay = w.bulkUnit === 'sec' ? 1 / 86400 : 1;            // EPANET states 1/day (and ft/day for a wall)
+				const sgn = (v) => (w.sign === 'positive' ? Math.abs(v) : v) * perDay;
+				const cid = newId();
+				supportElement(cid, 52, chem, 'EPANET chemical ' + chem);
+				const wallOrder = R.orderWall !== undefined ? R.orderWall : 1;
+				const lim = R.limitingPotential;
+				const dif = parseFloat(qo.diffusivity);
+				insert(db, 'IdahoConstituent', {
+					SupportElementID: cid, IdahoConstituent_Diffusivity: 1.3e-8 * (isFinite(dif) ? dif : 1),
+					IdahoConstituent_HasUnlimitedConcentration: lim ? 0 : 1, IdahoConstituent_ConcentrationLimit: lim || 0,
+					IdahoConstituent_BulkReactionOrder: R.orderBulk !== undefined ? R.orderBulk : 1,
+					IdahoConstituent_BulkReactionRate: sgn(R.globalBulk || 0),
+					IdahoConstituent_IsRoughnessCorrelated: R.roughnessCorrelation ? 1 : 0, IdahoConstituent_RoughnessCorrelationFactor: R.roughnessCorrelation || 0,
+					WallReactionOrder: wallOrder
+				});
+				insert(db, wallOrder === 0 ? 'IdahoConstituent_WallReactionOrder_ZeroOrderType' : 'IdahoConstituent_WallReactionOrder_FirstOrderType',
+					wallOrder === 0 ? { SupportElementID: cid, ZeroOrderType_ZeroOrderWallReactionRate: sgn(R.globalWall || 0) } : { SupportElementID: cid, FirstOrderType_FirstOrderWallReactionRate: sgn(R.globalWall || 0) });
+				db.run('UPDATE Constituent_SystemData SET Constituent_ConstituentID = ?', [cid]);
+				const init = EngCalcs.lpnInitQualityParse(secs.QUALITY || []);
+				Object.keys(init).forEach((nid) => {
+					if (!nodeById[nid]) { return; }
+					db.run('UPDATE BaseIdahoNode_Constituent_Data SET Constituent_InitialConcentration = ? WHERE DomainElementID = ?', [init[nid], elId['n:' + nid]]);
+				});
+				const srcs = EngCalcs.lpnSourcesParse(secs.SOURCES || []);
+				const codeOf = (t) => (w.sourceCode !== undefined ? w.sourceCode : { CONCEN: 0, MASS: 1, SETPOINT: 2, FLOWPACED: 3 }[t]);
+				Object.keys(srcs).forEach((nid) => {
+					const n = nodeById[nid], s = srcs[nid];
+					if (!n) { return; }
+					const id = elId['n:' + nid];
+					const sp = s.pattern && patId[s.pattern] !== undefined ? patId[s.pattern] : null;
+					db.run('UPDATE BaseIdahoNode_Constituent_Data SET Constituent_IsConstituentSource = 1, ConstituentSourceType = ?, Constituent_ConstituentSourcePattern = ?, BaselineConcentration = ? WHERE DomainElementID = ?',
+						[codeOf(s.type), sp, s.type === 'MASS' ? 0 : s.quality, id]);
+					if (s.type === 'MASS') {
+						const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM BaseIdahoNode_Constituent_Data WHERE DomainElementID = ?', [id])[0].a;
+						db.run('DELETE FROM BaseIdahoNode_Constituent_ConstituentSourceType_MassBoosterType WHERE DomainElementID = ?', [id]);
+						insert(db, 'BaseIdahoNode_Constituent_ConstituentSourceType_MassBoosterType', { DomainElementID: id, AlternativeID: alt, MassBoosterType_BaselineMassRate: s.quality });
+					}
+					carried('source on ' + nid + ': ' + s.type + ' ' + s.quality + ' (candidate source code ' + codeOf(s.type) + ')');
+				});
+				Object.keys(R.bulk).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalBulkReactionRate = 1, Constituent_LocalBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.bulk[pid]), pipeElId[pid]]); } });
+				Object.keys(R.wall).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalWallRate = 1, Constituent_WallReactionRate = ? WHERE DomainElementID = ?', [sgn(R.wall[pid]), pipeElId[pid]]); } });
+				Object.keys(R.tank).forEach((tid) => { if (elId['n:' + tid] !== undefined) { db.run('UPDATE ConventionalTank_Constituent_Data SET Constituent_TankSpecifyLocalBulkRate = 1, Constituent_TankBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.tank[tid]), elId['n:' + tid]]); } });
+				carried('chemical ' + chem + ': bulk ' + sgn(R.globalBulk || 0) + ', wall ' + sgn(R.globalWall || 0) + ' (candidate units: ' + (w.bulkUnit || 'day') + ', sign ' + (w.sign || 'as stated') + ')');
+			}
+			report.candidateWritten = (report.candidateWritten || 0) + 1;
+		}
+	}
 
 	// ---- analysis options: the template's own EPS options already read 24 h, 1 h step; set them explicitly ----
 	const T = parsed.times;

@@ -207,6 +207,38 @@ Test files for Tom: `wtg_multiplier_example.inp`, `wtg_notes_example.inp` (copie
 `dev/lpn-spike/reference/wtg-export-multiplier.inp` and `wtg-export-notes.inp`). Harness sections: 11 and 12 of
 `wtg-export-harness.js`, 9 of `wtg-page-export-harness.js`.
 
+## Candidates under test, 2026-11-02
+
+Tom's answers to the four sample asks: *"Emitter has a junction with an emitter coefficient of 0.01"*; for the pump
+speed and the tank mixing, *"Why don't you just guess and I can test in WTG against your expectations?"*; for water
+quality, *"You already export NET-3 successfully, and it is a water quality run. Please clarify."* So we write the
+guesses and he opens them. The writer takes `opts.candidate` (`js/lpn-wtg-export.js`, `writeCandidates()`); the
+page never passes it, so the visitor export and its "does not yet write" list are unchanged until a guess is
+confirmed. `node dev/lpn-spike/wtg-feature-tests.js` builds the 31 files, the `.inp` of each network, the EPANET
+numbers and Tom's README into `~/tom-files/2026-11-02/wtg-feature-tests/`; `wtg-feature-tests-harness.js` checks them.
+The licence line holds: the codes come from table and column names in the saved project and the public help, and
+Tom's WaterGEMS is used only as a user would use it.
+
+**What Net3 does (his question 4).** Net3 exports and opens, but as a hydraulic run. The copy of Net3 we use has
+`Quality Trace Lake`, no source, no initial quality, and zero reaction rates. The export leaves that analysis choice out
+(the plan lists it as `quality`, because the option is not `None`). In his saved project every constituent table is
+empty or at its defaults, so nothing shows where the analysis type, the trace node, a source, a reaction or a mixing
+model is kept. That is why "Water quality" is on the list. The `trace` candidate is Net3's own case in a small network.
+
+| Feature | Where it goes | What each candidate guesses |
+|---|---|---|
+| Emitter coefficient | `IdahoFireFlowNode_Physical_Data.Physical_EmitterCoefficient`; unit code 28 unmeasured | A: the EPANET number as typed (gpm per psi^0.5). B: cubic feet per second per psi^0.5 (x 0.00222800929672 per gpm). C: cubic feet per second per foot^0.5 (B x 0.4333^0.5). D: gpm per foot^0.5 |
+| Pump speed pattern | `StandardPump_Physical_Data.Physical_IsVariableSpeedPump` = 1, `VSPType`, and `StandardPump_Physical_VSPType_PatternBasedType.PatternBasedType_Pattern` = the pattern's id | `VSPType` is 0, 1, 2 or 3. Column order (fixed head, fixed flow, pattern) suggests 2; the pump-type names Tom reads from each file decide. The pattern is the ordinary stepwise pattern the demands use; a pattern category for speed patterns may exist and is not set |
+| Tank mixing | `ConventionalTank_Constituent_Data.TankMixingModel` (1 = mixed is the only value seen); two compartment adds a row in `..._TwoCompartmentType` | Help page order is Complete, Two-Compartment, FIFO, LIFO, so 2, 3, 4 if codes start at 1 for mixed. Also code 0 for two compartment. The compartment pair is 0.2 and 0.8 as fractions, or 20 and 80 as percents |
+| Calculation type | `EpaNetEngine.CalculationType` (5 in every file seen); a row in `EpaNetEngine_CalculationType_ConstituentAnalysisType`, `..._AgeAnalysisType` or `..._TraceAnalysisType` with the tolerance (EPANET's 0.01) | Nothing known: nine files, 0 to 9 without 5, read by name. The default guess for the quality files is constituent 1, age 0, trace 7 |
+| Chlorine | A support element of type 52 (`IdahoConstituent`; the type id follows the order of the element-type list, anchored by 54, 55, 56 and 63), its id in `Constituent_SystemData.Constituent_ConstituentID`; the global bulk and wall rates in `IdahoConstituent` and its wall-order table; initial concentrations and sources in `BaseIdahoNode_Constituent_Data`; local rates in `IdahoPipe_Constituent_Data` and the tank's | The rate unit is per day or per second (EPANET states 1/day and ft/day); the sign is as EPANET states it or positive. The source type is 0 concentration, 1 mass booster, 2 set point, 3 flow paced (the order of the four EPANET types), and a mass booster's rate goes in `MassBoosterType_BaselineMassRate`. The wall order column is 1 for first order |
+| Age, trace | `Trace_SystemData.Trace_TraceElement` is the traced node's element id | Calculation type as above; the traced element is the node |
+
+Open: the water quality time step (`EpaWaterQualityTimeStep`, left at the template's value, so WaterGEMS may use
+other than EPANET's 5 minutes); the pump definition type reading "Pump Type" in Tom's five choices may be the
+definition's type (`PumpDefinitionType`) and not `VSPType`, which his answer to the file will show; Tom's emitter
+exponent is the options' 0.5 and was not changed.
+
 ## What the tests show
 
 `node dev/lpn-spike/wtg-export-harness.js` (needs Tom's fixture and the reader from `feat/sqlite-reader`;
