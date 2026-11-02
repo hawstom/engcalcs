@@ -370,7 +370,8 @@ async function run() {
 		ok('a quality step that comes to 0 (hydraulic step under 10 s, none stated) is refused by name',
 			EngCalcs.lpnNativeRunRefusals(fast, { quality: true }).some((r) => r.code === 'native-run-quality' && r.ids[0] === 'Quality Timestep'));
 		const tr = onePipe({ mode: 'trace', traceNode: 'NOPE' });
-		ok('a trace on a node out of the run is refused by name', EngCalcs.lpnNativeRunRefusals(tr, { quality: true }).some((r) => r.ids[0] === 'NOPE'));
+		ok('a trace on a node out of the run is no analysis, as in EPANET: it runs, with a quality of 0 everywhere (dev/lpn-spike/native-refusal-harness.js holds it to EPANET)',
+			EngCalcs.lpnNativeRunRefusals(tr, { quality: true }).length === 0 && EngCalcs.lpnNativeRun(tr, { quality: true }).frames.every((f) => Object.keys(f.qualities).every((id) => f.qualities[id] === 0)));
 		const mx = lineWithTank({ quality: AGE, mixing: { model: 'STIRRED' } });
 		ok('a mixing model EPANET does not know is refused by name (error 213)', EngCalcs.lpnNativeRunRefusals(mx, { quality: true }).some((r) => r.ids[0] === 'T'));
 	}

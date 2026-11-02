@@ -566,7 +566,10 @@
 					// is needed. The REAL points are the curve as measured, unscaled -- so a pump
 					// with more than three points and a speed of 0.9 would run at full speed unless
 					// the column is written. Same rule either way: SPEED, or PATTERN, never both.
-					var speedNamed = pumpEps || samples.real;
+					// Under `eps` only the page's own unscaled model (h0Base) is given a SPEED or a PATTERN: a pump
+					// without it states its speed already in its curve, so a pattern beside it means nothing and
+					// the built-in loop ignores it the same way.
+					var speedNamed = pumpEps || (samples.real && !eps);
 					pumpsWritten[link.id] = 1;
 					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname +
 						(speedNamed && link.speedPattern ? '  PATTERN ' + link.speedPattern :

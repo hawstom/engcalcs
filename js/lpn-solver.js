@@ -644,6 +644,12 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	var badRules = EngCalcs.lpnRulesRefused ? EngCalcs.lpnRulesRefused(model) : [];
 	if (badRules.length > 0) { issues.push({ code: 'rules-refused', ids: badRules }); }
 
+	// THE REST OF WHAT EPANET REFUSES IN A PERIOD (input it will not read, an MSX file it cannot parse, a rule or
+	// quality step of 0 s), by name and in both engines (js/lpn-native-run.js lpnPeriodRefused).
+	if (EngCalcs.lpnPeriodRefused) {
+		EngCalcs.lpnPeriodRefused(model).forEach(function (r) { issues.push(r); });
+	}
+
 	if (EngCalcs.lpnDemandModelIsPda(model)) {
 		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
 		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {

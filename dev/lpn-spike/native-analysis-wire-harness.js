@@ -153,13 +153,17 @@ async function run() {
 				`${r.e.frames.length} steps, ${diffs.length} differ` + (diffs.length ? ' first at ' + diffs[0].t : ''));
 		}
 	}
-	// A refusal falls back to EPANET, quietly: the analysis is not the transport's status bar.
+	// An input EPANET refuses is named, in either setting, and the analysis is not run by the other engine; the status bar is left alone.
 	{
 		const m = load('Net1.inp');
-		m.nodes.find((n) => n.type === 'tank').volCurveName = 'NOSUCH';
+		Object.assign(m.nodes.find((n) => n.type === 'tank'), { volCurve: 'C1', volCurveSI: [[0, 0]] });   // one row: EPANET error 230
 		engine = 'native'; routeNotes = [];
 		const r = await EngCalcs.lpnTimeRunModel(copy(m), {});
-		ok('a model the loop refuses is run by EPANET, and the status bar is left alone', r.engine === 'epanet' && routeNotes.length === 0, r.engine);
+		engine = 'epanet';
+		const e = await EngCalcs.lpnTimeRunModel(copy(m), {});
+		engine = 'native';
+		ok('a model EPANET refuses is named by the built-in setting as by the EPANET setting, and the status bar is left alone',
+			r.ok === false && e.ok === false && JSON.stringify(r.issues) === JSON.stringify(e.issues) && r.issues[0].code === 'tank-curve-refused' && routeNotes.length === 0, JSON.stringify(r.issues));
 	}
 	// The page's own source calls the bridge nowhere: every run goes through the one choice.
 	{

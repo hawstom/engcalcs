@@ -877,11 +877,19 @@ async function run() {
 		const r = EngCalcs.lpnNativeRun(m);
 		ok('refuses a rule record it cannot read (no name or clauses)', r.refused === true && r.issues.some((i) => i.code === 'native-run-rules'), JSON.stringify(r.issues || ''));
 	}
-	refusal('a speed pattern on a pump without its unscaled curve (not the page\'s model)', (m) => { m.links.push({ id: 'PU', type: 'pump', from: 'R', to: 'J', speedPattern: 'D', h0: 50, a: 1, b: 2 }); }, 'native-run-speed-pattern');
+	{
+		// A pump without the page's unscaled curve states its speed in its curve: both engines ignore its pattern
+		const m = base(); m.links.push({ id: 'PU', type: 'pump', from: 'R', to: 'J', speedPattern: 'D', h0: 50, a: 1, b: 2 });
+		ok('a speed pattern on a pump without its unscaled curve is no longer refused (both engines ignore it; native-refusal-harness.js holds it to EPANET)',
+			!EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-speed-pattern'));
+	}
 	refusal('a speed pattern the model lacks', (m) => { m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NOPE')); }, 'native-run-speed-pattern');
 	refusal('a speed pattern with a negative multiplier', (m) => { m.time.patterns.push(pat('NEG', [1, -0.5]));
 		m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NEG')); }, 'native-run-speed-pattern');
-	refusal('a tank naming a volume curve the model carries no rows for', (m) => { m.nodes.find((n) => n.id === 'T').volCurveName = 'V1'; }, 'native-run-volume-curve');
+	{
+		const m = base(); m.nodes.find((n) => n.id === 'T').volCurveName = 'V1';
+		ok('a tank naming a volume curve the model carries no rows for is a cylinder, as in EPANET, and is no longer refused', !EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-volume-curve'));
+	}
 	refusal('a volume curve that stops short of the tank\'s maximum (EPANET error 225)', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: NARROW.slice(0, 7) }); }, 'native-run-volume-curve');
 	refusal('a volume curve that starts above the tank\'s minimum (EPANET error 225)', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: NARROW.slice(2) }); }, 'native-run-volume-curve');
 	refusal('a volume curve whose levels do not increase', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: [[0, 0], [5, 50], [5, 60], [14, 900]] }); }, 'native-run-volume-curve');
@@ -901,7 +909,7 @@ async function run() {
 		// Slice 7 wired this file to the page: Looped-Network.php loads it, and js/lpn-time.js asks for it only
 		// through the plan that refuses what it cannot run (dev/lpn-spike/native-wire-harness.js holds the path).
 		const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8'), tsrc = fs.readFileSync(path.join(ROOT, 'js', 'lpn-time.js'), 'utf8');
-		ok('the page loads lpnNativeRun, and only lpn-time.js calls it, after the plan', /js\/lpn-native-run\.js/.test(php) && /lpnNativeRunRefusals\(model, \{ quality: true \}\)/.test(tsrc) &&
+		ok('the page loads lpnNativeRun, and only lpn-time.js calls it, after the plan', /js\/lpn-native-run\.js/.test(php) && /lpnNativeRunGaps\(model, \{ quality: true \}\)/.test(tsrc) &&
 			!/lpnNativeRun/.test(fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8')));
 	}
 	console.log(`\n${pass} passed, ${fail} failed` + (gaps ? `, ${gaps} run reports not held (valve and Darcy-Weisbach trial counts)` : ''));

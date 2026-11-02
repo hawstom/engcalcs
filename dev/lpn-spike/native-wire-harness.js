@@ -31,6 +31,7 @@ Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
 require(path.join(ROOT, 'js', 'lpn-inp.js'));
 require(path.join(ROOT, 'js', 'lpn-epanet.js'));
 require(path.join(ROOT, 'js', 'lpn-time.js'));
+require(path.join(ROOT, 'js', 'lpn-native-msx.js'));
 require(path.join(ROOT, 'js', 'lpn-native-run.js'));
 const { buildModel } = require('./net3-model.js');
 
@@ -283,22 +284,23 @@ async function run() {
 			`p ${gap('pressures').toExponential(2)} v ${gap('velocities').toExponential(2)} hl ${gap('headlosses').toExponential(2)}`);
 	}
 
-	console.log('-- a case the loop refuses routes to EPANET and says so');
+	console.log('-- an input EPANET refuses is named in both settings, and nothing is routed');
 	{
 		const m = withAccuracy(loadEpa('Net1.inp').model);
-		m.nodes.find((n) => n.type === 'tank').volCurveName = 'NOSUCH';   // a curve the model has no rows for: native-run-volume-curve
 		const tank = m.nodes.find((n) => n.type === 'tank').id;
-		ok('the loop refuses it by name', EngCalcs.lpnNativeRunRefusals(m, { quality: true }).some((r) => r.code === 'native-run-volume-curve' && r.ids[0] === tank));
-		const plan = EngCalcs.lpnTimeNativePlan(m);
-		ok('the plan is "wanted, not used"', plan.wanted === true && plan.use === false, JSON.stringify(plan.refusals));
+		Object.assign(m.nodes.find((n) => n.type === 'tank'), { volCurve: 'C1', volCurveSI: [[0, 0]] });   // one row: EPANET error 230
+		ok('lpnDiagnose names the tank', EngCalcs.lpnDiagnose(m).some((i) => i.code === 'tank-curve-refused' && i.ids[0] === tank));
 		engine = 'native';
-		const routed = await pagePath(m, 'native');
-		ok('the run is EPANET\'s', routed.run.engine === 'epanet' && routed.frames.every((f) => f.engine === 'epanet') && routed.run.frames.length === 25);
-		ok('and the status sentence names the kind and the id (tank ' + tank + ')',
-			routed.routeNotes.some((t) => /EPANET solver/.test(t) && t.indexOf('tank ' + tank) >= 0), JSON.stringify(routed.routeNotes));
-		const chosen = await pagePath(m, 'epanet');
-		ok('with the EPANET engine chosen the same network is run by EPANET and nothing is said', chosen.run.engine === 'epanet' && chosen.routeNotes.every((t) => t === ''));
-		ok('the plan is not "wanted" when EPANET is chosen', EngCalcs.lpnTimeNativePlan(m).wanted === false);
+		const plan = EngCalcs.lpnTimeNativePlan(m);
+		ok('the plan is "wanted" and "used": the built-in loop has no gap here, it names the input', plan.wanted === true && plan.use === true && plan.refusals.length === 0, JSON.stringify(plan.refusals));
+		const viaNative = await EngCalcs.lpnTimeRunModel(JSON.parse(JSON.stringify(m)), {});
+		engine = 'epanet';
+		const viaEpanet = await EngCalcs.lpnTimeRunModel(JSON.parse(JSON.stringify(m)), {});
+		engine = 'native';
+		ok('the built-in setting returns the refusal, with no frames', viaNative.ok === false && viaNative.engine === 'native' && viaNative.frames.length === 0 && viaNative.issues.some((i) => i.code === 'tank-curve-refused' && i.ids[0] === tank), JSON.stringify(viaNative.issues));
+		ok('the EPANET setting returns the same refusal', viaEpanet.ok === false && JSON.stringify(viaEpanet.issues) === JSON.stringify(viaNative.issues), JSON.stringify(viaEpanet.issues));
+		ok('the plan is not "wanted" when EPANET is chosen', (engine = 'epanet', EngCalcs.lpnTimeNativePlan(m).wanted === false));
+		engine = 'native';
 	}
 	{
 		// A pressure-driven demand model is the built-in loop's too (Task 733): planned, run, and not routed to EPANET.
@@ -307,15 +309,20 @@ async function run() {
 		m.nodes.forEach((n) => { if (n.type === 'junction') { n.demand *= 2.5; if (n.demandBase !== undefined) { n.demandBase *= 2.5; } } });
 		engine = 'native';
 		const plan = EngCalcs.lpnTimeNativePlan(m), via = await pagePath(m, 'native');
-		ok('a pressure-driven model is planned for the built-in loop', plan.use === true && plan.pda === false, JSON.stringify(plan.refusals));
+		ok('a pressure-driven model is planned for the built-in loop', plan.use === true, JSON.stringify(plan.refusals));
 		ok('...and run by it, with a delivered demand and a deficit in the frames', via.run.engine === 'native' && via.frames.every((f) => f.demandDeficits) &&
 			via.frames.some((f) => Object.keys(f.demandDeficits).some((id) => f.demandDeficits[id] > 1e-6)), via.run.engine);
 	}
 	{
 		const m = withAccuracy(loadEpa('Net1.inp').model);
-		m.msx = { text: '[TITLE]' };
-		const plan = (engine = 'native', EngCalcs.lpnTimeNativePlan(m));
-		ok('EPANET-MSX is refused with no ids, so the generic sentence is used', plan.use === false && plan.wanted === true && plan.refusals.some((r) => r.ids.length === 0));
+		m.quality = { mode: 'msx' }; m.msx = { text: '[SPECIES]\nBOGUS X Y' };
+		engine = 'native';
+		const plan = EngCalcs.lpnTimeNativePlan(m), viaNative = await EngCalcs.lpnTimeRunModel(JSON.parse(JSON.stringify(m)), {});
+		engine = 'epanet';
+		const viaEpanet = await EngCalcs.lpnTimeRunModel(JSON.parse(JSON.stringify(m)), {});
+		engine = 'native';
+		ok('an EPANET-MSX file that cannot be read is named in both settings, and the built-in loop has no gap', plan.use === true && viaNative.ok === false &&
+			viaNative.issues.some((i) => i.code === 'quality-refused') && JSON.stringify(viaEpanet.issues) === JSON.stringify(viaNative.issues), JSON.stringify(viaNative.issues));
 	}
 
 	console.log(`\n${pass} passed, ${fail} failed`);
