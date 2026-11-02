@@ -1495,7 +1495,7 @@ EngCalcs.lpnSolve = function (model, options) {
 				// A PBV or a GPV: no friction (it has no length) and its own law, from above.
 				if (String(link.valveType).toUpperCase() === 'PBV') { pbvCoeff(k); } else { gpvCoeff(k); }
 			} else {
-				if (!resFixed) {
+				if (!resFixed && !opts.epAcc) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
 					res = EngCalcs.lpnResistance(link, method, visc);
 					linkR[k] = res.r;
@@ -1513,8 +1513,41 @@ EngCalcs.lpnSolve = function (model, options) {
 					// twice. One Math.pow, two uses, same value.
 					pw = Math.pow(aq, nk - 1);
 
+				if (!resFixed && opts.epAcc) {
+					// hydcoeffs.c dwpipecoeff() and frictionFactor(): Hagen-Poiseuille up to Re 2000 (a straight line in Q), then
+					// Swamee-Jain or Dunlop's polynomial, and the derivative carries the friction factor's own dependence on Q.
+					// Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
+					var dd = link.diameter, dl = link.length, dArea = Math.PI * dd * dd / 4, dr = dl > 0 ? dl / (dd * 2 * EngCalcs.lpnG * dArea * dArea) : 0,
+						ds = visc * dd, dw = aq / ds, dEr = link.roughness / dd, dy1, dy2, dy3, df, dDfdq = 0, dfa, dfb, dxr, dx1, dx2, dx3, dx4, dr1;
+					if (dw <= 1570.79633) {
+						var rLam = 16 * Math.PI * ds * dr;
+						h = q * (rLam + m * aq);
+						p = rLam + 2 * m * aq;
+					} else {
+						if (dw >= 3141.59265) {
+							dy1 = 4.61841319859 / Math.pow(dw, 0.9);
+							dy2 = dEr / 3.7 + dy1;
+							dy3 = -0.8685889638 * Math.log(dy2);
+							df = 1 / (dy3 * dy3);
+							dDfdq = 1.8 * df * dy1 * -0.8685889638 / dy2 / dy3 / aq;
+						} else {
+							dy2 = dEr / 3.7 + 3.28895476345e-3;
+							dy3 = -0.8685889638 * Math.log(dy2);
+							dfa = 1 / (dy3 * dy3);
+							dfb = (2 + -5.14214965799e-3 / (dy2 * dy3)) * dfa;
+							dxr = dw / 1570.79633;
+							dx1 = 7 * dfa - dfb; dx2 = 0.128 - 17 * dfa + 2.5 * dfb; dx3 = -0.128 + 13 * dfa - 2 * dfb; dx4 = 0.032 - 3 * dfa + 0.5 * dfb;
+							df = dx1 + dxr * (dx2 + dxr * (dx3 + dxr * dx4));
+							dDfdq = (dx2 + dxr * (2 * dx3 + dxr * 3 * dx4)) / ds / 1570.79633;
+						}
+						dr1 = df * dr + m;
+						h = dr1 * aq * q;
+						p = 2 * dr1 * aq + dDfdq * dr * aq * aq;
+					}
+				} else {
 				h = rk * pw * q + m * aq * q;
 				p = nk * rk * pw + 2 * m * aq;
+				}
 				if (!(p > gradMin)) {
 					// Below the gradient floor the relation is replaced by a straight
 					// line of that slope through the origin, so h and p stay
