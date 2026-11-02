@@ -540,7 +540,7 @@ on Net3 (below), a 2-compartment tank with a mixing zone of 0.05 (2.6e-3 off), a
 its upstream tank's concentration as the tank leaves the step (after this step's mix, run on a copy of the tank's segments), not
 as it entered it; and the mixing zone starts first and holds up to its own volume, where epanet-msx's main branch starts the
 first segment with the volume above it. Now: LIFO 7.7e-5, 2COMP 1.3e-4 (zone 0.3 of the tank) and 6.7e-5 (the whole tank) on
-Net1; MIXED and FIFO moved from 2.6e-4 to under 7.5e-5 as well. Net3 with either model holds the same 1.15e-3 at node 15.
+Net1; MIXED and FIFO moved from 2.6e-4 to under 7.5e-5 as well. Net3 with either model: 2.5e-4 (the dead end below is fixed).
 
 Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
 the arsenic example, 1 525 on Net1):
@@ -551,8 +551,8 @@ the arsenic example, 1 525 on Net1):
 | Net1 with a decaying chlorine, RK5 | 3.2e-4 mg/L |
 | Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
 | Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
-| Net3 (pumps closing, three tanks, two reservoirs), three species | **1.2e-3**; every value but one dead-end node is within 4e-4 |
-| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 1.3e-4, 6.7e-5, **2.6e-3**; 1.15e-3 (the dead end) |
+| Net3 (pumps closing, three tanks, two reservoirs), three species | **2.5e-4** (1.2e-3 before the stagnant-flow rule below) |
+| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 1.3e-4, 6.7e-5, **2.6e-3**; 2.5e-4, 2.6e-4 |
 
 Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
 a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
@@ -569,12 +569,10 @@ step), mixed with any external inflow as `updateNodes()` does, and the average o
 in; a reservoir sends the concentration it has, a tank the one it ends the step with. Found by two small chains of short pipes in `native-msx-harness.js`
 (exact to 1e-15 whichever way the links are numbered), not by reading the source: epanet-msx's main branch sends the first
 segment's quality for all of it and does not fit. A pump or valve holds no segment at all, so none is averaged at the node it
-feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness holds it at 0.0012. What is left is node 15, a dead end
-whose pipe carries 1e-8 L/s of noise in both hydraulic runs (opposite signs): the same quality hour differs by 1.3 per cent
-there, 1e-3 of a milligram per litre. Feeding the loop's quality pass EPANET's own flows did not move it, so it is in the
-transport of a near-stopped pipe, not in the flows; not found. Narrowed 2026-11-01: the pipe's own mean quality agrees with the
-engine to six digits at every hour (so the segments hold the same water), and node 15's value is the engine's alone to differ,
-by the concentration of the pipe's third segment against the loop's first (0.05825 against 0.05710 mg/L at 8 h); giving the loop
-EPANET's flows at every reporting time, zeroing every flow under 1e-5 cfs, and forcing the noise flows positive, each left
-node 15 at 0.057105 to five digits, so the loop's value does not depend on the sign or size of the noise. What stays unknown
-is the engine's segment order at its unreported hydraulic steps. 
+feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness held it at 0.0012. What was left was node 15, a dead end whose pipe carries 1e-8 L/s of noise (1.15e-3, 1.3 per cent). Found in the
+engine's own source (USEPA/EPANETMSX, src/solver/msxqual.c, LGPL v3; no code is carried, the rules are written again in
+`js/lpn-native-msx.js`): `getHydVars()` sets any flow under 0.005 gpm (Q_STAGNANT, 1.114e-5 cfs) to zero; a pipe's direction has
+three states (positive, negative, zero); its segments are turned over only when the flow goes from one way to the other, never
+when it stops or starts; and a node with no inflow takes the average of the first segment of each link flowing into it and
+the last segment of each link flowing out, a pipe at zero flow counting as flowing from its first node. So the noise pipe
+kept its old orientation in the loop and read the wrong end. Net3 went from 1.15e-3 to 2.45e-4 (3e-4 held). 
