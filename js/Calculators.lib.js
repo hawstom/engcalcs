@@ -778,6 +778,20 @@ EngCalcs.pointerClass = function () {
 	return '';
 };
 
+// THE THEME COLUMN of the page-view beacon (Task 824). The theme the visitor chose, by name, or 'day'
+// when none was chosen and the theme of the day was in force, or '' on a page that has no themes.
+// Read at send time from the page's own window.ecTheme (which reads localStorage `lpn_theme`);
+// stores nothing and rides only on the page-view beacon that already exists.
+EngCalcs.themeClass = function () {
+	'use strict';
+	try {
+		if (!window.ecTheme) return '';
+		return window.ecTheme.picked() ? String(window.ecTheme.get()) : 'day';
+	} catch (err) {
+		return '';
+	}
+};
+
 // Logs one confirmed-human calculator-usage event (see log-calc-event.php),
 // gated to real user-triggered recalculation at least 10s after page load so
 // the automatic initial calc-on-load and fast/scripted interaction don't count.
@@ -808,7 +822,8 @@ EngCalcs.maybeLogHumanView = function () {
 		self._sendOrQueue('/engcalcs/log-human-view.php', {
 			page: self.cookieName || '',
 			lang: document.documentElement.lang || '',
-			pointer: self.pointerClass()
+			pointer: self.pointerClass(),
+			theme: self.themeClass()
 		});
 	}, delay);
 };
