@@ -107,22 +107,21 @@
 //                   kWh/flow averaged over the time on line, cost per day (x 24 / duration), and the
 //                   demand charge = Emax x Demand Charge; writeenergy() (report.c) prints the totals line.
 //
-// WHAT IT REFUSES, by name, so the caller can hand the network to the EPANET engine exactly as it
-// does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): a rule the
-// loop does not copy exactly (a rule on a pipe's roughness, a reservoir's level or pressure, a
-// GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
-// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality
-// unless the caller asks for it (`{quality: true}`; then only what the pass cannot copy), EPANET-MSX, pump energy EPANET itself refuses to read (a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase), a
-// control EPANET itself refuses (on a check valve, a GPV given a number), and
-// what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
-// later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
-// awkward to copy exactly.
+// WHAT IT REFUSES is only what EPANET itself refuses, and EngCalcs.lpnDiagnose names each of those in both
+// engines before either runs (lpnPeriodRefused, lpnRulesRefused): a rule EPANET rejects when it reads the file,
+// a hydraulic step under 10 s with a rule or no quality step, a speed pattern the model lacks or with a
+// negative multiplier, a tank volume curve or initial level EPANET refuses, a source type, source pattern
+// or mixing model EPANET does not know, an EPANET-MSX file it cannot read, pump energy input it refuses, and a
+// control it refuses (on a check valve, a GPV given a number). lpnNativeRunRefusals lists them for the loop's
+// own guard; lpnNativeRunGaps lists what is left over, which is empty for every model the page can build.
+// Nothing the loop lacks is handed to EPANET: a pressure-driven demand model, a valve of any type, a tank with
+// no area, a trace from a node out of the run and the rest are run here (dev/native-eps-plan.md).
 //
 // WIRED TO THE PAGE (slice 7). js/lpn-time.js runs a period through lpnNativeRun(model, {quality: true})
-// when the project's engine setting is the built-in solver and lpnNativeRunRefusals() names nothing
-// (EngCalcs.lpnTimeNativePlan); otherwise it uses EPANET as before and says so. It is held to EPANET's
-// answer by dev/lpn-spike/native-eps-harness.js and its siblings, and, through the page's own run path,
-// by dev/lpn-spike/native-wire-harness.js.
+// whenever the project's engine setting is the built-in solver (EngCalcs.lpnTimeNativePlan). It is held to
+// EPANET's answer by dev/lpn-spike/native-eps-harness.js and its siblings, to EPANET's refusals by
+// dev/lpn-spike/native-refusal-harness.js, and, through the page's own run path, by
+// dev/lpn-spike/native-wire-harness.js.
 
 (function (root) {
 	'use strict';

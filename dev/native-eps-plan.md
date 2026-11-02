@@ -77,8 +77,8 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
 7. **Wiring to the page (built, on branch `feat/native-wire`; merges on Tom's word).** `lpnTimeRun()` asks
    `EngCalcs.lpnTimeNativePlan(model)` (js/lpn-time.js): the loop runs the period, quality included
    (`lpnNativeRun(model, {quality: true})`), when the open scenario's engine setting is the built-in solver and
-   `lpnNativeRunRefusals(model, {quality: true})` names nothing; otherwise EPANET runs it as before and, if the
-   user had chosen the built-in solver, the status bar says so (`lpn_engine_native_route`, `..._ids`). `modelNeedsEpanet()` no longer calls a period EPANET's
+   `lpnNativeRunGaps(model, {quality: true})` names nothing (it never does for a model the page builds); the
+   setting alone decides, and EPANET runs only when it is the chosen setting (`## What the built-in setting never hands to EPANET`). `modelNeedsEpanet()` no longer calls a period EPANET's
    when the plan says the loop runs it. Only the transport's run is wired: fire flow, criticality, demand
    scaling, the scenario comparison and the Alternatives preview still call `lpnEpanetRun`. The loop returns
    the convergence fields of the EPANET run. Test: `native-wire-harness.js` (Net1 chlorine, Net2 fluoride,
@@ -90,9 +90,9 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    (`native-eps-quality-harness.js`) and on Net1, Net2 and Net3 (`native-wire-harness.js`). The average rates in mass per hour that EPANET's
    report prints are shown by no part of the page, so the built-in loop does not keep them. The run report's
    "Water Quality Mass Balance" block is written (round 4: the engine's raw figures, equal to six digits, and its segment count). After every Calculate the status bar says which solver answered
-   (`lpn_engine_native_used`; the routed-run sentences name EPANET) and the run summary says it for either solver
+   (`lpn_engine_native_used`) and the run summary says it for either solver
    (`lpn_engine_native_used`, `lpn_engine_epanet_used`). The run report is empty on a built-in run
-   (see Reports, Run report). EPANET-MSX stays on EPANET.
+   (see Reports, Run report). EPANET-MSX runs in the loop (`## EPANET-MSX in the built-in solver`).
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -330,22 +330,46 @@ ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine
 `lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`. What stays
 true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.
 
-## What still falls back to EPANET under the built-in setting (updated 2026-11-01)
+## What the built-in setting never hands to EPANET (updated 2026-11-02; Task 733, `feat/native-pdd`)
 
-Built on `feat/native-wire` after the first inventory: every run path asks one door (`EngCalcs.lpnTimeRunModel`,
-the engine choice the transport uses); a control on a reservoir and a junction-pressure control on a valve; a
-pump with no curve on a speed pattern (already a pipe in both engines; now held); the rules EPANET refuses,
-named by `lpnDiagnose`; and pressure-driven demand, steady and period.
+Tom, 2026-11-02, on the Settings tip that said the built-in solver runs periods "unless the network uses a feature
+that only the EPANET solver runs": *"Bad. We will not release this branch until the gap is gone."* The table that
+stood here is empty. With the built-in setting ticked, `EngCalcs.lpnTimeNativePlan()` is "used" for every model the
+page builds, and no run goes to EPANET. Every case is one of two kinds, each held against the EPANET engine by
+`dev/lpn-spike/native-refusal-harness.js` (99 checks):
 
-**A period the transport runs** (`lpnTimeNativePlan()`; the status bar names the element or setting):
-
-| Falls back for | Where it is decided | Why it stays |
+| Case | Now | Measured on EPANET 2.3.5 |
 |---|---|---|
-| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality` | Slices 1 to 5 are built (`## EPANET-MSX in the built-in solver`); the loop runs a file it can read, and leaves to EPANET: a file with a line it cannot read or an expression missing (named by line and code), a tank with no area. All four tank mixing models run in the loop. |
-| A hydraulic step under 10 s with any rule | `native-run-rules` | EPANET's rule step is the hydraulic step over ten in whole seconds, so under 10 s it is zero and `% 0` stops the engine (measured: `lpnEpanetRun` returns not-ok with no issues). There is no answer to match. |
-| A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
-| A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
-| A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | A real failure, shown as EPANET's answer. |
+| Pressure-driven demand, steady and period | run | `native-pda-harness.js` (23 checks) |
+| A speed pattern on a pump without the page's unscaled curve | run, pattern ignored (the bridge writes none either) | runs, no pattern |
+| A tank that names a volume curve it has no rows for | run as a cylinder | runs as a cylinder |
+| A tank whose minimum and maximum levels are equal | run | runs; heads 0.0006 mm |
+| A trace from a node out of the run | run: quality 0 everywhere | runs; `quality` 0 everywhere |
+| EPANET-MSX mode with no file; an unused file under age | run (no analysis; age) | same |
+| A tank with no area under age, chemical or EPANET-MSX | run, as a reservoir (`qualityNet()` retypes it) | same; age nodes 5e-5 s, chemical 3e-10, MSX 3e-8; level and demand like a reservoir's |
+| A control on a check valve (207), a number on a GPV (207), a negative pipe or pump setting (211) | refused in both: `control-refused` | not ok |
+| A hydraulic step under 10 s with a rule | refused in both: `rule-step-refused` | not ok (`% 0`) |
+| A pump speed pattern the model lacks (205) | refused in both: `speed-pattern-refused` | not ok |
+| A pump speed pattern with a negative multiplier | refused in both: `speed-pattern-refused` | not ok on a non-integer exponent (b = 1.5); finite but meaningless at b = 2 |
+| A tank curve with one row or X not increasing (230), or not reaching MinLvl to MaxLvl (225) | refused in both: `tank-curve-refused` | not ok |
+| A tank started outside its levels (225) | refused in both: `tank-levels-refused` | not ok |
+| A source of an unknown type (213), a source pattern the model lacks (205), an unknown mixing model (213) | refused in both: `quality-refused` | not ok |
+| A hydraulic step under 10 s, quality on, no quality step | refused in both: `quality-refused` ("Quality Timestep") | does not return (over 40 s) |
+| An EPANET-MSX file with a line or expression it cannot read, or a species with no pipe expression | refused in both: `quality-refused`, by line | not ok |
+| Pump energy EPANET refuses (a negative price (217) or demand charge (213), efficiency 0 (217), a price pattern the model lacks (205), an efficiency curve with X not increasing (230)) | refused in both: `energy-refused` | not ok |
+| A rule EPANET refuses (201 to 207) | refused in both: `rules-refused` | not ok |
+| A step the built-in solver cannot solve, or a loop that throws | stops, says so, changes nothing | see below |
+
+**All the refusals are in `EngCalcs.lpnDiagnose`** (`lpnPeriodRefused()` in js/lpn-native-run.js), for a project that
+runs a period only, so a steady project is never refused for them. `runSolve()` already diagnoses before any run, and
+`periodRun()` diagnoses again for the analysis runs, so the status bar names them whichever setting is chosen and
+neither engine starts.
+
+**A step the built-in solver cannot solve, or a loop that throws, no longer swaps engines.** `builtinStopped()` in
+js/lpn-time.js returns a run with no frames and the reasons (`unreachable` and the like, from lpnDiagnose at that
+step), then `builtin-stopped` with the time. EPANET's answer to such a step is not one worth offering: a node cut off
+by a control gets a head of -5 million metres and a warning. The setting is the way to ask EPANET, and the sentence
+says so. Not changed: a step the built-in solver cannot solve keeps no partial frames (EPANET's own stop keeps them).
 
 **Not a run, and not changed**: the run's warnings in EPANET's words (`nativeWarnings()`
 carries only the bridge's notes). A later slice.

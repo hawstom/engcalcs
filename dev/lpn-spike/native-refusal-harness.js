@@ -116,8 +116,8 @@ const REFUSED = [
 const NEVER_RETURNS = [
 	['a quality step of zero (hydraulic step under 10 s, none stated)', 'quality-refused', 'Quality Timestep', (m) => { m.quality = { mode: 'age' }; m.time.times.hydraulicStep = 5; }]
 ];
-// EPANET returns numbers for these, and they are meaningless: a speed pattern with a negative multiplier (a power
-// of a negative speed, NaN for most curves), so it is named in both engines rather than run
+// EPANET returns no answer, or numbers with NaN in them, for these: a speed pattern with a negative multiplier (a
+// power of a negative speed is NaN for a non-integer exponent), so it is named in both engines rather than run
 const MEANINGLESS = [
 	['a pump speed pattern with a negative multiplier', 'speed-pattern-refused', 'PU', (m) => { m.time.patterns.push({ id: 'NEG', multipliers: [1, -0.5] }); m.links.push(pump({ speedPattern: 'NEG' })); }]
 ];
@@ -166,13 +166,15 @@ async function main() {
 		ok(name + ': lpnDiagnose names it', named(EngCalcs.lpnDiagnose(copy(m)), code, id), JSON.stringify(EngCalcs.lpnDiagnose(copy(m))));
 		ok(name + ': the loop refuses it too, by name', EngCalcs.lpnNativeRun(copy(m), { quality: true }).refused === true && EngCalcs.lpnNativeRunGaps(copy(m), { quality: true }).length === 0);
 	}
-	console.log('-- EPANET answers with numbers that mean nothing, so both engines name it');
+	console.log('-- EPANET gives no answer, or NaN, so both engines name it');
 	for (const [name, code, id, mut] of MEANINGLESS) {
 		const m = net(); mut(m);
 		const steady = copy(m); steady.time.times.duration = 0;
 		ok(name + ': lpnDiagnose names it', named(EngCalcs.lpnDiagnose(copy(m)), code, id));
 		ok(name + ': a steady project is not refused for it', !EngCalcs.lpnDiagnose(steady).some((i) => i.code === code));
 		ok(name + ': the loop refuses it too, by name', EngCalcs.lpnNativeRun(copy(m), { quality: true }).refused === true);
+		const e = await epanetRun(m), bad = (f) => Object.keys(f.heads).some((id) => !isFinite(f.heads[id])) || Object.keys(f.flows).some((id) => !isFinite(f.flows[id]));
+		ok(name + ': EPANET itself returns no answer, or one with NaN in it (this curve, b = 1.5)', !e.ok || e.frames.some(bad), 'ok=' + e.ok + ', ' + (e.frames || []).length + ' frames');
 	}
 	console.log('-- the page\'s own run path');
 	{

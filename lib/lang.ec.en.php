@@ -2757,7 +2757,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. A network that uses a feature the built-in solver does not run is solved by the EPANET solver.';
+$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar names it.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -3718,17 +3718,14 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // actually holds the thing, which is where they are a fact about the number on screen rather
 // than a comparison offered in advance.
 //
-// What the tip keeps is the two things a person ticking this box does need: which paths go to
-// EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
-// connection actually pays.
+// What the tip keeps is the two things a person ticking this box does need: that input EPANET
+// refuses is refused by both solvers, and the one-time download, which is the cost a visitor on a
+// slow connection actually pays. No path goes to EPANET whatever the box says (Task 733).
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver also runs an extended period simulation and an EPANET-MSX analysis, unless the network uses a feature that only the EPANET solver runs. The status bar then states that the EPANET solver was used. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar names it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
-// Said out loud, never silently: the user picked the built-in solver and this network was sent to
-// the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
-// setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
