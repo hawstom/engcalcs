@@ -46,6 +46,8 @@ $page = isset($_POST['page']) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_POST['pag
 $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang']) : '';
 // Task 285: the one device bit. Closed set, see ecPointerClass(); anything else is ''.
 $pointer = ecPointerClass(isset($_POST['pointer']) ? $_POST['pointer'] : '');
+// Task 824: the sixth column, the theme the page was shown in. Closed set, see ecThemeClass().
+$theme = ecThemeClass(isset($_POST['theme']) ? $_POST['theme'] : '');
 
 if ($page === '') {
     http_response_code(400);
@@ -98,7 +100,7 @@ if (isset($_POST['offline_ts'])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $pointer . ecLogBucketSuffix() . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $pointer . "\t" . $theme . ecLogBucketSuffix() . "\n";
     @file_put_contents(HUMAN_VIEW_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

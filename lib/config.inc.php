@@ -989,6 +989,19 @@ function ecPointerClass($raw) {
 }
 
 /**
+ * The theme column of the page-view log (Task 824): the theme this page was painted in, as one of
+ * the closed set window.ecTheme lists, or 'day' when the visitor never chose one and the theme of
+ * the day was in force, or '' (a page with no themes, or an older client). A CLOSED SET, like the
+ * pointer. It is read from localStorage `lpn_theme` by the page's own script at send time and
+ * travels in the beacon that already exists; nothing new is stored on the device.
+ */
+function ecThemeClass($raw) {
+    $set = array('day', 'system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'desktop',
+                 'newspaper', 'amber', 'green', 'arcade', 'space', 'prairie');
+    return in_array($raw, $set, true) ? $raw : '';
+}
+
+/**
  * The naming events TITLE_LOG accepts, and the ec_seen bit each de-duplicates on. The two title
  * fields belong to the form calculators; 'save' and 'rename' are Looped-Network's equivalents
  * (Tom, 2026-09-08: *"Rename and Save are meaningful as tests"*) -- a project saved to a file, a
