@@ -489,6 +489,8 @@ async function main() {
 		ok('the results note is hidden while Scenarios is Current', !(await noteShown()));
 		await page.evaluate(() => { const e = document.getElementById('lpn_export_scenarios_all'); e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); });
 		ok('the results note shows when Scenarios is All', await noteShown());
+		ok('the note says what All leaves out: parents, alternatives and inheritance',
+			(await page.evaluate(() => document.getElementById('lpn_export_scn_note').textContent)).indexOf((await a.lang('lpn_export_table_scn_keeps')).trim()) >= 0);
 		await page.evaluate((c) => {
 			Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === c)
 				.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));

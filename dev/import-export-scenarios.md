@@ -13,7 +13,7 @@ alternatives each scenario names, inheritance, and the Presentation and Calculat
 
 ## Part 1. The inventory
 
-36 commands on `master` (6 that read or write this page's own file, 14 imports of other things,
+39 commands on `master` (rows 8a, 8b and 23a added 2026-11-01; 6 that read or write this page's own file, 14 imports of other things,
 16 exports), plus 2 on `feat/sheet-sync` and 1 planned on `feat/sqlite-reader`. There is **no file
 drag-and-drop** on the page (no `drop` handler takes files); every file comes through a menu row and
 a hidden `<input type=file>` (declared in `Looped-Network.php`, wired in `js/looped-network.js`).
@@ -45,6 +45,8 @@ where marked **(not traced)**.
 |---|---|---|---|---|---|
 | 7 | File > Import > EPANET file… | `pickInpFile`, `importInpFromFile`, `landInpText`, `inpAskDestination`, `updateProjectFromInp` | `.inp`, or EPANET's `.net` | With the open project empty: a **new project**, Base only, as always. With assets in it: asks **a new project / this project (or the open scenario, or Base)**. *This project* matches assets by ID, updates differing values through `setProp()` (an override in a scenario), adds assets only in the file (inactive in Base when a scenario is the target), keeps and names assets only in the project, refuses a file whose units or head loss formula differ, is **one undo step**, and ends in a **receipt dialog** naming the scenario. Built, Task 814 | X, or S |
 | 8 | File > Import > GeoJSON network… | `pickGeoJsonNetFile`, `landGeoJsonNetText`, `askImportDestination`, `updateProjectFromGeoJson`, `finishGeoJsonNet` | GeoJSON | **The same as row 7, by the same code** (`askImportDestination`, `inpPlanFromSource`, `updateProjectWithPlan`, `showInpUpdateReceipt`): a file from another source passes the mapping step first, then the same question; a file this page wrote asks only the question. The receipt adds a *Reading the file* list of the importer's own differences. The file's `scenario` property is still not read back. Built, Task 814 | X, or S |
+| 8a | File > Import > Network > DXF file… | `pickDxfNetworkFile`, `landDxfNetwork`, `finishDxfNetwork`, `docFromDxfNet`, `showDxfNetReport` | ASCII DXF this page wrote | Always a **new project**, so no question arises. Reads one alternative's layers (the file holds one scenario's network) and lists what it skipped in a report. Built | X |
+| 8b | File > Import > Network > EPANET-MSX file… | `openMsxRow`, `pickMsxFile`, `attachMsx` | `.msx` | Attaches the text to the open project (`doc.msx`), kept and written back unchanged; Multi-species quality is chosen. Not scenario data, so no scenario question. Built | P |
 | 9 | File > Import > Surveyed points… | `pickSurveyFile`, `landSurveyText`, `createSurveyNodes` | CSV, TXT, PNT | Into the **open project**. Each node goes through `addNode()`, which calls `bornInScenario()`: in a scenario other than Base, the node is **inactive in Base and active only there**. When the project holds more than Base the box asks where they go (the open scenario, a new child scenario, or Base) and the report names the scenario. Built | S |
 | 10 | File > Import > GeoJSON shapes… | `pickGeoJsonFile`, `landGeoJsonShapes` | GeoJSON | Shapes are "in no scenario" (`js/lpn-geojson.js`). Open project, one undo step. The receipt says "Shapes appear in every scenario." when the project holds more than Base. Built, `scenario-io-names-browser-harness.js` S1 | P |
 | 11 | File > Import > DXF shapes… | `pickDxfShapesFile`, `importDxfShapesFromFile` | ASCII DXF | As 10 The same receipt line as row 10. Built | P |
@@ -65,7 +67,8 @@ where marked **(not traced)**.
 | 21 | File > Export > EPANET file… | `exportInpFile`; `inpExportDocument`, `inpExportOptions` | `.inp` (+ `.zip` with picture) | **The open scenario's resolved values**, its own demand list, positions, `[TIMES]` and demand multiplier. File named `<project>-<scenario>.inp` (not for Base). Other scenarios, alternatives, Presentation: none. With more than Base, or any stored alternative, a confirmation (`confirmExportLeaves`) asks before the file is written, naming the scenario and what is left; every export then ends in a receipt dialog (`showExportReceipt`) and a status line (`exportScenarioSentence`). The flattening dialog (`showInpExportFlattening`) still appears for pipe types, fittings, customers, inactive controls and moved nodes | S |
 | 22 | File > Export > GeoJSON file… | `exportGeoJsonFile`, `geoJsonExportOptions` | GeoJSON | Open scenario's resolved values; its name stored **inside** the file (`scenario` property); file named `<project>-<scenario>.geojson` outside Base; results attached only when they belong to the open scenario (`geoJsonStaleScenario`); same confirmation and receipt as row 21 | S |
 | 23 | File > Export > DXF file… | `exportDxfFile`, `dxfModel` | DXF | Open scenario as the "alternative" layer name (`BASE` for Base); whole network as that scenario has it. File named `<project>-<scenario>.dxf` outside Base; same confirmation and receipt as row 21 | S |
-| 24 | File > Export > ODS file… | `openExportTableBox('ods')`, `paneExportDownload` | ODS | Box asks **Tables** (Current/All) and, if the project has a scenario besides Base, **Scenarios** (Current/All). All = one sheet per scenario, side by side; no tree; results for the last-calculated scenario only (note shown). Sheet and file names carry the scenario (`paneExportDownload`). The box does not yet say that parents, alternatives and inheritance are not in the file | S, or all |
+| 23a | File > Export > Network > EPANET-MSX file… | `exportMsxFile` | `.msx` | Writes back exactly the text that came in; asks nothing, names no scenario (the file is not scenario data). Built | P |
+| 24 | File > Export > ODS file… | `openExportTableBox('ods')`, `paneExportDownload` | ODS | Box asks **Tables** (Current/All) and, if the project has a scenario besides Base, **Scenarios** (Current/All). All = one sheet per scenario, side by side; no tree; results for the last-calculated scenario only (note shown). Sheet and file names carry the scenario (`paneExportDownload`). The box says that parents, alternatives and inheritance are not in the file (`lpn_export_table_scn_keeps`). Built | S, or all |
 | 25 | File > Export > XLSX file… | as 24 | XLSX | as 24 | S, or all |
 | 26 | File > Export > CSV file… | as 24 (a zip when more than one) | CSV | as 24 | S, or all |
 | 27 | File > Export > Workspace… | `exportWorkspaceFile` | JSON | None (browser furniture) | - |
@@ -98,7 +101,7 @@ where marked **(not traced)**.
 
 Rows 9, 18, 19 and 20 write into whichever scenario is open, and each now says which; 21, 22, 23 leave the other scenarios behind, and each now asks first and says so. What still does not tell is listed in the next paragraph.
 
-**Rows still short of the standard (2026-10-24):** none for 13, 16 and 17 (Tom: profiles and pictures get no scenario line at all); 24-26 (the box does not say what All leaves out); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
+**Rows still short of the standard (2026-10-24):** none for 13, 16 and 17 (Tom: profiles and pictures get no scenario line at all); 36 and 29 and 35 (silent by design). Rows 21-23 still do not offer a choice of scenario to export (the standard's optional "Scenario to export" line).
 
 ## Part 2. The standard
 
@@ -156,11 +159,11 @@ surprising thing. Questions 2 and 3 appear only when they apply.
    Base or the visitor is not in Base)
    *{open scenario}, open now* (default) / *A new scenario, child of {open scenario}* (name field) /
    *Base. Every scenario inherits Base.*
-3. **Which alternative?** (only with Basic mode off, one line per category the file touches)
+3. **Which alternative?** (only with Basic mode off and only where the open scenario names an alternative for a category the file touches; one line per such category)
    *{scenario}'s own alternative* (default) / *A new alternative, child of {parent}* (name field) /
    *The Base alternative.*
 
-**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is not asked.
+**Built (`import-new-scenario-browser-harness.js`):** the new scenario is made under the one undo step, so the file is compared with what it inherits, and is taken back when there is nothing to write. With Basic mode on, every scenario is a child of Base, so the button reads "child of Base"; with it off, "child of {open scenario}". Question 3 (alternatives) is asked after the destination, by `askImportAlternatives()`: see 2e.
 
 Then one **preview line** and the buttons. Imports that can be previewed without cost (a table of
 values, survey points) preview; a whole network preview is the existing import report afterwards.
@@ -169,20 +172,41 @@ values, survey points) preview; a whole network preview is the existing import r
 
 | Command (numbers from part 1) | Format level | Today | Treatment under the standard |
 |---|---|---|---|
-| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Receipt is a dialog naming the scenario |
-| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Alternative question (3) not asked |
+| 7 `.inp` import, 8 GeoJSON network | 1 | Asks where it goes when the project has assets (built); new project otherwise | Question 1 built (new project / open scenario / a new scenario, child of the open one, with a name field / Base), for both doors. Question 3 built, asked only when the scenario names an alternative (Basic mode off): one choice per category the file writes (the scenario's own alternative, a new one with a name, the Base alternative). Receipt is a dialog naming the scenario and the alternatives |
+| 9 Survey points | 0 | Asks where the points go (the open scenario, a new child scenario, Base) when the project holds more than Base; Base alone asks nothing. Built | Question 3 built: the Active topology alternative takes the nodes (the open scenario's own, a new one, or Base's) |
 | 10-12 Shapes, 16 profile, 17 picture | 0, project-level | Silent, correct; Shapes now say "Shapes appear in every scenario." | No question; the same receipt line for profile and picture is left |
 | 13 Libraries | 0, project-level | Silent, correct | No question; receipt "shared by every scenario" |
+| 8a DXF network, 8b MSX | 1, 0 | A new project; or attached to the project, not scenario data | No question |
 | 14 Workspace, 15 Calibration | none | Silent | No change; calibration's header names the scenario it was compared with |
 | 18 Tables paste, 19 Paste properties, 20 DEM | 0 | Each names the scenario it wrote to (built) | No new dialog (a cell-level gesture must not gain a dialog); the notice names the scenario and counts overrides |
 | 1-6 Own file | 4 | Whole tree | No question; Save as and Duplicate unchanged |
 | 21 `.inp`, 22 GeoJSON, 23 DXF | 1 | One scenario, partly disclosed | Export confirmation (3 in 2b) when the project has more than Base; receipt naming the scenario |
-| 24-26 Tables files | 2 | Already asks Scenarios Current/All | Keep the box; add the sentence about what All does and does not keep |
+| 24-26 Tables files | 2 | Already asks Scenarios Current/All | Keep the box; the sentence about what All does and does not keep is built |
 | 28-35 Pane export, copy, print, full report, run report, screenshot, Copy properties | 1 | One scenario's view, silent | Receipt line names the scenario; no dialog |
 | 36 Copy curve points | 0 | Silent | No change |
 | B1 Scenario workbook export | 3 | n/a | Receipt: export, not a save, not a sync |
 | B2 Scenario workbook import | 3 | Compare and apply | Already the model; add "new project or this project" only if it ever can land in a new one |
 | B3 Bentley import | 3 | n/a | Landing is a new project (the model differs); compare-and-apply report is not possible into a new project, so the receipt lists what Bentley held that this page did not keep |
+
+### 2e. What is Built and what is Left (checked in the code, 2026-10-30)
+
+| Row (2d) | Treatment | Status |
+|---|---|---|
+| 7 `.inp`, 8 GeoJSON network | Question 1 and 2: new project, open scenario, new scenario, Base; receipt dialog | Built |
+| 7, 8 | Question 3, the alternative: asked only when it can matter (Basic mode off, and the open scenario names an alternative other than its own for a category the file writes) | Built (`import-alternative-browser-harness.js`). Not asked for a new scenario (it makes its own alternative) or for Base |
+| 9 Survey points | Question 2 | Built |
+| 9 Survey points | Question 3 (Active topology alone) | Built, same harness |
+| 10-12 Shapes | Receipt line "Shapes appear in every scenario." | Built |
+| 13 Libraries | Receipt line "Every scenario can use them." | Built |
+| 16 Profile, 17 Picture | Receipt line | Closed: Tom ruled they get no scenario line (see "Rows still short" above) |
+| 8a DXF network, 8b MSX import, 23a MSX export | No question: a new project, or not scenario data | Built |
+| 14 Workspace, 15 Calibration | Calibration's header names its scenario | Built |
+| 18-20 Tables paste, Paste properties, DEM | Notice names the scenario and counts overrides | Built |
+| 21-23 `.inp`, GeoJSON, DXF export | Confirmation and receipt naming the scenario | Built. The optional "Scenario to export" choice is Left |
+| 24-26 Tables files | The sentence about what All does and does not keep | Built (`table-export-dialog-browser-harness.js`) |
+| 28-35 Pane export, copy, print, reports, screenshot | Name the scenario | Built |
+| B1-B3 | Scenario workbook, Bentley | Not on `master`; they follow their branches |
+| Tables-file IMPORT (ODS/CSV) | A level 0 import of values | Not a command yet. It is Task 752 step 3, which uses question 3 as built here |
 
 ## Part 3. Draft English
 
