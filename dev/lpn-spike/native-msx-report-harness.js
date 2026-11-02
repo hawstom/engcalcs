@@ -34,7 +34,7 @@ function example(msxText) {
 // The part of a run report this harness compares: everything after "Analysis ended" (the MSX tables and the mass balance blocks).
 function tail(report) {
 	const lines = String(report || '').split('\n'), i = lines.findIndex((l) => /Analysis ended/.test(l));
-	return lines.slice(i + 1).map((l) => l.replace(/\s+$/, ''));
+	return lines.slice(i + 1).map((l) => l.replace(/\s+$/, '')).map((l) => (/^\s*\*.*\*$/.test(l) ? '<BANNER>' : l));   // the banner box names the solver that wrote it
 }
 // a printed number may differ in its last digit; everything else must be identical
 function lineMatch(a, b) {

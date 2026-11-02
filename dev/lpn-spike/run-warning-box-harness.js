@@ -92,7 +92,7 @@ async function boxFor(model, report, run) {
 	console.log((unRun.report || '').split('\n').filter((l) => /WARNING|nbalanced/.test(l)).join('\n'));
 	st = await boxFor(null, null, unRun);
 	check(st.warnings > 0, 'unbalanced: warnings counted', String(st.warnings));
-	check(/Time steps not balanced \(\d+\)/.test(st.text) && /Run report/.test(st.text), 'unbalanced: the box names it and points at the Run report', st.text);
+	check(/Time steps not balanced \(\d+\)/.test(st.text) && /Solver \(run\) report/.test(st.text), 'unbalanced: the box names it and points at the Run report', st.text);
 
 	// ---- pump beyond its curve ----
 	const pxRun = await real.call(EngCalcs, await load(PUMPX), {});
@@ -100,7 +100,7 @@ async function boxFor(model, report, run) {
 	console.log((pxRun.report || '').split('\n').filter((l) => /WARNING/.test(l)).join('\n'));
 	st = await boxFor(null, null, pxRun);
 	check(st.warnings > 0, 'pump: warnings counted', String(st.warnings));
-	check(/Warnings \(\d+\)/.test(st.text) && /Run report/.test(st.text), 'pump: the box names it and points at the Run report', st.text);
+	check(/Warnings \(\d+\)/.test(st.text) && /Solver \(run\) report/.test(st.text), 'pump: the box names it and points at the Run report', st.text);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall ok');
 	process.exit(failures ? 1 : 0);

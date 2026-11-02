@@ -720,7 +720,8 @@ async function compare(c) {
 	// Darcy-Weisbach project, a PBV stopped by a control or a speed pattern that discards a stated speed counts a different number of
 	// trials and is reported as a gap, not held (the periodic PRV, PSV, FCV and GPV cases are held).
 	if (!process.env.NOREPORT) {
-		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>');
+		// The banner box (lines that start and end with a star) names the solver that wrote the report, so the two differ by design.
+		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').replace(/^[ \t]*\*.*\*[ \t]*$/gm, '<BANNER>');
 		const a = stamp(epa.report).split('\n'), b = stamp(nat.report).split('\n');
 		const bal = /^(\s+)(Total Inflow|Consumer Demand|Demand Deficit|Emitter Flow|Leakage Flow|Total Outflow|Storage Flow|Flow Ratio):\s+(-?[0-9.]+)$/;
 		let first = -1;

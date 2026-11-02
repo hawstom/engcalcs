@@ -74,7 +74,7 @@ async function main() {
 		};
 		await openReports();
 		const reps = await rowTexts(a, '#lpn_menu_list2');
-		ok('rows read Run report, Status changes, Calibration, Full', JSON.stringify(reps.slice(2)) === JSON.stringify(['Run report', 'Status changes', 'Calibration', 'Full']), reps.join(' | '));
+		ok('rows read Solver (run), Status changes, Calibration, Full', JSON.stringify(reps.slice(2)) === JSON.stringify(['Solver (run)', 'Status changes', 'Calibration', 'Full']), reps.join(' | '));
 		ok('no row says EPANET', !reps.some((t) => /EPANET/.test(t)), reps.join(' | '));
 		const L = async (k) => (await a.lang(k)).trim();
 		const names = { run: await L('lpn_reports_epanet'), status: await L('lpn_reports_status'), calib: await L('lpn_reports_calib'), full: await L('lpn_reports_full') };

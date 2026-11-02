@@ -8346,7 +8346,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run report',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Solver (run)',
 				tip: pc.lpn_time_run_report_tip,
 				disabled: !(EngCalcs.lpnTimeHasReport && EngCalcs.lpnTimeHasReport()),
 				// **GREYED UNTIL A RUN HAS HAPPENED.** Every run, by either solver and for a single instant as for a
@@ -47375,7 +47375,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run report, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on

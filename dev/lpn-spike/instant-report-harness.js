@@ -19,7 +19,7 @@ Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
 const { buildModel } = require('./net3-model.js');
 let pass = 0, fail = 0;
 function ok(name, cond, extra) { console.log((cond ? 'PASS ' : 'FAIL ') + name + (extra ? '   ' + extra : '')); cond ? pass++ : fail++; }
-const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>');
+const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').replace(/^[ \t]*\*.*\*[ \t]*$/gm, '<BANNER>');
 function load(file) {
 	const m = buildModel(EngCalcs, EngCalcs.lpnInpParse(fs.readFileSync(path.join(__dirname, 'reference', file), 'utf8')));
 	m.hydraulics = Object.assign({ accuracy: 1e-5 }, m.hydraulics || {});
@@ -37,7 +37,7 @@ async function run() {
 		ok(file + ': a solved instant has a report to show', EngCalcs.lpnTimeHasReport() === true);
 		ok(file + ': the built-in solver writes it at once, no waiting', EngCalcs.lpnTimeReportAsync() === null);
 		const nat = EngCalcs.lpnTimeLastReport();
-		ok(file + ': built-in report is EPANET\'s text', /E P A N E T/.test(nat) && /Analysis ended/.test(nat) && /Balanced after/.test(nat), nat.split('\n').length + ' lines');
+		ok(file + ': built-in report is EPANET\'s text', /Looped Network built-in solver/.test(nat) && /Analysis ended/.test(nat) && /Balanced after/.test(nat), nat.split('\n').length + ' lines');
 		EngCalcs.lpnTimeInstantRun(m, 'epanet');
 		ok(file + ': EPANET\'s instant report is not there until asked', EngCalcs.lpnTimeLastReport() === '');
 		const later = EngCalcs.lpnTimeReportAsync();

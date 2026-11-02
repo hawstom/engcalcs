@@ -1159,8 +1159,8 @@ $ec_lang['lpn_guide_ct_box_def']='<p>Show plot, when cleared, hides the fill and
 $ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='What the report holds';
-$ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Run report. The report is the text EPANET writes for a run, in pages. The row is grey until the network has been run. Either solver writes the same report, for a single instant or for an extended period simulation. It starts with the banner and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
-$ec_lang['lpn_guide_rr_example_def']='<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Run report. The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.</p>';
+$ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Solver (run). The Solver (run) report is the text report of a run, in pages, in the layout and words of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header names the solver that wrote it. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
+$ec_lang['lpn_guide_rr_example_def']='<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.</p>';
 $ec_lang['lpn_guide_st_what_term']='What is listed';
 $ec_lang['lpn_guide_st_what_def']='<p>Choose Water, Reports, Status changes. Each row gives the time of a change and the change: a pump, valve, or pipe now open or now closed, or a tank now filling, emptying, full, or empty. A time step that did not fully converge is listed too. The list is in time order and holds only changes, not every step. It is read from the same extended period run as the Tables pane and the Full report.</p>';
 $ec_lang['lpn_guide_st_example_def']='<p>Open the Net1 example and choose Water, Reports, Status changes. Tank N2 is now filling at 1:00, emptying at 11:00, filling at 16:00, and emptying at 22:00. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00.</p>';
@@ -2418,7 +2418,7 @@ $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modellin
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The run report is available under Reports, Run report, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
@@ -3743,11 +3743,11 @@ $ec_lang['lpn_engine_refused_why']='EPANET solver message: {message}';
 $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
 // A run EPANET started and could not finish, for example when a tank empties and the junctions it
 // fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
-$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
+$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.';
 $ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before the end of the period.';
 $ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
 $ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy results were computed.';
-$ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
+$ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.';
 // Why a stopped run stopped, read from EPANET's own run report (R-402). {link} is the link EPANET
 // had just closed, {tank} the tank at one end of it, {nodes} the ids of the nodes EPANET then could
 // not solve for, comma-separated. Follows lpn_time_run_stopped or lpn_time_run_stopped_kept.
@@ -3969,9 +3969,9 @@ $ec_lang['lpn_time_runbox_hide']='Do not show this box again';
 $ec_lang['lpn_settings_runbox']='Show the run progress box';
 $ec_lang['lpn_settings_runbox_tip']='A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
-$ec_lang['lpn_time_run_report']='Run report';
+$ec_lang['lpn_time_run_report']='Solver (run) report';
 $ec_lang['lpn_time_run_report_copied']='Copied';
-$ec_lang['lpn_time_run_report_tip']='The EPANET text report of the last run: whether it converged, the status of each step, and any warnings. Both solvers write it in the words EPANET uses.';
+$ec_lang['lpn_time_run_report_tip']='The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header names the solver that wrote it, and both solvers use the layout and words of the EPANET report.';
 
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='Playback speed';
@@ -4176,8 +4176,8 @@ $ec_lang['lpn_settings_energy']='Energy';
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
 // Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
-// the tips say where a report comes from. Run report is EPANET's text report, written by either solver.
-$ec_lang['lpn_reports_epanet']='Run report';
+// the tips say where a report comes from. The Solver (run) report is the text report of a run, written by either solver.
+$ec_lang['lpn_reports_epanet']='Solver (run)';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';

@@ -838,11 +838,12 @@
 				else if (n.type === 'tank') { ntk++; } else { nj++; }
 			});
 			links.forEach(function (l, k) { var kd = ls[k].kind; if (kd === 'valve') { nv++; } else if (kd === 'pump') { npu++; } else { np++; } });
+			// The banner names the solver that wrote the report: EPANET's own banner is EPANET's to print.
 			['******************************************************************',
-				'*                           E P A N E T                          *',
-				'*                   Hydraulic and Water Quality                  *',
+				'*                 Looped Network built-in solver                 *',
+				'*                  Hydraulic and Water Quality                   *',
 				'*                   Analysis for Pipe Networks                   *',
-				'*                          Version 2.3.05                        *',
+				'*                Report layout follows EPANET 2.3                *',
 				'******************************************************************', '',
 				'EngCalcs looped network', ' ',
 				'    Input Data File ................... temp.inp',

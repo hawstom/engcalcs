@@ -244,7 +244,7 @@ function sameResults(label, r, kinds, skip) {
 
 	console.log('\n6. THE BUILT-IN SOLVER\'S REPORT IS IN THE PROJECT\'S UNITS TOO (Perry, 2026-11-01: it printed metres and L/s in a US project)');
 	{
-		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').split('\n').map((x) => x.replace(/\s+$/, ''));
+		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').replace(/^[ \t]*\*.*\*[ \t]*$/gm, '<BANNER>').split('\n').map((x) => x.replace(/\s+$/, ''));
 		// the two solvers' numbers differ in a last digit; words, units and layout must be equal
 		const tok = (a, b) => {
 			if (a === b) { return true; }

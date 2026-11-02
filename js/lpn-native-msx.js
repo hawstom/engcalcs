@@ -1644,8 +1644,7 @@
 			var rptSp = [null], cnt;
 			spec.species.forEach(function (sp2) { rptSp.push(rp.species[sp2.id] || { rpt: false, precision: 2 }); });
 			newPage();
-			['******************************************************************', '*                      E P A N E T  -  M S X                     *', '*                   Multi-Species Water Quality                  *',
-				'*                   Analysis for Pipe  Networks                  *', '*                           Version 2.0.0                        *', '******************************************************************'].forEach(writeLine);
+			['******************************************************************', '*                 Looped Network built-in solver                 *', '*                  Multi-Species Water Quality                   *', '*                   Analysis for Pipe Networks                   *', '*              Report layout follows EPANET-MSX 2.0              *', '******************************************************************'].forEach(writeLine);
 			writeLine('');
 			writeLine(spec.title + '\n');   // the engine keeps the newline fgets() read with the title line
 			for (nn = 1; nn <= N; nn++) { if (nodeRpt[nn]) { tableHdr(false, nodes[nn].id); table(false, nn); } }

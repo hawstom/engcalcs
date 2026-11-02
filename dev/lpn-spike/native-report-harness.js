@@ -27,7 +27,8 @@ function ok(name, cond, extra) {
 	console.log((cond ? 'PASS ' : 'FAIL ') + name + (extra ? '   ' + extra : ''));
 	if (cond) { pass++; } else { fail++; }
 }
-const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>');
+// The banner box (lines that start and end with a star) names the solver that wrote the report, so the two differ by design.
+const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').replace(/^[ \t]*\*.*\*[ \t]*$/gm, '<BANNER>');
 const copy = (m) => JSON.parse(JSON.stringify(m));
 function load(file, edit) {
 	const parsed = EngCalcs.lpnInpParse(fs.readFileSync(path.join(__dirname, 'reference', file), 'utf8'));
@@ -72,8 +73,9 @@ async function run() {
 	// The pieces by name, on the shipped example, so a regression says which line broke.
 	const r = await same('Net3 as shipped', load('Net3.inp'));
 	const t = r.b.join('\n');
+	ok('the built-in report header names the built-in solver and never prints EPANET\'s banner; EPANET\'s own report keeps its banner', /Looped Network built-in solver/.test(r.n.report) && !/E P A N E T/.test(r.n.report) && /E P A N E T/.test(r.e.report));
 	ok('the report has the banner, the summary, the status table and the flow balance in EPANET\'s order',
-		/E P A N E T/.test(t) && t.indexOf('Number of Junctions') < t.indexOf('Analysis begun') && t.indexOf('Hydraulic Status:') < t.indexOf('Hydraulic Flow Balance (L/s)') && /Analysis ended/.test(t));
+		t.indexOf('Number of Junctions') < t.indexOf('Analysis begun') && t.indexOf('Hydraulic Status:') < t.indexOf('Hydraulic Flow Balance (L/s)') && /Analysis ended/.test(t));
 	ok('a control that acts is written as EPANET writes it ("changed by Tank 1 control", then "changed from closed to open")',
 		/Pump 335 changed by Tank 1 control/.test(t) && /Pipe 330 changed from closed to open/.test(t));
 	ok('a tank and a reservoir are written when they change ("Tank 1 is filling at 3.99 m", "Reservoir Lake is closed")',
