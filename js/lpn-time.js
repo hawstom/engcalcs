@@ -1143,7 +1143,7 @@
 				if (run.refused) {
 					// EPANET writes a report even on an input it rejects, and that text is the one
 					// place the offending line is named -- so it is KEPT here, unlike a failure,
-					// and Project > EPANET run report can show it.
+					// and Reports > Run report can show it.
 					lastReport = run.report || ''; lastReportMs = state.lastRunMs;
 					lastReportFrames = 0;
 					boxFailed(token, refusedText(run));
@@ -1789,7 +1789,7 @@
 		boxUi = null;
 	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
 	// `boxReport` is the copy the box is rendering and dies with it; this is the document's answer to
-	// "what did the engine say last time", which Project > EPANET run report asks (Task 467). Without
+	// "what did the engine say last time", which Reports > Run report asks (Task 467). Without
 	// it that row could only ever answer for a run the user pressed Calculate for, and an automatic
 	// run -- the common case, see EC.LPN_TIME_AUTO -- would leave it silent or, worse, showing the
 	// report of some older run that did have a box.
@@ -2081,11 +2081,10 @@
 	EC.lpnTimeCopyForTest = EC.lpnCopyText;
 	EC.lpnTimeRunReport = function () { return boxReport; };
 	/**
-	 * **PROJECT > EPANET RUN REPORT** (Task 467): put the last run's report on screen.
+	 * **REPORTS > RUN REPORT** (Task 467): put the last run's report on screen.
 	 *
-	 * Returns false when there is none, and says nothing itself -- the caller owns the message,
-	 * because "no report yet" is a sentence about the PAGE (nothing has been run, or the native
-	 * solver ran it, which prints nothing) and js/looped-network.js is where the page talks.
+	 * Returns false when there is none (nothing has been run yet), and says nothing: the menu row is greyed
+	 * until a run has happened, since every run by either solver leaves a report.
 	 *
 	 * It reuses the run box rather than opening a second window: the box is already the one place
 	 * this page shows a run's outcome, it already closes on its X, Enter and Escape, and a second

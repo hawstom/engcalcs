@@ -8326,8 +8326,8 @@ var EngCalcs = EngCalcs || {};
 	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
 	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
 	// the shortest true name of each thing is the right label, and "Reports > Pump energy report"
-	// would be the stammer. The BOX TITLES are unchanged -- "Pump energy report" and "EPANET run
-	// report" still name the objects themselves, which is Task 577's ruling and is not disturbed.
+	// would be the stammer. The BOX TITLES are unchanged -- "Pump energy report" and "Run report"
+	// still name the objects themselves, which is Task 577's ruling and is not disturbed.
 	//
 	// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566): it is not a kind of run of its own,
 	// it is what the extended-period simulation already worked out on its way past. The scenario
@@ -8349,20 +8349,15 @@ var EngCalcs = EngCalcs || {};
 				icon: 'info', label: pc.lpn_reports_epanet || 'Run report',
 				tip: pc.lpn_time_run_report_tip,
 				disabled: !(EngCalcs.lpnTimeHasReport && EngCalcs.lpnTimeHasReport()),
-				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
-				// hidden when there is nothing to show: a row that disappears teaches nobody that
-				// the report exists, while a sentence saying why there is none teaches exactly that
-				// (the native solver prints nothing, so a network that has never reached EPANET has
-				// no report and never will until it does).
-				// The box says the same sentence itself where there is no report, so the row is
-				// one call. It stays here rather than being hidden when there is nothing to show,
-				// for the reason openRunReportBox() states.
+				// **GREYED UNTIL A RUN HAS HAPPENED.** Every run, by either solver and for a single instant as for a
+				// period, leaves a report (Tom, 2026-11-01), so there is no sentence for "no report": the row is
+				// here, so the report is known to exist, and is disabled until there is something to open.
 				fn: function () { closeMenu(); openRunReportBox(); }
 			},
 			// **STATUS AND FULL, EPANET'S OWN TWO NAMES, LAST** (ROADMAP Tasks 716, 715; Tom,
 			// 2026-09-25: *"Make the reports roadmap tasks before EPANET++."*). Both read the
 			// extended period run's own frames (js/lpn-time.js) rather than computing anything of
-			// their own, so they sit with the EPANET run report rather than above the divider with
+			// their own, so they sit with the run report rather than above the divider with
 			// Run and Fire flow -- nothing here is a criterion to set or a sweep to start.
 			//
 			// **THE ROW SAYS "Status"/"Full", NOT "Status report"/"Full report"** -- the parent
@@ -85155,7 +85150,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_ENERGYBOX_KEY, JSON.stringify(energyboxLayout)); } catch (e) {}
 	}
-	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
+	// ---- THE RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
 	//
 	// Tom, 2026-09-02: *"EPANET report: How about we make that another draggable, sizeable, modal
 	// box?"*, corrected when asked to *"I meant non-modal."* So it stops nothing, and it is the

@@ -87,9 +87,9 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    the step, scaled to a day, and `ratecoeffs()` zeroes it at each hydraulic period, so a report time reads the
    last step of the period before it); a chemical frame carries `linkRates` for every pipe, in mass/L/day, held to
    EPANET's within 5e-7 relative over its own hydraulics and 2e-3 absolute end to end on all 24 chemical cases
-   (`native-eps-quality-harness.js`) and on Net1, Net2 and Net3 (`native-wire-harness.js`). The mass balance and the
-   average rates in mass per hour that EPANET's report prints are shown by no part of the page, so the built-in
-   loop does not keep them. After every Calculate the status bar says which solver answered
+   (`native-eps-quality-harness.js`) and on Net1, Net2 and Net3 (`native-wire-harness.js`). The average rates in mass per hour that EPANET's
+   report prints are shown by no part of the page, so the built-in loop does not keep them. The run report's
+   "Water Quality Mass Balance" block is written (round 4: the engine's raw figures, equal to six digits, and its segment count). After every Calculate the status bar says which solver answered
    (`lpn_engine_native_used`; the routed-run sentences name EPANET) and the run summary says it for either solver
    (`lpn_engine_native_used`, `lpn_engine_epanet_used`). The run report is empty on a built-in run
    (see Reports, Run report). EPANET-MSX stays on EPANET.
@@ -282,8 +282,7 @@ writes no Quality line); a tank with no area in a quality run; a source type or 
 does not know (error 213); a source on a pattern the model lacks (error 205); a quality step that
 comes to 0 (hydraulic step under 10 s, none stated: EPANET's walk never advances).
 
-**Not copied.** The mass balance and the average reaction rates in mass per hour (no part of the page shows
-them). The per-pipe reaction rate the page's column shows IS copied (slice 7). A pump at speed 0 left OPEN, which
+**Not copied.** The average reaction rates in mass per hour (no part of the page shows them). The per-pipe reaction rate the page's column shows IS copied (slice 7). A pump at speed 0 left OPEN, which
 EPANET carries a flow of 1e-8 x its head difference through and the loop carries 0.
 
 Test: `native-eps-quality-harness.js`, 106 checks. Every case is run three ways: EPANET; the pass over
@@ -342,7 +341,7 @@ named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 
 | Falls back for | Where it is decided | Why it stays |
 |---|---|---|
-| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality` | Slices 1 to 5 are built (`## EPANET-MSX in the built-in solver`); the loop runs a file it can read, and leaves to EPANET: a file with a line it cannot read or an expression missing (named by line and code), a tank that is a 2-compartment or last-in-first-out tank (named by tank), a tank with no area. |
+| EPANET-MSX (`model.msx`, mode `msx`) | `native-run-quality` | Slices 1 to 5 are built (`## EPANET-MSX in the built-in solver`); the loop runs a file it can read, and leaves to EPANET: a file with a line it cannot read or an expression missing (named by line and code), a tank with no area. All four tank mixing models run in the loop. |
 | A hydraulic step under 10 s with any rule | `native-run-rules` | EPANET's rule step is the hydraulic step over ten in whole seconds, so under 10 s it is zero and `% 0` stops the engine (measured: `lpnEpanetRun` returns not-ok with no issues). There is no answer to match. |
 | A speed pattern on a pump the page did not model (no unscaled curve), or with a negative multiplier | `native-run-speed-pattern` | Not a page model. A negative multiplier makes EPANET itself return NaN (measured), so there is no answer to match. |
 | A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
@@ -479,7 +478,7 @@ second in the time a tank fills (11:23:40 against 11:23:41), the two flows diffe
 GPV with no curve (an open TCV in the engine's file) at 8:00:00, 14 trials against 15: both fall by the same factor of 0.46 a
 trial, the engine starting from a relative flow change of 0.95 where the loop starts from 0.56 after a rule re-opens the bypass
 pipe; not found (starting the valve from 1 ft/s moves the loop's figure to 0.32, not 0.95). The flow balance's numbers agree to 2e-5 of themselves.
-Quality runs write the summary lines for the analysis but not EPANET's "Water Quality Mass Balance" block.
+Quality runs write the summary lines for the analysis and EPANET's "Water Quality Mass Balance" block.
 
 ## EPANET-MSX in the built-in solver
 

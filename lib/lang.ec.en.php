@@ -2340,7 +2340,7 @@ $ec_lang['lpn_file_export_workspace_tip']='Download a small file holding the lay
 $ec_lang['lpn_file_import_workspace']='Workspace…';
 $ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
 $ec_lang['lpn_file_import_msx']='EPANET-MSX file…';
-$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.';
+$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.';
 $ec_lang['lpn_file_export_item_msx']='EPANET-MSX file…';
 $ec_lang['lpn_file_export_msx_tip']='Download the attached EPANET-MSX file exactly as it was imported.';
 $ec_lang['lpn_msx_report_heading']='Attached {file}';
@@ -2356,7 +2356,7 @@ $ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
 $ec_lang['lpn_quality_msx_species']='Species';
 $ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
 $ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.';
-$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
+$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
@@ -2757,7 +2757,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible selected, the network, including an extended period simulation, is solved by the built-in solver instead. A network that the built-in solver does not run, such as one that uses EPANET-MSX, is always solved by the EPANET solver.';
+$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. A network that uses a feature the built-in solver does not run is solved by the EPANET solver.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -3722,7 +3722,7 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver also runs an extended period simulation, unless the network uses EPANET-MSX or another feature that only the EPANET solver runs. The status bar then states that the EPANET solver was used. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver also runs an extended period simulation and an EPANET-MSX analysis, unless the network uses a feature that only the EPANET solver runs. The status bar then states that the EPANET solver was used. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
