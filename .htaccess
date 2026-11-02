@@ -64,3 +64,12 @@ Options -Indexes
 # mod_alias, the same override level as the Redirect rules above, so this is known
 # to be permitted on this host -- unlike Options, which needs a separate grant.
 RedirectMatch 404 "/\.(?!well-known/)[^/]+/"
+
+# Compress text on the way out. Without it the host sent every page, stylesheet and script
+# uncompressed (engcalcs.css alone 553 KB on the wire, 2026-11-01), and Google Search Console
+# flagged Manning-Pipe-Flow.php on a phone for a Largest Contentful Paint over 2.5 s. The host
+# loads mod_deflate (170_mod_deflate.conf); AddOutputFilterByType is FileInfo, the same override
+# level as the Redirect rules above. The guard keeps a host without the module serving, uncompressed.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>

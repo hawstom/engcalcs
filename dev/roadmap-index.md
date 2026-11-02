@@ -7,17 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**87 open tasks.** Next (100): 5 · Soon (75): 16 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
+**86 open tasks.** Next (100): 2 · Soon (75): 18 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (5)
+## 100 — Next (2)
 
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
-- Task 737 — WAIT: sprint · One canonical word per concept, so every language names each one once.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
-- Task 812 — Port the label bench's proven findings to master, one branch each.
-- Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (16)
+## 75 — Soon (18)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -27,6 +24,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
+- Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 818 — An MCP server, so an AI agent can run a network.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
@@ -35,6 +33,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 848 — Report column widths a reader can drag, kept per browser.
 - Task 849 — Every place uses the short Properties name for a field.
 - Task 851 — Net1's legend box covers the Tank label on a phone.
+- Task 853 — Stop sending every calculator the map page's stylesheet comments.
 
 ## 50 — Someday (30)
 
@@ -115,5 +114,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-80 of 87 titles are within 4–12 words. `!` marks the rest;
+79 of 86 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

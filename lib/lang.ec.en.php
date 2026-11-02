@@ -1078,7 +1078,7 @@ $ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sections, and where settings are saved';
-$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
 $ec_lang['lpn_guide_set_search_term']='Searching';
 $ec_lang['lpn_guide_set_search_def']='<p>Type one or more words in Search settings to list only the settings that mention all of them, in the name or in the tip. A word that matches a heading shows every setting under that heading. For example, opacity lists Symbol opacity (0 to 1) and Background image opacity (0 to 1); opacity symbol lists the first alone; and sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not. The search changes no setting.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Settings in a scenario';
@@ -1280,7 +1280,7 @@ $ec_lang['lpn_ex_net3_title']='EPANET Net3, gpm (US)';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='An EPANET example at Novato, California, with the world map behind it: 92 junctions, 3 tanks, and 2 reservoirs, no valves, about 5 miles square. A 24-hour extended-period simulation, with a source trace from the Lake. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center, gpm (US)';
-$ec_lang['lpn_ex_elm_street_desc']='Prescott Valley, Arizona: 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_elm_street_desc']='Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1686,6 +1686,7 @@ $ec_lang['lpn_export_table_current']='Current';
 $ec_lang['lpn_export_table_all']='All';
 $ec_lang['lpn_export_table_go']='Export';
 $ec_lang['lpn_export_table_scn_note']='Results are exported only for the scenario last calculated.';
+$ec_lang['lpn_export_table_scn_keeps']='All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1779,7 +1780,7 @@ $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate automatically" is on in Settings, Calculation, Hydraulics. When Recalculate is off, a toolbar Calculate button appears.';
+$ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate automatically" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
@@ -1798,7 +1799,7 @@ $ec_lang['lpn_calc_hint_mute']='Don’t show this again';
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
-$ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
+$ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
@@ -2488,6 +2489,24 @@ $ec_lang['lpn_inpup_new_scn']='Created the scenario {scenario}, a child of {pare
 $ec_lang['lpn_inpup_btn_newscn_basic']='A new scenario';
 $ec_lang['lpn_inpup_new_scn_basic']='Created the scenario {scenario} and opened it.';
 $ec_lang['lpn_inpup_new_none']='No scenario was created.';
+// Question 3 of an import into the open scenario (Basic mode off): which alternative receives the values.
+$ec_lang['lpn_inpalt_lead']='This file changes values in the categories below. Choose the alternative that receives the values of each.';
+$ec_lang['lpn_inpalt_base_note']='Every scenario inherits the Base alternative, so choosing it changes them all.';
+// {category} is an alternative category, such as Physical or Demand; it heads one choice.
+$ec_lang['lpn_inpalt_heading']='Alternative for {category}';
+// {scenario} is a scenario name; it labels a choice.
+$ec_lang['lpn_inpalt_own']='{scenario}\'s own alternative';
+// {parent} is an alternative name; it labels a choice.
+// {alternative} is an alternative name and {scenarios} the other scenarios that use it, such as "Off peak, Fire flow".
+$ec_lang['lpn_inpalt_shared']='{alternative}, also used by {scenarios}';
+// {n} is a count of further scenarios.
+$ec_lang['lpn_inpalt_more']='and others ({n})';
+$ec_lang['lpn_inpalt_new']='A new alternative, child of {parent}';
+$ec_lang['lpn_inpalt_name']='Name of the new alternative';
+$ec_lang['lpn_inpalt_base']='The Base alternative';
+// {list} is a list such as "Physical: Peak; Demand: Base"; each item is a category and the alternative that took the values.
+$ec_lang['lpn_inpalt_receipt']='Alternatives that received the values: {list}';
+$ec_lang['lpn_inpalt_cancelled']='Nothing was changed.';
 $ec_lang['lpn_survey_where_title']='Import surveyed points';
 $ec_lang['lpn_survey_where_lead']='Each point becomes a node. Choose where the nodes go.';
 $ec_lang['lpn_survey_where_note']='In a scenario, the nodes are inactive in Base and active only there. Choosing Base adds them to Base, so every scenario inherits them.';
@@ -4046,6 +4065,7 @@ $ec_lang['lpn_saved_project']='Saved with the project';
 $ec_lang['lpn_saved_browser']='Saved in this browser';
 $ec_lang['lpn_saved_session']='Not saved';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
+$ec_lang['lpn_settings_solver']='Solver';
 $ec_lang['lpn_settings_quality']='Quality';
 $ec_lang['lpn_settings_quality_track']='Quality parameter';
 // Edited by TGH 2026-09-07

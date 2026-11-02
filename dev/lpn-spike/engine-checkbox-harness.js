@@ -31,7 +31,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetEngine: function (e) { settings.engine = e; },\n" +
 	"\t\tserializeProject: serializeProject,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
-	"\t\thydraulicsFieldsEl: function () { return document.getElementById('lpn_set_hydraulics_fields'); },\n" +
+	"\t\thydraulicsFieldsEl: function () { return document.getElementById('lpn_set_solver_fields'); },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +

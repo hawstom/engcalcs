@@ -1250,7 +1250,7 @@ echoHeader("EngCalcsApp", $html_title,
 					</div>
 				</section>
 				<?php // ---- Section: CALCULATION ----
-				      // Units, Time, Hydraulics -- what the numbers MEAN, WHEN they are asked for, and HOW
+				      // Solver, Units, Time, Hydraulics -- what the numbers MEAN, WHEN they are asked for, and HOW
 				      // they are solved. "Hydraulics" is EPANET's own name for the third group (its
 				      // Analysis Options are Hydraulics, Quality, Reactions, Times, Energy), so Tom's
 				      // future Quality category is a sibling of it rather than a new idea.
@@ -1262,6 +1262,11 @@ echoHeader("EngCalcsApp", $html_title,
 				<section id="lpn_set_sec_calc" class="lpn-set-sec" data-set-sec="calc">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_calculation']?></h3>
 					<div class="lpn-set-secbody">
+						<?php // Solver: which solver answers, and when it runs (Tom, 2026-11-01: *"Shouldn't the first
+						      // three settings under Calculation, Hydraulics be directly under Calculation or
+						      // Calculation, Solver?"*). EPANET's and Bentley's word. Hydraulics keeps the model. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_solver" data-saved="project"><?=$ec_lang['lpn_settings_solver']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_solver_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_units" data-saved="project"><?=$ec_lang['lpn_view_units']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_time" data-saved="project"><?=$ec_lang['lpn_time_menu']?><?=lpnSavedMark('project')?></div>
@@ -2638,6 +2643,7 @@ EngCalcs.pageConfig = {
 	lpn_export_table_all: <?=json_encode($ec_lang['lpn_export_table_all'])?>,
 	lpn_export_table_go: <?=json_encode($ec_lang['lpn_export_table_go'])?>,
 	lpn_export_table_scn_note: <?=json_encode($ec_lang['lpn_export_table_scn_note'])?>,
+	lpn_export_table_scn_keeps: <?=json_encode($ec_lang['lpn_export_table_scn_keeps'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
 	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,
@@ -3923,6 +3929,17 @@ EngCalcs.pageConfig = {
 	lpn_inpup_newscn_name: <?=json_encode($ec_lang['lpn_inpup_newscn_name'])?>,
 	lpn_inpup_new_scn: <?=json_encode($ec_lang['lpn_inpup_new_scn'])?>,
 	lpn_inpup_new_none: <?=json_encode($ec_lang['lpn_inpup_new_none'])?>,
+	lpn_inpalt_lead: <?=json_encode($ec_lang['lpn_inpalt_lead'])?>,
+	lpn_inpalt_base_note: <?=json_encode($ec_lang['lpn_inpalt_base_note'])?>,
+	lpn_inpalt_heading: <?=json_encode($ec_lang['lpn_inpalt_heading'])?>,
+	lpn_inpalt_own: <?=json_encode($ec_lang['lpn_inpalt_own'])?>,
+	lpn_inpalt_shared: <?=json_encode($ec_lang['lpn_inpalt_shared'])?>,
+	lpn_inpalt_more: <?=json_encode($ec_lang['lpn_inpalt_more'])?>,
+	lpn_inpalt_new: <?=json_encode($ec_lang['lpn_inpalt_new'])?>,
+	lpn_inpalt_name: <?=json_encode($ec_lang['lpn_inpalt_name'])?>,
+	lpn_inpalt_base: <?=json_encode($ec_lang['lpn_inpalt_base'])?>,
+	lpn_inpalt_receipt: <?=json_encode($ec_lang['lpn_inpalt_receipt'])?>,
+	lpn_inpalt_cancelled: <?=json_encode($ec_lang['lpn_inpalt_cancelled'])?>,
 	lpn_survey_where_title: <?=json_encode($ec_lang['lpn_survey_where_title'])?>,
 	lpn_survey_where_lead: <?=json_encode($ec_lang['lpn_survey_where_lead'])?>,
 	lpn_survey_where_note: <?=json_encode($ec_lang['lpn_survey_where_note'])?>,
@@ -4343,6 +4360,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_sym_customer: <?=json_encode($ec_lang['lpn_settings_sym_customer'])?>,
 	lpn_settings_sym_node_colors: <?=json_encode($ec_lang['lpn_settings_sym_node_colors'])?>,
 	lpn_settings_sym_link_colors: <?=json_encode($ec_lang['lpn_settings_sym_link_colors'])?>,
+	lpn_settings_solver: <?=json_encode($ec_lang['lpn_settings_solver'])?>,
 	lpn_settings_hydraulics: <?=json_encode($ec_lang['lpn_settings_hydraulics'])?>,
 	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
 	lpn_settings_energy: <?=json_encode($ec_lang['lpn_settings_energy'])?>,

@@ -133,7 +133,9 @@ async function sectionRow(Session, browser) {
 				acts: btns.map((e) => e.getAttribute('data-dock')),
 				named: btns.every((e) => (e.getAttribute('aria-label') || '').length > 2 && e.title === e.getAttribute('aria-label')),
 				buttons: btns.every((e) => e.tagName === 'BUTTON' && e.type === 'button' && e.tabIndex === 0),
-				pad: parseFloat(getComputedStyle(b.querySelector('.lpn-setbox-title')).paddingRight)
+				// A hidden box reports the padding as written, min(96px, 100% - 12px) since fix/box-title capped it at the bar's width; its first term is the room kept.
+				pad: (function (v) { var m = /^min\(\s*([\d.]+)px/.exec(v); return m ? parseFloat(m[1]) : parseFloat(v); })(getComputedStyle(b.querySelector('.lpn-setbox-title')).paddingRight),
+				padRaw: getComputedStyle(b.querySelector('.lpn-setbox-title')).paddingRight
 			};
 		}), BOXES);
 		const bad = rows.filter((r) => r.missing || !r.row || !r.beforeX);
@@ -143,7 +145,7 @@ async function sectionRow(Session, browser) {
 		ok('...as real, keyboard-reachable buttons, each named by its aria-label and its tip',
 			rows.every((r) => r.named && r.buttons));
 		ok('...and the title stops short of the row and the X', rows.every((r) => r.pad >= 40 + 2 * 28 - 0.5),
-			JSON.stringify(rows.map((r) => r.pad)));
+			JSON.stringify(rows.map((r) => r.padRaw)));
 		const names = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-corner-btn')).map((b) => b.getAttribute('aria-label')));
 		ok('the names come from the language file', names[0] === await a.lang('lpn_dock_left') && names[1] === await a.lang('lpn_dock_right'), JSON.stringify(names));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

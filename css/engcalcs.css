@@ -5165,7 +5165,11 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-setbox-title {
 	position: absolute; top: 0; left: 0; right: 0; height: 39px; box-sizing: border-box;
 	padding: 10px 12px 0; font-weight: bold; pointer-events: none;
-	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap;   /* a title too long for its bar is clipped, never an ellipsis (Tom, 2026-11-01); the bar stays 39 px so the buttons beside it stay usable */
+	border-bottom: 1px solid var(--ec-border-strong); white-space: nowrap;
+	/* A title too long for its bar is clipped, never an ellipsis (Tom, 2026-11-01), and CLIPPED AT THE CONTENT BOX: `overflow: hidden` clips at the
+	   PADDING edge, so the room the padding reserves for the buttons was still painted on and the letters ran under the `?`, the dock row and the x.
+	   `overflow: clip` with a content-box margin stops the text where the first control begins; the bar's own border and picture still span the width. */
+	overflow: clip; overflow-clip-margin: content-box;
 	font-family: var(--ec-font-title); font-weight: var(--ec-title-weight); color: var(--ec-title-ink); text-transform: var(--ec-title-case); letter-spacing: var(--ec-title-tracking);
 	background-image: var(--ec-titlebar-image); text-shadow: var(--ec-title-halo);
 	background-position: var(--ec-titlebar-pos); background-size: var(--ec-titlebar-size); background-repeat: var(--ec-titlebar-repeat);
@@ -5196,7 +5200,14 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 }
 .lpn-box-corner > * { pointer-events: auto; }
 html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-rtl); }
-.lpn-has-corner > .lpn-setbox-title { padding-right: calc(40px + var(--lpn-corner-w, 0px)); }
+/* The room kept for the controls is capped at the bar's width less its start padding, so a box dragged narrower than its own buttons still has a bar no wider than the box. */
+.lpn-setbox-title:has(~ .lpn-popover-x) { padding-right: min(40px, calc(100% - var(--ec-title-pad-start))); }
+.lpn-has-corner > .lpn-setbox-title { padding-right: min(calc(40px + var(--lpn-corner-w, 0px)), calc(100% - var(--ec-title-pad-start))); }
+/* A browser without `overflow-clip-margin` (Safari) would clip at the padding edge, so there the bar itself stops short of the buttons instead. */
+@supports not (overflow-clip-margin: content-box) {
+	.lpn-setbox-title:has(~ .lpn-popover-x) { right: 40px; padding-right: 0; }
+	.lpn-has-corner > .lpn-setbox-title { right: min(calc(40px + var(--lpn-corner-w, 0px)), calc(100% - 2px)); padding-right: 0; }
+}
 .lpn-corner-btn {
 	width: 28px; height: 39px; padding: 0; border: 0; background: transparent;
 	color: var(--ec-ink); cursor: pointer;
@@ -7781,3 +7792,10 @@ textarea.lpn-desc-ta {
 .lpn-wtg-box-p { margin: 0 0 8px; }
 .lpn-wtg-box-list { margin: 0; padding-left: 20px; }
 .lpn-wtg-box-list li { margin-bottom: 4px; }
+
+/* The import's alternative question (Task 814, question 3): one paragraph, one group of choices, one indented name field. */
+.lpn-dlg-p { margin: 0 0 8px; }
+.lpn-dlg-strong { font-weight: bold; }
+.lpn-dlg-group { margin: 0 0 10px; }
+.lpn-dlg-opt { display: block; }
+.lpn-dlg-indent { margin: 2px 0 0 20px; }

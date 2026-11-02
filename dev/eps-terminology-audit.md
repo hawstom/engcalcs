@@ -118,7 +118,7 @@ owns.
   itself.
 - **The page only ADVISES.** When a completed run exceeds `EC.LPN_TIME_SLOW_MS` (1000 ms),
   `adviseIfSlow()` posts `lpn_time_run_slow` as a messenger notice (logged, fades; it no longer stands on the status line), which names the control in words:
-  *turn off "Recalculate automatically" in Settings, under Calculation, Hydraulics*. That sentence
+  *turn off "Recalculate automatically" in Settings, under Calculation, Solver*. That sentence
   is advice, and acting on it is a second deliberate act.
 - **Once it is off**, an edit whose model fingerprint has moved drops the frames, puts the clock
   back to the first reporting time and schedules nothing; what is drawn is the steady solve of that

@@ -22,7 +22,7 @@ both. The harness reports a control that changed both as `both` and fails it.
   body and never in the title bar. The class is declared in Looped-Network.php as
   `data-saved="..."` and the marker is written by `lpnSavedMark()`.
 - **A row whose home differs from its sub-heading's** carries its own marker under its name
-  (`row(..., saved)` in js/looped-network.js). Today: *Show the run progress box* under Hydraulics
+  (`row(..., saved)` in js/looped-network.js). Today: *Show the run progress box* under Solver
   (this browser, under a project heading).
 - **Column width** is not a Settings control. Its discovery paths are the Width entry in Manage
   columns and a 1 s tip on the column divider, both saying the width is kept in this browser. The
