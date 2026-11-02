@@ -71,6 +71,15 @@ async function run() {
 	if (base) { ok('the tables are there (three of them)', base.b.filter((l) => /<<< (Node|Link)/.test(l)).length === 3); }
 	await same('every node and link, precision 4 on AS5, species NH2CL off', example(EXMSX.replace(/NODES\s+C\s+D[^\n]*/, 'NODES ALL').replace(/LINKS\s+5[^\n]*/, 'LINKS ALL').replace('SPECIE  AS5   YES', 'SPECIE  AS5 YES 4').replace('SPECIE  NH2CL YES', 'SPECIE  NH2CL NO')));
 	await same('a page of 24 lines', example(EXMSX + '\n  PAGESIZE 24\n'));
+	// the arsenic example reported in m3/h (Perry, 2026-11-01): the whole report, units and all, line for line
+	{
+		const mm = example(EXMSX);
+		mm.reportUnits = { flow: 'cmh', length: 'm', diameter: 'mm' };
+		const e = await EngCalcs.lpnEpanetRun(copy(mm)), n = EngCalcs.lpnNativeRun(copy(mm), { quality: true });
+		const head = (r) => String(r.report).split('\n').filter((l) => /Flow Balance|Total Inflow|Consumer Demand/.test(l)).map((l) => l.trim());
+		ok('the arsenic example in m3/h: both reports head the flow balance in m3/h with the same figures',
+			head(e).length === 3 && /m3\/h/.test(head(e)[0]) && head(n)[0] === head(e)[0] && head(n).every((l, i) => lineMatch(l, head(e)[i])), head(e).join(' | ') + '  vs  ' + head(n).join(' | '));
+	}
 	// A file that flags nothing writes no MSX report at all, in either solver.
 	{
 		const none = example(EXMSX.replace(/NODES[^\n]*\n/, '').replace(/LINKS[^\n]*\n/, ''));
