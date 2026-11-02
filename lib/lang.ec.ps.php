@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='که بیا محاسبه ډېره ورو 
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='دا شبکې د محاسبې لپاره {secs} ثانیې ونیولې، او دا ټاکل شوې چې له هرې بدلون وروسته بیا محاسبه شي. ترڅو دا ودروئ او "محاسبه کول" تڼۍ بېرته ترلاسه کړئ، په تنظیماتو کې، د محاسبې لاندې، هایدرولیکس کې "پخپله بیا محاسبه کول" غیرفعاله کړئ.';
-$ec_lang['lpn_time_no_report']='تر اوسه هیڅ د چلولو راپور نشته. راپور د EPANET خپل متن دی، نو دا هغه وخت ښکاره کیږي کله چې دا شبکه د EPANET حل کوونکي سره محاسبه شوې وي.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

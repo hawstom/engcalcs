@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='اگر دوبارہ حساب بہت سس�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='اس نیٹ ورک کو حل ہونے میں {secs} سیکنڈ لگے، اور یہ ہر تبدیلی کے بعد دوبارہ حل ہونے کے لیے مقرر ہے۔ اسے روکنے اور حل کریں کا بٹن واپس لانے کے لیے، ترتیبات میں، حساب کتاب کے تحت ہائیڈرالکس میں "خود بخود دوبارہ حل کریں" بند کریں۔';
-$ec_lang['lpn_time_no_report']='ابھی کوئی رن رپورٹ نہیں ہے۔ یہ رپورٹ EPANET کی متنی رپورٹ ہے، اس لیے یہ اس نیٹ ورک کا حساب ہونے کے بعد ظاہر ہوتی ہے۔';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

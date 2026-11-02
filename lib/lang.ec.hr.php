@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Isključite ako je ponovni izračun presp
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Izračun ove mreže trajao je {secs} s, a postavljena je da se ponovno izračunava nakon svake promjene. Da to zaustavite i vratite gumb Izračunaj, isključite „Izračunavaj automatski” u Postavkama, pod Izračun, Hidraulika.';
-$ec_lang['lpn_time_no_report']='Izvještaj o pokretanju još ne postoji. Izvještaj je EPANET tekstualni izvještaj, pa se pojavljuje nakon što je ova mreža izračunata.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='បិទប្រសិនបើកា�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='បណ្ដាញនេះចំណាយពេល {secs} វិនាទីដើម្បីគណនា ហើយវាត្រូវបានកំណត់ឲ្យគណនាឡើងវិញបន្ទាប់ពីរាល់ការផ្លាស់ប្ដូរ។ ដើម្បីបញ្ឈប់វា ហើយឲ្យប៊ូតុង គណនា ត្រឡប់មកវិញ សូមបិទ “គណនាឡើងវិញដោយស្វ័យប្រវត្តិ” នៅក្នុង ការកំណត់ ក្រោម ការគណនា, ធារាសាស្ត្រ។';
-$ec_lang['lpn_time_no_report']='មិនទាន់មានរបាយការណ៍ដំណើរការនៅឡើយទេ។ របាយការណ៍នេះជាអត្ថបទផ្ទាល់របស់ EPANET ដូច្នេះវានឹងបង្ហាញនៅពេលបណ្ដាញនេះត្រូវបានគណនាដោយឧបករណ៍ដោះស្រាយ EPANET។';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

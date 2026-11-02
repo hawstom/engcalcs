@@ -1747,7 +1747,6 @@ $ec_lang['lpn_settings_auto_run_tip']='اگر محاسبهٔ دوباره بسی
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='محاسبهٔ این شبکه {secs} ثانیه طول کشید، و طوری تنظیم شده که پس از هر تغییری دوباره محاسبه شود. برای متوقف کردن این کار و بازگرداندن دکمهٔ محاسبه، «محاسبهٔ خودکار» را در تنظیمات، زیر محاسبه، هیدرولیک، خاموش کنید.';
-$ec_lang['lpn_time_no_report']='هنوز گزارش اجرا وجود ندارد. گزارش همان گزارش متنی EPANET است، پس پس از محاسبهٔ این شبکه نمایان می‌شود.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

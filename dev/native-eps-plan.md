@@ -92,7 +92,7 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    loop does not keep them. After every Calculate the status bar says which solver answered
    (`lpn_engine_native_used`; the routed-run sentences name EPANET) and the run summary says it for either solver
    (`lpn_engine_native_used`, `lpn_engine_epanet_used`). The run report is empty on a built-in run
-   (`lpn_time_no_report` says why). EPANET-MSX stays on EPANET.
+   (see Reports, Run report). EPANET-MSX stays on EPANET.
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -328,7 +328,7 @@ the loop end to end. Tolerances, at every node and link at every reporting time:
 
 "The built-in solver solves one instant" was false for the networks the loop covers from the day slice 7
 ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine_why`,
-`lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`, `lpn_time_no_report`. What stays
+`lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`. What stays
 true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.
 
 ## What still falls back to EPANET under the built-in setting (updated 2026-11-01)
@@ -348,8 +348,7 @@ named by `lpnDiagnose`; and pressure-driven demand, steady and period.
 | A tank volume curve with no usable rows; a tank level outside its limits; a quality, energy or control input EPANET refuses (errors 207, 211, 213, 217, 225, 230) | `native-run-volume-curve`, `-tank-levels`, `-quality`, `-energy`, `-control-unsupported` | EPANET errors on each, so the answer is the same refusal in both engines. Rules got their named refusal (`lpnDiagnose` `rules-refused`); these five have not been moved to `lpnDiagnose` yet. |
 | A step the built-in solver cannot solve (`lpnDiagnose`), or a loop that throws | `finish(null)` in `periodRun()` | A real failure, shown as EPANET's answer. |
 
-**Not a run, and not changed**: the EPANET text run report (Project, EPANET run report; no report exists on a
-built-in run and `lpn_time_no_report` says so) and the run's warnings in EPANET's words (`nativeWarnings()`
+**Not a run, and not changed**: the run's warnings in EPANET's words (`nativeWarnings()`
 carries only the bridge's notes). A later slice.
 
 ## Analysis runs (this slice)

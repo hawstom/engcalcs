@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='ပြန်တွက်ချက်ခ�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='ဤကွန်ရက်ကို တွက်ချက်ရန် {secs} စက္ကန့် ကြာခဲ့ပြီး၊ ပြောင်းလဲမှုတိုင်းနောက်တွင် ပြန်တွက်ချက်ရန် သတ်မှတ်ထားသည်။ ၎င်းကို ရပ်တန့်ပြီး Calculate ခလုတ် ပြန်ရရန်၊ ဆက်တင်များ ထဲ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် အောက်ရှိ “အလိုအလျောက် ပြန်တွက်ချက်ရန်” ကို ပိတ်ပါ။';
-$ec_lang['lpn_time_no_report']='လည်ပတ်မှုအစီရင်ခံစာ မရှိသေးပါ။ အစီရင်ခံစာသည် EPANET စာသားအစီရင်ခံစာဖြစ်သဖြင့် ဤကွန်ရက်ကို တွက်ချက်ပြီးနောက် ပေါ်လာမည်။';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

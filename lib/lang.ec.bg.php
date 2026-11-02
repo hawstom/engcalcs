@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Изключете, ако преизчи
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Тази мрежа отне {secs} s за изчисление, и е зададена да се преизчислява след всяка промяна. За да спрете това и да върнете бутона „Изчисли“, изключете „Преизчислявай автоматично“ в Настройки, под Изчисление, Хидравлика.';
-$ec_lang['lpn_time_no_report']='Все още няма отчет от изчислението. Отчетът е текстовият отчет на EPANET, затова се появява, след като тази мрежа е изчислена.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

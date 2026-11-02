@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Desative se o recálculo estiver lento de
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Esta rede levou {secs} s para calcular, e está configurada para recalcular depois de cada mudança. Para interromper isso e recuperar um botão Calcular, desligue "Recalcular automaticamente" em Configurações, em Cálculo, Hidráulica.';
-$ec_lang['lpn_time_no_report']='Ainda não há relatório de execução. O relatório é o relatório de texto do EPANET, então aparece depois que esta rede for calculada.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

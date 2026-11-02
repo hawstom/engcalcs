@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Yeniden hesaplama çok yavaşsa kapatın.
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Bu şebekenin hesaplanması {secs} sn sürdü ve her değişiklikten sonra yeniden hesaplanacak şekilde ayarlı. Bunu durdurup bir Hesapla düğmesi geri almak için Ayarlar\'da, Hesaplama, Hidrolik altında “Otomatik olarak yeniden hesapla”yı kapatın.';
-$ec_lang['lpn_time_no_report']='Henüz bir çalışma raporu yok. Rapor, EPANET\'in kendi metnidir, bu yüzden bu şebeke EPANET çözücüsüyle hesaplandığında görünür.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

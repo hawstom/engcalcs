@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='如果重新计算太慢，请关闭此�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='此管网计算耗时 {secs} 秒，且设置为每次更改后自动重新计算。要停止这一行为并恢复"计算"按钮，请在"设置"的"计算"下"水力计算"中关闭"自动重新计算"。';
-$ec_lang['lpn_time_no_report']='尚无运行报告。该报告是 EPANET 文本报告，因此在本管网计算之后才会出现。';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

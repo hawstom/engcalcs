@@ -1104,6 +1104,7 @@
 	function startRun(model) {
 		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model),
 			shown = state.wantedByUser;
+		instantRun = null;   // a period's report replaces an instant's
 		cancelIdleRun();
 		state.busy = true;
 		state.failed = null;
@@ -2090,7 +2091,42 @@
 	 * this page shows a run's outcome, it already closes on its X, Enter and Escape, and a second
 	 * window would be a second thing to keep in step with the report's format.
 	 */
-	EC.lpnTimeLastReport = function () { return lastReport; };
+	EC.lpnTimeLastReport = function () {
+		if (!lastReport && instantRun && instantRun.engine !== 'epanet') { instantReportNative(); }
+		return lastReport;
+	};
+	// **A SINGLE INSTANT LEAVES A RUN REPORT TOO** (Tom, 2026-11-01: every run, by either engine). The report of an
+	// instant is EPANET's, written by the engine the run used, and is made when it is asked for rather than on every
+	// edit: the page records the model it solved, and the first read turns it into text. The built-in loop writes it
+	// at once; EPANET is asked for it as a run of no duration and answers later (EC.lpnTimeReportAsync).
+	var instantRun = null;
+	EC.lpnTimeInstantRun = function (model, engine) {
+		instantRun = model ? { model: model, engine: engine === 'epanet' ? 'epanet' : 'native', pending: null } : null;
+		lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
+	};
+	// Is there a run to report on: a period that wrote one, or an instant that was solved.
+	EC.lpnTimeHasReport = function () { return !!(lastReport || instantRun); };
+	function instantReportNative() {
+		var r, run = instantRun;
+		try {
+			r = EC.lpnNativeRun && EC.lpnNativeRun(run.model, { quality: true });
+		} catch (e) { r = null; }
+		if (r && r.ok && r.report) { lastReport = r.report; }
+		else if (EC.lpnEpanetRun) { run.engine = 'epanet'; }
+	}
+	// null when the report is already text (or there is no run); otherwise a promise that settles when EPANET has written
+	// it. After it settles, lpnTimeLastReport() answers.
+	EC.lpnTimeReportAsync = function () {
+		var run = instantRun;
+		if (lastReport || !run) { return null; }
+		if (run.engine !== 'epanet') { instantReportNative(); if (lastReport || run.engine !== 'epanet') { return null; } }
+		if (!run.pending) {
+			run.pending = EC.lpnEpanetRun(run.model, { quiet: true }).then(function (r) {
+				if (instantRun === run && r && r.report) { lastReport = r.report; }
+			}, function () {});
+		}
+		return run.pending;
+	};
 	// The same act as the box's X, Escape and Enter, exposed so a harness can close it the way a
 	// person does rather than by reaching into state.
 	EC.lpnTimeRunBoxHide = function () { boxHide(); };

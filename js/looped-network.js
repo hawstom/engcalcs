@@ -8346,8 +8346,9 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run report',
 				tip: pc.lpn_time_run_report_tip,
+				disabled: !(EngCalcs.lpnTimeHasReport && EngCalcs.lpnTimeHasReport()),
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
 				// the report exists, while a sentence saying why there is none teaches exactly that
@@ -47363,7 +47364,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run report, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
@@ -81088,6 +81089,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 
 		engineRouteNote = '';
 		var engine = scnSetting('engine');
+		// Every run leaves a run report: the instant's is made when it is asked for (js/lpn-time.js).
+		if (EngCalcs.lpnTimeInstantRun) { EngCalcs.lpnTimeInstantRun(model, engine); }
 		if (engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
 			runSolveEpanet(model);
 			return;
@@ -84981,25 +84984,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
 	}
 	function openRunReportBox(restoring) {
-		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
-			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(),
-			noReport = pc.lpn_time_no_report ||
-				'There is no run report. The report is the EPANET text report, so it appears after an extended period simulation of this network.';
-		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
-		// the built-in solver prints nothing, so a network that has never reached EPANET has no
-		// report and never will until it does, and a sentence saying that teaches what a vanishing
-		// row cannot. A box the reader ASKED for gets the sentence as a notice and no box; a box
-		// coming back with the page (Tom, 2026-09-08) is a box the reader left open, so it comes
-		// back with the sentence inside it and refreshRunReportBoxIfOpen() fills it when the run
-		// arrives.
-		if (!text && !restoring) {
-			setNotice(noReport);
-			return false;
+		var box = rptBoxEl(), pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(), later;
+		// **EVERY RUN LEAVES A REPORT, by either engine** (Tom, 2026-11-01), so there is no sentence for "no
+		// report": the menu row is greyed until a run has happened. A single instant solved by EPANET writes its
+		// report when asked, a moment later, and the box opens when it arrives.
+		later = !text && EngCalcs.lpnTimeReportAsync ? EngCalcs.lpnTimeReportAsync() : null;
+		if (later) {
+			later.then(function () { openRunReportBox(restoring); });
+			return true;
 		}
+		text = lastRunReportText();
+		if (!text && !restoring) { return false; }
 		if (!box || !pre) { return false; }
 		closeMenu();
 		hideOpenTips();
-		pre.textContent = text || noReport;
+		pre.textContent = text;
 		showRunReportScenario();
 		box.style.display = 'flex';
 		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
@@ -85077,6 +85076,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
+		else if (EngCalcs.lpnTimeReportAsync) {
+			var later = EngCalcs.lpnTimeReportAsync();
+			if (later) { later.then(function () { if (lastRunReportText() && rptBoxIsOpen()) { pre.textContent = lastRunReportText(); } }); }
+		}
 		showRunReportScenario();
 	}
 	function closeEnergyBox() {

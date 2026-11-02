@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Dezactivați dacă recalcularea este prea
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Calculul acestei rețele a durat {secs} s, iar rețeaua este setată să se recalculeze după fiecare modificare. Pentru a opri asta și a readuce butonul Calculează, dezactivați „Recalculează automat” din Setări, la Calcul, Hidraulică.';
-$ec_lang['lpn_time_no_report']='Nu există încă un raport de rulare. Raportul este raportul text EPANET, deci apare după ce această rețea a fost calculată.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

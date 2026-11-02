@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Ausschalten, wenn die Neuberechnung zu la
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Die Berechnung dieses Netzes hat {secs} s gedauert, und es ist so eingestellt, dass es nach jeder Änderung neu berechnet wird. Um das zu stoppen und eine Schaltfläche Berechnen zurückzubekommen, schalten Sie „Automatisch neu berechnen“ in den Einstellungen unter Berechnung, Hydraulik aus.';
-$ec_lang['lpn_time_no_report']='Es gibt noch keinen Laufbericht. Der Bericht ist der EPANET-Textbericht und erscheint daher, nachdem dieses Netz berechnet wurde.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

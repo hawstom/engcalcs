@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Vypněte, je-li přepočet příliš poma
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Výpočet této sítě trval {secs} s a síť je nastavena tak, aby se přepočítala po každé změně. Chcete-li to zastavit a získat zpět tlačítko Vypočítat, vypněte v Nastavení, v části Výpočet, Hydraulika, „Přepočítávat automaticky“.';
-$ec_lang['lpn_time_no_report']='Zpráva o výpočtu zatím neexistuje. Zpráva je textová zpráva EPANET, takže se objeví poté, co je tato síť vypočtena.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

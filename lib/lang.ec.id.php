@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Matikan jika penghitungan ulang terlalu l
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Jaringan ini membutuhkan {secs} s untuk dihitung, dan diatur untuk menghitung ulang setelah setiap perubahan. Untuk menghentikannya dan mendapatkan kembali tombol Hitung, matikan “Hitung ulang otomatis” di Pengaturan, pada Perhitungan, Hidraulika.';
-$ec_lang['lpn_time_no_report']='Belum ada laporan proses. Laporan ini adalah laporan teks EPANET, sehingga muncul setelah jaringan ini dihitung.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

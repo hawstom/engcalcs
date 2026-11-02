@@ -2657,7 +2657,6 @@ EngCalcs.pageConfig = {
 	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
 	lpn_time_run_report_copied: <?=json_encode($ec_lang['lpn_time_run_report_copied'])?>,
 	lpn_time_run_report_tip: <?=json_encode($ec_lang['lpn_time_run_report_tip'])?>,
-	lpn_time_no_report: <?=json_encode($ec_lang['lpn_time_no_report'])?>,
 	lpn_close: <?=json_encode($ec_lang['lpn_close'])?>,
 	lpn_dock_left: <?=json_encode($ec_lang['lpn_dock_left'])?>,
 	lpn_dock_right: <?=json_encode($ec_lang['lpn_dock_right'])?>,

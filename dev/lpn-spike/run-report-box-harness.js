@@ -40,7 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\treportMenuRow: function () {\n" +
 	"\t\t\tvar pc = EngCalcs.pageConfig || {};\n" +
 	"\t\t\treturn reportMenuRows().filter(function (r) {\n" +
-	"\t\t\t\treturn r && r.label === (pc.lpn_reports_epanet || 'Run');\n" +
+	"\t\t\t\treturn r && r.label === (pc.lpn_reports_epanet || 'Run report');\n" +
 	"\t\t\t})[0] || null;\n" +
 	"\t\t},\n"
 );
@@ -106,27 +106,21 @@ console.log('\n=== 2. a new run rewrites what the reader is looking at ===');
 }
 
 // ------------------------------------------------------------------------------------------------
-console.log('\n=== 3. SHOWN, OR EXPLAINED -- never an empty box ===');
+console.log('\n=== 3. NO RUN, NO ROW (the sentence is gone; every run leaves a report) ===');
 // ------------------------------------------------------------------------------------------------
 {
 	withReport('');
+	global.EngCalcs.lpnTimeHasReport = function () { return false; };
 	notice.textContent = '';
 	const opened = L.openRunReportBox();
-	ok('with no report the box refuses to open', opened === false);
-	ok('...and it is not on screen', L.rptBoxIsOpen() === false, box.style.display);
-	ok('...and the reader is told why, in a sentence naming the EPANET solver',
-		/EPANET/.test(notice.textContent || ''), JSON.stringify(notice.textContent));
-	// The menu ROW is unconditional for the same reason: a row that disappears teaches nobody that
-	// the report exists. This is the row itself, read out of the menu it is built into.
+	ok('with no report the box does not open', opened === false && L.rptBoxIsOpen() === false);
+	ok('...and says nothing, because the row is greyed instead of explaining', !notice.textContent, JSON.stringify(notice.textContent));
 	const row = L.reportMenuRow();
-	ok('the menu row is there even with no report to show', !!row && typeof row.fn === 'function');
-	notice.textContent = '';
-	row.fn();
-	ok('...and pressing it explains rather than opening a blank box',
-		L.rptBoxIsOpen() === false && /EPANET/.test(notice.textContent || ''),
-		JSON.stringify(notice.textContent));
+	ok('the menu row is there, greyed until a run has happened', !!row && row.disabled === true);
+	global.EngCalcs.lpnTimeHasReport = function () { return true; };
+	ok('...and enabled once a run has left a report', L.reportMenuRow().disabled === false);
 	withReport(REPORT);
-	row.fn();
+	L.reportMenuRow().fn();
 	ok('...and with a report it opens the box', L.rptBoxIsOpen() === true, box.style.display);
 	L.closeRunReportBox();
 }

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Zima ikiwa ukokotoaji upya ni wa polepole
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Mtandao huu ulichukua sekunde {secs} kukokotoa, na umewekwa kukokotoa upya baada ya kila mabadiliko. Ili kusitisha hilo na kupata kitufe cha Kokotoa kirudi, zima “Kokotoa upya kiotomatiki” kwenye Mipangilio, chini ya Ukokotoaji, Haidroliki.';
-$ec_lang['lpn_time_no_report']='Bado hakuna ripoti ya uendeshaji. Ripoti ni ripoti ya maandishi ya EPANET, kwa hiyo huonekana baada ya mtandao huu kukokotolewa.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact

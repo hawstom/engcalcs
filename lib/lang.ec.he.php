@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='כבו אם החישוב מחדש איט�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='חישוב רשת זו ארך {secs} שנ׳, והיא מוגדרת להיות מחושבת מחדש אחרי כל שינוי. כדי לעצור זאת ולקבל בחזרה כפתור חישוב, כבו את ”חשב מחדש אוטומטית” בהגדרות, תחת חישוב, הידראוליקה.';
-$ec_lang['lpn_time_no_report']='עדיין אין דוח הרצה. הדוח הוא דוח הטקסט של EPANET, ולכן הוא מופיע לאחר שרשת זו חושבה.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
