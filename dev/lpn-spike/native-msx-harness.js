@@ -4,6 +4,12 @@
 //
 // The engine under it is the vendored epanet-js build, which runs EPA's own epanet-msx. Each slice is held to that
 // engine, never to this file agreeing with itself.
+//   Slices 2 to 5: the chemistry and the transport. The same network and the same .msx run through the engine
+//            (lpnEpanetRun) and through the built-in loop (lpnNativeRun with quality) and every species at every node and
+//            link at every reporting time is compared: each solver (EUL, RK5, ROS2), coupling NONE and FULL, equilibrium and
+//            formula species, a wall species, every source type, a pattern, per-pipe parameters, a term using Av, and the
+//            tank models MIXED and FIFO. A 2-compartment or last-in-first-out tank under MSX is left to EPANET by name
+//            (the gap is measured and held below), not claimed.
 //   Slice 1: the file and the expressions. The .msx parser (js/lpn-native-msx.js lpnMsxParse) reads the fixtures to the
 //            same species, units, tolerances, constants, parameters, sources and initial qualities the engine reads from
 //            the same text, and the expression evaluator gives MSX's own answers, quirks included.
@@ -14,7 +20,10 @@ const ROOT = path.join(__dirname, '..', '..');
 require('./bootstrap.js');
 const EngCalcs = require(path.join(ROOT, 'js', 'lpn-solver.js'));
 global.EngCalcs = EngCalcs;
-require(path.join(ROOT, 'js', 'lpn-native-msx.js'));
+require(path.join(ROOT, 'js', 'lpn-patterns.js'));
+Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
+['lpn-inp', 'lpn-epanet', 'lpn-time', 'lpn-native-msx', 'lpn-native-run'].forEach((f) => require(path.join(ROOT, 'js', f + '.js')));
+const { buildModel } = require('./net3-model.js');
 
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {
@@ -181,8 +190,94 @@ async function slice1() {
 		!bad.ok && bad.errors.length >= 5 && bad.errors.every((e) => e.line > 0 || e.code === 410), bad.errors.map((e) => e.code + '@' + e.line).join(' '));
 }
 
+const copy = (m) => JSON.parse(JSON.stringify(m));
+function loadNet(file, edit, msxText) {
+	const parsed = EngCalcs.lpnInpParse(fs.readFileSync(file.indexOf('/') >= 0 ? file : path.join(__dirname, 'reference', file), 'utf8'));
+	const m = buildModel(EngCalcs, parsed);
+	m.hydraulics = Object.assign({ accuracy: 1e-5 }, m.hydraulics || {});
+	m.quality = { mode: 'msx' };
+	m.msx = { text: msxText };
+	if (edit) { edit(m); }
+	return m;
+}
+// every value of every species at every node and link at every report time: the largest gap, and where
+async function against(name, m, tol) {
+	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	const e = await EngCalcs.lpnEpanetRun(copy(m)), refs = EngCalcs.lpnNativeRunRefusals(copy(m), { quality: true });
+	if (!e.ok) { ok(name + ': the engine ran', false, JSON.stringify(e.issues || '')); return null; }
+	if (refs.length) { ok(name + ': the built-in loop takes it', false, JSON.stringify(refs)); return null; }
+	const n = EngCalcs.lpnNativeRun(copy(m), { quality: true });
+	if (!n.ok) { ok(name + ': the built-in loop ran', false, JSON.stringify(n.issues || '')); return null; }
+	let worst = 0, at = '', cnt = 0, moved = 0;
+	e.frames.forEach((fe, i) => {
+		const fn = n.frames[i];
+		['msxNodes', 'msxLinks'].forEach((key) => {
+			Object.keys(fe[key] || {}).forEach((id) => {
+				fe[key][id].forEach((v, sp) => {
+					if (v === null) { if (fn[key][id][sp] !== null) { worst = Infinity; at = 'wall at node ' + id; } return; }
+					const d = Math.abs(v - fn[key][id][sp]);
+					cnt++;
+					if (i && Math.abs(v - e.frames[i - 1][key][id][sp]) > 1e-3) { moved++; }
+					if (d > worst) { worst = d; at = `${key === 'msxNodes' ? 'node' : 'link'} ${id} species ${sp + 1} at ${fe.t / 3600} h (${v.toPrecision(6)} / ${fn[key][id][sp].toPrecision(6)})`; }
+				});
+			});
+		});
+	});
+	ok(`${name}: ${cnt} values within ${tol}, and they move (${moved} changes) so agreement is not two constants`, e.frames.length === n.frames.length && worst <= tol && moved > 20,
+		`worst ${worst.toExponential(2)} ${at}`);
+	return { e, n };
+}
+const CHL = `[TITLE]
+Chlorine first-order bulk decay (one species)
+[OPTIONS]
+AREA_UNITS FT2
+RATE_UNITS HR
+SOLVER     RK5
+TIMESTEP   300
+RTOL       0.001
+ATOL       0.0001
+[SPECIES]
+BULK CL2 MG
+[COEFFICIENTS]
+CONSTANT Kb 0.3
+[PIPES]
+RATE CL2 -Kb*CL2
+[TANKS]
+RATE CL2 -Kb*CL2
+[QUALITY]
+GLOBAL CL2 0.5
+NODE 9 CL2 1.2
+`;
+async function slices2to5() {
+	console.log('-- slices 2 to 5: the chemistry and the transport, against the engine');
+	const EX = path.join(FIX, 'msx-example');
+	const exInp = path.join(EX, 'example.inp'), exMsx = fs.readFileSync(path.join(EX, 'example.msx'), 'utf8');
+	await against('Net1, chlorine decay, RK5', loadNet('Net1.inp', null, CHL), 5e-4);
+	for (const solver of ['EUL', 'RK5', 'ROS2']) {
+		for (const coupling of ['NONE', 'FULL']) {
+			const t1 = NET1_MSX.replace('SOLVER RK5', 'SOLVER ' + solver).replace('COUPLING NONE', 'COUPLING ' + coupling);
+			await against(`Net1, two bulk species and a wall species with a term, parameter, pattern and two sources, ${solver}, coupling ${coupling}`, loadNet('Net1.inp', null, t1), 5e-4);
+			const t2 = exMsx.replace(/SOLVER\s+RK5/, 'SOLVER ' + solver).replace('[OPTIONS]', '[OPTIONS]\n  COUPLING ' + coupling);
+			await against(`EPA's arsenic oxidation and adsorption example (equilibrium, formula, wall), ${solver}, coupling ${coupling}`, loadNet(exInp, null, t2), 1e-5);
+		}
+	}
+	// source types: the four, on a node with demand, one with a pattern; a tank-model tour on Net1's tank
+	const SRC = NET1_MSX.replace('CONC 10 CL2 1.5 P1\n  MASS 13 TOT 20', 'SETPOINT 10 CL2 0.9\n  FLOW 13 TOT 2.5 P1\n  MASS 22 TOT 15\n  CONC 31 CL2 3');
+	await against('Net1, SETPOINT, FLOWPACED (with a pattern), MASS and CONCEN sources', loadNet('Net1.inp', null, SRC), 5e-4);
+	for (const mix of ['MIXED', 'FIFO']) {
+		await against(`Net1, tank mixing model ${mix}`, loadNet('Net1.inp', (m) => { m.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix }; } }); }, NET1_MSX), 5e-4);
+	}
+	// what is NOT yet claimed: named, and the gap measured
+	for (const mix of ['2COMP', 'LIFO']) {
+		const m = loadNet('Net1.inp', (mm) => { mm.nodes.forEach((nd) => { if (nd.type === 'tank') { nd.mixing = { model: mix, fraction: 0.3 }; } }); }, NET1_MSX);
+		const refs = EngCalcs.lpnNativeRunRefusals(copy(m), { quality: true });
+		ok(`Net1, tank mixing model ${mix}: the built-in loop leaves it to EPANET, by tank name`, refs.some((r) => r.code === 'native-run-quality' && r.ids.indexOf('2') >= 0), JSON.stringify(refs));
+	}
+}
+
 async function run() {
 	await slice1();
+	await slices2to5();
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 }

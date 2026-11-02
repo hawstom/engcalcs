@@ -362,7 +362,14 @@
 		// keeps every quality run on EPANET until slice 7's wiring says otherwise, exactly as before.
 		// Asked for, what the pass cannot copy is refused by name; EPANET-MSX always is.
 		q = model.quality;
-		if (model.msx || (q && q.mode === 'msx')) { add('native-run-quality', [], true); }
+		if (model.msx || (q && q.mode === 'msx')) {
+			// EPANET-MSX: run when the caller asks for quality and the file reads and its expressions are complete
+			// (js/lpn-native-msx.js); what it cannot copy is refused by name, as for a chemical.
+			var mc = (options && options.quality) ? msxConfig(model) : null;
+			if (!mc) { add('native-run-quality', [], true); }
+			else if (mc.bad.length) { add('native-run-quality', mc.bad); }
+			else if (!((time.times && time.times.qualityStep > 0) || mc.spec.options.qstep > 0 || hydStepOf(time.times) >= 10)) { add('native-run-quality', ['Quality Timestep']); }
+		}
 		else if (q && q.mode && q.mode !== 'none') {
 			if (!(options && options.quality)) { add('native-run-quality', [], true); }
 			else {
@@ -748,7 +755,7 @@
 			emax = Math.max(emax, psum);
 		}
 		rtime = repStep;
-		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, hydRecs = [],
+		var qcfg = opts.quality ? qualityConfig(model) : { mode: null }, msxCfg = opts.quality ? msxConfig(model) : null, hydRecs = [],
 			stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0, convAccuracy = null;
 
 
@@ -1092,7 +1099,7 @@
 			if (res.converged === false) { stepsUnconverged++; if (firstBadT === null) { firstBadT = htime; } }
 			readBack(stepModel, stepLinks, ls, res);
 			solveTimes.push(htime);
-			if (qcfg.mode) { hydRecs.push(hydRecord(model, cur, res, ls, htime)); }   // savehyd()
+			if (qcfg.mode || msxCfg) { hydRecs.push(hydRecord(model, cur, res, ls, htime, !!msxCfg)); }   // savehyd()
 			// A tank's net inflow, from the link flows the solve returned (a link a full or empty tank
 			// shut reports no flow, which is what keeps the level from passing its limits).
 			tanks.forEach(function (tk) {
@@ -1139,13 +1146,27 @@
 			if (++guard >= 100000) { break; }
 			yield { phase: 'hydraulic', done: htime, of: dur };
 		}
+		// ---- EPANET-MSX: its own pass, over the same records ----
+		var msxSpecies;
+		if (msxCfg) {
+			var mnet = qualityNet(model), mtanks = {};
+			tanks.forEach(function (tk) {
+				var mx = tk.node.mixing || {}, mmx = mx.model ? keywordOf(mx.model, MIX_TYPES) : MIX1, f1 = typeof mx.fraction === 'number' && isFinite(mx.fraction) && mx.fraction !== 0 ? mx.fraction : 1;
+				mtanks[tk.id] = { V0: tk.V0, Vmax: tk.Vmax, v1frac: f1, mix: mmx === MIX1 ? 0 : mmx === MIX2 ? 1 : mmx === FIFO ? 2 : 3 };
+			});
+			var mqs = times.qualityStep > 0 ? times.qualityStep : Math.floor(hydStep / 10);
+			var mres = yield* EC.lpnMsxPassSteps({ spec: msxCfg.spec, net: mnet, recs: hydRecs, tanks: mtanks, tankCount: mnet.nodes.filter(function (nd) { return nd && (nd.type === 'reservoir' || nd.type === 'tank'); }).length,
+				method: model.method || 'hw', dur: dur, qstep: Math.min(mqs, hydStep), patStep: patStep, patStart: patStart, isReportTime: isReportTime, frames: frames });
+			if (!mres.ok) { return { ok: false, issues: mres.issues }; }
+			msxSpecies = mres.species;
+		}
 		// ---- WATER QUALITY (phase 4): EPANET's second pass, over the hydraulics just saved ----
 		if (qcfg.mode) {
 			tanks.forEach(function (tk) { tk.vEnd = tk.V; });
 			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur),
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur), msxSpecies: msxSpecies,
 			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
 			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
 			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,
@@ -1706,6 +1727,27 @@
 
 	// What the model asks of the quality pass, as js/lpn-epanet.js writes it to EPANET, and what of it
 	// the loop cannot run (`bad`, ids for native-run-quality). `mode` is null for no analysis.
+	// EPANET-MSX: the attached file, read against the run's own nodes and links. null when there is none to run;
+	// `bad` lists what stops the run, named in the file's words (the line, the code).
+	function msxConfig(model) {
+		var q = model.quality || {}, nodeId = {}, linkId = {}, r, bad = [];
+		if (q.mode !== 'msx' || !model.msx || !model.msx.text || typeof EC.lpnMsxParse !== 'function') { return null; }
+		(model.nodes || []).forEach(function (n) { nodeId[String(n.id)] = true; });
+		(model.links || []).forEach(function (l) { linkId[String(l.id)] = true; });
+		r = EC.lpnMsxParse(model.msx.text, { node: function (id) { return !!nodeId[id]; }, link: function (id) { return !!linkId[id]; } });
+		r.errors.forEach(function (e) { bad.push('line ' + e.line + ' (' + e.code + ')'); });
+		if (!bad.length && typeof EC.lpnMsxCheck === 'function') {
+			var code = EC.lpnMsxCheck(r.spec);
+			if (code) { bad.push('expressions (' + code + ')'); }
+		}
+		(model.nodes || []).forEach(function (n) {
+			if (n.type === 'tank' && !tankHasArea(n)) { bad.push(String(n.id)); }
+			// a 2-compartment or last-in-first-out tank under MSX is not yet copied to the engine's answer (native-msx-harness.js
+			// holds the gap at 1e-2 and 3e-2 of the concentration); the run is left to EPANET, by tank name
+			if (n.type === 'tank' && n.mixing && n.mixing.model && /^(2COMP|LIFO)$/i.test(String(n.mixing.model))) { bad.push(String(n.id)); }
+		});
+		return { spec: r.spec, bad: bad };
+	}
 	function qualityConfig(model) {
 		var q = model.quality || {}, bad = [], pats = {}, cfg = { mode: null, bad: bad }, inNode = {};
 		(model.nodes || []).forEach(function (n) { inNode[String(n.id)] = n; });
@@ -1763,7 +1805,7 @@
 
 	// One saved hydraulic solution (output.c savehyd()): link flows and junction demands in cfs as
 	// 4-byte floats, a link at or below CLOSED saved with no flow. Keyed by the model's own link order.
-	function hydRecord(model, cur, res, ls, t) {
+	function hydRecord(model, cur, res, ls, t, withHyd) {
 		var q = new Array(model.links.length), closed = new Array(model.links.length), d = {}, exp = model.emitterExponent || 0.5;
 		model.links.forEach(function (l, k) {
 			closed[k] = ls[k].s <= CLOSED;
@@ -1778,6 +1820,24 @@
 			if (n.emitter > 0) { x += n.emitter * Math.pow(Math.max((res.heads[n.id] || 0) - (n.elev || 0), 0), exp); }
 			d[String(n.id)] = Math.fround(x * 1000 / LPS_PER_CFS);
 		});
+		if (withHyd) {
+			// What EPANET-MSX reads from the hydraulics file (output.c savehyd()): every node's head (ft), every link's flow (none
+			// in a link at or below CLOSED), as 4-byte floats; and the net inflow of each reservoir and tank, its node demand, a
+			// closed link's leak included.
+			var h = {}, dn = {}, qr = new Array(model.links.length), net = {};
+			model.links.forEach(function (l, k) {
+				var f = res.leakFlows && typeof res.leakFlows[l.id] === 'number' ? res.leakFlows[l.id] : (res.flows[l.id] || 0);
+				qr[k] = f * 1000 / LPS_PER_CFS;
+				if (l.to !== undefined) { net[String(l.to)] = (net[String(l.to)] || 0) + qr[k]; }
+				if (l.from !== undefined) { net[String(l.from)] = (net[String(l.from)] || 0) - qr[k]; }
+				qr[k] = closed[k] ? 0 : Math.fround(qr[k]);   // savehyd(): a link at or below CLOSED is saved with no flow
+			});
+			model.nodes.forEach(function (n) {
+				h[String(n.id)] = Math.fround((res.heads[n.id] || 0) / FT);
+				if (n.type === 'reservoir' || n.type === 'tank') { dn[String(n.id)] = Math.fround(net[String(n.id)] || 0); }
+			});
+			return { t: t, q: qr, closed: closed, d: d, h: h, dn: dn };
+		}
 		return { t: t, q: q, closed: closed, d: d };
 	}
 

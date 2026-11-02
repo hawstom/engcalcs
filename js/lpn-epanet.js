@@ -750,7 +750,9 @@
 		// number we invented would state a split the user never made.
 		// Skipped entirely when no analysis is running -- a hydraulics-only file gets exactly the
 		// input it always got, and a mixing model means nothing without a quality run.
-		if (qualLine) {
+		// EPANET-MSX reads a tank's mixing model from the same section, so a multi-species run needs it written too (it was not, and
+		// every MSX tank mixed completely whatever the page said).
+		if (qualLine || (qualMode === 'msx' && model.msx && model.msx.text)) {
 			for (i = 0; i < model.nodes.length; i++) {
 				n = model.nodes[i];
 				if (!n.mixing || !n.mixing.model) { continue; }
