@@ -584,7 +584,7 @@
 			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. Its run report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Run report',
-			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
+			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.',
 			close: pageConfig.lpn_close || 'Close',
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
 			// page has to be one press (Tom, 2026-09-04, having just had to retype one by hand: *"A

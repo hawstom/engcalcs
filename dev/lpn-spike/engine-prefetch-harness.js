@@ -35,7 +35,7 @@ const INJECT =
 	"\t\tgetDoc: function () { return doc; }, settings: function () { return settings; },\n" +
 	"\t\tserializeProject: serializeProject,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
-	"\t\thydraulicsFieldsEl: function () { return document.getElementById('lpn_set_hydraulics_fields'); },\n" +
+	"\t\thydraulicsFieldsEl: function () { return document.getElementById('lpn_set_solver_fields'); },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +

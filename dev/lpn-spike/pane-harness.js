@@ -267,7 +267,7 @@ console.log('\n--- the rulings that are easiest to undo by accident ---');
 	report(box > 0, 'the Settings box is in the page');
 	['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_options',
 		'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-		'lpn_set_time_fields', 'lpn_set_hydraulics_fields', 'lpn_set_page_fields',
+		'lpn_set_time_fields', 'lpn_set_hydraulics_fields', 'lpn_set_solver_fields', 'lpn_set_page_fields',
 		'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_nodelink',
 		'lpn_set_colors_shared'].forEach((id) => {
 		const at = php.indexOf('id="' + id + '"');
