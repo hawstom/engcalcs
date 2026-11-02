@@ -262,6 +262,19 @@ function sameResults(label, r, kinds, skip) {
 			for (let i = 0; i < Math.max(a.length, b.length); i++) { if (!tok(a[i] || '', b[i] || '')) { first = i; break; } }
 			ok(label + ': the built-in report states the same units and layout as EPANET\'s, line for line', first < 0,
 				first < 0 ? a.length + ' lines' : 'line ' + (first + 1) + ': EPANET "' + a[first] + '" built-in "' + b[first] + '"');
+			// the mass balance block is EPANET's raw figures: each within 1e-4 of itself (noise under 1e-3 aside), the segment count exact
+			{
+				const mbOf = (t) => { const L2 = stamp(t), i = L2.findIndex((x) => /Water Quality Mass Balance/.test(x)); return i < 0 ? [] : L2.slice(i, i + 10); };
+				const ma = mbOf(e.report), mb2 = mbOf(n.report);
+				let worst = 0, bad = ma.length === 0 || ma.length !== mb2.length;
+				ma.forEach((l, i) => {
+					const x = Number(l.split(/:\s+/).pop()), y = Number((mb2[i] || '').split(/:\s+/).pop());
+					if (!isFinite(x) || !isFinite(y)) { if (l !== mb2[i]) { bad = true; } return; }
+					if (/Total Segments/.test(l)) { if (x !== y) { bad = true; } return; }
+					if (Math.max(Math.abs(x), Math.abs(y)) > 1e-3) { worst = Math.max(worst, Math.abs(x - y) / Math.max(Math.abs(x), Math.abs(y))); }
+				});
+				ok(label + ': the Water Quality Mass Balance block is there, with the engine\'s unit word and segment count', !bad && worst <= 1e-4, ma.length + ' lines, worst ' + worst.toExponential(1) + (ma[0] ? ', ' + ma[0] : ''));
+			}
 			ok(label + ': the flow balance is headed (' + expectFlow + ') and tank levels are in ' + expectUnit,
 				n.report.indexOf('Hydraulic Flow Balance (' + expectFlow + ')') >= 0 && !/ at [\d.]+ (m|ft)\b/.test(n.report.replace(new RegExp(' at [\\d.]+ ' + expectUnit + '\\b', 'g'), '')));
 		}
@@ -275,6 +288,10 @@ function sameResults(label, r, kinds, skip) {
 		model = L.assembleModel();
 		model.reportUnits = { flow: 'cmh', length: 'm', diameter: 'mm' };
 		await nativeVsEngine('Net1 in m3/h', model, 'm', 'm3/h');
+		open('Net3.lwn', 'us');
+		model = L.assembleModel();
+		model.quality = Object.assign({}, model.quality, { mode: 'age' });
+		await nativeVsEngine('Net3 as water age in gpm', model, 'ft', 'gpm');
 		open('Net1.lwn', 'us');
 		model = L.assembleModel();
 		model.time = Object.assign({}, model.time, { times: Object.assign({}, (model.time || {}).times, { duration: 0 }) });

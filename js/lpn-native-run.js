@@ -870,8 +870,8 @@
 			if (q.mode && dur > 0) {
 				ds = times.qualityStep > 0 ? times.qualityStep : (hydStep >= 3600 ? 300 : Math.floor(hydStep / 10));
 				rline('    Water Quality Time Step ........... ' + fmtF(ds / 60, 2) + ' min');
-				units = q.mode === 'age' ? 'hrs' : q.mode === 'trace' ? '%' : String(qlt.chemical || 'CHEMICAL').split(/\s+/)[1] || 'mg/L';
-				tol = typeof qlt.tolerance === 'number' && isFinite(qlt.tolerance) ? qlt.tolerance : (q.mode === 'age' ? 900 / 3600 : 0.01);
+				units = q.mode === 'age' ? 'hrs' : q.mode === 'trace' ? '% from' : String(qlt.chemical || 'CHEMICAL').split(/\s+/)[1] || 'mg/L';
+				tol = typeof qlt.tolerance === 'number' && isFinite(qlt.tolerance) ? qlt.tolerance : 0.01;
 				rline('    Water Quality Tolerance ........... ' + fmtF(tol, 2) + ' ' + units);
 			}
 			[ '    Specific Gravity .................. ' + fmtF(typeof hy.specificGravity === 'number' ? hy.specificGravity : 1, 2),
@@ -1034,7 +1034,21 @@
 			fb.inflow += inflow * dt; fb.outflow += outflow * dt; fb.consumer += cons * dt; fb.emitter += em * dt;
 			fb.deficit += def * dt; fb.storage += stor * dt;
 		}
-		function reportEnd(endTime, msxText) {
+		// report.c writemassbalance(): the water quality mass balance of an EPANET quality run, the engine's own raw figures
+		function massBalanceLines(m) {
+			var qm = model.quality || {}, qlu = String((model.quality || {}).chemical || '').split(/\s+/)[1] || 'mg/L',
+				unit = qm.mode === 'trace' ? ' (mg)' : qm.mode === 'age' ? ' (hrs)' : /^mg/i.test(qlu) ? ' (mg)' : /^ug/i.test(qlu) ? ' (ug)' : '',
+				massin = m.initial + m.inflow, massout = m.outflow + m.final, ratio;
+			if (m.reacted > 0) { massout += m.reacted; } else { massin -= m.reacted; }
+			ratio = massin === 0 ? 1 : massout / massin;
+			return ['Water Quality Mass Balance' + unit, '================================',
+				'Initial Mass:      ' + cE(m.initial), 'Mass Inflow:       ' + cE(m.inflow), 'Mass Outflow:      ' + cE(m.outflow),
+				'Mass Reacted:      ' + cE(m.reacted), 'Final Mass:        ' + cE(m.final), 'Mass Ratio:         ' + ratio.toFixed(5),
+				'Total Segments:     ' + m.segCount, '================================\n'];
+		}
+		// C's %12.5e
+		function cE(x) { var t = x.toExponential(5), ix = t.indexOf('e'), ex = t.slice(ix + 2); return padLeft(t.slice(0, ix + 2) + (ex.length < 2 ? '0' + ex : ex), 12); }
+		function reportEnd(endTime, msxText, qmb) {
 			var sec = endTime > 0 ? endTime : 1, qin = fb.inflow / sec, qout = fb.outflow / sec, qs = fb.storage / sec, r;
 			if (!repOn) { return ''; }
 			if (qs > 0) { qout += qs; } else { qin -= qs; }
@@ -1044,7 +1058,7 @@
 				'Demand Deficit:    ' + padLeft(fmtF(fb.deficit / sec / repFlowDiv, 3), 12), 'Emitter Flow:      ' + padLeft(fmtF(fb.emitter / sec / repFlowDiv, 3), 12),
 				'Leakage Flow:      ' + padLeft(fmtF(0, 3), 12), 'Total Outflow:     ' + padLeft(fmtF(fb.outflow / sec / repFlowDiv, 3), 12),
 				'Storage Flow:      ' + padLeft(fmtF(fb.storage / sec / repFlowDiv, 3), 12), 'Flow Ratio:        ' + padLeft(fmtF(r, 3), 12),
-				'================================\n'].concat(msxText === null ? [] : ['Processing MSX input file temp.msx\n'], ['Analysis ended ' + ctimeText(new Date()) + '\n']).forEach(rline);
+				'================================\n'].concat(qmb ? massBalanceLines(qmb) : [], msxText === null ? [] : ['Processing MSX input file temp.msx\n'], ['Analysis ended ' + ctimeText(new Date()) + '\n']).forEach(rline);
 			return '  Page 1                                    ' + ctimeText(repStamp) + '\n' + repOut.map(function (x) { return '\n  ' + x; }).join('') + (msxText ? '\n' + msxText : '');
 		}
 		if (repOn) { reportHeader(); }
@@ -1173,7 +1187,7 @@
 			yield { phase: 'hydraulic', done: htime, of: dur };
 		}
 		// ---- EPANET-MSX: its own pass, over the same records ----
-		var msxSpecies, msxReport = null;
+		var msxSpecies, msxReport = null, qualMass = null;
 		if (msxCfg) {
 			var mnet = qualityNet(model), mtanks = {};
 			tanks.forEach(function (tk) {
@@ -1192,8 +1206,9 @@
 			tanks.forEach(function (tk) { tk.vEnd = tk.V; });
 			var qres = yield* qualityPassSteps(model, qcfg, hydRecs, frames, tanks, times, byPat, hydStep);
 			if (!qres.ok) { return { ok: false, issues: qres.issues }; }
+			qualMass = qres.massBalance;
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur, msxReport), msxSpecies: msxSpecies,
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes, report: reportEnd(dur, msxReport, qualMass), msxSpecies: msxSpecies,
 			// The same convergence fields lpnEpanetRun resolves to, so the page reads one shape.
 			converged: stepsUnconverged === 0, steps: stepsRun, stepsUnconverged: stepsUnconverged,
 			firstUnconvergedTime: firstBadT, relativeError: worstRelErr, accuracy: convAccuracy,
@@ -1885,6 +1900,7 @@
 			patStep = times.patternStep > 0 ? times.patternStep : 3600, patStart = times.patternStart > 0 ? times.patternStart : 0,
 			dur = times.duration > 0 ? times.duration : 0,
 			qstep, ctol, viscos, diffus, sc, bulkOrder, wallOrder, tankOrder, kbulk, kwall, climit, rfactor, bucf, tucf,
+			mb = { initial: 0, inflow: 0, outflow: 0, reacted: 0, final: 0, segCount: 0 },
 			nodeQual = new Array(N + 1), sourceQual = 0, flowDir = new Array(L + 1), rc = new Array(L + 1), pipeRate = new Array(L + 1).fill(0),
 			first = [], last = [], adj = [], sorted = new Array(N + 1), reactflag,
 			tk = [], tankOfNode = {}, srcOf = new Array(N + 1), kb = new Array(L + 1), kw = new Array(L + 1),
@@ -1959,6 +1975,7 @@
 			if (!first[c]) { first[c] = s; }
 			if (last[c]) { last[c].prev = s; }
 			last[c] = s;
+			mb.segCount++;
 		}
 		function reversesegs(c) {
 			var s = first[c], ns, ps = null;
@@ -2001,6 +2018,14 @@
 			}
 		});
 		for (k = 1; k <= L; k++) { flowDir[k] = 0; rc[k] = 0; pipeRate[k] = 0; }
+		// quality.c findstoredmass(): the mass in every pipe and every tank (a reservoir holds none)
+		function storedMass() {
+			var tot = 0, s2, k3;
+			for (k3 = 1; k3 <= L; k3++) { for (s2 = first[k3]; s2; s2 = s2.prev) { tot += s2.c * s2.v; } }
+			tk.forEach(function (t) { if (t.A !== 0) { for (s2 = first[t.chain]; s2; s2 = s2.prev) { tot += s2.c * s2.v; } } });
+			return tot;
+		}
+		mb.initial = storedMass(); mb.segCount = 0;
 
 		// ---- qualreact.c ----
 		function piperate(k2) {
@@ -2071,6 +2096,7 @@
 				rsum = 0; vsum = 0;
 				for (s = first[k2]; s; s = s.prev) {
 					cn = pipereact(k2, s.c, dt);
+					mb.reacted += (s.c - cn) * s.v;
 					// qualreact.c reactpipes(): the volume-weighted mean of |c_new - c_old| over the segments
 					// in the pipe, per second of the step, scaled to a day (a chemical only).
 					rsum += Math.abs(cn - s.c) * s.v; vsum += s.v;
@@ -2082,7 +2108,7 @@
 		function reacttanks(dt) {
 			tk.forEach(function (t) {
 				if (t.A === 0) { return; }
-				for (var s = first[t.chain]; s; s = s.prev) { s.c = tankreact(s.c, t.kb, dt); }
+				for (var s = first[t.chain]; s; s = s.prev) { var c0 = s.c; s.c = tankreact(s.c, t.kb, dt); mb.reacted += (c0 - s.c) * s.v; }
 			});
 		}
 		// tankmix1(): complete mixing
@@ -2094,7 +2120,7 @@
 			s.v += vnet;
 			s.v = Math.max(0, s.v);
 			t.C = s.c;
-			if (s.v > t.Vmax) { s.v = t.Vmax; }
+			if (s.v > t.Vmax) { mb.outflow += (s.v - t.Vmax) * t.C; s.v = t.Vmax; }
 		}
 		// tankmix2(): two compartments
 		function tankmix2(t, vin, win, vnet) {
@@ -2114,7 +2140,7 @@
 					mz.v = vmz;
 					sz.v += vt;
 					vsz = t.Vmax - vmz;
-					if (sz.v > vsz) { sz.v = vsz; }
+					if (sz.v > vsz) { mb.outflow += (sz.v - vsz) * sz.c; sz.v = vsz; }
 				} else {
 					sz.v = Math.max(0, sz.v - vt);
 					mz.v = vmz + vt + vnet;
@@ -2151,6 +2177,7 @@
 			if (vsum > 0) { t.C = wsum / vsum; }
 			else if (!first[c]) { t.C = 0; }
 			else { t.C = first[c].c; }
+			if (t.V >= t.Vmax && vnet > 0) { mb.outflow += vnet * t.C; }
 		}
 		// tankmix4(): last in, first out
 		function tankmix4(t, vin, win, vnet) {
@@ -2163,15 +2190,18 @@
 				if (Math.abs(s.c - cin) < ctol) { s.v += vnet; } else { addseg(c, vnet, cin); }
 				t.C = last[c].c;
 				if (t.V >= t.Vmax) {
+					wsum = 0;
 					while (vnet > 0) {
 						s = first[c];
 						if (!s) { break; }
 						vseg = Math.min(s.v, vnet);
 						if (s === last[c]) { vseg = vnet; }
+						wsum += s.c * vseg;
 						vnet -= vseg;
 						if (vnet >= 0 && vseg >= s.v) { if (s.prev) { first[c] = s.prev; } }
 						else { s.v -= vseg; }
 					}
+					mb.outflow += wsum;
 				}
 			} else if (vnet < 0) {
 				vsum = 0; wsum = 0; vnet = -vnet;
@@ -2276,6 +2306,7 @@
 				if (v >= 0 && vseg >= s.v) {
 					first[k2] = s.prev;
 					if (!first[k2]) { last[k2] = null; }
+					mb.segCount--;
 				} else { s.v -= vseg; }
 			}
 		}
@@ -2307,6 +2338,10 @@
 					var k2 = a.link, m2 = flowDir[k2] < 0 ? links[k2].n2 : links[k2].n1;
 					if (m2 === n2) { evalnodeoutflow(k2, nodequal, tstep); }
 				});
+				// qualroute.c updatemassbalance(): what a node takes out of the network and puts into it this step
+				if (isJunction(n2)) { mb.outflow += Math.max(0, cur.d[String(nodes[n2].id)] || 0) * tstep * nodeQual[n2]; mb.inflow += sourceQual * volout; }
+				else if (nodes[n2].type === 'reservoir') { mb.outflow += acc.massin; mb.inflow += (sourceQual > 0 ? sourceQual : nodeQual[n2]) * volout; }
+				else { mb.inflow += sourceQual * volout; }
 			}
 		}
 		function selectnonstacknode(numsorted, indegree) {
@@ -2405,7 +2440,9 @@
 			}
 			qtime += hstep;
 		}
-		return { ok: true };
+		// quality.c evalmassbalance()
+		mb.final = storedMass();
+		return { ok: true, massBalance: mb };
 	}
 
 	/**
