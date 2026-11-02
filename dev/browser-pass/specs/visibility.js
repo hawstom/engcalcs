@@ -122,7 +122,7 @@ exports.run = async function ({ browser, report }) {
 			'lpn_set_sub_nodeSym,lpn_set_sub_nodeColors,lpn_set_sub_linkSym,lpn_set_sub_linkColors,' +
 			'lpn_set_sub_custLbl,lpn_set_sub_nodeLink,' +
 			'lpn_set_sub_mapDisplay,lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
-			'lpn_set_sub_customProps,lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
+			'lpn_set_sub_customProps,lpn_set_sub_solver,lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
 			'lpn_set_sub_energy,lpn_set_sub_quality',
 			'...and the sub-headings under them, unmoved by the regrouping', subs.join(','));
 		report.ok(!(await a.page.evaluate(() =>

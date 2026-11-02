@@ -1250,7 +1250,7 @@ echoHeader("EngCalcsApp", $html_title,
 					</div>
 				</section>
 				<?php // ---- Section: CALCULATION ----
-				      // Units, Time, Hydraulics -- what the numbers MEAN, WHEN they are asked for, and HOW
+				      // Solver, Units, Time, Hydraulics -- what the numbers MEAN, WHEN they are asked for, and HOW
 				      // they are solved. "Hydraulics" is EPANET's own name for the third group (its
 				      // Analysis Options are Hydraulics, Quality, Reactions, Times, Energy), so Tom's
 				      // future Quality category is a sibling of it rather than a new idea.
@@ -1262,15 +1262,15 @@ echoHeader("EngCalcsApp", $html_title,
 				<section id="lpn_set_sec_calc" class="lpn-set-sec" data-set-sec="calc">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_calculation']?></h3>
 					<div class="lpn-set-secbody">
-						<div class="lpn-set-sub" id="lpn_set_sub_units" data-saved="project"><?=$ec_lang['lpn_view_units']?><?=lpnSavedMark('project')?></div>
-						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
-						<div class="lpn-set-sub" id="lpn_set_sub_time" data-saved="project"><?=$ec_lang['lpn_time_menu']?><?=lpnSavedMark('project')?></div>
-						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
 						<?php // Solver: which solver answers, and when it runs (Tom, 2026-11-01: *"Shouldn't the first
 						      // three settings under Calculation, Hydraulics be directly under Calculation or
 						      // Calculation, Solver?"*). EPANET's and Bentley's word. Hydraulics keeps the model. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_solver" data-saved="project"><?=$ec_lang['lpn_settings_solver']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_solver_fields" class="lpn-set-part"></div></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_units" data-saved="project"><?=$ec_lang['lpn_view_units']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_time" data-saved="project"><?=$ec_lang['lpn_time_menu']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics" data-saved="project"><?=$ec_lang['lpn_settings_hydraulics']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
 						<?php // Energy after Hydraulics: it is the one section here whose answer is money,

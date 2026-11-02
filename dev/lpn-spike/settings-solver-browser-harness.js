@@ -50,8 +50,8 @@ async function checkProject(a, L, label) {
 	const T = {};
 	for (const k of ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_solver', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality',
 		'lpn_settings_auto_run', 'lpn_settings_runbox', 'lpn_settings_engine_native', 'bpn_method']) { T[k] = await L(k); }
-	ok('Calculation has Units, Time, Solver, Hydraulics, Energy, Quality in that order',
-		JSON.stringify(calc.map((s) => s.text)) === JSON.stringify([T.lpn_view_units, T.lpn_time_menu, T.lpn_settings_solver, T.lpn_settings_hydraulics, T.lpn_settings_energy, T.lpn_settings_quality]),
+	ok('Calculation has Solver, Units, Time, Hydraulics, Energy, Quality in that order',
+		JSON.stringify(calc.map((s) => s.text)) === JSON.stringify([T.lpn_settings_solver, T.lpn_view_units, T.lpn_time_menu, T.lpn_settings_hydraulics, T.lpn_settings_energy, T.lpn_settings_quality]),
 		JSON.stringify(calc.map((s) => s.text)));
 	const solver = calc.filter((s) => s.id === 'lpn_set_sub_solver')[0], hyd = calc.filter((s) => s.id === 'lpn_set_sub_hydraulics')[0];
 	const three = [T.lpn_settings_auto_run, T.lpn_settings_runbox, T.lpn_settings_engine_native];
@@ -62,7 +62,7 @@ async function checkProject(a, L, label) {
 
 	const idx = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_setbox_index [data-sub]')).map((b) => ({ sub: b.getAttribute('data-sub'), text: b.textContent.trim() })));
 	const ids = idx.map((b) => b.sub), iSol = ids.indexOf('lpn_set_sub_solver');
-	ok('the index lists Solver between Time and Hydraulics', iSol > 0 && ids[iSol - 1] === 'lpn_set_sub_time' && ids[iSol + 1] === 'lpn_set_sub_hydraulics' && idx[iSol].text === T.lpn_settings_solver, JSON.stringify(idx.slice(iSol - 1, iSol + 2)));
+	ok('the index lists Solver first under Calculation, before Units', iSol > 0 && ids[iSol + 1] === 'lpn_set_sub_units' && idx[iSol].text === T.lpn_settings_solver, JSON.stringify(idx.slice(iSol - 1, iSol + 2)));
 	await P.evaluate(() => { const b = document.querySelector('#lpn_setbox_index [data-sub="lpn_set_sub_solver"]'); if (b) { b.click(); } });
 	await a.settle(700);
 	const seen = await P.evaluate(() => {

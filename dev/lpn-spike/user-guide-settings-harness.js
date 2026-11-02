@@ -44,7 +44,7 @@ const STRUCTURE = [
 	['lpn_menu_map', ['lpn_menu_map']],
 	['lpn_settings_page', ['lpn_settings_page']],
 	['lpn_settings_sec_assets', ['lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props']],
-	['lpn_settings_sec_calculation', ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_solver', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
+	['lpn_settings_sec_calculation', ['lpn_settings_solver', 'lpn_view_units', 'lpn_time_menu', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
 	['lpn_settings_color_credits', []]
 ];
 // The numbers the units example states, read out of the chapter so a changed example is re-measured.
