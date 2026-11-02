@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Spanne';
 $ec_lang['lpn_time_clock_day']='Tag {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Geben Sie eine Zeit als Stunden und Minuten an, wie 2:30. Eine reine Zahl bedeutet Stunden, also sind 8 acht Stunden. Eine halbe Stunde ist 0:30.';
 $ec_lang['lpn_time_running']='Die Simulation mit erweitertem Zeitraum wird ausgeführt.';
-$ec_lang['lpn_time_no_engine']='Der eingebaute Löser berechnet jeweils nur einen Zeitpunkt, daher zeigt dies das Netz nur zum Zeitpunkt {time}: Jedes Muster wird zu diesem Zeitpunkt gelesen, und jeder Tank bleibt auf seinem Anfangsstand, statt sich zu füllen und zu leeren. Stellen Sie einmal eine Internetverbindung her, um den EPANET-Löser herunterzuladen, der eine Simulation mit erweitertem Zeitraum ausführt.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Der eingebaute Löser berechnet jeweils nur einen Zeitpunkt, daher zeigt dies das Netz nur zum Zeitpunkt {time}: Jedes Muster wird zu diesem Zeitpunkt gelesen, und jeder Tank bleibt auf seinem Anfangsstand, statt sich zu füllen und zu leeren. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Der Download des EPANET-Lösers ist fehlgeschlagen. Laden Sie die Seite neu, um es erneut zu versuchen; möglicherweise blockiert eine Firewall, ein Proxy oder eine Browsererweiterung den Download.';
 $ec_lang['lpn_time_engine_start_failed']='Der Browser hat den Start des EPANET-Lösers abgelehnt. WebAssembly ist möglicherweise durch eine Sicherheitseinstellung oder eine Erweiterung ausgeschaltet.';
 $ec_lang['lpn_time_engine_run_failed']='Der EPANET-Lauf ist fehlgeschlagen. Das ist ein Fehler in dieser Seite; melden Sie ihn über den Link {wrong}.';

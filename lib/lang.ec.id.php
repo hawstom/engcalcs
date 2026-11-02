@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Rentang';
 $ec_lang['lpn_time_clock_day']='Hari {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Tulis waktu sebagai jam dan menit, seperti 2:30. Angka polos berarti jam, jadi 8 berarti delapan jam. Setengah jam adalah 0:30.';
 $ec_lang['lpn_time_running']='Menjalankan simulasi periode waktu.';
-$ec_lang['lpn_time_no_engine']='Penyelesai bawaan menyelesaikan satu saat dalam satu waktu, sehingga ini adalah jaringan pada {time} saja: setiap pola dibaca pada saat itu, dan setiap tangki tetap pada level awalnya alih-alih terisi dan terkuras. Sambungkan ke internet satu kali untuk mengunduh penyelesai EPANET, yang menjalankan simulasi periode waktu.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Penyelesai bawaan menyelesaikan satu saat dalam satu waktu, sehingga ini adalah jaringan pada {time} saja: setiap pola dibaca pada saat itu, dan setiap tangki tetap pada level awalnya alih-alih terisi dan terkuras. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Pengunduhan penyelesai EPANET gagal. Muat ulang halaman untuk mencoba lagi; firewall, proxy, atau ekstensi peramban mungkin memblokirnya.';
 $ec_lang['lpn_time_engine_start_failed']='Peramban menolak memulai penyelesai EPANET. WebAssembly mungkin dimatikan oleh pengaturan keamanan atau ekstensi.';
 $ec_lang['lpn_time_engine_run_failed']='Proses EPANET gagal. Ini adalah cacat pada halaman ini; gunakan tautan {wrong} untuk melaporkannya.';

@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Wigo';
 $ec_lang['lpn_time_clock_day']='Siku {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Andika muda kama saa na dakika, kwa mfano 2:30. Namba peke yake inamaanisha saa, hivyo 8 ni saa nane. Nusu saa ni 0:30.';
 $ec_lang['lpn_time_running']='Inaendesha uigaji wa kipindi kirefu cha muda.';
-$ec_lang['lpn_time_no_engine']='Kitatuzi kilichojengwa ndani hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee: kila muundo husomwa wakati huo, na kila tanki hubaki kwenye kiwango chake cha mwanzo badala ya kujaa na kupungua. Unganisha kwenye intaneti mara moja ili kupakua kitatuzi cha EPANET, kinachoendesha uigaji wa kipindi kirefu cha muda.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Kitatuzi kilichojengwa ndani hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee: kila muundo husomwa wakati huo, na kila tanki hubaki kwenye kiwango chake cha mwanzo badala ya kujaa na kupungua. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Upakuaji wa kitatuzi cha EPANET umeshindwa. Pakia upya ukurasa ili kujaribu tena; ngome ya moto, seva mbadala, au kiongezi cha kivinjari kinaweza kuuzuia.';
 $ec_lang['lpn_time_engine_start_failed']='Kivinjari kimekataa kuanzisha kitatuzi cha EPANET. WebAssembly inaweza kuwa imezimwa na mpangilio wa usalama au kiongezi.';
 $ec_lang['lpn_time_engine_run_failed']='Uendeshaji wa EPANET umeshindwa. Hiyo ni hitilafu katika ukurasa huu; tumia kiungo cha {wrong} kuiripoti.';

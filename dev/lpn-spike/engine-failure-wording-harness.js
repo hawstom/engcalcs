@@ -16,6 +16,8 @@
 const path = require('path');
 const { setUnitSet, loadLoopedNetwork, NODE_ENGINE_URL } = require('./lpn-dom-stub.js');
 require(path.join(__dirname, '..', '..', 'js', 'lpn-time.js'));
+require(path.join(__dirname, '..', '..', 'js', 'lpn-native-msx.js'));
+require(path.join(__dirname, '..', '..', 'js', 'lpn-native-run.js'));
 
 const INJECT =
 	"\t\tgetDoc: function () { return doc; }, settings: function () { return settings; },\n" +
@@ -92,51 +94,45 @@ async function main() {
 	ok('a fetch failure online is fetch', EC.lpnEngineFailWhy(errs.fetch) === 'fetch');
 	ok('an untagged rejection is a run failure', EC.lpnEngineFailWhy(new Error('x')) === 'run');
 
-	console.log('\n--- banner 1: the extended period note ---');
-	const L = loadLoopedNetwork(INJECT);
-	L.buildLayers(); L.seedDefaultInputs();
-	const doc = L.getDoc();
-	doc.nodes.push({ id: 'R1', type: 'reservoir', x: 0, y: 0, elev: 100 });
-	doc.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
-	doc.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [],
-		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
-	doc.times = EC.lpnTimesDefaults(); doc.times.duration = 86400;
-	let status = '';
-	const solveNow = () => { EC.lpnTimeRun({ nodes: [{ id: 'J1', type: 'junction', elev: 1 }], links: [] }); };
+	console.log('\n--- banner 1: the status sentence when the built-in solver ran the period in EPANET\'s place ---');
+	// EPANET is the chosen solver and cannot run: the built-in loop runs the period and the status bar says so.
+	const times = EC.lpnTimesDefaults(); times.duration = 86400;
+	const PMODEL = Object.assign({}, MODEL, {
+		time: { times: times, patterns: [], defaultPattern: null, controls: [], warnings: [] }, hydraulics: { accuracy: 1e-5 }
+	});
+	let note = '', frames = 0;
+	const solveNow = () => { EC.lpnTimeRun(JSON.parse(JSON.stringify(PMODEL))); };
 	EC.lpnTimeInit({
-		tabs: [], doc: () => doc, apply: () => {}, status: (t) => { status = t; },
+		tabs: [], doc: () => ({ times: times, nodes: PMODEL.nodes, links: PMODEL.links }), apply: () => { frames = EC.lpnTimeRunFrames().length; },
+		status: () => {}, routeNote: (t) => { note = t; }, engine: () => 'epanet',
 		solve: solveNow, solveNow: solveNow,
 		native: () => ({ ok: true, converged: true, heads: {}, flows: {} }),
 		snapshot: () => {}, save: () => {}, toSI: (v) => v, toDisplay: (v) => v, unitLabel: () => ''
 	});
 	EC.LPN_TIME_AUTO.idleMs = 40; EC.LPN_TIME_AUTO.budgetMs = 60;
-	const NOW = EC.lpnTimeElapsedText(0);
 	const exp = {
-		offline: sub(PC.lpn_time_no_engine, NOW),
-		fetch: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_fetch_failed), NOW),
-		engine: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_start_failed), NOW),
-		run: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_run_failed.replace('{wrong}', PC.lpn_wrong_btn)), NOW)
+		offline: PC.lpn_time_epanet_fallback,
+		fetch: PC.lpn_time_epanet_fallback_why.replace('{reason}', PC.lpn_time_engine_fetch_failed),
+		engine: PC.lpn_time_epanet_fallback_why.replace('{reason}', PC.lpn_time_engine_start_failed),
+		run: PC.lpn_time_epanet_fallback_why.replace('{reason}', PC.lpn_time_engine_run_failed.replace('{wrong}', PC.lpn_wrong_btn))
 	};
 	async function drive(err, onLine) {
 		setOnLine(onLine);
 		EC.lpnEpanetRun = () => wait(5).then(() => { throw err; });
-		EC.lpnTimeRunBoxHide(); status = '';
+		EC.lpnTimeRunBoxHide(); note = ''; frames = 0;
 		EC.lpnTimeArrived(); EC.lpnTimeRunNow();
-		await wait(100);
-		return status;
+		await wait(300);
+		return note;
 	}
 	const cases = [['offline', errs.fetch, false], ['fetch', errs.fetch, true], ['engine', errs.engine, true], ['run', errs.run, true]];
 	for (const [name, err, onLine] of cases) {
 		const s = await drive(err, onLine);
 		ok('status says the ' + name + ' sentence', s === exp[name], JSON.stringify(s));
-		ok('...and still states the network at {time} only', /\b0:00\b|at /.test(s) && s.indexOf('{') < 0 && /built-in solver/.test(s));
-		const w = L.tsWaitingText(PC);
-		ok('time-series note says the same ' + name + ' sentence', w === exp[name], JSON.stringify(w));
+		ok('...the built-in solver really ran the period (25 frames), not one instant', frames === 25, 'frames ' + frames);
+		ok('...and it names the built-in solver, with no placeholder left', /built-in solver/.test(s) && s.indexOf('{') < 0);
 	}
-	// The offline note's own closing sentence, taken from its key: the other causes must not carry it.
-	const offlineTail = PC.lpn_time_no_engine.slice(PC.lpn_time_no_engine.lastIndexOf('. ', PC.lpn_time_no_engine.length - 2) + 2);
-	ok('only the offline note tells the reader to go online',
-		exp.offline.indexOf(offlineTail) >= 0 && ['fetch', 'engine', 'run'].every((k) => exp[k].indexOf(offlineTail) < 0));
+	// The offline sentence is the plain one: the other causes carry their own reason instead.
+	ok('only the offline sentence is the bare one', exp.offline.indexOf('could not be used') < 0 && ['fetch', 'engine', 'run'].every((k) => exp[k].indexOf(exp.offline) < 0));
 	ok('the run sentence carries a {wrong} placeholder, filled with this language\'s own link label',
 		PC.lpn_time_engine_run_failed.indexOf('{wrong}') >= 0 && exp.run.indexOf(PC.lpn_wrong_btn) >= 0 && exp.run.indexOf('{') < 0);
 	const savedBtn = PC.lpn_wrong_btn; PC.lpn_wrong_btn = 'Algo anda mal?';

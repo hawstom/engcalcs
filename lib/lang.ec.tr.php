@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Aralık';
 $ec_lang['lpn_time_clock_day']='Gün {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Bir zamanı saat ve dakika olarak yazın, örneğin 2:30. Düz bir sayı saat anlamına gelir; yani 8, sekiz saattir. Yarım saat 0:30 olarak yazılır.';
 $ec_lang['lpn_time_running']='Uzun süreli simülasyon çalıştırılıyor.';
-$ec_lang['lpn_time_no_engine']='Yerleşik çözücü bir seferde yalnızca bir anı hesaplar, bu yüzden bu yalnızca {time} anındaki şebekedir: her desen o anda okunur ve her depo dolup boşalmak yerine hâlâ başlangıç seviyesindedir. Bir zaman dilimi hesaplaması çalıştıran EPANET çözücüsünü almak için bir kez internete bağlanın.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Yerleşik çözücü her seferinde tek bir anı çözer, bu yüzden bu, şebekenin yalnızca {time} anındaki halidir: her desen o anda okunur ve her depo dolup boşalmak yerine ilk seviyesinde kalır. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET çözücüsünün indirilmesi başarısız oldu. Yeniden denemek için sayfayı yeniden yükleyin; bir güvenlik duvarı, vekil sunucu veya tarayıcı eklentisi onu engelliyor olabilir.';
 $ec_lang['lpn_time_engine_start_failed']='Tarayıcı EPANET çözücüsünü başlatmayı reddetti. WebAssembly bir güvenlik ayarı veya bir eklenti tarafından kapatılmış olabilir.';
 $ec_lang['lpn_time_engine_run_failed']='EPANET çalıştırması başarısız oldu. Bu bu sayfada bir kusurdur; bildirmek için {wrong} bağlantısını kullanın.';

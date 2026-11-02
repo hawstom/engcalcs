@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='পরিসর';
 $ec_lang['lpn_time_clock_day']='দিন {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='একটি সময় ঘণ্টা ও মিনিট আকারে লিখুন, যেমন 2:30। একটি সাধারণ সংখ্যা মানে ঘণ্টা, তাই 8 মানে আট ঘণ্টা। আধা ঘণ্টা হলো 0:30।';
 $ec_lang['lpn_time_running']='বর্ধিত সময়কাল সিমুলেশন রান করা হচ্ছে।';
-$ec_lang['lpn_time_no_engine']='বিল্ট-ইন সমাধানকারী একবারে একটি মুহূর্ত সমাধান করে, তাই এটি কেবল {time}-এর নেটওয়ার্ক: প্রতিটি প্যাটার্ন সেই মুহূর্তে পড়া হয়, এবং প্রতিটি ট্যাংক ভরা ও খালি হওয়ার বদলে তার প্রাথমিক স্তরেই থাকে। বর্ধিত সময়কাল সিমুলেশন চালায় এমন EPANET সমাধানকারী ডাউনলোড করতে একবার ইন্টারনেটে সংযুক্ত হন।';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='বিল্ট-ইন সমাধানকারী একবারে একটি মুহূর্ত সমাধান করে, তাই এটি কেবল {time}-এর নেটওয়ার্ক: প্রতিটি প্যাটার্ন সেই মুহূর্তে পড়া হয়, এবং প্রতিটি ট্যাংক ভরা ও খালি হওয়ার বদলে তার প্রাথমিক স্তরেই থাকে। {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET সমাধানকারী ডাউনলোড ব্যর্থ হয়েছে। আবার চেষ্টা করতে পেজটি রিলোড করুন; ফায়ারওয়াল, প্রক্সি বা ব্রাউজার এক্সটেনশন এটি আটকে দিতে পারে।';
 $ec_lang['lpn_time_engine_start_failed']='ব্রাউজার EPANET সমাধানকারী চালু করতে অস্বীকার করেছে। কোনো নিরাপত্তা সেটিং বা এক্সটেনশন WebAssembly বন্ধ করে রাখতে পারে।';
 $ec_lang['lpn_time_engine_run_failed']='EPANET রান ব্যর্থ হয়েছে। এটি এই পেজের একটি ত্রুটি; এটি জানাতে {wrong} লিংক ব্যবহার করুন।';

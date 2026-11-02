@@ -371,6 +371,13 @@ step), then `builtin-stopped` with the time. EPANET's answer to such a step is n
 by a control gets a head of -5 million metres and a warning. The setting is the way to ask EPANET, and the sentence
 says so. Not changed: a step the built-in solver cannot solve keeps no partial frames (EPANET's own stop keeps them).
 
+**The other direction: EPANET chosen and unable to run.** A rejected `lpnEpanetRun` (offline, a blocked download, a browser that
+refuses WebAssembly, a run that fails to start) makes `periodRun()` run the period with the built-in loop; the status bar
+says so (`lpn_time_epanet_fallback`, `_why`), and the run, its summary and its report header name the built-in solver.
+A steady solve already did this (`lpn_engine_failed`). An answer EPANET does give (warnings, a refusal in its words) is
+not touched. `noEngine()` and its one-instant sentence are gone. Test: `dev/lpn-spike/engine-fallback-harness.js`.
+The report line "Input Data File ... temp.inp" is EPANET's own for a period run (Tom, 2026-10-11) and the built-in report matches it.
+
 **Not a run, and not changed**: the run's warnings in EPANET's words (`nativeWarnings()`
 carries only the bridge's notes). A later slice.
 

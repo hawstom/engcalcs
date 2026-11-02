@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='सीमा';
 $ec_lang['lpn_time_clock_day']='दिन {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='समय को घंटे और मिनट के रूप में लिखें, जैसे 2:30। एक सादी संख्या का अर्थ घंटे है, इसलिए 8 का अर्थ है आठ घंटे। आधा घंटा 0:30 है।';
 $ec_lang['lpn_time_running']='विस्तारित अवधि सिमुलेशन चलाया जा रहा है।';
-$ec_lang['lpn_time_no_engine']='बिल्ट-इन सॉल्वर एक बार में एक क्षण हल करता है, इसलिए यह केवल {time} पर का नेटवर्क है: हर पैटर्न उसी क्षण पर पढ़ा जाता है, और हर टैंक भरने और खाली होने के बजाय अपने प्रारंभिक स्तर पर रहता है। विस्तारित अवधि सिमुलेशन चलाने वाले EPANET सॉल्वर को डाउनलोड करने के लिए एक बार इंटरनेट से जुड़ें।';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='बिल्ट-इन सॉल्वर एक बार में एक ही क्षण की गणना करता है, इसलिए यह केवल {time} पर का नेटवर्क है: हर पैटर्न उसी क्षण पर पढ़ा जाता है, और हर टैंक भरने और खाली होने के बजाय अपने प्रारंभिक स्तर पर रहता है। {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET सॉल्वर का डाउनलोड विफल रहा। दोबारा प्रयास करने के लिए पेज रीलोड करें; फ़ायरवॉल, प्रॉक्सी या ब्राउज़र एक्सटेंशन इसे रोक रहा हो सकता है।';
 $ec_lang['lpn_time_engine_start_failed']='ब्राउज़र ने EPANET सॉल्वर शुरू करने से मना कर दिया। WebAssembly किसी सुरक्षा सेटिंग या एक्सटेंशन द्वारा बंद हो सकता है।';
 $ec_lang['lpn_time_engine_run_failed']='EPANET रन विफल रहा। यह इस पेज में दोष है; इसकी सूचना देने के लिए {wrong} लिंक का उपयोग करें।';

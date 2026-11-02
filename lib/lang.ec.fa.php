@@ -3733,10 +3733,8 @@ $ec_lang['lpn_time_stat_range']='دامنه';
 $ec_lang['lpn_time_clock_day']='روز {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='زمان را به‌صورت ساعت و دقیقه بنویسید، مانند 2:30. یک عدد ساده به معنای ساعت است، پس 8 یعنی هشت ساعت. نیم ساعت می‌شود 0:30.';
 $ec_lang['lpn_time_running']='در حال اجرای شبیه‌سازی بازهٔ زمانی.';
-$ec_lang['lpn_time_no_engine']='حل‌کنندهٔ داخلی در هر بار یک لحظه را حل می‌کند، پس این شبکه فقط در {time} است: هر الگو در همان لحظه خوانده می‌شود، و هر تانک به‌جای پر و خالی شدن در تراز نخستین خود می‌ماند. یک‌بار به اینترنت وصل شوید تا حل‌کنندهٔ EPANET، که شبیه‌سازی بازهٔ زمانی را اجرا می‌کند، دانلود شود.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='حل‌کنندهٔ داخلی در هر بار یک لحظه را حل می‌کند، پس این شبکه فقط در {time} است: هر الگو در همان لحظه خوانده می‌شود، و هر تانک به‌جای پر و خالی شدن در تراز نخستین خود می‌ماند. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='دریافت حل‌کنندهٔ EPANET ناموفق بود. برای تلاش دوباره صفحه را بازبارگذاری کنید؛ ممکن است یک فایروال، پروکسی یا افزونهٔ مرورگر آن را مسدود کرده باشد.';
 $ec_lang['lpn_time_engine_start_failed']='مرورگر از راه‌اندازی حل‌کنندهٔ EPANET خودداری کرد. ممکن است WebAssembly با یک تنظیم امنیتی یا یک افزونه خاموش شده باشد.';
 $ec_lang['lpn_time_engine_run_failed']='اجرای EPANET ناموفق بود. این یک نقص در این صفحه است؛ برای گزارش آن از پیوند {wrong} استفاده کنید.';

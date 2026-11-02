@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='لړه';
 $ec_lang['lpn_time_clock_day']='ورځ {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='وخت د ساعتونو او دقیقو په بڼه ولیکئ، لکه 2:30. یوازې یوه شمېره ساعتونه معنی لري، نو 8 یعنې اته ساعته دي. نیم ساعت 0:30 دی.';
 $ec_lang['lpn_time_running']='اوږدې مودې سمولېشن چلیږي.';
-$ec_lang['lpn_time_no_engine']='دننه جوړ شوی حل کوونکی یو وخت یوازې یوه شېبه حلوي، نو دا شبکه یوازې په {time} کې ده: هر نمونه پر هغه شېبه لوستل کیږي، او هر ټانک په خپله پیل کچه پاتې کیږي پر ځای دې چې ډک او تش شي. یو ځل انټرنیټ سره وصل شئ ترڅو د EPANET حل کوونکی ډاونلوډ کړئ، چې اوږدې مودې سمولېشن چلوي.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='دننه جوړ شوی حل کوونکی یو وخت یوازې یوه شېبه حلوي، نو دا شبکه یوازې په {time} کې ده: هر نمونه پر هغه شېبه لوستل کیږي، او هر ټانک په خپله پیل کچه پاتې کیږي پر ځای دې چې ډک او تش شي. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='د EPANET حل کوونکي ډاونلوډ ناکام شو. بیا هڅه کولو لپاره پاڼه بیا بار کړئ؛ ممکن فایروال، پراکسي، یا د براوزر توسیع یې بندوي.';
 $ec_lang['lpn_time_engine_start_failed']='براوزر د EPANET حل کوونکي د پیلولو نه ډډه وکړه. ممکن WebAssembly د امنیت تنظیم یا توسیع له خوا بند شوی وي.';
 $ec_lang['lpn_time_engine_run_failed']='د EPANET چلول ناکام شول. دا د دې پاڼې نیمګړتیا ده؛ د راپور ورکولو لپاره د {wrong} لینک وکاروئ.';

@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='المدى';
 $ec_lang['lpn_time_clock_day']='اليوم {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='اكتب الوقت بالساعات والدقائق، مثل 2:30. الرقم المجرد يعني ساعات، فمثلاً 8 يعني ثماني ساعات. نصف الساعة هو 0:30.';
 $ec_lang['lpn_time_running']='جارٍ تشغيل المحاكاة ممتدة الفترة.';
-$ec_lang['lpn_time_no_engine']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. اتصل بالإنترنت مرة واحدة لتنزيل حلّال EPANET، الذي يشغّل محاكاة ممتدة الفترة.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='فشل تنزيل حلّال EPANET. أعد تحميل الصفحة للمحاولة مرة أخرى؛ فقد يكون جدار حماية أو وكيل شبكة أو امتداد متصفح يحجبه.';
 $ec_lang['lpn_time_engine_start_failed']='رفض المتصفح تشغيل حلّال EPANET. قد يكون WebAssembly معطَّلاً بإعداد أمني أو بامتداد.';
 $ec_lang['lpn_time_engine_run_failed']='فشل تشغيل EPANET. هذا عيب في هذه الصفحة؛ استخدم الرابط {wrong} للإبلاغ عنه.';

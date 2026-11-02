@@ -38441,11 +38441,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		why = EngCalcs.lpnTimeWaiting ? EngCalcs.lpnTimeWaiting() : 'manual';
 		if (why === 'running') { return pc.lpn_time_running || 'Running the extended period simulation.'; }
 		if (why === 'failed') { return pc.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.'; }
-		if (why === 'engine') {
-			if (EngCalcs.lpnTimeNoEngineText) { return EngCalcs.lpnTimeNoEngineText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0); }
-			return String(pc.lpn_time_no_engine || 'The built-in solver shows this network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.')
-				.replace('{time}', EngCalcs.lpnTimeElapsedText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0));
-		}
 		return pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.';
 	}
 	function renderTimeSeries() {
@@ -81525,8 +81520,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var offline = warmFailedOffline();
 			if (!quiet) {
 				setNotice(offline
-					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.')
-					: (pc.lpn_engine_unavailable_why || 'This network cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
+					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.')
+					: (pc.lpn_engine_unavailable_why || 'The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
 			}
 			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();
@@ -81666,8 +81661,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// no reason given.
 				// The warm leg only downloads, so the cause is offline or a blocked download.
 				base = warmFailedOffline()
-					? (pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.')
-					: (pc.lpn_engine_needed_failed_why || 'This network can only be solved by the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch'));
+					? (pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.')
+					: (pc.lpn_engine_needed_failed_why || 'The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch'));
 			}
 		}
 		full = base;

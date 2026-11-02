@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='ክልል';
 $ec_lang['lpn_time_clock_day']='ቀን {day}፣ {clock}';
 $ec_lang['lpn_time_format_tip']='ጊዜን በሰዓትና ደቂቃ ይጻፉ፣ ለምሳሌ 2:30። ነጠላ ቁጥር የፈጀውን ሰዓት ብዛት ያመለክታል፤ ስለዚህ 8 ብቻ ማለት ስምንት ሰዓት የፈጀ ጊዜ ማለት ነው እንጂ የቀን ሰዓት አይደለም። ግማሽ ሰዓት 0:30 ተብሎ ይጻፋል።';
 $ec_lang['lpn_time_running']='የተራዘመ ጊዜ ማስመሰያውን በማስኬድ ላይ።';
-$ec_lang['lpn_time_no_engine']='አብሮ የተሰራው ፈታች አንድ ቅጽበት በአንድ ጊዜ ይፈታል፣ ስለዚህ ይህ መረብ በ{time} ላይ ብቻ ነው፦ እያንዳንዱ ስርዓት በዚያ ቅጽበት ይነበባል፣ እያንዳንዱ ታንክም ከመሙላትና ከመትፋት ይልቅ በመነሻ ደረጃው ላይ ይቆያል። የተራዘመ ጊዜ ማስመሰያ የሚያካሂደውን የEPANET ፈታች ለማውረድ አንድ ጊዜ ከኢንተርኔት ጋር ይገናኙ።';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='አብሮ የተሰራው ፈታች አንድ ቅጽበት በአንድ ጊዜ ይፈታል፣ ስለዚህ ይህ መረብ በ{time} ላይ ብቻ ነው፦ እያንዳንዱ ስርዓት በዚያ ቅጽበት ይነበባል፣ እያንዳንዱ ታንክም ከመሙላትና ከመትፋት ይልቅ በመነሻ ደረጃው ላይ ይቆያል። {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='የEPANET ፈታች ማውረድ አልተሳካም። እንደገና ለመሞከር ገጹን እንደገና ይጫኑ፤ ፋየርዎል፣ ፕሮክሲ ወይም የአሳሽ ማራዘሚያ እያገደው ሊሆን ይችላል።';
 $ec_lang['lpn_time_engine_start_failed']='አሳሹ የEPANET ፈታችን ለመጀመር ፈቃደኛ አልሆነም። WebAssembly በደህንነት ቅንብር ወይም በማራዘሚያ ጠፍቶ ሊሆን ይችላል።';
 $ec_lang['lpn_time_engine_run_failed']='የEPANET ስራ አልተሳካም። ይህ በዚህ ገጽ ውስጥ ያለ ጉድለት ነው፤ ለማሳወቅ {wrong} አገናኙን ይጠቀሙ።';

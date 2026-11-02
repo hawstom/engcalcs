@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Interval';
 $ec_lang['lpn_time_clock_day']='Ziua {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Scrieți o oră ca ore și minute, de exemplu 2:30. Un număr simplu înseamnă ore, deci 8 înseamnă opt ore. O jumătate de oră este 0:30.';
 $ec_lang['lpn_time_running']='Se rulează simularea pe perioadă extinsă.';
-$ec_lang['lpn_time_no_engine']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit la acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. Conectați-vă o dată la internet pentru a descărca rezolvitorul EPANET, care rulează o simulare pe perioadă extinsă.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit în acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Descărcarea rezolvitorului EPANET a eșuat. Reîncărcați pagina pentru a încerca din nou; un firewall, un proxy sau o extensie a browserului o poate bloca.';
 $ec_lang['lpn_time_engine_start_failed']='Browserul a refuzat pornirea rezolvitorului EPANET. WebAssembly poate fi dezactivat de o setare de securitate sau de o extensie.';
 $ec_lang['lpn_time_engine_run_failed']='Rularea EPANET a eșuat. Aceasta este un defect al acestei pagini; folosiți legătura {wrong} pentru a-l raporta.';

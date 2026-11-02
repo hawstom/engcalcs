@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Rozpětí';
 $ec_lang['lpn_time_clock_day']='Den {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Zapište čas jako hodiny a minuty, například 2:30. Prosté číslo znamená hodiny, takže 8 je osm hodin. Půl hodiny je 0:30.';
 $ec_lang['lpn_time_running']='Probíhá simulace s časovým průběhem.';
-$ec_lang['lpn_time_no_engine']='Vestavěný řešič řeší vždy jen jeden okamžik, proto je to síť pouze v čase {time}: každý vzorec se čte v tomto okamžiku a každá nádrž zůstává na své počáteční hladině, místo aby se plnila a vyprazdňovala. Jednorázovým připojením k internetu stáhnete řešič EPANET, který provede simulaci s časovým průběhem.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Vestavěný řešič řeší vždy jen jeden okamžik, proto je to síť pouze v čase {time}: každý vzorec se čte v tomto okamžiku a každá nádrž zůstává na své počáteční hladině, místo aby se plnila a vyprazdňovala. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Stažení řešiče EPANET se nezdařilo. Načtěte stránku znovu a zkuste to znovu; může jej blokovat brána firewall, proxy server nebo rozšíření prohlížeče.';
 $ec_lang['lpn_time_engine_start_failed']='Prohlížeč odmítl řešič EPANET spustit. WebAssembly může být vypnuto bezpečnostním nastavením nebo rozšířením.';
 $ec_lang['lpn_time_engine_run_failed']='Výpočet EPANET selhal. Jde o chybu této stránky; nahlaste ji pomocí odkazu {wrong}.';

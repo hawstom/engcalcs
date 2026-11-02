@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Raspon';
 $ec_lang['lpn_time_clock_day']='Dan {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Upišite vrijeme kao sate i minute, na primjer 2:30. Obični broj znači sate, pa 8 znači osam sati. Pola sata je 0:30.';
 $ec_lang['lpn_time_running']='Izvođenje simulacije produljenog razdoblja.';
-$ec_lang['lpn_time_no_engine']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. Povežite se jednom s internetom da preuzmete EPANET rješavač, koji izvodi simulaciju produljenog razdoblja.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Preuzimanje EPANET rješavača nije uspjelo. Ponovno učitajte stranicu da pokušate opet; moguće ga blokira vatrozid, proxy ili dodatak preglednika.';
 $ec_lang['lpn_time_engine_start_failed']='Preglednik je odbio pokrenuti EPANET rješavač. WebAssembly je možda isključen sigurnosnom postavkom ili dodatkom.';
 $ec_lang['lpn_time_engine_run_failed']='EPANET pokretanje nije uspjelo. To je greška na ovoj stranici; upotrijebite vezu {wrong} da je prijavite.';

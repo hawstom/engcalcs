@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Amplitude';
 $ec_lang['lpn_time_clock_day']='Dia {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Escreva um horário como horas e minutos, como 2:30. Um número simples significa horas, então 8 é oito horas. Meia hora é 0:30.';
 $ec_lang['lpn_time_running']='Executando a simulação de período estendido.';
-$ec_lang['lpn_time_no_engine']='O solucionador integrado calcula um momento de cada vez, então isto é a rede apenas em {time}: cada padrão é lido nesse momento, e cada tanque permanece no seu nível inicial em vez de encher e esvaziar. Conecte-se à internet uma vez para baixar o solucionador do EPANET, que executa uma simulação de período estendido.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='O solucionador integrado calcula um momento de cada vez, então isto é a rede apenas em {time}: cada padrão é lido nesse momento, e cada tanque permanece no seu nível inicial em vez de encher e esvaziar. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='O download do solucionador do EPANET falhou. Recarregue a página para tentar de novo; um firewall, um proxy ou uma extensão do navegador pode estar bloqueando-o.';
 $ec_lang['lpn_time_engine_start_failed']='O navegador se recusou a iniciar o solucionador do EPANET. O WebAssembly pode estar desativado por uma configuração de segurança ou por uma extensão.';
 $ec_lang['lpn_time_engine_run_failed']='A execução do EPANET falhou. Isso é um defeito desta página; use o link {wrong} para relatá-lo.';

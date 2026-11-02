@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='رینج';
 $ec_lang['lpn_time_clock_day']='دن {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='وقت گھنٹے اور منٹ کی صورت میں لکھیں، جیسے 2:30۔ سادہ عدد کا مطلب گھنٹے ہیں، اس لیے 8 کا مطلب آٹھ گھنٹے ہے۔ آدھا گھنٹہ 0:30 ہے۔';
 $ec_lang['lpn_time_running']='وقتی دورانیے کی سمولیشن چلائی جا رہی ہے۔';
-$ec_lang['lpn_time_no_engine']='بلٹ اِن حل کار ایک وقت میں ایک لمحہ حل کرتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اپنی ابتدائی سطح پر رہتا ہے۔ وقتی دورانیے کی سمولیشن چلانے والا EPANET حل کار ڈاؤن لوڈ کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں۔';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='بلٹ اِن حل کار ایک وقت میں ایک لمحے کو حل کرتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اپنی ابتدائی سطح پر رہتا ہے۔ {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET حل کار کا ڈاؤن لوڈ ناکام ہو گیا۔ دوبارہ کوشش کے لیے صفحہ ریلوڈ کریں؛ ممکن ہے فائر وال، پراکسی یا براؤزر ایکسٹینشن اسے روک رہی ہو۔';
 $ec_lang['lpn_time_engine_start_failed']='براؤزر نے EPANET حل کار شروع کرنے سے انکار کر دیا۔ ممکن ہے WebAssembly کسی سکیورٹی سیٹنگ یا ایکسٹینشن سے بند ہو۔';
 $ec_lang['lpn_time_engine_run_failed']='EPANET رن ناکام ہو گیا۔ یہ اس صفحے کی خرابی ہے؛ رپورٹ کرنے کے لیے {wrong} لنک استعمال کریں۔';

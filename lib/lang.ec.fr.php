@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Étendue';
 $ec_lang['lpn_time_clock_day']='Jour {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Écrivez une heure sous forme d\'heures et de minutes, par exemple 2:30. Un nombre seul est en heures : 8 signifie huit heures. Une demi-heure s\'écrit 0:30.';
 $ec_lang['lpn_time_running']='Exécution de la simulation en période étendue.';
-$ec_lang['lpn_time_no_engine']='Le solveur intégré résout un seul instant à la fois ; il s\'agit donc du réseau à {time} seulement : chaque courbe de modulation est lue à cet instant, et chaque bâche reste à son niveau initial au lieu de se remplir et de se vider. Connectez-vous une fois à internet pour télécharger le solveur EPANET, qui exécute une simulation en période étendue.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Le solveur intégré résout un seul instant à la fois ; il s\'agit donc du réseau à {time} seulement : chaque courbe de modulation est lue à cet instant, et chaque bâche reste à son niveau initial au lieu de se remplir et de se vider. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Le téléchargement du solveur EPANET a échoué. Rechargez la page pour réessayer ; un pare-feu, un proxy ou une extension du navigateur peut le bloquer.';
 $ec_lang['lpn_time_engine_start_failed']='Le navigateur a refusé de démarrer le solveur EPANET. WebAssembly est peut-être désactivé par un paramètre de sécurité ou une extension.';
 $ec_lang['lpn_time_engine_run_failed']='Le calcul EPANET a échoué. Il s\'agit d\'un défaut de cette page ; utilisez le lien {wrong} pour le signaler.';

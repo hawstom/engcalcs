@@ -2754,7 +2754,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // returning visitor with the page cached and the engine not cached is a real state, and Task 608
 // shrank it further by fetching the engine before anybody is waiting. But the conclusion holds on
 // a better reason: **the reader is already told, at the moment it happens, by
-// lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
+// lpn_time_epanet_fallback and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
 $ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar names it.';
@@ -2837,10 +2837,10 @@ $ec_lang['lpn_roughness_method_note']='⚠ Pipes with a roughness outside the no
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is now stored on this device and works offline.';
-$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.';
+$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='This network cannot be solved without the EPANET solver. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2852,8 +2852,8 @@ $ec_lang['lpn_engine_bar_label']='Solver loading progress';
 $ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
 $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
-$ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
-$ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
+$ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.';
+$ec_lang['lpn_engine_needed_failed_why']='The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3925,10 +3925,10 @@ $ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 // Said once per page load after a chemical simulation run by the built-in solver, which reports no reaction rates.
 $ec_lang['lpn_time_running']='Running the extended period simulation.';
-$ec_lang['lpn_time_no_engine']='The built-in solver shows this network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.';
-// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
-// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='The built-in solver shows this network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}';
+// When EPANET is the chosen solver and cannot load or start, the built-in loop runs the period and the status bar says so.
+// The first sentence is for offline; for the other causes the second ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_epanet_fallback']='The EPANET solver could not be loaded, so the built-in solver ran this network.';
+$ec_lang['lpn_time_epanet_fallback_why']='The built-in solver ran this network, because the EPANET solver could not be used. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.';
 $ec_lang['lpn_time_engine_start_failed']='The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.';
 $ec_lang['lpn_time_engine_run_failed']='The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.';

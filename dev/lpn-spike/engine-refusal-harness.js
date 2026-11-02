@@ -30,6 +30,8 @@ require(path.join(ROOT, 'js', 'lpn-patterns.js'));
 require(path.join(ROOT, 'js', 'lpn-inp.js'));
 require(path.join(ROOT, 'js', 'lpn-epanet.js'));
 require(path.join(ROOT, 'js', 'lpn-time.js'));
+require(path.join(ROOT, 'js', 'lpn-native-msx.js'));
+require(path.join(ROOT, 'js', 'lpn-native-run.js'));
 const { buildModel } = require('./net3-model.js');
 // The two status messages, read out of lib/lang.ec.en.php. This harness loads no DOM stub, so
 // there is no pageConfig and js/lpn-time.js falls back to its own English literals -- which
@@ -42,7 +44,7 @@ function lang(key) {
 	if (!m) { throw new Error('no such lang key: ' + key); }
 	return m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
 }
-// ...as a PATTERN, with any {placeholder} left open: lpn_time_no_engine names the moment it solved.
+// ...as a PATTERN, with any {placeholder} left open: a key's {placeholder} is left open.
 function langRe(key) {
 	return new RegExp(lang(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 		.replace(/\\\{\w+\\\}/g, '.+?'));
@@ -75,7 +77,7 @@ async function absentEngineSection() {
 			moduleUrl: 'file://' + path.join(ROOT, 'js', 'vendor', 'no-such-engine.js')
 		});
 	} catch (e) { rejected = true; }
-	check(rejected, 'an engine that cannot be imported REJECTS, which is what noEngine() answers',
+	check(rejected, 'an engine that cannot be imported REJECTS, which is what the built-in fallback answers (periodRun)',
 		rejected ? '' : JSON.stringify(resolvedWith));
 	check(!resolvedWith || !resolvedWith.refused,
 		'...and is never dressed up as a refusal, which would blame a network that is fine');
@@ -208,12 +210,13 @@ async function pageSection() {
 	console.log('\n---- the three sentences a refused run owes the user ----');
 	const doc = { times: EngCalcs.lpnTimesDefaults(), nodes: [], links: [] };
 	doc.times.duration = 86400;
-	let natives = 0, status = '';
-	const solveNow = () => { EngCalcs.lpnTimeRun({ nodes: [{ id: 'J1', type: 'junction', elev: 1 }], links: [] }); };
+	let natives = 0, status = '', routeNote = '';
+	const net3 = buildModel(EngCalcs, EngCalcs.lpnInpParse(fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.inp'), 'utf8')));
+	const solveNow = () => { EngCalcs.lpnTimeRun(JSON.parse(JSON.stringify(net3))); };
 	EngCalcs.lpnTimeInit({
 		tabs: [],
 		doc: () => doc,
-		apply: () => {}, status: (t) => { status = t; },
+		apply: () => {}, status: (t) => { status = t; }, routeNote: (t) => { routeNote = t; },
 		solve: solveNow, solveNow: solveNow,
 		native: () => { natives++; return { ok: true, converged: true, heads: {}, flows: {} }; },
 		snapshot: () => {}, save: () => {},
@@ -236,7 +239,7 @@ async function pageSection() {
 	check(status.indexOf(WORDS) >= 0, '(b) ...in the engine\'s own words, so they can act on it');
 	check(/built-in solver/.test(status), '(c) ...and that the numbers on screen came from our solver');
 	check(natives > 0, 'and the built-in solver really was the one that produced them', String(natives));
-	check(!langRe('lpn_time_no_engine').test(status),
+	check(!/connect to the internet/i.test(status + routeNote),
 		'and is NOT told to go online -- the engine is right here, and that is an hour wasted');
 	eq(EngCalcs.lpnTimeRunBoxState().phase, 'failed', 'the run box says the run did not happen');
 	check(EngCalcs.lpnTimeRunBoxState().open, '...and stays up to be read');
@@ -249,11 +252,11 @@ async function pageSection() {
 	// The tagged fetch failure reads as offline only when the browser says so (navigator.onLine);
 	// engine-failure-wording-harness.js covers the other causes.
 	Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
-	status = '';
+	status = ''; routeNote = '';
 	EngCalcs.lpnTimeRunNow();
-	await wait(80);
-	check(langRe('lpn_time_no_engine').test(status),
-		'an unreachable engine still gets its own message, unchanged', status);
+	await wait(120);
+	check(langRe('lpn_time_epanet_fallback').test(routeNote),
+		'an unreachable engine says so, and that the built-in solver ran the period', routeNote);
 	check(!langRe('lpn_engine_refused').test(status), '...and is never reported as a refusal');
 }
 

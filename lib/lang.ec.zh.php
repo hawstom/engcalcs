@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='极差';
 $ec_lang['lpn_time_clock_day']='第 {day} 天，{clock}';
 $ec_lang['lpn_time_format_tip']='请以小时和分钟的形式输入时间，例如 2:30。单独一个数字表示小时，例如 8 表示 8 小时。半小时可写作 0:30。';
 $ec_lang['lpn_time_running']='正在运行延时模拟。';
-$ec_lang['lpn_time_no_engine']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有时间模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。联网一次以下载可运行延时模拟的 EPANET 求解器。';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有时间模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。{reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET 求解器下载失败。请重新加载页面后重试；防火墙、代理或浏览器扩展程序可能正在阻止下载。';
 $ec_lang['lpn_time_engine_start_failed']='浏览器拒绝启动 EPANET 求解器。WebAssembly 可能已被安全设置或扩展程序关闭。';
 $ec_lang['lpn_time_engine_run_failed']='EPANET 运行失败。这是本页面的缺陷；请使用 {wrong} 链接报告。';

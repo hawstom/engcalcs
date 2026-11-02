@@ -3731,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='טווח';
 $ec_lang['lpn_time_clock_day']='יום {day},‏ {clock}';
 $ec_lang['lpn_time_format_tip']='כתבו זמן כשעות ודקות, כמו 2:30. מספר פשוט פירושו שעות, כך ש-8 הוא שמונה שעות. חצי שעה הוא 0:30.';
 $ec_lang['lpn_time_running']='מריץ את הסימולציה על פני תקופת זמן.';
-$ec_lang['lpn_time_no_engine']='הפותר המובנה פותר רגע אחד בכל פעם, ולכן זו הרשת ב-{time} בלבד: כל תבנית נקראת באותו רגע, וכל מכל נשאר במפלס ההתחלתי שלו במקום להתמלא ולהתרוקן. התחברו לאינטרנט פעם אחת כדי להוריד את פותר EPANET, המריץ סימולציה על פני תקופת זמן.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='הפותר המובנה פותר רגע אחד בכל פעם, ולכן זו הרשת ב-{time} בלבד: כל תבנית נקראת באותו רגע, וכל מכל נשאר במפלס ההתחלתי שלו במקום להתמלא ולהתרוקן. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='הורדת פותר EPANET נכשלה. טענו את העמוד מחדש כדי לנסות שוב; ייתכן שחומת אש, שרת proxy או תוסף דפדפן חוסמים אותה.';
 $ec_lang['lpn_time_engine_start_failed']='הדפדפן סירב להפעיל את פותר EPANET. ייתכן ש-WebAssembly כבוי בגלל הגדרת אבטחה או תוסף.';
 $ec_lang['lpn_time_engine_run_failed']='הרצת EPANET נכשלה. זהו פגם בעמוד זה; השתמשו בקישור {wrong} כדי לדווח עליו.';
