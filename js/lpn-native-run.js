@@ -537,7 +537,8 @@
 				if (c.type === LOWLEVEL && h <= c.grade + HTOL) { reset = true; }
 				if (c.type === HILEVEL && h >= c.grade - HTOL) { reset = true; }
 				if (!reset) { return; }
-				if (st.k !== c.setting || st.s !== c.status) {
+				// hydsolver.c pswitch(): the setting decides; the status is compared only when the valve has no setting (MISSING)
+				if (st.k !== c.setting || (st.k === MISSING && st.s !== c.status)) {
 					st.s = c.status;
 					st.k = c.setting;
 					applyLink(stepLinks[c.k], st);
@@ -1053,7 +1054,7 @@
 			initFlows[l.id] = FT * area / FLOW_G;
 		});
 
-		var vTrial;
+		var vTrial, trialsSoFar;
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
 			// demands()' last loop, setlinksetting() on a pump: the multiplier IS the speed.
@@ -1087,10 +1088,13 @@
 			else if (!res) { sOpts.flows0 = initFlows; }
 			res = solveInFeet(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
+			trialsSoFar = res.iterations;
 			for (vTrial = 0; vTrial < 20 && valveSwitch(stepLinks, function (id) { return res.heads[id]; }); vTrial++) {
 				sOpts.flows0 = Object.assign({}, res.flows, res.leakFlows || {});
 				res = solveInFeet(stepModel, sOpts);
 				if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
+				// EPANET carries on counting trials after a control changes a valve (hydsolve() continues; it does not start again)
+				trialsSoFar += res.iterations; res.iterations = trialsSoFar;
 			}
 			// The run's convergence is a conjunction over its solves, as js/lpn-epanet.js noteStep() keeps it.
 			stepsRun++;
