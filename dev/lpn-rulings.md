@@ -69,13 +69,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
     share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it
     reports is a **Source share**, a percentage. Two things, two words, and the tip ties them.
-- **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
+- **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18 THROUGH THE EPANET ENGINE, AND IN THE BUILT-IN SOLVER 2026-11-03** (`js/lpn-time.js`).
   Tanks fill and drain, demands follow patterns, the TOOLBAR's transport scrubs the frames (it
   mounts into `lpn_toolbar_run`, not a bottom pane -- this line said bottom pane until 2026-09-10
   and sent a design brief off on the wrong control); checked against
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
-  (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
-  getting one** — with EPANET unreachable the page solves one instant and says so. Patterns on a
+  (`dev/lpn-spike/eps-net3-harness.js`). **Since 2026-11-03 the built-in solver runs it too**
+  (`js/lpn-native-run.js`, Task 733), and with EPANET chosen but unable to load the page runs the
+  period on the built-in loop and says so. Patterns on a
   reservoir head and on a pump speed shipped 2026-08-24 (248.02), and rule-based `[RULES]` closed
   2026-09-05 (248.03): `js/lpn-rules.js` is EPANET's own grammar, parsing a rule so that every number
   in it can be converted per clause into the engine's units. **EPANET checks its rule base BETWEEN

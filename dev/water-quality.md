@@ -24,10 +24,9 @@ percentage can never appear under the word "age".
 ## It is EPANET-only and RUN-only, and neither is a limitation to route around
 
 Quality is transported along flows over time. A water age at one instant is not a number, it is the
-answer to a question nobody asked — so it rides on the extended-period run (Task 248) and the
-built-in solver has nothing to do. **`js/lpn-solver.js` has no time dimension and is not getting
-one.** With the engine unreachable the page says so exactly as the run already does, and shows no
-quality value at all rather than a column of zeros.
+answer to a question nobody asked — so it rides on the extended-period run (Task 248). Since 2026-11-03 the built-in
+solver runs it too (Task 733, `dev/native-eps-plan.md`), matched against EPANET 2.3.5; a quality run
+never shows a column of zeros in place of a value it could not compute.
 
 ## There is no pass or fail, and one must not be invented
 

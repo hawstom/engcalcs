@@ -71,8 +71,8 @@ the equivalent section in `branched-network-calculator-scope.md` turned out to b
 valuable page. Everything below is **out permanently**. Reopening any of it requires a new decision
 with a new reason, not an appeal to completeness.
 
-- ~~**Extended-period simulation.**~~ **SHIPPED, through the EPANET engine only** (`js/lpn-time.js`):
-  patterns, controls, `[RULES]`, tank levels over time. The built-in solver still solves one instant.
+- ~~**Extended-period simulation.**~~ **SHIPPED in either engine** (`js/lpn-time.js`; the built-in solver's
+  time loop since 2026-11-03, Task 733): patterns, controls, `[RULES]`, tank levels over time.
 - ~~**Tank.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP Task 248).** This is the first entry
   ever to leave this list, and the section above asks for a new decision with a new reason rather
   than an appeal to completeness, so here is both. The reason is not completeness: Tom raised Task
