@@ -239,8 +239,75 @@ written by the visitor export):
 | Feature | Known | Open |
 |---|---|---|
 | Two-compartment mixing | Code 0. Compartments are percents: 0.2 and 0.8 failed in WaterGEMS with *"Must add to 100"*; 20 and 80 ran | Tom: *"giving 0.5 at hour 12. EPANET gives 0.170"*. Compartment 1 and 2 may be the other way round, or the calculation type confounded it. Round 2 writes both orders with calculation type 3 |
-| Chlorine | Support element type 52 `IdahoConstituent`, calculation type 3, the source codes above | Tom: J0 showed Setpoint Booster 1.0 but J1 1.0 at hours 12 and 24 and T1 0.2 (EPANET J1 0.958/0.961, T1 0.061/0.102; no reactions J1 1.000, T1 0.126), so the reactions were not read, or the file ran as the wrong type (written as Flushing, 1). Unit and sign of the rates unknown: round 2 repeats the four storages; the best evidence is a file Tom saves from WaterGEMS with bulk -2 per day and wall -1 ft per day |
+| Chlorine | **Now written by the page** (below): Tom's own save settled the table, columns, sign and units | Per-pipe and per-tank rates, source patterns: column names only, still candidate |
 | Age, trace | Calculation types 2 and 4; `Trace_SystemData.Trace_TraceElement` is the traced node | Not yet run with the right types |
+
+## Tom's chlorine save, 2026-11-03: where WaterGEMS keeps a constituent
+
+Source: `~/tom-files/2026-11-03/wtg-constituent-chlorine-from-tom/Net3-Novato-CA-World.wtg(.sqlite)`, read as plain
+SQLite (copied first). He made a Chlorine constituent (bulk -2 per day, wall -1 ft per day) for the whole network and saved.
+
+| What | Table.column | Value in his save |
+|---|---|---|
+| The constituent is a support element of type 52 | `HMISupportElement` (type 52), label in `HMIModelingElement` | "Chlorine", id 278 (279 is a soft-deleted "Copy of Chlorine", same guid) |
+| Its properties | `IdahoConstituent`: `Diffusivity` 1.3e-08, `HasUnlimitedConcentration` 1, `ConcentrationLimit` 0, `BulkReactionOrder` 1, `BulkReactionRate` | bulk **-2.0** |
+| Wall order and rate | `IdahoConstituent.WallReactionOrder` 1, and **both** sub-tables hold a row: `IdahoConstituent_WallReactionOrder_FirstOrderType.FirstOrderType_FirstOrderWallReactionRate`, `..._ZeroOrderType.ZeroOrderType_ZeroOrderWallReactionRate` | first order **-1.0**; zero order 0.0 (the order not in use holds 0) |
+| Tied to the whole network | `Constituent_SystemData` (`AlternativeID`, `Constituent_ConstituentID`) | one row, alternative 11 (the Base hydraulic alternative), constituent 278 |
+| Elements | `BaseIdahoNode_Constituent_Data`, `BaseDirectedNode_Constituent_Data` (`Constituent_InitialConcentration`), `IdahoPipe_Constituent_Data`, `ConventionalTank_Constituent_Data` | rows exist for every element already; **nothing per element changed** (initial 0, no source, no local rate, mixing code 1) |
+
+Units and sign: the numbers are stored exactly as typed, in the dialog's units: per day for the bulk rate, ft per day for
+the wall rate, with EPANET's sign (a decay is negative). A per-second storage would be -2.3e-5; it is not. There is no
+conversion to SI. Rates stated positive are not what WaterGEMS stores for a decay.
+
+**The calculation type stayed 5** (the plain hydraulic run) and the table
+`EpaNetEngine_CalculationType_ConstituentAnalysisType` stayed empty: making a constituent does not choose the Constituent
+run. A Constituent run needs both the constituent (`Constituent_SystemData`) and the calculation type 3 with its tolerance row.
+The water quality time step is untouched too (`EpaSetWaterQualityTimeStep` 0, `EpaWaterQualityTimeStep` 0.0), and the
+hydraulic step is stored in seconds (3600.0), so a written quality step would be in seconds (a guess, tested in round 3).
+
+**Diff against our round 2 `chlorine-day-signed`:** identical in every column of the constituent tables, system data and
+element tables, except that ours (1) set calculation type 3 (his is 5) and added the tolerance row, (2) wrote no
+zero-order wall row (his has one), (3) set J0 as a set point source (his has none). So round 2's day-signed file already
+stored the rates his way. Round 1's `J1` 1.0 is therefore most likely the wrong calculation type (the first guess was Flushing, 1), not the
+layout. Round 2's chlorine files have not been reported on yet.
+
+**Written by the page now** (`writeChemical()` in `js/lpn-wtg-export.js`, no `opts.candidate`): for a chemical in mg/L
+with global bulk and wall reactions, sources without a pattern, initial quality, calculation type 3, the constituent and
+both wall sub-tables as above. **Still candidate-only:** a rate stated for one pipe or tank, a source pattern (column
+names only), age and trace runs, two-compartment mixing, the quality time step. A project holding any of these still lists
+"Water quality" as not written, so the visitor is told. The page's wording is unchanged; no key was added.
+
+Round 3 (`node dev/lpn-spike/wtg-feature-tests-3.js`, files in `~/tom-files/2026-11-03/wtg-feature-tests-3/`): the chlorine
+file by the page's path, the two-compartment pair plus a 5 minute quality-step variant, and age and trace again.
+
+## Two compartment: why Tom's numbers are not EPANET's (hypotheses, 2026-11-03)
+
+Tom read, at `T1`, hour 12 and 24: 20 percent inlet compartment 0.5 and 0.7 mg/L; 80 percent 0.4 and 0.6. EPANET (default
+step) gets 0.170 and 0.299, and 0.070 and 0.126. Round 1's completely mixed tank read about 0.2 at hour 24 (EPANET 0.126).
+WaterGEMS shows one decimal, so each reading carries up to 0.05 of rounding. **The two-compartment codes (0, percents,
+compartment 1 first) are not changed on this evidence.**
+
+1. **A coarse water quality time step (leading).** In EPANET this tiny network's tank is very sensitive to the quality step,
+   because the tank swings from full to nearly empty and the water arrives in a few packets. Measured here with the cycling
+   network: step 5 minutes gives T1 0.130/0.245 (20 percent) and 0.053/0.102 (80 percent); 30 minutes 0.709/0.871 and
+   0.348/0.473; **1 hour 0.480/0.611 and 0.404/0.525**. The 1 hour numbers round to 0.5/0.6 and 0.4/0.5, within a tenth of
+   Tom's 0.5/0.7 and 0.4/0.6 at every reading, and keep the ordering. His template has `EpaSetWaterQualityTimeStep` 0, which
+   may mean "use the hydraulic step" (1 hour here) and not EPANET's one tenth of it. Round 3 asks what step the Calculation
+   Options show, and writes a 5 minute step (300 s) in one file.
+2. **Initial tank quality.** EPANET starts T1 at 0 mg/L. If WaterGEMS starts it elsewhere, every number rises: 0.5 initial
+   gives 0.566/0.634 and 0.527/0.555 even at EPANET's own step, with the 20 percent tank above the 80 percent one. The file
+   stores 0 (`Constituent_InitialConcentration`), but what the dialog shows is the answer. Round 3 asks.
+3. **Setpoint booster semantics.** EPANET's set point source only raises a node's outflow up to the set point. WaterGEMS has the
+   same name but could add the strength at the node's inflow, or reset at each time step. J1 reads 1.00 in both, so this
+   changes the tank only if the booster acts differently on the pump's inflow. Round 3 asks for `J1` at hour 12.
+4. **Run start.** WaterGEMS may spin the quality up from a steady state or a first hydraulic pass, which would also mean a
+   non-zero tank at hour 0. This looks the same as hypothesis 2 from the outside.
+5. **The ordering agrees** (the 20 percent inlet compartment reads higher, as in EPANET), which argues against compartments
+   1 and 2 being swapped: a swap would reverse it.
+6. **A constituent is required for a Constituent run** (his save: the type stays hydraulic until one is chosen, and the constituent
+   is one row in `Constituent_SystemData`). Our two-compartment files carry the Chlorine constituent through the same
+   writer, so they should be valid Constituent runs; if WaterGEMS had instead run them with no constituent, T1 would
+   read blank, not 0.5.
 
 Open: the water quality time step (`EpaWaterQualityTimeStep`, left at the template's value, so WaterGEMS may use other
 than EPANET's 5 minutes).

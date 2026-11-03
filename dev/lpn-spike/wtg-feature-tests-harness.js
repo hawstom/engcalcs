@@ -1,7 +1,7 @@
 // The WaterGEMS feature writer paths (Task 749). Confirmed by Tom's WaterGEMS on 2026-11-03 and written by the page with
 // no `opts.candidate`: emitter coefficient (ft3/s per psi^n), pump speed pattern (VSPType 0), tank mixing mixed/FIFO/LIFO
-// (codes 1/2/3). Still candidate-only: two-compartment mixing (code 0, percents) and water quality (calculation type
-// 3/2/4, source codes 0 concentration, 1 flow paced, 2 set point, 3 mass).
+// (codes 1/2/3). A chemical run (constituent, bulk -2 per day, wall -1 ft per day, as Tom's own save stores it) is written with no
+// candidate. Still candidate-only: two-compartment mixing (code 0, percents), age and trace, per-element rates.
 //   node dev/lpn-spike/wtg-feature-tests-harness.js
 // Checks the round-2 files dev/lpn-spike/wtg-feature-tests.js builds and the plain writer. NOT proof that WaterGEMS
 // accepts the candidates: only Tom's copy can say that.
@@ -144,15 +144,37 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		db.close();
 	}
 
-	console.log('\nThe page\'s writer is unchanged for quality without a candidate');
+	console.log('\nA chemical run is written with NO candidate, as Tom\'s own save stores it (2026-11-03)');
 	{
 		const inp = fs.readFileSync(path.join(out, '2-chlorine', 'chlorine.inp'), 'utf8');
 		const plain = plainWrite(inp);
 		const db = wrap(plain.bytes);
-		ok('no constituent, no source, no calculation type change when no candidate is passed', rows(db, 'SELECT COUNT(*) AS c FROM IdahoConstituent')[0].c === 0
-			&& rows(db, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 5 && rows(db, 'SELECT COUNT(*) AS c FROM BaseIdahoNode_Constituent_Data WHERE Constituent_IsConstituentSource = 1')[0].c === 0);
-		ok('the report still counts the quality analysis as not written', plain.report.notCarried.some((s) => /quality analysis/.test(s)) && plain.report.candidateWritten === undefined);
+		const ch = rows(db, 'SELECT * FROM IdahoConstituent');
+		ok('one Chlorine constituent: bulk -2.0 per day, order 1, wall order 1; no per-second conversion', ch.length === 1 && ch[0].IdahoConstituent_BulkReactionRate === -2 && ch[0].IdahoConstituent_BulkReactionOrder === 1 && ch[0].WallReactionOrder === 1, JSON.stringify(ch));
+		ok('wall first order -1.0, and the zero order sub-table holds 0 as WaterGEMS writes it',
+			rows(db, 'SELECT FirstOrderType_FirstOrderWallReactionRate AS v FROM IdahoConstituent_WallReactionOrder_FirstOrderType')[0].v === -1
+			&& rows(db, 'SELECT ZeroOrderType_ZeroOrderWallReactionRate AS v FROM IdahoConstituent_WallReactionOrder_ZeroOrderType')[0].v === 0);
+		ok('it is the project\'s constituent (Constituent_SystemData) and a support element of type 52 named Chlorine',
+			rows(db, 'SELECT Constituent_ConstituentID AS c FROM Constituent_SystemData')[0].c === ch[0].SupportElementID && supOf(db, 'Chlorine') === ch[0].SupportElementID);
+		ok('calculation type 3 with its tolerance row; J0 is a set point source (code 2) at 1.0',
+			rows(db, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 3 && rows(db, 'SELECT COUNT(*) AS c FROM EpaNetEngine_CalculationType_ConstituentAnalysisType')[0].c === 1
+			&& rows(db, 'SELECT ConstituentSourceType AS t, BaselineConcentration AS b FROM BaseIdahoNode_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'J0')])[0].t === 2);
+		ok('nothing is written under a candidate name: candidateWritten is unset, and the report no longer lists the chemical as not written',
+			plain.report.candidateWritten === undefined && plain.report.carried.some((s) => /^chemical Chlorine: bulk -2, wall -1 per day/.test(s)) && !plain.report.notCarried.some((s) => /reactions, sources/.test(s)));
 		db.close();
+		// what is still candidate-only is still not written without one
+		const loc = plainWrite(inp.replace('[END]', '[REACTIONS]\n Bulk 1 -3\n\n[END]'));
+		const db2 = wrap(loc.bytes);
+		ok('a rate stated for one pipe is not written without a candidate', rows(db2, 'SELECT COUNT(*) AS c FROM IdahoPipe_Constituent_Data WHERE Constituent_SpecifyLocalBulkReactionRate = 1')[0].c === 0);
+		db2.close();
+		const ageW = plainWrite(fs.readFileSync(path.join(out, '3-age-and-trace', 'age.inp'), 'utf8'));
+		const db3 = wrap(ageW.bytes);
+		ok('an age run is still not written without a candidate (type 5, no constituent)', rows(db3, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 5 && rows(db3, 'SELECT COUNT(*) AS c FROM IdahoConstituent')[0].c === 0 && ageW.report.notCarried.some((s) => /quality analysis/.test(s)));
+		db3.close();
+		const noQ = plainWrite(ft.cyclingNet({}));
+		const db4 = wrap(noQ.bytes);
+		ok('a project with no quality analysis has no constituent and stays type 5', rows(db4, 'SELECT COUNT(*) AS c FROM IdahoConstituent')[0].c === 0 && rows(db4, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 5);
+		db4.close();
 	}
 
 	console.log('\nThe README');
@@ -163,6 +185,30 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		ok('it quotes the EPANET numbers it computed', text.indexOf(x.twoComp.frac02[12].node.T1.quality.toFixed(3)) >= 0 && text.indexOf(x.chlorine[24].node.J1.quality.toFixed(3)) >= 0 && text.indexOf(x.age[24].node.T1.quality.toFixed(2)) >= 0);
 		ok('it asks for the saved file with bulk -2 per day and wall -1 ft per day', /bulk reaction rate of -2 per day and a wall reaction rate of -1 ft per day/.test(text));
 		ok('it uses no em dash', text.indexOf('—') < 0);
+	}
+
+	console.log('\nRound 3 (dev/lpn-spike/wtg-feature-tests-3.js)');
+	{
+		const ft3 = require('./wtg-feature-tests-3.js');
+		const out3 = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-feature-tests-3-'));
+		const r3 = await ft3.build(out3);
+		ok('6 files written, each with integrity ok, no foreign key violation and its .wtg beside it', r3.files.length === 6 && r3.files.every((f) => f.report.integrity === 'ok' && f.report.foreignKeyViolations === 0 && fs.existsSync(path.join(f.dir, f.name + '.wtg'))));
+		const chl = r3.files.filter((f) => f.name === 'chlorine')[0];
+		ok('the chlorine file is written by the page\'s path: no candidate', chl.candidate === undefined && chl.report.candidateWritten === undefined);
+		const dbq = wrap(fs.readFileSync(path.join(out3, '2-two-compartment', 'twocomp-c1-20-c2-80-wq5min.wtg.sqlite')));
+		const eq = rows(dbq, 'SELECT EpaSetWaterQualityTimeStep AS f, EpaWaterQualityTimeStep AS s FROM EpaNetEngine')[0];
+		ok('the wq5min file sets the water quality time step flag and 300 seconds', eq.f === 1 && eq.s === 300, JSON.stringify(eq));
+		dbq.close();
+		const db20 = wrap(fs.readFileSync(path.join(out3, '2-two-compartment', 'twocomp-c1-20-c2-80.wtg.sqlite')));
+		ok('the plain two compartment file leaves the time step at the template\'s', rows(db20, 'SELECT EpaSetWaterQualityTimeStep AS f FROM EpaNetEngine')[0].f === 0);
+		db20.close();
+		const e = r3.expected.twoComp;
+		ok('EPANET: a 1 hour quality step puts the 20 and 80 percent tanks within 0.1 of Tom\'s readings at hour 12 (' + e.step1h.frac02[12].node.T1.quality.toFixed(3) + ', ' + e.step1h.frac08[12].node.T1.quality.toFixed(3) + ')',
+			near(e.step1h.frac02[12].node.T1.quality, 0.5, 0.1) && near(e.step1h.frac08[12].node.T1.quality, 0.4, 0.1) && e.step5min.frac02[12].node.T1.quality < 0.2);
+		const text3 = ft3.readme(r3.expected);
+		ok('the round 3 README names the single most useful step first, quotes the EPANET numbers, uses no em dash and mentions no letter',
+			text3.indexOf('## Single most useful step') > 0 && text3.indexOf('## Single most useful step') < text3.indexOf('## 1-chlorine') && text3.indexOf(e.step5min.frac02[12].node.T1.quality.toFixed(3)) >= 0 && text3.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text3));
+		fs.rmSync(out3, { recursive: true, force: true });
 	}
 
 	fs.rmSync(out, { recursive: true, force: true });
