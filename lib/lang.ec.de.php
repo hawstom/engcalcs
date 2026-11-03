@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Ausschalten, wenn die Neuberechnung zu la
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Die Berechnung dieses Netzes hat {secs} s gedauert, und es ist so eingestellt, dass es nach jeder Änderung neu berechnet wird. Um das zu stoppen und eine Schaltfläche Berechnen zurückzubekommen, schalten Sie „Automatisch neu berechnen“ in den Einstellungen unter Berechnung, Hydraulik aus.';
-$ec_lang['lpn_time_no_report']='Es gibt noch keinen Laufbericht. Der Bericht ist der EPANET-Textbericht und erscheint daher, nachdem dieses Netz berechnet wurde.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Spanne';
 $ec_lang['lpn_time_clock_day']='Tag {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Geben Sie eine Zeit als Stunden und Minuten an, wie 2:30. Eine reine Zahl bedeutet Stunden, also sind 8 acht Stunden. Eine halbe Stunde ist 0:30.';
 $ec_lang['lpn_time_running']='Die Simulation mit erweitertem Zeitraum wird ausgeführt.';
-$ec_lang['lpn_time_no_engine']='Der eingebaute Löser berechnet jeweils nur einen Zeitpunkt, daher zeigt dies das Netz nur zum Zeitpunkt {time}: Jedes Muster wird zu diesem Zeitpunkt gelesen, und jeder Tank bleibt auf seinem Anfangsstand, statt sich zu füllen und zu leeren. Stellen Sie einmal eine Internetverbindung her, um den EPANET-Löser herunterzuladen, der eine Simulation mit erweitertem Zeitraum ausführt.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Der eingebaute Löser berechnet jeweils nur einen Zeitpunkt, daher zeigt dies das Netz nur zum Zeitpunkt {time}: Jedes Muster wird zu diesem Zeitpunkt gelesen, und jeder Tank bleibt auf seinem Anfangsstand, statt sich zu füllen und zu leeren. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Der Download des EPANET-Lösers ist fehlgeschlagen. Laden Sie die Seite neu, um es erneut zu versuchen; möglicherweise blockiert eine Firewall, ein Proxy oder eine Browsererweiterung den Download.';
 $ec_lang['lpn_time_engine_start_failed']='Der Browser hat den Start des EPANET-Lösers abgelehnt. WebAssembly ist möglicherweise durch eine Sicherheitseinstellung oder eine Erweiterung ausgeschaltet.';
 $ec_lang['lpn_time_engine_run_failed']='Der EPANET-Lauf ist fehlgeschlagen. Das ist ein Fehler in dieser Seite; melden Sie ihn über den Link {wrong}.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Erforderlicher Druck';
 $ec_lang['lpn_settings_req_pressure_tip']='Geben Sie den Druck ein, bei dem oder oberhalb dessen ein Entnahmeknoten seine volle Entnahme erhält. Er muss größer als der Mindestdruck sein. Verwenden Sie die Druckeinheit dieses Projekts. Leer lassen, um den EPANET-Standardwert zu verwenden, der bei US-Durchflusseinheiten in psi und sonst in Metern angegeben ist.';
 $ec_lang['lpn_settings_pressure_exponent']='Druckexponent';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Geben Sie den Exponenten der Kennlinie ein, die vom Durchfluss null beim Mindestdruck auf die volle Entnahme beim erforderlichen Druck ansteigt.';
-$ec_lang['lpn_engine_pda_route']='Mit dem EPANET-Löser berechnet, weil das Entnahmemodell druckgesteuert ist.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Das Entnahmemodell ist druckgesteuert, und nur der EPANET-Löser kann es berechnen. Der EPANET-Löser konnte nicht geladen werden, daher fehlen diese Ergebnisse.';
 $ec_lang['lpn_result_delivered_demand']='Gelieferte Entnahme';
 $ec_lang['lpn_result_delivered_demand_tip']='Der Durchfluss, den dieser Entnahmeknoten unter dem druckgesteuerten Entnahmemodell tatsächlich erhält. Er ist kleiner als die Entnahme, wenn der Druck unter dem erforderlichen Druck liegt.';
 $ec_lang['lpn_result_demand_deficit']='Entnahmedefizit';

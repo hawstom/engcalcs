@@ -4,7 +4,7 @@
 //
 // Tom, 2026-11-01: *"Shouldn't the first three settings under Calculation, Hydraulics be directly
 // under Calculation or Calculation, Solver?"* The three are Recalculate automatically, Show the run
-// progress box, and Use the built-in solver when possible: which solver answers, and when. The
+// progress box, and Use the built-in solver: which solver answers, and when. The
 // hydraulic model (friction method, accuracy, demand model, ...) stays under Hydraulics.
 //
 // Asserted on Net1 and on Net3, for each:

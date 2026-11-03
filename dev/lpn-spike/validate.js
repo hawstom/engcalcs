@@ -87,7 +87,8 @@ function energyResidual(model, result) {
 	for (const link of model.links) {
 		if (link.status === 'closed') { continue; }
 		const dh = result.heads[link.from] - result.heads[link.to];
-		const r = Math.abs(dh - result.headlosses[link.id]);
+		// A pipe's reported head loss is a magnitude (EPANET's convention); a pump's keeps its sign.
+		const r = link.type === 'pump' ? Math.abs(dh - result.headlosses[link.id]) : Math.abs(Math.abs(dh) - result.headlosses[link.id]);
 		if (r > worst) { worst = r; worstId = link.id; }
 	}
 	return { worst, worstId };

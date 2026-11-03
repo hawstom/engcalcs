@@ -32,6 +32,8 @@ const { ROOT, byId, loadLoopedNetwork, setUnitSet } = stub;
 
 require(path.join(ROOT, 'js', 'lpn-patterns.js'));
 require(path.join(ROOT, 'js', 'lpn-time.js'));
+require(path.join(ROOT, 'js', 'lpn-native-msx.js'));
+require(path.join(ROOT, 'js', 'lpn-native-run.js'));
 
 const EC = global.EngCalcs;
 const PC = EC.pageConfig;
@@ -193,11 +195,11 @@ async function change(L, value) {
 	const failed = await change(net3, 'none');
 	console.warn = realWarn;
 	EC.lpnEpanetRun = realRun;
-	const noEngine = String(PC.lpn_time_no_engine || '').split('{time}')[0];
-	ok('the status bar says what happened, in the page\'s own words',
-		!!noEngine && statusText().indexOf(noEngine) === 0, JSON.stringify(statusText().slice(0, 60)));
+	const fallback = String(PC.lpn_time_epanet_fallback_why || '').split('{reason}')[0];
+	ok('the status bar says EPANET could not run and the built-in solver ran the period, in the page\'s own words',
+		!!fallback && statusText().indexOf(fallback) >= 0, JSON.stringify(statusText().slice(0, 100)));
 	ok('...and the built-in solver\'s answer is what is drawn, once', failed.applies.length === 1 &&
-		failed.applies[0] === 'steady', JSON.stringify(failed.applies));
+		failed.applies[0] === 'frame', JSON.stringify(failed.applies));
 
 	// ---- 4. RECALCULATE OFF ---------------------------------------------------------------------
 	console.log('\n--- 4. Recalculate off: nothing is applied ---');

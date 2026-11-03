@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Matikan jika penghitungan ulang terlalu l
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Jaringan ini membutuhkan {secs} s untuk dihitung, dan diatur untuk menghitung ulang setelah setiap perubahan. Untuk menghentikannya dan mendapatkan kembali tombol Hitung, matikan “Hitung ulang otomatis” di Pengaturan, pada Perhitungan, Hidraulika.';
-$ec_lang['lpn_time_no_report']='Belum ada laporan proses. Laporan ini adalah laporan teks EPANET, sehingga muncul setelah jaringan ini dihitung.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Rentang';
 $ec_lang['lpn_time_clock_day']='Hari {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Tulis waktu sebagai jam dan menit, seperti 2:30. Angka polos berarti jam, jadi 8 berarti delapan jam. Setengah jam adalah 0:30.';
 $ec_lang['lpn_time_running']='Menjalankan simulasi periode waktu.';
-$ec_lang['lpn_time_no_engine']='Penyelesai bawaan menyelesaikan satu saat dalam satu waktu, sehingga ini adalah jaringan pada {time} saja: setiap pola dibaca pada saat itu, dan setiap tangki tetap pada level awalnya alih-alih terisi dan terkuras. Sambungkan ke internet satu kali untuk mengunduh penyelesai EPANET, yang menjalankan simulasi periode waktu.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Penyelesai bawaan menyelesaikan satu saat dalam satu waktu, sehingga ini adalah jaringan pada {time} saja: setiap pola dibaca pada saat itu, dan setiap tangki tetap pada level awalnya alih-alih terisi dan terkuras. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Pengunduhan penyelesai EPANET gagal. Muat ulang halaman untuk mencoba lagi; firewall, proxy, atau ekstensi peramban mungkin memblokirnya.';
 $ec_lang['lpn_time_engine_start_failed']='Peramban menolak memulai penyelesai EPANET. WebAssembly mungkin dimatikan oleh pengaturan keamanan atau ekstensi.';
 $ec_lang['lpn_time_engine_run_failed']='Proses EPANET gagal. Ini adalah cacat pada halaman ini; gunakan tautan {wrong} untuk melaporkannya.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Tekanan yang diperlukan';
 $ec_lang['lpn_settings_req_pressure_tip']='Masukkan tekanan pada atau di atas mana simpul menerima kebutuhan penuhnya. Nilainya harus lebih besar dari tekanan minimum. Gunakan satuan tekanan proyek ini. Biarkan kosong untuk memakai default EPANET, yaitu psi untuk satuan aliran US dan meter untuk lainnya.';
 $ec_lang['lpn_settings_pressure_exponent']='Eksponen tekanan';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Masukkan eksponen kurva yang naik dari tanpa aliran pada tekanan minimum hingga kebutuhan penuh pada tekanan yang diperlukan.';
-$ec_lang['lpn_engine_pda_route']='Diselesaikan dengan penyelesai EPANET, karena model kebutuhan berbasis tekanan.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Model kebutuhan berbasis tekanan, dan hanya penyelesai EPANET yang dapat menghitungnya. Penyelesai EPANET tidak dapat dimuat, sehingga hasil ini tidak ada.';
 $ec_lang['lpn_result_delivered_demand']='Kebutuhan terpenuhi';
 $ec_lang['lpn_result_delivered_demand_tip']='Aliran yang benar-benar diterima simpul ini di bawah model kebutuhan berbasis tekanan. Nilainya kurang dari kebutuhan jika tekanan di bawah tekanan yang diperlukan.';
 $ec_lang['lpn_result_demand_deficit']='Defisit kebutuhan';

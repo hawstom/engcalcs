@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Isključite ako je ponovni izračun presp
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Izračun ove mreže trajao je {secs} s, a postavljena je da se ponovno izračunava nakon svake promjene. Da to zaustavite i vratite gumb Izračunaj, isključite „Izračunavaj automatski” u Postavkama, pod Izračun, Hidraulika.';
-$ec_lang['lpn_time_no_report']='Izvještaj o pokretanju još ne postoji. Izvještaj je EPANET tekstualni izvještaj, pa se pojavljuje nakon što je ova mreža izračunata.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Raspon';
 $ec_lang['lpn_time_clock_day']='Dan {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Upišite vrijeme kao sate i minute, na primjer 2:30. Obični broj znači sate, pa 8 znači osam sati. Pola sata je 0:30.';
 $ec_lang['lpn_time_running']='Izvođenje simulacije produljenog razdoblja.';
-$ec_lang['lpn_time_no_engine']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. Povežite se jednom s internetom da preuzmete EPANET rješavač, koji izvodi simulaciju produljenog razdoblja.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Preuzimanje EPANET rješavača nije uspjelo. Ponovno učitajte stranicu da pokušate opet; moguće ga blokira vatrozid, proxy ili dodatak preglednika.';
 $ec_lang['lpn_time_engine_start_failed']='Preglednik je odbio pokrenuti EPANET rješavač. WebAssembly je možda isključen sigurnosnom postavkom ili dodatkom.';
 $ec_lang['lpn_time_engine_run_failed']='EPANET pokretanje nije uspjelo. To je greška na ovoj stranici; upotrijebite vezu {wrong} da je prijavite.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Potrebni tlak';
 $ec_lang['lpn_settings_req_pressure_tip']='Unesite tlak pri kojem ili iznad kojeg čvor prima punu potražnju. Mora biti veći od minimalnog tlaka. Upotrijebite jedinicu tlaka ovog projekta. Ostavite prazno da se koristi zadana vrijednost EPANET-a, koja je u psi za američke jedinice protoka, a inače u metrima.';
 $ec_lang['lpn_settings_pressure_exponent']='Eksponent tlaka';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Unesite eksponent krivulje koja raste od nultog protoka pri minimalnom tlaku do pune potražnje pri potrebnom tlaku.';
-$ec_lang['lpn_engine_pda_route']='Riješeno EPANET rješavačem, jer je model potražnje vođen tlakom.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Model potražnje je vođen tlakom, a izračunati ga može samo EPANET rješavač. EPANET rješavač nije se mogao učitati, pa ovi rezultati nedostaju.';
 $ec_lang['lpn_result_delivered_demand']='Isporučena potražnja';
 $ec_lang['lpn_result_delivered_demand_tip']='Protok koji ovaj čvor stvarno prima prema modelu potražnje vođenom tlakom. Manji je od potražnje kada je tlak ispod potrebnog tlaka.';
 $ec_lang['lpn_result_demand_deficit']='Manjak potražnje';

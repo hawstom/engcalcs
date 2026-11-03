@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='اگر دوبارہ حساب بہت سس�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='اس نیٹ ورک کو حل ہونے میں {secs} سیکنڈ لگے، اور یہ ہر تبدیلی کے بعد دوبارہ حل ہونے کے لیے مقرر ہے۔ اسے روکنے اور حل کریں کا بٹن واپس لانے کے لیے، ترتیبات میں، حساب کتاب کے تحت ہائیڈرالکس میں "خود بخود دوبارہ حل کریں" بند کریں۔';
-$ec_lang['lpn_time_no_report']='ابھی کوئی رن رپورٹ نہیں ہے۔ یہ رپورٹ EPANET کی متنی رپورٹ ہے، اس لیے یہ اس نیٹ ورک کا حساب ہونے کے بعد ظاہر ہوتی ہے۔';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='رینج';
 $ec_lang['lpn_time_clock_day']='دن {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='وقت گھنٹے اور منٹ کی صورت میں لکھیں، جیسے 2:30۔ سادہ عدد کا مطلب گھنٹے ہیں، اس لیے 8 کا مطلب آٹھ گھنٹے ہے۔ آدھا گھنٹہ 0:30 ہے۔';
 $ec_lang['lpn_time_running']='وقتی دورانیے کی سمولیشن چلائی جا رہی ہے۔';
-$ec_lang['lpn_time_no_engine']='بلٹ اِن حل کار ایک وقت میں ایک لمحہ حل کرتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اپنی ابتدائی سطح پر رہتا ہے۔ وقتی دورانیے کی سمولیشن چلانے والا EPANET حل کار ڈاؤن لوڈ کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں۔';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='بلٹ اِن حل کار ایک وقت میں ایک لمحے کو حل کرتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اپنی ابتدائی سطح پر رہتا ہے۔ {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET حل کار کا ڈاؤن لوڈ ناکام ہو گیا۔ دوبارہ کوشش کے لیے صفحہ ریلوڈ کریں؛ ممکن ہے فائر وال، پراکسی یا براؤزر ایکسٹینشن اسے روک رہی ہو۔';
 $ec_lang['lpn_time_engine_start_failed']='براؤزر نے EPANET حل کار شروع کرنے سے انکار کر دیا۔ ممکن ہے WebAssembly کسی سکیورٹی سیٹنگ یا ایکسٹینشن سے بند ہو۔';
 $ec_lang['lpn_time_engine_run_failed']='EPANET رن ناکام ہو گیا۔ یہ اس صفحے کی خرابی ہے؛ رپورٹ کرنے کے لیے {wrong} لنک استعمال کریں۔';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='مطلوبہ دباؤ';
 $ec_lang['lpn_settings_req_pressure_tip']='وہ دباؤ درج کریں جس پر یا جس سے زیادہ پر جنکشن کو اس کی پوری طلب ملتی ہے۔ یہ کم از کم دباؤ سے زیادہ ہونا چاہیے۔ اس پراجیکٹ کی دباؤ کی اکائی استعمال کریں۔ EPANET کی ڈیفالٹ قدر استعمال کرنے کے لیے خالی چھوڑیں، جو US بہاؤ اکائیوں کے لیے psi میں اور بصورت دیگر میٹر میں ہوتی ہے۔';
 $ec_lang['lpn_settings_pressure_exponent']='دباؤ کا ایکسپونینٹ';
 $ec_lang['lpn_settings_pressure_exponent_tip']='اس منحنی کا ایکسپونینٹ درج کریں جو کم از کم دباؤ پر صفر بہاؤ سے مطلوبہ دباؤ پر پوری طلب تک بڑھتی ہے۔';
-$ec_lang['lpn_engine_pda_route']='EPANET حل کار سے حل کیا گیا، کیونکہ طلب کا ماڈل دباؤ پر مبنی ہے۔';
-$ec_lang['lpn_diag_pda_needs_epanet']='طلب کا ماڈل دباؤ پر مبنی ہے، اور اسے صرف EPANET حل کار نکال سکتا ہے۔ EPANET حل کار لوڈ نہیں ہو سکا، اس لیے یہ نتائج موجود نہیں۔';
 $ec_lang['lpn_result_delivered_demand']='فراہم کردہ طلب';
 $ec_lang['lpn_result_delivered_demand_tip']='وہ بہاؤ جو اس جنکشن کو دباؤ پر مبنی طلب کے ماڈل میں اصل میں ملتا ہے۔ دباؤ مطلوبہ دباؤ سے کم ہو تو یہ طلب سے کم ہوتا ہے۔';
 $ec_lang['lpn_result_demand_deficit']='طلب کی کمی';

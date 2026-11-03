@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='که بیا محاسبه ډېره ورو 
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='دا شبکې د محاسبې لپاره {secs} ثانیې ونیولې، او دا ټاکل شوې چې له هرې بدلون وروسته بیا محاسبه شي. ترڅو دا ودروئ او "محاسبه کول" تڼۍ بېرته ترلاسه کړئ، په تنظیماتو کې، د محاسبې لاندې، هایدرولیکس کې "پخپله بیا محاسبه کول" غیرفعاله کړئ.';
-$ec_lang['lpn_time_no_report']='تر اوسه هیڅ د چلولو راپور نشته. راپور د EPANET خپل متن دی، نو دا هغه وخت ښکاره کیږي کله چې دا شبکه د EPANET حل کوونکي سره محاسبه شوې وي.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='لړه';
 $ec_lang['lpn_time_clock_day']='ورځ {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='وخت د ساعتونو او دقیقو په بڼه ولیکئ، لکه 2:30. یوازې یوه شمېره ساعتونه معنی لري، نو 8 یعنې اته ساعته دي. نیم ساعت 0:30 دی.';
 $ec_lang['lpn_time_running']='اوږدې مودې سمولېشن چلیږي.';
-$ec_lang['lpn_time_no_engine']='دننه جوړ شوی حل کوونکی یو وخت یوازې یوه شېبه حلوي، نو دا شبکه یوازې په {time} کې ده: هر نمونه پر هغه شېبه لوستل کیږي، او هر ټانک په خپله پیل کچه پاتې کیږي پر ځای دې چې ډک او تش شي. یو ځل انټرنیټ سره وصل شئ ترڅو د EPANET حل کوونکی ډاونلوډ کړئ، چې اوږدې مودې سمولېشن چلوي.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='دننه جوړ شوی حل کوونکی یو وخت یوازې یوه شېبه حلوي، نو دا شبکه یوازې په {time} کې ده: هر نمونه پر هغه شېبه لوستل کیږي، او هر ټانک په خپله پیل کچه پاتې کیږي پر ځای دې چې ډک او تش شي. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='د EPANET حل کوونکي ډاونلوډ ناکام شو. بیا هڅه کولو لپاره پاڼه بیا بار کړئ؛ ممکن فایروال، پراکسي، یا د براوزر توسیع یې بندوي.';
 $ec_lang['lpn_time_engine_start_failed']='براوزر د EPANET حل کوونکي د پیلولو نه ډډه وکړه. ممکن WebAssembly د امنیت تنظیم یا توسیع له خوا بند شوی وي.';
 $ec_lang['lpn_time_engine_run_failed']='د EPANET چلول ناکام شول. دا د دې پاڼې نیمګړتیا ده؛ د راپور ورکولو لپاره د {wrong} لینک وکاروئ.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='اړین فشار';
 $ec_lang['lpn_settings_req_pressure_tip']='هغه فشار ولیکئ چې په هغه یا پورته یو جنکشن خپله بشپړه غوښتنه ترلاسه کوي. دا باید له لږ ترلږه فشار نه ډېر وي. د دې پروژې د فشار واحد وکاروئ. د EPANET ډیفالټ کارولو لپاره یې خالي پرېږدئ، چې د US بهاو واحدونو لپاره په psi کې دی او نورو ته په مترو کې.';
 $ec_lang['lpn_settings_pressure_exponent']='د فشار توان';
 $ec_lang['lpn_settings_pressure_exponent_tip']='د هغې منحنۍ توان ولیکئ چې په لږ ترلږه فشار کې له صفر بهاو څخه په اړین فشار کې بشپړې غوښتنې ته پورته کیږي.';
-$ec_lang['lpn_engine_pda_route']='د EPANET حل کوونکي سره حل شو، ځکه چې د غوښتنې ماډل فشار محور دی.';
-$ec_lang['lpn_diag_pda_needs_epanet']='د غوښتنې ماډل فشار محور دی، او یوازې د EPANET حل کوونکی یې محاسبه کولی شي. د EPANET حل کوونکی نشو پورته کیدی، نو دا پایلې ورک دي.';
 $ec_lang['lpn_result_delivered_demand']='وړاندې شوې غوښتنه';
 $ec_lang['lpn_result_delivered_demand_tip']='هغه بهاو چې دا جنکشن د فشار محور غوښتنې ماډل لاندې په حقیقت کې ترلاسه کوي. دا له غوښتنې نه لږ دی کله چې فشار له اړین فشار نه ټیټ وي.';
 $ec_lang['lpn_result_demand_deficit']='د غوښتنې کمښت';

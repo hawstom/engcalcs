@@ -8326,8 +8326,8 @@ var EngCalcs = EngCalcs || {};
 	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
 	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
 	// the shortest true name of each thing is the right label, and "Reports > Pump energy report"
-	// would be the stammer. The BOX TITLES are unchanged -- "Pump energy report" and "EPANET run
-	// report" still name the objects themselves, which is Task 577's ruling and is not disturbed.
+	// would be the stammer. The BOX TITLES are unchanged -- "Pump energy report" and "Run report"
+	// still name the objects themselves, which is Task 577's ruling and is not disturbed.
 	//
 	// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566): it is not a kind of run of its own,
 	// it is what the extended-period simulation already worked out on its way past. The scenario
@@ -8346,22 +8346,18 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Solver (run)',
 				tip: pc.lpn_time_run_report_tip,
-				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
-				// hidden when there is nothing to show: a row that disappears teaches nobody that
-				// the report exists, while a sentence saying why there is none teaches exactly that
-				// (the native solver prints nothing, so a network that has never reached EPANET has
-				// no report and never will until it does).
-				// The box says the same sentence itself where there is no report, so the row is
-				// one call. It stays here rather than being hidden when there is nothing to show,
-				// for the reason openRunReportBox() states.
+				disabled: !(EngCalcs.lpnTimeHasReport && EngCalcs.lpnTimeHasReport()),
+				// **GREYED UNTIL A RUN HAS HAPPENED.** Every run, by either solver and for a single instant as for a
+				// period, leaves a report (Tom, 2026-11-01), so there is no sentence for "no report": the row is
+				// here, so the report is known to exist, and is disabled until there is something to open.
 				fn: function () { closeMenu(); openRunReportBox(); }
 			},
 			// **STATUS AND FULL, EPANET'S OWN TWO NAMES, LAST** (ROADMAP Tasks 716, 715; Tom,
 			// 2026-09-25: *"Make the reports roadmap tasks before EPANET++."*). Both read the
 			// extended period run's own frames (js/lpn-time.js) rather than computing anything of
-			// their own, so they sit with the EPANET run report rather than above the divider with
+			// their own, so they sit with the run report rather than above the divider with
 			// Run and Fire flow -- nothing here is a criterion to set or a sweep to start.
 			//
 			// **THE ROW SAYS "Status"/"Full", NOT "Status report"/"Full report"** -- the parent
@@ -38445,11 +38441,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		why = EngCalcs.lpnTimeWaiting ? EngCalcs.lpnTimeWaiting() : 'manual';
 		if (why === 'running') { return pc.lpn_time_running || 'Running the extended period simulation.'; }
 		if (why === 'failed') { return pc.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.'; }
-		if (why === 'engine') {
-			if (EngCalcs.lpnTimeNoEngineText) { return EngCalcs.lpnTimeNoEngineText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0); }
-			return String(pc.lpn_time_no_engine || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.')
-				.replace('{time}', EngCalcs.lpnTimeElapsedText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0));
-		}
 		return pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.';
 	}
 	function renderTimeSeries() {
@@ -47379,7 +47370,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file states where a chemical is injected into the network and how water mixes in each tank. Each source is shown on the node where it is applied, and each tank shows its mixing model. Both are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
@@ -65072,10 +65063,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// *"I am not sure it's right to disable the checkbox"*, then *"You are right about 'the truth
 		// was already being told without disabling'. I agree."*). It shipped disabled for one round on
 		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
-		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
+		// -- turned out to rest on a false premise. TWO THINGS ALREADY TELL THE TRUTH: this row's own
 		// tip names the case permanently ("an extended period run always does"; until Task 733 it named
-		// a PBV or GPV too); `lpn_engine_pda_route` says it again at the moment of
-		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
+		// a PBV or GPV too); and the banner says it while the engine loads. A fourth telling was a conditional
 		// duplicate of a permanent one.
 		//
 		// **AND THE COST WAS A CONTROL THAT FLICKERS AS YOU DRAW.** Add a PRV and the box greys; delete
@@ -65099,7 +65089,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		setboxTag(row(solverBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
+		setboxTag(row(solverBody, pc.lpn_settings_engine_native || 'Use the built-in solver', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET
@@ -79189,8 +79179,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The two valve data faults (Task 733; Tom, 2026-10-18): EPANET refuses both, so both engines do.
 		if (issue.code === 'valve-conflict') { return (pc.lpn_diag_valve_conflict || 'These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
+		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
+		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }
+		// The rest of what EPANET refuses in a period, named in both engines, and the built-in solver's own stop (Task 733).
+		if (issue.code === 'control-refused') { return (pc.lpn_diag_control_refused || 'EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'rule-step-refused') { return pc.lpn_diag_rule_step_refused || 'Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.'; }
+		if (issue.code === 'speed-pattern-refused') { return (pc.lpn_diag_speed_pattern_refused || 'These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'tank-curve-refused') { return (pc.lpn_diag_tank_curve_refused || 'The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'tank-levels-refused') { return (pc.lpn_diag_tank_levels_refused || 'The initial level of these tanks is not between the minimum level and the maximum level:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'quality-refused') { return (pc.lpn_diag_quality_refused || 'EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'energy-refused') { return (pc.lpn_diag_energy_refused || 'EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'builtin-stopped') {
+			return typeof issue.t === 'number' && EngCalcs.lpnTimeElapsedText
+				? (pc.lpn_diag_builtin_stopped_at || 'The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.').replace('{time}', EngCalcs.lpnTimeElapsedText(issue.t))
+				: (pc.lpn_diag_builtin_stopped || 'The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.');
+		}
+		if (issue.code === 'builtin-error') { return (pc.lpn_diag_builtin_error || 'An error occurred in the built-in solver: {message}').replace('{message}', String(issue.message || '')); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
-		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
@@ -81286,18 +81291,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// network this page has had until now.
 		if (EngCalcs.lpnTimeRun && EngCalcs.lpnTimeRun(model)) { return; }
 
-		var pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 		engineRouteNote = '';
 		var engine = scnSetting('engine');
-		if ((engine === 'epanet' || pdaRoute) && EngCalcs.lpnSolveEpanet) {
-			if (pdaRoute && engine !== 'epanet') {
-				// Task 762: the one thing that routes a network to EPANET by its own contents.
-				engineRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
-					'Solved with the EPANET solver, because the demand model is pressure driven.';
-			}
+		// Every run leaves a run report: the instant's is made when it is asked for (js/lpn-time.js).
+		if (EngCalcs.lpnTimeInstantRun) { EngCalcs.lpnTimeInstantRun(model, engine); }
+		if (engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
 			runSolveEpanet(model);
 			return;
 		}
+		// The built-in solver was asked for and answered: the status bar says so (Tom, 2026-11-01).
+		if (engine === 'native') { engineRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_native_used || 'Solved with the built-in solver.'; }
 		applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 	}
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
@@ -81517,8 +81520,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var offline = warmFailedOffline();
 			if (!quiet) {
 				setNotice(offline
-					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.')
-					: (pc.lpn_engine_unavailable_why || 'This network cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
+					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.')
+					: (pc.lpn_engine_unavailable_why || 'The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
 			}
 			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();
@@ -81535,7 +81538,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// before any solve has run: opening a file with a PRV in it is exactly the moment the
 			// built-in solver stops being available for it.
 			syncEpanetNeed(model);
-			if (EngCalcs.lpnDemandModelIsPda(model)) { warmEpanetEngine('needed'); }
+			if (EngCalcs.lpnDemandModelIsPda(model) && scnSetting('engine') === 'epanet') { warmEpanetEngine('needed'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 
@@ -81549,9 +81552,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The model's own clock when it carries one (Task 755): the scenario comparison assembles
 		// each scenario's model in turn, and a scenario's run time is its own.
 		if (model && model.time && model.time.times && EngCalcs.lpnTimeIsExtended) {
-			if (EngCalcs.lpnTimeIsExtended(model.time.times)) { return true; }
+			// **A PERIOD NEEDS EPANET UNLESS THE BUILT-IN SOLVER'S OWN LOOP WILL RUN IT** (Task 733,
+			// slice 7): chosen by the user, and nothing in the model one the loop refuses.
+			if (EngCalcs.lpnTimeIsExtended(model.time.times)) {
+				return !(EngCalcs.lpnTimeNativePlan && EngCalcs.lpnTimeNativePlan(model).use);
+			}
 		} else if (effectiveTimesExtended()) { return true; }
-		return !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
+		return false;   // a pressure-driven demand model is solved by the built-in solver too (Task 733)
 	}
 	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
 	// A half-built document is not an answer of "yes", so it answers no rather than throwing.
@@ -81654,8 +81661,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// no reason given.
 				// The warm leg only downloads, so the cause is offline or a blocked download.
 				base = warmFailedOffline()
-					? (pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.')
-					: (pc.lpn_engine_needed_failed_why || 'This network can only be solved by the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch'));
+					? (pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.')
+					: (pc.lpn_engine_needed_failed_why || 'The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch'));
 			}
 		}
 		full = base;
@@ -81885,8 +81892,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario comparison run asks the same question of the same model, and two functions choosing
 	// an engine is two answers to "which engine solves this network" waiting to disagree.
 	function engineFor(model) {
-		var useEpanet = (scnSetting('engine') === 'epanet'
-				|| (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model))) && !!EngCalcs.lpnSolveEpanet;
+		var useEpanet = scnSetting('engine') === 'epanet' && !!EngCalcs.lpnSolveEpanet;
 		return {
 			epanet: useEpanet,
 			solve: useEpanet
@@ -81961,7 +81967,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// only where the project has a clock and the EPANET engine can be reached; anywhere else the
 	// step on screen is the only condition, as it always was.
 	function analysisCanRun() {
-		return effectiveTimesExtended() && !!EngCalcs.lpnEpanetRun;
+		return effectiveTimesExtended() && !!EngCalcs.lpnTimeCanRun();
 	}
 	// **A FIRE FOR A STATED DURATION IS A CHOICE BESIDE "REPORTING STEP TESTED"**, not a box of its
 	// own: it needs the same clock, the same Required fire flow and Residual pressure to hold, and
@@ -81978,7 +81984,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function analysisRun(onProgress) {
 		var model = assembleModel(), fresh = EngCalcs.lpnTimeFreshRun ? EngCalcs.lpnTimeFreshRun(model) : null;
 		if (fresh) { return Promise.resolve(fresh); }
-		return EngCalcs.lpnEpanetRun(model, { onProgress: onProgress });
+		return EngCalcs.lpnTimeRunModel(model, { onProgress: onProgress });
 	}
 	function analysisSteps(run, times) {
 		return times.map(function (t) {
@@ -83227,7 +83233,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return analysisRun(function (p) { updateEpsRunBox((p && p.fraction || 0) / 2); }).then(function (run) {
 			baseRun = run;
-			return EngCalcs.lpnEpanetRun(built.model, { onProgress: function (p) { updateEpsRunBox(0.5 + (p && p.fraction || 0) / 2); } });
+			return EngCalcs.lpnTimeRunModel(built.model, { onProgress: function (p) { updateEpsRunBox(0.5 + (p && p.fraction || 0) / 2); } });
 		}).then(function (fired) {
 			var d = (fired && baseRun) ? EngCalcs.lpnDurFireDigest({
 				model: model, fire: built.fire, residual: residual > 0 ? residual : 0, base: baseRun, fired: fired
@@ -83682,7 +83688,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		engine = engineFor(model);
 		// One EPANET run per outage, as every run is; the answer is handed to the sweep whole.
 		sweepSolve = whole ? function (m) {
-			return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
+			return EngCalcs.lpnTimeRunModel(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
 		} : engine.solve;
 		before = JSON.stringify(doc);
 		critRunT = whole ? null : modelTimeSeconds();
@@ -84170,7 +84176,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// run, and whether a tank emptied.
 		return { model: model, ids: ids, whole: whole, time: whole ? null : dsNow(),
 			engine: whole ? { epanet: true, solve: function (m) {
-				return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
+				return EngCalcs.lpnTimeRunModel(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
 			} } : engineFor(model) };
 	}
 	function dsBegin() {
@@ -84568,7 +84574,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// EPANET engine only, as every run on this page is; with no engine, the one moment is solved
 	// and the row says nothing it cannot back.
 	function scenarioCompareRunsPeriod(model) {
-		return !!(EngCalcs.lpnEpanetRun && EngCalcs.lpnTimeIsExtended &&
+		return !!(EngCalcs.lpnTimeCanRun && EngCalcs.lpnTimeCanRun() && EngCalcs.lpnTimeIsExtended &&
 			EngCalcs.lpnTimeIsExtended(model && model.time && model.time.times));
 	}
 	// **THE SCENARIOS ARE SOLVED ONE AFTER ANOTHER, NEVER ALL AT ONCE.** The EPANET bridge is one
@@ -84624,7 +84630,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					return null;
 				}
 				if (scenarioCompareRunsPeriod(pair.model)) {
-					return EngCalcs.lpnEpanetRun(pair.model).then(function (run) {
+					return EngCalcs.lpnTimeRunModel(pair.model).then(function (run) {
 						var ext = null, converged = true;
 						if (!run || !run.ok || !(run.frames || []).length) {
 							rows.push({
@@ -85154,7 +85160,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_ENERGYBOX_KEY, JSON.stringify(energyboxLayout)); } catch (e) {}
 	}
-	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
+	// ---- THE RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
 	//
 	// Tom, 2026-09-02: *"EPANET report: How about we make that another draggable, sizeable, modal
 	// box?"*, corrected when asked to *"I meant non-modal."* So it stops nothing, and it is the
@@ -85182,25 +85188,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
 	}
 	function openRunReportBox(restoring) {
-		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
-			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(),
-			noReport = pc.lpn_time_no_report ||
-				'There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated.';
-		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
-		// the built-in solver prints nothing, so a network that has never reached EPANET has no
-		// report and never will until it does, and a sentence saying that teaches what a vanishing
-		// row cannot. A box the reader ASKED for gets the sentence as a notice and no box; a box
-		// coming back with the page (Tom, 2026-09-08) is a box the reader left open, so it comes
-		// back with the sentence inside it and refreshRunReportBoxIfOpen() fills it when the run
-		// arrives.
-		if (!text && !restoring) {
-			setNotice(noReport);
-			return false;
+		var box = rptBoxEl(), pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(), later;
+		// **EVERY RUN LEAVES A REPORT, by either engine** (Tom, 2026-11-01), so there is no sentence for "no
+		// report": the menu row is greyed until a run has happened. A single instant solved by EPANET writes its
+		// report when asked, a moment later, and the box opens when it arrives.
+		later = !text && EngCalcs.lpnTimeReportAsync ? EngCalcs.lpnTimeReportAsync() : null;
+		if (later) {
+			later.then(function () { openRunReportBox(restoring); });
+			return true;
 		}
+		text = lastRunReportText();
+		if (!text && !restoring) { return false; }
 		if (!box || !pre) { return false; }
 		closeMenu();
 		hideOpenTips();
-		pre.textContent = text || noReport;
+		pre.textContent = text;
 		showRunReportScenario();
 		box.style.display = 'flex';
 		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
@@ -85278,6 +85280,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
+		// An open box follows a run, but a run never starts the EPANET download for a report: only a warm engine writes it here.
+		else if (EngCalcs.lpnTimeReportAsync && epanetWarmState === 'ready') {
+			var later = EngCalcs.lpnTimeReportAsync();
+			if (later) { later.then(function () { if (lastRunReportText() && rptBoxIsOpen()) { pre.textContent = lastRunReportText(); } }); }
+		}
 		showRunReportScenario();
 	}
 	function closeEnergyBox() {
@@ -88852,6 +88859,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is a period run in the middle of typing: the exact thing the change is for.
 			solveNow: runSolve,
 			native: function (m) { return EngCalcs.lpnSolve(m, { tol: solveAccuracy() }); },
+			// **WHICH SOLVER THE USER ASKED FOR** (Task 733, slice 7): the open scenario's engine
+			// setting, 'native' or 'epanet'. js/lpn-time.js runs the period with the built-in solver's
+			// own loop when this says 'native' and the loop refuses nothing in the model.
+			engine: function () { return scnSetting('engine'); },
+			// The sentence the status bar carries after a period the user asked the built-in solver
+			// to run was sent to EPANET (empty to clear it). The same slot as the pressure-driven note.
+			routeNote: function (t) { engineRouteNote = t || ''; },
 			snapshot: saveUndoSnapshot, save: saveToStorage,
 			toSI: toSI, toDisplay: toDisplay, unitLabel: unitLabel,
 			// The one door from the Time TAB (the transport) to the Time SETTINGS, which moved to

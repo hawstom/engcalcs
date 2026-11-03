@@ -2628,8 +2628,8 @@ EngCalcs.pageConfig = {
 	lpn_time_clock_day: <?=json_encode($ec_lang['lpn_time_clock_day'])?>,
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
-	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
-	lpn_time_no_engine_why: <?=json_encode($ec_lang['lpn_time_no_engine_why'])?>,
+	lpn_time_epanet_fallback: <?=json_encode($ec_lang['lpn_time_epanet_fallback'])?>,
+	lpn_time_epanet_fallback_why: <?=json_encode($ec_lang['lpn_time_epanet_fallback_why'])?>,
 	lpn_time_engine_fetch_failed: <?=json_encode($ec_lang['lpn_time_engine_fetch_failed'])?>,
 	lpn_time_engine_start_failed: <?=json_encode($ec_lang['lpn_time_engine_start_failed'])?>,
 	lpn_time_engine_run_failed: <?=json_encode($ec_lang['lpn_time_engine_run_failed'])?>,
@@ -2663,7 +2663,6 @@ EngCalcs.pageConfig = {
 	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
 	lpn_time_run_report_copied: <?=json_encode($ec_lang['lpn_time_run_report_copied'])?>,
 	lpn_time_run_report_tip: <?=json_encode($ec_lang['lpn_time_run_report_tip'])?>,
-	lpn_time_no_report: <?=json_encode($ec_lang['lpn_time_no_report'])?>,
 	lpn_close: <?=json_encode($ec_lang['lpn_close'])?>,
 	lpn_dock_left: <?=json_encode($ec_lang['lpn_dock_left'])?>,
 	lpn_dock_right: <?=json_encode($ec_lang['lpn_dock_right'])?>,
@@ -4376,11 +4375,22 @@ EngCalcs.pageConfig = {
 	lpn_settings_req_pressure_tip: <?=json_encode($ec_lang['lpn_settings_req_pressure_tip'])?>,
 	lpn_settings_pressure_exponent: <?=json_encode($ec_lang['lpn_settings_pressure_exponent'])?>,
 	lpn_settings_pressure_exponent_tip: <?=json_encode($ec_lang['lpn_settings_pressure_exponent_tip'])?>,
-	lpn_engine_pda_route: <?=json_encode($ec_lang['lpn_engine_pda_route'])?>,
+	lpn_engine_native_used: <?=json_encode($ec_lang['lpn_engine_native_used'])?>,
+	lpn_engine_epanet_used: <?=json_encode($ec_lang['lpn_engine_epanet_used'])?>,
 	lpn_diag_valve_conflict: <?=json_encode($ec_lang['lpn_diag_valve_conflict'])?>,
 	lpn_diag_gpv_curve_order: <?=json_encode($ec_lang['lpn_diag_gpv_curve_order'])?>,
+	lpn_diag_rules_refused: <?=json_encode($ec_lang['lpn_diag_rules_refused'])?>,
+	lpn_diag_control_refused: <?=json_encode($ec_lang['lpn_diag_control_refused'])?>,
+	lpn_diag_rule_step_refused: <?=json_encode($ec_lang['lpn_diag_rule_step_refused'])?>,
+	lpn_diag_speed_pattern_refused: <?=json_encode($ec_lang['lpn_diag_speed_pattern_refused'])?>,
+	lpn_diag_tank_curve_refused: <?=json_encode($ec_lang['lpn_diag_tank_curve_refused'])?>,
+	lpn_diag_tank_levels_refused: <?=json_encode($ec_lang['lpn_diag_tank_levels_refused'])?>,
+	lpn_diag_quality_refused: <?=json_encode($ec_lang['lpn_diag_quality_refused'])?>,
+	lpn_diag_energy_refused: <?=json_encode($ec_lang['lpn_diag_energy_refused'])?>,
+	lpn_diag_builtin_stopped: <?=json_encode($ec_lang['lpn_diag_builtin_stopped'])?>,
+	lpn_diag_builtin_stopped_at: <?=json_encode($ec_lang['lpn_diag_builtin_stopped_at'])?>,
+	lpn_diag_builtin_error: <?=json_encode($ec_lang['lpn_diag_builtin_error'])?>,
 	lpn_gpv_one_point_note: <?=json_encode($ec_lang['lpn_gpv_one_point_note'])?>,
-	lpn_diag_pda_needs_epanet: <?=json_encode($ec_lang['lpn_diag_pda_needs_epanet'])?>,
 	lpn_result_delivered_demand: <?=json_encode($ec_lang['lpn_result_delivered_demand'])?>,
 	lpn_result_delivered_demand_tip: <?=json_encode($ec_lang['lpn_result_delivered_demand_tip'])?>,
 	lpn_result_demand_deficit: <?=json_encode($ec_lang['lpn_result_demand_deficit'])?>,
@@ -4846,6 +4856,12 @@ EngCalcs.pageConfig = {
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this
       // order wrong and the Time tab simply never appears, silently. ?>
 <script src="/engcalcs/js/lpn-time.js?v=<?=filemtime(__DIR__.'/js/lpn-time.js')?>"></script>
+<?php // The built-in solver's own period loop and water-quality pass (Task 733, slice 7). AFTER
+      // lpn-solver.js and lpn-patterns.js, which it reads at call time; lpn-time.js asks for it
+      // through EngCalcs.lpnNativeRun and works without it, so a failed load costs only the
+      // built-in solver's periods, which then go to EPANET. ?>
+<script src="/engcalcs/js/lpn-native-msx.js?v=<?=filemtime(__DIR__.'/js/lpn-native-msx.js')?>"></script>
+<script src="/engcalcs/js/lpn-native-run.js?v=<?=filemtime(__DIR__.'/js/lpn-native-run.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <?php // Rule-based controls, the language (ROADMAP Task 248.03). Pure grammar and unit kinds, no
       // DOM. BEFORE looped-network.js, whose modelRules() parses and converts every rule on the

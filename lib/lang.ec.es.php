@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Desactívelo si el recálculo es demasiad
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Esta red tardó {secs} s en calcularse, y está configurada para recalcularse después de cada cambio. Para detener eso y recuperar el botón Calcular, desactive «Recalcular automáticamente» en Configuración, bajo Cálculo, Hidráulica.';
-$ec_lang['lpn_time_no_report']='Todavía no hay informe de ejecución. El informe es el informe de texto de EPANET, así que aparece una vez que se haya calculado esta red.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Rango';
 $ec_lang['lpn_time_clock_day']='Día {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Escriba una hora como horas y minutos, por ejemplo 2:30. Un número simple significa horas, así que 8 son ocho horas. Media hora es 0:30.';
 $ec_lang['lpn_time_running']='Ejecutando la simulación de período extendido.';
-$ec_lang['lpn_time_no_engine']='El solucionador incorporado resuelve un instante a la vez, así que esto es la red solo en {time}: cada patrón se lee en ese instante, y cada depósito permanece en su nivel inicial en lugar de llenarse y vaciarse. Conéctese a internet una vez para descargar el solucionador de EPANET, que ejecuta una simulación de período extendido.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='El solucionador incorporado resuelve un instante a la vez, así que esto es la red solo en {time}: cada patrón se lee en ese instante, y cada depósito permanece en su nivel inicial en lugar de llenarse y vaciarse. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Falló la descarga del solucionador de EPANET. Recargue la página para intentarlo de nuevo; un cortafuegos, un proxy o una extensión del navegador podría estar bloqueándola.';
 $ec_lang['lpn_time_engine_start_failed']='El navegador rechazó iniciar el solucionador de EPANET. Es posible que WebAssembly esté desactivado por una configuración de seguridad o una extensión.';
 $ec_lang['lpn_time_engine_run_failed']='Falló la ejecución de EPANET. Eso es un defecto de esta página; use el enlace {wrong} para informarlo.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Presión requerida';
 $ec_lang['lpn_settings_req_pressure_tip']='Ingrese la presión igual o superior a la cual un nudo recibe su demanda completa. Debe ser mayor que la presión mínima. Use la unidad de presión de este proyecto. Déjela en blanco para usar el valor predeterminado de EPANET, que está en psi para unidades de caudal de EE. UU. y en metros en los demás casos.';
 $ec_lang['lpn_settings_pressure_exponent']='Exponente de presión';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Ingrese el exponente de la curva que sube desde caudal nulo a la presión mínima hasta la demanda completa a la presión requerida.';
-$ec_lang['lpn_engine_pda_route']='Resuelto con el solucionador de EPANET, porque el modelo de demanda es impulsado por la presión.';
-$ec_lang['lpn_diag_pda_needs_epanet']='El modelo de demanda es impulsado por la presión, y solo el solucionador de EPANET puede calcularlo. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados.';
 $ec_lang['lpn_result_delivered_demand']='Demanda entregada';
 $ec_lang['lpn_result_delivered_demand_tip']='El caudal que este nudo recibe realmente con el modelo de demanda impulsado por la presión. Es menor que la demanda cuando la presión es inferior a la presión requerida.';
 $ec_lang['lpn_result_demand_deficit']='Déficit de demanda';

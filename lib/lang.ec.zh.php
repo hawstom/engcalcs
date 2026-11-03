@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='如果重新计算太慢，请关闭此�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='此管网计算耗时 {secs} 秒，且设置为每次更改后自动重新计算。要停止这一行为并恢复"计算"按钮，请在"设置"的"计算"下"水力计算"中关闭"自动重新计算"。';
-$ec_lang['lpn_time_no_report']='尚无运行报告。该报告是 EPANET 文本报告，因此在本管网计算之后才会出现。';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='极差';
 $ec_lang['lpn_time_clock_day']='第 {day} 天，{clock}';
 $ec_lang['lpn_time_format_tip']='请以小时和分钟的形式输入时间，例如 2:30。单独一个数字表示小时，例如 8 表示 8 小时。半小时可写作 0:30。';
 $ec_lang['lpn_time_running']='正在运行延时模拟。';
-$ec_lang['lpn_time_no_engine']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有时间模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。联网一次以下载可运行延时模拟的 EPANET 求解器。';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='内置求解器一次只求解一个时刻，因此这仅是 {time} 时刻的管网：所有时间模式都按该时刻读取，所有水箱都保持初始水位，而不会充水和放水。{reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET 求解器下载失败。请重新加载页面后重试；防火墙、代理或浏览器扩展程序可能正在阻止下载。';
 $ec_lang['lpn_time_engine_start_failed']='浏览器拒绝启动 EPANET 求解器。WebAssembly 可能已被安全设置或扩展程序关闭。';
 $ec_lang['lpn_time_engine_run_failed']='EPANET 运行失败。这是本页面的缺陷；请使用 {wrong} 链接报告。';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='所需压力';
 $ec_lang['lpn_settings_req_pressure_tip']='输入节点压力等于或高于该值时即获得全部需水量的压力。它必须大于最小压力。使用本项目的压力单位。留空则使用 EPANET 的默认值：美制流量单位时以 psi 为单位，否则以米为单位。';
 $ec_lang['lpn_settings_pressure_exponent']='压力指数';
 $ec_lang['lpn_settings_pressure_exponent_tip']='输入曲线的指数，该曲线从最小压力处的零流量上升到所需压力处的全部需水量。';
-$ec_lang['lpn_engine_pda_route']='已使用 EPANET 求解器求解，因为需水量模型为压力驱动。';
-$ec_lang['lpn_diag_pda_needs_epanet']='需水量模型为压力驱动，只有 EPANET 求解器能够计算。EPANET 求解器未能加载，因此缺少这些结果。';
 $ec_lang['lpn_result_delivered_demand']='实际供水量';
 $ec_lang['lpn_result_delivered_demand_tip']='在压力驱动需水量模型下，此节点实际获得的流量。压力低于所需压力时，它小于需水量。';
 $ec_lang['lpn_result_demand_deficit']='需水量缺口';

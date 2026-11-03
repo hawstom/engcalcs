@@ -64,7 +64,6 @@ const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootst
  * staged build that must not reach a visitor until Tom says so; the harness named loads it.
  */
 const EC_UNREFERENCED_MODULES = [
-    'lpn-native-run.js' => 'Task 733 phase 3, slices 1-2: the built-in solver\'s period loop with simple controls, held to EPANET by dev/lpn-spike/native-eps-harness.js and not yet called by the page (dev/native-eps-plan.md)',
     'no-form-restore.js' => 'inlined into Looped-Network.php\'s <head> by file_get_contents(), because it must run before the body parses; held by dev/lpn-spike/form-restore-browser-harness.js',
 ];
 
@@ -78,6 +77,10 @@ const EC_HARNESS_LAZY_MODULES = [
                   . 'directly; the editor reaches them through its own document, not at IIFE time.',
     'lpn-time.js' => 'extended-period simulation. A whole engine dimension, and booting it for a '
                    . 'label-placement assertion would be the stub importing the suite.',
+    'lpn-native-msx.js' => 'EPANET-MSX in the built-in solver: the .msx parser, the expressions and the multi-species pass. lpn-native-run.js asks for it at run time; '
+                         . 'dev/lpn-spike/native-msx-harness.js loads it.',
+    'lpn-native-run.js' => 'the built-in solver\'s period loop and quality pass. lpn-time.js asks for it at run time, '
+                         . 'and lpn-time.js is itself lazy; dev/lpn-spike/native-eps-harness.js and its siblings load it.',
     'lpn-patterns.js' => 'demand and speed patterns, in the same position as lpn-time.js and '
                        . 'loaded by the pattern harnesses.',
     'lpn-georef.js' => 'the georeferencing transforms. Loaded by the georef harnesses; the editor '

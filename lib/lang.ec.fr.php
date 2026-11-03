@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Désactivez cette option si le recalcul e
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Ce réseau a mis {secs} s à se calculer, et il est réglé pour se recalculer après chaque modification. Pour arrêter cela et retrouver un bouton Calculer, désactivez « Calculer automatiquement » dans Paramètres, sous Calcul, Hydraulique.';
-$ec_lang['lpn_time_no_report']='Il n\'y a pas encore de rapport de calcul. Ce rapport est le texte propre d\'EPANET ; il apparaît donc une fois ce réseau calculé avec le solveur EPANET.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Étendue';
 $ec_lang['lpn_time_clock_day']='Jour {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Écrivez une heure sous forme d\'heures et de minutes, par exemple 2:30. Un nombre seul est en heures : 8 signifie huit heures. Une demi-heure s\'écrit 0:30.';
 $ec_lang['lpn_time_running']='Exécution de la simulation en période étendue.';
-$ec_lang['lpn_time_no_engine']='Le solveur intégré résout un seul instant à la fois ; il s\'agit donc du réseau à {time} seulement : chaque courbe de modulation est lue à cet instant, et chaque bâche reste à son niveau initial au lieu de se remplir et de se vider. Connectez-vous une fois à internet pour télécharger le solveur EPANET, qui exécute une simulation en période étendue.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Le solveur intégré résout un seul instant à la fois ; il s\'agit donc du réseau à {time} seulement : chaque courbe de modulation est lue à cet instant, et chaque bâche reste à son niveau initial au lieu de se remplir et de se vider. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Le téléchargement du solveur EPANET a échoué. Rechargez la page pour réessayer ; un pare-feu, un proxy ou une extension du navigateur peut le bloquer.';
 $ec_lang['lpn_time_engine_start_failed']='Le navigateur a refusé de démarrer le solveur EPANET. WebAssembly est peut-être désactivé par un paramètre de sécurité ou une extension.';
 $ec_lang['lpn_time_engine_run_failed']='Le calcul EPANET a échoué. Il s\'agit d\'un défaut de cette page ; utilisez le lien {wrong} pour le signaler.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Pression requise';
 $ec_lang['lpn_settings_req_pressure_tip']='Saisissez la pression à laquelle, ou au-dessus de laquelle, une jonction reçoit toute sa demande. Elle doit être supérieure à la pression minimale. Utilisez l\'unité de pression de ce projet. Laissez vide pour utiliser la valeur par défaut d\'EPANET, qui est en psi pour les unités de débit US et en mètres sinon.';
 $ec_lang['lpn_settings_pressure_exponent']='Exposant de pression';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Saisissez l\'exposant de la courbe qui monte de l\'absence de débit à la pression minimale jusqu\'à la demande complète à la pression requise.';
-$ec_lang['lpn_engine_pda_route']='Calculé avec le solveur EPANET, car le modèle de demande est piloté par la pression.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Le modèle de demande est piloté par la pression, et seul le solveur EPANET peut le calculer. Le solveur EPANET n\'a pas pu être chargé ; ces résultats sont donc absents.';
 $ec_lang['lpn_result_delivered_demand']='Demande livrée';
 $ec_lang['lpn_result_delivered_demand_tip']='Le débit que cette jonction reçoit effectivement avec le modèle de demande piloté par la pression. Il est inférieur à la demande lorsque la pression est inférieure à la pression requise.';
 $ec_lang['lpn_result_demand_deficit']='Déficit de demande';

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='पुनर्गणना बहुत 
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='इस नेटवर्क की गणना करने में {secs} सेकंड लगे, और यह हर बदलाव के बाद फिर से गणना करने के लिए सेट है। इसे रोकने और गणना करें बटन वापस पाने के लिए, सेटिंग्स में, गणना के अंतर्गत, हाइड्रॉलिक्स में जाकर “स्वतः फिर से गणना करें” बंद करें।';
-$ec_lang['lpn_time_no_report']='अभी तक कोई रन रिपोर्ट नहीं है। रिपोर्ट EPANET की पाठ रिपोर्ट है, इसलिए नेटवर्क की गणना होने के बाद यह दिखाई देती है।';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='सीमा';
 $ec_lang['lpn_time_clock_day']='दिन {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='समय को घंटे और मिनट के रूप में लिखें, जैसे 2:30। एक सादी संख्या का अर्थ घंटे है, इसलिए 8 का अर्थ है आठ घंटे। आधा घंटा 0:30 है।';
 $ec_lang['lpn_time_running']='विस्तारित अवधि सिमुलेशन चलाया जा रहा है।';
-$ec_lang['lpn_time_no_engine']='बिल्ट-इन सॉल्वर एक बार में एक क्षण हल करता है, इसलिए यह केवल {time} पर का नेटवर्क है: हर पैटर्न उसी क्षण पर पढ़ा जाता है, और हर टैंक भरने और खाली होने के बजाय अपने प्रारंभिक स्तर पर रहता है। विस्तारित अवधि सिमुलेशन चलाने वाले EPANET सॉल्वर को डाउनलोड करने के लिए एक बार इंटरनेट से जुड़ें।';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='बिल्ट-इन सॉल्वर एक बार में एक ही क्षण की गणना करता है, इसलिए यह केवल {time} पर का नेटवर्क है: हर पैटर्न उसी क्षण पर पढ़ा जाता है, और हर टैंक भरने और खाली होने के बजाय अपने प्रारंभिक स्तर पर रहता है। {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET सॉल्वर का डाउनलोड विफल रहा। दोबारा प्रयास करने के लिए पेज रीलोड करें; फ़ायरवॉल, प्रॉक्सी या ब्राउज़र एक्सटेंशन इसे रोक रहा हो सकता है।';
 $ec_lang['lpn_time_engine_start_failed']='ब्राउज़र ने EPANET सॉल्वर शुरू करने से मना कर दिया। WebAssembly किसी सुरक्षा सेटिंग या एक्सटेंशन द्वारा बंद हो सकता है।';
 $ec_lang['lpn_time_engine_run_failed']='EPANET रन विफल रहा। यह इस पेज में दोष है; इसकी सूचना देने के लिए {wrong} लिंक का उपयोग करें।';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='आवश्यक दाब';
 $ec_lang['lpn_settings_req_pressure_tip']='वह दाब दर्ज करें जिस पर या जिससे ऊपर जंक्शन को उसकी पूरी माँग मिलती है। यह न्यूनतम दाब से अधिक होना चाहिए। इस प्रोजेक्ट की दाब इकाई का उपयोग करें। EPANET का डिफ़ॉल्ट उपयोग करने के लिए इसे खाली छोड़ें, जो US प्रवाह इकाइयों के लिए psi में है और अन्यथा मीटर में।';
 $ec_lang['lpn_settings_pressure_exponent']='दाब घातांक';
 $ec_lang['lpn_settings_pressure_exponent_tip']='उस कर्व का घातांक दर्ज करें जो न्यूनतम दाब पर शून्य प्रवाह से आवश्यक दाब पर पूरी माँग तक बढ़ता है।';
-$ec_lang['lpn_engine_pda_route']='EPANET सॉल्वर से हल किया गया, क्योंकि माँग मॉडल दाब-आधारित है।';
-$ec_lang['lpn_diag_pda_needs_epanet']='माँग मॉडल दाब-आधारित है, और इसकी गणना केवल EPANET सॉल्वर कर सकता है। EPANET सॉल्वर लोड नहीं हो सका, इसलिए ये परिणाम उपलब्ध नहीं हैं।';
 $ec_lang['lpn_result_delivered_demand']='आपूर्ति की गई माँग';
 $ec_lang['lpn_result_delivered_demand_tip']='दाब-आधारित माँग मॉडल में इस जंक्शन को वास्तव में मिलने वाला प्रवाह। दाब आवश्यक दाब से कम होने पर यह माँग से कम होता है।';
 $ec_lang['lpn_result_demand_deficit']='माँग की कमी';

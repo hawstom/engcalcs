@@ -112,8 +112,8 @@ console.log('\n--- opened and never touched: the flag alone brings a box back --
 	const B = reload();
 	B.restoreOpenBoxes();
 	NAMES.forEach((n) => ok(n + ': came back after a reload', B.isOpen[n]() === true, byId[IDS[n]].style.display));
-	ok('the run report came back with its own "no report yet" sentence inside, not empty',
-		byId.lpn_rptbox_pre.textContent.indexOf(PC.lpn_time_no_report) >= 0,
+	ok('the run report came back, and says no sentence about a missing report',
+		B.isOpen.rpt() === true && byId.lpn_rptbox_pre.textContent === '',
 		byId.lpn_rptbox_pre.textContent);
 	NAMES.forEach((n) => {
 		B.close[n]();

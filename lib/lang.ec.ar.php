@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='أوقفه إذا كانت إعادة ا�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='استغرقت هذه الشبكة {secs} ث لحسابها، وهي مضبوطة لإعادة الحساب بعد كل تغيير. لإيقاف ذلك واستعادة زر احسب، أوقف تفعيل "إعادة الحساب تلقائياً" في الإعدادات، تحت الحساب، الهيدروليكا.';
-$ec_lang['lpn_time_no_report']='لا يوجد تقرير تشغيل بعد. التقرير هو التقرير النصي لـEPANET، لذا يظهر بعد حساب هذه الشبكة.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='المدى';
 $ec_lang['lpn_time_clock_day']='اليوم {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='اكتب الوقت بالساعات والدقائق، مثل 2:30. الرقم المجرد يعني ساعات، فمثلاً 8 يعني ثماني ساعات. نصف الساعة هو 0:30.';
 $ec_lang['lpn_time_running']='جارٍ تشغيل المحاكاة ممتدة الفترة.';
-$ec_lang['lpn_time_no_engine']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. اتصل بالإنترنت مرة واحدة لتنزيل حلّال EPANET، الذي يشغّل محاكاة ممتدة الفترة.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='يحلّ الحلّال المدمج لحظة واحدة في كل مرة، فهذه هي الشبكة عند {time} فقط: يُقرأ كل نمط عند تلك اللحظة، ويبقى كل صهريج عند منسوبه الابتدائي بدلاً من أن يمتلئ ويفرغ. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='فشل تنزيل حلّال EPANET. أعد تحميل الصفحة للمحاولة مرة أخرى؛ فقد يكون جدار حماية أو وكيل شبكة أو امتداد متصفح يحجبه.';
 $ec_lang['lpn_time_engine_start_failed']='رفض المتصفح تشغيل حلّال EPANET. قد يكون WebAssembly معطَّلاً بإعداد أمني أو بامتداد.';
 $ec_lang['lpn_time_engine_run_failed']='فشل تشغيل EPANET. هذا عيب في هذه الصفحة؛ استخدم الرابط {wrong} للإبلاغ عنه.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='الضغط المطلوب';
 $ec_lang['lpn_settings_req_pressure_tip']='أدخل الضغط الذي يتلقى الملتقى عنده أو فوقه طلبه الكامل. يجب أن يكون أكبر من أدنى ضغط. استخدم وحدة ضغط هذا المشروع. اتركه فارغاً لاستخدام القيمة الافتراضية في EPANET، وهي بوحدة psi لوحدات التدفق الأمريكية وبالأمتار فيما عدا ذلك.';
 $ec_lang['lpn_settings_pressure_exponent']='أس الضغط';
 $ec_lang['lpn_settings_pressure_exponent_tip']='أدخل أس المنحنى الذي يرتفع من تدفق صفري عند أدنى ضغط إلى الطلب الكامل عند الضغط المطلوب.';
-$ec_lang['lpn_engine_pda_route']='حُلّت الشبكة بحلّال EPANET، لأن نموذج الطلب معتمد على الضغط.';
-$ec_lang['lpn_diag_pda_needs_epanet']='نموذج الطلب معتمد على الضغط، ولا يحسبه إلا حلّال EPANET. تعذّر تحميل حلّال EPANET، لذا فهذه النتائج مفقودة.';
 $ec_lang['lpn_result_delivered_demand']='الطلب المُسلَّم';
 $ec_lang['lpn_result_delivered_demand_tip']='التدفق الذي يتلقاه هذا الملتقى فعلاً في نموذج الطلب المعتمد على الضغط. وهو أقل من الطلب عندما يكون الضغط دون الضغط المطلوب.';
 $ec_lang['lpn_result_demand_deficit']='عجز الطلب';

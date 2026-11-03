@@ -1382,11 +1382,6 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
-        "lpn_diag_pda_needs_epanet": {
-            "on": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
-        },
         "lpn_diag_pda_pressures": {
             "on": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
             "ruled": "2026-10-05",
@@ -1964,19 +1959,14 @@
             "answer": "OK."
         },
         "lpn_engine_needed_failed": {
-            "on": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
-            "ruled": "2026-09-07",
-            "answer": "There is that \"and\" construction again that is not best for an engineering software. I edited it."
+            "on": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
+            "ruled": "2026-11-03",
+            "answer": "OK."
         },
         "lpn_engine_needed_loading": {
             "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
             "ruled": "2026-09-06",
             "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
-        },
-        "lpn_engine_pda_route": {
-            "on": "Solved with the EPANET solver, because the demand model is pressure driven.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
         },
         "lpn_engine_wait": {
             "on": "Loading solver. Results delayed momentarily. Continue working.",
@@ -8531,6 +8521,81 @@
             "on": "How many others",
             "ruled": "2026-11-01",
             "answer": "I am the one who change \"And others\" to \"How many others\"."
+        },
+        "lpn_settings_engine_native": {
+            "on": "Use the built-in solver",
+            "ruled": "2026-11-03",
+            "answer": "OK. Change it."
+        },
+        "lpn_settings_engine_native_tip": {
+            "on": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+            "ruled": "2026-11-03",
+            "answer": "Edited. I am continually dismayed by your falling back to the word \"names\". (The string carries his edit.)"
+        },
+        "lpn_notes_1_def": {
+            "on": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.",
+            "ruled": "2026-11-03",
+            "answer": "Edited. I am continually dismayed by your falling back to the word \"names\". (The string carries his edit.)"
+        },
+        "lpn_time_run_report_tip": {
+            "on": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+            "ruled": "2026-11-03",
+            "answer": "Edited. I am continually dismayed by your falling back to the word \"names\". (The string carries his edit.)"
+        },
+        "lpn_guide_rr_what_def": {
+            "on": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>",
+            "ruled": "2026-11-03",
+            "answer": "His edit: \"the printed report of a run in the layout and wording of the EPANET report\"; \"its header states the solver used\"."
+        },
+        "lpn_time_epanet_fallback": {
+            "on": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_engine_unavailable": {
+            "on": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_builtin_stopped_at": {
+            "on": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_control_refused": {
+            "on": "EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_rule_step_refused": {
+            "on": "Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_speed_pattern_refused": {
+            "on": "These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_tank_curve_refused": {
+            "on": "The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_tank_levels_refused": {
+            "on": "The initial level of these tanks is not between the minimum level and the maximum level:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_quality_refused": {
+            "on": "EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
+        },
+        "lpn_diag_energy_refused": {
+            "on": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
+            "ruled": "2026-11-03",
+            "answer": "OK."
         }
     }
 }

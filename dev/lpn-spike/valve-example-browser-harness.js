@@ -2,7 +2,7 @@
 //   node dev/lpn-spike/valve-example-browser-harness.js   (takes the browser lock itself)
 //
 // Real Chromium, the real page. The gallery card "Valve types" is clicked; the page solves the file
-// with the engine the file states (EPANET), then the "Use the built-in solver when possible" box in
+// with the engine the file states (EPANET), then the "Use the built-in solver" box in
 // Settings is ticked and the page solves it again. In each solve, from the page's own result:
 //   PBV1 drop = 60 psi; PRV1 downstream J4 = 45 psi; PSV1 upstream J3 = 55 psi; FCV1 flow = 300 gpm;
 //   TCV1 loss = K v^2/2g (K 150); GPV1 loss = the STRAINER curve at its flow;

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Desative se o recálculo estiver lento de
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Esta rede levou {secs} s para calcular, e está configurada para recalcular depois de cada mudança. Para interromper isso e recuperar um botão Calcular, desligue "Recalcular automaticamente" em Configurações, em Cálculo, Hidráulica.';
-$ec_lang['lpn_time_no_report']='Ainda não há relatório de execução. O relatório é o relatório de texto do EPANET, então aparece depois que esta rede for calculada.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Amplitude';
 $ec_lang['lpn_time_clock_day']='Dia {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Escreva um horário como horas e minutos, como 2:30. Um número simples significa horas, então 8 é oito horas. Meia hora é 0:30.';
 $ec_lang['lpn_time_running']='Executando a simulação de período estendido.';
-$ec_lang['lpn_time_no_engine']='O solucionador integrado calcula um momento de cada vez, então isto é a rede apenas em {time}: cada padrão é lido nesse momento, e cada tanque permanece no seu nível inicial em vez de encher e esvaziar. Conecte-se à internet uma vez para baixar o solucionador do EPANET, que executa uma simulação de período estendido.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='O solucionador integrado calcula um momento de cada vez, então isto é a rede apenas em {time}: cada padrão é lido nesse momento, e cada tanque permanece no seu nível inicial em vez de encher e esvaziar. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='O download do solucionador do EPANET falhou. Recarregue a página para tentar de novo; um firewall, um proxy ou uma extensão do navegador pode estar bloqueando-o.';
 $ec_lang['lpn_time_engine_start_failed']='O navegador se recusou a iniciar o solucionador do EPANET. O WebAssembly pode estar desativado por uma configuração de segurança ou por uma extensão.';
 $ec_lang['lpn_time_engine_run_failed']='A execução do EPANET falhou. Isso é um defeito desta página; use o link {wrong} para relatá-lo.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Pressão necessária';
 $ec_lang['lpn_settings_req_pressure_tip']='Informe a pressão igual ou acima da qual uma junção recebe sua demanda total. Ela deve ser maior que a pressão mínima. Use a unidade de pressão deste projeto. Deixe em branco para usar o padrão do EPANET, que é em psi para unidades de vazão dos EUA e em metros nos demais casos.';
 $ec_lang['lpn_settings_pressure_exponent']='Expoente de pressão';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Informe o expoente da curva que sobe de nenhuma vazão na pressão mínima até a demanda total na pressão necessária.';
-$ec_lang['lpn_engine_pda_route']='Resolvido com o solucionador do EPANET, porque o modelo de demanda é dirigido pela pressão.';
-$ec_lang['lpn_diag_pda_needs_epanet']='O modelo de demanda é dirigido pela pressão, e somente o solucionador do EPANET consegue calculá-lo. O solucionador do EPANET não pôde ser carregado, então estes resultados estão ausentes.';
 $ec_lang['lpn_result_delivered_demand']='Demanda entregue';
 $ec_lang['lpn_result_delivered_demand_tip']='A vazão que esta junção realmente recebe no modelo de demanda dirigido pela pressão. É menor que a demanda quando a pressão está abaixo da pressão necessária.';
 $ec_lang['lpn_result_demand_deficit']='Déficit de demanda';

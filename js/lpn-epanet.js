@@ -566,7 +566,10 @@
 					// is needed. The REAL points are the curve as measured, unscaled -- so a pump
 					// with more than three points and a speed of 0.9 would run at full speed unless
 					// the column is written. Same rule either way: SPEED, or PATTERN, never both.
-					var speedNamed = pumpEps || samples.real;
+					// Under `eps` only the page's own unscaled model (h0Base) is given a SPEED or a PATTERN: a pump
+					// without it states its speed already in its curve, so a pattern beside it means nothing and
+					// the built-in loop ignores it the same way.
+					var speedNamed = pumpEps || (samples.real && !eps);
 					pumpsWritten[link.id] = 1;
 					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname +
 						(speedNamed && link.speedPattern ? '  PATTERN ' + link.speedPattern :
@@ -750,7 +753,9 @@
 		// number we invented would state a split the user never made.
 		// Skipped entirely when no analysis is running -- a hydraulics-only file gets exactly the
 		// input it always got, and a mixing model means nothing without a quality run.
-		if (qualLine) {
+		// EPANET-MSX reads a tank's mixing model from the same section, so a multi-species run needs it written too (it was not, and
+		// every MSX tank mixed completely whatever the page said).
+		if (qualLine || (qualMode === 'msx' && model.msx && model.msx.text)) {
 			for (i = 0; i < model.nodes.length; i++) {
 				n = model.nodes[i];
 				if (!n.mixing || !n.mixing.model) { continue; }
@@ -2129,7 +2134,7 @@
 					 * numbers"); dev/lpn-spike/msx-run-harness.js anchors them.
 					 */
 					msxOn = !qualOn && (model.quality || {}).mode === 'msx' && !!(model.msx && model.msx.text),
-					msxOpened = false, msxSpecies = null,
+					msxOpened = false, msxSpecies = null, msxReportOn = false,
 					/**
 					 * **THE REACTION RATE IS EPANET'S OWN NUMBER, READ OUT OF EPANET'S OWN BINARY
 					 * OUTPUT FILE** (ROADMAP Task 652). Nothing on this page computes it, and
@@ -2199,6 +2204,9 @@
 					try { p.closeQ(); } catch (e) { /* no quality pass, or already shut */ }
 					// MSX state is the engine's own global, not the Project's, so a run that opened
 					// it must close it or the next run inherits a half-finished one.
+					// EPANET-MSX's own text report, into the run report, when the file's [REPORT] section asks for one (it needs
+					// the results file, which msxInit(1) keeps).
+					if (msxOpened && msxReportOn) { try { p.msxReport(); } catch (e) { /* no report this time */ } }
 					if (msxOpened) { try { p.msxClose(); } catch (e) { /* already shut */ } msxOpened = false; }
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
@@ -2591,7 +2599,8 @@
 								msxSpecies.push({ id: id, wall: sp.type === MSX_WALL, units: sp.units,
 									unitText: String(sp.units) + '/' + (sp.type === MSX_WALL ? EngCalcs.lpnMsxAreaUnits(model.msx.text) : 'L') });
 							}
-							p.msxInit(0);
+							msxReportOn = !!(EngCalcs.lpnMsxReportWanted && EngCalcs.lpnMsxReportWanted(String(model.msx.text)));
+							p.msxInit(msxReportOn ? 1 : 0);
 						} catch (e) { failed(e); return; }
 						phase0 = runSpan / 2; phaseSpan = runSpan / 2; t = 0; guard = 0;
 						try { msxRead(0); } catch (e) { failed(e); return; }

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='ပြန်တွက်ချက်ခ�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='ဤကွန်ရက်ကို တွက်ချက်ရန် {secs} စက္ကန့် ကြာခဲ့ပြီး၊ ပြောင်းလဲမှုတိုင်းနောက်တွင် ပြန်တွက်ချက်ရန် သတ်မှတ်ထားသည်။ ၎င်းကို ရပ်တန့်ပြီး Calculate ခလုတ် ပြန်ရရန်၊ ဆက်တင်များ ထဲ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် အောက်ရှိ “အလိုအလျောက် ပြန်တွက်ချက်ရန်” ကို ပိတ်ပါ။';
-$ec_lang['lpn_time_no_report']='လည်ပတ်မှုအစီရင်ခံစာ မရှိသေးပါ။ အစီရင်ခံစာသည် EPANET စာသားအစီရင်ခံစာဖြစ်သဖြင့် ဤကွန်ရက်ကို တွက်ချက်ပြီးနောက် ပေါ်လာမည်။';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='အပိုင်းအခြား';
 $ec_lang['lpn_time_clock_day']='နေ့ {day}၊ {clock}';
 $ec_lang['lpn_time_format_tip']='အချိန်ကို 2:30 ကဲ့သို့ နာရီနှင့် မိနစ်ဖြင့် ရေးပါ။ ဂဏန်းရိုးရိုးသည် နာရီကို ဆိုလိုသည်၊ ထို့ကြောင့် 8 ဆိုလျှင် ရှစ်နာရီ ဖြစ်သည်။ တစ်နာရီ ထက်ဝက်ကို 0:30 ဟု ရေးသည်။';
 $ec_lang['lpn_time_running']='extended period simulation ကို လည်ပတ်နေသည်။';
-$ec_lang['lpn_time_no_engine']='တွင်ပါ ဖြေရှင်းစက်သည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကို ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာ ဖြစ်သည် - ပုံစံတိုင်းကို ထိုအချိန်တွင် ဖတ်ပြီး ရေတိုက်တိုင်းသည် ပြည့်ခြင်း၊ ကျခြင်း မလုပ်ဘဲ စတင်အဆင့်တွင် ရှိနေသည်။ extended period simulation ကို လည်ပတ်သော EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်ရန် အင်တာနက်သို့ တစ်ကြိမ် ချိတ်ဆက်ပါ။';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='တွင်ပါ ဖြေရှင်းစက်သည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကိုသာ ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာ ဖြစ်သည် - ပုံစံတိုင်းကို ထိုအချိန်တွင် ဖတ်ပြီး ရေတိုက်တိုင်းသည် ရေပြည့်ခြင်း၊ ကျခြင်း မလုပ်ဘဲ မူလအဆင့်တွင် ရှိနေသည်။ {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET ဖြေရှင်းစက် ဒေါင်းလုဒ်လုပ်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားရန် စာမျက်နှာကို ပြန်လည်ဖွင့်ပါ၊ ဖိုင်ယာဝေါ၊ ပရောက်စီ သို့မဟုတ် ဘရောက်ဇာ တိုးချဲ့ဆော့ဖ်ဝဲက ပိတ်ဆို့နေနိုင်သည်။';
 $ec_lang['lpn_time_engine_start_failed']='ဘရောက်ဇာက EPANET ဖြေရှင်းစက်ကို စတင်ရန် ငြင်းပယ်သည်။ လုံခြုံရေးဆက်တင် သို့မဟုတ် တိုးချဲ့ဆော့ဖ်ဝဲကြောင့် WebAssembly ပိတ်ထားနိုင်သည်။';
 $ec_lang['lpn_time_engine_run_failed']='EPANET run မအောင်မြင်ပါ။ ၎င်းသည် ဤစာမျက်နှာ၏ အမှားတစ်ခုဖြစ်သည်၊ တင်ပြရန် {wrong} လင့်ခ်ကို အသုံးပြုပါ။';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='လိုအပ်သော ဖိအာ�
 $ec_lang['lpn_settings_req_pressure_tip']='ဆက်စပ်နေရာတစ်ခုသည် ၎င်း၏ လိုအင်အပြည့်ကို ရရှိသည့် ဖိအား (သို့မဟုတ် ထို့ထက်မြင့်သည့်ဖိအား) ကို ထည့်သွင်းပါ။ ၎င်းသည် အနည်းဆုံးဖိအားထက် ကြီးရမည်။ ဤပရောဂျက်၏ ဖိအားယူနစ်ကို သုံးပါ။ EPANET ၏ မူလတန်ဖိုးကို သုံးရန် အလွတ်ထားပါ၊ ၎င်းသည် US ရေစီးနှုန်းယူနစ်များအတွက် psi ဖြစ်ပြီး အခြားအခါများတွင် မီတာ ဖြစ်သည်။';
 $ec_lang['lpn_settings_pressure_exponent']='ဖိအား ထပ်ကိန်း';
 $ec_lang['lpn_settings_pressure_exponent_tip']='အနည်းဆုံးဖိအားတွင် ရေစီးနှုန်းမရှိမှ လိုအပ်သောဖိအားတွင် လိုအင်အပြည့်သို့ တက်လာသော မျဉ်းကွေး၏ ထပ်ကိန်းကို ထည့်သွင်းပါ။';
-$ec_lang['lpn_engine_pda_route']='လိုအင် မော်ဒယ်သည် ဖိအားဖြင့်မောင်းသည် ဖြစ်သဖြင့် EPANET ဖြေရှင်းစက်ဖြင့် ဖြေရှင်းထားသည်။';
-$ec_lang['lpn_diag_pda_needs_epanet']='လိုအင် မော်ဒယ်သည် ဖိအားဖြင့်မောင်းသည် ဖြစ်ပြီး EPANET ဖြေရှင်းစက်သာ ၎င်းကို တွက်ချက်နိုင်သည်။ EPANET ဖြေရှင်းစက်ကို မတင်နိုင်သဖြင့် ဤရလဒ်များ ပျောက်နေသည်။';
 $ec_lang['lpn_result_delivered_demand']='ပေးပို့သော လိုအင်';
 $ec_lang['lpn_result_delivered_demand_tip']='ဖိအားဖြင့်မောင်းသည့် လိုအင်မော်ဒယ်အောက်တွင် ဤဆက်စပ်နေရာ အမှန်တကယ်ရရှိသော ရေစီးနှုန်း။ ဖိအားသည် လိုအပ်သောဖိအားအောက်တွင် ရှိလျှင် လိုအင်ထက် နည်းသည်။';
 $ec_lang['lpn_result_demand_deficit']='လိုအင် လိုချက်';

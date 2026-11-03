@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Yeniden hesaplama çok yavaşsa kapatın.
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Bu şebekenin hesaplanması {secs} sn sürdü ve her değişiklikten sonra yeniden hesaplanacak şekilde ayarlı. Bunu durdurup bir Hesapla düğmesi geri almak için Ayarlar\'da, Hesaplama, Hidrolik altında “Otomatik olarak yeniden hesapla”yı kapatın.';
-$ec_lang['lpn_time_no_report']='Henüz bir çalışma raporu yok. Rapor, EPANET\'in kendi metnidir, bu yüzden bu şebeke EPANET çözücüsüyle hesaplandığında görünür.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Aralık';
 $ec_lang['lpn_time_clock_day']='Gün {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Bir zamanı saat ve dakika olarak yazın, örneğin 2:30. Düz bir sayı saat anlamına gelir; yani 8, sekiz saattir. Yarım saat 0:30 olarak yazılır.';
 $ec_lang['lpn_time_running']='Uzun süreli simülasyon çalıştırılıyor.';
-$ec_lang['lpn_time_no_engine']='Yerleşik çözücü bir seferde yalnızca bir anı hesaplar, bu yüzden bu yalnızca {time} anındaki şebekedir: her desen o anda okunur ve her depo dolup boşalmak yerine hâlâ başlangıç seviyesindedir. Bir zaman dilimi hesaplaması çalıştıran EPANET çözücüsünü almak için bir kez internete bağlanın.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Yerleşik çözücü her seferinde tek bir anı çözer, bu yüzden bu, şebekenin yalnızca {time} anındaki halidir: her desen o anda okunur ve her depo dolup boşalmak yerine ilk seviyesinde kalır. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET çözücüsünün indirilmesi başarısız oldu. Yeniden denemek için sayfayı yeniden yükleyin; bir güvenlik duvarı, vekil sunucu veya tarayıcı eklentisi onu engelliyor olabilir.';
 $ec_lang['lpn_time_engine_start_failed']='Tarayıcı EPANET çözücüsünü başlatmayı reddetti. WebAssembly bir güvenlik ayarı veya bir eklenti tarafından kapatılmış olabilir.';
 $ec_lang['lpn_time_engine_run_failed']='EPANET çalıştırması başarısız oldu. Bu bu sayfada bir kusurdur; bildirmek için {wrong} bağlantısını kullanın.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Gereken basınç';
 $ec_lang['lpn_settings_req_pressure_tip']='Bir düğümün talebinin tamamını aldığı basıncı veya üstünü girin. Asgari basınçtan büyük olmalıdır. Bu projenin basınç birimini kullanın. EPANET\'in varsayılanını kullanmak için boş bırakın; bu, ABD debi birimlerinde psi, diğerlerinde metredir.';
 $ec_lang['lpn_settings_pressure_exponent']='Basınç üssü';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Asgari basınçta sıfır debiden gereken basınçta talebin tamamına yükselen eğrinin üssünü girin.';
-$ec_lang['lpn_engine_pda_route']='Talep modeli basınca dayalı olduğu için EPANET çözücüsüyle çözüldü.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Talep modeli basınca dayalıdır ve onu yalnızca EPANET çözücüsü hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden bu sonuçlar eksik.';
 $ec_lang['lpn_result_delivered_demand']='Karşılanan talep';
 $ec_lang['lpn_result_delivered_demand_tip']='Bu düğümün basınca dayalı talep modeli altında gerçekte aldığı debi. Basınç gereken basıncın altındaysa talepten azdır.';
 $ec_lang['lpn_result_demand_deficit']='Talep açığı';
