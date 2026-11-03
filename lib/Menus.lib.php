@@ -29,6 +29,9 @@ function echoMenu($type) {
  *
 **/
 function echoMainMenu() {
+  global $ec_canonical_origins;
+  $host = preg_replace('/^www\\.|:\\d+$/', '', strtolower(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : ''));
+  $offsite = isset($ec_canonical_origins[$host]) && $host !== 'hawsedc.com';
 // Define the menu items.
   $menuarr =
     array(
@@ -61,7 +64,11 @@ function echoMainMenu() {
 // warning wherever SERVER_NAME is absent, such as CLI. A root-relative path is correct from any
 // depth and on all four of http/https x www/non-www, which is what the site actually answers on.
     } else {
-      echo '<a href="'.htmlspecialchars(rtrim($menuarr[$i][0]), ENT_QUOTES, 'UTF-8').'">'.rtrim($menuarr[$i][1]).'</a>';
+// Only /engcalcs/ is served by the sibling hosts (librewaternet.org, epanet-plus-plus.org); every other
+// item is a hawsedc.com page, and root-relative there it 404s (Search Console, 2026-11-02: /index.php).
+      $path = rtrim($menuarr[$i][0]);
+      if ($offsite && strpos($path, '/engcalcs/') !== 0) { $path = CANONICAL_ORIGIN_DEFAULT . $path; }
+      echo '<a href="'.htmlspecialchars($path, ENT_QUOTES, 'UTF-8').'">'.rtrim($menuarr[$i][1]).'</a>';
     }
 // If there are more menu items coming, add a vertical bar and spaces.
     if (isset($menuarr[$i + 1]))
