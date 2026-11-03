@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 3303,
-        "delta_key_count": 17,
-        "english_changed_key_count": 4,
+        "expected_key_count": 3313,
+        "delta_key_count": 52,
+        "english_changed_key_count": 24,
         "exempt_key_count": 49,
         "exempt_keys": [
             "calc_units_us",
@@ -80,13 +80,19 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: проток\n- flow used, taken, or consumed\n    English: demand\n    Your language: Потрошња\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: веза\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- solver or the part that works out the answer\n    English: solver\n    Your language: решавач\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Потрошач\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: проток\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: деоница\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: локални губици\n- flow used, taken, or consumed\n    English: demand\n    Your language: Потрошња\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Притисак\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: веза\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: подразумевано\n- solver or the part that works out the answer\n    English: solver\n    Your language: решавач\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Тенк\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Вентил\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Потрошач\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
+        "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -98,14 +104,49 @@
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
         "lpn_inpalt_cancelled": "Nothing was changed.",
-        "lpn_settings_solver": "Solver"
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.",
+        "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
+        "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
+        "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_engine_native": "Use the built-in solver",
+        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
+        "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
+        "lpn_time_run_report": "Solver (run) report",
+        "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+        "lpn_settings_solver": "Solver",
+        "lpn_reports_epanet": "Solver (run)",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
+        "lpn_engine_native_used": "Solved with the built-in solver.",
+        "lpn_engine_epanet_used": "Solved with the EPANET solver.",
+        "lpn_diag_rules_refused": "EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:",
+        "lpn_diag_control_refused": "EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:",
+        "lpn_diag_rule_step_refused": "Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.",
+        "lpn_diag_speed_pattern_refused": "These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:",
+        "lpn_diag_tank_curve_refused": "The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:",
+        "lpn_diag_tank_levels_refused": "The initial level of these tanks is not between the minimum level and the maximum level:",
+        "lpn_diag_quality_refused": "EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:",
+        "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
+        "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "keys": {
+        "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
+        "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -117,9 +158,54 @@
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
         "lpn_inpalt_cancelled": "Nothing was changed.",
-        "lpn_settings_solver": "Solver"
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.",
+        "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
+        "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
+        "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_engine_native": "Use the built-in solver",
+        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
+        "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
+        "lpn_time_run_report": "Solver (run) report",
+        "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+        "lpn_settings_solver": "Solver",
+        "lpn_reports_epanet": "Solver (run)",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
+        "lpn_engine_native_used": "Solved with the built-in solver.",
+        "lpn_engine_epanet_used": "Solved with the EPANET solver.",
+        "lpn_diag_rules_refused": "EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:",
+        "lpn_diag_control_refused": "EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:",
+        "lpn_diag_rule_step_refused": "Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.",
+        "lpn_diag_speed_pattern_refused": "These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:",
+        "lpn_diag_tank_curve_refused": "The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:",
+        "lpn_diag_tank_levels_refused": "The initial level of these tanks is not between the minimum level and the maximum level:",
+        "lpn_diag_quality_refused": "EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:",
+        "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
+        "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "key_context": {
+        "lpn_guide_text_rptbox": {
+            "reason": "english_changed",
+            "current_value": "Приказује текстуални извештај који је написао EPANET решавач за последњу симулацију током продуженог периода, укључујући упозорења и сажетак мреже. Свака нова симулација током продуженог периода замењује га; решавање у једном тренутку не замењује, а измена оставља претходни извештај на месту.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_text_scncmp_box",
+                    "value": "Решава сваки сценарио означен у Менаџеру сценарија, све њих осим ако ознаке нису уклоњене, са копије цртежа, и за сваки у табели наводи број сопствених вредности, множилац потрошње, укупно време рада, хидраулички временски корак, најнижи притисак и највећу брзину. Изаберите Вода, Извештаји, Поређење сценарија да га отворите. Поређење почиње када се оквир отвори и поново после сваке измене док је отворен.\\n\\nНе мења пројекат, а отворени сценарио остаје какав је био.",
+                    "english": "Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\\n\\nIt does not change the project, and the scenario that is open is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_guide_text_status_box",
+                    "value": "Наводи по редоследу времена сваку промену током последње симулације током продуженог периода: отварање или затварање пумпе, вентила или цеви, тенк који почиње да се пуни или празни или постаје пун или празан, и сваки временски корак који није у потпуности конвергирао. Наводе се само промене, не сваки временски корак.",
+                    "english": "Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step."
+                }
+            }
+        },
         "lpn_guide_set_where_def": {
             "reason": "english_changed",
             "current_value": "<p>Листа са леве стране оквира скаче на одељак или поднаслов. Одељци су Визуелизација (Ознаке чворова, Боје чворова, Ознаке веза, Боје веза, Потрошач и Све), Мапа, Страница, Елементи (Префикси ID-а, Вредности и Прилагођена својства), Прорачун (Јединице, Време, Хидраулика, Енергија и Квалитет воде) и Заслуге. Сваки поднаслов наводи да ли су његова подешавања Сачувано уз пројекат или Сачувано у овом прегледачу. Све се чува са пројектом осим подешавања под Страница и једног реда у Хидраулици, Прикажи прозор напретка прорачуна, који сам наводи Сачувано у овом прегледачу.<\/p><p>Картица Подешавања у Табелама наводи иста подешавања као редове, са њиховом Категоријом и Вредношћу, па се подешавање може наћи и проверити и тамо.<\/p>",
@@ -133,6 +219,38 @@
                     "key": "lpn_guide_set_search_term",
                     "value": "Претрага",
                     "english": "Searching"
+                }
+            }
+        },
+        "lpn_guide_rr_what_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Изаберите Вода, Извештаји, Прорачун. Извештај је текст који је EPANET решавач записао за последњу симулацију проширеног периода, у страницама. Почиње натписом и именом мреже, затим броји чворове, резервоаре, тенкове, цеви, пумпе и вентиле, затим наводи опције анализе, а затим наводи хидраулички статус прорачуна са његовим упозорењима. Дугме Копирај копира текст.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_rr_what_term",
+                    "value": "Шта извештај садржи",
+                    "english": "What the report holds"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_rr_example_def",
+                    "value": "<p>Отворите пример Net1, који је већ израчунат, и изаберите Вода, Извештаји, Прорачун. Сажетак броји 9 чворова, 1 резервоар, 1 тенк, 12 цеви, 1 пумпу и 0 вентила. Формула губитка напора је Hazen-Williams, хидраулички временски корак је 1.00 hrs, а укупно трајање је 24.00 hrs.<\/p>",
+                    "english": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>"
+                }
+            }
+        },
+        "lpn_guide_rr_example_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Отворите пример Net1, који је већ израчунат, и изаберите Вода, Извештаји, Прорачун. Сажетак броји 9 чворова, 1 резервоар, 1 тенк, 12 цеви, 1 пумпу и 0 вентила. Формула губитка напора је Hazen-Williams, хидраулички временски корак је 1.00 hrs, а укупно трајање је 24.00 hrs.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_rr_what_def",
+                    "value": "<p>Изаберите Вода, Извештаји, Прорачун. Извештај је текст који је EPANET решавач записао за последњу симулацију проширеног периода, у страницама. Почиње натписом и именом мреже, затим броји чворове, резервоаре, тенкове, цеви, пумпе и вентиле, затим наводи опције анализе, а затим наводи хидраулички статус прорачуна са његовим упозорењима. Дугме Копирај копира текст.<\/p>",
+                    "english": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_st_what_term",
+                    "value": "Шта је наведено",
+                    "english": "What is listed"
                 }
             }
         },
@@ -194,9 +312,62 @@
                     "english": "Don’t show this again"
                 },
                 "next_translated": {
-                    "key": "lpn_time_no_report",
-                    "value": "Још нема извештаја о прорачуну. Извештај је текстуални извештај EPANET-а, па се појављује пошто се ова мрежа израчуна.",
-                    "english": "There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated."
+                    "key": "lpn_menu_help",
+                    "value": "Помоћ",
+                    "english": "Help"
+                }
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "english_changed",
+            "current_value": "Прикачите EPANET-MSX датотеку (.msx) овом пројекту или прикажите ону која је већ прикачена. Чува се са пројектом, записује се назад непромењена и покреће је EPANET-MSX машина у симулацији током продуженог периода.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_msx",
+                    "value": "EPANET-MSX датотека…",
+                    "english": "EPANET-MSX file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_msx",
+                    "value": "EPANET-MSX датотека…",
+                    "english": "EPANET-MSX file…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…",
+                "value": "EPANET-MSX датотека…"
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "english_changed",
+            "current_value": "Вредност ове EPANET-MSX врсте, коју рачуна EPANET-MSX машина, у јединицама које декларише EPANET-MSX датотека. За везу је то просек дуж везе.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_msx_none",
+                    "value": "Овом пројекту није прикачена ниједна EPANET-MSX датотека. Прикачите је преко Датотека, Увези, Мрежа, EPANET-MSX датотека.",
+                    "english": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_inp_drop_report": {
+            "reason": "english_changed",
+            "current_value": "Ова датотека садржи EPANET-ова сопствена подешавања за форматирање извештаја који штампа. Извештај решавача можете прочитати овде, под Извештаји, Прорачун, али излази у стандардном формату решавача, а не у оном који та подешавања траже. Редови се чувају и биће поново уписани ако сачувате EPANET датотеку.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_tags",
+                    "value": "Ова датотека даје тагове неким од својих чворова, цеви или других елемената. Сваки таг је у потпуности пренет и налази се у својствима свог елемента, где га можете прочитати или изменити.",
+                    "english": "This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_sections",
+                    "value": "Ова датотека садржи одељак који ова страница уопште не чита. Ништа се овде не користи из њега. Чува се у целини и биће поново уписан ако сачувате EPANET датотеку.",
+                    "english": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file."
                 }
             }
         },
@@ -376,6 +547,250 @@
                 }
             }
         },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "EPANET решавач подразумевано решава мрежу. Када је постављено укупно време рада, сваки временски корак извештаја израчунава се редом: тенкови се пуне и празне, потрошње прате своје обрасце, а трака алата репродукује прорачун. Са означеним Користи уграђени решавач када је могуће, решење у једном тренутку може уместо тога решити уграђени решавач, али симулацију током продуженог периода увек решава EPANET решавач.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Како се решава",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Шта не ради",
+                    "english": "What it does not do"
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "EPANET решавач није могао да се преузме, а потребан је за решавање ове мреже. После једног повезивања на интернет, решавач се чува на овом уређају.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "EPANET решавач је сада на овом уређају и ради без интернета.",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "Ова мрежа се не може решити без EPANET решавача. {reason}",
+                    "english": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "Ова мрежа се не може решити без EPANET решавача. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "EPANET решавач није могао да се преузме, а потребан је за решавање ове мреже. После једног повезивања на интернет, решавач се чува на овом уређају.",
+                    "english": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Учитавање EPANET решавача док градите. Резултати ће бити доступни када се потпуно учита.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_engine_needed_failed": {
+            "reason": "english_changed",
+            "current_value": "EPANET решавач још није учитан, не може да се учита, а ова мрежа може да се реши само помоћу њега. Биће учитан када будете повезани на интернет.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_wait_bytes",
+                    "value": "Решавач учитан {kb} KB до сада. Укупна величина није доступна, па проценат завршетка није познат.",
+                    "english": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed_why",
+                    "value": "Ова мрежа се може решити само EPANET решавачем. {reason}",
+                    "english": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}"
+                }
+            }
+        },
+        "lpn_engine_needed_failed_why": {
+            "reason": "english_changed",
+            "current_value": "Ова мрежа се може решити само EPANET решавачем. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "EPANET решавач још није учитан, не може да се учита, а ова мрежа може да се реши само помоћу њега. Биће учитан када будете повезани на интернет.",
+                    "english": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_on_fixed_head",
+                    "value": "Ови вентили су директно повезани на резервоар или тенк, који већ одређује ниво воде тамо, па вентилу не остаје ништа да регулише. Поставите кратку цев између вентила и резервоара или тенка:",
+                    "english": "These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:"
+                }
+            }
+        },
+        "lpn_settings_engine_native": {
+            "reason": "english_changed",
+            "current_value": "Користи уграђени решавач када је могуће",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_demand_multiplier_tip",
+                    "value": "Један фактор који се примењује на сваку потрошњу у мрежи одједном. Сваки сценарио може имати засебну вредност, па се просечан дан, максималан дан или врхунски час могу направити променом само овог подешавања.",
+                    "english": "A single factor applied to every demand in the network at once. Each scenario can have a separate value, so average day, maximum day, or peak hour can be created by changing only this setting."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_engine_native_tip",
+                    "value": "Укључите ово да бисте, где је могуће, користили уграђени решавач. У супротном, увек се користи EPANET решавач америчке агенције EPA. Уграђени решавач се не користи за симулације током продуженог периода. При првом коришћењу EPANET решавача преузима се око 650 KB, који потом остаје сачуван на овом уређају. Где цев има локални (минорни) губитак, два решавача се разилазе у последњим цифрама: EPANET користи заокружену вредност гравитационог убрзања, па су његови локални губици веома благо нижи него у тачном облику.",
+                    "english": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_engine_native_tip",
+                "english": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+                "value": "Укључите ово да бисте, где је могуће, користили уграђени решавач. У супротном, увек се користи EPANET решавач америчке агенције EPA. Уграђени решавач се не користи за симулације током продуженог периода. При првом коришћењу EPANET решавача преузима се око 650 KB, који потом остаје сачуван на овом уређају. Где цев има локални (минорни) губитак, два решавача се разилазе у последњим цифрама: EPANET користи заокружену вредност гравитационог убрзања, па су његови локални губици веома благо нижи него у тачном облику."
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "Укључите ово да бисте, где је могуће, користили уграђени решавач. У супротном, увек се користи EPANET решавач америчке агенције EPA. Уграђени решавач се не користи за симулације током продуженог периода. При првом коришћењу EPANET решавача преузима се око 650 KB, који потом остаје сачуван на овом уређају. Где цев има локални (минорни) губитак, два решавача се разилазе у последњим цифрама: EPANET користи заокружену вредност гравитационог убрзања, па су његови локални губици веома благо нижи него у тачном облику.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "Користи уграђени решавач када је могуће",
+                    "english": "Use the built-in solver"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Учитавање EPANET решавача…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver",
+                "value": "Користи уграђени решавач када је могуће"
+            }
+        },
+        "lpn_time_run_stopped": {
+            "reason": "english_changed",
+            "current_value": "EPANET прорачун је заустављен у {time}, па нема резултата. Његов извештај о прорачуну објашњава зашто.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "Бројеви на екрану потичу од уграђеног решавача уместо тога.",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_stat_stopped",
+                    "value": "{statistic} није приказано: прорачун је заустављен пре краја периода.",
+                    "english": "{statistic} not shown: the run stopped before the end of the period."
+                }
+            }
+        },
+        "lpn_time_run_stopped_kept": {
+            "reason": "english_changed",
+            "current_value": "EPANET прорачун је заустављен у {time}. Резултати иду до {solved}, последњег периода који је решен, а после тога се ништа не приказује. Његов извештај о прорачуну објашњава зашто.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_stopped",
+                    "value": "EPANET прорачун је заустављен пре краја периода, па резултати енергије пумпи нису израчунати.",
+                    "english": "The EPANET run stopped before the end of the period, so no pump energy results were computed."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_cut_off",
+                    "value": "EPANET је затворио {link}, а затим није могао да реши {nodes}.",
+                    "english": "EPANET had closed {link} and then could not solve for {nodes}."
+                }
+            }
+        },
+        "lpn_time_run_fell_back": {
+            "reason": "english_changed",
+            "current_value": "Бројеви на екрану потичу од уграђеног решавача уместо тога. Он рачуна један тренутак одједном, па је ово мрежа само у тренутку {time}, при чему сваки тенк и даље стоји на почетном нивоу.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_cut_off_empty",
+                    "value": "Тенк {tank} је био празан, па је EPANET затворио {link} да се не празни даље, а затим није могао да реши {nodes}.",
+                    "english": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}."
+                },
+                "next_translated": {
+                    "key": "lpn_control_dangling_note",
+                    "value": "Ове контроле именују елемент који више није у овом пројекту, па су изостављене: {ids}",
+                    "english": "These controls refer to an element that is no longer in this project, so they were ignored: {ids}"
+                }
+            }
+        },
+        "lpn_time_epanet_fallback": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_running",
+                    "value": "Извршава се симулација током продуженог периода.",
+                    "english": "Running the extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_engine_fetch_failed",
+                    "value": "Преузимање EPANET решавача није успело. Поново учитајте страницу да покушате опет; можда га блокира заштитни зид, прокси или проширење прегледача.",
+                    "english": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it."
+                }
+            }
+        },
+        "lpn_time_epanet_fallback_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_running",
+                    "value": "Извршава се симулација током продуженог периода.",
+                    "english": "Running the extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_engine_fetch_failed",
+                    "value": "Преузимање EPANET решавача није успело. Поново учитајте страницу да покушате опет; можда га блокира заштитни зид, прокси или проширење прегледача.",
+                    "english": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it."
+                }
+            }
+        },
+        "lpn_time_run_report": {
+            "reason": "english_changed",
+            "current_value": "Прорачун: извештај",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "Прорачун се није завршио, па нема резултата за касније тренутке.",
+                    "english": "The run did not finish, so there are no results for the later times."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_report_copied",
+                    "value": "Копирано",
+                    "english": "Copied"
+                }
+            },
+            "tip": {
+                "key": "lpn_time_run_report_tip",
+                "english": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+                "value": "Оно што је сам EPANET решавач исписао о последњем прорачуну: да ли је конвергирао, и на шта год је упозорио. То је текст самог решавача, не наш."
+            }
+        },
+        "lpn_time_run_report_tip": {
+            "reason": "english_changed",
+            "current_value": "Оно што је сам EPANET решавач исписао о последњем прорачуну: да ли је конвергирао, и на шта год је упозорио. То је текст самог решавача, не наш.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_report_copied",
+                    "value": "Копирано",
+                    "english": "Copied"
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Брзина",
+                    "english": "Speed"
+                }
+            },
+            "label": {
+                "key": "lpn_time_run_report",
+                "english": "Solver (run) report",
+                "value": "Прорачун: извештај"
+            }
+        },
         "lpn_settings_solver": {
             "reason": "missing",
             "current_value": null,
@@ -391,10 +806,261 @@
                     "english": "Quality"
                 }
             }
+        },
+        "lpn_reports_epanet": {
+            "reason": "english_changed",
+            "current_value": "Прорачун",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reports_menu",
+                    "value": "Извештаји",
+                    "english": "Reports"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_title",
+                    "value": "Пумпе: извештај о енергији",
+                    "english": "Pump energy report"
+                }
+            }
+        },
+        "lpn_settings_demand_model_tip": {
+            "reason": "english_changed",
+            "current_value": "Изаберите како чворови добијају проток. Вођен потрошњом (DDA) испоручује сваку потрошњу у целости, без обзира на притисак. Вођен притиском (PDA) испоручује мање од потрошње тамо где је притисак испод потребног притиска, а рачуна га само EPANET решавач.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_demand_model",
+                    "value": "Модел потрошње",
+                    "english": "Demand model"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_demand_model_dda",
+                    "value": "Вођен потрошњом",
+                    "english": "Demand driven"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_demand_model",
+                "english": "Demand model",
+                "value": "Модел потрошње"
+            }
+        },
+        "lpn_engine_native_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_pressure_exponent_tip",
+                    "value": "Унесите експонент криве која расте од нултог протока при минималном притиску до пуне потрошње при потребном притиску.",
+                    "english": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_conflict",
+                    "value": "Ови регулациони вентили су међусобно спојени на начин који EPANET не дозвољава, на пример два вентила за смањење притиска у серији. Уметните кратку цев између њих:",
+                    "english": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:"
+                }
+            }
+        },
+        "lpn_engine_epanet_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_pressure_exponent_tip",
+                    "value": "Унесите експонент криве која расте од нултог протока при минималном притиску до пуне потрошње при потребном притиску.",
+                    "english": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_conflict",
+                    "value": "Ови регулациони вентили су међусобно спојени на начин који EPANET не дозвољава, на пример два вентила за смањење притиска у серији. Уметните кратку цев између њих:",
+                    "english": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:"
+                }
+            }
+        },
+        "lpn_diag_rules_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_control_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_rule_step_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_speed_pattern_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_tank_curve_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_tank_levels_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_quality_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_energy_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_stopped_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "Криве губитка напора ових вентила опште намене не могу се прочитати: сваки проток мора бити већи од претходног, а крива са једном тачком захтева проток већи од нуле:",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ Ови вентили опште намене имају криву губитка напора са само једном тачком, па је њихов губитак напора узет као пропорционалан протоку, кроз ту тачку: {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
         }
     },
-    "key_plain": [],
-    "key_notes": [],
+    "key_plain": {
+        "lpn_reports_epanet": "Run: the report of the simulation run."
+    },
+    "key_notes": {
+        "lpn_time_run_report": [
+            "Layout (box title): The title of a box that can be docked and set to auto-hide. Tucked away, the box shows only the start of its title, on a narrow tab at the map's edge turned on its side, cut off after about 12 to 25 characters. Put the word that names the box's subject first, so each tab can be told from its neighbors; a title form with a colon is fine (Pump energy report, in Spanish: Bombas: informe de energía). Where the natural phrase already starts with that word, keep it. The same text may also be a menu row."
+        ]
+    },
     "key_concepts": [],
     "uniqueness_attention": [
         {
