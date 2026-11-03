@@ -1,14 +1,12 @@
-// CANDIDATE FILES FOR TOM'S WATERGEMS (Task 749): one tiny network per feature, written once per plausible guess
-// at a storage unit or a code that no saved project has ever shown, with the numbers EPANET gives for the same
-// network so that Tom can compare what his WaterGEMS shows.
+// WaterGEMS FEATURE TESTS (Task 749). Round 1 (2026-11-02) offered guesses; Tom's results of 2026-11-03 confirmed the
+// emitter unit, the pump speed type and the mixing codes (dev/wtg-export.md), which the writer now writes without
+// `opts.candidate`. This script keeps the shared helpers (networks, EPANET runs, the pair writer) and builds ROUND 2,
+// what is still open: two-compartment mixing, chlorine reactions and the source type, age and trace.
 //
-//   node dev/lpn-spike/wtg-feature-tests.js [--out <dir>]        default ~/tom-files/2026-11-02/wtg-feature-tests
+//   node dev/lpn-spike/wtg-feature-tests.js [--out <dir>]        default ~/tom-files/2026-11-03/wtg-feature-tests-2
 //
-// The features: emitter coefficient, pump speed pattern, tank mixing (2-compartment, FIFO, LIFO), water quality
-// (chlorine with a source and reactions, age, trace). The writer is js/lpn-wtg-export.js, switched by `opts.candidate`.
 // Licence line: nobody decompiles or probes Bentley software; Tom's WaterGEMS is used only as an ordinary user would
-// (does a file we wrote open, with the same results as EPANET?). What each guess rests on: dev/wtg-export.md,
-// "Candidates under test". The harness: dev/lpn-spike/wtg-feature-tests-harness.js.
+// (does a file we wrote open, with the same results as EPANET?). The harness: dev/lpn-spike/wtg-feature-tests-harness.js.
 'use strict';
 
 const fs = require('fs');
@@ -16,7 +14,6 @@ const os = require('os');
 const path = require('path');
 const zlib = require('zlib');
 const ROOT = path.resolve(__dirname, '..', '..');
-
 // ---------------------------------------------------------------------------------------------
 // The networks. All are US customary, gpm, Hazen-Williams, 24 h at a 1 h step, with coordinates.
 // ---------------------------------------------------------------------------------------------
@@ -130,9 +127,12 @@ function writePair(env, inpText, name, candidate, dir) {
 
 const f1 = (v) => Number(v).toFixed(1), f2 = (v) => Number(v).toFixed(2), f3 = (v) => Number(v).toFixed(3);
 
+
 // ---------------------------------------------------------------------------------------------
-// The whole set. Returns { files: [{path, feature, candidate, report}], expected: {...} }.
+// ROUND 2: only what is still open. Calculation type, source codes and mixing codes are the confirmed ones.
 // ---------------------------------------------------------------------------------------------
+const CHLORINE_REACTIONS = { bulk: -2, wall: -1 };
+
 async function build(outDir) {
 	const env = await setup();
 	const files = [], expected = {};
@@ -142,123 +142,79 @@ async function build(outDir) {
 		files.push({ feature: feature, name: name, candidate: candidate, report: report, dir: dir });
 	}
 	function inpCopy(feature, name, text) { fs.mkdirSync(path.join(outDir, feature), { recursive: true }); fs.writeFileSync(path.join(outDir, feature, name + '.inp'), text); }
+	const nodes = ['J0', 'J1', 'T1'], lk = ['PU1', '3'];
 
-	// 1. Emitter
+	// 1. Two compartment. The .inp states 0.2 (EPANET: 0.2 of the tank volume is the compartment water enters and leaves by).
 	{
-		const ex = await runEpanet(EMITTER_NET, ['J1', 'J2', 'J3'], ['1', '2', '3'], [0, 12]);
-		expected.emitter = { hour0: ex[0], hour12: ex[12] };
-		inpCopy('1-emitter', 'emitter', EMITTER_NET);
-		['A', 'B', 'C', 'D'].forEach((c) => { add('1-emitter', EMITTER_NET, 'emitter-' + c, { emitter: c }); });
+		const mk = (frac) => cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: '2COMP ' + frac, title: 'Two compartment test: chlorine set point 1.0 mg/L at J0, tank T1 two compartment ' + frac });
+		const inp = mk('0.2'), inpRev = mk('0.8');
+		expected.twoComp = {
+			frac02: await runEpanet(inp, nodes, lk, [12, 24]),
+			frac08: await runEpanet(inpRev, nodes, lk, [12, 24]),
+			mixed: await runEpanet(cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: 'MIXED' }), nodes, lk, [12, 24])
+		};
+		inpCopy('1-two-compartment', 'twocomp-0.2', inp);
+		inpCopy('1-two-compartment', 'twocomp-0.8', inpRev);
+		add('1-two-compartment', inp, 'twocomp-c1-20-c2-80', { mixCode: 0, mixFraction: 'percent', wq: {} });
+		add('1-two-compartment', inp, 'twocomp-c1-80-c2-20', { mixCode: 0, mixFraction: 'percent', swap: true, wq: {} });
 	}
-	// 2. Pump speed pattern
+	// 2. Chlorine, four ways of storing the reaction rates.
 	{
-		const inp = cyclingNet({ pumpPattern: true, title: 'Pump speed pattern test: pump PU1 follows pattern SP' });
-		const ex = await runEpanet(inp, ['J0', 'J1', 'T1'], ['PU1', '2', '3'], [0, 6, 12, 18]);
-		expected.pumpSpeed = ex;
-		expected.pumpFixed = await runEpanet(cyclingNet({}), ['J0', 'J1', 'T1'], ['PU1', '2', '3'], [0, 6, 12, 18]);
-		inpCopy('2-pump-speed', 'pump-speed', inp);
-		[0, 1, 2, 3].forEach((v) => { add('2-pump-speed', inp, 'pump-speed-vsp' + v, { vsp: v }); });
+		const chl = cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: 'MIXED', reactions: CHLORINE_REACTIONS, title: 'Chlorine test: set point 1.0 mg/L at J0, bulk -2 per day, wall -1 ft per day' });
+		expected.chlorine = await runEpanet(chl, nodes, lk, [12, 24]);
+		expected.chlorineNoDecay = await runEpanet(cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: 'MIXED', reactions: { bulk: 0, wall: 0 } }), nodes, lk, [12, 24]);
+		inpCopy('2-chlorine', 'chlorine', chl);
+		add('2-chlorine', chl, 'chlorine-day-signed', { wq: { bulkUnit: 'day', sign: 'epanet' } });
+		add('2-chlorine', chl, 'chlorine-second-signed', { wq: { bulkUnit: 'sec', sign: 'epanet' } });
+		add('2-chlorine', chl, 'chlorine-day-positive', { wq: { bulkUnit: 'day', sign: 'positive' } });
+		add('2-chlorine', chl, 'chlorine-second-positive', { wq: { bulkUnit: 'sec', sign: 'positive' } });
 	}
-	// 3. Tank mixing
+	// 3. Age and trace.
 	{
-		expected.mixing = {};
-		for (const m of [['mixed', 'MIXED'], ['2comp', '2COMP 0.2'], ['fifo', 'FIFO'], ['lifo', 'LIFO']]) {
-			const inp = cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: m[1], title: 'Tank mixing test: chlorine set point 1.0 mg/L at J0, tank T1 mixing ' + m[1] });
-			const ex = await runEpanet(inp, ['J0', 'J1', 'T1'], ['PU1', '3'], [6, 12, 24]);
-			expected.mixing[m[0]] = ex;
-			inpCopy('4-tank-mixing', 'mix-' + m[0], inp);
-			if (m[0] === 'mixed') { continue; }
-			if (m[0] === '2comp') {
-				add('4-tank-mixing', inp, 'mix-2comp-code2-fraction', { mixCode: 2, mixFraction: 'fraction', wq: {} });
-				add('4-tank-mixing', inp, 'mix-2comp-code2-percent', { mixCode: 2, mixFraction: 'percent', wq: {} });
-				add('4-tank-mixing', inp, 'mix-2comp-code0-fraction', { mixCode: 0, mixFraction: 'fraction', wq: {} });
-			}
-			if (m[0] === 'fifo') { add('4-tank-mixing', inp, 'mix-fifo-code3', { mixCode: 3, wq: {} }); }
-			if (m[0] === 'lifo') { add('4-tank-mixing', inp, 'mix-lifo-code4', { mixCode: 4, wq: {} }); }
-		}
-	}
-	// 4. The calculation type (which number is "Constituent", "Age", "Trace")
-	{
-		const inp = cyclingNet({ quality: 'Chlorine mg/L', source: true, title: 'Calculation type series: open the calculation options and read the Calculation Type' });
-		for (let k = 0; k <= 9; k++) { if (k !== 5) { add('3-calculation-type', inp, 'calctype-' + k, { wq: { calcType: k } }); } }
-	}
-	// 5. Water quality
-	{
-		const reactions = { bulk: -2, wall: -1 };
-		const chl = cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: 'MIXED', reactions: reactions, title: 'Chlorine test: set point 1.0 mg/L at J0, bulk -2 per day, wall -1 ft per day' });
-		expected.chlorine = await runEpanet(chl, ['J0', 'J1', 'T1'], ['PU1', '3'], [6, 12, 24]);
-		inpCopy('5-water-quality', 'chlorine', chl);
-		expected.chlorineNoDecay = await runEpanet(cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: 'MIXED', reactions: { bulk: 0, wall: 0 } }), ['J0', 'J1', 'T1'], ['PU1'], [12, 24]);
-		add('5-water-quality', chl, 'chlorine-day-signed', { wq: { bulkUnit: 'day', sign: 'epanet' } });
-		add('5-water-quality', chl, 'chlorine-second-signed', { wq: { bulkUnit: 'sec', sign: 'epanet' } });
-		add('5-water-quality', chl, 'chlorine-day-positive', { wq: { bulkUnit: 'day', sign: 'positive' } });
-		add('5-water-quality', chl, 'chlorine-second-positive', { wq: { bulkUnit: 'sec', sign: 'positive' } });
-		[0, 1, 3].forEach((c) => { add('5-water-quality', chl, 'source-type-code' + c, { wq: { bulkUnit: 'day', sign: 'epanet', sourceCode: c } }); });
 		const age = cyclingNet({ quality: 'Age', title: 'Age test' });
-		expected.age = await runEpanet(age, ['J0', 'J1', 'T1'], ['PU1'], [12, 24]);
-		inpCopy('5-water-quality', 'age', age);
-		add('5-water-quality', age, 'age', { wq: {} });
+		expected.age = await runEpanet(age, nodes, ['PU1'], [12, 24]);
+		inpCopy('3-age-and-trace', 'age', age);
+		add('3-age-and-trace', age, 'age', { wq: {} });
 		const trace = cyclingNet({ quality: 'Trace R', title: 'Trace test: percent of water from reservoir R' });
-		expected.trace = await runEpanet(trace, ['J0', 'J1', 'T1'], ['PU1'], [12, 24]);
-		inpCopy('5-water-quality', 'trace', trace);
-		add('5-water-quality', trace, 'trace', { wq: {} });
+		expected.trace = await runEpanet(trace, nodes, ['PU1'], [12, 24]);
+		inpCopy('3-age-and-trace', 'trace', trace);
+		add('3-age-and-trace', trace, 'trace', { wq: {} });
 	}
 	return { files: files, expected: expected, env: env };
 }
 
-// ---------------------------------------------------------------------------------------------
-// The README Tom reads: plain click steps, a few numbers per file, what each outcome tells us.
-// One paragraph per line (no hard wraps).
-// ---------------------------------------------------------------------------------------------
+// The README Tom reads: plain steps, a few numbers per file, what each outcome means. One paragraph per line.
 function readme(x) {
 	const L = [];
 	const p = (t) => { L.push(t, ''); };
 	const q = (e, h, n) => f3(e[h].node[n].quality);
-	L.push('# WaterGEMS feature tests: files to open, what to compare', '');
-	p('Written 2026-11-02 (Arizona time). Nobody has opened these in WaterGEMS yet; you are the test. Each file is a pair, a `.wtg` and a `.wtg.sqlite` with the same name, and the two must stay side by side. Copy a whole folder to a plain local disk folder (not OneDrive, not a network share) and open the `.wtg` with File > Open. Every file is a tiny project in US units (gpm, feet, inches, psi) with the Base scenario only, 24 hours at a 1 hour step. Next to each folder\'s files is the same network as an EPANET `.inp`, so you can also open that in WaterGEMS or EPANET to see what an import makes of it.');
-	p('Why these exist: you asked us to guess and let you test. Where we do not know a storage unit or a code, there is one file per plausible guess, named for the guess. You do not need to open all of them: open the first file of a section, compare, and only go on if it is wrong. Nothing here is on the page or in the visitor export; it stays here until you say which guess is right.');
-	p('To compute: press the Compute button on the Home tab, then set the time to the hour named in the table (the time box in the toolbar), and read the value from the element\'s properties or from a Flex Table. If a file will not open, send me the exact message and stop with that file.');
+	const tc = x.twoComp, ch = x.chlorine, nd = x.chlorineNoDecay, ag = x.age, tr = x.trace;
+	L.push('# WaterGEMS feature tests, round 2', '');
+	p('Written 2026-11-03 (Arizona time). Thank you for round 1. Because of your answers, the emitter, pump speed and the plain, first in first out and last in first out tank mixing are now written by the page. This round is only what is still open: two compartment tank mixing, chlorine, and age and trace. Eight files, in three folders.');
+	p('Each file is a pair, a `.wtg` and a `.wtg.sqlite` with the same name; keep the two side by side, and copy the whole folder to a plain local disk folder before opening. Every file is a tiny project in US units (gpm, feet, inches, psi), Base scenario only, 24 hours at a 1 hour step. The same network is beside each folder\'s files as an EPANET `.inp`.');
+	p('This time the Calculation Type is already set to the right run (Constituent for chlorine and two compartment, Age, Trace), so you should not need to change it. If you find it set to something else, tell me.');
+	p('To compute, press Compute on the Home tab, set the time to the hour named below, and read the value in the element\'s properties or a Flex Table.');
 
-	// 1 emitter
-	const e0 = x.emitter.hour0.node;
-	L.push('## 1-emitter (4 files, open `emitter-A` first)', '');
-	p('The network: a reservoir `R` feeds junction `J1`, which feeds `J2` (100 gpm) and `J3`. `J1` has an emitter coefficient of 0.01 (your value) and `J3` has 1.0, both in EPANET\'s unit for a US project, gpm per psi^0.5, with exponent 0.5. Neither draws anything else. The four files differ only in the number stored for the coefficient: A stores 0.01 and 1.0 as typed; B stores them as cubic feet per second per psi^0.5; C as cubic feet per second per foot^0.5; D as gpm per foot^0.5.');
-	p('Steps: open the file, double-click `J1`, and write down the Emitter Coefficient field (the number and the unit it shows). Do the same for `J3`. Compute and read the flow leaving each junction.');
-	p('EPANET gets, at every hour: `J3` ' + f2(e0.J3.demand) + ' gpm, `J1` ' + f2(e0.J1.demand) + ' gpm (read it to 0.1 gpm only, since the solver\'s tolerance is that coarse next to a flow of 109 gpm), `J2` 100 gpm, pressure ' + f1(e0.J3.pressure) + ' psi at both emitter junctions, flow in the reservoir pipe ' + f1(x.emitter.hour0.link['1'].flow) + ' gpm.');
-	p('What it tells us: the file whose `J3` flow is ' + f2(e0.J3.demand) + ' gpm has the right storage unit, and the other three show flows that are off by a large factor (one of them by only about a third, so read the number). If none matches, send the four `J3` flows and the field text each showed: the ratios give the unit. If the field shows 0.01 with a unit text, send the text.');
+	L.push('## Single most useful step', '');
+	p('If you only do one thing: in WaterGEMS, make a chlorine constituent with a bulk reaction rate of -2 per day and a wall reaction rate of -1 ft per day, apply it to the whole network, and save the project (File > Save As) under any name. Send me that pair of files. We can then read where WaterGEMS keeps the rates, and the signs and units, instead of guessing between the four files in the second folder.');
 
-	// 2 pump speed
-	const pf = x.pumpFixed, ps = x.pumpSpeed;
-	L.push('## 2-pump-speed (4 files, open `pump-speed-vsp2` first)', '');
-	p('The network is the small one used for the other tests: reservoir `R`, pump `PU1`, junctions `J0` and `J1` (300 gpm on a daily pattern), and tank `T1`. Pump `PU1` follows a relative speed pattern `SP`: 1.00 for hours 0 to 5, 0.90 for 6 to 11, 0.95 for 12 to 17, 1.00 for 18 to 23. The four files differ only in the code for the variable speed pump type: vsp0, vsp1, vsp2, vsp3, and every one is marked a variable speed pump with pattern `SP` as its pattern.');
-	p('Steps: double-click `PU1` and write down what its pump type (the field with your five choices) and its speed pattern show. Then compute and read the flow through `PU1` at hours 0, 6, 12 and 18.');
-	p('EPANET gets for `PU1`: hour 0 ' + f1(ps[0].link.PU1.flow) + ' gpm, hour 6 ' + f1(ps[6].link.PU1.flow) + ', hour 12 ' + f1(ps[12].link.PU1.flow) + ', hour 18 ' + f1(ps[18].link.PU1.flow) + '. The same pump at a constant speed 1.00 (no pattern) gets ' + f1(pf[0].link.PU1.flow) + ', ' + f1(pf[6].link.PU1.flow) + ', ' + f1(pf[12].link.PU1.flow) + ', ' + f1(pf[18].link.PU1.flow) + '.');
-	p('What it tells us: the name each file shows for its pump type tells us which number is which of your five choices, and the one that shows a pattern choice is the code we want (a relative speed factor pattern, as EPANET\'s PATTERN). If the flows follow the first list, that file\'s code works and the pattern multiplies the speed the way EPANET\'s does. If they follow the second list, WaterGEMS ignored the pattern. If the pattern field is empty when you open the pump, tell me which file and what it shows.');
+	L.push('## 1-two-compartment (2 files)', '');
+	p('The small network: reservoir `R`, pump `PU1`, junctions `J0` and `J1`, tank `T1`. A set point booster of 1.0 mg/L at `J0`, no reactions, and `T1` set to two compartment. Last time your file read 0.2 and 0.8 and WaterGEMS asked for 100 in total, so these use percents. `twocomp-c1-20-c2-80` has compartment 1 at 20 and compartment 2 at 80. `twocomp-c1-80-c2-20` has them the other way round.');
+	p('Steps: open `twocomp-c1-20-c2-80`, double-click `T1`, and write down the Mixing Model and the two compartment numbers. Compute and read the chlorine at `T1` at hours 12 and 24. Then do the same for the other file.');
+	p('EPANET gets, when the compartment that water enters and leaves by is 20 percent of the tank: hour 12 ' + q(tc.frac02, 12, 'T1') + ', hour 24 ' + q(tc.frac02, 24, 'T1') + ' mg/L. When it is 80 percent: hour 12 ' + q(tc.frac08, 12, 'T1') + ', hour 24 ' + q(tc.frac08, 24, 'T1') + '. A completely mixed tank gets ' + q(tc.mixed, 12, 'T1') + ' and ' + q(tc.mixed, 24, 'T1') + '. Last time you read 0.5 at hour 12.');
+	p('What it means: if the first file gives the first pair of numbers and the second gives the second pair, compartment 1 is the compartment water enters and leaves by, just as in EPANET, and the codes are right. If the first file gives the second pair, compartment 1 and 2 are the other way round and we swap them. If neither pair appears, the way WaterGEMS runs two compartment tanks differs from EPANET; send both results and the chlorine at `J1` at hour 12 (EPANET gets ' + q(tc.frac02, 12, 'J1') + ').');
 
-	// 3 calculation type
-	L.push('## 3-calculation-type (9 files, `calctype-0` to `calctype-9`, there is no 5)', '');
-	p('One tiny network (the same as the tank mixing one), nine times, differing only in the number stored for the Calculation Type of the scenario\'s calculation options. Steps, for each: open the file, go to Analysis > Calculation Options, open the Base calculation options, and write down the Calculation Type it shows. No need to compute. For number 5, write down what your Net3 export from before shows; that is the plain hydraulic run, number 5.');
-	p('What it tells us: a list of numbers and names, for example 0 = Age, 1 = Constituent. That is all we need to write the quality runs with the right type; it takes about a minute a file. If a file shows an error or a blank type, say which.');
+	L.push('## 2-chlorine (4 files, open `chlorine-day-signed` first)', '');
+	p('The same network: set point booster of 1.0 mg/L at `J0`, a bulk reaction of -2 per day and a wall reaction of -1 ft per day, tank `T1` completely mixed. The four files differ only in how the two rates are stored: per day with the minus signs (`chlorine-day-signed`), per second with minus signs, per day written positive, per second written positive.');
+	p('Steps: open `chlorine-day-signed`, double-click `J0` (it should read Setpoint Booster 1.0), open the water quality reaction settings and write down the bulk and wall rates with their units text. Compute and read the chlorine at `J1` and `T1` at hours 12 and 24.');
+	p('EPANET gets: hour 12 `J1` ' + q(ch, 12, 'J1') + ', `T1` ' + q(ch, 12, 'T1') + '; hour 24 `J1` ' + q(ch, 24, 'J1') + ', `T1` ' + q(ch, 24, 'T1') + ' mg/L. With no reactions it gets `J1` ' + q(nd, 24, 'J1') + ' and `T1` ' + q(nd, 24, 'T1') + ' at hour 24. Last time you read 1.0 at `J1` and 0.2 at `T1`, which looks like no reactions at all.');
+	p('What it means: the file whose numbers match EPANET has the right unit and sign. If `J1` is about 1.00 everywhere, the rates were not read in that file; try the next one. If none of the four match, please send the rates the reaction settings showed and their units text, and the Save As file from the step above.');
 
-	// 4 mixing
-	const mx = x.mixing;
-	L.push('## 4-tank-mixing (5 files, open `mix-2comp-code2-fraction` first)', '');
-	p('The same small network, now a water quality run for chlorine: a set point booster of 1.0 mg/L at `J0`, no reactions, and tank `T1` (30 ft across, between 2 and 25 ft) with a mixing model. `T1` fills and drains over the day. The files: mix-2comp-code2-fraction (two compartment, stored as code 2, first compartment 0.2 and second 0.8), mix-2comp-code2-percent (code 2, 20 and 80), mix-2comp-code0-fraction (code 0, 0.2 and 0.8), mix-fifo-code3 (first in first out, code 3), mix-lifo-code4 (last in first out, code 4). Plain mixed is code 1, which your files already use.');
-	p('Steps: double-click `T1` and write down the Mixing Model it shows (the name) and, for a two compartment file, the compartment numbers. To run it: Analysis > Calculation Options > Base calculation options, and if the Calculation Type is not the constituent (chlorine) run, choose it (section 3 finds out which number we wrote), then Compute. Read the chlorine concentration at `T1` at hour 12.');
-	p('EPANET gets for `T1` at hour 12: completely mixed ' + q(mx.mixed, 12, 'T1') + ' mg/L, two compartment (first compartment 0.2) ' + q(mx['2comp'], 12, 'T1') + ', FIFO ' + q(mx.fifo, 12, 'T1') + ', LIFO ' + q(mx.lifo, 12, 'T1') + '. At hour 24: ' + q(mx.mixed, 24, 'T1') + ', ' + q(mx['2comp'], 24, 'T1') + ', ' + q(mx.fifo, 24, 'T1') + ', ' + q(mx.lifo, 24, 'T1') + '. At `J1`, hour 12, every model gives about ' + q(mx.mixed, 12, 'J1') + '.');
-	p('What it tells us: the name in the Mixing Model field of each file gives us the code (for instance, if code 3 shows LIFO, then FIFO is 4). For the two compartment file whose compartment 1 reads as 20 percent (or as 0.2), that is the right way to state the fraction. The concentrations at hour 12 then show whether WaterGEMS applies the model the way EPANET does; the answers above separate the four models plainly.');
+	L.push('## 3-age-and-trace (2 files)', '');
+	p('The same network without a chemical. `age` is an age run: EPANET gets ' + f2(ag[24].node.J1.quality) + ' hours at `J1` and ' + f2(ag[24].node.T1.quality) + ' hours at `T1` at hour 24 (' + f2(ag[12].node.T1.quality) + ' at `T1` at hour 12). `trace` follows the water from reservoir `R`: EPANET gets ' + f1(tr[24].node.J1.quality) + ' percent at `J1` and ' + f1(tr[24].node.T1.quality) + ' percent at `T1` at hour 24 (' + f1(tr[12].node.T1.quality) + ' at hour 12).');
+	p('Steps: open each, check the Calculation Type reads Age or Trace, compute, and compare. For `trace`, also say whether the trace node reads `R`. What it means: matching numbers confirm the type and the trace node; a different type name tells us which code is wrong.');
 
-	// 5 water quality
-	const ch = x.chlorine, nd = x.chlorineNoDecay;
-	L.push('## 5-water-quality (chlorine files, then `age` and `trace`)', '');
-	p('Your question about Net3: Net3 exports and opens, but the export writes it as a hydraulic run. The only quality in our copy of Net3 is the analysis choice, a trace of the water from `Lake` (it has no chemical, no source and zero reaction rates), and that choice is not written: in your saved project every water quality table was empty or at its defaults, so we had no example of where WaterGEMS keeps the analysis type, the trace node, the sources, the reactions or the mixing. That is why the export\'s list says it does not yet write them. These files are our guess at where they go; `trace` below is Net3\'s own case in a small network.');
-	p('The chlorine network is the small one again: a set point booster of 1.0 mg/L at `J0`, a bulk reaction of -2 per day and a wall reaction of -1 ft per day (EPANET\'s units and signs), tank `T1` completely mixed. Four files differ in how the reaction rates are stored: chlorine-day-signed (per day, negative for decay, as EPANET states them), chlorine-second-signed (per second), chlorine-day-positive (per day, written positive), chlorine-second-positive. Three more, source-type-code0, source-type-code1 and source-type-code3, are the same as chlorine-day-signed but with the source type stored as another code.');
-	p('Steps: open `chlorine-day-signed` first. Double-click `J0` and write down the source type and strength it shows. Open the Base calculation options; if the Calculation Type is not the constituent (chlorine) run, choose it. Compute, and read the chlorine at `J1` and `T1` at hours 12 and 24. For the three source-type files, only open `J0` and write down the source type name it shows; no need to compute.');
-	p('EPANET gets: hour 12 `J1` ' + q(ch, 12, 'J1') + ', `T1` ' + q(ch, 12, 'T1') + '; hour 24 `J1` ' + q(ch, 24, 'J1') + ', `T1` ' + q(ch, 24, 'T1') + ' mg/L. With the reactions switched off it would be `J1` ' + q(nd, 24, 'J1') + ' and `T1` ' + q(nd, 24, 'T1') + ' at hour 24, so a file that shows those means the rates were read as zero (the unit is wrong the other way), and a file that shows 0 at `J1` read them as enormous. A value above 1.0 at `J1` means the sign is the other way. WaterGEMS may differ from EPANET in the third decimal because its water quality time step may not be EPANET\'s 5 minutes.');
-	p('What it tells us: which of the four reaction files matches fixes the unit and sign of the rates. The source type names fix the source type code. If `J1` is 1.00 or 0.00 in all four, send what each showed for the bulk and wall rate fields when you opened a pipe\'s water quality properties and the reaction settings, with their units text.');
-	const ag = x.age, tr = x.trace;
-	p('`age` and `trace` are the same small network without a chemical. `age` is an age run: EPANET gets ' + f2(ag[24].node.J1.quality) + ' hours at `J1` and ' + f2(ag[24].node.T1.quality) + ' hours at `T1` at hour 24 (' + f2(ag[12].node.T1.quality) + ' at `T1` at hour 12). `trace` traces the water from reservoir `R`: ' + f1(tr[24].node.J1.quality) + ' percent at `J1` and ' + f1(tr[24].node.T1.quality) + ' percent at `T1` at hour 24 (' + f1(tr[12].node.T1.quality) + ' at hour 12). Open each, check the Calculation Type (set it by hand to Age or Trace if it is not), compute, and compare. For `trace`, also say whether the trace node reads `R`.');
-	p('If any of this does not open: the message, and the file name, is all I need. If it opens but the numbers differ: send me the number you saw and the file name. Saving a file from WaterGEMS (File > Save As) with the setting made by hand, for example one tank on FIFO and one on LIFO, would settle every code in a single file each.');
+	p('If a file will not open: the exact message and the file name is all I need. If it opens but the numbers differ: send the number you saw and the file name.');
 	return L.join('\n');
 }
 
@@ -268,11 +224,11 @@ if (require.main === module) {
 	(async function () {
 		const args = {};
 		for (let i = 2; i < process.argv.length; i += 2) { args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1]; }
-		const outDir = args.out || path.join(os.homedir(), 'tom-files', '2026-11-02', 'wtg-feature-tests');
+		const outDir = args.out || path.join(os.homedir(), 'tom-files', '2026-11-03', 'wtg-feature-tests-2');
 		const r = await build(outDir);
 		fs.writeFileSync(path.join(outDir, 'expected.json'), JSON.stringify(r.expected, null, 1));
 		fs.writeFileSync(path.join(outDir, 'README.md'), module.exports.readme(r.expected) + '\n');
-		console.log(r.files.length + ' candidate files under ' + outDir);
+		console.log(r.files.length + ' files under ' + outDir);
 		r.files.forEach((f) => { console.log(' ', f.feature + '/' + f.name, 'integrity', f.report.integrity, 'fk', f.report.foreignKeyViolations); });
 	}()).catch((e) => { console.error(e); process.exit(1); });
 }

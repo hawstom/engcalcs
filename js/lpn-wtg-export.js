@@ -494,7 +494,6 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				IdahoDemandNode_Demand_Data: { DemandCollectionCount: demandRows(n).length, UnitDemandLoadCollectionCount: 0 },
 				IdahoFireFlowNode_Physical_Data: { Physical_EmitterCoefficient: 0 }
 			});
-			if (n.emitter && !(opts.candidate && opts.candidate.emitter)) { lost('emitter on ' + n.id + ' (storage unit of the emitter coefficient is not measured)'); }
 			cloneRows(proto.junction, id, { IdahoDemandNode_Demand_DemandCollection: 1 }, ov);
 			// One row per demand, in the order the junction states them (EPANET's [DEMANDS] lines).
 			demandRows(n).forEach((d) => {
@@ -640,7 +639,6 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[defKey(l)] },
 			BasePump_InitialSettings_Data: { InitialSettings_RelativeSpeedFactor: l.speed > 0 ? l.speed : 1 }
 		});
-		if (l.speedPattern && !(opts.candidate && opts.candidate.vsp !== undefined)) { lost('speed pattern ' + l.speedPattern + ' on pump ' + l.id + ' (the table exists, no sample states it)'); }
 		if (l.power) { lost('constant power on pump ' + l.id); }
 		const closed = (initialStatus[l.id] || (String(l.status || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open')) === 'closed';
 		pipeRows(aId, l.id + '-A', elId['n:' + l.from], pumpId, [P(a), mid], 1, 99, 130, 0, closed, false);
@@ -765,60 +763,73 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	report.counts.controls = nCtl; report.counts.levelControls = nLevel;
 	carried('controls: ' + nLevel + ' tank-level controls and ' + (nCtl - nLevel) + ' clock-time pipe-status controls, in one control set assigned to the Base operational alternative');
 
+	// ---- CONFIRMED BY TOM'S WATERGEMS, 2026-11-03: emitter coefficient, pump speed pattern, tank mixing (mixed, FIFO, LIFO) ----
+	writeConfirmed();
+	function writeConfirmed() {
+		const secs = parsed.inpSections || {};
+		// -- emitters. WaterGEMS stores the coefficient in cubic feet per second per psi^n (candidate B; its dialog
+		// shows gpm per psi^n). The parser keeps n.emitter in SI (m3/s per m^n of head), whatever units the project
+		// displays, so the value is first turned back to EPANET's US figure (gpm per psi^n: scale by the head in
+		// metres of one psi, raised to the exponent, and divide by the m3/s in one gpm), then by GPM_TO_CFS. A
+		// US project and an SI project that state the same physical emitter therefore store the same number.
+		const expo = (parsed.hydraulics && parsed.hydraulics.emitterExponent) || 0.5;
+		const M_PER_PSI_HEAD = 0.3048 / EngCalcs.EPANET_PSI_PER_FT;
+		const kGpm = (n) => n.emitter * Math.pow(M_PER_PSI_HEAD, expo) / 6.30901964e-5;
+		nodes.filter((n) => n.type === 'junction' && n.emitter).forEach((n) => {
+			const v = kGpm(n) * GPM_TO_CFS;
+			db.run('UPDATE IdahoFireFlowNode_Physical_Data SET Physical_EmitterCoefficient = ? WHERE DomainElementID = ?', [v, elId['n:' + n.id]]);
+			carried('emitter on ' + n.id + ': ' + kGpm(n).toFixed(6) + ' gpm per psi^' + expo + ', stored as ' + v + ' ft3/s per psi^' + expo);
+		});
+		// -- a pump speed pattern: VSPType 0 is pattern based
+		links.filter((l) => l.type === 'pump' && l.speedPattern).forEach((l) => {
+			if (patId[l.speedPattern] === undefined) { throw fail('data', 'Pump ' + l.id + ' names speed pattern ' + l.speedPattern + ', which the project does not define.', [l.id], 'data'); }
+			const id = pumpNodeId[l.id];
+			db.run('UPDATE StandardPump_Physical_Data SET Physical_IsVariableSpeedPump = 1, VSPType = 0 WHERE DomainElementID = ?', [id]);
+			const have = rowsOf(db, 'SELECT COUNT(*) AS c FROM StandardPump_Physical_VSPType_PatternBasedType WHERE DomainElementID = ?', [id])[0].c;
+			if (have) { db.run('UPDATE StandardPump_Physical_VSPType_PatternBasedType SET PatternBasedType_Pattern = ? WHERE DomainElementID = ?', [patId[l.speedPattern], id]); }
+			else {
+				const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM StandardPump_Physical_Data WHERE DomainElementID = ?', [id])[0].a;
+				insert(db, 'StandardPump_Physical_VSPType_PatternBasedType', { DomainElementID: id, AlternativeID: alt, PatternBasedType_Pattern: patId[l.speedPattern] });
+			}
+			carried('pump ' + l.id + ' speed pattern ' + l.speedPattern);
+		});
+		// -- tank mixing: TankMixingModel 1 mixed, 2 FIFO, 3 LIFO (0 two compartment is still a candidate)
+		const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
+		Object.keys(mixMap).forEach((tid) => {
+			const m = mixMap[tid];
+			if (!nodeById[tid] || nodeById[tid].type !== 'tank') { return; }
+			if (m.model === '2COMP') { lost('two-compartment mixing on tank ' + tid + ' (code and compartment units not confirmed)'); return; }
+			const code = { MIXED: 1, FIFO: 2, LIFO: 3 }[m.model];
+			if (code === undefined || m.model === 'MIXED') { return; }
+			db.run('UPDATE ConventionalTank_Constituent_Data SET TankMixingModel = ? WHERE DomainElementID = ?', [code, elId['n:' + tid]]);
+			carried('tank ' + tid + ' mixing ' + m.model + ' (TankMixingModel ' + code + ')');
+		});
+	}
+
 	// ---- CANDIDATE FEATURES (Task 749, 2026-11-02): written ONLY when the caller passes `opts.candidate`. ----
 	// Each states a guess at a column or a code that no saved project has ever shown (dev/wtg-export.md, "Candidates under test").
-	// The page never passes it, so the shipped export and its list of what is not written are unchanged until Tom's
+	// The page never passes it, so the shipped export and its list of what is not written do not change until
 	// WaterGEMS has confirmed a candidate.
 	if (opts.candidate) { writeCandidates(opts.candidate); }
 	function writeCandidates(cand) {
 		const secs = parsed.inpSections || {};
 		const isNum = (v) => typeof v === 'number' && isFinite(v);
-		// -- emitters. [EMITTERS] gives k in flow per psi^n (US); the parser keeps it in SI, so it is turned back here.
-		if (cand.emitter) {
-			const expo = (parsed.hydraulics && parsed.hydraulics.emitterExponent) || 0.5;
-			const PSI_PER_FT = EngCalcs.EPANET_PSI_PER_FT, M_PER_PSI_HEAD = 0.3048 / PSI_PER_FT;       // metres of head in one psi
-			const kOf = (n) => n.emitter * Math.pow(M_PER_PSI_HEAD, expo) / 6.30901964e-5;
-			const perFt = Math.pow(PSI_PER_FT, expo);                               // gpm per psi^n -> gpm per ft^n
-			nodes.filter((n) => n.type === 'junction' && n.emitter).forEach((n) => {
-				const k = kOf(n);
-				const v = { A: k, B: k * GPM_TO_CFS, C: k * perFt * GPM_TO_CFS, D: k * perFt }[cand.emitter];
-				db.run('UPDATE IdahoFireFlowNode_Physical_Data SET Physical_EmitterCoefficient = ? WHERE DomainElementID = ?', [v, elId['n:' + n.id]]);
-				carried('emitter on ' + n.id + ': k = ' + k.toFixed(6) + ' stored as ' + v + ' (candidate ' + cand.emitter + ')');
-				report.candidateWritten = (report.candidateWritten || 0) + 1;
-			});
-		}
-		// -- a pump speed pattern
-		if (cand.vsp !== undefined) {
-			links.filter((l) => l.type === 'pump' && l.speedPattern).forEach((l) => {
-				if (patId[l.speedPattern] === undefined) { throw fail('data', 'Pump ' + l.id + ' names speed pattern ' + l.speedPattern + ', which the project does not define.', [l.id], 'data'); }
-				const id = pumpNodeId[l.id];
-				db.run('UPDATE StandardPump_Physical_Data SET Physical_IsVariableSpeedPump = 1, VSPType = ? WHERE DomainElementID = ?', [cand.vsp, id]);
-				const have = rowsOf(db, 'SELECT COUNT(*) AS c FROM StandardPump_Physical_VSPType_PatternBasedType WHERE DomainElementID = ?', [id])[0].c;
-				if (have) { db.run('UPDATE StandardPump_Physical_VSPType_PatternBasedType SET PatternBasedType_Pattern = ? WHERE DomainElementID = ?', [patId[l.speedPattern], id]); }
-				else {
-					const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM StandardPump_Physical_Data WHERE DomainElementID = ?', [id])[0].a;
-					insert(db, 'StandardPump_Physical_VSPType_PatternBasedType', { DomainElementID: id, AlternativeID: alt, PatternBasedType_Pattern: patId[l.speedPattern] });
-				}
-				carried('pump ' + l.id + ' speed pattern ' + l.speedPattern + ' (candidate VSPType ' + cand.vsp + ')');
-				report.candidateWritten = (report.candidateWritten || 0) + 1;
-			});
-		}
-		// -- tank mixing. cand.mixCode: code for every model but MIXED; cand.mixFraction: 'fraction' | 'percent'
+		// -- two-compartment mixing. cand.mixCode (confirmed 0), cand.mixFraction: 'fraction' | 'percent' (percent confirmed);
+		// cand.swap puts the stated first compartment in compartment 2.
 		if (cand.mixCode !== undefined) {
 			const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
 			Object.keys(mixMap).forEach((tid) => {
 				const m = mixMap[tid];
-				if (!nodeById[tid] || nodeById[tid].type !== 'tank' || m.model === 'MIXED') { return; }
+				if (!nodeById[tid] || nodeById[tid].type !== 'tank' || m.model !== '2COMP') { return; }
 				const id = elId['n:' + tid];
 				const code = cand.mixCode;
 				db.run('UPDATE ConventionalTank_Constituent_Data SET TankMixingModel = ? WHERE DomainElementID = ?', [code, id]);
-				if (m.model === '2COMP') {
-					const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [id])[0].a;
-					const f = isNum(m.fraction) ? m.fraction : 0.5;
-					const scale = cand.mixFraction === 'percent' ? 100 : 1;
-					db.run('DELETE FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType WHERE DomainElementID = ?', [id]);
-					insert(db, 'ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType', { DomainElementID: id, AlternativeID: alt, TwoCompartmentType_Compartment1: f * scale, TwoCompartmentType_Compartment2: (1 - f) * scale });
-				}
+				const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [id])[0].a;
+				const f = isNum(m.fraction) ? m.fraction : 0.5;
+				const scale = cand.mixFraction === 'fraction' ? 1 : 100;
+				const c1 = cand.swap ? 1 - f : f;
+				db.run('DELETE FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType WHERE DomainElementID = ?', [id]);
+				insert(db, 'ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType', { DomainElementID: id, AlternativeID: alt, TwoCompartmentType_Compartment1: c1 * scale, TwoCompartmentType_Compartment2: (1 - c1) * scale });
 				carried('tank ' + tid + ' mixing ' + m.model + (m.fraction !== undefined ? ' ' + m.fraction : '') + ' (candidate TankMixingModel ' + code + ')');
 				report.candidateWritten = (report.candidateWritten || 0) + 1;
 			});
@@ -829,7 +840,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			const qo = parsed.qualityOptions || {};
 			const q = EngCalcs.lpnQualityParse(qo.quality || '');
 			const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
-			const calcTypes = Object.assign({ chemical: 1, age: 0, trace: 7 }, w.calcTypes || {});
+			const calcTypes = Object.assign({ chemical: 3, age: 2, trace: 4 }, w.calcTypes || {});
 			const calcType = w.calcType !== undefined ? w.calcType : calcTypes[q.mode];
 			if (q.mode !== 'none' && calcType !== undefined) {
 				db.run('UPDATE EpaNetEngine SET CalculationType = ?', [calcType]);
@@ -869,7 +880,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 					db.run('UPDATE BaseIdahoNode_Constituent_Data SET Constituent_InitialConcentration = ? WHERE DomainElementID = ?', [init[nid], elId['n:' + nid]]);
 				});
 				const srcs = EngCalcs.lpnSourcesParse(secs.SOURCES || []);
-				const codeOf = (t) => (w.sourceCode !== undefined ? w.sourceCode : { CONCEN: 0, MASS: 1, SETPOINT: 2, FLOWPACED: 3 }[t]);
+				const codeOf = (t) => (w.sourceCode !== undefined ? w.sourceCode : { CONCEN: 0, FLOWPACED: 1, SETPOINT: 2, MASS: 3 }[t]);
 				Object.keys(srcs).forEach((nid) => {
 					const n = nodeById[nid], s = srcs[nid];
 					if (!n) { return; }
@@ -930,7 +941,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.close();
 	report.skippedColumns = Object.keys(skippedColumns);
 	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
-	report.notCarried.push('quality analysis (Trace Lake), reactions, mixing, sources, energy price and pattern, the [REPORT] settings');
+	report.notCarried.push('quality analysis (Trace Lake), reactions, two-compartment mixing, sources, energy price and pattern, the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	return { bytes: bytes, report: report };
 }
@@ -1048,12 +1059,10 @@ function plan(doc, opts) {
 	});
 	if (badPumps.length) { refused.push({ code: 'pump_curve', ids: badPumps }); }
 
-	const emit = idsOf(nodes, (n) => n.type === 'junction' && n.emitter);
-	if (emit.length) { notCarried.push({ code: 'emitters', ids: emit }); }
 	// A water quality analysis asked for ([OPTIONS] Quality other than None), or a source, a mixing model or a reaction stated.
 	const q = parsed.qualityOptions || {};
 	const quality = (String(q.quality || '').trim() !== '' && !/^none\b/i.test(String(q.quality).trim()))
-		|| (secs.SOURCES || []).length > 0 || (secs.MIXING || []).length > 0 || (secs.REACTIONS || []).length > 0;
+		|| (secs.SOURCES || []).length > 0 || (secs.REACTIONS || []).length > 0;
 	if (quality) { notCarried.push({ code: 'quality', ids: [] }); }
 	// An energy line that states a price, a price pattern or a demand charge other than zero. Efficiency lines are carried.
 	const price = (secs.ENERGY || []).filter((ln) => {
@@ -1075,10 +1084,10 @@ function plan(doc, opts) {
 		if (!tankLevel && !clock && frozen.indexOf(c.link) < 0) { frozen.push(c.link); }
 	});
 	if (frozen.length) { notCarried.push({ code: 'controls_pressure', ids: frozen }); }
-	const mix = idsOf(nodes, (n) => n.type === 'tank' && n.mixingModel && String(n.mixingModel).toUpperCase() !== 'MIXED');
+	// Mixed, FIFO and LIFO are written; two-compartment is still a candidate and is named here.
+	const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
+	const mix = Object.keys(mixMap).filter((tid) => mixMap[tid].model === '2COMP' && nodes.some((n) => n.id === tid && n.type === 'tank'));
 	if (mix.length) { notCarried.push({ code: 'tank_mixing', ids: mix }); }
-	const sp = idsOf(links, (l) => l.type === 'pump' && l.speedPattern);
-	if (sp.length) { notCarried.push({ code: 'pump_speed_pattern', ids: sp }); }
 	// Settings and drawing data with no place in the file. The multiplier and the demand model change the
 	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.
 	const hy = parsed.hydraulics || {};

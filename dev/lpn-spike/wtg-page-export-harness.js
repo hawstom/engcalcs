@@ -242,13 +242,17 @@ function head(t) { console.log('\n' + t); }
 	ok('...in the sentence the language file gives, naming the pump', L.wtgRefusal(p4.refused[0]) === fillP('lpn_wtg_export_no_pump_curve', { ids: '10' }), L.wtgRefusal(p4.refused[0]));
 	const w4 = await write();
 	ok('...and the write is refused with the same reason, no file made', !w4.out && w4.err === fillP('lpn_wtg_export_failed', { detail: L.wtgRefusal(p4.refused[0]) }), w4.err);
-	// Emitters and a second demand are carried nowhere, so the plan names them. Net3 again, with an emitter on junction 15.
+	// Emitters are written (ft3/s per psi^n), so the plan no longer names them; a two-compartment tank is still named.
 	const EMIT = NET3.replace(/\[EMITTERS\][^\[]*/, '').replace(/\[PATTERNS\]/, '[EMITTERS]\n 15  2.5\n\n[PATTERNS]');
 	L.importInp({ name: 'Net3-emitter.inp', _text: EMIT });
 	const pe = L.wtgPlan();
-	const em = pe.ok && pe.notCarried.filter((x) => x.code === 'emitters')[0];
-	ok('an emitter on junction 15 is named in what the file cannot carry', !!em && JSON.stringify(em.ids) === '["15"]', pe.ok && JSON.stringify(pe.notCarried.map((x) => x.code)));
-	ok('...with a sentence naming the junction', !!em && L.wtgLines([em])[0] === fillP('lpn_wtg_export_lost_emitters', { ids: '15' }), em && L.wtgLines([em])[0]);
+	ok('an emitter on junction 15 is written, so the plan does not name it', pe.ok && !pe.notCarried.some((x) => x.code === 'emitters'), pe.ok && JSON.stringify(pe.notCarried.map((x) => x.code)));
+	const MIX2 = NET3.replace('[END]', '[MIXING]\n 1  2COMP  0.2\n 2  FIFO\n\n[END]');
+	L.importInp({ name: 'Net3-2comp.inp', _text: MIX2 });
+	const pm2 = L.wtgPlan();
+	const tm = pm2.ok && pm2.notCarried.filter((x) => x.code === 'tank_mixing')[0];
+	ok('a two-compartment tank (1) is named as not written, and a FIFO tank (2) is not', !!tm && JSON.stringify(tm.ids) === '["1"]', pm2.ok && JSON.stringify(pm2.notCarried));
+	ok('...with a sentence naming the tank', !!tm && L.wtgLines([tm])[0] === fillP('lpn_wtg_export_lost_tank_mixing', { ids: '1' }), tm && L.wtgLines([tm])[0]);
 
 	// ---- 6b. what changes the numbers or has no place in the file is named, with its value ----
 	head('6b. Settings and drawing data the files cannot hold');

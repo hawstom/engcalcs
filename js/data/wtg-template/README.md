@@ -22,4 +22,4 @@ The source project is kept outside the repository (`~/webdev/fixtures/wtg-tgh-1/
 
 Bump `TEMPLATE_VERSION` in `js/lpn-wtg-export.js` when the files change, and regenerate the golden
 (`WTG_WRITE_GOLDEN=1 node dev/lpn-spike/wtg-page-export-harness.js`). Record: `dev/wtg-export.md`.
-Shipping a WaterGEMS-saved layout is covered by Tom's letter to Bentley, before any public release.
+The template is a WaterGEMS-saved layout shipped as is; no letter to Bentley precedes release (Tom, 2026-11-03).
