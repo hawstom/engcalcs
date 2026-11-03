@@ -65089,7 +65089,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		setboxTag(row(solverBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
+		setboxTag(row(solverBody, pc.lpn_settings_engine_native || 'Use the built-in solver', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET

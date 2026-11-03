@@ -2,7 +2,7 @@
 //   node dev/lpn-spike/native-solver-toggle-browser-harness.js
 // (it takes /tmp/engcalcs-browser.lock itself; never wrap it in that lock).
 //
-// Tom's sequence on Net3: tick "Use the built-in solver when possible", scale the demands by 1.5, run the day, untick.
+// Tom's sequence on Net3: tick "Use the built-in solver", scale the demands by 1.5, run the day, untick.
 //  1. With Recalculate automatically ON, ticking and unticking re-run the period: the frames and the status-bar sentence
 //     follow the solver (before the fix the untick left the built-in results and the sentence on screen).
 //  2. The Solver (run) report's banner names the built-in solver when it wrote the report (never EPANET's spaced letters),
