@@ -295,9 +295,29 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			ok('source pattern: J0 is a set point source (code 2, 1.0) naming pattern SP', s0.Constituent_IsConstituentSource === 1 && s0.ConstituentSourceType === 2 && s0.BaselineConcentration === 1 && s0.Constituent_ConstituentSourcePattern === supOf(db, 'SP'), JSON.stringify(s0));
 			db.close();
 		}
+		// 4. pressure-driven demand: power 0.5, threshold 40 psi
+		{
+			const w = plainWrite(sv.CASES['pdd-on'](base));
+			const db = wrap(w.bytes);
+			const sys = rows(db, 'SELECT * FROM PressureDependentDemand_SystemData')[0];
+			const fn = rows(db, 'SELECT * FROM PressureDependentDemandFunction')[0];
+			ok('pressure-driven demand: a type 60 function, threshold 40, has threshold 1, power type 0, exponent 0.5 (as Tom\'s save)', fn && fn.SupportElementID === sys.PressureDependentDemand_GlobalPDDFunction && fn.PressureDependentDemandFunction_PressureThreshold === 40
+				&& fn.PressureDependentDemandFunction_HasThresholdPressure === 1 && fn.PddFunctionType === 0
+				&& rows(db, 'SELECT PowerFunctionType_PowerFunctionExponent AS e FROM PressureDependentDemandFunction_PddFunctionType_PowerFunctionType')[0].e === 0.5
+				&& rows(db, 'SELECT SupportElementTypeID AS t FROM HMISupportElement WHERE SupportElementID = ?', [fn.SupportElementID])[0].t === 60, JSON.stringify(fn));
+			ok('pressure-driven demand: global reference pressure 0, percent 100, equals threshold 1, and the calculation option is on', sys.GlobalReferencePressure === 0 && sys.GlobalPddPercent === 100 && sys.GlobalRefPressureEqualsPressureThreshold === 1
+				&& rows(db, 'SELECT EpaNetEngine_UsePressureDependentDemand AS u FROM EpaNetEngine')[0].u === 1);
+			db.close();
+			const wm = plainWrite(sv.CASES['pdd-on'](base).replace('Minimum Pressure   \t0', 'Minimum Pressure   \t5'));
+			const dbm = wrap(wm.bytes);
+			ok('a minimum pressure above 0 has no place in WaterGEMS\'s function: nothing is written', !wm.report.pddWritten && rows(dbm, 'SELECT COUNT(*) AS c FROM PressureDependentDemandFunction')[0].c === 0
+				&& rows(dbm, 'SELECT EpaNetEngine_UsePressureDependentDemand AS u FROM EpaNetEngine')[0].u === 0);
+			dbm.close();
+		}
 		// The EPANET side, converged (6 minute quality step), against what Tom read
 		const f = await sv.figures();
 		const q = (k, h, n) => f[k].step6min[h].node[n].quality;
+		ok('pressure-driven demand: EPANET (minimum 0, required 40 psi, exponent 0.5) delivers ' + f['pdd-on'].step6min[12].node.J1.demand.toFixed(1) + ' gpm at ' + f['pdd-on'].step6min[12].node.J1.pressure.toFixed(1) + ' psi against Tom\'s 290 at 37', near(f['pdd-on'].step6min[12].node.J1.demand, 290, 3) && near(f['pdd-on'].step6min[12].node.J1.pressure, 37, 1));
 		ok('rates on one pipe: EPANET J1 hour 12 ' + q('rates-one-pipe', 12, 'J1').toFixed(3) + ' against Tom\'s 0.845 (the engines differ by about 2 percent; without the rates both read 0.96)', near(q('rates-one-pipe', 12, 'J1'), 0.845, 0.03) && q('base', 12, 'J1') > 0.95);
 		ok('rate on the tank: EPANET T1 hour 24 ' + q('rate-tank', 24, 'T1').toFixed(3) + ' against Tom\'s 0.076', near(q('rate-tank', 24, 'T1'), 0.076, 0.02));
 		ok('source pattern: EPANET J1 hours 6 and 14 ' + q('source-pattern', 6, 'J1').toFixed(3) + ', ' + q('source-pattern', 14, 'J1').toFixed(3) + ' against Tom\'s 0.955 and 0.479', near(q('source-pattern', 6, 'J1'), 0.955, 0.01) && near(q('source-pattern', 14, 'J1'), 0.479, 0.01));

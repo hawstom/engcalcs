@@ -950,6 +950,20 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// psi setting becomes a head by the specific gravity, so a file that states 0.998 needs it carried.
 	const hy = parsed.hydraulics || {};
 	const sg = hy.specificGravity > 0 ? hy.specificGravity : 1.0, visc = hy.viscosity > 0 ? hy.viscosity : 1.0;
+	// ---- PRESSURE-DRIVEN DEMAND: Tom's save pdd-on (2026-11-03). A Pressure Dependent Demand Function (support type 60) of
+	// type power, the threshold pressure in psi and the power as typed, named by the alternative's global function; the
+	// calculation option turns it on. EPANET: Minimum Pressure 0, Required Pressure = threshold, Pressure Exponent = power. ----
+	if (pddCarriable(hy)) {
+		const fId = newId();
+		supportElement(fId, 60, 'Pressure Dependent Demand Function - 1', '');
+		insert(db, 'PressureDependentDemandFunction', { SupportElementID: fId, PressureDependentDemandFunction_PressureThreshold: hy.reqPressure, PressureDependentDemandFunction_HasThresholdPressure: 1, PddFunctionType: 0 });
+		insert(db, 'PressureDependentDemandFunction_PddFunctionType_PowerFunctionType', { SupportElementID: fId, PowerFunctionType_PowerFunctionExponent: typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5 });
+		insert(db, 'PressureDependentDemandFunction_PddFunctionType_PieceLinearType', { SupportElementID: fId, PressureFlowCurveCount: 0 });
+		db.run('UPDATE PressureDependentDemand_SystemData SET PressureDependentDemand_GlobalPDDFunction = ?', [fId]);
+		db.run('UPDATE EpaNetEngine SET EpaNetEngine_UsePressureDependentDemand = 1');
+		carried('pressure-driven demand: power ' + (typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5) + ', threshold ' + hy.reqPressure + ' psi');
+		report.pddWritten = true;
+	}
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
 	// The water quality time step, in seconds like the hydraulic one (False, the template's, means a tenth of the hydraulic step).
 	const qStepWanted = opts.qualityStepSeconds > 0 ? opts.qualityStepSeconds : ((opts.candidate && opts.candidate.wq && opts.candidate.wq.qualityStepSeconds) || 0);
@@ -1105,6 +1119,17 @@ function chemicalCarriable(parsed) {
 	return !Object.keys(srcs).some((k) => srcs[k].pattern && !havePattern[srcs[k].pattern]);
 }
 
+// Is this project's pressure-driven demand one WaterGEMS holds? Tom's save pdd-on (2026-11-03) stored a power function:
+// demand is the full demand times (pressure / threshold) ^ power below the threshold pressure, from zero pressure. That is
+// EPANET's pressure-driven model with a minimum pressure of 0, a required pressure equal to the threshold, and the same
+// exponent. A minimum above 0 has no place in it.
+function pddCarriable(hy) {
+	if (!hy || String(hy.demandModel || '').toUpperCase() !== 'PDA') { return false; }
+	const min = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
+	const exp = typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5;
+	return min === 0 && typeof hy.reqPressure === 'number' && hy.reqPressure > 0 && exp > 0;
+}
+
 // Is this a two-compartment tank WaterGEMS can hold? Its compartments are percents that add to 100, so the EPANET
 // fraction must lie strictly between 0 and 1.
 // A pump curve WaterGEMS can hold: three points from zero flow (shutoff, design, maximum) or one design point.
@@ -1186,7 +1211,7 @@ function plan(doc, opts) {
 	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.
 	const hy = parsed.hydraulics || {};
 	if (hy.demandMultiplier !== undefined && Number(hy.demandMultiplier) !== 1) { notCarried.push({ code: 'demand_multiplier', ids: [], value: String(hy.demandMultiplier) }); }
-	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA') { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
+	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA' && !pddCarriable(hy)) { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
 	if ((parsed.labels || []).length) { notCarried.push({ code: 'texts', ids: [] }); }
 	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
 	// Always: this has no place in the file, whatever the network. (A pipe's material is not named: an EPANET project
