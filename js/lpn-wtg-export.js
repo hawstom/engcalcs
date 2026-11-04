@@ -403,20 +403,25 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	function defKey(pm) { return pm.curveId + '|' + (effCurveOf(pm) ? effCurveOf(pm).id : ''); }
 	links.filter((l) => l.type === 'pump').forEach((pm) => {
 		const c = curveById[pm.curveId];
-		if (!c || c.points.length !== 3 || c.points[0][0] !== 0) {
-			throw fail('pump-curve', 'Pump ' + pm.id + ' has no three-point head curve (shutoff, design, maximum). Power pumps and multiple-point curves are not written.', [pm.id], 'pump_curve', { ids: pm.id });
+		if (!pumpCurveCarriable(c)) {
+			throw fail('pump-curve', 'Pump ' + pm.id + ' has no three-point or one-point head curve. Power pumps and other multiple-point curves are not written.', [pm.id], 'pump_curve', { ids: pm.id });
 		}
 		const dk = defKey(pm);
 		if (pumpDefId[dk]) { return; }
 		const id = newId(); pumpDefId[dk] = id;
 		const ec = effCurveOf(pm);
-		const pts = c.points;
+		// A one-point curve (design point) is WaterGEMS's "design point" definition, PumpDefinitionType 1 (Tom's save tompump1pt,
+		// 2026-11-03, our three-point pump changed to one point at 300 gpm and 120 ft): the type and the best-efficiency maximum
+		// flow (twice the design flow) change; the design point, shutoff 1.25 x head and maximum 2 x flow at 0.5 x head keep
+		// the values WaterGEMS holds for that design point.
+		const one = c.points.length === 1;
+		const pts = one ? [[0, c.points[0][1] * 1.25], c.points[0], [c.points[0][0] * 2, c.points[0][1] * 0.5]] : c.points;
 		supportElement(id, 51, 'Pump Curve ' + c.id, 'EPANET curve ' + c.id + (c.note ? ': ' + c.note : ''));
 		const eff = ec && ec.points.length === 1 ? ec.points[0][1] : (opts.efficiency || 75);
 		const multi = !!(ec && ec.points.length > 1);
 		cloneRows(proto.pumpDef, id, { IdahoPumpDefinition_PumpEfficiencyType_BestEfficiencyPointType: 1, IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType: 1 }, {
 			IdahoPumpDefinition: {
-				PumpDefinitionType: 2,                       // standard three point (observed: Tom's PD1 and its design/shutoff/max fields)
+				PumpDefinitionType: one ? 1 : 2,             // 1 design point (tompump1pt); 2 standard three point (Tom's PD1)
 				ShutoffHead: pts[0][1],
 				DesignDischarge: pts[1][0] * GPM_TO_CFS, DesignHead: pts[1][1],
 				MaxOperatingDischarge: pts[2][0] * GPM_TO_CFS, MaxOperatingHead: pts[2][1],
@@ -424,6 +429,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				PumpEfficiencyType: multi ? 2 : 0            // 0 constant (EPS sample's ConstantEfficiencyType); 2 efficiency points (the reader's)
 			}
 		});
+		if (one) { db.run('UPDATE IdahoPumpDefinition SET IdahoPumpDefinition_UserDefinedBestEfficiencyMaxFlow = ? WHERE SupportElementID = ?', [pts[2][0] * GPM_TO_CFS, id]); }
 		insert(db, 'IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType', { SupportElementID: id, ConstantEfficiencyType_PumpEfficiency: eff });
 		if (multi) {
 			// The rows are the curve's own points, flow gpm to ft3/s, efficiency as stated.
@@ -433,7 +439,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			});
 		}
 	});
-	carried('pump curves: ' + Object.keys(pumpDefId).length + ' three-point pump definitions, constant efficiency ' + (opts.efficiency || 75) + ' %');
+	carried('pump curves: ' + Object.keys(pumpDefId).length + ' pump definitions (three-point or one-point), constant efficiency ' + (opts.efficiency || 75) + ' %');
 
 	// ---- GPV headloss curves (support type 63): flow gpm -> ft3/s, headloss ft ----
 	const gpvCurveId = {};
@@ -1097,6 +1103,13 @@ function chemicalCarriable(parsed) {
 
 // Is this a two-compartment tank WaterGEMS can hold? Its compartments are percents that add to 100, so the EPANET
 // fraction must lie strictly between 0 and 1.
+// A pump curve WaterGEMS can hold: three points from zero flow (shutoff, design, maximum) or one design point.
+function pumpCurveCarriable(c) {
+	if (!c || !c.points) { return false; }
+	if (c.points.length === 1) { return c.points[0][0] > 0 && c.points[0][1] > 0; }
+	return c.points.length === 3 && c.points[0][0] === 0;
+}
+
 function twoCompCarriable(m) {
 	return !!m && typeof m.fraction === 'number' && m.fraction > 0 && m.fraction < 1;
 }
@@ -1126,7 +1139,7 @@ function plan(doc, opts) {
 	const badPumps = idsOf(links, (l) => {
 		if (l.type !== 'pump') { return false; }
 		const c = curveById[l.curveId];
-		return !c || !c.points || c.points.length !== 3 || c.points[0][0] !== 0;
+		return !pumpCurveCarriable(c);
 	});
 	if (badPumps.length) { refused.push({ code: 'pump_curve', ids: badPumps }); }
 

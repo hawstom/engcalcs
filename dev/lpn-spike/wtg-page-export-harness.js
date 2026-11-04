@@ -358,6 +358,38 @@ function head(t) { console.log('\n' + t); }
 		}
 	}
 
+	// ---- 8b. a one-point pump curve (Net1's pump 9) is written as WaterGEMS's design point definition ----
+	head('8b. Net1: a one-point pump curve exports as a design point (tompump1pt, Tom 2026-11-03)');
+	{
+		L.importInp({ name: 'Net1.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8') });
+		const n1 = L.wtgPlan();
+		ok('Net1 is planned with no pump curve refusal', n1.ok && !n1.refused.some((r) => r.code === 'pump_curve'), n1.ok && JSON.stringify(n1.refused));
+		const n1w = await write();
+		ok('Net1 is written', !!n1w.out, n1w.err);
+		if (n1w.out) {
+			const zp = path.join(tmp, 'net1.zip'), zd = path.join(tmp, 'net1');
+			fs.mkdirSync(zd);
+			fs.writeFileSync(zp, Buffer.from(await n1w.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", zp, zd);
+			const n1b = fs.readFileSync(path.join(zd, n1w.out.sqliteName));
+			const nd = new SQL.Database(new Uint8Array(n1b));
+			const pd1 = nd.exec('SELECT PumpDefinitionType, DesignDischarge, DesignHead, ShutoffHead, MaxOperatingDischarge, MaxOperatingHead, IdahoPumpDefinition_UserDefinedBestEfficiencyMaxFlow FROM IdahoPumpDefinition')[0].values[0];
+			const cf = 0.22280092967190634 / 100;
+			ok('the definition is type 1 (design point) at 1500 gpm and 250 ft, as tompump1pt stores it', pd1[0] === 1 && Math.abs(pd1[1] - 1500 * cf) < 1e-9 && pd1[2] === 250, JSON.stringify(pd1));
+			ok('...with shutoff 1.25 x head, maximum at twice the flow and half the head, and the best-efficiency maximum flow twice the design flow', Math.abs(pd1[3] - 312.5) < 1e-9 && Math.abs(pd1[4] - 3000 * cf) < 1e-9 && pd1[5] === 125 && Math.abs(pd1[6] - 3000 * cf) < 1e-9, JSON.stringify(pd1));
+			nd.close();
+			const n1db = await EngCalcs.lpnSqliteOpen(new Uint8Array(n1b));
+			const n1r = EngCalcs.lpnWtgRead(n1db, { display: EngCalcs.lpnWtgDisplayUnits(fs.readFileSync(path.join(zd, n1w.out.wtgName), 'utf8')), flowUnits: 'GPM' });
+			ok('Net1 reads back', n1r.ok, n1r.message);
+			if (n1r.ok) {
+				const nb = EngCalcs.lpnInpParse(n1r.inp);
+				const pc = nb.curves.find((c) => c.points.some((pt) => Math.abs(pt[0] - 1500) < 0.01 && Math.abs(pt[1] - 250) < 0.01));
+				ok('the pump curve comes back through the design point (1500 gpm, 250 ft)', !!pc, JSON.stringify(nb.curves.map((c) => c.points)));
+			}
+		}
+		L.importInp({ name: 'Net3.inp', _text: NET3 });
+	}
+
 	// ---- 9. the page's own route carries description, tag and demand category into Notes ----
 	head('9. dev/lpn-spike/reference/wtg-export-notes.inp: description, tag and categories reach the Notes');
 	{

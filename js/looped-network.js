@@ -45094,7 +45094,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			empty: 'This project has no nodes, so there is nothing to export.',
 			units: 'This network cannot be written: its flow unit is {unit}, and only gpm is written.',
 			headloss: 'This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.',
-			pump_curve: 'This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.'
+			pump_curve: 'This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.'
 		};
 		return wtgFill('lpn_wtg_export_no_' + r.code, fb[r.code] || r.code, { unit: r.detail || '', method: r.detail || '', ids: wtgIdList(r.ids) });
 	}
