@@ -4911,3 +4911,10 @@ OBSERVED MISSED: the gap Tom named is not gone. EPANET chosen (the default) and 
 OBSERVED: a control that cuts J2 off at 2:00: EPANET gives head -3,395,437 m; built-in stops with "These nodes have no path... The built-in solver stopped at 2:00..." (good). Tip says "runs every network the page builds" -- overstated by that case.
 SPECULATION: report line "Input Data File ... temp.inp" is not the project's name (not checked against EPANET's).
 Method: scratchpad p2 (a..h.js).
+
+## 2026-11-03 feat/wtg-page-export (59538e531), Task 749, checked 2026-11-03
+OBSERVED: browser export in Chromium: Net2, Net3 and wtg-export-parts.inp each download one .zip and the receipt lists what was left out; Net1 is refused by name (pump 9 has no three-point curve), no file. Browser harness and the three wtg Node harnesses pass.
+OBSERVED: a project stating Quality Age plus a 0:30 quality time step exports with no mention of the step (box and receipt list only positions); js/lpn-wtg-export.js plan() has no check for it, dev/wtg-export.md lists it as not written.
+OBSERVED: keys lpn_wtg_export_lost_emitters and ..._lost_pump_speed_pattern are never emitted by plan() now; stale comments looped-network.js:54788-54789 (still say "saved project").
+OBSERVED: no Bentley letter/decompile text in shipped code; only licence-line comments and the harness guard. Candidate writers run only under opts.candidate, which the page never passes.
+SPECULATION: the Net1 refusal may surprise Tom, who named Net1 to test; wording is honest.
