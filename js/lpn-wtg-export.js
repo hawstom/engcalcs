@@ -1139,6 +1139,11 @@ function plan(doc, opts) {
 	const quality = (String(q.quality || '').trim() !== '' && !/^none\b/i.test(String(q.quality).trim()))
 		|| (secs.SOURCES || []).length > 0 || (secs.REACTIONS || []).length > 0;
 	if (quality && !chemicalCarriable(parsed) && !ageTraceCarriable(parsed)) { notCarried.push({ code: 'quality', ids: [] }); }
+	// A quality time step the project states other than EPANET's default of 5 minutes (300 s). Absent means the default,
+	// so a project that never typed one is not named.
+	// The .inp this plan reads back never states it, so it is read from the document itself.
+	const dt = (doc && doc.times) || {}, qStep = dt.qualityStep;
+	if (typeof qStep === 'number' && qStep > 0 && qStep !== 300) { notCarried.push({ code: 'quality_step', ids: [], value: (dt.text && dt.text.qualityStep) || String(qStep) + ' s' }); }
 	// An energy line that states a price, a price pattern or a demand charge other than zero. Efficiency lines are carried.
 	const price = (secs.ENERGY || []).filter((ln) => {
 		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);

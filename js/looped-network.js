@@ -45074,13 +45074,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function wtgNotCarriedLines(items) {
 		var texts = {
-			emitters: 'Emitter coefficients: {ids}.',
 			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
+			quality_step: 'Quality time step {value}. It is not written, so a run uses the default quality time step.',
 			energy_price: 'Energy price, price pattern, and demand charge.',
 			rules: 'Rule-based controls.',
 			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',
 			tank_mixing: 'Tank mixing model (tanks {ids}). Tanks are written fully mixed.',
-			pump_speed_pattern: 'Pump speed pattern (pumps {ids}).',
 			demand_multiplier: 'Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.',
 			demand_model: 'Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.',
 			texts: 'Text on the map.',
@@ -54785,8 +54784,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
 			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } },
-			// .wtg project (Task 749): a .wtg and its .wtg.sqlite, written into a project the visitor saved.
-			// Asks its own box (scenario, what is left out, which saved project), so no confirmExportLeaves().
+			// .wtg project (Task 749): a .wtg and its .wtg.sqlite, built from the template the page holds; the visitor chooses no file.
+			// Asks its own box (scenario, what is left out), so no confirmExportLeaves().
 			{ icon: 'save', label: pc.lpn_file_export_item_wtg || '.wtg.sqlite file…', key: 'lpn_file_export_item_wtg',
 			  tip: pc.lpn_file_export_wtg_tip, fn: exportWtgFile }
 		];

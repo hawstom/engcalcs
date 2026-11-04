@@ -266,6 +266,13 @@ function head(t) { console.log('\n' + t); }
 	const pd = L.wtgPlan();
 	const dd = pd.ok && pd.notCarried.filter((x) => x.code === 'demand_model')[0];
 	ok('a pressure-driven demand model (PDA) is named, with its value', !!dd && dd.value === 'PDA' && L.wtgLines([dd])[0] === fillP('lpn_wtg_export_lost_demand_model', { value: 'PDA' }), pd.ok && JSON.stringify(pd.notCarried.map((x) => x.code)));
+	// A quality time step the project states is named; the default (Net3 states 0:05) and an unstated one are not
+	ok('Net3 (quality step 0:05, the default) does not name a quality time step', !planned.notCarried.some((x) => x.code === 'quality_step'));
+	L.importInp({ name: 'Net3-qstep.inp', _text: NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:30') });
+	const pq = L.wtgPlan();
+	const qs = pq.ok && pq.notCarried.filter((x) => x.code === 'quality_step')[0];
+	ok('a stated quality time step of 0:30 is named, with its value', !!qs && qs.value === '0:30', pq.ok && JSON.stringify(pq.notCarried.map((x) => x.code + ':' + (x.value || ''))));
+	ok('...in the sentence the language file gives', !!qs && L.wtgLines([qs])[0] === fillP('lpn_wtg_export_lost_quality_step', { value: '0:30' }), qs && L.wtgLines([qs])[0]);
 	// Map Text, tags, a backdrop: built as parsed networks, since the .inp writer's own output decides what reaches the plan
 	const withExtras = Object.assign({}, planned.parsed, { labels: [{ id: 't1' }], inpSections: Object.assign({}, planned.parsed.inpSections, { TAGS: [' NODE 10 foo'] }), backdrop: { file: 'x.bmp' } });
 	const codesExtras = [];
