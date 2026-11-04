@@ -12,7 +12,7 @@
  * **LICENCE LINE.** Built only from files an ordinary user or the public holds: TSNet's MIT samples and
  * a project saved by Tom's own WaterGEMS. No Bentley software or
  * DLL was looked inside, and no Bentley code is in this repository. THE TEMPLATE IS BUILT IN: js/data/
- * wtg-template/ is Tom's own saved project (schema 1.0.54.0) emptied to one prototype of each kind
+ * wtg-template/ is Tom's own saved project (its schema version is the one his WaterGEMS wrote) emptied to one prototype of each kind
  * by dev/scripts/build_wtg_template.js; this module copies it, removes the prototypes, and writes ours.
  * The visitor chooses no file. A caller may still pass any saved project's bytes (`o.sqlite`, `o.wtg`).
  *
