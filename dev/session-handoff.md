@@ -95,6 +95,12 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
+
+- **Task 749: WaterGEMS feature tests are complete** (rounds 3 and 4, his numbers 11-03). Hydraulics match EPANET (T1 135.81/133.68 ft, PU1 311/321 gpm); chlorine J1 0.958/0.960 exact; remaining tank-quality gaps are WaterGEMS's own mixing arithmetic, which does not move with the quality step. Written now: emitters, pump speed pattern, all four tank mixing models, chemical run with global rates, age, trace. A stated quality step is listed as not written (fc01e6573). Perry: nothing blocking (journal 674cc38d3). Dead keys deleted: `lpn_wtg_export_lost_emitters`, `lpn_wtg_export_lost_pump_speed_pattern`. New key `lpn_wtg_export_lost_quality_step` (English only). **Waits his word to merge**, and his call on Net1 (refused: one-point pump curve). Branch pushed at fc01e6573.
+- **Landing sites:** tagline *"the EPANET legacy, extended"* (epp 380089a). librewaternet.org's landing pages 301 to epp (2920746, his "c"); its /app/ and /engcalcs/ stay, because saved projects are per origin. **Disclosures reimagined, waiting his edit and word:** both `~/webdev/epanet-plus-plus.org` and `~/webdev/not-epanet.org` checkouts are LEFT ON BRANCH `disclosures` so he can edit in place (previews localhost:8080/drafts/epp/disclosures.html, /drafts/nepo/index.html, symlinks). Commit his edits there, merge to their master, push, and switch back. hawsedc.com techdocs.php link follows sewslope's title (653a9cf).
+- **This handoff is on master unpushed**; the next batch's `check_all` stamps and pushes it.
+
 ## STATE — 2026-11-03 evening (sixty-third session, Opus main, Sonnet agents)
 
 - **`feat/native-wire` merged on his word** (*"Merge it including the wording changes at epp and lwn etc. We no longer are dependent on the EPANET engine!"*). Task 733 closed. The "one instant only" claims are rewritten on librewaternet.org (3388385), not-epanet.org (404cc64) and epanet-plus-plus.org (f7f795a), with their CLAIMS rows and citations; EPANET stays the default setting, and no copy claims completeness against EPANET. `dev/positioning.md`, `dev/lpn-rulings.md`, scope and water-quality docs follow.
