@@ -231,18 +231,22 @@ function head(t) { console.log('\n' + t); }
 		const c = q('SELECT IdahoControl_ControlCondition, IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = ' + k)[0];
 		const sc = q('SELECT SimpleConditionType, CompareOperator FROM IdahoControlCondition_ConditionType_SimpleConditionType WHERE SupportElementID = ' + c[0])[0];
 		const act = q('SELECT SimpleActionType_Element, ElementType FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0];
-		const st = q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0] === 0 ? 'OPEN' : 'CLOSED';
+		const isPumpAct = q('SELECT ElementType FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0][0] === 68;
+		// a pump action (Tom's ctl-pump-level): the read-back EPANET network holds the pump as a node, so it is switched by its upstream pipe
+		const st = (isPumpAct ? q('SELECT ActionPumpStatus FROM IdahoControlAction_PumpAttribute_ActionPumpStatusType WHERE SupportElementID = ' + c[1])[0][0]
+			: q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0]) === 0 ? 'OPEN' : 'CLOSED';
+		const actLabel = (id) => label(id) + (isPumpAct ? '-A' : '');
 		let when;
 		if (sc[0] === 2) {
 			when = 'AT CLOCKTIME ' + hm(q('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType WHERE SupportElementID = ' + c[0])[0][0] % 86400);
 		} else {
 			const e = q('SELECT ElementType_Element, ElementType_TankLevel, ControlConditionElementType FROM IdahoControlCondition_SimpleConditionType_ElementType WHERE SupportElementID = ' + c[0])[0];
 			const tk = q('SELECT TankAttribute FROM IdahoControlCondition_ControlConditionElementType_ControlConditionTankType WHERE SupportElementID = ' + c[0])[0][0];
-			if (sc[0] !== 0 || e[2] !== 52 || tk !== 3 || (sc[1] !== 3 && sc[1] !== 1) || act[1] !== 69) { throw new Error('unexpected control codes for ' + k); }
+			if (sc[0] !== 0 || e[2] !== 52 || tk !== 3 || (sc[1] !== 3 && sc[1] !== 1) || act[1] !== 69 && act[1] !== 68) { throw new Error('unexpected control codes for ' + k); }
 			when = 'IF NODE ' + label(e[0]) + ' ' + (sc[1] === 3 ? 'BELOW' : 'ABOVE') + ' ' + e[1];
 			nLevelBack++;
 		}
-		ctlLines.push('LINK ' + label(act[0]) + ' ' + st + ' ' + when);
+		ctlLines.push('LINK ' + actLabel(act[0]) + ' ' + st + ' ' + when);
 	});
 	ok('four tank-level controls read back as tank-level conditions (less than = 3, greater than = 1) on tank 1',
 		nLevelBack === 4 && ctlLines.filter((l) => /IF NODE 1 (BELOW 17\.1|ABOVE 19\.1)$/.test(l)).length === 4, ctlLines.join(' | '));

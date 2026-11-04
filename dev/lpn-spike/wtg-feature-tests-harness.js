@@ -295,6 +295,15 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			ok('source pattern: J0 is a set point source (code 2, 1.0) naming pattern SP', s0.Constituent_IsConstituentSource === 1 && s0.ConstituentSourceType === 2 && s0.BaselineConcentration === 1 && s0.Constituent_ConstituentSourcePattern === supOf(db, 'SP'), JSON.stringify(s0));
 			db.close();
 		}
+		// 1. a pump switched on a tank level: the action is the pump itself (ElementType 68, status 0 On / 1 Off), as Tom's save stores it
+		{
+			const w = plainWrite(sv.CASES['ctl-pump-level'](base));
+			const db = wrap(w.bytes);
+			const acts = rows(db, 'SELECT a.SimpleActionType_Element AS el, a.ElementType AS ty, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID ORDER BY p.ActionPumpStatus');
+			ok('pump level controls: two actions on pump PU1 itself (type 68), one Off (1) and one On (0)', acts.length === 2 && acts.every((a) => a.ty === 68 && a.el === elOf(db, 'PU1')) && acts[0].st === 0 && acts[1].st === 1, JSON.stringify(acts));
+			ok('pump level controls: both sit in the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection')[0].c === 2 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
+			db.close();
+		}
 		// 4. pressure-driven demand: power 0.5, threshold 40 psi
 		{
 			const w = plainWrite(sv.CASES['pdd-on'](base));
@@ -317,6 +326,7 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		// The EPANET side, converged (6 minute quality step), against what Tom read
 		const f = await sv.figures();
 		const q = (k, h, n) => f[k].step6min[h].node[n].quality;
+		ok('pump level controls: EPANET T1 grade at hours 12 and 24 ' + f['ctl-pump-level'].step6min[12].node.T1.head.toFixed(2) + ', ' + f['ctl-pump-level'].step6min[24].node.T1.head.toFixed(2) + ' against Tom\'s 131.25 and 131.55', near(f['ctl-pump-level'].step6min[12].node.T1.head, 131.25, 0.2) && near(f['ctl-pump-level'].step6min[24].node.T1.head, 131.55, 0.2));
 		ok('pressure-driven demand: EPANET (minimum 0, required 40 psi, exponent 0.5) delivers ' + f['pdd-on'].step6min[12].node.J1.demand.toFixed(1) + ' gpm at ' + f['pdd-on'].step6min[12].node.J1.pressure.toFixed(1) + ' psi against Tom\'s 290 at 37', near(f['pdd-on'].step6min[12].node.J1.demand, 290, 3) && near(f['pdd-on'].step6min[12].node.J1.pressure, 37, 1));
 		ok('rates on one pipe: EPANET J1 hour 12 ' + q('rates-one-pipe', 12, 'J1').toFixed(3) + ' against Tom\'s 0.845 (the engines differ by about 2 percent; without the rates both read 0.96)', near(q('rates-one-pipe', 12, 'J1'), 0.845, 0.03) && q('base', 12, 'J1') > 0.95);
 		ok('rate on the tank: EPANET T1 hour 24 ' + q('rate-tank', 24, 'T1').toFixed(3) + ' against Tom\'s 0.076', near(q('rate-tank', 24, 'T1'), 0.076, 0.02));

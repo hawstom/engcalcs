@@ -662,10 +662,10 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// (dev/wtg-export.md, "Controls").
 	const changes = (schedule && schedule.changes) || [];
 	const clockEpoch = (t) => EPOCH_2000 + (t % 86400);
-	function controlText(t, linkLabel, status) {
+	function controlText(t, linkLabel, status, isPump) {
 		const hh = Math.floor((t % 86400) / 3600), mm = Math.floor((t % 3600) / 60), ss = t % 60;
 		const clock = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (ss ? ':' + String(ss).padStart(2, '0') : '');
-		return { cond: 'Clock Time  = ' + clock + ' ', act: linkLabel + ' Pipe Status = ' + status + ' ' };
+		return { cond: 'Clock Time  = ' + clock + ' ', act: linkLabel + (isPump ? ' Pump' : ' Pipe') + ' Status = ' + status + ' ' };
 	}
 	let nCtl = 0, nLevel = 0;
 	const controlIds = [];
@@ -681,14 +681,14 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
 	levelCtl.forEach((c) => {
 		const isPump = !!pumpNodeId[c.link];
-		const pipeLabel = isPump ? (c.link + '-A') : c.link;
-		const statusWord = c.action.status === 'open' ? 'Open' : 'Closed';
+		const pipeLabel = c.link;
+		const statusWord = isPump ? (c.action.status === 'open' ? 'On' : 'Off') : (c.action.status === 'open' ? 'Open' : 'Closed');
 		const sym = c.condition.cmp === 'below' ? '<' : '>';
 		const cId = newId(), aId = newId(), kId = newId();
 		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
 		const aName = statusWord + '-' + pipeLabel;
 		const condTxt = cName + ' {"' + c.condition.node + '" Level ' + sym + ' ' + fmt2(c.condition.value) + ' ft}';
-		const actTxt = aName + ' {"' + pipeLabel + '" Pipe Status = ' + statusWord + ' }';
+		const actTxt = aName + ' {"' + pipeLabel + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
 		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
 		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
 		supportElement(kId, 54, 'LC' + kId, '');
@@ -709,8 +709,15 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
 		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
 		setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
-		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, { SimpleActionType_Element: pipeElId[c.link], ElementType: 69 });
-		const aSub = [
+		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, isPump ? { SimpleActionType_Element: pumpNodeId[c.link], ElementType: 68 } : { SimpleActionType_Element: pipeElId[c.link], ElementType: 69 });
+		// A pump's action is the pump itself (Tom's ctl-pump-level save, whose run switched the pump by its rule): the pump,
+		// FCV and pump-status rows only, status 0 On and 1 Off. A pipe's carries the full set.
+		const aSub = isPump ? [
+			['IdahoControlAction_ElementType_ControlActionFCVType', { FCVAttribute: 0 }],
+			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: c.action.status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_FCVAttribute_ActionFCVSettingType', { ActionFCVSettingType_Discharge: 0 }]
+		] : [
 			['IdahoControlAction_ElementType_ControlActionPipeType', { PipeAttribute: 0 }],
 			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: c.action.status === 'open' ? 0 : 1 }],
 			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
@@ -741,17 +748,25 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const pipeEl = pipeElId[ch.link];
 		if (!pipeEl) { return; }
 		const isPump = !!pumpNodeId[ch.link];
-		const label = isPump ? (ch.link + '-A') : ch.link;
-		const txt = controlText(ch.t, label, ch.status === 'open' ? 'Open' : 'Closed');
+		const label = ch.link;
+		const txt = controlText(ch.t, label, ch.status === 'open' ? (isPump ? 'On' : 'Open') : (isPump ? 'Off' : 'Closed'), isPump);
 		const cId = newId(), aId = newId(), kId = newId();
 		supportElement(cId, 56, 'C' + cId); supportElement(aId, 55, 'A' + aId); supportElement(kId, 54, 'LC' + kId);
 		insert(db, 'IdahoControlCondition', { SupportElementID: cId, IdahoControlCondition_DefineDescription: 0, IdahoControlCondition_Description: 'text', IdahoControlCondition_ExpandedDescription: txt.cond, ConditionType: 0 });
 		insert(db, 'IdahoControlCondition_ConditionType_SimpleConditionType', { SupportElementID: cId, SimpleConditionType: 2, CompareOperator: 0 });
 		insert(db, 'IdahoControlCondition_SimpleConditionType_ClockTimeType', { SupportElementID: cId, ClockTimeType_ClockTime: clockEpoch(ch.t) });
 		insert(db, 'IdahoControlAction', { SupportElementID: aId, IdahoControlAction_DefineDescription: 0, IdahoControlAction_Description: 'text', IdahoControlAction_ExpandedDescription: txt.act, ControlActionType: 0 });
-		insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pipeEl, ElementType: 69 });
-		insert(db, 'IdahoControlAction_ElementType_ControlActionPipeType', { SupportElementID: aId, PipeAttribute: 0 });
-		insert(db, 'IdahoControlAction_PipeAttribute_ActionPipeStatusType', { SupportElementID: aId, ActionPipeStatus: ch.status === 'open' ? 0 : 1 });
+		if (isPump) {
+			insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pumpNodeId[ch.link], ElementType: 68 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionFCVType', { SupportElementID: aId, FCVAttribute: 0 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionPumpType', { SupportElementID: aId, PumpAttribute: 0 });
+			insert(db, 'IdahoControlAction_PumpAttribute_ActionPumpStatusType', { SupportElementID: aId, ActionPumpStatus: ch.status === 'open' ? 0 : 1 });
+			insert(db, 'IdahoControlAction_FCVAttribute_ActionFCVSettingType', { SupportElementID: aId, ActionFCVSettingType_Discharge: 0 });
+		} else {
+			insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pipeEl, ElementType: 69 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionPipeType', { SupportElementID: aId, PipeAttribute: 0 });
+			insert(db, 'IdahoControlAction_PipeAttribute_ActionPipeStatusType', { SupportElementID: aId, ActionPipeStatus: ch.status === 'open' ? 0 : 1 });
+		}
 		insert(db, 'IdahoControl', { SupportElementID: kId, IdahoControl_DefineDescription: 0, IdahoControl_Description: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ExpandedDescription: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, ControlType: 1 });
 		insert(db, 'IdahoControl_ControlType_LogicalType', { SupportElementID: kId, LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
 		controlIds.push(kId); nCtl++;
