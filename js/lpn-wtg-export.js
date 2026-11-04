@@ -881,9 +881,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// so nothing is converted. The constituent is tied to the whole network by the one row of Constituent_SystemData (the
 	// alternative's constituent), and every node already has its Constituent_Data row. WaterGEMS writes both wall-order
 	// sub-tables; the order not in use holds 0. The Constituent calculation type is 3 (the nine files).
-	// `w` carries the round-2 storage variants (opts.candidate.wq); `local` writes per-element rates and source patterns,
-	// whose columns no saved file has shown, so it is candidate-only.
-	function writeChemical(w, local) {
+	// `w` carries the round-2 storage variants (opts.candidate.wq). Per-pipe and per-tank rates and a source's pattern are
+	// written as Tom's saves rates-one-pipe, rate-tank and source-pattern stored them (dev/wtg-export.md).
+	function writeChemical(w) {
 		const secs = parsed.inpSections || {};
 		const qo = parsed.qualityOptions || {};
 		const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
@@ -924,7 +924,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			const n = nodeById[nid], s = srcs[nid];
 			if (!n) { return; }
 			const id = elId['n:' + nid];
-			const sp = local && s.pattern && patId[s.pattern] !== undefined ? patId[s.pattern] : null;
+			const sp = s.pattern && patId[s.pattern] !== undefined ? patId[s.pattern] : null;
 			db.run('UPDATE BaseIdahoNode_Constituent_Data SET Constituent_IsConstituentSource = 1, ConstituentSourceType = ?, Constituent_ConstituentSourcePattern = ?, BaselineConcentration = ? WHERE DomainElementID = ?',
 				[codeOf(s.type), sp, s.type === 'MASS' ? 0 : s.quality, id]);
 			if (s.type === 'MASS') {
@@ -934,7 +934,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			}
 			carried('source on ' + nid + ': ' + s.type + ' ' + s.quality + ' (source code ' + codeOf(s.type) + ')');
 		});
-		if (local) {
+		{
 			Object.keys(R.bulk).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalBulkReactionRate = 1, Constituent_LocalBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.bulk[pid]), pipeElId[pid]]); } });
 			Object.keys(R.wall).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalWallRate = 1, Constituent_WallReactionRate = ? WHERE DomainElementID = ?', [sgn(R.wall[pid]), pipeElId[pid]]); } });
 			Object.keys(R.tank).forEach((tid) => { if (elId['n:' + tid] !== undefined) { db.run('UPDATE ConventionalTank_Constituent_Data SET Constituent_TankSpecifyLocalBulkRate = 1, Constituent_TankBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.tank[tid]), elId['n:' + tid]]); } });
@@ -942,7 +942,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		carried('chemical ' + chem + ': bulk ' + sgn(R.globalBulk || 0) + ', wall ' + sgn(R.globalWall || 0) + ' per day');
 		report.chemicalWritten = true;
 	}
-	if (chemicalCarriable(parsed)) { writeChemical((opts.candidate && opts.candidate.wq) || {}, !!opts.candidate); }
+	if (chemicalCarriable(parsed)) { writeChemical((opts.candidate && opts.candidate.wq) || {}); }
 
 	// ---- analysis options: the template's own EPS options already read 24 h, 1 h step; set them explicitly ----
 	const T = parsed.times;
@@ -1088,17 +1088,21 @@ function idsOf(list, test) { return list.filter(test).map((x) => x.id); }
  */
 
 // Is this project's water quality a chemical run this export writes in full? A chemical in mg/L with the global
-// reactions, sources without a pattern, initial quality, and no reaction rate stated for a single pipe or tank.
-// Age and trace runs, and the rest, are not written on the page's path (dev/wtg-export.md).
+// reactions, a bulk or wall rate stated for one pipe, a bulk rate for one tank, sources with or without a pattern, and
+// initial quality (Tom's saves of 2026-11-03: dev/wtg-export.md, "Tom's ten saves"). A rate for one pipe's wall is
+// kept in WaterGEMS beside the first-order wall rate only, so a zero-order wall network keeps its note.
+// Age and trace runs, and the rest, are not written on the page's path.
 function chemicalCarriable(parsed) {
 	const q = parsed.qualityOptions || {}, secs = parsed.inpSections || {};
 	const text = String(q.quality || '').trim();
 	if (!text || EngCalcs.lpnQualityParse(text).mode !== 'chemical') { return false; }
-	if (/\b(ug|µg|g|mg)\/\w+/i.test(text) && !/\bmg\/L\b/i.test(text)) { return false; }
+	if (/\b(ug|\u00b5g|g|mg)\/\w+/i.test(text) && !/\bmg\/L\b/i.test(text)) { return false; }
 	const R = EngCalcs.lpnReactionsParse(secs.REACTIONS || []);
-	if (Object.keys(R.bulk).length || Object.keys(R.wall).length || Object.keys(R.tank).length) { return false; }
+	if (Object.keys(R.wall).length && R.orderWall !== undefined && R.orderWall !== 1) { return false; }
 	const srcs = EngCalcs.lpnSourcesParse(secs.SOURCES || []);
-	return !Object.keys(srcs).some((k) => srcs[k].pattern);
+	const havePattern = {};
+	(parsed.patterns || []).forEach((p) => { havePattern[p.id] = true; });
+	return !Object.keys(srcs).some((k) => srcs[k].pattern && !havePattern[srcs[k].pattern]);
 }
 
 // Is this a two-compartment tank WaterGEMS can hold? Its compartments are percents that add to 100, so the EPANET

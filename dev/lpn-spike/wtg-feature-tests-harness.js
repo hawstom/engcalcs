@@ -2,7 +2,7 @@
 // no `opts.candidate`: emitter coefficient (ft3/s per psi^n), pump speed pattern (VSPType 0), tank mixing mixed/FIFO/LIFO
 // (codes 1/2/3). A chemical run (constituent, bulk -2 per day, wall -1 ft per day, as Tom's own save stores it) is written with no
 // candidate. Since round 3 (Tom, 2026-11-03) also written with no candidate: two-compartment mixing (code 0, percents), age (type 2)
-// and trace (type 4). Still candidate-only: per-element rates, source patterns, the quality time step.
+// and trace (type 4). Since Tom's ten saves (2026-11-03) also written with no candidate: per-pipe and per-tank rates and a source's pattern.
 //   node dev/lpn-spike/wtg-feature-tests-harness.js
 // Checks the round-2 files dev/lpn-spike/wtg-feature-tests.js builds and the plain writer. NOT proof that WaterGEMS
 // accepts the candidates: only Tom's copy can say that.
@@ -262,6 +262,45 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			sm > 0 && sm < text4.indexOf('## 1-quality-step') && text4.indexOf(e4.twoComp.step30min[12].node.T1.quality.toFixed(3)) >= 0 && text4.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text4));
 		ok('every paragraph is one line and no code appears', text4.split('\n').filter((l) => l.trim()).every((l) => /^#|^[A-Z`]|^\d/.test(l)) && !/```|=>|function /.test(text4));
 		fs.rmSync(out4, { recursive: true, force: true });
+	}
+
+	console.log('\nTom\'s ten saves of 2026-11-03 (dev/lpn-spike/wtg-saves-epanet.js, dev/wtg-export.md "Tom\'s ten saves")');
+	{
+		const sv = require('./wtg-saves-epanet.js');
+		const base = sv.chlorineNet();
+		// 5. a reaction rate on one pipe: his save stored (specify 1, -10) and (specify 1, -5) in the pipe's row, in his units
+		{
+			const w = plainWrite(sv.CASES['rates-one-pipe'](base));
+			const db = wrap(w.bytes);
+			const p2 = elOf(db, '2'), p3 = elOf(db, '3');
+			const a = rows(db, 'SELECT * FROM IdahoPipe_Constituent_Data WHERE DomainElementID = ?', [p2])[0], b = rows(db, 'SELECT * FROM IdahoPipe_Constituent_Data WHERE DomainElementID = ?', [p3])[0];
+			ok('rates on one pipe: pipe 2 specifies bulk -10 and wall -5 (as Tom\'s save), pipe 3 specifies none', a.Constituent_SpecifyLocalBulkReactionRate === 1 && a.Constituent_LocalBulkReactionRate === -10
+				&& a.Constituent_SpecifyLocalWallRate === 1 && a.Constituent_WallReactionRate === -5 && a.Constituent_PipeZeroOrderWallReactionRate === 0 && b.Constituent_SpecifyLocalBulkReactionRate === 0 && b.Constituent_SpecifyLocalWallRate === 0, JSON.stringify(a));
+			ok('rates on one pipe: written with no candidate', w.report.candidateWritten === undefined && w.report.chemicalWritten === true);
+			db.close();
+		}
+		// 6. a bulk rate on the tank
+		{
+			const w = plainWrite(sv.CASES['rate-tank'](base));
+			const db = wrap(w.bytes);
+			const t = rows(db, 'SELECT * FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'T1')])[0];
+			ok('rate on the tank: T1 specifies bulk -30 and keeps mixing code 1 (as Tom\'s save)', t.Constituent_TankSpecifyLocalBulkRate === 1 && t.Constituent_TankBulkReactionRate === -30 && t.TankMixingModel === 1, JSON.stringify(t));
+			db.close();
+		}
+		// 7. a pattern on the booster
+		{
+			const w = plainWrite(sv.CASES['source-pattern'](base));
+			const db = wrap(w.bytes);
+			const s0 = rows(db, 'SELECT * FROM BaseIdahoNode_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'J0')])[0];
+			ok('source pattern: J0 is a set point source (code 2, 1.0) naming pattern SP', s0.Constituent_IsConstituentSource === 1 && s0.ConstituentSourceType === 2 && s0.BaselineConcentration === 1 && s0.Constituent_ConstituentSourcePattern === supOf(db, 'SP'), JSON.stringify(s0));
+			db.close();
+		}
+		// The EPANET side, converged (6 minute quality step), against what Tom read
+		const f = await sv.figures();
+		const q = (k, h, n) => f[k].step6min[h].node[n].quality;
+		ok('rates on one pipe: EPANET J1 hour 12 ' + q('rates-one-pipe', 12, 'J1').toFixed(3) + ' against Tom\'s 0.845 (the engines differ by about 2 percent; without the rates both read 0.96)', near(q('rates-one-pipe', 12, 'J1'), 0.845, 0.03) && q('base', 12, 'J1') > 0.95);
+		ok('rate on the tank: EPANET T1 hour 24 ' + q('rate-tank', 24, 'T1').toFixed(3) + ' against Tom\'s 0.076', near(q('rate-tank', 24, 'T1'), 0.076, 0.02));
+		ok('source pattern: EPANET J1 hours 6 and 14 ' + q('source-pattern', 6, 'J1').toFixed(3) + ', ' + q('source-pattern', 14, 'J1').toFixed(3) + ' against Tom\'s 0.955 and 0.479', near(q('source-pattern', 6, 'J1'), 0.955, 0.01) && near(q('source-pattern', 14, 'J1'), 0.479, 0.01));
 	}
 
 	fs.rmSync(out, { recursive: true, force: true });
