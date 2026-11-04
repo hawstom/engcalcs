@@ -340,9 +340,92 @@ Settled:
 
 **Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
 pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
-without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Still not written: per-pipe and per-tank rates, source patterns,
-tank-level and clock controls beyond those seen, rule-based controls, energy price, pressure-driven
-demand, map text, backdrop, true positions.
+without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Written since Tom's ten saves (next section): per-pipe and per-tank rates, source patterns, pump controls, pressure-driven
+demand, true positions for EPSG:2223. Still not written: rule-based controls, energy price, map text, backdrop, true positions for any other system.
+
+## Tom's ten saves, 2026-11-03 night: how WaterGEMS stores each
+
+Source: `~/tom-files/2026-11-03/wtg-saves-needed/`, each a `Save As` of our `chlorine` pair with one change, diffed table by table
+against `chlorine.wtg.sqlite` (nothing else differs but open counters, a Notes empty string and one empty support element 43).
+Each run also left a `.rpc` text report (the engine's own log), read as data. EPANET figures: `dev/lpn-spike/wtg-saves-epanet.js`
+(pump as two 1 ft pipes, quality step 6 minutes, i.e. converged; the 1 hour figures are in its second column). Harness cases:
+`wtg-feature-tests-harness.js`, last section. The engine's log header says "Version 25.0" and each pass is an EPANET-style
+balance; a rule firing prints "Pump 39 changed by rule 47".
+
+| # | Save | Stored as | Tom read | EPANET | Verdict |
+|---|---|---|---|---|---|
+| 1 | `ctl-pump-level` | two controls in one set; condition on `T1`; action on the **pump** (see below) | `T1` grade 131.25, 131.55 | 131.34, 131.59 | agrees; **written** |
+| 2 | `ctl-logical` | logical control with an ELSE and a priority (see below), **but the set holds no control** | pump On at hour 12 | On | agrees by default; **not written** |
+| 3 | `ctl-pressure-time` | pressure condition complete; time condition and its action incomplete; **set holds no control** | pump On at hour 7 | On (J1 never reaches 60 psi) | untested by the run; pressure condition **candidate** (`opts.candidate.pressureControls`) |
+| 4 | `pdd-on` | power function, see below | 290 gpm at 37 psi | 290.4 gpm at 37.5 psi | agrees; **written** |
+| 5 | `rates-one-pipe` | `IdahoPipe_Constituent_Data` row: specify bulk 1, bulk -10, specify wall 1, wall -5, zero-order wall 0 | `J1` 0.845 | 0.865 | within 2 percent; **written** |
+| 6 | `rate-tank` | `ConventionalTank_Constituent_Data`: specify bulk 1, bulk -30 | `T1` hour 24 0.076 | 0.065 | agrees to 0.011; **written** |
+| 7 | `source-pattern` | source node's `Constituent_ConstituentSourcePattern` = a new `IdahoPattern` | `J1` 0.955, 0.479 | 0.962, 0.480 | agrees; **written** |
+| 8 | `energy-price` | **no file was saved** (the price is in the Energy Pricing manager, outside the project's element tables we compared) | | | not written |
+| 9 | `spatial-ref` | one column, see below | J0 2000,1000; J1 3000,1000 | | **written for EPSG:2223 only** |
+| 10 | `map-extras` | **neither `.wtg` nor `.sqlite` changed** | | | not possible from these files |
+
+Why 5 and 6 differ a little from EPANET: the file holds exactly the typed numbers (-10, -5, -30, per day and ft per day, in the
+dialog's units, with EPANET's sign), so the gap is the engine's. It is the same size and direction as the gap in the unchanged
+network (WaterGEMS `T1` 0.189 and 0.244 where EPANET gives 0.174 and 0.219; `J1` 0.958 against EPANET 0.964), the tank-mixing
+arithmetic recorded above. The README's EPANET figures (0.865, 0.065, 0.962/0.480) were already the converged ones.
+
+**1. A pump control.** The action is the pump itself: `IdahoControlAction_ControlActionType_SimpleActionType` has
+`SimpleActionType_Element` the pump node's ElementID and `ElementType` 68; the rows are `ControlActionFCVType` 0,
+`ControlActionPumpType` 0 (status), `ActionPumpStatusType` **0 On, 1 Off**, `ActionFCVSettingType` 0 (no pipe rows). The run proves
+the set is applied: "4:42 Pump 39 changed by rule 47" when the tank level reached 20.03 ft, and "6:42 ... by rule 51" at 14 ft.
+**Tom chose the attribute "Hydraulic Grade"** (node attribute 1; the value 20 is stored in both `ElementType_HydraulicGrade` and
+`ElementType_TankLevel`), yet the engine compared the tank LEVEL (it fired at level 20, grade would be 140). The writer keeps the
+Level attribute (`TankAttribute` 3, value in `ElementType_TankLevel`), which is what EPANET's control means. His reading 131.25 is
+grade (elevation 120 + level 11.25). The page used to close the pump's upstream pipe `-A`; it now writes the pump action, for level and
+clock controls alike. The initial state is still the `-A` pipe's status. The golden digests were regenerated for this.
+**Tank grade as a condition** (node attribute 1 on a tank) exists in the file; not written, since EPANET has no such control.
+
+**2. Logical control.** `IdahoControl_ControlType_LogicalType`: `LogicalType_HasPriority` 1, `LogicalType_HasElse` 1,
+`LogicalType_ElseAction` the else action's id, `ControlPriority` 3; the description reads "IF T1 Level < 14.00 ft THEN PU1 Pump Status = On
+ ELSE PU1 Pump Status = Off  PRIORITY 3". Without ELSE the same row is `0, 0, <an empty action id>, 0`. **The control set (`IdahoLogicalControlSet`
+48) has count 0 and no member rows**, although the alternative names it, so the run says nothing about the control. Not written: it needs
+EPANET `[RULES]` premises (AND/OR, several) mapped to a single condition; no sample of that.
+
+**3. Pressure and time conditions.** Pressure: `SimpleConditionType` 0, `CompareOperator` 1 (greater), `ElementType_Element` the junction,
+`ElementType_Pressure` 60 (psi), `ControlConditionElementType` 50, node attribute 2 (the tank attribute row 1 here, 3 for a tank). Time from
+start: `SimpleConditionType` 3, `IdahoControlCondition_SimpleConditionType_TimeFromStartType` = 21600 (seconds), element NULL, but its
+operator column read 0 against the text "Time From Start  > 6.000 hours" and its action was left as "<none>"; the pair is incomplete, so
+the time condition stays written as the clock-time schedule (identical when the run starts at 00:00). The set was empty again (count 0), the
+same mistake as item 2. A request for Tom: repeat 2 and 3 with the control dragged into the set (the pump-level save has the right shape).
+
+**4. Pressure-driven demand.** A new support element, type 60, "Pressure Dependent Demand Function - 1":
+`PressureDependentDemandFunction` (threshold **40, in psi**, has-threshold 1, function type 0 = power), the power 0.5 in
+`..._PddFunctionType_PowerFunctionType`, a `..._PieceLinearType` row with count 0; `PressureDependentDemand_SystemData.GlobalPDDFunction`
+names it (reference pressure 0, percent 100, reference equals threshold 1); and `EpaNetEngine_UsePressureDependentDemand` goes 0 to 1.
+Mapping: WaterGEMS delivers demand x (pressure / threshold)^power below the threshold, from zero pressure, which is EPANET `Demand Model
+PDA`, `Minimum Pressure 0`, `Required Pressure` = threshold, `Pressure Exponent` = power. EPANET gives 290.4 gpm at 37.5 psi against 290
+at 37. A project with a minimum pressure above 0 has no form in WaterGEMS's function and keeps its "demand model" line in the box.
+
+**8. Energy price.** No `energy-price` file was saved, so no table is known and nothing is written. Tom's question, whether energy cost
+and a quality run cannot share an alternative, **cannot be confirmed from Bentley's public pages**. What they do say: energy cost
+needs the scenario computed first and only EPS scenarios can be used
+(https://DOCS.BENTLEY.COM/LiveContent/web/Bentley WaterGEMS SS6-v1/en/76019.html); the price is chosen in an Energy Pricing manager
+(constant, pattern and so on) and cost is read through the Scenario Energy Cost tool, with block rates only in Energy Management
+(https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/7242.energy-cost-and-energy-management,
+which now redirects). Neither says a constituent run blocks it. The calculation type is a property of the calculation option, and
+Constituent (3) replaces the plain hydraulic type (5) in our file; a plausible but unconfirmed reading is that the cost tool works from a
+plain hydraulic result. A save with a Constant price in the manager, in a plain-hydraulic scenario, would show where the price lives.
+
+**9. Spatial reference.** One column changed: `IdahoDataSet.HmiModelCoordinateReference` went from empty to a 17 KB JSON text: horizontal CRS
+id `AZ83-CIF`, EPSG 2223, "NAD83 Arizona State Plane, Central Zone, Intl Foot", unit InternationalFoot, the datum's transform paths and extent, and a
+vertical CRS `NAVD88`. No geometry changed: J0 stays at 2000, 1000 and J1 at 3000, 1000; the drawn numbers simply become the system's feet
+(`HMIDataSetGeometrySpatialReference` stays empty). The text is kept byte for byte in `js/data/wtg-template/crs-epsg-2223.json.gz` (no path or name
+in it). The page knows EPSG codes by the thousand (`js/data/epsg-projected.json`) but we have WaterGEMS's definition for exactly one, so
+only a project whose `project.crs` is `EPSG:2223` takes this path: its coordinates (already the system's feet, `dev/geographic-projects.md`:
+a projected project holds the user's own eastings and northings) are written with no scale, and "positions" leaves the box. Any other
+system keeps the one-scale drawing and its box line. Each further system needs one save from Tom.
+
+**10. Text and background.** Both live in the third file, `<project>.wtg.dwh` (the drawing; "Standalone Drawing", a binary store): the text as
+UTF-16 "TEST TEXT" (upper case), the picture as a Background Layer holding its absolute and relative path (`C:\Users\...\PKD-ID-Back.png`,
+`..\..\PKD-ID-Back.png`), **not the picture itself**, so a picture would travel only if the receiver's path resolves. The `.wtg` and
+`.sqlite` of the save are identical to `chlorine` but for counters. The export writes no `.dwh` (WaterGEMS makes one when it opens the
+project), and a binary drawing store cannot be written from one sample; the box lines for text and the picture stay.
 
 ## What the tests show
 
