@@ -793,12 +793,24 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			}
 			carried('pump ' + l.id + ' speed pattern ' + l.speedPattern);
 		});
-		// -- tank mixing: TankMixingModel 1 mixed, 2 FIFO, 3 LIFO (0 two compartment is still a candidate)
+		// -- tank mixing: TankMixingModel 0 two compartment, 1 mixed, 2 FIFO, 3 LIFO
 		const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
 		Object.keys(mixMap).forEach((tid) => {
 			const m = mixMap[tid];
 			if (!nodeById[tid] || nodeById[tid].type !== 'tank') { return; }
-			if (m.model === '2COMP') { lost('two-compartment mixing on tank ' + tid + ' (code and compartment units not confirmed)'); return; }
+			if (m.model === '2COMP') {
+				// Confirmed by Tom's round 3 (2026-11-03): code 0, compartments as percents, compartment 1 the inlet one. WaterGEMS
+				// refuses fractions ("Must add to 100"). EPANET's fraction is the inlet compartment's share of the volume.
+				if (!twoCompCarriable(m)) { lost('two-compartment mixing on tank ' + tid + ' (no fraction between 0 and 1 stated)'); return; }
+				const tk = elId['n:' + tid];
+				const c1 = Math.round(m.fraction * 1e9) / 1e7;
+				db.run('UPDATE ConventionalTank_Constituent_Data SET TankMixingModel = 0 WHERE DomainElementID = ?', [tk]);
+				const alt = rowsOf(db, 'SELECT AlternativeID AS a FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [tk])[0].a;
+				db.run('DELETE FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType WHERE DomainElementID = ?', [tk]);
+				insert(db, 'ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType', { DomainElementID: tk, AlternativeID: alt, TwoCompartmentType_Compartment1: c1, TwoCompartmentType_Compartment2: Math.round((100 - c1) * 1e7) / 1e7 });
+				carried('tank ' + tid + ' mixing 2COMP ' + m.fraction + ' (TankMixingModel 0, compartments ' + c1 + ' and ' + (100 - c1) + ' percent)');
+				return;
+			}
 			const code = { MIXED: 1, FIFO: 2, LIFO: 3 }[m.model];
 			if (code === undefined || m.model === 'MIXED') { return; }
 			db.run('UPDATE ConventionalTank_Constituent_Data SET TankMixingModel = ? WHERE DomainElementID = ?', [code, elId['n:' + tid]]);
@@ -834,24 +846,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				report.candidateWritten = (report.candidateWritten || 0) + 1;
 			});
 		}
-		// -- water quality: age and trace are candidates; a chemical run is written below, on the page's path
+		// -- water quality: the age and trace run is written on the page's path; the time step is still a candidate
 		if (cand.wq) {
 			const w = cand.wq;
-			const qo = parsed.qualityOptions || {};
-			const q = EngCalcs.lpnQualityParse(qo.quality || '');
-			const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
-			const calcTypes = Object.assign({ age: 2, trace: 4 }, w.calcTypes || {});
-			const calcType = w.calcType !== undefined ? w.calcType : calcTypes[q.mode];
-			if ((q.mode === 'age' || q.mode === 'trace') && calcType !== undefined) {
-				db.run('UPDATE EpaNetEngine SET CalculationType = ?', [calcType]);
-				const tol = parseFloat(qo.tolerance), tv = isFinite(tol) ? tol : 0.01;
-				if (q.mode === 'age') { insert(db, 'EpaNetEngine_CalculationType_AgeAnalysisType', { CalculationOptionsID: calcId, AgeAnalysisType_AgeTolerance: tv }); }
-				if (q.mode === 'trace') { insert(db, 'EpaNetEngine_CalculationType_TraceAnalysisType', { CalculationOptionsID: calcId, TraceAnalysisType_TraceTolerance: tv }); }
-				carried('calculation type ' + calcType + ' for a ' + q.mode + ' run (candidate)');
-			}
-			if (q.mode === 'trace' && q.traceNode && elId['n:' + q.traceNode] !== undefined) {
-				db.run('UPDATE Trace_SystemData SET Trace_TraceElement = ? ', [elId['n:' + q.traceNode]]);
-			}
 			// The water quality time step (candidate): the flag and the step in seconds, like the hydraulic step.
 			if (w.qualityStepSeconds > 0) {
 				db.run('UPDATE EpaNetEngine SET EpaSetWaterQualityTimeStep = 1, EpaWaterQualityTimeStep = ?', [w.qualityStepSeconds]);
@@ -860,6 +857,27 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			report.candidateWritten = (report.candidateWritten || 0) + 1;
 		}
 	}
+
+	// ---- AN AGE OR TRACE RUN: written on the page's path (Tom's round 3, 2026-11-03). He saw Age and Trace R in the
+	// Calculation Type of the files written this way: type 2 with its tolerance row, type 4 with its tolerance row and the
+	// traced node in Trace_SystemData. WaterGEMS's J1 age (0.173 h) agreed with EPANET's to the third decimal once the
+	// pump's two 1 ft connecting pipes were counted. ----
+	function writeAgeTrace() {
+		const qo = parsed.qualityOptions || {};
+		const q = EngCalcs.lpnQualityParse(qo.quality || '');
+		const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
+		const calcType = q.mode === 'age' ? 2 : 4;
+		db.run('UPDATE EpaNetEngine SET CalculationType = ?', [calcType]);
+		const tol = parseFloat(qo.tolerance), tv = isFinite(tol) ? tol : 0.01;
+		if (q.mode === 'age') { insert(db, 'EpaNetEngine_CalculationType_AgeAnalysisType', { CalculationOptionsID: calcId, AgeAnalysisType_AgeTolerance: tv }); }
+		else {
+			insert(db, 'EpaNetEngine_CalculationType_TraceAnalysisType', { CalculationOptionsID: calcId, TraceAnalysisType_TraceTolerance: tv });
+			db.run('UPDATE Trace_SystemData SET Trace_TraceElement = ? ', [elId['n:' + q.traceNode]]);
+		}
+		carried('calculation type ' + calcType + ' for a ' + q.mode + ' run' + (q.mode === 'trace' ? ' from ' + q.traceNode : ''));
+		report.ageTraceWritten = true;
+	}
+	if (ageTraceCarriable(parsed)) { writeAgeTrace(); }
 
 	// ---- A CHEMICAL QUALITY RUN: written on the page's path (Tom's own WaterGEMS save, 2026-11-03, dev/wtg-export.md). ----
 	// His save made a Chlorine constituent (support element type 52), bulk -2 per day and wall -1 ft per day. It stored
@@ -967,7 +985,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.close();
 	report.skippedColumns = Object.keys(skippedColumns);
 	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
-	report.notCarried.push((report.chemicalWritten ? 'quality analysis other than the chemical run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', two-compartment mixing, energy price and pattern, the [REPORT] settings');
+	report.notCarried.push(((report.chemicalWritten || report.ageTraceWritten) ? 'quality analysis other than the run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', energy price and pattern, the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	return { bytes: bytes, report: report };
 }
@@ -1081,6 +1099,22 @@ function chemicalCarriable(parsed) {
 	return !Object.keys(srcs).some((k) => srcs[k].pattern);
 }
 
+// Is this a two-compartment tank WaterGEMS can hold? Its compartments are percents that add to 100, so the EPANET
+// fraction must lie strictly between 0 and 1.
+function twoCompCarriable(m) {
+	return !!m && typeof m.fraction === 'number' && m.fraction > 0 && m.fraction < 1;
+}
+
+// Is this project's analysis an age or a trace run this export writes? A trace needs a node that is written. A project
+// that also states sources or reactions keeps its "Water quality" note.
+function ageTraceCarriable(parsed) {
+	const q = parsed.qualityOptions || {}, secs = parsed.inpSections || {};
+	const m = EngCalcs.lpnQualityParse(String(q.quality || '').trim());
+	if (m.mode !== 'age' && m.mode !== 'trace') { return false; }
+	if ((secs.SOURCES || []).length || (secs.REACTIONS || []).length) { return false; }
+	return m.mode === 'age' || (parsed.nodes || []).some((n) => n.id === m.traceNode);
+}
+
 function plan(doc, opts) {
 	const out = EngCalcs.lpnExportInp(doc, opts || {});
 	if (!out || !out.ok) { return { ok: false, error: out && out.error, detail: out && out.detail }; }
@@ -1104,7 +1138,7 @@ function plan(doc, opts) {
 	const q = parsed.qualityOptions || {};
 	const quality = (String(q.quality || '').trim() !== '' && !/^none\b/i.test(String(q.quality).trim()))
 		|| (secs.SOURCES || []).length > 0 || (secs.REACTIONS || []).length > 0;
-	if (quality && !chemicalCarriable(parsed)) { notCarried.push({ code: 'quality', ids: [] }); }
+	if (quality && !chemicalCarriable(parsed) && !ageTraceCarriable(parsed)) { notCarried.push({ code: 'quality', ids: [] }); }
 	// An energy line that states a price, a price pattern or a demand charge other than zero. Efficiency lines are carried.
 	const price = (secs.ENERGY || []).filter((ln) => {
 		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);
@@ -1125,9 +1159,9 @@ function plan(doc, opts) {
 		if (!tankLevel && !clock && frozen.indexOf(c.link) < 0) { frozen.push(c.link); }
 	});
 	if (frozen.length) { notCarried.push({ code: 'controls_pressure', ids: frozen }); }
-	// Mixed, FIFO and LIFO are written; two-compartment is still a candidate and is named here.
+	// Mixed, FIFO, LIFO and two-compartment are written; a two-compartment tank with no usable fraction is named here.
 	const mixMap = (EngCalcs.lpnMixingParse && secs.MIXING) ? EngCalcs.lpnMixingParse(secs.MIXING) : {};
-	const mix = Object.keys(mixMap).filter((tid) => mixMap[tid].model === '2COMP' && nodes.some((n) => n.id === tid && n.type === 'tank'));
+	const mix = Object.keys(mixMap).filter((tid) => mixMap[tid].model === '2COMP' && !twoCompCarriable(mixMap[tid]) && nodes.some((n) => n.id === tid && n.type === 'tank'));
 	if (mix.length) { notCarried.push({ code: 'tank_mixing', ids: mix }); }
 	// Settings and drawing data with no place in the file. The multiplier and the demand model change the
 	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.

@@ -137,10 +137,28 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		});
 		const w = plainWrite(ft.cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: '2COMP 0.2' }));
 		const db = wrap(w.bytes);
-		ok('two-compartment mixing is not written without a candidate (code stays 1, no compartment row)',
-			rows(db, 'SELECT TankMixingModel AS m FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'T1')])[0].m === 1
-			&& rows(db, 'SELECT COUNT(*) AS c FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0].c === 0);
-		ok('...and the writer\'s report lists tank T1 as not written', w.report.notCarried.some((s) => /two-compartment mixing on tank T1/.test(s)), JSON.stringify(w.report.notCarried));
+		const tc = rows(db, 'SELECT TwoCompartmentType_Compartment1 AS a, TwoCompartmentType_Compartment2 AS b FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType WHERE DomainElementID = ?', [elOf(db, 'T1')]);
+		ok('two-compartment mixing 0.2 is written with no candidate: code 0, compartments 20 and 80 percent (Tom, round 3)',
+			rows(db, 'SELECT TankMixingModel AS m FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'T1')])[0].m === 0
+			&& tc.length === 1 && near(tc[0].a, 20, 1e-9) && near(tc[0].b, 80, 1e-9) && w.report.candidateWritten === undefined, JSON.stringify(tc));
+		ok('...and the report does not list it as not written', !w.report.notCarried.some((s) => /two-compartment mixing/.test(s)));
+		const w8 = plainWrite(ft.cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: '2COMP 0.8' }));
+		const db8 = wrap(w8.bytes);
+		const tc8 = rows(db8, 'SELECT TwoCompartmentType_Compartment1 AS a, TwoCompartmentType_Compartment2 AS b FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0];
+		ok('0.8 stores compartment 1 = 80 and compartment 2 = 20', near(tc8.a, 80, 1e-9) && near(tc8.b, 20, 1e-9), JSON.stringify(tc8));
+		db8.close();
+		const w3 = plainWrite(ft.cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: '2COMP 0.333' }));
+		const db3m = wrap(w3.bytes);
+		const tc3 = rows(db3m, 'SELECT TwoCompartmentType_Compartment1 AS a, TwoCompartmentType_Compartment2 AS b FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0];
+		ok('0.333 stores 33.3 and 66.7, which add to 100', near(tc3.a, 33.3, 1e-9) && near(tc3.a + tc3.b, 100, 1e-9), JSON.stringify(tc3));
+		db3m.close();
+		const wn = plainWrite(ft.cyclingNet({ quality: 'Chlorine mg/L', source: true, mixing: '2COMP' }));
+		const dbn = wrap(wn.bytes);
+		ok('a two-compartment tank with no fraction is not written (code stays 1, no row) and is listed',
+			rows(dbn, 'SELECT TankMixingModel AS m FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [elOf(dbn, 'T1')])[0].m === 1
+			&& rows(dbn, 'SELECT COUNT(*) AS c FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0].c === 0
+			&& wn.report.notCarried.some((s) => /two-compartment mixing on tank T1/.test(s)), JSON.stringify(wn.report.notCarried));
+		dbn.close();
 		db.close();
 	}
 
@@ -169,7 +187,18 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		db2.close();
 		const ageW = plainWrite(fs.readFileSync(path.join(out, '3-age-and-trace', 'age.inp'), 'utf8'));
 		const db3 = wrap(ageW.bytes);
-		ok('an age run is still not written without a candidate (type 5, no constituent)', rows(db3, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 5 && rows(db3, 'SELECT COUNT(*) AS c FROM IdahoConstituent')[0].c === 0 && ageW.report.notCarried.some((s) => /quality analysis/.test(s)));
+		ok('an age run is written with no candidate: calculation type 2 with its tolerance row, no constituent, and not listed as lost',
+			rows(db3, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 2 && rows(db3, 'SELECT COUNT(*) AS c FROM EpaNetEngine_CalculationType_AgeAnalysisType')[0].c === 1
+			&& rows(db3, 'SELECT COUNT(*) AS c FROM IdahoConstituent')[0].c === 0 && ageW.report.candidateWritten === undefined && ageW.report.ageTraceWritten === true
+			&& !ageW.report.notCarried.some((s) => /reactions, sources/.test(s)));
+		const trW = plainWrite(fs.readFileSync(path.join(out, '3-age-and-trace', 'trace.inp'), 'utf8'));
+		const dbt = wrap(trW.bytes);
+		ok('a trace run from R is written with no candidate: type 4, tolerance row, Trace_SystemData holds R',
+			rows(dbt, 'SELECT CalculationType AS t FROM EpaNetEngine')[0].t === 4 && rows(dbt, 'SELECT COUNT(*) AS c FROM EpaNetEngine_CalculationType_TraceAnalysisType')[0].c === 1
+			&& rows(dbt, 'SELECT Trace_TraceElement AS e FROM Trace_SystemData')[0].e === elOf(dbt, 'R'));
+		dbt.close();
+		const trBad = plainWrite(fs.readFileSync(path.join(out, '3-age-and-trace', 'trace.inp'), 'utf8').replace('Trace R', 'Trace NOPE'));
+		ok('a trace from a node that does not exist is not written and stays listed', trBad.report.ageTraceWritten === undefined && trBad.report.notCarried.some((s) => /reactions, sources/.test(s)));
 		db3.close();
 		const noQ = plainWrite(ft.cyclingNet({}));
 		const db4 = wrap(noQ.bytes);
