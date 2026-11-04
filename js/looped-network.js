@@ -38556,7 +38556,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// zero would then spend its left half on hours the engine never reported.
 		xB = EngCalcs.lpnProfile.axisBounds(
 			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
-		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		yB = EngCalcs.lpnProfile.seriesBounds(values, lay.y);
 		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
 		// **THE MARGINS FOLLOW THE INK** (Tom, 2026-10-19, on the Rounded theme's graph bubble: no margin
 		// at the lower right, the last time label cut off, and a wide gap between the y title and its
