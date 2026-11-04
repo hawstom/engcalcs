@@ -192,7 +192,7 @@ cannot place. Ranked by what a WaterGEMS user loses without the item:
 | Rank | Item | Placeable now? | State |
 |---|---|---|---|
 | 1 | Demand multiplier | Yes, as arithmetic: no field for it has a seen value (`EpaNetEngine_NormalDemandAdjustmentsCollection` is empty in Tom's file) | **Written**: each base demand is stored already multiplied. The box still says the setting itself is not written |
-| 2 | Water quality, reactions, sources, two-compartment mixing | Mixed, FIFO and LIFO mixing: yes | Mixing **written**. The rest stays candidate-only (below) |
+| 2 | Water quality, reactions, sources, two-compartment mixing | Yes | **Written**: every mixing model, a chemical run, age and trace. Per-element rates, source patterns and the quality step stay candidate-only (below) |
 | 3 | Emitter coefficients | Yes: ft3/s per psi^n | **Written** (below) |
 | 4 | Pump speed pattern | Yes: `VSPType` 0 | **Written** (below) |
 | 5 | Energy price, price pattern, demand charge | No: `EnergyPricing` is empty | Stays |
@@ -224,7 +224,7 @@ line holds: codes come from table and column names, public help, and Tom's own W
 |---|---|---|
 | Emitter coefficient | `IdahoFireFlowNode_Physical_Data.Physical_EmitterCoefficient` in cubic feet per second per psi^n: the EPANET number x 0.00222800929672 (candidate B). The parser keeps k in SI whatever the project shows, so the writer turns it to gpm per psi^n first, then to ft3/s; J3's 1.0 stores 0.00222800929672 | *"B seems to be right. Note that WTG says that the coeff. is gpm/psi^n."* |
 | Pump speed pattern | `Physical_IsVariableSpeedPump` = 1, `VSPType` 0 (pattern based), pattern id in `..._VSPType_PatternBasedType` | *"vsp0 is correct."* |
-| Tank mixing | `ConventionalTank_Constituent_Data.TankMixingModel`: 1 completely mixed, 2 FIFO, 3 LIFO (0 two compartment, 4 nothing) | both code-2 files showed FIFO; code 3 LIFO |
+| Tank mixing | `ConventionalTank_Constituent_Data.TankMixingModel`: 1 completely mixed, 2 FIFO, 3 LIFO (0 two compartment, 4 nothing) | both code-2 files showed FIFO; code 3 LIFO; code 0 with percents 20 and 80 showed 2-Compartment 20 80 0 (round 3) |
 
 **Calculation type codes** (`EpaNetEngine.CalculationType`), from the nine files: 0 Fire flow, 1 Flushing, 2 Age,
 3 Constituent, 4 Trace, 5 the plain hydraulic run (every saved file; "Hydraulics Only" never appeared), 6 Multi-species,
@@ -233,14 +233,15 @@ all wrong. **Source type codes**: 0 Concentration, 1 Flow Paced Booster, 2 Setpo
 guess had mass and flow paced swapped). Whether the mass booster's rate table (`MassBoosterType_BaselineMassRate`) is
 right under code 3 is unchecked. Tom saw "Setpoint Booster 1.0" at J0.
 
-**Still candidate-only** (written only with `opts.candidate`; a 2COMP tank, and all water quality, are named as not
-written by the visitor export):
+**Still candidate-only** (written only with `opts.candidate`; a project holding any of these still lists "Water quality"):
 
 | Feature | Known | Open |
 |---|---|---|
-| Two-compartment mixing | Code 0. Compartments are percents: 0.2 and 0.8 failed in WaterGEMS with *"Must add to 100"*; 20 and 80 ran | Tom: *"giving 0.5 at hour 12. EPANET gives 0.170"*. Compartment 1 and 2 may be the other way round, or the calculation type confounded it. Round 2 writes both orders with calculation type 3 |
-| Chlorine | **Now written by the page** (below): Tom's own save settled the table, columns, sign and units | Per-pipe and per-tank rates, source patterns: column names only, still candidate |
-| Age, trace | Calculation types 2 and 4; `Trace_SystemData.Trace_TraceElement` is the traced node | Not yet run with the right types |
+| Per-pipe and per-tank reaction rates, source patterns | Column names only (`IdahoPipe_Constituent_Data`, `ConventionalTank_Constituent_Data`, `BaseIdahoNode_Constituent_Data`) | No saved file shows one |
+| Water quality time step | `EpaNetEngine.EpaSetWaterQualityTimeStep` 1 and `EpaWaterQualityTimeStep` in seconds: 300 showed as True 0.083 hr in the dialog (round 3) | The answers did not move; round 4 asks Tom to type a step himself and save |
+
+Written by the page since round 3 (2026-11-03): two-compartment tanks (a fraction strictly between 0 and 1 only), age (type 2)
+and trace (type 4, `Trace_SystemData`) runs when the file states no sources or reactions.
 
 ## Tom's chlorine save, 2026-11-03: where WaterGEMS keeps a constituent
 
@@ -274,43 +275,48 @@ layout. Round 2's chlorine files have not been reported on yet.
 **Written by the page now** (`writeChemical()` in `js/lpn-wtg-export.js`, no `opts.candidate`): for a chemical in mg/L
 with global bulk and wall reactions, sources without a pattern, initial quality, calculation type 3, the constituent and
 both wall sub-tables as above. **Still candidate-only:** a rate stated for one pipe or tank, a source pattern (column
-names only), age and trace runs, two-compartment mixing, the quality time step. A project holding any of these still lists
+names only), the quality time step. A project holding any of these still lists
 "Water quality" as not written, so the visitor is told. The page's wording is unchanged; no key was added.
 
 Round 3 (`node dev/lpn-spike/wtg-feature-tests-3.js`, files in `~/tom-files/2026-11-03/wtg-feature-tests-3/`): the chlorine
 file by the page's path, the two-compartment pair plus a 5 minute quality-step variant, and age and trace again.
+Round 4 (`node dev/lpn-spike/wtg-feature-tests-4.js`, `~/tom-files/<date>/wtg-feature-tests-4/`): all three by the page's own path, with
+EPANET's numbers computed on the network as WaterGEMS holds it (pump as two 1 ft pipes) and at its 1 hour quality step.
 
-## Two compartment: why Tom's numbers are not EPANET's (hypotheses, 2026-11-03)
+## Round 3 results, 2026-11-03: what they settled
 
-Tom read, at `T1`, hour 12 and 24: 20 percent inlet compartment 0.5 and 0.7 mg/L; 80 percent 0.4 and 0.6. EPANET (default
-step) gets 0.170 and 0.299, and 0.070 and 0.126. Round 1's completely mixed tank read about 0.2 at hour 24 (EPANET 0.126).
-WaterGEMS shows one decimal, so each reading carries up to 0.05 of rounding. **The two-compartment codes (0, percents,
-compartment 1 first) are not changed on this evidence.**
+Tom's readings (Arizona time, WaterGEMS shows one or two decimals):
 
-1. **A coarse water quality time step (leading).** In EPANET this tiny network's tank is very sensitive to the quality step,
-   because the tank swings from full to nearly empty and the water arrives in a few packets. Measured here with the cycling
-   network: step 5 minutes gives T1 0.130/0.245 (20 percent) and 0.053/0.102 (80 percent); 30 minutes 0.709/0.871 and
-   0.348/0.473; **1 hour 0.480/0.611 and 0.404/0.525**. The 1 hour numbers round to 0.5/0.6 and 0.4/0.5, within a tenth of
-   Tom's 0.5/0.7 and 0.4/0.6 at every reading, and keep the ordering. His template has `EpaSetWaterQualityTimeStep` 0, which
-   may mean "use the hydraulic step" (1 hour here) and not EPANET's one tenth of it. Round 3 asks what step the Calculation
-   Options show, and writes a 5 minute step (300 s) in one file.
-2. **Initial tank quality.** EPANET starts T1 at 0 mg/L. If WaterGEMS starts it elsewhere, every number rises: 0.5 initial
-   gives 0.566/0.634 and 0.527/0.555 even at EPANET's own step, with the 20 percent tank above the 80 percent one. The file
-   stores 0 (`Constituent_InitialConcentration`), but what the dialog shows is the answer. Round 3 asks.
-3. **Setpoint booster semantics.** EPANET's set point source only raises a node's outflow up to the set point. WaterGEMS has the
-   same name but could add the strength at the node's inflow, or reset at each time step. J1 reads 1.00 in both, so this
-   changes the tank only if the booster acts differently on the pump's inflow. Round 3 asks for `J1` at hour 12.
-4. **Run start.** WaterGEMS may spin the quality up from a steady state or a first hydraulic pass, which would also mean a
-   non-zero tank at hour 0. This looks the same as hypothesis 2 from the outside.
-5. **The ordering agrees** (the 20 percent inlet compartment reads higher, as in EPANET), which argues against compartments
-   1 and 2 being swapped: a swap would reverse it.
-6. **A constituent is required for a Constituent run** (his save: the type stays hydraulic until one is chosen, and the constituent
-   is one row in `Constituent_SystemData`). Our two-compartment files carry the Chlorine constituent through the same
-   writer, so they should be valid Constituent runs; if WaterGEMS had instead run them with no constituent, T1 would
-   read blank, not 0.5.
+| File | Tom read | EPANET, 1 h quality step, pump as two 1 ft pipes | EPANET, 5 min |
+|---|---|---|---|
+| `twocomp-c1-20-c2-80`, `T1` hours 12 and 24 | 2-Compartment 20 80 0; 0.49, 0.65; `J1` 1.00 | 0.480, 0.611 | 0.130, 0.245 |
+| `twocomp-c1-80-c2-20` | 80 20 0; 0.45, 0.58 | 0.404, 0.525 | 0.053, 0.102 |
+| `twocomp-c1-20-c2-80-wq5min` | step True 0.083 hr; **0.49, 0.65 again** | | |
+| `chlorine` | `J1` 1.0, 1.0; `T1` 0.2, 0.2 | `J1` 0.958, 0.960; `T1` 0.174, 0.219 | `T1` 0.047, 0.084 |
+| `age` (hour 24) | `J1` 0.173 h; `T1` 17.96 h | 0.173; 18.51 | 0.170; 1.93 |
+| `trace` (hour 24) | `J1` 100; `T1` 57.5 % | 100; 52.2 | 100; 10.2 |
 
-Open: the water quality time step (`EpaWaterQualityTimeStep`, left at the template's value, so WaterGEMS may use other
-than EPANET's 5 minutes).
+Settled:
+
+- **Two-compartment codes are right** (code 0, percents, compartment 1 the inlet compartment; the 20 percent tank reads above the
+  80 percent one, as in EPANET). The calculation options show the quality step as False, "uses Hydraulic Time Step of 1.000".
+  EPANET's answer at this tank swings from 0.13 to 0.71 as its quality step goes 5 to 30 minutes, so the 1 hour step puts
+  EPANET within 0.05 of WaterGEMS (readings 0.49/0.65 and 0.45/0.58) and the gap is the engines', not the codes'.
+- **The quality-step field is written and read** (300 s shows as True 0.083 hr) **but did not move the answers.** Either
+  WaterGEMS runs its own step whatever the dialog states, or our stored step lacks a second field. Round 4 asks Tom to type
+  30 minutes himself and save, so a diff separates the two. Until then the page does not write the step.
+- **Chlorine passes.** `J1` 1.0 was one decimal rounding 0.96. `T1` 0.2 and 0.2 matches EPANET's 0.17 and 0.22 and rules out
+  "reactions not applied" (none would give 0.40 and 0.53). Whether the wall rate is read apart from the bulk rate is
+  open (round 4 asks for `J1` to three decimals: both 0.958, bulk only 0.988). No per-element override or "apply" flag is
+  needed: a table-by-table diff of our `chlorine` against his save (every Constituent and EpaNetEngine table) differs only in
+  the calculation type (his 5, ours 3 with its tolerance row) and the element ids.
+- **Age and trace write correctly** (Calculation Type reads Age and Trace R). The earlier gap (17.96 against 1.93 h) was two
+  things: the quality step, and **the pump**. A pump is a node between two 1 ft pipes 99 in across (as WaterGEMS's own
+  `.inp` import makes it), and 53 ft3 of water in each takes 77 s to cross at 310 gpm. Adding them to the EPANET network
+  puts `J1` at 0.173 h, WaterGEMS's number to the third decimal. Every EPANET figure quoted to Tom since round 4 includes them.
+- **Still open, small:** `T1` age 17.96 against 18.51 h, trace 57.5 against 52.2 percent, two-compartment 0.45 against 0.40.
+  Round 4 asks for the tank's hydraulic grade and the pump flow, which separates "the tank fills differently" (our
+  pump curve, levels or pattern) from "WaterGEMS stirs a tank differently" (its engine; nothing to change).
 
 ## What the tests show
 

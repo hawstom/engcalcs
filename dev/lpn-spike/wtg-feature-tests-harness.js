@@ -1,7 +1,8 @@
 // The WaterGEMS feature writer paths (Task 749). Confirmed by Tom's WaterGEMS on 2026-11-03 and written by the page with
 // no `opts.candidate`: emitter coefficient (ft3/s per psi^n), pump speed pattern (VSPType 0), tank mixing mixed/FIFO/LIFO
 // (codes 1/2/3). A chemical run (constituent, bulk -2 per day, wall -1 ft per day, as Tom's own save stores it) is written with no
-// candidate. Still candidate-only: two-compartment mixing (code 0, percents), age and trace, per-element rates.
+// candidate. Since round 3 (Tom, 2026-11-03) also written with no candidate: two-compartment mixing (code 0, percents), age (type 2)
+// and trace (type 4). Still candidate-only: per-element rates, source patterns, the quality time step.
 //   node dev/lpn-spike/wtg-feature-tests-harness.js
 // Checks the round-2 files dev/lpn-spike/wtg-feature-tests.js builds and the plain writer. NOT proof that WaterGEMS
 // accepts the candidates: only Tom's copy can say that.
@@ -238,6 +239,29 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		ok('the round 3 README names the single most useful step first, quotes the EPANET numbers, uses no em dash and mentions no letter',
 			text3.indexOf('## Single most useful step') > 0 && text3.indexOf('## Single most useful step') < text3.indexOf('## 1-chlorine') && text3.indexOf(e.step5min.frac02[12].node.T1.quality.toFixed(3)) >= 0 && text3.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text3));
 		fs.rmSync(out3, { recursive: true, force: true });
+	}
+
+	console.log('\nRound 4 (dev/lpn-spike/wtg-feature-tests-4.js)');
+	{
+		const ft4 = require('./wtg-feature-tests-4.js');
+		const out4 = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-feature-tests-4-'));
+		const r4 = await ft4.build(out4);
+		ok('4 files written by the page\'s own path (no candidate), each with integrity ok and no foreign key violation', r4.files.length === 4 && r4.files.every((f) => f.candidate === undefined && f.report.candidateWritten === undefined && f.report.integrity === 'ok' && f.report.foreignKeyViolations === 0 && fs.existsSync(path.join(f.dir, f.name + '.wtg'))));
+		const e4 = r4.expected;
+		ok('EPANET with the pump held as two 1 ft pipes reproduces WaterGEMS\'s J1 age of 0.173 h to the third decimal (' + e4.age[24].node.J1.quality.toFixed(3) + ')', near(e4.age[24].node.J1.quality, e4.tomAge.J1_24, 0.0005));
+		ok('chlorine at a 1 hour step: T1 with the reactions (' + e4.chlorine[12].node.T1.quality.toFixed(3) + ') rounds to 0.2 as Tom read, with none to 0.4', e4.chlorine[12].node.T1.quality.toFixed(1) === '0.2' && e4.chlorineNoReactions[12].node.T1.quality.toFixed(1) === '0.4');
+		ok('chlorine J1 tells the wall rate from the bulk rate: both ' + e4.chlorine[12].node.J1.quality.toFixed(3) + ', bulk only ' + e4.chlorineBulkOnly[12].node.J1.quality.toFixed(3), e4.chlorineBulkOnly[12].node.J1.quality - e4.chlorine[12].node.J1.quality > 0.02);
+		ok('the quality step moves EPANET\'s T1 well apart: 5 min, 1 h and 30 min differ by more than 0.2', Math.abs(e4.twoComp.step30min[12].node.T1.quality - e4.twoComp.step1h[12].node.T1.quality) > 0.2 && Math.abs(e4.twoComp.step1h[12].node.T1.quality - e4.twoComp.step5min[12].node.T1.quality) > 0.2);
+		const db4t = wrap(fs.readFileSync(path.join(out4, '1-quality-step', 'twocomp-c1-20-c2-80.wtg.sqlite')));
+		ok('the round 4 two-compartment file leaves the quality step at the template\'s and holds 20 and 80', rows(db4t, 'SELECT EpaSetWaterQualityTimeStep AS f FROM EpaNetEngine')[0].f === 0
+			&& rows(db4t, 'SELECT TwoCompartmentType_Compartment1 AS a FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0].a === 20);
+		db4t.close();
+		const text4 = ft4.readme(e4);
+		const sm = text4.indexOf('## Single most useful step');
+		ok('the round 4 README leads with the single most useful step, quotes the EPANET numbers, uses no em dash and mentions no letter',
+			sm > 0 && sm < text4.indexOf('## 1-quality-step') && text4.indexOf(e4.twoComp.step30min[12].node.T1.quality.toFixed(3)) >= 0 && text4.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text4));
+		ok('every paragraph is one line and no code appears', text4.split('\n').filter((l) => l.trim()).every((l) => /^#|^[A-Z`]|^\d/.test(l)) && !/```|=>|function /.test(text4));
+		fs.rmSync(out4, { recursive: true, force: true });
 	}
 
 	fs.rmSync(out, { recursive: true, force: true });
