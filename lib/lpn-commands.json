@@ -449,7 +449,7 @@
     },
     {
      "id": "project/reports_menu/reports_epanet",
-     "label": "Run",
+     "label": "Solver (run)",
      "parent": "Reports"
     },
     {
