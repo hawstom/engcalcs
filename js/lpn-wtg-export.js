@@ -673,7 +673,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// in the codes Tom's own saved wtg-control-1 showed (dev/wtg-export.md, "Tank-level controls").
 	// A junction-pressure condition has no sample, so its link keeps the frozen clock schedule.
 	const levelCtl = opts.frozenLevelControls ? [] : (parsed.controls || []).filter((c) => c.condition && c.condition.kind === 'node'
-		&& nodeById[c.condition.node] && nodeById[c.condition.node].type === 'tank' && pipeElId[c.link]
+		&& nodeById[c.condition.node] && (nodeById[c.condition.node].type === 'tank' || (opts.candidate && opts.candidate.pressureControls && nodeById[c.condition.node].type === 'junction')) && pipeElId[c.link]
 		&& (c.condition.cmp === 'below' || c.condition.cmp === 'above'));
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
@@ -687,7 +687,11 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const cId = newId(), aId = newId(), kId = newId();
 		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
 		const aName = statusWord + '-' + pipeLabel;
-		const condTxt = cName + ' {"' + c.condition.node + '" Level ' + sym + ' ' + fmt2(c.condition.value) + ' ft}';
+		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
+		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). That save's control was never
+		// put in the control set, so no run has shown WaterGEMS applying it.
+		const isJ = nodeById[c.condition.node].type === 'junction';
+		const condTxt = cName + ' {"' + c.condition.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(c.condition.value) + (isJ ? ' psi}' : ' ft}');
 		const actTxt = aName + ' {"' + pipeLabel + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
 		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
 		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
@@ -695,13 +699,13 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
 		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
 		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
-			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: 0,
-			ElementType_TankLevel: c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
+			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? c.condition.value : 0,
+			ElementType_TankLevel: isJ ? 0 : c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
 			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
 			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
-			ControlConditionElementType: 52
+			ControlConditionElementType: isJ ? 50 : 52
 		});
-		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', 1], TankType: ['ControlConditionTankType', 'TankAttribute', 3],
+		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', isJ ? 2 : 1], TankType: ['ControlConditionTankType', 'TankAttribute', isJ ? 1 : 3],
 			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
 			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
 			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],

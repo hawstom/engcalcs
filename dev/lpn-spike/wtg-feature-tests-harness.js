@@ -304,6 +304,22 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			ok('pump level controls: both sit in the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection')[0].c === 2 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
 			db.close();
 		}
+		// 3. a junction pressure condition (candidate only: the control in Tom's save was never in the control set)
+		{
+			const inp = sv.CASES['ctl-pressure-time'](base).replace(' LINK PU1 OPEN AT TIME 6', '');
+			const wc = plainWrite(inp, { candidate: { pressureControls: true } });
+			const db = wrap(wc.bytes);
+			const j1 = elOf(db, 'J1');
+			const e = rows(db, 'SELECT * FROM IdahoControlCondition_SimpleConditionType_ElementType')[0];
+			const op = rows(db, 'SELECT * FROM IdahoControlCondition_ConditionType_SimpleConditionType')[0];
+			ok('pressure condition (candidate): J1, 60 in the pressure column, element type 50, node attribute 2, operator greater (1), as Tom\'s save', e && e.ElementType_Element === j1 && e.ElementType_Pressure === 60 && e.ElementType_TankLevel === 0 && e.ControlConditionElementType === 50
+				&& rows(db, 'SELECT NodeAttribute AS a FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType')[0].a === 2 && op.SimpleConditionType === 0 && op.CompareOperator === 1, JSON.stringify(e));
+			db.close();
+			const wp = plainWrite(inp);
+			const dbp = wrap(wp.bytes);
+			ok('without the candidate flag no pressure condition is written', rows(dbp, 'SELECT COUNT(*) AS c FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType WHERE NodeAttribute = 2')[0].c === 0);
+			dbp.close();
+		}
 		// 4. pressure-driven demand: power 0.5, threshold 40 psi
 		{
 			const w = plainWrite(sv.CASES['pdd-on'](base));
