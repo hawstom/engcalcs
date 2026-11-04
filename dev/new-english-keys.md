@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**52 still to read on master**, of 61 untranslated keys, of 3346 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**50 still to read on master**, of 59 untranslated keys, of 3344 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -38,7 +38,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   *Current plain sentence:* Run: the report of the simulation run.
   @@ NEEDS RULING
 
-## lpn_  (61, 52 to read @@ NEEDS RULING)
+## lpn_  (59, 50 to read @@ NEEDS RULING)
 
 - **`lpn_diag_builtin_error`**
   > An error occurred in the built-in solver: {message}
@@ -154,9 +154,6 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 - **`lpn_wtg_export_lost_demand_multiplier`**
   > Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.
   @@ NEEDS RULING
-- **`lpn_wtg_export_lost_emitters`**
-  > Emitter coefficients: {ids}.
-  @@ NEEDS RULING
 - **`lpn_wtg_export_lost_energy_price`**
   > Energy price, price pattern, and demand charge.
   @@ NEEDS RULING
@@ -165,9 +162,6 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_positions`**
   > True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.
-  @@ NEEDS RULING
-- **`lpn_wtg_export_lost_pump_speed_pattern`**
-  > Pump speed pattern (pumps {ids}).
   @@ NEEDS RULING
 - **`lpn_wtg_export_lost_quality`**
   > Water quality: the analysis, reactions, sources, and tank mixing.
@@ -188,7 +182,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.
   @@ NEEDS RULING
 - **`lpn_wtg_export_no_pump_curve`**
-  > This network cannot be written: pumps {ids} have no three-point head curve (shutoff, design, and maximum). A power pump or a multiple-point curve is not written.
+  > This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.
   @@ NEEDS RULING
 - **`lpn_wtg_export_no_units`**
   > This network cannot be written: its flow unit is {unit}, and only gpm is written.
@@ -228,7 +222,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 4 unmerged branch(es).
+**10 still to read**, of 53 new keys across 2 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -402,7 +396,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
-
-### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
-
-### feat/wtg-page-export (`5b59b2711`) — adds no English strings

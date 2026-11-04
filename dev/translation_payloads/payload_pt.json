@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 3313,
-        "delta_key_count": 52,
+        "expected_key_count": 3344,
+        "delta_key_count": 83,
         "english_changed_key_count": 24,
         "exempt_key_count": 68,
         "exempt_keys": [
@@ -99,7 +99,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: vazão\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: trecho\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: perda de carga localizada\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Pressão\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: junção\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: reservatório\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nó\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: trecho\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: imagem de fundo\n- water network project, file, or model\n    English: project (saved network)\n    Your language: projeto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: cenário\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: padrão\n- solver or the part that works out the answer\n    English: solver\n    Your language: solucionador\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Tanque\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: vazão de incêndio\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Cliente\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: vazão\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: carga\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: perda de carga\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: trecho\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: perda de carga localizada\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Pressão\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: junção\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: reservatório\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nó\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: trecho\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: imagem de fundo\n- water network project, file, or model\n    English: project (saved network)\n    Your language: projeto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: cenário\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: padrão\n- solver or the part that works out the answer\n    English: solver\n    Your language: solucionador\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Tanque\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: vazão de incêndio\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Cliente\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figura\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
@@ -109,6 +109,37 @@
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_export_item_wtg": ".wtg.sqlite file…",
+        "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
+        "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
+        "lpn_wtg_export_lost_quality": "Water quality: the analysis, reactions, sources, and tank mixing.",
+        "lpn_wtg_export_lost_energy_price": "Energy price, price pattern, and demand charge.",
+        "lpn_wtg_export_lost_rules": "Rule-based controls.",
+        "lpn_wtg_export_lost_controls_pressure": "Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.",
+        "lpn_wtg_export_lost_tank_mixing": "Tank mixing model (tanks {ids}). Tanks are written fully mixed.",
+        "lpn_wtg_export_lost_positions": "True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.",
+        "lpn_wtg_export_lost_demand_multiplier": "Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.",
+        "lpn_wtg_export_lost_demand_model": "Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.",
+        "lpn_wtg_export_lost_texts": "Text on the map.",
+        "lpn_wtg_export_lost_backdrop": "The background picture.",
+        "lpn_wtg_export_t_layout": "The export template does not match the layout this export writes.",
+        "lpn_wtg_export_t_gpv_curve": "Valve {id} has no headloss curve in this project.",
+        "lpn_wtg_export_t_vol_range": "The volume curve of tank {id} does not cover the tank's range of water depth.",
+        "lpn_wtg_export_t_head_pattern": "Reservoir {id} names a head pattern that this project does not define.",
+        "lpn_wtg_export_t_vol_missing": "Tank {id} names a volume curve that this project does not define.",
+        "lpn_wtg_export_t_asset_kind": "Asset {id} is of a kind this export does not write.",
+        "lpn_wtg_export_t_offline": "The export needs a connection to this site the first time, to load its template and the database and EPANET engines. Check the connection and try again.",
+        "lpn_wtg_export_t_integrity": "The files written failed their own check, so they were not offered.",
+        "lpn_wtg_export_no_empty": "This project has no nodes, so there is nothing to export.",
+        "lpn_wtg_export_no_units": "This network cannot be written: its flow unit is {unit}, and only gpm is written.",
+        "lpn_wtg_export_no_headloss": "This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.",
+        "lpn_wtg_export_no_pump_curve": "This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.",
+        "lpn_wtg_export_refused": "This project cannot be written as a .wtg project: {detail}",
+        "lpn_wtg_export_working": "Writing the .wtg project…",
+        "lpn_wtg_export_failed": "The .wtg project was not written: {detail}",
+        "lpn_wtg_export_exported": "Exported {zip}, holding {wtg} and {sqlite}.",
+        "lpn_wtg_export_extract": "Extract both files into one folder, then open the .wtg.",
+        "lpn_wtg_export_left_out": "Not written: {items}",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
@@ -163,6 +194,37 @@
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_export_item_wtg": ".wtg.sqlite file…",
+        "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
+        "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
+        "lpn_wtg_export_lost_quality": "Water quality: the analysis, reactions, sources, and tank mixing.",
+        "lpn_wtg_export_lost_energy_price": "Energy price, price pattern, and demand charge.",
+        "lpn_wtg_export_lost_rules": "Rule-based controls.",
+        "lpn_wtg_export_lost_controls_pressure": "Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.",
+        "lpn_wtg_export_lost_tank_mixing": "Tank mixing model (tanks {ids}). Tanks are written fully mixed.",
+        "lpn_wtg_export_lost_positions": "True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.",
+        "lpn_wtg_export_lost_demand_multiplier": "Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.",
+        "lpn_wtg_export_lost_demand_model": "Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.",
+        "lpn_wtg_export_lost_texts": "Text on the map.",
+        "lpn_wtg_export_lost_backdrop": "The background picture.",
+        "lpn_wtg_export_t_layout": "The export template does not match the layout this export writes.",
+        "lpn_wtg_export_t_gpv_curve": "Valve {id} has no headloss curve in this project.",
+        "lpn_wtg_export_t_vol_range": "The volume curve of tank {id} does not cover the tank's range of water depth.",
+        "lpn_wtg_export_t_head_pattern": "Reservoir {id} names a head pattern that this project does not define.",
+        "lpn_wtg_export_t_vol_missing": "Tank {id} names a volume curve that this project does not define.",
+        "lpn_wtg_export_t_asset_kind": "Asset {id} is of a kind this export does not write.",
+        "lpn_wtg_export_t_offline": "The export needs a connection to this site the first time, to load its template and the database and EPANET engines. Check the connection and try again.",
+        "lpn_wtg_export_t_integrity": "The files written failed their own check, so they were not offered.",
+        "lpn_wtg_export_no_empty": "This project has no nodes, so there is nothing to export.",
+        "lpn_wtg_export_no_units": "This network cannot be written: its flow unit is {unit}, and only gpm is written.",
+        "lpn_wtg_export_no_headloss": "This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.",
+        "lpn_wtg_export_no_pump_curve": "This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.",
+        "lpn_wtg_export_refused": "This project cannot be written as a .wtg project: {detail}",
+        "lpn_wtg_export_working": "Writing the .wtg project…",
+        "lpn_wtg_export_failed": "The .wtg project was not written: {detail}",
+        "lpn_wtg_export_exported": "Exported {zip}, holding {wtg} and {sqlite}.",
+        "lpn_wtg_export_extract": "Extract both files into one folder, then open the .wtg.",
+        "lpn_wtg_export_left_out": "Not written: {items}",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
@@ -334,6 +396,502 @@
                     "key": "lpn_menu_help",
                     "value": "Ajuda",
                     "english": "Help"
+                }
+            }
+        },
+        "lpn_file_export_item_wtg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_file_export_wtg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_quality": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_energy_price": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_controls_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_tank_mixing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_demand_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_demand_model": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_texts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_lost_backdrop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_layout": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_gpv_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_vol_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_head_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_vol_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_asset_kind": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_offline": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_t_integrity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_no_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_no_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_no_headloss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_no_pump_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_extract": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
+                }
+            }
+        },
+        "lpn_wtg_export_left_out": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_refused",
+                    "value": "Este projeto não pode ser gravado como um arquivo EPANET: {detail}",
+                    "english": "This project cannot be written as an EPANET file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_dxf",
+                    "value": "Arquivo DXF…",
+                    "english": "DXF file…"
                 }
             }
         },
