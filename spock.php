@@ -275,6 +275,12 @@ ur_table($view, 'lang', 'Language the page was served in',
 ur_table($view, 'pointer', 'Device pointer',
     'log/engcalcs-human-view.log, field 5. A row with four fields before the bucket predates the '
   . 'column (2026-09-08) and reads as (none), never as fine.');
+ur_table($view, 'themeKind', 'Theme, chosen or theme of the day',
+    'log/engcalcs-human-view.log, field 6. chosen is a theme the visitor picked; day is the theme of '
+  . 'the day. (none) is a page with no themes or a row from before the column.');
+ur_table($view, 'theme', 'Theme shown',
+    'log/engcalcs-human-view.log, field 6 (the theme name, or day). Looped-Network is the only '
+  . 'themed page.');
 ?>
 
 <h2>Calculating</h2>

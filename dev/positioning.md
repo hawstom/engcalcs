@@ -326,8 +326,9 @@ valves 2026-08-14, the run 2026-08-18 through the EPANET engine, checked against
 own `Net3.rpt`. What is left of Task 248 is a pattern on a reservoir head or a pump (248.02) and
 rule-based `[RULES]` (248.03). **"No extended-period simulation yet" is FALSE and must not be
 written again**; it stood in the landing draft until Tom caught it, three days after the run shipped.
-The built-in solver has no time dimension and is not getting one, so a run is an EPANET-engine
-capability and public copy must say which. **`.inp` EXPORT shipped the same day and the same draft
+Since Task 733 slice 7 merged (2026-11-03) the built-in solver runs the extended period, water
+quality and EPANET-MSX too, matched against EPANET 2.3.5, so a run is no longer an EPANET-engine-only
+capability; "our own solver does one instant" is FALSE. EPANET stays the default setting. **`.inp` EXPORT shipped the same day and the same draft
 called that missing too**, so the rule is general: check `dev/roadmap-closed-ids.md` before writing
 any "not built yet" sentence, because this page's honesty paragraph is the first thing to rot.
 

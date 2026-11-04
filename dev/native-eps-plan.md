@@ -74,10 +74,25 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    cases, 20 constructed cases, 3 Net1 cases, 7 refusals) and `native-eps-examples-harness.js`
    (the five pumped gallery examples with a price, pattern, demand charge and efficiency curves added
    through `assembleModel()`, with and without a speed pattern, in US and SI units).
-7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
-   engine setting is built-in and nothing is refused; the transport, frames and Run box are
-   unchanged because the frames have the shape `lpnEpanetRun` resolves to. Water quality is built
-   (phase 4, below) and is wired the same way, on his word; EPANET-MSX stays on EPANET.
+7. **Wiring to the page (built, on branch `feat/native-wire`; merges on Tom's word).** `lpnTimeRun()` asks
+   `EngCalcs.lpnTimeNativePlan(model)` (js/lpn-time.js): the loop runs the period, quality included
+   (`lpnNativeRun(model, {quality: true})`), when the open scenario's engine setting is the built-in solver and
+   `lpnNativeRunGaps(model, {quality: true})` names nothing (it never does for a model the page builds); the
+   setting alone decides, and EPANET runs only when it is the chosen setting (`## What the built-in setting never hands to EPANET`). `modelNeedsEpanet()` no longer calls a period EPANET's
+   when the plan says the loop runs it. Only the transport's run is wired: fire flow, criticality, demand
+   scaling, the scenario comparison and the Alternatives preview still call `lpnEpanetRun`. The loop returns
+   the convergence fields of the EPANET run. Test: `native-wire-harness.js` (Net1 chlorine, Net2 fluoride,
+   Net3 trace and Net3 plain, through the page's run path, held to the tolerances above; a refused case).
+   **Reaction rates are computed** (`reactpipes()` keeps the volume-weighted mean of |c_new - c_old| per second of
+   the step, scaled to a day, and `ratecoeffs()` zeroes it at each hydraulic period, so a report time reads the
+   last step of the period before it); a chemical frame carries `linkRates` for every pipe, in mass/L/day, held to
+   EPANET's within 5e-7 relative over its own hydraulics and 2e-3 absolute end to end on all 24 chemical cases
+   (`native-eps-quality-harness.js`) and on Net1, Net2 and Net3 (`native-wire-harness.js`). The average rates in mass per hour that EPANET's
+   report prints are shown by no part of the page, so the built-in loop does not keep them. The run report's
+   "Water Quality Mass Balance" block is written (round 4: the engine's raw figures, equal to six digits, and its segment count). After every Calculate the status bar says which solver answered
+   (`lpn_engine_native_used`) and the run summary says it for either solver
+   (`lpn_engine_native_used`, `lpn_engine_epanet_used`). The run report is empty on a built-in run
+   (see Reports, Run report). EPANET-MSX runs in the loop (`## EPANET-MSX in the built-in solver`).
 
 ## What slice 1 learned (so slice 2 does not rediscover it)
 
@@ -267,8 +282,7 @@ writes no Quality line); a tank with no area in a quality run; a source type or 
 does not know (error 213); a source on a pattern the model lacks (error 205); a quality step that
 comes to 0 (hydraulic step under 10 s, none stated: EPANET's walk never advances).
 
-**Not copied.** The mass balance and the average reaction rates (the page's reaction-rate column reads
-EPANET's binary output): they change no value a frame carries. A pump at speed 0 left OPEN, which
+**Not copied.** The average reaction rates in mass per hour (no part of the page shows them). The per-pipe reaction rate the page's column shows IS copied (slice 7). A pump at speed 0 left OPEN, which
 EPANET carries a flow of 1e-8 x its head difference through and the loop carries 0.
 
 Test: `native-eps-quality-harness.js`, 106 checks. Every case is run three ways: EPANET; the pass over
@@ -311,6 +325,309 @@ the loop end to end. Tolerances, at every node and link at every reporting time:
 
 ## Wording
 
-"The built-in solver solves one instant" (CLAUDE.md, `lpn_time_no_engine`, `lpn-time.js` comments)
-stays true until slice 7 ships to visitors. It becomes false for the networks a slice covers at that
-moment, not when the code merges. Do not edit it earlier.
+"The built-in solver solves one instant" was false for the networks the loop covers from the day slice 7
+ships. Reworded on `feat/native-wire`: `lpn_time_no_engine`, `lpn_time_no_engine_why`,
+`lpn_time_run_fell_back`, `lpn_settings_engine_native_tip`, `lpn_notes_1_def`. What stays
+true: js/lpn-solver.js solves one instant, and a period no engine can run is shown as one instant.
+
+## What the built-in setting never hands to EPANET (updated 2026-11-02; Task 733, `feat/native-pdd`)
+
+Tom, 2026-11-02, on the Settings tip that said the built-in solver runs periods "unless the network uses a feature
+that only the EPANET solver runs": *"Bad. We will not release this branch until the gap is gone."* The table that
+stood here is empty. With the built-in setting ticked, `EngCalcs.lpnTimeNativePlan()` is "used" for every model the
+page builds, and no run goes to EPANET. Every case is one of two kinds, each held against the EPANET engine by
+`dev/lpn-spike/native-refusal-harness.js` (99 checks):
+
+| Case | Now | Measured on EPANET 2.3.5 |
+|---|---|---|
+| Pressure-driven demand, steady and period | run | `native-pda-harness.js` (23 checks) |
+| A speed pattern on a pump without the page's unscaled curve | run, pattern ignored (the bridge writes none either) | runs, no pattern |
+| A tank that names a volume curve it has no rows for | run as a cylinder | runs as a cylinder |
+| A tank whose minimum and maximum levels are equal | run | runs; heads 0.0006 mm |
+| A trace from a node out of the run | run: quality 0 everywhere | runs; `quality` 0 everywhere |
+| EPANET-MSX mode with no file; an unused file under age | run (no analysis; age) | same |
+| A tank with no area under age, chemical or EPANET-MSX | run, as a reservoir (`qualityNet()` retypes it) | same; age nodes 5e-5 s, chemical 3e-10, MSX 3e-8; level and demand like a reservoir's |
+| A control on a check valve (207), a number on a GPV (207), a negative pipe or pump setting (211) | refused in both: `control-refused` | not ok |
+| A hydraulic step under 10 s with a rule | refused in both: `rule-step-refused` | not ok (`% 0`) |
+| A pump speed pattern the model lacks (205) | refused in both: `speed-pattern-refused` | not ok |
+| A pump speed pattern with a negative multiplier | refused in both: `speed-pattern-refused` | not ok on a non-integer exponent (b = 1.5); finite but meaningless at b = 2 |
+| A tank curve with one row or X not increasing (230), or not reaching MinLvl to MaxLvl (225) | refused in both: `tank-curve-refused` | not ok |
+| A tank started outside its levels (225) | refused in both: `tank-levels-refused` | not ok |
+| A source of an unknown type (213), a source pattern the model lacks (205), an unknown mixing model (213) | refused in both: `quality-refused` | not ok |
+| A hydraulic step under 10 s, quality on, no quality step | refused in both: `quality-refused` ("Quality Timestep") | does not return (over 40 s) |
+| An EPANET-MSX file with a line or expression it cannot read, or a species with no pipe expression | refused in both: `quality-refused`, by line | not ok |
+| Pump energy EPANET refuses (a negative price (217) or demand charge (213), efficiency 0 (217), a price pattern the model lacks (205), an efficiency curve with X not increasing (230)) | refused in both: `energy-refused` | not ok |
+| A rule EPANET refuses (201 to 207) | refused in both: `rules-refused` | not ok |
+| A step the built-in solver cannot solve, or a loop that throws | stops, says so, changes nothing | see below |
+
+**All the refusals are in `EngCalcs.lpnDiagnose`** (`lpnPeriodRefused()` in js/lpn-native-run.js), for a project that
+runs a period only, so a steady project is never refused for them. `runSolve()` already diagnoses before any run, and
+`periodRun()` diagnoses again for the analysis runs, so the status bar names them whichever setting is chosen and
+neither engine starts.
+
+**A step the built-in solver cannot solve, or a loop that throws, no longer swaps engines.** `builtinStopped()` in
+js/lpn-time.js returns a run with no frames and the reasons (`unreachable` and the like, from lpnDiagnose at that
+step), then `builtin-stopped` with the time. EPANET's answer to such a step is not one worth offering: a node cut off
+by a control gets a head of -5 million metres and a warning. The setting is the way to ask EPANET, and the sentence
+says so. Not changed: a step the built-in solver cannot solve keeps no partial frames (EPANET's own stop keeps them).
+
+**The other direction: EPANET chosen and unable to run.** A rejected `lpnEpanetRun` (offline, a blocked download, a browser that
+refuses WebAssembly, a run that fails to start) makes `periodRun()` run the period with the built-in loop; the status bar
+says so (`lpn_time_epanet_fallback`, `_why`), and the run, its summary and its report header name the built-in solver.
+A steady solve already did this (`lpn_engine_failed`). An answer EPANET does give (warnings, a refusal in its words) is
+not touched. `noEngine()` and its one-instant sentence are gone. Test: `dev/lpn-spike/engine-fallback-harness.js`.
+The report line "Input Data File ... temp.inp" is EPANET's own for a period run (Tom, 2026-10-11) and the built-in report matches it.
+
+**Not a run, and not changed**: the run's warnings in EPANET's words (`nativeWarnings()`
+carries only the bridge's notes). A later slice.
+
+## Analysis runs (this slice)
+
+Scenario comparison, fire flow over a duration, criticality, demand scaling, the Alternatives preview and
+`analysisRun` no longer call `lpnEpanetRun`. They call `EngCalcs.lpnTimeRunModel(model, opts)`, which is
+`periodRun()` with the status-bar note switched off (the transport owns that slot). The setting decides, and
+a model the loop refuses runs on EPANET exactly as before. Held by `native-analysis-wire-harness.js` on Net1 and
+Net3: the models those analyses build (a fire demand on a pattern, a pipe closed, a demand multiplier) run both
+ways and agree on the lowest pressure of every node (1 mm), the highest velocity of every link (1e-4 m/s), the
+tank-empty verdict, and every number the fire-flow digest reports. Net3 with demands scaled to 1.5 (pumps past their curves, EPANET warning 4) had differed by 17 mm in a node's lowest pressure; the cause is
+below (`## Flows in EPANET's cubic feet`). Every neighbouring multiplier now holds to 0.11 mm; 1.5 exactly is a knife edge held only up to its event.
+
+## Controls on a reservoir and on a junction pressure at a valve
+
+hydraul.c `controls()` reads every node past the junctions as a tank. A reservoir has no area, so the volume at
+the control level and at the node's head are both 0 and the condition is met at every step, whatever level is
+stated; the loop copies that (`rec.on = 'reservoir'`, `reset = true`). hydstatus.c `pswitch()` for a valve (PRV and
+above) changes it when its setting differs from the control's, else when its status does (measured: an OPEN
+control re-opens a valve stated Closed; two contradicting controls on one valve flip each trial in EPANET and
+the case is not held). The solver builds its valve arrays once, so the loop judges a valve between solves
+(`valveSwitch()`) and solves again from the same flows until nothing changes. Held by 11 cases in
+`native-eps-harness.js` (a reservoir; PRV, FCV, TCV and PBV; setting and status changes).
+Known and not part of this: an FCV at its limit in parallel with a narrow bypass differs by 0.02 L/s from EPANET
+(a plain-solver gap, with or without a control).
+
+## [RULES] EPANET refuses
+
+`EngCalcs.lpnDiagnose` returns `rules-refused` with the rule names for a project that runs a period, whichever
+engine is chosen: FILLTIME on a junction, a time EPANET cannot read, an action on a check valve, a link or node
+that does not exist, a negative setting, a numeric action on a GPV, no premise or no THEN action. (A rule the
+page's grammar cannot read is dropped by `assembleModel()` and said as a warning in both engines; it never
+reaches either.) `native-rules-refusal-harness.js` runs each text through EPANET itself with the check off to
+show EPANET refuses it, and shows a rule EPANET reads but the loop does not copy is not named.
+
+## Pressure-driven demand (PDA)
+
+Transcribed from OWA-EPANET 2.3.5 hydcoeffs.c (`demandcoeffs`, `demandheadloss`, `addlowerbarrier`,
+`addupperbarrier`) and hydsolver.c (`newdemandflows`, `pdaconverged`, `hasconverged`). A junction of positive full
+demand is an emitter-like element with head loss `dP (D/Dfull)^(1/Pexp)` and EPANET's smooth barriers at both
+ends (constants 1e9 and 1e-6, in ft and cfs, converted); the delivered demand D starts at the full demand each
+solve, is stepped toward the matrix head (clamped to 0.4 Dfull a trial, scaled by the damping factor), and the
+solve is not converged until every D is within 0.0001 cfs of the demand function at the solved pressure. Junctions
+of zero or negative demand stay fixed. `MINPDIFF` is taken as 0.1 (feet), which only matters when Required minus
+Minimum pressure is under 0.1 ft; it could not be read from the source fetched and is not tested. The result carries
+`demands` (delivered, emitter included, as EN_DEMAND) and `demandDeficits`; frames and the quality pass read them.
+`lpnDiagnose` no longer refuses PDA under the built-in setting; `pda-pressures` still does. The page no longer
+routes a PDA project to EPANET; the keys `lpn_engine_pda_route` and `lpn_diag_pda_needs_epanet` were deleted in all 27 files (nothing rendered them).
+Held by `native-pda-harness.js` (23 checks): 11 constructed steady cases (exponents 0.5, 1, 1.5; a minimum
+pressure; defaults; pressure under the minimum; zero and negative demand; a tank; an emitter), Net1 and Net3 with
+PDA options and demands scaled until nodes starve (heads within 0.5 mm, flows within 0.02 L/s, delivered demand
+within 0.0001 L/s), two 24 h periods, and water age over a starved period (nodes 0.06 s). Not held: PDA with
+[RULES] that read a node's DEMAND (the rule reads the step's full demand, as for a demand-driven run).
+
+## Flows in EPANET's cubic feet (the 17 mm gap)
+
+EPANET divides every flow of an LPS file by 28.317 although a cubic foot is 28.3168466 L, so its hydraulics are the
+physical problem with every flow (demands, emitter and curve flows, an FCV setting) 5.4e-6 smaller than exact SI. The
+loop solves in those flows and reports the file's (`solveInFeet()` in js/lpn-native-run.js: inputs times
+28.316846592/28.317, a pump's power-law coefficient times that to the power minus b, outputs divided back). Base Net3
+went from 0.13 mm to 0.0014 mm of EPANET at every node. A closed link also carries head difference over CBIG
+(hydcoeffs.c pipecoeff(), pumpcoeff()) (`opts.closedLeak`, `leakFlows`), which starts the next step but is not a tank's inflow.
+
+Tank 2 at 1.5 reaches its minimum level at 15:07:56 to within 1.5e-6 m. `tanklevels()` snaps a draining tank to its
+minimum only when `V - q <= Vmin` (a full second of flow below it), so EPANET leaves tank 2 a hair below the minimum for
+hours and `tankstatus()` (`head <= Hmin`) calls it empty; its solve uses that head. The loop used to hand the solver the
+limit itself (`solverLevel()`), 7.9e-6 m too high, which moved the tank's pipe flow by 2.5e-4 of itself and landed the
+tank 1.8e-6 m on the wrong side of the line. The true head goes to the solver now, and the shut-tank test accepts a level
+below the minimum. Neighbouring multipliers, 1.5 itself and the base run are held for the whole run to 0.004 mm
+(`native-analysis-wire-harness.js`). Also copied from the source here: only a link above CLOSED adds to a tank's net
+inflow (newlinkflows()). Tried and left out because nothing it touches is measurable: a pipe's friction gradient under RQtol
+becoming RQtol / Hexp (pipecoeff()), RQtol 1e-7 rather than 1e-6 for pipes and pumps, and EPANET's PI (3.141592654) in the
+first flows; together they push Net2's water age 3.95 s from EPANET's, past its 3 s tolerance (of 190 000 s). The pipe to Tank 2 is in that low-flow line, so its
+flow is the leftover of the network around it: a one-ulp change to one pipe's roughness moves the loop's tank landing by 4e-7 m
+and EPANET's by the same, which is why the landing must be decided by the head handed to the solver and not by luck.
+
+## The rule premises that fell back (native-wire, slice 3)
+
+Copied now, from rules.c `checkvalue()` and input1.c/input3.c: a pipe's SETTING (LinkSetting is Kc, which inithyd() fills;
+rules.c converts it for PRV, PSV, PBV and FCV only, so a Darcy-Weisbach roughness is held in feet and compared with the number
+as typed in millimetres); a GPV's SETTING (the index of its curve, read from the file the bridge writes, or the 0 of the
+throttle a curveless GPV is written as); and a reservoir's LEVEL and PRESSURE (its head less its base head, which EPANET
+keeps in the node's elevation, so 0 until a head pattern moves it). Held by 8 cases in `native-eps-harness.js` and by
+`native-rules-refusal-harness.js`, which now says the loop copies them.
+
+## Run report and warning words (native-wire, slice 4)
+
+`EngCalcs.lpnNativeRun(...).report` is EPANET 2.3.5's text report, written as the run goes from report.c, epanet.c and
+hydraul.c's own strings (text.h FMT18 to FMT69, WARN01 to WARN06): the banner, the summary of the project, "Analysis begun",
+"Hydraulic Status:", then for every instant "Balanced after N trials", each tank and reservoir whose state changed
+(thresholds on its net inflow of 0.001 cfs), each link whose status changed (pipes, then pumps, then valves, EPANET's
+numbering), the control and rule actions in the order they act, the WARNING lines (negative pressures, a valve that cannot
+deliver, a pump past its curve or unable to lift, disconnected nodes and the closed link that cuts them off, unbalanced),
+the flow balance and "Analysis ended". Held to EPANET's own report line for line, the three clock stamps aside, on Net1,
+Net2 and Net3 at Accuracy 1e-5 and 1e-3, on Net3 with its demands raised, and on warning cases
+(`native-report-harness.js`, 22 checks), and on every constructed case of `native-eps-harness.js`.
+
+What makes the trial count equal: the solve stops at EPANET's trial (`opts.epAcc`, hasconverged(): total flow change within
+Accuracy of total flow, Accuracy clamped to 1e-5 .. 1e-1, 0.001 when none is stated), from the flows EPANET starts from
+(initlinkflow(): a closed link QZERO, a pump its speed times its design flow, every other link 1 ft/s; later steps from the
+last flows, a closed link's being its leak), and a pump's flow is read as it stands (no floor), as pumpcoeff() reads it.
+**This changes the answer the page gives under the built-in setting:** it is now EPANET's trial's, not a tighter one, so at
+the page's default Accuracy of 0.001 the heads are EPANET's, to the last digit, and equally loose.
+
+**Valve status is carried, as EPANET carries it.** The solver started every solve with each pressure or flow valve ACTIVE and
+with the valve's flow at 1 ft/s, so a step after a valve had gone open or closed took 5 trials where EPANET took 1 (a closed
+valve's flow of 0 was thrown away as "no previous flow"). The loop now hands the next solve the status the last one ended in
+(`valveStart`) and the flow it ended with (a closed valve's being EPANET's leak, QZERO). Constructed valve cases whose trial
+counts now equal EPANET's: PRV, PSV, FCV (twice) and a GPV's setting as a premise (at the first step that
+differed the loop took 5, 5, 2, 2 and 2 trials against EPANET's 1, 3, 1, 1 and 1; now equal); a PBV that EPANET balanced in 6 trials and the loop called "Unbalanced after 13" is now balanced in 8.
+
+**Round 3 (trial counts, found by running EPANET at status report level 2, which prints every trial's relative flow change, beside the
+loop's own trace).** Causes and fixes: (1) a valve a control changed was re-solved as a new solve, so its trials were counted from 1
+again where EPANET goes on counting (`hydsolve()` continues): now added up; (2) the control's test on a valve compared the status
+as well as the setting every step (`pswitch()` compares the setting, and the status only when the setting is MISSING): fixed;
+(3) after the change the next trials started from the step's first statuses (a link a full tank shut, a pump that could not lift,
+a pressure valve's state), not those the trials reached: fixed, and a valve reported with no flow starts from QZERO whatever it is
+then told; (4) a pump on a speed pattern starts its first solve at speed 1 (its stated SPEED is discarded); (5) Darcy-Weisbach
+used a frozen friction factor and a quadratic law at every Reynolds number, where EPANET uses a straight line below Re 2000 and
+adds the friction factor's own derivative in the gradient: now EPANET's. Trial counts then equal EPANET's on every constructed case
+but three, from 11 cases that differed: junction-pressure controls on a PRV (three cases), an FCV (two), a TCV and a PBV, the
+pump speed pattern and the Darcy-Weisbach case now agree.
+
+**Still not held** (3 cases print `GAP`): (a) a PBV at 2:46:53, 8 trials against 6: after a full tank shuts the pipe below it the
+PBV's forced drop leaves a relative flow change of about 1e-5 at the convergence threshold, 6e-5 for the loop and 1e-5 for the
+engine in the trial after, and the count follows which side of 1e-5 each lands on; (b) the Darcy-Weisbach case differs by one
+second in the time a tank fills (11:23:40 against 11:23:41), the two flows differing in the fifth digit, not in a count; (c) a
+GPV with no curve (an open TCV in the engine's file) at 8:00:00, 14 trials against 15: both fall by the same factor of 0.46 a
+trial, the engine starting from a relative flow change of 0.95 where the loop starts from 0.56 after a rule re-opens the bypass
+pipe; not found (starting the valve from 1 ft/s moves the loop's figure to 0.32, not 0.95). The flow balance's numbers agree to 2e-5 of themselves.
+Quality runs write the summary lines for the analysis and EPANET's "Water Quality Mass Balance" block.
+
+## EPANET-MSX in the built-in solver
+
+Tom, 2026-11-01: *"I'd prefer to implement EPANET-MSX even if it causes us a delay. There is no rush on this."* and *"Trudge forward."*
+`dev/msx-scope.md` Phase 3 ("do not start until Phase 2 has users") is superseded by that call.
+
+### What MSX computes (EPANET-MSX 1.1 / 2.0, read from the source, not from memory)
+
+The reference implementation is OpenWaterAnalytics/epanet-msx, `src/` (msxqual.c, msxchem.c, msxtank.c, rk5.c, ros2.c,
+newton.c, msxutils.c, mathexpr.c, msxinp.c, msxproj.c), Copyright (C) 2007 Feng Shang, Lewis Rossman and James Uber (US EPA).
+**Licence:** `doc/license.txt` in that repository is the GNU LGPL v3 (with `dev/msx-scope.md` having said MIT, which was wrong
+or out of date); LGPL v3 and this project's GPL v3 combine, and every file written from it names the source and carries that
+notice. The vendored epanet-js build already runs it (the page's Phase 2); that WASM engine is the test oracle here.
+
+- **Input.** A second file, `model.msx.text`: `[OPTIONS]` (AREA_UNITS FT2 default, M2, CM2; RATE_UNITS **DAY** default, SEC, MIN, HR;
+  SOLVER EUL default, RK5, ROS2; COUPLING NONE default, FULL; TIMESTEP 300 s; RTOL 0.001; ATOL 0.01; COMPILER ignored),
+  `[SPECIES]` (BULK or WALL, units, optional ATOL and RTOL), `[COEFFICIENTS]` (CONSTANT, PARAMETER), `[TERMS]` (named
+  expressions), `[PIPES]` and `[TANKS]` (one RATE, FORMULA or EQUIL expression per species; tanks reuse the pipe set when none is
+  given), `[SOURCES]` (CONCEN, MASS, SETPOINT, FLOWPACED; species, node, strength, pattern), `[QUALITY]` (GLOBAL, NODE, LINK
+  initial values), `[PARAMETERS]` (PIPE and TANK overrides), `[PATTERNS]`. Expressions are + - * / ^, unary minus, parentheses and
+  the functions abs, sgn, sqrt, step, exp, log, log10, sin, cos, tan, cot, asin, acos, atan, acot, sinh, cosh, tanh, coth,
+  asinh, acosh, atanh, acoth; they may use any species, term, parameter, constant, and the pipe's hydraulic variables
+  D (diameter, project length unit), Q (flow), U (velocity), Re, Us (shear velocity), Ff (Darcy-Weisbach friction factor),
+  Av (wall area per volume, area unit per litre) and Kc (roughness). In a tank the hydraulic variables are 0.
+- **Hydraulics.** MSX reads EPANET's saved hydraulics (node demands D, heads H and link flows Q as 4-byte floats, step by step),
+  so it runs after the hydraulic run and over the same records the water quality pass already keeps (`hydRecord()`).
+- **Transport.** Time-driven, not event-driven: every quality step (TIMESTEP, cut to land on each hydraulic change) does, in order,
+  react every segment of every pipe and tank (`MSXchem_react`), advect (wall species only: the entering segment takes the
+  volume-weighted wall concentration of the segments displaced, and the rest shift), accumulate (take the flow volume from the
+  leading segments of each pipe into its downstream node; a pipe whose volume is less than the flow passes the upstream node's
+  concentration), update nodes (mix inflows; a tank by its mixing model MIXED, 2COMP, FIFO or LIFO; new equilibrium), add
+  sources (CONCEN on external inflow, MASS, SETPOINT, FLOWPACED) and release (a new segment at the entrance of each pipe, or
+  the last segment grown when its concentrations are within every species' ATOL of the new ones).
+- **Chemistry in a segment.** RATE species integrate dC/dt over the step in RATE_UNITS by Euler (clipped at 0), RK5 (Cash-Karp/
+  Dormand-Prince, adaptive, with its remembered step `hstep` kept on the segment, tolerances per species) or ROS2 (a two-stage
+  Rosenbrock, adaptive, forward-difference Jacobian eps 1e-7). EQUIL species are the solution of a Newton system (20 iterations,
+  3 significant digits, the Jacobian by central differences of eps 1e-7) after every reaction, and inside every rate
+  evaluation when COUPLING is FULL. FORMULA species are evaluated last. Negative results are clipped to 0.
+- **Outputs the page shows.** Per reporting time, per node and per link, one number per species in the file's order, in the
+  species' units (wall species per AREA_UNITS, none at a node): a node's concentration (a tank's own) and a link's volume-weighted
+  mean over its segments, as `MSXqual_getNodeQual()` and `MSXqual_getLinkQual()` give them (`frames[].msxNodes`, `.msxLinks`,
+  `msxSpecies`). **The MSX text report is produced** (msxrpt.c, in the vendored engine's 2.0.0 words) by both solvers when the
+  file's `[REPORT]` section flags a node or a link: after "Analysis ended", a logo, the title and one series table per flagged
+  node and link (species YES/NO and precision, PAGESIZE), held to the engine line for line by `native-msx-report-harness.js`.
+  The engine ignores `[TIMES] Statistic` here (it prints series for all four values), so the loop does. The engine's
+  "Water Quality Mass Balance" blocks after the tables (one per species with a pipe RATE expression) are written too, from
+  msxqual.c's own accounting (initial and final stored mass, source and reservoir inflow, demand and reservoir outflow, mass
+  reacted by segment): equal to the engine to six printed digits on the arsenic example, and within 1.4e-5 on Net1 with each tank model.
+
+### Test cases
+
+EPA's arsenic oxidation and adsorption example (`dev/lpn-spike/fixtures/msx-example/`: As5Adsorb, with its published `.rpt`),
+the one-species chlorine decay (`dev/lpn-spike/fixtures/chlorine-decay.msx`) on Net1, EPANET's own chemical analysis as the
+cross-check of the decay (`msx-run-harness.js` already holds both against the engine), and constructed networks run through
+both engines by `native-msx-harness.js`: each solver, FULL coupling, equilibrium, wall species, every source type, every tank
+mixing model, a pattern, per-pipe parameters.
+
+### Slices (each ends with its harness green and a commit)
+
+1. **The file and the expressions.** `js/lpn-native-msx.js`: the `.msx` parser with MSX's defaults, units and errors (named, in
+   the file's words), and the expression evaluator. Held by `native-msx-harness.js` against the engine's own reading of the
+   same files (`msxGetCount`, `msxGetSpecies`, `msxGetConstant`, `msxGetParameter`) and by hand-computed expressions.
+2. **The chemistry of one segment.** EUL, RK5, ROS2, Newton, equilibrium, formulas, coupling. Held by a reaction-only network
+   (no flow, one pipe, one tank) against the engine at 1e-6 relative.
+3. **Transport and nodes for bulk species**, a MIXED tank, sources and initial quality. Held on Net1 and the chlorine decay.
+4. **Wall species**, the arsenic example against its published report and the engine.
+5. **Tank models 2COMP, FIFO, LIFO**, per-element parameters, patterns on sources.
+6. **Wiring.** The run no longer falls back to EPANET for a file the slices cover; `lpnNativeRunRefusals` names what is not covered.
+
+### Built so far (native-wire, 2026-11-01), and what it found
+
+`js/lpn-native-msx.js`, `native-msx-harness.js` (66 checks, about 10 s). **Done: slices 1 to 5 and the wiring of slice 6.** Not done: nothing
+known (the Net3 dead end and the mass balance blocks are done, below).
+**2-compartment and last-in-first-out tanks are in the loop** (they were left to EPANET by tank name; the first run of both was
+1.7e-2 and 1.8e-2 off the engine). Two causes, both found by running the engine: a pipe that sends more than it holds sends
+its upstream tank's concentration as the tank leaves the step (after this step's mix, run on a copy of the tank's segments), not
+as it entered it; and the mixing zone starts first and holds up to its own volume, where epanet-msx's main branch starts the
+first segment with the volume above it. Now: LIFO 7.7e-5, 2COMP 6.7e-5 at every zone size on
+Net1; MIXED and FIFO moved from 2.6e-4 to under 7.5e-5 as well. Net3 with either model: 2.5e-4 (the dead end below is fixed).
+
+Against the vendored engine, every species at every node and link at every reporting time (13 775 values on Net3, 1 125 on
+the arsenic example, 1 525 on Net1):
+
+| Case | Worst gap |
+|---|---|
+| EPA's arsenic example (equilibrium, formula and wall species, term with Av), EUL, RK5, ROS2, coupling NONE and FULL | 7e-14 (EUL, RK5); **7e-7 (ROS2)** |
+| Net1 with a decaying chlorine, RK5 | 3.2e-4 mg/L |
+| Net1 with two bulk species and a wall species, a term, a parameter override, a pattern, two sources, each solver and coupling | 2.6e-4 |
+| Net1 with SETPOINT, FLOWPACED (on a pattern), MASS and CONCEN sources; tank MIXED and FIFO | 2.6e-4 |
+| Net3 (pumps closing, three tanks, two reservoirs), three species | **2.5e-4** (1.2e-3 before the stagnant-flow rule below) |
+| Net1 with a LIFO tank; with a 2COMP tank (mixing zone 0.3, 1, 0.05); Net3 with either | 7.7e-5; 6.7e-5 at 0.3, 1 and 0.05 (it was 2.6e-3 at 0.05); 2.8e-4, 2.6e-4 |
+
+Where the vendored engine departs from epanet-msx's main branch, found by running both (each is a comment at its line):
+a pipe never holds more than its own volume (the segment released into it is capped at the link's volume); a link whose volume is
+no more than the flow volume (a pump or valve always) passes all it holds and the rest of the flow volume as the upstream node's own
+water, and is emptied; a reservoir's formula species are evaluated; a tank's rate species start from the SEGMENT's concentration, not
+the tank's (the main branch makes every segment of a FIFO, LIFO or 2COMP tank follow one curve); LIFO removes the newest
+segment by `next`, not `prev`. And one defect in this repository's bridge, corrected: `lpnToInp` did not write `[MIXING]` for an
+MSX run, so every tank mixed completely in the EPANET engine whatever the page said; it does now.
+
+The Net3 gap was how a pipe that moves several of its volumes in one quality step hands water downstream. The vendored engine
+sends the water a pipe cannot hold (flow volume past link volume) from the upstream node's concentration AS THAT NODE WILL MIX IT
+THIS STEP: everything the links into it bring, so they are taken first (the loop sorts the links in flow order each hydraulic
+step), mixed with any external inflow as `updateNodes()` does, and the average of the segments around the node when nothing flows
+in; a reservoir sends the concentration it has, a tank the one it ends the step with. Found by two small chains of short pipes in `native-msx-harness.js`
+(exact to 1e-15 whichever way the links are numbered), not by reading the source: epanet-msx's main branch sends the first
+segment's quality for all of it and does not fit. A pump or valve holds no segment at all, so none is averaged at the node it
+feeds once it stops. Net3 went from 3.0e-2 to 1.2e-3; the harness held it at 0.0012. What was left was node 15, a dead end whose pipe carries 1e-8 L/s of noise (1.15e-3, 1.3 per cent). Found in the
+engine's own source (USEPA/EPANETMSX, src/solver/msxqual.c, LGPL v3; no code is carried, the rules are written again in
+`js/lpn-native-msx.js`): `getHydVars()` sets any flow under 0.005 gpm (Q_STAGNANT, 1.114e-5 cfs) to zero; a pipe's direction has
+three states (positive, negative, zero); its segments are turned over only when the flow goes from one way to the other, never
+when it stops or starts; and a node with no inflow takes the average of the first segment of each link flowing into it and
+the last segment of each link flowing out, a pipe at zero flow counting as flowing from its first node. So the noise pipe
+kept its old orientation in the loop and read the wrong end. Net3 went from 1.15e-3 to 2.45e-4 (3e-4 held). 
+
+**The tank models are epanet-msx 2.0's, not 1.1's** (USEPA/EPANETMSX, src/solver/msxtank.c and msxqual.c, LGPL v3; the rules are
+written again in `js/lpn-native-msx.js`, no code carried). The 2-compartment cause of the 2.6e-3 at a mixing zone of 0.05: 2.0
+keeps the mixing zone as the tank's LAST segment and moves a transferred volume between the zones each step (where 1.1 steps
+each zone's concentration by an Euler step through the inflow), and starts the stagnant zone first with the volume above the
+mixing zone's. Now 6.7e-5 at zones of 0.05, 0.3 and the whole tank. LIFO and FIFO follow 2.0's order (the new segment is added
+before the withdrawal, and a tank's only segment keeps its volume when it is emptied, as the engine's does).

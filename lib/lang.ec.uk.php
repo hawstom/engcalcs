@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Вимкніть, якщо перерах
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Розрахунок цієї мережі тривав {secs} с, а вона налаштована перераховуватися після кожної зміни. Щоб зупинити це й повернути кнопку Розрахувати, вимкніть «Перераховувати автоматично» в Налаштуваннях, у розділі Розрахунок, Гідравліка.';
-$ec_lang['lpn_time_no_report']='Звіту про розрахунок ще немає. Звіт — це текстовий звіт EPANET, тож він з’являється після розрахунку цієї мережі.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Діапазон';
 $ec_lang['lpn_time_clock_day']='День {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Записуйте час як години і хвилини, наприклад 2:30. Просте число означає години, тож 8 — це вісім годин. Півгодини — це 0:30.';
 $ec_lang['lpn_time_running']='Виконується розрахунок за розширений період.';
-$ec_lang['lpn_time_no_engine']='Вбудований розв’язувач розраховує один момент часу за раз, тож це мережа лише на {time}: кожен шаблон зчитується в цей момент, а кожна ємність залишається на початковому рівні, не наповнюючись і не спорожнюючись. Підключіться до інтернету один раз, щоб завантажити розв’язувач EPANET, який виконує розрахунок за розширений період.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Вбудований розв’язувач розраховує один момент часу за раз, тож це мережа лише на {time}: кожен шаблон зчитується в цей момент, а кожна ємність залишається на початковому рівні, не наповнюючись і не спорожнюючись. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Не вдалося завантажити розв’язувач EPANET. Перезавантажте сторінку, щоб спробувати ще раз; завантаженню може заважати брандмауер, проксі або розширення браузера.';
 $ec_lang['lpn_time_engine_start_failed']='Браузер відмовився запускати розв’язувач EPANET. WebAssembly може бути вимкнено параметром безпеки або розширенням.';
 $ec_lang['lpn_time_engine_run_failed']='Розрахунок EPANET не вдався. Це дефект цієї сторінки; повідомте про нього через посилання {wrong}.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Потрібний тиск';
 $ec_lang['lpn_settings_req_pressure_tip']='Введіть тиск, за якого або вище якого вузол отримує повне споживання. Він має бути більшим за мінімальний тиск. Використовуйте одиницю тиску цього проєкту. Залиште порожнім, щоб узяти типове значення EPANET: у psi для американських одиниць витрати, інакше в метрах.';
 $ec_lang['lpn_settings_pressure_exponent']='Показник степеня тиску';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Введіть показник степеня кривої, що зростає від нульової витрати за мінімального тиску до повного споживання за потрібного тиску.';
-$ec_lang['lpn_engine_pda_route']='Розраховано розв’язувачем EPANET, бо модель споживання задана за тиском.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Модель споживання задана за тиском, і її може розрахувати лише розв’язувач EPANET. Розв’язувач EPANET не вдалося завантажити, тож цих результатів немає.';
 $ec_lang['lpn_result_delivered_demand']='Подане споживання';
 $ec_lang['lpn_result_delivered_demand_tip']='Витрата, яку цей вузол фактично отримує за моделі споживання за тиском. Вона менша за споживання, коли тиск нижчий за потрібний.';
 $ec_lang['lpn_result_demand_deficit']='Дефіцит споживання';

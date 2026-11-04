@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Изключете, ако преизчи
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Тази мрежа отне {secs} s за изчисление, и е зададена да се преизчислява след всяка промяна. За да спрете това и да върнете бутона „Изчисли“, изключете „Преизчислявай автоматично“ в Настройки, под Изчисление, Хидравлика.';
-$ec_lang['lpn_time_no_report']='Все още няма отчет от изчислението. Отчетът е текстовият отчет на EPANET, затова се появява, след като тази мрежа е изчислена.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Размах';
 $ec_lang['lpn_time_clock_day']='Ден {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Запишете време като часове и минути, например 2:30. Голо число означава часове, така че 8 означава осем часа. Половин час е 0:30.';
 $ec_lang['lpn_time_running']='Изпълнява се изчисление за период от време.';
-$ec_lang['lpn_time_no_engine']='Вграденият решаващ алгоритъм изчислява по един момент наведнъж, затова това е мрежата само в {time}: всеки шаблон се чете в този момент, а всяка цистерна остава на началното си ниво, вместо да се пълни и изпразва. Свържете се с интернет веднъж, за да изтеглите решаващия модул на EPANET, който изпълнява изчисление за период от време.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Вграденият решаващ алгоритъм изчислява по един момент наведнъж, затова това е мрежата само в {time}: всеки шаблон се чете в този момент, а всяка цистерна остава на началното си ниво, вместо да се пълни и изпразва. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Изтеглянето на решаващия модул на EPANET не успя. Презаредете страницата, за да опитате отново; възможно е защитна стена, прокси или разширение на браузъра да го блокира.';
 $ec_lang['lpn_time_engine_start_failed']='Браузърът отказа да стартира решаващия модул на EPANET. Възможно е WebAssembly да е изключен от настройка за сигурност или от разширение.';
 $ec_lang['lpn_time_engine_run_failed']='Изчислението с EPANET не успя. Това е дефект на тази страница; използвайте връзката {wrong}, за да го докладвате.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Изисквано налягане';
 $ec_lang['lpn_settings_req_pressure_tip']='Въведете налягането, при което и над което възелът получава пълната си потребност. То трябва да е по-голямо от минималното налягане. Използвайте мерната единица за налягане на този проект. Оставете празно, за да се използва стойността по подразбиране на EPANET, която е в psi за американските единици за водно количество и в метри в останалите случаи.';
 $ec_lang['lpn_settings_pressure_exponent']='Показател на налягането';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Въведете показателя на кривата, която расте от нулево водно количество при минималното налягане до пълната потребност при изисквано налягане.';
-$ec_lang['lpn_engine_pda_route']='Изчислено с решаващия модул на EPANET, защото моделът на потребността е зависим от налягането.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Моделът на потребността е зависим от налягането и само решаващият модул на EPANET може да го изчисли. Решаващият модул на EPANET не можа да бъде зареден, затова тези резултати липсват.';
 $ec_lang['lpn_result_delivered_demand']='Доставена потребност';
 $ec_lang['lpn_result_delivered_demand_tip']='Водното количество, което този възел действително получава при модела на потребността, зависим от налягането. То е по-малко от потребността, когато налягането е под изискваното налягане.';
 $ec_lang['lpn_result_demand_deficit']='Недостиг на потребност';

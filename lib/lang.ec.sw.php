@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Zima ikiwa ukokotoaji upya ni wa polepole
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Mtandao huu ulichukua sekunde {secs} kukokotoa, na umewekwa kukokotoa upya baada ya kila mabadiliko. Ili kusitisha hilo na kupata kitufe cha Kokotoa kirudi, zima “Kokotoa upya kiotomatiki” kwenye Mipangilio, chini ya Ukokotoaji, Haidroliki.';
-$ec_lang['lpn_time_no_report']='Bado hakuna ripoti ya uendeshaji. Ripoti ni ripoti ya maandishi ya EPANET, kwa hiyo huonekana baada ya mtandao huu kukokotolewa.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Wigo';
 $ec_lang['lpn_time_clock_day']='Siku {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Andika muda kama saa na dakika, kwa mfano 2:30. Namba peke yake inamaanisha saa, hivyo 8 ni saa nane. Nusu saa ni 0:30.';
 $ec_lang['lpn_time_running']='Inaendesha uigaji wa kipindi kirefu cha muda.';
-$ec_lang['lpn_time_no_engine']='Kitatuzi kilichojengwa ndani hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee: kila muundo husomwa wakati huo, na kila tanki hubaki kwenye kiwango chake cha mwanzo badala ya kujaa na kupungua. Unganisha kwenye intaneti mara moja ili kupakua kitatuzi cha EPANET, kinachoendesha uigaji wa kipindi kirefu cha muda.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Kitatuzi kilichojengwa ndani hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee: kila muundo husomwa wakati huo, na kila tanki hubaki kwenye kiwango chake cha mwanzo badala ya kujaa na kupungua. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Upakuaji wa kitatuzi cha EPANET umeshindwa. Pakia upya ukurasa ili kujaribu tena; ngome ya moto, seva mbadala, au kiongezi cha kivinjari kinaweza kuuzuia.';
 $ec_lang['lpn_time_engine_start_failed']='Kivinjari kimekataa kuanzisha kitatuzi cha EPANET. WebAssembly inaweza kuwa imezimwa na mpangilio wa usalama au kiongezi.';
 $ec_lang['lpn_time_engine_run_failed']='Uendeshaji wa EPANET umeshindwa. Hiyo ni hitilafu katika ukurasa huu; tumia kiungo cha {wrong} kuiripoti.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Shinikizo linalohitajika';
 $ec_lang['lpn_settings_req_pressure_tip']='Andika shinikizo ambalo muunganiko hupokea mahitaji yake kamili likiwa ndilo au zaidi yake. Lazima liwe kubwa kuliko shinikizo la chini kabisa. Tumia kitengo cha shinikizo cha mradi huu. Liache wazi ili kutumia chaguo-msingi la EPANET, ambalo ni psi kwa vitengo vya mtiririko vya Marekani na mita vinginevyo.';
 $ec_lang['lpn_settings_pressure_exponent']='Kipeo cha shinikizo';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Andika kipeo cha mkunjo unaopanda kutoka kutokuwa na mtiririko kwenye shinikizo la chini kabisa hadi mahitaji kamili kwenye shinikizo linalohitajika.';
-$ec_lang['lpn_engine_pda_route']='Imetatuliwa kwa kitatuzi cha EPANET, kwa sababu muundo wa mahitaji unaendeshwa na shinikizo.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Muundo wa mahitaji unaendeshwa na shinikizo, na ni kitatuzi cha EPANET pekee kinachoweza kuukokotoa. Kitatuzi cha EPANET hakikuweza kupakiwa, kwa hiyo matokeo haya hayapo.';
 $ec_lang['lpn_result_delivered_demand']='Mahitaji yaliyotolewa';
 $ec_lang['lpn_result_delivered_demand_tip']='Mtiririko ambao muunganiko huu hupokea kweli chini ya muundo wa mahitaji unaoendeshwa na shinikizo. Ni mdogo kuliko mahitaji wakati shinikizo liko chini ya shinikizo linalohitajika.';
 $ec_lang['lpn_result_demand_deficit']='Upungufu wa mahitaji';

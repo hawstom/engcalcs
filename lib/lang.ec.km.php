@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='បិទប្រសិនបើកា�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='បណ្ដាញនេះចំណាយពេល {secs} វិនាទីដើម្បីគណនា ហើយវាត្រូវបានកំណត់ឲ្យគណនាឡើងវិញបន្ទាប់ពីរាល់ការផ្លាស់ប្ដូរ។ ដើម្បីបញ្ឈប់វា ហើយឲ្យប៊ូតុង គណនា ត្រឡប់មកវិញ សូមបិទ “គណនាឡើងវិញដោយស្វ័យប្រវត្តិ” នៅក្នុង ការកំណត់ ក្រោម ការគណនា, ធារាសាស្ត្រ។';
-$ec_lang['lpn_time_no_report']='មិនទាន់មានរបាយការណ៍ដំណើរការនៅឡើយទេ។ របាយការណ៍នេះជាអត្ថបទផ្ទាល់របស់ EPANET ដូច្នេះវានឹងបង្ហាញនៅពេលបណ្ដាញនេះត្រូវបានគណនាដោយឧបករណ៍ដោះស្រាយ EPANET។';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='ជួរ';
 $ec_lang['lpn_time_clock_day']='ថ្ងៃទី {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='សរសេរពេលវេលាជាម៉ោង និងនាទី ដូចជា 2:30។ លេខធម្មតាមានន័យជាម៉ោង ដូច្នេះ 8 មានន័យប្រាំបីម៉ោង។ កន្លះម៉ោងគឺ 0:30។';
 $ec_lang['lpn_time_running']='កំពុងគណនាការក្លែងធ្វើលើរយៈពេលមួយ។';
-$ec_lang['lpn_time_no_engine']='ឧបករណ៍ដោះស្រាយខាងក្នុងគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ៖ តម្គុណលំនាំគ្រប់មួយត្រូវបានអានត្រង់ភ្លែតនោះ ហើយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា ជំនួសឲ្យការបំពេញ និងបង្ហូរ។ ភ្ជាប់អ៊ីនធឺណិតម្ដង ដើម្បីទាញយកឧបករណ៍ដោះស្រាយ EPANET ដែលដំណើរការការក្លែងធ្វើលើរយៈពេលមួយ។';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='ឧបករណ៍ដោះស្រាយខាងក្នុងគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ៖ លំនាំគ្រប់មួយត្រូវបានអានត្រង់ភ្លែតនោះ ហើយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា ជំនួសឲ្យការបំពេញ និងបង្ហូរ។ {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='ការទាញយកឧបករណ៍ដោះស្រាយ EPANET បានបរាជ័យ។ ផ្ទុកទំព័រឡើងវិញដើម្បីព្យាយាមម្ដងទៀត។ ជញ្ជាំងភ្លើង ប្រូកស៊ី ឬផ្នែកបន្ថែមកម្មវិធីរុករកអាចកំពុងទប់ស្កាត់វា។';
 $ec_lang['lpn_time_engine_start_failed']='កម្មវិធីរុករកមិនព្រមចាប់ផ្ដើមឧបករណ៍ដោះស្រាយ EPANET ទេ។ WebAssembly អាចត្រូវបានបិទដោយការកំណត់សុវត្ថិភាព ឬផ្នែកបន្ថែម។';
 $ec_lang['lpn_time_engine_run_failed']='ការដំណើរការ EPANET បានបរាជ័យ។ នោះជាកំហុសនៅក្នុងទំព័រនេះ។ ប្រើតំណ {wrong} ដើម្បីរាយការណ៍វា។';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='សម្ពាធដែលត្រូ�
 $ec_lang['lpn_settings_req_pressure_tip']='បញ្ចូលសម្ពាធដែលត្រឹម ឬលើសនោះ ថ្នាំងទទួលតម្រូវការពេញលេញរបស់វា។ វាត្រូវតែធំជាងសម្ពាធអប្បបរមា។ ប្រើខ្នាតសម្ពាធរបស់គម្រោងនេះ។ ទុកឲ្យទទេដើម្បីប្រើលំនាំដើមរបស់ EPANET ដែលជា psi សម្រាប់ខ្នាតលំហូរអាមេរិក និងម៉ែត្រសម្រាប់ផ្សេងទៀត។';
 $ec_lang['lpn_settings_pressure_exponent']='និទស្សន្តសម្ពាធ';
 $ec_lang['lpn_settings_pressure_exponent_tip']='បញ្ចូលនិទស្សន្តនៃខ្សែកោងដែលឡើងពីគ្មានលំហូរនៅសម្ពាធអប្បបរមា ទៅតម្រូវការពេញលេញនៅសម្ពាធដែលត្រូវការ។';
-$ec_lang['lpn_engine_pda_route']='បានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ព្រោះគំរូតម្រូវការផ្អែកលើសម្ពាធ។';
-$ec_lang['lpn_diag_pda_needs_epanet']='គំរូតម្រូវការផ្អែកលើសម្ពាធ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់។';
 $ec_lang['lpn_result_delivered_demand']='តម្រូវការដែលបានផ្ដល់';
 $ec_lang['lpn_result_delivered_demand_tip']='លំហូរដែលថ្នាំងនេះទទួលបានពិតប្រាកដក្រោមគំរូតម្រូវការផ្អែកលើសម្ពាធ។ វាតិចជាងតម្រូវការ នៅពេលសម្ពាធទាបជាងសម្ពាធដែលត្រូវការ។';
 $ec_lang['lpn_result_demand_deficit']='កង្វះតម្រូវការ';

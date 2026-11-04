@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3290,
+    "count": 3285,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7077,7 +7077,6 @@
         "lpn_diag_not_converged_drawn": "c9af3c1a40344645b34e08540c4eace6a6aab2fd",
         "lpn_diag_not_converged_error": "a4bca62339886e680d6aedd3c95a072efd4eb90d",
         "lpn_diag_not_converged_trials": "3dc4d15aacde0500578a4163bfffdb31ae317739",
-        "lpn_diag_pda_needs_epanet": "d045e4b184f611f93ac47190ff9901d31e6b236d",
         "lpn_diag_pda_pressures": "7400b020caeb54c651f793fa38655345276bda59",
         "lpn_diag_unreachable": "47ac0fa90c300d4af6030cbe9d66684201016f97",
         "lpn_diag_valve_conflict": "dae9e3d4836df50df959a8545af2f2e1ceb4fea5",
@@ -7268,7 +7267,6 @@
         "lpn_engine_needed_failed": "61caa90ec1a10da73de93656293323da2d2934b8",
         "lpn_engine_needed_failed_why": "94f0bc0a1eb18f3eff74cd6ddc0774602a4ee949",
         "lpn_engine_needed_loading": "885cf961b4e706413eaeb08704ad24601bc7d019",
-        "lpn_engine_pda_route": "7da8190b512a3468f3e35ecf43d47cc8a8938f08",
         "lpn_engine_ready": "23d4813de30763e559ee97a9646f6dbf61eb36dc",
         "lpn_engine_refused": "815a147f3525b395c9fee1cec420496473cf507e",
         "lpn_engine_refused_fallback": "4a0ed25241bb3023e10b9b942c8cd443684af3a1",
@@ -9280,10 +9278,7 @@
         "lpn_time_level": "2acd312aaacd65e498c59f4407e0167feb048c2e",
         "lpn_time_menu": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
         "lpn_time_next": "aaf8ed898a06fb6844e4de115541eccc70875afc",
-        "lpn_time_no_engine": "9998b2ec4df9c03c4dc4359813b464c2a1c32c63",
-        "lpn_time_no_engine_why": "077517fbbded6e108de479306dc2b8ed544363b7",
         "lpn_time_no_period": "22868dbdfb350ceef9c7bfe0e39f7e20a4916613",
-        "lpn_time_no_report": "e17ec1d97d6317a75a3bf838cabf3d5d53bae77f",
         "lpn_time_pattern_start": "a764bb1e81176ba8a27f7e13e88e965049f85138",
         "lpn_time_pattern_step": "3e1e3dcda0a00dc27a84e0d20f639f5e0250490e",
         "lpn_time_pause": "781961bc81c25697841ecce5d4d9dad9f6b261c6",
@@ -12127,10 +12122,6 @@
             "words": 5,
             "ends_sentence": true
         },
-        "lpn_diag_pda_needs_epanet": {
-            "words": 26,
-            "ends_sentence": true
-        },
         "lpn_diag_pda_pressures": {
             "words": 14,
             "ends_sentence": true
@@ -12889,10 +12880,6 @@
         },
         "lpn_engine_needed_loading": {
             "words": 13,
-            "ends_sentence": true
-        },
-        "lpn_engine_pda_route": {
-            "words": 12,
             "ends_sentence": true
         },
         "lpn_engine_ready": {
@@ -20939,20 +20926,8 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_time_no_engine": {
-            "words": 53,
-            "ends_sentence": true
-        },
-        "lpn_time_no_engine_why": {
-            "words": 38,
-            "ends_sentence": false
-        },
         "lpn_time_no_period": {
             "words": 31,
-            "ends_sentence": true
-        },
-        "lpn_time_no_report": {
-            "words": 22,
             "ends_sentence": true
         },
         "lpn_time_pattern_start": {

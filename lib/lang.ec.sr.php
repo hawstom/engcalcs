@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Искључите ако је понов
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Ова мрежа је требало {secs} s да се израчуна, а подешена је да се поново израчунава после сваке измене. Да бисте то зауставили и вратили дугме Израчунај, искључите „Аутоматски израчунавај” у Подешавањима, под Прорачун, Хидраулика.';
-$ec_lang['lpn_time_no_report']='Још нема извештаја о прорачуну. Извештај је текстуални извештај EPANET-а, па се појављује пошто се ова мрежа израчуна.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Опсег';
 $ec_lang['lpn_time_clock_day']='Дан {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Упишите време као часове и минуте, на пример 2:30. Обичан број значи часове, тако да 8 значи осам часова. Пола сата је 0:30.';
 $ec_lang['lpn_time_running']='Извршава се симулација током продуженог периода.';
-$ec_lang['lpn_time_no_engine']='Уграђени решавач израчунава један тренутак истовремено, па је ово мрежа само у тренутку {time}: сваки образац се чита у том тренутку, а сваки тенк и даље стоји на свом почетном нивоу уместо да се пуни и празни. Повежите се једном на интернет да бисте преузели EPANET решавач, који покреће симулацију током продуженог периода.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Уграђени решавач израчунава један тренутак истовремено, па је ово мрежа само у тренутку {time}: сваки образац се чита у том тренутку, а сваки тенк остаје на свом почетном нивоу уместо да се пуни и празни. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Преузимање EPANET решавача није успело. Поново учитајте страницу да покушате опет; можда га блокира заштитни зид, прокси или проширење прегледача.';
 $ec_lang['lpn_time_engine_start_failed']='Прегледач је одбио да покрене EPANET решавач. WebAssembly је можда искључен безбедносним подешавањем или проширењем.';
 $ec_lang['lpn_time_engine_run_failed']='EPANET прорачун није успео. То је грешка у овој страници; користите везу {wrong} да је пријавите.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Потребан притисак';
 $ec_lang['lpn_settings_req_pressure_tip']='Унесите притисак на коме или изнад кога чвор добија пуну потрошњу. Мора бити већи од минималног притиска. Користите јединицу притиска овог пројекта. Оставите празно да користите подразумеване вредности EPANET-а, у psi за америчке јединице протока, а иначе у метрима.';
 $ec_lang['lpn_settings_pressure_exponent']='Експонент притиска';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Унесите експонент криве која расте од нултог протока при минималном притиску до пуне потрошње при потребном притиску.';
-$ec_lang['lpn_engine_pda_route']='Решено EPANET решавачем, јер је модел потрошње вођен притиском.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Модел потрошње је вођен притиском, а рачуна га само EPANET решавач. EPANET решавач није могао да се учита, па ови резултати недостају.';
 $ec_lang['lpn_result_delivered_demand']='Испоручена потрошња';
 $ec_lang['lpn_result_delivered_demand_tip']='Проток који овај чвор заиста добија по моделу потрошње вођеном притиском. Мањи је од потрошње када је притисак испод потребног притиска.';
 $ec_lang['lpn_result_demand_deficit']='Мањак потрошње';

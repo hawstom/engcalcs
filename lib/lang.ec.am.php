@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='እንደገና ማስላት በጣም �
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='ይህ መረብ ለማሰላት {secs} ሰከንድ ወስዷል፣ እናም ከእያንዳንዱ ለውጥ በኋላ እንደገና እንዲያሰላ ተዘጋጅቷል። ይህን ለማስቆምና የአስላ አዝራር ለማግኘት፣ በቅንብሮች ውስጥ፣ በስሌት፣ ሃይድሮሊክስ ስር ያለውን «በራስ-ሰር እንደገና አስላ»ን ያጥፉ።';
-$ec_lang['lpn_time_no_report']='እስካሁን የስራ ሪፖርት የለም። ሪፖርቱ የEPANET የጽሑፍ ሪፖርት ነው፣ ስለዚህ ይህ መረብ ከተሰላ በኋላ ይታያል።';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='ክልል';
 $ec_lang['lpn_time_clock_day']='ቀን {day}፣ {clock}';
 $ec_lang['lpn_time_format_tip']='ጊዜን በሰዓትና ደቂቃ ይጻፉ፣ ለምሳሌ 2:30። ነጠላ ቁጥር የፈጀውን ሰዓት ብዛት ያመለክታል፤ ስለዚህ 8 ብቻ ማለት ስምንት ሰዓት የፈጀ ጊዜ ማለት ነው እንጂ የቀን ሰዓት አይደለም። ግማሽ ሰዓት 0:30 ተብሎ ይጻፋል።';
 $ec_lang['lpn_time_running']='የተራዘመ ጊዜ ማስመሰያውን በማስኬድ ላይ።';
-$ec_lang['lpn_time_no_engine']='አብሮ የተሰራው ፈታች አንድ ቅጽበት በአንድ ጊዜ ይፈታል፣ ስለዚህ ይህ መረብ በ{time} ላይ ብቻ ነው፦ እያንዳንዱ ስርዓት በዚያ ቅጽበት ይነበባል፣ እያንዳንዱ ታንክም ከመሙላትና ከመትፋት ይልቅ በመነሻ ደረጃው ላይ ይቆያል። የተራዘመ ጊዜ ማስመሰያ የሚያካሂደውን የEPANET ፈታች ለማውረድ አንድ ጊዜ ከኢንተርኔት ጋር ይገናኙ።';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='አብሮ የተሰራው ፈታች አንድ ቅጽበት በአንድ ጊዜ ይፈታል፣ ስለዚህ ይህ መረብ በ{time} ላይ ብቻ ነው፦ እያንዳንዱ ስርዓት በዚያ ቅጽበት ይነበባል፣ እያንዳንዱ ታንክም ከመሙላትና ከመትፋት ይልቅ በመነሻ ደረጃው ላይ ይቆያል። {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='የEPANET ፈታች ማውረድ አልተሳካም። እንደገና ለመሞከር ገጹን እንደገና ይጫኑ፤ ፋየርዎል፣ ፕሮክሲ ወይም የአሳሽ ማራዘሚያ እያገደው ሊሆን ይችላል።';
 $ec_lang['lpn_time_engine_start_failed']='አሳሹ የEPANET ፈታችን ለመጀመር ፈቃደኛ አልሆነም። WebAssembly በደህንነት ቅንብር ወይም በማራዘሚያ ጠፍቶ ሊሆን ይችላል።';
 $ec_lang['lpn_time_engine_run_failed']='የEPANET ስራ አልተሳካም። ይህ በዚህ ገጽ ውስጥ ያለ ጉድለት ነው፤ ለማሳወቅ {wrong} አገናኙን ይጠቀሙ።';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='የሚያስፈልግ ግፊት';
 $ec_lang['lpn_settings_req_pressure_tip']='መገናኛ ሙሉ ፍላጎቱን የሚቀበልበትን ግፊት ወይም ከዚያ በላይ ያስገቡ። ከዝቅተኛው ግፊት መብለጥ አለበት። የዚህን ፕሮጀክት የግፊት መለኪያ ክፍል ይጠቀሙ። የEPANET ነባሪን ለመጠቀም ባዶ ይተዉት፣ እሱም ለUS የፍሰት መለኪያ ክፍሎች በpsi ነው፣ ለሌሎች ደግሞ በሜትር።';
 $ec_lang['lpn_settings_pressure_exponent']='የግፊት ገላጭ';
 $ec_lang['lpn_settings_pressure_exponent_tip']='ከዝቅተኛው ግፊት ምንም ፍሰት ከሌለበት ተነስቶ በሚያስፈልገው ግፊት ወደ ሙሉ ፍላጎት የሚወጣውን ኩርባ ገላጭ ያስገቡ።';
-$ec_lang['lpn_engine_pda_route']='የፍላጎት ሞዴሉ በግፊት የሚመራ ስለሆነ በEPANET ፈታች ተፈትቷል።';
-$ec_lang['lpn_diag_pda_needs_epanet']='የፍላጎት ሞዴሉ በግፊት የሚመራ ነው፣ የሚያሰላውም የEPANET ፈታች ብቻ ነው። የEPANET ፈታች ሊጫን አልቻለም፣ ስለዚህ እነዚህ ውጤቶች የሉም።';
 $ec_lang['lpn_result_delivered_demand']='የደረሰ ፍላጎት';
 $ec_lang['lpn_result_delivered_demand_tip']='በግፊት በሚመራው የፍላጎት ሞዴል ይህ መገናኛ በትክክል የሚቀበለው ፍሰት። ግፊቱ ከሚያስፈልገው ግፊት በታች ሲሆን ከፍላጎቱ ያነሰ ነው።';
 $ec_lang['lpn_result_demand_deficit']='የፍላጎት ጉድለት';

@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 3303,
-        "delta_key_count": 17,
-        "english_changed_key_count": 4,
+        "expected_key_count": 3313,
+        "delta_key_count": 52,
+        "english_changed_key_count": 24,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -71,13 +71,19 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ថ្នាំង\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: អាងស្តុក\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- solver or the part that works out the answer\n    English: solver\n    Your language: ឧបករណ៍ដោះស្រាយ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: អតិថិជន\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ចម្រៀកបំពង់\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ការបាត់បង់មូលដ្ឋាន\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ថ្នាំង\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: អាងស្តុក\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: លំនាំដើម\n- solver or the part that works out the answer\n    English: solver\n    Your language: ឧបករណ៍ដោះស្រាយ\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ធុងទឹក\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: វ៉ាល់\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: អតិថិជន\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
+        "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -89,14 +95,49 @@
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
         "lpn_inpalt_cancelled": "Nothing was changed.",
-        "lpn_settings_solver": "Solver"
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.",
+        "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
+        "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
+        "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_engine_native": "Use the built-in solver",
+        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
+        "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
+        "lpn_time_run_report": "Solver (run) report",
+        "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+        "lpn_settings_solver": "Solver",
+        "lpn_reports_epanet": "Solver (run)",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
+        "lpn_engine_native_used": "Solved with the built-in solver.",
+        "lpn_engine_epanet_used": "Solved with the EPANET solver.",
+        "lpn_diag_rules_refused": "EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:",
+        "lpn_diag_control_refused": "EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:",
+        "lpn_diag_rule_step_refused": "Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.",
+        "lpn_diag_speed_pattern_refused": "These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:",
+        "lpn_diag_tank_curve_refused": "The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:",
+        "lpn_diag_tank_levels_refused": "The initial level of these tanks is not between the minimum level and the maximum level:",
+        "lpn_diag_quality_refused": "EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:",
+        "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
+        "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "keys": {
+        "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
+        "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inp_drop_report": "This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.",
         "lpn_inpalt_lead": "This file changes values in the categories below. Choose the alternative that receives the values of each.",
         "lpn_inpalt_base_note": "Every scenario inherits the Base alternative, so choosing it changes them all.",
         "lpn_inpalt_heading": "Alternative for {category}",
@@ -108,9 +149,54 @@
         "lpn_inpalt_base": "The Base alternative",
         "lpn_inpalt_receipt": "Alternatives that received the values: {list}",
         "lpn_inpalt_cancelled": "Nothing was changed.",
-        "lpn_settings_solver": "Solver"
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.",
+        "lpn_engine_unavailable_why": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}",
+        "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.",
+        "lpn_engine_needed_failed_why": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}",
+        "lpn_settings_engine_native": "Use the built-in solver",
+        "lpn_settings_engine_native_tip": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.",
+        "lpn_time_epanet_fallback": "The EPANET solver could not be loaded, so the built-in solver ran this network.",
+        "lpn_time_epanet_fallback_why": "The built-in solver ran this network, because the EPANET solver could not be used. {reason}",
+        "lpn_time_run_report": "Solver (run) report",
+        "lpn_time_run_report_tip": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+        "lpn_settings_solver": "Solver",
+        "lpn_reports_epanet": "Solver (run)",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.",
+        "lpn_engine_native_used": "Solved with the built-in solver.",
+        "lpn_engine_epanet_used": "Solved with the EPANET solver.",
+        "lpn_diag_rules_refused": "EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:",
+        "lpn_diag_control_refused": "EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:",
+        "lpn_diag_rule_step_refused": "Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.",
+        "lpn_diag_speed_pattern_refused": "These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:",
+        "lpn_diag_tank_curve_refused": "The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:",
+        "lpn_diag_tank_levels_refused": "The initial level of these tanks is not between the minimum level and the maximum level:",
+        "lpn_diag_quality_refused": "EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:",
+        "lpn_diag_energy_refused": "EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:",
+        "lpn_diag_builtin_stopped": "The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_stopped_at": "The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.",
+        "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "key_context": {
+        "lpn_guide_text_rptbox": {
+            "reason": "english_changed",
+            "current_value": "បង្ហាញរបាយការណ៍អត្ថបទដែលសរសេរដោយម៉ាស៊ីន EPANET សម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ រួមទាំងការព្រមាន និងសេចក្តីសង្ខេបបណ្ដាញ។ ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់នីមួយៗជំនួសវា ការដោះស្រាយនៅពេលតែមួយមិនជំនួសទេ ហើយការកែសម្រួលទុករបាយការណ៍មុននៅនឹងកន្លែង។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_text_scncmp_box",
+                    "value": "ដោះស្រាយគ្រប់សេណារីយ៉ូដែលបានធីកក្នុង កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ទាំងអស់លើកលែងតែការធីកត្រូវបានដោះចេញ ពីច្បាប់ចម្លងនៃគំនូរ ហើយរៀបជាតារាងសម្រាប់សេណារីយ៉ូនីមួយៗ នូវចំនួនតម្លៃផ្ទាល់ខ្លួន កត្តាគុណតម្រូវការ រយៈពេលដំណើរការសរុប ចន្លោះពេលធារាសាស្ត្រ សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុត។ ជ្រើសរើស ទឹក, របាយការណ៍, ការប្រៀបធៀបសេណារីយ៉ូ ដើម្បីបើកវា។ ការប្រៀបធៀបចាប់ផ្ដើមពេលវាបើក ហើយចាប់ផ្ដើមម្ដងទៀតបន្ទាប់ពីការកែសម្រួលនីមួយៗ ខណៈដែលវានៅបើក។\\n\\nវាមិនផ្លាស់ប្ដូរគម្រោងទេ ហើយសេណារីយ៉ូដែលកំពុងបើកនៅដដែល។",
+                    "english": "Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\\n\\nIt does not change the project, and the scenario that is open is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_guide_text_status_box",
+                    "value": "រាយតាមលំដាប់ពេលវេលា រាល់ការផ្លាស់ប្ដូរក្នុងការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ៖ ម៉ាស៊ីនបូម វ៉ាល់ ឬបំពង់បើក ឬបិទ ធុងទឹកចាប់ផ្ដើមបំពេញ ឬបន្ទោរបង់ ឬពេញ ឬទទេ និងជំហានពេលវេលាណាមួយដែលមិនបានប្រសព្វគ្នាពេញលេញ។ មានតែការផ្លាស់ប្ដូរប៉ុណ្ណោះដែលត្រូវបានរាយ មិនមែនគ្រប់ជំហានពេលវេលាទេ។",
+                    "english": "Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step."
+                }
+            }
+        },
         "lpn_guide_set_where_def": {
             "reason": "english_changed",
             "current_value": "<p>បញ្ជីនៅខាងឆ្វេងនៃប្រអប់លោតទៅផ្នែកមួយ ឬចំណងជើងរងមួយ។ ផ្នែកទាំងនោះគឺ ការមើលឃើញទិន្នន័យ (ស្លាកថ្នាំង ពណ៌ថ្នាំង ស្លាកតំណ ពណ៌តំណ អតិថិជន និងទាំងអស់) ផែនទី ទំព័រ ធាតុ (បុព្វបទលេខសម្គាល់ តម្លៃ និងលក្ខណៈសម្បត្តិផ្ទាល់ខ្លួន) ការគណនា (ខ្នាតវាស់ ពេលវេលា ធារាសាស្ត្រ ថាមពល និងគុណភាពទឹក) និង កិត្តិយស។ ចំណងជើងរងនីមួយៗចែងថាតើការកំណត់របស់វា រក្សាទុកជាមួយគម្រោង ឬ រក្សាទុកក្នុងកម្មវិធីរុករកនេះ។ អ្វីៗទាំងអស់ត្រូវបានរក្សាទុកជាមួយគម្រោង លើកលែងតែការកំណត់ក្រោម ទំព័រ និងជួរដេកមួយក្នុង ធារាសាស្ត្រ គឺ បង្ហាញប្រអប់វឌ្ឍនភាពដំណើរការ ដែលចែងខ្លួនឯងថា រក្សាទុកក្នុងកម្មវិធីរុករកនេះ។<\/p><p>ផ្ទាំង ការកំណត់ ក្នុង តារាង រាយការកំណត់ដូចគ្នាជាជួរដេក ជាមួយ ប្រភេទ និង តម្លៃ របស់វា ដូច្នេះការកំណត់ក៏អាចត្រូវបានរក និងត្រួតពិនិត្យនៅទីនោះដែរ។<\/p>",
@@ -124,6 +210,38 @@
                     "key": "lpn_guide_set_search_term",
                     "value": "ការស្វែងរក",
                     "english": "Searching"
+                }
+            }
+        },
+        "lpn_guide_rr_what_def": {
+            "reason": "english_changed",
+            "current_value": "<p>ជ្រើសរើស ទឹក, របាយការណ៍, ការដំណើរការ។ របាយការណ៍គឺជាអត្ថបទដែលម៉ាស៊ីន EPANET បានសរសេរសម្រាប់ការក្លែងធ្វើលើរយៈពេលមួយចុងក្រោយ ជាទំព័រ។ វាចាប់ផ្ដើមដោយបដា និងឈ្មោះបណ្ដាញ បន្ទាប់មករាប់ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ បន្ទាប់មកចែងជម្រើសវិភាគ ហើយបន្ទាប់មករាយស្ថានភាពធារាសាស្ត្រនៃការដំណើរការជាមួយការព្រមានរបស់វា។ ប៊ូតុង ចម្លង ចម្លងអត្ថបទ។<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_rr_what_term",
+                    "value": "អ្វីដែលរបាយការណ៍មាន",
+                    "english": "What the report holds"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_rr_example_def",
+                    "value": "<p>បើកឧទាហរណ៍ Net1 ដែលបានគណនារួចហើយ ហើយជ្រើសរើស ទឹក, របាយការណ៍, ការដំណើរការ។ សេចក្ដីសង្ខេបរាប់ 9 ថ្នាំង 1 អាងស្តុក 1 ធុងទឹក 12 បំពង់ 1 ម៉ាស៊ីនបូម និង 0 វ៉ាល់។ រូបមន្តការបាត់បង់ក្បាលទឹកគឺ Hazen-Williams ជំហានពេលវេលាធារាសាស្ត្រគឺ 1.00 hrs ហើយរយៈពេលសរុបគឺ 24.00 hrs។<\/p>",
+                    "english": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>"
+                }
+            }
+        },
+        "lpn_guide_rr_example_def": {
+            "reason": "english_changed",
+            "current_value": "<p>បើកឧទាហរណ៍ Net1 ដែលបានគណនារួចហើយ ហើយជ្រើសរើស ទឹក, របាយការណ៍, ការដំណើរការ។ សេចក្ដីសង្ខេបរាប់ 9 ថ្នាំង 1 អាងស្តុក 1 ធុងទឹក 12 បំពង់ 1 ម៉ាស៊ីនបូម និង 0 វ៉ាល់។ រូបមន្តការបាត់បង់ក្បាលទឹកគឺ Hazen-Williams ជំហានពេលវេលាធារាសាស្ត្រគឺ 1.00 hrs ហើយរយៈពេលសរុបគឺ 24.00 hrs។<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_rr_what_def",
+                    "value": "<p>ជ្រើសរើស ទឹក, របាយការណ៍, ការដំណើរការ។ របាយការណ៍គឺជាអត្ថបទដែលម៉ាស៊ីន EPANET បានសរសេរសម្រាប់ការក្លែងធ្វើលើរយៈពេលមួយចុងក្រោយ ជាទំព័រ។ វាចាប់ផ្ដើមដោយបដា និងឈ្មោះបណ្ដាញ បន្ទាប់មករាប់ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ បន្ទាប់មកចែងជម្រើសវិភាគ ហើយបន្ទាប់មករាយស្ថានភាពធារាសាស្ត្រនៃការដំណើរការជាមួយការព្រមានរបស់វា។ ប៊ូតុង ចម្លង ចម្លងអត្ថបទ។<\/p>",
+                    "english": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_st_what_term",
+                    "value": "អ្វីដែលត្រូវបានរាយ",
+                    "english": "What is listed"
                 }
             }
         },
@@ -185,9 +303,62 @@
                     "english": "Don’t show this again"
                 },
                 "next_translated": {
-                    "key": "lpn_time_no_report",
-                    "value": "មិនទាន់មានរបាយការណ៍ដំណើរការនៅឡើយទេ។ របាយការណ៍នេះជាអត្ថបទផ្ទាល់របស់ EPANET ដូច្នេះវានឹងបង្ហាញនៅពេលបណ្ដាញនេះត្រូវបានគណនាដោយឧបករណ៍ដោះស្រាយ EPANET។",
-                    "english": "There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated."
+                    "key": "lpn_menu_help",
+                    "value": "ជំនួយ",
+                    "english": "Help"
+                }
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "english_changed",
+            "current_value": "ភ្ជាប់ឯកសារ EPANET-MSX (.msx) ទៅគម្រោងនេះ ឬបង្ហាញឯកសារដែលបានភ្ជាប់រួចហើយ។ វាត្រូវបានរក្សាជាមួយគម្រោង សរសេរត្រឡប់មកវិញដោយមិនផ្លាស់ប្ដូរ និងដំណើរការដោយម៉ាស៊ីន EPANET-MSX ក្នុងការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_msx",
+                    "value": "ឯកសារ EPANET-MSX…",
+                    "english": "EPANET-MSX file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_item_msx",
+                    "value": "ឯកសារ EPANET-MSX…",
+                    "english": "EPANET-MSX file…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…",
+                "value": "ឯកសារ EPANET-MSX…"
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "english_changed",
+            "current_value": "តម្លៃនៃប្រភេទសារធាតុ EPANET-MSX នេះ ដែលគណនាដោយម៉ាស៊ីន EPANET-MSX ក្នុងឯកតាដែលឯកសារ EPANET-MSX ប្រកាស។ សម្រាប់តំណ វាជាមធ្យមតាមបណ្ដោយតំណ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_msx_none",
+                    "value": "គ្មានឯកសារ EPANET-MSX ត្រូវបានភ្ជាប់ទៅគម្រោងនេះទេ។ ភ្ជាប់មួយដោយ ឯកសារ, នាំចូល, បណ្ដាញ, ឯកសារ EPANET-MSX។",
+                    "english": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "កន្លែងធ្វើការត្រូវបានរក្សាទុកទៅ {file}៖ ការកំណត់ {n}។",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_inp_drop_report": {
+            "reason": "english_changed",
+            "current_value": "ឯកសារនេះមានការកំណត់ទ្រង់ទ្រាយរបាយការណ៍របស់ EPANET។ របាយការណ៍ការដំណើរការមាននៅក្រោម របាយការណ៍, ការដំណើរការ ប៉ុន្តែវាប្រើទ្រង់ទ្រាយស្ដង់ដារ EPANET ជាជាងទ្រង់ទ្រាយដែលការកំណត់ទាំងនេះបញ្ជាក់។ បន្ទាត់ទាំងនោះត្រូវបានរក្សាទុក ហើយសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_tags",
+                    "value": "ឯកសារនេះកំណត់ស្លាកសម្គាល់ទៅថ្នាំង បំពង់ ឬធាតុផ្សេងទៀតមួយចំនួន។ ស្លាកសម្គាល់នីមួយៗត្រូវបាននាំចូល ហើយបង្ហាញក្នុងលក្ខណៈសម្បត្តិរបស់ធាតុរបស់វា ដែលអាចមើល ឬកែសម្រួលបាន។",
+                    "english": "This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_sections",
+                    "value": "ឯកសារនេះផ្ទុកផ្នែកមួយដែលទំព័រនេះមិនអានទាល់តែសោះ។ គ្មានអ្វីនៅទីនេះប្រើវាទេ។ វាត្រូវបានរក្សាទុកទាំងស្រុង ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។",
+                    "english": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file."
                 }
             }
         },
@@ -367,6 +538,250 @@
                 }
             }
         },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "តាមលំនាំដើម បណ្ដាញត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET។ ពេលរយៈពេលដំណើរការសរុបត្រូវបានកំណត់ ជំហានពេលវេលារាយការណ៍នីមួយៗត្រូវបានគណនាតាមលំដាប់៖ ធុងទឹកបំពេញ និងបញ្ចេញ តម្រូវការធ្វើតាមលំនាំរបស់វា ហើយរបារឧបករណ៍ចាក់ឡើងវិញនូវការដំណើរការ។ ពេល ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន ត្រូវបានធីក ដំណោះស្រាយនៅពេលតែមួយអាចត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយខាងក្នុងជំនួសវិញ ប៉ុន្តែការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់តែងតែត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "របៀបដែលវាត្រូវបានដោះស្រាយ",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "អ្វីដែលវាមិនធ្វើ",
+                    "english": "What it does not do"
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយបណ្ដាញនេះ។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "ឧបករណ៍ដោះស្រាយ EPANET ស្ថិតនៅក្នុងឧបករណ៍នេះឥឡូវនេះ ហើយដំណើរការដោយគ្មានអ៊ីនធឺណិត។",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "បណ្ដាញនេះមិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}",
+                    "english": "The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "បណ្ដាញនេះមិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយបណ្ដាញនេះ។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។",
+                    "english": "Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET ខណៈអ្នកកំពុងកសាង។ លទ្ធផលនឹងអាចប្រើបានពេលផ្ទុករួចទាំងស្រុង។",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_engine_needed_failed": {
+            "reason": "english_changed",
+            "current_value": "ឧបករណ៍ដោះស្រាយ EPANET មិនទាន់ត្រូវបានផ្ទុកនៅឡើយទេ មិនអាចផ្ទុកបានទេ ហើយបណ្ដាញនេះអាចដោះស្រាយបានដោយវាតែប៉ុណ្ណោះ។ វានឹងត្រូវបានផ្ទុកនៅពេលអ្នកភ្ជាប់អ៊ីនធឺណិត។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_wait_bytes",
+                    "value": "ឧបករណ៍ដោះស្រាយបានផ្ទុក {kb} KB រហូតមកដល់ពេលនេះ។ ចំនួនសរុបមិនមានទេ ដូច្នេះភាគរយនៃការបញ្ចប់មិនស្គាល់ទេ។",
+                    "english": "Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_failed_why",
+                    "value": "បណ្ដាញនេះអាចដោះស្រាយបានដោយឧបករណ៍ដោះស្រាយ EPANET តែប៉ុណ្ណោះ។ {reason}",
+                    "english": "The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}"
+                }
+            }
+        },
+        "lpn_engine_needed_failed_why": {
+            "reason": "english_changed",
+            "current_value": "បណ្ដាញនេះអាចដោះស្រាយបានដោយឧបករណ៍ដោះស្រាយ EPANET តែប៉ុណ្ណោះ។ {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "ឧបករណ៍ដោះស្រាយ EPANET មិនទាន់ត្រូវបានផ្ទុកនៅឡើយទេ មិនអាចផ្ទុកបានទេ ហើយបណ្ដាញនេះអាចដោះស្រាយបានដោយវាតែប៉ុណ្ណោះ។ វានឹងត្រូវបានផ្ទុកនៅពេលអ្នកភ្ជាប់អ៊ីនធឺណិត។",
+                    "english": "The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_on_fixed_head",
+                    "value": "វ៉ាល់ទាំងនេះតភ្ជាប់ដោយផ្ទាល់ទៅអាងស្តុក ឬធុងទឹក ដែលកំណត់ក្បាលទឹកនៅថ្នាំងនោះ ដូច្នេះវ៉ាល់គ្មានអ្វីត្រូវត្រួតត្រាទេ។ សូមដាក់បំពង់ខ្លីមួយរវាងវ៉ាល់ និងអាងស្តុក ឬធុងទឹក៖",
+                    "english": "These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:"
+                }
+            }
+        },
+        "lpn_settings_engine_native": {
+            "reason": "english_changed",
+            "current_value": "ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_demand_multiplier_tip",
+                    "value": "កត្តាតែមួយដែលអនុវត្តចំពោះតម្រូវការទាំងអស់ក្នុងបណ្ដាញក្នុងពេលតែមួយ។ សេណារីយ៉ូនីមួយៗអាចមានតម្លៃដាច់ដោយឡែក ដូច្នេះថ្ងៃមធ្យម ថ្ងៃអតិបរមា ឬម៉ោងកំពូលអាចបង្កើតបានដោយប្ដូរតែការកំណត់នេះ។",
+                    "english": "A single factor applied to every demand in the network at once. Each scenario can have a separate value, so average day, maximum day, or peak hour can be created by changing only this setting."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_engine_native_tip",
+                    "value": "បើកវាដើម្បីប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន។ បើមិនដូច្នោះទេ ឧបករណ៍ដោះស្រាយ EPANET ពី US EPA តែងតែត្រូវបានប្រើ។ ឧបករណ៍ដោះស្រាយខាងក្នុងមិនត្រូវបានប្រើសម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ទេ។ លើកដំបូងដែលឧបករណ៍ដោះស្រាយ EPANET ត្រូវបានប្រើ ប្រហែល 650 KB ត្រូវបានទាញយក ហើយបន្ទាប់មកត្រូវបានរក្សាទុកលើឧបករណ៍នេះ។ ពេលបំពង់មានការបាត់បង់មូលដ្ឋាន (ក្នុងតំបន់) ឧបករណ៍ដោះស្រាយទាំងពីរខុសគ្នាត្រង់ខ្ទង់ចុងក្រោយ៖ EPANET ប្រើតម្លៃកាត់ខ្ទង់នៃសំទុះទំនាញ ដូច្នេះការបាត់បង់មូលដ្ឋានរបស់វាទាបជាងបន្តិចបន្តួចពីទម្រង់ពិតប្រាកដ។",
+                    "english": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_engine_native_tip",
+                "english": "Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+                "value": "បើកវាដើម្បីប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន។ បើមិនដូច្នោះទេ ឧបករណ៍ដោះស្រាយ EPANET ពី US EPA តែងតែត្រូវបានប្រើ។ ឧបករណ៍ដោះស្រាយខាងក្នុងមិនត្រូវបានប្រើសម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ទេ។ លើកដំបូងដែលឧបករណ៍ដោះស្រាយ EPANET ត្រូវបានប្រើ ប្រហែល 650 KB ត្រូវបានទាញយក ហើយបន្ទាប់មកត្រូវបានរក្សាទុកលើឧបករណ៍នេះ។ ពេលបំពង់មានការបាត់បង់មូលដ្ឋាន (ក្នុងតំបន់) ឧបករណ៍ដោះស្រាយទាំងពីរខុសគ្នាត្រង់ខ្ទង់ចុងក្រោយ៖ EPANET ប្រើតម្លៃកាត់ខ្ទង់នៃសំទុះទំនាញ ដូច្នេះការបាត់បង់មូលដ្ឋានរបស់វាទាបជាងបន្តិចបន្តួចពីទម្រង់ពិតប្រាកដ។"
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "បើកវាដើម្បីប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន។ បើមិនដូច្នោះទេ ឧបករណ៍ដោះស្រាយ EPANET ពី US EPA តែងតែត្រូវបានប្រើ។ ឧបករណ៍ដោះស្រាយខាងក្នុងមិនត្រូវបានប្រើសម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ទេ។ លើកដំបូងដែលឧបករណ៍ដោះស្រាយ EPANET ត្រូវបានប្រើ ប្រហែល 650 KB ត្រូវបានទាញយក ហើយបន្ទាប់មកត្រូវបានរក្សាទុកលើឧបករណ៍នេះ។ ពេលបំពង់មានការបាត់បង់មូលដ្ឋាន (ក្នុងតំបន់) ឧបករណ៍ដោះស្រាយទាំងពីរខុសគ្នាត្រង់ខ្ទង់ចុងក្រោយ៖ EPANET ប្រើតម្លៃកាត់ខ្ទង់នៃសំទុះទំនាញ ដូច្នេះការបាត់បង់មូលដ្ឋានរបស់វាទាបជាងបន្តិចបន្តួចពីទម្រង់ពិតប្រាកដ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន",
+                    "english": "Use the built-in solver"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver",
+                "value": "ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន"
+            }
+        },
+        "lpn_time_run_stopped": {
+            "reason": "english_changed",
+            "current_value": "ការដំណើរការ EPANET បានឈប់នៅ {time} ដូច្នេះគ្មានលទ្ធផលទេ។ របាយការណ៍ដំណើរការរបស់វាប្រាប់មូលហេតុ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "លេខនៅលើអេក្រង់មកពីឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_stat_stopped",
+                    "value": "{statistic} មិនបង្ហាញ៖ ការដំណើរការបានឈប់មុនចុងបញ្ចប់នៃរយៈពេល។",
+                    "english": "{statistic} not shown: the run stopped before the end of the period."
+                }
+            }
+        },
+        "lpn_time_run_stopped_kept": {
+            "reason": "english_changed",
+            "current_value": "ការដំណើរការ EPANET បានឈប់នៅ {time}។ លទ្ធផលមានដល់ {solved} ជារយៈពេលចុងក្រោយដែលវាបានដោះស្រាយ ហើយគ្មានលទ្ធផលបង្ហាញបន្ទាប់ពីនោះទេ។ របាយការណ៍ដំណើរការរបស់វាប្រាប់មូលហេតុ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_energy_stopped",
+                    "value": "ការដំណើរការ EPANET បានឈប់មុនចុងបញ្ចប់នៃរយៈពេល ដូច្នេះគ្មានលទ្ធផលថាមពលម៉ាស៊ីនបូមត្រូវបានគណនាទេ។",
+                    "english": "The EPANET run stopped before the end of the period, so no pump energy results were computed."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_cut_off",
+                    "value": "EPANET បានបិទ {link} ហើយបន្ទាប់មកមិនអាចដោះស្រាយសម្រាប់ {nodes} បានទេ។",
+                    "english": "EPANET had closed {link} and then could not solve for {nodes}."
+                }
+            }
+        },
+        "lpn_time_run_fell_back": {
+            "reason": "english_changed",
+            "current_value": "លេខនៅលើអេក្រង់មកពីឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។ វាគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ ជាមួយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_cut_off_empty",
+                    "value": "ធុងទឹក {tank} ទទេ ដូច្នេះ EPANET បានបិទ {link} ដើម្បីរក្សាវាមិនឲ្យបញ្ចេញបន្ថែមទៀត ហើយបន្ទាប់មកមិនអាចដោះស្រាយសម្រាប់ {nodes} បានទេ។",
+                    "english": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}."
+                },
+                "next_translated": {
+                    "key": "lpn_control_dangling_note",
+                    "value": "ច្បាប់ត្រួតពិនិត្យទាំងនេះនិយាយពីធាតុមួយដែលលែងមាននៅក្នុងគម្រោងនេះទៀតហើយ ដូច្នេះពួកវាត្រូវបានលុបចេញ៖ {ids}",
+                    "english": "These controls refer to an element that is no longer in this project, so they were ignored: {ids}"
+                }
+            }
+        },
+        "lpn_time_epanet_fallback": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_running",
+                    "value": "កំពុងគណនាការក្លែងធ្វើលើរយៈពេលមួយ។",
+                    "english": "Running the extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_engine_fetch_failed",
+                    "value": "ការទាញយកឧបករណ៍ដោះស្រាយ EPANET បានបរាជ័យ។ ផ្ទុកទំព័រឡើងវិញដើម្បីព្យាយាមម្ដងទៀត។ ជញ្ជាំងភ្លើង ប្រូកស៊ី ឬផ្នែកបន្ថែមកម្មវិធីរុករកអាចកំពុងទប់ស្កាត់វា។",
+                    "english": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it."
+                }
+            }
+        },
+        "lpn_time_epanet_fallback_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_running",
+                    "value": "កំពុងគណនាការក្លែងធ្វើលើរយៈពេលមួយ។",
+                    "english": "Running the extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_engine_fetch_failed",
+                    "value": "ការទាញយកឧបករណ៍ដោះស្រាយ EPANET បានបរាជ័យ។ ផ្ទុកទំព័រឡើងវិញដើម្បីព្យាយាមម្ដងទៀត។ ជញ្ជាំងភ្លើង ប្រូកស៊ី ឬផ្នែកបន្ថែមកម្មវិធីរុករកអាចកំពុងទប់ស្កាត់វា។",
+                    "english": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it."
+                }
+            }
+        },
+        "lpn_time_run_report": {
+            "reason": "english_changed",
+            "current_value": "ការដំណើរការ៖ របាយការណ៍",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "ការដំណើរការមិនបានបញ្ចប់ទេ ដូច្នេះគ្មានលទ្ធផលសម្រាប់ពេលវេលាក្រោយៗទេ។",
+                    "english": "The run did not finish, so there are no results for the later times."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_report_copied",
+                    "value": "បានចម្លង",
+                    "english": "Copied"
+                }
+            },
+            "tip": {
+                "key": "lpn_time_run_report_tip",
+                "english": "The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.",
+                "value": "របាយការណ៍ដែល EPANET សរសេរសម្រាប់ការដំណើរការចុងក្រោយ ពាក្យតាមពាក្យ៖ ថាតើវាប្រសព្វ និងការព្រមានណាមួយ។ អត្ថបទត្រូវបានផលិតដោយឧបករណ៍ដោះស្រាយ EPANET មិនមែនដោយទំព័រនេះទេ។"
+            }
+        },
+        "lpn_time_run_report_tip": {
+            "reason": "english_changed",
+            "current_value": "របាយការណ៍ដែល EPANET សរសេរសម្រាប់ការដំណើរការចុងក្រោយ ពាក្យតាមពាក្យ៖ ថាតើវាប្រសព្វ និងការព្រមានណាមួយ។ អត្ថបទត្រូវបានផលិតដោយឧបករណ៍ដោះស្រាយ EPANET មិនមែនដោយទំព័រនេះទេ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_report_copied",
+                    "value": "បានចម្លង",
+                    "english": "Copied"
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "ល្បឿន",
+                    "english": "Speed"
+                }
+            },
+            "label": {
+                "key": "lpn_time_run_report",
+                "english": "Solver (run) report",
+                "value": "ការដំណើរការ៖ របាយការណ៍"
+            }
+        },
         "lpn_settings_solver": {
             "reason": "missing",
             "current_value": null,
@@ -382,10 +797,261 @@
                     "english": "Quality"
                 }
             }
+        },
+        "lpn_reports_epanet": {
+            "reason": "english_changed",
+            "current_value": "ការដំណើរការ",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_reports_menu",
+                    "value": "របាយការណ៍",
+                    "english": "Reports"
+                },
+                "next_translated": {
+                    "key": "lpn_energy_title",
+                    "value": "ម៉ាស៊ីនបូម៖ របាយការណ៍ថាមពល",
+                    "english": "Pump energy report"
+                }
+            }
+        },
+        "lpn_settings_demand_model_tip": {
+            "reason": "english_changed",
+            "current_value": "ជ្រើសរើសរបៀបដែលថ្នាំងទទួលលំហូរ។ ផ្អែកលើតម្រូវការ (DDA) ផ្ដល់តម្រូវការគ្រប់មួយពេញលេញ មិនថាសម្ពាធប៉ុន្មានទេ។ ផ្អែកលើសម្ពាធ (PDA) ផ្ដល់តិចជាងតម្រូវការ នៅកន្លែងដែលសម្ពាធទាបជាងសម្ពាធដែលត្រូវការ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលគណនាវា។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_demand_model",
+                    "value": "គំរូតម្រូវការ",
+                    "english": "Demand model"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_demand_model_dda",
+                    "value": "ផ្អែកលើតម្រូវការ",
+                    "english": "Demand driven"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_demand_model",
+                "english": "Demand model",
+                "value": "គំរូតម្រូវការ"
+            }
+        },
+        "lpn_engine_native_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_pressure_exponent_tip",
+                    "value": "បញ្ចូលនិទស្សន្តនៃខ្សែកោងដែលឡើងពីគ្មានលំហូរនៅសម្ពាធអប្បបរមា ទៅតម្រូវការពេញលេញនៅសម្ពាធដែលត្រូវការ។",
+                    "english": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_conflict",
+                    "value": "វ៉ាល់ត្រួតពិនិត្យទាំងនេះត្រូវបានភ្ជាប់ទៅគ្នាតាមរបៀបដែល EPANET មិនអនុញ្ញាត ដូចជាវ៉ាល់បន្ថយសម្ពាធពីរជាស៊េរី។ សូមបញ្ចូលបំពង់ខ្លីមួយរវាងពួកវា៖",
+                    "english": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:"
+                }
+            }
+        },
+        "lpn_engine_epanet_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_pressure_exponent_tip",
+                    "value": "បញ្ចូលនិទស្សន្តនៃខ្សែកោងដែលឡើងពីគ្មានលំហូរនៅសម្ពាធអប្បបរមា ទៅតម្រូវការពេញលេញនៅសម្ពាធដែលត្រូវការ។",
+                    "english": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_conflict",
+                    "value": "វ៉ាល់ត្រួតពិនិត្យទាំងនេះត្រូវបានភ្ជាប់ទៅគ្នាតាមរបៀបដែល EPANET មិនអនុញ្ញាត ដូចជាវ៉ាល់បន្ថយសម្ពាធពីរជាស៊េរី។ សូមបញ្ចូលបំពង់ខ្លីមួយរវាងពួកវា៖",
+                    "english": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:"
+                }
+            }
+        },
+        "lpn_diag_rules_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_control_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_rule_step_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_speed_pattern_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_tank_curve_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_tank_levels_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_quality_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_energy_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_stopped_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
+        },
+        "lpn_diag_builtin_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_gpv_curve_order",
+                    "value": "ខ្សែកោងការបាត់បង់ក្បាលទឹករបស់វ៉ាល់គោលបំណងទូទៅទាំងនេះមិនអាចអានបានទេ៖ លំហូរនីមួយៗត្រូវតែធំជាងលំហូរមុនវា ហើយខ្សែកោងដែលមានចំណុចមួយត្រូវការលំហូរលើសសូន្យ៖",
+                    "english": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:"
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_one_point_note",
+                    "value": "⚠ វ៉ាល់គោលបំណងទូទៅទាំងនេះមានខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមានតែមួយចំណុច ដូច្នេះការបាត់បង់ក្បាលទឹករបស់ពួកវាត្រូវបានយកជាសមាមាត្រនឹងលំហូរ តាមរយៈចំណុចនោះ៖ {ids}",
+                    "english": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}"
+                }
+            }
         }
     },
-    "key_plain": [],
-    "key_notes": [],
+    "key_plain": {
+        "lpn_reports_epanet": "Run: the report of the simulation run."
+    },
+    "key_notes": {
+        "lpn_time_run_report": [
+            "Layout (box title): The title of a box that can be docked and set to auto-hide. Tucked away, the box shows only the start of its title, on a narrow tab at the map's edge turned on its side, cut off after about 12 to 25 characters. Put the word that names the box's subject first, so each tab can be told from its neighbors; a title form with a colon is fine (Pump energy report, in Spanish: Bombas: informe de energía). Where the natural phrase already starts with that word, keep it. The same text may also be a menu row."
+        ]
+    },
     "key_concepts": [],
     "uniqueness_attention": [
         {

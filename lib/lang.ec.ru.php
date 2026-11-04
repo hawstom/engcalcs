@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Отключите, если пересч
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Расчёт этой сети занял {secs} с, а она настроена пересчитываться после каждого изменения. Чтобы это остановить и вернуть кнопку «Рассчитать», отключите «Рассчитывать автоматически» в настройках, в разделе «Расчёт» → «Гидравлика».';
-$ec_lang['lpn_time_no_report']='Отчёта о расчёте пока нет. Это текстовый отчёт EPANET, поэтому он появляется после расчёта этой сети.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Размах';
 $ec_lang['lpn_time_clock_day']='День {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Записывайте время как часы и минуты, например 2:30. Просто число означает часы, поэтому 8 — это восемь часов. Полчаса — это 0:30.';
 $ec_lang['lpn_time_running']='Выполняется расчёт с продолжённым периодом.';
-$ec_lang['lpn_time_no_engine']='Встроенный решатель рассчитывает только один момент времени, поэтому это сеть только на {time}: каждый шаблон читается на этот момент, а каждый бак по-прежнему находится на начальном уровне, а не наполняется и не опорожняется. Подключитесь к интернету один раз, чтобы загрузить расчётное ядро EPANET, которое выполняет расчёт с продолжённым периодом.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Встроенный решатель рассчитывает один момент времени, поэтому здесь показана сеть только на {time}: все шаблоны считываются на этот момент, а каждый бак остаётся на начальном уровне, не наполняясь и не опорожняясь. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Не удалось загрузить расчётное ядро EPANET. Перезагрузите страницу и повторите попытку; загрузку может блокировать межсетевой экран, прокси-сервер или расширение браузера.';
 $ec_lang['lpn_time_engine_start_failed']='Браузер отказался запустить расчётное ядро EPANET. WebAssembly может быть отключён настройкой безопасности или расширением.';
 $ec_lang['lpn_time_engine_run_failed']='Расчёт EPANET завершился ошибкой. Это дефект данной страницы; сообщите о нём через ссылку «{wrong}».';
@@ -4950,8 +4947,6 @@ $ec_lang['lpn_settings_req_pressure']='Требуемое давление';
 $ec_lang['lpn_settings_req_pressure_tip']='Введите давление, при котором и выше которого узел получает расход отбора полностью. Оно должно быть больше минимального давления. Используйте единицу давления этого проекта. Оставьте поле пустым, чтобы использовать значение EPANET по умолчанию: фунты на кв. дюйм (psi) для американских единиц расхода и метры в остальных случаях.';
 $ec_lang['lpn_settings_pressure_exponent']='Показатель степени давления';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Введите показатель степени кривой, которая растёт от нулевого расхода при минимальном давлении до полного расхода отбора при требуемом давлении.';
-$ec_lang['lpn_engine_pda_route']='Расчёт выполнен расчётным ядром EPANET, потому что выбрана модель расхода отбора с зависимостью от давления.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Выбрана модель расхода отбора с зависимостью от давления, и рассчитать её может только расчётное ядро EPANET. Расчётное ядро EPANET не удалось загрузить, поэтому результаты отсутствуют.';
 $ec_lang['lpn_result_delivered_demand']='Подаваемый расход отбора';
 $ec_lang['lpn_result_delivered_demand_tip']='Расход, который этот узел фактически получает при модели расхода отбора с зависимостью от давления. Он меньше расхода отбора, когда давление ниже требуемого.';
 $ec_lang['lpn_result_demand_deficit']='Дефицит расхода отбора';

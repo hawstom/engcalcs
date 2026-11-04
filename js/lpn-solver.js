@@ -638,14 +638,23 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	var badCurves = EngCalcs.lpnGpvsWith(model, 'gpv-order');
 	if (badCurves.length > 0) { issues.push({ code: 'gpv-curve-order', ids: badCurves }); }
 
+	// A [RULES] BLOCK EPANET WOULD REFUSE TO READ is named, by rule, whichever engine is chosen: it is a fact
+	// about the text, and EPANET would answer with an error number and no rule attached. Only a project that
+	// runs a period ever runs its rules (js/lpn-native-run.js lpnRulesRefused).
+	var badRules = EngCalcs.lpnRulesRefused ? EngCalcs.lpnRulesRefused(model) : [];
+	if (badRules.length > 0) { issues.push({ code: 'rules-refused', ids: badRules }); }
+
+	// THE REST OF WHAT EPANET REFUSES IN A PERIOD (input it will not read, an MSX file it cannot parse, a rule or
+	// quality step of 0 s), by name and in both engines (js/lpn-native-run.js lpnPeriodRefused).
+	if (EngCalcs.lpnPeriodRefused) {
+		EngCalcs.lpnPeriodRefused(model).forEach(function (r) { issues.push(r); });
+	}
+
 	if (EngCalcs.lpnDemandModelIsPda(model)) {
 		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
 		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {
 			issues.push({ code: 'pda-pressures', ids: [] });
 		}
-	}
-	if (opts.engine === 'native' && EngCalcs.lpnDemandModelIsPda(model)) {
-		issues.push({ code: 'pda-needs-epanet', ids: [] });
 	}
 
 	if (fixed.length === 0) {
@@ -806,12 +815,80 @@ EngCalcs.lpnSolve = function (model, options) {
 
 	for (i = 0; i < nn; i++) { demandScale += Math.abs(junctions[i].demand || 0); }
 
+	// ---- PRESSURE-DRIVEN DEMAND (Task 733), EPANET 2.3.5 hydcoeffs.c demandcoeffs()/demandheadloss() and
+	// hydsolver.c newdemandflows()/pdaconverged() ----
+	//
+	// A junction with a positive full demand is modelled like an emitter: it delivers D, 0 <= D <= Dfull, and the
+	// head across it is Hloss = dP (D/Dfull)^(1/Pexp) above its elevation plus Pmin, with a smooth barrier at each
+	// end (the 1e9 and 1e-6 are EPANET's, in ft and cfs). D starts at the full demand every solve, is stepped
+	// toward the head the matrix gives (limited to 0.4 Dfull a trial), and the solve is not converged until D
+	// agrees with the demand function at the solved pressure to 0.0001 cfs. A junction of zero or negative demand
+	// keeps its demand as a fixed outflow.
+	var pdaOn = EngCalcs.lpnDemandModelIsPda(model), pdaD = null, pdaFull = null,
+		pdaPmin = 0, pdaPreq = 0.1, pdaExp = 0.5;
+	if (pdaOn) {
+		var pdaIn = model.hydraulics;
+		if (typeof pdaIn.minPressure === 'number') { pdaPmin = pdaIn.minPressure; }
+		if (typeof pdaIn.reqPressure === 'number') { pdaPreq = pdaIn.reqPressure; }
+		if (typeof pdaIn.pressureExponent === 'number') { pdaExp = pdaIn.pressureExponent; }
+		pdaD = new Float64Array(nn);
+		pdaFull = new Float64Array(nn);
+		for (i = 0; i < nn; i++) { pdaFull[i] = junctions[i].demand || 0; pdaD[i] = pdaFull[i]; }
+	}
+	// hydcoeffs.c demandheadloss(): [head loss (m), gradient (m per m3/s)] for junction i at its current D.
+	function pdaHeadloss(i2, dp2, n2) {
+		var d = pdaD[i2], dfull = pdaFull[i2], r = Math.abs(d) / dfull,
+			hg = n2 * dp2 * Math.pow(r, n2 - 1) / dfull, hl = hg * d / n2, a, b;
+		a = 1e9 * (d / VCFS);                    // addlowerbarrier(d)
+		b = Math.sqrt(a * a + 1e-6);
+		hl += (a - b) / 2 * VFT;
+		hg += (1e9 / 2) * (1 - a / b) * VFT / VCFS;
+		a = 1e9 * ((d - dfull) / VCFS);          // addupperbarrier(d - dfull)
+		b = Math.sqrt(a * a + 1e-6);
+		hl += (a + b) / 2 * VFT;
+		hg += (1e9 / 2) * (1 + a / b) * VFT / VCFS;
+		return [hl, hg];
+	}
+
+	// validate.c: a custom curve's Q0 is half way along its flows, any other pump's the middle sample of the
+	// three the bridge writes (0.5 of the flow at zero head); times the pump's speed.
+	function epPumpSeed(link) {
+		var sp = typeof link.pumpSpeed === 'number' && link.pumpSpeed > 0 ? link.pumpSpeed : 1, pc, q0;
+		pc = link.curveSI && link.curveSI.length ? EngCalcs.lpnPumpFromCurve(link.curveSI) : null;
+		if (pc && pc.custom) { q0 = (pc.x[0] + pc.x[pc.x.length - 1]) / 2; }
+		else if (link.a > 0 && link.b > 0 && link.h0 > 0) { q0 = 0.5 * Math.pow(link.h0 / link.a, 1 / link.b); }
+		else { return 0.3048 * Math.PI * link.diameter * link.diameter / 4; }
+		return sp * q0;
+	}
+
+	// A valve's first flow: the last solution's where an extended-period run passes one (`opts.flows0`), as for every other
+	// link; a valve the last solve left CLOSED keeps the leak EPANET keeps for it (QZERO, 1e-6 cfs), not a velocity of
+	// 1 ft/s; otherwise EPANET's first guess, the flow at 1 ft/s (hydraul.c initlinkflow()).
+	function valveFlow0(k2) {
+		var f0 = opts.flows0 && opts.flows0[links[k2].id];
+		if (typeof f0 === 'number' && f0 !== 0 && isFinite(f0)) { return f0; }
+		// a valve the last solve reported with no flow was shut (or at rest): EPANET still holds the leak it had, about QZERO,
+		// whatever the valve is now told (a control that opens it too)
+		if (opts.epAcc && ((opts.flows0 && f0 === 0) || (links[k2].valveStart === 'closed' && !links[k2].valveFixed))) { return 1e-6 * 0.3048 * 0.3048 * 0.3048; }
+		return Math.PI * links[k2].diameter * links[k2].diameter / 4 * VFT;
+	}
 	// Initial guess. Any nonzero flow works because of the gradient floor; a
 	// velocity-scaled seed simply starts closer than a constant would.
 	for (k = 0; k < links.length; k++) {
 		Q[k] = links[k].status === 'closed'
-			? 0
-			: 0.3 * Math.PI * links[k].diameter * links[k].diameter / 4;
+			? (opts.epAcc ? 1e-6 * 0.3048 * 0.3048 * 0.3048 : 0)   // inithyd(): a closed link starts at QZERO, 1e-6 cfs
+			: (opts.epAcc ? 0.3048 : 0.3) * Math.PI * links[k].diameter * links[k].diameter / 4;
+		// hydraul.c initlinkflow(): a pump starts at its setting times its design flow, every other link at a
+		// velocity of 1 ft/s. Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
+		if (opts.epAcc && links[k].status !== 'closed' && links[k].type === 'pump') {
+			Q[k] = epPumpSeed(links[k]);
+		}
+		// **A START FROM THE LAST SOLUTION** (Task 733, slice 7), as EPANET's period loop starts every step
+		// from the flows of the one before. Only a closed link's 0 is kept; an open one with no usable
+		// previous flow keeps the seed above.
+		if (opts.flows0 && (links[k].status !== 'closed' || opts.closedLeak) && typeof opts.flows0[links[k].id] === 'number' && opts.flows0[links[k].id] !== 0 && isFinite(opts.flows0[links[k].id])) {
+			Q[k] = opts.flows0[links[k].id];
+		}
 	}
 	// Junction heads start at their own elevation; only emitters read H before the
 	// first solve, and they need something physical rather than zero.
@@ -941,7 +1018,10 @@ EngCalcs.lpnSolve = function (model, options) {
 		// input3.c controldata() setting MISSING for a valve). It is a plain minor loss and its
 		// state is never re-decided: hydstatus.c valvestatus() and linkstatus() both skip a valve
 		// whose setting is MISSING. Only js/lpn-native-run.js sets it; nothing on the page does.
-		vStat[k] = links[k].valveFixed === 'open' ? 'open' : 'active';
+		// A valve's status is carried from solve to solve by an extended-period run (`valveStart`), as EPANET carries
+		// LinkStatus; a run's first solve and the single instant start it ACTIVE, as inithyd() does.
+		vStat[k] = links[k].valveFixed === 'open' ? 'open' :
+			(links[k].valveStart && !links[k].valveFixed ? links[k].valveStart : 'active');
 		if (links[k].valveFixed === 'open') { vFixed[k] = true; }
 		vc.push(k);
 		vSet[k] = links[k].setting || 0;
@@ -954,7 +1034,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		if (vt0 === 'PRV') { vHset[k] = (byId[links[k].to].elev || 0) + vSet[k]; }
 		if (vt0 === 'PSV') { vHset[k] = (byId[links[k].from].elev || 0) + vSet[k]; }
 		// EPANET's first guess for a valve: the flow at 1 ft/s (hydraul.c initlinkflow()).
-		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+		Q[k] = valveFlow0(k);
 	}
 	if (vc.length) { X = new Float64Array(nn); }
 
@@ -987,7 +1067,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			fStat[k] = 'active';
 		}
 		// The same first guess as every EPANET valve: 1 ft/s (hydraul.c initlinkflow()).
-		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+		Q[k] = valveFlow0(k);
 	}
 
 	// hydcoeffs.c pbvcoeff(). A setting of zero is EPANET's "fixed OPEN or CLOSED" branch and an
@@ -1124,7 +1204,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		var tn = nodes[i];
 		if (tn.type !== 'tank' || !(tn.diameter > 0) || typeof tn.level !== 'number' ||
 			typeof tn.minLevel !== 'number' || typeof tn.maxLevel !== 'number' ||
-			tn.minLevel > tn.level || tn.level > tn.maxLevel) { continue; }
+			(tn.minLevel > tn.level && !opts.epAcc) || tn.level > tn.maxLevel) { continue; }
 		// A tank that CAN OVERFLOW takes inflow at its limit (`overflow`, the .inp's ninth column):
 		// tankstatus() skips the full-tank closure when CanOverflow is set. Only a hand-built model
 		// states it (the page has no such field), and the built-in loop then spills the excess.
@@ -1322,7 +1402,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	// The pump branch of the iteration below sends a custom-curve pump through customPumpCoeffs()
 	// in both directions. The XHEAD test (pumpLinkStatus) reads link.h0, which for a custom curve is
 	// the shutoff head at speed (EPANET's Hmax, the curve's first head).
-	var pCurve = [], pSpeed = [], pcFit;
+	var pCurve = [], pSpeed = [], pcFit, epRelErr = 0;
 	for (k = 0; k < links.length; k++) {
 		pCurve[k] = null;
 		if (links[k].type !== 'pump' || !links[k].curveSI || !links[k].curveSI.length) { continue; }
@@ -1356,20 +1436,24 @@ EngCalcs.lpnSolve = function (model, options) {
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
-			if (link.status === 'closed') { G[k] = 0; y[k] = 0; continue; }
+			// hydcoeffs.c pipecoeff(), pumpcoeff(): a closed link is P = 1/CBIG, Y = its flow, so it still
+			// leaks (head difference / CBIG). Only the extended-period loop asks for that (`opts.closedLeak`).
+			if (link.status === 'closed' && !opts.closedLeak) { G[k] = 0; y[k] = 0; continue; }
 			// A control valve is assembled after everything else -- see valveCoeffs().
 			if (vStat[k] !== undefined) { continue; }
 
 			q = Q[k];
 			aq = Math.abs(q);
 
-			if (tClosed[k] || pX[k] || cvShut[k]) {
+			if (tClosed[k] || pX[k] || cvShut[k] || link.status === 'closed') {
 				// hydcoeffs.c: a closed link's coefficients are P = 1/CBIG, Y = its flow.
 				G[k] = V_CBIG_INV;
 				y[k] = q;
 			} else if (link.type === 'pump') {
 				// Head GAIN: H_to - H_from = H0 - a Q^b, so h = -(H0 - a Q^b).
-				var qp = Math.max(aq, qMin);
+				// hydcoeffs.c pumpcoeff() reads |LinkFlow| as it stands (no floor), and a gradient under RQtol is a straight
+				// line through the shutoff head, h0 + hgrad q. Only the extended-period loop asks (`opts.epAcc`).
+				var qp = opts.epAcc ? aq : Math.max(aq, qMin);
 				if (!(link.h0 > 0) && !(link.a > 0)) {
 					// NO CURVE ENTERED -- the state every newly drawn pump is in, since nothing
 					// assigns a pump a curve it was not given. It neither adds nor loses head, in
@@ -1409,7 +1493,7 @@ EngCalcs.lpnSolve = function (model, options) {
 					p = link.a * link.b * Math.pow(qp, link.b - 1);
 					// Same floor again, for a degenerate curve (e.g. a shutoff head with no droop):
 					// p = 0 would otherwise give an infinite conductance.
-					if (!(p > gradMin)) { p = gradMin; h = p * q; }
+					if (!(p > gradMin)) { p = gradMin; h = opts.epAcc ? -link.h0 + p * q : p * q; }
 					G[k] = 1 / p;
 					y[k] = h / p;
 				}
@@ -1417,7 +1501,7 @@ EngCalcs.lpnSolve = function (model, options) {
 				// A PBV or a GPV: no friction (it has no length) and its own law, from above.
 				if (String(link.valveType).toUpperCase() === 'PBV') { pbvCoeff(k); } else { gpvCoeff(k); }
 			} else {
-				if (!resFixed) {
+				if (!resFixed && !opts.epAcc) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
 					res = EngCalcs.lpnResistance(link, method, visc);
 					linkR[k] = res.r;
@@ -1435,8 +1519,41 @@ EngCalcs.lpnSolve = function (model, options) {
 					// twice. One Math.pow, two uses, same value.
 					pw = Math.pow(aq, nk - 1);
 
+				if (!resFixed && opts.epAcc) {
+					// hydcoeffs.c dwpipecoeff() and frictionFactor(): Hagen-Poiseuille up to Re 2000 (a straight line in Q), then
+					// Swamee-Jain or Dunlop's polynomial, and the derivative carries the friction factor's own dependence on Q.
+					// Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
+					var dd = link.diameter, dl = link.length, dArea = Math.PI * dd * dd / 4, dr = dl > 0 ? dl / (dd * 2 * EngCalcs.lpnG * dArea * dArea) : 0,
+						ds = visc * dd, dw = aq / ds, dEr = link.roughness / dd, dy1, dy2, dy3, df, dDfdq = 0, dfa, dfb, dxr, dx1, dx2, dx3, dx4, dr1;
+					if (dw <= 1570.79633) {
+						var rLam = 16 * Math.PI * ds * dr;
+						h = q * (rLam + m * aq);
+						p = rLam + 2 * m * aq;
+					} else {
+						if (dw >= 3141.59265) {
+							dy1 = 4.61841319859 / Math.pow(dw, 0.9);
+							dy2 = dEr / 3.7 + dy1;
+							dy3 = -0.8685889638 * Math.log(dy2);
+							df = 1 / (dy3 * dy3);
+							dDfdq = 1.8 * df * dy1 * -0.8685889638 / dy2 / dy3 / aq;
+						} else {
+							dy2 = dEr / 3.7 + 3.28895476345e-3;
+							dy3 = -0.8685889638 * Math.log(dy2);
+							dfa = 1 / (dy3 * dy3);
+							dfb = (2 + -5.14214965799e-3 / (dy2 * dy3)) * dfa;
+							dxr = dw / 1570.79633;
+							dx1 = 7 * dfa - dfb; dx2 = 0.128 - 17 * dfa + 2.5 * dfb; dx3 = -0.128 + 13 * dfa - 2 * dfb; dx4 = 0.032 - 3 * dfa + 0.5 * dfb;
+							df = dx1 + dxr * (dx2 + dxr * (dx3 + dxr * dx4));
+							dDfdq = (dx2 + dxr * (2 * dx3 + dxr * 3 * dx4)) / ds / 1570.79633;
+						}
+						dr1 = df * dr + m;
+						h = dr1 * aq * q;
+						p = 2 * dr1 * aq + dDfdq * dr * aq * aq;
+					}
+				} else {
 				h = rk * pw * q + m * aq * q;
 				p = nk * rk * pw + 2 * m * aq;
+				}
 				if (!(p > gradMin)) {
 					// Below the gradient floor the relation is replaced by a straight
 					// line of that slope through the origin, so h and p stay
@@ -1491,7 +1608,18 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 
 		for (i = 0; i < nn; i++) {
-			F[i] -= (junctions[i].demand || 0);
+			if (pdaOn) {
+				if (pdaFull[i] > 0) {
+					var pdl = pdaHeadloss(i, pdaPreq - pdaPmin, 1 / pdaExp);
+					if (pdl[1] > 0) {
+						M[envDiag[i]] += 1 / pdl[1];
+						F[i] += (pdl[0] + (junctions[i].elev || 0) + pdaPmin) / pdl[1];
+					}
+				}
+				F[i] -= pdaD[i];
+			} else {
+				F[i] -= (junctions[i].demand || 0);
+			}
 			if (junctions[i].emitter > 0) {
 				// Outflow C (H - z)^gamma, linearized about the current head.
 				var dh = Math.max(H[i] - (junctions[i].elev || 0), 0),
@@ -1503,7 +1631,7 @@ EngCalcs.lpnSolve = function (model, options) {
 				F[i] += ge * H[i] - qe;
 				if (X !== null) { X[i] -= qe; }
 			}
-			if (X !== null) { X[i] -= (junctions[i].demand || 0); }
+			if (X !== null) { X[i] -= (pdaOn ? pdaD[i] : (junctions[i].demand || 0)); }
 		}
 		if (X !== null) { valveCoeffs(); }
 
@@ -1526,7 +1654,7 @@ EngCalcs.lpnSolve = function (model, options) {
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
-			if (link.status === 'closed') { continue; }
+			if (link.status === 'closed' && !opts.closedLeak) { continue; }
 			iIdx = junctionIndex[link.from];
 			jIdx = junctionIndex[link.to];
 			var hi = iIdx === undefined ? byId[link.from].head : Hnew[iIdx],
@@ -1542,6 +1670,22 @@ EngCalcs.lpnSolve = function (model, options) {
 			Q[k] = qNew;
 		}
 
+		// hydsolver.c newdemandflows(): step each pressure-driven demand toward the head just solved.
+		if (pdaOn) {
+			var pdp = Math.max(pdaPreq - pdaPmin, 0.1 * VFT),   // MINPDIFF (0.1, compared with a pressure in ft)
+				pn = 1 / pdaExp, pdq, pdh, pdl2;
+			for (i = 0; i < nn; i++) {
+				if (pdaFull[i] <= 0) { continue; }
+				pdl2 = pdaHeadloss(i, pdp, pn);
+				pdh = Hnew[i] - (junctions[i].elev || 0) - pdaPmin;
+				pdq = (pdl2[0] - pdh) / pdl2[1];
+				pdq *= relax;
+				if (Math.abs(pdq) > 0.4 * pdaFull[i]) { pdq = 0.4 * (pdq < 0 ? -1 : 1) * pdaFull[i]; }
+				pdaD[i] -= pdq;
+				sumAbsQ += Math.abs(pdaD[i]);
+				sumAbsDq += Math.abs(pdq);
+			}
+		}
 		H = Hnew;
 		// Normalised by the network's TOTAL DEMAND, not by the current total flow.
 		// Total flow is the wrong yardstick twice over: it grows with the number of
@@ -1558,7 +1702,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// absolute change is held to that however loose `tol` is (the convergence test below).
 		maxFlowChange = demandScale > 0 ? sumAbsDq / demandScale : sumAbsDq;
 
-		if (opts.onIteration) { opts.onIteration(iter, maxFlowChange, Q, H); }
+		if (opts.onIteration) { opts.onIteration(iter, maxFlowChange, Q, H, sumAbsQ > 0 ? sumAbsDq / sumAbsQ : sumAbsDq); }
 
 		// absTol catches the no-flow network, where demandScale is zero and
 		// maxFlowChange is therefore already an absolute quantity. 1e-12 m3/s is a
@@ -1579,6 +1723,8 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 
 		if (maxFlowChange < (demandScale > 0 ? tol : Math.min(tol, 1e-9)) || sumAbsDq < absTol) { done = true; }
+		epRelErr = sumAbsQ > 0 ? sumAbsDq / sumAbsQ : sumAbsDq;   // hydsolver.c hasconverged()'s relerr
+		if (opts.epAcc && sumAbsQ > 0 && sumAbsDq / sumAbsQ <= opts.epAcc) { done = true; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
 		// floor of the factorization, then stops improving -- measured on a
@@ -1648,6 +1794,17 @@ EngCalcs.lpnSolve = function (model, options) {
 			}
 		}
 
+		// hydsolver.c pdaconverged(): the demands must also agree with the demand function at the solved pressure.
+		if (done && pdaOn) {
+			for (i = 0; i < nn; i++) {
+				if (pdaFull[i] <= 0) { continue; }
+				var pp = H[i] - (junctions[i].elev || 0), pq;
+				if (pp <= pdaPmin) { pq = 0; }
+				else if (pp >= pdaPreq) { pq = pdaFull[i]; }
+				else { pq = pdaFull[i] * Math.pow((pp - pdaPmin) / (pdaPreq - pdaPmin), pdaExp); }
+				if (Math.abs(pq - pdaD[i]) > 0.0001 * VCFS) { done = false; break; }
+			}
+		}
 		if (done) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
@@ -1707,11 +1864,30 @@ EngCalcs.lpnSolve = function (model, options) {
 	if (onePoint.length > 0) { report.warnings = [{ code: 'gpv-one-point', ids: onePoint }]; }
 	// The links a full or empty tank shut for this answer (EPANET's TEMPCLOSED), by id: the
 	// extended-period loop needs them, because a simple control compares against that status.
+	// What the links EPANET holds closed (P = 1/CBIG) still carry, by id, m3/s; the loop starts the next step from them.
+	if (opts.closedLeak) {
+		report.leakFlows = {};
+		for (k = 0; k < links.length; k++) {
+			if (links[k].status === 'closed' || tClosed[k] || pX[k] || cvShut[k]) { report.leakFlows[links[k].id] = Q[k]; }
+		}
+	}
+	report.epRelErr = epRelErr;   // EPANET's relative flow change at the last trial
 	report.tankClosed = [];
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
 	// And the pumps the solve ended with shut because they cannot lift (EPANET's XHEAD), likewise.
 	report.pumpXhead = [];
 	for (k = 0; k < pumps.length; k++) { if (pX[pumps[k]]) { report.pumpXhead.push(links[pumps[k]].id); } }
+	if (pdaOn) {
+		// What each junction receives, and what it asked for and did not get (EN_DEMAND and EN_DEMANDDEFICIT), m3/s.
+		report.demands = {};
+		report.demandDeficits = {};
+		for (i = 0; i < nn; i++) {
+			// EN_DEMAND is the delivered demand plus what the junction's emitter discharges (hydraul.c NodeDemand).
+			report.demands[junctions[i].id] = pdaD[i] + (junctions[i].emitter > 0
+				? junctions[i].emitter * Math.pow(Math.max(H[i] - (junctions[i].elev || 0), 0), emitterExp) : 0);
+			report.demandDeficits[junctions[i].id] = Math.max(0, pdaFull[i] - pdaD[i]);
+		}
+	}
 	report.cvClosed = [];
 	report.statuses = {};
 	for (k = 0; k < cvk.length; k++) {
@@ -1761,6 +1937,10 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// surface's height above the street.
 			heads[model.nodes[i].id] = model.nodes[i].head;
 			pressures[model.nodes[i].id] = (model.nodes[i].head - EngCalcs.lpnPressureDatum(model.nodes[i])) * sg;
+			// **AS EPANET REPORTS IT** (Task 733, slice 7): EPANET keeps a reservoir's total head in its
+			// elevation, so its pressure is 0 whatever ground the page draws it on. Both settings show the
+			// same row.
+			if (model.nodes[i].type === 'reservoir') { pressures[model.nodes[i].id] = 0; }
 		}
 	}
 	for (i = 0; i < junctions.length; i++) {
@@ -1785,8 +1965,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			velocities[link.id] = vClosed || !(link.diameter > 0) ? 0
 				: Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4);
 			headlosses[link.id] = vClosed ? 0
-				: (junctionIndex[link.from] === undefined ? byId[link.from].head : H[junctionIndex[link.from]]) -
-				(junctionIndex[link.to] === undefined ? byId[link.to].head : H[junctionIndex[link.to]]);
+				: Math.abs((junctionIndex[link.from] === undefined ? byId[link.from].head : H[junctionIndex[link.from]]) -
+				(junctionIndex[link.to] === undefined ? byId[link.to].head : H[junctionIndex[link.to]]));
 			continue;
 		}
 		flows[link.id] = Q[k];
@@ -1797,10 +1977,13 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		// unsigned, so a signed velocity here makes the two engines disagree, and it breaks any
 		// "highest velocity" comparison by sorting a fast reverse flow to the BOTTOM of the range.
 		// Direction is already carried by the sign of the flow and by the arrow the map draws.
-		velocities[link.id] = link.diameter > 0
+		// A pump reports no velocity and a shut link no head loss, as EPANET's EN_getlinkvalue does.
+		velocities[link.id] = link.diameter > 0 && link.type !== 'pump'
 			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
-		if (link.type === 'pump') {
+		if (link.status === 'closed') {
+			headlosses[link.id] = 0;
+		} else if (link.type === 'pump') {
 			// Sign convention: a pump's head loss is the negation of its head gain, so a working
 			// pump reports a NEGATIVE head loss. There is no separate head-gain quantity anywhere on
 			// this page, and no floor/extrapolation check on the curve either: a pump has exactly
@@ -1822,7 +2005,9 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			m = kEff > 0
 				? kEff / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
 				: 0;
-			headlosses[link.id] = res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k];
+			// EPANET's EN_HEADLOSS on a pipe is the magnitude, whichever way the water runs (Task 733, slice 7);
+			// every display already reads the magnitude (shownHeadloss()), so the sign carried nothing.
+			headlosses[link.id] = Math.abs(res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k]);
 		}
 	}
 

@@ -999,7 +999,7 @@ $ec_lang['lpn_guide_text_library_box']='Holds the project\'s patterns, curves, p
 $ec_lang['lpn_guide_text_energy_box']='Reports the energy use, peak power, and cost of each pump over the last extended period simulation, using each pump\'s efficiency and the energy price set under Settings, Energy. It needs a Total run time in Settings and a solved network. It does not change the network.';
 $ec_lang['lpn_guide_text_contour_box']='Controls the contour plot drawn on the map from the node value chosen in Color nodes by: the color scheme, the fill and its opacity, the contour line interval and labels, and how far the color reaches from each pipe. Turning it off hides the plot and leaves the node colors. It changes only the display, not the network.';
 $ec_lang['lpn_guide_text_scncmp_box']='Solves each scenario that is checked in the Scenario manager, all of them unless checks have been cleared, from a copy of the drawing, and tabulates for each the number of overrides, the demand multiplier, the total run time, the hydraulic time step, the lowest pressure, and the highest velocity. Choose Water, Reports, Scenario comparison to open it. The comparison starts when it opens and starts again after each edit while it remains open.\n\nIt does not change the project, and the scenario that is open is left as it was.';
-$ec_lang['lpn_guide_text_rptbox']='Shows the text report written by the EPANET engine for the last extended period simulation, including its warnings and the network summary. Each extended period simulation replaces it; a solve at a single instant does not, and an edit leaves the previous report in place.';
+$ec_lang['lpn_guide_text_rptbox']='Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.';
 $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step.';
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download, copy, or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
@@ -1159,8 +1159,8 @@ $ec_lang['lpn_guide_ct_box_def']='<p>Show plot, when cleared, hides the fill and
 $ec_lang['lpn_guide_ct_example_def']='<p>Open the Net1 example and choose Water, Graphs, Contour. The contour plot shows pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. The nodes keep the colors they had, before the plot and after Show plot is cleared.</p>';
 // The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
 $ec_lang['lpn_guide_rr_what_term']='What the report holds';
-$ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Run. The report is the text that the EPANET engine wrote for the last extended period simulation, in pages. It starts with the banner and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
-$ec_lang['lpn_guide_rr_example_def']='<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Run. The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.</p>';
+$ec_lang['lpn_guide_rr_what_def']='<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.</p>';
+$ec_lang['lpn_guide_rr_example_def']='<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.</p>';
 $ec_lang['lpn_guide_st_what_term']='What is listed';
 $ec_lang['lpn_guide_st_what_def']='<p>Choose Water, Reports, Status changes. Each row gives the time of a change and the change: a pump, valve, or pipe now open or now closed, or a tank now filling, emptying, full, or empty. A time step that did not fully converge is listed too. The list is in time order and holds only changes, not every step. It is read from the same extended period run as the Tables pane and the Full report.</p>';
 $ec_lang['lpn_guide_st_example_def']='<p>Open the Net1 example and choose Water, Reports, Status changes. Tank N2 is now filling at 1:00, emptying at 11:00, filling at 16:00, and emptying at 22:00. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00.</p>';
@@ -1800,7 +1800,6 @@ $ec_lang['lpn_calc_hint_mute']='Don’t show this again';
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.';
-$ec_lang['lpn_time_no_report']='There is no run report yet. The report is the EPANET text report, so it appears after this network has been calculated.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -2376,7 +2375,7 @@ $ec_lang['lpn_file_export_workspace_tip']='Download a small file holding the lay
 $ec_lang['lpn_file_import_workspace']='Workspace…';
 $ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
 $ec_lang['lpn_file_import_msx']='EPANET-MSX file…';
-$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.';
+$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run in an extended period simulation by the solver selected in Settings.';
 $ec_lang['lpn_file_export_item_msx']='EPANET-MSX file…';
 $ec_lang['lpn_file_export_msx_tip']='Download the attached EPANET-MSX file exactly as it was imported.';
 $ec_lang['lpn_msx_report_heading']='Attached {file}';
@@ -2392,7 +2391,7 @@ $ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
 $ec_lang['lpn_quality_msx_species']='Species';
 $ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
 $ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.';
-$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
+$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the selected solver, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
@@ -2454,7 +2453,7 @@ $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modellin
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_tags']='This file assigns tags to some junctions, pipes, or other assets. Every tag was imported and appears in the properties of its asset, where it can be viewed or edited.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The Solver (run) report is available under Reports, Solver (run), but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
@@ -2790,10 +2789,10 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // returning visitor with the page cached and the engine not cached is a real state, and Task 608
 // shrank it further by fetching the engine before anybody is waiting. But the conclusion holds on
 // a better reason: **the reader is already told, at the moment it happens, by
-// lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
+// lpn_time_epanet_fallback and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.';
+$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver selected, the network, including an extended period simulation and an EPANET-MSX analysis, is solved by the built-in solver instead. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2873,10 +2872,10 @@ $ec_lang['lpn_roughness_method_note']='⚠ Pipes with a roughness outside the no
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is now stored on this device and works offline.';
-$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.';
+$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, so the built-in solver runs this network. After one connection to the internet, the EPANET solver is stored on this device.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='This network cannot be solved without the EPANET solver. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='The EPANET solver could not be downloaded, so the built-in solver runs this network. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2888,8 +2887,8 @@ $ec_lang['lpn_engine_bar_label']='Solver loading progress';
 $ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
 $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
-$ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
-$ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
+$ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded and cannot be loaded now, so the built-in solver runs this network. EPANET will be loaded when you are connected to the internet.';
+$ec_lang['lpn_engine_needed_failed_why']='The EPANET solver could not be loaded, so the built-in solver runs this network. {reason}';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3745,7 +3744,7 @@ $ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins
 $ec_lang['lpn_settings_option_unset']='Not stated';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='A single factor applied to every demand in the network at once. Each scenario can have a separate value, so average day, maximum day, or peak hour can be created by changing only this setting.';
-$ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
+$ec_lang['lpn_settings_engine_native']='Use the built-in solver';
 // **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
 // *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
 // spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
@@ -3754,17 +3753,14 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // actually holds the thing, which is where they are a fact about the number on screen rather
 // than a comparison offered in advance.
 //
-// What the tip keeps is the two things a person ticking this box does need: which paths go to
-// EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
-// connection actually pays.
+// What the tip keeps is the two things a person ticking this box does need: that input EPANET
+// refuses is refused by both solvers, and the one-time download, which is the cost a visitor on a
+// slow connection actually pays. No path goes to EPANET whatever the box says (Task 733).
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Select this to use the built-in solver. Otherwise, the EPANET solver from the US EPA is used. The built-in solver runs every network the page builds, including an extended period simulation and an EPANET-MSX analysis, and the status bar states which solver was used. Input that EPANET does not accept is not accepted by the built-in solver either, and the status bar reports it. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
-// Said out loud, never silently: the user picked the built-in solver and this network was sent to
-// the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
-// setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3779,11 +3775,11 @@ $ec_lang['lpn_engine_refused_why']='EPANET solver message: {message}';
 $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
 // A run EPANET started and could not finish, for example when a tank empties and the junctions it
 // fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
-$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
+$ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.';
 $ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before the end of the period.';
 $ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
 $ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy results were computed.';
-$ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
+$ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.';
 // Why a stopped run stopped, read from EPANET's own run report (R-402). {link} is the link EPANET
 // had just closed, {tank} the tank at one end of it, {nodes} the ids of the nodes EPANET then could
 // not solve for, comma-separated. Follows lpn_time_run_stopped or lpn_time_run_stopped_kept.
@@ -3792,7 +3788,7 @@ $ec_lang['lpn_time_run_cut_off_full']='Tank {tank} was full, so EPANET had close
 $ec_lang['lpn_time_run_cut_off_empty']='Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
-$ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.';
+$ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.';
 // ---- controls we could not use (ROADMAP Task 466) ---------------------------------------------
 // A control naming an element that is no longer drawn has to be left out -- EPANET rejects the
 // whole network over one of them -- and {ids} names which, because "a control was ignored" with
@@ -3962,11 +3958,12 @@ $ec_lang['lpn_time_stat_maximum']='Max';
 $ec_lang['lpn_time_stat_range']='Range';
 $ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
+// Said once per page load after a chemical simulation run by the built-in solver, which reports no reaction rates.
 $ec_lang['lpn_time_running']='Running the extended period simulation.';
-$ec_lang['lpn_time_no_engine']='The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.';
-// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
-// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}';
+// When EPANET is the chosen solver and cannot load or start, the built-in loop runs the period and the status bar says so.
+// The first sentence is for offline; for the other causes the second ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_epanet_fallback']='The EPANET solver could not be loaded, so the built-in solver ran this network.';
+$ec_lang['lpn_time_epanet_fallback_why']='The built-in solver ran this network, because the EPANET solver could not be used. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.';
 $ec_lang['lpn_time_engine_start_failed']='The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.';
 $ec_lang['lpn_time_engine_run_failed']='The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.';
@@ -4004,9 +4001,9 @@ $ec_lang['lpn_time_runbox_hide']='Do not show this box again';
 $ec_lang['lpn_settings_runbox']='Show the run progress box';
 $ec_lang['lpn_settings_runbox_tip']='A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
-$ec_lang['lpn_time_run_report']='Run report';
+$ec_lang['lpn_time_run_report']='Solver (run) report';
 $ec_lang['lpn_time_run_report_copied']='Copied';
-$ec_lang['lpn_time_run_report_tip']='The report EPANET wrote for the last run, verbatim: whether it converged, and any warnings. The text is produced by the EPANET solver, not by this page.';
+$ec_lang['lpn_time_run_report_tip']='The text report of the last run: the network counts, the analysis options, whether it converged, the status of each step, and any warnings. Its header states the solver used, and both solvers use the layout and wording of the EPANET report.';
 
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='Playback speed';
@@ -4211,8 +4208,8 @@ $ec_lang['lpn_settings_energy']='Energy';
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
 // Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
-// the tips say where a report comes from. Run is EPANET's verbatim report.
-$ec_lang['lpn_reports_epanet']='Run';
+// the tips say where a report comes from. The Solver (run) report is the text report of a run, written by either solver.
+$ec_lang['lpn_reports_epanet']='Solver (run)';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
@@ -5300,7 +5297,7 @@ $ec_lang['lpn_survey_note_ring_junction']='This point became a junction so the r
 $ec_lang['lpn_survey_note_pipe_zero_length']='This point is at the same spot as the node before it, so the pipe between them has no length.';
 $ec_lang['lpn_survey_note_node_on_pipe']='This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.';
 $ec_lang['lpn_settings_demand_model']='Demand model';
-$ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.';
+$ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure.';
 $ec_lang['lpn_settings_demand_model_dda']='Demand driven';
 $ec_lang['lpn_settings_demand_model_pda']='Pressure driven';
 $ec_lang['lpn_settings_min_pressure']='Minimum pressure';
@@ -5309,11 +5306,22 @@ $ec_lang['lpn_settings_req_pressure']='Required pressure';
 $ec_lang['lpn_settings_req_pressure_tip']='Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project\'s pressure unit. Leave it blank to use EPANET\'s default, which is in psi for US flow units and meters otherwise.';
 $ec_lang['lpn_settings_pressure_exponent']='Pressure exponent';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.';
-$ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
+$ec_lang['lpn_engine_native_used']='Solved with the built-in solver.';
+$ec_lang['lpn_engine_epanet_used']='Solved with the EPANET solver.';
 $ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
 $ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
+$ec_lang['lpn_diag_rules_refused']='EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:';
+$ec_lang['lpn_diag_control_refused']='EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:';
+$ec_lang['lpn_diag_rule_step_refused']='Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.';
+$ec_lang['lpn_diag_speed_pattern_refused']='These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:';
+$ec_lang['lpn_diag_tank_curve_refused']='The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:';
+$ec_lang['lpn_diag_tank_levels_refused']='The initial level of these tanks is not between the minimum level and the maximum level:';
+$ec_lang['lpn_diag_quality_refused']='EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:';
+$ec_lang['lpn_diag_energy_refused']='EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:';
+$ec_lang['lpn_diag_builtin_stopped']='The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.';
+$ec_lang['lpn_diag_builtin_stopped_at']='The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.';
+$ec_lang['lpn_diag_builtin_error']='An error occurred in the built-in solver: {message}';
 $ec_lang['lpn_gpv_one_point_note']='⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}';
-$ec_lang['lpn_diag_pda_needs_epanet']='The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';
 $ec_lang['lpn_result_delivered_demand_tip']='The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.';
 $ec_lang['lpn_result_demand_deficit']='Demand deficit';

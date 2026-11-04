@@ -355,7 +355,7 @@ console.log('\n6. EPANET unreachable: one instant, the multipliers in it, and sa
 			((res.heads.J2 - res.heads.R2) / FT).toFixed(4) + ' vs ' + (want / FT).toFixed(4) + ' ft');
 	}
 	const said = byId.lpn_status.textContent || '';
-	ok('...and the page says it is one moment only', /moment|EPANET/i.test(said), said.slice(0, 80));
+	ok('...and the page says the built-in solver answered', /built-in solver/i.test(said), said.slice(0, 80));
 	EngCalcs.lpnEpanetRun = realRun;
 	EngCalcs.lpnSolveEpanet = realSolve;
 }

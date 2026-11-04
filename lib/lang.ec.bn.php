@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='পুনরায় গণনা খু
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='এই নেটওয়ার্কটি গণনা করতে {secs} সেকেন্ড লেগেছে, এবং এটি প্রতিটি পরিবর্তনের পর পুনরায় গণনা করার জন্য নির্ধারিত আছে। এটি বন্ধ করে গণনা করুন বোতাম ফিরিয়ে আনতে, সেটিংস-এ, হিসাব, হাইড্রোলিক্স-এর অধীনে “স্বয়ংক্রিয়ভাবে পুনরায় গণনা করুন” বন্ধ করুন।';
-$ec_lang['lpn_time_no_report']='এখনও কোনো রান প্রতিবেদন নেই। প্রতিবেদনটি EPANET-এর টেক্সট প্রতিবেদন, তাই এই নেটওয়ার্ক গণনা করার পর এটি দেখা যায়।';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='পরিসর';
 $ec_lang['lpn_time_clock_day']='দিন {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='একটি সময় ঘণ্টা ও মিনিট আকারে লিখুন, যেমন 2:30। একটি সাধারণ সংখ্যা মানে ঘণ্টা, তাই 8 মানে আট ঘণ্টা। আধা ঘণ্টা হলো 0:30।';
 $ec_lang['lpn_time_running']='বর্ধিত সময়কাল সিমুলেশন রান করা হচ্ছে।';
-$ec_lang['lpn_time_no_engine']='বিল্ট-ইন সমাধানকারী একবারে একটি মুহূর্ত সমাধান করে, তাই এটি কেবল {time}-এর নেটওয়ার্ক: প্রতিটি প্যাটার্ন সেই মুহূর্তে পড়া হয়, এবং প্রতিটি ট্যাংক ভরা ও খালি হওয়ার বদলে তার প্রাথমিক স্তরেই থাকে। বর্ধিত সময়কাল সিমুলেশন চালায় এমন EPANET সমাধানকারী ডাউনলোড করতে একবার ইন্টারনেটে সংযুক্ত হন।';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='বিল্ট-ইন সমাধানকারী একবারে একটি মুহূর্ত সমাধান করে, তাই এটি কেবল {time}-এর নেটওয়ার্ক: প্রতিটি প্যাটার্ন সেই মুহূর্তে পড়া হয়, এবং প্রতিটি ট্যাংক ভরা ও খালি হওয়ার বদলে তার প্রাথমিক স্তরেই থাকে। {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='EPANET সমাধানকারী ডাউনলোড ব্যর্থ হয়েছে। আবার চেষ্টা করতে পেজটি রিলোড করুন; ফায়ারওয়াল, প্রক্সি বা ব্রাউজার এক্সটেনশন এটি আটকে দিতে পারে।';
 $ec_lang['lpn_time_engine_start_failed']='ব্রাউজার EPANET সমাধানকারী চালু করতে অস্বীকার করেছে। কোনো নিরাপত্তা সেটিং বা এক্সটেনশন WebAssembly বন্ধ করে রাখতে পারে।';
 $ec_lang['lpn_time_engine_run_failed']='EPANET রান ব্যর্থ হয়েছে। এটি এই পেজের একটি ত্রুটি; এটি জানাতে {wrong} লিংক ব্যবহার করুন।';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='প্রয়োজনীয় চা�
 $ec_lang['lpn_settings_req_pressure_tip']='যে চাপে বা তার ওপরে একটি সংযোগস্থল পূর্ণ চাহিদা পায় তা লিখুন। এটি সর্বনিম্ন চাপের চেয়ে বেশি হতে হবে। প্রকল্পের চাপের একক ব্যবহার করুন। EPANET-এর ডিফল্ট ব্যবহার করতে ফাঁকা রাখুন, যা US প্রবাহ এককের জন্য psi এবং অন্যথায় মিটার।';
 $ec_lang['lpn_settings_pressure_exponent']='চাপের সূচক';
 $ec_lang['lpn_settings_pressure_exponent_tip']='সেই কার্ভের সূচক লিখুন যা সর্বনিম্ন চাপে শূন্য প্রবাহ থেকে প্রয়োজনীয় চাপে পূর্ণ চাহিদা পর্যন্ত ওঠে।';
-$ec_lang['lpn_engine_pda_route']='EPANET সমাধানকারী দিয়ে সমাধান করা হয়েছে, কারণ চাহিদা মডেল চাপ-চালিত।';
-$ec_lang['lpn_diag_pda_needs_epanet']='চাহিদা মডেল চাপ-চালিত, এবং শুধু EPANET সমাধানকারী এটি হিসাব করতে পারে। EPANET সমাধানকারী লোড করা যায়নি, তাই এই ফলাফলগুলো নেই।';
 $ec_lang['lpn_result_delivered_demand']='সরবরাহকৃত চাহিদা';
 $ec_lang['lpn_result_delivered_demand_tip']='চাপ-চালিত চাহিদা মডেলে এই সংযোগস্থল প্রকৃতপক্ষে যে প্রবাহ পায়। প্রয়োজনীয় চাপের নিচে চাপ থাকলে এটি চাহিদার চেয়ে কম হয়।';
 $ec_lang['lpn_result_demand_deficit']='চাহিদার ঘাটতি';

@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Dezactivați dacă recalcularea este prea
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Calculul acestei rețele a durat {secs} s, iar rețeaua este setată să se recalculeze după fiecare modificare. Pentru a opri asta și a readuce butonul Calculează, dezactivați „Recalculează automat” din Setări, la Calcul, Hidraulică.';
-$ec_lang['lpn_time_no_report']='Nu există încă un raport de rulare. Raportul este raportul text EPANET, deci apare după ce această rețea a fost calculată.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Interval';
 $ec_lang['lpn_time_clock_day']='Ziua {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Scrieți o oră ca ore și minute, de exemplu 2:30. Un număr simplu înseamnă ore, deci 8 înseamnă opt ore. O jumătate de oră este 0:30.';
 $ec_lang['lpn_time_running']='Se rulează simularea pe perioadă extinsă.';
-$ec_lang['lpn_time_no_engine']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit la acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. Conectați-vă o dată la internet pentru a descărca rezolvitorul EPANET, care rulează o simulare pe perioadă extinsă.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Rezolvitorul integrat rezolvă un singur moment la un moment dat, deci aceasta este rețeaua doar la {time}: fiecare model este citit în acel moment, iar fiecare bazin rămâne la nivelul inițial în loc să se umple și să se golească. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Descărcarea rezolvitorului EPANET a eșuat. Reîncărcați pagina pentru a încerca din nou; un firewall, un proxy sau o extensie a browserului o poate bloca.';
 $ec_lang['lpn_time_engine_start_failed']='Browserul a refuzat pornirea rezolvitorului EPANET. WebAssembly poate fi dezactivat de o setare de securitate sau de o extensie.';
 $ec_lang['lpn_time_engine_run_failed']='Rularea EPANET a eșuat. Aceasta este un defect al acestei pagini; folosiți legătura {wrong} pentru a-l raporta.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Presiune necesară';
 $ec_lang['lpn_settings_req_pressure_tip']='Introduceți presiunea la care sau peste care o joncțiune primește cerința integrală. Trebuie să fie mai mare decât presiunea minimă. Folosiți unitatea de presiune a acestui proiect. Lăsați gol pentru a folosi valoarea implicită EPANET, care este în psi pentru unitățile de debit din SUA și în metri în caz contrar.';
 $ec_lang['lpn_settings_pressure_exponent']='Exponent de presiune';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Introduceți exponentul curbei care crește de la debit nul la presiunea minimă până la cerința integrală la presiunea necesară.';
-$ec_lang['lpn_engine_pda_route']='Rezolvat cu rezolvitorul EPANET, deoarece modelul de cerință este dependent de presiune.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Modelul de cerință este dependent de presiune și doar rezolvitorul EPANET îl poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc.';
 $ec_lang['lpn_result_delivered_demand']='Cerință livrată';
 $ec_lang['lpn_result_delivered_demand_tip']='Debitul pe care această joncțiune îl primește efectiv în modelul de cerință dependentă de presiune. Este mai mic decât cerința atunci când presiunea este sub presiunea necesară.';
 $ec_lang['lpn_result_demand_deficit']='Deficit de cerință';

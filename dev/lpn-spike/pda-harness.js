@@ -88,7 +88,7 @@ function reference(pmin, preq, n) {
 
 async function main() {
 
-console.log('=== 2. PDA routes to EPANET by itself ===');
+console.log('=== 2. PDA is solved by the engine the setting names ===');
 setUnitSet('si');
 L.buildLayers();
 L.seedDefaultInputs();
@@ -109,13 +109,19 @@ async function solved() { L.runSolve(); await settleEpanet(); return L.lastResul
 	s.hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
 	const was = epanetSolves();
 	const r = await solved();
-	ok('the built-in solver was set, and EPANET was handed the network anyway', epanetSolves() === was + 1, epanetSolves() - was);
-	ok('...and the answer is EPANET\'s', !!r && r.engine === 'epanet', r && r.engine);
-	ok('the stored engine setting was NOT rewritten', s.engine === 'native', s.engine);
-	ok('the status bar says why', /pressure driven/i.test(statusEl.textContent || ''), JSON.stringify(statusEl.textContent));
+	ok('the built-in solver was set, and EPANET was not asked (Task 733: it solves PDA itself)', epanetSolves() === was, epanetSolves() - was);
+	ok('...and the answer is the built-in solver\'s, with a delivered demand and a deficit', !!r && r.engine !== 'epanet' && !!r.demands && !!r.demandDeficits && r.demandDeficits.J1 > 0, r && r.engine);
+	ok('the stored engine setting was not changed', s.engine === 'native', s.engine);
+	ok('the status bar names the built-in solver', /built-in solver/i.test(statusEl.textContent || ''), JSON.stringify(statusEl.textContent));
 	const model = L.assembleModel();
 	const nat = EngCalcs.lpnDiagnose(model, { engine: 'native' });
-	ok('the built-in solver refuses PDA by name', nat.some((i) => i.code === 'pda-needs-epanet'), JSON.stringify(nat));
+	ok('the built-in solver no longer refuses PDA', !nat.some((i) => i.code === 'pda-needs-epanet'), JSON.stringify(nat));
+	const hand = reference(0, 20, 0.5), gotN = r.demands && r.demands.J1;
+	ok('the built-in solver delivers the hand-worked flow within 0.5%', typeof gotN === 'number' && Math.abs(gotN - hand) / hand < 0.005, (gotN * 1000).toFixed(4) + ' vs ' + (hand * 1000).toFixed(4) + ' L/s');
+	s.engine = 'epanet';
+	const was2 = epanetSolves(), r2 = await solved();
+	ok('with the EPANET solver chosen, EPANET is handed the network', epanetSolves() === was2 + 1 && !!r2 && r2.engine === 'epanet');
+	s.engine = 'native';
 }
 
 console.log('\n=== 3. the delivered flow is the hand-worked one ===');

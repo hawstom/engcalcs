@@ -180,15 +180,16 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   (static pressure, drawdown, converge, runs), and never invent plain-English substitutes.
 - **When one name does two jobs, split it.** Source trace (the analysis, on a Trace node) vs Source
   share (the percentage).
-- **Extended-period simulation shipped, through the EPANET engine only** (`js/lpn-time.js`), with
-  patterns, reservoir-head and pump-speed patterns, and `[RULES]`. The transport mounts in
-  `lpn_toolbar_run`. The built-in solver solves one instant and is not getting a time dimension.
-  **"No EPS yet" is false.**
-- **Every valve type (PRV, PSV, FCV, TCV, PBV, GPV) solves in either engine; nothing about a valve
-  routes to EPANET.** Valve data EPANET refuses (a forbidden valve pair, an unreadable GPV curve) is
-  refused by name in both, by `EngCalcs.lpnDiagnose`. A pressure-driven demand model still routes to
-  EPANET, without rewriting the stored `engine` setting. Speed is no longer a reason to prefer either
-  engine.
+- **Extended-period simulation shipped** (`js/lpn-time.js`), with patterns, reservoir-head and pump-speed
+  patterns, and `[RULES]`. The transport mounts in `lpn_toolbar_run`. Either engine runs it: the
+  built-in solver through its own time loop (`js/lpn-native-run.js`), EPANET through its engine, and the
+  setting decides. **No network goes to EPANET because the built-in solver lacks a feature** (Tom,
+  2026-11-02: "We will not release this branch until the gap is gone."); input EPANET itself refuses is
+  refused by name in both, by `EngCalcs.lpnDiagnose`. **"No EPS yet" is false.**
+- **Every valve type (PRV, PSV, FCV, TCV, PBV, GPV) and a pressure-driven demand model solve in either
+  engine; nothing about them routes to EPANET.** Valve data EPANET refuses (a forbidden valve pair, an
+  unreadable GPV curve) is refused by name in both, by `EngCalcs.lpnDiagnose`. Speed is no longer a reason
+  to prefer either engine.
 - **A curve is a document object; an element holds only a reference.** `doc.curves` holds
   `{id, kind, points, src, tok}`; the Library's Curves section is the only editor. The reference is
   scenario-overridable, the points are not. The three-point fit is derived, never stored. Four

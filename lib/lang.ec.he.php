@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='כבו אם החישוב מחדש איט�
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='חישוב רשת זו ארך {secs} שנ׳, והיא מוגדרת להיות מחושבת מחדש אחרי כל שינוי. כדי לעצור זאת ולקבל בחזרה כפתור חישוב, כבו את ”חשב מחדש אוטומטית” בהגדרות, תחת חישוב, הידראוליקה.';
-$ec_lang['lpn_time_no_report']='עדיין אין דוח הרצה. הדוח הוא דוח הטקסט של EPANET, ולכן הוא מופיע לאחר שרשת זו חושבה.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='טווח';
 $ec_lang['lpn_time_clock_day']='יום {day},‏ {clock}';
 $ec_lang['lpn_time_format_tip']='כתבו זמן כשעות ודקות, כמו 2:30. מספר פשוט פירושו שעות, כך ש-8 הוא שמונה שעות. חצי שעה הוא 0:30.';
 $ec_lang['lpn_time_running']='מריץ את הסימולציה על פני תקופת זמן.';
-$ec_lang['lpn_time_no_engine']='הפותר המובנה פותר רגע אחד בכל פעם, ולכן זו הרשת ב-{time} בלבד: כל תבנית נקראת באותו רגע, וכל מכל נשאר במפלס ההתחלתי שלו במקום להתמלא ולהתרוקן. התחברו לאינטרנט פעם אחת כדי להוריד את פותר EPANET, המריץ סימולציה על פני תקופת זמן.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='הפותר המובנה פותר רגע אחד בכל פעם, ולכן זו הרשת ב-{time} בלבד: כל תבנית נקראת באותו רגע, וכל מכל נשאר במפלס ההתחלתי שלו במקום להתמלא ולהתרוקן. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='הורדת פותר EPANET נכשלה. טענו את העמוד מחדש כדי לנסות שוב; ייתכן שחומת אש, שרת proxy או תוסף דפדפן חוסמים אותה.';
 $ec_lang['lpn_time_engine_start_failed']='הדפדפן סירב להפעיל את פותר EPANET. ייתכן ש-WebAssembly כבוי בגלל הגדרת אבטחה או תוסף.';
 $ec_lang['lpn_time_engine_run_failed']='הרצת EPANET נכשלה. זהו פגם בעמוד זה; השתמשו בקישור {wrong} כדי לדווח עליו.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='לחץ נדרש';
 $ec_lang['lpn_settings_req_pressure_tip']='הזינו את הלחץ שבו או מעליו צומת מקבל את הדרישה במלואה. הוא חייב להיות גדול מהלחץ המזערי. השתמשו ביחידת הלחץ של פרויקט זה. השאירו ריק כדי להשתמש בברירת המחדל של EPANET, שהיא ב-psi ליחידות ספיקה אמריקאיות ובמטרים בשאר המקרים.';
 $ec_lang['lpn_settings_pressure_exponent']='מעריך הלחץ';
 $ec_lang['lpn_settings_pressure_exponent_tip']='הזינו את מעריך העקום העולה מאפס ספיקה בלחץ המזערי עד הדרישה המלאה בלחץ הנדרש.';
-$ec_lang['lpn_engine_pda_route']='נפתר בפותר EPANET, מפני שמודל הדרישה מונחה לחץ.';
-$ec_lang['lpn_diag_pda_needs_epanet']='מודל הדרישה מונחה לחץ, ורק פותר EPANET יכול לחשב אותו. לא ניתן היה לטעון את פותר EPANET, ולכן תוצאות אלה חסרות.';
 $ec_lang['lpn_result_delivered_demand']='דרישה שסופקה';
 $ec_lang['lpn_result_delivered_demand_tip']='הספיקה שצומת זה מקבל בפועל במודל דרישה מונחה לחץ. היא קטנה מהדרישה כשהלחץ נמוך מהלחץ הנדרש.';
 $ec_lang['lpn_result_demand_deficit']='גירעון דרישה';

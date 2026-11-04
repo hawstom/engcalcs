@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**33 still to read on master**, of 33 untranslated keys, of 3323 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**52 still to read on master**, of 61 untranslated keys, of 3346 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,17 +25,110 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## Plain sentences to check  (0, none are stale)
+## Plain sentences to check  (1, 1 to read @@ NEEDS RULING)
 
-Every entry in `dev/plain-sentences.md` matches the English it was written against.
+**These are your translator notes in `dev/plain-sentences.md`, not visitor wording.** Each was written
+against English that has since changed, or against a key that no longer exists. Say which: keep it
+as is, change it (give the new text), or remove it. CC applies your answer to the file.
 
-## lpn_  (33, 33 to read @@ NEEDS RULING)
+- **`lpn_reports_epanet`**
+  > Solver (run)
+  *Why stale:* the English changed after this entry was written
+  *Written against:* Run
+  *Current plain sentence:* Run: the report of the simulation run.
+  @@ NEEDS RULING
 
+## lpn_  (61, 52 to read @@ NEEDS RULING)
+
+- **`lpn_diag_builtin_error`**
+  > An error occurred in the built-in solver: {message}
+  @@ NEEDS RULING
+- **`lpn_diag_builtin_stopped`**
+  > The built-in solver stopped, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.
+  @@ NEEDS RULING
+- **`lpn_diag_builtin_stopped_at`**
+  > The built-in solver stopped at {time}, so the run has no results. To run this network with the EPANET solver, change the setting under Calculation, Solver in Settings.
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_control_refused`**
+  > EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_energy_refused`**
+  > EPANET does not accept this energy input: a negative price or demand charge, an efficiency of 0 or less, a price pattern that does not exist, or an efficiency curve whose flows do not increase. Correct these:
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_quality_refused`**
+  > EPANET does not accept this water quality input: a source type, source pattern or mixing model that does not exist, a quality time step of 0 seconds (a hydraulic time step under 10 seconds with no quality time step stated), or an EPANET-MSX file that cannot be read. Correct these:
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_rule_step_refused`**
+  > Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_rules_refused`**
+  > EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:
+  @@ NEEDS RULING
+- **`lpn_diag_speed_pattern_refused`**
+  > These pumps use a speed pattern that does not exist or that holds a negative value. A speed pattern must exist and hold values of 0 or more:
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_tank_curve_refused`**
+  > The volume curves of these tanks cannot be used. A curve needs at least two points, each level greater than the one before it, and a range that reaches from the minimum level to the maximum level of the tank:
+  _Ruled OK 2026-11-03._
+- **`lpn_diag_tank_levels_refused`**
+  > The initial level of these tanks is not between the minimum level and the maximum level:
+  _Ruled OK 2026-11-03._
+- **`lpn_engine_epanet_used`**
+  > Solved with the EPANET solver.
+  @@ NEEDS RULING
+- **`lpn_engine_native_used`**
+  > Solved with the built-in solver.
+  @@ NEEDS RULING
+- **`lpn_export_table_scn_keeps`**
+  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_wtg`**
   > .wtg.sqlite file…
   @@ NEEDS RULING
 - **`lpn_file_export_wtg_tip`**
   > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.
+  @@ NEEDS RULING
+- **`lpn_inpalt_base`**
+  > The Base alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_base_note`**
+  > Every scenario inherits the Base alternative, so choosing it changes them all.
+  @@ NEEDS RULING
+- **`lpn_inpalt_cancelled`**
+  > Nothing was changed.
+  @@ NEEDS RULING
+- **`lpn_inpalt_heading`**
+  > Alternative for {category}
+  @@ NEEDS RULING
+- **`lpn_inpalt_lead`**
+  > This file changes values in the categories below. Choose the alternative that receives the values of each.
+  @@ NEEDS RULING
+- **`lpn_inpalt_more`**
+  > and others ({n})
+  @@ NEEDS RULING
+- **`lpn_inpalt_name`**
+  > Name of the new alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_new`**
+  > A new alternative, child of {parent}
+  @@ NEEDS RULING
+- **`lpn_inpalt_own`**
+  > {scenario}'s own alternative
+  @@ NEEDS RULING
+- **`lpn_inpalt_receipt`**
+  > Alternatives that received the values: {list}
+  @@ NEEDS RULING
+- **`lpn_inpalt_shared`**
+  > {alternative}, also used by {scenarios}
+  @@ NEEDS RULING
+- **`lpn_settings_solver`**
+  > Solver
+  @@ NEEDS RULING
+- **`lpn_time_epanet_fallback`**
+  > The EPANET solver could not be loaded, so the built-in solver ran this network.
+  _Ruled OK 2026-11-03._
+- **`lpn_time_epanet_fallback_why`**
+  > The built-in solver ran this network, because the EPANET solver could not be used. {reason}
   @@ NEEDS RULING
 - **`lpn_wtg_export_exported`**
   > Exported {zip}, holding {wtg} and {sqlite}.
@@ -135,7 +228,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**39 still to read**, of 82 new keys across 8 unmerged branch(es).
+**10 still to read**, of 53 new keys across 4 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -146,105 +239,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1101d (`bfe18f2fe`) — adds no English strings
-
-### feat/alternative-import (`c8be0f791`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_export_table_scn_keeps`**
-  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
-  @@ NEEDS RULING
-- **`lpn_inpalt_base`**
-  > The Base alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_base_note`**
-  > Every scenario inherits the Base alternative, so choosing it changes them all.
-  @@ NEEDS RULING
-- **`lpn_inpalt_cancelled`**
-  > Nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_inpalt_heading`**
-  > Alternative for {category}
-  @@ NEEDS RULING
-- **`lpn_inpalt_lead`**
-  > This file changes values in the categories below. Choose the alternative that receives the values of each.
-  @@ NEEDS RULING
-- **`lpn_inpalt_more`**
-  > and others ({n})
-  @@ NEEDS RULING
-- **`lpn_inpalt_name`**
-  > Name of the new alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_new`**
-  > A new alternative, child of {parent}
-  @@ NEEDS RULING
-- **`lpn_inpalt_own`**
-  > {scenario}'s own alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_receipt`**
-  > Alternatives that received the values: {list}
-  @@ NEEDS RULING
-- **`lpn_inpalt_shared`**
-  > {alternative}, also used by {scenarios}
-  @@ NEEDS RULING
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/import-alternative (`3d7cfa0f6`) — 12 new, 12 to read @@ NEEDS RULING
-
-- **`lpn_export_table_scn_keeps`**
-  > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
-  @@ NEEDS RULING
-- **`lpn_inpalt_base`**
-  > The Base alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_base_note`**
-  > Every scenario inherits the Base alternative, so choosing it changes them all.
-  @@ NEEDS RULING
-- **`lpn_inpalt_cancelled`**
-  > Nothing was changed.
-  @@ NEEDS RULING
-- **`lpn_inpalt_heading`**
-  > Alternative for {category}
-  @@ NEEDS RULING
-- **`lpn_inpalt_lead`**
-  > This file changes values in the categories below. Choose the alternative that receives the values of each.
-  @@ NEEDS RULING
-- **`lpn_inpalt_more`**
-  > and others ({n})
-  @@ NEEDS RULING
-- **`lpn_inpalt_name`**
-  > Name of the new alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_new`**
-  > A new alternative, child of {parent}
-  @@ NEEDS RULING
-- **`lpn_inpalt_own`**
-  > {scenario}'s own alternative
-  @@ NEEDS RULING
-- **`lpn_inpalt_receipt`**
-  > Alternatives that received the values: {list}
-  @@ NEEDS RULING
-- **`lpn_inpalt_shared`**
-  > {alternative}, also used by {scenarios}
-  @@ NEEDS RULING
-
-### feat/native-wire (`ae10e1721`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_diag_rules_refused`**
-  > EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:
-  @@ NEEDS RULING
-- **`lpn_engine_epanet_used`**
-  > Solved with the EPANET solver.
-  @@ NEEDS RULING
-- **`lpn_engine_native_route`**
-  > Solved with the EPANET solver, because the built-in solver does not run this simulation.
-  @@ NEEDS RULING
-- **`lpn_engine_native_route_ids`**
-  > Solved with the EPANET solver, because the built-in solver does not run this simulation for: {ids}.
-  @@ NEEDS RULING
-- **`lpn_engine_native_used`**
-  > Solved with the built-in solver.
-  @@ NEEDS RULING
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
@@ -410,4 +405,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/wtg-export (`8edd6369b`) — already merged into feat/wtg-page-export; its strings are listed there
 
-### feat/wtg-page-export (`db1af172d`) — adds no English strings
+### feat/wtg-page-export (`5b59b2711`) — adds no English strings

@@ -39,6 +39,8 @@
  *     bucket, so every column counted from the front stays where it was.
  *   * the pointer (Task 285) is the fifth field of a view or calc row. A row with four fields left
  *     after the bucket predates it and reads as pointer unknown, never as fine.
+ *   * the theme (Task 824) is the sixth field of a view row: a chosen theme's name, or 'day' for the
+ *     theme of the day. Fewer fields left after the bucket means it predates the column.
  *   * the served/asked pair on the reach log is present only on rows with six fields left. A
  *     shorter row is counted and reported as 'older format', never guessed at.
  */
@@ -117,6 +119,10 @@ function ecUsageParseRow($kind, $line)
             $row['lang']    = $get(2);
             $row['asked']   = $get(3);
             $row['pointer'] = $n >= 5 ? $get(4) : '';
+            // Task 824: the sixth field of a VIEW row only: a chosen theme's name, or 'day'. A row
+            // with five fields left predates it and reads as unknown, never as day.
+            $row['theme']     = ($kind === 'view' && $n >= 6) ? $get(5) : '';
+            $row['themeKind'] = $row['theme'] === '' ? '' : ($row['theme'] === 'day' ? 'day' : 'chosen');
             break;
         case 'naming':
             // ts page lang browser_lang field
@@ -431,7 +437,7 @@ function ecUsageFinalizeDaily(array $daily, array $days)
 function ecUsageReportBuild(array $dirs, $from, $to)
 {
     $fieldsByKind = array(
-        'view'   => array('page', 'lang', 'pointer'),
+        'view'   => array('page', 'lang', 'pointer', 'theme', 'themeKind'),
         'calc'   => array('page'),
         'naming' => array('field', 'page'),
         'reach'  => array('lang', 'source', 'asked'),

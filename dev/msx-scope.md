@@ -81,8 +81,9 @@ links by the IDs in the `.inp`, so it cannot stand alone.
 
 ### Library and licence
 CITED (GitHub, fetched 2026-10-17): `github.com/OpenWaterAnalytics/epanet-msx`, "the multi-species
-extension to the EPANET hydraulic analysis engine", **MIT licence**, OWA organisation. MIT is
-GPL-3-compatible, the same standing as the vendored OWA-EPANET (`js/vendor/README.md`). The
+extension to the EPANET hydraulic analysis engine", OWA organisation. **Its source tree carries the GNU LGPL v3** (`doc/license.txt`,
+read 2026-11-01; this section first said MIT, from the repository's summary line). LGPL v3 and this project's GPL v3 combine; the
+native port (`js/lpn-native-msx.js`) names the source and keeps its notice. The
 fetched page gave no version number and did not mention OWA-EPANET 2.3.
 
 ### Does a JS/WASM build exist?
@@ -142,7 +143,7 @@ rule needs a decision before code), tank mixing models under MSX, and the valida
 single-species decay as a cross-check, the way `native-valve-harness.js` matched valves).
 MSX is EPS-like by nature, so it depends on `js/lpn-time.js`.
 
-**Phase 3, native (Task 733's long road).** Not scoped. Writing a species reaction ODE solver
+**Phase 3, native (Task 733's long road).** Superseded by Tom, 2026-11-01 ("I'd prefer to implement EPANET-MSX even if it causes us a delay"): built on `feat/native-wire`, `dev/native-eps-plan.md`, `## EPANET-MSX in the built-in solver`. Originally: not scoped. Writing a species reaction ODE solver
 (Euler, RK5, Rosenbrock) and a general expression evaluator natively is a research task; the
 built-in solver stays one instant (`CLAUDE.md`). SPECULATION: do not start until Phase 2 has users.
 

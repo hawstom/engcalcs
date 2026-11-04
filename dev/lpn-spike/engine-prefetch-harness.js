@@ -26,6 +26,7 @@
 'use strict';
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+require(require('path').join(__dirname, '..', '..', 'js', 'lpn-time.js'));
 // These scenarios simulate an OFFLINE visitor: the failure wording is chosen by navigator.onLine (engine-failure-wording-harness.js).
 Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
 
@@ -133,11 +134,13 @@ function line(L) {
 		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
 	return d;
 }
-// A network only EPANET answers. Since Task 733 no valve is one (Tom, 2026-10-18: every type is
-// the built-in solver's), so it is the pressure-driven demand model (Task 762).
+// A network only EPANET answers. Since Task 733 no valve, no pressure-driven demand model and no
+// ordinary period is one (every type is the built-in solver's, Tom 2026-10-18), so it is a period with an
+// EPANET-MSX input, which the built-in loop leaves on EPANET.
 function withEpanetOnly(L) {
 	const d = line(L);
-	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
+	d.times = global.EngCalcs.lpnTimesDefaults(); d.times.duration = 86400;
+	d.msx = { text: '[TITLE]' };
 	return d;
 }
 function fresh() {
@@ -244,7 +247,7 @@ console.log('\n--- the drawing becomes a network ---');
 // ------------------------------------------------------------------------------------------
 // 3. A NETWORK ONLY EPANET CAN SOLVE: THE CHECKBOX AND THE BANNER
 // ------------------------------------------------------------------------------------------
-console.log('\n--- a pressure-driven network, which the built-in solver does not solve ---');
+console.log('\n--- a period with an EPANET-MSX input, which the built-in loop does not run ---');
 {
 	fakeLoader();
 	const L = fresh();

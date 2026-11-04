@@ -1747,7 +1747,6 @@ $ec_lang['lpn_settings_auto_run_tip']='اگر محاسبهٔ دوباره بسی
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='محاسبهٔ این شبکه {secs} ثانیه طول کشید، و طوری تنظیم شده که پس از هر تغییری دوباره محاسبه شود. برای متوقف کردن این کار و بازگرداندن دکمهٔ محاسبه، «محاسبهٔ خودکار» را در تنظیمات، زیر محاسبه، هیدرولیک، خاموش کنید.';
-$ec_lang['lpn_time_no_report']='هنوز گزارش اجرا وجود ندارد. گزارش همان گزارش متنی EPANET است، پس پس از محاسبهٔ این شبکه نمایان می‌شود.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3734,10 +3733,8 @@ $ec_lang['lpn_time_stat_range']='دامنه';
 $ec_lang['lpn_time_clock_day']='روز {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='زمان را به‌صورت ساعت و دقیقه بنویسید، مانند 2:30. یک عدد ساده به معنای ساعت است، پس 8 یعنی هشت ساعت. نیم ساعت می‌شود 0:30.';
 $ec_lang['lpn_time_running']='در حال اجرای شبیه‌سازی بازهٔ زمانی.';
-$ec_lang['lpn_time_no_engine']='حل‌کنندهٔ داخلی در هر بار یک لحظه را حل می‌کند، پس این شبکه فقط در {time} است: هر الگو در همان لحظه خوانده می‌شود، و هر تانک به‌جای پر و خالی شدن در تراز نخستین خود می‌ماند. یک‌بار به اینترنت وصل شوید تا حل‌کنندهٔ EPANET، که شبیه‌سازی بازهٔ زمانی را اجرا می‌کند، دانلود شود.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='حل‌کنندهٔ داخلی در هر بار یک لحظه را حل می‌کند، پس این شبکه فقط در {time} است: هر الگو در همان لحظه خوانده می‌شود، و هر تانک به‌جای پر و خالی شدن در تراز نخستین خود می‌ماند. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='دریافت حل‌کنندهٔ EPANET ناموفق بود. برای تلاش دوباره صفحه را بازبارگذاری کنید؛ ممکن است یک فایروال، پروکسی یا افزونهٔ مرورگر آن را مسدود کرده باشد.';
 $ec_lang['lpn_time_engine_start_failed']='مرورگر از راه‌اندازی حل‌کنندهٔ EPANET خودداری کرد. ممکن است WebAssembly با یک تنظیم امنیتی یا یک افزونه خاموش شده باشد.';
 $ec_lang['lpn_time_engine_run_failed']='اجرای EPANET ناموفق بود. این یک نقص در این صفحه است؛ برای گزارش آن از پیوند {wrong} استفاده کنید.';
@@ -4953,8 +4950,6 @@ $ec_lang['lpn_settings_req_pressure']='فشار لازم';
 $ec_lang['lpn_settings_req_pressure_tip']='فشاری را وارد کنید که در آن یا بالاتر از آن یک گره مصرف کامل خود را دریافت می‌کند. باید از کمترین فشار بزرگ‌تر باشد. از واحد فشار این پروژه استفاده کنید. برای استفاده از پیش‌فرض EPANET آن را خالی بگذارید، که برای واحدهای دبی آمریکایی بر حسب psi و در غیر آن بر حسب متر است.';
 $ec_lang['lpn_settings_pressure_exponent']='توان فشار';
 $ec_lang['lpn_settings_pressure_exponent_tip']='توان منحنی‌ای را وارد کنید که از دبی صفر در کمترین فشار تا مصرف کامل در فشار لازم بالا می‌رود.';
-$ec_lang['lpn_engine_pda_route']='با حل‌کنندهٔ EPANET حل شد، زیرا مدل مصرف فشارمحور است.';
-$ec_lang['lpn_diag_pda_needs_epanet']='مدل مصرف فشارمحور است، و فقط حل‌کنندهٔ EPANET می‌تواند آن را محاسبه کند. حل‌کنندهٔ EPANET بارگذاری نشد، پس این نتیجه‌ها وجود ندارند.';
 $ec_lang['lpn_result_delivered_demand']='مصرف تحویل‌شده';
 $ec_lang['lpn_result_delivered_demand_tip']='دبی‌ای که این گره در مدل مصرف فشارمحور واقعاً دریافت می‌کند. هنگامی که فشار زیر فشار لازم باشد، از مصرف کمتر است.';
 $ec_lang['lpn_result_demand_deficit']='کسری مصرف';

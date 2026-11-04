@@ -31,6 +31,8 @@ require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
+require(ROOT + 'js/lpn-native-msx.js');
+require(ROOT + 'js/lpn-native-run.js');
 
 global.alert = global.window.alert = function () { };
 
@@ -239,6 +241,62 @@ function sameResults(label, r, kinds, skip) {
 	ok('gph in a feet project reports in gpm', RU({ flow: 'gph', length: 'ft', diameter: 'in' }).code === 1);
 	ok('m3/s in a metre project stays L/s', RU({ flow: 'm3ps', length: 'm', diameter: 'mm' }) === null);
 	ok('cfs is EPANET\'s CFS', RU({ flow: 'ft3ps', length: 'ft' }).code === 0);
+
+	console.log('\n6. THE BUILT-IN SOLVER\'S REPORT IS IN THE PROJECT\'S UNITS TOO (Perry, 2026-11-01: it printed metres and L/s in a US project)');
+	{
+		const stamp = (t) => String(t || '').replace(/(Sun|Mon|Tue|Wed|Thu|Fri|Sat) [A-Z][a-z]{2} [ 0-9]\d \d\d:\d\d:\d\d \d{4}/g, '<TIME>').replace(/^[ \t]*\*.*\*[ \t]*$/gm, '<BANNER>').split('\n').map((x) => x.replace(/\s+$/, ''));
+		// the two solvers' numbers differ in a last digit; words, units and layout must be equal
+		const tok = (a, b) => {
+			if (a === b) { return true; }
+			const x = a.trim().split(/\s+/), y = b.trim().split(/\s+/);
+			if (x.length !== y.length) { return false; }
+			return x.every((t, i) => t === y[i] || (isFinite(Number(t)) && isFinite(Number(y[i])) && Math.abs(Number(t) - Number(y[i])) <= 0.0015 + 2e-5 * Math.abs(Number(t))));
+		};
+		async function nativeVsEngine(label, mdl, expectUnit, expectFlow) {
+			const e = await global.EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(mdl)), {});
+			const n = global.EngCalcs.lpnNativeRun(JSON.parse(JSON.stringify(mdl)), { quality: true });
+			ok(label + ': both solvers ran', e.ok && n.ok, JSON.stringify(n.issues || e.issues || ''));
+			if (!(e.ok && n.ok)) { return; }
+			const a = stamp(e.report), b = stamp(n.report);
+			let first = -1;
+			for (let i = 0; i < Math.max(a.length, b.length); i++) { if (!tok(a[i] || '', b[i] || '')) { first = i; break; } }
+			ok(label + ': the built-in report states the same units and layout as EPANET\'s, line for line', first < 0,
+				first < 0 ? a.length + ' lines' : 'line ' + (first + 1) + ': EPANET "' + a[first] + '" built-in "' + b[first] + '"');
+			// the mass balance block is EPANET's raw figures: each within 1e-4 of itself (noise under 1e-3 aside), the segment count exact
+			{
+				const mbOf = (t) => { const L2 = stamp(t), i = L2.findIndex((x) => /Water Quality Mass Balance/.test(x)); return i < 0 ? [] : L2.slice(i, i + 10); };
+				const ma = mbOf(e.report), mb2 = mbOf(n.report);
+				let worst = 0, bad = ma.length === 0 || ma.length !== mb2.length;
+				ma.forEach((l, i) => {
+					const x = Number(l.split(/:\s+/).pop()), y = Number((mb2[i] || '').split(/:\s+/).pop());
+					if (!isFinite(x) || !isFinite(y)) { if (l !== mb2[i]) { bad = true; } return; }
+					if (/Total Segments/.test(l)) { if (x !== y) { bad = true; } return; }
+					if (Math.max(Math.abs(x), Math.abs(y)) > 1e-3) { worst = Math.max(worst, Math.abs(x - y) / Math.max(Math.abs(x), Math.abs(y))); }
+				});
+				ok(label + ': the Water Quality Mass Balance block is there, with the engine\'s unit word and segment count', !bad && worst <= 1e-4, ma.length + ' lines, worst ' + worst.toExponential(1) + (ma[0] ? ', ' + ma[0] : ''));
+			}
+			ok(label + ': the flow balance is headed (' + expectFlow + ') and tank levels are in ' + expectUnit,
+				n.report.indexOf('Hydraulic Flow Balance (' + expectFlow + ')') >= 0 && !/ at [\d.]+ (m|ft)\b/.test(n.report.replace(new RegExp(' at [\\d.]+ ' + expectUnit + '\\b', 'g'), '')));
+		}
+		open('Net1.lwn', 'us');
+		model = L.assembleModel();
+		await nativeVsEngine('Net1 in gpm', model, 'ft', 'gpm');
+		open('Net3.lwn', 'us');
+		model = L.assembleModel();
+		await nativeVsEngine('Net3 in gpm', model, 'ft', 'gpm');
+		open('Net1.lwn', 'us');
+		model = L.assembleModel();
+		model.reportUnits = { flow: 'cmh', length: 'm', diameter: 'mm' };
+		await nativeVsEngine('Net1 in m3/h', model, 'm', 'm3/h');
+		open('Net3.lwn', 'us');
+		model = L.assembleModel();
+		model.quality = Object.assign({}, model.quality, { mode: 'age' });
+		await nativeVsEngine('Net3 as water age in gpm', model, 'ft', 'gpm');
+		open('Net1.lwn', 'us');
+		model = L.assembleModel();
+		model.time = Object.assign({}, model.time, { times: Object.assign({}, (model.time || {}).times, { duration: 0 }) });
+		await nativeVsEngine('Net1 as a single instant in gpm', model, 'ft', 'gpm');
+	}
 
 	console.log(fails === 0 ? '\nrun report units harness: all checks passed'
 		: '\nrun report units harness: ' + fails + ' FAILED');

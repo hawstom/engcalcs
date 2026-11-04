@@ -1745,7 +1745,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Vypněte, je-li přepočet příliš poma
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Výpočet této sítě trval {secs} s a síť je nastavena tak, aby se přepočítala po každé změně. Chcete-li to zastavit a získat zpět tlačítko Vypočítat, vypněte v Nastavení, v části Výpočet, Hydraulika, „Přepočítávat automaticky“.';
-$ec_lang['lpn_time_no_report']='Zpráva o výpočtu zatím neexistuje. Zpráva je textová zpráva EPANET, takže se objeví poté, co je tato síť vypočtena.';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -3732,10 +3731,8 @@ $ec_lang['lpn_time_stat_range']='Rozpětí';
 $ec_lang['lpn_time_clock_day']='Den {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Zapište čas jako hodiny a minuty, například 2:30. Prosté číslo znamená hodiny, takže 8 je osm hodin. Půl hodiny je 0:30.';
 $ec_lang['lpn_time_running']='Probíhá simulace s časovým průběhem.';
-$ec_lang['lpn_time_no_engine']='Vestavěný řešič řeší vždy jen jeden okamžik, proto je to síť pouze v čase {time}: každý vzorec se čte v tomto okamžiku a každá nádrž zůstává na své počáteční hladině, místo aby se plnila a vyprazdňovala. Jednorázovým připojením k internetu stáhnete řešič EPANET, který provede simulaci s časovým průběhem.';
 // lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
 // of a failed extended period run the same note ends in {reason}, one of the three sentences below.
-$ec_lang['lpn_time_no_engine_why']='Vestavěný řešič řeší vždy jen jeden okamžik, proto je to síť pouze v čase {time}: každý vzorec se čte v tomto okamžiku a každá nádrž zůstává na své počáteční hladině, místo aby se plnila a vyprazdňovala. {reason}';
 $ec_lang['lpn_time_engine_fetch_failed']='Stažení řešiče EPANET se nezdařilo. Načtěte stránku znovu a zkuste to znovu; může jej blokovat brána firewall, proxy server nebo rozšíření prohlížeče.';
 $ec_lang['lpn_time_engine_start_failed']='Prohlížeč odmítl řešič EPANET spustit. WebAssembly může být vypnuto bezpečnostním nastavením nebo rozšířením.';
 $ec_lang['lpn_time_engine_run_failed']='Výpočet EPANET selhal. Jde o chybu této stránky; nahlaste ji pomocí odkazu {wrong}.';
@@ -4951,8 +4948,6 @@ $ec_lang['lpn_settings_req_pressure']='Požadovaný tlak';
 $ec_lang['lpn_settings_req_pressure_tip']='Zadejte tlak, při kterém nebo nad kterým uzel přijímá plný odběr. Musí být větší než minimální tlak. Použijte jednotku tlaku tohoto projektu. Ponecháte-li pole prázdné, použije se výchozí hodnota programu EPANET, která je v psi pro americké jednotky průtoku a jinak v metrech.';
 $ec_lang['lpn_settings_pressure_exponent']='Exponent tlaku';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Zadejte exponent křivky, která stoupá od nulového průtoku při minimálním tlaku k plnému odběru při požadovaném tlaku.';
-$ec_lang['lpn_engine_pda_route']='Vyřešeno pomocí řešiče EPANET, protože model odběru je řízený tlakem.';
-$ec_lang['lpn_diag_pda_needs_epanet']='Model odběru je řízený tlakem a počítat jej umí pouze řešič EPANET. Řešič EPANET se nepodařilo načíst, proto tyto výsledky chybí.';
 $ec_lang['lpn_result_delivered_demand']='Dodaný odběr';
 $ec_lang['lpn_result_delivered_demand_tip']='Průtok, který tento uzel skutečně přijímá podle modelu odběru řízeného tlakem. Je menší než odběr, je-li tlak pod požadovaným tlakem.';
 $ec_lang['lpn_result_demand_deficit']='Nedodaný odběr';

@@ -47,6 +47,8 @@ const TRUTH = require('./native-eps-quality-truth.js');
 const LPS = 0.001;
 const H = 3600;
 const OVER_REL = 1e-8;
+// EPANET's binary output stores a rate as a 4-byte float, so a rate read back is good to about 1e-7 relative.
+const RATE_REL = 5e-7;
 
 let pass = 0, fail = 0;
 function ok(name, cond, extra) {
@@ -201,6 +203,18 @@ async function compare(c) {
 	const on = worstGap(epa.frames, over.frames, 'qualities'), ol = worstGap(epa.frames, over.frames, 'linkQualities');
 	ok(c.name + ' -- quality pass over EPANET\'s own saved hydraulics', sameSteps(over.frames) && on.rel <= OVER_REL && ol.rel <= OVER_REL,
 		`node ${on.d.toExponential(2)} ${unit} @${on.at}  link ${ol.d.toExponential(2)} ${unit} @${ol.at} (tol ${OVER_REL} x max(1, |value|))`);
+	// 2b. the reaction rate of every pipe (output.c REACTRATE: mass/L/day), a chemical only
+	if (mode === 'chemical') {
+		const orr = worstGap(epa.frames, over.frames, 'linkRates'), nr0 = worstGap(epa.frames, nat.frames, 'linkRates');
+		let nRates = 0, hiRate = 0;
+		epa.frames.forEach((f) => Object.values(f.linkRates || {}).forEach((v) => { nRates++; hiRate = Math.max(hiRate, v); }));
+		const have = (fr) => fr.every((f, i) => Object.keys(f.linkRates || {}).length === Object.keys(epa.frames[i].linkRates || {}).length);
+		ok(c.name + ' -- reaction rates over EPANET\'s own saved hydraulics', nRates > 0 && have(over.frames) && orr.rel <= RATE_REL,
+			`${nRates} pipe-frames, highest ${hiRate.toPrecision(4)} ${unit}/day, worst gap ${orr.d.toExponential(2)} @${orr.at}`);
+		const rt = c.rateTol !== undefined ? c.rateTol : Math.max(c.linkTol || c.tol, 2e-3);
+		ok(c.name + ' -- reaction rates end to end', nRates > 0 && have(nat.frames) && nr0.d <= rt,
+			`worst gap ${nr0.d.toExponential(2)} ${unit}/day @${nr0.at} (tol ${rt})`);
+	}
 	// 3. end to end
 	const nn = worstGap(epa.frames, nat.frames, 'qualities'), nl = worstGap(epa.frames, nat.frames, 'linkQualities');
 	let hi = -Infinity, lo = Infinity, mid = 0;
@@ -356,7 +370,8 @@ async function run() {
 		ok('a quality step that comes to 0 (hydraulic step under 10 s, none stated) is refused by name',
 			EngCalcs.lpnNativeRunRefusals(fast, { quality: true }).some((r) => r.code === 'native-run-quality' && r.ids[0] === 'Quality Timestep'));
 		const tr = onePipe({ mode: 'trace', traceNode: 'NOPE' });
-		ok('a trace on a node out of the run is refused by name', EngCalcs.lpnNativeRunRefusals(tr, { quality: true }).some((r) => r.ids[0] === 'NOPE'));
+		ok('a trace on a node out of the run is no analysis, as in EPANET: it runs, with a quality of 0 everywhere (dev/lpn-spike/native-refusal-harness.js holds it to EPANET)',
+			EngCalcs.lpnNativeRunRefusals(tr, { quality: true }).length === 0 && EngCalcs.lpnNativeRun(tr, { quality: true }).frames.every((f) => Object.keys(f.qualities).every((id) => f.qualities[id] === 0)));
 		const mx = lineWithTank({ quality: AGE, mixing: { model: 'STIRRED' } });
 		ok('a mixing model EPANET does not know is refused by name (error 213)', EngCalcs.lpnNativeRunRefusals(mx, { quality: true }).some((r) => r.ids[0] === 'T'));
 	}

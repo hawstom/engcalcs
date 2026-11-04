@@ -126,7 +126,7 @@
 		if (i < 0) { return null; }
 		f = run.frames[i];
 		return {
-			ok: true, engine: 'epanet', engineVersion: run.engineVersion, issues: [],
+			ok: true, engine: run.engine || 'epanet', engineVersion: run.engineVersion, issues: [],
 			warnings: run.warnings || [],
 			// **THIS SAID `converged: true` AND NOBODY HAD ASKED** (ROADMAP Task 565, its general
 			// half). It was the third hardcoded assertion of the same shape -- js/lpn-epanet.js had
@@ -414,8 +414,7 @@
 		// automatic run after a quiet moment owes them silence, or the page grows a box that pops
 		// up every time the mouse stops moving.
 		lastRunMs: null, lastBusyMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null,
-		// `failed` is how the last run ended when it left no frames: 'engine' (no EPANET here),
-		// 'run' (EPANET failed or refused), or null. Read only by EC.lpnTimeWaiting().
+		// `failed` is how the last run ended when it left no frames: 'run' (a run failed or was refused), or null. Read only by EC.lpnTimeWaiting().
 		failed: null
 	};
 
@@ -514,12 +513,10 @@
 			// understand. And I don't think it's needed at all. The transport will always be there,
 			// and no explanation is needed." A one-step network is not a special case to be explained
 			// away -- the step selector holds one step and that is the whole of what there is to say.
-			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
-			// are seeing one instant" is a fact about this session that the user acts on.)
 			running: pageConfig.lpn_time_running || 'Running the extended period simulation.',
-			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. Connect to the internet once to download the EPANET solver, which runs an extended period simulation.',
-			// The same note for a failure that is NOT a missing network: {reason} is one of the three below.
-			noEngineWhy: pageConfig.lpn_time_no_engine_why || 'The built-in solver solves one instant at a time, so this is the network at {time} only: every pattern is read at that instant, and every tank remains at its initial level instead of filling and draining. {reason}',
+			// The status-bar sentence when EPANET is the chosen solver, could not run, and the built-in loop ran the period.
+			epanetFallback: pageConfig.lpn_time_epanet_fallback || 'The EPANET solver could not be loaded, so the built-in solver ran this network.',
+			epanetFallbackWhy: pageConfig.lpn_time_epanet_fallback_why || 'The built-in solver ran this network, because the EPANET solver could not be used. {reason}',
 			slider: pageConfig.lpn_time_slider || 'Elapsed simulation time',
 			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
@@ -560,22 +557,26 @@
 			// and "it said this" are the same two facts whether one moment was asked for or a whole
 			// period. Only the third differs, because only a RUN has a moment and a tank level to
 			// name -- which is where whole-label reuse stops.
+			// Which solver answered, said in the status bar after a built-in run (the routed run above says
+			// EPANET) and in the run summary after either (Tom, 2026-11-01: nothing said what was done differently).
+			nativeUsed: pageConfig.lpn_engine_native_used || 'Solved with the built-in solver.',
+			epanetUsed: pageConfig.lpn_engine_epanet_used || 'Solved with the EPANET solver.',
 			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver rejected this network, so the run did not start.',
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
 			// nothing of ours could reconstruct that.
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'EPANET solver message: {message}',
 			// A run EPANET started and could not finish (Tom, 2026-10-14: a tank emptied, the
 			// junctions it fed lost their only source, Error 110 at 7:24). "Did not start" was false.
-			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.',
+			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. The Solver (run) report says why.',
 			statStopped: pageConfig.lpn_time_stat_stopped || '{statistic} not shown: the run stopped before the end of the period.',
 			stoppedNoQuality: pageConfig.lpn_time_stopped_no_quality || 'No water quality results were computed, because the quality analysis starts after the hydraulic run ends.',
 			// Which link EPANET had just closed at the stop, and why, from its own report (R-402).
 			runCutOff: pageConfig.lpn_time_run_cut_off || 'EPANET had closed {link} and then could not solve for {nodes}.',
 			runCutOffFull: pageConfig.lpn_time_run_cut_off_full || 'Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.',
 			runCutOffEmpty: pageConfig.lpn_time_run_cut_off_empty || 'Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.',
-			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. Its run report says why.',
-			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
-			runReport: pageConfig.lpn_time_run_report || 'Run report',
+			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. The Solver (run) report says why.',
+			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. They show the network at {time} only, with every tank at its initial level.',
+			runReport: pageConfig.lpn_time_run_report || 'Solver (run) report',
 			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.',
 			close: pageConfig.lpn_close || 'Close',
 			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
@@ -640,7 +641,8 @@
 	 * predecessor and draw a flat step nothing computed.
 	 *
 	 * **AN EMPTY LIST IS THE HONEST ANSWER WITH NO RUN**, and there is no third state to check --
-	 * the built-in solver has no time dimension, so a page whose engine was unreachable holds one
+	 * js/lpn-solver.js has no time dimension (js/lpn-native-run.js gives the built-in solver one,
+	 * where the user chose it), so a page with no engine that can run the period holds one
 	 * instant and has nothing to plot against time.
 	 */
 	// Who the run in hand is, so a reader that scans every frame (the Frequency and Profile axes)
@@ -681,7 +683,7 @@
 	 * So the attachment rides beside the clock, on the same one line of assembleModel().
 	 *
 	 * **THE INTEGRATION ITSELF IS EPANET'S, AND WE HAVE NONE OF OUR OWN TO CORRECT.** Nothing in
-	 * this suite turns a volume step into a level step: the built-in solver has no time dimension,
+	 * this suite turns a volume step into a level step: js/lpn-solver.js has no time dimension,
 	 * and the run is the engine's. So the whole of the work is handing the engine the column and
 	 * the rows it already knows how to read, which js/lpn-epanet.js writes.
 	 *
@@ -788,9 +790,8 @@
 			if (state.run) { state.run = null; state.t = 0; state.statView = false; renderPanel(); }
 			return false;
 		}
-		// The engine is unreachable: one instant, said out loud. Unchanged, and it is not an edit
-		// path -- there is nothing to invalidate because there were never any frames.
-		if (!EC.lpnEpanetRun) { state.wanted = false; state.wantedByUser = false; return noEngine(model); }
+		// Neither solver's code is on the page: nothing can run a period, and the steady solve stands.
+		if (!periodEngineHere(model)) { state.wanted = false; state.wantedByUser = false; return false; }
 		if (state.wanted) { state.wanted = false; startRun(model); return true; }
 		// **AN EDIT THE SOLVER CANNOT SEE IS NOT AN EDIT AT ALL.** Moving a node, editing a text
 		// element, renaming, recolouring, retitling a label: none of them can change one flow, and
@@ -863,7 +864,10 @@
 	 * nothing is lost -- a demand or a pattern the user edits still changes this string.
 	 */
 	function modelFingerprint(model) {
-		return JSON.stringify(model, function (k, v) { return k === 'demand' ? undefined : v; });
+		// The solver setting is not in the model, yet it decides which solver wrote the frames: a change of
+		// it is a change the frames cannot answer.
+		return JSON.stringify(model, function (k, v) { return k === 'demand' ? undefined : v; }) +
+			'|' + (host && host.engine ? host.engine() : '');
 	}
 
 	/**
@@ -952,17 +956,182 @@
 		if (state.busy) { return; }
 		if (host.solveNow) { host.solveNow(); } else { host.solve(); }
 	}
+	/**
+	 * **WHICH SOLVER RUNS THIS PERIOD** (Task 733). The engine setting decides, and nothing else does: the
+	 * built-in solver's own time loop (js/lpn-native-run.js) runs every period when the setting is the
+	 * built-in solver, and the EPANET engine runs it when the setting is EPANET. What EPANET itself will not
+	 * run is refused by name in both (EngCalcs.lpnDiagnose); there is no feature that is left to the other
+	 * engine. `refusals` is therefore empty for every model the page can build; a record in it would be a
+	 * defect, and the run says that the built-in solver could not run it instead of changing engines.
+	 *
+	 * `use` is true when the loop will run it. The setting is read through the host, so this file still
+	 * knows nothing of `settings`.
+	 */
+	// How long the built-in loop runs before it hands the thread back to the page (ms).
+	EC.LPN_TIME_NATIVE_SLICE_MS = 50;
+	EC.lpnTimeNativePlan = function (model) {
+		var out = { use: false, wanted: false, refusals: [] };
+		if (!host || typeof host.engine !== 'function' || host.engine() === 'epanet') { return out; }
+		if (!EC.lpnNativeRun || !EC.lpnNativeRunGaps || !model) { return out; }
+		out.wanted = true;
+		// What the loop refuses and lpnDiagnose names (input EPANET itself refuses) is not a gap: the run reports it
+		// by name and does not start, in either engine. Anything else would be a feature the loop lacks.
+		out.refusals = EC.lpnNativeRunGaps(model, { quality: true });
+		out.use = out.refusals.length === 0;
+		return out;
+	};
+	// Is there a solver that could run a period? Either one will: EPANET when it is the chosen setting and
+	// loads, the built-in loop when it is chosen or when EPANET cannot run (periodRun()). Only a page with
+	// neither script has none.
+	function periodEngineHere() {
+		return !!(EC.lpnEpanetRun || EC.lpnNativeRun);
+	}
+	/**
+	 * **THE BUILT-IN SOLVER FAILED: SAY SO, AND DO NOT CHANGE ENGINES** (Task 733). A step it could not solve
+	 * (a node cut off from every reservoir and tank when a control closes a pipe, say) or a loop that threw
+	 * comes back as a run with no frames and these issues, which the page prints in its status bar. The
+	 * numbers of the other engine are not substituted: EPANET's answer to a step like that is a head of
+	 * millions of metres, and a quiet swap would put numbers on screen that nobody chose. The EPANET
+	 * setting is one click away.
+	 */
+	function builtinStopped(issues, t, opts) {
+		if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(''); }
+		var list = [];
+		issues.forEach(function (i) { if (i && i.code) { list.push(i); } });
+		list.push({ code: 'builtin-stopped', ids: [], t: typeof t === 'number' ? t : null });   // last: the reasons read first
+		if (root.console && console.warn) { console.warn('The built-in solver stopped:', JSON.stringify(issues)); }
+		return { ok: false, engine: 'native', issues: list, frames: [], report: '' };
+	}
+	/**
+	 * The period, from whichever solver the plan names. Resolves to the shape lpnEpanetRun resolves to.
+	 * The loop is synchronous, so it runs in a task of its own after the "Running" status has had a
+	 * chance to paint. A loop that fails to solve some step, or that throws, is reported as the built-in
+	 * solver's failure (builtinStopped()); the other engine is never run in its place.
+	 */
+	function periodRun(model, opts) {
+		var plan = EC.lpnTimeNativePlan(model);
+		if (!plan.use) {
+			if (!plan.wanted) {
+				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(''); }
+				// **EPANET IS THE CHOSEN SOLVER; IF IT CANNOT RUN, THE BUILT-IN LOOP RUNS THE PERIOD** (Task 733).
+				// "Cannot run" is a rejection: not downloaded and offline, a blocked download, a browser that
+				// refuses WebAssembly, or a run that failed to start. An answer EPANET gives (results with
+				// warnings, a refusal in its words) is EPANET's and is returned as it is.
+				if (!EC.lpnEpanetRun || !EC.lpnNativeRun || !EC.lpnNativeRunGaps) {
+					return EC.lpnEpanetRun ? EC.lpnEpanetRun(model, opts) : Promise.resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '' });
+				}
+				return EC.lpnEpanetRun(model, opts).then(null, function (err) {
+					if (opts && typeof opts.superseded === 'function' && opts.superseded()) { return { ok: false, engine: 'native', issues: [], frames: [], report: '', superseded: true }; }
+					if (root.console && console.warn) { console.warn('EPANET could not run; the built-in solver runs the period:', err); }
+					return nativePeriodRun(model, opts, fallbackNote(err));
+				});
+			}
+			return Promise.resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: plan.refusals.map(function (r) { return r.code + ' ' + r.ids.join(', '); }).join('; ') }], null, opts));
+		}
+		return nativePeriodRun(model, opts, '');
+	}
+	// The status-bar sentence for a period the built-in loop ran because EPANET could not: one short
+	// sentence that names the cause when it is known (a blocked download, a refused start, a failed run).
+	function fallbackNote(err) {
+		var S = strings(), why = EC.lpnEngineFailWhy ? EC.lpnEngineFailWhy(err) : 'offline',
+			reason = (why && why !== 'offline' && EC.lpnEngineReason) ? EC.lpnEngineReason(why) : null;
+		return reason ? S.epanetFallbackWhy.replace('{reason}', reason) : S.epanetFallback;
+	}
+	// The built-in loop, with the note to show in the solver slot when it ran in EPANET's place.
+	function nativePeriodRun(model, opts, note) {
+		var issues;
+		// Input EPANET itself refuses (and a network that cannot be solved at all) is named before either engine
+		// runs, with the same words in both (lpnDiagnose).
+		issues = EC.lpnDiagnose(model);
+		if (issues.length) { return Promise.resolve({ ok: false, engine: 'native', issues: issues, frames: [], report: '' }); }
+		return new Promise(function (resolve) {
+			var busy = 0, gen, // The project's Accuracy, but never looser than 1e-5: measured on 600 junctions, 1e-3 and 1e-5 cost the same
+				// from a warm start, and 1e-5 is the tolerance the loop was held to EPANET at.
+				tol = model.hydraulics && model.hydraulics.accuracy > 0 ? Math.min(model.hydraulics.accuracy, 1e-5) : undefined,
+				onProgress = opts && typeof opts.onProgress === 'function' ? opts.onProgress : null,
+				withQuality = !!(model.quality && model.quality.mode && model.quality.mode !== 'none');
+			function finish(run) {
+				if (!run || !run.ok) { resolve(builtinStopped((run && run.issues) || [], run && run.t, opts)); return; }
+				// The status bar names the solver, in the slot the routed-run note uses, until the next run replaces it.
+				if (host.routeNote && !(opts && opts.quiet)) { host.routeNote(note || strings().nativeUsed); }
+				run.engineVersion = undefined;
+				run.issues = [];
+				run.report = run.report || '';   // the loop writes EPANET's report in EPANET's words (lpn-native-run.js)
+				run.busyMs = busy;
+				run.quality = run.qualityRan ? model.quality : null;
+				run.warnings = nativeWarnings(model, run.warnings);
+				if (onProgress) { onProgress({ t: run.duration, duration: run.duration, fraction: 1, frames: run.frames.length }); }
+				resolve(run);
+			}
+			// **A SLICE OF ABOUT 50 ms, THEN BACK TO THE EVENT LOOP**, so a large network neither freezes the
+			// page nor holds a bar still (600 junctions, a day: 2.7 s in one piece). The hydraulic walk is the
+			// first 60 percent of the bar when quality follows, all of it otherwise; the quality pass the rest.
+			// A run that has been superseded (an edit, a newer Run) stops where it is: nobody will read it.
+			function slice() {
+				var s0 = nowMs(), r = null, p = null, hyd = withQuality ? 0.6 : 1;
+				if (opts && typeof opts.superseded === 'function' && opts.superseded()) { resolve({ ok: false, engine: 'native', issues: [], frames: [], report: '', superseded: true }); return; }
+				try {
+					do { r = gen.next(); if (!r.done) { p = r.value; } } while (!r.done && nowMs() - s0 < EC.LPN_TIME_NATIVE_SLICE_MS);
+				} catch (e) { resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: String(e && e.message || e) }], null, opts)); return; }
+				busy += nowMs() - s0;
+				if (r.done) { finish(r.value); return; }
+				if (onProgress && p) {
+					onProgress({ t: p.phase === 'hydraulic' ? p.done : 0, duration: p.phase === 'hydraulic' ? p.of : 0,
+						fraction: p.phase === 'hydraulic' ? hyd * (p.of > 0 ? p.done / p.of : 1) : hyd + (1 - hyd) * (p.of > 0 ? p.done / p.of : 1), frames: 0 });
+				}
+				setTimeout(slice, 0);
+			}
+			try { gen = EC.lpnNativeRunSteps(model, { quality: true, tol: tol }); } catch (e) { resolve(builtinStopped([{ code: 'builtin-error', ids: [], message: String(e && e.message || e) }], null, opts)); return; }
+			setTimeout(slice, 0);
+		});
+	}
+	// The notes about what was left out of the run (a control naming a missing element, a GPV curve of
+	// one point) are the bridge's, and they are about the document, not the engine, so they are the
+	// same whichever solver ran. The one that is EPANET's own arithmetic (the rounded Manning
+	// constant) is not said of a run that did not use it.
+	function nativeWarnings(model, own) {
+		var out = (own || []).slice(), seen = {};
+		try {
+			if (EC.lpnToInp) {
+				EC.lpnToInp(model, { eps: true }).warnings.forEach(function (w) {
+					if (w && w.code !== 'manning-constant-differs') { out.push(w); }
+				});
+			}
+		} catch (e) { /* the notes are a courtesy; the run stands without them */ }
+		return out.filter(function (w) {
+			var k = w.code + '|' + (w.ids || []).join(',');
+			if (seen[k]) { return false; }
+			seen[k] = true;
+			return true;
+		});
+	}
+	/**
+	 * **THE ENGINE CHOICE FOR EVERY RUN THAT IS NOT THE TRANSPORT'S** (Task 733): scenario comparison, fire
+	 * flow over a duration, criticality, demand scaling, the Alternatives preview and the analysis run all
+	 * come here instead of calling EngCalcs.lpnEpanetRun, so the project's engine setting decides for them
+	 * as for the transport. It is quiet: it never writes the status bar's solver note (the transport's run
+	 * owns that slot). Resolves to the shape lpnEpanetRun resolves to.
+	 */
+	EC.lpnTimeRunModel = function (model, opts) {
+		var o = {};
+		Object.keys(opts || {}).forEach(function (k) { o[k] = opts[k]; });
+		o.quiet = true;
+		return periodRun(model, o);
+	};
+	// Can a period be run for this model by either engine?
+	EC.lpnTimeCanRun = function (model) { return periodEngineHere(model); };
 	function startRun(model) {
 		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model),
 			shown = state.wantedByUser;
+		instantRun = null;   // a period's report replaces an instant's
 		cancelIdleRun();
 		state.busy = true;
 		state.failed = null;
-		state.failedWhy = null;
-		state.wantedByUser = false;
+				state.wantedByUser = false;
 		host.status(strings().running, 'time-running');
 		if (shown) { boxStart(token); }
-		EC.lpnEpanetRun(model, {
+		periodRun(model, {
+			superseded: function () { return token !== state.token; },
 			onProgress: function (p) {
 				// **A SUPERSEDED RUN MAY NOT DRIVE THE BOX.** It is still running, and its bar
 				// would still be filling, and it is answering a network that no longer exists.
@@ -992,7 +1161,7 @@
 				if (run.refused) {
 					// EPANET writes a report even on an input it rejects, and that text is the one
 					// place the offending line is named -- so it is KEPT here, unlike a failure,
-					// and Project > EPANET run report can show it.
+					// and Reports > Run report can show it.
 					lastReport = run.report || ''; lastReportMs = state.lastRunMs;
 					lastReportFrames = 0;
 					boxFailed(token, refusedText(run));
@@ -1030,7 +1199,9 @@
 			}
 			lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
 			boxFailed(token);
-			noEngine(model, EC.lpnEngineFailWhy ? EC.lpnEngineFailWhy(err) : 'offline');
+			state.run = null;
+			state.failed = 'run';
+			renderPanel();
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
 		});
 	}
@@ -1151,8 +1322,7 @@
 		state.t = 0; state.statView = false;
 		state.wanted = true;
 		state.failed = null;
-		state.failedWhy = null;
-		renderPanel();
+				renderPanel();
 		return false;
 	};
 
@@ -1163,7 +1333,6 @@
 	 *   'manual'  -- the switch is off, so the Calculate button is on screen and is the answer;
 	 *   'running' -- a run is in flight, queued, or waiting out the quiet moment;
 	 *   'failed'  -- the last run failed or was refused, and the status bar says why;
-	 *   'engine'  -- EPANET is not here, so there is one instant and never a period.
 	 * With the switch on and none of those, a run is OWED and nothing will start it, so this starts
 	 * one -- silently, as an automatic run is -- and answers 'running'. Starting it here rather
 	 * than answering "press Calculate" is the only way that sentence can be true with no button.
@@ -1175,7 +1344,6 @@
 		// Off before `wanted`: an arrival with the switch off sets the flag and runs nothing.
 		if (!autoRunAllowed()) { return 'manual'; }
 		if (state.wanted || state.idle) { return 'running'; }
-		if (state.failed === 'engine' || !EC.lpnEpanetRun) { return 'engine'; }
 		if (state.failed) { return 'failed'; }
 		requestRun(false);
 		return 'running';
@@ -1242,39 +1410,11 @@
 		};
 	};
 
-	// The banner for the cause on record: 'offline' (and an unrecorded cause) keeps the original
-	// sentence; 'fetch', 'engine' and 'run' say what actually went wrong and what to do about it.
-	function noEngineText(t) {
-		var S = strings(), why = state.failedWhy,
-			reason = (why && why !== 'offline' && EC.lpnEngineReason) ? EC.lpnEngineReason(why) : null;
-		return (reason ? S.noEngineWhy.replace('{reason}', reason) : S.noEngine).replace('{time}', EC.lpnTimeElapsedText(t));
-	}
-	EC.lpnTimeNoEngineText = function (t) { return noEngineText(t); };
-
 	/**
-	 * **THE HONEST ANSWER WHEN THE ENGINE IS NOT THERE.** js/lpn-solver.js has no time dimension at
-	 * all -- it solves one steady state -- so the only truthful thing to show is ONE INSTANT, said
-	 * out loud, with the two consequences named: the demand multipliers are the ones for that
-	 * moment, and the tanks are sitting at their stored starting levels rather than filling and
-	 * draining. Running the native solver once per reporting time and calling the result a run is
-	 * the tempting alternative and it is the one thing this must never do; every tank would be flat
-	 * across the whole day and nothing on screen would say so.
-	 */
-	function noEngine(model, why) {
-		state.run = null;
-		state.failed = 'engine';
-		state.failedWhy = why || 'offline';
-		host.apply(host.native(model));
-		host.status(noEngineText(state.t), 'time-no-engine');
-		renderPanel();
-		return true;
-	}
-
-	/**
-	 * **THE HONEST ANSWER WHEN THE ENGINE IS THERE AND SAID NO** (Task 471). noEngine()'s sibling,
-	 * and deliberately not noEngine() itself: that message ends "connect to the internet once to
-	 * fetch the EPANET solver", which is exactly wrong here -- the solver was fetched, it ran, and
-	 * it rejected this network. Telling a user to go online is a dead end they can spend an hour on.
+	 * **THE HONEST ANSWER WHEN THE ENGINE IS THERE AND SAID NO** (Task 471). The solver was fetched, it
+	 * ran, and it rejected this network, so the user is not told to go online: that is a dead end they
+	 * can spend an hour on. (An engine that could not load or start at all is a different case: the
+	 * built-in loop runs the period, periodRun().)
 	 *
 	 * Three sentences, and the middle one is EPANET's: what would not happen, why in the engine's
 	 * own words, and where the numbers now on screen actually came from. The last is the one Task
@@ -1382,9 +1522,9 @@
 		// **NO FRAMES, AND THE USER HAS ASKED TO SEE ANOTHER MOMENT.** That gesture is the same
 		// request the Run button makes, so it makes it -- a transport that answered "press Run
 		// first" would be a control that does nothing. The rejected alternative is to solve one
-		// instant at t and draw it: that is the flat-tank answer noEngine() exists to refuse to
-		// give silently, and it is only honest where there is no engine to give a better one.
-		if (EC.lpnEpanetRun && EC.lpnTimeIsExtended(docTimes())) { requestRun(true); }
+		// instant at t and draw it: that is the flat-tank answer, and it is only honest where
+		// no solver could run the period.
+		if (periodEngineHere(null) && EC.lpnTimeIsExtended(docTimes())) { requestRun(true); }
 		else {
 			// No engine: the only way to show another moment is to solve it, and modelTimeSeconds()
 			// reads state.t so the rebuilt model is at the new instant.
@@ -1637,7 +1777,7 @@
 		boxUi = null;
 	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
 	// `boxReport` is the copy the box is rendering and dies with it; this is the document's answer to
-	// "what did the engine say last time", which Project > EPANET run report asks (Task 467). Without
+	// "what did the engine say last time", which Reports > Run report asks (Task 467). Without
 	// it that row could only ever answer for a run the user pressed Calculate for, and an automatic
 	// run -- the common case, see EC.LPN_TIME_AUTO -- would leave it silent or, worse, showing the
 	// report of some older run that did have a box.
@@ -1673,6 +1813,7 @@
 		boxState.phase = 'done';
 		boxState.fraction = 1;
 		boxState.frames = ((run && run.frames) || []).length;
+		boxState.engine = (run && run.engine) || 'epanet';
 		boxState.ms = ms;
 		boxReport = (run && run.report) || '';
 		boxState.reportLength = boxReport.length;
@@ -1767,6 +1908,8 @@
 			// "no time was measured" rather than "it was quick", which is the opposite of what the
 			// number is there to say.
 			.replace('{secs}', (boxState.ms / 1000).toFixed(boxState.ms < 1000 ? 2 : 1));
+		// Which solver produced the run, whichever it was.
+		if (boxState.phase === 'done') { line += ' ' + (boxState.engine === 'native' ? S.nativeUsed : S.epanetUsed); }
 		if (boxState.unbalanced > 0) { line += ' ' + S.runUnbalanced.replace('{n}', String(boxState.unbalanced)); }
 		if (boxState.warnings > 0) { line += ' ' + S.runWarnings.replace('{n}', String(boxState.warnings)); }
 		if (boxState.unbalanced > 0 || boxState.warnings > 0) { line += ' ' + S.runSeeReport.replace('{report}', S.runReport); }
@@ -1926,17 +2069,55 @@
 	EC.lpnTimeCopyForTest = EC.lpnCopyText;
 	EC.lpnTimeRunReport = function () { return boxReport; };
 	/**
-	 * **PROJECT > EPANET RUN REPORT** (Task 467): put the last run's report on screen.
+	 * **REPORTS > RUN REPORT** (Task 467): put the last run's report on screen.
 	 *
-	 * Returns false when there is none, and says nothing itself -- the caller owns the message,
-	 * because "no report yet" is a sentence about the PAGE (nothing has been run, or the native
-	 * solver ran it, which prints nothing) and js/looped-network.js is where the page talks.
+	 * Returns false when there is none (nothing has been run yet), and says nothing: the menu row is greyed
+	 * until a run has happened, since every run by either solver leaves a report.
 	 *
 	 * It reuses the run box rather than opening a second window: the box is already the one place
 	 * this page shows a run's outcome, it already closes on its X, Enter and Escape, and a second
 	 * window would be a second thing to keep in step with the report's format.
 	 */
-	EC.lpnTimeLastReport = function () { return lastReport; };
+	EC.lpnTimeLastReport = function () {
+		if (!lastReport && instantRun && instantRun.engine !== 'epanet') { instantReportNative(); }
+		return lastReport;
+	};
+	// **A SINGLE INSTANT LEAVES A RUN REPORT TOO** (Tom, 2026-11-01: every run, by either engine). The report of an
+	// instant is EPANET's, written by the engine the run used, and is made when it is asked for rather than on every
+	// edit: the page records the model it solved, and the first read turns it into text. The built-in loop writes it
+	// at once; EPANET is asked for it as a run of no duration and answers later (EC.lpnTimeReportAsync).
+	var instantRun = null;
+	EC.lpnTimeInstantRun = function (model, engine) {
+		instantRun = model ? { model: model, engine: engine === 'epanet' ? 'epanet' : 'native', pending: null } : null;
+		lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
+	};
+	// Is there a run to report on: a period that wrote one, or an instant that was solved.
+	EC.lpnTimeHasReport = function () { return !!(lastReport || instantRun); };
+	function instantReportNative() {
+		var r, run = instantRun;
+		try {
+			r = EC.lpnNativeRun && EC.lpnNativeRun(run.model, { quality: true });
+		} catch (e) { r = null; }
+		if (r && r.ok && r.report) { lastReport = r.report; }
+		else if (EC.lpnEpanetRun) { run.engine = 'epanet'; }
+	}
+	// null when the report is already text (or there is no run); otherwise a promise that settles when EPANET has written
+	// it. After it settles, lpnTimeLastReport() answers.
+	EC.lpnTimeReportAsync = function () {
+		var run = instantRun;
+		if (lastReport || !run) { return null; }
+		if (run.engine !== 'epanet') { instantReportNative(); if (lastReport || run.engine !== 'epanet') { return null; } }
+		if (!run.pending) {
+			run.pending = EC.lpnEpanetRun(run.model, { quiet: true }).then(function (r) {
+				if (instantRun === run && r && r.report) { lastReport = r.report; }
+			}, function () {
+				// EPANET could not write it (offline, a blocked download): the run on screen was the built-in
+				// solver's, and so is its report.
+				if (instantRun === run) { run.engine = 'native'; run.pending = null; instantReportNative(); }
+			});
+		}
+		return run.pending;
+	};
 	// The same act as the box's X, Escape and Enter, exposed so a harness can close it the way a
 	// person does rather than by reaching into state.
 	EC.lpnTimeRunBoxHide = function () { boxHide(); };

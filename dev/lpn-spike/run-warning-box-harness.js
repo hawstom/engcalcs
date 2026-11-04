@@ -83,7 +83,7 @@ async function boxFor(model, report, run) {
 	check(cleanRun.ok, 'Net1 runs');
 	let st = await boxFor(null, null, cleanRun);
 	check(st.warnings === 0, 'Net1: no warnings counted', String(st.warnings));
-	check(/^The run finished\. Reporting time steps: \d+\. Time taken: [\d.]+ s\.$/.test(st.text), 'Net1: the plain finish line, unchanged', st.text);
+	check(/^The run finished\. Reporting time steps: \d+\. Time taken: [\d.]+ s\. Solved with the EPANET solver\.$/.test(st.text), 'Net1: the plain finish line, then the solver that answered', st.text);
 
 	// ---- unbalanced ----
 	const unRun = await real.call(EngCalcs, Object.assign(await load(net3), { hydraulics: { trials: 1, accuracy: 1e-8, unbalanced: 'continue', unbalancedTrials: 0 } }), {});
@@ -92,7 +92,7 @@ async function boxFor(model, report, run) {
 	console.log((unRun.report || '').split('\n').filter((l) => /WARNING|nbalanced/.test(l)).join('\n'));
 	st = await boxFor(null, null, unRun);
 	check(st.warnings > 0, 'unbalanced: warnings counted', String(st.warnings));
-	check(/Time steps not balanced \(\d+\)/.test(st.text) && /Run report/.test(st.text), 'unbalanced: the box names it and points at the Run report', st.text);
+	check(/Time steps not balanced \(\d+\)/.test(st.text) && /Solver \(run\) report/.test(st.text), 'unbalanced: the box names it and points at the Run report', st.text);
 
 	// ---- pump beyond its curve ----
 	const pxRun = await real.call(EngCalcs, await load(PUMPX), {});
@@ -100,7 +100,7 @@ async function boxFor(model, report, run) {
 	console.log((pxRun.report || '').split('\n').filter((l) => /WARNING/.test(l)).join('\n'));
 	st = await boxFor(null, null, pxRun);
 	check(st.warnings > 0, 'pump: warnings counted', String(st.warnings));
-	check(/Warnings \(\d+\)/.test(st.text) && /Run report/.test(st.text), 'pump: the box names it and points at the Run report', st.text);
+	check(/Warnings \(\d+\)/.test(st.text) && /Solver \(run\) report/.test(st.text), 'pump: the box names it and points at the Run report', st.text);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall ok');
 	process.exit(failures ? 1 : 0);
