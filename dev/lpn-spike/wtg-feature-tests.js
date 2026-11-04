@@ -89,7 +89,8 @@ async function runEpanet(inpText, nodes, links, hours) {
 				out[t / 3600] = row;
 			}
 			const ts = p.nextH();
-			p.stepQ();
+			// stepQ advances ONE quality step; loop until the hydraulic interval is covered (a step shorter than the hydraulic one needs many).
+			for (let g2 = 0; g2 < 100000; g2++) { if (!(p.stepQ() > 0)) { break; } }
 			if (!(ts > 0)) { break; }
 		}
 		p.closeH(); p.closeQ();

@@ -2350,7 +2350,6 @@ EngCalcs.pageConfig = {
 	lpn_file_export_wtg_tip: <?=json_encode($ec_lang['lpn_file_export_wtg_tip'])?>,
 	lpn_wtg_export_lost_lead: <?=json_encode($ec_lang['lpn_wtg_export_lost_lead'])?>,
 	lpn_wtg_export_lost_quality: <?=json_encode($ec_lang['lpn_wtg_export_lost_quality'])?>,
-	lpn_wtg_export_lost_quality_step: <?=json_encode($ec_lang['lpn_wtg_export_lost_quality_step'])?>,
 	lpn_wtg_export_lost_energy_price: <?=json_encode($ec_lang['lpn_wtg_export_lost_energy_price'])?>,
 	lpn_wtg_export_lost_rules: <?=json_encode($ec_lang['lpn_wtg_export_lost_rules'])?>,
 	lpn_wtg_export_lost_controls_pressure: <?=json_encode($ec_lang['lpn_wtg_export_lost_controls_pressure'])?>,

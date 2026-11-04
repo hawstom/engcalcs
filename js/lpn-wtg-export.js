@@ -846,16 +846,6 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 				report.candidateWritten = (report.candidateWritten || 0) + 1;
 			});
 		}
-		// -- water quality: the age and trace run is written on the page's path; the time step is still a candidate
-		if (cand.wq) {
-			const w = cand.wq;
-			// The water quality time step (candidate): the flag and the step in seconds, like the hydraulic step.
-			if (w.qualityStepSeconds > 0) {
-				db.run('UPDATE EpaNetEngine SET EpaSetWaterQualityTimeStep = 1, EpaWaterQualityTimeStep = ?', [w.qualityStepSeconds]);
-				carried('water quality time step ' + w.qualityStepSeconds + ' s (candidate)');
-			}
-			report.candidateWritten = (report.candidateWritten || 0) + 1;
-		}
 	}
 
 	// ---- AN AGE OR TRACE RUN: written on the page's path (Tom's round 3, 2026-11-03). He saw Age and Trace R in the
@@ -955,6 +945,12 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const hy = parsed.hydraulics || {};
 	const sg = hy.specificGravity > 0 ? hy.specificGravity : 1.0, visc = hy.viscosity > 0 ? hy.viscosity : 1.0;
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
+	// The water quality time step, in seconds like the hydraulic one (False, the template's, means a tenth of the hydraulic step).
+	const qStepWanted = opts.qualityStepSeconds > 0 ? opts.qualityStepSeconds : ((opts.candidate && opts.candidate.wq && opts.candidate.wq.qualityStepSeconds) || 0);
+	if (qStepWanted > 0) {
+		db.run('UPDATE EpaNetEngine SET EpaSetWaterQualityTimeStep = 1, EpaWaterQualityTimeStep = ?', [qStepWanted]);
+		carried('water quality time step ' + qStepWanted + ' s');
+	}
 	// The report time step, in seconds like the other two. 0 is the template's "same as the hydraulic step"; no
 	// results depend on it. (Whether WaterGEMS reports at it is for Tom's copy to say.)
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_ReportingTimeStep = ?', [T.reportStep > 0 && T.reportStep !== T.hydraulicStep ? T.reportStep : 0]);
@@ -1139,11 +1135,12 @@ function plan(doc, opts) {
 	const quality = (String(q.quality || '').trim() !== '' && !/^none\b/i.test(String(q.quality).trim()))
 		|| (secs.SOURCES || []).length > 0 || (secs.REACTIONS || []).length > 0;
 	if (quality && !chemicalCarriable(parsed) && !ageTraceCarriable(parsed)) { notCarried.push({ code: 'quality', ids: [] }); }
-	// A quality time step the project states other than EPANET's default of 5 minutes (300 s). Absent means the default,
-	// so a project that never typed one is not named.
-	// The .inp this plan reads back never states it, so it is read from the document itself.
-	const dt = (doc && doc.times) || {}, qStep = dt.qualityStep;
-	if (typeof qStep === 'number' && qStep > 0 && qStep !== 300) { notCarried.push({ code: 'quality_step', ids: [], value: (dt.text && dt.text.qualityStep) || String(qStep) + ' s' }); }
+	// The water quality time step. EPANET's default is a tenth of the hydraulic step, and so is WaterGEMS's when its
+	// setting is False, so a project that states none (or states exactly that) writes False. Any other stated step is
+	// written as True with the seconds: the file of 2026-11-03 showed 300 s as True 0.083 hr, so that field is read.
+	// The .inp this plan reads back never states it (js/lpn-patterns.js), so it is read from the document itself.
+	const dt = (doc && doc.times) || {}, qStep = dt.qualityStep, hStepSec = (parsed.times && parsed.times.hydraulicStep) || 3600;
+	const qualityStepSeconds = (typeof qStep === 'number' && qStep > 0 && Math.abs(qStep - hStepSec / 10) > 0.5) ? qStep : 0;
 	// An energy line that states a price, a price pattern or a demand charge other than zero. Efficiency lines are carried.
 	const price = (secs.ENERGY || []).filter((ln) => {
 		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);
@@ -1178,7 +1175,7 @@ function plan(doc, opts) {
 	// Always: this has no place in the file, whatever the network. (A pipe's material is not named: an EPANET project
 	// states none, so there is nothing to leave out; every pipe keeps the template's default.)
 	notCarried.push({ code: 'positions', ids: [] });
-	return { ok: true, refused: refused, notCarried: notCarried, inp: out.inp, parsed: parsed, differences: out.differences || [] };
+	return { ok: true, refused: refused, notCarried: notCarried, qualityStepSeconds: qualityStepSeconds, inp: out.inp, parsed: parsed, differences: out.differences || [] };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1282,7 +1279,7 @@ async function build(planned, o) {
 	let sched = { initial: {}, changes: [] };
 	if (watch.length) { sched = await referenceSchedule(o.epanet, planned.inp, watch); }
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;
-	const out = writeWtg(SQL, o.sqlite, parsed, sched, { name: o.name || 'Network', efficiency: eff, allowUntestedSchema: !!o.allowUntestedSchema });
+	const out = writeWtg(SQL, o.sqlite, parsed, sched, { name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
 	const R = out.report;
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');

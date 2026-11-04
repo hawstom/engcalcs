@@ -266,13 +266,25 @@ function head(t) { console.log('\n' + t); }
 	const pd = L.wtgPlan();
 	const dd = pd.ok && pd.notCarried.filter((x) => x.code === 'demand_model')[0];
 	ok('a pressure-driven demand model (PDA) is named, with its value', !!dd && dd.value === 'PDA' && L.wtgLines([dd])[0] === fillP('lpn_wtg_export_lost_demand_model', { value: 'PDA' }), pd.ok && JSON.stringify(pd.notCarried.map((x) => x.code)));
-	// A quality time step the project states is named; the default (Net3 states 0:05) and an unstated one are not
-	ok('Net3 (quality step 0:05, the default) does not name a quality time step', !planned.notCarried.some((x) => x.code === 'quality_step'));
-	L.importInp({ name: 'Net3-qstep.inp', _text: NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:30') });
-	const pq = L.wtgPlan();
-	const qs = pq.ok && pq.notCarried.filter((x) => x.code === 'quality_step')[0];
-	ok('a stated quality time step of 0:30 is named, with its value', !!qs && qs.value === '0:30', pq.ok && JSON.stringify(pq.notCarried.map((x) => x.code + ':' + (x.value || ''))));
-	ok('...in the sentence the language file gives', !!qs && L.wtgLines([qs])[0] === fillP('lpn_wtg_export_lost_quality_step', { value: '0:30' }), qs && L.wtgLines([qs])[0]);
+	// The quality time step is written. EPANET's default and WaterGEMS's False are both a tenth of the hydraulic step (6 min at 1 h).
+	const qsOf = (txt) => { L.importInp({ name: 'Net3-qstep.inp', _text: txt }); const pl = L.wtgPlan(); return pl.ok ? pl : null; };
+	const pq5 = qsOf(NET3);
+	ok('Net3 states 0:05, which is not a tenth of its 1 hour step: planned as 300 s, and no longer listed as not written', !!pq5 && pq5.qualityStepSeconds === 300 && !pq5.notCarried.some((x) => x.code === 'quality_step'), pq5 && String(pq5.qualityStepSeconds));
+	const pq6 = qsOf(NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:06'));
+	ok('a stated 0:06 (a tenth of 1 hour) plans no step: WaterGEMS stays False', !!pq6 && pq6.qualityStepSeconds === 0, pq6 && String(pq6.qualityStepSeconds));
+	const pqn = qsOf(NET3.replace(/ Quality Timestep[^\n]*\n/i, ''));
+	ok('no step stated plans no step', !!pqn && pqn.qualityStepSeconds === 0, pqn && String(pqn.qualityStepSeconds));
+	const pq30 = qsOf(NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:30'));
+	ok('a stated 0:30 plans 1800 s', !!pq30 && pq30.qualityStepSeconds === 1800 && !pq30.notCarried.some((x) => x.code === 'quality_step'), pq30 && String(pq30.qualityStepSeconds));
+	if (pq30) {
+		const qb = await EngCalcs.lpnWtgExportBuild(pq30, { sqlite: tplBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad(), name: 'Net3-q30' });
+		const qd = new SQL.Database(new Uint8Array(qb.sqlite)); const qe = qd.exec('SELECT EpaSetWaterQualityTimeStep, EpaWaterQualityTimeStep FROM EpaNetEngine')[0].values[0]; qd.close();
+		ok('the file written for 0:30 holds the flag 1 and 1800 seconds', qe[0] === 1 && qe[1] === 1800, JSON.stringify(qe));
+	}
+	const qdef = new SQL.Database(new Uint8Array((await EngCalcs.lpnWtgExportBuild(pq6, { sqlite: tplBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad(), name: 'Net3-q6' })).sqlite));
+	const qde = qdef.exec('SELECT EpaSetWaterQualityTimeStep, EpaWaterQualityTimeStep FROM EpaNetEngine')[0].values[0]; qdef.close();
+	ok('the file written for a default step keeps the flag False', qde[0] === 0 && qde[1] === 0, JSON.stringify(qde));
+	L.importInp({ name: 'Net3.inp', _text: NET3 });
 	// Map Text, tags, a backdrop: built as parsed networks, since the .inp writer's own output decides what reaches the plan
 	const withExtras = Object.assign({}, planned.parsed, { labels: [{ id: 't1' }], inpSections: Object.assign({}, planned.parsed.inpSections, { TAGS: [' NODE 10 foo'] }), backdrop: { file: 'x.bmp' } });
 	const codesExtras = [];

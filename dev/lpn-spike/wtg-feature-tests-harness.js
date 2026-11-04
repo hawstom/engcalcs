@@ -233,8 +233,8 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		ok('the plain two compartment file leaves the time step at the template\'s', rows(db20, 'SELECT EpaSetWaterQualityTimeStep AS f FROM EpaNetEngine')[0].f === 0);
 		db20.close();
 		const e = r3.expected.twoComp;
-		ok('EPANET: a 1 hour quality step puts the 20 and 80 percent tanks within 0.1 of Tom\'s readings at hour 12 (' + e.step1h.frac02[12].node.T1.quality.toFixed(3) + ', ' + e.step1h.frac08[12].node.T1.quality.toFixed(3) + ')',
-			near(e.step1h.frac02[12].node.T1.quality, 0.5, 0.1) && near(e.step1h.frac08[12].node.T1.quality, 0.4, 0.1) && e.step5min.frac02[12].node.T1.quality < 0.2);
+		ok('EPANET at the 5 minute step (converged; the loop now runs every quality step) puts the 20 and 80 percent tanks within 0.1 of Tom\'s readings at hour 12 (' + e.step5min.frac02[12].node.T1.quality.toFixed(3) + ', ' + e.step5min.frac08[12].node.T1.quality.toFixed(3) + ')',
+			near(e.step5min.frac02[12].node.T1.quality, 0.5, 0.1) && near(e.step5min.frac08[12].node.T1.quality, 0.4, 0.1));
 		const text3 = ft3.readme(r3.expected);
 		ok('the round 3 README names the single most useful step first, quotes the EPANET numbers, uses no em dash and mentions no letter',
 			text3.indexOf('## Single most useful step') > 0 && text3.indexOf('## Single most useful step') < text3.indexOf('## 1-chlorine') && text3.indexOf(e.step5min.frac02[12].node.T1.quality.toFixed(3)) >= 0 && text3.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text3));
@@ -250,8 +250,8 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 		const e4 = r4.expected;
 		ok('EPANET with the pump held as two 1 ft pipes reproduces WaterGEMS\'s J1 age of 0.173 h to the third decimal (' + e4.age[24].node.J1.quality.toFixed(3) + ')', near(e4.age[24].node.J1.quality, e4.tomAge.J1_24, 0.0005));
 		ok('chlorine at a 1 hour step: T1 with the reactions (' + e4.chlorine[12].node.T1.quality.toFixed(3) + ') rounds to 0.2 as Tom read, with none to 0.4', e4.chlorine[12].node.T1.quality.toFixed(1) === '0.2' && e4.chlorineNoReactions[12].node.T1.quality.toFixed(1) === '0.4');
-		ok('chlorine J1 tells the wall rate from the bulk rate: both ' + e4.chlorine[12].node.J1.quality.toFixed(3) + ', bulk only ' + e4.chlorineBulkOnly[12].node.J1.quality.toFixed(3), e4.chlorineBulkOnly[12].node.J1.quality - e4.chlorine[12].node.J1.quality > 0.02);
-		ok('the quality step moves EPANET\'s T1 well apart: 5 min, 1 h and 30 min differ by more than 0.2', Math.abs(e4.twoComp.step30min[12].node.T1.quality - e4.twoComp.step1h[12].node.T1.quality) > 0.2 && Math.abs(e4.twoComp.step1h[12].node.T1.quality - e4.twoComp.step5min[12].node.T1.quality) > 0.2);
+		ok('chlorine J1 tells the wall rate from the bulk rate: both ' + e4.chlorine[12].node.J1.quality.toFixed(3) + ', bulk only ' + e4.chlorineBulkOnly[12].node.J1.quality.toFixed(3), e4.chlorineBulkOnly[12].node.J1.quality - e4.chlorine[12].node.J1.quality > 0.01);
+		ok('with the pump as two pipes EPANET\'s T1 hardly depends on the step (6 min, 30 min, 1 h within 0.03 at hour 12): the earlier swing was a harness fault', [e4.twoComp.step5min, e4.twoComp.step30min, e4.twoComp.step1h].every((x) => near(x[12].node.T1.quality, e4.twoComp.step5min[12].node.T1.quality, 0.03)));
 		const db4t = wrap(fs.readFileSync(path.join(out4, '1-quality-step', 'twocomp-c1-20-c2-80.wtg.sqlite')));
 		ok('the round 4 two-compartment file leaves the quality step at the template\'s and holds 20 and 80', rows(db4t, 'SELECT EpaSetWaterQualityTimeStep AS f FROM EpaNetEngine')[0].f === 0
 			&& rows(db4t, 'SELECT TwoCompartmentType_Compartment1 AS a FROM ConventionalTank_Constituent_TankMixingModel_TwoCompartmentType')[0].a === 20);

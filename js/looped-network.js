@@ -45075,7 +45075,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wtgNotCarriedLines(items) {
 		var texts = {
 			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
-			quality_step: 'Quality time step {value}. It is not written, so a run uses the default quality time step.',
 			energy_price: 'Energy price, price pattern, and demand charge.',
 			rules: 'Rule-based controls.',
 			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',

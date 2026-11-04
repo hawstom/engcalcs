@@ -2310,7 +2310,6 @@ $ec_lang['lpn_file_export_item_wtg']='.wtg.sqlite file…';
 $ec_lang['lpn_file_export_wtg_tip']='Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.';
 $ec_lang['lpn_wtg_export_lost_lead']='This export does not yet write the following:';
 $ec_lang['lpn_wtg_export_lost_quality']='Water quality: the analysis, reactions, sources, and tank mixing.';
-$ec_lang['lpn_wtg_export_lost_quality_step']='Quality time step {value}. It is not written, so a run uses the default quality time step.';
 $ec_lang['lpn_wtg_export_lost_energy_price']='Energy price, price pattern, and demand charge.';
 $ec_lang['lpn_wtg_export_lost_rules']='Rule-based controls.';
 $ec_lang['lpn_wtg_export_lost_controls_pressure']='Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.';
