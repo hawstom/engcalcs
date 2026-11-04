@@ -1,0 +1,114 @@
+[TITLE]
+Every valve kind, a pump at part speed, a reservoir on a head pattern and a tank on a volume curve, for the WaterGEMS export spike.
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ J1              	100         	0           	                	;
+ J2              	90          	0           	                	;
+ J3              	80          	60          	D               	;
+ J4              	80          	0           	                	;
+ J5              	70          	0           	                	;
+ J6              	70          	0           	                	;
+ J7              	60          	100         	D               	;
+ J8              	60          	0           	                	;
+ J9              	55          	0           	                	;
+ J10             	50          	50          	D               	;
+ J12             	80          	20          	                	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ R               	50          	HP              	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ TK              	150         	10          	2           	30          	20          	0           	VC              	;
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ P1              	J1              	J2              	800         	8           	120         	0           	Open  	;
+ P2              	J3              	J4              	600         	8           	120         	0           	Open  	;
+ P3              	J6              	J7              	500         	8           	120         	0           	Open  	;
+ P4              	J1              	TK              	400         	8           	120         	0           	Open  	;
+ P7              	J4              	J12             	200         	8           	120         	0           	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ PU              	R               	J1              	HEAD 1	SPEED 0.9	;
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+ V1              	J2              	J3              	8           	PRV 	40          	2           	;
+ V2              	J4              	J5              	8           	TCV 	20          	0           	;
+ V3              	J5              	J6              	8           	FCV 	200         	0           	;
+ V4              	J7              	J8              	6           	PSV 	20          	0           	;
+ V5              	J8              	J9              	6           	PBV 	10          	0           	;
+ V6              	J9              	J10             	6           	GPV 	GP          	0           	;
+ V7              	J3              	J12             	6           	TCV 	5           	0           	;
+
+[STATUS]
+ V7              	Closed
+
+[PATTERNS]
+;ID              	Multipliers
+ D               	0.8         	0.8         	0.9         	1.0         	1.1         	1.2         
+ D               	1.2         	1.1         	1.0         	0.9         	0.9         	0.8         
+ D               	0.8         	0.8         	0.9         	1.0         	1.1         	1.2         
+ D               	1.2         	1.1         	1.0         	0.9         	0.9         	0.8         
+ HP              	1.0         	1.0         	1.0         	1.2         	1.2         	1.2         
+ HP              	1.4         	1.4         	1.4         	1.2         	1.2         	1.2         
+ HP              	1.0         	1.0         	1.0         	1.2         	1.2         	1.2         
+ HP              	1.4         	1.4         	1.4         	1.2         	1.2         	1.2         
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP: Pump curve
+ 1               	0           	300         
+ 1               	500         	220         
+ 1               	1000        	100         
+;HEADLOSS: GPV curve
+ GP              	0           	0           
+ GP              	100         	4           
+ GP              	400         	30          
+;VOLUME: Tank curve
+ VC              	2           	0           
+ VC              	10          	2400        
+ VC              	20          	9000        
+ VC              	30          	21000       
+
+[ENERGY]
+ Global Efficiency  	75
+ Global Price       	0.0
+
+[TIMES]
+ Duration           	24:00 
+ Hydraulic Timestep 	1:00 
+ Pattern Timestep   	1:00 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
+ Start ClockTime    	12 am
+ Statistic          	None
+
+[OPTIONS]
+ Units              	GPM
+ Headloss           	H-W
+ Pattern            	D
+ Accuracy           	0.001
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ R               	0.00            	2.00            
+ J1              	1.00            	2.00            
+ J2              	2.00            	2.00            
+ J3              	3.00            	2.00            
+ J4              	4.00            	2.00            
+ J5              	5.00            	2.00            
+ J6              	6.00            	2.00            
+ J7              	7.00            	2.00            
+ J8              	8.00            	2.00            
+ J9              	9.00            	2.00            
+ J10             	10.00           	2.00            
+ J12             	4.00            	1.00            
+ TK              	1.00            	1.00            
+
+[END]

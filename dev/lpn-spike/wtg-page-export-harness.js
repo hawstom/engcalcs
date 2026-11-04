@@ -1,0 +1,416 @@
+// THE PAGE'S .wtg.sqlite EXPORT (ROADMAP Task 749), headless. Run with:
+//
+//   node dev/lpn-spike/wtg-page-export-harness.js
+//
+// WHAT IT PROVES. The real page code (js/looped-network.js, through the DOM stub) imports EPA's
+// Net3, and the page's own export path -- wtgExportPlan() over inpExportDocument() and
+// inpExportOptions(), then wtgExportWrite() with the two files a visitor chooses -- makes the
+// .zip it would download. The database inside is then
+//   1. identical, table by table and row by row (random identifiers and the save time masked), to the
+//      frozen golden (reference/wtg-net3-golden.json), so a change to the writer or the template that
+//      changes what lands in a table fails here instead of agreeing with itself;
+//   2. read back by the WaterGEMS reader (js/lpn-sqlite.js and js/lpn-wtg.js, branch
+//      feat/sqlite-reader): 97 nodes, 117 pipes, both pump curves, five patterns, EPS times;
+//   3. solved by EPANET from the read-back network: heads agree with Net3's own run.
+// It also holds the refusals (a flow unit other than gpm, a pump with a four-point curve), the
+// schema-version gate, the list of what the file does not write, the menu row, and that the box
+// the visitor sees names every item on that list.
+//
+// The template is the one the page ships (js/data/wtg-template/). NEEDS the reader files from branch
+// feat/sqlite-reader (dev/lpn-spike/wtg-sqljs.js finds them); missing, it prints NOT RUN and exits 0.
+'use strict';
+
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { execFileSync } = require('child_process');
+const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const helper = require('./wtg-sqljs.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
+
+const zlib = require('zlib');
+const TPL_DIR = path.join(ROOT, 'js', 'data', 'wtg-template');
+const loadTpl = () => ({ sqlite: zlib.gunzipSync(fs.readFileSync(path.join(TPL_DIR, 'wtg-template.wtg.sqlite.gz'))), wtg: zlib.gunzipSync(fs.readFileSync(path.join(TPL_DIR, 'wtg-template.wtg.gz'))) });
+
+let fails = 0, checks = 0;
+function ok(name, cond, extra) {
+	checks++;
+	if (!cond) { fails++; }
+	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
+}
+function head(t) { console.log('\n' + t); }
+
+(async function () {
+	let readerPaths = null;
+	try { readerPaths = helper.readerPaths(); helper.sqlJsPath(); } catch (e) { readerPaths = null; }
+	if (!readerPaths) {
+		console.log('NOT RUN: needs the reader from branch feat/sqlite-reader.');
+		process.exit(0);
+	}
+
+	require(ROOT + 'js/lpn-inp.js');
+	require(ROOT + 'js/lpn-net.js');
+	require(ROOT + 'js/lpn-patterns.js');
+	require(ROOT + 'js/lpn-wtg-export.js');
+	global.FileReader = function () {
+		this.readAsArrayBuffer = function (file) {
+			const bytes = new TextEncoder().encode(file._text);
+			this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+			if (this.onload) { this.onload({ target: { result: this.result } }); }
+		};
+	};
+	global.alert = global.window.alert = function () {};
+	global.confirm = global.window.confirm = function () { return true; };
+
+	const L = loadLoopedNetwork(
+		EXAMPLE_EXPORTS +
+		"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
+		"\t\twtgPlan: wtgExportPlan, wtgWrite: wtgExportWrite, wtgLines: wtgNotCarriedLines,\n" +
+		"\t\twtgRefusal: wtgRefusalText, exportWtg: exportWtgFile,\n" +
+		"\t\texportRows: exportNetworkRows, exportBase: inpExportBaseName,\n" +
+		"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+		"\t\t\tworld = el('g', {}, svg);\n" +
+		"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+		"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+		"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+		"\t\t\trubberBandEl = el('line', {}, world); },\n" +
+		"\t\tunitFactor: unitFactor"
+	);
+	L.buildLayers();
+	const EngCalcs = global.EngCalcs;
+	const PC = EngCalcs.pageConfig;   // the page's own strings, from the language file the stub loads
+	const fillP = (key, vals) => Object.keys(vals).reduce((s, k) => s.split('{' + k + '}').join(vals[k]), PC[key]);
+
+	// sql.js and the reader, as Node gets them
+	const initSqlJs = require(helper.sqlJsPath());
+	const wasm = fs.readFileSync(helper.wasmPath());
+	const SQL = await initSqlJs({ wasmBinary: wasm });
+	EngCalcs.lpnWtgExportSetEngine(initSqlJs, wasm);
+	global.window.EngCalcs = EngCalcs;   // the reader modules attach to window when there is one
+	require(readerPaths.sqlite); require(readerPaths.wtg);
+	EngCalcs.lpnSqliteSetEngine(initSqlJs, wasm);
+
+	const NET3 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
+	setUnitSet('us');
+	L.importInp({ name: 'Net3.inp', _text: NET3 });
+	const tpl = loadTpl(), tplBytes = tpl.sqlite, tplWtg = tpl.wtg;
+	const write = () => new Promise((resolve) => L.wtgWrite((out, err) => resolve({ out: out, err: err })));
+	// The page fetches the template from this site; here it is handed over the way Node has it.
+	EngCalcs.lpnWtgExportSetTemplate(tplBytes, tplWtg.toString('utf8'));
+	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wtg-page-export-'));
+	const py = (code, ...args) => execFileSync('python3', ['-I', '-c', code, ...args], { encoding: 'utf8' });
+
+	// ---- 1. the plan ----
+	head('1. The plan for the open project (Net3)');
+	const planned = L.wtgPlan();
+	ok('the plan is made, with no refusal', planned.ok && planned.refused.length === 0, planned.ok ? '' : planned.detail);
+	const codes = planned.notCarried.map((x) => x.code);
+	ok('it names the water quality analysis (Net3 traces Lake) and map positions, and no pipe material (the project states none)',
+		codes.indexOf('quality') >= 0 && codes.indexOf('material') < 0 && codes.indexOf('positions') >= 0, codes.join(','));
+	ok('it names no emitters, no rules and no pressure controls (Net3 has none)',
+		['emitters', 'rules', 'controls_pressure', 'tank_mixing', 'pump_speed_pattern'].every((c) => codes.indexOf(c) < 0), codes.join(','));
+	ok('the plan reads 92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps',
+		planned.parsed.nodes.filter((n) => n.type === 'junction').length === 92 && planned.parsed.nodes.filter((n) => n.type === 'reservoir').length === 2
+		&& planned.parsed.nodes.filter((n) => n.type === 'tank').length === 3 && planned.parsed.links.filter((l) => l.type === 'pipe').length === 117
+		&& planned.parsed.links.filter((l) => l.type === 'pump').length === 2);
+	const lines = L.wtgLines(planned.notCarried);
+	ok('each item has a sentence of its own, none left as a bare code', lines.length === planned.notCarried.length && lines.every((s) => /\s/.test(s) && !/\{/.test(s)), lines.join(' | '));
+
+	// ---- 2. the menu row ----
+	head('2. File > Export > Network');
+	const rows = L.exportRows();
+	const wtgRow = rows.filter((r) => r.key === 'lpn_file_export_item_wtg')[0];
+	ok('a row keyed lpn_file_export_item_wtg, labelled ".wtg.sqlite file…" with no program named', !!wtgRow && wtgRow.label === PC.lpn_file_export_item_wtg && !/water(cad|gems)|bentley/i.test(wtgRow.label), wtgRow && wtgRow.label);
+	ok('the row\'s key is its own (no other row shares it)', rows.filter((r) => r.key === 'lpn_file_export_item_wtg').length === 1 && typeof wtgRow.fn === 'function');
+	ok('the tip names no program', !!PC.lpn_file_export_wtg_tip && !/water(cad|gems)|bentley/i.test(PC.lpn_file_export_wtg_tip));
+
+	// The box the visitor sees. The stub's dialog is the page's own openDialog(), so this is the shipped box.
+	head('2b. The box asked before anything is written');
+	L.exportWtg();
+	const dlgBody = global.document.getElementById('lpn_dialog_body'), dlgBar = global.document.getElementById('lpn_dialog_buttons');
+	const walk = (e, f) => { f(e); (e.children || []).forEach((c) => walk(c, f)); };
+	const texts = []; walk(dlgBody, (e) => { if (e._tag === 'li' || e._tag === 'p') { texts.push(e.textContent || e._text || ''); } });
+	ok('it leads with the sentence "This export does not yet write the following:", and names no program', texts.indexOf(PC.lpn_wtg_export_lost_lead) >= 0 && PC.lpn_wtg_export_lost_lead === 'This export does not yet write the following:' && !texts.some((s) => /water(cad|gems)|bentley/i.test(s)));
+	ok('no item says the file or the program "cannot" carry a thing', !/cannot/i.test(Object.keys(PC).filter((k) => /^lpn_wtg_export_lost_/.test(k)).map((k) => PC[k]).join(' ')));
+	ok('it asks the visitor to choose no file', !(dlgBar.children || []).some((b) => /choose/i.test(b.textContent || b._text || '')) && !global.document.getElementById('lpn_wtg_template_file'));
+	ok('it lists every item the plan does not write (' + lines.length + '), each as a list entry', lines.every((l) => texts.indexOf(l) >= 0), texts.length + ' lines');
+	const btns = (dlgBar.children || []).map((b) => b.textContent || b._text);
+	ok('its buttons are Export and Cancel', JSON.stringify(btns) === JSON.stringify([PC.lpn_export_table_go, PC.lpn_cancel]), JSON.stringify(btns));
+	const cancel = (dlgBar.children || [])[1];
+	if (cancel && cancel.click) { cancel.click(); }
+
+	// ---- 3. the files, as the page makes them ----
+	head('3. The page writes Net3 into the built-in template and zips the pair, with no file chosen');
+	const wrote = await write();
+	ok('written', !!wrote.out, wrote.err);
+	if (!wrote.out) { console.log('\n' + fails + ' check(s) FAILED:'); process.exit(1); }
+	const out = wrote.out;
+	ok('the template bytes are not modified', Buffer.compare(tplBytes, loadTpl().sqlite) === 0);
+	ok('the download is one .zip named for the project and holding the two files',
+		out.zipName === 'Net3.wtg.zip' && out.wtgName === 'Net3.wtg' && out.sqliteName === 'Net3.wtg.sqlite', out.zipName + ' / ' + out.wtgName + ' / ' + out.sqliteName);
+	const zipPath = path.join(tmp, out.zipName);
+	fs.writeFileSync(zipPath, Buffer.from(await out.zip.arrayBuffer()));
+	const listing = JSON.parse(py("import zipfile,sys,json\nz=zipfile.ZipFile(sys.argv[1])\nprint(json.dumps({'bad':z.testzip(),'names':z.namelist(),'sizes':[i.file_size for i in z.infolist()]}))", zipPath));
+	ok('the archive is sound and holds exactly ' + out.wtgName + ' and ' + out.sqliteName, listing.bad === null && JSON.stringify(listing.names.sort()) === JSON.stringify([out.sqliteName, out.wtgName].sort()), JSON.stringify(listing));
+	py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", zipPath, tmp);
+	const sqlitePath = path.join(tmp, out.sqliteName), wtgPath = path.join(tmp, out.wtgName);
+	const pageBytes = fs.readFileSync(sqlitePath), pageWtg = fs.readFileSync(wtgPath, 'utf8');
+	const pyOut = JSON.parse(py("import sqlite3,sys,json\ndb=sqlite3.connect('file:'+sys.argv[1]+'?mode=ro',uri=True)\n"
+		+ "print(json.dumps({'integrity':db.execute('pragma integrity_check').fetchone()[0],'fk':len(db.execute('pragma foreign_key_check').fetchall()),'tables':db.execute(\"select count(*) from sqlite_master where type='table'\").fetchone()[0],'live':db.execute('select count(*) from HMIDomainElement where IsDeleted=0').fetchone()[0]}))", sqlitePath));
+	ok('Python\'s sqlite3: integrity ok, no foreign key violations, 406 tables, 220 live elements', pyOut.integrity === 'ok' && pyOut.fk === 0 && pyOut.tables === 406 && pyOut.live === 220, JSON.stringify(pyOut));
+
+	// ---- 4. the same as the spike's known-good output ----
+	head('4. Identical to the frozen golden: this writer and the built-in template, Net3');
+	const { dump, digests } = require('./wtg-dump.js');
+	const golden = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), 'utf8'));
+	const D = digests(dump(SQL, pageBytes));
+	const noId = (s) => s.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1#$2');
+	if (process.env.WTG_WRITE_GOLDEN) { fs.writeFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-net3-golden.json'), JSON.stringify({ note: golden.note, schema: '1.0.54.0', wtgSha256: require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex'), tables: D }, null, 1)); console.log('golden written'); }
+	const gNames = Object.keys(golden.tables);
+	const differing = gNames.filter((n) => !D[n] || D[n].sha256 !== golden.tables[n].sha256 || D[n].rows !== golden.tables[n].rows);
+	ok('all ' + gNames.length + ' tables hold the golden rows, by digest (identifiers, save times and the project Notes masked)', differing.length === 0 && Object.keys(D).length === gNames.length, differing.slice(0, 6).join(', '));
+	let rowCount = 0; gNames.forEach((n) => { rowCount += golden.tables[n].rows; });
+	ok('...and that is not an empty comparison: ' + rowCount + ' rows', rowCount > 3000);
+	ok('the .wtg matches the golden digest, apart from its new identity', require('crypto').createHash('sha256').update(noId(pageWtg)).digest('hex') === golden.wtgSha256);
+	ok('the .wtg\'s identity is new, not the template\'s', !pageWtg.includes((/<StorageFileHeader [^>]*\bId="([0-9a-f-]{36})"/.exec(tplWtg.toString('utf8')) || [])[1]));
+	ok('the project name written is the project\'s own', (() => {
+		const d = new SQL.Database(new Uint8Array(pageBytes)); const n = d.exec('SELECT Name FROM HMIDomainDataSet')[0].values[0][0]; d.close(); return n === 'Net3';
+	})());
+
+	const parsed = EngCalcs.lpnInpParse(NET3);
+
+	// ---- 5. the reader and EPANET ----
+	head('5. Read back with the WaterGEMS reader, then solved by EPANET');
+	const db = await EngCalcs.lpnSqliteOpen(pageBytes);
+	ok('recognised as a WaterGEMS model', EngCalcs.lpnWtgIsWtg(db));
+	const display = EngCalcs.lpnWtgDisplayUnits(pageWtg);
+	const rb = EngCalcs.lpnWtgRead(db, { display: display, flowUnits: 'GPM' });
+	ok('read back', rb.ok, rb.message);
+	const back = EngCalcs.lpnInpParse(rb.inp);
+	const bn = Object.fromEntries(back.nodes.map((x) => [x.id, x])), bl = Object.fromEntries(back.links.map((x) => [x.id, x]));
+	ok('every node and link of Net3 comes back (97 nodes; 117 pipes; both pumps as nodes with two pipes each)',
+		parsed.nodes.every((n) => bn[n.id] && bn[n.id].type === n.type) && parsed.links.filter((l) => l.type === 'pipe').every((l) => bl[l.id] && bl[l.id].type === 'pipe')
+		&& parsed.links.filter((l) => l.type === 'pump').every((p) => bl[p.id] && bl[p.id + '-A'] && bl[p.id + '-B']));
+	ok('pipe lengths, diameters and roughness are Net3\'s', parsed.links.filter((l) => l.type === 'pipe').every((l) => ['length', 'diameter', 'roughness'].every((k) => Math.abs(bl[l.id][k] - l[k]) <= 1e-6 * Math.max(1, Math.abs(l[k])))));
+	ok('both three-point pump curves and all five patterns come back',
+		parsed.links.filter((l) => l.type === 'pump').every((pm) => JSON.stringify(back.curves.find((c) => c.id === bl[pm.id].curveId).points.map((p) => p.map((v) => Math.round(v * 1e6) / 1e6)))
+			=== JSON.stringify(parsed.curves.find((c) => c.id === pm.curveId).points)) && back.patterns.length === 5);
+	ok('EPS: 24 h, 1 h step, starting at midnight', back.times.duration === 86400 && back.times.hydraulicStep === 3600 && back.times.startClock === 0);
+	const q = (sql) => db.select(sql).rows;
+	const setId = q('SELECT Operational_IdahoControlSetID FROM Operational_SystemData')[0][0];
+	ok('the Base operational alternative names a control set holding all six controls', setId !== null && q('SELECT COUNT(*) FROM IdahoLogicalControlSet_LogicalControlCollection WHERE SupportElementID = ' + setId)[0][0] === 6);
+	ok('four of them are tank-level conditions (less than = 3, greater than = 1) and two are clock times',
+		q('SELECT COUNT(*) FROM IdahoControlCondition_SimpleConditionType_ElementType WHERE ControlConditionElementType = 52')[0][0] === 4
+		&& q('SELECT COUNT(*) FROM IdahoControlCondition_ConditionType_SimpleConditionType WHERE SimpleConditionType = 2')[0][0] === 2);
+	// the read-back network, with the controls the reader leaves unread put back from the tables, as wtg-export-harness.js does
+	const label = (id) => q('SELECT Label FROM HMIModelingElement WHERE ElementID = ' + id)[0][0];
+	const hm = (secs) => { const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), x = secs % 60; return (h % 12 === 0 ? 12 : h % 12) + ':' + String(m).padStart(2, '0') + (x ? ':' + String(x).padStart(2, '0') : '') + (h < 12 ? ' AM' : ' PM'); };
+	const ctl = q('SELECT LogicalControlCollection_IdahoLogicalControlID FROM IdahoLogicalControlSet_LogicalControlCollection WHERE SupportElementID = ' + setId).map((r) => {
+		const k = r[0], c = q('SELECT IdahoControl_ControlCondition, IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = ' + k)[0];
+		const sc = q('SELECT SimpleConditionType, CompareOperator FROM IdahoControlCondition_ConditionType_SimpleConditionType WHERE SupportElementID = ' + c[0])[0];
+		const act = q('SELECT SimpleActionType_Element FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0];
+		const st = q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0] === 0 ? 'OPEN' : 'CLOSED';
+		if (sc[0] === 2) { return 'LINK ' + label(act[0]) + ' ' + st + ' AT CLOCKTIME ' + hm(q('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType WHERE SupportElementID = ' + c[0])[0][0] % 86400); }
+		const e = q('SELECT ElementType_Element, ElementType_TankLevel FROM IdahoControlCondition_SimpleConditionType_ElementType WHERE SupportElementID = ' + c[0])[0];
+		return 'LINK ' + label(act[0]) + ' ' + st + ' IF NODE ' + label(e[0]) + ' ' + (sc[1] === 3 ? 'BELOW' : 'ABOVE') + ' ' + e[1];
+	});
+	const rbInp = rb.inp.replace(/\[CONTROLS\][\s\S]*?(?=\n\[)/, '').replace(/\n\[TIMES\]/, '\n[CONTROLS]\n' + ctl.join('\n') + '\n\n[TIMES]');
+	const ids = parsed.nodes.map((n) => n.id), lids = parsed.links.map((l) => l.id);
+	const spike = require('./wtg-export.js');   // only its EPANET reference run
+	const R0 = await spike.epanetReference(NET3, [], ids, lids), R1 = await spike.epanetReference(rbInp, [], ids, lids);
+	let wh = 0, wq = 0;
+	Object.keys(R0.snapshots).forEach((t) => {
+		ids.forEach((i) => { wh = Math.max(wh, Math.abs(R0.snapshots[t].heads[i] - R1.snapshots[t].heads[i])); });
+		lids.forEach((i) => { wq = Math.max(wq, Math.abs(R0.snapshots[t].flows[i] - R1.snapshots[t].flows[i])); });
+	});
+	ok('EPANET, 24 hours: worst head ' + wh.toFixed(4) + ' ft (tolerance 0.05), worst flow ' + wq.toFixed(3) + ' gpm (tolerance 3)', wh < 0.05 && wq < 3);
+
+	// ---- 6. refusals, by name ----
+	head('6. What the export refuses, by name');
+	setUnitSet('si');
+	openExample(L, 'si');
+	const pu = L.wtgPlan();
+	ok('a project in SI units (the gallery\'s SI example) is refused for its flow unit', pu.ok && pu.refused.some((r) => r.code === 'units'), JSON.stringify(pu.refused));
+	ok('...and the sentence names the unit and says only gpm is written', pu.ok && L.wtgRefusal(pu.refused[0]) === fillP('lpn_wtg_export_no_units', { unit: 'LPS' }), pu.ok && L.wtgRefusal(pu.refused[0]));
+	setUnitSet('us');
+	// A pump with a four-point head curve: Net3 with one more point on pump 10's curve, imported as a project of its own
+	const FOURPT = NET3.replace(/( 1\s+4000\.\s+63\.\s*\r?\n)/, '$1 1               \t5000.       \t40.         \n');
+	ok('(the four-point network differs from Net3 only by that point)', FOURPT !== NET3 && FOURPT.length - NET3.length < 60);
+	L.importInp({ name: 'Net3-four-point.inp', _text: FOURPT });
+	const p4 = L.wtgPlan();
+	ok('a pump with a four-point head curve is refused, naming pump 10 and no other', p4.ok && p4.refused.length === 1 && p4.refused[0].code === 'pump_curve' && JSON.stringify(p4.refused[0].ids) === '["10"]', JSON.stringify(p4.refused));
+	ok('...in the sentence the language file gives, naming the pump', L.wtgRefusal(p4.refused[0]) === fillP('lpn_wtg_export_no_pump_curve', { ids: '10' }), L.wtgRefusal(p4.refused[0]));
+	const w4 = await write();
+	ok('...and the write is refused with the same reason, no file made', !w4.out && w4.err === fillP('lpn_wtg_export_failed', { detail: L.wtgRefusal(p4.refused[0]) }), w4.err);
+	// Emitters are written (ft3/s per psi^n), so the plan no longer names them; a two-compartment tank with a fraction is written; one without a fraction is named.
+	const EMIT = NET3.replace(/\[EMITTERS\][^\[]*/, '').replace(/\[PATTERNS\]/, '[EMITTERS]\n 15  2.5\n\n[PATTERNS]');
+	L.importInp({ name: 'Net3-emitter.inp', _text: EMIT });
+	const pe = L.wtgPlan();
+	ok('an emitter on junction 15 is written, so the plan does not name it', pe.ok && !pe.notCarried.some((x) => x.code === 'emitters'), pe.ok && JSON.stringify(pe.notCarried.map((x) => x.code)));
+	const MIX2 = NET3.replace('[END]', '[MIXING]\n 1  2COMP\n 2  FIFO\n 3  2COMP  0.2\n\n[END]');
+	L.importInp({ name: 'Net3-2comp.inp', _text: MIX2 });
+	const pm2 = L.wtgPlan();
+	const tm = pm2.ok && pm2.notCarried.filter((x) => x.code === 'tank_mixing')[0];
+	ok('a two-compartment tank with no fraction (1) is named as not written; a FIFO tank (2) and one at 0.2 (3) are not', !!tm && JSON.stringify(tm.ids) === '["1"]', pm2.ok && JSON.stringify(pm2.notCarried));
+	ok('...with a sentence naming the tank', !!tm && L.wtgLines([tm])[0] === fillP('lpn_wtg_export_lost_tank_mixing', { ids: '1' }), tm && L.wtgLines([tm])[0]);
+
+	// ---- 6b. what changes the numbers or has no place in the file is named, with its value ----
+	head('6b. Settings and drawing data the files cannot hold');
+	L.importInp({ name: 'Net3-mult.inp', _text: NET3.replace(/(Demand Multiplier\s+)[\d.]+/i, '$12.0') });
+	const pm = L.wtgPlan();
+	const dm = pm.ok && pm.notCarried.filter((x) => x.code === 'demand_multiplier')[0];
+	ok('a Demand Multiplier of 2.0 is named in the left-out list, with its value', !!dm && dm.value === '2', pm.ok && JSON.stringify(pm.notCarried.map((x) => x.code + ':' + (x.value || ''))));
+	ok('...in the sentence the language file gives', !!dm && L.wtgLines([dm])[0] === fillP('lpn_wtg_export_lost_demand_multiplier', { value: '2' }), dm && L.wtgLines([dm])[0]);
+	ok('...and Net3 itself (multiplier 1) does not name it', !planned.notCarried.some((x) => x.code === 'demand_multiplier'));
+	L.importInp({ name: 'Net3-pda.inp', _text: NET3.replace(/(\[OPTIONS\][^\n]*\n)/, '$1 Demand Model       \tPDA\n') });
+	const pd = L.wtgPlan();
+	const dd = pd.ok && pd.notCarried.filter((x) => x.code === 'demand_model')[0];
+	ok('a pressure-driven demand model (PDA) is named, with its value', !!dd && dd.value === 'PDA' && L.wtgLines([dd])[0] === fillP('lpn_wtg_export_lost_demand_model', { value: 'PDA' }), pd.ok && JSON.stringify(pd.notCarried.map((x) => x.code)));
+	// The quality time step is written. EPANET's default and WaterGEMS's False are both a tenth of the hydraulic step (6 min at 1 h).
+	const qsOf = (txt) => { L.importInp({ name: 'Net3-qstep.inp', _text: txt }); const pl = L.wtgPlan(); return pl.ok ? pl : null; };
+	const pq5 = qsOf(NET3);
+	ok('Net3 states 0:05, which is not a tenth of its 1 hour step: planned as 300 s, and no longer listed as not written', !!pq5 && pq5.qualityStepSeconds === 300 && !pq5.notCarried.some((x) => x.code === 'quality_step'), pq5 && String(pq5.qualityStepSeconds));
+	const pq6 = qsOf(NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:06'));
+	ok('a stated 0:06 (a tenth of 1 hour) plans no step: WaterGEMS stays False', !!pq6 && pq6.qualityStepSeconds === 0, pq6 && String(pq6.qualityStepSeconds));
+	const pqn = qsOf(NET3.replace(/ Quality Timestep[^\n]*\n/i, ''));
+	ok('no step stated plans no step', !!pqn && pqn.qualityStepSeconds === 0, pqn && String(pqn.qualityStepSeconds));
+	const pq30 = qsOf(NET3.replace(/(Quality Timestep\s+)\S+/i, '$10:30'));
+	ok('a stated 0:30 plans 1800 s', !!pq30 && pq30.qualityStepSeconds === 1800 && !pq30.notCarried.some((x) => x.code === 'quality_step'), pq30 && String(pq30.qualityStepSeconds));
+	if (pq30) {
+		const qb = await EngCalcs.lpnWtgExportBuild(pq30, { sqlite: tplBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad(), name: 'Net3-q30' });
+		const qd = new SQL.Database(new Uint8Array(qb.sqlite)); const qe = qd.exec('SELECT EpaSetWaterQualityTimeStep, EpaWaterQualityTimeStep FROM EpaNetEngine')[0].values[0]; qd.close();
+		ok('the file written for 0:30 holds the flag 1 and 1800 seconds', qe[0] === 1 && qe[1] === 1800, JSON.stringify(qe));
+	}
+	const qdef = new SQL.Database(new Uint8Array((await EngCalcs.lpnWtgExportBuild(pq6, { sqlite: tplBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad(), name: 'Net3-q6' })).sqlite));
+	const qde = qdef.exec('SELECT EpaSetWaterQualityTimeStep, EpaWaterQualityTimeStep FROM EpaNetEngine')[0].values[0]; qdef.close();
+	ok('the file written for a default step keeps the flag False', qde[0] === 0 && qde[1] === 0, JSON.stringify(qde));
+	L.importInp({ name: 'Net3.inp', _text: NET3 });
+	// Map Text, tags, a backdrop: built as parsed networks, since the .inp writer's own output decides what reaches the plan
+	const withExtras = Object.assign({}, planned.parsed, { labels: [{ id: 't1' }], inpSections: Object.assign({}, planned.parsed.inpSections, { TAGS: [' NODE 10 foo'] }), backdrop: { file: 'x.bmp' } });
+	const codesExtras = [];
+	{
+		const origExport = EngCalcs.lpnExportInp, origParse = EngCalcs.lpnInpParse;
+		EngCalcs.lpnInpParse = () => withExtras;
+		EngCalcs.lpnExportInp = () => ({ ok: true, inp: planned.inp, differences: [] });
+		const px = EngCalcs.lpnWtgExportPlan(L.getDoc(), {});
+		EngCalcs.lpnInpParse = origParse; EngCalcs.lpnExportInp = origExport;
+		px.notCarried.forEach((x) => codesExtras.push(x.code));
+		ok('map Text and a backdrop are each named when the project has them; tags are written into Notes, so not named', ['texts', 'backdrop'].every((c) => codesExtras.indexOf(c) >= 0) && codesExtras.indexOf('tags') < 0, codesExtras.join(','));
+		ok('...each with a sentence of its own', L.wtgLines(px.notCarried.filter((x) => ['texts', 'backdrop'].indexOf(x.code) >= 0)).join('|') === [PC.lpn_wtg_export_lost_texts, PC.lpn_wtg_export_lost_backdrop].join('|'));
+	}
+	L.importInp({ name: 'Net3.inp', _text: NET3 });
+
+	// ---- 6c. a refusal reads plainly: no program, no column ----
+	head('6c. A refusal reads plainly');
+	const tKeys = Object.keys(PC).filter((k) => /^lpn_wtg_export_(t_|no_|failed)/.test(k));
+	ok('no refusal sentence names a program, a vendor, a column or a table', tKeys.length >= 10 && tKeys.every((k) => !/water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])), tKeys.filter((k) => /water(cad|gems)|bentley|HMI|Idaho|sqlite_|column|table/i.test(PC[k])).join(','));
+	ok('no key asks the visitor for a saved project (the template is built in)', !PC.lpn_wtg_export_choose && !PC.lpn_wtg_export_need && !PC.lpn_wtg_export_need_both && !PC.lpn_wtg_export_t_schema && !PC.lpn_wtg_export_t_kind && !PC.lpn_wtg_export_t_not_project);
+	EngCalcs.lpnWtgExportSetEngine(() => Promise.reject(new Error('Failed to fetch')), wasm);
+	const off = await write();
+	ok('the SQLite engine cannot be fetched (offline): the sentence says the first use needs a connection', off.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_offline }), off.err);
+	EngCalcs.lpnWtgExportSetEngine(initSqlJs, wasm);
+	EngCalcs.lpnWtgExportSetTemplate(null);
+	const off2 = await write();
+	ok('the template cannot be fetched (no site to fetch from here): the same sentence', off2.err === fillP('lpn_wtg_export_failed', { detail: PC.lpn_wtg_export_t_offline }), off2.err);
+	EngCalcs.lpnWtgExportSetTemplate(tplBytes, tplWtg.toString('utf8'));
+
+	// ---- 7. the schema gate and the template checks ----
+	head('7. The template is checked before anything is written');
+	const sv = await EngCalcs.lpnWtgExportBuild(planned, { sqlite: tplBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad(), name: 'Net3' });
+	ok('the tested schema version is on the list', EngCalcs.lpnWtgExportTestedSchemas.indexOf(sv.report.schemaVersion) >= 0, sv.report.schemaVersion);
+	const odd = new SQL.Database(new Uint8Array(tplBytes));
+	odd.run("UPDATE HMISchemaVersionInfo SET Value = '1.0.99.0' WHERE Name = 'HMICoreSchemaVersion'");
+	const oddBytes = odd.export(); odd.close();
+	let err = null;
+	try { await EngCalcs.lpnWtgExportBuild(planned, { sqlite: oddBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad() }); } catch (e) { err = e; }
+	ok('a schema version not on the list is refused, naming it', !!err && err.code === 'schema' && err.message.indexOf('1.0.99.0') >= 0, err && err.message);
+	err = null;
+	try { await EngCalcs.lpnWtgExportBuild(planned, { sqlite: Uint8Array.from([1, 2, 3, 4]), wtg: '<x/>', epanet: await EngCalcs.lpnEpanetLoad() }); } catch (e) { err = e; }
+	ok('a file that is not a project is refused', !!err && err.code === 'template', err && err.message);
+	const bare = new SQL.Database(new Uint8Array(tplBytes));
+	bare.run('UPDATE HMIDomainElement SET IsDeleted = 1 WHERE DomainElementTypeID = 52');
+	const bareBytes = bare.export(); bare.close();
+	err = null;
+	try { await EngCalcs.lpnWtgExportBuild(planned, { sqlite: bareBytes, wtg: tplWtg.toString('utf8'), epanet: await EngCalcs.lpnEpanetLoad() }); } catch (e) { err = e; }
+	ok('a saved project with no tank to copy is refused, naming the kind', !!err && err.code === 'template-kind' && JSON.stringify(err.ids) === '["tank"]', err && err.message);
+
+	// ---- 8. a network with one of each valve kind ----
+	head('8. dev/scripts/valve_example.inp (PBV, PRV, PSV, FCV, TCV, GPV) exports and reads back');
+	{
+		const VALVE_INP = fs.readFileSync(path.join(ROOT, 'dev', 'scripts', 'valve_example.inp'), 'utf8');
+		L.importInp({ name: 'Valves.inp', _text: VALVE_INP });
+		const vp = L.wtgPlan();
+		ok('the plan is made, with no refusal', vp.ok && vp.refused.length === 0, vp.ok ? '' : vp.detail);
+		const vw = await write();
+		ok('written', !!vw.out, vw.err);
+		if (vw.out) {
+			const vZip = path.join(tmp, 'valves.zip'), vDir = path.join(tmp, 'valves');
+			fs.mkdirSync(vDir);
+			fs.writeFileSync(vZip, Buffer.from(await vw.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", vZip, vDir);
+			ok('the zip holds the two files', fs.existsSync(path.join(vDir, vw.out.wtgName)) && fs.existsSync(path.join(vDir, vw.out.sqliteName)));
+			const vdb = await EngCalcs.lpnSqliteOpen(new Uint8Array(fs.readFileSync(path.join(vDir, vw.out.sqliteName))));
+			const vrb = EngCalcs.lpnWtgRead(vdb, { display: EngCalcs.lpnWtgDisplayUnits(fs.readFileSync(path.join(vDir, vw.out.wtgName), 'utf8')), flowUnits: 'GPM' });
+			ok('read back', vrb.ok, vrb.message);
+			const vb = EngCalcs.lpnInpParse(vrb.inp), vl = Object.fromEntries(vb.links.map((x) => [x.id, x]));
+			const want = { PBV1: 'PBV', PRV1: 'PRV', PSV1: 'PSV', FCV1: 'FCV', TCV1: 'TCV', GPV1: 'GPV' };
+			ok('all six valve kinds come back as their own kind', Object.keys(want).every((k) => vl[k] && vl[k].type === 'valve' && vl[k].valveType === want[k]), Object.keys(want).map((k) => k + ':' + (vl[k] && vl[k].valveType)).join(' '));
+		}
+	}
+
+	// ---- 8b. a one-point pump curve (Net1's pump 9) is written as WaterGEMS's design point definition ----
+	head('8b. Net1: a one-point pump curve exports as a design point (tompump1pt, Tom 2026-11-03)');
+	{
+		L.importInp({ name: 'Net1.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8') });
+		const n1 = L.wtgPlan();
+		ok('Net1 is planned with no pump curve refusal', n1.ok && !n1.refused.some((r) => r.code === 'pump_curve'), n1.ok && JSON.stringify(n1.refused));
+		const n1w = await write();
+		ok('Net1 is written', !!n1w.out, n1w.err);
+		if (n1w.out) {
+			const zp = path.join(tmp, 'net1.zip'), zd = path.join(tmp, 'net1');
+			fs.mkdirSync(zd);
+			fs.writeFileSync(zp, Buffer.from(await n1w.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", zp, zd);
+			const n1b = fs.readFileSync(path.join(zd, n1w.out.sqliteName));
+			const nd = new SQL.Database(new Uint8Array(n1b));
+			const pd1 = nd.exec('SELECT PumpDefinitionType, DesignDischarge, DesignHead, ShutoffHead, MaxOperatingDischarge, MaxOperatingHead, IdahoPumpDefinition_UserDefinedBestEfficiencyMaxFlow FROM IdahoPumpDefinition')[0].values[0];
+			const cf = 0.22280092967190634 / 100;
+			ok('the definition is type 1 (design point) at 1500 gpm and 250 ft, as tompump1pt stores it', pd1[0] === 1 && Math.abs(pd1[1] - 1500 * cf) < 1e-9 && pd1[2] === 250, JSON.stringify(pd1));
+			ok('...with shutoff 1.25 x head, maximum at twice the flow and half the head, and the best-efficiency maximum flow twice the design flow', Math.abs(pd1[3] - 312.5) < 1e-9 && Math.abs(pd1[4] - 3000 * cf) < 1e-9 && pd1[5] === 125 && Math.abs(pd1[6] - 3000 * cf) < 1e-9, JSON.stringify(pd1));
+			nd.close();
+			const n1db = await EngCalcs.lpnSqliteOpen(new Uint8Array(n1b));
+			const n1r = EngCalcs.lpnWtgRead(n1db, { display: EngCalcs.lpnWtgDisplayUnits(fs.readFileSync(path.join(zd, n1w.out.wtgName), 'utf8')), flowUnits: 'GPM' });
+			ok('Net1 reads back', n1r.ok, n1r.message);
+			if (n1r.ok) {
+				const nb = EngCalcs.lpnInpParse(n1r.inp);
+				const pc = nb.curves.find((c) => c.points.some((pt) => Math.abs(pt[0] - 1500) < 0.01 && Math.abs(pt[1] - 250) < 0.01));
+				ok('the pump curve comes back through the design point (1500 gpm, 250 ft)', !!pc, JSON.stringify(nb.curves.map((c) => c.points)));
+			}
+		}
+		L.importInp({ name: 'Net3.inp', _text: NET3 });
+	}
+
+	// ---- 9. the page's own route carries description, tag and demand category into Notes ----
+	head('9. dev/lpn-spike/reference/wtg-export-notes.inp: description, tag and categories reach the Notes');
+	{
+		L.importInp({ name: 'Notes.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-notes.inp'), 'utf8') });
+		const np = L.wtgPlan();
+		ok('the plan is made, and names neither tags nor demand category names as left out', np.ok && !np.notCarried.some((x) => x.code === 'tags' || x.code === 'demand_category'), np.ok ? np.notCarried.map((x) => x.code).join(',') : np.detail);
+		const nwr = await write();
+		ok('written', !!nwr.out, nwr.err);
+		if (nwr.out) {
+			const nZip = path.join(tmp, 'notes.zip'), nDir = path.join(tmp, 'notes');
+			fs.mkdirSync(nDir);
+			fs.writeFileSync(nZip, Buffer.from(await nwr.out.zip.arrayBuffer()));
+			py("import zipfile,sys\nzipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])", nZip, nDir);
+			const ndb = new SQL.Database(new Uint8Array(fs.readFileSync(path.join(nDir, nwr.out.sqliteName))));
+			const nn = (label) => { const r = ndb.exec("SELECT Notes FROM HMIModelingElement WHERE Label = '" + label + "'"); return r.length ? r[0].values[0][0] : null; };
+			ok('junction J1 holds its description, tag and both category names', nn('J1') === 'Corner of Elm and Main\nTag: Zone3\nDemand categories: Residential 100 gpm; Commercial 40 gpm', JSON.stringify(nn('J1')));
+			ok('pipe 2 holds its description and tag, tank T1 its tag, pump PU1 its description', nn('2') === 'Main trunk, cement lined 1974\nTag: Trunk' && nn('T1') === 'Tag: Hilltop' && nn('PU1') === 'Lake pump');
+			ndb.close();
+		}
+	}
+
+	console.log(fails ? '\n' + fails + ' check(s) FAILED' : '\nall ' + checks + ' checks passed');
+	process.exit(fails ? 1 : 0);
+}()).catch((e) => { console.error(e); process.exit(1); });

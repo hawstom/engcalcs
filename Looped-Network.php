@@ -2346,6 +2346,37 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
 	lpn_file_export_item_dxf: <?=json_encode($ec_lang['lpn_file_export_item_dxf'])?>,
 	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
+	lpn_file_export_item_wtg: <?=json_encode($ec_lang['lpn_file_export_item_wtg'])?>,
+	lpn_file_export_wtg_tip: <?=json_encode($ec_lang['lpn_file_export_wtg_tip'])?>,
+	lpn_wtg_export_lost_lead: <?=json_encode($ec_lang['lpn_wtg_export_lost_lead'])?>,
+	lpn_wtg_export_lost_quality: <?=json_encode($ec_lang['lpn_wtg_export_lost_quality'])?>,
+	lpn_wtg_export_lost_energy_price: <?=json_encode($ec_lang['lpn_wtg_export_lost_energy_price'])?>,
+	lpn_wtg_export_lost_rules: <?=json_encode($ec_lang['lpn_wtg_export_lost_rules'])?>,
+	lpn_wtg_export_lost_controls_pressure: <?=json_encode($ec_lang['lpn_wtg_export_lost_controls_pressure'])?>,
+	lpn_wtg_export_lost_tank_mixing: <?=json_encode($ec_lang['lpn_wtg_export_lost_tank_mixing'])?>,
+	lpn_wtg_export_lost_positions: <?=json_encode($ec_lang['lpn_wtg_export_lost_positions'])?>,
+	lpn_wtg_export_lost_demand_multiplier: <?=json_encode($ec_lang['lpn_wtg_export_lost_demand_multiplier'])?>,
+	lpn_wtg_export_lost_demand_model: <?=json_encode($ec_lang['lpn_wtg_export_lost_demand_model'])?>,
+	lpn_wtg_export_lost_texts: <?=json_encode($ec_lang['lpn_wtg_export_lost_texts'])?>,
+	lpn_wtg_export_lost_backdrop: <?=json_encode($ec_lang['lpn_wtg_export_lost_backdrop'])?>,
+	lpn_wtg_export_t_layout: <?=json_encode($ec_lang['lpn_wtg_export_t_layout'])?>,
+	lpn_wtg_export_t_gpv_curve: <?=json_encode($ec_lang['lpn_wtg_export_t_gpv_curve'])?>,
+	lpn_wtg_export_t_vol_range: <?=json_encode($ec_lang['lpn_wtg_export_t_vol_range'])?>,
+	lpn_wtg_export_t_head_pattern: <?=json_encode($ec_lang['lpn_wtg_export_t_head_pattern'])?>,
+	lpn_wtg_export_t_vol_missing: <?=json_encode($ec_lang['lpn_wtg_export_t_vol_missing'])?>,
+	lpn_wtg_export_t_asset_kind: <?=json_encode($ec_lang['lpn_wtg_export_t_asset_kind'])?>,
+	lpn_wtg_export_t_offline: <?=json_encode($ec_lang['lpn_wtg_export_t_offline'])?>,
+	lpn_wtg_export_t_integrity: <?=json_encode($ec_lang['lpn_wtg_export_t_integrity'])?>,
+	lpn_wtg_export_no_empty: <?=json_encode($ec_lang['lpn_wtg_export_no_empty'])?>,
+	lpn_wtg_export_no_units: <?=json_encode($ec_lang['lpn_wtg_export_no_units'])?>,
+	lpn_wtg_export_no_headloss: <?=json_encode($ec_lang['lpn_wtg_export_no_headloss'])?>,
+	lpn_wtg_export_no_pump_curve: <?=json_encode($ec_lang['lpn_wtg_export_no_pump_curve'])?>,
+	lpn_wtg_export_refused: <?=json_encode($ec_lang['lpn_wtg_export_refused'])?>,
+	lpn_wtg_export_working: <?=json_encode($ec_lang['lpn_wtg_export_working'])?>,
+	lpn_wtg_export_failed: <?=json_encode($ec_lang['lpn_wtg_export_failed'])?>,
+	lpn_wtg_export_exported: <?=json_encode($ec_lang['lpn_wtg_export_exported'])?>,
+	lpn_wtg_export_extract: <?=json_encode($ec_lang['lpn_wtg_export_extract'])?>,
+	lpn_wtg_export_left_out: <?=json_encode($ec_lang['lpn_wtg_export_left_out'])?>,
 	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
 	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
 	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
@@ -4930,6 +4961,9 @@ EngCalcs.pageConfig = {
 <?php // Writing a DXF file of the model (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
       // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
 <script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
+<?php // Writing a .wtg project of the model (ROADMAP Task 749). No DOM; the 658 KB SQLite engine it needs
+      // (js/vendor/sql-wasm.*) is fetched only when File > Export > .wtg.sqlite file is used. BEFORE looped-network.js. ?>
+<script src="/engcalcs/js/lpn-wtg-export.js?v=<?=filemtime(__DIR__.'/js/lpn-wtg-export.js')?>"></script>
 <?php // Reading a DXF file this page wrote, as a network (ROADMAP Task 772, slice 1). Pure text, no DOM, no request;
       // uses EngCalcs.lpnDxfRead (lpn-gisread.js) and lpn-dxf.js's constants. BEFORE looped-network.js, which
       // calls EngCalcs.lpnDxfNetRead() when File > Import > Network > DXF file is chosen. ?>

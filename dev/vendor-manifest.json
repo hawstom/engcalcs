@@ -111,6 +111,22 @@
         "unknown code is shown exactly as it stands. The harmful direction is a code DEPRECATED",
         "since v12.029 that we still offer. Re-run the generator on a newer wheel to refresh."
       ]
+    },
+    {
+      "name": "A WaterGEMS project the owner saved in his own WaterGEMS, emptied, as the .wtg export template",
+      "path": "js/data/wtg-template/wtg-template.wtg.sqlite.gz",
+      "digest": "Oia12pkMtHluc4dKHHXH4zH2b8D5/AAjEa2/zafD/YYEEVhKihKpoaEsbibm7yIt",
+      "also": "js/data/wtg-template/wtg-template.wtg.gz, sha384 LgcQjrgfhDp5ChKWPmJysHltLIrGOV8pDorOgifuNJjnL6IQHpoMCM9lvL9gYaLA",
+      "licence": "own work",
+      "generated_by": "dev/scripts/build_wtg_template.js",
+      "checked_by": "dev/lpn-spike/wtg-page-export-harness.js (golden digests) and wtg-export-harness.js",
+      "input": {
+        "file": "WTG-tgh-1.wtg and WTG-tgh-1.wtg.sqlite (WaterGEMS 26.0.0.532, schema 1.0.54.0), kept at ~/webdev/fixtures/wtg-tgh-1/",
+        "committed": false
+      },
+      "_comment": [
+        "A project the owner saved in his own WaterGEMS, emptied to one element of each kind. What was changed is in js/data/wtg-template/README.md. vendor_integrity_check.php does not read this list; the digest is for a person checking the bytes at rest."
+      ]
     }
   ],
   "packages": [
@@ -179,6 +195,33 @@
           "modifications": [
             "Renamed .mjs -> .js, as above."
           ]
+        }
+      ]
+    },
+    {
+      "name": "sql.js",
+      "version": "1.14.2",
+      "licence": "MIT",
+      "upstream": "https://www.npmjs.com/package/sql.js",
+      "notes": "SQLite compiled to WebAssembly. Copied from the npm tarball package-lock.json pins by sha512 (3ZGPovOb...). Vendored 2026-10-17 for Task 749: the read-only reader js/lpn-sqlite.js, the foundation for opening a Bentley .wtg.sqlite. Fetched from this site only when a database is opened; never precached (lib/ServiceWorker.lib.php). Record: dev/sqlite-reader.md.",
+      "files": [
+        {
+          "path": "js/vendor/sql-wasm.js",
+          "from": "dist/sql-wasm.js",
+          "digest": "7Zym2PlgXfg8ap8cqJUwlZrLl+VEwt0NVbzYfhH28IWLnSpAgQOnSCY2+EXo5MtM",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/sql-wasm.wasm",
+          "from": "dist/sql-wasm.wasm",
+          "digest": "x0YkuPkDHnKTZcB1JO4eb6j5+eU36aka+jBA6tOKTFaTz98b9V7fPT0QgZ9qyQW2",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/sql.js.LICENSE",
+          "from": "LICENSE",
+          "digest": "fAqxaCuuvOMGw+5ppM3KD5J96nhrYILOvzBIyvktepGPn5EAo3qy4zRqw6nfbgtj",
+          "modifications": []
         }
       ]
     }

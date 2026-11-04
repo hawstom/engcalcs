@@ -45042,6 +45042,154 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		backdropExportPicture(finish);
 	}
 	/**
+	 * **EXPORT .wtg.sqlite (ROADMAP Task 749; Tom, 2026-10-23: the menu names no program, *"We don't
+	 * have to name WaterGEMS. We mostly mean WaterCAD anyway, and they are ambiguous. So .wtg
+	 * works."*).** The writer is js/lpn-wtg-export.js and the record is dev/wtg-export.md. It writes a
+	 * `.wtg` and a `.wtg.sqlite` FROM A BUILT-IN TEMPLATE (js/data/wtg-template/, made from a project
+	 * saved in the owner's own WaterGEMS, by dev/scripts/build_wtg_template.js; Tom, 2026-11-01: *"Why are we asking user
+	 * to choose an existing file? That's bad UX."*). The visitor chooses no file. A
+	 * format that holds one scenario (level 1 of dev/import-export-scenarios.md): the open scenario's
+	 * resolved values, read through the .inp writer's own flattening, and the box says which.
+	 *
+	 * **THE BOX IS ASKED BEFORE ANYTHING IS WRITTEN** and names, by asset ID, everything the files
+	 * cannot carry; a network the files cannot hold at all is refused by name in place of the box.
+	 * Two files travel in ONE .zip, because Chrome lets a
+	 * click download one file (exportInpFile()). Exporting is not saving: no stampProjectSaved().
+	 */
+	function wtgExportPlan() {
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		return withLightMap(function () { return EngCalcs.lpnWtgExportPlan(inpExportDocument(), inpExportOptions()); });
+	}
+	function wtgIdList(ids) {
+		var shown = (ids || []).slice(0, 12).join(', ');
+		return (ids || []).length > 12 ? shown + ', …' : shown;
+	}
+	// A line's text from its language key; {ids} and {unit} filled once, by split and join, so an ID
+	// that spells another placeholder is never filled a second time.
+	function wtgFill(key, fallback, values) {
+		var pcX = EngCalcs.pageConfig || {}, s = String(pcX[key] || fallback), ks = Object.keys(values);
+		ks.forEach(function (k, i) { s = s.split('{' + k + '}').join('\u0001' + i + '\u0002'); });
+		ks.forEach(function (k, i) { s = s.split('\u0001' + i + '\u0002').join(values[k]); });
+		return s;
+	}
+	function wtgNotCarriedLines(items) {
+		var texts = {
+			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
+			energy_price: 'Energy price, price pattern, and demand charge.',
+			rules: 'Rule-based controls.',
+			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',
+			tank_mixing: 'Tank mixing model (tanks {ids}). Tanks are written fully mixed.',
+			demand_multiplier: 'Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.',
+			demand_model: 'Demand model {value} (pressure-driven analysis). It is not written, so a run uses the demands as stated.',
+			texts: 'Text on the map.',
+			backdrop: 'The background picture.',
+			positions: 'True map positions. Assets are placed in feet at one scale, so the drawing keeps its shape but not its location.'
+		};
+		return (items || []).map(function (it) {
+			return wtgFill('lpn_wtg_export_lost_' + it.code, texts[it.code] || it.code, { ids: wtgIdList(it.ids), value: it.value === undefined ? '' : it.value });
+		});
+	}
+	function wtgRefusalText(r) {
+		var fb = {
+			empty: 'This project has no nodes, so there is nothing to export.',
+			units: 'This network cannot be written: its flow unit is {unit}, and only gpm is written.',
+			headloss: 'This network cannot be written: only the Hazen-Williams head loss formula is written, and this project uses {method}.',
+			pump_curve: 'This network cannot be written: pumps {ids} have no three-point or one-point head curve. A power pump or another multiple-point curve is not written.'
+		};
+		return wtgFill('lpn_wtg_export_no_' + r.code, fb[r.code] || r.code, { unit: r.detail || '', method: r.detail || '', ids: wtgIdList(r.ids) });
+	}
+	// A thrown reason (js/lpn-wtg-export.js `reason` and `vals`) as a sentence: no program and no column named.
+	function wtgErrorText(e) {
+		var fb = {
+			layout: 'The export template does not match the layout this export writes.',
+			gpv_curve: 'Valve {id} has no headloss curve in this project.',
+			vol_range: 'The volume curve of tank {id} does not cover the tank\'s range of water depth.',
+			head_pattern: 'Reservoir {id} names a head pattern that this project does not define.',
+			vol_missing: 'Tank {id} names a volume curve that this project does not define.',
+			asset_kind: 'Asset {id} is of a kind this export does not write.',
+			offline: 'The export needs a connection to this site the first time, to load its template and the database and EPANET engines. Check the connection and try again.',
+			integrity: 'The files written failed their own check, so they were not offered.'
+		}, r = e && e.reason, v = (e && e.vals) || {};
+		if (r === 'units' || r === 'headloss' || r === 'pump_curve') { return wtgRefusalText({ code: r, detail: v.unit || v.method, ids: e.ids }); }
+		if (r && fb[r]) {
+			// Each token spelled out, once and globally (the placeholder check reads these spellings).
+			return String((EngCalcs.pageConfig || {})['lpn_wtg_export_t_' + r] || fb[r]).split('{id}').join(v.id || '');
+		}
+		return (e && e.message) ? e.message : String(e);
+	}
+	function exportWtgFile() {
+		var pcX = EngCalcs.pageConfig || {}, planned = wtgExportPlan(), fmt, scnSentence;
+		fmt = String(pcX.lpn_file_export_item_wtg || '.wtg.sqlite file…').replace(/…$/, '');
+		if (!planned.ok) {
+			askDialog({ kind: 'alert', title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+				text: wtgFill('lpn_wtg_export_refused', 'This project cannot be written as a .wtg project: {detail}', { detail: planned.detail || planned.error || '?' }) });
+			return;
+		}
+		if (planned.refused.length) {
+			askDialog({ kind: 'alert', title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+				text: planned.refused.map(wtgRefusalText).join('\n') });
+			return;
+		}
+		scnSentence = exportScenarioSentence().replace(/^\s+/, '');
+		openDialog(function (body) {
+			function p(text) {
+				var e = document.createElement('p');
+				e.className = 'lpn-wtg-box-p';
+				e.textContent = text;
+				body.appendChild(e);
+			}
+			var ul = document.createElement('ul');
+			if (scnSentence) { p(scnSentence); }
+			p(pcX.lpn_wtg_export_lost_lead || 'This export does not yet write the following:');
+			ul.id = 'lpn_wtg_export_lost';
+			ul.className = 'lpn-wtg-box-list';
+			wtgNotCarriedLines(planned.notCarried).forEach(function (text) {
+				var li = document.createElement('li');
+				li.textContent = text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [
+			{ label: pcX.lpn_export_table_go || 'Export', isDefault: true, fn: runWtgExport },
+			{ label: pcX.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt) });
+	}
+	function runWtgExport() {
+		setNotice(wtgFill('lpn_wtg_export_working', 'Writing the .wtg project…', {}));
+		wtgExportWrite(wtgExportFinish);
+	}
+	/**
+	 * Writes the pair from the built-in template (js/data/wtg-template/, fetched here for the first time). `done`
+	 * is called with the Blob of the .zip and its name, or with an error message; a harness drives this.
+	 */
+	function wtgExportWrite(done) {
+		var base = inpExportBaseName(), planned = wtgExportPlan();
+		if (!planned.ok || planned.refused.length) {
+			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}', { detail: planned.ok ? planned.refused.map(wtgRefusalText).join(' ') : (planned.detail || planned.error || '?') }));
+			return;
+		}
+		function fail(e) {
+			done(null, wtgFill('lpn_wtg_export_failed', 'The .wtg project was not written: {detail}',
+				{ detail: wtgErrorText(e) }));
+		}
+		Promise.resolve(EngCalcs.lpnEpanetLoad()).catch(function () { var x = new Error('EPANET engine'); x.reason = 'offline'; throw x; }).then(function (epanet) {
+			return EngCalcs.lpnWtgExportBuild(planned, { epanet: epanet, name: projectDisplayName(project) }).then(function (built) {
+				return buildZip([{ name: base + '.wtg', data: built.wtg }, { name: base + '.wtg.sqlite', data: built.sqlite }]).then(function (zip) {
+					done({ zip: zip, zipName: base + '.wtg.zip', wtgName: base + '.wtg', sqliteName: base + '.wtg.sqlite', planned: planned, report: built.report });
+				});
+			});
+		}).catch(fail);
+	}
+	function wtgExportFinish(out, err) {
+		var left, extract = wtgFill('lpn_wtg_export_extract', 'Extract both files into one folder, then open the .wtg.', {});
+		if (!out) { setWarning(err); return; }
+		downloadBlob(out.zip, out.zipName);
+		setNotice(wtgFill('lpn_wtg_export_exported', 'Exported {zip}, holding {wtg} and {sqlite}.',
+			{ zip: out.zipName, wtg: out.wtgName, sqlite: out.sqliteName }) + ' ' + extract + exportScenarioSentence());
+		left = wtgNotCarriedLines(out.planned.notCarried).join(' ');
+		showExportReceipt(out.zipName, [], [extract, wtgFill('lpn_wtg_export_left_out', 'Not written: {items}', { items: left })]);
+	}
+	/**
 	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
 	 * first).** The writer is js/lpn-geojson.js and its rules are dev/geojson.md; this is the way in
 	 * (the document, the scenario on screen, the results on screen) and the way out (a download).
@@ -54634,7 +54782,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
-			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } }
+			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } },
+			// .wtg project (Task 749): a .wtg and its .wtg.sqlite, built from the template the page holds; the visitor chooses no file.
+			// Asks its own box (scenario, what is left out), so no confirmExportLeaves().
+			{ icon: 'save', label: pc.lpn_file_export_item_wtg || '.wtg.sqlite file…', key: 'lpn_file_export_item_wtg',
+			  tip: pc.lpn_file_export_wtg_tip, fn: exportWtgFile }
 		];
 	}
 	function exportTableRows() {

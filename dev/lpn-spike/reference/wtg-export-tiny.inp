@@ -1,0 +1,67 @@
+[TITLE]
+Smallest network that uses every kind the WaterGEMS export spike writes: a reservoir, a pump, a junction on a pattern, a tank.
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ J0              	40          	0           	                	;
+ J1              	50          	100         	P1              	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ R               	20          	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ T1              	80          	10          	2           	20          	30          	0           	                	;
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 2               	J0              	J1              	1000        	8           	120         	0           	Open  	;
+ 3               	J1              	T1              	500         	8           	120         	0           	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ PU1             	R               	J0              	HEAD 1	;
+
+[PATTERNS]
+;ID              	Multipliers
+ P1              	0.6         	0.5         	0.5         	0.5         	0.6         	0.8         
+ P1              	1.2         	1.6         	1.4         	1.2         	1.1         	1.0         
+ P1              	1.0         	1.0         	1.0         	1.1         	1.2         	1.5         
+ P1              	1.6         	1.4         	1.2         	1.0         	0.8         	0.7         
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP: Pump curve
+ 1               	0           	150         
+ 1               	300         	120         
+ 1               	600         	60          
+
+[ENERGY]
+ Global Efficiency  	75
+ Global Price       	0.0
+
+[TIMES]
+ Duration           	24:00 
+ Hydraulic Timestep 	1:00 
+ Pattern Timestep   	1:00 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
+ Start ClockTime    	12 am
+ Statistic          	None
+
+[OPTIONS]
+ Units              	GPM
+ Headloss           	H-W
+ Pattern            	P1
+ Accuracy           	0.001
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ J0              	2.00            	1.00            
+ J1              	3.00            	1.00            
+ R               	0.00            	1.00            
+ T1              	4.00            	1.00            
+
+[END]

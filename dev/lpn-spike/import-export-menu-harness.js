@@ -123,7 +123,7 @@ async function main() {
 		await a._clickRow('#lpn_menu_list2', 'Network');
 		await page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
 		const enet = await rowsOf(page, 3);
-		ok('Network holds EPANET file, GeoJSON file, DXF file (no MSX file attached)', same(labels(enet), ['EPANET file…', 'GeoJSON file…', 'DXF file…']), JSON.stringify(labels(enet)));
+		ok('Network holds EPANET file, GeoJSON file, DXF file, .wtg.sqlite file (no MSX file attached)', same(labels(enet), ['EPANET file…', 'GeoJSON file…', 'DXF file…', '.wtg.sqlite file…']), JSON.stringify(labels(enet)));
 		await a._clickRow('#lpn_menu_list2', 'Tables');
 		await page.waitForFunction(() => document.getElementById('lpn_menu_list3').textContent.indexOf('ODS') >= 0);
 		const etab = await rowsOf(page, 3);

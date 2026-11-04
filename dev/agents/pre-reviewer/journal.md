@@ -4876,6 +4876,14 @@ OBSERVED: HEAD harnesses fail on base code (library 3+ FAIL and crash, scenario 
 SPECULATION: the ? is 14x20 px, a small finger target on a phone (tap landed in my probe).
 Method: scratchpad perry12c q.js scan2.js scan3.js tip.js; shots _panel/www/img/box12c-*.png.
 
+## 2026-11-01 -- feat/wtg-page-export (Task 749), one-click export (275d49f99)
+OBSERVED (re-verify before citing): wtg-export-harness all passed; wtg-page-export-harness 54/54; wtg-page-export-browser-harness all passed (Net3: box opens first, no file chooser, one Net3.wtg.zip holding .wtg + .wtg.sqlite, integrity ok, 220 live elements, template fetched only at Export, same-origin only, no new device storage).
+OBSERVED: template decompressed (6 MB sqlite, 65 KB .wtg): no author names, paths, machine names, project notes in text or table cells; HMISelectionSet and logical-control tables empty; ProjectOptions Title/Company/Engineer/Notes blank.
+OBSERVED: valve rows are inserted by build_wtg_template.js defaultRow() from column DEFAULT clauses; one row per table, no WaterGEMS has ever opened them (doc says so itself).
+OBSERVED: fact-check URLs on communities.bentley.com now 301 to bentleysystems.service-now.com; two of three titles resolve (water quality, pressure-dependent demand), the energy-cost URL redirects to the community root (dead).
+OBSERVED: the export zip holds only the two project files; the CC BY credit is on screen in the receipt, not inside the zip.
+Method: scratchpad t/ (decompressed template), br.txt.
+
 ## 2026-11-01 -- feat/native-wire, Task 733 slice 7 (bb5c8ab02)
 OBSERVED (re-verify before citing; Chromium, Net1/Net3/n600 fixture): built-in solver ticked, Calculate runs the loop (engine native, 25 frames, no EPANET banner) on Net1 and Net3; unticked EPANET runs. native-wire-harness 50/50.
 OBSERVED: Net3 native vs EPANET, 25 frames: junction heads within 2.4e-4 m, flows 3e-5, tank levels 1.2e-4 m, trace quality 0.10; status words identical. BUT in the frames: reservoir pressure 67.06 / 50.90 native vs 0 EPANET; a running pump's velocity 1.82 native vs 0 EPANET; a closed pump or closed pipe headloss -60.96 / -31.70 native vs 0 EPANET (steady native solver, same as before the branch; the Tables pane can show them).
@@ -4903,3 +4911,10 @@ OBSERVED MISSED: the gap Tom named is not gone. EPANET chosen (the default) and 
 OBSERVED: a control that cuts J2 off at 2:00: EPANET gives head -3,395,437 m; built-in stops with "These nodes have no path... The built-in solver stopped at 2:00..." (good). Tip says "runs every network the page builds" -- overstated by that case.
 SPECULATION: report line "Input Data File ... temp.inp" is not the project's name (not checked against EPANET's).
 Method: scratchpad p2 (a..h.js).
+
+## 2026-11-03 feat/wtg-page-export (59538e531), Task 749, checked 2026-11-03
+OBSERVED: browser export in Chromium: Net2, Net3 and wtg-export-parts.inp each download one .zip and the receipt lists what was left out; Net1 is refused by name (pump 9 has no three-point curve), no file. Browser harness and the three wtg Node harnesses pass.
+OBSERVED: a project stating Quality Age plus a 0:30 quality time step exports with no mention of the step (box and receipt list only positions); js/lpn-wtg-export.js plan() has no check for it, dev/wtg-export.md lists it as not written.
+OBSERVED: keys lpn_wtg_export_lost_emitters and ..._lost_pump_speed_pattern are never emitted by plan() now; stale comments looped-network.js:54788-54789 (still say "saved project").
+OBSERVED: no Bentley letter/decompile text in shipped code; only licence-line comments and the harness guard. Candidate writers run only under opts.candidate, which the page never passes.
+SPECULATION: the Net1 refusal may surprise Tom, who named Net1 to test; wording is honest.
