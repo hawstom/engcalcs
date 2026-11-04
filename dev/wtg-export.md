@@ -238,7 +238,7 @@ right under code 3 is unchecked. Tom saw "Setpoint Booster 1.0" at J0.
 | Feature | Known | Open |
 |---|---|---|
 | Per-pipe and per-tank reaction rates, source patterns | Column names only (`IdahoPipe_Constituent_Data`, `ConventionalTank_Constituent_Data`, `BaseIdahoNode_Constituent_Data`) | No saved file shows one |
-| Water quality time step | `EpaNetEngine.EpaSetWaterQualityTimeStep` 1 and `EpaWaterQualityTimeStep` in seconds: 300 showed as True 0.083 hr in the dialog (round 3) | The answers did not move; round 4 asks Tom to type a step himself and save |
+| Water quality time step | `EpaNetEngine.EpaSetWaterQualityTimeStep` 1 and `EpaWaterQualityTimeStep` in seconds: 300 showed as True 0.083 hr in the dialog (round 3) | Answers do not depend on it (round 4); Tom's own typed step did not persist in his save. Not needed |
 
 Written by the page since round 3 (2026-11-03): two-compartment tanks (a fraction strictly between 0 and 1 only), age (type 2)
 and trace (type 4, `Trace_SystemData`) runs when the file states no sources or reactions.
@@ -302,9 +302,14 @@ Settled:
   80 percent one, as in EPANET). The calculation options show the quality step as False, "uses Hydraulic Time Step of 1.000".
   EPANET's answer at this tank swings from 0.13 to 0.71 as its quality step goes 5 to 30 minutes, so the 1 hour step puts
   EPANET within 0.05 of WaterGEMS (readings 0.49/0.65 and 0.45/0.58) and the gap is the engines', not the codes'.
-- **The quality-step field is written and read** (300 s shows as True 0.083 hr) **but did not move the answers.** Either
-  WaterGEMS runs its own step whatever the dialog states, or our stored step lacks a second field. Round 4 asks Tom to type
-  30 minutes himself and save, so a diff separates the two. Until then the page does not write the step.
+- **The quality step does not change WaterGEMS's answers, and we stop working on it.** Our 300 s file showed True 0.083 hr, so
+  the field is read. Then Tom typed 30 minutes himself (round 4): `T1` 0.50/0.65, the same as 1 hour and 5 minutes. (His
+  note: the help says a step left False is one tenth of the hydraulic step, 6 minutes; EPANET's own answer swings from
+  0.13 to 0.71 across these steps.) WaterGEMS's tank arithmetic is not sensitive to the step. His saved copy carries
+  **no** typed step (`EpaSetWaterQualityTimeStep` 0, `EpaWaterQualityTimeStep` 0.0; no 1800 or 0.5 in any table), and
+  differs from our file only in open counters, a Notes empty string, and an empty `QBATDefinition`/support element 43. So how
+  WaterGEMS persists a typed step is unobserved; the page does not write the step, and nothing needs it.
+
 - **Chlorine passes.** `J1` 1.0 was one decimal rounding 0.96. `T1` 0.2 and 0.2 matches EPANET's 0.17 and 0.22 and rules out
   "reactions not applied" (none would give 0.40 and 0.53). Whether the wall rate is read apart from the bulk rate is
   open (round 4 asks for `J1` to three decimals: both 0.958, bulk only 0.988). No per-element override or "apply" flag is
@@ -314,9 +319,17 @@ Settled:
   things: the quality step, and **the pump**. A pump is a node between two 1 ft pipes 99 in across (as WaterGEMS's own
   `.inp` import makes it), and 53 ft3 of water in each takes 77 s to cross at 310 gpm. Adding them to the EPANET network
   puts `J1` at 0.173 h, WaterGEMS's number to the third decimal. Every EPANET figure quoted to Tom since round 4 includes them.
-- **Still open, small:** `T1` age 17.96 against 18.51 h, trace 57.5 against 52.2 percent, two-compartment 0.45 against 0.40.
-  Round 4 asks for the tank's hydraulic grade and the pump flow, which separates "the tank fills differently" (our
-  pump curve, levels or pattern) from "WaterGEMS stirs a tank differently" (its engine; nothing to change).
+- **The remaining tank differences are the engine's, closed (round 4).** Tom read `T1` hydraulic grade 135.81 and 133.68 ft
+  and `PU1` flow 311 and 321 gpm at hours 12 and 24; EPANET with the pump as two pipes gets 135.8, 133.7, 310.9 and 321.3.
+  Hydraulics match to the digit shown, so our pump curve, levels, pattern and units are right. WaterGEMS's chlorine `T1`
+  0.189/0.244 (EPANET 1 h: 0.174/0.219), age 17.96 h (18.51) and trace 57.5 % (52.2) are its tank-mixing arithmetic, which
+  neither the file nor the step changes. No round 5.
+
+**Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
+pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
+without a pattern, initial quality), age and trace runs. Still not written: per-pipe and per-tank rates, source patterns,
+the quality time step, tank-level and clock controls beyond those seen, rule-based controls, energy price, pressure-driven
+demand, map text, backdrop, true positions.
 
 ## What the tests show
 
