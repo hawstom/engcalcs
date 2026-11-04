@@ -339,6 +339,24 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 				&& rows(dbm, 'SELECT EpaNetEngine_UsePressureDependentDemand AS u FROM EpaNetEngine')[0].u === 0);
 			dbm.close();
 		}
+		// 9. a coordinate system: EPSG:2223, as Tom's spatial-ref save. Only the data set's definition column changes; the drawn feet stay
+		{
+			const crsJson = require('zlib').gunzipSync(fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'data', 'wtg-template', 'crs-epsg-2223.json.gz'))).toString('utf8');
+			const inp = base.replace(/(\[COORDINATES\][\s\S]*?)(\n\[)/, (m, a, b) => a.replace(/(\n \S+\s+)([\d.]+)(\s+)([\d.]+)/g, (mm, id, x, sp, y) => id + (x * 1000) + sp + (y * 1000)) + b);
+			const w = plainWrite(inp, { crsJson: crsJson });
+			const db = wrap(w.bytes);
+			const col = rows(db, 'SELECT HmiModelCoordinateReference AS c FROM IdahoDataSet')[0].c;
+			const j = JSON.parse(col);
+			ok('spatial reference: the data set holds the EPSG:2223 definition as saved (NAD83 Arizona Central, international foot)', col === crsJson && j.horizontalCRS.epsg === 2223 && j.horizontalCRS.unit === 'InternationalFoot' && j.verticalCRS.id === 'NAVD88');
+			const g = rows(db, "SELECT HMIGeometry AS g FROM BaseIdahoNode_HmiDataSetGeometry_Data WHERE DomainElementID = ?", [elOf(db, 'J0')])[0].g;
+			const dv = new DataView(g.buffer, g.byteOffset, g.byteLength);
+			ok('spatial reference: J0 sits at 2000, 1000 as Tom\'s save shows, with no scale applied', near(dv.getFloat64(g.byteLength - 16, true), 2000, 1e-9) && near(dv.getFloat64(g.byteLength - 8, true), 1000, 1e-9), String(g.byteLength));
+			db.close();
+			const w0 = plainWrite(base);
+			const db0 = wrap(w0.bytes);
+			ok('without a coordinate system the template\'s empty definition stays', rows(db0, 'SELECT HmiModelCoordinateReference AS c FROM IdahoDataSet')[0].c === '');
+			db0.close();
+		}
 		// The EPANET side, converged (6 minute quality step), against what Tom read
 		const f = await sv.figures();
 		const q = (k, h, n) => f[k].step6min[h].node[n].quality;

@@ -359,8 +359,12 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		if (d > 0) { ratios.push(l.length / d); }
 	});
 	ratios.sort((p, q) => p - q);
-	const coordScale = ratios.length ? Math.round(ratios[Math.floor(ratios.length / 2)] / 10) * 10 || 1000 : 1000;
+	const coordScale = opts.crsJson ? 1 : ratios.length ? Math.round(ratios[Math.floor(ratios.length / 2)] / 10) * 10 || 1000 : 1000;
 	report.coordScaleFtPerMapUnit = coordScale;
+	// TRUE POSITIONS (Tom's save spatial-ref, 2026-11-03): choosing NAD83 / Arizona Central (ft), EPSG:2223, changed one
+	// column of the project and no geometry: IdahoDataSet.HmiModelCoordinateReference holds the system's definition (JSON,
+	// kept byte for byte in js/data/wtg-template/crs-epsg-2223.json.gz) and the drawn feet are read as that system's feet.
+	if (opts.crsJson) { db.run('UPDATE IdahoDataSet SET HmiModelCoordinateReference = ?', [opts.crsJson]); carried('coordinate system EPSG:2223, positions in international feet as the project states them'); report.crs = 'EPSG:2223'; }
 	// Extent of the drawn map in feet: sizes the symbols (see symbolMultiplier()).
 	{
 		const xs = nodes.map((n) => n.x * coordScale), ys = nodes.map((n) => n.y * coordScale);
@@ -1172,6 +1176,9 @@ function ageTraceCarriable(parsed) {
 	return m.mode === 'age' || (parsed.nodes || []).some((n) => n.id === m.traceNode);
 }
 
+// The one coordinate system whose WaterGEMS definition a saved project has shown us.
+var CRS_WRITTEN = 'EPSG:2223';
+
 function plan(doc, opts) {
 	const out = EngCalcs.lpnExportInp(doc, opts || {});
 	if (!out || !out.ok) { return { ok: false, error: out && out.error, detail: out && out.detail }; }
@@ -1235,8 +1242,9 @@ function plan(doc, opts) {
 	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
 	// Always: this has no place in the file, whatever the network. (A pipe's material is not named: an EPANET project
 	// states none, so there is nothing to leave out; every pipe keeps the template's default.)
-	notCarried.push({ code: 'positions', ids: [] });
-	return { ok: true, refused: refused, notCarried: notCarried, qualityStepSeconds: qualityStepSeconds, inp: out.inp, parsed: parsed, differences: out.differences || [] };
+	const crs = (doc && doc.project && doc.project.crs) === CRS_WRITTEN ? CRS_WRITTEN : '';
+	if (!crs) { notCarried.push({ code: 'positions', ids: [] }); }
+	return { ok: true, crs: crs, refused: refused, notCarried: notCarried, qualityStepSeconds: qualityStepSeconds, inp: out.inp, parsed: parsed, differences: out.differences || [] };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1315,6 +1323,19 @@ function loadTemplate() {
 	return templatePromise;
 }
 
+var crsPromise = null;
+function loadCrs() {
+	if (crsPromise) { return crsPromise; }
+	crsPromise = fetch(base() + 'js/data/wtg-template/crs-epsg-2223.json.gz?v=' + TEMPLATE_VERSION, { credentials: 'same-origin' }).then((r) => {
+		if (!r.ok) { throw new Error('HTTP ' + r.status); }
+		return r.arrayBuffer();
+	}).then(gunzip).then((b) => new TextDecoder('utf-8').decode(b)).catch((e) => {
+		crsPromise = null;
+		throw fail('template-load', 'The export template could not be loaded (' + (e && e.message) + ').', null, 'offline');
+	});
+	return crsPromise;
+}
+
 // ---------------------------------------------------------------------------------------------
 // Build: the plan, a template, the engines -> the two files.
 // ---------------------------------------------------------------------------------------------
@@ -1340,7 +1361,9 @@ async function build(planned, o) {
 	let sched = { initial: {}, changes: [] };
 	if (watch.length) { sched = await referenceSchedule(o.epanet, planned.inp, watch); }
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;
-	const out = writeWtg(SQL, o.sqlite, parsed, sched, { name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
+	let crsJson = o.crsJson || '';
+	if (planned.crs === CRS_WRITTEN && !crsJson) { crsJson = await loadCrs(); }
+	const out = writeWtg(SQL, o.sqlite, parsed, sched, { crsJson: crsJson, name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
 	const R = out.report;
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
