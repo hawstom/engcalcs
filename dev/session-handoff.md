@@ -95,6 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-11-05 evening (sixty-sixth session, Opus main, Sonnet agent)
+
+- **Master is three merges ahead of GitHub, unchecked**: the ".wtg file…" menu label (d195bf6af), the 11-05 handoff and this one. Fold them into the next batch's `check_all` and push then; do not run the suite for these alone.
+- **`feat/wtg-saves` (Task 749, pushed 355704ca3) now writes one-condition `[RULES]`** (tank level, one THEN, optional ELSE and PRIORITY) as WaterGEMS logical controls. Tom's 11-05 readings all match EPANET: logical control T1 10.90/11.38; energy 222.1 kWh, $22.21; Net3 hour 24, tank 1 147.73 against 147.69, pump 335 13,080 gpm and 94.13 ft against 13,087 and 94.07 (he wrote "pump 1"; pump 10 is off at hour 24). His 60 psi test never fired. **Waiting on him:** the test folders `~/tom-files/2026-11-05/wtg-tests/` (1-rule, 2-pressure, README), his three 11-05 save files copied to `~/tom-files/2026-11-04/wtg-saves-redo/` (energy-price shows where the price is stored), then his word to merge. `lpn_wtg_export_lost_rules` English changed (now lists rule ids); payloads regenerate on the merge.
+- **`.wtg.dwh` is not written, by reasoning given to Tom 11-05**: an undocumented binary "Standalone Drawing" store, not self-describing like the `.sqlite`; WaterGEMS rebuilds it when absent; it holds only map text and a backdrop's file path.
+- **not-epanet.org: delete it** (Tom: *"should be deleted since it is a redirect"*). Still to ask: retire the repo and the cPanel domain, or point it straight at epp; then drop it from the sibling-sites rule in CLAUDE.md.
+- **Priority 100 holds only Task 749.** Tom asked for label research candidates: advised in `~/tom-files/messenger.md` 11-05; promote nothing without his word.
+
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 
 - **`feat/wtg-page-export` merged on his word** (*"Sure. Merge."*); Task 749 stays open for the ten saves in `~/tom-files/2026-11-03/wtg-saves-needed/README.md`, one small branch per item, cut from master. **The round 2-4 "EPANET gets" figures at 5 min were wrong**: our test script (`dev/lpn-spike/wtg-feature-tests.js`) stepped quality once an hour; fixed (751f22db6). Converged EPANET and WaterGEMS agree within ~10 % on the small network, and closely on his Net3 72 h chlorine runs. The product solver was never affected. EPANET's and WaterGEMS's default quality step are both the hydraulic step / 10; the export writes any other stated step. One-point pump: `PumpDefinitionType` 1 (his `tompump1pt` save), so Net1 exports. Dead keys deleted: `lpn_wtg_export_lost_emitters`, `lpn_wtg_export_lost_pump_speed_pattern`.
