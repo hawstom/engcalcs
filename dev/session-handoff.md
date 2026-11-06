@@ -95,21 +95,19 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-05 night (sixty-seventh session, Opus main, Sonnet agents)
+## STATE — 2026-11-06 (sixty-eighth session, Opus main)
 
-- **GitHub master is 6fc817702 (suite green, pushed 11-06).** Master holds one more merge, this handoff, unchecked: fold it into the next batch with `research/label-prepass`.
-- **`feat/wtg-saves` merged on his word** (*"Yes. Merge once they pass."*) after both control tests passed: 1-rule exactly (On 338 gpm, 10.90, 11.38); 2-pressure statuses exact (Off at 5, On at 8), levels 8.71/10.34 against EPANET 8.75/10.36, J1 37.58/34.08 against 37.42/34.09. Pressure controls are no longer a trial. His three redo saves are in `~/tom-files/2026-11-04/wtg-saves-redo/`; the energy price is built from `energy-price.wtg.sqlite` on its own branch (see below), Task 749 stays open for it.
-- **not-epanet.org: his call** (*"Retire the repository and point the domain straight at epanet-plus-plus.org"*). The cPanel domain stays; its `.htaccess` 301s to epp (not-epanet.org ea0fd2b, needs his pull there); archiving the GitHub repository is his click (no `gh` or token on jasmine). Dropped from the sibling-sites rule.
-- **Task 813 promoted to 100 on his word** (experiment E2, static candidate pruning per notch).
-- **`.wtg.dwh` stays unwritten**: his *"OK until requested."*
-- **`fix/wtg-energy-price` (df99ca2ec, pushed) waits his WaterGEMS test** `~/tom-files/2026-11-06/wtg-energy/` (expect PU1 222.1 kWh, 22.21), then his word. Writes a constant global and pump price as Bentley's `EnergyPricing` support element (type 61) linked from the pump's `BasePump_EnergyCost_Data`; price pattern and demand charge stay "not written". English `lpn_wtg_export_lost_energy_price` now "Energy price pattern and demand charge." (his look owed); payloads regenerate on the merge.
-- **E2 ran and failed** (`research/label-prepass`, 4171f3b55, pushed, inquiry §6a): exact on all 13 views, but no faster on a first visit (n600 +5%/+1%/+3% at 1x/1.5x/2x) and the build costs 133-473 ms. Verdict: do not port. Docs and dev scripts only; merge it on green with the next batch. Task 813 stays at 100 only if Tom names the next experiment; the inquiry now points at §4.3 (conflict graph) and §4.5.
+- **Merged on his word** (*"Merge it."*): `fix/wtg-energy-price` after his WaterGEMS test passed (*"All good."*: PU1 222.1 kWh, 22.21), with his look at "Energy price pattern and demand charge." Merged with it on green: `research/label-prepass` (E2 failed; his *"OK. Approved."*).
+- **Price pattern and demand charge are next on Task 749**, his wish to export fully what we provide. Waits his two saves, `~/tom-files/2026-11-06/wtg-energy-more/README.md`; cut a branch from master when they arrive.
+- **Labels: Task 812 ("look like your neighbours") at 100, 813 back to 75**, on his *"I agree."* Start from N163 on Novato.
+- **Roadmap on his word:** 822, 847, 848, 849, 853 to 100; 818 to 50.
+- **not-epanet.org archived on GitHub and pulled on the server by him** (*"Done."*).
+- **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
 
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 
 - **`feat/wtg-page-export` merged on his word** (*"Sure. Merge."*); Task 749 stays open for the ten saves in `~/tom-files/2026-11-03/wtg-saves-needed/README.md`, one small branch per item, cut from master. **The round 2-4 "EPANET gets" figures at 5 min were wrong**: our test script (`dev/lpn-spike/wtg-feature-tests.js`) stepped quality once an hour; fixed (751f22db6). Converged EPANET and WaterGEMS agree within ~10 % on the small network, and closely on his Net3 72 h chlorine runs. The product solver was never affected. EPANET's and WaterGEMS's default quality step are both the hydraulic step / 10; the export writes any other stated step. One-point pump: `PumpDefinitionType` 1 (his `tompump1pt` save), so Net1 exports. Dead keys deleted: `lpn_wtg_export_lost_emitters`, `lpn_wtg_export_lost_pump_speed_pattern`.
 - **`feat/wtg-saves` (Task 749, preview 8102), from his ten saves 11-04:** writes pump controls as pump actions (Net3 golden regenerated; ask him to re-export Net3), one-pipe and tank rates, source patterns, pressure-driven demand (minimum 0 only), EPSG:2223 positions. Candidate: pressure controls. Waits his three redos and a Net3 check, `~/tom-files/2026-11-04/wtg-saves-redo/README.md`, then his word to merge. Map text and backdrop live in the `.wtg.dwh`, which we do not write. Energy price: Bentley's public pages do not say a quality run blocks cost; his save will.
-- **Translation sprint: his word for Sunday 2026-11-08** (*"OK, Sunday then."*). Ask him only for the count then; 50 English strings unread, 59 untranslated on master after this merge. Wave 0 reads them first.
 - **`fix/graph-y-range` merged on green** (1ddbdaa31): the time-series y axis had a 1-unit minimum span, so 0 to 0.1 drew as -1 to 1 (his bug report). `series-axis-harness.js`.
 - **Landing sites:** tagline *"the EPANET legacy, extended"* (epp 380089a). librewaternet.org's landing pages 301 to epp (2920746, his "c"); its /app/ and /engcalcs/ stay, because saved projects are per origin; write landing copy only in epp. Disclosures reimagined with his own edits, merged and pushed (epp a421a22, not-epanet.org 5fd7f69). hawsedc.com techdocs.php link follows sewslope's title (653a9cf).
 
