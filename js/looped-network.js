@@ -45076,7 +45076,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var texts = {
 			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
 			energy_price: 'Energy price, price pattern, and demand charge.',
-			rules: 'Rule-based controls.',
+			rules: 'Rule-based controls that are not written (rules {ids}).',
 			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',
 			tank_mixing: 'Tank mixing model (tanks {ids}). Tanks are written fully mixed.',
 			demand_multiplier: 'Demand multiplier {value}, as a setting. Every demand is written already multiplied by it.',

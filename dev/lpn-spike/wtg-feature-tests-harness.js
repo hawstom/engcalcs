@@ -33,6 +33,8 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 	const supOf = (db, label) => rows(db, 'SELECT m.ElementID AS id FROM HMIModelingElement m JOIN HMISupportElement d ON d.SupportElementID = m.ElementID WHERE m.Label = ? AND d.IsDeleted = 0', [label])[0].id;
 	const plainWrite = (inp, extra) => lib.writeWtg(r.env.SQL, r.env.tplSqlite, EC.lpnInpParse(inp), { initial: {}, changes: [] }, Object.assign({ name: 'plain', efficiency: 75 }, extra || {}));
 
+	const addRule = (inp, rule) => /\n\[RULES\]\n/.test(inp) ? inp.replace('\n[RULES]\n', '\n[RULES]\n' + rule + '\n') : inp.replace('\n[END]', '\n[RULES]\n' + rule + '\n[END]');
+
 	console.log('\nRound 2: the set');
 	ok('8 files written', r.files.length === 8, String(r.files.length));
 	ok('every file: integrity ok and no foreign key violations', r.files.every((f) => f.report.integrity === 'ok' && f.report.foreignKeyViolations === 0));
@@ -356,6 +358,47 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			const db0 = wrap(w0.bytes);
 			ok('without a coordinate system the template\'s empty definition stays', rows(db0, 'SELECT HmiModelCoordinateReference AS c FROM IdahoDataSet')[0].c === '');
 			db0.close();
+		}
+		// 2. a logical control (Tom's ctl-logical save: HasElse 1, ElseAction the else action, priority 3), now in the control set
+		{
+			const w = plainWrite(sv.CASES['ctl-logical'](base));
+			const db = wrap(w.bytes);
+			const lt = rows(db, 'SELECT * FROM IdahoControl_ControlType_LogicalType');
+			const ctl = rows(db, 'SELECT * FROM IdahoControl');
+			const pu1 = elOf(db, 'PU1');
+			ok('rule: one control written with HasPriority 1, HasElse 1, priority 3, ControlType 0', lt.length === 1 && ctl.length === 1 && lt[0].LogicalType_HasPriority === 1 && lt[0].LogicalType_HasElse === 1 && lt[0].ControlPriority === 3 && ctl[0].ControlType === 0, JSON.stringify(lt));
+			const els = rows(db, 'SELECT a.SimpleActionType_Element AS el, a.ElementType AS ty, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID WHERE a.SupportElementID = ?', [lt[0].LogicalType_ElseAction]);
+			const thn = rows(db, 'SELECT a.SimpleActionType_Element AS el, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID WHERE a.SupportElementID = ?', [ctl[0].IdahoControl_ControlAction]);
+			ok('rule: THEN is PU1 On (0) and ELSE, a real action row, is PU1 Off (1), both on the pump (type 68)', els.length === 1 && els[0].el === pu1 && els[0].ty === 68 && els[0].st === 1 && thn.length === 1 && thn[0].el === pu1 && thn[0].st === 0, JSON.stringify([els, thn]));
+			const cond = rows(db, 'SELECT e.ElementType_Element AS el, e.ElementType_TankLevel AS v, e.ControlConditionElementType AS ty, o.CompareOperator AS op FROM IdahoControlCondition_SimpleConditionType_ElementType e JOIN IdahoControlCondition_ConditionType_SimpleConditionType o ON o.SupportElementID = e.SupportElementID');
+			ok('rule: condition is T1 level < 14 (operator 3, element type 52)', cond.length === 1 && cond[0].el === elOf(db, 'T1') && cond[0].v === 14 && cond[0].op === 3 && cond[0].ty === 52, JSON.stringify(cond));
+			ok('rule: a member of the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection WHERE LogicalControlCollection_IdahoLogicalControlID = ?', [ctl[0].SupportElementID])[0].c === 1 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
+			ok('rule: description reads like Tom\'s ("... THEN ... ELSE ... PRIORITY 3")', /^IF .*THEN .*ELSE .*PRIORITY 3$/.test(ctl[0].IdahoControl_Description), ctl[0].IdahoControl_Description);
+			ok('rule: no frozen clock-time control is left for PU1', rows(db, 'SELECT COUNT(*) AS c FROM IdahoControl').length === 1);
+			db.close();
+			const unw = (inp, flag) => lib.carriableRules(EC.lpnInpParse(inp), !!flag).unwritten;
+			ok('rule: none is left in the not-written list', unw(sv.CASES['ctl-logical'](base)).length === 0);
+			// no ELSE, no priority: 0, 0, NULL, 0
+			const w2 = plainWrite(addRule(base, 'RULE 2\nIF TANK T1 LEVEL ABOVE 20\nTHEN PUMP PU1 STATUS IS CLOSED'));
+			const db2 = wrap(w2.bytes);
+			const l2 = rows(db2, 'SELECT * FROM IdahoControl_ControlType_LogicalType');
+			ok('rule without ELSE or priority: 0, 0, NULL, 0', l2.length === 1 && l2[0].LogicalType_HasPriority === 0 && l2[0].LogicalType_HasElse === 0 && l2[0].LogicalType_ElseAction === null && l2[0].ControlPriority === 0, JSON.stringify(l2));
+			db2.close();
+			// two premises: not written, named
+			const two = addRule(base, 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const w3 = plainWrite(two);
+			const db3 = wrap(w3.bytes);
+			ok('a two-premise AND rule is not written', rows(db3, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 0);
+			db3.close();
+			ok('...and the not-written list names it (rule 7)', unw(two).join() === '7', unw(two).join());
+			// mixed: written rule 1, unwritten rule 7; only 7 is reported
+			const mix = addRule(addRule(base, 'RULE 1\nIF TANK T1 LEVEL BELOW 14\nTHEN PUMP PU1 STATUS IS OPEN\nELSE PUMP PU1 STATUS IS CLOSED\nPRIORITY 3'), 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const dbm = wrap(plainWrite(mix).bytes);
+			ok('a mix writes rule 1 and reports only rule 7', rows(dbm, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 1 && unw(mix).join() === '7', unw(mix).join());
+			dbm.close();
+			// pressure premise only with the candidate flag
+			const pr = addRule(base, 'RULE 3\nIF NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS CLOSED');
+			ok('a junction pressure rule is held back without the candidate flag and written with it', unw(pr).join() === '3' && unw(pr, true).length === 0);
 		}
 		// The EPANET side, converged (6 minute quality step), against what Tom read
 		const f = await sv.figures();

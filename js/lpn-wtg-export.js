@@ -679,55 +679,32 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const levelCtl = opts.frozenLevelControls ? [] : (parsed.controls || []).filter((c) => c.condition && c.condition.kind === 'node'
 		&& nodeById[c.condition.node] && (nodeById[c.condition.node].type === 'tank' || (opts.candidate && opts.candidate.pressureControls && nodeById[c.condition.node].type === 'junction')) && pipeElId[c.link]
 		&& (c.condition.cmp === 'below' || c.condition.cmp === 'above'));
+	// [RULES] of the simplest shape (carriableRules) join them as logical controls. A link a written rule acts on keeps no frozen schedule.
+	const ruleCtl = carriableRules(parsed, (opts.candidate && opts.candidate.pressureControls)).written;
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
+	ruleCtl.forEach((c) => { realLinks[c.link] = 1; if (c.elseAction) { realLinks[c.elseAction.link] = 1; } });
 	const fmt2 = (v) => Number(v).toFixed(2);
 	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
-	levelCtl.forEach((c) => {
-		const isPump = !!pumpNodeId[c.link];
-		const pipeLabel = c.link;
-		const statusWord = isPump ? (c.action.status === 'open' ? 'On' : 'Off') : (c.action.status === 'open' ? 'Open' : 'Closed');
-		const sym = c.condition.cmp === 'below' ? '<' : '>';
-		const cId = newId(), aId = newId(), kId = newId();
-		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
-		const aName = statusWord + '-' + pipeLabel;
-		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
-		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). That save's control was never
-		// put in the control set, so no run has shown WaterGEMS applying it.
-		const isJ = nodeById[c.condition.node].type === 'junction';
-		const condTxt = cName + ' {"' + c.condition.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(c.condition.value) + (isJ ? ' psi}' : ' ft}');
-		const actTxt = aName + ' {"' + pipeLabel + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
-		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
+	// One action row set: a pump's action is the pump itself, a pipe's the pipe (status only). Returns its id and text.
+	function writeAction(link, status) {
+		const isPump = !!pumpNodeId[link];
+		const statusWord = isPump ? (status === 'open' ? 'On' : 'Off') : (status === 'open' ? 'Open' : 'Closed');
+		const aId = newId(), aName = statusWord + '-' + link;
+		const actTxt = aName + ' {"' + link + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
 		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
-		supportElement(kId, 54, 'LC' + kId, '');
-		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
-		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
-		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
-			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? c.condition.value : 0,
-			ElementType_TankLevel: isJ ? 0 : c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
-			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
-			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
-			ControlConditionElementType: isJ ? 50 : 52
-		});
-		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', isJ ? 2 : 1], TankType: ['ControlConditionTankType', 'TankAttribute', isJ ? 1 : 3],
-			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
-			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
-			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],
-			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
-			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
-		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
 		setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
-		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, isPump ? { SimpleActionType_Element: pumpNodeId[c.link], ElementType: 68 } : { SimpleActionType_Element: pipeElId[c.link], ElementType: 69 });
+		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, isPump ? { SimpleActionType_Element: pumpNodeId[link], ElementType: 68 } : { SimpleActionType_Element: pipeElId[link], ElementType: 69 });
 		// A pump's action is the pump itself (Tom's ctl-pump-level save, whose run switched the pump by its rule): the pump,
 		// FCV and pump-status rows only, status 0 On and 1 Off. A pipe's carries the full set.
 		const aSub = isPump ? [
 			['IdahoControlAction_ElementType_ControlActionFCVType', { FCVAttribute: 0 }],
 			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
-			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: c.action.status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: status === 'open' ? 0 : 1 }],
 			['IdahoControlAction_FCVAttribute_ActionFCVSettingType', { ActionFCVSettingType_Discharge: 0 }]
 		] : [
 			['IdahoControlAction_ElementType_ControlActionPipeType', { PipeAttribute: 0 }],
-			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: c.action.status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: status === 'open' ? 0 : 1 }],
 			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
 			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: 0 }],
 			['IdahoControlAction_PumpAttribute_ActionPumpSettingType', { ActionPumpSettingType_RelativeSpeedFactor: 0 }],
@@ -746,11 +723,48 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			['IdahoControlAction_PRVAttribute_ActionPressureValveStatusType', { ActionPressureValveStatus: 1 }]
 		];
 		aSub.forEach((r) => { setRows(r[0], aId, r[1]); });
-		const words = 'IF ' + condTxt + ' THEN ' + actTxt;
-		setRows('IdahoControl', kId, { IdahoControl_DefineDescription: 0, IdahoControl_Description: words, IdahoControl_ExpandedDescription: words, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, IdahoControl_ControlNotes: '', ControlType: 0 });
-		setRows('IdahoControl_ControlType_LogicalType', kId, { LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
+		return { id: aId, txt: actTxt };
+	}
+	function writeControl(c) {
+		const sym = c.condition.cmp === 'below' ? '<' : '>';
+		const cId = newId();
+		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
+		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
+		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). That save's control was never
+		// put in the control set, so no run has shown WaterGEMS applying it.
+		const isJ = nodeById[c.condition.node].type === 'junction';
+		const condTxt = cName + ' {"' + c.condition.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(c.condition.value) + (isJ ? ' psi}' : ' ft}');
+		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
+		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
+		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
+		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
+			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? c.condition.value : 0,
+			ElementType_TankLevel: isJ ? 0 : c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
+			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
+			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
+			ControlConditionElementType: isJ ? 50 : 52
+		});
+		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', isJ ? 2 : 1], TankType: ['ControlConditionTankType', 'TankAttribute', isJ ? 1 : 3],
+			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
+			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
+			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],
+			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
+			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
+		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
+		const act = writeAction(c.link, c.action.status);
+		const actTxt = act.txt;
+		const elseAct = c.elseAction ? writeAction(c.elseAction.link, c.elseAction.status) : null;
+		const kId = newId();
+		supportElement(kId, 54, 'LC' + kId, '');
+		// A logical control (Tom's ctl-logical save): the ELSE action's id, a priority and their two flags; otherwise 0, 0, NULL, 0.
+		const hasPrio = c.priority !== undefined && c.priority !== null;
+		const words = 'IF ' + condTxt + ' THEN ' + actTxt + (elseAct ? ' ELSE ' + elseAct.txt : '') + (hasPrio ? ' PRIORITY ' + c.priority : '');
+		setRows('IdahoControl', kId, { IdahoControl_DefineDescription: 0, IdahoControl_Description: words, IdahoControl_ExpandedDescription: words, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: act.id, IdahoControl_ControlNotes: '', ControlType: 0 });
+		setRows('IdahoControl_ControlType_LogicalType', kId, { LogicalType_HasPriority: hasPrio ? 1 : 0, LogicalType_HasElse: elseAct ? 1 : 0, LogicalType_ElseAction: elseAct ? elseAct.id : null, ControlPriority: hasPrio ? c.priority : 0 });
 		controlIds.push(kId); nCtl++; nLevel++;
-	});
+	}
+	levelCtl.forEach(writeControl);
+	ruleCtl.forEach(writeControl);
 	changes.forEach((ch) => {
 		if (realLinks[ch.link]) { return; }
 		const pipeEl = pipeElId[ch.link];
@@ -1179,6 +1193,43 @@ function ageTraceCarriable(parsed) {
 // The one coordinate system whose WaterGEMS definition a saved project has shown us.
 var CRS_WRITTEN = 'EPSG:2223';
 
+// [RULES] of the simplest shape, which WaterGEMS holds as a logical control (Tom's ctl-logical save): one premise (a tank level
+// above or below a value, or with `pressure` a junction pressure), one THEN setting a pump's or pipe's status, at most one ELSE
+// of the same kind, and an optional PRIORITY. Everything else is named in `unwritten` (the rule's name) and stays out.
+function carriableRules(parsed, pressure) {
+	const out = { written: [], unwritten: [] };
+	const lines = parsed.rules || [];
+	if (!lines.length || !EngCalcs.lpnRuleParse) { if (lines.length) { out.unwritten.push('?'); } return out; }
+	const nodes = parsed.nodes || [], links = parsed.links || [];
+	const nodeType = (id) => { const n = nodes.find((x) => x.id === id); return n && n.type; };
+	const linkType = (id) => { const l = links.find((x) => x.id === id); return l && l.type; };
+	const REL = { BELOW: 'below', '<': 'below', ABOVE: 'above', '>': 'above' };
+	EngCalcs.lpnRuleParse(lines).forEach((b) => {
+		const live = b.lines.some((ln) => String(ln).replace(/;.*$/, '').trim() !== '');
+		if (!live) { return; }
+		const no = () => { out.unwritten.push(b.name || '?'); };
+		if (!b.ok || !b.name) { return no(); }
+		const conds = b.clauses.filter((c) => c.part === 'cond'), acts = b.clauses.filter((c) => c.part === 'act'), pr = b.clauses.filter((c) => c.part === 'priority');
+		if (conds.length !== 1 || conds[0].join !== 'IF' || !acts.length || acts.length > 2 || pr.length > 1) { return no(); }
+		const cl = conds[0], cmp = REL[cl.rel];
+		const tankOk = cl.attr === 'LEVEL' && (cl.object === 'TANK' || cl.object === 'NODE') && nodeType(cl.id) === 'tank';
+		const presOk = pressure && cl.attr === 'PRESSURE' && (cl.object === 'JUNCTION' || cl.object === 'NODE') && nodeType(cl.id) === 'junction';
+		if (!cmp || !(tankOk || presOk) || typeof cl.value !== 'number') { return no(); }
+		if (acts[0].join !== 'THEN' || (acts[1] && acts[1].join !== 'ELSE')) { return no(); }
+		const act = (a) => {
+			const lt = linkType(a.id), v = String(a.valueText).toUpperCase();
+			if (a.attr !== 'STATUS' || !((a.object === 'PUMP' && lt === 'pump') || (a.object === 'PIPE' && lt === 'pipe') || (a.object === 'LINK' && (lt === 'pump' || lt === 'pipe')))) { return null; }
+			if (v === 'OPEN' || (v === 'ON' && lt === 'pump')) { return { link: a.id, status: 'open' }; }
+			if (v === 'CLOSED' || (v === 'OFF' && lt === 'pump')) { return { link: a.id, status: 'closed' }; }
+			return null;
+		};
+		const t = act(acts[0]), e = acts[1] ? act(acts[1]) : null;
+		if (!t || (acts[1] && !e) || !(a => a === undefined || (isFinite(a) && a >= 0))(pr[0] && pr[0].value)) { return no(); }
+		out.written.push({ name: b.name, link: t.link, condition: { kind: 'node', node: cl.id, cmp: cmp, value: cl.value }, action: { status: t.status }, elseAction: e, priority: pr[0] ? pr[0].value : null });
+	});
+	return out;
+}
+
 function plan(doc, opts) {
 	const out = EngCalcs.lpnExportInp(doc, opts || {});
 	if (!out || !out.ok) { return { ok: false, error: out && out.error, detail: out && out.detail }; }
@@ -1219,7 +1270,7 @@ function plan(doc, opts) {
 		return /price|charge/.test(key) && Number(val) !== 0;
 	});
 	if (price.length) { notCarried.push({ code: 'energy_price', ids: [] }); }
-	if ((parsed.rules || []).length) { notCarried.push({ code: 'rules', ids: [] }); }
+	{ const rc = carriableRules(parsed, !!(opts && opts.candidate && opts.candidate.pressureControls)); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
 	const frozen = [];
 	(parsed.controls || []).forEach((c) => {
 		const cond = c.condition || {};
@@ -1379,6 +1430,6 @@ EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = {
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.
 EngCalcs.lpnWtgExportInternals = { writeWtg: writeWtg, patchWtgXml: patchWtgXml, symbolMultiplier: symbolMultiplier, smartLabel: smartLabel,
-	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS };
+	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));
