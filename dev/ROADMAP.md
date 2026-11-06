@@ -57,6 +57,10 @@ the block.
 
 - 75|847| **The built-in solver leaves flow circulating in a loop with no demand.** Perry, 2026-10-27, on the starter extension's Static scenario: 3.18 gpm round a closed loop with zero demand (EPANET 0.07 gpm). Likely a convergence tolerance; a loop with no source or sink must carry zero.
 
+- 100|813| **Pre-processing the network for label placement: methods, benefits, results.**
+  Tom, 2026-11-05: *"Let's move item 2 to priority 100 with the others hopefully to follow soon."* (item 2 = experiment E2, static candidate pruning per notch, §4.2 and §5 of the inquiry). The others: look like your neighbours (Task 812's remainder), leaders a person would draw.
+  Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md`.
+  **`feat/label-margin` (labels out to open ground on a leader) came back into this study 2026-10-21**, archived as tag `archive/feat/label-margin`. Tom: *"I am discouraged about this. Maybe we better back off on trying to merge it to master. Can we put it back into a long term study to resolve these issues more systematically?"* Open on it: overprints of hand-dragged labels, five label tests already failing on the branch (crossing, gang, stability, side index, pipe-label level). His three lessons: `dev/label-trials/tom-1020/lessons.md`.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
   **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
@@ -261,9 +265,6 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
-  Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md` on `docs/label-port`.
-  **`feat/label-margin` (labels out to open ground on a leader) came back into this study 2026-10-21**, archived as tag `archive/feat/label-margin`. Tom: *"I am discouraged about this. Maybe we better back off on trying to merge it to master. Can we put it back into a long term study to resolve these issues more systematically?"* Open on it: overprints of hand-dragged labels, five label tests already failing on the branch (crossing, gang, stability, side index, pipe-label level). His three lessons: `dev/label-trials/tom-1020/lessons.md`.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

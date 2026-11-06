@@ -95,13 +95,12 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-05 evening (sixty-sixth session, Opus main, Sonnet agent)
+## STATE — 2026-11-05 night (sixty-seventh session, Opus main, Sonnet agents)
 
-- **Master is three merges ahead of GitHub, unchecked**: the ".wtg file…" menu label (d195bf6af), the 11-05 handoff and this one. Fold them into the next batch's `check_all` and push then; do not run the suite for these alone.
-- **`feat/wtg-saves` (Task 749, pushed 355704ca3) now writes one-condition `[RULES]`** (tank level, one THEN, optional ELSE and PRIORITY) as WaterGEMS logical controls. Tom's 11-05 readings all match EPANET: logical control T1 10.90/11.38; energy 222.1 kWh, $22.21; Net3 hour 24, tank 1 147.73 against 147.69, pump 335 13,080 gpm and 94.13 ft against 13,087 and 94.07 (he wrote "pump 1"; pump 10 is off at hour 24). His 60 psi test never fired. **Waiting on him:** the test folders `~/tom-files/2026-11-05/wtg-tests/` (1-rule, 2-pressure, README), his three 11-05 save files copied to `~/tom-files/2026-11-04/wtg-saves-redo/` (energy-price shows where the price is stored), then his word to merge. `lpn_wtg_export_lost_rules` English changed (now lists rule ids); payloads regenerate on the merge.
-- **`.wtg.dwh` is not written, by reasoning given to Tom 11-05**: an undocumented binary "Standalone Drawing" store, not self-describing like the `.sqlite`; WaterGEMS rebuilds it when absent; it holds only map text and a backdrop's file path.
-- **not-epanet.org: delete it** (Tom: *"should be deleted since it is a redirect"*). Still to ask: retire the repo and the cPanel domain, or point it straight at epp; then drop it from the sibling-sites rule in CLAUDE.md.
-- **Priority 100 holds only Task 749.** Tom asked for label research candidates: advised in `~/tom-files/messenger.md` 11-05; promote nothing without his word.
+- **`feat/wtg-saves` merged on his word** (*"Yes. Merge once they pass."*) after both control tests passed: 1-rule exactly (On 338 gpm, 10.90, 11.38); 2-pressure statuses exact (Off at 5, On at 8), levels 8.71/10.34 against EPANET 8.75/10.36, J1 37.58/34.08 against 37.42/34.09. Pressure controls are no longer a trial. His three redo saves are in `~/tom-files/2026-11-04/wtg-saves-redo/`; the energy price is built from `energy-price.wtg.sqlite` on its own branch (see below), Task 749 stays open for it.
+- **not-epanet.org: his call** (*"Retire the repository and point the domain straight at epanet-plus-plus.org"*). The cPanel domain stays; its `.htaccess` 301s to epp (not-epanet.org ea0fd2b, needs his pull there); archiving the GitHub repository is his click (no `gh` or token on jasmine). Dropped from the sibling-sites rule.
+- **Task 813 promoted to 100 on his word** (experiment E2, static candidate pruning per notch).
+- **`.wtg.dwh` stays unwritten**: his *"OK until requested."*
 
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 

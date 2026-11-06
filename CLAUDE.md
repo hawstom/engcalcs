@@ -131,9 +131,9 @@ provenance rules: `dev/agents/README.md`.
 
 ### Sibling sites
 
-**Push `~/webdev/librewaternet.org` and `~/webdev/not-epanet.org` exactly as this repo is pushed**
+**Push `~/webdev/librewaternet.org` and `~/webdev/epanet-plus-plus.org` exactly as this repo is pushed**
 (Tom, 2026-09-11), unless he says otherwise for a particular change. Before writing landing-page
-copy, read `~/webdev/librewaternet.org/CLAUDE.md` — it does not load from a session rooted here.
+copy, read `~/webdev/epanet-plus-plus.org/CLAUDE.md` — it does not load from a session rooted here.
 
 ---
 
