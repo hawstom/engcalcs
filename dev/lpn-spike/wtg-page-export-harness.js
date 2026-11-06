@@ -120,7 +120,7 @@ function head(t) { console.log('\n' + t); }
 	head('2. File > Export > Network');
 	const rows = L.exportRows();
 	const wtgRow = rows.filter((r) => r.key === 'lpn_file_export_item_wtg')[0];
-	ok('a row keyed lpn_file_export_item_wtg, labelled ".wtg.sqlite file…" with no program named', !!wtgRow && wtgRow.label === PC.lpn_file_export_item_wtg && !/water(cad|gems)|bentley/i.test(wtgRow.label), wtgRow && wtgRow.label);
+	ok('a row keyed lpn_file_export_item_wtg, labelled ".wtg file…" with no program named', !!wtgRow && wtgRow.label === PC.lpn_file_export_item_wtg && !/water(cad|gems)|bentley/i.test(wtgRow.label), wtgRow && wtgRow.label);
 	ok('the row\'s key is its own (no other row shares it)', rows.filter((r) => r.key === 'lpn_file_export_item_wtg').length === 1 && typeof wtgRow.fn === 'function');
 	ok('the tip names no program', !!PC.lpn_file_export_wtg_tip && !/water(cad|gems)|bentley/i.test(PC.lpn_file_export_wtg_tip));
 
