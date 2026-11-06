@@ -341,7 +341,7 @@ Settled:
 **Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
 pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
 without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Written since Tom's ten saves (next section): per-pipe and per-tank rates, source patterns, pump controls, pressure-driven
-demand, true positions for EPSG:2223. Still not written: rule-based controls, energy price, map text, backdrop, true positions for any other system.
+demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), energy price, map text, backdrop, true positions for any other system.
 
 ## Tom's ten saves, 2026-11-03 night: how WaterGEMS stores each
 
@@ -355,15 +355,18 @@ balance; a rule firing prints "Pump 39 changed by rule 47".
 | # | Save | Stored as | Tom read | EPANET | Verdict |
 |---|---|---|---|---|---|
 | 1 | `ctl-pump-level` | two controls in one set; condition on `T1`; action on the **pump** (see below) | `T1` grade 131.25, 131.55 | 131.34, 131.59 | agrees; **written** |
-| 2 | `ctl-logical` | logical control with an ELSE and a priority (see below), **but the set holds no control** | pump On at hour 12 | On | agrees by default; **not written** |
-| 3 | `ctl-pressure-time` | pressure condition complete; time condition and its action incomplete; **set holds no control** | pump On at hour 7 | On (J1 never reaches 60 psi) | untested by the run; pressure condition **candidate** (`opts.candidate.pressureControls`) |
+| 2 | `ctl-logical` | logical control with an ELSE and a priority (see below); the 2026-11-03 save's set held no control. Repeated 2026-11-05 as `ctl-logical-2` with the control in the set | PU1 On at hour 12; `T1` level 10.90 at hour 12, 11.38 at hour 24 | On; 10.90, 11.38 | agrees exactly; **written** (simplest-shape rules) |
+| 3 | `ctl-pressure-time` | pressure condition complete; time condition and its action incomplete; 2026-11-03 set held no control | pump On at hour 7 | On (J1 never reaches 60 psi) | untested by the run; pressure condition **candidate** (`opts.candidate.pressureControls`) |
+| 3b | `ctl-pressure-time-2` (2026-11-05, control in the set) | as 3 | PU1 On at hours 5 and 7 | On (J1 never reaches 60 psi, so the run tests nothing) | still untested; the test file `2-pressure` uses thresholds J1 reaches (38.5 and 35 psi) |
 | 4 | `pdd-on` | power function, see below | 290 gpm at 37 psi | 290.4 gpm at 37.5 psi | agrees; **written** |
 | 5 | `rates-one-pipe` | `IdahoPipe_Constituent_Data` row: specify bulk 1, bulk -10, specify wall 1, wall -5, zero-order wall 0 | `J1` 0.845 | 0.865 | within 2 percent; **written** |
 | 6 | `rate-tank` | `ConventionalTank_Constituent_Data`: specify bulk 1, bulk -30 | `T1` hour 24 0.076 | 0.065 | agrees to 0.011; **written** |
 | 7 | `source-pattern` | source node's `Constituent_ConstituentSourcePattern` = a new `IdahoPattern` | `J1` 0.955, 0.479 | 0.962, 0.480 | agrees; **written** |
-| 8 | `energy-price` | **no file was saved** (the price is in the Energy Pricing manager, outside the project's element tables we compared) | | | not written |
+| 8 | `energy-price` | 2026-11-05 readings only (plain hydraulic EPS, constant 0.10/kWh; Compute is a button inside the Energy Cost box): energy 222.1 kWh, cost 22.21, storage cost -0.44 (`T1` ends 1.68 ft above its start), daily cost 21.77. His three new save files had not reached this machine, so where the price and the storage are stored is unknown | | EPANET at 75 percent efficiency: 222.1 kWh, 22.21 exactly | the computed energy agrees; **not written** |
 | 9 | `spatial-ref` | one column, see below | J0 2000,1000; J1 3000,1000 | | **written for EPSG:2223 only** |
 | 10 | `map-extras` | **neither `.wtg` nor `.sqlite` changed** | | | not possible from these files |
+
+Net3 exported from this branch, read 2026-11-05 at hour 24: tank 1 grade 147.73 (EPANET 147.69); pump 335 13,080 gpm and 94.13 ft (EPANET 13,087 and 94.07); pump 10 is off at hour 24 by its clock control in both.
 
 Why 5 and 6 differ a little from EPANET: the file holds exactly the typed numbers (-10, -5, -30, per day and ft per day, in the
 dialog's units, with EPANET's sign), so the gap is the engine's. It is the same size and direction as the gap in the unchanged
@@ -383,16 +386,20 @@ clock controls alike. The initial state is still the `-A` pipe's status. The gol
 
 **2. Logical control.** `IdahoControl_ControlType_LogicalType`: `LogicalType_HasPriority` 1, `LogicalType_HasElse` 1,
 `LogicalType_ElseAction` the else action's id, `ControlPriority` 3; the description reads "IF T1 Level < 14.00 ft THEN PU1 Pump Status = On
- ELSE PU1 Pump Status = Off  PRIORITY 3". Without ELSE the same row is `0, 0, <an empty action id>, 0`. **The control set (`IdahoLogicalControlSet`
-48) has count 0 and no member rows**, although the alternative names it, so the run says nothing about the control. Not written: it needs
-EPANET `[RULES]` premises (AND/OR, several) mapped to a single condition; no sample of that.
+ ELSE PU1 Pump Status = Off  PRIORITY 3". Without ELSE the same row is `0, 0, <an empty action id>, 0`. Both actions are pump actions
+(type 68, status 0 On / 1 Off), the second a row set of its own. In the 2026-11-03 save the control set (`IdahoLogicalControlSet` 48) was empty;
+repeated with the control in the set (2026-11-05) the run gave PU1 On at hour 12 and `T1` level 10.90 and 11.38 ft at hours 12 and 24, which are
+EPANET's. **Written**: an EPANET rule with exactly one premise (`TANK`/`NODE` `LEVEL` `BELOW`/`ABOVE`/`<`/`>`; with the pressure candidate flag also
+a junction `PRESSURE`), a THEN that sets a pump's or pipe's `STATUS` (OPEN/CLOSED, ON/OFF for a pump), at most one ELSE of the same kind and
+an optional PRIORITY becomes one control in the same single set as the simple controls (`js/lpn-wtg-export.js`, `carriableRules`). Any other rule
+(AND/OR, several actions, other attributes) is named by rule in the not-written list. A link a written rule acts on gets no frozen clock schedule.
 
 **3. Pressure and time conditions.** Pressure: `SimpleConditionType` 0, `CompareOperator` 1 (greater), `ElementType_Element` the junction,
 `ElementType_Pressure` 60 (psi), `ControlConditionElementType` 50, node attribute 2 (the tank attribute row 1 here, 3 for a tank). Time from
 start: `SimpleConditionType` 3, `IdahoControlCondition_SimpleConditionType_TimeFromStartType` = 21600 (seconds), element NULL, but its
 operator column read 0 against the text "Time From Start  > 6.000 hours" and its action was left as "<none>"; the pair is incomplete, so
 the time condition stays written as the clock-time schedule (identical when the run starts at 00:00). The set was empty again (count 0), the
-same mistake as item 2. A request for Tom: repeat 2 and 3 with the control dragged into the set (the pump-level save has the right shape).
+same mistake as item 2. Repeated with the control in the set (2026-11-05): PU1 On at hours 5 and 7, which tests nothing since J1 never reaches 60 psi; the test file `2-pressure` (2026-11-05) uses thresholds J1 does reach.
 
 **4. Pressure-driven demand.** A new support element, type 60, "Pressure Dependent Demand Function - 1":
 `PressureDependentDemandFunction` (threshold **40, in psi**, has-threshold 1, function type 0 = power), the power 0.5 in
