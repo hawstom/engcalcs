@@ -411,7 +411,7 @@ mostly data entry rather than discovery.
    does not, the error text decides whether the route survives.)
 2. **Built on `feat/wtg-page-export` (2026-10-23, not merged until Tom says).** The writer is `js/lpn-wtg-export.js`
    (DOM-free; `dev/lpn-spike/wtg-export.js` is now only the command line). File > Export > Network >
-   `.wtg.sqlite file…` (key `lpn_file_export_item_wtg`; no program named, Tom's call) asks a box BEFORE writing: the
+   `.wtg file…` (key `lpn_file_export_item_wtg`; no program named, Tom's call) asks a box BEFORE writing: the
    scenario, and "This export does not yet write the following:" with each item by asset ID. The visitor
    clicks Export (no file is chosen: the template is built in, 2026-11-01); one `.zip` of the pair
    downloads, and the receipt credits the sample. The document is read through `lpnExportInp` and `lpnInpParse` (the .inp is built in memory and

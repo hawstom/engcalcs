@@ -1,7 +1,7 @@
 # The built-in `.wtg` export template
 
 `wtg-template.wtg.sqlite.gz` and `wtg-template.wtg.gz` are the project that File > Export > Network >
-`.wtg.sqlite file…` writes the open network into. The page fetches them from this site, once, when an
+`.wtg file…` writes the open network into. The page fetches them from this site, once, when an
 export runs (never at page load, never precached) and unpacks them in the browser.
 
 ## Where it comes from

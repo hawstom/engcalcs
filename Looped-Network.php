@@ -4962,7 +4962,7 @@ EngCalcs.pageConfig = {
       // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
 <script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
 <?php // Writing a .wtg project of the model (ROADMAP Task 749). No DOM; the 658 KB SQLite engine it needs
-      // (js/vendor/sql-wasm.*) is fetched only when File > Export > .wtg.sqlite file is used. BEFORE looped-network.js. ?>
+      // (js/vendor/sql-wasm.*) is fetched only when File > Export > .wtg file is used. BEFORE looped-network.js. ?>
 <script src="/engcalcs/js/lpn-wtg-export.js?v=<?=filemtime(__DIR__.'/js/lpn-wtg-export.js')?>"></script>
 <?php // Reading a DXF file this page wrote, as a network (ROADMAP Task 772, slice 1). Pure text, no DOM, no request;
       // uses EngCalcs.lpnDxfRead (lpn-gisread.js) and lpn-dxf.js's constants. BEFORE looped-network.js, which

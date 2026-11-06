@@ -91,7 +91,7 @@
     },
     {
      "id": "file/file_export_menu/file_export_item_wtg",
-     "label": ".wtg.sqlite file…",
+     "label": ".wtg file…",
      "parent": "Export…"
     },
     {

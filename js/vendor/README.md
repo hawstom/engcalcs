@@ -75,7 +75,7 @@ the default build already embeds the engine, which is what keeps this to two fil
 `sql-wasm.js` and `sql-wasm.wasm` are sql.js 1.14.2, SQLite compiled to WebAssembly, MIT licensed,
 © the sql.js authors; SQLite itself is public domain. Full licence text: `sql.js.LICENSE`. MIT is
 GPL-3-compatible. Copied unmodified from the npm tarball's `dist/`; `package-lock.json` pins it by
-sha512. Loaded only by `js/lpn-sqlite.js` (reading) and `js/lpn-wtg-export.js` (File > Export > .wtg.sqlite file), only when a database is opened or written, and never precached
+sha512. Loaded only by `js/lpn-sqlite.js` (reading) and `js/lpn-wtg-export.js` (File > Export > .wtg file), only when a database is opened or written, and never precached
 (ROADMAP Task 749, `dev/sqlite-reader.md`). Upgrading: `npm install --save-dev --save-exact
 sql.js@<v>`, copy the two files and `LICENSE`, update the digests in `dev/vendor-manifest.json` and
 `VERSION` in `js/lpn-sqlite.js`, and run `node dev/lpn-spike/sqlite-reader-harness.js`.
