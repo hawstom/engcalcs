@@ -95,6 +95,11 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
+## STATE — 2026-11-05 (sixty-fifth session)
+
+- **Master is two merges ahead of GitHub, unchecked**: the export menu now says *".wtg file…"* (d195bf6af, his ask) and this handoff. Tom stopped a full `check_all` for a 7-character label (*"Please tell me that you are not running a 40-minute check after removing 7 characters"*); fold both into the next batch's run and push then. `feat/wtg-saves` already has the label (5c5ef7842, pushed).
+- **not-epanet.org: delete it** (Tom: *"should be deleted since it is a redirect"*). The live domain 301s to librewaternet.org, which 301s to epp, so the repo's page never shows. Ask him whether to retire the repo and the cPanel domain, or point it straight at epp; then drop it from the sibling-sites rule in CLAUDE.md.
+
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 
 - **`feat/wtg-page-export` merged on his word** (*"Sure. Merge."*); Task 749 stays open for the ten saves in `~/tom-files/2026-11-03/wtg-saves-needed/README.md`, one small branch per item, cut from master. **The round 2-4 "EPANET gets" figures at 5 min were wrong**: our test script (`dev/lpn-spike/wtg-feature-tests.js`) stepped quality once an hour; fixed (751f22db6). Converged EPANET and WaterGEMS agree within ~10 % on the small network, and closely on his Net3 72 h chlorine runs. The product solver was never affected. EPANET's and WaterGEMS's default quality step are both the hydraulic step / 10; the export writes any other stated step. One-point pump: `PumpDefinitionType` 1 (his `tompump1pt` save), so Net1 exports. Dead keys deleted: `lpn_wtg_export_lost_emitters`, `lpn_wtg_export_lost_pump_speed_pattern`.
