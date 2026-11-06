@@ -101,6 +101,8 @@ lines rather than appending corrections.
 - **not-epanet.org: his call** (*"Retire the repository and point the domain straight at epanet-plus-plus.org"*). The cPanel domain stays; its `.htaccess` 301s to epp (not-epanet.org ea0fd2b, needs his pull there); archiving the GitHub repository is his click (no `gh` or token on jasmine). Dropped from the sibling-sites rule.
 - **Task 813 promoted to 100 on his word** (experiment E2, static candidate pruning per notch).
 - **`.wtg.dwh` stays unwritten**: his *"OK until requested."*
+- **`fix/wtg-energy-price` (df99ca2ec, pushed) waits his WaterGEMS test** `~/tom-files/2026-11-06/wtg-energy/` (expect PU1 222.1 kWh, 22.21), then his word. Writes a constant global and pump price as Bentley's `EnergyPricing` support element (type 61) linked from the pump's `BasePump_EnergyCost_Data`; price pattern and demand charge stay "not written". English `lpn_wtg_export_lost_energy_price` now "Energy price pattern and demand charge." (his look owed); payloads regenerate on the merge.
+- **E2 ran and failed** (`research/label-prepass`, 4171f3b55, pushed, inquiry §6a): exact on all 13 views, but no faster on a first visit (n600 +5%/+1%/+3% at 1x/1.5x/2x) and the build costs 133-473 ms. Verdict: do not port. Docs and dev scripts only; merge it on green with the next batch. Task 813 stays at 100 only if Tom names the next experiment; the inquiry now points at §4.3 (conflict graph) and §4.5.
 
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 
