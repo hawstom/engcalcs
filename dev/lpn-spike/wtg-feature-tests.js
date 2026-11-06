@@ -105,7 +105,7 @@ async function setup() {
 	require('./bootstrap.js');
 	const helper = require('./wtg-sqljs.js');
 	const EngCalcs = require(path.join(ROOT, 'js', 'lpn-solver.js')); global.EngCalcs = EngCalcs;
-	require(path.join(ROOT, 'js', 'lpn-patterns.js')); require(path.join(ROOT, 'js', 'lpn-inp.js'));
+	require(path.join(ROOT, 'js', 'lpn-patterns.js')); require(path.join(ROOT, 'js', 'lpn-inp.js')); Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
 	require(path.join(ROOT, 'js', 'lpn-wtg-export.js'));
 	const initSqlJs = require(helper.sqlJsPath());
 	const SQL = await initSqlJs({ wasmBinary: fs.readFileSync(helper.wasmPath()) });

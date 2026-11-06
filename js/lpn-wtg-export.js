@@ -359,8 +359,12 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		if (d > 0) { ratios.push(l.length / d); }
 	});
 	ratios.sort((p, q) => p - q);
-	const coordScale = ratios.length ? Math.round(ratios[Math.floor(ratios.length / 2)] / 10) * 10 || 1000 : 1000;
+	const coordScale = opts.crsJson ? 1 : ratios.length ? Math.round(ratios[Math.floor(ratios.length / 2)] / 10) * 10 || 1000 : 1000;
 	report.coordScaleFtPerMapUnit = coordScale;
+	// TRUE POSITIONS (Tom's save spatial-ref, 2026-11-03): choosing NAD83 / Arizona Central (ft), EPSG:2223, changed one
+	// column of the project and no geometry: IdahoDataSet.HmiModelCoordinateReference holds the system's definition (JSON,
+	// kept byte for byte in js/data/wtg-template/crs-epsg-2223.json.gz) and the drawn feet are read as that system's feet.
+	if (opts.crsJson) { db.run('UPDATE IdahoDataSet SET HmiModelCoordinateReference = ?', [opts.crsJson]); carried('coordinate system EPSG:2223, positions in international feet as the project states them'); report.crs = 'EPSG:2223'; }
 	// Extent of the drawn map in feet: sizes the symbols (see symbolMultiplier()).
 	{
 		const xs = nodes.map((n) => n.x * coordScale), ys = nodes.map((n) => n.y * coordScale);
@@ -662,10 +666,10 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// (dev/wtg-export.md, "Controls").
 	const changes = (schedule && schedule.changes) || [];
 	const clockEpoch = (t) => EPOCH_2000 + (t % 86400);
-	function controlText(t, linkLabel, status) {
+	function controlText(t, linkLabel, status, isPump) {
 		const hh = Math.floor((t % 86400) / 3600), mm = Math.floor((t % 3600) / 60), ss = t % 60;
 		const clock = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (ss ? ':' + String(ss).padStart(2, '0') : '');
-		return { cond: 'Clock Time  = ' + clock + ' ', act: linkLabel + ' Pipe Status = ' + status + ' ' };
+		return { cond: 'Clock Time  = ' + clock + ' ', act: linkLabel + (isPump ? ' Pump' : ' Pipe') + ' Status = ' + status + ' ' };
 	}
 	let nCtl = 0, nLevel = 0;
 	const controlIds = [];
@@ -673,46 +677,34 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// in the codes Tom's own saved wtg-control-1 showed (dev/wtg-export.md, "Tank-level controls").
 	// A junction-pressure condition has no sample, so its link keeps the frozen clock schedule.
 	const levelCtl = opts.frozenLevelControls ? [] : (parsed.controls || []).filter((c) => c.condition && c.condition.kind === 'node'
-		&& nodeById[c.condition.node] && nodeById[c.condition.node].type === 'tank' && pipeElId[c.link]
+		&& nodeById[c.condition.node] && (nodeById[c.condition.node].type === 'tank' || (opts.candidate && opts.candidate.pressureControls && nodeById[c.condition.node].type === 'junction')) && pipeElId[c.link]
 		&& (c.condition.cmp === 'below' || c.condition.cmp === 'above'));
+	// [RULES] of the simplest shape (carriableRules) join them as logical controls. A link a written rule acts on keeps no frozen schedule.
+	const ruleCtl = carriableRules(parsed, (opts.candidate && opts.candidate.pressureControls)).written;
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
+	ruleCtl.forEach((c) => { realLinks[c.link] = 1; if (c.elseAction) { realLinks[c.elseAction.link] = 1; } });
 	const fmt2 = (v) => Number(v).toFixed(2);
 	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
-	levelCtl.forEach((c) => {
-		const isPump = !!pumpNodeId[c.link];
-		const pipeLabel = isPump ? (c.link + '-A') : c.link;
-		const statusWord = c.action.status === 'open' ? 'Open' : 'Closed';
-		const sym = c.condition.cmp === 'below' ? '<' : '>';
-		const cId = newId(), aId = newId(), kId = newId();
-		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
-		const aName = statusWord + '-' + pipeLabel;
-		const condTxt = cName + ' {"' + c.condition.node + '" Level ' + sym + ' ' + fmt2(c.condition.value) + ' ft}';
-		const actTxt = aName + ' {"' + pipeLabel + '" Pipe Status = ' + statusWord + ' }';
-		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
+	// One action row set: a pump's action is the pump itself, a pipe's the pipe (status only). Returns its id and text.
+	function writeAction(link, status) {
+		const isPump = !!pumpNodeId[link];
+		const statusWord = isPump ? (status === 'open' ? 'On' : 'Off') : (status === 'open' ? 'Open' : 'Closed');
+		const aId = newId(), aName = statusWord + '-' + link;
+		const actTxt = aName + ' {"' + link + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
 		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
-		supportElement(kId, 54, 'LC' + kId, '');
-		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
-		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
-		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
-			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: 0,
-			ElementType_TankLevel: c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
-			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
-			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
-			ControlConditionElementType: 52
-		});
-		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', 1], TankType: ['ControlConditionTankType', 'TankAttribute', 3],
-			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
-			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
-			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],
-			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
-			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
-		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
 		setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
-		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, { SimpleActionType_Element: pipeElId[c.link], ElementType: 69 });
-		const aSub = [
+		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, isPump ? { SimpleActionType_Element: pumpNodeId[link], ElementType: 68 } : { SimpleActionType_Element: pipeElId[link], ElementType: 69 });
+		// A pump's action is the pump itself (Tom's ctl-pump-level save, whose run switched the pump by its rule): the pump,
+		// FCV and pump-status rows only, status 0 On and 1 Off. A pipe's carries the full set.
+		const aSub = isPump ? [
+			['IdahoControlAction_ElementType_ControlActionFCVType', { FCVAttribute: 0 }],
+			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
+			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_FCVAttribute_ActionFCVSettingType', { ActionFCVSettingType_Discharge: 0 }]
+		] : [
 			['IdahoControlAction_ElementType_ControlActionPipeType', { PipeAttribute: 0 }],
-			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: c.action.status === 'open' ? 0 : 1 }],
+			['IdahoControlAction_PipeAttribute_ActionPipeStatusType', { ActionPipeStatus: status === 'open' ? 0 : 1 }],
 			['IdahoControlAction_ElementType_ControlActionPumpType', { PumpAttribute: 0 }],
 			['IdahoControlAction_PumpAttribute_ActionPumpStatusType', { ActionPumpStatus: 0 }],
 			['IdahoControlAction_PumpAttribute_ActionPumpSettingType', { ActionPumpSettingType_RelativeSpeedFactor: 0 }],
@@ -731,27 +723,72 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			['IdahoControlAction_PRVAttribute_ActionPressureValveStatusType', { ActionPressureValveStatus: 1 }]
 		];
 		aSub.forEach((r) => { setRows(r[0], aId, r[1]); });
-		const words = 'IF ' + condTxt + ' THEN ' + actTxt;
-		setRows('IdahoControl', kId, { IdahoControl_DefineDescription: 0, IdahoControl_Description: words, IdahoControl_ExpandedDescription: words, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, IdahoControl_ControlNotes: '', ControlType: 0 });
-		setRows('IdahoControl_ControlType_LogicalType', kId, { LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
+		return { id: aId, txt: actTxt };
+	}
+	function writeControl(c) {
+		const sym = c.condition.cmp === 'below' ? '<' : '>';
+		const cId = newId();
+		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
+		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
+		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). That save's control was never
+		// put in the control set, so no run has shown WaterGEMS applying it.
+		const isJ = nodeById[c.condition.node].type === 'junction';
+		const condTxt = cName + ' {"' + c.condition.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(c.condition.value) + (isJ ? ' psi}' : ' ft}');
+		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
+		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
+		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
+		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
+			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? c.condition.value : 0,
+			ElementType_TankLevel: isJ ? 0 : c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
+			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
+			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
+			ControlConditionElementType: isJ ? 50 : 52
+		});
+		const cSub = { NodeType: ['ControlConditionNodeType', 'NodeAttribute', isJ ? 2 : 1], TankType: ['ControlConditionTankType', 'TankAttribute', isJ ? 1 : 3],
+			PumpType: ['ControlConditionPumpType', 'ControlConditionPumpAttribute', 0], PipeType: ['ControlConditionPipeType', 'ConditionPipeAttribute', 0],
+			PressureValveType: ['ControlConditionPressureValveType', 'ControlConditionPressureValveAttribute', 0],
+			FCVType: ['ControlConditionFCVType', 'ControlConditionFCVAttribute', 0], GPVType: ['ControlConditionGPVType', 'ControlConditionGPVAttribute', 0],
+			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
+			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
+		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
+		const act = writeAction(c.link, c.action.status);
+		const actTxt = act.txt;
+		const elseAct = c.elseAction ? writeAction(c.elseAction.link, c.elseAction.status) : null;
+		const kId = newId();
+		supportElement(kId, 54, 'LC' + kId, '');
+		// A logical control (Tom's ctl-logical save): the ELSE action's id, a priority and their two flags; otherwise 0, 0, NULL, 0.
+		const hasPrio = c.priority !== undefined && c.priority !== null;
+		const words = 'IF ' + condTxt + ' THEN ' + actTxt + (elseAct ? ' ELSE ' + elseAct.txt : '') + (hasPrio ? ' PRIORITY ' + c.priority : '');
+		setRows('IdahoControl', kId, { IdahoControl_DefineDescription: 0, IdahoControl_Description: words, IdahoControl_ExpandedDescription: words, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: act.id, IdahoControl_ControlNotes: '', ControlType: 0 });
+		setRows('IdahoControl_ControlType_LogicalType', kId, { LogicalType_HasPriority: hasPrio ? 1 : 0, LogicalType_HasElse: elseAct ? 1 : 0, LogicalType_ElseAction: elseAct ? elseAct.id : null, ControlPriority: hasPrio ? c.priority : 0 });
 		controlIds.push(kId); nCtl++; nLevel++;
-	});
+	}
+	levelCtl.forEach(writeControl);
+	ruleCtl.forEach(writeControl);
 	changes.forEach((ch) => {
 		if (realLinks[ch.link]) { return; }
 		const pipeEl = pipeElId[ch.link];
 		if (!pipeEl) { return; }
 		const isPump = !!pumpNodeId[ch.link];
-		const label = isPump ? (ch.link + '-A') : ch.link;
-		const txt = controlText(ch.t, label, ch.status === 'open' ? 'Open' : 'Closed');
+		const label = ch.link;
+		const txt = controlText(ch.t, label, ch.status === 'open' ? (isPump ? 'On' : 'Open') : (isPump ? 'Off' : 'Closed'), isPump);
 		const cId = newId(), aId = newId(), kId = newId();
 		supportElement(cId, 56, 'C' + cId); supportElement(aId, 55, 'A' + aId); supportElement(kId, 54, 'LC' + kId);
 		insert(db, 'IdahoControlCondition', { SupportElementID: cId, IdahoControlCondition_DefineDescription: 0, IdahoControlCondition_Description: 'text', IdahoControlCondition_ExpandedDescription: txt.cond, ConditionType: 0 });
 		insert(db, 'IdahoControlCondition_ConditionType_SimpleConditionType', { SupportElementID: cId, SimpleConditionType: 2, CompareOperator: 0 });
 		insert(db, 'IdahoControlCondition_SimpleConditionType_ClockTimeType', { SupportElementID: cId, ClockTimeType_ClockTime: clockEpoch(ch.t) });
 		insert(db, 'IdahoControlAction', { SupportElementID: aId, IdahoControlAction_DefineDescription: 0, IdahoControlAction_Description: 'text', IdahoControlAction_ExpandedDescription: txt.act, ControlActionType: 0 });
-		insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pipeEl, ElementType: 69 });
-		insert(db, 'IdahoControlAction_ElementType_ControlActionPipeType', { SupportElementID: aId, PipeAttribute: 0 });
-		insert(db, 'IdahoControlAction_PipeAttribute_ActionPipeStatusType', { SupportElementID: aId, ActionPipeStatus: ch.status === 'open' ? 0 : 1 });
+		if (isPump) {
+			insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pumpNodeId[ch.link], ElementType: 68 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionFCVType', { SupportElementID: aId, FCVAttribute: 0 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionPumpType', { SupportElementID: aId, PumpAttribute: 0 });
+			insert(db, 'IdahoControlAction_PumpAttribute_ActionPumpStatusType', { SupportElementID: aId, ActionPumpStatus: ch.status === 'open' ? 0 : 1 });
+			insert(db, 'IdahoControlAction_FCVAttribute_ActionFCVSettingType', { SupportElementID: aId, ActionFCVSettingType_Discharge: 0 });
+		} else {
+			insert(db, 'IdahoControlAction_ControlActionType_SimpleActionType', { SupportElementID: aId, SimpleActionType_Element: pipeEl, ElementType: 69 });
+			insert(db, 'IdahoControlAction_ElementType_ControlActionPipeType', { SupportElementID: aId, PipeAttribute: 0 });
+			insert(db, 'IdahoControlAction_PipeAttribute_ActionPipeStatusType', { SupportElementID: aId, ActionPipeStatus: ch.status === 'open' ? 0 : 1 });
+		}
 		insert(db, 'IdahoControl', { SupportElementID: kId, IdahoControl_DefineDescription: 0, IdahoControl_Description: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ExpandedDescription: 'IF ' + txt.cond + ' THEN ' + txt.act, IdahoControl_ControlCondition: cId, IdahoControl_ControlAction: aId, ControlType: 1 });
 		insert(db, 'IdahoControl_ControlType_LogicalType', { SupportElementID: kId, LogicalType_HasPriority: 0, LogicalType_HasElse: 0, LogicalType_ElseAction: null, ControlPriority: 0 });
 		controlIds.push(kId); nCtl++;
@@ -881,9 +918,9 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// so nothing is converted. The constituent is tied to the whole network by the one row of Constituent_SystemData (the
 	// alternative's constituent), and every node already has its Constituent_Data row. WaterGEMS writes both wall-order
 	// sub-tables; the order not in use holds 0. The Constituent calculation type is 3 (the nine files).
-	// `w` carries the round-2 storage variants (opts.candidate.wq); `local` writes per-element rates and source patterns,
-	// whose columns no saved file has shown, so it is candidate-only.
-	function writeChemical(w, local) {
+	// `w` carries the round-2 storage variants (opts.candidate.wq). Per-pipe and per-tank rates and a source's pattern are
+	// written as Tom's saves rates-one-pipe, rate-tank and source-pattern stored them (dev/wtg-export.md).
+	function writeChemical(w) {
 		const secs = parsed.inpSections || {};
 		const qo = parsed.qualityOptions || {};
 		const calcId = rowsOf(db, 'SELECT CalculationOptionsID AS c FROM EpaNetEngine ORDER BY CalculationOptionsID')[0].c;
@@ -924,7 +961,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			const n = nodeById[nid], s = srcs[nid];
 			if (!n) { return; }
 			const id = elId['n:' + nid];
-			const sp = local && s.pattern && patId[s.pattern] !== undefined ? patId[s.pattern] : null;
+			const sp = s.pattern && patId[s.pattern] !== undefined ? patId[s.pattern] : null;
 			db.run('UPDATE BaseIdahoNode_Constituent_Data SET Constituent_IsConstituentSource = 1, ConstituentSourceType = ?, Constituent_ConstituentSourcePattern = ?, BaselineConcentration = ? WHERE DomainElementID = ?',
 				[codeOf(s.type), sp, s.type === 'MASS' ? 0 : s.quality, id]);
 			if (s.type === 'MASS') {
@@ -934,7 +971,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			}
 			carried('source on ' + nid + ': ' + s.type + ' ' + s.quality + ' (source code ' + codeOf(s.type) + ')');
 		});
-		if (local) {
+		{
 			Object.keys(R.bulk).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalBulkReactionRate = 1, Constituent_LocalBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.bulk[pid]), pipeElId[pid]]); } });
 			Object.keys(R.wall).forEach((pid) => { if (pipeElId[pid] !== undefined) { db.run('UPDATE IdahoPipe_Constituent_Data SET Constituent_SpecifyLocalWallRate = 1, Constituent_WallReactionRate = ? WHERE DomainElementID = ?', [sgn(R.wall[pid]), pipeElId[pid]]); } });
 			Object.keys(R.tank).forEach((tid) => { if (elId['n:' + tid] !== undefined) { db.run('UPDATE ConventionalTank_Constituent_Data SET Constituent_TankSpecifyLocalBulkRate = 1, Constituent_TankBulkReactionRate = ? WHERE DomainElementID = ?', [sgn(R.tank[tid]), elId['n:' + tid]]); } });
@@ -942,7 +979,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		carried('chemical ' + chem + ': bulk ' + sgn(R.globalBulk || 0) + ', wall ' + sgn(R.globalWall || 0) + ' per day');
 		report.chemicalWritten = true;
 	}
-	if (chemicalCarriable(parsed)) { writeChemical((opts.candidate && opts.candidate.wq) || {}, !!opts.candidate); }
+	if (chemicalCarriable(parsed)) { writeChemical((opts.candidate && opts.candidate.wq) || {}); }
 
 	// ---- analysis options: the template's own EPS options already read 24 h, 1 h step; set them explicitly ----
 	const T = parsed.times;
@@ -950,6 +987,20 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// psi setting becomes a head by the specific gravity, so a file that states 0.998 needs it carried.
 	const hy = parsed.hydraulics || {};
 	const sg = hy.specificGravity > 0 ? hy.specificGravity : 1.0, visc = hy.viscosity > 0 ? hy.viscosity : 1.0;
+	// ---- PRESSURE-DRIVEN DEMAND: Tom's save pdd-on (2026-11-03). A Pressure Dependent Demand Function (support type 60) of
+	// type power, the threshold pressure in psi and the power as typed, named by the alternative's global function; the
+	// calculation option turns it on. EPANET: Minimum Pressure 0, Required Pressure = threshold, Pressure Exponent = power. ----
+	if (pddCarriable(hy)) {
+		const fId = newId();
+		supportElement(fId, 60, 'Pressure Dependent Demand Function - 1', '');
+		insert(db, 'PressureDependentDemandFunction', { SupportElementID: fId, PressureDependentDemandFunction_PressureThreshold: hy.reqPressure, PressureDependentDemandFunction_HasThresholdPressure: 1, PddFunctionType: 0 });
+		insert(db, 'PressureDependentDemandFunction_PddFunctionType_PowerFunctionType', { SupportElementID: fId, PowerFunctionType_PowerFunctionExponent: typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5 });
+		insert(db, 'PressureDependentDemandFunction_PddFunctionType_PieceLinearType', { SupportElementID: fId, PressureFlowCurveCount: 0 });
+		db.run('UPDATE PressureDependentDemand_SystemData SET PressureDependentDemand_GlobalPDDFunction = ?', [fId]);
+		db.run('UPDATE EpaNetEngine SET EpaNetEngine_UsePressureDependentDemand = 1');
+		carried('pressure-driven demand: power ' + (typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5) + ', threshold ' + hy.reqPressure + ' psi');
+		report.pddWritten = true;
+	}
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
 	// The water quality time step, in seconds like the hydraulic one (False, the template's, means a tenth of the hydraulic step).
 	const qStepWanted = opts.qualityStepSeconds > 0 ? opts.qualityStepSeconds : ((opts.candidate && opts.candidate.wq && opts.candidate.wq.qualityStepSeconds) || 0);
@@ -1088,17 +1139,32 @@ function idsOf(list, test) { return list.filter(test).map((x) => x.id); }
  */
 
 // Is this project's water quality a chemical run this export writes in full? A chemical in mg/L with the global
-// reactions, sources without a pattern, initial quality, and no reaction rate stated for a single pipe or tank.
-// Age and trace runs, and the rest, are not written on the page's path (dev/wtg-export.md).
+// reactions, a bulk or wall rate stated for one pipe, a bulk rate for one tank, sources with or without a pattern, and
+// initial quality (Tom's saves of 2026-11-03: dev/wtg-export.md, "Tom's ten saves"). A rate for one pipe's wall is
+// kept in WaterGEMS beside the first-order wall rate only, so a zero-order wall network keeps its note.
+// Age and trace runs, and the rest, are not written on the page's path.
 function chemicalCarriable(parsed) {
 	const q = parsed.qualityOptions || {}, secs = parsed.inpSections || {};
 	const text = String(q.quality || '').trim();
 	if (!text || EngCalcs.lpnQualityParse(text).mode !== 'chemical') { return false; }
-	if (/\b(ug|µg|g|mg)\/\w+/i.test(text) && !/\bmg\/L\b/i.test(text)) { return false; }
+	if (/\b(ug|\u00b5g|g|mg)\/\w+/i.test(text) && !/\bmg\/L\b/i.test(text)) { return false; }
 	const R = EngCalcs.lpnReactionsParse(secs.REACTIONS || []);
-	if (Object.keys(R.bulk).length || Object.keys(R.wall).length || Object.keys(R.tank).length) { return false; }
+	if (Object.keys(R.wall).length && R.orderWall !== undefined && R.orderWall !== 1) { return false; }
 	const srcs = EngCalcs.lpnSourcesParse(secs.SOURCES || []);
-	return !Object.keys(srcs).some((k) => srcs[k].pattern);
+	const havePattern = {};
+	(parsed.patterns || []).forEach((p) => { havePattern[p.id] = true; });
+	return !Object.keys(srcs).some((k) => srcs[k].pattern && !havePattern[srcs[k].pattern]);
+}
+
+// Is this project's pressure-driven demand one WaterGEMS holds? Tom's save pdd-on (2026-11-03) stored a power function:
+// demand is the full demand times (pressure / threshold) ^ power below the threshold pressure, from zero pressure. That is
+// EPANET's pressure-driven model with a minimum pressure of 0, a required pressure equal to the threshold, and the same
+// exponent. A minimum above 0 has no place in it.
+function pddCarriable(hy) {
+	if (!hy || String(hy.demandModel || '').toUpperCase() !== 'PDA') { return false; }
+	const min = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
+	const exp = typeof hy.pressureExponent === 'number' ? hy.pressureExponent : 0.5;
+	return min === 0 && typeof hy.reqPressure === 'number' && hy.reqPressure > 0 && exp > 0;
 }
 
 // Is this a two-compartment tank WaterGEMS can hold? Its compartments are percents that add to 100, so the EPANET
@@ -1122,6 +1188,46 @@ function ageTraceCarriable(parsed) {
 	if (m.mode !== 'age' && m.mode !== 'trace') { return false; }
 	if ((secs.SOURCES || []).length || (secs.REACTIONS || []).length) { return false; }
 	return m.mode === 'age' || (parsed.nodes || []).some((n) => n.id === m.traceNode);
+}
+
+// The one coordinate system whose WaterGEMS definition a saved project has shown us.
+var CRS_WRITTEN = 'EPSG:2223';
+
+// [RULES] of the simplest shape, which WaterGEMS holds as a logical control (Tom's ctl-logical save): one premise (a tank level
+// above or below a value, or with `pressure` a junction pressure), one THEN setting a pump's or pipe's status, at most one ELSE
+// of the same kind, and an optional PRIORITY. Everything else is named in `unwritten` (the rule's name) and stays out.
+function carriableRules(parsed, pressure) {
+	const out = { written: [], unwritten: [] };
+	const lines = parsed.rules || [];
+	if (!lines.length || !EngCalcs.lpnRuleParse) { if (lines.length) { out.unwritten.push('?'); } return out; }
+	const nodes = parsed.nodes || [], links = parsed.links || [];
+	const nodeType = (id) => { const n = nodes.find((x) => x.id === id); return n && n.type; };
+	const linkType = (id) => { const l = links.find((x) => x.id === id); return l && l.type; };
+	const REL = { BELOW: 'below', '<': 'below', ABOVE: 'above', '>': 'above' };
+	EngCalcs.lpnRuleParse(lines).forEach((b) => {
+		const live = b.lines.some((ln) => String(ln).replace(/;.*$/, '').trim() !== '');
+		if (!live) { return; }
+		const no = () => { out.unwritten.push(b.name || '?'); };
+		if (!b.ok || !b.name) { return no(); }
+		const conds = b.clauses.filter((c) => c.part === 'cond'), acts = b.clauses.filter((c) => c.part === 'act'), pr = b.clauses.filter((c) => c.part === 'priority');
+		if (conds.length !== 1 || conds[0].join !== 'IF' || !acts.length || acts.length > 2 || pr.length > 1) { return no(); }
+		const cl = conds[0], cmp = REL[cl.rel];
+		const tankOk = cl.attr === 'LEVEL' && (cl.object === 'TANK' || cl.object === 'NODE') && nodeType(cl.id) === 'tank';
+		const presOk = pressure && cl.attr === 'PRESSURE' && (cl.object === 'JUNCTION' || cl.object === 'NODE') && nodeType(cl.id) === 'junction';
+		if (!cmp || !(tankOk || presOk) || typeof cl.value !== 'number') { return no(); }
+		if (acts[0].join !== 'THEN' || (acts[1] && acts[1].join !== 'ELSE')) { return no(); }
+		const act = (a) => {
+			const lt = linkType(a.id), v = String(a.valueText).toUpperCase();
+			if (a.attr !== 'STATUS' || !((a.object === 'PUMP' && lt === 'pump') || (a.object === 'PIPE' && lt === 'pipe') || (a.object === 'LINK' && (lt === 'pump' || lt === 'pipe')))) { return null; }
+			if (v === 'OPEN' || (v === 'ON' && lt === 'pump')) { return { link: a.id, status: 'open' }; }
+			if (v === 'CLOSED' || (v === 'OFF' && lt === 'pump')) { return { link: a.id, status: 'closed' }; }
+			return null;
+		};
+		const t = act(acts[0]), e = acts[1] ? act(acts[1]) : null;
+		if (!t || (acts[1] && !e) || !(a => a === undefined || (isFinite(a) && a >= 0))(pr[0] && pr[0].value)) { return no(); }
+		out.written.push({ name: b.name, link: t.link, condition: { kind: 'node', node: cl.id, cmp: cmp, value: cl.value }, action: { status: t.status }, elseAction: e, priority: pr[0] ? pr[0].value : null });
+	});
+	return out;
 }
 
 function plan(doc, opts) {
@@ -1164,7 +1270,7 @@ function plan(doc, opts) {
 		return /price|charge/.test(key) && Number(val) !== 0;
 	});
 	if (price.length) { notCarried.push({ code: 'energy_price', ids: [] }); }
-	if ((parsed.rules || []).length) { notCarried.push({ code: 'rules', ids: [] }); }
+	{ const rc = carriableRules(parsed, !!(opts && opts.candidate && opts.candidate.pressureControls)); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
 	const frozen = [];
 	(parsed.controls || []).forEach((c) => {
 		const cond = c.condition || {};
@@ -1182,13 +1288,14 @@ function plan(doc, opts) {
 	// numbers a run gives, so they carry their value; no sample file states where a multiplier lives.
 	const hy = parsed.hydraulics || {};
 	if (hy.demandMultiplier !== undefined && Number(hy.demandMultiplier) !== 1) { notCarried.push({ code: 'demand_multiplier', ids: [], value: String(hy.demandMultiplier) }); }
-	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA') { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
+	if (hy.demandModel && String(hy.demandModel).toUpperCase() !== 'DDA' && !pddCarriable(hy)) { notCarried.push({ code: 'demand_model', ids: [], value: String(hy.demandModel) }); }
 	if ((parsed.labels || []).length) { notCarried.push({ code: 'texts', ids: [] }); }
 	if (parsed.backdrop) { notCarried.push({ code: 'backdrop', ids: [] }); }
 	// Always: this has no place in the file, whatever the network. (A pipe's material is not named: an EPANET project
 	// states none, so there is nothing to leave out; every pipe keeps the template's default.)
-	notCarried.push({ code: 'positions', ids: [] });
-	return { ok: true, refused: refused, notCarried: notCarried, qualityStepSeconds: qualityStepSeconds, inp: out.inp, parsed: parsed, differences: out.differences || [] };
+	const crs = (doc && doc.project && doc.project.crs) === CRS_WRITTEN ? CRS_WRITTEN : '';
+	if (!crs) { notCarried.push({ code: 'positions', ids: [] }); }
+	return { ok: true, crs: crs, refused: refused, notCarried: notCarried, qualityStepSeconds: qualityStepSeconds, inp: out.inp, parsed: parsed, differences: out.differences || [] };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1267,6 +1374,19 @@ function loadTemplate() {
 	return templatePromise;
 }
 
+var crsPromise = null;
+function loadCrs() {
+	if (crsPromise) { return crsPromise; }
+	crsPromise = fetch(base() + 'js/data/wtg-template/crs-epsg-2223.json.gz?v=' + TEMPLATE_VERSION, { credentials: 'same-origin' }).then((r) => {
+		if (!r.ok) { throw new Error('HTTP ' + r.status); }
+		return r.arrayBuffer();
+	}).then(gunzip).then((b) => new TextDecoder('utf-8').decode(b)).catch((e) => {
+		crsPromise = null;
+		throw fail('template-load', 'The export template could not be loaded (' + (e && e.message) + ').', null, 'offline');
+	});
+	return crsPromise;
+}
+
 // ---------------------------------------------------------------------------------------------
 // Build: the plan, a template, the engines -> the two files.
 // ---------------------------------------------------------------------------------------------
@@ -1292,7 +1412,9 @@ async function build(planned, o) {
 	let sched = { initial: {}, changes: [] };
 	if (watch.length) { sched = await referenceSchedule(o.epanet, planned.inp, watch); }
 	const eff = Number((/Global Efficiency\s+([\d.]+)/i.exec(planned.inp) || [])[1]) || 75;
-	const out = writeWtg(SQL, o.sqlite, parsed, sched, { name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
+	let crsJson = o.crsJson || '';
+	if (planned.crs === CRS_WRITTEN && !crsJson) { crsJson = await loadCrs(); }
+	const out = writeWtg(SQL, o.sqlite, parsed, sched, { crsJson: crsJson, name: o.name || 'Network', efficiency: eff, qualityStepSeconds: planned.qualityStepSeconds || 0, allowUntestedSchema: !!o.allowUntestedSchema });
 	const R = out.report;
 	if (R.integrity !== 'ok' || R.foreignKeyViolations) {
 		throw fail('integrity', 'The file written failed its own integrity check (' + R.integrity + ', ' + R.foreignKeyViolations + ' foreign key violations), so it was not offered.', null, 'integrity');
@@ -1308,6 +1430,6 @@ EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = {
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.
 EngCalcs.lpnWtgExportInternals = { writeWtg: writeWtg, patchWtgXml: patchWtgXml, symbolMultiplier: symbolMultiplier, smartLabel: smartLabel,
-	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS };
+	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));

@@ -2,7 +2,7 @@
 // no `opts.candidate`: emitter coefficient (ft3/s per psi^n), pump speed pattern (VSPType 0), tank mixing mixed/FIFO/LIFO
 // (codes 1/2/3). A chemical run (constituent, bulk -2 per day, wall -1 ft per day, as Tom's own save stores it) is written with no
 // candidate. Since round 3 (Tom, 2026-11-03) also written with no candidate: two-compartment mixing (code 0, percents), age (type 2)
-// and trace (type 4). Still candidate-only: per-element rates, source patterns, the quality time step.
+// and trace (type 4). Since Tom's ten saves (2026-11-03) also written with no candidate: per-pipe and per-tank rates and a source's pattern.
 //   node dev/lpn-spike/wtg-feature-tests-harness.js
 // Checks the round-2 files dev/lpn-spike/wtg-feature-tests.js builds and the plain writer. NOT proof that WaterGEMS
 // accepts the candidates: only Tom's copy can say that.
@@ -32,6 +32,8 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 	const elOf = (db, label) => rows(db, 'SELECT m.ElementID AS id FROM HMIModelingElement m JOIN HMIDomainElement d ON d.DomainElementID = m.ElementID WHERE m.Label = ? AND d.IsDeleted = 0', [label])[0].id;
 	const supOf = (db, label) => rows(db, 'SELECT m.ElementID AS id FROM HMIModelingElement m JOIN HMISupportElement d ON d.SupportElementID = m.ElementID WHERE m.Label = ? AND d.IsDeleted = 0', [label])[0].id;
 	const plainWrite = (inp, extra) => lib.writeWtg(r.env.SQL, r.env.tplSqlite, EC.lpnInpParse(inp), { initial: {}, changes: [] }, Object.assign({ name: 'plain', efficiency: 75 }, extra || {}));
+
+	const addRule = (inp, rule) => /\n\[RULES\]\n/.test(inp) ? inp.replace('\n[RULES]\n', '\n[RULES]\n' + rule + '\n') : inp.replace('\n[END]', '\n[RULES]\n' + rule + '\n[END]');
 
 	console.log('\nRound 2: the set');
 	ok('8 files written', r.files.length === 8, String(r.files.length));
@@ -262,6 +264,150 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			sm > 0 && sm < text4.indexOf('## 1-quality-step') && text4.indexOf(e4.twoComp.step30min[12].node.T1.quality.toFixed(3)) >= 0 && text4.indexOf('\u2014') < 0 && !/letter|Bentley/i.test(text4));
 		ok('every paragraph is one line and no code appears', text4.split('\n').filter((l) => l.trim()).every((l) => /^#|^[A-Z`]|^\d/.test(l)) && !/```|=>|function /.test(text4));
 		fs.rmSync(out4, { recursive: true, force: true });
+	}
+
+	console.log('\nTom\'s ten saves of 2026-11-03 (dev/lpn-spike/wtg-saves-epanet.js, dev/wtg-export.md "Tom\'s ten saves")');
+	{
+		const sv = require('./wtg-saves-epanet.js');
+		const base = sv.chlorineNet();
+		// 5. a reaction rate on one pipe: his save stored (specify 1, -10) and (specify 1, -5) in the pipe's row, in his units
+		{
+			const w = plainWrite(sv.CASES['rates-one-pipe'](base));
+			const db = wrap(w.bytes);
+			const p2 = elOf(db, '2'), p3 = elOf(db, '3');
+			const a = rows(db, 'SELECT * FROM IdahoPipe_Constituent_Data WHERE DomainElementID = ?', [p2])[0], b = rows(db, 'SELECT * FROM IdahoPipe_Constituent_Data WHERE DomainElementID = ?', [p3])[0];
+			ok('rates on one pipe: pipe 2 specifies bulk -10 and wall -5 (as Tom\'s save), pipe 3 specifies none', a.Constituent_SpecifyLocalBulkReactionRate === 1 && a.Constituent_LocalBulkReactionRate === -10
+				&& a.Constituent_SpecifyLocalWallRate === 1 && a.Constituent_WallReactionRate === -5 && a.Constituent_PipeZeroOrderWallReactionRate === 0 && b.Constituent_SpecifyLocalBulkReactionRate === 0 && b.Constituent_SpecifyLocalWallRate === 0, JSON.stringify(a));
+			ok('rates on one pipe: written with no candidate', w.report.candidateWritten === undefined && w.report.chemicalWritten === true);
+			db.close();
+		}
+		// 6. a bulk rate on the tank
+		{
+			const w = plainWrite(sv.CASES['rate-tank'](base));
+			const db = wrap(w.bytes);
+			const t = rows(db, 'SELECT * FROM ConventionalTank_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'T1')])[0];
+			ok('rate on the tank: T1 specifies bulk -30 and keeps mixing code 1 (as Tom\'s save)', t.Constituent_TankSpecifyLocalBulkRate === 1 && t.Constituent_TankBulkReactionRate === -30 && t.TankMixingModel === 1, JSON.stringify(t));
+			db.close();
+		}
+		// 7. a pattern on the booster
+		{
+			const w = plainWrite(sv.CASES['source-pattern'](base));
+			const db = wrap(w.bytes);
+			const s0 = rows(db, 'SELECT * FROM BaseIdahoNode_Constituent_Data WHERE DomainElementID = ?', [elOf(db, 'J0')])[0];
+			ok('source pattern: J0 is a set point source (code 2, 1.0) naming pattern SP', s0.Constituent_IsConstituentSource === 1 && s0.ConstituentSourceType === 2 && s0.BaselineConcentration === 1 && s0.Constituent_ConstituentSourcePattern === supOf(db, 'SP'), JSON.stringify(s0));
+			db.close();
+		}
+		// 1. a pump switched on a tank level: the action is the pump itself (ElementType 68, status 0 On / 1 Off), as Tom's save stores it
+		{
+			const w = plainWrite(sv.CASES['ctl-pump-level'](base));
+			const db = wrap(w.bytes);
+			const acts = rows(db, 'SELECT a.SimpleActionType_Element AS el, a.ElementType AS ty, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID ORDER BY p.ActionPumpStatus');
+			ok('pump level controls: two actions on pump PU1 itself (type 68), one Off (1) and one On (0)', acts.length === 2 && acts.every((a) => a.ty === 68 && a.el === elOf(db, 'PU1')) && acts[0].st === 0 && acts[1].st === 1, JSON.stringify(acts));
+			ok('pump level controls: both sit in the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection')[0].c === 2 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
+			db.close();
+		}
+		// 3. a junction pressure condition (candidate only: the control in Tom's save was never in the control set)
+		{
+			const inp = sv.CASES['ctl-pressure-time'](base).replace(' LINK PU1 OPEN AT TIME 6', '');
+			const wc = plainWrite(inp, { candidate: { pressureControls: true } });
+			const db = wrap(wc.bytes);
+			const j1 = elOf(db, 'J1');
+			const e = rows(db, 'SELECT * FROM IdahoControlCondition_SimpleConditionType_ElementType')[0];
+			const op = rows(db, 'SELECT * FROM IdahoControlCondition_ConditionType_SimpleConditionType')[0];
+			ok('pressure condition (candidate): J1, 60 in the pressure column, element type 50, node attribute 2, operator greater (1), as Tom\'s save', e && e.ElementType_Element === j1 && e.ElementType_Pressure === 60 && e.ElementType_TankLevel === 0 && e.ControlConditionElementType === 50
+				&& rows(db, 'SELECT NodeAttribute AS a FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType')[0].a === 2 && op.SimpleConditionType === 0 && op.CompareOperator === 1, JSON.stringify(e));
+			db.close();
+			const wp = plainWrite(inp);
+			const dbp = wrap(wp.bytes);
+			ok('without the candidate flag no pressure condition is written', rows(dbp, 'SELECT COUNT(*) AS c FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType WHERE NodeAttribute = 2')[0].c === 0);
+			dbp.close();
+		}
+		// 4. pressure-driven demand: power 0.5, threshold 40 psi
+		{
+			const w = plainWrite(sv.CASES['pdd-on'](base));
+			const db = wrap(w.bytes);
+			const sys = rows(db, 'SELECT * FROM PressureDependentDemand_SystemData')[0];
+			const fn = rows(db, 'SELECT * FROM PressureDependentDemandFunction')[0];
+			ok('pressure-driven demand: a type 60 function, threshold 40, has threshold 1, power type 0, exponent 0.5 (as Tom\'s save)', fn && fn.SupportElementID === sys.PressureDependentDemand_GlobalPDDFunction && fn.PressureDependentDemandFunction_PressureThreshold === 40
+				&& fn.PressureDependentDemandFunction_HasThresholdPressure === 1 && fn.PddFunctionType === 0
+				&& rows(db, 'SELECT PowerFunctionType_PowerFunctionExponent AS e FROM PressureDependentDemandFunction_PddFunctionType_PowerFunctionType')[0].e === 0.5
+				&& rows(db, 'SELECT SupportElementTypeID AS t FROM HMISupportElement WHERE SupportElementID = ?', [fn.SupportElementID])[0].t === 60, JSON.stringify(fn));
+			ok('pressure-driven demand: global reference pressure 0, percent 100, equals threshold 1, and the calculation option is on', sys.GlobalReferencePressure === 0 && sys.GlobalPddPercent === 100 && sys.GlobalRefPressureEqualsPressureThreshold === 1
+				&& rows(db, 'SELECT EpaNetEngine_UsePressureDependentDemand AS u FROM EpaNetEngine')[0].u === 1);
+			db.close();
+			const wm = plainWrite(sv.CASES['pdd-on'](base).replace('Minimum Pressure   \t0', 'Minimum Pressure   \t5'));
+			const dbm = wrap(wm.bytes);
+			ok('a minimum pressure above 0 has no place in WaterGEMS\'s function: nothing is written', !wm.report.pddWritten && rows(dbm, 'SELECT COUNT(*) AS c FROM PressureDependentDemandFunction')[0].c === 0
+				&& rows(dbm, 'SELECT EpaNetEngine_UsePressureDependentDemand AS u FROM EpaNetEngine')[0].u === 0);
+			dbm.close();
+		}
+		// 9. a coordinate system: EPSG:2223, as Tom's spatial-ref save. Only the data set's definition column changes; the drawn feet stay
+		{
+			const crsJson = require('zlib').gunzipSync(fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'data', 'wtg-template', 'crs-epsg-2223.json.gz'))).toString('utf8');
+			const inp = base.replace(/(\[COORDINATES\][\s\S]*?)(\n\[)/, (m, a, b) => a.replace(/(\n \S+\s+)([\d.]+)(\s+)([\d.]+)/g, (mm, id, x, sp, y) => id + (x * 1000) + sp + (y * 1000)) + b);
+			const w = plainWrite(inp, { crsJson: crsJson });
+			const db = wrap(w.bytes);
+			const col = rows(db, 'SELECT HmiModelCoordinateReference AS c FROM IdahoDataSet')[0].c;
+			const j = JSON.parse(col);
+			ok('spatial reference: the data set holds the EPSG:2223 definition as saved (NAD83 Arizona Central, international foot)', col === crsJson && j.horizontalCRS.epsg === 2223 && j.horizontalCRS.unit === 'InternationalFoot' && j.verticalCRS.id === 'NAVD88');
+			const g = rows(db, "SELECT HMIGeometry AS g FROM BaseIdahoNode_HmiDataSetGeometry_Data WHERE DomainElementID = ?", [elOf(db, 'J0')])[0].g;
+			const dv = new DataView(g.buffer, g.byteOffset, g.byteLength);
+			ok('spatial reference: J0 sits at 2000, 1000 as Tom\'s save shows, with no scale applied', near(dv.getFloat64(g.byteLength - 16, true), 2000, 1e-9) && near(dv.getFloat64(g.byteLength - 8, true), 1000, 1e-9), String(g.byteLength));
+			db.close();
+			const w0 = plainWrite(base);
+			const db0 = wrap(w0.bytes);
+			ok('without a coordinate system the template\'s empty definition stays', rows(db0, 'SELECT HmiModelCoordinateReference AS c FROM IdahoDataSet')[0].c === '');
+			db0.close();
+		}
+		// 2. a logical control (Tom's ctl-logical save: HasElse 1, ElseAction the else action, priority 3), now in the control set
+		{
+			const w = plainWrite(sv.CASES['ctl-logical'](base));
+			const db = wrap(w.bytes);
+			const lt = rows(db, 'SELECT * FROM IdahoControl_ControlType_LogicalType');
+			const ctl = rows(db, 'SELECT * FROM IdahoControl');
+			const pu1 = elOf(db, 'PU1');
+			ok('rule: one control written with HasPriority 1, HasElse 1, priority 3, ControlType 0', lt.length === 1 && ctl.length === 1 && lt[0].LogicalType_HasPriority === 1 && lt[0].LogicalType_HasElse === 1 && lt[0].ControlPriority === 3 && ctl[0].ControlType === 0, JSON.stringify(lt));
+			const els = rows(db, 'SELECT a.SimpleActionType_Element AS el, a.ElementType AS ty, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID WHERE a.SupportElementID = ?', [lt[0].LogicalType_ElseAction]);
+			const thn = rows(db, 'SELECT a.SimpleActionType_Element AS el, p.ActionPumpStatus AS st FROM IdahoControlAction_ControlActionType_SimpleActionType a JOIN IdahoControlAction_PumpAttribute_ActionPumpStatusType p ON p.SupportElementID = a.SupportElementID WHERE a.SupportElementID = ?', [ctl[0].IdahoControl_ControlAction]);
+			ok('rule: THEN is PU1 On (0) and ELSE, a real action row, is PU1 Off (1), both on the pump (type 68)', els.length === 1 && els[0].el === pu1 && els[0].ty === 68 && els[0].st === 1 && thn.length === 1 && thn[0].el === pu1 && thn[0].st === 0, JSON.stringify([els, thn]));
+			const cond = rows(db, 'SELECT e.ElementType_Element AS el, e.ElementType_TankLevel AS v, e.ControlConditionElementType AS ty, o.CompareOperator AS op FROM IdahoControlCondition_SimpleConditionType_ElementType e JOIN IdahoControlCondition_ConditionType_SimpleConditionType o ON o.SupportElementID = e.SupportElementID');
+			ok('rule: condition is T1 level < 14 (operator 3, element type 52)', cond.length === 1 && cond[0].el === elOf(db, 'T1') && cond[0].v === 14 && cond[0].op === 3 && cond[0].ty === 52, JSON.stringify(cond));
+			ok('rule: a member of the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection WHERE LogicalControlCollection_IdahoLogicalControlID = ?', [ctl[0].SupportElementID])[0].c === 1 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
+			ok('rule: description reads like Tom\'s ("... THEN ... ELSE ... PRIORITY 3")', /^IF .*THEN .*ELSE .*PRIORITY 3$/.test(ctl[0].IdahoControl_Description), ctl[0].IdahoControl_Description);
+			ok('rule: no frozen clock-time control is left for PU1', rows(db, 'SELECT COUNT(*) AS c FROM IdahoControl').length === 1);
+			db.close();
+			const unw = (inp, flag) => lib.carriableRules(EC.lpnInpParse(inp), !!flag).unwritten;
+			ok('rule: none is left in the not-written list', unw(sv.CASES['ctl-logical'](base)).length === 0);
+			// no ELSE, no priority: 0, 0, NULL, 0
+			const w2 = plainWrite(addRule(base, 'RULE 2\nIF TANK T1 LEVEL ABOVE 20\nTHEN PUMP PU1 STATUS IS CLOSED'));
+			const db2 = wrap(w2.bytes);
+			const l2 = rows(db2, 'SELECT * FROM IdahoControl_ControlType_LogicalType');
+			ok('rule without ELSE or priority: 0, 0, NULL, 0', l2.length === 1 && l2[0].LogicalType_HasPriority === 0 && l2[0].LogicalType_HasElse === 0 && l2[0].LogicalType_ElseAction === null && l2[0].ControlPriority === 0, JSON.stringify(l2));
+			db2.close();
+			// two premises: not written, named
+			const two = addRule(base, 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const w3 = plainWrite(two);
+			const db3 = wrap(w3.bytes);
+			ok('a two-premise AND rule is not written', rows(db3, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 0);
+			db3.close();
+			ok('...and the not-written list names it (rule 7)', unw(two).join() === '7', unw(two).join());
+			// mixed: written rule 1, unwritten rule 7; only 7 is reported
+			const mix = addRule(addRule(base, 'RULE 1\nIF TANK T1 LEVEL BELOW 14\nTHEN PUMP PU1 STATUS IS OPEN\nELSE PUMP PU1 STATUS IS CLOSED\nPRIORITY 3'), 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const dbm = wrap(plainWrite(mix).bytes);
+			ok('a mix writes rule 1 and reports only rule 7', rows(dbm, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 1 && unw(mix).join() === '7', unw(mix).join());
+			dbm.close();
+			// pressure premise only with the candidate flag
+			const pr = addRule(base, 'RULE 3\nIF NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS CLOSED');
+			ok('a junction pressure rule is held back without the candidate flag and written with it', unw(pr).join() === '3' && unw(pr, true).length === 0);
+		}
+		// The EPANET side, converged (6 minute quality step), against what Tom read
+		const f = await sv.figures();
+		const q = (k, h, n) => f[k].step6min[h].node[n].quality;
+		ok('pump level controls: EPANET T1 grade at hours 12 and 24 ' + f['ctl-pump-level'].step6min[12].node.T1.head.toFixed(2) + ', ' + f['ctl-pump-level'].step6min[24].node.T1.head.toFixed(2) + ' against Tom\'s 131.25 and 131.55', near(f['ctl-pump-level'].step6min[12].node.T1.head, 131.25, 0.2) && near(f['ctl-pump-level'].step6min[24].node.T1.head, 131.55, 0.2));
+		ok('pressure-driven demand: EPANET (minimum 0, required 40 psi, exponent 0.5) delivers ' + f['pdd-on'].step6min[12].node.J1.demand.toFixed(1) + ' gpm at ' + f['pdd-on'].step6min[12].node.J1.pressure.toFixed(1) + ' psi against Tom\'s 290 at 37', near(f['pdd-on'].step6min[12].node.J1.demand, 290, 3) && near(f['pdd-on'].step6min[12].node.J1.pressure, 37, 1));
+		ok('rates on one pipe: EPANET J1 hour 12 ' + q('rates-one-pipe', 12, 'J1').toFixed(3) + ' against Tom\'s 0.845 (the engines differ by about 2 percent; without the rates both read 0.96)', near(q('rates-one-pipe', 12, 'J1'), 0.845, 0.03) && q('base', 12, 'J1') > 0.95);
+		ok('rate on the tank: EPANET T1 hour 24 ' + q('rate-tank', 24, 'T1').toFixed(3) + ' against Tom\'s 0.076', near(q('rate-tank', 24, 'T1'), 0.076, 0.02));
+		ok('source pattern: EPANET J1 hours 6 and 14 ' + q('source-pattern', 6, 'J1').toFixed(3) + ', ' + q('source-pattern', 14, 'J1').toFixed(3) + ' against Tom\'s 0.955 and 0.479', near(q('source-pattern', 6, 'J1'), 0.955, 0.01) && near(q('source-pattern', 14, 'J1'), 0.479, 0.01));
 	}
 
 	fs.rmSync(out, { recursive: true, force: true });

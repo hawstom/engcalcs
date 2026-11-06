@@ -209,10 +209,14 @@ function head(t) { console.log('\n' + t); }
 		const k = r[0], c = q('SELECT IdahoControl_ControlCondition, IdahoControl_ControlAction FROM IdahoControl WHERE SupportElementID = ' + k)[0];
 		const sc = q('SELECT SimpleConditionType, CompareOperator FROM IdahoControlCondition_ConditionType_SimpleConditionType WHERE SupportElementID = ' + c[0])[0];
 		const act = q('SELECT SimpleActionType_Element FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0];
-		const st = q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0] === 0 ? 'OPEN' : 'CLOSED';
-		if (sc[0] === 2) { return 'LINK ' + label(act[0]) + ' ' + st + ' AT CLOCKTIME ' + hm(q('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType WHERE SupportElementID = ' + c[0])[0][0] % 86400); }
+		const isPumpAct = q('SELECT ElementType FROM IdahoControlAction_ControlActionType_SimpleActionType WHERE SupportElementID = ' + c[1])[0][0] === 68;
+		// a pump action (Tom's ctl-pump-level): the read-back EPANET network holds the pump as a node, so it is switched by its upstream pipe
+		const st = (isPumpAct ? q('SELECT ActionPumpStatus FROM IdahoControlAction_PumpAttribute_ActionPumpStatusType WHERE SupportElementID = ' + c[1])[0][0]
+			: q('SELECT ActionPipeStatus FROM IdahoControlAction_PipeAttribute_ActionPipeStatusType WHERE SupportElementID = ' + c[1])[0][0]) === 0 ? 'OPEN' : 'CLOSED';
+		const actLabel = (id) => label(id) + (isPumpAct ? '-A' : '');
+		if (sc[0] === 2) { return 'LINK ' + actLabel(act[0]) + ' ' + st + ' AT CLOCKTIME ' + hm(q('SELECT ClockTimeType_ClockTime FROM IdahoControlCondition_SimpleConditionType_ClockTimeType WHERE SupportElementID = ' + c[0])[0][0] % 86400); }
 		const e = q('SELECT ElementType_Element, ElementType_TankLevel FROM IdahoControlCondition_SimpleConditionType_ElementType WHERE SupportElementID = ' + c[0])[0];
-		return 'LINK ' + label(act[0]) + ' ' + st + ' IF NODE ' + label(e[0]) + ' ' + (sc[1] === 3 ? 'BELOW' : 'ABOVE') + ' ' + e[1];
+		return 'LINK ' + actLabel(act[0]) + ' ' + st + ' IF NODE ' + label(e[0]) + ' ' + (sc[1] === 3 ? 'BELOW' : 'ABOVE') + ' ' + e[1];
 	});
 	const rbInp = rb.inp.replace(/\[CONTROLS\][\s\S]*?(?=\n\[)/, '').replace(/\n\[TIMES\]/, '\n[CONTROLS]\n' + ctl.join('\n') + '\n\n[TIMES]');
 	const ids = parsed.nodes.map((n) => n.id), lids = parsed.links.map((l) => l.id);
