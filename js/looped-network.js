@@ -45119,7 +45119,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function exportWtgFile() {
 		var pcX = EngCalcs.pageConfig || {}, planned = wtgExportPlan(), fmt, scnSentence;
-		fmt = String(pcX.lpn_file_export_item_wtg || '.wtg.sqlite file…').replace(/…$/, '');
+		fmt = String(pcX.lpn_file_export_item_wtg || '.wtg file…').replace(/…$/, '');
 		if (!planned.ok) {
 			askDialog({ kind: 'alert', title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
 				text: wtgFill('lpn_wtg_export_refused', 'This project cannot be written as a .wtg project: {detail}', { detail: planned.detail || planned.error || '?' }) });
@@ -54785,7 +54785,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } },
 			// .wtg project (Task 749): a .wtg and its .wtg.sqlite, built from the template the page holds; the visitor chooses no file.
 			// Asks its own box (scenario, what is left out), so no confirmExportLeaves().
-			{ icon: 'save', label: pc.lpn_file_export_item_wtg || '.wtg.sqlite file…', key: 'lpn_file_export_item_wtg',
+			{ icon: 'save', label: pc.lpn_file_export_item_wtg || '.wtg file…', key: 'lpn_file_export_item_wtg',
 			  tip: pc.lpn_file_export_wtg_tip, fn: exportWtgFile }
 		];
 	}

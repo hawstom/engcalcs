@@ -83,7 +83,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
   > All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.
   @@ NEEDS RULING
 - **`lpn_file_export_item_wtg`**
-  > .wtg.sqlite file…
+  > .wtg file…
   @@ NEEDS RULING
 - **`lpn_file_export_wtg_tip`**
   > Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.
@@ -222,7 +222,7 @@ as is, change it (give the new text), or remove it. CC applies your answer to th
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 2 unmerged branch(es).
+**10 still to read**, of 53 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -396,3 +396,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### feat/wtg-saves (`0c852262b`) — adds no English strings

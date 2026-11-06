@@ -2304,9 +2304,9 @@ $ec_lang['lpn_inp_export_flat_inactive_controls']='These controls and rules refe
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_difference_one']='One thing the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
-// Task 749: File > Export > Network > .wtg.sqlite file. The pair of files that programs opening .wtg projects use.
+// Task 749: File > Export > Network > .wtg file. The pair of files that programs opening .wtg projects use.
 // The menu names no program (Tom, 2026-10-23); {ids} is a list of asset IDs as the project spells them.
-$ec_lang['lpn_file_export_item_wtg']='.wtg.sqlite file…';
+$ec_lang['lpn_file_export_item_wtg']='.wtg file…';
 $ec_lang['lpn_file_export_wtg_tip']='Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.';
 $ec_lang['lpn_wtg_export_lost_lead']='This export does not yet write the following:';
 $ec_lang['lpn_wtg_export_lost_quality']='Water quality: the analysis, reactions, sources, and tank mixing.';
