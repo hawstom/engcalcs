@@ -238,6 +238,51 @@ view; raw lines `dev/label-trials/preprocessing/run-*.jsonl`.
 - **Not yet tested:** Chromium; a non-Base scenario; a pass that writes a setting part-way (none is
   known to). Those three are the port's harness (`port-plan.md` Step 1).
 
+## 6a. E2, run 2026-11-06 (MEASURED)
+
+`dev/label-trials/preprocessing/patch-prune.js` applied to copies of master `47338267` page code
+(`/home/haws/label-trials-work/preproc/e2/`). **Static** = a node or valve symbol box and a pipe
+segment of the first-fit call's input; a Text box, a placed label and a leader are not. The patched
+first-fit keeps a table per static set (checksum of the symbols and pipes, so one per notch) of rows
+(label id, side, sweep, pad), each guarded by every number its answer depends on. A row holds the
+verdict of the static obstacles alone, "pipe under the rows" and "leader through a symbol"; the sweeps
+test only the other labels' ground. A side the table calls blocked is skipped before its boxes are built.
+`bench-e2.js` (E1's bench plus the first pass of each view and test counters); raw lines
+`run-prune-*.jsonl`. A `--verify` copy ran every skipped or cached answer beside the original test over
+all 13 views and threw on any difference: none.
+
+| hypothesis | result | numbers |
+|---|---|---|
+| **H2a** identical fingerprint | **held** | all 13 views, 4 timed runs, the verify copy and both counting copies equal master's |
+| **H2b** at least half of tests against static | **failed** | first-fit tests (box, leader, pipe-under-rows, leader-through-symbol, own-pipe) static share on n600: 1x **45.8%**, 1.5x **32.0%**, 2x 24.8%, 3x 20.6%, 4x 21.6%. Net3 1x 63.9%, 2x 44.1%, 4x 30.1% |
+| **H2c** pass down 15% on n600 1x-2x, net of build | **failed** | first pass of a view (build included), mean of runs 2-4: 1x **+5.1%**, 1.5x +1.2%, 2x +2.8% (slower). Repeat passes: -10.6%, -2.3%, -3.2% |
+| **H2d** build under one first-fit (74 ms) | **failed** | the static-verdict work in a first pass on n600: 1x **473 ms**, 1.5x 265, 2x 133, 3x 51, 4x 24 |
+
+- **Tests removed are real, time saved is not.** Counted in the same patched copy, n600 first-fit tests
+  against master: first pass -17.7% (1x), -18.3%, -20.1%; a repeat pass -51.7%, -36.8%, -31.1%. Net3
+  and Novato 1x lose 41-43% on the first pass (cross-call hits). But a test against a static symbol is
+  a cheap early-out (the distance check rejects most), so the tests removed are the cheap ones; the
+  rest of the pass (candidate and box building, the sort, shed rungs, the dynamic tests) is untouched.
+- **Hit rate on a first pass is low**: n600 1x 28,773 hits, 244,649 misses, 31,892 guard failures;
+  the calls that share a static set give the same label different boxes (a form, a pad, a reach), so
+  one row is overwritten by the next call. A row per call would hit more and cost more memory.
+- **Where the static tests live.** 98% of the static share is symbol boxes (clear test); pipes enter
+  only through "pipe under the rows" (about 2% of tests). Pipes are soft in the clear test, so a pipe
+  never blocks, and a table of "blocked by a pipe" is empty. The prune is a symbol-box prune.
+- **Noise.** Four interleaved runs of five passes on a shared machine; run 1 ran under load
+  (average 7-13) and is in the files but not in the means above. Over all four runs n600 first pass is
+  +7.3%, +7.1%, -1.2%, -0.8%, -1.0% (1x to 4x). Differences under about 5% are not resolved.
+- **Net3 and Novato** first pass is 3-32% slower at 2x and 4x (a table filled and not read again).
+
+**Verdict: do not port it.** It is exact (H2a) and removes a fifth to half of the tests, and still does
+not pay: the first visit is the only one that costs anything (the bank serves revisits in about 13 ms),
+and on the first visit it is no faster and slightly slower. A port would also need the table dropped
+on any geometry edit near a node, any symbol-size or scale change (a notch is its own table), and a
+rebuild per call site; memory is about 11 numbers and a few flags per row (n600: 1,985 rows at 1x,
+about 0.3 MB a notch, 5 notches) and is not the obstacle. What would move the 18% prediction and the
+35% narrow phase is not skipping static tests but cutting the dynamic ones (D in the counts: label
+against label, 55% to 79% of tests on n600) or the re-runs; that is E2's lesson for §4.3 and §4.5.
+
 ## 7. Threats to validity
 
 - The DOM stub's character width is nominal; the browser's share of DOM work is larger, so stub
