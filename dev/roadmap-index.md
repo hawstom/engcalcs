@@ -7,14 +7,19 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 2 · Soon (75): 17 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
+**85 open tasks.** Next (100): 7 · Soon (75): 11 · Someday (50): 31 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (2)
+## 100 — Next (7)
 
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
-- Task 813 — Pre-processing the network for label placement: methods, benefits, results.
+- Task 812 — Port the label bench's proven findings to master, one branch each.
+- Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
+- Task 847 — The built-in solver leaves flow circulating in a loop with no demand.
+- Task 848 — Report column widths a reader can drag, kept per browser.
+- Task 849 — Every place uses the short Properties name for a field.
+- Task 853 — Stop sending every calculator the map page's stylesheet comments.
 
-## 75 — Soon (17)
+## 75 — Soon (11)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -24,17 +29,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
-- Task 812 — Port the label bench's proven findings to master, one branch each.
-- Task 818 — An MCP server, so an AI agent can run a network.
-- Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
+- Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 823 — Starter examples a new user can build from.
-- Task 847 — The built-in solver leaves flow circulating in a loop with no demand.
-- Task 848 — Report column widths a reader can drag, kept per browser.
-- Task 849 — Every place uses the short Properties name for a field.
 - Task 851 — Net1's legend box covers the Tank label on a phone.
-- Task 853 — Stop sending every calculator the map page's stylesheet comments.
 
-## 50 — Someday (30)
+## 50 — Someday (31)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -64,6 +63,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 817 — Sketch a network that arrives without coordinates.
+- Task 818 — An MCP server, so an AI agent can run a network.
 - Task 832 — Compare Google Docs' Help menu with ours.
 - Task 850 — A master Demands table, one row per demand.
 
