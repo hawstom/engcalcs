@@ -195,7 +195,7 @@ cannot place. Ranked by what a WaterGEMS user loses without the item:
 | 2 | Water quality, reactions, sources, two-compartment mixing | Yes | **Written**: every mixing model, a chemical run, age and trace. Per-element rates, source patterns and the quality step stay candidate-only (below) |
 | 3 | Emitter coefficients | Yes: ft3/s per psi^n | **Written** (below) |
 | 4 | Pump speed pattern | Yes: `VSPType` 0 | **Written** (below) |
-| 5 | Energy price, price pattern, demand charge | No: `EnergyPricing` is empty | Stays |
+| 5 | Energy price, price pattern, demand charge | The constant price: yes (Tom's `energy-price` save, 2026-11-04). Pattern and demand charge: no row seen | **Constant price written** ("Energy price" below); pattern and demand charge stay |
 | 6 | Controls on a pressure or other condition; rule-based controls | No: `IdahoControl_ControlType_LogicalType` is empty; the only condition codes seen are clock time and tank level | Stays (written as the clock times EPANET switched them) |
 | 7 | Pressure-driven demand model | No | Stays |
 | 8 | Description, tag, demand category names | Yes: `HMIModelingElement.Notes` is a field of every element | **Written** into Notes (`Tag: x`, `Demand categories: Residential 100 gpm; ...`). No tag or category field was seen, so the lines left the box |
@@ -341,7 +341,7 @@ Settled:
 **Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
 pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
 without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Written since Tom's ten saves (next section): per-pipe and per-tank rates, source patterns, pump controls, pressure-driven
-demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), energy price, map text, backdrop, true positions for any other system.
+demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Written since the `energy-price` save: a constant energy price, global or per pump. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), energy price pattern and demand charge, map text, backdrop, true positions for any other system.
 
 ## Tom's ten saves, 2026-11-03 night: how WaterGEMS stores each
 
@@ -362,7 +362,7 @@ balance; a rule firing prints "Pump 39 changed by rule 47".
 | 5 | `rates-one-pipe` | `IdahoPipe_Constituent_Data` row: specify bulk 1, bulk -10, specify wall 1, wall -5, zero-order wall 0 | `J1` 0.845 | 0.865 | within 2 percent; **written** |
 | 6 | `rate-tank` | `ConventionalTank_Constituent_Data`: specify bulk 1, bulk -30 | `T1` hour 24 0.076 | 0.065 | agrees to 0.011; **written** |
 | 7 | `source-pattern` | source node's `Constituent_ConstituentSourcePattern` = a new `IdahoPattern` | `J1` 0.955, 0.479 | 0.962, 0.480 | agrees; **written** |
-| 8 | `energy-price` | 2026-11-05 readings only (plain hydraulic EPS, constant 0.10/kWh; Compute is a button inside the Energy Cost box): energy 222.1 kWh, cost 22.21, storage cost -0.44 (`T1` ends 1.68 ft above its start), daily cost 21.77. His three new save files had not reached this machine, so where the price and the storage are stored is unknown | | EPANET at 75 percent efficiency: 222.1 kWh, 22.21 exactly | the computed energy agrees; **not written** |
+| 8 | `energy-price` | 2026-11-05 readings only (plain hydraulic EPS, constant 0.10/kWh; Compute is a button inside the Energy Cost box): energy 222.1 kWh, cost 22.21, storage cost -0.44 (`T1` ends 1.68 ft above its start), daily cost 21.77. His three new save files had not reached this machine, so where the price and the storage are stored was unknown until the save arrived (below) | | EPANET at 75 percent efficiency: 222.1 kWh, 22.21 exactly | the computed energy agrees; **constant price written** |
 | 9 | `spatial-ref` | one column, see below | J0 2000,1000; J1 3000,1000 | | **written for EPSG:2223 only** |
 | 10 | `map-extras` | **neither `.wtg` nor `.sqlite` changed** | | | not possible from these files |
 
@@ -409,15 +409,29 @@ Mapping: WaterGEMS delivers demand x (pressure / threshold)^power below the thre
 PDA`, `Minimum Pressure 0`, `Required Pressure` = threshold, `Pressure Exponent` = power. EPANET gives 290.4 gpm at 37.5 psi against 290
 at 37. A project with a minimum pressure above 0 has no form in WaterGEMS's function and keeps its "demand model" line in the box.
 
-**8. Energy price.** No `energy-price` file was saved, so no table is known and nothing is written. Tom's question, whether energy cost
-and a quality run cannot share an alternative, **cannot be confirmed from Bentley's public pages**. What they do say: energy cost
-needs the scenario computed first and only EPS scenarios can be used
-(https://DOCS.BENTLEY.COM/LiveContent/web/Bentley WaterGEMS SS6-v1/en/76019.html); the price is chosen in an Energy Pricing manager
-(constant, pattern and so on) and cost is read through the Scenario Energy Cost tool, with block rates only in Energy Management
-(https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/7242.energy-cost-and-energy-management,
-which now redirects). Neither says a constituent run blocks it. The calculation type is a property of the calculation option, and
-Constituent (3) replaces the plain hydraulic type (5) in our file; a plausible but unconfirmed reading is that the cost tool works from a
-plain hydraulic result. A save with a Constant price in the manager, in a plain-hydraulic scenario, would show where the price lives.
+**8. Energy price** (Tom's `energy-price` save, 2026-11-04; readings of 2026-11-05: 222.1 kWh, cost 22.21, storage cost -0.44,
+daily cost 21.77). Diffed against `ctl-pressure-time-2` of the same folder, the closest save of the same network: the only
+differences are the price and one more, `EpaNetEngine.CalculationType` 3 to 5 (Tom set Hydraulics Only; `ctl-pressure-time-2` was
+a chlorine run). Against the plain `chlorine` original the diff also carries every control table, so that one was not used. The
+price is three rows:
+
+- A new support element of type 61 (`HMISupportElement` row, `HMIModelingElement` ElementType 4, label `Energy Pricing - 1`, smart
+  label `Energy Pricing - 0000001`), counted in `HMIElementTypeCount` (1, 4, 61).
+- One `EnergyPricing` row on it: `EnergyPricing_EnergyPrice` and `EnergyPricing_StartEnergyPrice` both 0.1 (currency per kWh, as typed),
+  billing period 30, start time 946684800, `TariffType` 0, `PeakChargeType` 0, peak demand charge 0 and every curve count 0 (the
+  column default for `TariffType` is 1, so the saved 0 is written explicitly).
+- The pump's existing `BasePump_EnergyCost_Data` row (PU1, the alternative the pump's other data is in) keeps
+  `EnergyCost_InlcudeInEnergyCalculation` 1 and now holds `EnergyCost_EnergyPricingID` = the new element (it was empty). The
+  carbon columns stay 0 and empty.
+
+Written: `[ENERGY] Global Price` reaches every pump with no price of its own, a pump's own `PRICE` replaces it, and a price of zero
+is no price (the pump's pointer stays empty). One `EnergyPricing` element per distinct price, shared by the pumps that pay it; a
+shared element is inferred, because Tom attached the one he made to one pump. Not written: `Global Pattern` and a pump's `PATTERN`
+(the save holds a constant, so the curve tables `EnergyPriceCurveCount` counts are unseen), `Demand Charge` (the peak-charge columns
+are all at their defaults), and a block-rate tariff. These stay on the not-written list, now worded "Energy price pattern and demand
+charge". EPANET's figure for the pump over 24 h at 75 percent efficiency: 222.06 kWh, 22.21 at 0.10 (`wtg-energy-price-harness.js`). The
+storage cost beside it (-0.44, the difference between 22.21 and the daily cost 21.77) is computed by WaterGEMS; no changed field holds it. Whether a quality run blocks "Compute with
+energy cost" is answered by Tom's screen, not by the file: the energy-price save is a plain hydraulic run.
 
 **9. Spatial reference.** One column changed: `IdahoDataSet.HmiModelCoordinateReference` went from empty to a 17 KB JSON text: horizontal CRS
 id `AZ83-CIF`, EPSG 2223, "NAD83 Arizona State Plane, Central Zone, Intl Foot", unit InternationalFoot, the datum's transform paths and extent, and a
@@ -602,7 +616,8 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[CURVES]` pump, headloss, volume | yes | as above | done |
 | `[CURVES]` efficiency curve | yes: two or more points are `PumpEfficiencyType` 2 with a `..._MultipleEfficiencyPointsType` row (count) and one `IdahoPumpDefinition_DischargeEfficiencyCurve` row per point (flow gpm to ft3/s, efficiency as stated); one point is written as a constant. Pumps share a definition only when head and efficiency curves both match | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2); table layout from the template's schema, no sample states a non-empty one | done; read back by our reader (`wtg-export-demands.inp`). Efficiency never changes a hydraulic result, so the EPANET agreement is unaffected; whether WaterGEMS accepts the rows is Tom's test |
 | `[ENERGY]` global efficiency | yes | constant efficiency | done |
-| `[ENERGY]` price, price pattern, demand charge | no | `EnergyCost_EnergyPricingID` points at an energy-pricing support element; no sample holds one | no |
+| `[ENERGY]` price | yes | constant price: `EnergyPricing` element, pointed at by `EnergyCost_EnergyPricingID` | done |
+| `[ENERGY]` price pattern, demand charge | no | no sample holds a pattern or a charge | no |
 | `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls in the same control set | the one sample control (Zenodo) | done |
 | `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | yes, as tank-level controls in a control set | Tom's `wtg-control-1` (see "Tank-level controls: the codes") | done; whether WaterGEMS fires them is Tom's test |
 | `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes (the ELSE column and a priority column are in `IdahoControl_ControlType_LogicalType`) | needs a sample with an ELSE |
@@ -618,8 +633,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 
 **Candidates for a later round**, where the sample files already show the table that would hold the item
 (fact-check table above): the demand multiplier (`EpaNetEngine_NormalDemandAdjustmentsCollection`, one row in
-the Zenodo EPS model, scope code still to decode), energy pricing (`EnergyPricing` and its curves, pointed at
-by the pump), pump speed pattern (`StandardPump_Physical_VSPType_PatternBasedType`), tank mixing
+the Zenodo EPS model, scope code still to decode), energy price pattern and demand charge (the constant price is written; the curves are unseen), pump speed pattern (`StandardPump_Physical_VSPType_PatternBasedType`), tank mixing
 (`TankMixingModel`; 1 = mixed is the only value seen), emitters (the table exists; the storage unit is
 Ask 2). Each needs a saved example with a non-empty row before it is written.
 
@@ -652,6 +666,7 @@ what he sees instead.
 
 ```
 node dev/lpn-spike/wtg-export-harness.js
+node dev/lpn-spike/wtg-energy-price-harness.js
 node dev/lpn-spike/wtg-export.js --template ~/webdev/fixtures/wtg-tgh-1/WTG-tgh-1.wtg.sqlite \
      --wtg ~/webdev/fixtures/wtg-tgh-1/WTG-tgh-1.wtg --out <dir>
 ```
