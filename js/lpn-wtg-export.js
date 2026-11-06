@@ -285,7 +285,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	let nextId = keptMax + 1;
 	const newId = () => nextId++;
 	const live = { 55: 0, 56: 0, 52: 0, 69: 0, 68: 0, 64: 0, 65: 0, 66: 0, 60: 0, 61: 0, 62: 0 };
-	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 59: 0, 63: 0 };
+	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 59: 0, 61: 0, 63: 0 };
 
 	function modeling(id, type, label, notes) {
 		insert(db, 'HMIModelingElement', {
@@ -656,6 +656,39 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		pipeElId[l.id] = aId;     // pump on/off is carried by the upstream pipe's status
 		nPump++; nAdded += 2;
 	});
+	// ---- energy price (dev/wtg-export.md, "Energy price") ----
+	// A constant price is one EnergyPricing support element (type 61); a pump points at it through its BasePump_EnergyCost_Data
+	// row. [ENERGY] "Global Price" reaches every pump with no price of its own, a pump's own PRICE replaces it, and a price
+	// of zero is no price at all. One element per distinct price. A price pattern and a demand charge are not written.
+	{
+		const en = EngCalcs.lpnEnergyParse ? EngCalcs.lpnEnergyParse((parsed.inpSections || {}).ENERGY || []) : null;
+		const priceEl = {}, written = [];
+		if (en) {
+			links.forEach((l) => {
+				if (l.type !== 'pump') { return; }
+				const own = Object.prototype.hasOwnProperty.call(en.price, l.id) ? en.price[l.id] : en.globalPrice;
+				if (!(own > 0)) { return; }
+				const key = String(own);
+				if (!priceEl[key]) {
+					const eid = newId();
+					supportElement(eid, 61, 'Energy Pricing - ' + (Object.keys(priceEl).length + 1));
+					insert(db, 'EnergyPricing', {
+						SupportElementID: eid, EnergyPricing_IncludePeakDemandCharge: 0, EnergyPricing_BillingPeriod: 30,
+						EnergyPricing_EnergyPricingStartTime: EPOCH_2000, EnergyPricing_PeakDemandCharge: 0,
+						EnergyPricing_StartEnergyPrice: own, EnergyPricing_EnergyPrice: own, EnergyPricing_AboveRangeEnergyPrice: 0,
+						EnergyPricing_BillingDemand: 0, EnergyPricing_UseAdvancedPeakCharges: 0, TariffType: 0, PeakChargeType: 0,
+						EnergyPriceCurveCount: 0, BlockRateCurveCount: 0, BlockRateBasedOnDemandCurveCount: 0,
+						ClockTimePeakChargesCount: 0, SimulationTimePeakChargesCount: 0
+					});
+					priceEl[key] = eid;
+				}
+				db.run('UPDATE BasePump_EnergyCost_Data SET EnergyCost_EnergyPricingID = ? WHERE DomainElementID = ?', [priceEl[key], pumpNodeId[l.id]]);
+				written.push(l.id);
+			});
+		}
+		report.counts.energyPrices = Object.keys(priceEl).length; report.counts.pumpsWithPrice = written.length;
+		if (written.length) { carried('energy price: ' + report.counts.energyPrices + ' constant price' + (report.counts.energyPrices > 1 ? 's' : '') + ' on ' + written.length + ' pump' + (written.length > 1 ? 's' : '')); }
+	}
 	report.counts.pipes = nPipe; report.counts.pumps = nPump; report.counts.valves = nValve; report.counts.pumpConnectingPipes = nAdded;
 	carried('junctions ' + nJ + ', reservoirs ' + nR + ', tanks ' + nT + ', pipes ' + nPipe + ', pumps ' + nPump + ' (each a node with ' + 2 + ' added 1 ft pipes), valves ' + nValve);
 
@@ -1038,7 +1071,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.close();
 	report.skippedColumns = Object.keys(skippedColumns);
 	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
-	report.notCarried.push(((report.chemicalWritten || report.ageTraceWritten) ? 'quality analysis other than the run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', energy price and pattern, the [REPORT] settings');
+	report.notCarried.push(((report.chemicalWritten || report.ageTraceWritten) ? 'quality analysis other than the run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', energy price pattern and demand charge, the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	return { bytes: bytes, report: report };
 }
@@ -1230,6 +1263,18 @@ function carriableRules(parsed, pressure) {
 	return out;
 }
 
+// The [ENERGY] lines the writer has no place for: a price pattern (global or a pump's) and a demand charge other than zero.
+// A constant price, global or a pump's own, is written (dev/wtg-export.md, "Energy price").
+function energyNotWritten(lines) {
+	return (lines || []).filter((ln) => {
+		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);
+		if (f.length < 2) { return false; }
+		const key = f.slice(0, -1).join(' ').toLowerCase(), val = f[f.length - 1];
+		if (/pattern/.test(key)) { return true; }
+		return /charge/.test(key) && Number(val) !== 0;
+	});
+}
+
 function plan(doc, opts) {
 	const out = EngCalcs.lpnExportInp(doc, opts || {});
 	if (!out || !out.ok) { return { ok: false, error: out && out.error, detail: out && out.detail }; }
@@ -1260,15 +1305,8 @@ function plan(doc, opts) {
 	// The .inp this plan reads back never states it (js/lpn-patterns.js), so it is read from the document itself.
 	const dt = (doc && doc.times) || {}, qStep = dt.qualityStep, hStepSec = (parsed.times && parsed.times.hydraulicStep) || 3600;
 	const qualityStepSeconds = (typeof qStep === 'number' && qStep > 0 && Math.abs(qStep - hStepSec / 10) > 0.5) ? qStep : 0;
-	// An energy line that states a price, a price pattern or a demand charge other than zero. Efficiency lines are carried.
-	const price = (secs.ENERGY || []).filter((ln) => {
-		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);
-		if (f.length < 2) { return false; }
-		const key = f.slice(0, -1).join(' ').toLowerCase(), val = f[f.length - 1];
-		if (/efficiency/.test(key)) { return false; }
-		if (/pattern/.test(key)) { return true; }
-		return /price|charge/.test(key) && Number(val) !== 0;
-	});
+	// An energy line that states a price pattern or a demand charge other than zero (a constant price is written).
+	const price = energyNotWritten(secs.ENERGY || []);
 	if (price.length) { notCarried.push({ code: 'energy_price', ids: [] }); }
 	{ const rc = carriableRules(parsed, !!(opts && opts.candidate && opts.candidate.pressureControls)); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
 	const frozen = [];
@@ -1430,6 +1468,6 @@ EngCalcs.lpnWtgExportSetEngine = function (initSqlJs, wasmBinary) { injected = {
 EngCalcs.lpnWtgExportTestedSchemas = TESTED_SCHEMAS.slice();
 // For the spike's command line and harness (dev/lpn-spike/wtg-export.js): the pieces under the page.
 EngCalcs.lpnWtgExportInternals = { writeWtg: writeWtg, patchWtgXml: patchWtgXml, symbolMultiplier: symbolMultiplier, smartLabel: smartLabel,
-	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules };
+	referenceSchedule: referenceSchedule, GPM_TO_CFS: GPM_TO_CFS, carriableRules: carriableRules, energyNotWritten: energyNotWritten };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));
