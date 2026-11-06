@@ -97,6 +97,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-11-05 night (sixty-seventh session, Opus main, Sonnet agents)
 
+- **GitHub master is 6fc817702 (suite green, pushed 11-06).** Master holds one more merge, this handoff, unchecked: fold it into the next batch with `research/label-prepass`.
 - **`feat/wtg-saves` merged on his word** (*"Yes. Merge once they pass."*) after both control tests passed: 1-rule exactly (On 338 gpm, 10.90, 11.38); 2-pressure statuses exact (Off at 5, On at 8), levels 8.71/10.34 against EPANET 8.75/10.36, J1 37.58/34.08 against 37.42/34.09. Pressure controls are no longer a trial. His three redo saves are in `~/tom-files/2026-11-04/wtg-saves-redo/`; the energy price is built from `energy-price.wtg.sqlite` on its own branch (see below), Task 749 stays open for it.
 - **not-epanet.org: his call** (*"Retire the repository and point the domain straight at epanet-plus-plus.org"*). The cPanel domain stays; its `.htaccess` 301s to epp (not-epanet.org ea0fd2b, needs his pull there); archiving the GitHub repository is his click (no `gh` or token on jasmine). Dropped from the sibling-sites rule.
 - **Task 813 promoted to 100 on his word** (experiment E2, static candidate pruning per notch).
