@@ -7,13 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 1 · Soon (75): 18 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
+**85 open tasks.** Next (100): 2 · Soon (75): 17 · Someday (50): 30 · Maybe (25): 17 · Parked (5): 19
 
-## 100 — Next (1)
+## 100 — Next (2)
 
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
+- Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 
-## 75 — Soon (18)
+## 75 — Soon (17)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -24,7 +25,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
-- Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 818 — An MCP server, so an AI agent can run a network.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
 - Task 823 — Starter examples a new user can build from.
