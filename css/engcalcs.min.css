@@ -1465,6 +1465,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-dot::before { background: var(--ec-held-ink); }
 .lpn-ovm-hollow::before { border: 1px solid var(--ec-ink-subtle); opacity: 0.6; }
 .lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
+.lpn-ovm-up { position: absolute; top: 0; inset-inline-start: 0; height: 0.45em; align-items: flex-start; z-index: 1; }
+.lpn-ovm-up::before { content: ''; display: block; width: 0; height: 0; margin-top: 0.05em; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-bottom: 0.4em solid var(--ec-held-ink); }
+#lpn_popup_fields.lpn-gprops .lpn-ggut .lpn-ovm:has(> .lpn-ovm-up) { position: relative; }
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 .lpn-set-heldlist { display: flex; flex-wrap: wrap; column-gap: 1em; margin: 0 0 0.2em; margin-inline-start: 1.9em; width: auto; font-size: 0.85em; color: var(--ec-ink-subtle); }

@@ -1656,6 +1656,8 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Showing {n} of {all}.';
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
 $ec_lang['lpn_ovm_child_ask']='Clear child overrides ({n} total)?';
 $ec_lang['lpn_ovm_child_tip']='Child scenarios override this value ({n} total). Click to clear their overrides.';
+$ec_lang['lpn_ovm_push_ask']='Push override upward? Scenarios that inherit it change ({n} total).';
+$ec_lang['lpn_ovm_push_tip']='Push override upward';
 $ec_lang['lpn_ovm_dot_clear']='Click to clear it.';
 $ec_lang['lpn_ovm_dot_clear_one']='Click to clear this override.';
 $ec_lang['lpn_ovm_dot_alt']='This override is stored in alternative "{alternative}".';

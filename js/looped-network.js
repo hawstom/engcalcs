@@ -73350,6 +73350,94 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return out;
 	}
+	/**
+	 * **PUSH AN OVERRIDE UPWARD** (Task 855, Tom 2026-11-06: *"the override is cleared in the current
+	 * alternative and entered in its parent."*). The open scenario's own value is cleared and written
+	 * one layer up the chain the category resolves through (treeLayers()), so the scenario reads it
+	 * afterwards: the stored alternative above the one it writes (which changes every scenario using
+	 * it), else the parent scenario's own, else Base's elements. A scenario that names an alternative
+	 * inherits through that alternative's parent, not through its scenario parent (Tom, 2026-10-12).
+	 * pushTarget() is {base: true}, {kind, obj, via?} or null (Base; a Base of its own).
+	 */
+	function pushTarget(el, props) {
+		var scn = activeScenario(), cat = categoryOf(props[0], elGroup(el)), layers, t, i, nx, t2;
+		if (!scn || scn.isBase) { return null; }
+		layers = treeLayers(scn, cat);
+		t = writeTargetFor(scn, cat);
+		for (i = 0; i < layers.length; i++) { if (t && layers[i].obj === t.obj) { break; } }
+		nx = layers[i + 1];
+		if (!nx) { return scn.root === true ? null : { base: true }; }
+		if (nx.kind === 'scn') {
+			t2 = writeTargetFor(nx.obj, cat);
+			return { kind: t2 ? t2.kind : 'scn', obj: t2 ? t2.obj : nx.obj, via: nx.obj };
+		}
+		return { kind: nx.kind, obj: nx.obj };
+	}
+	// The overridden properties of a marker the push may move: never a morph (a type change lays the asset out afresh).
+	function pushableProps(el, props) {
+		var held = props.filter(function (p) { return hasOverride(el, p); });
+		return held.length && !held.some(function (p) { return !!LPN_MORPH_PROP[p]; }) ? held : [];
+	}
+	/**
+	 * **THE OTHER SCENARIOS A PUSH CHANGES**: those whose value for the element comes from the holder
+	 * the push writes (or from Base, where that is the plain elements), not counting the open scenario
+	 * or the scenarios below it (they already show this value), and not its parent scenario, the one a
+	 * push is meant for. A scenario sharing the holder is counted, so a plain push into a parent asks nothing.
+	 */
+	function pushOtherScenarios(el, props) {
+		var scn = activeScenario(), tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el),
+			holder = tgt && !tgt.base ? tgt.obj : null, below = scenarioDescendants(scn), out = [],
+			par = scn.root === true ? null : parentScenarioOf(scn);
+		if (!tgt) { return out; }
+		scenarios.forEach(function (s) {
+			var layers, i, held, reached = false, stopped = false;
+			if (s.isBase || s === scn || (s === par && !tgt.base) || below.indexOf(s) >= 0) { return; }
+			layers = treeLayers(s, cat);
+			for (i = 0; i < layers.length && !stopped; i++) {
+				if (holder && layers[i].obj === holder) { reached = true; stopped = true; break; }
+				held = (layerValuesByCategory(layers[i])[cat] || {})[key] || [];
+				if (held.some(function (pv) { return props.indexOf(pv[0]) >= 0; })) { stopped = true; }
+			}
+			if (reached || (!holder && !stopped)) { out.push(s); }
+		});
+		return out;
+	}
+	// What the open scenario holds for these properties, as [[prop, stored value, effective value]], read before it is cleared.
+	function pushValuesOf(el, props) {
+		var ov = localOverrideMap(activeScenario(), categoryOf(props[0], elGroup(el)))[ovKey(el)] || {};
+		return props.map(function (p) {
+			var eff = p === 'demands' ? ownDemandRows(el) : effective(el, p);
+			return [p, altCopy(ov[p]), altCopy(eff === undefined ? null : eff)];
+		});
+	}
+	// Clear here, write above: the caller has taken the undo snapshot (one step for both).
+	function pushOverrideUp(el, props, vals) {
+		var tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), t, map, layerId;
+		if (!tgt) { return false; }
+		props.forEach(function (p) { clearOverride(el, p); });
+		if (tgt.base) {
+			paneInScenario(baseScenario(), function () { vals.forEach(function (v) { setProp(el, v[0], v[2]); }); });
+			return true;
+		}
+		t = tgt.via ? ownWriteTarget(tgt.via, cat) : tgt;
+		map = t.kind === 'alt' ? (plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {})) : (plainObject(t.obj.overrides) ? t.obj.overrides : (t.obj.overrides = {}));
+		if (!plainObject(map[key])) { map[key] = {}; }
+		vals.forEach(function (v) { map[key][v[0]] = v[1] === undefined ? null : v[1]; });
+		layerId = (t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + t.obj.id;
+		touchTreeKey('pushOverrideUp', layerId, map, key);
+		return true;
+	}
+	// "Push override upward" asked through the page's own dialog when other scenarios change; no
+	// question when none does. `go` runs after the undo snapshot is taken.
+	function askPushOverride(n, go) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!n) { saveUndoSnapshot(); go(); return; }
+		askDialog({ kind: 'confirm', text: (pc.lpn_ovm_push_ask || 'Push override upward? Scenarios that inherit it change ({n} total).').replace('{n}', String(n)) }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			go();
+		});
+	}
 	// "Clear child overrides ({n} total)?", asked through the page's own dialog; `clear` runs on yes,
 	// as one undo step.
 	function askClearChildOverrides(n, clear) {
@@ -73396,7 +73484,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere;
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere, pushProps;
 		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
 		start = ovmRowStart(fields);
 		if (!start) { return; }
@@ -73438,6 +73526,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}));
 			// A row with a dot and a triangle is the one thing that needs the second cell.
 			if (!baseHere) { ovmGutterOn(fields, 'lpn-ovm-gut2'); }
+		}
+		// The orange up arrow over the dot (Task 855): move this override into the parent scenario.
+		pushProps = (o.on && !baseHere && pushTarget(o.el, o.props)) ? pushableProps(o.el, o.props) : [];
+		if (pushProps.length) {
+			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
+				askPushOverride(pushOtherScenarios(o.el, o.props).length, function () {
+					pushOverrideUp(o.el, now, vals);
+					afterPropertyEdit(o.el);
+					refreshScenarioStatus();
+					refreshPopupIfOpen();
+				});
+			}));
 		}
 		fields.insertBefore(g, start);
 		if (!o.on || baseHere) { return; }
