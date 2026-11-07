@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='التفاعل عند جدار الأنبوب
 $ec_lang['lpn_reaction_pipe_tip']='هذا الأنبوب وحده. اتركه فارغاً ليستخدم الأنبوب المعامل المحدد للشبكة كلها تحت الإعدادات، جودة المياه.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='معامل التفاعل';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='التفاعل في الماء المحفوظ في هذا الصهريج، كمعدل بوحدة 1/يوم. الرقم السالب يحلّل المادة الكيميائية والرقم الموجب يزيدها. يبقى الماء في الصهريج أطول بكثير مما يبقى في أي أنبوب، لذا فهنا غالباً يُفقد المتبقي. تعني القيمة الفارغة استخدام معامل التفاعل في المتن المضبوط للشبكة كلها في الإعدادات، الحساب، جودة المياه.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='الضوابط';
 $ec_lang['lpn_inpup_i_rules']='القواعد';
 $ec_lang['lpn_inpup_i_options']='الخيارات';
 $ec_lang['lpn_roughness_method_note']='⚠ أنابيب خشونتها خارج النطاق المعتاد لـ {method}: {n}. القيم لم تتغير وربما أُدخلت لطريقة احتكاك أخرى.';
-$ec_lang['lpn_field_cv']='صمام عدم رجوع (CV)';
 $ec_lang['lpn_field_cv_tip']='ينقل هذا الأنبوب الماء من عقدة بدايته إلى عقدة نهايته فقط، كما يفعل صمام عدم الرجوع. فإن انعكس التدفق أُغلق الأنبوب إلى أن يستطيع الجريان إلى الأمام من جديد. ويسمّي EPANET هذه الحالة CV.';
 $ec_lang['lpn_theme_hc']='تباين عالٍ';
 $ec_lang['lpn_theme_amber']='كهرماني';

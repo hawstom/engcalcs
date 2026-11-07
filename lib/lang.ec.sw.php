@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Mwitikio kwenye ukuta wa bomba, unaotumika kw
 $ec_lang['lpn_reaction_pipe_tip']='Bomba hili peke yake. Kiache tupu na bomba litatumia mgawo uliowekwa kwa mtandao mzima chini ya Mipangilio, Ubora wa maji.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Mgawo wa mwitikio';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Mwitikio ndani ya maji yaliyohifadhiwa kwenye tanki hili, kama kiwango cha 1/siku. Namba hasi huozesha kemikali na namba chanya huiongeza. Maji hukaa kwenye tanki muda mrefu zaidi kuliko kwenye bomba lolote, hivyo mara nyingi hapa ndipo kiasi kinachobaki hupotea. Wazi humaanisha kutumia mgawo wa mwitikio wa wingi wa maji uliowekwa kwa mtandao mzima chini ya Mipangilio, Ukokotoaji, Ubora wa maji.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='vidhibiti';
 $ec_lang['lpn_inpup_i_rules']='kanuni';
 $ec_lang['lpn_inpup_i_options']='chaguo';
 $ec_lang['lpn_roughness_method_note']='⚠ Mabomba yenye usuguo nje ya kiwango cha kawaida cha {method}: {n}. Thamani hazijabadilishwa na huenda ziliingizwa kwa njia nyingine ya msuguano.';
-$ec_lang['lpn_field_cv']='Vali ya kuzuia mtiririko kurudi nyuma (CV)';
 $ec_lang['lpn_field_cv_tip']='Bomba hili hupitisha maji kutoka kifundo chake cha mwanzo hadi kifundo chake cha mwisho tu, kama vali ya kuzuia mtiririko kurudi nyuma inavyofanya. Mtiririko ukitaka kugeuka, bomba hufungwa hadi liweze kutiririsha mbele tena. EPANET huita hali hii CV.';
 $ec_lang['lpn_theme_hc']='Utofautishaji wa juu';
 $ec_lang['lpn_theme_amber']='Kaharabu';

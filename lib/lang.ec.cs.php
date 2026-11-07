@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reakce na stěně potrubí, použitá pro ka�
 $ec_lang['lpn_reaction_pipe_tip']='Toto potrubí samostatně. Ponechte prázdné a potrubí použije koeficient nastavený pro celou síť v Nastavení, Kvalita vody.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Koeficient reakce';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reakce ve vodě v této nádrži jako rychlost v 1/den. Záporné číslo chemickou látku rozkládá a kladné ji zvyšuje. Voda stojí v nádrži mnohem déle než v kterémkoli potrubí, takže právě zde se zbytková koncentrace často ztrácí. Prázdné pole znamená použití koeficientu objemové reakce nastaveného pro celou síť v Nastavení, Výpočet, Kvalita.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='řídicí pravidla';
 $ec_lang['lpn_inpup_i_rules']='pravidla';
 $ec_lang['lpn_inpup_i_options']='volby';
 $ec_lang['lpn_roughness_method_note']='⚠ Potrubí s drsností mimo běžný rozsah pro {method}: {n}. Hodnoty zůstaly beze změny a mohly být zadány pro jinou metodu tření.';
-$ec_lang['lpn_field_cv']='Zpětná klapka (CV)';
 $ec_lang['lpn_field_cv_tip']='Toto potrubí propouští vodu jen z počátečního uzlu do koncového uzlu, jako zpětná klapka. Kdyby se průtok měl obrátit, potrubí se uzavře, dokud nebude moci znovu proudit dopředu. EPANET tento stav nazývá CV.';
 $ec_lang['lpn_theme_hc']='Vysoký kontrast';
 $ec_lang['lpn_theme_amber']='Jantarový';

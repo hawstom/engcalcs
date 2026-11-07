@@ -109,17 +109,6 @@ const EC_TABLE_PARITY_EXEMPT = [
     // (b) one property, two labels.
     'pipe/fn:pipeTypePropLabel' => 'b. the reaction pair a pipe type owns; the columns are '
         . 'lpn_reaction_bulk_short and lpn_reaction_wall_short',
-    'junction/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'pipe/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'pump/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'reservoir/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'tank/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'text/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'valve/lpn_field_active_short' => 'b. the column is lpn_field_active; Properties says Active',
-    'pipe/lpn_field_cv_short' => 'b. the column is lpn_field_cv; Properties says Check valve',
-    'tank/lpn_field_tank_level_short' => 'b. the column is lpn_field_tank_level; Properties says the short form',
-    'tank/lpn_field_tank_minlevel_short' => 'b. the column is lpn_field_tank_minlevel; Properties says the short form',
-    'tank/lpn_field_tank_maxlevel_short' => 'b. the column is lpn_field_tank_maxlevel; Properties says the short form',
     'pipe/lpn_field_auto_length' => 'b. the Length column is the property; Auto length is the flag that says the drawing sets it (lenAuto)',
     'valve/lpn_field_valve_setting_drop' => 'b. the column is lpn_field_valve_setting, which carries '
         . 'no unit on purpose: a valve setting is a different quantity per type',
@@ -147,7 +136,6 @@ const EC_TABLE_PARITY_EXEMPT = [
     'pipe/lpn_survey_codes_col_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
     'pump/lpn_survey_codes_col_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
     'valve/lpn_survey_codes_col_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
-    'valve/lpn_full_col_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
     // (d) a label that arrives as a nested helper's parameter.
     'text/fn:labelText' => 'd. alignRow() is declared inside renderLabelFields(); the two rows it '
         . 'builds are the lpn_field_text_align and lpn_field_text_valign columns',

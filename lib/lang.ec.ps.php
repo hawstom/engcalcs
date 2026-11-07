@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='د پایپ دیوال کې تعامل، چې
 $ec_lang['lpn_reaction_pipe_tip']='یوازې دا پایپ. یې خالي پرېږدئ او پایپ به هغه کچه وکاروي چې د تنظیمات، د اوبو کیفیت لاندې د ټولې شبکې لپاره ټاکل شوې.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='د تعامل کچه';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='په دې ټانک کې ساتل شویو اوبو کې تعامل، د 1/ورځ کچې په توګه. منفي شمېره کیمیاوي ماده کموي او مثبته یې زیاتوي. اوبه په ټانک کې د هر پایپ په پرتله ډېر اوږد ولاړې وي، نو ډېری وخت دلته پاتې مقدار له لاسه ورکول کیږي. خالي یعنې د ډلې تعامل کوفیشنټ وکاروئ چې د ټولې شبکې لپاره په تنظیماتو، محاسبه، کیفیت کې ټاکل شوی.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='کنټرولونه';
 $ec_lang['lpn_inpup_i_rules']='قواعد';
 $ec_lang['lpn_inpup_i_options']='اختیارونه';
 $ec_lang['lpn_roughness_method_note']='⚠ هغه پایپونه چې خشونت یې د {method} لپاره له عادي حد بهر دی: {n}. ارزښتونه نه دي بدل شوي او ښايي د بل رګړ طریقې لپاره لیکل شوي وي.';
-$ec_lang['lpn_field_cv']='چک والو (CV)';
 $ec_lang['lpn_field_cv_tip']='دا پایپ اوبه یوازې د خپلې پیل نقطې نه د پای نقطې ته تیروي، لکه چک والو. که بهاو بیرته لاړ شي، پایپ تړل کیږي تر هغه چې بیا مخ ته جریان وکړي. EPANET دا حالت CV بولي.';
 $ec_lang['lpn_theme_hc']='لوړ کنټراست';
 $ec_lang['lpn_theme_amber']='امبر';

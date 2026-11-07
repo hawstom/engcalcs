@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reazione alla parete della tubazione, usata p
 $ec_lang['lpn_reaction_pipe_tip']='Questa tubazione da sola. Lasciala vuota e la tubazione usa il coefficiente impostato per l\'intera rete in Impostazioni, Qualità dell\'acqua.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Coefficiente di reazione';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reazione nell\'acqua contenuta in questa vasca, come velocità in 1/giorno. Un numero negativo fa decadere la sostanza chimica e uno positivo la fa aumentare. L\'acqua sosta in una vasca molto più a lungo che in qualsiasi tubazione, quindi è spesso qui che si perde un residuo. Vuoto significa usare il coefficiente di reazione nella massa impostato per l\'intera rete in Impostazioni, Calcolo, Qualità dell\'acqua.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='controlli';
 $ec_lang['lpn_inpup_i_rules']='regole';
 $ec_lang['lpn_inpup_i_options']='opzioni';
 $ec_lang['lpn_roughness_method_note']='⚠ Tubazioni con una scabrezza fuori dal campo normale per {method}: {n}. I valori non sono stati modificati e potrebbero essere stati inseriti per un altro metodo di attrito.';
-$ec_lang['lpn_field_cv']='Valvola di ritegno (CV)';
 $ec_lang['lpn_field_cv_tip']='Questa tubazione fa passare l\'acqua solo dal nodo iniziale al nodo finale, come fa una valvola di ritegno. Se il flusso dovesse invertirsi, la tubazione si chiude finché non può di nuovo scorrere in avanti. EPANET chiama questo stato CV.';
 $ec_lang['lpn_theme_hc']='Alto contrasto';
 $ec_lang['lpn_theme_amber']='Ambra';

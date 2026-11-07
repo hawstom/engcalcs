@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Réaction à la paroi de la conduite, utilis�
 $ec_lang['lpn_reaction_pipe_tip']='Cette conduite seule. Laissez la case vide et la conduite utilise le coefficient fixé pour tout le réseau sous Paramètres, Qualité de l\'eau.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Coefficient de réaction';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Réaction dans l\'eau contenue dans cette bâche, sous forme de taux en 1/jour. Un nombre négatif fait décroître le produit chimique et un nombre positif l\'augmente. L\'eau séjourne bien plus longtemps dans une bâche que dans n\'importe quelle conduite ; c\'est donc souvent là qu\'un résiduel se perd. Vide signifie utiliser le coefficient de réaction dans la masse défini pour tout le réseau sous Paramètres, Calcul, Qualité.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='contrôles';
 $ec_lang['lpn_inpup_i_rules']='règles';
 $ec_lang['lpn_inpup_i_options']='options';
 $ec_lang['lpn_roughness_method_note']='⚠ Conduites dont la rugosité est hors de la plage normale pour {method} : {n}. Les valeurs sont inchangées et ont pu être saisies pour une autre méthode de frottement.';
-$ec_lang['lpn_field_cv']='Clapet anti-retour (CV)';
 $ec_lang['lpn_field_cv_tip']='Cette conduite ne laisse passer l\'eau que de son nœud de départ vers son nœud d\'arrivée, comme un clapet anti-retour. Si l\'écoulement devait s\'inverser, la conduite se ferme jusqu\'à pouvoir de nouveau s\'écouler vers l\'aval. EPANET appelle cet état CV.';
 $ec_lang['lpn_theme_hc']='Contraste élevé';
 $ec_lang['lpn_theme_amber']='Ambre';

@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='תגובה בדופן הצינור, המשמ�
 $ec_lang['lpn_reaction_pipe_tip']='צינור זה בפני עצמו. השאירו ריק והצינור משתמש במקדם שנקבע לכל הרשת תחת הגדרות, איכות מים.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='מקדם תגובה';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='תגובה במים המוחזקים במכל זה, כקצב ב-1/יום. מספר שלילי מפרק את החומר הכימי ומספר חיובי מגדיל אותו. מים שוהים במכל זמן ארוך בהרבה מאשר בכל צינור, ולכן לרוב כאן אובדת השארית. ריק פירושו שימוש במקדם תגובת הגוף שנקבע לכל הרשת תחת הגדרות, חישוב, איכות מים.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='בקרות';
 $ec_lang['lpn_inpup_i_rules']='כללים';
 $ec_lang['lpn_inpup_i_options']='אפשרויות';
 $ec_lang['lpn_roughness_method_note']='⚠ צינורות עם חספוס מחוץ לטווח הרגיל של {method}: {n}. הערכים לא שונו וייתכן שהוזנו עבור שיטת חיכוך אחרת.';
-$ec_lang['lpn_field_cv']='שסתום אל-חוזר (CV)';
 $ec_lang['lpn_field_cv_tip']='הצינור הזה מעביר מים רק מצומת ההתחלה שלו לצומת הסיום שלו, כמו שסתום אל-חוזר. אם הזרימה הייתה מתהפכת, הצינור נסגר עד שיוכל לזרום שוב קדימה. EPANET קורא למצב הזה CV.';
 $ec_lang['lpn_theme_hc']='ניגודיות גבוהה';
 $ec_lang['lpn_theme_amber']='ענבר';

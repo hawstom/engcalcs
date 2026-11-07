@@ -30055,7 +30055,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
 				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
-					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
+					{ key: 'valveType', label: 'lpn_full_col_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
 					// flow, or a bare loss coefficient -- so in a table of mixed valves there is no
@@ -40364,17 +40364,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ types: ['tank'], keys: ['bottomElev'], props: ['bottomElev'], unit: 'lpn_u_elevhead',
 				label: pc.lpn_field_tank_base_elev || 'Base elevation' },
 			{ types: ['tank'], keys: ['_level'], props: ['level'], unit: 'lpn_u_elevhead',
-				label: pc.lpn_field_tank_level || 'Water depth' },
+				label: pc.lpn_field_tank_level_short || 'Initial depth' },
 			{ types: ['tank'], keys: ['minLevel'], props: ['minLevel'], unit: 'lpn_u_elevhead',
-				label: pc.lpn_field_tank_minlevel || 'Lowest water depth' },
+				label: pc.lpn_field_tank_minlevel_short || 'Minimum depth' },
 			{ types: ['tank'], keys: ['maxLevel'], props: ['maxLevel'], unit: 'lpn_u_elevhead',
-				label: pc.lpn_field_tank_maxlevel || 'Highest water depth' },
+				label: pc.lpn_field_tank_maxlevel_short || 'Maximum depth' },
 			{ types: ['tank'], keys: ['tankDiameter'], props: ['tankDiameter'], unit: 'lpn_u_length',
 				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
 			{ types: ['tank'], keys: ['volCurve'], props: ['volCurve'], label: pc.lpn_curve_kind_volume || 'Tank volume' },
 			{ types: ['tank'], keys: ['mixingModel'], props: ['mixingModel'], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
 			{ types: ['tank'], keys: ['mixingFraction'], props: ['mixingFraction'], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
-			{ types: ['tank'], keys: ['_tankCoeff'], props: ['tankCoeff'], label: pc.lpn_reaction_tank || 'Reaction coefficient' }
+			{ types: ['tank'], keys: ['_tankCoeff'], props: ['tankCoeff'], label: pc.lpn_reaction_tank_short || 'Reaction' }
 		].concat(customPropDefs().filter(function (d) { return !!d.key; }).map(function (d) {
 			return { custom: true, keys: ['_' + d.key], props: [d.key], label: customPropLabel(d),
 				types: LPN_NODE_TYPES.filter(function (t) { return customPropAppliesToType(d, 'node', t); }) };
@@ -40682,9 +40682,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				label: pc.lpn_field_length || 'Length', decimals: l.lenAuto ? 2 : undefined },
 			{ has: pipe, keys: ['_fittingsId'], props: ['fittingsId'], label: pc.lpn_field_fittings || 'Fittings list' },
 			{ has: function (d) { return d.type === 'pipe' || (d.type === 'valve' && d.valveType !== 'TCV'); },
-				keys: ['_k'], props: ['k'], none: [0], label: pc.lpn_field_km || 'Minor (local) loss coefficient, k' },
-			{ has: pipe, keys: ['_bulkCoeff'], props: ['bulkCoeff'], label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient' },
-			{ has: pipe, keys: ['_wallCoeff'], props: ['wallCoeff'], label: pc.lpn_reaction_wall || 'Wall reaction coefficient' },
+				keys: ['_k'], props: ['k'], none: [0], label: pc.lpn_field_km_short || 'Minor loss, k' },
+			{ has: pipe, keys: ['_bulkCoeff'], props: ['bulkCoeff'], label: pc.lpn_reaction_bulk_short || 'Bulk reaction' },
+			{ has: pipe, keys: ['_wallCoeff'], props: ['wallCoeff'], label: pc.lpn_reaction_wall_short || 'Wall reaction' },
 			{ has: pump, keys: ['_curveId'], props: ['curveId'], label: pc.lpn_pump_curve_source || 'Pump head curve' },
 			{ has: function (d) { return d.type === 'valve' && d.valveType === 'GPV'; }, keys: ['_curveId'], props: ['curveId'],
 				label: pc.lpn_gpv_curve_source || 'Valve head loss curve' },
@@ -61066,7 +61066,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water depth', pc.lpn_settings_head_error || 'Head error limit',
+				pc.lpn_field_tank_level_short || 'Initial depth', pc.lpn_settings_head_error || 'Head error limit',
 				(pc.lpn_field_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') {
