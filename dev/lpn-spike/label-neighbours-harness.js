@@ -7,7 +7,7 @@
 // Novato and the 600-junction downtown network; Novato is also run with ID, Demand, Elevation, Head and
 // Pressure, the values Tom's screenshot showed (his N163 shows two of them, H and P). Measured per view: node labels shown, values shown, one-line
 // labels, the DISAGREEMENTS (a label showing two values or more whose four nearest such neighbours
-// within 250 px, at least three, mostly take the other form), overprints (a shown label's rows
+// within 250 px, at least three, mostly take the other form), overprints (a one-line node label with a pipe through it, a shown label's rows
 // over a node symbol, a pump or valve symbol, or another label, deeper than 1.5 px), and the
 // layout time.
 //
@@ -108,6 +108,13 @@ function ok(label, cond, detail) {
 			if (g && k) { lsym.push(Collide.box(+g[1], +g[2], +k[1] * 24, +k[1] * 24, +g[3])); }
 		});
 		const br = [];
+		// A pipe through a one-line node label (the box, as the first-fit reasons with it).
+		const pipes = ((cap.obs && cap.obs.segments) || []).filter((g) => g.kind === 'link');
+		drawn.forEach((d) => {
+			const h = holderOf(d.id);
+			if (d.id.charAt(0) !== 'n' || !h || !h.inline) { return; }
+			d.boxes.forEach((b) => pipes.forEach((g) => { if (Collide.segmentBoxDistance(g, b) <= 0) { br.push(d.id + ' crossed by pipe ' + g.owner); } }));
+		});
 		drawn.forEach((d, i) => d.boxes.forEach((b) => {
 			nsym.forEach((q) => { if (Collide.boxOverlapDepth(b, q.box) > eps) { br.push(d.id + ' on node ' + q.id); } });
 			lsym.forEach((q) => { if (Collide.boxOverlapDepth(b, q) > eps) { br.push(d.id + ' on a valve or pump'); } });

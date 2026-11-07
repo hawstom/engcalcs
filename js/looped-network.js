@@ -1357,6 +1357,7 @@ var EngCalcs = EngCalcs || {};
 		// The flag is the label's FORM, kept even when a shed leaves it one line, so the sides it is
 		// placed on (nodeFirstFitSpec()) stay those of the form it was tried in.
 		ne.inline = !!inline;
+		ne.conformed = false;   // set by conformNodeLabels() after it writes
 		if (!ne.inline) { ne.inlineFrom = null; }
 		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
@@ -2958,7 +2959,12 @@ var EngCalcs = EngCalcs || {};
 		cand.forEach(function (c, k) {
 			var m = reqs[k].m;
 			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
-			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+			// **TWO SCREEN PIXELS OF CLEAR GROUND ROUND A PIPE** (pre-review, 2026-11-06: N217 on Novato,
+			// a pipe grazing the first pixel of the glyphs, which are a pixel taller than the box the
+			// first-fit reasons with). Only this step asks for it: it is a label moved for looks.
+			var spec = inlineNodeSpec(c.n, fs, m.wPx / s0);
+			spec.linkMargin = 2 / s0;
+			list.push({ id: c.id, c: c, spec: spec });
 		});
 		if (!list.length) { return placed; }
 		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
@@ -2967,6 +2973,7 @@ var EngCalcs = EngCalcs || {};
 				from = { wPx: ne.twPx, rowWPx: ne.rowWPx ? ne.rowWPx.slice() : null, lineCount: ne.lineCount, lines: ne.lines.slice() };
 			writeNodeLabelGlyphs(ne, it.c.n, ne.lines.slice(), fsNow, true);
 			ne.inlineFrom = from;
+			ne.conformed = true;
 		});
 		res.took.forEach(function (id) { measureLabelWidths(list.filter(function (x) { return x.id === id; })[0].c.ne); });
 		return res.placed;
@@ -2977,7 +2984,9 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (ne && ne.inline && ne.inlineFrom && n.lx === undefined) {
-				list.push({ id: nodeLabelKey(n.id), spec: inlineNodeSpec(n, fs, labelBoxWidth(ne)) });
+				var spec = inlineNodeSpec(n, fs, labelBoxWidth(ne));
+				if (ne.conformed) { spec.linkMargin = 2 / (state.s || 1); }
+				list.push({ id: nodeLabelKey(n.id), spec: spec });
 			}
 		});
 		if (!list.length) { return placed; }
@@ -63584,7 +63593,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, conformed: !!h.conformed, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -63638,7 +63647,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
-		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null; h.conformed = !!c.conformed;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;
