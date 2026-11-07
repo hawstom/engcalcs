@@ -45075,7 +45075,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function wtgNotCarriedLines(items) {
 		var texts = {
 			quality: 'Water quality: the analysis, reactions, sources, and tank mixing.',
-			energy_price: 'Energy price, price pattern, and demand charge.',
+			energy_price: 'An energy price pattern that the project does not define.',
 			rules: 'Rule-based controls that are not written (rules {ids}).',
 			controls_pressure: 'Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.',
 			tank_mixing: 'Tank mixing model (tanks {ids}). Tanks are written fully mixed.',
