@@ -121,3 +121,20 @@ link that reads back as a pipe; the group still restores.
   more than 2e-8 m3/s; the two engines agree on the virtual network to 1e-5 m.
 - **Not done:** water quality travel time through a virtual pipe in an EPANET run is the stand-in's 0.01 m, not
   exactly 0; the built-in extended-period loop treats it as length 0.
+
+### Pump+ (built)
+
+- **Place:** the Plus toolbar button (Pump+ first; pressing it again while a Plus form is the tool moves to the
+  next form, Virtual pipe) or Insert > Pump+. A press on open ground makes two coincident junctions (IDs from
+  the new `U` and `D` ID prefixes, set under Settings > ID prefixes, spaces refused as for the others) and a
+  pump from the upstream to the downstream node; a press on a pipe in Base splices it in (pipe, pump, pipe).
+  The tool stays armed, like every inserter. The pump has no curve until one is chosen, so it adds no head.
+- **Look:** the pump symbol carries a filled disc on its upstream side and a hollow one on its downstream
+  side. Its direction is the existing zero-length rule: toward the first pipe on the downstream node, else
+  away from the one on the upstream node, else rightward.
+- **One click selects the group** (both nodes and the pump), by any member. The Properties box is the pump's
+  (curve, speed, efficiency, Closed, Active), one Elevation, the flow and head, upstream and downstream head and
+  pressure, and **Explode**. An elevation, x or y set on either node (Properties, Tables, the override tick) is
+  written to both by `setProp()`. Rename and delete keep the grouping true.
+- **Not done in this slice:** Valve+, Well, System; the Assemblies table; the Downstream pipe chooser; detection and
+  Convert; coincident nodes moved by a drag of one node alone (a click selects all three, so a drag moves all).

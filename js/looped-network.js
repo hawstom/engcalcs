@@ -3980,7 +3980,7 @@ var EngCalcs = EngCalcs || {};
 	// M is the meter, and a Customer is what it stands for (Task 247).
 	// S is the Shape (Task 779), map annotation like Text.
 	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X', meter: 'M', shape: 'S' };
-	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1, S: 1 }; }
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1, S: 1, U: 1, D: 1 }; }
 	var nextId = newNextId();
 	// Re-derive the counters from the ids actually present, matching against the CURRENT
 	// settings.idPrefixes, not a hardcoded single-letter regex -- a customized prefix can be any
@@ -5545,6 +5545,15 @@ var EngCalcs = EngCalcs || {};
 	// an override. A call site that writes `el._diameter` directly is therefore not merely
 	// impolite: inside a scenario it silently edits Base under every other scenario at once.
 	function setProp(el, prop, value) {
+		// **THE TWO NODES OF AN ASSEMBLY SHARE ELEVATION AND PLACE** (Task 822): the partner is written
+		// by the same call, whichever door (Properties, Tables, the marker's tick) the edit came by.
+		if ((prop === 'elev' || prop === 'x' || prop === 'y') && elGroup(el) === 'node' && !assemblyWriting) {
+			var asm = assemblyOfNode(el.id), mate = asm ? nodeById(asm.up === el.id ? asm.down : asm.up) : null;
+			if (mate) {
+				assemblyWriting = true;
+				try { setProp(mate, prop, value); } finally { assemblyWriting = false; }
+			}
+		}
 		// A POSITION IS WRITTEN BY ONE FUNCTION, whichever scenario is showing, and `value` is the
 		// outward coordinate every editor of it already holds (Task 674). Routed here so the
 		// override marker's own tick -- setOverride(el, prop, effective(el, prop)) -- and any future
@@ -9107,7 +9116,7 @@ var EngCalcs = EngCalcs || {};
 			// M is the structural (internal) letter for Customer (LPN_ID_KEY.meter); its default
 			// DISPLAYED prefix is 'C' (R-229) -- a project stored with the old 'M' default keeps it,
 			// since only the user touches a file's data.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C', S: 'S' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C', S: 'S', U: 'U', D: 'D' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -13930,6 +13939,8 @@ var EngCalcs = EngCalcs || {};
 			perfDebugAccum('  lk:symbol', function () {
 				resizePumpSymbol(l.id); positionPumpSymbol(l.id);
 			});
+			var asmHere = assemblyOfLink(l.id);
+			if (asmHere) { paintAssembly(asmHere); }
 		}
 		// **NOT WHILE THE WHOLE DRAWING IS BEING REBUILT.** A project switch lays every label out
 		// once at the end -- restored from what this tab had worked out, or computed in the one
@@ -13962,6 +13973,7 @@ var EngCalcs = EngCalcs || {};
 		// symbolBoxTransform(). symbolG already carries the place and the rotation, so the size
 		// gets its own inner <g> and the split this comment describes is untouched.
 		if (le.symbolBox) { le.symbolBox.setAttribute('transform', symbolBoxTransform(-half, -half, size, size)); }
+		if (le.asmMarks && assemblyOfLink(id)) { paintAssembly(assemblyOfLink(id)); }
 		// The grab shape is the symbol's own outline in the same box, so it grows and shrinks with
 		// the drawing and there is no second opinion anywhere about how big a pump is.
 		// **SPLIT EXACTLY AS symbolG/symbolSvg IS SPLIT: SIZE HERE, PLACE THERE.** A zoom or a
@@ -22442,13 +22454,21 @@ var EngCalcs = EngCalcs || {};
 	}
 	function locatedElementRef() { return locatedRef ? { kind: locatedRef.kind, id: locatedRef.id } : null; }
 	function setSelection(kind, id) {
-		setSelectionList((kind && id) ? [{ kind: kind, id: id }] : []);
+		var asm = (kind && id) ? assemblyOfRef(kind, id) : null;
+		// One click selects the whole assembly (Task 822), the clicked element staying the subject.
+		setSelectionList(asm ? assemblyRefs(asm, { kind: kind, id: id }) : ((kind && id) ? [{ kind: kind, id: id }] : []));
 	}
 	// Shift-click and a shift-drag: already in means OUT again, which is what every editor's
 	// modified click does and is the only way to correct a marquee that caught one thing too many.
 	function toggleInSelection(kind, id) {
 		if (!kind || !id) { return; }
-		if (isSelected(kind, id)) {
+		var asm = assemblyOfRef(kind, id);
+		if (asm) {
+			var refs = assemblyRefs(asm);
+			if (isSelected(kind, id)) {
+				setSelectionList(selections.filter(function (s) { return !refs.some(function (r) { return r.kind === s.kind && r.id === s.id; }); }));
+			} else { setSelectionList(selections.concat(refs)); }
+		} else if (isSelected(kind, id)) {
 			setSelectionList(selections.filter(function (s) { return !(s.kind === kind && s.id === id); }));
 		} else {
 			setSelectionList(selections.concat([{ kind: kind, id: id }]));
@@ -23165,6 +23185,12 @@ var EngCalcs = EngCalcs || {};
 	// default and by far the more common press is Zoom to fit, and Zoom Window is reached by
 	// pressing it a second time rather than by a memory of what was last used.
 	var zoomToolShape = 'fit';   // 'fit' | 'window'
+	// The Plus button's forms (Task 822), and which one it shows. Not stored: a fact about this page only.
+	var PLUS_FORMS = [
+		{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' },
+		{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: 'lpn_tool_add_virtual_tip', label: 'Virtual pipe' }
+	];
+	var plusForm = 0, repaintPlusTool = null;
 	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
 	// **R-181 (Tom, 2026-09-23): "the first time you click, it does not change modes... I think
 	// that it should act like Select area. Click twice in a row to get mode change."** This is a
@@ -39688,7 +39714,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
-		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual',
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual', 'add-pumpplus': 'lpn_mode_add_pumpplus',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain', 'add-shape': 'lpn_mode_add_shape',
 		'vertices': 'lpn_mode_vertices',
@@ -39934,6 +39960,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// nodes (upstream drawn filled, downstream hollow) and `links` are the pumps between them. The nodes
 	// and the links are ordinary members of `doc.nodes` and `doc.links`, so every table, the solvers and
 	// the `.inp` see exactly what they saw before; the list only says they are managed as one.
+	var assemblyWriting = false;
 	function assemblyList() { return doc.assemblies || []; }
 	function assemblyOfNode(id) {
 		var list = assemblyList(), i;
@@ -39962,6 +39989,154 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push({ id: a.id !== undefined ? a.id : a.links[0], kind: a.kind || 'pump', up: a.up, down: a.down, links: a.links.slice() });
 		});
 		return out;
+	}
+	// The elements an assembly is made of, as selection refs, with `lastRef` last so it stays the subject.
+	function assemblyRefs(a, lastRef) {
+		var refs = [{ kind: 'node', id: a.up }, { kind: 'node', id: a.down }].concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));
+		if (lastRef) {
+			refs = refs.filter(function (r) { return !(r.kind === lastRef.kind && r.id === lastRef.id); }).concat([lastRef]);
+		}
+		return refs;
+	}
+	function assemblyOfRef(kind, id) { return kind === 'node' ? assemblyOfNode(id) : kind === 'link' ? assemblyOfLink(id) : null; }
+	/**
+	 * **PUMP+: TWO COINCIDENT NODES AND A PUMP BETWEEN THEM, GROUPED** (Task 822). The nodes take their IDs
+	 * from the U and D prefixes, the pump from the pump prefix. The caller has taken the undo snapshot.
+	 * Equal x, y and elevation by construction; setProp() keeps them equal after.
+	 */
+	function addPumpPlus(x, y) {
+		var up = addNode('junction', x, y, mintId('U')), dn = addNode('junction', x, y, mintId('D')),
+			pump = addLink('pump', up.id, dn.id, []), a;
+		a = { id: pump.id, kind: 'pump', up: up.id, down: dn.id, links: [pump.id] };
+		if (!doc.assemblies) { doc.assemblies = []; }
+		doc.assemblies.push(a);
+		paintAssembly(a);
+		return a;
+	}
+	// Clicking a pipe splices the assembly in: the pipe now ends at the upstream node and its other half
+	// starts at the downstream node. Base only, as breakPipeAtPoint(); elsewhere it is placed on open ground.
+	function splicePumpPlus(pipe, wx, wy) {
+		var r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a;
+		up = r.node;
+		applyNodeRename(up.id, mintId('U'));
+		dn = addNode('junction', up.x, up.y, mintId('D'));
+		if (up.elev !== undefined) { dn.elev = up.elev; }   // base-write: construction
+		pump = addLink('pump', up.id, dn.id, []);
+		reconnectLinkEnd(r.added, 'from', dn.id);
+		a = { id: pump.id, kind: 'pump', up: up.id, down: dn.id, links: [pump.id] };
+		if (!doc.assemblies) { doc.assemblies = []; }
+		doc.assemblies.push(a);
+		paintAssembly(a);
+		return a;
+	}
+	function pumpPlusTap(e, w, t) {
+		var pid = tapLinkId(t), pipe = pid ? linkById(pid) : null, a;
+		saveUndoSnapshot();
+		logLpnFirstAction('element');
+		if (pipe && pipe.type === 'pipe' && inBaseScenario() && nodeById(pipe.from) && nodeById(pipe.to) &&
+			(function () { var f = Geom.nearestFractionOnPolyline(linkPointList(pipe), w.x, w.y).f; return f > 1e-9 && f < 1 - 1e-9; }())) {
+			a = splicePumpPlus(pipe, w.x, w.y);
+		} else {
+			a = addPumpPlus(w.x, w.y);
+		}
+		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
+	}
+	// The look: the pump symbol carries a filled disc on its upstream side and a hollow one on its
+	// downstream side (Tom's sketch and call: upstream filled, downstream hollow).
+	function paintAssembly(a) {
+		var le = linkEls[a.links[0]], r, k;
+		if (!le || !le.symbolG) { return; }
+		if (!le.asmMarks) {
+			le.asmMarks = [el('circle', { 'class': 'lpn-asm-mark lpn-asm-up' }, le.symbolG),
+				el('circle', { 'class': 'lpn-asm-mark lpn-asm-down' }, le.symbolG)];
+		}
+		r = nodeRadius({ type: 'junction' }) * 0.8;
+		k = pumpSymbolSize('pump') / 2;
+		le.asmMarks[0].setAttribute('cx', -k); le.asmMarks[0].setAttribute('cy', 0); le.asmMarks[0].setAttribute('r', r);
+		le.asmMarks[1].setAttribute('cx', k); le.asmMarks[1].setAttribute('cy', 0); le.asmMarks[1].setAttribute('r', r);
+	}
+	function unpaintAssembly(a) {
+		var le = linkEls[a.links[0]];
+		if (le && le.asmMarks) { le.asmMarks.forEach(function (m) { if (m.remove) { m.remove(); } }); le.asmMarks = null; }
+	}
+	// **EXPLODE: THE GROUP ENDS, THE ELEMENTS STAY** (Task 822). Plain nodes and the pump are left exactly
+	// as they are. The caller has taken the undo snapshot.
+	function explodeAssembly(id) {
+		var a = assemblyById(id);
+		if (!a) { return; }
+		unpaintAssembly(a);
+		doc.assemblies = doc.assemblies.filter(function (x) { return x !== a; });
+		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === id) { closePopup(); }
+		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
+	}
+	// A member deleted dissolves its group: what is left are plain elements.
+	function forgetAssembliesOf(id) {
+		var gone = assemblyList().filter(function (a) { return a.up === id || a.down === id || a.links.indexOf(id) >= 0; });
+		gone.forEach(function (a) {
+			unpaintAssembly(a);
+			if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === a.id) { closePopup(); }
+		});
+		if (gone.length) { doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; }); }
+	}
+	function renameInAssemblies(oldId, newId) {
+		assemblyList().forEach(function (a) {
+			if (a.up === oldId) { a.up = newId; }
+			if (a.down === oldId) { a.down = newId; }
+			a.links = a.links.map(function (x) { return x === oldId ? newId : x; });
+			if (a.id === oldId) { a.id = newId; }
+		});
+	}
+	function openAssemblyPopup(id, sx, sy) {
+		var a = assemblyById(id), le = a && linkEls[a.links[0]], at;
+		if (!a) { return; }
+		currentPopup = { kind: 'assembly', id: id };
+		renderAssemblyFields(id);
+		at = popupAnchorFor(le, null, nodeRadius({ type: 'junction' }) * 2, sx, sy);
+		openPopupAt(at.x, at.y);
+	}
+	function renderAssemblyFields(id) {
+		var a = assemblyById(id), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {},
+			up, dn, pump, res = lastSolveResult;
+		if (!a) { return; }
+		up = nodeById(a.up); dn = nodeById(a.down); pump = linkById(a.links[0]);
+		idField(pump.id, function (newId) {
+			applyLinkRename(pump.id, newId);
+			currentPopup = { kind: 'assembly', id: newId };
+			renderAssemblyFields(newId);
+			scheduleSolve();
+		}, 'link');
+		clearFields(fields);
+		descField(fields, pump);
+		tagField(fields, pump);
+		// One elevation for both nodes (setProp() writes the partner too).
+		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+			function () { return effective(up, 'elev'); },
+			function (v) { setProp(up, 'elev', v); updateNode(up.id, true); updateNode(dn.id, true); refreshPopupIfOpen(); },
+			null, { el: up, prop: 'elev' });
+		renderPumpCurveFields(fields, pump, pump.id);
+		renderPumpSpeedFields(fields, pump);
+		renderPumpEfficiencyFields(fields, pump);
+		closedField(fields, pump, pump.id);
+		activeField(fields, pump);
+		if (res && !linkResultHeld(pump) && res.flows[pump.id] !== undefined) {
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(res.flows[pump.id]), undefined, resultDec('link', 'flow'));
+			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), shownHeadloss(pump, res.headlosses[pump.id]), undefined, resultDec('link', 'headloss'));
+		}
+		if (res && res.pressures[up.id] !== undefined && res.pressures[dn.id] !== undefined) {
+			readonlyUnitField(fields, pc.lpn_assembly_up_head || 'Upstream head', resultUnit('elevhead'), res.heads[up.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
+			readonlyUnitField(fields, pc.lpn_assembly_up_pressure || 'Upstream pressure', resultUnit('pressure'), res.pressures[up.id], undefined, resultDec('node', 'pressure'));
+			readonlyUnitField(fields, pc.lpn_assembly_down_head || 'Downstream head', resultUnit('elevhead'), res.heads[dn.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
+			readonlyUnitField(fields, pc.lpn_assembly_down_pressure || 'Downstream pressure', resultUnit('pressure'), res.pressures[dn.id], undefined, resultDec('node', 'pressure'));
+		}
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.setAttribute('data-assembly-explode', '1');
+		btn.textContent = pc.lpn_assembly_explode || 'Explode';
+		helpTip(btn, pc.lpn_assembly_explode_tip);
+		btn.addEventListener('click', function () { saveUndoSnapshot(); explodeAssembly(id); });
+		fields.appendChild(btn);
+		lpnPropsGrid(fields);
+		tipsIn(fields);
 	}
 	// A NEW VALVE'S SETTING, PER TYPE, because the setting is a different QUANTITY for each one (see
 	// js/lpn-epanet.js): a pressure for a PRV or PSV, a flow for an FCV, a dimensionless loss
@@ -40319,6 +40494,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	function deleteNode(id) {
+		forgetAssembliesOf(id);
 		var links = incidentLinks[id].slice(), i, orphaned = 0;
 		if (isSelected('node', id)) { deselectOne('node', id); }   // see deleteLink()
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
@@ -41981,6 +42157,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else if (firstViewPending) { applyFirstViewDocks(); }
 	}
 	function deleteLink(id) {
+		forgetAssembliesOf(id);
 		var l = linkById(id);
 		if (isSelected('link', id)) { deselectOne('link', id); }   // Task 415: the subject may be deleted by a cascade, not only by its own verb
 		// The ONE teardown list, shared with rebuildLink() -- see removeLinkEls(). A repeat is a real
@@ -55143,6 +55320,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
 			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
 			// **THE "++" ROWS OF TOM'S INSERT MENU NOTES** (2026-10-25; dev/assemblies.md): no digit.
+			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
 			{ icon: 'virtual', pointerOnly: true, label: pc.lpn_tool_add_virtual || 'Virtual pipe', tip: pc.lpn_tool_add_virtual_tip, fn: function () { setMode('add-virtual'); } }
 		];
 	}
@@ -58775,6 +58953,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Rebuilt, not appended to: this runs again on a unit switch and a language-driven relabel.
 		toolbarIconIndex = [];
 		setModeUI = function () {
+			PLUS_FORMS.forEach(function (f, i) { if (f.mode === mode && plusForm !== i) { plusForm = i; if (repaintPlusTool) { repaintPlusTool(); } } });
 			toolbar.querySelectorAll('button[data-tool]').forEach(function (b) {
 				b.setAttribute('aria-pressed', b.dataset.tool === mode ? 'true' : 'false');
 			});
@@ -58958,9 +59137,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
-			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip },
-			{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: pc.lpn_tool_add_virtual_tip }
+			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
+		// **THE PLUS BUTTON: ONE SLOT, CYCLED BY PRESSING IT AGAIN** (Task 822; Declan's cycle in
+		// dev/assemblies.md). Pump+ first; a second press in a row moves to the next form. Like the
+		// select-area button it shows a corner triangle. The form last used is kept for this page only.
+		var plusBtn = document.createElement('button');
+		plusBtn.type = 'button';
+		function paintPlusButton() {
+			var f = PLUS_FORMS[plusForm], nx = PLUS_FORMS[(plusForm + 1) % PLUS_FORMS.length];
+			setIconLabel(plusBtn, f.icon, pc[f.key] || f.label, toolTipWithKey(f.mode, (pc[f.tip] || '') + ' ' +
+				(pc.lpn_tool_plus_next || 'Press it again for the next one: {next}.').replace('{next}', pc[nx.key] || nx.label)));
+			if (plusBtn.className.indexOf('lpn-tool-more') < 0) { plusBtn.className += ' lpn-tool-more'; }
+			plusBtn.dataset.tool = f.mode;
+			plusBtn.setAttribute('aria-pressed', mode === f.mode ? 'true' : 'false');
+		}
+		plusBtn.addEventListener('click', function () {
+			if (PLUS_FORMS.some(function (f) { return f.mode === mode; })) { plusForm = (plusForm + 1) % PLUS_FORMS.length; }
+			setMode(PLUS_FORMS[plusForm].mode);
+			paintPlusButton();
+		});
+		repaintPlusTool = paintPlusButton;
+		paintPlusButton();
+		addGroup.appendChild(plusBtn);
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
@@ -59970,6 +60169,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
+			}
+			else if (mode === 'add-pumpplus') {
+				pumpPlusTap(e, w, t);
 			}
 			else if (mode === 'add-shape') {
 				shapeToolTap(e, w, snapHit);
@@ -64134,7 +64336,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['L', pc.lpn_tool_add_pipe || 'Pipe'],
 			['P', pc.lpn_tool_add_pump || 'Pump'],
 			['V', pc.lpn_tool_add_valve || 'Valve'],
-			['M', pc.lpn_tool_add_meter || 'Customer']
+			['M', pc.lpn_tool_add_meter || 'Customer'],
+			// The two nodes of a Pump+ (Task 822): upstream and downstream, U and D until changed.
+			['U', pc.lpn_prefix_up || 'Upstream node'],
+			['D', pc.lpn_prefix_down || 'Downstream node']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps it inside
@@ -74874,6 +75079,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
+		renameInAssemblies(oldId, newId);
 		n.id = newId;
 		invalidateIdMaps();   // an id changed IN PLACE -- the one mutation the array check cannot see
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === oldId) {
@@ -74921,6 +75127,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// this one function, and only one of them used to finish the job.
 	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
+		renameInAssemblies(oldId, newId);
 		l.id = newId;
 		invalidateIdMaps();   // as applyNodeRename() -- see byId()
 		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === oldId) {
@@ -74985,6 +75192,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// prefixes at once" button cycles become reachable, and the failure would be a corrupted drawing.
 
 	function elementsForIdKey(key) {
+		if (key === 'U' || key === 'D') {
+			return assemblyList().map(function (a) { return nodeById(key === 'U' ? a.up : a.down); }).filter(Boolean);
+		}
 		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
 			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
 	}
@@ -75958,6 +76168,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tbody.appendChild(tr);
 	}
 	function openPopup(nodeId, sx, sy) {
+		var asmN = assemblyOfNode(nodeId);
+		if (asmN) { openAssemblyPopup(asmN.id, sx, sy); return; }
 		var n = nodeById(nodeId), ne = nodeEls[nodeId];
 		currentPopup = { kind: 'node', id: nodeId };
 		renderNodeFields(nodeId);
@@ -76749,6 +76961,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
+		var asmL = assemblyOfLink(linkId);
+		if (asmL) { openAssemblyPopup(asmL.id, sx, sy); return; }
 		var l = linkById(linkId), le = linkEls[linkId];
 		currentPopup = { kind: 'link', id: linkId };
 		renderLinkFields(linkId);
@@ -77888,6 +78102,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!currentPopup || !panelIsOpen(popup)) { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
 		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
+		else if (currentPopup.kind === 'assembly') { if (assemblyById(currentPopup.id)) { renderAssemblyFields(currentPopup.id); } else { closePopup(); } }
 		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
 		// and closes if the subject has gone.
 		else if (currentPopup.kind === 'multi') { if (selectionCount()) { openMultiProperties(); } else { closePopup(); } }
