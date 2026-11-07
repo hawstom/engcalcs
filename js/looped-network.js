@@ -40124,9 +40124,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (res && res.pressures[up.id] !== undefined && res.pressures[dn.id] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_assembly_up_head || 'Upstream head', resultUnit('elevhead'), res.heads[up.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-			readonlyUnitField(fields, pc.lpn_assembly_up_pressure || 'Upstream pressure', resultUnit('pressure'), res.pressures[up.id], undefined, resultDec('node', 'pressure'));
+			readonlyUnitField(fields, pc.hw_pressure_up || 'Upstream pressure', resultUnit('pressure'), res.pressures[up.id], undefined, resultDec('node', 'pressure'));
 			readonlyUnitField(fields, pc.lpn_assembly_down_head || 'Downstream head', resultUnit('elevhead'), res.heads[dn.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-			readonlyUnitField(fields, pc.lpn_assembly_down_pressure || 'Downstream pressure', resultUnit('pressure'), res.pressures[dn.id], undefined, resultDec('node', 'pressure'));
+			readonlyUnitField(fields, pc.hw_pressure_down || 'Downstream pressure', resultUnit('pressure'), res.pressures[dn.id], undefined, resultDec('node', 'pressure'));
 		}
 		var btn = document.createElement('button');
 		btn.type = 'button';

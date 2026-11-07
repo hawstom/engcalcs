@@ -10,7 +10,7 @@
 			"reason": "map symbology: a Shape, the user's own drawn annotation (Task 779); its default ink is the --ec-map-shape token"
 		},
 		{
-			"path": "^\\.lpn-link-symbol-backdrop",
+			"path": "^\\.lpn-(link-symbol-backdrop|asm-)",
 			"reason": "map symbology: the drawing's own ink"
 		},
 		{
