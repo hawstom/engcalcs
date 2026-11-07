@@ -2915,8 +2915,61 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
 		inlineRing = ring;
 		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
+		if (LPN_CONFORM) {
+			placed = perfDebugAccum('  ns:conform', function () { return conformNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
+		}
 		inlineRing = null;
 		return placed;
+	}
+	// **A NODE LABEL TAKES THE FORM ITS NEIGHBOURS TAKE** (Task 812; Tom, 2026-10-20, on N163 of
+	// Novato, stacked among one-line neighbours: *"Is looking like your neighbors not a value?"*).
+	// After the one-line trial, a stacked label that shows two values or more, whose four nearest
+	// neighbours that show two or more (within LPN_CONFORM_RADIUS_PX, at least three of them) are
+	// mostly one line, tries the SAME values on one line, in the same strict first-fit: it is taken
+	// only where it overprints nothing and crosses no leader, and a label that finds no such place
+	// keeps its stack. The neighbours' forms are read once, before any label changes, so the
+	// answer does not depend on the order the labels are tried in. A hand-placed label is left alone.
+	var LPN_CONFORM = true, LPN_CONFORM_RADIUS_PX = 250, LPN_CONFORM_K = 4;
+	function conformNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
+		var fs = parseFloat(fsNow) || effectiveFontSize(), s0 = state.s || 1, items = [], cand = [], list = [], reqs, res,
+			maxPx = ((svg && svg.clientWidth) || 1920) * LPN_INLINE_MAX_VIEW_FRAC;
+		placed.forEach(function (r) {
+			var n = nodeOf[r.id], ne = n && nodeEls[n.id], sp = byId[r.id];
+			if (r.dropped || !sp || !ne || ne.empty || !ne.lines || ne.lines.length < 2) { return; }
+			items.push({ id: r.id, n: n, ne: ne, x: sp.anchor.x * s0, y: sp.anchor.y * s0, inline: !!ne.inline });
+		});
+		items.forEach(function (a) {
+			if (a.inline || a.n.lx !== undefined || byId[a.id].dragged) { return; }
+			var nb = [], i, b, d, ni = 0;
+			for (i = 0; i < items.length; i++) {
+				b = items[i];
+				if (b === a) { continue; }
+				d = Math.hypot(a.x - b.x, a.y - b.y);
+				if (d <= LPN_CONFORM_RADIUS_PX) { nb.push({ d: d, inline: b.inline }); }
+			}
+			nb.sort(function (p, q) { return p.d - q.d; });
+			nb = nb.slice(0, LPN_CONFORM_K);
+			if (nb.length < 3) { return; }
+			nb.forEach(function (q) { if (q.inline) { ni++; } });
+			if (ni * 2 > nb.length) { cand.push(a); }
+		});
+		if (!cand.length) { return placed; }
+		reqs = measureLevelForms(cand.map(function (c) { return { lines: c.ne.lines, stacked: false }; }), fsNow);
+		cand.forEach(function (c, k) {
+			var m = reqs[k].m;
+			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
+			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+		});
+		if (!list.length) { return placed; }
+		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
+		res.took.forEach(function (id) {
+			var it = list.filter(function (x) { return x.id === id; })[0], ne = it.c.ne,
+				from = { wPx: ne.twPx, rowWPx: ne.rowWPx ? ne.rowWPx.slice() : null, lineCount: ne.lineCount, lines: ne.lines.slice() };
+			writeNodeLabelGlyphs(ne, it.c.n, ne.lines.slice(), fsNow, true);
+			ne.inlineFrom = from;
+		});
+		res.took.forEach(function (id) { measureLabelWidths(list.filter(function (x) { return x.id === id; })[0].c.ne); });
+		return res.placed;
 	}
 	var inlineRing = null;
 	function reinsertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, ring) {
