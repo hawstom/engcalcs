@@ -75,7 +75,7 @@ function ok(label, cond, detail) {
 		const holderOf = (id) => id.charAt(0) === 'n' ? nodeEls[id.slice(2)] : linkEls[id.slice(2)];
 		const drawn = [];
 		if (cap.inline && cap.node) {
-			// Every one-line call: the trial's, and the neighbour-conformity step's after it.
+			// Every one-line call: the trial's, and the second round's.
 			const took = {}; cap.inline.forEach((out) => out.forEach((r) => { if (!r.dropped) { took[r.id] = r; } }));
 			cap.node = cap.node.map((r) => took[r.id] || r);
 		}

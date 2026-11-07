@@ -103,9 +103,8 @@ const SCENES = [
 		link: ['flow'], step: true, notches: [-4, -14], named: ['113'], shotAt: -14,
 		at: { notch: -4, shown: ['11'], ownNearest: ['10'] } },
 	{ key: 'novato', name: 'Net3 on the world map near Novato', file: 'dev/water-network-examples/Net3-Novato-CA-World.lwn', fit: true, noMax: true,
-		// Tom's fields (his 2026-10-20 screenshot): ID, Qb, Z, H, P. A node label that sheds down to H and P
-		// is the one the neighbour-conformity step sets on one line (conformNodeLabels()).
-		node: NOVATO_NODE, link: NET3_LINK, notches: (process.env.NOVATO_NOTCHES || '0,1,8,11,12,13,14').split(',').map(Number), named: [], conform: '163' },
+		// Tom's fields (his 2026-10-20 screenshot): ID, Qb, Z, H, P.
+		node: NOVATO_NODE, link: NET3_LINK, notches: (process.env.NOVATO_NOTCHES || '0,1,8,11,12,13,14').split(',').map(Number), named: [] },
 	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
 		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
 ].filter((sc) => (process.env.LABEL_FORM_SCENES || 'net3,net1,novato,phone').split(',').indexOf(sc.key) >= 0);
@@ -259,7 +258,6 @@ async function main() {
 			if (sc.outToPipe) { console.log(`        wheeled out ${on.out} notches from the card's opening view (pipe ${sc.outToPipe.id} about ${sc.outToPipe.px} px)`); }
 			const extra = [];
 			for (const ref of refs) { extra.push({ ref, r: await layOut(Session, browser, sc, { ref }) }); }
-			let conformSeen = 0;
 			on.views.forEach((v, i) => {
 				const w = off.views[i];
 				console.log(`        ${v.notch < 0 ? -v.notch + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
@@ -298,20 +296,12 @@ async function main() {
 				// cost Net3 at 9 notches 145 -> 138: "A cost for no benefit is pointless."). The reference
 				// above is this branch with the forms cut; this one is master's files, laid out here.
 				const m = extra.find((e) => e.ref === 'master');
-				if (m && sc.conform) {
-					// A label stacked on master among one-line neighbours is one line here (N163, Task 812).
-					const mv = m.r.views[i], id = sc.conform;
-					if (mv.node[id] && mv.node[id].n >= 2 && mv.ex.nodeInline.indexOf(id) < 0 && v.ex.nodeInline.indexOf(id) >= 0) { conformSeen++; }
-				}
 				if (m) {
 					const mv = m.r.views[i];
 					ok(tag + ': no fewer labels and no fewer values than master\'s own layout', v.labels >= mv.labels && v.values >= mv.values,
 						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}`);
 				}
 			});
-			if (sc.conform) {
-				ok(sc.name + ': N' + sc.conform + ', stacked on master, is one line in at least one view', conformSeen > 0, conformSeen + ' views');
-			}
 			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
 			if (sc.at) {

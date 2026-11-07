@@ -1269,6 +1269,13 @@ EngCalcs.lpnCollide = (function () {
 		}
 		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
 		function commit(lbl, sides, c, b) {
+			// `release`: a label RE-placed in another form (a node label's one line, in place of its
+			// stack) gives its old ground back to the labels after it, at once, so a column of
+			// stacks that turn to lines one after another does not hold itself in place (Task 812).
+			if (lbl.release) {
+				obs.boxes.forEach(function (o) { if (o.owner === lbl.id) { o.cx = o.cy = 1e300; o.w = o.h = 0; } });
+				obs.segments.forEach(function (o) { if (o.owner === lbl.id && o.kind === 'leader') { o.ax = o.bx = o.ay = o.by = 1e300; } });
+			}
 			// EVERY line box is committed, so the next label sees the staircase this one really
 			// occupies rather than a rectangle around it.
 			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
@@ -1310,7 +1317,7 @@ EngCalcs.lpnCollide = (function () {
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
-				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !(lbl.linkMargin > 0 && boxesNearLink(b, local, lbl.id, lbl.linkMargin)) && !leaderThroughSymbol(lbl, c, local) &&
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local) &&
 						(!strict || strictOk(lbl, c, b, true))) {
 					return commit(lbl, sides, c, b);
 				}
@@ -1337,7 +1344,6 @@ EngCalcs.lpnCollide = (function () {
 				// `offLinks`: a label no pipe may run through, even here (a one-line node label: a
 				// pipe through a line of text strikes it through, pre-review 2026-10-18).
 				if (lbl.offLinks && boxesOnLink(labelLineBoxes(lbl, c), local, lbl.id)) { continue; }
-				if (lbl.linkMargin > 0 && boxesNearLink(labelLineBoxes(lbl, c), local, lbl.id, lbl.linkMargin)) { continue; }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
@@ -1554,21 +1560,6 @@ EngCalcs.lpnCollide = (function () {
 			if (o.owner !== undefined && o.owner === ownerId) { continue; }
 			for (i = 0; i < boxes.length; i++) {
 				if (segmentInBoxFraction(o, boxes[i]) > 0) { return true; }
-			}
-		}
-		return false;
-	}
-
-	// A pipe within `margin` of any of the boxes (a label drawn a little larger than its box must
-	// still clear the pipe: the glyphs' own height is a pixel more than the box the pass reasons with).
-	function boxesNearLink(boxes, obs, ownerId, margin) {
-		var i, j, o;
-		for (j = 0; j < obs.segments.length; j++) {
-			o = obs.segments[j];
-			if (o.kind !== 'link') { continue; }
-			if (o.owner !== undefined && o.owner === ownerId) { continue; }
-			for (i = 0; i < boxes.length; i++) {
-				if (segmentBoxDistance(o, boxes[i]) < margin) { return true; }
 			}
 		}
 		return false;

@@ -969,6 +969,15 @@ var EngCalcs = EngCalcs || {};
 		ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
 		return out;
 	}
+	// **A STACK THAT IS ABOUT TO BECOME A LINE IS NOT GROUND** (Task 812, Tom 2026-11-06, on N163 of
+	// Novato: *"there is room for its entire label as one line ... infinite space in yonder
+	// direction"*). The space was there; N163 was refused it because its neighbours' labels were still
+	// STANDING on it as stacks, and the neighbours were tried later in the drop order. So a label that
+	// takes its line gives its stack's ground back at once (`release`), and the labels that found
+	// nothing are tried once more (insertInlineNodeLabels()). A far-side run of candidates, 12 text
+	// heights out, was tried first and found nothing more on any of the 600-junction, Net1, Net3 or
+	// Novato views at any zoom, at 17% of the pass time: it is not here.
+	var LPN_OPEN_SIDE = true;
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
 	// demand is. Ties break on id, so the order is total and stable -- an unstable order would
@@ -1357,7 +1366,6 @@ var EngCalcs = EngCalcs || {};
 		// The flag is the label's FORM, kept even when a shed leaves it one line, so the sides it is
 		// placed on (nodeFirstFitSpec()) stay those of the form it was tried in.
 		ne.inline = !!inline;
-		ne.conformed = false;   // set by conformNodeLabels() after it writes
 		if (!ne.inline) { ne.inlineFrom = null; }
 		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
@@ -2854,7 +2862,7 @@ var EngCalcs = EngCalcs || {};
 	// (`inlineFrom`), so a drag frame lays out the same stacks and sets the same lines.
 	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
 	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
-	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring) {
+	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring, round) {
 		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
 		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
 		// The ring pass's labels (free pipe labels, dragged ones) with the leaders the renderer draws.
@@ -2862,17 +2870,21 @@ var EngCalcs = EngCalcs || {};
 			f.boxes.forEach(function (b) { ground.boxes.push(b); });
 			if (f.leader) { ground.segments.push(f.leader); }
 		});
+		var retry = {};
+		list.forEach(function (it) { retry[it.id] = true; });
 		placed.forEach(function (r) {
 			var sp = byId[r.id];
 			if (r.dropped || !sp) { return; }
-			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(b); });
+			// A label tried in another form may give its stack's ground back to the ones after it
+			// (`release`), so the ground holds COPIES of its boxes: the placement it leaves stays whole.
+			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(retry[r.id] ? Object.assign({}, b) : b); });
 			if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) {
 				ground.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		});
 		list.forEach(function (it) {
 			var sp = byId[it.id];
-			if (sp) { specs.push(Object.assign({}, sp, it.spec)); }
+			if (sp) { specs.push(Object.assign({}, sp, it.spec, { release: LPN_OPEN_SIDE })); }
 		});
 		if (!specs.length) { return { placed: placed, took: [] }; }
 		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
@@ -2883,7 +2895,15 @@ var EngCalcs = EngCalcs || {};
 			var it = list.filter(function (x) { return x.id === id; })[0];
 			Object.assign(byId[id], it.spec);
 		});
-		return { placed: placed.map(function (r) { return res[r.id] || r; }), took: took };
+		placed = placed.map(function (r) { return res[r.id] || r; });
+		// **A SECOND ROUND, BECAUSE THE FIRST GIVES GROUND BACK ONLY AS IT GOES** (Task 812): a label
+		// tried before its neighbour finds the neighbour's stack still standing on the ground it wants.
+		// Once the neighbour has gone to its line, the ones that found no place are tried again.
+		if (LPN_OPEN_SIDE && !(round > 0) && took.length && took.length < list.length) {
+			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list.filter(function (it) { return !res[it.id]; }), ring, 1);
+			return { placed: again.placed, took: took.concat(again.took) };
+		}
+		return { placed: placed, took: took };
 	}
 	// **A ONE-LINE LABEL LIES ON THE MAP AND OFF ITS FURNITURE** (pre-review, 2026-10-18: on a 390 px
 	// phone a line ran off the map's right edge and under the labels legend). The map's edges, as four
@@ -2916,67 +2936,8 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
 		inlineRing = ring;
 		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
-		if (LPN_CONFORM) {
-			placed = perfDebugAccum('  ns:conform', function () { return conformNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
-		}
 		inlineRing = null;
 		return placed;
-	}
-	// **A NODE LABEL TAKES THE FORM ITS NEIGHBOURS TAKE** (Task 812; Tom, 2026-10-20, on N163 of
-	// Novato, stacked among one-line neighbours: *"Is looking like your neighbors not a value?"*).
-	// After the one-line trial, a stacked label that shows two values or more, whose four nearest
-	// neighbours that show two or more (within LPN_CONFORM_RADIUS_PX, at least three of them) are
-	// mostly one line, tries the SAME values on one line, in the same strict first-fit: it is taken
-	// only where it overprints nothing and crosses no leader, and a label that finds no such place
-	// keeps its stack. The neighbours' forms are read once, before any label changes, so the
-	// answer does not depend on the order the labels are tried in. A hand-placed label is left alone.
-	var LPN_CONFORM = true, LPN_CONFORM_RADIUS_PX = 250, LPN_CONFORM_K = 4;
-	function conformNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
-		var fs = parseFloat(fsNow) || effectiveFontSize(), s0 = state.s || 1, items = [], cand = [], list = [], reqs, res,
-			maxPx = ((svg && svg.clientWidth) || 1920) * LPN_INLINE_MAX_VIEW_FRAC;
-		placed.forEach(function (r) {
-			var n = nodeOf[r.id], ne = n && nodeEls[n.id], sp = byId[r.id];
-			if (r.dropped || !sp || !ne || ne.empty || !ne.lines || ne.lines.length < 2) { return; }
-			items.push({ id: r.id, n: n, ne: ne, x: sp.anchor.x * s0, y: sp.anchor.y * s0, inline: !!ne.inline });
-		});
-		items.forEach(function (a) {
-			if (a.inline || a.n.lx !== undefined || byId[a.id].dragged) { return; }
-			var nb = [], i, b, d, ni = 0;
-			for (i = 0; i < items.length; i++) {
-				b = items[i];
-				if (b === a) { continue; }
-				d = Math.hypot(a.x - b.x, a.y - b.y);
-				if (d <= LPN_CONFORM_RADIUS_PX) { nb.push({ d: d, inline: b.inline }); }
-			}
-			nb.sort(function (p, q) { return p.d - q.d; });
-			nb = nb.slice(0, LPN_CONFORM_K);
-			if (nb.length < 3) { return; }
-			nb.forEach(function (q) { if (q.inline) { ni++; } });
-			if (ni * 2 > nb.length) { cand.push(a); }
-		});
-		if (!cand.length) { return placed; }
-		reqs = measureLevelForms(cand.map(function (c) { return { lines: c.ne.lines, stacked: false }; }), fsNow);
-		cand.forEach(function (c, k) {
-			var m = reqs[k].m;
-			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
-			// **TWO SCREEN PIXELS OF CLEAR GROUND ROUND A PIPE** (pre-review, 2026-11-06: N217 on Novato,
-			// a pipe grazing the first pixel of the glyphs, which are a pixel taller than the box the
-			// first-fit reasons with). Only this step asks for it: it is a label moved for looks.
-			var spec = inlineNodeSpec(c.n, fs, m.wPx / s0);
-			spec.linkMargin = 2 / s0;
-			list.push({ id: c.id, c: c, spec: spec });
-		});
-		if (!list.length) { return placed; }
-		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
-		res.took.forEach(function (id) {
-			var it = list.filter(function (x) { return x.id === id; })[0], ne = it.c.ne,
-				from = { wPx: ne.twPx, rowWPx: ne.rowWPx ? ne.rowWPx.slice() : null, lineCount: ne.lineCount, lines: ne.lines.slice() };
-			writeNodeLabelGlyphs(ne, it.c.n, ne.lines.slice(), fsNow, true);
-			ne.inlineFrom = from;
-			ne.conformed = true;
-		});
-		res.took.forEach(function (id) { measureLabelWidths(list.filter(function (x) { return x.id === id; })[0].c.ne); });
-		return res.placed;
 	}
 	var inlineRing = null;
 	function reinsertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, ring) {
@@ -2984,9 +2945,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (ne && ne.inline && ne.inlineFrom && n.lx === undefined) {
-				var spec = inlineNodeSpec(n, fs, labelBoxWidth(ne));
-				if (ne.conformed) { spec.linkMargin = 2 / (state.s || 1); }
-				list.push({ id: nodeLabelKey(n.id), spec: spec });
+				list.push({ id: nodeLabelKey(n.id), spec: inlineNodeSpec(n, fs, labelBoxWidth(ne)) });
 			}
 		});
 		if (!list.length) { return placed; }
@@ -63593,7 +63552,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, conformed: !!h.conformed, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -63647,7 +63606,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
-		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null; h.conformed = !!c.conformed;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;
