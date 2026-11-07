@@ -10557,6 +10557,7 @@ var EngCalcs = EngCalcs || {};
 		'add-reservoir': { node: true, vertex: true, line: true, shape: true },
 		'add-tank': { node: true, vertex: true, line: true, shape: true },
 		'add-pipe': { node: true, vertex: true, shape: true },
+		'add-virtual': { node: true, vertex: true, shape: true },
 		'add-pump': { node: true, vertex: true, shape: true },
 		'add-valve': { node: true, vertex: true, shape: true },
 		'add-shape': { node: true, vertex: true, line: true, shape: true }
@@ -12904,6 +12905,7 @@ var EngCalcs = EngCalcs || {};
 		var le = linkEls[l.id];
 		if (!le || !le.line || !le.line.classList) { return; }
 		le.line.classList.toggle('lpn-link-closed', linkStatusOf(l) === 'closed');
+		le.line.classList.toggle('lpn-link-virtual', l.virtual === true);
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
 	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no generated
@@ -13809,7 +13811,8 @@ var EngCalcs = EngCalcs || {};
 		// on Net3's pump 10). paintLinkStatus() keeps it current as the transport moves.
 		var line = el('polyline', {
 			points: linkPoints(l), fill: 'none',
-			'class': 'lpn-link lpn-link-' + l.type + (linkStatusOf(l) === 'closed' ? ' lpn-link-closed' : ''),
+			'class': 'lpn-link lpn-link-' + l.type + (linkStatusOf(l) === 'closed' ? ' lpn-link-closed' : '') +
+				(l.virtual === true ? ' lpn-link-virtual' : ''),
 			'data-link': l.id
 		}, linksLayer);
 		var handles = [], i;
@@ -22197,7 +22200,7 @@ var EngCalcs = EngCalcs || {};
 	// point of both.
 	var LINK_CLICK_EXITS_MODE = {
 		'add-junction': true, 'add-reservoir': true, 'add-tank': true,
-		'add-pipe': true, 'add-pump': true, 'add-valve': true, 'add-chain': true
+		'add-pipe': true, 'add-pump': true, 'add-valve': true, 'add-chain': true, 'add-virtual': true
 	};
 	// The link a press landed on, by the browser's own hit test alone -- a link's own data label
 	// included, because that label IS the link's data and a click on it opens the link in Select.
@@ -22758,7 +22761,7 @@ var EngCalcs = EngCalcs || {};
 	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
 	// events; a press dismisses it like anywhere else.
 	function hoverCardOtherMode() {
-		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain';
+		return mode === 'delete' || mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-chain' || mode === 'add-virtual';
 	}
 	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
 	function hoverCardOtherTarget(x, y) {
@@ -39685,7 +39688,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
-		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain', 'add-shape': 'lpn_mode_add_shape',
 		'vertices': 'lpn_mode_vertices',
@@ -39913,6 +39916,52 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		buildLinkEls(l);
 		scheduleSolve();
 		return l;
+	}
+	/**
+	 * **A VIRTUAL PIPE** (Task 822; dev/assemblies.md): an ordinary pipe marked `virtual`, which both
+	 * solvers treat as a connection of zero length, volume, velocity and loss. It is a pipe in every
+	 * table and in the drawing (dotted), so nothing that lists pipes has to learn a new kind.
+	 */
+	function addVirtualPipe(fromId, toId, verts, wantId) {
+		var l = addLink('pipe', fromId, toId, verts, wantId);
+		l.virtual = true;   // base-write: construction: a virtual pipe is born virtual in Base
+		paintLinkStatus(l);
+		return l;
+	}
+	// ---- ASSEMBLIES (Task 822; dev/assemblies.md) ----------------------------------------------------
+	// **A GROUPING OVER PLAIN OBJECTS, NEVER A SECOND KIND OF OBJECT.** `doc.assemblies` is a list of
+	// `{ id, kind, up, down, links }`: the id is the first link's, `up` and `down` are the two coincident
+	// nodes (upstream drawn filled, downstream hollow) and `links` are the pumps between them. The nodes
+	// and the links are ordinary members of `doc.nodes` and `doc.links`, so every table, the solvers and
+	// the `.inp` see exactly what they saw before; the list only says they are managed as one.
+	function assemblyList() { return doc.assemblies || []; }
+	function assemblyOfNode(id) {
+		var list = assemblyList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].up === id || list[i].down === id) { return list[i]; } }
+		return null;
+	}
+	function assemblyOfLink(id) {
+		var list = assemblyList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].links.indexOf(id) >= 0) { return list[i]; } }
+		return null;
+	}
+	function assemblyById(id) {
+		var list = assemblyList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	// The saved list, kept only where every element it names is in the file as a node or a link.
+	function assembliesFromSaved(list, d) {
+		var nodeIds = {}, linkIds = {}, out = [];
+		if (!Array.isArray(list)) { return out; }
+		(d.nodes || []).forEach(function (n) { nodeIds[n.id] = 1; });
+		(d.links || []).forEach(function (l) { linkIds[l.id] = 1; });
+		list.forEach(function (a) {
+			if (!a || !nodeIds[a.up] || !nodeIds[a.down] || !Array.isArray(a.links) || !a.links.length) { return; }
+			if (!a.links.every(function (id) { return linkIds[id]; })) { return; }
+			out.push({ id: a.id !== undefined ? a.id : a.links[0], kind: a.kind || 'pump', up: a.up, down: a.down, links: a.links.slice() });
+		});
+		return out;
 	}
 	// A NEW VALVE'S SETTING, PER TYPE, because the setting is a different QUANTITY for each one (see
 	// js/lpn-epanet.js): a pressure for a PRV or PSV, a flow for an FCV, a dimensionless loss
@@ -42564,6 +42613,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **THE SHAPES** (Task 779): map annotation, written only when there is one, so a file
 			// without any is byte for byte what it was before Shapes existed.
 			shapes: (doc.shapes && doc.shapes.length) ? doc.shapes : undefined,
+			// **THE GROUPINGS** (Task 822; dev/assemblies.md): which nodes and links are managed as one.
+			// Written only when there is one, so a file without any is byte for byte what it was.
+			assemblies: (doc.assemblies && doc.assemblies.length) ? doc.assemblies : undefined,
 			// The frame every coordinate above is measured from (Task 354). Written unconditionally,
 			// including the {0, 0} an ordinary drawing has, because a file that omits it is a file
 			// whose reader has to guess -- and the guess is only right until somebody hand-edits one.
@@ -43750,6 +43802,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.customers = saved.customers || [];
 		// The Shapes (Task 779). A file written before they existed has none.
 		doc.shapes = Array.isArray(saved.shapes) ? saved.shapes : [];
+		// The groupings (Task 822). Only those whose every element is in the file are kept.
+		doc.assemblies = assembliesFromSaved(saved.assemblies, doc);
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
@@ -47092,6 +47146,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				_k: l.k || 0
 			};
 			if (l.desc) { out.desc = l.desc; }   // base-write: see the reservoir above
+			if (l.virtual === true) { out.virtual = true; }   // base-write: import builds Base; a `;VIRTUAL:` comment (Task 822)
 			if (l.type === 'valve') {
 				// A PRV/PSV setting is a pressure and an FCV's a flow (js/lpn-inp.js's
 				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is psi
@@ -47194,6 +47249,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			origin: geo ? { x: 0, y: 0 } : undefined,
 			scenarios: defaultScenarios(),
 			nodes: nodes, links: links, labels: labels, nextId: next,
+			assemblies: (parsed.assemblies && parsed.assemblies.length) ? parsed.assemblies : undefined,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
 			backdrop: null,   // an .inp names an image file; it never carries one. See the report.
 			// SETTINGS ARE INHERITED WHOLE. Do NOT reintroduce a `textSize` estimate from the model's
@@ -47541,6 +47597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
 			// sentence names the Text and never the other word.
 			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir, or tank that is not in the file. It was imported as free text at the location stated in the file and is not attached to any asset.';
+			case 'assembly-unresolved': return pc.lpn_inp_drop_assembly || 'The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
 			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.';
 			default: return code;
 		}
@@ -55084,7 +55141,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
-			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } }
+			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
+			// **THE "++" ROWS OF TOM'S INSERT MENU NOTES** (2026-10-25; dev/assemblies.md): no digit.
+			{ icon: 'virtual', pointerOnly: true, label: pc.lpn_tool_add_virtual || 'Virtual pipe', tip: pc.lpn_tool_add_virtual_tip, fn: function () { setMode('add-virtual'); } }
 		];
 	}
 	// The walkthroughs live on Tom's blog, so this is the one menu action in the bar that leaves the
@@ -58899,7 +58958,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
-			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip }
+			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip },
+			{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: pc.lpn_tool_add_virtual_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -59914,7 +59974,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else if (mode === 'add-shape') {
 				shapeToolTap(e, w, snapHit);
 			}
-			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
+			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve' || mode === 'add-virtual') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
 				// area, which a real tap on a real screen routinely misses by a few pixels -- that
 				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
@@ -59926,7 +59986,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
 						logLpnFirstAction('element');
-						addLink(mode.slice('add-'.length), pendingLinkFrom, hitId, pendingLinkVerts);
+						if (mode === 'add-virtual') { addVirtualPipe(pendingLinkFrom, hitId, pendingLinkVerts); }
+						else { addLink(mode.slice('add-'.length), pendingLinkFrom, hitId, pendingLinkVerts); }
 						// **THE TOOL CARRIES ON FROM THE NODE IT JUST REACHED** (Tom, 2026-09-11:
 						// *"It might be good to have the pipe tool continue from the last node."*).
 						// It used to clear, so drawing a run of five pipes cost five presses on
@@ -76456,8 +76517,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		descField(fields, l);
 		tagField(fields, l);
 		morphTypeRow(fields, l);
+		if (l.type === 'pipe') { virtualField(fields, l); }
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
+		} else if (l.type === 'pipe' && l.virtual === true) {
+			// A virtual pipe (Task 822) has no diameter, roughness, minor loss or length to state.
+			void 0;
 		} else if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
 			renderPumpSpeedFields(fields, l);
@@ -76554,7 +76619,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
-			if (l.type !== 'pump' && linkLengthSI(l)) {
+			if (l.type !== 'pump' && !l.virtual && linkLengthSI(l)) {
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip, resultDec('link', 'gradient'));
 			}
@@ -77667,6 +77732,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// stored token: "Base: open" beside a box labelled Closed is one negation more than a
 		// reader should have to do, and it needs no key of its own.
 		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'closed'); });
+	}
+	// **VIRTUAL PIPE** (Task 822): a pipe with no length, volume, velocity or loss. Base's own, like
+	// the type: a scenario varies what is open, not what an element is, so the box is greyed out
+	// outside Base. Box first, then words, as closedField().
+	function virtualField(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input'), text = document.createElement('span');
+		input.type = 'checkbox';
+		input.checked = l.virtual === true;
+		input.disabled = !inBaseScenario();
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (input.checked) { l.virtual = true; } else { delete l.virtual; }   // base-write: the box is disabled outside Base
+			paintLinkStatus(l);
+			scheduleSolve();
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_field_virtual_short || 'Virtual pipe', pc.lpn_field_virtual_tip);
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
 	}
 	// **CHECK VALVE (CV)**, a pipe's third status beside open and closed: the same `status`
 	// property the Closed box writes, so the two boxes are one EPANET status column and ticking
@@ -79117,6 +79205,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 				});
 			}
+			// **A VIRTUAL PIPE IS A CONNECTION WITH NO PHYSICS** (Task 822; dev/assemblies.md). It
+			// crosses to both solvers with length 0 and no minor loss, and `virtual` rides along so
+			// js/lpn-epanet.js writes the stand-in pipe a curveless pump already uses and both
+			// engines report its velocity and head loss as 0.
+			if (l.type === 'pipe' && l.virtual === true) { out.virtual = true; out.length = 0; out.k = 0; }
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is why a valve
 				// needs a line here at all. A pressure setting is a head in metres, a flow setting is

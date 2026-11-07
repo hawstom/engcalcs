@@ -591,6 +591,13 @@
 						'  0  ' + (link.status === 'closed' ? 'Closed' : 'Open'));
 					warnings.push({ code: 'pump-no-curve-as-pipe', ids: [link.id] });
 				}
+			} else if (link.virtual) {
+				// A VIRTUAL PIPE (Task 822) is the same stand-in a curveless pump uses: EPANET refuses
+				// a pipe of length 0, so it gets 0.01 m of 1000 mm pipe at the smoothest roughness,
+				// whose head loss is below solver tolerance. Not reported: it is exactly what was asked for.
+				pipes.push(' ' + link.id + '  ' + link.from + '  ' + link.to +
+					'  0.01  1000  ' + (method === 'dw' ? '0.0000015' : (method === 'manning' ? '0.008' : '150')) +
+					'  0  ' + (link.status === 'closed' ? 'Closed' : link.status === 'cv' ? 'CV' : 'Open'));
 			} else {
 				// length m, diameter m -> mm, minor-loss coefficient dimensionless.
 				pipes.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
@@ -1376,7 +1383,9 @@
 				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : '') +
 				// **A CHECK-VALVE PIPE IS A LINK TYPE TO EPANET** (CVPIPE, fixed when the file is read),
 				// and error 207 refuses EN_INITSTATUS on one, so turning CV on or off reopens the Project.
-				'\u0001' + (l.type === 'pipe' && l.status === 'cv' ? 'cv' : ''));
+				'\u0001' + (l.type === 'pipe' && l.status === 'cv' ? 'cv' : '') +
+				// A pipe turning virtual (Task 822) is written as a different [PIPES] row, so it reopens.
+				'\u0001' + (l.virtual ? 'v' : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -1539,6 +1548,8 @@
 			} else if (l.type === 'pump') {
 				// Curveless pump: a stand-in pipe whose geometry lpnToInp fixes from the method,
 				// and the method is in the signature. Only its status can change.
+			} else if (l.virtual) {
+				// A virtual pipe (Task 822) is the same stand-in: its geometry is fixed, only its status moves.
 			} else if (l.type === 'valve') {
 				// A VALVE IS NOT A PIPE AND setPipeData() IS NOT VALID ON ONE. Without this branch
 				// a valve falls through to the pipe branch and its SETTING is never pushed at all.
@@ -1779,8 +1790,8 @@
 					idx = s.linkIdx[link.id];
 					// L/s -> m3/s, and EPANET's headloss is already m for a pipe.
 					flows[link.id] = p.getLinkValue(idx, EN_FLOW) / 1000;
-					velocities[link.id] = p.getLinkValue(idx, EN_VELOCITY);
-					headlosses[link.id] = p.getLinkValue(idx, EN_HEADLOSS);
+					velocities[link.id] = link.virtual ? 0 : p.getLinkValue(idx, EN_VELOCITY);
+					headlosses[link.id] = link.virtual ? 0 : p.getLinkValue(idx, EN_HEADLOSS);
 					// A check-valve pipe's state is the solve's answer, so it is reported, as the
 					// built-in solver reports it.
 					if (link.status === 'cv') { statuses[link.id] = p.getLinkValue(idx, EN_STATUS) > 0 ? 'open' : 'closed'; }
@@ -2659,8 +2670,8 @@
 									for (i = 0; i < model.links.length; i++) {
 										l = model.links[i];
 										f.flows[l.id] = ruFlow(p.getLinkValue(linkIdx[l.id], EN_FLOW)) / 1000;
-										f.velocities[l.id] = ruHead(p.getLinkValue(linkIdx[l.id], EN_VELOCITY));
-										f.headlosses[l.id] = ruHead(p.getLinkValue(linkIdx[l.id], EN_HEADLOSS));
+										f.velocities[l.id] = l.virtual ? 0 : ruHead(p.getLinkValue(linkIdx[l.id], EN_VELOCITY));
+										f.headlosses[l.id] = l.virtual ? 0 : ruHead(p.getLinkValue(linkIdx[l.id], EN_HEADLOSS));
 										f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
 									}
 									frames.push(f);

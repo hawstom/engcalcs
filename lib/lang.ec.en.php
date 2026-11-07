@@ -651,6 +651,11 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 // by what it does as well as by the abbreviation an engineer already knows, because the letters
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='Valve';
+$ec_lang['lpn_tool_add_virtual']='Virtual pipe';
+$ec_lang['lpn_tool_add_virtual_tip']='Connect two nodes with a virtual pipe, which has no length, volume, velocity or head loss. Select a start node and then an end node.';
+$ec_lang['lpn_mode_add_virtual']='Mode: Add Virtual Pipe. Select a start node and then an end node to connect them with a pipe that has no length, volume, velocity or head loss. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_field_virtual_short']='Virtual pipe';
+$ec_lang['lpn_field_virtual_tip']='A virtual pipe joins two nodes with no length, volume, travel time, velocity or head loss. Both solvers treat it as a direct connection. Cleared, it is an ordinary pipe again.';
 $ec_lang['lpn_tool_add_text']='Text';
 // Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
 $ec_lang['lpn_tool_add_chain']='Junction Pipe Chain';
@@ -2437,6 +2442,7 @@ $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The 
 $ec_lang['lpn_inp_drop_patterns']='This page did not read the demand patterns, because the extended period simulation module did not load. Every demand is the value stated in the file.';
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions have demands that vary over the run. Their patterns were imported in full, and the demand shown is the value at the time on the clock.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept, it is being solved, and each of them shows it in the Emitter coefficient box in its properties.';
+$ec_lang['lpn_inp_drop_assembly']='The file groups these pumps with nodes it does not contain, so the group was not restored. The nodes and pumps that are there came in as plain elements.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. The pump was imported without a curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It was imported without a curve, so it adds no head.';

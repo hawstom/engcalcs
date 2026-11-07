@@ -1978,7 +1978,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		// "highest velocity" comparison by sorting a fast reverse flow to the BOTTOM of the range.
 		// Direction is already carried by the sign of the flow and by the arrow the map draws.
 		// A pump reports no velocity and a shut link no head loss, as EPANET's EN_getlinkvalue does.
-		velocities[link.id] = link.diameter > 0 && link.type !== 'pump'
+		velocities[link.id] = link.diameter > 0 && link.type !== 'pump' && !link.virtual
 			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
 		if (link.status === 'closed') {
@@ -2008,6 +2008,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// EPANET's EN_HEADLOSS on a pipe is the magnitude, whichever way the water runs (Task 733, slice 7);
 			// every display already reads the magnitude (shownHeadloss()), so the sign carried nothing.
 			headlosses[link.id] = Math.abs(res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k]);
+			// A virtual pipe (Task 822) reports no loss at all, whatever the gradient floor did.
+			if (link.virtual) { headlosses[link.id] = 0; }
 		}
 	}
 

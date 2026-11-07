@@ -384,6 +384,7 @@
 			seen = {},          // name -> row count, for the ones we only count
 			i, line, semi, toks, cmt;
 
+		var markVirtual = [], markAssemblies = [];
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
 		var pendingCurveType = null;
@@ -414,6 +415,17 @@
 			// token, so no section that does NOT mean anything by its comments can mistake one for
 			// data.
 			if (semi >= 0) { cmt = line.slice(semi + 1).trim(); line = line.slice(0, semi); }
+			// **THE GROUPING COMMENTS THIS PAGE WRITES** (Task 822): `;VIRTUAL: id ...` and
+			// `;ASSEMBLY: kind up down link ...`, read wherever they sit and never carried as text.
+			if (semi >= 0 && !line.trim()) {
+				var gm = /^(VIRTUAL|ASSEMBLY)\s*:\s*(.*)$/i.exec(cmt);
+				if (gm) {
+					var gt = gm[2].split(/\s+/).filter(Boolean);
+					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
+					else if (gt.length >= 4) { markAssemblies.push({ kind: gt[0].toLowerCase(), up: gt[1], down: gt[2], links: gt.slice(3) }); }
+					continue;
+				}
+			}
 			// **A `;|` LINE CONTINUES THE DESCRIPTION ABOVE IT**, in a file written by an early build of
 			// Task 806, before line breaks went on the one comment as "\P" (EngCalcs.lpnDescText).
 			// Still read, never written. On the row of one of the six element sections, or on the
@@ -1131,6 +1143,19 @@
 			links.push(pipe); linkIndex[pipe.id] = pipe;
 		}
 
+		// ---- THE GROUPING COMMENTS (Task 822) ----
+		// A pipe named by `;VIRTUAL:` comes back virtual; an assembly comes back only if every element it
+		// names is in the file as the right kind. One that is not is reported, never half-restored.
+		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
+		var assemblies = [], assemblyBad = [];
+		markAssemblies.forEach(function (a) {
+			var un = nodeIndex[a.up], dn = nodeIndex[a.down],
+				good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
+			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
+			else { assemblyBad.push(a.links[0]); }
+		});
+		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
+
 		// ---- [CURVES], READ IN FULL AND KEPT AS DOCUMENT OBJECTS (Task 586) ----------------------
 		//
 		// **A CURVE IS A THING THE DOCUMENT HOLDS, NOT A PROPERTY OF WHATEVER REFERENCES IT.** Every
@@ -1665,6 +1690,7 @@
 			nodes: nodes,
 			links: links,
 			labels: labels,
+			assemblies: assemblies,
 			backdrop: backdrop,
 			// [BACKDROP] UNITS: 'feet', 'meters', 'degrees' or 'none' when the file names one of
 			// EPANET's four, and null both when the line is absent and when its word is one this
@@ -2880,6 +2906,7 @@
 		}
 
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
+			virtualIds = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
 			demandRows = [],
 			nodeById = {}, linkById = {}, omitted = {}, offLink = {}, i, j, nd, lk, lb;
@@ -3149,12 +3176,21 @@
 					typedPipes.push(lk.id);
 					typesUsed[eff(lk, 'typeId')] = true;
 				}
-				pipes.push(row([lk.id, lk.from, lk.to,
-					n(cLen, lk, '_length', eff(lk, 'length') || 0),
-					dia,
-					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
-					minorLossText(lk),
-					pipeStatus]) + descOf(lk));
+				if (lk.type === 'pipe' && lk.virtual === true) {
+					// A VIRTUAL PIPE (Task 822) goes out as the stand-in a curveless pump uses: EPANET
+					// refuses length 0, so 0.01 of a very wide, very smooth pipe, whose loss is below
+					// solver tolerance. The `;VIRTUAL:` line below is what lets it come back as virtual.
+					virtualIds.push(lk.id);
+					pipes.push(row([lk.id, lk.from, lk.to, '0.01', sys === 'us' ? '40' : '1000',
+						roughStandIn(settings.method), '0', pipeStatus]) + descOf(lk));
+				} else {
+					pipes.push(row([lk.id, lk.from, lk.to,
+						n(cLen, lk, '_length', eff(lk, 'length') || 0),
+						dia,
+						n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
+						minorLossText(lk),
+						pipeStatus]) + descOf(lk));
+				}
 			}
 			for (j = 0; j < (lk.verts || []).length; j++) {
 				verts.push(row([lk.id,
@@ -3657,6 +3693,23 @@
 				yc = (c.kind === 'head' || c.kind === 'headloss') ? cHead : PLAIN_AXIS;
 			EngCalcs.lpnCurveLines(c, xc, yc).forEach(function (ln) { curves.push(ln); });
 		});
+		/**
+		 * **THE GROUPING IS COMMENT LINES, AND ONLY WHERE THERE IS ONE** (Task 822; dev/assemblies.md).
+		 * `;VIRTUAL: id id ...` names the pipes that are virtual (written as the stand-in row above) and
+		 * `;ASSEMBLY: pump U1 D1 P1` names an assembly's kind, upstream node, downstream node and links.
+		 * Plain EPANET sees comments. A file without either gets no line, so Net1/2/3 stay character-exact.
+		 */
+		function assemblyComments() {
+			var out = '', live = {};
+			doc.links.forEach(function (l2) { if (!offLink[l2.id]) { live[l2.id] = 1; } });
+			if (virtualIds.length) { out += ';VIRTUAL: ' + virtualIds.join(' ') + '\n'; }
+			(doc.assemblies || []).forEach(function (a) {
+				if (!a || !a.up || !a.down || !a.links || !a.links.length) { return; }
+				if (omitted[a.up] || omitted[a.down] || !a.links.every(function (id) { return live[id]; })) { return; }
+				out += ';ASSEMBLY: ' + [a.kind || 'pump', a.up, a.down].concat(a.links).join(' ') + '\n';
+			});
+			return out ? out + '\n' : '';
+		}
 		var title = opts.title !== undefined ? opts.title : ((doc.project && doc.project.name) || '');
 		var inp = '[TITLE]\n' + String(title).replace(/[\r\n]+/g, ' ') + '\n\n' +
 			// [JUNCTIONS] is written even when empty: it is one of the three sections lpnInpParse()
@@ -3744,6 +3797,7 @@
 			section('VERTICES', verts) +
 			section('LABELS', labelRows) +
 			section('BACKDROP', backdropRows) +
+			assemblyComments() +
 			'[END]\n';
 		// Reported LAST, so the two counts are complete: the walks above are what fill them.
 		if (typedPipes.length) {

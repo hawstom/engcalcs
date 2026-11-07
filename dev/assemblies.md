@@ -71,3 +71,53 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
     Maybe we add Pressure Tank in our Libraries, shown only if somebody adds one."*
   - *For open-air tank:* the normal tank parameters.
 - *Well icon* (Tom, 2026-10-26): *"I wonder if it would be nice to depict drawdown on a well icon."* Sketch as above.
+
+## Tom's calls, 2026-11-06, and what is built
+
+- **Detection (a later slice).** Assemblies will be guessed from coincidence plus a naming pattern plus a
+  topological pattern, and only when the map is not heavily coincident (at least half the nodes
+  non-coincident). The page alerts that apparent assemblies were found and asks permission to convert.
+  **Convert pumps and valves to assemblies** (later) uses virtual pipes so no result moves, and alerts that
+  the model could be made physically representative. Detection must produce the same stored grouping
+  described below, so it needs no storage of its own.
+- **First slice:** the virtual pipe, then Pump+. Valve+, Well and System follow.
+
+### The grouping (one design for every assembly kind)
+
+`doc.assemblies` is a list of `{ id, kind, up, down, links }` and nothing else is an assembly. `id` is the
+first link's id, `kind` is `pump` (later `valve`), `up` and `down` are the two coincident junctions, `links`
+are the pump links between them. The nodes and links are ordinary entries in `doc.nodes` and `doc.links`:
+every table, the solvers and the `.inp` see what they always saw. A grouping is written to the project file
+only when there is one, and `applySaved()` keeps one only if every element it names exists. Deleting or
+renaming a member keeps the list true (delete dissolves the group, rename follows it). Undo carries it,
+because it is part of `doc`.
+
+In the `.inp` it is one comment line per assembly, `;ASSEMBLY: pump U1 D1 P1` (kind, upstream node,
+downstream node, links), written after the last section and before `[END]`. EPANET and every other reader
+skip it; our reader restores the group only when every element is in the file, and reports it (`assembly-
+unresolved`) when not. A file with no assembly gets no line, so Net1, Net2 and Net3 stay character-exact.
+A pump with no curve exports as a pipe (the existing `pump-no-curve-as-pipe` difference), so the group names a
+link that reads back as a pipe; the group still restores.
+
+### The virtual pipe
+
+- **Stored** as `virtual: true` on an ordinary pipe (`type: 'pipe'`). It is a pipe in every table, in Find and
+  in the drawing, where it is dotted (Tom's sketch of 2026-10-25). Its stored diameter, roughness, minor loss and
+  length are ignored, so a pipe that is made virtual and then ordinary again comes back as it was. Base's
+  own, like a pipe's type: the box is greyed out inside a scenario.
+- **Built-in solver:** the model handed to it (`assembleModel`) carries `length: 0`, `k: 0`, `virtual: true`.
+  A pipe of length 0 already has resistance 0 (`lpnResistance`), so no solver change was needed beyond
+  reporting velocity 0 and head loss 0.
+- **EPANET:** refuses a pipe of length 0 (error 211), so the model's pipe goes out as the stand-in a curveless
+  pump already uses: 0.01 m of 1000 mm at C 150 (0.0000015 for Darcy-Weisbach, 0.008 for Manning). Its head loss
+  is about 1e-7 m at 100 L/s. Velocity and head loss are reported as 0 from the engine too. Not reported as a
+  difference: it is exactly what was asked for.
+- **`.inp` export** writes the same stand-in row (0.01, then 40 in or 1000 mm, then C 150 and so on) and one
+  `;VIRTUAL: id id ...` line next to the assembly lines. Import reads the line and marks those pipes virtual;
+  the row's numbers are taken as written, so a second export is byte-identical. Plain EPANET sees a short, wide
+  pipe: the loss is negligible but the 0.01 m of volume is not exactly zero, and says so here.
+- **Measured** (`dev/lpn-spike/virtual-pipe-harness.js`, a four-pipe loop, 15 L/s through the virtual pipe):
+  inserting one moves no head by more than 2e-7 m in the built-in solver and 4.5e-7 m in EPANET, and no flow by
+  more than 2e-8 m3/s; the two engines agree on the virtual network to 1e-5 m.
+- **Not done:** water quality travel time through a virtual pipe in an EPANET run is the stand-in's 0.01 m, not
+  exactly 0; the built-in extended-period loop treats it as length 0.

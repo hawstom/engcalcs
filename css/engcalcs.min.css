@@ -1382,6 +1382,9 @@ html[lang="zh"] .ec-welcome {
 .lpn-link-closed {
 	stroke-dasharray: calc(2.571 * var(--lpn-lw, 0)) calc(2 * var(--lpn-lw, 0));
 }
+.lpn-link-virtual {
+	stroke-dasharray: calc(0.5 * var(--lpn-lw, 0)) calc(1.6 * var(--lpn-lw, 0));
+}
 .lpn-arrow { fill: none; stroke: var(--lpn-map-ink); stroke-width: 0.25; stroke-linejoin: miter; pointer-events: none; }
 .lpn-vhandle {
 	fill: var(--lpn-map-ink); stroke: var(--lpn-map-ink);

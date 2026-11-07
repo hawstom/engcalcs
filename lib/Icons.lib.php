@@ -244,6 +244,10 @@ $ec_icons = array(
 	// (r 4.25), as he asked: "as similar as possible in size and weight to the Junction tool icon";
 	// the pipe and the next junction are dashed, square-ended because round caps would close the gaps.
 	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
+	// **VIRTUAL PIPE** (Task 822; Tom's sketch, 2026-10-25): the pipe icon's two end ticks with the run dotted.
+	'virtual'    => '<path d="M5 12H19" stroke-linecap="butt" stroke-dasharray="1.2 2.4"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
+	// **PUMP+** (same sketch): the pump with a small plus on its outlet, which marks the assembly form.
+	'pumpplus'   => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/><path d="M18 3V9M15 6H21"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
 	// **A SHAPE (Task 779): Tom's own freehand drawing, an irregular open polyline of four strokes**
 	// (Tom, 2026-10-12: *"I didn't draw an open pentagon ... and I didn't want a broken regular convex
