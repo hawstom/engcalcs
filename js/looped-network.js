@@ -76520,9 +76520,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (l.type === 'pipe') { virtualField(fields, l); }
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
-		} else if (l.type === 'pipe' && l.virtual === true) {
-			// A virtual pipe (Task 822) has no diameter, roughness, minor loss or length to state.
-			void 0;
 		} else if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
 			renderPumpSpeedFields(fields, l);
@@ -77749,7 +77746,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scheduleSolve();
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_field_virtual_short || 'Virtual pipe', pc.lpn_field_virtual_tip);
+		setFieldLabel(text, pc.lpn_tool_add_virtual || 'Virtual pipe', pc.lpn_field_virtual_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);

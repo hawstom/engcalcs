@@ -2110,7 +2110,6 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_virtual: <?=json_encode($ec_lang['lpn_tool_add_virtual'])?>,
 	lpn_tool_add_virtual_tip: <?=json_encode($ec_lang['lpn_tool_add_virtual_tip'])?>,
 	lpn_mode_add_virtual: <?=json_encode($ec_lang['lpn_mode_add_virtual'])?>,
-	lpn_field_virtual_short: <?=json_encode($ec_lang['lpn_field_virtual_short'])?>,
 	lpn_field_virtual_tip: <?=json_encode($ec_lang['lpn_field_virtual_tip'])?>,
 	lpn_tool_add_text: <?=json_encode($ec_lang['lpn_tool_add_text'])?>,
 	lpn_tool_add_chain: <?=json_encode($ec_lang['lpn_tool_add_chain'])?>,

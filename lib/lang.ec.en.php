@@ -654,8 +654,7 @@ $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_virtual']='Virtual pipe';
 $ec_lang['lpn_tool_add_virtual_tip']='Connect two nodes with a virtual pipe, which has no length, volume, velocity or head loss. Select a start node and then an end node.';
 $ec_lang['lpn_mode_add_virtual']='Mode: Add Virtual Pipe. Select a start node and then an end node to connect them with a pipe that has no length, volume, velocity or head loss. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.';
-$ec_lang['lpn_field_virtual_short']='Virtual pipe';
-$ec_lang['lpn_field_virtual_tip']='A virtual pipe joins two nodes with no length, volume, travel time, velocity or head loss. Both solvers treat it as a direct connection. Cleared, it is an ordinary pipe again.';
+$ec_lang['lpn_field_virtual_tip']='A virtual pipe joins two nodes with no length, volume, travel time, velocity or head loss. Both solvers treat it as a direct connection, and the diameter, roughness, minor loss and length below are not used. Cleared, it is an ordinary pipe again.';
 $ec_lang['lpn_tool_add_text']='Text';
 // Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
 $ec_lang['lpn_tool_add_chain']='Junction Pipe Chain';

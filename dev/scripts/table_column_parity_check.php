@@ -109,6 +109,7 @@ const EC_TABLE_PARITY_EXEMPT = [
     // (b) one property, two labels.
     'pipe/fn:pipeTypePropLabel' => 'b. the reaction pair a pipe type owns; the columns are '
         . 'lpn_reaction_bulk_short and lpn_reaction_wall_short',
+    'pipe/lpn_tool_add_virtual' => 'Task 822: a virtual pipe is a Base-only flag drawn dotted on the map; the existing tables are unchanged by Tom\'s call until the Assemblies table slice',
     'pipe/lpn_field_auto_length' => 'b. the Length column is the property; Auto length is the flag that says the drawing sets it (lenAuto)',
     'valve/lpn_field_valve_setting_drop' => 'b. the column is lpn_field_valve_setting, which carries '
         . 'no unit on purpose: a valve setting is a different quantity per type',
