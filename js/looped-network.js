@@ -73429,7 +73429,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **WHERE A PUSH LANDS, BY NAME**: the parent scenario's name, the stored alternative's, or Base's,
 	// and the value already held there when it differs (a single property only), shown as the question's "replaced".
-	function pushDestination(el, props, vals) {
+	function pushDestination(el, props, vals, unit) {
 		var tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), name, old, map, ov, t;
 		if (!tgt) { return null; }
 		if (tgt.base) {
@@ -73443,7 +73443,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (props.length === 1 && plainObject(ov) && Object.prototype.hasOwnProperty.call(ov, props[0])) { old = ov[props[0]]; }
 		}
 		if (old !== undefined && old !== null && typeof old !== 'object' && vals.length === 1 && String(old) !== String(vals[0][1])) {
+			// An emitter coefficient is stored in SI and shown in the flow and pressure units chosen; the rest are stored as typed.
+			if (props[0] === 'emitter' && typeof old === 'number') { old = emitterToDisplay(old); }
 			old = formatPropValue(old);
+			if (unit && /^-?[\d.]+$/.test(old)) { old += ' ' + unit; }
 		} else { old = null; }
 		return { name: name, old: old };
 	}
@@ -73553,7 +73556,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (pushProps.length) {
 			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
 				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
-				askPushOverride(pushDestination(o.el, now, vals), pushOtherScenarios(o.el, o.props).length, function () {
+				askPushOverride(pushDestination(o.el, now, vals, ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || ''), pushOtherScenarios(o.el, o.props).length, function () {
 					pushOverrideUp(o.el, now, vals);
 					afterPropertyEdit(o.el);
 					refreshScenarioStatus();

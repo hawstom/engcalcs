@@ -28,6 +28,7 @@ function report(ok, label, detail) {
 setUnitSet('us');
 
 const L = loadLoopedNetwork(
+	"\t\taddLink: addLink, emitterToStore: emitterToStore, linkById: function (id) { return doc.links.filter(function (l) { return l.id === id; })[0]; },\n" +
 	"\t\tnodeById: nodeById, deleteScenario: deleteScenario, addNode: addNode, setProp: setProp, baseValue: baseValue, effective: effective, hasOverride: hasOverride,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, undo: undo, saveUndoSnapshot: saveUndoSnapshot,\n" +
 	"\t\tbaseId: function () { return baseScenario().id; }, scn: scenarioById, activeScenario: activeScenario,\n" +
@@ -101,10 +102,12 @@ report(JSON.stringify(ids(L.pushOtherScenarios(m, ['elev']))) === JSON.stringify
 delete L.scn(B.id).alternatives.physical;
 
 // 4. the arrow: drawn only where it can act.
-function arrowIn(id, e, p) {
+function arrowIn(id, e, p, labelText) {
 	return L.inScn(id, () => {
 		const f = global.document.createElement('div');
-		f.appendChild(global.document.createElement('label'));
+		const lab = global.document.createElement('label');
+		if (labelText) { lab.textContent = labelText; }
+		f.appendChild(lab);
 		L.marker(f, e, p);
 		const g = f.children.filter((c) => String(c.className).indexOf('lpn-ovm') === 0)[0];
 		return g ? (g.children.filter((c) => String(c.className).indexOf('lpn-ovm-up') >= 0)[0] || null) : null;
@@ -170,6 +173,27 @@ answer = false;
 click(arrowIn(C1.id, n, 'elev'));
 fresh();
 report(L.baseValue(n, 'elev') === 100 && has(C1.id, n, 'elev'), 'order case: No changes nothing');
+
+// The destination's old value is quoted as the person sees it: emitter in the chosen flow/pressure units
+// (stored in SI), diameter as typed, each with the unit the row's label states.
+{
+	L.switchScenario(L.baseId());
+	const Q = L.createScenario('Q', L.baseId());
+	L.setProp(n, 'emitter', L.emitterToStore(500));
+	const pipe = L.addLink('pipe', nid, mid, []);
+	L.setProp(pipe, 'diameter', 8);
+	const Q1 = L.createScenario('Q1', Q.id);
+	L.setProp(n, 'emitter', L.emitterToStore(1111));
+	L.setProp(pipe, 'diameter', 12);
+	fresh();
+	asked = null; answer = false;
+	click(arrowIn(Q1.id, n, 'emitter', 'Emitter coefficient (gpm/psi)'));
+	report(asked && /to Q\?/.test(asked.text) && /replaces 500 gpm\/psi there/.test(asked.text), 'emitter coefficient: the old value is shown in the displayed unit, with its unit', asked && asked.text);
+	report(asked && !/0\.0\d/.test(asked.text), 'emitter coefficient: not the SI number');
+	asked = null;
+	click(arrowIn(Q1.id, L.linkById(pipe.id), 'diameter', 'Diameter (in)'));
+	report(asked && /replaces 8 in there/.test(asked.text), 'diameter in US units: the old value as typed, with in', asked && asked.text);
+}
 
 // 6. Recalculate off. The click ends in afterPropertyEdit(), as the dot's Clear does, so a push
 // refreshes the one element and its labels and leaves the stale results alone
