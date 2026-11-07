@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Boru cidarındaki tepkime; kendi katsayısın
 $ec_lang['lpn_reaction_pipe_tip']='Yalnızca bu boru için. Boş bırakırsanız boru, Ayarlar, Su kalitesi altında tüm şebeke için belirlenen katsayıyı kullanır.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Tepkime katsayısı';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Bu depoda tutulan sudaki tepkime, 1/gün cinsinden bir hız olarak. Negatif bir sayı kimyasalı azaltır, pozitif bir sayı ise artırır. Su, herhangi bir boruda kaldığından çok daha uzun süre bir depoda kalır, bu yüzden kalıntının kaybolduğu yer genellikle burasıdır. Boş bırakırsanız depo, Ayarlar, Su kalitesi altında tüm şebeke için belirlenen kütle tepkime katsayısını kullanır.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='kontroller';
 $ec_lang['lpn_inpup_i_rules']='kurallar';
 $ec_lang['lpn_inpup_i_options']='seçenekler';
 $ec_lang['lpn_roughness_method_note']='⚠ {method} için normal aralığın dışında pürüzlülüğe sahip borular: {n}. Değerler değişmedi ve başka bir sürtünme yöntemi için girilmiş olabilir.';
-$ec_lang['lpn_field_cv']='Çek valf (CV)';
 $ec_lang['lpn_field_cv_tip']='Bu boru suyu bir çek valf gibi yalnızca başlangıç düğümünden bitiş düğümüne geçirir. Akış ters dönecek olursa boru, yeniden ileri akabilene kadar kapanır. EPANET bu duruma CV der.';
 $ec_lang['lpn_theme_hc']='Yüksek karşıtlık';
 $ec_lang['lpn_theme_amber']='Kehribar';

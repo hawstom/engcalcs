@@ -183,8 +183,8 @@ function run(mutate, quiet) {
 		ok('3.2b the "values will be lost" sentence follows, and every line under it is "ID: entry"',
 			text.indexOf(PC.lpn_change_type_lost) > 0 && text.split(PC.lpn_change_type_lost + '\n')[1].split('\n\n')[0].split('\n').every(l => l.indexOf(J + ': ') === 0),
 			text);
-		ok('3.3 it names the water depth and the tank diameter, with the ID',
-			text.indexOf(J + ': ' + PC.lpn_field_tank_level) >= 0 && text.indexOf(PC.lpn_field_tank_diameter) >= 0, text);
+		ok('3.3 it names the initial depth and the tank diameter, with the ID',
+			text.indexOf(J + ': ' + PC.lpn_field_tank_level_short) >= 0 && text.indexOf(PC.lpn_field_tank_diameter) >= 0, text);
 		ok('3.4 Cancel leaves the document byte-identical', snap() === before);
 		ok('3.5 ...and the node still a tank', L.nodeById(J).type === 'tank');
 		change(J, 'junction', true);
@@ -597,7 +597,7 @@ function run(mutate, quiet) {
 		ok('15.2b "These are new" lists the pipe\'s diameter, roughness, minor loss and length, with units',
 			bornPart.indexOf('9: ' + PC.lpn_field_diameter + ' ' + D.diameter + ' in') >= 0 &&
 			bornPart.indexOf(' ' + D.roughness + '\n') > 0 &&
-			bornPart.indexOf('9: ' + PC.lpn_field_km + ' ' + D.k) >= 0 &&
+			bornPart.indexOf('9: ' + PC.lpn_field_km_short + ' ' + D.k) >= 0 &&
 			bornPart.indexOf('9: ' + PC.lpn_field_length + ' ') >= 0, bornPart);
 		const tv = changeLink('9', 'valve', false)[0] || '';
 		const bornV = tv.split(PC.lpn_change_type_born + '\n')[1] || '';

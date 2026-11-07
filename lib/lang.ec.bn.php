@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='পাইপের দেয়ালে ব�
 $ec_lang['lpn_reaction_pipe_tip']='শুধু এই পাইপের নিজস্ব মান। এটি খালি রাখলে পাইপটি সেটিংস, পানির গুণমান-এর অধীনে পুরো নেটওয়ার্কের জন্য নির্ধারিত সহগ ব্যবহার করে।';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='বিক্রিয়া সহগ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='এই ট্যাংকে ধরে রাখা পানিতে বিক্রিয়া, 1/day হার হিসেবে। ঋণাত্মক সংখ্যা রাসায়নিকটিকে ক্ষয় করে এবং ধনাত্মক সংখ্যা বাড়ায়। পানি যেকোনো পাইপের চেয়ে ট্যাংকে অনেক বেশি সময় থাকে, তাই প্রায়ই এখানেই অবশিষ্ট হারিয়ে যায়। ফাঁকা মানে সেটিংস, হিসাব, গুণমান-এর অধীনে পুরো নেটওয়ার্কের জন্য নির্ধারিত বাল্ক বিক্রিয়া সহগ ব্যবহার করা।';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='নিয়ন্ত্রণ';
 $ec_lang['lpn_inpup_i_rules']='নিয়ম';
 $ec_lang['lpn_inpup_i_options']='বিকল্প';
 $ec_lang['lpn_roughness_method_note']='⚠ {method}-এর জন্য স্বাভাবিক পরিসরের বাইরে রাফনেসযুক্ত পাইপ: {n}। মানগুলো অপরিবর্তিত এবং হয়তো অন্য ঘর্ষণ পদ্ধতির জন্য লেখা হয়েছিল।';
-$ec_lang['lpn_field_cv']='চেক ভালভ (CV)';
 $ec_lang['lpn_field_cv_tip']='এই পাইপ চেক ভালভের মতো শুধু তার শুরুর নোড থেকে শেষের নোডে পানি যেতে দেয়। প্রবাহ উল্টে যেতে চাইলে পাইপটি বন্ধ হয়ে যায়, যতক্ষণ না আবার সামনের দিকে প্রবাহিত হতে পারে। EPANET এই অবস্থাকে CV বলে।';
 $ec_lang['lpn_theme_hc']='উচ্চ বৈসাদৃশ্য';
 $ec_lang['lpn_theme_amber']='অ্যাম্বার';

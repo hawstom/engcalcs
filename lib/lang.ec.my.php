@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='ကိုယ်ပိုင် တန်ဖ�
 $ec_lang['lpn_reaction_pipe_tip']='ဤပိုက်တစ်ခုတည်း ကိုယ်တိုင်။ ဗလာထားလိုက်ပါက ဤပိုက်သည် ဆက်တင်များ၊ ရေအရည်အသွေး အောက်ရှိ ကွန်ရက်တစ်ခုလုံးအတွက် သတ်မှတ်ထားသော ကိန်းကို သုံးသည်။';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='တုံ့ပြန်မှု ကိန်း';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='ဤရေတိုက်ထဲရှိ ရေ၏ တုံ့ပြန်မှု၊ 1/day နှုန်းအဖြစ်။ အနှုတ်ဂဏန်းသည် ဓာတုပစ္စည်းကို ယိုယွင်းစေပြီး အပေါင်းဂဏန်းသည် တိုးစေသည်။ ရေသည် ရေတိုက်ထဲတွင် မည်သည့်ပိုက်ထက်မဆို ပိုကြာစွာ နေသဖြင့် ကျန်ရှိပမာဏ ဆုံးရှုံးသည့်နေရာ ဖြစ်လေ့ရှိသည်။ အလွတ်ထားလျှင် ဆက်တင်များ၊ တွက်ချက်မှု၊ ရေအရည်အသွေး အောက်တွင် ကွန်ရက်တစ်ခုလုံးအတွက် သတ်မှတ်ထားသော ရေကိုယ်ထည်တုံ့ပြန်မှုကိန်းကို သုံးသည်။';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='ထိန်းချုပ်မှုမျ�
 $ec_lang['lpn_inpup_i_rules']='စည်းမျဉ်းများ';
 $ec_lang['lpn_inpup_i_options']='ရွေးချယ်စရာများ';
 $ec_lang['lpn_roughness_method_note']='⚠ {method} အတွက် ပုံမှန်အကွာအဝေးအပြင်ရှိ ကြမ်းတမ်းမှုပါ ပိုက်လိုင်းများ: {n}။ တန်ဖိုးများ မပြောင်းလဲဘဲ အခြား ပွတ်တိုက်မှု နည်းလမ်းအတွက် ထည့်ထားခြင်း ဖြစ်နိုင်သည်။';
-$ec_lang['lpn_field_cv']='စစ်ဆေးဗားလ် (CV)';
 $ec_lang['lpn_field_cv_tip']='ဤပိုက်လိုင်းသည် စစ်ဆေးဗားလ်ကဲ့သို့ ရေကို ၎င်း၏ စတင်အမှတ်မှ အဆုံးအမှတ်သို့သာ ဖြတ်စီးစေသည်။ စီးနှုန်း ပြောင်းပြန်ဖြစ်မည့်အခါ ရှေ့သို့ ပြန်စီးနိုင်သည်အထိ ပိုက်လိုင်းပိတ်သည်။ EPANET က ဤအနေအထားကို CV ဟု ခေါ်သည်။';
 $ec_lang['lpn_theme_hc']='အလင်းအမှောင်ကွာခြားမှု မြင့်';
 $ec_lang['lpn_theme_amber']='ပယင်းရောင်';

@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reacția la peretele conductei, folosită pen
 $ec_lang['lpn_reaction_pipe_tip']='Doar această conductă. Lăsați-o goală și conducta folosește coeficientul stabilit pentru întreaga rețea la Setări, Calitatea apei.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Coeficient de reacție';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reacția din apa reținută în acest bazin, ca rată în 1/zi. Un număr negativ descompune substanța chimică, iar unul pozitiv o mărește. Apa stă într-un bazin mult mai mult decât în orice conductă, deci aici se pierde adesea concentrația reziduală. Gol înseamnă a folosi coeficientul de reacție în masă stabilit pentru întreaga rețea la Setări, Calcul, Calitatea apei.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='comenzile';
 $ec_lang['lpn_inpup_i_rules']='regulile';
 $ec_lang['lpn_inpup_i_options']='opțiunile';
 $ec_lang['lpn_roughness_method_note']='⚠ Conducte cu o rugozitate în afara intervalului normal pentru {method}: {n}. Valorile sunt nemodificate și este posibil să fi fost introduse pentru altă metodă de frecare.';
-$ec_lang['lpn_field_cv']='Clapetă de reținere (CV)';
 $ec_lang['lpn_field_cv_tip']='Această conductă lasă apa să treacă numai de la nodul ei de început la nodul ei de sfârșit, ca o clapetă de reținere. Dacă debitul s-ar inversa, conducta se închide până când poate curge din nou înainte. EPANET numește această stare CV.';
 $ec_lang['lpn_theme_hc']='Contrast ridicat';
 $ec_lang['lpn_theme_amber']='Chihlimbar';

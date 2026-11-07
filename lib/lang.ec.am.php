@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='በቧንቧው ግድግዳ ላይ ያለ �
 $ec_lang['lpn_reaction_pipe_tip']='ይህ ቧንቧ ብቻውን። ባዶ ይተውት እና ቧንቧው በቅንብሮች፣ የውሃ ጥራት ስር ለጠቅላላው መረብ የተዘጋጀውን ቅንጅት ይጠቀማል።';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='የግብረመልስ ቅንጅት';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='በዚህ ታንክ ውስጥ በተያዘ ውሃ ውስጥ ያለ ግብረመልስ፣ በ1/ቀን ተመን። አሉታዊ ቁጥር ኬሚካሉን ያበስብሳል፣ አዎንታዊ ደግሞ ይጨምረዋል። ውሃ በታንክ ውስጥ በማንኛውም ቧንቧ ውስጥ ከሚቆይበት እጅግ ረዘም ብሎ ይቆያል፣ ስለዚህ ቀሪ ብዙ ጊዜ የሚጠፋው እዚህ ነው። ባዶ ማለት በቅንብሮች፣ ስሌት፣ የውሃ ጥራት ስር ለመላው መረብ የተዘጋጀውን የጅምላ ግብረመልስ ቅንጅት ተጠቀም ማለት ነው።';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='መቆጣጠሪያዎች';
 $ec_lang['lpn_inpup_i_rules']='ህጎች';
 $ec_lang['lpn_inpup_i_options']='አማራጮች';
 $ec_lang['lpn_roughness_method_note']='⚠ ለ{method} ከመደበኛው ክልል ውጪ ሻካሪነት ያላቸው ቧንቧዎች፦ {n}። ዋጋዎቹ አልተቀየሩም፣ ለሌላ የግጭት ዘዴም የገቡ ሊሆኑ ይችላሉ።';
-$ec_lang['lpn_field_cv']='የመመለሻ መከላከያ ቫልቭ (CV)';
 $ec_lang['lpn_field_cv_tip']='ይህ ቧንቧ እንደ መመለሻ መከላከያ ቫልቭ ውሃን ከመነሻ ነጥቡ ወደ መድረሻ ነጥቡ ብቻ ያሳልፋል። ፍሰቱ ሊገለበጥ ከሆነ፣ እንደገና ወደ ፊት መፍሰስ እስኪችል ድረስ ቧንቧው ይዘጋል። EPANET ይህንን ሁኔታ CV ይለዋል።';
 $ec_lang['lpn_theme_hc']='ከፍተኛ ንፅፅር';
 $ec_lang['lpn_theme_amber']='አምበር';

@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reaktion an der Rohrwand, verwendet für jede
 $ec_lang['lpn_reaction_pipe_tip']='Diese Rohrleitung allein. Bleibt es leer, verwendet die Rohrleitung den für das gesamte Netz unter Einstellungen, Wasserqualität festgelegten Koeffizienten.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Reaktionskoeffizient';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reaktion im Wasser dieses Tanks, als Rate in 1/Tag. Eine negative Zahl baut den Stoff ab, eine positive lässt ihn zunehmen. Wasser verbleibt in einem Tank weit länger als in jedem Rohr, daher geht hier oft ein Restgehalt verloren. Leer bedeutet, dass der für das gesamte Netz unter Einstellungen, Berechnung, Wasserqualität festgelegte Reaktionskoeffizient im Wasserkörper verwendet wird.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='Steuerungen';
 $ec_lang['lpn_inpup_i_rules']='Regeln';
 $ec_lang['lpn_inpup_i_options']='Optionen';
 $ec_lang['lpn_roughness_method_note']='⚠ Rohre mit einer Rauheit außerhalb des üblichen Bereichs für {method}: {n}. Die Werte sind unverändert und wurden möglicherweise für ein anderes Reibungsverfahren eingegeben.';
-$ec_lang['lpn_field_cv']='Rückschlagventil (CV)';
 $ec_lang['lpn_field_cv_tip']='Dieses Rohr leitet Wasser nur von seinem Anfangsknoten zu seinem Endknoten, wie ein Rückschlagventil. Würde sich der Durchfluss umkehren, schließt das Rohr, bis es wieder vorwärts fließen kann. EPANET nennt diesen Status CV.';
 $ec_lang['lpn_theme_hc']='Hoher Kontrast';
 $ec_lang['lpn_theme_amber']='Bernstein';

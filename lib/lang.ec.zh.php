@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='在管壁处发生的反应，用于所有未
 $ec_lang['lpn_reaction_pipe_tip']='仅适用于此管道。留空则该管道采用“设置”、“水质”中为全网设置的系数。';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='反应系数';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='此水箱中所存水的反应，以 1/天 为单位的速率表示。负值表示化学物质衰减，正值表示其增加。水在水箱中停留的时间远长于在任何管道中的停留时间，因此余量往往在这里损失。留空则采用“设置”、“计算”、“水质”中为整个管网设置的水体反应系数。';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='控制规则';
 $ec_lang['lpn_inpup_i_rules']='规则';
 $ec_lang['lpn_inpup_i_options']='选项';
 $ec_lang['lpn_roughness_method_note']='⚠ 糙率超出 {method} 正常范围的管道：{n}。这些数值未改变，可能是为另一种摩阻公式输入的。';
-$ec_lang['lpn_field_cv']='止回阀 (CV)';
 $ec_lang['lpn_field_cv_tip']='此管道像止回阀一样，只允许水从其起点节点流向终点节点。如果流向将要反转，管道就关闭，直到又能正向流动。EPANET 将此状态称为 CV。';
 $ec_lang['lpn_theme_hc']='高对比度';
 $ec_lang['lpn_theme_amber']='琥珀';

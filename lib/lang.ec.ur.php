@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='پائپ کی دیوار پر رد عمل، �
 $ec_lang['lpn_reaction_pipe_tip']='یہ پائپ خود اپنے لیے۔ اسے خالی چھوڑیں تو پائپ ترتیبات، پانی کا معیار کے تحت پورے نیٹ ورک کے لیے مقرر کردہ گتانک استعمال کرتا ہے۔';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='ری ایکشن گتانک';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='اس ٹینک میں رکھے گئے پانی میں رد عمل، 1/day میں ایک شرح کے طور پر۔ منفی عدد کیمیکل کو کم کرتا ہے اور مثبت عدد اسے بڑھاتا ہے۔ پانی کسی بھی پائپ کے مقابلے میں ٹینک میں کہیں زیادہ دیر ٹھہرتا ہے، اس لیے اکثر یہیں ریزیجوول ضائع ہوتا ہے۔ اسے خالی چھوڑیں تو ٹینک ترتیبات، پانی کا معیار کے تحت پورے نیٹ ورک کے لیے مقرر کردہ بلک ری ایکشن گتانک استعمال کرتا ہے۔';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='کنٹرولز';
 $ec_lang['lpn_inpup_i_rules']='قواعد';
 $ec_lang['lpn_inpup_i_options']='آپشنز';
 $ec_lang['lpn_roughness_method_note']='⚠ ان پائپوں کی تعداد جن کا کھردرا پن {method} کی عام حد سے باہر ہے: {n}۔ قدریں بدلی نہیں گئیں اور ہو سکتا ہے کسی اور رگڑ کے طریقے کے لیے درج کی گئی ہوں۔';
-$ec_lang['lpn_field_cv']='چیک والو (CV)';
 $ec_lang['lpn_field_cv_tip']='یہ پائپ پانی صرف اپنے شروع کے نوڈ سے اپنے آخر کے نوڈ تک گزارتا ہے، جیسے چیک والو۔ اگر بہاؤ الٹ جاتا تو پائپ بند ہو جاتا ہے جب تک وہ دوبارہ آگے کو نہ بہہ سکے۔ EPANET اس حالت کو CV کہتا ہے۔';
 $ec_lang['lpn_theme_hc']='اعلیٰ تضاد';
 $ec_lang['lpn_theme_amber']='عنبری';
