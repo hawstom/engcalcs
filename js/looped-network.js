@@ -465,7 +465,7 @@ var EngCalcs = EngCalcs || {};
 		// **TWO WAYS, AND THEY ARE DELIBERATELY NOT ONE FLAG:** `hiddenDropped` says nowhere would
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
-		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed || assemblyDownLabelHidden(id));
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
@@ -39991,6 +39991,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return out;
 	}
 	// The elements an assembly is made of, as selection refs, with `lastRef` last so it stays the subject.
+	// **A DRAG OF ONE NODE OF AN ASSEMBLY MOVES THE OTHER TOO** (Task 822): equal x and y, in Base and in
+	// a scenario alike, because the position is read back through the same door a typed one uses.
+	function syncAssemblyMate(n) {
+		var a = n && assemblyOfNode(n.id), mate = a && nodeById(a.up === n.id ? a.down : a.up);
+		if (!mate) { return; }
+		writeNodeCoord(mate, false, nodeDrawX(n));
+		writeNodeCoord(mate, true, nodeDrawY(n));
+		if (inBaseFor(categoryOf('x', 'node'))) {
+			['_xsrc', '_ysrc'].forEach(function (k) { delete mate[k]; });
+			if (LPN_GEO_XSRC !== undefined) { delete mate[LPN_GEO_XSRC]; delete mate[LPN_GEO_YSRC]; if (n[LPN_GEO_XSRC] !== undefined) { mate[LPN_GEO_XSRC] = n[LPN_GEO_XSRC]; } if (n[LPN_GEO_YSRC] !== undefined) { mate[LPN_GEO_YSRC] = n[LPN_GEO_YSRC]; } }
+		}
+		updateNode(mate.id);
+	}
+	// The downstream node's label is not drawn while grouped: one label for the point, the upstream's.
+	function assemblyDownLabelHidden(id) {
+		var list = assemblyList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].down === id) { return true; } }
+		return false;
+	}
 	function assemblyRefs(a, lastRef) {
 		var refs = [{ kind: 'node', id: a.up }, { kind: 'node', id: a.down }].concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));
 		if (lastRef) {
@@ -40011,13 +40030,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		paintAssembly(a);
+		layoutNodeLabel(dn.id);
 		return a;
 	}
 	// Clicking a pipe splices the assembly in: the pipe now ends at the upstream node and its other half
 	// starts at the downstream node. Base only, as breakPipeAtPoint(); elsewhere it is placed on open ground.
 	function splicePumpPlus(pipe, wx, wy) {
-		var r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a;
+		var e1 = nodeById(pipe.from).elev, e2 = nodeById(pipe.to).elev,
+			frac = Geom.nearestFractionOnPolyline(linkPointList(pipe), wx, wy).f,
+			r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a, elevAt;
 		up = r.node;
+		// The elevation along the pipe between its end nodes, by length; blank ends (a DEM fill) leave it to the default.
+		if (typeof e1 === 'number' && typeof e2 === 'number') { elevAt = +(e1 + frac * (e2 - e1)).toFixed(4); up.elev = elevAt; }   // base-write: construction
 		applyNodeRename(up.id, mintId('U'));
 		dn = addNode('junction', up.x, up.y, mintId('D'));
 		if (up.elev !== undefined) { dn.elev = up.elev; }   // base-write: construction
@@ -40027,6 +40051,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		paintAssembly(a);
+		layoutNodeLabel(dn.id);
 		return a;
 	}
 	function pumpPlusTap(e, w, t) {
@@ -40050,8 +40075,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			le.asmMarks = [el('circle', { 'class': 'lpn-asm-mark lpn-asm-up' }, le.symbolG),
 				el('circle', { 'class': 'lpn-asm-mark lpn-asm-down' }, le.symbolG)];
 		}
-		r = nodeRadius({ type: 'junction' }) * 0.8;
-		k = pumpSymbolSize('pump') / 2;
+		// Large enough to read at 1x and on a phone: about twice a junction's disc, standing just outside the volute.
+		r = nodeRadius({ type: 'junction' }) * 1.6;
+		k = pumpSymbolSize('pump') / 2 + r * 0.6;
 		le.asmMarks[0].setAttribute('cx', -k); le.asmMarks[0].setAttribute('cy', 0); le.asmMarks[0].setAttribute('r', r);
 		le.asmMarks[1].setAttribute('cx', k); le.asmMarks[1].setAttribute('cy', 0); le.asmMarks[1].setAttribute('r', r);
 	}
@@ -40066,6 +40092,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!a) { return; }
 		unpaintAssembly(a);
 		doc.assemblies = doc.assemblies.filter(function (x) { return x !== a; });
+		if (nodeEls[a.down]) { layoutNodeLabel(a.down); }
 		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === id) { closePopup(); }
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
 	}
@@ -40076,7 +40103,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			unpaintAssembly(a);
 			if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === a.id) { closePopup(); }
 		});
-		if (gone.length) { doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; }); }
+		if (gone.length) {
+			doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; });
+			gone.forEach(function (a) { if (nodeEls[a.down]) { layoutNodeLabel(a.down); } });
+		}
 	}
 	function renameInAssemblies(oldId, newId) {
 		assemblyList().forEach(function (a) {
@@ -40415,6 +40445,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!el) { return; }
 			saveUndoSnapshot();
 			deleteCustomerById(id);
+			return;
+		}
+		// **DELETING ONE MEMBER OF AN ASSEMBLY DELETES THE GROUP**, both nodes and the pump, as one undo step (Task 822).
+		var asmDel = el && !undoGroup && (kind === 'node' || kind === 'link') ? assemblyOfRef(kind, id) : null;
+		if (asmDel) {
+			var refsDel = assemblyRefs(asmDel);
+			undoGroup = { taken: false };
+			try {
+				refsDel.filter(function (r) { return r.kind === 'link'; }).forEach(function (r) { deleteElement(r.kind, r.id); });
+				refsDel.filter(function (r) { return r.kind === 'node'; }).forEach(function (r) { deleteElement(r.kind, r.id); });
+			} finally { undoGroup = null; }
 			return;
 		}
 		// One guard for both branches. A delete gesture can name an element that is already gone --
@@ -60908,6 +60949,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				writeNodeCoord(n, false, w.x + drag.offX);
 				writeNodeCoord(n, true, w.y + drag.offY);
 			}
+			syncAssemblyMate(n);
 			showSnapMark(ns);
 			updateNode(drag.id);
 			relayoutLabels();

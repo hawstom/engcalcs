@@ -36,6 +36,7 @@ const L = loadLoopedNetwork(
 	"\t\tapplySaved: applySaved, migrateSaved: migrateSaved, serializeProject: serializeProject,\n" +
 	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
 	"\t\tdeleteNode: deleteNode, deleteLink: deleteLink, linkEls: function () { return linkEls; },\n" +
+	"\t\tnodeLabelHidden: function (id) { return nodeEls[id].text.style.visibility === 'hidden'; },\n" +
 	"\t\tresetIds: function () { nextId = newNextId(); },\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -107,6 +108,7 @@ console.log('\n--- 1. place on open ground ---');
 	ok('the tool stays armed, so another can be placed', L.getMode() === 'add-pumpplus');
 	press(500, 150);
 	ok('a second one: U2, D2 and a second group', doc.assemblies.length === 2 && doc.nodes[2].id === 'U2' && doc.nodes[3].id === 'D2');
+	ok('only the upstream node\'s label is drawn', !L.nodeLabelHidden('U1') && L.nodeLabelHidden('D1'));
 	ok('the pump symbol carries the two marks', (function () { const le = L.linkEls()[doc.links[0].id]; return !!(le && le.asmMarks && le.asmMarks.length === 2); })());
 	L.undo();
 	ok('undo takes the second one away whole', L.getDoc().nodes.length === 2 && L.getDoc().links.length === 1 && L.getDoc().assemblies.length === 1, L.getDoc().nodes.length + '/' + L.getDoc().links.length + '/' + L.getDoc().assemblies.length);
@@ -119,16 +121,24 @@ console.log('\n--- 2. place by pressing a pipe ---');
 	const doc = fresh();
 	const a = L.addNode('junction', 0, 0).id, b = L.addNode('junction', 400, 0).id;
 	const pipe = L.addLink('pipe', a, b, []);
+	L.nodeById(a).elev = 100; L.nodeById(b).elev = 200;
+	L.setMode('add-pumpplus');
+	press(100, 0, hitLink(pipe.id));
+	ok('the spliced pair takes the elevation along the pipe by length (a quarter of the way: 125)',
+		L.nodeById('U1').elev === 125 && L.nodeById('D1').elev === 125, L.nodeById('U1').elev + ' ' + L.nodeById('D1').elev);
+	L.undo();
 	L.setMode('add-pumpplus');
 	press(200, 0, hitLink(pipe.id));
+	ok('halfway: 150', L.nodeById('U1').elev === 150 && L.nodeById('D1').elev === 150, L.nodeById('U1').elev + ' ' + L.nodeById('D1').elev);
+	const dle = L.nodeEls ? 0 : 0;
 	ok('the pipe is spliced: two pipes and a pump', doc.links.filter((l) => l.type === 'pipe').length === 2 && doc.links.filter((l) => l.type === 'pump').length === 1,
 		doc.links.map((l) => l.id + ':' + l.type + ' ' + l.from + '>' + l.to).join('; '));
-	const g = doc.assemblies[0];
+	const g = L.getDoc().assemblies[0];
 	ok('one grouping, U1 and D1', doc.assemblies.length === 1 && g.up === 'U1' && g.down === 'D1', JSON.stringify(g));
 	const p1 = doc.links.find((l) => l.id === pipe.id), p2 = doc.links.find((l) => l.type === 'pipe' && l.id !== pipe.id);
 	ok('the first half ends at the upstream node, the other half starts at the downstream one', p1.from === a && p1.to === 'U1' && p2.from === 'D1' && p2.to === b,
 		p1.from + '>' + p1.to + ' ' + p2.from + '>' + p2.to);
-	ok('both nodes sit on the pipe at the press', nodesAt(doc, 200, 0).length === 2);
+	ok('both nodes sit on the pipe at the press', nodesAt(L.getDoc(), 200, 0).length === 2);
 	ok('one undo gives back the single pipe', (function () { L.undo(); const d = L.getDoc(); return d.links.length === 1 && d.nodes.length === 2 && d.assemblies.length === 0 && d.links[0].to === b; })());
 }
 
@@ -175,6 +185,7 @@ console.log('\n--- 4. Explode, undo, delete ---');
 	const d0 = L.undoDepth();
 	(explode._listeners.click || []).forEach((fn) => fn({}));
 	ok('Explode ends the group', doc.assemblies.length === 0);
+	ok('and both nodes are labelled again', !L.nodeLabelHidden('U1') && !L.nodeLabelHidden('D1'));
 	ok('and leaves two plain junctions and the pump', doc.nodes.length === 2 && doc.links.length === 1 && doc.nodes.every((n) => n.type === 'junction') && doc.links[0].type === 'pump');
 	ok('as one undo step', L.undoDepth() === d0 + 1);
 	L.undo();
