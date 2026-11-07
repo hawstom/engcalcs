@@ -99,7 +99,7 @@ lines rather than appending corrections.
 
 - **Merged:** `feat/wtg-energy-more` on his word (*"OK to merge."*); `fix/clear-restores-unit` on green (an emitter coefficient's "Clear restores" line quoted the stored SI number). Task 855 to 100 with his calls.
 - **Waiting his browser pass (Perry: ready):** `feat/override-push` (Task 855, preview 8102): orange arrow over the override dot; always asks, naming the destination and the value replaced. Its tap zone is ~9 px tall on a phone; bigger means taller rows. Not in the Tables pane. After merge, `pushDestination` can call `propDisplayValue` (from the clear-restores fix). `feat/assembly` (Task 822 slice 1, preview 8103): Virtual pipe and Pump+; five builder questions in messenger.md.
-- **`feat/label-open-side` (Task 812, was `feat/label-neighbours`, preview 8101 still on the old name)**: partial; see the roadmap entry. Not ready for him.
+- **`feat/label-open-side` (Task 812, was `feat/label-neighbours`, preview 8101)**: partial; see the roadmap entry. Not ready for him.
 - **Ida's answer to "which asset is Properties editing"** is in her hopper (`dev/agents/interface-designer/properties-asset-2026-11-06.md`): title the box "Valve V12". His call.
 - Still open from 11-06 evening: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
 - **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
