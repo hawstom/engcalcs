@@ -229,7 +229,7 @@ $ovAllowed = [
     // the down triangle (Task 790): the holder each child scenario writes to, read, and on a yes cleared
     'childOverrideHolders', 'clearChildOverrides',
     // push upward (Task 855): the stored value moved to the layer above the one it is cleared from
-    'pushOverrideUp',
+    'pushOverrideUp', 'pushDestination',
     // Manage overrides: one of a scenario's own items cleared from the very holder it was listed from
     'ovlClearItems',
     // a new Base of its own: a snapshot of Base, written once into the record it creates

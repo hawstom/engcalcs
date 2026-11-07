@@ -73427,12 +73427,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		touchTreeKey('pushOverrideUp', layerId, map, key);
 		return true;
 	}
-	// "Push override upward" asked through the page's own dialog when other scenarios change; no
-	// question when none does. `go` runs after the undo snapshot is taken.
-	function askPushOverride(n, go) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!n) { saveUndoSnapshot(); go(); return; }
-		askDialog({ kind: 'confirm', text: (pc.lpn_ovm_push_ask || 'Push override upward? Scenarios that inherit it change ({n} total).').replace('{n}', String(n)) }, function (yes) {
+	// **WHERE A PUSH LANDS, BY NAME**: the parent scenario's name, the stored alternative's, or Base's,
+	// and the value already held there when it differs (a single property only), shown as the question's "replaced".
+	function pushDestination(el, props, vals) {
+		var tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), name, old, map, ov, t;
+		if (!tgt) { return null; }
+		if (tgt.base) {
+			name = scenarioDisplayName(baseScenario());
+			if (props.length === 1) { old = baseValue(el, props[0]); }
+		} else {
+			name = tgt.via ? scenarioDisplayName(tgt.via) : (tgt.kind === 'scn' ? scenarioDisplayName(tgt.obj) : String(tgt.obj.name || ''));
+			t = tgt.via ? writeTargetFor(tgt.via, cat) : tgt;
+			map = t ? (t.kind === 'alt' ? t.obj.values : t.obj.overrides) : null;
+			ov = plainObject(map) ? map[key] : null;
+			if (props.length === 1 && plainObject(ov) && Object.prototype.hasOwnProperty.call(ov, props[0])) { old = ov[props[0]]; }
+		}
+		if (old !== undefined && old !== null && typeof old !== 'object' && vals.length === 1 && String(old) !== String(vals[0][1])) {
+			old = formatPropValue(old);
+		} else { old = null; }
+		return { name: name, old: old };
+	}
+	// Push override upward is always asked, through the page's own dialog, naming where it goes; the
+	// sentence about other scenarios is added when some change. `go` runs after the undo snapshot is taken.
+	function askPushOverride(dest, n, go) {
+		var pc = EngCalcs.pageConfig || {}, text = (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name);
+		if (dest.old !== null) { text += (pc.lpn_ovm_push_replace || ' It replaces {old} there.').replace('{old}', dest.old); }
+		if (n) { text += (pc.lpn_ovm_push_others || ' Scenarios that inherit it change ({n} total).').replace('{n}', String(n)); }
+		askDialog({ kind: 'confirm', text: text }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
 			go();
@@ -73532,7 +73553,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (pushProps.length) {
 			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
 				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
-				askPushOverride(pushOtherScenarios(o.el, o.props).length, function () {
+				askPushOverride(pushDestination(o.el, now, vals), pushOtherScenarios(o.el, o.props).length, function () {
 					pushOverrideUp(o.el, now, vals);
 					afterPropertyEdit(o.el);
 					refreshScenarioStatus();

@@ -125,7 +125,7 @@ global.window = global.window || {};
 global.window.lpnDialogAnswerer = (req) => { asked = req; return answer; };
 L.switchScenario(A1.id);
 click(arrowIn(A1.id, m, 'elev'));
-report(asked && asked.kind === 'confirm' && /\(1 total\)/.test(asked.text) && /^Push override upward\?/.test(asked.text), 'siblings inherit it: the question is asked with the count', asked && asked.text);
+report(asked && asked.kind === 'confirm' && /\(1 total\)/.test(asked.text) && /^Push override upward to A\?/.test(asked.text), 'the question names the destination (A) and, as siblings inherit it, the count', asked && asked.text);
 fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'No: nothing changes');
 answer = true; asked = null;
@@ -134,16 +134,42 @@ fresh();
 report(!has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 333, 'Yes: pushed', 'A ' + val(A.id, m, 'elev'));
 L.undo(); fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'one undo after the click restores both');
-// No other scenario changes: no question. Remove A2 (the only other scenario reading A's alternative).
+// Always asked, even when no other scenario changes. The destination holds 200 (A's own), so the question says it is replaced.
 L.switchScenario(L.baseId());
 L.deleteScenario(A2.id);
 L.switchScenario(A1.id);
 asked = null; answer = true;
 click(arrowIn(A1.id, m, 'elev'));
 fresh();
-report(asked === null && !has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 333, 'when no other scenario changes there is no question, and it goes', asked ? 'asked ' + asked.text : 'not asked');
+report(asked && !/total/.test(asked.text) && /^Push override upward to A\?/.test(asked.text), 'with no other scenario changing it is still asked, with no count', asked && asked.text);
+report(asked && /replaces 200 there/.test(asked.text), 'and says what it replaces', asked && asked.text);
+report(!has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 333, 'Yes: pushed');
 L.undo(); fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'and that is one undo step too');
+
+// The order case: C1 overrode BEFORE its parent P had a stored alternative, so C1's alternative has no parent.
+// The push lands in Base while P shows its own value, and the question says Base.
+L.switchScenario(L.baseId());
+const P = L.createScenario('P', L.baseId());
+const C1 = L.createScenario('C1', P.id);
+L.setProp(n, 'elev', 640);
+L.switchScenario(P.id);
+L.setProp(n, 'elev', 50);
+L.switchScenario(C1.id);
+asked = null; answer = true;
+click(arrowIn(C1.id, n, 'elev'));
+fresh();
+report(asked && /^Push override upward to Base\?/.test(asked.text), 'order case: the question names Base', asked && asked.text);
+report(asked && /replaces 100 there/.test(asked.text), 'order case: Base\'s own value is named as replaced', asked && asked.text);
+report(L.baseValue(n, 'elev') === 640 && val(P.id, n, 'elev') === 50 && !has(C1.id, n, 'elev') && val(C1.id, n, 'elev') === 640,
+	'order case: Base gets 640, P keeps its own 50, C1 reads 640', L.baseValue(n, 'elev') + ',' + val(P.id, n, 'elev') + ',' + val(C1.id, n, 'elev'));
+L.undo(); fresh();
+report(L.baseValue(n, 'elev') === 100 && has(C1.id, n, 'elev'), 'order case: one undo restores both');
+// Declined: nothing moves.
+answer = false;
+click(arrowIn(C1.id, n, 'elev'));
+fresh();
+report(L.baseValue(n, 'elev') === 100 && has(C1.id, n, 'elev'), 'order case: No changes nothing');
 
 // 6. Recalculate off. The click ends in afterPropertyEdit(), as the dot's Clear does, so a push
 // refreshes the one element and its labels and leaves the stale results alone
