@@ -348,6 +348,16 @@
      "parent": "Insert"
     },
     {
+     "id": "project/menu_insert/tool_add_pumpplus",
+     "label": "Pump+",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_virtual",
+     "label": "Virtual pipe",
+     "parent": "Insert"
+    },
+    {
      "id": "project/tool_settings",
      "label": "Settings",
      "parent": ""
@@ -699,6 +709,11 @@
     {
      "id": "tb/add-shape",
      "label": "Shape",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-pumpplus",
+     "label": "Pump+",
      "parent": ""
     },
     {
