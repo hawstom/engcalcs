@@ -85,6 +85,7 @@ language. `lib/config.inc.php` reads `APP_ENV`: `development` → `DEBUG_MODE=tr
 | `lib/Calculators.lib.php` | `echoCalculatorForm()`, `ecTipLabel()`, `ecLinkTipLabel()` |
 | `lib/Canonical.lib.php` | `ecCanonicalPaths()` — the one place a pretty URL is declared |
 | `lib/Language.Settings.php` | Per-language `QUALITY` weight used in Accept-Language negotiation |
+| `css/engcalcs.min.css` | **Generated, committed, and the file pages link.** Edit `css/engcalcs.css` (comments live there), then `php dev/scripts/build_css.php`; `check_all` fails when it is stale |
 | `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` |
 | `js/lpn-geom.js` | `lpn_` pure geometry. No DOM |
 | `js/lpn-collide.js` | `lpn_` label collision avoidance. No DOM |
