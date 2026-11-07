@@ -294,7 +294,7 @@ $og_image = ecCanonicalOrigin(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_
 <?php
 if (substr($type, 0, 8) === "EngCalcs") {
 ?>
-	<link rel="stylesheet" href="/engcalcs/css/engcalcs.css?v=<?=filemtime(__DIR__.'/../css/engcalcs.css')?>" type="text/css" />
+	<link rel="stylesheet" href="/engcalcs/css/engcalcs.min.css?v=<?=filemtime(__DIR__.'/../css/engcalcs.min.css')?>" type="text/css" />
 <?php
 }
 ?>
