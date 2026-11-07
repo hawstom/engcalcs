@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 3344,
+        "expected_key_count": 3342,
         "delta_key_count": 83,
         "english_changed_key_count": 24,
         "exempt_key_count": 66,
