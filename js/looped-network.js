@@ -945,7 +945,10 @@ var EngCalcs = EngCalcs || {};
 	// The same label's one-line form, as insertInlineNodeLabels() places it: `w` its one-line width.
 	function inlineNodeSpec(n, fs, w) {
 		var d = defaultLabelOffset();
-		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true,
+		// **TWO SCREEN PIXELS OF CLEAR GROUND ROUND A PIPE** (pre-review, 2026-11-06: N217 on Novato, a
+		// pipe grazing the first pixel of the glyphs, which are a pixel taller than the box the first-fit
+		// reasons with).
+		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true, linkMargin: 2 / (state.s || 1),
 			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
 	}
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
