@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='ប្រតិកម្មនៅជញ្ជ
 $ec_lang['lpn_reaction_pipe_tip']='បំពង់នេះតែម្នាក់ឯង។ ទុកវាទទេ ហើយបំពង់នេះប្រើមេគុណដែលបានកំណត់សម្រាប់បណ្ដាញទាំងមូល ក្រោម ការកំណត់, គុណភាពទឹក។';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='មេគុណប្រតិកម្ម';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='ប្រតិកម្មក្នុងទឹកដែលផ្ទុកក្នុងធុងទឹកនេះ ជាអត្រាគិតជា 1/ថ្ងៃ។ លេខអវិជ្ជមានបំបែកសារធាតុគីមី ហើយលេខវិជ្ជមានបង្កើនវា។ ទឹកស្ថិតក្នុងធុងទឹកយូរជាងស្ថិតក្នុងបំពង់ណាមួយ ដូច្នេះច្រើនតែជាកន្លែងដែលកម្រិតសល់បាត់បង់។ ទទេមានន័យថាប្រើមេគុណប្រតិកម្មក្នុងខ្លួនទឹកដែលបានកំណត់សម្រាប់បណ្ដាញទាំងមូល ក្រោម ការកំណត់, ការគណនា, គុណភាពទឹក។';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='ច្បាប់ត្រួតពិនិ�
 $ec_lang['lpn_inpup_i_rules']='ក្បួន';
 $ec_lang['lpn_inpup_i_options']='ជម្រើស';
 $ec_lang['lpn_roughness_method_note']='⚠ បំពង់ដែលមានភាពរដិបរដុបក្រៅជួរធម្មតាសម្រាប់ {method}៖ {n}។ តម្លៃមិនត្រូវបានប្ដូរទេ ហើយអាចត្រូវបានបញ្ចូលសម្រាប់វិធីសាស្ត្រកកិតផ្សេង។';
-$ec_lang['lpn_field_cv']='វ៉ាល់ទប់ទល់ត្រឡប់ (CV)';
 $ec_lang['lpn_field_cv_tip']='បំពង់នេះឲ្យទឹកឆ្លងកាត់តែពីថ្នាំងចាប់ផ្ដើមទៅថ្នាំងបញ្ចប់របស់វា ដូចវ៉ាល់ទប់ទល់ត្រឡប់ដែរ។ ប្រសិនបើលំហូរនឹងត្រឡប់ទិស បំពង់បិទរហូតដល់វាអាចហូរទៅមុខម្ដងទៀត។ EPANET ហៅស្ថានភាពនេះថា CV។';
 $ec_lang['lpn_theme_hc']='កម្រិតពណ៌ផ្ទុយខ្ពស់';
 $ec_lang['lpn_theme_amber']='លឿងទុំ';

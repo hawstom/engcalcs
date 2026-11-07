@@ -2310,7 +2310,7 @@ $ec_lang['lpn_file_export_item_wtg']='.wtg file…';
 $ec_lang['lpn_file_export_wtg_tip']='Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.';
 $ec_lang['lpn_wtg_export_lost_lead']='This export does not yet write the following:';
 $ec_lang['lpn_wtg_export_lost_quality']='Water quality: the analysis, reactions, sources, and tank mixing.';
-$ec_lang['lpn_wtg_export_lost_energy_price']='Energy price pattern and demand charge.';
+$ec_lang['lpn_wtg_export_lost_energy_price']='An energy price pattern that the project does not define.';
 $ec_lang['lpn_wtg_export_lost_rules']='Rule-based controls that are not written (rules {ids}).';
 $ec_lang['lpn_wtg_export_lost_controls_pressure']='Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.';
 $ec_lang['lpn_wtg_export_lost_tank_mixing']='Tank mixing model (tanks {ids}). Tanks are written fully mixed.';
@@ -3101,7 +3101,6 @@ $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not cha
 // Active, which is a different question -- whether the scenario contains the link at all
 // (paneColClosed() in js/looped-network.js) -- and stays "Active".
 $ec_lang['lpn_field_closed']='Closed';
-$ec_lang['lpn_field_cv']='Check valve (CV)';
 $ec_lang['lpn_field_cv_tip']='This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.';
 $ec_lang['lpn_field_closed_tip']='Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time.';
 $ec_lang['lpn_field_x']='X';
@@ -4144,7 +4143,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall (see EPANET Help) u
 $ec_lang['lpn_reaction_pipe_tip']='Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Reaction coefficient';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one increases it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,

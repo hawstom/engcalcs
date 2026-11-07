@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-11-01",
-    "count": 3285,
+    "count": 3283,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -7421,7 +7421,6 @@
         "lpn_field_closed": "88d86b7721d587644e9c4cf33a084202cb3b0ff0",
         "lpn_field_closed_tip": "218b39318ae56a256cf4d05b5f97a0079b0b316d",
         "lpn_field_coord_tip": "5dbf87bfe2c61a820c161d0761f88536544f36e2",
-        "lpn_field_cv": "725c0803ac8bc0ff2ff900b37ff87921658fbb1c",
         "lpn_field_cv_short": "cc5bfa51b333398960b29e3a84a19c05a6c9608d",
         "lpn_field_cv_tip": "2aab4efd89837f9ad5df883e94d7d790b62efc4b",
         "lpn_field_demand_pattern": "6462eca1e16244ec2bf0210e3fffb44b7d8e5bdc",
@@ -8636,7 +8635,6 @@
         "lpn_reaction_pipe_tip": "b236b1d63bb0afa363fe2f0de01ea76bbf35d496",
         "lpn_reaction_rough_corr": "e77f62da6c5f0c0238d36d176a054a83cb6e15ee",
         "lpn_reaction_rough_corr_tip": "8e2f23d7f716489ba0d13713c27366fa74702ca7",
-        "lpn_reaction_tank": "21c8ecaae1f5d1e167dad1d4e2e56a87032e9fe8",
         "lpn_reaction_tank_short": "f996ddc38c3593e12f81c743c1ddf012beec3240",
         "lpn_reaction_tank_short_tip": "8695c97f5f34e753e55d69cbc3b12cc936948464",
         "lpn_reaction_tank_tip": "fb92bd0682a6a38b29c0ca8b8a76c6bfb172e15b",
@@ -13498,10 +13496,6 @@
             "words": 31,
             "ends_sentence": true
         },
-        "lpn_field_cv": {
-            "words": 3,
-            "ends_sentence": false
-        },
         "lpn_field_cv_short": {
             "words": 2,
             "ends_sentence": false
@@ -18357,10 +18351,6 @@
         "lpn_reaction_rough_corr_tip": {
             "words": 47,
             "ends_sentence": true
-        },
-        "lpn_reaction_tank": {
-            "words": 2,
-            "ends_sentence": false
         },
         "lpn_reaction_tank_short": {
             "words": 1,

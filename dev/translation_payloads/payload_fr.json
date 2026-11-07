@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 3344,
+        "expected_key_count": 3342,
         "delta_key_count": 83,
         "english_changed_key_count": 24,
         "exempt_key_count": 80,
@@ -125,7 +125,7 @@
         "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
         "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
         "lpn_wtg_export_lost_quality": "Water quality: the analysis, reactions, sources, and tank mixing.",
-        "lpn_wtg_export_lost_energy_price": "Energy price pattern and demand charge.",
+        "lpn_wtg_export_lost_energy_price": "An energy price pattern that the project does not define.",
         "lpn_wtg_export_lost_rules": "Rule-based controls that are not written (rules {ids}).",
         "lpn_wtg_export_lost_controls_pressure": "Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.",
         "lpn_wtg_export_lost_tank_mixing": "Tank mixing model (tanks {ids}). Tanks are written fully mixed.",
@@ -210,7 +210,7 @@
         "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
         "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
         "lpn_wtg_export_lost_quality": "Water quality: the analysis, reactions, sources, and tank mixing.",
-        "lpn_wtg_export_lost_energy_price": "Energy price pattern and demand charge.",
+        "lpn_wtg_export_lost_energy_price": "An energy price pattern that the project does not define.",
         "lpn_wtg_export_lost_rules": "Rule-based controls that are not written (rules {ids}).",
         "lpn_wtg_export_lost_controls_pressure": "Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.",
         "lpn_wtg_export_lost_tank_mixing": "Tank mixing model (tanks {ids}). Tanks are written fully mixed.",

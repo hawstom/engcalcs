@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reaksi pada dinding pipa, digunakan untuk set
 $ec_lang['lpn_reaction_pipe_tip']='Khusus untuk pipa ini. Biarkan kosong dan pipa ini menggunakan koefisien yang ditetapkan untuk seluruh jaringan di bawah Pengaturan, Kualitas air.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Koefisien reaksi';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reaksi dalam air yang tersimpan di tangki ini, sebagai laju dalam 1/hari. Angka negatif meluruhkan bahan kimia dan angka positif menambahnya. Air berdiam di tangki jauh lebih lama daripada di pipa mana pun, sehingga di sinilah residu paling sering hilang. Kosong berarti memakai koefisien reaksi badan air yang ditetapkan untuk seluruh jaringan di Pengaturan, Perhitungan, Kualitas.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='kendali';
 $ec_lang['lpn_inpup_i_rules']='aturan';
 $ec_lang['lpn_inpup_i_options']='opsi';
 $ec_lang['lpn_roughness_method_note']='⚠ Pipa dengan kekasaran di luar rentang normal untuk {method}: {n}. Nilainya tidak berubah dan mungkin dimasukkan untuk metode gesekan lain.';
-$ec_lang['lpn_field_cv']='Katup searah (CV)';
 $ec_lang['lpn_field_cv_tip']='Pipa ini hanya melewatkan air dari simpul awalnya ke simpul akhirnya, seperti katup searah. Bila aliran akan berbalik, pipa menutup sampai dapat mengalir maju lagi. EPANET menyebut status ini CV.';
 $ec_lang['lpn_theme_hc']='Kontras tinggi';
 $ec_lang['lpn_theme_amber']='Ambar';

@@ -5800,10 +5800,6 @@
             "on": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
             "ruled": "2026-09-04"
         },
-        "lpn_reaction_tank": {
-            "on": "Reaction coefficient",
-            "ruled": "2026-09-04"
-        },
         "lpn_reaction_tank_short": {
             "on": "Reaction",
             "ruled": "2026-09-04"
@@ -8471,11 +8467,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_field_cv": {
-            "on": "Check valve (CV)",
-            "ruled": "2026-10-22",
-            "answer": "Approved."
         },
         "lpn_field_cv_tip": {
             "on": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",

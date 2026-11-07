@@ -140,6 +140,9 @@ run_check "no Accept-Language header answers 500" blocking php dev/scripts/accep
 # entries were unreachable and the offline promise on About.php was simply false. Nothing rendered
 # wrong, nothing errored, and the only place the defect existed was the GAP between two files. This
 # renders real pages and diffs their asset URLs against what the worker will really cache.
+# Task 853: pages link css/engcalcs.min.css, the comment-free build of css/engcalcs.css. Fails when the
+# source was edited and the build was not rerun (php dev/scripts/build_css.php).
+run_check "served stylesheet fresh"      blocking php dev/scripts/build_css.php --check
 run_check "service worker precache"      blocking php dev/scripts/sw_manifest_check.php
 # Task 322 row 10. The offline promise and the no-request-until-asked promise both live in the
 # worker. A precached tile is fetched at install, on a page the visitor merely OPENED, which

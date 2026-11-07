@@ -3913,7 +3913,6 @@ $ec_lang['lpn_reaction_wall_tip']='واکنش در دیوارهٔ لوله، ب�
 $ec_lang['lpn_reaction_pipe_tip']='مخصوص همین لوله. آن را خالی بگذارید تا لوله از ضریب تنظیم‌شده برای کل شبکه در تنظیمات، کیفیت آب استفاده کند.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='ضریب واکنش';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='واکنش در آب نگه‌داشته‌شده در این تانک، به‌صورت نرخی بر حسب 1/روز. عدد منفی ماده را تجزیه می‌کند و عدد مثبت آن را می‌افزاید. آب در تانک بسیار بیشتر از هر لوله‌ای می‌ماند، پس اغلب باقیمانده در همین‌جا از دست می‌رود. خالی یعنی استفاده از ضریب واکنش توده‌ای که برای کل شبکه در تنظیمات، محاسبه، کیفیت آب تعیین شده است.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5103,7 +5102,6 @@ $ec_lang['lpn_inpup_i_controls']='کنترل‌ها';
 $ec_lang['lpn_inpup_i_rules']='قاعده‌ها';
 $ec_lang['lpn_inpup_i_options']='گزینه‌ها';
 $ec_lang['lpn_roughness_method_note']='⚠ لوله‌هایی با زبری بیرون از گسترهٔ عادی برای {method}: {n}. مقدارها بدون تغییرند و ممکن است برای روش اصطکاک دیگری وارد شده باشند.';
-$ec_lang['lpn_field_cv']='شیر یک‌طرفه (CV)';
 $ec_lang['lpn_field_cv_tip']='این لوله آب را فقط از گرهٔ آغاز به گرهٔ پایان عبور می‌دهد، همان‌طور که یک شیر یک‌طرفه می‌دهد. اگر جریان بخواهد معکوس شود، لوله بسته می‌شود تا دوباره بتواند رو به جلو جریان یابد. EPANET این وضعیت را CV می‌نامد.';
 $ec_lang['lpn_theme_hc']='کنتراست بالا';
 $ec_lang['lpn_theme_amber']='کهربایی';

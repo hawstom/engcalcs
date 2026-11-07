@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reação na parede do trecho (veja a Ajuda do
 $ec_lang['lpn_reaction_pipe_tip']='Reação no corpo da água (veja a Ajuda do EPANET). Um número negativo decai o produto químico e um positivo o aumenta. Em branco significa usar o coeficiente definido para toda a rede em Configurações, Cálculo, Qualidade da água.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Coeficiente de reação';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reação na água contida neste tanque, como uma taxa em 1/dia. Um número negativo decai o produto químico e um positivo o aumenta. A água permanece em um tanque muito mais tempo do que em qualquer trecho, então é aqui que um residual costuma se perder. Em branco significa usar o coeficiente de reação no corpo da água definido para toda a rede em Configurações, Cálculo, Qualidade da água.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='controles';
 $ec_lang['lpn_inpup_i_rules']='regras';
 $ec_lang['lpn_inpup_i_options']='opções';
 $ec_lang['lpn_roughness_method_note']='⚠ Tubos com rugosidade fora da faixa normal para {method}: {n}. Os valores não foram alterados e podem ter sido digitados para outro método de atrito.';
-$ec_lang['lpn_field_cv']='Válvula de retenção (CV)';
 $ec_lang['lpn_field_cv_tip']='Este tubo deixa passar água somente do seu nó inicial para o seu nó final, como faz uma válvula de retenção. Se a vazão fosse se inverter, o tubo se fecha até poder escoar para a frente de novo. O EPANET chama este status de CV.';
 $ec_lang['lpn_theme_hc']='Alto contraste';
 $ec_lang['lpn_theme_amber']='Âmbar';

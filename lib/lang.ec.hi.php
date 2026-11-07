@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='पाइप की दीवार पर �
 $ec_lang['lpn_reaction_pipe_tip']='यह पाइप अपने आप में। इसे खाली छोड़ें तो पाइप Settings, Water quality के अंतर्गत पूरे नेटवर्क के लिए तय गुणांक उपयोग करता है।';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='प्रतिक्रिया गुणांक';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='इस टैंक में रखे पानी में होने वाली प्रतिक्रिया, 1/day में एक दर के रूप में। ऋणात्मक संख्या रसायन को क्षीण करती है और धनात्मक संख्या उसे बढ़ाती है। पानी किसी भी पाइप की तुलना में टैंक में कहीं अधिक समय तक रुका रहता है, इसलिए अक्सर यहीं अवशेष खो जाता है। खाली का अर्थ है सेटिंग्स, गणना, जल गुणवत्ता के अंतर्गत पूरे नेटवर्क के लिए तय थोक प्रतिक्रिया गुणांक का उपयोग करना।';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='नियंत्रण';
 $ec_lang['lpn_inpup_i_rules']='नियम';
 $ec_lang['lpn_inpup_i_options']='विकल्प';
 $ec_lang['lpn_roughness_method_note']='⚠ {method} के लिए सामान्य सीमा से बाहर खुरदरापन वाले पाइप: {n}। मान बदले नहीं गए हैं और हो सकता है कि किसी अन्य घर्षण विधि के लिए दर्ज किए गए हों।';
-$ec_lang['lpn_field_cv']='चेक वाल्व (CV)';
 $ec_lang['lpn_field_cv_tip']='यह पाइप पानी को केवल अपने आरंभ नोड से अंत नोड की ओर जाने देता है, जैसे चेक वाल्व करता है। यदि प्रवाह उलटने वाला हो, तो पाइप तब तक बंद हो जाता है जब तक वह फिर आगे नहीं बह सकता। EPANET इस स्थिति को CV कहता है।';
 $ec_lang['lpn_theme_hc']='उच्च कंट्रास्ट';
 $ec_lang['lpn_theme_amber']='एम्बर';

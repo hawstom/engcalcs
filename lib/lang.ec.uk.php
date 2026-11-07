@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Реакція на стінці труби, 
 $ec_lang['lpn_reaction_pipe_tip']='Лише для цієї труби. Залиште поле порожнім, і труба використовуватиме коефіцієнт, заданий для всієї мережі в «Налаштування, Якість води».';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Коефіцієнт реакції';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Реакція у воді, що міститься в цій ємності, як швидкість у 1/добу. Від’ємне число зменшує кількість хімічної речовини, додатне — збільшує. Вода стоїть в ємності набагато довше, ніж у будь-якій трубі, тож саме тут часто втрачається залишкова концентрація. Порожнє поле означає використання коефіцієнта реакції в товщі води, заданого для всієї мережі в Налаштування, Розрахунок, Якість води.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='керування';
 $ec_lang['lpn_inpup_i_rules']='правила';
 $ec_lang['lpn_inpup_i_options']='опції';
 $ec_lang['lpn_roughness_method_note']='⚠ Труб із шорсткістю поза нормальним діапазоном для {method}: {n}. Значення не змінено, і їх могло бути введено для іншого методу тертя.';
-$ec_lang['lpn_field_cv']='Зворотний клапан (CV)';
 $ec_lang['lpn_field_cv_tip']='Ця труба пропускає воду лише від початкового вузла до кінцевого, як зворотний клапан. Якщо течія змінила б напрямок, труба закривається, доки знову не зможе текти вперед. EPANET називає цей стан CV.';
 $ec_lang['lpn_theme_hc']='Висока контрастність';
 $ec_lang['lpn_theme_amber']='Бурштинова';

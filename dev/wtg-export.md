@@ -195,7 +195,7 @@ cannot place. Ranked by what a WaterGEMS user loses without the item:
 | 2 | Water quality, reactions, sources, two-compartment mixing | Yes | **Written**: every mixing model, a chemical run, age and trace. Per-element rates, source patterns and the quality step stay candidate-only (below) |
 | 3 | Emitter coefficients | Yes: ft3/s per psi^n | **Written** (below) |
 | 4 | Pump speed pattern | Yes: `VSPType` 0 | **Written** (below) |
-| 5 | Energy price, price pattern, demand charge | The constant price: yes (Tom's `energy-price` save, 2026-11-04). Pattern and demand charge: no row seen | **Constant price written** ("Energy price" below); pattern and demand charge stay |
+| 5 | Energy price, price pattern, demand charge | The constant price: yes (Tom's `energy-price` save, 2026-11-04). Pattern and demand charge: yes (Tom's saves of 2026-11-06) | **All three written** ("Energy price" and 8a below) |
 | 6 | Controls on a pressure or other condition; rule-based controls | No: `IdahoControl_ControlType_LogicalType` is empty; the only condition codes seen are clock time and tank level | Stays (written as the clock times EPANET switched them) |
 | 7 | Pressure-driven demand model | No | Stays |
 | 8 | Description, tag, demand category names | Yes: `HMIModelingElement.Notes` is a field of every element | **Written** into Notes (`Tag: x`, `Demand categories: Residential 100 gpm; ...`). No tag or category field was seen, so the lines left the box |
@@ -341,7 +341,7 @@ Settled:
 **Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
 pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
 without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Written since Tom's ten saves (next section): per-pipe and per-tank rates, source patterns, pump controls, pressure-driven
-demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Written since the `energy-price` save: a constant energy price, global or per pump. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), energy price pattern and demand charge, map text, backdrop, true positions for any other system.
+demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Written since the `energy-price` save: an energy price (constant or by pattern, global or per pump) and a demand charge. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), map text, backdrop, true positions for any other system.
 
 ## Tom's ten saves, 2026-11-03 night: how WaterGEMS stores each
 
@@ -425,13 +425,36 @@ price is three rows:
   carbon columns stay 0 and empty.
 
 Written: `[ENERGY] Global Price` reaches every pump with no price of its own, a pump's own `PRICE` replaces it, and a price of zero
-is no price (the pump's pointer stays empty). One `EnergyPricing` element per distinct price, shared by the pumps that pay it; a
-shared element is inferred, because Tom attached the one he made to one pump. Not written: `Global Pattern` and a pump's `PATTERN`
-(the save holds a constant, so the curve tables `EnergyPriceCurveCount` counts are unseen), `Demand Charge` (the peak-charge columns
-are all at their defaults), and a block-rate tariff. These stay on the not-written list, now worded "Energy price pattern and demand
-charge". EPANET's figure for the pump over 24 h at 75 percent efficiency: 222.06 kWh, 22.21 at 0.10 (`wtg-energy-price-harness.js`). The
-storage cost beside it (-0.44, the difference between 22.21 and the daily cost 21.77) is computed by WaterGEMS; no changed field holds it. Whether a quality run blocks "Compute with
-energy cost" is answered by Tom's screen, not by the file: the energy-price save is a plain hydraulic run.
+is no price (the pump's pointer stays empty). One `EnergyPricing` element per distinct price, pattern and demand charge, shared by the
+pumps that pay it; a shared element is inferred, because Tom attached the one he made to one pump. EPANET's figure for the pump over
+24 h at 75 percent efficiency: 222.06 kWh, 22.21 at 0.10 (`wtg-energy-price-harness.js`). The storage cost beside it (-0.44, the
+difference between 22.21 and the daily cost 21.77) is computed by WaterGEMS; no changed field holds it. Whether a quality run blocks
+"Compute with energy cost" is answered by Tom's screen, not by the file.
+
+**8a. Price pattern and demand charge** (Tom's saves `energy-price-pattern` and `energy-demand-charge`, 2026-11-06, each diffed table
+by table against `energy-price-test`). Both are written.
+
+- Price pattern (0.05 from 0 to 6 h, 0.10, 0.20, 0.10): the `EnergyPricing` row has `StartEnergyPrice` 0.05 (the price at time 0),
+  `EnergyPrice` still the old constant 0.1, `TariffType` 1 and `EnergyPriceCurveCount` 4; the new table
+  `EnergyPricing_EnergyPriceCurve` holds (`TimeFromStart` seconds, `EnergyPrice`) = (21600, 0.1), (43200, 0.2), (64800, 0.1),
+  (86400, 0.05). A point states the price from that time on; the last closes the cycle with the start price again. EPANET's
+  `Global Pattern` / `PUMP id PATTERN` multiplies the pump's price (or the global price) by the pattern's multiplier at
+  `(t + pattern start) / pattern step`; the writer evaluates that into the curve: a point where the price changes, always one at the end
+  of the cycle (cycle = pattern length x step, repeated to cover the run's duration). A pattern whose price never changes is written
+  as a constant. Unseen: what WaterGEMS does past the last point on a run longer than the curve; the repeated cycles are our inference.
+- Demand charge (12 per kW): `IncludePeakDemandCharge` 0 to 1 and `PeakDemandCharge` 0 to 12, nothing else (billing period stays 30, the
+  constant price stays). EPANET's `Demand Charge` is global, so it goes on every pump's element, and a pump with no price but a
+  demand charge still gets an element. The advanced peak-charge tables stay empty.
+- Both saves also hold a new empty support element of type 1000 (a `QBATDefinition` row, `HMIElementTypeCount` 0 to 1) and the open
+  counter 4 to 5: a side effect of opening the project, not of the price. Not written.
+- Numbers (the harness prints them): Tom's WaterGEMS read PU1's energy cost over 24 h as 25.01 with the pattern; EPANET gives 25.01
+  (kW x step x price at the step). Demand charge: WaterGEMS 3.87; EPANET's peak for PU1 is 9.67 kW, so peak x 12 = 116.04, and
+  116.04 x (1 day / 30-day billing period) = 3.87. Bentley's public wiki (communities.bentley.com, "Using the Scenario Energy Cost
+  and Energy Management tools in WaterGEMS and WaterCAD") says the billing period spreads the demand charge into a daily figure;
+  that fits and is what we infer, but it does not state the formula, and the run being exactly one day leaves "x run days" and
+  "x 1 day" indistinguishable. No public page found says how a partial billing period is prorated. EPANET 2.2's own report prints
+  1392.49 for the same run: the charge enters twice (1 per kW prints 9.67, 2 prints 38.68, 12 prints 1392.49), and the app's
+  `lpn-epanet.js` computes 116.04. The three figures differ and none is hidden.
 
 **9. Spatial reference.** One column changed: `IdahoDataSet.HmiModelCoordinateReference` went from empty to a 17 KB JSON text: horizontal CRS
 id `AZ83-CIF`, EPSG 2223, "NAD83 Arizona State Plane, Central Zone, Intl Foot", unit InternationalFoot, the datum's transform paths and extent, and a
@@ -617,7 +640,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[CURVES]` efficiency curve | yes: two or more points are `PumpEfficiencyType` 2 with a `..._MultipleEfficiencyPointsType` row (count) and one `IdahoPumpDefinition_DischargeEfficiencyCurve` row per point (flow gpm to ft3/s, efficiency as stated); one point is written as a constant. Pumps share a definition only when head and efficiency curves both match | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2); table layout from the template's schema, no sample states a non-empty one | done; read back by our reader (`wtg-export-demands.inp`). Efficiency never changes a hydraulic result, so the EPANET agreement is unaffected; whether WaterGEMS accepts the rows is Tom's test |
 | `[ENERGY]` global efficiency | yes | constant efficiency | done |
 | `[ENERGY]` price | yes | constant price: `EnergyPricing` element, pointed at by `EnergyCost_EnergyPricingID` | done |
-| `[ENERGY]` price pattern, demand charge | no | no sample holds a pattern or a charge | no |
+| `[ENERGY]` price pattern, demand charge | yes | `EnergyPricing_EnergyPriceCurve`; `PeakDemandCharge` (8a) | done |
 | `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls in the same control set | the one sample control (Zenodo) | done |
 | `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | yes, as tank-level controls in a control set | Tom's `wtg-control-1` (see "Tank-level controls: the codes") | done; whether WaterGEMS fires them is Tom's test |
 | `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes (the ELSE column and a priority column are in `IdahoControl_ControlType_LogicalType`) | needs a sample with an ELSE |
@@ -633,7 +656,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 
 **Candidates for a later round**, where the sample files already show the table that would hold the item
 (fact-check table above): the demand multiplier (`EpaNetEngine_NormalDemandAdjustmentsCollection`, one row in
-the Zenodo EPS model, scope code still to decode), energy price pattern and demand charge (the constant price is written; the curves are unseen), pump speed pattern (`StandardPump_Physical_VSPType_PatternBasedType`), tank mixing
+the Zenodo EPS model, scope code still to decode), pump speed pattern (`StandardPump_Physical_VSPType_PatternBasedType`), tank mixing
 (`TankMixingModel`; 1 = mixed is the only value seen), emitters (the table exists; the storage unit is
 Ask 2). Each needs a saved example with a non-empty row before it is written.
 

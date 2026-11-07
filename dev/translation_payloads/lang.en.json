@@ -1487,7 +1487,7 @@
         "lpn_file_export_wtg_tip": "Download this network as a .wtg project: a .wtg file and its .wtg.sqlite database, together in one .zip.",
         "lpn_wtg_export_lost_lead": "This export does not yet write the following:",
         "lpn_wtg_export_lost_quality": "Water quality: the analysis, reactions, sources, and tank mixing.",
-        "lpn_wtg_export_lost_energy_price": "Energy price pattern and demand charge.",
+        "lpn_wtg_export_lost_energy_price": "An energy price pattern that the project does not define.",
         "lpn_wtg_export_lost_rules": "Rule-based controls that are not written (rules {ids}).",
         "lpn_wtg_export_lost_controls_pressure": "Controls on a junction pressure or another condition (links {ids}). Each is written as the fixed clock times at which EPANET switched it.",
         "lpn_wtg_export_lost_tank_mixing": "Tank mixing model (tanks {ids}). Tanks are written fully mixed.",
@@ -1872,7 +1872,6 @@
         "lpn_tip_select": "Use this mode to change, move, and drag assets and text on the map, or to pan the map. This is the default mode for the map. Pressing Esc a second time clears the selection.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
-        "lpn_field_cv": "Check valve (CV)",
         "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_closed_tip": "Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time.",
         "lpn_field_x": "X",
@@ -2479,7 +2478,6 @@
         "lpn_reaction_wall": "Wall reaction coefficient",
         "lpn_reaction_wall_tip": "Reaction at the pipe wall (see EPANET Help) used for every pipe with no entry. A negative number decays the chemical. Blank means no wall reaction.",
         "lpn_reaction_pipe_tip": "Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficient set for the whole network under Settings, Calculation, Quality.",
-        "lpn_reaction_tank": "Reaction coefficient",
         "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one increases it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.",
         "lpn_reaction_bulk_short": "Bulk reaction",
         "lpn_reaction_wall_short": "Wall reaction",
@@ -3346,7 +3344,7 @@
         "lpn_field_auto_length_tip": "Auto length: when checked, the slope length is calculated along the drawn line, and follows the drawing when a node is moved or an end elevation changes. Clear the box to type a length of your own.",
         "lpn_prop_label_symbol": "{label}, {symbol}"
     },
-    "count": 3344,
+    "count": 3342,
     "active_prefixes": [
         "about",
         "bpn",

@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Reakcija na stijenci cijevi, koja se koristi 
 $ec_lang['lpn_reaction_pipe_tip']='Samo za ovu cijev. Ostavite prazno i cijev koristi koeficijent postavljen za cijelu mrežu pod Postavke, Kvaliteta vode.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Koeficijent reakcije';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Reakcija u vodi u ovom spremniku, kao brzina u 1/dan. Negativan broj razgrađuje kemikaliju, a pozitivan je povećava. Voda stoji u spremniku mnogo dulje nego u bilo kojoj cijevi, pa se ovdje često gubi rezidual. Prazno znači da se koristi koeficijent reakcije u masi vode postavljen za cijelu mrežu pod Postavke, Proračun, Kvaliteta vode.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='kontrole';
 $ec_lang['lpn_inpup_i_rules']='pravila';
 $ec_lang['lpn_inpup_i_options']='opcije';
 $ec_lang['lpn_roughness_method_note']='⚠ Cijevi s hrapavošću izvan uobičajenog raspona za {method}: {n}. Vrijednosti su nepromijenjene i možda su unesene za drugu metodu trenja.';
-$ec_lang['lpn_field_cv']='Nepovratni ventil (CV)';
 $ec_lang['lpn_field_cv_tip']='Ova cijev propušta vodu samo od svog početnog do završnog čvora, kao nepovratni ventil. Ako bi se protok okrenuo, cijev se zatvara dok opet ne može teći naprijed. EPANET ovo stanje naziva CV.';
 $ec_lang['lpn_theme_hc']='Visoki kontrast';
 $ec_lang['lpn_theme_amber']='Jantarna';

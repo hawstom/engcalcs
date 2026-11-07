@@ -107,6 +107,9 @@ function ecSwScope() {
  */
 function ecSwAssetExclusions() {
     return [
+        // The commented developer source (Task 853). Pages link css/engcalcs.min.css, built from it by
+        // dev/scripts/build_css.php; nothing requests this file, and it is 553 KB.
+        'css/engcalcs.css'        => 'developer source; pages link the comment-free engcalcs.min.css',
         // 664 KB WASM-backed EPANET engine, loaded by dynamic import() only when the visitor
         // turns the EPANET solver on. Precaching it would multiply the install cost of the PWA
         // for every visitor, and this suite's stated audience is low-bandwidth. It is imported

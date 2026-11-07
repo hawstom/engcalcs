@@ -3911,7 +3911,6 @@ $ec_lang['lpn_reaction_wall_tip']='Реакция при стената на т�
 $ec_lang['lpn_reaction_pipe_tip']='Само тази тръба. Оставете полето празно и тръбата използва коефициента, зададен за цялата мрежа под Настройки, Качество на водата.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
-$ec_lang['lpn_reaction_tank']='Коефициент на реакция';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_tank_tip']='Реакция във водата, съдържаща се в тази цистерна, като скорост в 1/ден. Отрицателно число разгражда химичното вещество, а положително го увеличава. Водата престоява в цистерна много по-дълго, отколкото в която и да е тръба, затова често именно тук се губи остатъкът. Празно означава да се използва коефициентът на обемна реакция, зададен за цялата мрежа в Настройки, Изчисление, Качество на водата.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
@@ -5101,7 +5100,6 @@ $ec_lang['lpn_inpup_i_controls']='управление';
 $ec_lang['lpn_inpup_i_rules']='правила';
 $ec_lang['lpn_inpup_i_options']='опции';
 $ec_lang['lpn_roughness_method_note']='⚠ Тръби с грапавост извън нормалния диапазон за {method}: {n}. Стойностите са непроменени и може да са въведени за друг метод за триене.';
-$ec_lang['lpn_field_cv']='Възвратен вентил (CV)';
 $ec_lang['lpn_field_cv_tip']='Тази тръба пропуска вода само от началния си възел към крайния, както възвратен вентил. Ако водното количество би променило посоката си, тръбата се затваря, докато може отново да тече напред. EPANET нарича това състояние CV.';
 $ec_lang['lpn_theme_hc']='Висок контраст';
 $ec_lang['lpn_theme_amber']='Кехлибарена';
