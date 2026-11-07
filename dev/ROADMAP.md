@@ -55,7 +55,6 @@ the block.
 
 ## 100 — Next.
 
-- 100|847| **The built-in solver leaves flow circulating in a loop with no demand.** Perry, 2026-10-27, on the starter extension's Static scenario: 3.18 gpm round a closed loop with zero demand (EPANET 0.07 gpm). Likely a convergence tolerance; a loop with no source or sink must carry zero.
 
 - 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
   **E2 ran and failed (inquiry §6a); back to 75, 2026-11-06**, when Tom chose Task 812's "look like your neighbours" over experiment E3 (fit-at-home count). Next research leads: §4.3 conflict graph, §4.5 open space.
