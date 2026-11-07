@@ -657,28 +657,47 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		nPump++; nAdded += 2;
 	});
 	// ---- energy price (dev/wtg-export.md, "Energy price") ----
-	// A constant price is one EnergyPricing support element (type 61); a pump points at it through its BasePump_EnergyCost_Data
-	// row. [ENERGY] "Global Price" reaches every pump with no price of its own, a pump's own PRICE replaces it, and a price
-	// of zero is no price at all. One element per distinct price. A price pattern and a demand charge are not written.
+	// One EnergyPricing support element (type 61) per distinct price, price pattern and demand charge; a pump points at it
+	// through its BasePump_EnergyCost_Data row. [ENERGY] "Global Price" reaches every pump with no price of its own, a pump's
+	// own PRICE replaces it, and a price of zero is no price. A price pattern becomes the element's price curve (a start
+	// price and points of time from the start, as Tom's energy-price-pattern save holds it); "Demand Charge" (global, per kW)
+	// becomes the peak demand charge. A pump with no price still gets an element when a demand charge is stated.
 	{
 		const en = EngCalcs.lpnEnergyParse ? EngCalcs.lpnEnergyParse((parsed.inpSections || {}).ENERGY || []) : null;
 		const priceEl = {}, written = [];
 		if (en) {
+			const demand = en.demandCharge > 0 ? en.demandCharge : 0;
+			const tm = parsed.times || {}, pstep = tm.patternStep || 3600, pstart = tm.patternStart || 0, dur = tm.duration || 0;
+			const rd = (x) => Math.round(x * 1e10) / 1e10;
 			links.forEach((l) => {
 				if (l.type !== 'pump') { return; }
 				const own = Object.prototype.hasOwnProperty.call(en.price, l.id) ? en.price[l.id] : en.globalPrice;
-				if (!(own > 0)) { return; }
-				const key = String(own);
+				const base = own > 0 ? own : 0;
+				if (!base && !demand) { return; }
+				const patName = en.pattern[l.id] || en.globalPattern;
+				const pat = base && patName ? parsed.patterns.find((q) => q.id === patName) : null;
+				let start = base, curve = [];
+				if (pat && pat.multipliers && pat.multipliers.length) {
+					const m = pat.multipliers, n = m.length, cycle = n * pstep, total = cycle * Math.max(1, Math.ceil(dur / cycle));
+					const at = (t) => rd(base * m[Math.floor((t + pstart) / pstep) % n]);
+					start = at(0);
+					for (let t = pstep; t <= total; t += pstep) { if (t === total || at(t) !== at(t - pstep)) { curve.push([t, at(t)]); } }
+					if (curve.length === 1 && curve[0][1] === start) { curve = []; }
+				}
+				const key = JSON.stringify([base, start, curve, demand]);
 				if (!priceEl[key]) {
 					const eid = newId();
 					supportElement(eid, 61, 'Energy Pricing - ' + (Object.keys(priceEl).length + 1));
 					insert(db, 'EnergyPricing', {
-						SupportElementID: eid, EnergyPricing_IncludePeakDemandCharge: 0, EnergyPricing_BillingPeriod: 30,
-						EnergyPricing_EnergyPricingStartTime: EPOCH_2000, EnergyPricing_PeakDemandCharge: 0,
-						EnergyPricing_StartEnergyPrice: own, EnergyPricing_EnergyPrice: own, EnergyPricing_AboveRangeEnergyPrice: 0,
-						EnergyPricing_BillingDemand: 0, EnergyPricing_UseAdvancedPeakCharges: 0, TariffType: 0, PeakChargeType: 0,
-						EnergyPriceCurveCount: 0, BlockRateCurveCount: 0, BlockRateBasedOnDemandCurveCount: 0,
+						SupportElementID: eid, EnergyPricing_IncludePeakDemandCharge: demand ? 1 : 0, EnergyPricing_BillingPeriod: 30,
+						EnergyPricing_EnergyPricingStartTime: EPOCH_2000, EnergyPricing_PeakDemandCharge: demand,
+						EnergyPricing_StartEnergyPrice: start, EnergyPricing_EnergyPrice: base, EnergyPricing_AboveRangeEnergyPrice: 0,
+						EnergyPricing_BillingDemand: 0, EnergyPricing_UseAdvancedPeakCharges: 0, TariffType: curve.length ? 1 : 0, PeakChargeType: 0,
+						EnergyPriceCurveCount: curve.length, BlockRateCurveCount: 0, BlockRateBasedOnDemandCurveCount: 0,
 						ClockTimePeakChargesCount: 0, SimulationTimePeakChargesCount: 0
+					});
+					curve.forEach((c) => {
+						db.run('INSERT INTO EnergyPricing_EnergyPriceCurve (SupportElementID, EnergyPriceCurve_TimeFromStart, EnergyPriceCurve_EnergyPrice) VALUES (?,?,?)', [eid, c[0], c[1]]);
 					});
 					priceEl[key] = eid;
 				}
@@ -687,7 +706,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			});
 		}
 		report.counts.energyPrices = Object.keys(priceEl).length; report.counts.pumpsWithPrice = written.length;
-		if (written.length) { carried('energy price: ' + report.counts.energyPrices + ' constant price' + (report.counts.energyPrices > 1 ? 's' : '') + ' on ' + written.length + ' pump' + (written.length > 1 ? 's' : '')); }
+		if (written.length) { carried('energy price: ' + report.counts.energyPrices + ' pricing element' + (report.counts.energyPrices > 1 ? 's' : '') + ' on ' + written.length + ' pump' + (written.length > 1 ? 's' : '')); }
 	}
 	report.counts.pipes = nPipe; report.counts.pumps = nPump; report.counts.valves = nValve; report.counts.pumpConnectingPipes = nAdded;
 	carried('junctions ' + nJ + ', reservoirs ' + nR + ', tanks ' + nT + ', pipes ' + nPipe + ', pumps ' + nPump + ' (each a node with ' + 2 + ' added 1 ft pipes), valves ' + nValve);
@@ -1071,7 +1090,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	db.close();
 	report.skippedColumns = Object.keys(skippedColumns);
 	report.ids = { firstId: keptMax + 1, lastId: nextId - 1, pumpNodes: pumpNodeId, patterns: patId };
-	report.notCarried.push(((report.chemicalWritten || report.ageTraceWritten) ? 'quality analysis other than the run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', energy price pattern and demand charge, the [REPORT] settings');
+	report.notCarried.push(((report.chemicalWritten || report.ageTraceWritten) ? 'quality analysis other than the run written above' : 'quality analysis (Trace Lake), reactions, sources') + ', the [REPORT] settings');
 	if (!report.counts.levelControls) { report.notCarried.push('tank-level controls as controls: carried as the clock-time schedule EPANET followed'); }
 	return { bytes: bytes, report: report };
 }
@@ -1263,15 +1282,14 @@ function carriableRules(parsed, pressure) {
 	return out;
 }
 
-// The [ENERGY] lines the writer has no place for: a price pattern (global or a pump's) and a demand charge other than zero.
-// A constant price, global or a pump's own, is written (dev/wtg-export.md, "Energy price").
-function energyNotWritten(lines) {
+// The [ENERGY] lines the writer has no place for: a price pattern (global or a pump's) the project does not define.
+// A constant price, a price pattern and a demand charge are written (dev/wtg-export.md, "Energy price").
+function energyNotWritten(lines, patternIds) {
 	return (lines || []).filter((ln) => {
 		const f = String(ln).replace(/;.*$/, '').trim().split(/\s+/);
 		if (f.length < 2) { return false; }
 		const key = f.slice(0, -1).join(' ').toLowerCase(), val = f[f.length - 1];
-		if (/pattern/.test(key)) { return true; }
-		return /charge/.test(key) && Number(val) !== 0;
+		return /pattern/.test(key) && !(patternIds || []).includes(val);
 	});
 }
 
@@ -1305,8 +1323,8 @@ function plan(doc, opts) {
 	// The .inp this plan reads back never states it (js/lpn-patterns.js), so it is read from the document itself.
 	const dt = (doc && doc.times) || {}, qStep = dt.qualityStep, hStepSec = (parsed.times && parsed.times.hydraulicStep) || 3600;
 	const qualityStepSeconds = (typeof qStep === 'number' && qStep > 0 && Math.abs(qStep - hStepSec / 10) > 0.5) ? qStep : 0;
-	// An energy line that states a price pattern or a demand charge other than zero (a constant price is written).
-	const price = energyNotWritten(secs.ENERGY || []);
+	// An energy line that names a price pattern the project does not define (a price, a pattern and a demand charge are written).
+	const price = energyNotWritten(secs.ENERGY || [], (parsed.patterns || []).map((q) => q.id));
 	if (price.length) { notCarried.push({ code: 'energy_price', ids: [] }); }
 	{ const rc = carriableRules(parsed, !!(opts && opts.candidate && opts.candidate.pressureControls)); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
 	const frozen = [];
