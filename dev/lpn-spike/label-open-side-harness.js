@@ -20,6 +20,9 @@
 //     it, so the stack stays: printed, not asserted);
 //   * no notch, 0 to 14, shows fewer node labels or fewer values than without the far side (overprints
 //     are held by the harnesses that lay out the same labels (pipe-label-level-harness.js));
+//   * a one-line node label's far sides work: a leader from a node starts inside that node's own symbol,
+//     and it used to fail the leader check there for every side beyond the quiet distance, so no far
+//     side was ever taken (Collide.config.ownSymbol; Novato, 17 notches over 3 canvases: +7% node values);
 //   * the layout time of the whole sequence does not double (measured alone: about +4%).
 //
 // Copyright 2009 Thomas Gail Haws
@@ -37,7 +40,7 @@ function openOff(src) {
 const TABLE = process.env.OPEN_SIDE_TABLE === '1';
 const EX = path.join(__dirname, '..', 'water-network-examples');
 const SC = { name: 'Novato', file: path.join(EX, 'Net3-Novato-CA-World.lwn'), fields: ['id', 'demand', 'elev', 'head', 'pressure'] };
-const CANVASES = [[1300, 750], [1400, 900]];
+const CANVASES = (process.env.OPEN_SIDE_CANVASES || '1300x750,1400x900').split(',').map((c) => c.split('x').map(Number));
 const NOTCHES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const NAMED = ['161', '163', '164', '166', '265'];
 
@@ -105,6 +108,17 @@ function ok(label, cond, detail) {
 		});
 		const r13 = on.rows.find((x) => x.k === 13);
 		ok(`${tag} 13 notches: N265 shows all five fields on one line`, r13.named['265'] === 'line idehp', r13.named['265']);
+	}
+	// The own-symbol exemption: the same sequence with it switched off shows fewer node values.
+	{
+		const cfg = Collide.config;
+		let valsOn = 0, valsOff = 0;
+		for (const [w, h] of CANVASES) {
+			cfg.ownSymbol = true; (await runCanvas(w, h, true)).rows.forEach((r) => { valsOn += r.c.nodeRows; });
+			cfg.ownSymbol = false; (await runCanvas(w, h, true)).rows.forEach((r) => { valsOff += r.c.nodeRows; });
+		}
+		cfg.ownSymbol = true;
+		ok('a node label\'s leader may start inside its own node symbol: more node values over all notches', valsOn > valsOff, valsOff + ' -> ' + valsOn);
 	}
 	const pct = 100 * (sumOn / sumOff - 1);
 	console.log(`        layout time of both sequences: ${sumOff.toFixed(0)} -> ${sumOn.toFixed(0)} ms (${pct.toFixed(1)}%)`);

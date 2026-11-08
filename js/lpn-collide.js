@@ -35,6 +35,8 @@
 var EngCalcs = EngCalcs || {};
 
 EngCalcs.lpnCollide = (function () {
+	// Switches a harness may flip to measure a rule with and without it.
+	var config = { ownSymbol: true };
 	'use strict';
 
 	// ---- the goals, as weights ----------------------------------------------------------------
@@ -1258,6 +1260,10 @@ EngCalcs.lpnCollide = (function () {
 			for (i = 0; i < local.boxes.length; i++) {
 				o = local.boxes[i];
 				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				// A node label's leader starts AT its node: that node's own symbol is not in its way
+				// (leaderThroughSymbol() says the same). Without this every far side of a one-line
+				// node label failed here, whatever lay between (Task 812).
+				if (config.ownSymbol && lbl.leaderClean && o.kind === 'symbol' && Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
 				if (segmentInBoxFraction(g, o) > 0) { return false; }
 			}
 			for (i = 0; i < local.segments.length; i++) {
@@ -2370,7 +2376,8 @@ EngCalcs.lpnCollide = (function () {
 		labelCrossings: labelCrossings,
 		oversizedObstacles: function () { return oversizedCount; },
 		repairCrossingGangs: repairCrossingGangs,
-		shedCrossingSurvivors: shedCrossingSurvivors
+		shedCrossingSurvivors: shedCrossingSurvivors,
+		config: config
 	};
 }());
 

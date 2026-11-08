@@ -981,6 +981,15 @@ var EngCalcs = EngCalcs || {};
 	// heights out, was tried first and found nothing more on any of the 600-junction, Net1, Net3 or
 	// Novato views at any zoom, at 17% of the pass time: it is not here.
 	var LPN_OPEN_SIDE = true;
+	// **A STACK THAT SHOWS EVERYTHING AND A LINE THAT SHOWS EVERYTHING ARE NEAR-EQUAL, AND A TIE GOES TO
+	// THE LINE** (Tom, 2026-11-06: *"One-line is only very slightly less desirable than multi-line, if
+	// at all"*, and the one-line style should *"continue on inward"*). Tried after every label that
+	// lost something has had its turn, on strict ground, so a line is taken only where it overprints
+	// nothing and makes no pipe label yield. Measured over 64 views (Net3, Novato, the 600-junction
+	// network): +41 labels and +287 values for about +3% pass time. In Chromium on Novato N164, N166 and
+	// N265 go to lines at 12 to 16 notches; N163 cannot (the short pipe L181's label stands east of it).
+	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time.
+	var LPN_TIE_LINE = true;
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
 	// demand is. Ties break on id, so the order is total and stable -- an unstable order would
@@ -2902,8 +2911,9 @@ var EngCalcs = EngCalcs || {};
 		// **A SECOND ROUND, BECAUSE THE FIRST GIVES GROUND BACK ONLY AS IT GOES** (Task 812): a label
 		// tried before its neighbour finds the neighbour's stack still standing on the ground it wants.
 		// Once the neighbour has gone to its line, the ones that found no place are tried again.
-		if (LPN_OPEN_SIDE && !(round > 0) && took.length && took.length < list.length) {
-			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list.filter(function (it) { return !res[it.id]; }), ring, 1);
+		var needing = list.filter(function (it) { return !it.tie; });
+		if (LPN_OPEN_SIDE && !(round > 0) && took.length && needing.length && took.length < list.length) {
+			var again = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, needing.filter(function (it) { return !res[it.id]; }), ring, 1);
 			return { placed: again.placed, took: took.concat(again.took) };
 		}
 		return { placed: placed, took: took };
@@ -2961,6 +2971,7 @@ var EngCalcs = EngCalcs || {};
 			var n = nodeOf[r.id], ne = n && nodeEls[n.id];
 			if (!ne || ne.empty || !ne.allLines || ne.allLines.length < 2 || !byId[r.id]) { return; }
 			if (r.dropped || (ne.lines && ne.lines.length < ne.allLines.length)) { cand.push({ id: r.id, n: n, ne: ne }); }
+			else if (LPN_TIE_LINE && !ne.inline && n.lx === undefined) { cand.push({ id: r.id, n: n, ne: ne, tie: true }); }
 		});
 		if (!cand.length) { lastInlineTrial = null; return placed; }
 		// **PRICED BEFORE IT IS DRAWN.** Each label's one-line width comes from measureLevelForms(), the
@@ -2971,8 +2982,10 @@ var EngCalcs = EngCalcs || {};
 		cand.forEach(function (c, k) {
 			var m = reqs[k].m;
 			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
-			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+			list.push({ id: c.id, c: c, tie: !!c.tie, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
 		});
+		// The labels that lost something first; the ties after them.
+		list.sort(function (a, b) { return (a.tie ? 1 : 0) - (b.tie ? 1 : 0); });
 		if (!list.length) { lastInlineTrial = null; return placed; }
 		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
 		lastInlineTrial = { tried: list.length, took: res.took.length };

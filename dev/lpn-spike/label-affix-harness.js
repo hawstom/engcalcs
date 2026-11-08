@@ -61,7 +61,11 @@ const L = loadLoopedNetwork(
 	"\t\t\t\t\thasX: t.getAttribute('x') != null });\n" +
 	"\t\t\t}\n" +
 	"\t\t\treturn out;\n" +
-	"\t\t},\n"
+	"\t\t},\n",
+	null,
+	// This harness is about the stack's affixes. A stack that shows everything may now take one line
+	// (LPN_TIE_LINE, Task 812), so the page is loaded without that step.
+	function (src) { return src.replace('var LPN_TIE_LINE = true;', 'var LPN_TIE_LINE = false;'); }
 );
 
 // SVG's own rule, applied here so the page is never asked to explain itself: an x starts a row.

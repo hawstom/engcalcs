@@ -8,7 +8,9 @@
 			saveToStorage(); requestLabelRefresh();
 		},
 		solved: function () { return !!lastSolveResult; },
+		inlineTrial: function () { return lastInlineTrial; },
 		fit: function () { zoomExtent(); },
+		centerOn: function (id) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: state.s }); },
 		content: function () { refreshLabelText(); },
 		timeContent: function (n) {
 			var t = [], i, t0;
@@ -29,6 +31,16 @@
 				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true }),
 					level: !!le.levelBeside, leader: !!(le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
 					stacked: !!(f && f.stacked), values: f ? f.lines.length : (le.lines || []).length, text: le.text.textContent };
+			});
+			return out;
+		},
+		// Node labels' forms, for the open-side browser harness: 'line idehp', 'stack hp', 'hid'.
+		nodeForms: function (ids) {
+			var out = {};
+			ids.forEach(function (id) {
+				var ne = nodeEls[id];
+				out[id] = !ne ? '-' : (!(ne.text && ne.text.textContent && ne.text.checkVisibility({ visibilityProperty: true })) ? ('hid' + (ne.hiddenDropped ? ' dropped' : '') + (ne.hiddenCrossed ? ' crossed' : '') + (ne.crowdHidden ? ' crowd' : '') + (ne.hiddenBlocked ? ' blocked' : '')) :
+					((ne.inline ? 'line ' : 'stack ') + (ne.lines || []).map(function (l) { return l.field.charAt(0); }).join('')));
 			});
 			return out;
 		},
