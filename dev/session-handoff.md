@@ -95,15 +95,17 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-06 night (seventieth session, Opus main, Sonnet agents)
+## STATE — 2026-11-08 (seventy-first session, Opus main, Sonnet agents)
 
-- **Merged:** `feat/wtg-energy-more` on his word (*"OK to merge."*); `fix/clear-restores-unit` on green (an emitter coefficient's "Clear restores" line quoted the stored SI number). Task 855 to 100 with his calls.
-- **Waiting his browser pass (Perry: ready):** `feat/override-push` (Task 855, preview 8102): orange arrow over the override dot; always asks, naming the destination and the value replaced. Its tap zone is ~9 px tall on a phone; bigger means taller rows. Not in the Tables pane. After merge, `pushDestination` can call `propDisplayValue` (from the clear-restores fix). `feat/assembly` (Task 822 slice 1, preview 8103): Virtual pipe and Pump+; five builder questions in messenger.md.
-- **`feat/label-open-side` (Task 812, was `feat/label-neighbours`, preview 8101)**: partial; see the roadmap entry. Not ready for him.
-- **Ida's answer to "which asset is Properties editing"** is in her hopper (`dev/agents/interface-designer/properties-asset-2026-11-06.md`): title the box "Valve V12". His call.
-- Still open from 11-06 evening: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
-- **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1c8b8bbc-a65c-4d54-8d96-71f0a10a3dcc/scratchpad (brief-common.md, Perry's journals and probes).
+- **Nothing merged to master this session.** Six branches wait his browser pass or his word, each pushed, each with a preview row:
+  - `feat/override-push` (Task 855, 8102): his pass *"It's all ok."*; asked whether that is his word to merge. Open wording: the push question reads "It replaces 18 in there." (the unit "in" reads as a preposition), his call.
+  - `feat/override-table` (8105, cut from override-push): Tables cells wear the dot and arrow (his question, CC's yes); a marked column grows 14 px while it holds an override; Guide key `lpn_guide_scn_marks_def` rewritten. Perry-reviewed, fixes in.
+  - `feat/properties-title` (8106): "Properties: Valve V12" (his call), new key `lpn_popup_boxtitle_of`; side tab and Guide keep plain "Properties"; a cleared selection now empties a docked box (master left it stale). `propsTypeWord()` is the seam where feat/assembly supplies "Pump+".
+  - `feat/assembly` (Task 822, 8103): Plus button gone; Pipe/Pump/Valve buttons cycle Virtual pipe/Pump+/Valve+ on a second press (pressing an armed button no longer returns to Select; Escape does); + cut into the pump barrel; discs gone; Valve+ built. Perry: ready. Well not built. Open his: virtual pipe as flag or length 0 (Mary, `dev/agents/market-researcher/virtual-pipe-precedent-2026-11-08.md`: no precedent for a flag; CC recommends length 0); labels at an assembly (Task 856).
+  - `feat/label-open-side` (Task 812, 8101): far sides of one-line node labels never worked (own symbol counted as obstacle), fixed; ties go to a line; a pipe label with another place yields to a node label. 64 views: values 17553 -> 19960, no view fewer values. `label-form-wheel-browser-harness.js` fails 1/148 (Novato 1 notch: 3 pipe labels for 52 node values), his call. N163 a line at 13 and 16 only. Comparisons must pin the scale: zoom to fit differs by 0.5-2% between builds.
+- Still open from 11-06: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
+- **Translation sprint:** his Sunday 2026-11-08; 83 keys on master waiting; asked whether now or after the branches merge.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/7e5244a7-d550-42e8-ab9e-487b027c3790/scratchpad (brief-common.md, Perry probes pt/ and perry-asm/).
 
 ## STATE — 2026-11-06 (sixty-eighth session, Opus main)
 
