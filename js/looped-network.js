@@ -72273,6 +72273,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// a sibling of the popup in document.body rather than a child of it. hidePanel() sweeps.
 		hidePanel(popup);
 		currentPopup = null;
+		propsBoxTitleSync();
 	}
 	function renderPopupEmpty() {
 		var pc = EngCalcs.pageConfig || {}, popup = document.getElementById('lpn_popup'),
@@ -74682,11 +74683,50 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
+	// **THE BOX TITLE NAMES THE ASSET** (Tom, 2026-11-06: "Properties" is the important word, so the
+	// asset follows it: "Properties: Valve V12", "Properties: Pipes (2)", "Properties: 3 selected").
+	// The type word comes from this one function, so a type that has its own word (Pump+) supplies
+	// it here and nowhere else.
+	function propsTypeWord(el, kind) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'label') { return pc.lpn_tool_add_text || 'Text'; }
+		if (kind === 'customer') { return pc.lpn_tool_add_meter || 'Customer'; }
+		if (kind === 'shape') { return pc.lpn_tool_add_shape || 'Shape'; }
+		return pc['lpn_tool_add_' + (el && el.type)] || '';
+	}
+	function propsBoxTitleText() {
+		var pc = EngCalcs.pageConfig || {}, base = pc.lpn_popup_boxtitle || 'Properties', what = '', el, w, gs;
+		if (!currentPopup) { return base; }
+		if (currentPopup.kind === 'multi') {
+			gs = multiGroups();
+			if (gs.length === 1) {
+				w = gs[0].spec ? (pc[gs[0].spec.label] || gs[0].spec.id) : propsTypeWord(null, gs[0].type === 'text' ? 'label' : gs[0].type);
+				what = w + ' (' + gs[0].els.length + ')';
+			} else {
+				what = String(pc.lpn_multi_title || '{n} selected').replace('{n}', String(selectionCount()));
+			}
+		} else if (currentPopup.kind === 'node' || currentPopup.kind === 'link') {
+			el = currentPopup.kind === 'node' ? nodeById(currentPopup.id) : linkById(currentPopup.id);
+			if (!el) { return base; }
+			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
+		} else if (currentPopup.kind === 'customer') {
+			el = customerById(currentPopup.id);
+			what = el ? String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', el.id) : '';
+		} else {
+			what = propsTypeWord(null, 'label');
+		}
+		return what ? String(pc.lpn_popup_boxtitle_of || 'Properties: {asset}').replace('{asset}', what) : base;
+	}
+	function propsBoxTitleSync() {
+		var b = document.getElementById('lpn_popup_boxtitle'), t = propsBoxTitleText();
+		if (b && b.textContent !== t) { b.textContent = t; }
+	}
 	// The line under the box's own title: a heading that spans the grid (a customer, a selection, a
 	// Text) or, for an element with an id, the ID row (idField). `cls` is the title's class, so a
 	// leftover from the last element never stays.
 	function popupTitleSet(text, cls) {
 		var t = document.getElementById('lpn_popup_title'), w;
+		propsBoxTitleSync();
 		if (!t) { return; }
 		t.className = cls || 'lpn-gtitle';
 		t.textContent = '';
