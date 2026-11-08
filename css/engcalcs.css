@@ -4399,9 +4399,14 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* SHOW SCENARIOS (Tom, 2026-10-05): a cell holding a value set in its row's scenario, washed in the
    amber the map rings an override with. Before the selection wash, so a selected range still reads
    as one block. */
-.lpn-pane-table tbody td.lpn-pane-ovcell { position: relative; }
-/* Task 855's convention, in a cell: the orange dot, and the arrow over it, at the cell's start edge and inside it (no column is wider). */
-.lpn-pane-table tbody td .lpn-pane-ovm { position: absolute; margin: 0; top: 0; bottom: 0; height: auto; inset-inline-start: 0; }
+.lpn-pane-table tbody td.lpn-pane-ovcell.lpn-pane-ovcell.lpn-pane-ovcell { position: relative; padding-inline-start: var(--lpn-pane-ovm-w); }
+.lpn-pane-table { --lpn-pane-ovm-w: 1em; }
+/* Task 855's convention, in a cell: the orange dot, and the arrow over it, in a strip the marked cell reserves at its start
+   edge (so no digit is ever under a mark; a column grows by the strip's width only while it holds an override). The strip is
+   the cell's full height, the arrow taking its upper half and the dot its lower, so a row is no taller for them. */
+.lpn-pane-table tbody td .lpn-pane-ovm { position: absolute; margin: 0; top: 0; bottom: 0; height: auto; width: var(--lpn-pane-ovm-w); inset-inline-start: 0; flex-direction: column; align-items: stretch; }
+.lpn-pane-table tbody td .lpn-pane-ovm .lpn-ovm-cell { position: static; flex: 1 1 50%; width: 100%; height: auto; min-height: 0; align-self: stretch; }
+@media (pointer: coarse) { .lpn-pane-table { --lpn-pane-ovm-w: 1.6em; } }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }

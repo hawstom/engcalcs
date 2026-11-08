@@ -69,15 +69,23 @@ async function main() {
 		const baseDiam = await diam();
 		const baseStored = (await U.storedProject(ctx)).links.find((l) => String(l.id) === '10')._diameter;
 		await U.createScenarioViaMenu(ctx);
-		await U.editPropertyViaUI(ctx, { kind: 'link', id: '10', labelKey: 'lpn_field_diameter', value: '14' });
+		await U.editPropertyViaUI(ctx, { kind: 'link', id: '10', labelKey: 'lpn_field_diameter', value: '12.375' });
 		await U.editPropertyViaUI(ctx, { kind: 'link', id: '11', labelKey: 'lpn_field_diameter', value: '15' });
+		await U.editPropertyViaUI(ctx, { kind: 'link', id: '11', labelKey: 'lpn_field_length', value: '1234.5' });
 		await settle(600);
 		let m = await marks();
-		ok('T1 two cells wear marks, both diameter, pipes 10 and 11', m.length === 2 && m.every((x) => x.key === 'diameter') && m.map((x) => x.id).sort().join() === '10,11', JSON.stringify(m));
+		ok('T1 three cells wear marks: diameter of 10 and 11, length of 11', m.length === 3 && m.map((x) => x.id + x.key).sort().join() === '10diameter,11diameter,11length', JSON.stringify(m));
 		ok('T1 each has a dot and an arrow, inside its cell', m.every((x) => x.dot && x.up && x.inside));
 		// T2
 		const w = await widths();
-		ok('T2 no column wider than in Base (desktop)', w.length === baseW.length && w.every((x, i) => x <= baseW[i] + 0.1), JSON.stringify(w.map((x, i) => x - baseW[i]).filter((d) => d !== 0)));
+		const markW = await P.evaluate(() => document.querySelector('#lpn_pane_pipes .lpn-pane-ovm').getBoundingClientRect().width);
+		const grow = w.map((x, i) => Math.round((x - baseW[i]) * 10) / 10);
+		console.log('       column growth with an override in the widest cell (px, only the changed columns): ' + JSON.stringify(grow.map((d, i) => d ? i + ':' + d : null).filter(Boolean)) + '; strip ' + markW + ' px');
+		ok('T2 a column grows by at most the strip width, and only an overridden one', w.length === baseW.length && grow.every((d) => d <= markW + 0.6) && grow.filter((d) => d > 0.1).length <= 2, JSON.stringify(grow));
+		ok('T1 no mark sits over a value (12.375, 1234.5): mark ends before the cell content starts', await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_pipes td')).filter((td) => td.querySelector('.lpn-pane-ovm')).every((td) => {
+			const m = td.querySelector('.lpn-pane-ovm').getBoundingClientRect(), i = td.querySelector('input'), r = (i || td).getBoundingClientRect();
+			return m.right <= r.left + 0.5;
+		})));
 		await shot('desktop');
 
 		// T3: focus stays in the cell being typed in
@@ -100,7 +108,7 @@ async function main() {
 		// T4 cancel
 		await press(d0.buttons[d0.buttons.length - 1]);
 		await settle(400);
-		ok('T4 cancel changes nothing', (await marks()).length === 2 && JSON.stringify(await diam()) === JSON.stringify({ 10: '14', 11: '15' }), JSON.stringify(await diam()));
+		ok('T4 cancel changes nothing', (await marks()).length === 3 && JSON.stringify(await diam()) === JSON.stringify({ 10: '12.375', 11: '15' }), JSON.stringify(await diam()));
 		// push for real
 		const up2 = await mark('10', 'up');
 		await P.mouse.click(up2.x, up2.y);
@@ -111,32 +119,46 @@ async function main() {
 		await settle(900);
 		const after = await marks();
 		const baseNow = await P.evaluate(() => { const l = EngCalcs.lpnDebug ? null : null; return l; });
-		ok('T4 pipe 10 is cleared in the scenario, pipe 11 still marked', after.length === 1 && after[0].id === '11', JSON.stringify(after.map((x) => x.id)));
+		ok('T4 pipe 10 is cleared in the scenario, pipe 11 still marked', after.length === 2 && after.every((x) => x.id === '11'), JSON.stringify(after.map((x) => x.id)));
 		const st = await U.storedProject(ctx);
 		const base = st.links.find((l) => String(l.id) === '10');
-		ok('T4 Base now holds the pushed value (14 in)', base && Math.abs(base._diameter - 14) < 0.01, base && String(base._diameter));
+		ok('T4 Base now holds the pushed value (12.375 in)', base && Math.abs(base._diameter - 12.375) < 0.01, base && String(base._diameter));
 		await P.evaluate(() => document.activeElement && document.activeElement.blur());
 		await P.keyboard.press('Control+z');
 		await settle(900);
 		const back = await marks();
 		const st2 = await U.storedProject(ctx);
 		const base2 = st2.links.find((l) => String(l.id) === '10');
-		ok('T4 one Undo restores both sides', back.length === 2 && base2._diameter === baseStored, JSON.stringify(back.map((x) => x.id)) + ' base ' + base2._diameter);
+		ok('T4 one Undo restores both sides', back.length === 3 && base2._diameter === baseStored, JSON.stringify(back.map((x) => x.id)) + ' base ' + base2._diameter);
 		// T5 dot
 		const dot = await mark('11', 'dot');
 		await P.mouse.click(dot.x, dot.y);
 		await settle(900);
-		ok('T5 the dot clears pipe 11 with no question', !(await dlg()) && (await marks()).map((x) => x.id).join() === '10');
+		ok('T5 the dot clears pipe 11 with no question', !(await dlg()) && (await marks()).map((x) => x.id + x.key).sort().join() === '10diameter,11length');
 		await P.evaluate(() => document.activeElement && document.activeElement.blur());
 		await P.keyboard.press('Control+z');
 		await settle(900);
-		ok('T5 one Undo brings it back', (await marks()).length === 2);
+		ok('T5 one Undo brings it back', (await marks()).length === 3);
 
+		// T6 paste into an overridden cell: the value changes, the override and its marks stay
+		const pasted = await P.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_pipes td.lpn-pane-col-diameter')).find((t) => t._lpnPaneId == '11');
+			td.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, detail: 1 }));
+			td.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, detail: 1 }));
+			const dt = new DataTransfer(); dt.setData('text/plain', '16');
+			td.closest('table').dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+			return true;
+		});
+		await settle(900);
+		const dAfter = await diam();
+		ok('T6 pasting 16 into the overridden cell changes it and the marks stay', pasted && dAfter['11'] === '16' && (await marks()).filter((x) => x.id === '11' && x.key === 'diameter' && x.dot && x.up).length === 1, JSON.stringify(dAfter));
 		// phone width
 		await P.setViewportSize({ width: 390, height: 800 });
 		await settle(900);
 		m = await marks();
-		ok('T2 phone width: marks present and inside their cells', m.length === 2 && m.every((x) => x.dot && x.up && x.inside), JSON.stringify(m));
+		ok('T2 phone width: marks present and inside their cells', m.length === 3 && m.every((x) => x.dot && x.up && x.inside), JSON.stringify(m));
+		const zones = await P.evaluate(() => { const td = document.querySelector('#lpn_pane_pipes td.lpn-pane-col-diameter .lpn-pane-ovm'); const u = td.querySelector('.lpn-ovm-up').getBoundingClientRect(), d = td.querySelector('.lpn-ovm-dot').getBoundingClientRect(), r = td.parentElement.getBoundingClientRect(); return { up: [u.width, u.height], dot: [d.width, d.height], row: r.height }; });
+		console.log('       tap zones at phone width (w x h px): arrow ' + zones.up.map(Math.round).join('x') + ', dot ' + zones.dot.map(Math.round).join('x') + ', row ' + Math.round(zones.row));
 		ok('T2 phone width: the marks sit out of the cell flow (take no width)', await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_pipes .lpn-pane-ovm')).every((e) => getComputedStyle(e).position === 'absolute')));
 		await P.evaluate(() => { const t = document.querySelector('#lpn_pane_pipes td.lpn-pane-col-diameter .lpn-ovm'); if (t) { t.scrollIntoView({ block: 'nearest', inline: 'center' }); } });
 		await settle(300);
