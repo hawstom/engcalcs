@@ -69,7 +69,7 @@ async function main() {
 		const P = a.page;
 		const box = await P.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
 		const at = { x: box.x + 400, y: box.y + 300 };
-		const plus = async () => { await P.click('#lpn_toolbar button[data-tool="add-pumpplus"]'); await a.settle(200); };
+		const plus = async () => { for (let i = 0; i < 2; i++) { await P.click('#lpn_toolbar button[data-tool^="add-pump"]'); await a.settle(150); if (await P.evaluate(() => !!document.querySelector('#lpn_toolbar button[data-tool="add-pumpplus"][aria-pressed="true"]'))) { break; } } };
 		const undo = async () => { await P.keyboard.press('Control+z'); await a.settle(300); };
 
 		console.log('\n--- place ---');
@@ -116,6 +116,36 @@ async function main() {
 		await P.keyboard.press('Escape');
 		await undo();
 		ok('and one undo brings it back', (await circles(a)).length === 2 && (await nLinks(a)) === 1);
+		console.log('\n--- toolbar forms: Pump+ on Pump, Virtual pipe on Pipe ---');
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		const armed = () => P.evaluate(() => { const b = document.querySelector('#lpn_toolbar button[aria-pressed="true"]'); return b ? b.dataset.tool : null; });
+		const PUMP = '#lpn_toolbar button[data-tool="add-pump"], #lpn_toolbar button[data-tool="add-pumpplus"]';
+		const faceOf = (sel) => P.evaluate((q) => { const b = document.querySelector(q); return b ? b.innerHTML : null; }, sel);
+		ok('one button for Pump and Pump+, one for Pipe and Virtual pipe', await P.evaluate((q) => document.querySelectorAll(q).length === 1 &&
+			document.querySelectorAll('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').length === 1, PUMP));
+		ok('both carry the corner triangle', await P.evaluate((q) => document.querySelector(q).classList.contains('lpn-tool-more') &&
+			document.querySelector('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').classList.contains('lpn-tool-more'), PUMP));
+		// Put the button on Pump whatever form was remembered: press until Pump is armed.
+		for (let i = 0; i < 3 && (await armed()) !== 'add-pump'; i++) { await P.click(PUMP); await a.settle(150); }
+		const pumpFace = await faceOf(PUMP);
+		ok('Pump armed, showing the Pump face', (await armed()) === 'add-pump');
+		await P.click(PUMP); await a.settle(150);
+		ok('pressing again arms Pump+, and the button shows it', (await armed()) === 'add-pumpplus' && (await faceOf(PUMP)) !== pumpFace);
+		await P.click(PUMP); await a.settle(150);
+		ok('and again is back to Pump', (await armed()) === 'add-pump' && (await faceOf(PUMP)) === pumpFace);
+		await P.keyboard.press('Escape'); await P.keyboard.press('5'); await a.settle(150);
+		ok('key 5 arms Pipe', (await armed()) === 'add-pipe');
+		await P.keyboard.press('5'); await a.settle(150);
+		ok('key 5 again arms Virtual pipe', (await armed()) === 'add-virtual');
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		await P.keyboard.press('5'); await a.settle(150);
+		ok('the form last used is remembered', (await armed()) === 'add-virtual');
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		await P.keyboard.press('6'); await a.settle(100);
+		if ((await armed()) !== 'add-pumpplus') { await P.keyboard.press('6'); await a.settle(100); }
+		await P.mouse.click(at.x + 200, at.y + 150); await a.settle(300);
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		ok('a Pump+ on the map has a plus on its outlet barrel, and no discs', await P.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length === document.querySelectorAll('#lpn_canvas .lpn-link-symbol-pump').length && document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length >= 1 && document.querySelectorAll('#lpn_canvas .lpn-asm-mark').length === 0));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

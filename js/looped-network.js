@@ -13973,7 +13973,6 @@ var EngCalcs = EngCalcs || {};
 		// symbolBoxTransform(). symbolG already carries the place and the rotation, so the size
 		// gets its own inner <g> and the split this comment describes is untouched.
 		if (le.symbolBox) { le.symbolBox.setAttribute('transform', symbolBoxTransform(-half, -half, size, size)); }
-		if (le.asmMarks && assemblyOfLink(id)) { paintAssembly(assemblyOfLink(id)); }
 		// The grab shape is the symbol's own outline in the same box, so it grows and shrinks with
 		// the drawing and there is no second opinion anywhere about how big a pump is.
 		// **SPLIT EXACTLY AS symbolG/symbolSvg IS SPLIT: SIZE HERE, PLACE THERE.** A zoom or a
@@ -23185,12 +23184,34 @@ var EngCalcs = EngCalcs || {};
 	// default and by far the more common press is Zoom to fit, and Zoom Window is reached by
 	// pressing it a second time rather than by a memory of what was last used.
 	var zoomToolShape = 'fit';   // 'fit' | 'window'
-	// The Plus button's forms (Task 822), and which one it shows. Not stored: a fact about this page only.
-	var PLUS_FORMS = [
-		{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' },
-		{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: 'lpn_tool_add_virtual_tip', label: 'Virtual pipe' }
+	// **ONE TOOLBAR BUTTON, SEVERAL FORMS, THE SAME CONVENTION AS SELECT AREA** (Task 822; Tom, 2026-11-06:
+	// "Put Valve+ on Valve, Pump+ and Well on Pump, Virtual Pipe on Pipe"). The button shows the form it
+	// will place; pressing it again while one of its forms is the tool moves to the next; a corner
+	// triangle says so. The form last used is kept for this page only. `slot` is the base tool whose
+	// digit and Insert row the button keeps.
+	var TOOL_FORMS = [
+		{ slot: 'add-pipe', idx: 0, repaint: null, forms: [
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: null, label: 'Pipe' },
+			{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: 'lpn_tool_add_virtual_tip', label: 'Virtual pipe' }
+		] },
+		{ slot: 'add-pump', idx: 0, repaint: null, forms: [
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: null, label: 'Pump' },
+			{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' }
+		] }
 	];
-	var plusForm = 0, repaintPlusTool = null;
+	function toolFormsFor(mode) {
+		var i, j;
+		for (i = 0; i < TOOL_FORMS.length; i++) {
+			for (j = 0; j < TOOL_FORMS[i].forms.length; j++) { if (TOOL_FORMS[i].forms[j].mode === mode) { return TOOL_FORMS[i]; } }
+		}
+		return null;
+	}
+	// A digit or a button press: enter the slot's remembered form, or, when one of its forms is already the tool, the next one.
+	function enterFormSlot(g) {
+		if (g.forms.some(function (f) { return f.mode === mode; })) { g.idx = (g.idx + 1) % g.forms.length; }
+		setMode(g.forms[g.idx].mode);
+		if (g.repaint) { g.repaint(); }
+	}
 	var repaintZoomTool = null;  // set by the toolbar when it builds the button, same idiom as above
 	// **R-181 (Tom, 2026-09-23): "the first time you click, it does not change modes... I think
 	// that it should act like Select area. Click twice in a row to get mode change."** This is a
@@ -40066,24 +40087,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
 	}
-	// The look: the pump symbol carries a filled disc on its upstream side and a hollow one on its
-	// downstream side (Tom's sketch and call: upstream filled, downstream hollow).
+	// The look (Tom, 2026-11-06, after his sketch of 2026-10-25): a plus drawn across the outlet barrel of the pump
+	// symbol, in the symbol's own frame, so it scales, rotates and flips with the pump. The filled and hollow
+	// discs of the first slice are gone: the plus alone says a Pump+ is not a plain pump.
+	var ASSEMBLY_PLUS_PATH = { pump: 'M18.5 7.1V12.9M15.6 10H21.4' };
 	function paintAssembly(a) {
-		var le = linkEls[a.links[0]], r, k;
-		if (!le || !le.symbolG) { return; }
-		if (!le.asmMarks) {
-			le.asmMarks = [el('circle', { 'class': 'lpn-asm-mark lpn-asm-up' }, le.symbolG),
-				el('circle', { 'class': 'lpn-asm-mark lpn-asm-down' }, le.symbolG)];
-		}
-		// Large enough to read at 1x and on a phone: about twice a junction's disc, standing just outside the volute.
-		r = nodeRadius({ type: 'junction' }) * 1.6;
-		k = pumpSymbolSize('pump') / 2 + r * 0.6;
-		le.asmMarks[0].setAttribute('cx', -k); le.asmMarks[0].setAttribute('cy', 0); le.asmMarks[0].setAttribute('r', r);
-		le.asmMarks[1].setAttribute('cx', k); le.asmMarks[1].setAttribute('cy', 0); le.asmMarks[1].setAttribute('r', r);
+		var le = linkEls[a.links[0]], d = ASSEMBLY_PLUS_PATH[a.kind];
+		if (!le || !le.symbolSvg || !d) { return; }
+		// Paper-coloured, cut out of the pump's solid body, because an ink plus would vanish on it (Tom: "The + sign
+		// disappears").
+		if (!le.asmPlus) { le.asmPlus = el('path', { 'class': 'lpn-asm-plus', d: d }, le.symbolSvg); }
 	}
 	function unpaintAssembly(a) {
 		var le = linkEls[a.links[0]];
-		if (le && le.asmMarks) { le.asmMarks.forEach(function (m) { if (m.remove) { m.remove(); } }); le.asmMarks = null; }
+		if (le && le.asmPlus) { if (le.asmPlus.remove) { le.asmPlus.remove(); } le.asmPlus = null; }
 	}
 	// **EXPLODE: THE GROUP ENDS, THE ELEMENTS STAY** (Task 822). Plain nodes and the pump are left exactly
 	// as they are. The caller has taken the undo snapshot.
@@ -55350,7 +55367,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
 			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe'), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'virtual', pointerOnly: true, label: pc.lpn_tool_add_virtual || 'Virtual pipe', tip: pc.lpn_tool_add_virtual_tip, fn: function () { setMode('add-virtual'); } },
 			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump'), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
+			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
 			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
@@ -55360,9 +55379,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			// Beside Text, the other tool that adds nothing hydraulic (Task 779). No digit is left.
 			{ icon: 'shape', pointerOnly: true, label: pc.lpn_tool_add_shape || 'Shape', tip: toolTipWithKey('add-shape', pc.lpn_tool_add_shape_tip), hotkey: 'F', fn: function () { setMode('add-shape'); } },
-			// **THE "++" ROWS OF TOM'S INSERT MENU NOTES** (2026-10-25; dev/assemblies.md): no digit.
-			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
-			{ icon: 'virtual', pointerOnly: true, label: pc.lpn_tool_add_virtual || 'Virtual pipe', tip: pc.lpn_tool_add_virtual_tip, fn: function () { setMode('add-virtual'); } }
 		];
 	}
 	// The walkthroughs live on Tom's blog, so this is the one menu action in the bar that leaves the
@@ -58994,7 +59010,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Rebuilt, not appended to: this runs again on a unit switch and a language-driven relabel.
 		toolbarIconIndex = [];
 		setModeUI = function () {
-			PLUS_FORMS.forEach(function (f, i) { if (f.mode === mode && plusForm !== i) { plusForm = i; if (repaintPlusTool) { repaintPlusTool(); } } });
+			TOOL_FORMS.forEach(function (g) {
+				g.forms.forEach(function (f, i) { if (f.mode === mode && g.idx !== i) { g.idx = i; if (g.repaint) { g.repaint(); } } });
+			});
 			toolbar.querySelectorAll('button[data-tool]').forEach(function (b) {
 				b.setAttribute('aria-pressed', b.dataset.tool === mode ? 'true' : 'false');
 			});
@@ -59004,6 +59022,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			g.className = 'lpn-toolbar-group';
 			toolbar.appendChild(g);
 			return g;
+		}
+		// A Pipe, Pump or Valve button with more than one form (TOOL_FORMS). Shows the armed form's icon.
+		function formButton(g, into) {
+			var btn = document.createElement('button');
+			btn.type = 'button';
+			function paint() {
+				var f = g.forms[g.idx], nx = g.forms[(g.idx + 1) % g.forms.length];
+				var tip = (f.tip && pc[f.tip] ? pc[f.tip] + ' ' : '') +
+					(pc.lpn_tool_plus_next || 'Press it again for the next one: {next}.').replace('{next}', pc[nx.key] || nx.label);
+				setIconLabel(btn, f.icon, pc[f.key] || f.label, toolTipWithKey(g.slot, tip));
+				if (btn.className.indexOf('lpn-tool-more') < 0) { btn.className += ' lpn-tool-more'; }
+				btn.dataset.tool = f.mode;
+				btn.setAttribute('aria-pressed', mode === f.mode ? 'true' : 'false');
+			}
+			btn.addEventListener('click', function () { enterFormSlot(g); });
+			g.repaint = paint;
+			paint();
+			into.appendChild(btn);
 		}
 		function modeButton(t, into) {
 			var btn = document.createElement('button');
@@ -59173,34 +59209,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
+			{ form: 'add-pipe' },
+			{ form: 'add-pump' },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
 			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip }
-		].forEach(function (t) { modeButton(t, addGroup); });
-		// **THE PLUS BUTTON: ONE SLOT, CYCLED BY PRESSING IT AGAIN** (Task 822; Declan's cycle in
-		// dev/assemblies.md). Pump+ first; a second press in a row moves to the next form. Like the
-		// select-area button it shows a corner triangle. The form last used is kept for this page only.
-		var plusBtn = document.createElement('button');
-		plusBtn.type = 'button';
-		function paintPlusButton() {
-			var f = PLUS_FORMS[plusForm], nx = PLUS_FORMS[(plusForm + 1) % PLUS_FORMS.length];
-			setIconLabel(plusBtn, f.icon, pc[f.key] || f.label, toolTipWithKey(f.mode, (pc[f.tip] || '') + ' ' +
-				(pc.lpn_tool_plus_next || 'Press it again for the next one: {next}.').replace('{next}', pc[nx.key] || nx.label)));
-			if (plusBtn.className.indexOf('lpn-tool-more') < 0) { plusBtn.className += ' lpn-tool-more'; }
-			plusBtn.dataset.tool = f.mode;
-			plusBtn.setAttribute('aria-pressed', mode === f.mode ? 'true' : 'false');
-		}
-		plusBtn.addEventListener('click', function () {
-			if (PLUS_FORMS.some(function (f) { return f.mode === mode; })) { plusForm = (plusForm + 1) % PLUS_FORMS.length; }
-			setMode(PLUS_FORMS[plusForm].mode);
-			paintPlusButton();
-		});
-		repaintPlusTool = paintPlusButton;
-		paintPlusButton();
-		addGroup.appendChild(plusBtn);
+		].forEach(function (t) { if (t.form) { formButton(TOOL_FORMS.filter(function (g) { return g.slot === t.form; })[0], addGroup); } else { modeButton(t, addGroup); } });
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
@@ -78543,7 +78558,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var m = LPN_TOOL_KEYS[e.key];
 		if (!m) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
-		setMode(m);
+		var fg = TOOL_FORMS.filter(function (g) { return g.slot === m; })[0];
+		if (fg) { enterFormSlot(fg); } else { setMode(m); }
 	});
 
 	// **A IS AREA SELECT** (Tom, 2026-10-13, with W as the pattern, and F for Shape beside it): a named
