@@ -40099,7 +40099,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// a paper keyline where it crosses the solid.
 	var ASSEMBLY_PLUS = {
 		pump: { d: 'M18.5 7.1V12.9M15.6 10H21.4', over: false },
-		valve: { d: 'M20 -1V9M15 4H25', over: true }
+		valve: { d: 'M19 0V10M14 5H24', over: true }
 	};
 	function paintAssembly(a) {
 		var le = linkEls[a.links[0]], pl = ASSEMBLY_PLUS[a.kind];

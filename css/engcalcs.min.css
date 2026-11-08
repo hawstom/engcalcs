@@ -1384,8 +1384,8 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-asm-plus path { fill: none; stroke-linecap: butt; }
 .lpn-asm-plus-ink { stroke: var(--lpn-map-bg, #fff); stroke-width: 1.7; }
-.lpn-asm-plus-over .lpn-asm-plus-ink { stroke: var(--lpn-map-ink); stroke-width: 1.8; }
-.lpn-asm-plus-key { stroke: var(--lpn-map-bg, #fff); stroke-width: 4.2; }
+.lpn-asm-plus-over .lpn-asm-plus-ink { stroke: var(--lpn-map-ink); stroke-width: 2.6; }
+.lpn-asm-plus-key { stroke: var(--lpn-map-bg, #fff); stroke-width: 5.4; }
 .lpn-link-virtual {
 	stroke-dasharray: calc(0.5 * var(--lpn-lw, 0)) calc(1.6 * var(--lpn-lw, 0));
 }

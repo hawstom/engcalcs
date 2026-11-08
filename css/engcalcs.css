@@ -2053,8 +2053,8 @@ html[lang="zh"] .ec-welcome {
 /* The plus across a Pump+ symbol's outlet barrel (Task 822), drawn in the symbol's own 24-unit frame. */
 .lpn-asm-plus path { fill: none; stroke-linecap: butt; }
 .lpn-asm-plus-ink { stroke: var(--lpn-map-bg, #fff); stroke-width: 1.7; }
-.lpn-asm-plus-over .lpn-asm-plus-ink { stroke: var(--lpn-map-ink); stroke-width: 1.8; }
-.lpn-asm-plus-key { stroke: var(--lpn-map-bg, #fff); stroke-width: 4.2; }
+.lpn-asm-plus-over .lpn-asm-plus-ink { stroke: var(--lpn-map-ink); stroke-width: 2.6; }
+.lpn-asm-plus-key { stroke: var(--lpn-map-bg, #fff); stroke-width: 5.4; }
 /* A VIRTUAL pipe (Task 822): dotted, after Tom's sketch, so it is not mistaken for a closed (dashed) one.
    Later than .lpn-link-closed, so a closed virtual pipe is still dotted. */
 .lpn-link-virtual {
