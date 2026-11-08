@@ -72273,7 +72273,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// a sibling of the popup in document.body rather than a child of it. hidePanel() sweeps.
 		hidePanel(popup);
 		currentPopup = null;
-		propsBoxTitleSync();
 	}
 	function renderPopupEmpty() {
 		var pc = EngCalcs.pageConfig || {}, popup = document.getElementById('lpn_popup'),
