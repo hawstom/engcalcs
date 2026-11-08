@@ -136,6 +136,51 @@ async function main() {
 		console.log('--- 7. the menu row and the help still say Properties ---');
 		ok('7.1 the box heading in the guide is the plain word', (await L('lpn_popup_boxtitle')) === 'Properties');
 
+		console.log('--- 7b. the tab and the Guide keep the plain box name ---');
+		await node('21');
+		const tabText = await page.evaluate(() => { const t = document.querySelector('.lpn-dock-tab[aria-controls="lpn_popup"]'); return t ? t.textContent.trim() : null; });
+		ok('7b.1 docked: the side tab reads "' + P + '" while the title bar names the asset', tabText === P && (await title()) === P + ': ' + await tool('junction') + ' 21', tabText + ' | ' + await title());
+
+		console.log('--- 7c. a cleared selection empties the box ---');
+		const none = await L('lpn_popup_none');
+		const body = () => page.evaluate(() => document.getElementById('lpn_popup_fields').textContent.trim());
+		const emptyClick = async () => {
+			const e = await page.evaluate(() => {
+				const c = document.getElementById('lpn_canvas').getBoundingClientRect();
+				for (let y = c.top + 60; y < c.bottom - 60; y += 25) {
+					for (let x = c.left + 60; x < c.right - 60; x += 25) {
+						const el = document.elementFromPoint(x, y);
+						if (el && (el.id === 'lpn_canvas' || (el.closest('#lpn_canvas') && !/hit|lpn-node|lpn-link|symbol|label|text/.test(String(el.getAttribute('class') || '') + el.tagName)))) { return { x, y }; }
+					}
+				}
+				return null;
+			});
+			await page.mouse.click(e.x, e.y);
+			await settle(600);
+		};
+		await node('21');
+		await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
+		await page.keyboard.press('Escape');
+		await settle(600);
+		if ((await body()) !== none) { await page.keyboard.press('Escape'); await settle(600); }
+		ok('7c.1 docked, Escape: "nothing selected" body and plain title', (await body()) === none && (await title()) === P, (await title()) + ' | ' + (await body()).slice(0, 40));
+		await node('21');
+		await emptyClick();
+		ok('7c.2 docked, empty-map click: "nothing selected" body and plain title', (await body()) === none && (await title()) === P, (await title()) + ' | ' + (await body()).slice(0, 40));
+		await node('21');
+		await page.click('#lpn_popup .lpn-corner-btn[data-dock="float"]');
+		await settle(500);
+		await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
+		await page.keyboard.press('Escape');
+		await settle(600);
+		const floatGone = await page.evaluate(() => document.getElementById('lpn_popup').style.display === 'none');
+		ok('7c.3 floating, Escape: the selection is cleared and no stale asset shows', floatGone || ((await title()) === P && (await body()) === none), (await title()) + ' | floatGone ' + floatGone);
+		await page.click('#lpn_popup_close').catch(() => {});
+		await settle(300);
+		await node('21');
+		await page.click('#lpn_popup .lpn-corner-btn[data-dock="right"]');
+		await settle(500);
+
 		console.log('--- 8. the selected asset goes away: plain again ---');
 		await node('22');
 		await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
@@ -150,6 +195,12 @@ async function main() {
 			await settle(600);
 			await page.screenshot({ path: path.join(process.env.SHOTDIR, 'floating.png') });
 		}
+		console.log('--- 9. the Guide ---');
+		await node('21');
+		await a.menuClick(await L('lpn_help_manual'), 'help');
+		await settle(800);
+		const guideH = await page.evaluate(() => { const h = document.querySelector('#lpn_guide_b_lpn_popup h3'); return h ? h.textContent.trim() : null; });
+		ok('9.1 the Guide\'s Boxes entry reads "' + P + '" while an asset is selected', guideH !== null && guideH.indexOf(':') < 0 && guideH.indexOf(P) === 0, String(guideH));
 		ok('no uncaught page errors', errors.length === 0, errors.join(' | '));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? `\n${fails} FAILED` : '\nall ok');

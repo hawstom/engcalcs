@@ -22392,6 +22392,7 @@ var EngCalcs = EngCalcs || {};
 	// on an element that has stopped being selected, which is the failure a second write site
 	// would produce and which nothing on screen would explain.
 	function setSelectionList(list) {
+		var hadSelection = selections.length > 0;
 		// Any change to the subject retires the go-to mark: the element somebody went to is either
 		// now selected (and wears the stronger mark) or is no longer what they are looking at.
 		setLocated(null);
@@ -22406,6 +22407,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		selection = selections.length ? selections[selections.length - 1] : null;
 		selections.forEach(function (s) { paintSelection(s, true); });
+		// A selection that has emptied leaves no asset for the Properties box to show: a docked box
+		// says nothing is selected, a floating one closes.
+		if (!selections.length && hadSelection && currentPopup) { closePopup(); propsBoxTitleSync(); }
 		// **THE METER'S SLIDE HANDLE IS A FACT ABOUT THE SELECTION** (Task 247, Tom's own
 		// *"temporary draggable circle that slides along the pipe"*), so it is drawn and removed in
 		// the one place the subject is written. Anywhere else and there would be a path by which a
@@ -68105,6 +68109,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockTitleOf(d) {
 		var t = d.box.querySelector('.lpn-setbox-title'), g;
 		if (!t) { return d.box.id; }
+		// The Properties box's title bar names the asset; its tab and its Guide entry keep the box's own name.
+		if (d.box.id === 'lpn_popup') { return (EngCalcs.pageConfig || {}).lpn_popup_boxtitle || 'Properties'; }
 		// A title carrying a "?" (the Scenario manager's) names the box without the glyph.
 		if (t.querySelector('.ec-tip')) { t = t.cloneNode(true); g = t.querySelector('.ec-tip'); g.parentNode.removeChild(g); }
 		return t.textContent.replace(/\s+/g, ' ').trim();
