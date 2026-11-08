@@ -95,13 +95,15 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-06 evening (sixty-ninth session, Opus main, Sonnet agents)
+## STATE — 2026-11-06 night (seventieth session, Opus main, Sonnet agents)
 
-- **Merged on green** (no visitor-facing change needing his pass): `fix/loop-circulation` (Task 847 was already fixed 10-27 by 83025323e; harness on the real starter files), `fix/css-comments` (Task 853: pages link `css/engcalcs.min.css`, built by `php dev/scripts/build_css.php`; **any branch that edits `css/engcalcs.css` must rebuild and commit the min file; on a merge conflict in it, rebuild, never hand-merge**), `fix/short-field-names` (Task 849; deleted keys `lpn_field_cv`, `lpn_reaction_tank`; four wording questions for him in messenger.md). Tasks 848, 849, 853 closed; 854 (empty Text in a scenario) and 855 (push an override upward) opened at 75 from his 11-06 notes.
-- **`feat/wtg-energy-more` (Task 749) waits his WaterGEMS open** of `~/tom-files/2026-11-06/wtg-energy-more/ours/` (README there), then his word. His numbers reproduced: pattern 25.01; demand charge 3.87 = peak 9.67 kW x 12 / 30-day billing period (Bentley's public wiki says the billing period makes the charge daily; exact formula unpublished). The agent reports EPANET's own text report printing 1392.49 for the same run (charge applied twice?); not yet confirmed by me. Key `lpn_wtg_export_lost_energy_price` reworded on that branch.
-- **`feat/label-neighbours` (Task 812, "look like your neighbours", N163 on Novato)**: a Sonnet agent was building it at this handoff; read `git log master..feat/label-neighbours` and messenger.md. Pictures go to `~/webdev/worktrees/_panel/www/img/label-neighbours/`.
-- **Task 822 (assemblies)** needs his calls before any build: see messenger.md.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/8d342938-03c1-458f-ad17-442c3e0c6abc/scratchpad (brief-common.md).
+- **Merged:** `feat/wtg-energy-more` on his word (*"OK to merge."*); `fix/clear-restores-unit` on green (an emitter coefficient's "Clear restores" line quoted the stored SI number). Task 855 to 100 with his calls.
+- **Waiting his browser pass (Perry: ready):** `feat/override-push` (Task 855, preview 8102): orange arrow over the override dot; always asks, naming the destination and the value replaced. Its tap zone is ~9 px tall on a phone; bigger means taller rows. Not in the Tables pane. After merge, `pushDestination` can call `propDisplayValue` (from the clear-restores fix). `feat/assembly` (Task 822 slice 1, preview 8103): Virtual pipe and Pump+; five builder questions in messenger.md.
+- **`feat/label-open-side` (Task 812, was `feat/label-neighbours`, preview 8101)**: partial; see the roadmap entry. Not ready for him.
+- **Ida's answer to "which asset is Properties editing"** is in her hopper (`dev/agents/interface-designer/properties-asset-2026-11-06.md`): title the box "Valve V12". His call.
+- Still open from 11-06 evening: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
+- **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1c8b8bbc-a65c-4d54-8d96-71f0a10a3dcc/scratchpad (brief-common.md, Perry's journals and probes).
 
 ## STATE — 2026-11-06 (sixty-eighth session, Opus main)
 
@@ -109,7 +111,6 @@ lines rather than appending corrections.
 - **Labels: Task 812 ("look like your neighbours") at 100, 813 back to 75**, on his *"I agree."* Start from N163 on Novato.
 - **Roadmap on his word:** 822, 847, 848, 849, 853 to 100; 818 to 50.
 - **not-epanet.org archived on GitHub and pulled on the server by him** (*"Done."*).
-- **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
 
 ## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
 

@@ -586,3 +586,5 @@ The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), 
 
 - (2026-10-29) Results band heading in the Properties box, then the other category bands; reorder rows per scratchpad/ida-row-order.md. Tag: SPECULATION on value ranking, OBSERVED on current mixing of results among inputs.
 - (2026-10-29) One `pointer:coarse` token block (row height, hit areas) so no box re-decides its phone sizes. Tag: SPECULATION.
+
+- (2026-11-06) **Properties titles itself by the asset**: "Valve V12", "Pipes (2)", "Pump+ P3", live through Morph; second choice "Properties: Valve V12". Tom asked. `properties-asset-2026-11-06.md`. Tag: OBSERVED on today's title; SPECULATION on EPANET's caption.
