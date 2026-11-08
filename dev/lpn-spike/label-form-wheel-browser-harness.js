@@ -175,6 +175,14 @@ async function layOut(Session, browser, sc, mode, opts) {
 			} else { await wheel(a.page, k - at); }
 			at = k;
 			await a.settle(1500);
+			// **EVERY BUILD IS JUDGED AT THE SAME SCALE** (Task 812): Zoom to fit lands a build's own
+			// fraction of a percent to two percent apart from another's, and where labels tie on exact
+			// widths that alone moves a label. The reference and master are laid out at the scale the
+			// shipped build reached, so a difference is the layout's, not the view's.
+			if (opts && opts.scales && opts.centres && opts.scales[views.length]) {
+				await a.page.evaluate(([z, c]) => window.__lpnForm.rescale(z, c), [opts.scales[views.length], opts.centres[views.length]]);
+				await a.settle(1500);
+			}
 			const v = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 			v.notch = k;
 			if (k === shotAt) {
@@ -251,16 +259,18 @@ async function main() {
 		for (const sc of SCENES) {
 			console.log('=== ' + sc.name + ' ===');
 			const on = await layOut(Session, browser, sc, { shipped: true }, { shots, clips });
-			const off = await layOut(Session, browser, sc, { cut: true });
+			const scales = on.views.map((v) => v.scale), centres = on.views.map((v) => v.centre);
+			const off = await layOut(Session, browser, sc, { cut: true }, { scales, centres });
 			ok(sc.name + ': the hook reached the page both times, and the reference was served with every cut',
 				on.hooked >= 1 && off.hooked >= 1 && off.cut > 0 && off.cut % CUTS.length === 0 && on.cut === 0, `cuts ${off.cut}`);
 			ok(sc.name + ': no page errors', !on.errors.length && !off.errors.length, (on.errors.concat(off.errors)[0] || '').slice(0, 200));
 			if (sc.outToPipe) { console.log(`        wheeled out ${on.out} notches from the card's opening view (pipe ${sc.outToPipe.id} about ${sc.outToPipe.px} px)`); }
 			const extra = [];
-			for (const ref of refs) { extra.push({ ref, r: await layOut(Session, browser, sc, { ref }) }); }
+			for (const ref of refs) { extra.push({ ref, r: await layOut(Session, browser, sc, { ref }, { scales, centres }) }); }
 			on.views.forEach((v, i) => {
 				const w = off.views[i];
 				console.log(`        ${v.notch < 0 ? -v.notch + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
+				console.log(`          scale shipped ${v.scale} reference ${w.scale}; centre ${JSON.stringify(v.centre)} ${JSON.stringify(w.centre)}`);
 				console.log(`        ${' '.repeat(String(v.notch < 0 ? -v.notch + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
 				console.log(`          no one-line node form, same view: node labels ${v.stacked.nodes} -> ${v.nodes}, node values ${Object.keys(v.stacked.node).reduce((t, k) => t + v.stacked.node[k].n, 0)} -> ${Object.keys(v.node).reduce((t, k) => t + v.node[k].n, 0)}; all labels ${v.stacked.labels} -> ${v.labels}, values ${v.stacked.values} -> ${v.values}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
@@ -298,8 +308,11 @@ async function main() {
 				const m = extra.find((e) => e.ref === 'master');
 				if (m) {
 					const mv = m.r.views[i];
+					const nv = (f) => (/^(stack|line) (\w+)/.exec(f || '') || [0, 0, ''])[2].length, lv = (f) => parseInt(((f || '').split(' ')[1]) || '0', 10);
+					const gone = Object.keys(mv.nodesAll).filter((id) => nv(mv.nodesAll[id]) > nv(v.nodesAll[id])).map((id) => 'N' + id + ' ' + mv.nodesAll[id] + ' -> ' + v.nodesAll[id])
+						.concat(Object.keys(mv.linksAll).filter((id) => lv(mv.linksAll[id]) > lv(v.linksAll[id])).map((id) => 'L' + id + ' ' + mv.linksAll[id] + ' -> ' + (v.linksAll[id] || 'hid')));
 					ok(tag + ': no fewer labels and no fewer values than master\'s own layout', v.labels >= mv.labels && v.values >= mv.values,
-						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}`);
+						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}; master shows, we do not: ${gone.join('; ')}; any difference: ${Object.keys(mv.nodesAll).filter((id) => mv.nodesAll[id] !== v.nodesAll[id]).map((id) => 'N' + id + ' ' + mv.nodesAll[id] + ' -> ' + v.nodesAll[id]).concat(Object.keys(Object.assign({}, mv.linksAll, v.linksAll)).filter((id) => mv.linksAll[id] !== v.linksAll[id]).map((id) => 'L' + id + ' ' + mv.linksAll[id] + ' -> ' + v.linksAll[id])).join('; ')}`);
 				}
 			});
 			const A = on.views[on.views.length - 1];

@@ -1358,7 +1358,9 @@ EngCalcs.lpnCollide = (function () {
 				if (strict) {
 					// A side whose own pipe is the nearest wins; one that only its leader explains is
 					// kept as the fallback, taken if no clearer side follows.
-					if (verdict !== 'clear') { continue; }
+					// `takeYield`: ground held only by a pipe label that yields may be taken (the label is hidden
+					// after, and tried level beside its pipe).
+					if (verdict !== 'clear' && !(lbl.takeYield && verdict === 'yielding')) { continue; }
 					if (strictOk(lbl, c, b, true)) { return commit(lbl, sides, c, b); }
 					// Across another pipe it reads as that pipe's whatever its leader says (pre-review,
 					// 2026-10-18, Net1's "Q=1866.2" on pipe 111), so such a side is the last resort,

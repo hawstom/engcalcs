@@ -11,7 +11,8 @@
 
 const path = require('path');
 const V = require('./label-views-lib.js');
-const FLAGS = ['LPN_OPEN_SIDE', 'LPN_TIE_LINE'];
+const FLAGS = ['LPN_OPEN_SIDE', 'LPN_YIELD', 'LPN_TIE_LINE'];
+
 const COLLIDE_FLAGS = { LPN_OWN_SYMBOL: 'ownSymbol' };   // switches on lpnCollide.config
 const BASE = process.env.BENCH_BASE !== undefined ? process.env.BENCH_BASE.split('+').filter(Boolean) : ['LPN_OPEN_SIDE'];   // the branch before the flags that follow it
 const EX = path.join(__dirname, '..', 'water-network-examples');
@@ -28,12 +29,32 @@ function mutator(on) {
 	};
 }
 
+// **ONE SCALE FOR EVERY BUILD**: Zoom to fit lands a build's own fraction of a percent to two percent apart
+// from another's, and where labels tie on exact widths that moves a label. The origins are taken once,
+// from the layout before the flags, and every flag set is laid out at them.
+const ORIGINS = {};
+async function originOf(stub, sc, key, canvas) {
+	if (!ORIGINS[key]) {
+		const cfg = require(stub.ROOT + 'js/lpn-collide.js').lpnCollide.config, was = cfg.ownSymbol;
+		cfg.ownSymbol = false;
+		const o = await V.openScene(stub, sc, mutator([]));
+		if (canvas) {
+			o.L.setCanvas(canvas[0], canvas[1]); o.L.noteMapSized();
+			const ls = o.L.labelSettings();
+			Object.keys(ls.node).forEach((k) => { ls.node[k] = ['id', 'demand', 'elev', 'head', 'pressure'].indexOf(k) >= 0; });
+			o.L.zoomExtent();
+		}
+		cfg.ownSymbol = was;
+		ORIGINS[key] = canvas ? { s1: o.L.state().s } : { cx: o.cx, cy: o.cy, s1: o.s1 };
+	}
+	return ORIGINS[key];
+}
 async function bench(stub, on) {
 	const cfg = require(stub.ROOT + 'js/lpn-collide.js').lpnCollide.config;
 	Object.keys(COLLIDE_FLAGS).forEach((f) => { cfg[COLLIDE_FLAGS[f]] = on.indexOf(f) >= 0; });
 	const rows = [];
 	for (const sc of V.SCENES) {
-		const o = await V.openScene(stub, sc, mutator(on)), L = o.L;
+		const o0 = await V.openScene(stub, sc, mutator(on)), L = o0.L, o = Object.assign({}, o0, await originOf(stub, sc, sc.name));
 		for (const m of sc.mults) {
 			if (process.env.BENCH_HIST) { L.setView({ cx: o.cx, cy: o.cy, s: o.s1 * m * 1.07 }); L.refreshLabelText(); }
 			L.setView({ cx: o.cx, cy: o.cy, s: o.s1 * m });
@@ -50,7 +71,7 @@ async function bench(stub, on) {
 	const ls = L.labelSettings();
 	Object.keys(ls.node).forEach((k) => { ls.node[k] = ['id', 'demand', 'elev', 'head', 'pressure'].indexOf(k) >= 0; });
 	L.zoomExtent();
-	const s1 = L.state().s, p = L.nodeAt(L.getDoc().nodes.find((n) => n.id === '163'));
+	const s1 = (await originOf(stub, NOVATO, 'N163-' + cw + 'x' + ch, [cw, ch])).s1, p = L.nodeAt(L.getDoc().nodes.find((n) => n.id === '163'));
 	for (const k of (process.env.BENCH_WIDE ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] : [11, 12, 13, 14])) {
 		if (process.env.BENCH_HIST) { L.setView({ cx: p.x, cy: p.y, s: s1 * Math.pow(1.1, k) * 1.07 }); L.refreshLabelText(); }
 		L.setView({ cx: p.x, cy: p.y, s: s1 * Math.pow(1.1, k) });

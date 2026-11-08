@@ -11,6 +11,12 @@
 		inlineTrial: function () { return lastInlineTrial; },
 		crossShed: function () { return lastCrossingShed; },
 		fit: function () { zoomExtent(); },
+		scale: function () { return state.s; },
+		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },
+		rescale: function (s, c) { state.s = s; state.tx = c.tx; state.ty = c.ty; setTransform(); if (state.s !== lastLayoutScale) { onZoomChanged(); } refreshLabelText(); },
+		centre: function () { var r = svg.getBoundingClientRect(); return screenToWorld(r.left + r.width / 2, r.top + r.height / 2); },
+		allForms: function () { var ids = doc.nodes.map(function (n) { return n.id; }); return window.__lpnForm.nodeForms(ids); },
+		viewAt: function (id, s) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: s }); },
 		centerOn: function (id) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: state.s }); },
 		content: function () { refreshLabelText(); },
 		timeContent: function (n) {
@@ -29,7 +35,7 @@
 			ids.forEach(function (id) {
 				var le = linkEls[id], f = le && le.levelBeside && le.levelForm;
 				if (!le) { out[id] = null; return; }
-				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true }),
+				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }),
 					level: !!le.levelBeside, leader: !!(le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
 					stacked: !!(f && f.stacked), values: f ? f.lines.length : (le.lines || []).length, text: le.text.textContent };
 			});
@@ -40,7 +46,7 @@
 			var out = {};
 			ids.forEach(function (id) {
 				var ne = nodeEls[id];
-				out[id] = !ne ? '-' : (!(ne.text && ne.text.textContent && ne.text.checkVisibility({ visibilityProperty: true })) ? ('hid' + (ne.hiddenDropped ? ' dropped' : '') + (ne.hiddenCrossed ? ' crossed' : '') + (ne.crowdHidden ? ' crowd' : '') + (ne.hiddenBlocked ? ' blocked' : '')) :
+				out[id] = !ne ? '-' : (!(ne.text && ne.text.textContent && ne.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) ? ('hid' + (ne.hiddenDropped ? ' dropped' : '') + (ne.hiddenCrossed ? ' crossed' : '') + (ne.crowdHidden ? ' crowd' : '') + (ne.hiddenBlocked ? ' blocked' : '')) :
 					((ne.inline ? 'line ' : 'stack ') + (ne.lines || []).map(function (l) { return l.field.charAt(0); }).join('')));
 			});
 			return out;
@@ -234,7 +240,7 @@
 			});
 			v.labels = v.nodes + v.pipes;
 			v.sig = v.sig.join('\n');
-			return v;
+			v.scale = s; v.centre = { tx: state.tx, ty: state.ty }; v.nodesAll = window.__lpnForm.allForms(); v.linksAll = window.__lpnForm.linksShown(); return v;
 		}
 	};
 	window.__lpnForm.perf = function () {
@@ -249,7 +255,7 @@
 		function one(key, h) {
 			var e = h && h.leader, a, b, r, c, dx, dy;
 			if (!e || e.style.display === 'none' || e.style.visibility === 'hidden' || e.getAttribute('x1') == null) { return; }
-			var shown = !h.text || (!!h.text.textContent && h.text.checkVisibility({ visibilityProperty: true }));
+			var shown = !h.text || (!!h.text.textContent && h.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
 			a = sc(+e.getAttribute('x1'), +e.getAttribute('y1')); b = sc(+e.getAttribute('x2'), +e.getAttribute('y2'));
 			r = h.text ? h.text.getBoundingClientRect() : null; c = svg.getBoundingClientRect();
 			dx = (r && shown) ? Math.max(r.left - c.left - b.x, 0, b.x - (r.right - c.left)) : 0;

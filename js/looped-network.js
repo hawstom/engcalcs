@@ -989,7 +989,12 @@ var EngCalcs = EngCalcs || {};
 	// network): +41 labels and +287 values for about +3% pass time. In Chromium on Novato N164, N166 and
 	// N265 go to lines at 12 to 16 notches; N163 cannot (the short pipe L181's label stands east of it).
 	// A tie that finds no place is not tried a second time: the same counts, a quarter of the time.
+	var LPN_YIELD = true;
 	var LPN_TIE_LINE = true;
+	// **A LABEL THAT LOST SOMETHING MAY TAKE GROUND HELD ONLY BY A PIPE LABEL THAT YIELDS** (`takeYield`;
+	// a tie may not). The pipe label is hidden by yieldStationedLabels() and is then tried level beside
+	// its pipe, so it often keeps a place. Over 64 views: +16 labels, +423 values, no view with fewer
+	// values than before. A tie taking such ground as well gained 14 values more and lost one in one view.
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
 	// demand is. Ties break on id, so the order is total and stable -- an unstable order would
@@ -2958,7 +2963,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (ne && ne.inline && ne.inlineFrom && n.lx === undefined) {
-				list.push({ id: nodeLabelKey(n.id), spec: inlineNodeSpec(n, fs, labelBoxWidth(ne)) });
+				list.push({ id: nodeLabelKey(n.id), spec: Object.assign(inlineNodeSpec(n, fs, labelBoxWidth(ne)), { takeYield: LPN_YIELD }) });
 			}
 		});
 		if (!list.length) { return placed; }
@@ -2982,7 +2987,7 @@ var EngCalcs = EngCalcs || {};
 		cand.forEach(function (c, k) {
 			var m = reqs[k].m;
 			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
-			list.push({ id: c.id, c: c, tie: !!c.tie, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+			list.push({ id: c.id, c: c, tie: !!c.tie, spec: Object.assign(inlineNodeSpec(c.n, fs, m.wPx / s0), { takeYield: LPN_YIELD && !c.tie }) });
 		});
 		// The labels that lost something first; the ties after them.
 		list.sort(function (a, b) { return (a.tie ? 1 : 0) - (b.tie ? 1 : 0); });
