@@ -146,6 +146,17 @@ async function main() {
 		await P.mouse.click(at.x + 200, at.y + 150); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		ok('a Pump+ on the map has a plus on its outlet barrel, and no discs', await P.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length === document.querySelectorAll('#lpn_canvas .lpn-link-symbol-pump').length && document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length >= 1 && document.querySelectorAll('#lpn_canvas .lpn-asm-mark').length === 0));
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		await P.keyboard.press('7'); await a.settle(150);
+		const first7 = await armed();
+		await P.keyboard.press('7'); await a.settle(150);
+		ok('key 7 arms Valve, and again Valve+ (or the reverse if Valve+ was remembered)', (first7 === 'add-valve' && (await armed()) === 'add-valveplus') || (first7 === 'add-valveplus' && (await armed()) === 'add-valve'));
+		if ((await armed()) !== 'add-valveplus') { await P.keyboard.press('7'); await a.settle(150); }
+		const vb = await P.evaluate(() => { const b = document.querySelector('#lpn_toolbar button[data-tool="add-valveplus"]'); return !!b && b.classList.contains('lpn-tool-more'); });
+		ok('one button for Valve and Valve+, with the triangle', vb && (await P.evaluate(() => document.querySelectorAll('#lpn_toolbar button[data-tool="add-valve"], #lpn_toolbar button[data-tool="add-valveplus"]').length === 1)));
+		await P.mouse.click(at.x - 150, at.y + 150); await a.settle(300);
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		ok('a Valve+ on the map has a plus on its symbol, in the symbol\'s own frame', await P.evaluate(() => !!document.querySelector('#lpn_canvas .lpn-link-symbol-valve .lpn-asm-plus')));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

@@ -1143,19 +1143,6 @@
 			links.push(pipe); linkIndex[pipe.id] = pipe;
 		}
 
-		// ---- THE GROUPING COMMENTS (Task 822) ----
-		// A pipe named by `;VIRTUAL:` comes back virtual; an assembly comes back only if every element it
-		// names is in the file as the right kind. One that is not is reported, never half-restored.
-		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
-		var assemblies = [], assemblyBad = [];
-		markAssemblies.forEach(function (a) {
-			var un = nodeIndex[a.up], dn = nodeIndex[a.down],
-				good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
-			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
-			else { assemblyBad.push(a.links[0]); }
-		});
-		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
-
 		// ---- [CURVES], READ IN FULL AND KEPT AS DOCUMENT OBJECTS (Task 586) ----------------------
 		//
 		// **A CURVE IS A THING THE DOCUMENT HOLDS, NOT A PROPERTY OF WHATEVER REFERENCES IT.** Every
@@ -1383,6 +1370,20 @@
 			links.push(vlink); linkIndex[vlink.id] = vlink;
 		}
 		if (tcvIds.length) { drop('valve-tcv', tcvIds, null, 'link'); }
+		// ---- THE GROUPING COMMENTS (Task 822) ----
+		// Read after every link kind is in, the valves last, so a Valve+ finds its valve.
+		// A pipe named by `;VIRTUAL:` comes back virtual; an assembly comes back only if every element it
+		// names is in the file as the right kind. One that is not is reported, never half-restored.
+		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
+		var assemblies = [], assemblyBad = [];
+		markAssemblies.forEach(function (a) {
+			var un = nodeIndex[a.up], dn = nodeIndex[a.down],
+				good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
+			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
+			else { assemblyBad.push(a.links[0]); }
+		});
+		if (assemblyBad.length) { drop('assembly-unresolved', assemblyBad, null, 'link'); }
+
 		if (activeValveIds.length) { drop('valve-active', activeValveIds, null, 'link'); }
 
 		// ---- [STATUS] overrides ----

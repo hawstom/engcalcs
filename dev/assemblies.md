@@ -124,17 +124,29 @@ link that reads back as a pipe; the group still restores.
 
 ### Pump+ (built)
 
-- **Place:** the Plus toolbar button (Pump+ first; pressing it again while a Plus form is the tool moves to the
-  next form, Virtual pipe) or Insert > Pump+. A press on open ground makes two coincident junctions (IDs from
+- **Place:** the Pump toolbar button's second form (Tom, 2026-11-06: "Put Valve+ on Valve, Pump+ and Well on Pump,
+  Virtual Pipe on Pipe"; there is no Plus button). Pressing Pump, or key 6, while a form of it is the tool moves to
+  the next form; the button shows the armed form and a corner triangle, as Select area does. Pipe holds Virtual pipe
+  and Valve holds Valve+ the same way (`TOOL_FORMS`). Or Insert > Pump+, listed beside Pump. A press on open ground makes two coincident junctions (IDs from
   the new `U` and `D` ID prefixes, set under Settings > ID prefixes, spaces refused as for the others) and a
   pump from the upstream to the downstream node; a press on a pipe in Base splices it in (pipe, pump, pipe).
   The tool stays armed, like every inserter. The pump has no curve until one is chosen, so it adds no head.
-- **Look:** the pump symbol carries a filled disc on its upstream side and a hollow one on its downstream
-  side. Its direction is the existing zero-length rule: toward the first pipe on the downstream node, else
+- **Look:** a plus across the pump symbol's outlet barrel, cut out of the solid body in paper colour (an ink plus
+  vanished on it). The upstream/downstream discs are gone (Tom: misleading, too much room); the two coincident
+  nodes already draw a junction-sized hollow dot at the pump's centre, which is the "two nodes at a point" mark he
+  asked for. Its direction is the existing zero-length rule: toward the first pipe on the downstream node, else
   away from the one on the upstream node, else rightward.
 - **One click selects the group** (both nodes and the pump), by any member. The Properties box is the pump's
   (curve, speed, efficiency, Closed, Active), one Elevation, the flow and head, upstream and downstream head and
   pressure, and **Explode**. An elevation, x or y set on either node (Properties, Tables, the override tick) is
   written to both by `setProp()`. Rename and delete keep the grouping true.
-- **Not done in this slice:** Valve+, Well, System; the Assemblies table; the Downstream pipe chooser; detection and
+### Valve+ (built)
+
+The same grouping with `kind: 'valve'` (`;ASSEMBLY: valve U1 D1 V1`), on the Valve button's second form (key 7
+again). Same placement, splice, select-all, one Elevation, Explode, drag and delete. The Properties box is the
+valve's own (type, setting, diameter, loss) with the upstream and downstream pressure rows. The plus stands at the
+upper right of the bowtie, over the corner as in Tom's sketch, in ink with a paper keyline where it crosses the solid.
+`.inp` import reads the `;ASSEMBLY:` line after the valves are in, so a Valve+ restores.
+
+- **Not done in this slice:** Well, System; the Assemblies table; the Downstream pipe chooser; detection and
   Convert; coincident nodes moved by a drag of one node alone (a click selects all three, so a drag moves all).

@@ -216,7 +216,7 @@ function classOn() { return svg.classList.contains('lpn-placemode'); }
 // the drag-a-box that answers "zoom to here" rather than "place a junction here". `add-shape`
 // (Task 779): every press is a point of the Shape.
 const CROSSHAIR = ['add-junction', 'add-reservoir', 'add-tank', 'add-pipe', 'add-pump',
-	'add-valve', 'add-meter', 'add-text', 'add-chain', 'add-shape', 'add-virtual', 'add-pumpplus', 'select-area', 'zoom-window'];
+	'add-valve', 'add-meter', 'add-text', 'add-chain', 'add-shape', 'add-virtual', 'add-pumpplus', 'add-valveplus', 'select-area', 'zoom-window'];
 // NOT crosshair, each for its own stated reason: `select` acts on the object under the pointer,
 // `delete` does too (so `pointer` is the true thing to say), and `vertices` already states its own
 // rule per element in the stylesheet.

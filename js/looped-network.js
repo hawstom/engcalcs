@@ -23194,6 +23194,10 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: null, label: 'Pipe' },
 			{ mode: 'add-virtual', key: 'lpn_tool_add_virtual', icon: 'virtual', tip: 'lpn_tool_add_virtual_tip', label: 'Virtual pipe' }
 		] },
+		{ slot: 'add-valve', idx: 0, repaint: null, forms: [
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: null, label: 'Valve' },
+			{ mode: 'add-valveplus', key: 'lpn_tool_add_valveplus', icon: 'valveplus', tip: 'lpn_tool_add_valveplus_tip', label: 'Valve+' }
+		] },
 		{ slot: 'add-pump', idx: 0, repaint: null, forms: [
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: null, label: 'Pump' },
 			{ mode: 'add-pumpplus', key: 'lpn_tool_add_pumpplus', icon: 'pumpplus', tip: 'lpn_tool_add_pumpplus_tip', label: 'Pump+' }
@@ -39735,7 +39739,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
-		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual', 'add-pumpplus': 'lpn_mode_add_pumpplus',
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-virtual': 'lpn_mode_add_virtual', 'add-pumpplus': 'lpn_mode_add_pumpplus', 'add-valveplus': 'lpn_mode_add_valveplus',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
 		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain', 'add-shape': 'lpn_mode_add_shape',
 		'vertices': 'lpn_mode_vertices',
@@ -40044,10 +40048,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * from the U and D prefixes, the pump from the pump prefix. The caller has taken the undo snapshot.
 	 * Equal x, y and elevation by construction; setProp() keeps them equal after.
 	 */
-	function addPumpPlus(x, y) {
+	function addAssembly(kind, x, y) {
 		var up = addNode('junction', x, y, mintId('U')), dn = addNode('junction', x, y, mintId('D')),
-			pump = addLink('pump', up.id, dn.id, []), a;
-		a = { id: pump.id, kind: 'pump', up: up.id, down: dn.id, links: [pump.id] };
+			pump = addLink(kind, up.id, dn.id, []), a;
+		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		paintAssembly(a);
@@ -40056,7 +40060,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Clicking a pipe splices the assembly in: the pipe now ends at the upstream node and its other half
 	// starts at the downstream node. Base only, as breakPipeAtPoint(); elsewhere it is placed on open ground.
-	function splicePumpPlus(pipe, wx, wy) {
+	function spliceAssembly(kind, pipe, wx, wy) {
 		var e1 = nodeById(pipe.from).elev, e2 = nodeById(pipe.to).elev,
 			frac = Geom.nearestFractionOnPolyline(linkPointList(pipe), wx, wy).f,
 			r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a, elevAt;
@@ -40066,37 +40070,44 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		applyNodeRename(up.id, mintId('U'));
 		dn = addNode('junction', up.x, up.y, mintId('D'));
 		if (up.elev !== undefined) { dn.elev = up.elev; }   // base-write: construction
-		pump = addLink('pump', up.id, dn.id, []);
+		pump = addLink(kind, up.id, dn.id, []);
 		reconnectLinkEnd(r.added, 'from', dn.id);
-		a = { id: pump.id, kind: 'pump', up: up.id, down: dn.id, links: [pump.id] };
+		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		paintAssembly(a);
 		layoutNodeLabel(dn.id);
 		return a;
 	}
-	function pumpPlusTap(e, w, t) {
+	function assemblyTap(kind, e, w, t) {
 		var pid = tapLinkId(t), pipe = pid ? linkById(pid) : null, a;
 		saveUndoSnapshot();
 		logLpnFirstAction('element');
 		if (pipe && pipe.type === 'pipe' && inBaseScenario() && nodeById(pipe.from) && nodeById(pipe.to) &&
 			(function () { var f = Geom.nearestFractionOnPolyline(linkPointList(pipe), w.x, w.y).f; return f > 1e-9 && f < 1 - 1e-9; }())) {
-			a = splicePumpPlus(pipe, w.x, w.y);
+			a = spliceAssembly(kind, pipe, w.x, w.y);
 		} else {
-			a = addPumpPlus(w.x, w.y);
+			a = addAssembly(kind, w.x, w.y);
 		}
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
 	}
 	// The look (Tom, 2026-11-06, after his sketch of 2026-10-25): a plus drawn across the outlet barrel of the pump
 	// symbol, in the symbol's own frame, so it scales, rotates and flips with the pump. The filled and hollow
 	// discs of the first slice are gone: the plus alone says a Pump+ is not a plain pump.
-	var ASSEMBLY_PLUS_PATH = { pump: 'M18.5 7.1V12.9M15.6 10H21.4' };
+	// A pump's outlet barrel is wide enough to hold the plus, cut out of its solid body in paper colour. A valve's
+	// right-hand triangle is not, so its plus stands at the upper right, over the corner as in the sketch, in ink with
+	// a paper keyline where it crosses the solid.
+	var ASSEMBLY_PLUS = {
+		pump: { d: 'M18.5 7.1V12.9M15.6 10H21.4', over: false },
+		valve: { d: 'M20 -1V9M15 4H25', over: true }
+	};
 	function paintAssembly(a) {
-		var le = linkEls[a.links[0]], d = ASSEMBLY_PLUS_PATH[a.kind];
-		if (!le || !le.symbolSvg || !d) { return; }
-		// Paper-coloured, cut out of the pump's solid body, because an ink plus would vanish on it (Tom: "The + sign
-		// disappears").
-		if (!le.asmPlus) { le.asmPlus = el('path', { 'class': 'lpn-asm-plus', d: d }, le.symbolSvg); }
+		var le = linkEls[a.links[0]], pl = ASSEMBLY_PLUS[a.kind];
+		if (!le || !le.symbolSvg || !pl) { return; }
+		if (le.asmPlus) { return; }
+		le.asmPlus = el('g', { 'class': 'lpn-asm-plus' + (pl.over ? ' lpn-asm-plus-over' : '') }, le.symbolSvg);
+		if (pl.over) { el('path', { 'class': 'lpn-asm-plus-key', d: pl.d }, le.asmPlus); }
+		el('path', { 'class': 'lpn-asm-plus-ink', d: pl.d }, le.asmPlus);
 	}
 	function unpaintAssembly(a) {
 		var le = linkEls[a.links[0]];
@@ -40160,9 +40171,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(up, 'elev'); },
 			function (v) { setProp(up, 'elev', v); updateNode(up.id, true); updateNode(dn.id, true); refreshPopupIfOpen(); },
 			null, { el: up, prop: 'elev' });
-		renderPumpCurveFields(fields, pump, pump.id);
-		renderPumpSpeedFields(fields, pump);
-		renderPumpEfficiencyFields(fields, pump);
+		if (a.kind === 'valve') {
+			renderValveFields(fields, pump, pump.id);
+		} else {
+			renderPumpCurveFields(fields, pump, pump.id);
+			renderPumpSpeedFields(fields, pump);
+			renderPumpEfficiencyFields(fields, pump);
+		}
 		closedField(fields, pump, pump.id);
 		activeField(fields, pump);
 		if (res && !linkResultHeld(pump) && res.flows[pump.id] !== undefined) {
@@ -40179,7 +40194,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		btn.type = 'button';
 		btn.setAttribute('data-assembly-explode', '1');
 		btn.textContent = pc.lpn_assembly_explode || 'Explode';
-		helpTip(btn, pc.lpn_assembly_explode_tip);
+		helpTip(btn, a.kind === 'valve' ? pc.lpn_assembly_explode_valve_tip : pc.lpn_assembly_explode_tip);
 		btn.addEventListener('click', function () { saveUndoSnapshot(); explodeAssembly(id); });
 		fields.appendChild(btn);
 		lpnPropsGrid(fields);
@@ -55371,6 +55386,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump'), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
 			{ icon: 'pumpplus', pointerOnly: true, label: pc.lpn_tool_add_pumpplus || 'Pump+', tip: pc.lpn_tool_add_pumpplus_tip, fn: function () { setMode('add-pumpplus'); } },
 			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
+			{ icon: 'valveplus', pointerOnly: true, label: pc.lpn_tool_add_valveplus || 'Valve+', tip: pc.lpn_tool_add_valveplus_tip, fn: function () { setMode('add-valveplus'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
@@ -59209,13 +59225,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
-			{ form: 'add-pipe' },
-			{ form: 'add-pump' },
-			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
+			{ mode: 'add-pipe', form: true },
+			{ mode: 'add-pump', form: true },
+			{ mode: 'add-valve', form: true },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' },
 			{ mode: 'add-shape', key: 'lpn_tool_add_shape', icon: 'shape', tip: pc.lpn_tool_add_shape_tip }
-		].forEach(function (t) { if (t.form) { formButton(TOOL_FORMS.filter(function (g) { return g.slot === t.form; })[0], addGroup); } else { modeButton(t, addGroup); } });
+		].forEach(function (t) { if (t.form) { formButton(TOOL_FORMS.filter(function (g) { return g.slot === t.mode; })[0], addGroup); } else { modeButton(t, addGroup); } });
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
@@ -60226,8 +60242,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else if (mode === 'add-chain') {
 				chainTap(e, w, t);
 			}
-			else if (mode === 'add-pumpplus') {
-				pumpPlusTap(e, w, t);
+			else if (mode === 'add-pumpplus' || mode === 'add-valveplus') {
+				assemblyTap(mode === 'add-valveplus' ? 'valve' : 'pump', e, w, t);
 			}
 			else if (mode === 'add-shape') {
 				shapeToolTap(e, w, snapHit);
