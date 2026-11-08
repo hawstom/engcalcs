@@ -73586,6 +73586,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Under the row: after the row's own <br>.
 		fields.appendChild(note);
 	}
+	// A stored override value as the person sees it. Only an emitter coefficient is stored in a unit
+	// other than the one shown (SI; the shown flow and pressure units come from emitterToDisplay()).
+	function propDisplayValue(prop, v) {
+		return (prop === 'emitter' && typeof v === 'number') ? emitterToDisplay(v) : v;
+	}
 	function overrideMarker(fields, el, prop, format) {
 		if (!el || !isOverridable(el, prop)) { return; }
 		ovmGutter(fields, {
@@ -73594,7 +73599,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// an edit, so it changes no number by itself.
 			set: function () { setOverride(el, prop, effective(el, prop)); },
 			clear: function () { clearOverride(el, prop); },
-			line: function () { return inheritedLine(function () { return (format || formatPropValue)(effective(el, prop)); }); }
+			line: function () { return inheritedLine(function () { return (format || formatPropValue)(propDisplayValue(prop, effective(el, prop))); }); }
 		});
 	}
 	// **THE DEMAND TABLE'S ONE MARKER** (R-369), over the two properties a scenario can hold for this
