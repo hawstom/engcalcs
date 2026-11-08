@@ -93,7 +93,7 @@ async function layOut(Session, browser, ref, shots) {
 			await a.settle(1500);
 			const v = await a.page.evaluate(() => window.__lpnForm.read(1.5, 3));
 			const forms = await a.page.evaluate((ids) => window.__lpnForm.nodeForms(ids), NAMED);
-			if (process.env.OPEN_SIDE_WHY) { console.log('WHY ' + k + ': ' + JSON.stringify(await a.page.evaluate(() => { window.__lpnWhy = []; window.__lpnForm.content(); const w = window.__lpnWhy; window.__lpnWhy = null; return [JSON.stringify(window.__lpnForm.inlineTrial())].concat(w); }), null, 1)); }
+			if (process.env.OPEN_SIDE_WHY) { console.log('WHY ' + k + ': ' + JSON.stringify(await a.page.evaluate(() => { window.__lpnWhy = []; window.__lpnForm.content(); const w = window.__lpnWhy; window.__lpnWhy = null; return [JSON.stringify(window.__lpnForm.inlineTrial()), JSON.stringify(window.__lpnForm.crossShed())].concat(w); }), null, 1)); }
 			const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
 			rows.push({ k: k, nodes: v.nodes, values: Object.keys(v.node).reduce((t, id) => t + v.node[id].n, 0), forms: forms, ms: ms, v: v });
 			if (shots && SHOT_NOTCHES.indexOf(k) >= 0) {

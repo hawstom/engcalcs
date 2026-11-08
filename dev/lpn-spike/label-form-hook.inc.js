@@ -9,6 +9,7 @@
 		},
 		solved: function () { return !!lastSolveResult; },
 		inlineTrial: function () { return lastInlineTrial; },
+		crossShed: function () { return lastCrossingShed; },
 		fit: function () { zoomExtent(); },
 		centerOn: function (id) { var p = nodeAt(nodeById(id)); applyView({ cx: p.x, cy: p.y, s: state.s }); },
 		content: function () { refreshLabelText(); },
