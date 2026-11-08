@@ -4399,7 +4399,9 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* SHOW SCENARIOS (Tom, 2026-10-05): a cell holding a value set in its row's scenario, washed in the
    amber the map rings an override with. Before the selection wash, so a selected range still reads
    as one block. */
-.lpn-pane-table tbody td.lpn-pane-ovcell { background: var(--ec-hue-fff3cd); box-shadow: inset 0 -2px 0 var(--ec-hue-e8a33d), inset -1px 0 0 var(--ec-border); }
+.lpn-pane-table tbody td.lpn-pane-ovcell { position: relative; }
+/* Task 855's convention, in a cell: the orange dot, and the arrow over it, at the cell's start edge and inside it (no column is wider). */
+.lpn-pane-table tbody td .lpn-pane-ovm { position: absolute; margin: 0; top: 0; bottom: 0; height: auto; inset-inline-start: 0; }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }

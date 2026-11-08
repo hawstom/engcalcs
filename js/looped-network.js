@@ -33388,7 +33388,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				btn.addEventListener('click', function () { findGoTo(spec.group, paneRowEl(el).id); });
 				td.appendChild(btn);
 			}
-			if (spec.scnRows || paneMarksOpenScenario(spec)) { paneScnMarkCell(td, c, el); }
+			if (spec.scnRows || paneMarksOpenScenario(spec)) { paneScnMarkCell(td, c, el); paneOvMarksSync(spec, td, c, el); }
 			tr.appendChild(td);
 		});
 		spec.cells[el.id] = cells;
@@ -33447,6 +33447,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				// After the write: a plain cell's textContent just took its children with it.
 				paneValueWarn(spec, spec.tds && spec.tds[el.id] && spec.tds[el.id][c.key], c, el);
+				if (tds && tds[c.key] && (tds[c.key]._lpnOvSig || tds[c.key].classList.contains('lpn-pane-ovcell'))) { paneOvMarksSync(spec, tds[c.key], c, el); }
 			});
 		});
 		// Task 738's marks and count, which a refill changes as surely as it changes a value.
@@ -35622,28 +35623,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE SELECTED CELLS THAT HOLD A SCENARIO OVERRIDE**, each as {el, scn, props}: the element
 	// itself, the scenario its row shows (the table's own while Show scenarios is off), and the
 	// override keys that hold the cell's value. Base holds none.
+	// One cell's override, as paneOverrideCells() builds it: {el, scn, props} (a Settings row adds `col`), or null.
+	function paneOverrideHit(col, row) {
+		var x = row && row._lpnScn, scn = x ? x.scn : activeScenario(), el = paneRowEl(row), p, ov, props, has = Object.prototype.hasOwnProperty;
+		if (!el || !col || plainBase(scn)) { return null; }
+		// A Settings table row: the column says whether it holds an override, and clears it.
+		if (col.scnLocal) { return col.scnLocal(el, scn) ? { el: el, scn: scn, props: [], col: col } : null; }
+		p = paneColProp(col);
+		if (!p) { return null; }
+		// Where clearOverride() would act: the map this scenario writes this category to.
+		ov = localOverrideMap(scn, categoryOf(p, elGroup(el)))[ovKey(el)];
+		if (!ov) { return null; }
+		props = [p].concat(p === 'demand' ? ['demands'] : []).filter(function (k) { return has.call(ov, k); });
+		return props.length ? { el: el, scn: scn, props: props } : null;
+	}
 	function paneOverrideCells(spec, rows, cols, box) {
-		var out = [], r, c, row, col, x, scn, el, p, ov, props, has = Object.prototype.hasOwnProperty;
+		var out = [], r, c, hit;
 		for (r = box.r0; r <= box.r1; r++) {
-			row = rows[r];
-			x = row && row._lpnScn;
-			scn = x ? x.scn : activeScenario();
-			el = paneRowEl(row);
-			if (!el || plainBase(scn)) { continue; }
 			for (c = box.c0; c <= box.c1; c++) {
-				col = cols[c];
-				// A Settings table row: the column says whether it holds an override, and clears it.
-				if (col && col.scnLocal) {
-					if (col.scnLocal(el, scn)) { out.push({ el: el, scn: scn, props: [], col: col }); }
-					continue;
-				}
-				p = col && paneColProp(col);
-				if (!p) { continue; }
-				// Where clearOverride() would act: the map this scenario writes this category to.
-				ov = localOverrideMap(scn, categoryOf(p, elGroup(el)))[ovKey(el)];
-				if (!ov) { continue; }
-				props = [p].concat(p === 'demand' ? ['demands'] : []).filter(function (k) { return has.call(ov, k); });
-				if (props.length) { out.push({ el: el, scn: scn, props: props }); }
+				hit = paneOverrideHit(cols[c], rows[r]);
+				if (hit) { out.push(hit); }
 			}
 		}
 		return out;
@@ -35652,10 +35651,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario inherits. One undo step, and the same clearOverride() the Properties box's "Override
 	// in this scenario" box calls, run in the row's own scenario.
 	function paneClearOverrides(spec) {
-		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), hits, touched = {}, settingsCleared = false;
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), box = paneSelBox(spec, rows, cols);
 		if (!box) { return false; }
-		hits = paneOverrideCells(spec, rows, cols, box);
+		return paneClearHits(spec, paneOverrideCells(spec, rows, cols, box));
+	}
+	function paneClearHits(spec, hits) {
+		var touched = {}, settingsCleared = false;
 		if (!hits.length) { return false; }
 		saveUndoSnapshot();
 		hits.forEach(function (h) {
@@ -35672,6 +35673,56 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} finally { paneRenderHeld--; }
 		renderPaneTable(spec);
 		return true;
+	}
+	/**
+	 * **A TABLE CELL WEARS THE PROPERTIES BOX'S MARKS** (Tom, 2026-11-06: *"Should we restyle the table
+	 * override indicator to use the circle and arrow convention?"*): the orange dot, which clears this
+	 * cell's override as the dot in Properties does (one undo step), and over it the orange up arrow,
+	 * which pushes it to the parent through the same pushOverrideUp() and the same question. They are
+	 * drawn over the cell's start edge, inside the cell, so no column is wider, and they never take
+	 * focus (mousedown is stopped, no tab stop). A Settings row has the dot only: it has no property to push.
+	 */
+	function paneOvMarksSync(spec, td, c, row) {
+		var hit = td && td.classList && td.classList.contains('lpn-pane-ovcell') ? paneOverrideHit(c, row) : null,
+			x = row && row._lpnScn, scn = x ? x.scn : activeScenario(), pc = EngCalcs.pageConfig || {}, push = false, sig, box, cur;
+		if (!td) { return; }
+		cur = td.querySelector(':scope > .lpn-pane-ovm');
+		if (hit && !hit.col) {
+			push = paneInScenario(scn, function () { return !!pushTarget(hit.el, hit.props) && pushableProps(hit.el, hit.props).length > 0; });
+		}
+		sig = hit ? (push ? 'dp' : 'd') : '';
+		if (!sig) { if (cur) { cur.remove(); } td._lpnOvSig = ''; return; }
+		if (cur && td._lpnOvSig === sig) { return; }
+		if (cur) { cur.remove(); }
+		td._lpnOvSig = sig;
+		box = document.createElement('span');
+		box.className = 'lpn-ovm lpn-pane-ovm';
+		// A press on a mark is not a press on the cell: it must not move the selection, enter the cell or take focus.
+		box.addEventListener('mousedown', function (e) { e.stopPropagation(); e.preventDefault(); });
+		if (push) {
+			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+				var h = paneOverrideHit(c, row), vals, dest, others, now;
+				if (!h || h.col) { return; }
+				paneInScenario(h.scn, function () {
+					now = pushableProps(h.el, h.props);
+					vals = pushValuesOf(h.el, now);
+					dest = pushDestination(h.el, now, vals, paneHeadingUnitText(c) || '');
+					others = pushOtherScenarios(h.el, h.props).length;
+				});
+				if (!dest) { return; }
+				askPushOverride(dest, others, function () {
+					paneInScenario(h.scn, function () { pushOverrideUp(h.el, now, vals); });
+					afterPropertyEdit(h.el);
+					refreshScenarioStatus();
+					refreshPopupIfOpen();
+				});
+			}));
+		}
+		box.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
+			var h = paneOverrideHit(c, row);
+			if (h) { paneClearHits(spec, [h]); }
+		}));
+		td.appendChild(box);
 	}
 	function paneDeleteSelection(spec) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
