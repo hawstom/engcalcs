@@ -3156,7 +3156,7 @@ var EngCalcs = EngCalcs || {};
 	// LPN_AMBIG_RATIO times that distance), and the short leader crosses no label, no leader and no
 	// other node's symbol. Nothing is moved: no label gives anything up for it, and a leader the
 	// placement did not know about is drawn only where nothing is in its way.
-	var LPN_SHORT_LEADER_TEXT = 1.2, LPN_AMBIG_RATIO = 1.5, LPN_AMBIG_LEADERS = true;
+	var LPN_SHORT_LEADER_TEXT = 1.2, LPN_AMBIG_RATIO = 1.5, LPN_AMBIG_PIPE_RATIO = 2, LPN_AMBIG_LEADERS = true;
 	function ambiguousShortLeaders(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
 		var min = leaderThreshold(), lo = min * LPN_SHORT_LEADER_TEXT / LABEL_LEADER_THRESHOLD, specs = {}, cands = [], out = {}, entries, pts;
 		function dist(px, py, boxes) {
@@ -3513,6 +3513,29 @@ var EngCalcs = EngCalcs || {};
 			le.levelForm = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].form : null;
 			// No leader where the pass found its own pipe plainly the nearest (Collide's `quietMax`).
 			le.levelQuiet = !r.leader;
+			// **A QUIET LABEL WITH ANOTHER PIPE ABOUT AS NEAR SAYS WHOSE IT IS WITH A LEADER** (Task 812, Tom,
+			// 2026-11-09: *"L181 and L185 would be reassuringly confirmed if they had leaders"*). The same
+			// reading as ambiguousShortLeaders(): another pipe within LPN_AMBIG_RATIO times its own distance,
+			// and a leader that crosses no label, no leader and no symbol.
+			if (LPN_AMBIG_LEADERS && le.levelQuiet) {
+				var qa = r.anchor || sp.anchor, qg = Collide.segment(qa.x, qa.y, r.x, r.y, 'leader', r.id), own = Infinity, other = Infinity, qbs = r.boxes || [r.box], qok = Math.hypot(r.x - qa.x, r.y - qa.y) > levelLeaderMin();
+				ground.segments.forEach(function (o) {
+					if (o.kind !== 'link') { return; }
+					qbs.forEach(function (b) {
+						var dd = Collide.segmentBoxDistance(o, b);
+						if (o.owner === sp.id) { own = Math.min(own, dd); } else { other = Math.min(other, dd); }
+					});
+				});
+				if (qok && own < Infinity && other <= own * LPN_AMBIG_PIPE_RATIO) {
+					ground.boxes.forEach(function (o) {
+						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
+						if (o.kind === 'symbol' && Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2) { return; }
+						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
+					});
+					ground.segments.forEach(function (o) { if (qok && o.kind === 'leader' && o.owner !== r.id && Collide.segmentsCross(qg, o)) { qok = false; } });
+					if (qok) { le.levelQuiet = false; r.leader = qg; }
+				}
+			}
 			// Where its leader starts and its text hangs, from the station it was placed from.
 			var side = r.side >= 0 ? sp.sides[r.side] : null, a = r.anchor || sp.anchor;
 			le.levelAt = { along: side && side.along !== undefined ? side.along : null, ex: r.x - a.x, ey: r.y - a.y };

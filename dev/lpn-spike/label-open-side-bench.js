@@ -25,6 +25,7 @@ function mutator(on) {
 			if (re.test(src)) { src = src.replace(re, 'var ' + f + ' = ' + (on.indexOf(f) >= 0) + ';'); }
 		});
 		if (process.env.BENCH_LEADER) { src = src.replace(/var LABEL_LEADER_THRESHOLD = [0-9.]+;/, 'var LABEL_LEADER_THRESHOLD = ' + process.env.BENCH_LEADER + ';'); }
+		if (process.env.BENCH_PIPE_AMBIG) { src = src.replace(/LPN_AMBIG_PIPE_RATIO = [0-9.]+/, 'LPN_AMBIG_PIPE_RATIO = ' + process.env.BENCH_PIPE_AMBIG); }
 		if (process.env.BENCH_AMBIG) { src = src.replace(/LPN_AMBIG_RATIO = [0-9.]+/, 'LPN_AMBIG_RATIO = ' + process.env.BENCH_AMBIG); }
 		if (process.env.BENCH_SHORT) { src = src.replace(/LPN_SHORT_LEADER_TEXT = [0-9.]+/, 'LPN_SHORT_LEADER_TEXT = ' + process.env.BENCH_SHORT); }
 		// a mutation that changes nothing is an error in the loader; touch the file's first line
@@ -52,7 +53,29 @@ async function originOf(stub, sc, key, canvas) {
 	}
 	return ORIGINS[key];
 }
+// PIPES ALONE (Tom, 2026-11-09): every node label off, Novato at the wheel's 17 notches about N163 and
+// Net3 at its fit view and closer, to see how pipe labels perform by themselves.
+async function pipesAlone(stub, on) {
+	const cfg = require(stub.ROOT + 'js/lpn-collide.js').lpnCollide.config;
+	Object.keys(COLLIDE_FLAGS).forEach((f) => { cfg[COLLIDE_FLAGS[f]] = on.indexOf(f) >= 0; });
+	const rows = [];
+	const o = await V.openScene(stub, NOVATO, mutator(on)), L = o.L;
+	L.setCanvas(1920, 1000); L.noteMapSized();
+	const ls = L.labelSettings();
+	Object.keys(ls.node).forEach((k) => { ls.node[k] = false; });
+	L.zoomExtent();
+	const s1 = L.state().s, p = L.nodeAt(L.getDoc().nodes.find((n) => n.id === '163'));
+	for (let k = 0; k <= 16; k++) {
+		L.setView({ cx: p.x, cy: p.y, s: s1 * Math.pow(1.1, k) });
+		let best = Infinity;
+		for (let i = 0; i < 3; i++) { const t0 = process.hrtime.bigint(); L.refreshLabelText(); best = Math.min(best, Number(process.hrtime.bigint() - t0) / 1e6); }
+		const c = V.countShown(L);
+		rows.push({ v: 'Novato pipes-alone ' + k, shown: c.pipesShown, values: c.pipeRows, nodes: 0, nodeRows: 0, leaders: c.leaders, ms: best, asked: c.pipes, askedRows: c.pipeRowsAsked });
+	}
+	return rows;
+}
 async function bench(stub, on) {
+	if (process.env.BENCH_PIPES) { return pipesAlone(stub, on); }
 	const cfg = require(stub.ROOT + 'js/lpn-collide.js').lpnCollide.config;
 	Object.keys(COLLIDE_FLAGS).forEach((f) => { cfg[COLLIDE_FLAGS[f]] = on.indexOf(f) >= 0; });
 	const rows = [];
