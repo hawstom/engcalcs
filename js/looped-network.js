@@ -345,7 +345,7 @@ var EngCalcs = EngCalcs || {};
 	// a Text label's lb.x, which IS its box center's offset since Text is text-anchor:middle.
 	function updateDataLeader(holder, anchor, end) {
 		if (!holder.leader) { return; }
-		if (holder.empty) { holder.leader.style.display = 'none'; return; }
+		if (holder.empty || holder.noLeader) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
 		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
@@ -469,9 +469,9 @@ var EngCalcs = EngCalcs || {};
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
-		updateDataLeader(ne, anchor, end);
 		// Both labels of an assembly sit at its one point, so a leader would only cross the symbol and say nothing.
-		if (ne.leader && assemblyOfNode(id)) { ne.leader.style.display = 'none'; }
+		ne.noLeader = !!assemblyOfNode(id);
+		updateDataLeader(ne, anchor, end);
 	}
 	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
 	// whenever a vertex or endpoint drags.
