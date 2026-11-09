@@ -95,17 +95,13 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-08 (seventy-first session, Opus main, Sonnet agents)
+## STATE — 2026-11-08 night (seventy-second session, Opus main, Sonnet agents)
 
-- **Nothing merged to master this session.** Six branches wait his browser pass or his word, each pushed, each with a preview row:
-  - `feat/override-push` (Task 855, 8102): his pass *"It's all ok."*; asked whether that is his word to merge. Open wording: the push question reads "It replaces 18 in there." (the unit "in" reads as a preposition), his call.
-  - `feat/override-table` (8105, cut from override-push): Tables cells wear the dot and arrow (his question, CC's yes); a marked column grows 14 px while it holds an override; Guide key `lpn_guide_scn_marks_def` rewritten. Perry-reviewed, fixes in.
-  - `feat/properties-title` (8106): "Properties: Valve V12" (his call), new key `lpn_popup_boxtitle_of`; side tab and Guide keep plain "Properties"; a cleared selection now empties a docked box (master left it stale). `propsTypeWord()` is the seam where feat/assembly supplies "Pump+".
-  - `feat/assembly` (Task 822, 8103): Plus button gone; Pipe/Pump/Valve buttons cycle Virtual pipe/Pump+/Valve+ on a second press (pressing an armed button no longer returns to Select; Escape does); + cut into the pump barrel; discs gone; Valve+ built. Perry: ready. Well not built. Open his: virtual pipe as flag or length 0 (Mary, `dev/agents/market-researcher/virtual-pipe-precedent-2026-11-08.md`: no precedent for a flag; CC recommends length 0); labels at an assembly (Task 856).
-  - `feat/label-open-side` (Task 812, 8101): far sides of one-line node labels never worked (own symbol counted as obstacle), fixed; ties go to a line; a pipe label with another place yields to a node label. 64 views: values 17553 -> 19960, no view fewer values. `label-form-wheel-browser-harness.js` fails 1/148 (Novato 1 notch: 3 pipe labels for 52 node values), his call. N163 a line at 13 and 16 only. Comparisons must pin the scale: zoom to fit differs by 0.5-2% between builds.
-- Still open from 11-06: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
-- **Translation sprint:** his Sunday 2026-11-08; 83 keys on master waiting; asked whether now or after the branches merge.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/7e5244a7-d550-42e8-ab9e-487b027c3790/scratchpad (brief-common.md, Perry probes pt/ and perry-asm/).
+- **Merged on his word** (*"Merge."*, *"OK to merge. But fix the too wide Description column."*, *"Merge. But peripherally..."*): `feat/override-push` + `feat/override-table` (Task 855 closed) and `feat/properties-title`, via `chore/merge-1108`. Push question in his words: "Push override upward? Current value in Base: 18 in." (CC kept the unit; he typed "18", ask). Fixed first, both also on master before: a Tables column never opens wider than its pane (`paneColInitialEm()`, phone Description was 926 px in 390); the docked empty Properties message spans the box (was one word per line).
+- `feat/assembly` (Task 822, 8103), his round-2 notes done: no + on the map symbols; Pump+ icon + as big as Valve+'s; Valve+ tip sentence 1 in his words; labels at an assembly ganged (his option a, `assemblyLabelSides()`, leaderless), seam with Task 812 is one line in `nodeFirstFitSpec()`. Open: Pump+ tip to match Valve+'s shape?; virtual pipe (Sue: length 0 = zero volume, zero loss, Q/A velocity, zero travel time; a transient export merges the device onto the two nodes; her journal 2026-11-08). Well not built. Keep working, not merging (*"Let's keep working."*).
+- `feat/label-open-side` (Task 812, 8101): his notes (Novato labels hidden below 6 notches by default; N164 label far from its node, `/tmp/label-placement-mystery-1.png`; leaders a little sooner) given to an agent; the 1-notch trade he called progress.
+- **Translation sprint: later** (*"Later is fine."*), after the approved branches merge. Still open from 11-06: EPANET's own report printing 1392.49 demand charge, never confirmed.
+- Task 749 waits his WaterGEMS saves (rule-based and pressure controls).
 
 ## STATE — 2026-11-06 (sixty-eighth session, Opus main)
 
