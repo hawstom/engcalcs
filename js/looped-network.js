@@ -22392,6 +22392,7 @@ var EngCalcs = EngCalcs || {};
 	// on an element that has stopped being selected, which is the failure a second write site
 	// would produce and which nothing on screen would explain.
 	function setSelectionList(list) {
+		var hadSelection = selections.length > 0;
 		// Any change to the subject retires the go-to mark: the element somebody went to is either
 		// now selected (and wears the stronger mark) or is no longer what they are looking at.
 		setLocated(null);
@@ -22406,6 +22407,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		selection = selections.length ? selections[selections.length - 1] : null;
 		selections.forEach(function (s) { paintSelection(s, true); });
+		// A selection that has emptied leaves no asset for the Properties box to show: a docked box
+		// says nothing is selected, a floating one closes.
+		if (!selections.length && hadSelection && currentPopup) { closePopup(); propsBoxTitleSync(); }
 		// **THE METER'S SLIDE HANDLE IS A FACT ABOUT THE SELECTION** (Task 247, Tom's own
 		// *"temporary draggable circle that slides along the pipe"*), so it is drawn and removed in
 		// the one place the subject is written. Anywhere else and there would be a path by which a
@@ -68175,6 +68179,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockTitleOf(d) {
 		var t = d.box.querySelector('.lpn-setbox-title'), g;
 		if (!t) { return d.box.id; }
+		// The Properties box's title bar names the asset; its tab and its Guide entry keep the box's own name.
+		if (d.box.id === 'lpn_popup') { return (EngCalcs.pageConfig || {}).lpn_popup_boxtitle || 'Properties'; }
 		// A title carrying a "?" (the Scenario manager's) names the box without the glyph.
 		if (t.querySelector('.ec-tip')) { t = t.cloneNode(true); g = t.querySelector('.ec-tip'); g.parentNode.removeChild(g); }
 		return t.textContent.replace(/\s+/g, ' ').trim();
@@ -74878,11 +74884,50 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
+	// **THE BOX TITLE NAMES THE ASSET** (Tom, 2026-11-06: "Properties" is the important word, so the
+	// asset follows it: "Properties: Valve V12", "Properties: Pipes (2)", "Properties: 3 selected").
+	// The type word comes from this one function, so a type that has its own word (Pump+) supplies
+	// it here and nowhere else.
+	function propsTypeWord(el, kind) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'label') { return pc.lpn_tool_add_text || 'Text'; }
+		if (kind === 'customer') { return pc.lpn_tool_add_meter || 'Customer'; }
+		if (kind === 'shape') { return pc.lpn_tool_add_shape || 'Shape'; }
+		return pc['lpn_tool_add_' + (el && el.type)] || '';
+	}
+	function propsBoxTitleText() {
+		var pc = EngCalcs.pageConfig || {}, base = pc.lpn_popup_boxtitle || 'Properties', what = '', el, w, gs;
+		if (!currentPopup) { return base; }
+		if (currentPopup.kind === 'multi') {
+			gs = multiGroups();
+			if (gs.length === 1) {
+				w = gs[0].spec ? (pc[gs[0].spec.label] || gs[0].spec.id) : propsTypeWord(null, gs[0].type === 'text' ? 'label' : gs[0].type);
+				what = w + ' (' + gs[0].els.length + ')';
+			} else {
+				what = String(pc.lpn_multi_title || '{n} selected').replace('{n}', String(selectionCount()));
+			}
+		} else if (currentPopup.kind === 'node' || currentPopup.kind === 'link') {
+			el = currentPopup.kind === 'node' ? nodeById(currentPopup.id) : linkById(currentPopup.id);
+			if (!el) { return base; }
+			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
+		} else if (currentPopup.kind === 'customer') {
+			el = customerById(currentPopup.id);
+			what = el ? String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', el.id) : '';
+		} else {
+			what = propsTypeWord(null, 'label');
+		}
+		return what ? String(pc.lpn_popup_boxtitle_of || 'Properties: {asset}').replace('{asset}', what) : base;
+	}
+	function propsBoxTitleSync() {
+		var b = document.getElementById('lpn_popup_boxtitle'), t = propsBoxTitleText();
+		if (b && b.textContent !== t) { b.textContent = t; }
+	}
 	// The line under the box's own title: a heading that spans the grid (a customer, a selection, a
 	// Text) or, for an element with an id, the ID row (idField). `cls` is the title's class, so a
 	// leftover from the last element never stays.
 	function popupTitleSet(text, cls) {
 		var t = document.getElementById('lpn_popup_title'), w;
+		propsBoxTitleSync();
 		if (!t) { return; }
 		t.className = cls || 'lpn-gtitle';
 		t.textContent = '';

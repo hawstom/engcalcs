@@ -918,6 +918,9 @@ $ec_lang['lpn_dock_autohide']='Auto-hide';
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='Properties';
+// The same title once an asset is selected: the word Properties first, then the asset as the box's
+// own heading names it (Tom, 2026-11-06). {asset} is, for example, Valve V12, Pipes (2) or 3 selected.
+$ec_lang['lpn_popup_boxtitle_of']='Properties: {asset}';
 // What a docked Properties box says while nothing is selected: it stays in its dock (Tom, 2026-10-07).
 $ec_lang['lpn_popup_none']='Nothing is selected. Select an asset on the map to see its properties.';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';

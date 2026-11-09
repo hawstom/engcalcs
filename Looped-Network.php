@@ -2157,6 +2157,7 @@ EngCalcs.pageConfig = {
 	lpn_area_hint_shift: <?=json_encode($ec_lang['lpn_area_hint_shift'])?>,
 	lpn_area_hint_show: <?=json_encode($ec_lang['lpn_area_hint_show'])?>,
 	lpn_popup_boxtitle: <?=json_encode($ec_lang['lpn_popup_boxtitle'])?>,
+	lpn_popup_boxtitle_of: <?=json_encode($ec_lang['lpn_popup_boxtitle_of'])?>,
 	lpn_area_hint_touch_start: <?=json_encode($ec_lang['lpn_area_hint_touch_start'])?>,
 	lpn_area_hint_touch_go: <?=json_encode($ec_lang['lpn_area_hint_touch_go'])?>,
 	lpn_multi_title: <?=json_encode($ec_lang['lpn_multi_title'])?>,
