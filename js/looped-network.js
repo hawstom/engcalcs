@@ -75417,6 +75417,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			el = currentPopup.kind === 'node' ? nodeById(currentPopup.id) : linkById(currentPopup.id);
 			if (!el) { return base; }
 			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
+		} else if (currentPopup.kind === 'assembly') {
+			el = assemblyById(currentPopup.id);
+			what = el ? (pc['lpn_tool_add_' + (el.kind === 'well' ? 'well' : el.kind === 'valve' ? 'valveplus' : 'pumpplus')] || '') + ' ' + el.id : '';
+			what = what.replace(/^ /, '');
 		} else if (currentPopup.kind === 'customer') {
 			el = customerById(currentPopup.id);
 			what = el ? String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', el.id) : '';
