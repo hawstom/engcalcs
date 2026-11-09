@@ -112,6 +112,7 @@ const SCENES = [
 // the per-label node comparison without a second session.
 const TRIAL = "placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });";
 const TOL_PX = 1.5, AMBIG_PX = 3;
+const TRADE_VALUES_PER_LABEL = 10;
 
 async function wheel(page, n) {
 	const step = n > 0 ? -100 : 100;
@@ -305,13 +306,18 @@ async function main() {
 				// **NEVER FEWER LABELS THAN MASTER'S OWN LAYOUT** (Tom, 2026-10-20, on a leader rule that
 				// cost Net3 at 9 notches 145 -> 138: "A cost for no benefit is pointless."). The reference
 				// above is this branch with the forms cut; this one is master's files, laid out here.
+				// **THE ACCEPTED TRADE** (Tom, 2026-11-08, on feat/label-open-side: "This sounds like
+				// progress. Good work, I think."): a pipe label with somewhere else to go yields its ground to
+				// a node label, so a view may show FEWER LABELS than master if and only if it shows MORE
+				// VALUES, by at least TRADE_VALUES_PER_LABEL for every label lost (Novato at 1 notch: 3 pipe
+				// labels lost, 52 node values gained). Never fewer values than master, whatever the labels.
 				const m = extra.find((e) => e.ref === 'master');
 				if (m) {
 					const mv = m.r.views[i];
 					const nv = (f) => (/^(stack|line) (\w+)/.exec(f || '') || [0, 0, ''])[2].length, lv = (f) => parseInt(((f || '').split(' ')[1]) || '0', 10);
 					const gone = Object.keys(mv.nodesAll).filter((id) => nv(mv.nodesAll[id]) > nv(v.nodesAll[id])).map((id) => 'N' + id + ' ' + mv.nodesAll[id] + ' -> ' + v.nodesAll[id])
 						.concat(Object.keys(mv.linksAll).filter((id) => lv(mv.linksAll[id]) > lv(v.linksAll[id])).map((id) => 'L' + id + ' ' + mv.linksAll[id] + ' -> ' + (v.linksAll[id] || 'hid')));
-					ok(tag + ': no fewer labels and no fewer values than master\'s own layout', v.labels >= mv.labels && v.values >= mv.values,
+					ok(tag + ': no fewer values than master\'s own layout, and fewer labels only for at least ' + TRADE_VALUES_PER_LABEL + ' more values each', v.values >= mv.values && (v.labels >= mv.labels || v.values - mv.values >= TRADE_VALUES_PER_LABEL * (mv.labels - v.labels)),
 						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}; master shows, we do not: ${gone.join('; ')}; any difference: ${Object.keys(mv.nodesAll).filter((id) => mv.nodesAll[id] !== v.nodesAll[id]).map((id) => 'N' + id + ' ' + mv.nodesAll[id] + ' -> ' + v.nodesAll[id]).concat(Object.keys(Object.assign({}, mv.linksAll, v.linksAll)).filter((id) => mv.linksAll[id] !== v.linksAll[id]).map((id) => 'L' + id + ' ' + mv.linksAll[id] + ' -> ' + v.linksAll[id])).join('; ')}`);
 				}
 			});

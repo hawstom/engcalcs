@@ -24,6 +24,7 @@ function mutator(on) {
 			const re = new RegExp('var ' + f + ' = (true|false);');
 			if (re.test(src)) { src = src.replace(re, 'var ' + f + ' = ' + (on.indexOf(f) >= 0) + ';'); }
 		});
+		if (process.env.BENCH_LEADER) { src = src.replace(/var LABEL_LEADER_THRESHOLD = [0-9.]+;/, 'var LABEL_LEADER_THRESHOLD = ' + process.env.BENCH_LEADER + ';'); }
 		// a mutation that changes nothing is an error in the loader; touch the file's first line
 		return src + '\n//bench ' + on.join(',') + '\n';
 	};
@@ -61,7 +62,7 @@ async function bench(stub, on) {
 			let best = Infinity;
 			for (let i = 0; i < 3; i++) { const t0 = process.hrtime.bigint(); L.refreshLabelText(); best = Math.min(best, Number(process.hrtime.bigint() - t0) / 1e6); }
 			const c = V.countShown(L);
-			rows.push({ v: sc.name + ' ' + m + 'x', shown: c.pipesShown + c.nodesShown, values: c.pipeRows + c.nodeRows, nodes: c.nodesShown, nodeRows: c.nodeRows, ms: best });
+			rows.push({ v: sc.name + ' ' + m + 'x', shown: c.pipesShown + c.nodesShown, values: c.pipeRows + c.nodeRows, nodes: c.nodesShown, nodeRows: c.nodeRows, leaders: c.leaders, ms: best });
 		}
 	}
 	const canvases = process.env.BENCH_WIDE ? [[1300, 750], [1400, 900], [1920, 1000]] : [[1300, 750]];
@@ -78,7 +79,7 @@ async function bench(stub, on) {
 		let best = Infinity;
 		for (let i = 0; i < 3; i++) { const t0 = process.hrtime.bigint(); L.refreshLabelText(); best = Math.min(best, Number(process.hrtime.bigint() - t0) / 1e6); }
 		const c = V.countShown(L);
-		rows.push({ pipes: c.pipesShown, level: c.level, v: 'Novato N163 ' + cw + ' ' + k, shown: c.pipesShown + c.nodesShown, values: c.pipeRows + c.nodeRows, nodes: c.nodesShown, nodeRows: c.nodeRows, ms: best });
+		rows.push({ pipes: c.pipesShown, level: c.level, v: 'Novato N163 ' + cw + ' ' + k, shown: c.pipesShown + c.nodesShown, values: c.pipeRows + c.nodeRows, nodes: c.nodesShown, nodeRows: c.nodeRows, leaders: c.leaders, ms: best });
 	}
 	}
 	return rows;
@@ -96,7 +97,7 @@ const sets = process.argv.slice(2).length ? process.argv[2].split(',').map((v) =
 	const detail = process.env.BENCH_DETAIL ? out.length - 1 : 1;
 	const sum = (r, k) => r.reduce((t, x) => t + x[k], 0);
 	out.forEach((o) => {
-		console.log(`flags [${o.on.join(' ')}]: ${o.rows.length} views, labels ${sum(o.rows, 'shown')}, values ${sum(o.rows, 'values')}, time ${sum(o.rows, 'ms').toFixed(0)} ms`);
+		console.log(`flags [${o.on.join(' ')}]: ${o.rows.length} views, labels ${sum(o.rows, 'shown')}, values ${sum(o.rows, 'values')}, leaders ${sum(o.rows, 'leaders')}, time ${sum(o.rows, 'ms').toFixed(0)} ms`);
 	});
 	if (out.length > 1 && process.env.BENCH_DETAIL) {
 		out[detail].rows.forEach((r, i) => {

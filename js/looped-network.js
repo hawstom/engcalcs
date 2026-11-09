@@ -108,7 +108,13 @@ var EngCalcs = EngCalcs || {};
 	// ~= 2.8) so an untouched label never shows one -- true only if it scales with that offset,
 	// hence textFactor(). Text rather than symbol factor: the threshold protects the reader's
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
-	var LABEL_LEADER_THRESHOLD = 4;
+	// **3.4, DOWN FROM 4** (Tom, 2026-11-08: *"I would like to see leaders used a little sooner"*): a leader
+	// shows once the label's near edge is 3.4 text-sizes (about 29 px at the default font) from its element,
+	// not 4 (about 34 px). Over 64 views of Net3, Novato and the 600-junction network this draws 107 more
+	// leaders in 3503 and shows 48 fewer values in 19960 (a leader is a line, and a crossing hides a label).
+	// It stays above the default offset's resting distance, and 2.7 does not: there every label that has
+	// not moved shows a leader (3503 -> 5599). dev/lpn-spike/label-open-side-bench.js, BENCH_LEADER=<number>.
+	var LABEL_LEADER_THRESHOLD = 3.4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
 	function nodeLabelBase(n, full) {
 		var d = defaultLabelOffset(full);
