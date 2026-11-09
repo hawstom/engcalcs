@@ -3486,7 +3486,7 @@ var EngCalcs = EngCalcs || {};
 					b.kind = 'label'; ground.boxes.push(b);
 				});
 			}
-			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min || (h && h.leaderDue)) {
 				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		}
@@ -3516,7 +3516,8 @@ var EngCalcs = EngCalcs || {};
 			// **A QUIET LABEL WITH ANOTHER PIPE ABOUT AS NEAR SAYS WHOSE IT IS WITH A LEADER** (Task 812, Tom,
 			// 2026-11-09: *"L181 and L185 would be reassuringly confirmed if they had leaders"*). The same
 			// reading as ambiguousShortLeaders(): another pipe within LPN_AMBIG_RATIO times its own distance,
-			// and a leader that crosses no label, no leader and no symbol.
+			// and a leader that crosses no label, no leader and no symbol (a pipe's anchor is no node's own, so a
+			// leader starting inside an end node's symbol runs through it).
 			if (LPN_AMBIG_LEADERS && le.levelQuiet) {
 				var qa = r.anchor || sp.anchor, qg = Collide.segment(qa.x, qa.y, r.x, r.y, 'leader', r.id), own = Infinity, other = Infinity, qbs = r.boxes || [r.box], qok = Math.hypot(r.x - qa.x, r.y - qa.y) > levelLeaderMin();
 				ground.segments.forEach(function (o) {
@@ -3529,7 +3530,6 @@ var EngCalcs = EngCalcs || {};
 				if (qok && own < Infinity && other <= own * LPN_AMBIG_PIPE_RATIO) {
 					ground.boxes.forEach(function (o) {
 						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
-						if (o.kind === 'symbol' && Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2) { return; }
 						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
 					});
 					ground.segments.forEach(function (o) { if (qok && o.kind === 'leader' && o.owner !== r.id && Collide.segmentsCross(qg, o)) { qok = false; } });
@@ -63746,7 +63746,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -63801,7 +63801,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
-		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
