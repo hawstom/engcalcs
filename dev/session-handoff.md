@@ -95,15 +95,14 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-11-06 night (seventieth session, Opus main, Sonnet agents)
+## STATE — 2026-11-08 night (seventy-second session, Opus main, Sonnet agents)
 
-- **Merged:** `feat/wtg-energy-more` on his word (*"OK to merge."*); `fix/clear-restores-unit` on green (an emitter coefficient's "Clear restores" line quoted the stored SI number). Task 855 to 100 with his calls.
-- **Waiting his browser pass (Perry: ready):** `feat/override-push` (Task 855, preview 8102): orange arrow over the override dot; always asks, naming the destination and the value replaced. Its tap zone is ~9 px tall on a phone; bigger means taller rows. Not in the Tables pane. After merge, `pushDestination` can call `propDisplayValue` (from the clear-restores fix). `feat/assembly` (Task 822 slice 1, preview 8103): Virtual pipe and Pump+; five builder questions in messenger.md.
-- **`feat/label-open-side` (Task 812, was `feat/label-neighbours`, preview 8101)**: partial; see the roadmap entry. Not ready for him.
-- **Ida's answer to "which asset is Properties editing"** is in her hopper (`dev/agents/interface-designer/properties-asset-2026-11-06.md`): title the box "Valve V12". His call.
-- Still open from 11-06 evening: EPANET's own text report printing 1392.49 demand charge for the energy run, never confirmed.
-- **Translation sprint: his word for Sunday 2026-11-08.** Ask him only for the count then.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1c8b8bbc-a65c-4d54-8d96-71f0a10a3dcc/scratchpad (brief-common.md, Perry's journals and probes).
+- **Merged on his word** (*"Merge."*, *"OK to merge. But fix the too wide Description column."*, *"Merge. But peripherally..."*): `feat/override-push` + `feat/override-table` (Task 855 closed) and `feat/properties-title`, then `fix/merge-1108` on green. Push question in his words: "Push override upward? Current value in Base: 18 in." (CC kept the unit; he typed "18", ask). Fixed with them, both also wrong on master before: a Tables column never opens wider than its pane (`paneColInitialEm()`; the pane-heading rule now exempts a column at that cap); the docked empty Properties message spans the box. The push arrow had moved the Properties mark 2.6 px (`vertical-align` on the arrow variant).
+- `feat/assembly` (Task 822, 8103, round 3), his round-2 notes done: no + on the map symbols; Pump+ icon + as big as Valve+'s; Valve+ tip sentence 1 in his words; labels at an assembly ganged (his option a): `assemblyLabelSides()`, leaderless, clear of the pipes at any angle (`pump-plus-label-angle-browser-harness.js`); the seam with Task 812 is one line in `nodeFirstFitSpec()`. Perry found the diagonal overlap; fixed, not re-reviewed. Open his: Pump+ tip to match Valve+'s shape?; virtual pipe (Sue, her journal 11-08: length 0 = zero volume, zero loss, Q/A velocity, zero travel time; a transient export merges the device onto its two nodes). Well not built. *"Let's keep working."*: no merge until finished.
+- `feat/label-open-side` (Task 812, 8101, round 3): the 1-notch trade accepted (*"This sounds like progress."*) and the check now accepts at least 10 values per label lost; leader threshold 4 -> 3.4 text sizes (~34 -> ~29 px; +107 leaders, -48 values over 64 views; 3.5 the gentler choice). His N164 picture: the label has a hairline leader; the unlabelled node by "Q=7565.7" is N161, shed by the crossing pass, as on master. Harness Novato views blank Settings > Labels > "Show labels when zoomed to this map width or less" (65000 in the example). Only the Novato scene of `label-form-wheel-browser-harness.js` was run at 3.4; run the rest before asking him to merge.
+- **Translation sprint: later** (*"Later is fine."*), after the approved branches merge. Still open from 11-06: EPANET's own report printing 1392.49 demand charge, never confirmed.
+- Task 749 waits his WaterGEMS saves (rule-based and pressure controls).
+- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/4d7ac7c5-4364-4393-84aa-0950e8875863/scratchpad (brief-common.md).
 
 ## STATE — 2026-11-06 (sixty-eighth session, Opus main)
 

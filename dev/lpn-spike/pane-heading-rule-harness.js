@@ -238,7 +238,9 @@ const MEASURE = ([panelId, slack, wordMax, kl]) => {
 			key: key, text: btn.textContent.replace(new RegExp(SHY, 'g'), ''), H: H, headW: headW, contentW: contentW,
 			lineWs: lineWs, widest: lineWs.length ? Math.max.apply(null, lineWs) : 0,
 			thW: th.getBoundingClientRect().width, thPad: thPad, unitOk: unitOk, unitNote: unitNote,
-			clipped: clipped.slice(0, 3), isBool: isBool
+			clipped: clipped.slice(0, 3), isBool: isBool,
+			// Does this column sit at the pane-width ceiling (its width plus the ID column's fills the panel)?
+			atCap: ci > 0 && (th.getBoundingClientRect().width + table.querySelector('thead th').getBoundingClientRect().width) >= host.clientWidth - 4
 		});
 	});
 	return { cols: res };
@@ -275,6 +277,10 @@ function assertTable(label, report) {
 		if (c.key === 'verts') {
 			ok(name + ': sized by its heading alone, never widened by what it holds', c.thW <= c.basicMax || c.narrowerBreaks === true,
 				'heading cell ' + c.thW.toFixed(1) + 'px > rule ' + c.basicMax.toFixed(1) + 'px');
+		} else if (c.atCap) {
+			// A column never opens wider than the pane it is in (Tom, 2026-11-08, on a phone: "We can't
+			// let the Description column be initially so wide"), so a value longer than that is clipped
+			// by design here; widening the column or Properties shows all of it. Cap wins over "no clip".
 		} else {
 			ok(name + ': no present value is clipped', c.clipped.length === 0, c.clipped.join(', '));
 		}

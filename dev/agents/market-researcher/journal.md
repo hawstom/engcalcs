@@ -2952,3 +2952,8 @@ Full document: dev/agents/market-researcher/ai-agent-interface.md (placed by the
 - **CITED.** Autodesk WSPro Basic Pipe Data Fields (https://help.autodesk.com/cloudhelp/2026/ENU/WSPro-Help/files/GUID-EA252BC3-E324-40E0-BE9D-1ABBE49CB67E.htm): From Node ID, To Node ID are fields 1-2; closure lives on a separate Control page; results on a separate page. Bentley "Is active?" is a True/False in the property grid (docs.bentley.com WaterGEMS SS6 GUID-2D9E71F577204BAC9089D58AB66EEA6A).
 - **NOT FOUND.** WaterGEMS/WaterCAD property-grid category order (4 searches); InfoWater Pro Attribute-tab order; QWAT form layout; Giswater tab names for arc/node.
 - **SPECULATION.** Consensus: topology right after ID (Tom right); Active near the top is supported by epanet-js only (and Bentley treats it as topology); results last and separate. Re-derive before relying.
+
+## 2026-11-08 -- Virtual pipe: flag vs length 0 vs word in diameter (Tom's question). Full note: dev/agents/market-researcher/virtual-pipe-precedent-2026-11-08.md
+- **CITED.** No flag found anywhere. InfoWorks WS Pro treats zero-length links as ordinary (Expand Short Links tool) https://help.autodesk.com/cloudhelp/2026/ENU/WSPro-Help/files/GUID-B310251F-9D51-4B6A-967E-96D404D95507.htm ; WaterGEMS exports connectors as 1 ft x 99 in pipes https://communities.bentley.com/products/hydraulics___hydrology/w/hydraulics_and_hydrology__wiki/45050/missing-pipes-when-exporting-to-epanet ; EPANET pipe Initial Status "contains a check valve" is the one-field-changes-meaning precedent https://epanet-manual.readthedocs.io/en/latest/6_objects.html .
+- **NOT FOUND.** Synergi, KYPipe, epanet-js on this question.
+- **SPECULATION.** Recommend B (stated length 0); C weakest.
