@@ -40038,29 +40038,57 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// draws a leader (layoutNodeLabel). Returns null for a node outside any assembly, which keeps the placer's own
 	// candidates. The first candidate is the snug one; the next two stand a little further out.
 	function assemblyLabelSides(n, fs, lineCount) {
-		var a = assemblyOfNode(n.id), pump = a && linkById(a.links[0]), pl, ux, uy, sgn, half, pad, h, at, out = [], k, along, side;
+		var a = assemblyOfNode(n.id), pump = a && linkById(a.links[0]), pl, ux, uy, sgn, half, pad, w, h, at, out = [], ps, ideal,
+			r, step, k, tier = 0, rMin = -1, ang, ex, ey, right, x0, cs, ok, i, d, dm, along, cx, cy, want, tryAt;
 		if (!pump) { return null; }
 		pl = linkSymbolPlace(pump);
 		if (!pl) { return null; }
 		ux = Math.cos(pl.angle * Math.PI / 180); uy = Math.sin(pl.angle * Math.PI / 180);
-		sgn = a.down === n.id ? 1 : -1;
+		sgn = a.down === n.id ? 1 : -1;   // +1 downstream of the point, -1 upstream
 		half = pumpSymbolSize(pump.type) / 2;
-		pad = defaultLabelOffset().x * 0.5;
-		h = dataLabelBoxHeight(lineCount);
+		pad = Math.max(defaultLabelOffset().x * 0.5, fs * LPN_ALIGNED_PAD_FRAC * 1.5);   // the placer keeps this much air from a pipe
+		w = labelBoxWidth(nodeEls[n.id]); h = dataLabelBoxHeight(lineCount);
 		at = nodeAt(n);
-		for (k = 0; k < 3; k++) {
-			if (Math.abs(ux) >= Math.abs(uy)) {
-				// Across the page: clear of the pipe's own line, the upstream block above and upstream of the symbol,
-				// the downstream block below and downstream of it.
-				side = { x: at.x + sgn * (ux >= 0 ? 1 : -1) * (half * 0.6 + pad + k * fs * 1.2),
-					y: sgn < 0 ? at.y - pad - h - k * fs * 0.6 + fs * 0.85 : at.y + pad + k * fs * 0.6 + fs * 0.85 };
-			} else {
-				along = half + pad + k * fs * 1.2;
-				side = { x: at.x + half * 0.5 + pad, y: sgn * (uy >= 0 ? 1 : -1) < 0 ? at.y - along - h + fs * 0.85 : at.y + along + fs * 0.85 };
+		// Which side of the pipe's line the label stands on: the upstream label above it, the downstream label below it
+		// (to the right of both when the pipe runs nearly up and down). The pipe is a line through the point, so a label
+		// wholly on one side of it, off it by `pad`, crosses neither the pipe behind the point nor the pipe ahead.
+		// p = ps * (-uy, ux) is the unit vector across the pipe on the label's side: p.y < 0 for the upstream label and
+		// p.y > 0 for the downstream one; where the pipe runs nearly up and down, p.x > 0 for both.
+		want = sgn;
+		ps = Math.abs(ux) >= 0.3 ? (ux * want >= 0 ? 1 : -1) : (uy >= 0 ? -1 : 1);
+		ideal = { x: sgn * ux * 0.5 - ps * uy * 0.8, y: sgn * uy * 0.5 + ps * ux * 0.8 };
+		step = fs * 0.3;
+		tryAt = function (rad) {
+			var best = null, bestA = Infinity;
+			for (ang = 0; ang < 360; ang += 15) {
+				ex = at.x + rad * Math.cos(ang * Math.PI / 180); ey = at.y + rad * Math.sin(ang * Math.PI / 180);
+				right = ex >= at.x;
+				x0 = right ? ex : ex - w;
+				cs = [[x0, ey - fs * 0.85], [x0 + w, ey - fs * 0.85], [x0, ey - fs * 0.85 + h], [x0 + w, ey - fs * 0.85 + h]];
+				ok = true; dm = Infinity;
+				for (i = 0; i < 4; i++) {
+					d = ps * (-uy * (cs[i][0] - at.x) + ux * (cs[i][1] - at.y));   // distance across the pipe, + on label side
+					if (d < pad) { ok = false; break; }
+					dm = Math.min(dm, d);
+				}
+				if (!ok) { continue; }
+				// and clear of the symbol itself
+				if (Math.hypot(Math.max(x0 - at.x, 0, at.x - (x0 + w)), Math.max(cs[0][1] - at.y, 0, at.y - cs[2][1])) < half + pad * 0.5) { continue; }
+				cx = x0 + w / 2 - at.x; cy = ey - fs * 0.85 + h / 2 - at.y;
+				along = sgn * (cx * ux + cy * uy);   // beside, not beyond the wrong end
+				if (along < 0) { continue; }
+				d = -(Math.cos(ang * Math.PI / 180) * ideal.x + Math.sin(ang * Math.PI / 180) * ideal.y);
+				if (d < bestA) { bestA = d; best = { x: ex, y: ey, corner: -1, deg: null }; }
 			}
-			out.push({ x: side.x, y: side.y, corner: -1, deg: null });
+			return best;
+		};
+		for (r = half * 0.4 + pad, k = 0; k < 80 && out.length < 3; k++, r += step) {
+			var c = tryAt(r);
+			if (!c) { continue; }
+			if (rMin < 0) { rMin = r; }
+			if (r >= rMin + tier * fs * 1.2) { out.push(c); tier++; }
 		}
-		return out;
+		return out.length ? out : null;
 	}
 	function assemblyRefs(a, lastRef) {
 		var refs = [{ kind: 'node', id: a.up }, { kind: 'node', id: a.down }].concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));
