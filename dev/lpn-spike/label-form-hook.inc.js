@@ -10,6 +10,17 @@
 		solved: function () { return !!lastSolveResult; },
 		inlineTrial: function () { return lastInlineTrial; },
 		crossShed: function () { return lastCrossingShed; },
+		shedEntries: function () { return lastShedEntries; },
+		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
+		hiddenCrossedAudit: function () {
+			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };
+			pairs.forEach(function (p) { inPair[p[0]] = true; inPair[p[1]] = true; });
+			E.forEach(function (e) {
+				var h = e.id.charAt(0) === 'n' ? nodeEls[e.id.slice(2)] : linkEls[e.id.slice(2)];
+				if (h && h.hiddenCrossed) { out.hidden.push(e.id); if (!inPair[e.id]) { out.unjustified.push(e.id); } }
+			});
+			return out;
+		},
 		fit: function () { zoomExtent(); },
 		scale: function () { return state.s; },
 		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },

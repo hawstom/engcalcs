@@ -3158,17 +3158,8 @@ var EngCalcs = EngCalcs || {};
 		x = linkById(bare);
 		return (x && (x.type === 'pump' || x.type === 'valve')) ? 1 : 3;
 	}
-	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
-		var min = leaderThreshold(), entries = [], specs = {}, res;
-		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
-		// label hidden once must be back in contention next time, or the drawing only ever loses
-		// labels.
-		doc.links.forEach(function (l) {
-			var le = linkEls[l.id]; if (le) { le.hiddenCrossed = false; }
-		});
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id]; if (ne) { ne.hiddenCrossed = false; }
-		});
+	function crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var min = leaderThreshold(), entries = [], specs = {};
 		(nodeLabels || []).forEach(function (s) { specs[s.id] = s; });
 		(ringLabels || []).forEach(function (s) { specs[s.id] = s; });
 		function boxesOf(r) {
@@ -3202,7 +3193,22 @@ var EngCalcs = EngCalcs || {};
 				yields: !!f.yields, hideable: stationed,
 				rank: stationed ? crossingShedRank(f.id) : 0 });
 		});
+		return entries;
+	}
+	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var entries, res;
+		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
+		// label hidden once must be back in contention next time, or the drawing only ever loses
+		// labels.
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (le) { le.hiddenCrossed = false; }
+		});
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (ne) { ne.hiddenCrossed = false; }
+		});
+		entries = crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs);
 		res = Collide.shedCrossingSurvivors(entries, {});
+		lastShedEntries = entries;
 		// **IT IS A HIDE AND NOT A DROP, AND THE DIFFERENCE IS THE WHOLE OF THE PASS'S STABILITY.**
 		// The obvious wiring is the drop seam Task 398 already built -- mark the placement `dropped`
 		// and let the holder loop turn that into `hiddenDropped`. It oscillates: a dropped node
@@ -3225,6 +3231,10 @@ var EngCalcs = EngCalcs || {};
 	// phase three). For ?debug=labels to print. Not a decision input: nothing in the pass reads it
 	// back.
 	var lastCrossingShed = null;
+	// The entries the last final shed measured, for a harness to read. Not a decision input.
+	var lastShedEntries = null;
+	// The final placements the last pass drew, for a harness to measure afresh. Not a decision input.
+	var lastFinalGround = null;
 	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
 	// (dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
 	// shed to its last value and is still crowded, when no station on its pipe is clear, when a
@@ -3629,6 +3639,15 @@ var EngCalcs = EngCalcs || {};
 		// the repair and the crossing hides, so not one of them sees it, and it can move nobody.
 		nodePlaced = shedNodes ? runInlineTrial(nodeLabels, nodePlaced, nodeObs, pad, fsNow, placed)
 			: reinsertInlineNodeLabels(nodeLabels, nodePlaced, nodeObs, pad, fs, placed);
+		// **AND THE HIDES ARE JUDGED AGAIN ON WHAT THE READER WILL SEE** (Task 812, Tom, 2026-11-09: N161 on
+		// Novato had no label and *"this one would not cross other labels"*). The first shed measured the
+		// stacks; a label that then took its line left the pair its neighbour was hidden for. Only where
+		// something was hidden, and only after a one-line label moved: the labels it left have nothing
+		// to be hidden for.
+		lastFinalGround = { nodeLabels: nodeLabels, nodePlaced: nodePlaced, labels: labels, placed: placed, obs: obs };
+		if (lastCrossingShed && lastCrossingShed.hidden.length) {
+			lastCrossingShed = perfDebugAccum('  cl:crossShed2', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
+		}
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
