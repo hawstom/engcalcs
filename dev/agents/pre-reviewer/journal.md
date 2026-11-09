@@ -4918,3 +4918,13 @@ OBSERVED: a project stating Quality Age plus a 0:30 quality time step exports wi
 OBSERVED: keys lpn_wtg_export_lost_emitters and ..._lost_pump_speed_pattern are never emitted by plan() now; stale comments looped-network.js:54788-54789 (still say "saved project").
 OBSERVED: no Bentley letter/decompile text in shipped code; only licence-line comments and the harness guard. Candidate writers run only under opts.candidate, which the page never passes.
 SPECULATION: the Net1 refusal may surprise Tom, who named Net1 to test; wording is honest.
+
+## 2026-11-08 feat/assembly round 3 (d5be0d6c8, 77321abd5)
+- OBSERVED: Pump+ and Valve+ toolbar icon plus are now the same path (M19 0V10M14 5H24); renders match v3 pictures. Map symbols carry no plus (harness + code).
+- OBSERVED: Valve+ tip sentence 1 exact in lang.ec.en.php.
+- OBSERVED (real Chrome, blank project, pipe drawn at angle, Pump+/Valve+ placed on it): upstream label always on the upstream side, downstream on the downstream side, for 0/20/90/180/200/270 deg; never overlaps the symbol; no leader on U/D; labels stay within ~60 px of the point at every zoom.
+- OBSERVED DEFECT: at 45 and 135 deg the upstream label sits across the pipe's own line (135: pipe strikes through "Qb=0.0"). Candidates ignore the pipe direction on diagonals.
+- OBSERVED: on Net1 vertical pipe, zoomed out, the one-line (inline) U label stretches left of the point, 23 px away, no leader; acceptable but wide.
+- NOT DONE: label setting with one value vs four (my fixture did not load; labels stayed default); Recalculate off; save-reopen; Explode by hand. Harnesses pump-plus, valve-plus, pump-plus-drag-browser (23/23) pass.
+- Method note: Pump+ placed on pipe via click at SVG path midpoint; label boxes via getBoundingClientRect.
+- OBSERVED (CC, 2026-11-08): the 45/135 defect was fixed in 3e0e73295 with a 15-degree angle sweep harness; not re-reviewed.
