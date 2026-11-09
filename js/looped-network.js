@@ -302,7 +302,8 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	function linkLabelBase(l) {
-		var mid = linkLabelMid(l), d = defaultLabelOffset();
+		var mid = linkLabelMid(l), d = defaultLabelOffset(), asm = assemblyOfLink(l.id) ? assemblyLinkLabelBase(l) : null;
+		if (asm) { return asm; }
 		return { x: mid.x + (l.lx !== undefined ? l.lx : d.x),
 			y: mid.y + (l.ly !== undefined ? l.ly : d.y) };
 	}
@@ -345,7 +346,7 @@ var EngCalcs = EngCalcs || {};
 	// a Text label's lb.x, which IS its box center's offset since Text is text-anchor:middle.
 	function updateDataLeader(holder, anchor, end) {
 		if (!holder.leader) { return; }
-		if (holder.empty || holder.noLeader) { holder.leader.style.display = 'none'; return; }
+		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
 		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
@@ -469,8 +470,6 @@ var EngCalcs = EngCalcs || {};
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
-		// Both labels of an assembly sit at its one point, so a leader would only cross the symbol and say nothing.
-		ne.noLeader = !!assemblyOfNode(id);
 		updateDataLeader(ne, anchor, end);
 	}
 	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
@@ -532,7 +531,7 @@ var EngCalcs = EngCalcs || {};
 		return Geom.snapLeaderOffset(dx, dy, leaderSnapDeg());
 	}
 	function linkLabelAligned(l) {
-		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined;
+		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined && !assemblyOfLink(l.id);
 	}
 	// Whether the label is DRAWN along its pipe this pass: the setting asks for it, and the pass did
 	// not have to set it level beside the pipe instead (placeLevelPipeLabels()).
@@ -1037,6 +1036,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		doc.links.forEach(function (l) {
 			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), l); }
+			else if (assemblyOfLink(l.id) && assemblyLinkLabelBase(l, fs)) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), null); }
 		});
 		if (!boxes.length && !segs.length) { return obs; }
 		return { boxes: obs.boxes.concat(boxes), segments: obs.segments.concat(segs) };
@@ -1428,6 +1428,8 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelTooShort(l, le) {
 		if (!le || le.empty) { return false; }
 		if (l.lx !== undefined || l.ly !== undefined) { return false; }
+		// A Pump+ or Valve+ link has no length at all, so no run could ever fit; its label stands beside the symbol.
+		if (assemblyOfLink(l.id)) { return false; }
 		// SEGMENT, not polyline -- see linkLabelRoom(). This rule and the shed cascade have to be
 		// asking about the same room, or a label sheds to fit something it is then hidden for
 		// missing.
@@ -3491,8 +3493,9 @@ var EngCalcs = EngCalcs || {};
 				if (!le.hiddenCrowded) { stationed.push(l); }
 				return;
 			}
+			// A Pump+ or Valve+ label has the one place assemblyLinkLabelBase() chose, as a hand-placed one does.
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
-				l.lx !== undefined, le.lineCount, l);
+				l.lx !== undefined || !!assemblyLinkLabelBase(l, fs), le.lineCount, l.lx !== undefined ? l : null);
 		});
 		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** -- two different orders answering two different
 		// questions, exactly the split ESRI Maplex draws between label priority and what is left
@@ -40108,21 +40111,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// anything: this decides, before the placer sees it, the only candidate positions the two nodes' labels may take.
 	// The upstream node's label stands on the upstream side of the symbol and the downstream node's on the
 	// downstream side: the upstream label above and upstream of the point, the downstream label below and downstream
-	// of it, when the flow runs across the page; above and below it, to the right, when it runs up or down. Neither
-	// draws a leader (layoutNodeLabel). Returns null for a node outside any assembly, which keeps the placer's own
+	// of it, when the flow runs across the page; above and below it, to the right, when it runs up or down. A label that stands far
+	// enough from its node to need a leader gets one, by the same rule as any other label. Returns null for a node outside any assembly, which keeps the placer's own
 	// candidates. The first candidate is the snug one; the next two stand a little further out.
 	function assemblyLabelSides(n, fs, lineCount) {
-		var a = assemblyOfNode(n.id), pump = a && linkById(a.links[0]), pl, ux, uy, sgn, half, pad, w, h, at, out = [], ps, ideal,
+		var a = assemblyOfNode(n.id);
+		return a ? assemblyLabelCandidates(a, a.down === n.id ? 1 : -1, 0, labelBoxWidth(nodeEls[n.id]), dataLabelBoxHeight(lineCount), nodeAt(n), fs) : null;
+	}
+	// **THE PUMP'S OR VALVE'S OWN LABEL** (Task 822; Tom, 2026-11-09: *"I don't see the link labels"*) takes the one
+	// quarter of the symbol the two node labels leave: the downstream half, on the side of the pipe the upstream label
+	// is on. It is the first of the same candidates, so it is as close as a label can stand and still clear the pipes.
+	// A link that is in no assembly, or a label dragged by hand, keeps the ordinary base (linkLabelBase()).
+	function assemblyLinkLabelBase(l, fs) {
+		var a = assemblyOfLink(l.id), le = linkEls[l.id], at, c;
+		if (!a || !le || le.empty || l.lx !== undefined) { return null; }
+		at = linkLabelMid(l);
+		c = assemblyLabelCandidates(a, 1, 2, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), at, fs || effectiveFontSize());
+		return c && c.length ? { x: c[0].x, y: c[0].y } : null;
+	}
+	// `sgn` is +1 for the half downstream of the point and -1 for the half upstream; `side` is 0 for the label that
+	// stands on its own half's usual side of the pipe and 2 for the quarter across from the downstream label.
+	function assemblyLabelCandidates(a, sgn, side, w, h, at, fs) {
+		var pump = linkById(a.links[0]), pl, ux, uy, half, pad, out = [], ps, ideal,
 			r, step, k, tier = 0, rMin = -1, ang, ex, ey, right, x0, cs, ok, i, d, dm, along, cx, cy, want, tryAt;
 		if (!pump) { return null; }
 		pl = linkSymbolPlace(pump);
 		if (!pl) { return null; }
 		ux = Math.cos(pl.angle * Math.PI / 180); uy = Math.sin(pl.angle * Math.PI / 180);
-		sgn = a.down === n.id ? 1 : -1;   // +1 downstream of the point, -1 upstream
 		half = pumpSymbolSize(pump.type) / 2;
 		pad = Math.max(defaultLabelOffset().x * 0.5, fs * LPN_ALIGNED_PAD_FRAC * 1.5);   // the placer keeps this much air from a pipe
-		w = labelBoxWidth(nodeEls[n.id]); h = dataLabelBoxHeight(lineCount);
-		at = nodeAt(n);
 		// Which side of the pipe's line the label stands on: the upstream label above it, the downstream label below it
 		// (to the right of both when the pipe runs nearly up and down). The pipe is a line through the point, so a label
 		// wholly on one side of it, off it by `pad`, crosses neither the pipe behind the point nor the pipe ahead.
@@ -40130,6 +40147,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// p.y > 0 for the downstream one; where the pipe runs nearly up and down, p.x > 0 for both.
 		want = sgn;
 		ps = Math.abs(ux) >= 0.3 ? (ux * want >= 0 ? 1 : -1) : (uy >= 0 ? -1 : 1);
+		if (side === 2) { want = 1; ps = -(Math.abs(ux) >= 0.3 ? (ux * want >= 0 ? 1 : -1) : (uy >= 0 ? -1 : 1)); }   // across from the downstream label
 		ideal = { x: sgn * ux * 0.5 - ps * uy * 0.8, y: sgn * uy * 0.5 + ps * ux * 0.8 };
 		step = fs * 0.3;
 		tryAt = function (rad) {
@@ -60359,7 +60377,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
 				// snapped to it"). Falling back to the nearest node within screen-pixel tolerance
 				// makes a close tap connect anyway.
-				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id;
+				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id,
+					// **AT A PUMP+ OR VALVE+ THE END OF A PIPE IS THE UPSTREAM NODE AND ITS START THE DOWNSTREAM ONE** (Task 822;
+					// Tom, 2026-11-09): water flows into the device through a pipe that ends there and out through one that
+					// starts there. Silent, because the two nodes lie on one point and the press cannot say which was meant.
+					asmHit = hitId ? assemblyOfNode(hitId) : null;
+				if (asmHit) { hitId = pendingLinkFrom ? asmHit.up : asmHit.down; }
+				if (asmHit && pendingLinkFrom && assemblyOfNode(pendingLinkFrom) === asmHit) { hitId = pendingLinkFrom; }   // a pipe from a device to itself is nothing
 				if (hitId) {
 					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
 					else if (hitId !== pendingLinkFrom) {
@@ -60384,7 +60408,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						// A pipe DRAWN is a pipe committed -- addLink() has already run and the
 						// undo snapshot is taken -- so carrying on never puts the previous pipe at
 						// risk, and Escape abandons only the leg not yet drawn.
-						setPendingLinkFrom(hitId);
+						setPendingLinkFrom(asmHit ? asmHit.down : hitId);   // the next pipe starts at a device's downstream node
 					}
 					// A second press on the from-node itself is neither a bend nor a link: a
 					// zero-length self-loop is not a thing the solver models, and reading it as a
@@ -60565,7 +60589,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// suppressed while a chain is running (see the contextmenu listener) so this is the gesture.
 		if (e.button === 2) { setPendingLinkFrom(null); return; }
 		var onNode = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id;
-		var node;
+		var node, asmHit = onNode ? assemblyOfNode(onNode) : null, cont;
+		// The same rule as the pipe tool: a leg that ends at a Pump+ or Valve+ ends at its upstream node, and a chain
+		// that starts or goes on from one starts at its downstream node.
+		if (asmHit) { onNode = pendingLinkFrom ? (assemblyOfNode(pendingLinkFrom) === asmHit ? pendingLinkFrom : asmHit.up) : asmHit.down; }
 		if (!pendingLinkFrom) {
 			if (!onNode) {
 				saveUndoSnapshot();
@@ -60588,8 +60615,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// (which Redo could still return) are dropped here and only here.
 		var at = pendingLinkFrom, cut = chainTrail.length;
 		chainTrail.forEach(function (st, i) { if (st.n === at) { cut = i + 1; } });
-		var trail = chainTrail.slice(0, cut).concat([{ n: node.id, l: made.id }]);
-		setPendingLinkFrom(node.id);
+		cont = asmHit ? asmHit.down : node.id;
+		var trail = chainTrail.slice(0, cut).concat([{ n: cont, l: made.id }]);
+		setPendingLinkFrom(cont);
 		chainTrail = trail;
 	}
 	// **UNDO MOVES THE CHAIN BACK WITH THE DRAWING.** Undo rebuilds every node element, so the ring

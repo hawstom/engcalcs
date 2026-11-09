@@ -150,3 +150,20 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
 
 - **Not done in this slice:** Well, System; the Assemblies table; the Downstream pipe chooser; detection and
   Convert; coincident nodes moved by a drag of one node alone (a click selects all three, so a drag moves all).
+
+### Round 4 (Tom, 2026-11-09)
+
+- **Leaders:** an assembly's node label has a leader under the same rule as every label (it stands far enough from its
+  node to need one). Nothing suppresses it any more.
+- **The pump's or valve's own label** (it was hidden for want of a length to stand along) is not drawn along a pipe: it takes
+  the one quarter of the symbol the node labels leave, the downstream half on the side of the pipe the upstream label is on,
+  placed once like a hand-placed label (`assemblyLinkLabelBase()`).
+- **Which node a pipe joins:** a pipe, pump, valve, virtual pipe or chain leg that ENDS on a Pump+ or Valve+ joins its upstream
+  node; one that STARTS on it joins its downstream node; a chain or pipe that carries on after reaching one goes on from the
+  downstream node; a pipe from a device to itself is nothing. Before this the press took whichever of the two coincident
+  nodes the browser's hit test returned (in practice the later one, the downstream node) whether it was a start or an end.
+  A pipe's end moved afterwards is changed only by typing a node ID in From or To (Tables, Properties); there is no
+  dragging of a pipe end, so nothing is guessed there.
+- **Velocity:** a virtual pipe, and any pipe of length 0, reports velocity 0 in the built-in solver; EPANET is handed the
+  stand-in for a virtual pipe and reports 0 for it. A plain pipe of length 0 is refused by the EPANET engine (its
+  Error 211, illegal link property value, inside the Error 200 that opening a file reports); the built-in solver solves it.
