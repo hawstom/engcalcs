@@ -1978,7 +1978,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		// "highest velocity" comparison by sorting a fast reverse flow to the BOTTOM of the range.
 		// Direction is already carried by the sign of the flow and by the arrow the map draws.
 		// A pump reports no velocity and a shut link no head loss, as EPANET's EN_getlinkvalue does.
-		velocities[link.id] = link.diameter > 0 && link.type !== 'pump' && !link.virtual
+		// A virtual pipe, and a pipe of length 0 (what a virtual pipe is), has no length and so no velocity (Task 822; Tom, 2026-11-09: "I say zero").
+		velocities[link.id] = link.diameter > 0 && link.type !== 'pump' && !link.virtual && !(link.type === 'pipe' && link.length === 0)
 			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
 		if (link.status === 'closed') {

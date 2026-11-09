@@ -154,6 +154,19 @@ function worst(a, b, ids, field) {
 	const again = L.currentModel().links.find((l) => l.id === 'V1');
 	ok('and the model still gives it length 0', again.length === 0 && again.virtual === true);
 
+
+	console.log('-- 5. a user-drawn pipe of Length 0 reports velocity 0 (Tom, 2026-11-09: "I say zero")');
+	const plain0 = open(inp(0).replace(' P2  J1  J2  400  150', ' P2  J1  J2  0  150'));
+	const m0 = plain0.model.links.find((l) => l.id === 'P2');
+	ok('P2 is a plain pipe (not marked virtual) of length 0', m0.length === 0 && !m0.virtual, JSON.stringify(m0));
+	const n0 = EC.lpnSolve(plain0.model);
+	ok('built-in: it converges, carries flow, and reports velocity 0 and head loss 0', n0.ok && n0.converged && Math.abs(n0.flows.P2) > 1e-4 && n0.velocities.P2 === 0 && n0.headlosses.P2 === 0, 'Q=' + n0.flows.P2 + ' V=' + n0.velocities.P2);
+	ok('built-in: the pipe beside it still reports its own velocity', n0.velocities.P3 > 0, String(n0.velocities.P3));
+	const e0 = await EC.lpnSolveEpanet(plain0.model, { moduleUrl: NODE_ENGINE_URL });
+	ok('EPANET itself refuses a pipe of length 0 (error 211 inside error 200), so there is no engine velocity to report', e0.ok === false && /Error 200/.test(e0.engineError || ''), String(e0.engineError));
+	const v0 = EC.lpnSolve(inA.model);
+	ok('the marked virtual pipe: velocity 0, flow untouched (15 L/s)', v0.velocities.V1 === 0 && Math.abs(v0.flows.V1 - 0.015) <= FLOW_TOL);
+
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });
