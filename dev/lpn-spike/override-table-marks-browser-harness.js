@@ -102,7 +102,7 @@ async function main() {
 		await settle(300);
 		const d0 = await dlg();
 		ok('T3 pressing the arrow keeps focus in the cell being typed in, and typing goes on', !!stillFocus && /1$/.test(String(typed)), String(typed));
-		ok('T3 the arrow asked the push question', !!d0 && /^Push override upward to /.test(d0.text), d0 && d0.text);
+		ok('T3 the arrow asked the push question', !!d0 && /^Push override upward(?: to |\? Current value in )/.test(d0.text), d0 && d0.text);
 		console.log('       question: ' + (d0 && d0.text) + ' / buttons ' + (d0 && d0.buttons.join('|')));
 		await shot('push-question');
 		// T4 cancel
@@ -114,7 +114,7 @@ async function main() {
 		await P.mouse.click(up2.x, up2.y);
 		await settle(300);
 		const d1 = await dlg();
-		ok('T4 the question names Base and the value it replaces', !!d1 && /to Base\?/.test(d1.text) && d1.text.indexOf(baseDiam['10'].replace(/[^\d.]/g, '')) >= 0, d1 && d1.text);
+		ok('T4 the question names Base and the value it replaces', !!d1 && /(?:to Base\?|in Base: )/.test(d1.text) && d1.text.indexOf(baseDiam['10'].replace(/[^\d.]/g, '')) >= 0, d1 && d1.text);
 		await press(d1.buttons[0]);
 		await settle(900);
 		const after = await marks();

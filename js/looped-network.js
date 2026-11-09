@@ -30693,6 +30693,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **EACH SIDE CARRIES ITS OWN BOX** (R-356 follow-up, 2026-09-28). The heading's text sits in
 	// the `<th>`'s content box, inside the `<th>`'s own padding; a value's box (paneColContentEm())
 	// already carries its own padding or pull-down chrome. So the column is the wider of the two.
+	// The em a column may take of its panel: the panel's drawn width in the table font, less the first
+	// column. Infinity while the panel has no width (hidden, or no DOM), so nothing is capped blind.
+	function panePanelRoomEm(spec, c, hf) {
+		var panel, w, first, cols;
+		try {
+			panel = document.getElementById('lpn_pane_' + spec.id);
+			w = panel ? panel.clientWidth : 0;
+			if (!(w > 0) || !hf || !(hf.px > 0)) { return Infinity; }
+			cols = paneCols(spec);
+			first = cols[0];
+			return w / hf.px - ((first && first.key !== c.key) ? paneColInitialEm(spec, first) : 0);
+		} catch (e) { return Infinity; }
+	}
 	function paneColInitialEm(spec, c) {
 		var v = 0, contentEm, headingEm, hf, headPad;
 		if (!spec.initEmCache) { spec.initEmCache = {}; }
@@ -30701,6 +30714,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		headingEm = paneHeadingInitEm(c);
 		hf = paneHeadFont();
 		headPad = panePadEm(hf ? hf.px : 0);
+		// **A COLUMN NEVER OPENS WIDER THAN THE PANE IT IS IN** (Tom, 2026-11-08, on a phone: "We can't
+		// let the Description column be initially so wide"). Rule (a) has no ceiling, so one long
+		// Description made a column several panes wide. The ceiling is the panel's width less the ID
+		// column; the heading's own width still wins, and a width the reader dragged to is read
+		// before this is ever asked.
+		contentEm = Math.min(contentEm, Math.max(headingEm + headPad, panePanelRoomEm(spec, c, hf)));
 		if (headingEm > 0 || contentEm > 0) {
 			v = Math.max(contentEm, headingEm + headPad);
 			// The line-ratio rule may widen it further, never narrow it.
