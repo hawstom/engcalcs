@@ -22392,6 +22392,7 @@ var EngCalcs = EngCalcs || {};
 	// on an element that has stopped being selected, which is the failure a second write site
 	// would produce and which nothing on screen would explain.
 	function setSelectionList(list) {
+		var hadSelection = selections.length > 0;
 		// Any change to the subject retires the go-to mark: the element somebody went to is either
 		// now selected (and wears the stronger mark) or is no longer what they are looking at.
 		setLocated(null);
@@ -22406,6 +22407,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		selection = selections.length ? selections[selections.length - 1] : null;
 		selections.forEach(function (s) { paintSelection(s, true); });
+		// A selection that has emptied leaves no asset for the Properties box to show: a docked box
+		// says nothing is selected, a floating one closes.
+		if (!selections.length && hadSelection && currentPopup) { closePopup(); propsBoxTitleSync(); }
 		// **THE METER'S SLIDE HANDLE IS A FACT ABOUT THE SELECTION** (Task 247, Tom's own
 		// *"temporary draggable circle that slides along the pipe"*), so it is drawn and removed in
 		// the one place the subject is written. Anywhere else and there would be a path by which a
@@ -30693,6 +30697,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **EACH SIDE CARRIES ITS OWN BOX** (R-356 follow-up, 2026-09-28). The heading's text sits in
 	// the `<th>`'s content box, inside the `<th>`'s own padding; a value's box (paneColContentEm())
 	// already carries its own padding or pull-down chrome. So the column is the wider of the two.
+	// The em a column may take of its panel: the panel's drawn width in the table font, less the first
+	// column. Infinity while the panel has no width (hidden, or no DOM), so nothing is capped blind.
+	function panePanelRoomEm(spec, c, hf) {
+		var panel, w, first, cols;
+		try {
+			panel = document.getElementById('lpn_pane_' + spec.id);
+			w = panel ? panel.clientWidth : 0;
+			if (!(w > 0) || !hf || !(hf.px > 0)) { return Infinity; }
+			cols = paneCols(spec);
+			first = cols[0];
+			return w / hf.px - ((first && first.key !== c.key) ? paneColInitialEm(spec, first) : 0);
+		} catch (e) { return Infinity; }
+	}
 	function paneColInitialEm(spec, c) {
 		var v = 0, contentEm, headingEm, hf, headPad;
 		if (!spec.initEmCache) { spec.initEmCache = {}; }
@@ -30701,6 +30718,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		headingEm = paneHeadingInitEm(c);
 		hf = paneHeadFont();
 		headPad = panePadEm(hf ? hf.px : 0);
+		// **A COLUMN NEVER OPENS WIDER THAN THE PANE IT IS IN** (Tom, 2026-11-08, on a phone: "We can't
+		// let the Description column be initially so wide"). Rule (a) has no ceiling, so one long
+		// Description made a column several panes wide. The ceiling is the panel's width less the ID
+		// column; the heading's own width still wins, and a width the reader dragged to is read
+		// before this is ever asked.
+		contentEm = Math.min(contentEm, Math.max(headingEm + headPad, panePanelRoomEm(spec, c, hf)));
 		if (headingEm > 0 || contentEm > 0) {
 			v = Math.max(contentEm, headingEm + headPad);
 			// The line-ratio rule may widen it further, never narrow it.
@@ -33388,7 +33411,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				btn.addEventListener('click', function () { findGoTo(spec.group, paneRowEl(el).id); });
 				td.appendChild(btn);
 			}
-			if (spec.scnRows || paneMarksOpenScenario(spec)) { paneScnMarkCell(td, c, el); }
+			if (spec.scnRows || paneMarksOpenScenario(spec)) { paneScnMarkCell(td, c, el); paneOvMarksSync(spec, td, c, el); }
 			tr.appendChild(td);
 		});
 		spec.cells[el.id] = cells;
@@ -33447,6 +33470,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				// After the write: a plain cell's textContent just took its children with it.
 				paneValueWarn(spec, spec.tds && spec.tds[el.id] && spec.tds[el.id][c.key], c, el);
+				if (tds && tds[c.key] && (tds[c.key]._lpnOvSig || tds[c.key].classList.contains('lpn-pane-ovcell'))) { paneOvMarksSync(spec, tds[c.key], c, el); }
 			});
 		});
 		// Task 738's marks and count, which a refill changes as surely as it changes a value.
@@ -35622,28 +35646,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE SELECTED CELLS THAT HOLD A SCENARIO OVERRIDE**, each as {el, scn, props}: the element
 	// itself, the scenario its row shows (the table's own while Show scenarios is off), and the
 	// override keys that hold the cell's value. Base holds none.
+	// One cell's override, as paneOverrideCells() builds it: {el, scn, props} (a Settings row adds `col`), or null.
+	function paneOverrideHit(col, row) {
+		var x = row && row._lpnScn, scn = x ? x.scn : activeScenario(), el = paneRowEl(row), p, ov, props, has = Object.prototype.hasOwnProperty;
+		if (!el || !col || plainBase(scn)) { return null; }
+		// A Settings table row: the column says whether it holds an override, and clears it.
+		if (col.scnLocal) { return col.scnLocal(el, scn) ? { el: el, scn: scn, props: [], col: col } : null; }
+		p = paneColProp(col);
+		if (!p) { return null; }
+		// Where clearOverride() would act: the map this scenario writes this category to.
+		ov = localOverrideMap(scn, categoryOf(p, elGroup(el)))[ovKey(el)];
+		if (!ov) { return null; }
+		props = [p].concat(p === 'demand' ? ['demands'] : []).filter(function (k) { return has.call(ov, k); });
+		return props.length ? { el: el, scn: scn, props: props } : null;
+	}
 	function paneOverrideCells(spec, rows, cols, box) {
-		var out = [], r, c, row, col, x, scn, el, p, ov, props, has = Object.prototype.hasOwnProperty;
+		var out = [], r, c, hit;
 		for (r = box.r0; r <= box.r1; r++) {
-			row = rows[r];
-			x = row && row._lpnScn;
-			scn = x ? x.scn : activeScenario();
-			el = paneRowEl(row);
-			if (!el || plainBase(scn)) { continue; }
 			for (c = box.c0; c <= box.c1; c++) {
-				col = cols[c];
-				// A Settings table row: the column says whether it holds an override, and clears it.
-				if (col && col.scnLocal) {
-					if (col.scnLocal(el, scn)) { out.push({ el: el, scn: scn, props: [], col: col }); }
-					continue;
-				}
-				p = col && paneColProp(col);
-				if (!p) { continue; }
-				// Where clearOverride() would act: the map this scenario writes this category to.
-				ov = localOverrideMap(scn, categoryOf(p, elGroup(el)))[ovKey(el)];
-				if (!ov) { continue; }
-				props = [p].concat(p === 'demand' ? ['demands'] : []).filter(function (k) { return has.call(ov, k); });
-				if (props.length) { out.push({ el: el, scn: scn, props: props }); }
+				hit = paneOverrideHit(cols[c], rows[r]);
+				if (hit) { out.push(hit); }
 			}
 		}
 		return out;
@@ -35652,10 +35674,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// scenario inherits. One undo step, and the same clearOverride() the Properties box's "Override
 	// in this scenario" box calls, run in the row's own scenario.
 	function paneClearOverrides(spec) {
-		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), hits, touched = {}, settingsCleared = false;
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec), box = paneSelBox(spec, rows, cols);
 		if (!box) { return false; }
-		hits = paneOverrideCells(spec, rows, cols, box);
+		return paneClearHits(spec, paneOverrideCells(spec, rows, cols, box));
+	}
+	function paneClearHits(spec, hits) {
+		var touched = {}, settingsCleared = false;
 		if (!hits.length) { return false; }
 		saveUndoSnapshot();
 		hits.forEach(function (h) {
@@ -35672,6 +35696,56 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} finally { paneRenderHeld--; }
 		renderPaneTable(spec);
 		return true;
+	}
+	/**
+	 * **A TABLE CELL WEARS THE PROPERTIES BOX'S MARKS** (Tom, 2026-11-06: *"Should we restyle the table
+	 * override indicator to use the circle and arrow convention?"*): the orange dot, which clears this
+	 * cell's override as the dot in Properties does (one undo step), and over it the orange up arrow,
+	 * which pushes it to the parent through the same pushOverrideUp() and the same question. They are
+	 * drawn over the cell's start edge, inside the cell, so no column is wider, and they never take
+	 * focus (mousedown is stopped, no tab stop). A Settings row has the dot only: it has no property to push.
+	 */
+	function paneOvMarksSync(spec, td, c, row) {
+		var hit = td && td.classList && td.classList.contains('lpn-pane-ovcell') ? paneOverrideHit(c, row) : null,
+			x = row && row._lpnScn, scn = x ? x.scn : activeScenario(), pc = EngCalcs.pageConfig || {}, push = false, sig, box, cur;
+		if (!td) { return; }
+		cur = td.querySelector(':scope > .lpn-pane-ovm');
+		if (hit && !hit.col) {
+			push = paneInScenario(scn, function () { return !!pushTarget(hit.el, hit.props) && pushableProps(hit.el, hit.props).length > 0; });
+		}
+		sig = hit ? (push ? 'dp' : 'd') : '';
+		if (!sig) { if (cur) { cur.remove(); } td._lpnOvSig = ''; return; }
+		if (cur && td._lpnOvSig === sig) { return; }
+		if (cur) { cur.remove(); }
+		td._lpnOvSig = sig;
+		box = document.createElement('span');
+		box.className = 'lpn-ovm lpn-pane-ovm';
+		// A press on a mark is not a press on the cell: it must not move the selection, enter the cell or take focus.
+		box.addEventListener('mousedown', function (e) { e.stopPropagation(); e.preventDefault(); });
+		if (push) {
+			box.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+				var h = paneOverrideHit(c, row), vals, dest, others, now;
+				if (!h || h.col) { return; }
+				paneInScenario(h.scn, function () {
+					now = pushableProps(h.el, h.props);
+					vals = pushValuesOf(h.el, now);
+					dest = pushDestination(h.el, now, vals, paneHeadingUnitText(c) || '');
+					others = pushOtherScenarios(h.el, h.props).length;
+				});
+				if (!dest) { return; }
+				askPushOverride(dest, others, function () {
+					paneInScenario(h.scn, function () { pushOverrideUp(h.el, now, vals); });
+					afterPropertyEdit(h.el);
+					refreshScenarioStatus();
+					refreshPopupIfOpen();
+				});
+			}));
+		}
+		box.appendChild(ovmCell('lpn-ovm-dot', pc.lpn_ovm_dot_clear_one || 'Click to clear this override.', function () {
+			var h = paneOverrideHit(c, row);
+			if (h) { paneClearHits(spec, [h]); }
+		}));
+		td.appendChild(box);
 	}
 	function paneDeleteSelection(spec) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
@@ -68105,6 +68179,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockTitleOf(d) {
 		var t = d.box.querySelector('.lpn-setbox-title'), g;
 		if (!t) { return d.box.id; }
+		// The Properties box's title bar names the asset; its tab and its Guide entry keep the box's own name.
+		if (d.box.id === 'lpn_popup') { return (EngCalcs.pageConfig || {}).lpn_popup_boxtitle || 'Properties'; }
 		// A title carrying a "?" (the Scenario manager's) names the box without the glyph.
 		if (t.querySelector('.ec-tip')) { t = t.cloneNode(true); g = t.querySelector('.ec-tip'); g.parentNode.removeChild(g); }
 		return t.textContent.replace(/\s+/g, ' ').trim();
@@ -73350,6 +73426,119 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return out;
 	}
+	/**
+	 * **PUSH AN OVERRIDE UPWARD** (Task 855, Tom 2026-11-06: *"the override is cleared in the current
+	 * alternative and entered in its parent."*). The open scenario's own value is cleared and written
+	 * one layer up the chain the category resolves through (treeLayers()), so the scenario reads it
+	 * afterwards: the stored alternative above the one it writes (which changes every scenario using
+	 * it), else the parent scenario's own, else Base's elements. A scenario that names an alternative
+	 * inherits through that alternative's parent, not through its scenario parent (Tom, 2026-10-12).
+	 * pushTarget() is {base: true}, {kind, obj, via?} or null (Base; a Base of its own).
+	 */
+	function pushTarget(el, props) {
+		var scn = activeScenario(), cat = categoryOf(props[0], elGroup(el)), layers, t, i, nx, t2;
+		if (!scn || scn.isBase) { return null; }
+		layers = treeLayers(scn, cat);
+		t = writeTargetFor(scn, cat);
+		for (i = 0; i < layers.length; i++) { if (t && layers[i].obj === t.obj) { break; } }
+		nx = layers[i + 1];
+		if (!nx) { return scn.root === true ? null : { base: true }; }
+		if (nx.kind === 'scn') {
+			t2 = writeTargetFor(nx.obj, cat);
+			return { kind: t2 ? t2.kind : 'scn', obj: t2 ? t2.obj : nx.obj, via: nx.obj };
+		}
+		return { kind: nx.kind, obj: nx.obj };
+	}
+	// The overridden properties of a marker the push may move: never a morph (a type change lays the asset out afresh).
+	function pushableProps(el, props) {
+		var held = props.filter(function (p) { return hasOverride(el, p); });
+		return held.length && !held.some(function (p) { return !!LPN_MORPH_PROP[p]; }) ? held : [];
+	}
+	/**
+	 * **THE OTHER SCENARIOS A PUSH CHANGES**: those whose value for the element comes from the holder
+	 * the push writes (or from Base, where that is the plain elements), not counting the open scenario
+	 * or the scenarios below it (they already show this value), and not its parent scenario, the one a
+	 * push is meant for. A scenario sharing the holder is counted, so a plain push into a parent asks nothing.
+	 */
+	function pushOtherScenarios(el, props) {
+		var scn = activeScenario(), tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el),
+			holder = tgt && !tgt.base ? tgt.obj : null, below = scenarioDescendants(scn), out = [],
+			par = scn.root === true ? null : parentScenarioOf(scn);
+		if (!tgt) { return out; }
+		scenarios.forEach(function (s) {
+			var layers, i, held, reached = false, stopped = false;
+			if (s.isBase || s === scn || (s === par && !tgt.base) || below.indexOf(s) >= 0) { return; }
+			layers = treeLayers(s, cat);
+			for (i = 0; i < layers.length && !stopped; i++) {
+				if (holder && layers[i].obj === holder) { reached = true; stopped = true; break; }
+				held = (layerValuesByCategory(layers[i])[cat] || {})[key] || [];
+				if (held.some(function (pv) { return props.indexOf(pv[0]) >= 0; })) { stopped = true; }
+			}
+			if (reached || (!holder && !stopped)) { out.push(s); }
+		});
+		return out;
+	}
+	// What the open scenario holds for these properties, as [[prop, stored value, effective value]], read before it is cleared.
+	function pushValuesOf(el, props) {
+		var ov = localOverrideMap(activeScenario(), categoryOf(props[0], elGroup(el)))[ovKey(el)] || {};
+		return props.map(function (p) {
+			var eff = p === 'demands' ? ownDemandRows(el) : effective(el, p);
+			return [p, altCopy(ov[p]), altCopy(eff === undefined ? null : eff)];
+		});
+	}
+	// Clear here, write above: the caller has taken the undo snapshot (one step for both).
+	function pushOverrideUp(el, props, vals) {
+		var tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), t, map, layerId;
+		if (!tgt) { return false; }
+		props.forEach(function (p) { clearOverride(el, p); });
+		if (tgt.base) {
+			paneInScenario(baseScenario(), function () { vals.forEach(function (v) { setProp(el, v[0], v[2]); }); });
+			return true;
+		}
+		t = tgt.via ? ownWriteTarget(tgt.via, cat) : tgt;
+		map = t.kind === 'alt' ? (plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {})) : (plainObject(t.obj.overrides) ? t.obj.overrides : (t.obj.overrides = {}));
+		if (!plainObject(map[key])) { map[key] = {}; }
+		vals.forEach(function (v) { map[key][v[0]] = v[1] === undefined ? null : v[1]; });
+		layerId = (t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + t.obj.id;
+		touchTreeKey('pushOverrideUp', layerId, map, key);
+		return true;
+	}
+	// **WHERE A PUSH LANDS, BY NAME**: the parent scenario's name, the stored alternative's, or Base's,
+	// and the value already held there when it differs (a single property only), shown as the question's "replaced".
+	function pushDestination(el, props, vals, unit) {
+		var tgt = pushTarget(el, props), cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), name, old, map, ov, t;
+		if (!tgt) { return null; }
+		if (tgt.base) {
+			name = scenarioDisplayName(baseScenario());
+			if (props.length === 1) { old = baseValue(el, props[0]); }
+		} else {
+			name = tgt.via ? scenarioDisplayName(tgt.via) : (tgt.kind === 'scn' ? scenarioDisplayName(tgt.obj) : String(tgt.obj.name || ''));
+			t = tgt.via ? writeTargetFor(tgt.via, cat) : tgt;
+			map = t ? (t.kind === 'alt' ? t.obj.values : t.obj.overrides) : null;
+			ov = plainObject(map) ? map[key] : null;
+			if (props.length === 1 && plainObject(ov) && Object.prototype.hasOwnProperty.call(ov, props[0])) { old = ov[props[0]]; }
+		}
+		if (old !== undefined && old !== null && typeof old !== 'object' && vals.length === 1 && String(old) !== String(vals[0][1])) {
+			// An emitter coefficient is stored in SI and shown in the flow and pressure units chosen; the rest are stored as typed.
+			if (props[0] === 'emitter' && typeof old === 'number') { old = emitterToDisplay(old); }
+			old = formatPropValue(old);
+			if (unit && /^-?[\d.]+$/.test(old)) { old += ' ' + unit; }
+		} else { old = null; }
+		return { name: name, old: old };
+	}
+	// Push override upward is always asked, through the page's own dialog, naming where it goes; the
+	// sentence about other scenarios is added when some change. `go` runs after the undo snapshot is taken.
+	function askPushOverride(dest, n, go) {
+		var pc = EngCalcs.pageConfig || {}, text = dest.old === null
+			? (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name)
+			: (pc.lpn_ovm_push_ask_cur || 'Push override upward? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
+		if (n) { text += (pc.lpn_ovm_push_others || ' Scenarios that inherit it change ({n} total).').replace('{n}', String(n)); }
+		askDialog({ kind: 'confirm', text: text }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			go();
+		});
+	}
 	// "Clear child overrides ({n} total)?", asked through the page's own dialog; `clear` runs on yes,
 	// as one undo step.
 	function askClearChildOverrides(n, clear) {
@@ -73396,7 +73585,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
 	function ovmGutter(fields, o) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere;
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere, pushProps;
 		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
 		start = ovmRowStart(fields);
 		if (!start) { return; }
@@ -73438,6 +73627,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}));
 			// A row with a dot and a triangle is the one thing that needs the second cell.
 			if (!baseHere) { ovmGutterOn(fields, 'lpn-ovm-gut2'); }
+		}
+		// The orange up arrow over the dot (Task 855): move this override into the parent scenario.
+		pushProps = (o.on && !baseHere && pushTarget(o.el, o.props)) ? pushableProps(o.el, o.props) : [];
+		if (pushProps.length) {
+			g.appendChild(ovmCell('lpn-ovm-up', pc.lpn_ovm_push_tip || 'Push override upward', function () {
+				var now = pushableProps(o.el, o.props), vals = pushValuesOf(o.el, now);
+				askPushOverride(pushDestination(o.el, now, vals, ((/\(([^()]+)\)\s*\??\s*$/.exec(String(start.textContent || '').replace(/\s+/g, ' ')) || [])[1]) || ''), pushOtherScenarios(o.el, o.props).length, function () {
+					pushOverrideUp(o.el, now, vals);
+					afterPropertyEdit(o.el);
+					refreshScenarioStatus();
+					refreshPopupIfOpen();
+				});
+			}));
 		}
 		fields.insertBefore(g, start);
 		if (!o.on || baseHere) { return; }
@@ -74682,11 +74884,50 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (allIds(group).indexOf(newId) !== -1) { return pc.lpn_id_taken || 'That ID is already in use.'; }
 		return true;
 	}
+	// **THE BOX TITLE NAMES THE ASSET** (Tom, 2026-11-06: "Properties" is the important word, so the
+	// asset follows it: "Properties: Valve V12", "Properties: Pipes (2)", "Properties: 3 selected").
+	// The type word comes from this one function, so a type that has its own word (Pump+) supplies
+	// it here and nowhere else.
+	function propsTypeWord(el, kind) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'label') { return pc.lpn_tool_add_text || 'Text'; }
+		if (kind === 'customer') { return pc.lpn_tool_add_meter || 'Customer'; }
+		if (kind === 'shape') { return pc.lpn_tool_add_shape || 'Shape'; }
+		return pc['lpn_tool_add_' + (el && el.type)] || '';
+	}
+	function propsBoxTitleText() {
+		var pc = EngCalcs.pageConfig || {}, base = pc.lpn_popup_boxtitle || 'Properties', what = '', el, w, gs;
+		if (!currentPopup) { return base; }
+		if (currentPopup.kind === 'multi') {
+			gs = multiGroups();
+			if (gs.length === 1) {
+				w = gs[0].spec ? (pc[gs[0].spec.label] || gs[0].spec.id) : propsTypeWord(null, gs[0].type === 'text' ? 'label' : gs[0].type);
+				what = w + ' (' + gs[0].els.length + ')';
+			} else {
+				what = String(pc.lpn_multi_title || '{n} selected').replace('{n}', String(selectionCount()));
+			}
+		} else if (currentPopup.kind === 'node' || currentPopup.kind === 'link') {
+			el = currentPopup.kind === 'node' ? nodeById(currentPopup.id) : linkById(currentPopup.id);
+			if (!el) { return base; }
+			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
+		} else if (currentPopup.kind === 'customer') {
+			el = customerById(currentPopup.id);
+			what = el ? String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', el.id) : '';
+		} else {
+			what = propsTypeWord(null, 'label');
+		}
+		return what ? String(pc.lpn_popup_boxtitle_of || 'Properties: {asset}').replace('{asset}', what) : base;
+	}
+	function propsBoxTitleSync() {
+		var b = document.getElementById('lpn_popup_boxtitle'), t = propsBoxTitleText();
+		if (b && b.textContent !== t) { b.textContent = t; }
+	}
 	// The line under the box's own title: a heading that spans the grid (a customer, a selection, a
 	// Text) or, for an element with an id, the ID row (idField). `cls` is the title's class, so a
 	// leftover from the last element never stays.
 	function popupTitleSet(text, cls) {
 		var t = document.getElementById('lpn_popup_title'), w;
+		propsBoxTitleSync();
 		if (!t) { return; }
 		t.className = cls || 'lpn-gtitle';
 		t.textContent = '';

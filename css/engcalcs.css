@@ -2429,6 +2429,12 @@ html[lang="zh"] .ec-welcome {
 .lpn-ovm-dot::before { background: var(--ec-held-ink); }
 .lpn-ovm-hollow::before { border: 1px solid var(--ec-ink-subtle); opacity: 0.6; }
 .lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
+/* The up arrow (Task 855): a hit zone in the top of the dot's own cell, never above it (a zone reaching into the row above
+   took the lower part of that row's circle), the drawn triangle at its centre; the dot's own zone shrinks to its lower part, so the two never overlap. */
+.lpn-ovm-up { position: absolute; top: 0; inset-inline-start: 0; height: 0.55em; align-items: center; z-index: 1; }
+.lpn-ovm-up::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-bottom: 0.4em solid var(--ec-held-ink); }
+.lpn-ovm:has(> .lpn-ovm-up) > .lpn-ovm-dot { align-self: flex-end; height: 0.75em; }
+#lpn_popup_fields.lpn-gprops .lpn-ggut .lpn-ovm:has(> .lpn-ovm-up) { position: relative; }   /* the arrow positions against the mark */
 .lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* Settings box: the overridden settings of a multi-setting row, one dot each, under the row. */
@@ -3927,6 +3933,8 @@ option:disabled { color: var(--ec-ink-muted); }
 }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut, #lpn_popup_fields.lpn-gprops.lpn-ovm-gut1 { --lpn-g-gutw: 1.1em; padding-inline-start: 0; }
 #lpn_popup_fields.lpn-gprops.lpn-ovm-gut2 { --lpn-g-gutw: 2.05em; padding-inline-start: 0; }
+/* The "nothing is selected" message spans every track, or it lands in the label column and wraps a word to a line. */
+.lpn-gprops > .lpn-popup-none { grid-column: 1 / -1; min-width: 0; margin: 0; }
 .lpn-gprops > br { display: none; }
 .lpn-gprops .lpn-grow > * { min-width: 0; }
 .lpn-gprops .lpn-gname .ec-help { display: inline; min-width: 0; }
@@ -4393,7 +4401,14 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* SHOW SCENARIOS (Tom, 2026-10-05): a cell holding a value set in its row's scenario, washed in the
    amber the map rings an override with. Before the selection wash, so a selected range still reads
    as one block. */
-.lpn-pane-table tbody td.lpn-pane-ovcell { background: var(--ec-hue-fff3cd); box-shadow: inset 0 -2px 0 var(--ec-hue-e8a33d), inset -1px 0 0 var(--ec-border); }
+.lpn-pane-table tbody td.lpn-pane-ovcell.lpn-pane-ovcell.lpn-pane-ovcell { position: relative; padding-inline-start: var(--lpn-pane-ovm-w); }
+.lpn-pane-table { --lpn-pane-ovm-w: 1em; }
+/* Task 855's convention, in a cell: the orange dot, and the arrow over it, in a strip the marked cell reserves at its start
+   edge (so no digit is ever under a mark; a column grows by the strip's width only while it holds an override). The strip is
+   the cell's full height, the arrow taking its upper half and the dot its lower, so a row is no taller for them. */
+.lpn-pane-table tbody td .lpn-pane-ovm { position: absolute; margin: 0; top: 0; bottom: 0; height: auto; width: var(--lpn-pane-ovm-w); inset-inline-start: 0; flex-direction: column; align-items: stretch; }
+.lpn-pane-table tbody td .lpn-pane-ovm .lpn-ovm-cell { position: static; flex: 1 1 50%; width: 100%; height: auto; min-height: 0; align-self: stretch; }
+@media (pointer: coarse) { .lpn-pane-table { --lpn-pane-ovm-w: 1.6em; } }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }

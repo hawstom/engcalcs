@@ -1047,3 +1047,5 @@ Not wanted: free-form "design for me" requests (examples 4 and 5) as one-click a
 ## Added 2026-10-23 (pump and valve assemblies, expert levels)
 
 The items under "For my wish list" in `assemblies-2026-10-23.md` (this folder), answering Tom's questions of 2026-10-23. Put to him as the interview "Pump and Valve Assemblies".
+
+- **2026-11-08, transient export of assemblies (rank low; no transient tool in the roadmap).** Export of a Pump+/Valve+ to a transient tool should merge the virtual pipe away (device between the two nodes), not write a short stand-in; HAMMER help says short pipes shrink dt or distort mass (CITED, journal 2026-11-08). Size: small once an export format exists; I would not build it before one is asked for. Rank below the scenario manager.

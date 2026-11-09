@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 3342,
-        "delta_key_count": 83,
-        "english_changed_key_count": 24,
+        "expected_key_count": 3347,
+        "delta_key_count": 89,
+        "english_changed_key_count": 25,
         "exempt_key_count": 53,
         "exempt_keys": [
             "u_imgd",
@@ -84,13 +84,19 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ပိုက်အပိုင်း\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအင်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: မျဉ်း\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ပိုက်အပိုင်း\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအင်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: မျဉ်း\n- image, picture, or photo behind the drawing\n    English: background image\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ကိုယ်ပိုင် တန်ဖိုးများ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "lpn_popup_boxtitle_of": "Properties: {asset}",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
         "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
+        "lpn_ovm_push_ask": "Push override upward to {target}?",
+        "lpn_ovm_push_others": " Scenarios that inherit it change ({n} total).",
+        "lpn_ovm_push_ask_cur": "Push override upward? Current value in {target}: {old}.",
+        "lpn_ovm_push_tip": "Push override upward",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
@@ -171,11 +177,17 @@
         "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "keys": {
+        "lpn_popup_boxtitle_of": "Properties: {asset}",
         "lpn_guide_text_rptbox": "Shows the EPANET text report of the last run, including its warnings and the network summary. Either solver writes it, for a single instant or for an extended period simulation. Each run replaces it, and an edit that does not run leaves the previous report in place.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario has the solid dot and the arrow described below at its left, and they work as they do in Properties. Its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. An arrow over the solid dot pushes the override upward: click it, and after a confirmation that names where the value goes, it is cleared here and entered in the parent scenario. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is what Clear restores, as in Clear restores 18 in, the value in Base. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Solver, Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Solver, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_rr_what_def": "<p>Choose Water, Reports, Solver (run). The Solver (run) report is the printed report of a run in the layout and wording of the EPANET report. The row is grey until the network has been run. Either solver writes it, for a single instant or for an extended period simulation, and its header states the solver used. It starts with that header and the name of the network, then counts the junctions, reservoirs, tanks, pipes, pumps, and valves, then states the analysis options, and then lists the hydraulic status of the run with its warnings. The Copy button copies the text.<\/p>",
         "lpn_guide_rr_example_def": "<p>Open the Net1 example, which has been calculated already, and choose Water, Reports, Solver (run). The summary counts 9 junctions, 1 reservoir, 1 tank, 12 pipes, 1 pump, and 0 valves. The headloss formula is Hazen-Williams, the hydraulic timestep is 1.00 hrs, and the total duration is 24.00 hrs.<\/p>",
         "lpn_ex_elm_street_desc": "Background image, not georeferenced. 17 junctions, 1 reservoir, and 1 pump. A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan. Gallons per minute, with feet and inches.",
+        "lpn_ovm_push_ask": "Push override upward to {target}?",
+        "lpn_ovm_push_others": " Scenarios that inherit it change ({n} total).",
+        "lpn_ovm_push_ask_cur": "Push override upward? Current value in {target}: {old}.",
+        "lpn_ovm_push_tip": "Push override upward",
         "lpn_export_table_scn_keeps": "All holds one sheet for each scenario. Parent scenarios, alternatives and inheritance are not in the file.",
         "lpn_run_menu_tip": "Run simulation. Unnecessary when \"Recalculate automatically\" is on in Settings, Calculation, Solver. When Recalculate is off, a toolbar Calculate button appears.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Solver.",
@@ -256,6 +268,22 @@
         "lpn_diag_builtin_error": "An error occurred in the built-in solver: {message}"
     },
     "key_context": {
+        "lpn_popup_boxtitle_of": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "ဂုဏ်သတ္တိများ",
+                    "english": "Properties"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_none",
+                    "value": "မည်သည့်အရာမျှ မရွေးချယ်ထားပါ။ ဂုဏ်သတ္တိများကို ကြည့်ရန် မြေပုံပေါ်ရှိ အစိတ်အပိုင်းတစ်ခုကို ရွေးချယ်ပါ။",
+                    "english": "Nothing is selected. Select an asset on the map to see its properties."
+                }
+            }
+        },
         "lpn_guide_text_rptbox": {
             "reason": "english_changed",
             "current_value": "နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွက် EPANET အင်ဂျင်က ရေးသားသော စာသားအစီရင်ခံစာကို သတိပေးချက်များနှင့် ကွန်ရက်အကျဉ်းချုပ်အပါအဝင် ပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုတိုင်းက ၎င်းကို အစားထိုးသည်၊ အချိန်တစ်ခုတည်းတွင် ဖြေရှင်းခြင်းက အစားမထိုးပါ၊ တည်းဖြတ်မှုက ယခင်အစီရင်ခံစာကို ထားရစ်သည်။",
@@ -269,6 +297,22 @@
                     "key": "lpn_guide_text_status_box",
                     "value": "နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ပြောင်းလဲမှုတစ်ခုစီကို အချိန်စဉ်လိုက် စာရင်းပြသည်။ ရေတင်စက်၊ ဗားလ် သို့မဟုတ် ပိုက်လိုင်း ဖွင့်ခြင်း\/ပိတ်ခြင်း၊ ရေတိုက် ဖြည့်စ ဖြစ်ခြင်း၊ ဗလာစ ဖြစ်ခြင်း၊ ပြည့်ခြင်း သို့မဟုတ် ကုန်ခြင်း၊ နှင့် အပြည့်အဝ မညီမျှသွားသော အချိန်အဆင့်များ ပါဝင်သည်။ ပြောင်းလဲမှုများကိုသာ စာရင်းပြပြီး အချိန်အဆင့်တိုင်းကို မပြပါ။",
                     "english": "Lists, in time order, each change during the last extended period simulation: a pump, valve, or pipe opening or closing, a tank starting to fill or empty or becoming full or empty, and any time step that did not fully converge. Only changes are listed, not every time step."
+                }
+            }
+        },
+        "lpn_guide_scn_marks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>မြေပုံပေါ်တွင် ဖွင့်ထားသော အခြေအနေ၌ ကိုယ်ပိုင်တန်ဖိုး ရှိသော အစိတ်အပိုင်းကို ပယင်းရောင် ကွင်းဝိုင်းထားပြီး မိဘ အခြေအနေ သို့မဟုတ် အစားထိုးရွေးချယ်မှုမှ ကိုယ်ပိုင်တန်ဖိုး အမွေရသော အစိတ်အပိုင်းကို မီးခိုးရောင် ဖြတ်ကြောင်းမျဉ်းဖြင့် ကွင်းဝိုင်းသည်။ လိုအင်၊ အချင်း၊ ကြမ်းတမ်းမှု၊ ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်းသေနှင့် အလျားတို့အတွက် ဆက်တင်များ၊ ပုံရိပ်ပြသမှု၊ အမှတ် အညွှန်းများ သို့မဟုတ် မျဉ်း အညွှန်းများက ထိုတန်ဖိုးကို မြေပုံပေါ်တွင် ပြနေစဉ်မှသာ ကွင်းဝိုင်း ပေါ်သည်။ အခြား ဂုဏ်သတ္တိ တစ်ခုခု၏ ကိုယ်ပိုင်တန်ဖိုးတွင် ကွင်းဝိုင်း အမြဲပါသည်။ ဇယားများတွင် ဖွင့်ထားသော အခြေအနေက သတ်မှတ်သော တန်ဖိုးရှိ ဆဲလ်သည် ပယင်းရောင် ဖြစ်ပြီး ၎င်း၏ အကြံပြုချက်သည် ထိုတန်ဖိုးကို ကိုင်ထားသော အစားထိုးရွေးချယ်မှုကို အမည်ပေးသည် (ဥပမာ Physical alt.: Larger main)။ ဇယား၏ ဆဲလ်မီနူးရှိ အခြေအနေများ ပြရန်သည် အစိတ်အပိုင်းတိုင်းကို အခြေအနေတစ်ခုလျှင် တစ်ကြိမ်စီ စာရင်းပြသည်။<\/p><p>အခြေအနေတစ်ခုက ကိုယ်ပိုင်တန်ဖိုး ပြောင်းနိုင်သော ဂုဏ်သတ္တိများ၏ တန်းတိုင်း၏ ဘယ်ဘက်တွင် အမှတ်အသား ရှိသည်။ အပြည့်အဝ အစက်သည် ဖွင့်ထားသော အခြေအနေက တန်ဖိုးကို ကိုယ်ပိုင်ပြုထားသည်ဟု ဆိုလိုပြီး နှိပ်လျှင် ကိုယ်ပိုင်တန်ဖိုးကို ရှင်းလင်းသည်။ အလွတ်အစက်သည် တန်ဖိုးကို အမွေရထားသည်ဟု ဆိုလိုပြီး နှိပ်လျှင် ပြထားသော တန်ဖိုးကို ကိုယ်ပိုင်တန်ဖိုး ဖြစ်စေသည်။ တြိဂံသည် ဤအခြေအနေအောက်ရှိ အခြေအနေများက တန်ဖိုးကို ကိုယ်ပိုင်ပြုထားသည်ဟု ဆိုလိုပြီး အတည်ပြုပြီးနောက် နှိပ်လျှင် ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ရှင်းလင်းသည်။ ကိုယ်ပိုင်ပြုထားသော တန်းအောက်တွင် ရှင်းလင်းခြင်းက ပြန်ထားမည့်အရာကို ပြသည် (ဥပမာ Clear restores 18 in၊ အခြေခံရှိ တန်ဖိုး)။ ဆက်တင်များ သေတ္တာတွင် အပြည့်အဝ အစက်နှင့် တြိဂံသာ ရှိသည်၊ အဘယ်ကြောင့်ဆိုသော် ထိုနေရာတွင် တန်ဖိုးရိုက်ထည့်ခြင်းက ကိုယ်ပိုင်တန်ဖိုး ဖြစ်စေသောကြောင့် ဖြစ်သည်။<\/p><p>ကွင်းဝိုင်းများကို ဝှက်ရန် ဆက်တင်များ၊ စာမျက်နှာရှိ မြေပုံပေါ်တွင် ကိုယ်ပိုင်တန်ဖိုး အမှတ်အသားများ ပြရန်ကို အမှန်ခြစ် ဖြုတ်ပါ၊ သို့မဟုတ် မြေပုံ၊ မြေပုံကို သန့်ရှင်းရန်ကို ရွေးပါ။ နှစ်ခုစလုံးကို စီမံကိန်းတွင် မဟုတ်ဘဲ ဤဘရောက်ဇာတွင် သိမ်းထားသည်။ ဇယားများသည် မည်သို့ပင်ဖြစ်စေ ကိုယ်ပိုင်တန်ဖိုးများကို အမှတ်အသားပြုသည်။<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_marks_term",
+                    "value": "ကိုယ်ပိုင်တန်ဖိုးများ ပေါ်လာသည့်နေရာ",
+                    "english": "Where overrides show"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "ကိုယ်ပိုင်တန်ဖိုးများ ဖန်တီးခြင်းနှင့် ဖယ်ရှားခြင်း",
+                    "english": "Making and clearing overrides"
                 }
             }
         },
@@ -333,6 +377,70 @@
                     "key": "lpn_tool_undo",
                     "value": "ပြန်ဖျက်ရန်",
                     "english": "Undo"
+                }
+            }
+        },
+        "lpn_ovm_push_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovm_child_tip",
+                    "value": "ကလေး အခြေအနေများက ဤတန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားသည် ({n} စုစုပေါင်း)။ ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Child scenarios override this value ({n} total). Click to clear their overrides."
+                },
+                "next_translated": {
+                    "key": "lpn_ovm_dot_clear",
+                    "value": "ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Click to clear it."
+                }
+            }
+        },
+        "lpn_ovm_push_others": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovm_child_tip",
+                    "value": "ကလေး အခြေအနေများက ဤတန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားသည် ({n} စုစုပေါင်း)။ ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Child scenarios override this value ({n} total). Click to clear their overrides."
+                },
+                "next_translated": {
+                    "key": "lpn_ovm_dot_clear",
+                    "value": "ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Click to clear it."
+                }
+            }
+        },
+        "lpn_ovm_push_ask_cur": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovm_child_tip",
+                    "value": "ကလေး အခြေအနေများက ဤတန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားသည် ({n} စုစုပေါင်း)။ ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Child scenarios override this value ({n} total). Click to clear their overrides."
+                },
+                "next_translated": {
+                    "key": "lpn_ovm_dot_clear",
+                    "value": "ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Click to clear it."
+                }
+            }
+        },
+        "lpn_ovm_push_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovm_child_tip",
+                    "value": "ကလေး အခြေအနေများက ဤတန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားသည် ({n} စုစုပေါင်း)။ ၎င်းတို့၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Child scenarios override this value ({n} total). Click to clear their overrides."
+                },
+                "next_translated": {
+                    "key": "lpn_ovm_dot_clear",
+                    "value": "ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Click to clear it."
                 }
             }
         },
@@ -1623,7 +1731,22 @@
             "Layout (box title): The title of a box that can be docked and set to auto-hide. Tucked away, the box shows only the start of its title, on a narrow tab at the map's edge turned on its side, cut off after about 12 to 25 characters. Put the word that names the box's subject first, so each tab can be told from its neighbors; a title form with a colon is fine (Pump energy report, in Spanish: Bombas: informe de energía). Where the natural phrase already starts with that word, keep it. The same text may also be a menu row."
         ]
     },
-    "key_concepts": [],
+    "key_concepts": {
+        "lpn_guide_scn_marks_def": [
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ]
+    },
     "uniqueness_attention": [
         {
             "instruction": "Find unique names for each.",
