@@ -25,6 +25,8 @@ function mutator(on) {
 			if (re.test(src)) { src = src.replace(re, 'var ' + f + ' = ' + (on.indexOf(f) >= 0) + ';'); }
 		});
 		if (process.env.BENCH_LEADER) { src = src.replace(/var LABEL_LEADER_THRESHOLD = [0-9.]+;/, 'var LABEL_LEADER_THRESHOLD = ' + process.env.BENCH_LEADER + ';'); }
+		if (process.env.BENCH_AMBIG) { src = src.replace(/LPN_AMBIG_RATIO = [0-9.]+/, 'LPN_AMBIG_RATIO = ' + process.env.BENCH_AMBIG); }
+		if (process.env.BENCH_SHORT) { src = src.replace(/LPN_SHORT_LEADER_TEXT = [0-9.]+/, 'LPN_SHORT_LEADER_TEXT = ' + process.env.BENCH_SHORT); }
 		// a mutation that changes nothing is an error in the loader; touch the file's first line
 		return src + '\n//bench ' + on.join(',') + '\n';
 	};
@@ -99,6 +101,7 @@ const sets = process.argv.slice(2).length ? process.argv[2].split(',').map((v) =
 	out.forEach((o) => {
 		console.log(`flags [${o.on.join(' ')}]: ${o.rows.length} views, labels ${sum(o.rows, 'shown')}, values ${sum(o.rows, 'values')}, leaders ${sum(o.rows, 'leaders')}, time ${sum(o.rows, 'ms').toFixed(0)} ms`);
 	});
+	if (process.env.BENCH_ROWS) { base.forEach((r) => console.log('ROW ' + r.v + ' labels ' + r.shown + ' values ' + r.values + ' leaders ' + r.leaders + ' ms ' + r.ms.toFixed(0))); }
 	if (out.length > 1 && process.env.BENCH_DETAIL) {
 		out[detail].rows.forEach((r, i) => {
 			const b = out[0].rows[i];

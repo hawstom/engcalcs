@@ -11,6 +11,51 @@
 		inlineTrial: function () { return lastInlineTrial; },
 		crossShed: function () { return lastCrossingShed; },
 		shedEntries: function () { return lastShedEntries; },
+		// Why a hidden node label found no one-line place: the final ground, the label set in once with each
+		// constraint of the one-line trial taken off in turn. Returns which variants find a side.
+		whyNode: function (id) {
+			var g = lastFinalGround, n = nodeById(id), ne = nodeEls[id], fs = effectiveFontSize(), pad = fs * LPN_ALIGNED_PAD_FRAC, s0 = state.s || 1, out = {}, min = leaderThreshold(), reqs, m, base, key = nodeLabelKey(id);
+			reqs = measureLevelForms([{ lines: ne.allLines, stacked: false }], fs); m = reqs[0].m;
+			base = Object.assign({}, g.nodeLabels.filter(function (q) { return q.id === key; })[0] || { id: key, anchor: nodeAt(n), home: nodeLabelBase(n), priority: 1, dragged: false }, inlineNodeSpec(n, fs, m.wPx / s0), { takeYield: true });
+			function ground() {
+				var gr = { boxes: g.obs.boxes.slice().concat(viewFrameBoxes()), segments: g.obs.segments.slice() };
+				ringForeigners(g.placed).forEach(function (f) { f.boxes.forEach(function (b) { gr.boxes.push(b); }); if (f.leader) { gr.segments.push(f.leader); } });
+				g.nodePlaced.forEach(function (r) { var sp = g.nodeLabels.filter(function (q) { return q.id === r.id; })[0]; if (r.dropped || !sp || r.id === key) { return; } (r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { gr.boxes.push(Object.assign({}, b)); }); if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) { gr.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id)); } });
+				return gr;
+			}
+			function tryIt(name, mod, opts) {
+				var spec = Object.assign({}, base, mod || {}), r = Collide.placeLabelsFirstFit([spec], ground(), Object.assign({ pad: pad, lastPad: pad, strict: true, leaderMin: min }, opts || {}))[0];
+				out[name] = r && !r.dropped ? { x: Math.round((r.x - spec.anchor.x) * s0), y: Math.round((r.y - spec.anchor.y) * s0) } : null;
+			}
+			tryIt('asTried');
+			tryIt('noLinkMargin', { linkMargin: 0 });
+			tryIt('onLinks', { offLinks: false, linkMargin: 0 });
+			tryIt('noLeaderClean', { leaderClean: false });
+			tryIt('nonStrict', { linkMargin: 0, offLinks: false }, { strict: false });
+			(function () {
+				var a = nodeAt(n), d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), far = [], k;
+				[12, 16, 20, 28].forEach(function (reachTH) {
+					var sides = Collide.polarCandidates(a, { start: 0, end: 359.99 }, home, fs * reachTH, { rings: 8, tol: 0, max: 600, angleStep: 10 });
+					tryIt('anyAngle' + reachTH + 'TH', { sides: sides, linkMargin: 2 / s0 });
+					tryIt('far' + reachTH + 'permissive', { sides: sides, offLinks: false, linkMargin: 0 }, { strict: false });
+					tryIt('far' + reachTH + 'noLeaderClean', { sides: sides, leaderClean: false, linkMargin: 0 });
+					tryIt('anyAngle' + reachTH + 'THstack', { sides: sides, linkMargin: 2 / s0, w: (ne.rowWPx ? Math.max.apply(null, ne.rowWPx) : 100) / s0 * 0 + base.w * 0.35, h: dataLabelBoxHeight(5) });
+				});
+			}());
+			(function () {
+				var a = nodeAt(n), d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), gr = ground(), sides = Collide.polarCandidates(a, { start: 0, end: 359.99 }, home, fs * 8, { rings: 8, tol: 0, max: 600, angleStep: 10 }), tally = {}, free = 0;
+				var spec = Object.assign({}, base, { sides: sides });
+				sides.forEach(function (c) {
+					var bs = Collide.labelLineBoxes(spec, c), hit = null;
+					bs.forEach(function (b) { gr.boxes.forEach(function (o) { if (!hit && o.w > 0 && Collide.boxOverlapDepth(Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a), o) > 0) { hit = (o.kind || '?') + (o.owner ? ':' + o.owner : o.linkOwner ? ':l' + o.linkOwner : ''); } }); });
+					if (!hit) { free++; var g2 = Collide.segment(a.x, a.y, c.x, c.y, 'leader', key), why = null; gr.boxes.forEach(function (o) { if (!why && o.w > 0 && o.owner !== key && Collide.segmentInBoxFraction(g2, o) > 0) { why = 'leaderThru ' + (o.kind || '?') + (o.owner ? ':' + o.owner : o.linkOwner ? ':l' + o.linkOwner : ''); } }); gr.segments.forEach(function (o) { if (!why && o.kind === 'leader' && o.owner !== key && Collide.segmentsCross(g2, o)) { why = 'leaderCross ' + o.owner; } }); hit = why ? why : 'FREE'; }
+					tally[hit] = (tally[hit] || 0) + 1;
+				});
+				out.tally8TH = { n: sides.length, free: free, why: tally };
+			}());
+			out.stackCands = (g.nodeLabels.filter(function (q) { return q.id === key; })[0] || {}).sides ? g.nodeLabels.filter(function (q) { return q.id === key; })[0].sides.length : null;
+			return out;
+		},
 		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
 		hiddenCrossedAudit: function () {
 			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };

@@ -353,7 +353,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
+		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : (d <= leaderThreshold() && !holder.leaderDue)) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -3149,6 +3149,58 @@ var EngCalcs = EngCalcs || {};
 	// ring pass's free and dragged labels, the stationed pipe labels that reach the drawing as
 	// obstacles, and the user's Text objects. Leaving one out reports zero about a picture that has
 	// crossings in it.
+	// **A SHORT LEADER WHERE THE LABEL COULD BE TAKEN FOR ANOTHER NODE'S** (Task 812, Tom, 2026-11-09:
+	// *"I want leaders more often at shorter distances"*; N167 *"is arguably ambiguous without a leader"*).
+	// A node label past LPN_SHORT_LEADER_TEXT text sizes from its node and inside the usual leader
+	// distance draws its leader when some other node stands as near its rows as its own does (within
+	// LPN_AMBIG_RATIO times that distance), and the short leader crosses no label, no leader and no
+	// other node's symbol. Nothing is moved: no label gives anything up for it, and a leader the
+	// placement did not know about is drawn only where nothing is in its way.
+	var LPN_SHORT_LEADER_TEXT = 1.2, LPN_AMBIG_RATIO = 1.5, LPN_AMBIG_LEADERS = true;
+	function ambiguousShortLeaders(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var min = leaderThreshold(), lo = min * LPN_SHORT_LEADER_TEXT / LABEL_LEADER_THRESHOLD, specs = {}, cands = [], out = {}, entries, pts;
+		function dist(px, py, boxes) {
+			var best = Infinity;
+			boxes.forEach(function (b) {
+				var dx = Math.max(Math.abs(px - b.cx) - b.w / 2, 0), dy = Math.max(Math.abs(py - b.cy) - b.h / 2, 0);
+				best = Math.min(best, Math.hypot(dx, dy));
+			});
+			return best;
+		}
+		nodeLabels.forEach(function (sp) { specs[sp.id] = sp; });
+		nodePlaced.forEach(function (r) {
+			var sp = specs[r.id], d, ne, bs;
+			if (r.dropped || !sp) { return; }
+			ne = nodeEls[r.id.slice(2)];
+			if (!ne || ne.hiddenCrossed || sp.dragged) { return; }
+			d = Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y);
+			bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
+			if (d > lo && d <= min && bs.length) { cands.push({ r: r, sp: sp, bs: bs }); }
+		});
+		if (!cands.length) { return out; }
+		pts = doc.nodes.map(function (n) { var p = nodeAt(n); return { id: nodeLabelKey(n.id), x: p.x, y: p.y }; });
+		entries = crossingEntries(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs);
+		cands.forEach(function (c) {
+			var own = dist(c.sp.anchor.x, c.sp.anchor.y, c.bs), near = false, g, clear = true, i, j, e, o;
+			pts.forEach(function (q) { if (!near && q.id !== c.r.id && dist(q.x, q.y, c.bs) <= own * LPN_AMBIG_RATIO) { near = true; } });
+			if (!near) { return; }
+			g = Collide.segment(c.sp.anchor.x, c.sp.anchor.y, c.r.x, c.r.y, 'leader', c.r.id);
+			for (i = 0; clear && i < entries.length; i++) {
+				e = entries[i];
+				if (e.id === c.r.id) { continue; }
+				if (e.leader && Collide.segmentsCross(g, e.leader)) { clear = false; break; }
+				for (j = 0; j < e.boxes.length; j++) { if (Collide.segmentInBoxFraction(g, e.boxes[j]) > 0) { clear = false; break; } }
+			}
+			for (i = 0; clear && i < obs.boxes.length; i++) {
+				o = obs.boxes[i];
+				if (o.kind !== 'symbol' || !(o.w > 0)) { continue; }
+				if (Math.abs(o.cx - c.sp.anchor.x) <= o.w / 2 && Math.abs(o.cy - c.sp.anchor.y) <= o.h / 2) { continue; }
+				if (Collide.segmentInBoxFraction(g, o) > 0) { clear = false; }
+			}
+			if (clear) { out[c.r.id] = true; }
+		});
+		return out;
+	}
 	function crossingShedRank(id) {
 		var bare = id.slice(2), x;
 		if (id.charAt(0) === 'n') {
@@ -3648,6 +3700,8 @@ var EngCalcs = EngCalcs || {};
 		if (lastCrossingShed && lastCrossingShed.hidden.length) {
 			lastCrossingShed = perfDebugAccum('  cl:crossShed2', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
 		}
+		var leaderDue = LPN_AMBIG_LEADERS ? perfDebugAccum('  cl:ambig', function () { return ambiguousShortLeaders(nodeLabels, nodePlaced, labels, placed, obs); }) : {};
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderDue = !!leaderDue[nodeLabelKey(n.id)]; } });
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
