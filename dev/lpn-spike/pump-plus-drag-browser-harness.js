@@ -4,7 +4,7 @@
 // Task 822, Perry's review of feat/assembly (2026-11-06): *dragging a Pump+ with Select moves only D1; U1
 // stays and the pump stretches.* Asserted with real pointer events: dragging either node moves both and
 // they stay coincident, as one undo step; Delete (the key, and the Delete tool) removes the two nodes
-// and the pump together, as one undo step; only the upstream node's label is drawn while grouped.
+// and the pump together, as one undo step; each node keeps its own label, ganged on its own side of the symbol (upstream left of the symbol, downstream right, for a level pump).
 'use strict';
 
 const path = require('path');
@@ -81,7 +81,10 @@ async function main() {
 		ok('a Pump+ is two nodes at one point and a pump', together(cs) && (await nLinks(a)) === 1, JSON.stringify(cs));
 		const home = cs[0];
 		const shown = await labelsShown(a);
-		ok('one node label is drawn for the group: the upstream node\'s', shown.length <= 1 && shown.every((id) => /^U/.test(id)), JSON.stringify(shown));
+		ok('both nodes keep their own label', shown.length === 2 && shown.some((id) => /^U/.test(id)) && shown.some((id) => /^D/.test(id)), JSON.stringify(shown));
+		const lblBox = (id) => P.evaluate((i) => { const r = document.querySelector('#lpn_canvas text[data-nodelbl="' + i + '"]').getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; }, id);
+		const ub = await lblBox(shown.filter((id) => /^U/.test(id))[0]), db = await lblBox(shown.filter((id) => /^D/.test(id))[0]);
+		ok('the upstream label stands upstream of the point and the downstream label downstream, not overlapping', ub.r <= at.x + 1 && db.l >= at.x - 1 && ub.r <= db.l, JSON.stringify([ub, db, at]));
 
 		console.log('\n--- drag ---');
 		const drag = async (from, to) => {
@@ -145,7 +148,7 @@ async function main() {
 		if ((await armed()) !== 'add-pumpplus') { await P.keyboard.press('6'); await a.settle(100); }
 		await P.mouse.click(at.x + 200, at.y + 150); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
-		ok('a Pump+ on the map has a plus on its outlet barrel, and no discs', await P.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length === document.querySelectorAll('#lpn_canvas .lpn-link-symbol-pump').length && document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length >= 1 && document.querySelectorAll('#lpn_canvas .lpn-asm-mark').length === 0));
+		ok('a Pump+ on the map has a pump symbol and no plus and no discs', await P.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-link-symbol-pump').length >= 1 && document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length === 0 && document.querySelectorAll('#lpn_canvas .lpn-asm-mark').length === 0));
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		await P.keyboard.press('7'); await a.settle(150);
 		const first7 = await armed();
@@ -156,7 +159,7 @@ async function main() {
 		ok('one button for Valve and Valve+, with the triangle', vb && (await P.evaluate(() => document.querySelectorAll('#lpn_toolbar button[data-tool="add-valve"], #lpn_toolbar button[data-tool="add-valveplus"]').length === 1)));
 		await P.mouse.click(at.x - 150, at.y + 150); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
-		ok('a Valve+ on the map has a plus on its symbol, in the symbol\'s own frame', await P.evaluate(() => !!document.querySelector('#lpn_canvas .lpn-link-symbol-valve .lpn-asm-plus')));
+		ok('a Valve+ on the map has a valve symbol and no plus', await P.evaluate(() => !!document.querySelector('#lpn_canvas .lpn-link-symbol-valve') && document.querySelectorAll('#lpn_canvas .lpn-asm-plus').length === 0));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

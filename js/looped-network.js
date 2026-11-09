@@ -465,11 +465,13 @@ var EngCalcs = EngCalcs || {};
 		// **TWO WAYS, AND THEY ARE DELIBERATELY NOT ONE FLAG:** `hiddenDropped` says nowhere would
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
-		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed || assemblyDownLabelHidden(id));
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
 		updateDataLeader(ne, anchor, end);
+		// Both labels of an assembly sit at its one point, so a leader would only cross the symbol and say nothing.
+		if (ne.leader && assemblyOfNode(id)) { ne.leader.style.display = 'none'; }
 	}
 	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
 	// whenever a vertex or endpoint drags.
@@ -925,7 +927,7 @@ var EngCalcs = EngCalcs || {};
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
-			sides = Collide.cardinalSides(nodeAt(n), d,
+			sides = assemblyLabelSides(n, fs, ne.lineCount) || Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 		// **A ONE-LINE LABEL IS PLACED AS THE STACK IT WAS FIRST, AND THEN SET IN ITS LINE** (Task 734,
 		// tryInlineNodeLabels()): the first-fit sees the stack the shed left (`inlineFrom`, its
@@ -13939,8 +13941,6 @@ var EngCalcs = EngCalcs || {};
 			perfDebugAccum('  lk:symbol', function () {
 				resizePumpSymbol(l.id); positionPumpSymbol(l.id);
 			});
-			var asmHere = assemblyOfLink(l.id);
-			if (asmHere) { paintAssembly(asmHere); }
 		}
 		// **NOT WHILE THE WHOLE DRAWING IS BEING REBUILT.** A project switch lays every label out
 		// once at the end -- restored from what this tab had worked out, or computed in the one
@@ -40029,11 +40029,38 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		updateNode(mate.id);
 	}
-	// The downstream node's label is not drawn while grouped: one label for the point, the upstream's.
-	function assemblyDownLabelHidden(id) {
-		var list = assemblyList(), i;
-		for (i = 0; i < list.length; i++) { if (list[i].down === id) { return true; } }
-		return false;
+	// **LABELS AT AN ASSEMBLY** (Task 822; Tom, 2026-11-08, option (a): every node keeps its own label, and where
+	// two nodes share one point their labels are ganged into one block placed together). The placer is not taught
+	// anything: this decides, before the placer sees it, the only candidate positions the two nodes' labels may take.
+	// The upstream node's label stands on the upstream side of the symbol and the downstream node's on the
+	// downstream side: the upstream label above and upstream of the point, the downstream label below and downstream
+	// of it, when the flow runs across the page; above and below it, to the right, when it runs up or down. Neither
+	// draws a leader (layoutNodeLabel). Returns null for a node outside any assembly, which keeps the placer's own
+	// candidates. The first candidate is the snug one; the next two stand a little further out.
+	function assemblyLabelSides(n, fs, lineCount) {
+		var a = assemblyOfNode(n.id), pump = a && linkById(a.links[0]), pl, ux, uy, sgn, half, pad, h, at, out = [], k, along, side;
+		if (!pump) { return null; }
+		pl = linkSymbolPlace(pump);
+		if (!pl) { return null; }
+		ux = Math.cos(pl.angle * Math.PI / 180); uy = Math.sin(pl.angle * Math.PI / 180);
+		sgn = a.down === n.id ? 1 : -1;
+		half = pumpSymbolSize(pump.type) / 2;
+		pad = defaultLabelOffset().x * 0.5;
+		h = dataLabelBoxHeight(lineCount);
+		at = nodeAt(n);
+		for (k = 0; k < 3; k++) {
+			if (Math.abs(ux) >= Math.abs(uy)) {
+				// Across the page: clear of the pipe's own line, the upstream block above and upstream of the symbol,
+				// the downstream block below and downstream of it.
+				side = { x: at.x + sgn * (ux >= 0 ? 1 : -1) * (half * 0.6 + pad + k * fs * 1.2),
+					y: sgn < 0 ? at.y - pad - h - k * fs * 0.6 + fs * 0.85 : at.y + pad + k * fs * 0.6 + fs * 0.85 };
+			} else {
+				along = half + pad + k * fs * 1.2;
+				side = { x: at.x + half * 0.5 + pad, y: sgn * (uy >= 0 ? 1 : -1) < 0 ? at.y - along - h + fs * 0.85 : at.y + along + fs * 0.85 };
+			}
+			out.push({ x: side.x, y: side.y, corner: -1, deg: null });
+		}
+		return out;
 	}
 	function assemblyRefs(a, lastRef) {
 		var refs = [{ kind: 'node', id: a.up }, { kind: 'node', id: a.down }].concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));
@@ -40054,7 +40081,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
-		paintAssembly(a);
 		layoutNodeLabel(dn.id);
 		return a;
 	}
@@ -40075,7 +40101,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
-		paintAssembly(a);
 		layoutNodeLabel(dn.id);
 		return a;
 	}
@@ -40091,34 +40116,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[0] }));
 	}
-	// The look (Tom, 2026-11-06, after his sketch of 2026-10-25): a plus drawn across the outlet barrel of the pump
-	// symbol, in the symbol's own frame, so it scales, rotates and flips with the pump. The filled and hollow
-	// discs of the first slice are gone: the plus alone says a Pump+ is not a plain pump.
-	// A pump's outlet barrel is wide enough to hold the plus, cut out of its solid body in paper colour. A valve's
-	// right-hand triangle is not, so its plus stands at the upper right, over the corner as in the sketch, in ink with
-	// a paper keyline where it crosses the solid.
-	var ASSEMBLY_PLUS = {
-		pump: { d: 'M18.5 7.1V12.9M15.6 10H21.4', over: false },
-		valve: { d: 'M19 0V10M14 5H24', over: true }
-	};
-	function paintAssembly(a) {
-		var le = linkEls[a.links[0]], pl = ASSEMBLY_PLUS[a.kind];
-		if (!le || !le.symbolSvg || !pl) { return; }
-		if (le.asmPlus) { return; }
-		le.asmPlus = el('g', { 'class': 'lpn-asm-plus' + (pl.over ? ' lpn-asm-plus-over' : '') }, le.symbolSvg);
-		if (pl.over) { el('path', { 'class': 'lpn-asm-plus-key', d: pl.d }, le.asmPlus); }
-		el('path', { 'class': 'lpn-asm-plus-ink', d: pl.d }, le.asmPlus);
-	}
-	function unpaintAssembly(a) {
-		var le = linkEls[a.links[0]];
-		if (le && le.asmPlus) { if (le.asmPlus.remove) { le.asmPlus.remove(); } le.asmPlus = null; }
-	}
+	// No mark is drawn on the map symbol of a Pump+ or Valve+ (Tom, 2026-11-08): the two coincident nodes already
+	// draw a junction-sized dot at its centre. Only the toolbar button icons carry the plus.
 	// **EXPLODE: THE GROUP ENDS, THE ELEMENTS STAY** (Task 822). Plain nodes and the pump are left exactly
 	// as they are. The caller has taken the undo snapshot.
 	function explodeAssembly(id) {
 		var a = assemblyById(id);
 		if (!a) { return; }
-		unpaintAssembly(a);
 		doc.assemblies = doc.assemblies.filter(function (x) { return x !== a; });
 		if (nodeEls[a.down]) { layoutNodeLabel(a.down); }
 		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === id) { closePopup(); }
@@ -40128,8 +40132,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function forgetAssembliesOf(id) {
 		var gone = assemblyList().filter(function (a) { return a.up === id || a.down === id || a.links.indexOf(id) >= 0; });
 		gone.forEach(function (a) {
-			unpaintAssembly(a);
-			if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === a.id) { closePopup(); }
+				if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === a.id) { closePopup(); }
 		});
 		if (gone.length) {
 			doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; });

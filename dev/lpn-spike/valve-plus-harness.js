@@ -108,8 +108,8 @@ console.log('\n--- 1. place on open ground ---');
 	ok('the tool stays armed, so another can be placed', L.getMode() === 'add-valveplus');
 	press(500, 150);
 	ok('a second one: U2, D2 and a second group', doc.assemblies.length === 2 && doc.nodes[2].id === 'U2' && doc.nodes[3].id === 'D2');
-	ok('only the upstream node\'s label is drawn', !L.nodeLabelHidden('U1') && L.nodeLabelHidden('D1'));
-	ok('the valve symbol carries a plus on its outlet barrel and no discs', (function () { const le = L.linkEls()[doc.links[0].id]; return !!(le && le.asmPlus && !le.asmMarks); })());
+	ok('both nodes keep their own label drawn', !L.nodeLabelHidden('U1') && !L.nodeLabelHidden('D1'));
+	ok("the valve symbol draws no plus and no discs", (function () { const le = L.linkEls()[doc.links[0].id]; return !!le && !le.asmPlus && !le.asmMarks; })());
 	L.undo();
 	ok('undo takes the second one away whole', L.getDoc().nodes.length === 2 && L.getDoc().links.length === 1 && L.getDoc().assemblies.length === 1, L.getDoc().nodes.length + '/' + L.getDoc().links.length + '/' + L.getDoc().assemblies.length);
 	L.undo();
@@ -215,7 +215,7 @@ console.log('\n--- 5. the project file and the .inp ---');
 	ok('the saved project holds the grouping', saved.assemblies && saved.assemblies.length === 1 && saved.assemblies[0].id === pumpId, JSON.stringify(saved.assemblies));
 	L.applySaved(L.migrateSaved(saved)); L.buildDom();
 	ok('opened again, the group is there and the nodes and pump with it', L.getDoc().assemblies.length === 1 && L.getDoc().nodes.length === 4 && L.getDoc().links.length === 3);
-	ok('and the valve symbol has its plus again', !!L.linkEls()[pumpId].asmPlus);
+	ok('and the valve symbol still draws no plus', !L.linkEls()[pumpId].asmPlus);
 	const out = EC.lpnExportInp(L.serializeProject(), {});
 	ok('the export succeeds', out.ok, JSON.stringify(out.error));
 	ok('it carries one ;ASSEMBLY: comment line', new RegExp('^;ASSEMBLY: valve U1 D1 ' + pumpId + '$', 'm').test(out.inp), (out.inp.match(/^;ASSEMBLY.*$/m) || [''])[0]);
@@ -239,6 +239,13 @@ console.log('\n--- 5. the project file and the .inp ---');
 	// no assembly, no line
 	L.getDoc().assemblies = [];
 	ok('with no group, no comment line', !/;ASSEMBLY/.test(EC.lpnExportInp(L.serializeProject(), {}).inp));
+}
+
+console.log('\n--- 6a. the Valve+ button tip ---');
+{
+	const lang = require('fs').readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
+	ok('the Valve+ tip opens with Tom\'s sentence, then the second sentence unchanged',
+		lang.indexOf("$ec_lang['lpn_tool_add_valveplus_tip']='Add a valve, its upstream node, and its downstream node at one point. Specify a point on the map, or specify a pipe to split it and put the valve in it.';") >= 0);
 }
 
 console.log('\n--- 6. the ID prefixes ---');
