@@ -73453,8 +73453,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Push override upward is always asked, through the page's own dialog, naming where it goes; the
 	// sentence about other scenarios is added when some change. `go` runs after the undo snapshot is taken.
 	function askPushOverride(dest, n, go) {
-		var pc = EngCalcs.pageConfig || {}, text = (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name);
-		if (dest.old !== null) { text += (pc.lpn_ovm_push_replace || ' It replaces {old} there.').replace('{old}', dest.old); }
+		var pc = EngCalcs.pageConfig || {}, text = dest.old === null
+			? (pc.lpn_ovm_push_ask || 'Push override upward to {target}?').replace('{target}', dest.name)
+			: (pc.lpn_ovm_push_ask_cur || 'Push override upward? Current value in {target}: {old}.').replace('{target}', dest.name).replace('{old}', dest.old);
 		if (n) { text += (pc.lpn_ovm_push_others || ' Scenarios that inherit it change ({n} total).').replace('{n}', String(n)); }
 		askDialog({ kind: 'confirm', text: text }, function (yes) {
 			if (!yes) { return; }

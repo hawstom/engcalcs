@@ -128,7 +128,7 @@ global.window = global.window || {};
 global.window.lpnDialogAnswerer = (req) => { asked = req; return answer; };
 L.switchScenario(A1.id);
 click(arrowIn(A1.id, m, 'elev'));
-report(asked && asked.kind === 'confirm' && /\(1 total\)/.test(asked.text) && /^Push override upward to A\?/.test(asked.text), 'the question names the destination (A) and, as siblings inherit it, the count', asked && asked.text);
+report(asked && asked.kind === 'confirm' && /\(1 total\)/.test(asked.text) && /^Push override upward(?: to A\?|\? Current value in A: )/.test(asked.text), 'the question names the destination (A) and, as siblings inherit it, the count', asked && asked.text);
 fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'No: nothing changes');
 answer = true; asked = null;
@@ -144,8 +144,8 @@ L.switchScenario(A1.id);
 asked = null; answer = true;
 click(arrowIn(A1.id, m, 'elev'));
 fresh();
-report(asked && !/total/.test(asked.text) && /^Push override upward to A\?/.test(asked.text), 'with no other scenario changing it is still asked, with no count', asked && asked.text);
-report(asked && /replaces 200 there/.test(asked.text), 'and says what it replaces', asked && asked.text);
+report(asked && !/total/.test(asked.text) && /^Push override upward(?: to A\?|\? Current value in A: )/.test(asked.text), 'with no other scenario changing it is still asked, with no count', asked && asked.text);
+report(asked && /Current value in [^:]+: 200\./.test(asked.text), 'and says what it replaces', asked && asked.text);
 report(!has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 333, 'Yes: pushed');
 L.undo(); fresh();
 report(has(A1.id, m, 'elev') && val(A.id, m, 'elev') === 200, 'and that is one undo step too');
@@ -162,8 +162,8 @@ L.switchScenario(C1.id);
 asked = null; answer = true;
 click(arrowIn(C1.id, n, 'elev'));
 fresh();
-report(asked && /^Push override upward to Base\?/.test(asked.text), 'order case: the question names Base', asked && asked.text);
-report(asked && /replaces 100 there/.test(asked.text), 'order case: Base\'s own value is named as replaced', asked && asked.text);
+report(asked && /^Push override upward(?: to Base\?|\? Current value in Base: )/.test(asked.text), 'order case: the question names Base', asked && asked.text);
+report(asked && /Current value in [^:]+: 100\./.test(asked.text), 'order case: Base\'s own value is named as replaced', asked && asked.text);
 report(L.baseValue(n, 'elev') === 640 && val(P.id, n, 'elev') === 50 && !has(C1.id, n, 'elev') && val(C1.id, n, 'elev') === 640,
 	'order case: Base gets 640, P keeps its own 50, C1 reads 640', L.baseValue(n, 'elev') + ',' + val(P.id, n, 'elev') + ',' + val(C1.id, n, 'elev'));
 L.undo(); fresh();
@@ -188,11 +188,11 @@ report(L.baseValue(n, 'elev') === 100 && has(C1.id, n, 'elev'), 'order case: No 
 	fresh();
 	asked = null; answer = false;
 	click(arrowIn(Q1.id, n, 'emitter', 'Emitter coefficient (gpm/psi)'));
-	report(asked && /to Q\?/.test(asked.text) && /replaces 500 gpm\/psi there/.test(asked.text), 'emitter coefficient: the old value is shown in the displayed unit, with its unit', asked && asked.text);
+	report(asked && /Current value in Q: 500 gpm\/psi\./.test(asked.text), 'emitter coefficient: the old value is shown in the displayed unit, with its unit', asked && asked.text);
 	report(asked && !/0\.0\d/.test(asked.text), 'emitter coefficient: not the SI number');
 	asked = null;
 	click(arrowIn(Q1.id, L.linkById(pipe.id), 'diameter', 'Diameter (in)'));
-	report(asked && /replaces 8 in there/.test(asked.text), 'diameter in US units: the old value as typed, with in', asked && asked.text);
+	report(asked && /Current value in [^:]+: 8 in\./.test(asked.text), 'diameter in US units: the old value as typed, with in', asked && asked.text);
 }
 
 // 6. Recalculate off. The click ends in afterPropertyEdit(), as the dot's Clear does, so a push
