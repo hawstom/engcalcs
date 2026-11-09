@@ -358,6 +358,11 @@
      "parent": "Insert"
     },
     {
+     "id": "project/menu_insert/tool_add_well",
+     "label": "Well",
+     "parent": "Insert"
+    },
+    {
      "id": "project/menu_insert/tool_add_virtual",
      "label": "Virtual pipe",
      "parent": "Insert"
@@ -724,6 +729,11 @@
     {
      "id": "tb/add-valveplus",
      "label": "Valve+",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-well",
+     "label": "Well",
      "parent": ""
     },
     {

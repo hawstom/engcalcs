@@ -615,9 +615,11 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	// report it as a number with no element attached. Put a short pipe between them.
 	for (i = 0; i < model.links.length; i++) {
 		link = model.links[i];
-		// Every type but the throttle: PRV/PSV/FCV are EPANET's rule 219 (project.c valvecheck), and
-		// PBV/GPV were refused here before the native solver learnt the first three, and still are.
-		if (link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV') { continue; }
+		// Every type but the throttle and the general purpose valve: PRV/PSV/FCV are EPANET's rule 219
+		// (project.c valvecheck), and a PBV was refused here before the native solver learnt the others,
+		// and still is. A GPV may touch a reservoir or a tank: EPANET's check does not apply to it, and a
+		// Well (Task 822) is a reservoir, a GPV for the drawdown, and the pump's suction node.
+		if (link.type !== 'valve' || ['TCV', 'GPV'].indexOf((link.valveType || 'TCV').toUpperCase()) >= 0) { continue; }
 		if ((byId[link.from] && EngCalcs.lpnIsFixedHead(byId[link.from])) ||
 			(byId[link.to] && EngCalcs.lpnIsFixedHead(byId[link.to]))) {
 			badlyPlacedValves.push(link.id);

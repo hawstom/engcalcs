@@ -422,6 +422,10 @@
 				if (gm) {
 					var gt = gm[2].split(/\s+/).filter(Boolean);
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
+					else if (gt[0].toLowerCase() === 'well') {
+						// `;ASSEMBLY: well R S T G P`: reservoir, suction, tank, drawdown valve, pump. Anything shorter is not one.
+						if (gt.length === 6) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 4), links: gt.slice(4) }); }
+					}
 					else if (gt.length >= 4) { markAssemblies.push({ kind: gt[0].toLowerCase(), up: gt[1], down: gt[2], links: gt.slice(3) }); }
 					continue;
 				}
@@ -1377,8 +1381,17 @@
 		markVirtual.forEach(function (vid) { if (linkIndex[vid] && linkIndex[vid].type === 'pipe') { linkIndex[vid].virtual = true; } });
 		var assemblies = [], assemblyBad = [];
 		markAssemblies.forEach(function (a) {
-			var un = nodeIndex[a.up], dn = nodeIndex[a.down],
-				good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
+			var un, dn, wn, good;
+			if (a.kind === 'well') {
+				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
+				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && wn[2].type === 'tank' &&
+					a.links.every(function (id) { return !!linkIndex[id]; })) {
+					assemblies.push({ id: a.links[0], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() });
+				} else { assemblyBad.push(a.links[0]); }
+				return;
+			}
+			un = nodeIndex[a.up]; dn = nodeIndex[a.down];
+			good = !!un && !!dn && un.type === 'junction' && dn.type === 'junction' && a.links.every(function (id) { return !!linkIndex[id]; });
 			if (good) { assemblies.push({ id: a.links[0], kind: a.kind, up: a.up, down: a.down, links: a.links.slice() }); }
 			else { assemblyBad.push(a.links[0]); }
 		});
@@ -3705,9 +3718,10 @@
 			doc.links.forEach(function (l2) { if (!offLink[l2.id]) { live[l2.id] = 1; } });
 			if (virtualIds.length) { out += ';VIRTUAL: ' + virtualIds.join(' ') + '\n'; }
 			(doc.assemblies || []).forEach(function (a) {
-				if (!a || !a.up || !a.down || !a.links || !a.links.length) { return; }
-				if (omitted[a.up] || omitted[a.down] || !a.links.every(function (id) { return live[id]; })) { return; }
-				out += ';ASSEMBLY: ' + [a.kind || 'pump', a.up, a.down].concat(a.links).join(' ') + '\n';
+				var ends = a && a.kind === 'well' ? a.nodes : a && [a.up, a.down];
+				if (!a || !ends || !ends.every(Boolean) || !a.links || !a.links.length) { return; }
+				if (ends.some(function (id) { return omitted[id]; }) || !a.links.every(function (id) { return live[id]; })) { return; }
+				out += ';ASSEMBLY: ' + [a.kind || 'pump'].concat(ends, a.links).join(' ') + '\n';
 			});
 			return out ? out + '\n' : '';
 		}

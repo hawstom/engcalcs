@@ -167,3 +167,26 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
 - **Velocity:** a virtual pipe, and any pipe of length 0, reports velocity 0 in the built-in solver; EPANET is handed the
   stand-in for a virtual pipe and reports 0 for it. A plain pipe of length 0 is refused by the EPANET engine (its
   Error 211, illegal link property value, inside the Error 200 that opening a file reports); the built-in solver solves it.
+
+### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`)
+
+The Pump button's third form (Pump, Pump+, Well). Five ordinary elements at one point: **R** a reservoir whose head is
+the groundwater's static elevation, **S** the pump's suction (a junction, no demand, same elevation), **T** an open-air
+tank at the ground elevation where the system's pipes attach, **G** a GPV from R to S whose head-loss curve is the
+drawdown against pumping rate (it includes the point 0, 0), **P** the pump from S to T whose curve is the head lifted
+from the pumping level (the static elevation less the drawdown), not from the static elevation.
+
+- **Grouping:** `{ id: G, kind: 'well', nodes: [R, S, T], links: [G, P] }`; pump and valve groups keep `up` and `down`. The
+  `.inp` comment is `;ASSEMBLY: well R S T G P`, and the reader restores it only when all five exist (R a reservoir, S a
+  junction, T a tank), else `assembly-unresolved`.
+- **Shared values:** x and y reach all three nodes; the static elevation typed on R or S reaches the other of the two; T's
+  elevation is the ground's alone. A pipe that ends on or starts at a well joins T. Splicing into a pipe makes T the node
+  both halves attach to, with the ground interpolated along the pipe.
+- **Scenarios:** the static elevation and the two curve references (G's and P's `curveId`) are overridable through
+  `setProp()` as any node elevation and curve reference is. The tank's ground elevation and depths follow the ordinary
+  tank rules.
+- **Solvers:** `EngCalcs.lpnDiagnose` no longer refuses a GPV on a reservoir or tank (EPANET's error 219 covers PRV, PSV
+  and FCV only; a PBV is still refused). Both engines solve a well; the pump's discharge head equals static elevation less
+  drawdown(Q) plus pump head(Q) to better than 1e-8 m.
+- **Not built:** automatic controls for the open-air tank; the pressure tank (slice 2, waiting on Tom's answers); a drawdown
+  picture on the icon; the Assemblies table.
