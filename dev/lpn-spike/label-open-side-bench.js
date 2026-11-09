@@ -26,6 +26,7 @@ function mutator(on) {
 		});
 		if (process.env.BENCH_LEADER) { src = src.replace(/var LABEL_LEADER_THRESHOLD = [0-9.]+;/, 'var LABEL_LEADER_THRESHOLD = ' + process.env.BENCH_LEADER + ';'); }
 		if (process.env.BENCH_PIPE_AMBIG) { src = src.replace(/LPN_AMBIG_PIPE_RATIO = [0-9.]+/, 'LPN_AMBIG_PIPE_RATIO = ' + process.env.BENCH_PIPE_AMBIG); }
+		if (process.env.BENCH_REACH) { src = src.replace(/LPN_LEVEL_REACH_TEXT_HEIGHTS = [0-9.]+/, 'LPN_LEVEL_REACH_TEXT_HEIGHTS = ' + process.env.BENCH_REACH); }
 		if (process.env.BENCH_AMBIG) { src = src.replace(/LPN_AMBIG_RATIO = [0-9.]+/, 'LPN_AMBIG_RATIO = ' + process.env.BENCH_AMBIG); }
 		if (process.env.BENCH_SHORT) { src = src.replace(/LPN_SHORT_LEADER_TEXT = [0-9.]+/, 'LPN_SHORT_LEADER_TEXT = ' + process.env.BENCH_SHORT); }
 		// a mutation that changes nothing is an error in the loader; touch the file's first line
