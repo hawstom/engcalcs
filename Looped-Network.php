@@ -4443,6 +4443,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_epanet_used: <?=json_encode($ec_lang['lpn_engine_epanet_used'])?>,
 	lpn_diag_valve_conflict: <?=json_encode($ec_lang['lpn_diag_valve_conflict'])?>,
 	lpn_diag_gpv_curve_order: <?=json_encode($ec_lang['lpn_diag_gpv_curve_order'])?>,
+	lpn_diag_well_no_curve: <?=json_encode($ec_lang['lpn_diag_well_no_curve'])?>,
 	lpn_diag_rules_refused: <?=json_encode($ec_lang['lpn_diag_rules_refused'])?>,
 	lpn_diag_control_refused: <?=json_encode($ec_lang['lpn_diag_control_refused'])?>,
 	lpn_diag_rule_step_refused: <?=json_encode($ec_lang['lpn_diag_rule_step_refused'])?>,

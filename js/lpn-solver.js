@@ -637,6 +637,20 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		if (conflictMap[model.links[i].id]) { conflictIds.push(model.links[i].id); }
 	}
 	if (conflictIds.length > 0) { issues.push({ code: 'valve-conflict', ids: conflictIds }); }
+	// A WELL THAT NAMES NO CURVE (Task 822). A fresh Well has no drawdown curve and no pump curve on purpose
+	// (no invisible defaults), and the GPV with no curve and the pump with no curve are each a lossless
+	// connection, so a reservoir and a tank at different heads joined by them solve to an absurd flow.
+	// Refused by name in both engines. A plain pump or GPV with no curve stays a lossless connection.
+	var wellsBare = [];
+	(model.wells || []).forEach(function (w) {
+		var g = null, p = null, j;
+		for (j = 0; j < model.links.length; j++) {
+			if (model.links[j].id === w.gpv) { g = model.links[j]; }
+			if (model.links[j].id === w.pump) { p = model.links[j]; }
+		}
+		if (g && p && (!(g.curvePoints && g.curvePoints.length) || !(p.curveSI && p.curveSI.length))) { wellsBare.push(w.id); }
+	});
+	if (wellsBare.length > 0) { issues.push({ code: 'well-no-curve', ids: wellsBare }); }
 	var badCurves = EngCalcs.lpnGpvsWith(model, 'gpv-order');
 	if (badCurves.length > 0) { issues.push({ code: 'gpv-curve-order', ids: badCurves }); }
 

@@ -5341,6 +5341,7 @@ $ec_lang['lpn_engine_native_used']='Solved with the built-in solver.';
 $ec_lang['lpn_engine_epanet_used']='Solved with the EPANET solver.';
 $ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
 $ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
+$ec_lang['lpn_diag_well_no_curve']='These wells need a drawdown curve and a pump head curve. Choose both in the Properties box of each well:';
 $ec_lang['lpn_diag_rules_refused']='EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:';
 $ec_lang['lpn_diag_control_refused']='EPANET does not accept the controls on these links, because a control cannot act on a check valve, a numeric setting cannot control a general purpose valve, and the setting of a pipe or pump cannot be negative. Correct or delete the controls on:';
 $ec_lang['lpn_diag_rule_step_refused']='Rules need a hydraulic time step of at least 10 seconds. EPANET evaluates rules at one tenth of the hydraulic time step, in whole seconds, and a result of 0 cannot run. Increase the hydraulic time step or delete the rules.';

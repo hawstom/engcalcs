@@ -79959,6 +79959,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// absent option leaves the number exactly as it was.
 		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
+			// The wells, so EngCalcs.lpnDiagnose can refuse one that names no curve (Task 822).
+			wells: (doc.assemblies || []).filter(function (a) { return a.kind === 'well'; }).map(function (a) { return { id: a.id, gpv: a.links[0], pump: a.links[1] }; }),
 			visc: 1.007e-6 * (hyd.viscosity || 1),
 			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
@@ -80129,6 +80131,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		// The two valve data faults (Task 733; Tom, 2026-10-18): EPANET refuses both, so both engines do.
 		if (issue.code === 'valve-conflict') { return (pc.lpn_diag_valve_conflict || 'These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'well-no-curve') { return (pc.lpn_diag_well_no_curve || 'These wells need a drawdown curve and a pump head curve. Choose both in the Properties box of each well:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
 		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
 		if (issue.code === 'rules-refused') { return (pc.lpn_diag_rules_refused || 'EPANET does not accept these rules, because a clause is not valid for the element it names or states a value that cannot be read. Correct or delete them:') + ' ' + issue.ids.join(', '); }

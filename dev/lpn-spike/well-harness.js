@@ -45,6 +45,7 @@ const L = loadLoopedNetwork(
 	"\t\tdeleteNode: deleteNode, deleteLink: deleteLink, linkEls: function () { return linkEls; },\n" +
 	"\t\tapplyNodeRename: applyNodeRename, applyLinkRename: applyLinkRename,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, getScenarios: function () { return scenarios; },\n" +
+	"\t\ttitleText: propsBoxTitleText,\n" +
 	"\t\tcurrentModel: function () { return assembleModel(); },\n" +
 	"\t\tresetIds: function () { nextId = newNextId(); },\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
@@ -292,6 +293,33 @@ console.log('\n--- 7. EngCalcs.lpnDiagnose ---');
 	const doc = wellNetwork();
 	const diag = EC.lpnDiagnose(L.currentModel());
 	ok('a GPV off a reservoir is not refused', !(diag && (diag.errors || diag.issues || []).length) , JSON.stringify(diag));
+}
+
+console.log('\n--- 7b. a Well with no curve is refused by name in both engines; its box is titled Well ---');
+{
+	const doc = fresh();
+	L.setMode('add-well');
+	press(200, 150);
+	const j = L.addNode('junction', 600, 150);
+	L.addLink('pipe', 'T1', j.id, []);
+	const wid = doc.assemblies[0].id;
+	const PC = global.EngCalcs.pageConfig;
+	const diag = EC.lpnDiagnose(L.currentModel());
+	ok('lpnDiagnose names the curveless Well', diag.some((i) => i.code === 'well-no-curve' && i.ids.join() === wid), JSON.stringify(diag));
+	ok('the message says what to do and names the Well', typeof PC.lpn_diag_well_no_curve === 'string' && /Properties box/.test(PC.lpn_diag_well_no_curve));
+	const a = EC.lpnSolve(L.currentModel());
+	ok('built-in: refused, not solved to an absurd flow', a.ok === false && a.issues.some((i) => i.code === 'well-no-curve'), JSON.stringify(a.issues));
+	const e = await EC.lpnSolveEpanet(L.currentModel(), { moduleUrl: NODE_ENGINE_URL });
+	ok('EPANET: refused with the same issue', e.ok === false && (e.issues || []).some((i) => i.code === 'well-no-curve'), JSON.stringify(e.issues || e.engineError));
+	// with only the pump curve chosen it is still refused (the drawdown curve is missing)
+	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
+	L.setProp(doc.links[1], 'curveId', 'PC1');
+	ok('one curve of two is still refused', EC.lpnDiagnose(L.currentModel()).some((i) => i.code === 'well-no-curve'));
+	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
+	L.setProp(doc.links[0], 'curveId', 'DD1');
+	ok('both curves chosen: not refused', !EC.lpnDiagnose(L.currentModel()).some((i) => i.code === 'well-no-curve'));
+	L.openPopup('U1', 10, 10);
+	ok('the box is titled with the Well, not Text', L.titleText() === 'Properties: Well ' + wid, L.titleText());
 }
 
 console.log('\n--- 8. the project file and the .inp ---');
