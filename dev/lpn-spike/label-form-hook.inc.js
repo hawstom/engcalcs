@@ -10,6 +10,11 @@
 		solved: function () { return !!lastSolveResult; },
 		inlineTrial: function () { return lastInlineTrial; },
 		crossShed: function () { return lastCrossingShed; },
+		nodeLeaders: function (ids) {
+			var o = {};
+			ids.forEach(function (id) { var ne = nodeEls[id]; o[id] = !!(ne && ne.leader && ne.leader.style.display !== 'none' && ne.leader.style.visibility !== 'hidden' && ne.leader.getAttribute('x1') != null); });
+			return o;
+		},
 		shedEntries: function () { return lastShedEntries; },
 		// Why a hidden node label found no one-line place: the final ground, the label set in once with each
 		// constraint of the one-line trial taken off in turn. Returns which variants find a side.

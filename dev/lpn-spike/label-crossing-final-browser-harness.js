@@ -5,7 +5,7 @@
 // label it had crossed to a line: N161 stayed hidden for a crossing that no longer existed. Novato at the
 // wheel's notches 0 to 16 (three scales each, as label-open-side-browser-harness.js does). ASSERTED: every
 // node or pipe label hidden for a crossing is in a flagged pair in the final drawing, and N161 shows at
-// 9 notches. OPEN_SIDE_NOTCHES=9 narrows it.
+// 9 notches; N163 and N164 draw a short leader at 5 to 14 notches (ambiguousShortLeaders()). OPEN_SIDE_NOTCHES=9 narrows it.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -73,7 +73,7 @@ async function main() {
 		await a.settle(2000);
 		await a.page.evaluate(() => { window.__lpnForm.fit(); window.__lpnForm.centerOn('163'); });
 		await a.settle(2000);
-		let bad = [], hid = 0, n161 = null, views = 0;
+		let bad = [], hid = 0, n161 = null, views = 0, noLead = [];
 		for (const k of NOTCHES) {
 			for (const j of JITTER) {
 				await a.page.evaluate(([f, z]) => { window.__lpnForm.viewAt('163', f * Math.pow(1.1, z)); window.__lpnForm.content(); }, [FIT_SCALE * j, k]);
@@ -82,10 +82,15 @@ async function main() {
 				views++; hid += r.hidden.length;
 				r.unjustified.forEach((id) => bad.push(id + '@' + k + 'x' + j));
 				if (k === 9 && j === 1) { n161 = r.forms['161']; }
+				if (k >= 5 && k <= 14 && j === 1) {
+					const ld = await a.page.evaluate(() => window.__lpnForm.nodeLeaders(['163', '164']));
+					['163', '164'].forEach((id) => { if (!ld[id]) { noLead.push('N' + id + '@' + k); } });
+				}
 			}
 		}
 		ok('no page errors', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		ok('every label hidden for a crossing crosses something in the final drawing (' + hid + ' hides over ' + views + ' views)', bad.length === 0, bad.join(' '));
+		ok('N163 and N164 draw a short leader (another node stands as near their rows) at 5 to 14 notches', noLead.length === 0, noLead.join(' '));
 		if (NOTCHES.indexOf(9) >= 0) { ok('9 notches: N161 shows', /^(line|stack)/.test(n161), String(n161)); }
 		await a.close();
 	} finally {
