@@ -4946,3 +4946,21 @@ OBSERVED (re-verify; real Chromium, master fba145651 = merge-base vs branch, Nov
 - n600 1920 notch 9: 367 -> 510 leaders on 542 labels. n600 phone: 77 -> 145 at notch 9.
 - Net1, Net3 phone: no new overlaps; Net3 phone notch 6 swaps L330 for NRiver.
 - NOT DONE: mutation test of harness; Tom's own window size; a fixed fit scale for non-Novato scenes (fit differs between trees, Net1 notch 12 not comparable).
+
+## 2026-11-09 night feat/assembly round 5 (6af7fa10d), Task 822
+- OBSERVED (re-verify; real Chromium, Net1; probes in scratchpad pp/): plain Net1 and Net3 label text, leaders and overlaps byte-identical to master (no leak). assembly-sections-browser 12/12, assembly-link-labels-browser 22/22; well-tee, well, virtual-pipe 47, sections, pump-plus, valve-plus node harnesses pass.
+- OBSERVED: Pump+/Valve+ link labels read "LP1 Q=1230.0" / "LV1 Q=172.8 V=4.4"; no vertical/level leader and none through a label at 6 zoom steps for a horizontal and a vertical pipe.
+- OBSERVED DEFECT (small): at the fit view LP1 overlaps the rotated L110 label (14x14 px) on desktop and phone; nV1U/nV1D boxes overlap 6x17 px at every zoom (ink does not touch).
+- OBSERVED: Well with no curves now refused by name ("These wells need a drawdown curve and a pump head curve") and the whole Net1 loses its results while the banner stands. With C1 headloss + C2 pump chosen, ground 690, static 590: tank full gives W1B 0 and pump flow 729.6 gpm into the system, EPANET = built-in to 0.1 gpm. Changing ground 0 -> 690 leaves static at -100 (absolute, independent).
+- OBSERVED: drag moves all four nodes; .inp export writes W1T 690, virtual W1B 0.01 x 18 in (widest), ;VIRTUAL and ;ASSEMBLY comments; reimport as new project returns a Well, same flows. Length 0 on a pipe shows "Virtual pipe (length = 0)", V 0.0.
+- NOT DONE: DEM fill (needs Mapbox), mutation test of harnesses, light/dark pictures of every state.
+
+## 2026-11-10 feat/label-open-side round 5 (76fbb64b9), Task 812
+OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale forced by injecting the saved view {s,cx,-cy} from master's fit; counter in scratchpad q/):
+- Pipe fields shown, master->branch: Novato desktop notch 9 115->137, 11 107->132; n600 notch 9 334->360; Net3 notch 9 57->74. Pipe labels hidden down (Novato 9: 20->17). Leadered-but-shed pipe labels Novato 9: 16->11, 11: 10->6; still 7-11 left at 9-11.
+- L180 (Tom's): branch still "Q=3.5" at 9, 11-16; HIDDEN on branch at 5-8 and 10 where master showed it (full at 5-7). L181 lost at 9. L185 full-fields now at 12-16 (master shed at 13,15,16), but hidden at 10,11 both trees.
+- NODE labels on leaders: n600 notch 9 96->214, Net3 notch 0 36->48, phone Novato notch 8 11->36 (pre-existing from round 4, not new in 5).
+- PASS TIME (?debug=perf labelSettle on a bank miss, two runs each, order swapped): Novato 188->257 ms (+37-44%), n600 1660->2540 ms (+53%). Builder said +6%/+8%. Did not find why.
+- Stable: same notch reached by three paths, 0 label strings differ, both trees.
+- Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
+NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
