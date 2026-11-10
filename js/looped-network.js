@@ -3402,7 +3402,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
-			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {}, fsNow = fs + 'px';
+			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), nearReach = Math.max(home0 * 3, fs * 3), byKey = {}, fsNow = fs + 'px';
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (le) { le.levelForm = null; le.levelAt = null; }
@@ -3423,11 +3423,20 @@ var EngCalcs = EngCalcs || {};
 					deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
 					arcs = Collide.openArcs([deg, deg + 180]),
 					out = Collide.cardinalSides(p, d, arcs, {}),
-					ring = Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
-						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings }));
-				ring.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
-				ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
-				ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+					// The rings out to 3 text heights are the ones laid before reach grew; the rings beyond
+					// are added after them, flagged `far`, for the second sweep (below).
+					ring = Collide.polarCandidates(p, arcs[0], home0, nearReach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, nearReach, { rings: rings })),
+					farRing = reach > nearReach ? Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings })) : [];
+				function byRadius(set, far) {
+					set.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
+					set = set.filter(function (q) { return !far || q._r > nearReach + 0.5; });
+					set.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
+					set.forEach(function (q) { q.far = far; delete q._r; delete q._i; out.push(q); });
+				}
+				byRadius(ring, false);
+				byRadius(farRing, true);
 				if (along !== null) { out.forEach(function (q) { q.anchor = p; q.along = along; }); }
 				return out;
 			}
@@ -3504,8 +3513,40 @@ var EngCalcs = EngCalcs || {};
 		// near enough to draw no leader is taken only where its own pipe is the nearest pipe to its
 		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
 		// which says it instead. A label with no such side stays hidden.
-		var out = perfDebugAccum('  lv:fit', function () { return Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
-			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC }); });
+		// **GROUND OUT TO 3 TEXT HEIGHTS IS SPENT FIRST, THE FAR RINGS ONLY BY WHAT IS STILL HIDDEN**
+		// (Task 812; Net3 on a 390 px phone at 6 notches: with the far rings in the one sweep, a long
+		// pipe took a far spot and three shorter pipes lost the near spots they had, 87 -> 86 labels, 135
+		// -> 129 values). Two sweeps over the same ground: the first with every side within reach 3, as
+		// before; the second only for the labels it dropped, with every side to the full reach, on the
+		// ground the first left. No label that fits near its pipe loses its place to one that reaches.
+		var fitOpts = { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
+			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC };
+		function withSides(sp, keep) {
+			var idx = [], c = Object.assign({}, sp);
+			c.sides = sp.sides.filter(function (q, i) { if (keep(q)) { idx.push(i); return true; } return false; });
+			c._idx = idx;
+			return c;
+		}
+		function backToFullSides(r, c) { if (r.side >= 0 && c._idx) { r.side = c._idx[r.side]; } return r; }
+		var out = perfDebugAccum('  lv:fit', function () {
+			var near = specs.map(function (sp) { return withSides(sp, function (q) { return !q.far; }); }), nearBy = {},
+				first, left, second = [], ground2;
+			near.forEach(function (c) { nearBy[c.id] = c; });
+			first = Collide.placeLabelsFirstFit(near, ground, fitOpts).map(function (r) { return backToFullSides(r, nearBy[r.id]); });
+			left = first.filter(function (r) { return r.dropped && byKey[r.id].sides.some(function (q) { return q.far; }); });
+			if (!left.length) { return first; }
+			ground2 = { boxes: ground.boxes.slice(), segments: ground.segments.slice() };
+			first.forEach(function (r) {
+				if (r.dropped) { return; }
+				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground2.boxes.push(b); });
+				if (r.leader) { ground2.segments.push(r.leader); }
+			});
+			var leftBy = {}, again = left.map(function (r) { var c = withSides(byKey[r.id], function () { return true; }); leftBy[c.id] = c; return c; });
+			Collide.placeLabelsFirstFit(again, ground2, fitOpts).forEach(function (r) { second.push(backToFullSides(r, leftBy[r.id])); });
+			var secBy = {};
+			second.forEach(function (r) { secBy[r.id] = r; });
+			return first.map(function (r) { return secBy[r.id] || r; });
+		});
 		out.forEach(function (r) {
 			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
 			if (!le || r.dropped) { return; }
