@@ -33,8 +33,10 @@ volume); Well (a reservoir, pump, etc.); Well and pressure tank (residential).
   junctions. The first two pipes connected set the direction, toward the first pipe if it's drawn starting at and going away from the pump, else stay rightward until able to point toward the second pipe; Properties
   has a **Downstream pipe** chooser among its connected pipes. Clicking a pipe splices one in, but is
   probably not the usual way. One click either way.
-- **Node IDs:** settable in the project's ID prefixes from the start; spaces refused as for the other
-  prefixes; initial English prefixes **U** and **D**. Symbol: the upstream (high) side filled, the
+- **Node IDs:** systematic, from the device's own ID (Tom, 2026-11-09: "Shouldn't V1 have V1D and V1U?"): a Pump+ pump
+  P1 has nodes P1U and P1D, a Valve+ valve V1 has V1U and V1D, from the project's existing pump and valve prefixes; there is no
+  prefix of their own. A derived ID that is taken passes the whole number over, so the group never mixes two numbers. A rename
+  of one member renames no other; Explode and import never rename. Symbol: the upstream (high) side filled, the
   downstream (low) side hollow.
 - **Elevation:** ground elevation, equal for both nodes by definition: equal x, y and z. Properties
   shows upstream and downstream pressure and HGL.
@@ -92,7 +94,7 @@ only when there is one, and `applySaved()` keeps one only if every element it na
 renaming a member keeps the list true (delete dissolves the group, rename follows it). Undo carries it,
 because it is part of `doc`.
 
-In the `.inp` it is one comment line per assembly, `;ASSEMBLY: pump U1 D1 P1` (kind, upstream node,
+In the `.inp` it is one comment line per assembly, `;ASSEMBLY: pump P1U P1D P1` (kind, upstream node,
 downstream node, links), written after the last section and before `[END]`. EPANET and every other reader
 skip it; our reader restores the group only when every element is in the file, and reports it (`assembly-
 unresolved`) when not. A file with no assembly gets no line, so Net1, Net2 and Net3 stay character-exact.
@@ -127,8 +129,7 @@ link that reads back as a pipe; the group still restores.
 - **Place:** the Pump toolbar button's second form (Tom, 2026-11-06: "Put Valve+ on Valve, Pump+ and Well on Pump,
   Virtual Pipe on Pipe"; there is no Plus button). Pressing Pump, or key 6, while a form of it is the tool moves to
   the next form; the button shows the armed form and a corner triangle, as Select area does. Pipe holds Virtual pipe
-  and Valve holds Valve+ the same way (`TOOL_FORMS`). Or Insert > Pump+, listed beside Pump. A press on open ground makes two coincident junctions (IDs from
-  the new `U` and `D` ID prefixes, set under Settings > ID prefixes, spaces refused as for the others) and a
+  and Valve holds Valve+ the same way (`TOOL_FORMS`). Or Insert > Pump+, listed beside Pump. A press on open ground makes two coincident junctions (IDs P1U and P1D, from the pump prefix and the number it mints) and a
   pump from the upstream to the downstream node; a press on a pipe in Base splices it in (pipe, pump, pipe).
   The tool stays armed, like every inserter. The pump has no curve until one is chosen, so it adds no head.
 - **Look:** a plus across the pump symbol's outlet barrel, cut out of the solid body in paper colour (an ink plus
@@ -142,7 +143,7 @@ link that reads back as a pipe; the group still restores.
   written to both by `setProp()`. Rename and delete keep the grouping true.
 ### Valve+ (built)
 
-The same grouping with `kind: 'valve'` (`;ASSEMBLY: valve U1 D1 V1`), on the Valve button's second form (key 7
+The same grouping with `kind: 'valve'` (`;ASSEMBLY: valve V1U V1D V1`), on the Valve button's second form (key 7
 again). Same placement, splice, select-all, one Elevation, Explode, drag and delete. The Properties box is the
 valve's own (type, setting, diameter, loss) with the upstream and downstream pressure rows. The plus stands at the
 upper right of the bowtie, over the corner as in Tom's sketch, in ink with a paper keyline where it crosses the solid.
@@ -176,7 +177,13 @@ tank at the ground elevation where the system's pipes attach, **G** a GPV from R
 drawdown against pumping rate (it includes the point 0, 0), **P** the pump from S to T whose curve is the head lifted
 from the pumping level (the static elevation less the drawdown), not from the static elevation.
 
-- **Grouping:** `{ id: G, kind: 'well', nodes: [R, S, T], links: [G, P] }`; pump and valve groups keep `up` and `down`. The
+- **IDs and symbol (Tom, 2026-11-09):** the well is its pump and carries its ID, W1 from a new project prefix **W** (Settings, beside
+  the others; the pump prefix's Apply to all leaves well pumps alone). Its members are W1R (reservoir), W1U (the
+  pump's upstream node, S above), W1V (the drawdown valve, G) and W1T (the tank). It is drawn as one symbol, the toolbar icon's own
+  paths (ground line, casing, slim pipe, drawdown curve), on the tank's node; the other two nodes and both links draw as nothing.
+  A new well's static elevation is the ground less 100 ft or 30 m; where the ground waits for the DEM, the static level follows the
+  fill, and no door that reads the land surface ever writes R or S.
+- **Grouping:** `{ id: P, kind: 'well', nodes: [R, S, T], links: [G, P] }`; pump and valve groups keep `up` and `down`. The
   `.inp` comment is `;ASSEMBLY: well R S T G P`, and the reader restores it only when all five exist (R a reservoir, S a
   junction, T a tank), else `assembly-unresolved`.
 - **Shared values:** x and y reach all three nodes; the static elevation typed on R or S reaches the other of the two; T's
