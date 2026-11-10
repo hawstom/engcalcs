@@ -196,7 +196,7 @@ cannot place. Ranked by what a WaterGEMS user loses without the item:
 | 3 | Emitter coefficients | Yes: ft3/s per psi^n | **Written** (below) |
 | 4 | Pump speed pattern | Yes: `VSPType` 0 | **Written** (below) |
 | 5 | Energy price, price pattern, demand charge | The constant price: yes (Tom's `energy-price` save, 2026-11-04). Pattern and demand charge: yes (Tom's saves of 2026-11-06) | **All three written** ("Energy price" and 8a below) |
-| 6 | Controls on a pressure or other condition; rule-based controls | No: `IdahoControl_ControlType_LogicalType` is empty; the only condition codes seen are clock time and tank level | Stays (written as the clock times EPANET switched them) |
+| 6 | Controls on a pressure or other condition; rule-based controls | Mostly yes since 2026-11-05 and 2026-11-09 (logical controls, composites; "Composite controls"); a rule outside the written shapes is named in the not-written list | Narrowed |
 | 7 | Pressure-driven demand model | No | Stays |
 | 8 | Description, tag, demand category names | Yes: `HMIModelingElement.Notes` is a field of every element | **Written** into Notes (`Tag: x`, `Demand categories: Residential 100 gpm; ...`). No tag or category field was seen, so the lines left the box |
 | 9 | Text on the map, background picture, true positions | No: no sample states a map text, a backdrop path or a spatial reference | Stay |
@@ -341,7 +341,7 @@ Settled:
 **Feature tests are complete (2026-11-03).** Written by the page and read back by WaterGEMS as expected: emitters, pump speed
 pattern, mixed/FIFO/LIFO/two-compartment tanks, a chemical run (global bulk and wall rates, set point and other sources
 without a pattern, initial quality), age and trace runs, the quality time step (stated and not a tenth of the hydraulic step: flag True and seconds; otherwise False), one-point pump curves. Written since Tom's ten saves (next section): per-pipe and per-tank rates, source patterns, pump controls, pressure-driven
-demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls. Written since the `energy-price` save: an energy price (constant or by pattern, global or per pump) and a demand charge. Still not written: other rules (AND/OR, several premises, other attributes; named by rule in the not-written list), map text, backdrop, true positions for any other system.
+demand, true positions for EPSG:2223. Written since the 2026-11-05 readings: rules of the simplest shape (one tank-level premise, one THEN, at most one ELSE, an optional priority) as logical controls, and from 2026-11-09 two premises joined by AND or OR and several THEN actions. Written since the `energy-price` save: an energy price (constant or by pattern, global or per pump) and a demand charge. Still not written: other rules (three or more premises, a mix of AND and OR, several ELSE actions, other attributes; named by rule in the not-written list), map text, backdrop, true positions for any other system.
 
 ## Tom's ten saves, 2026-11-03 night: how WaterGEMS stores each
 
@@ -391,8 +391,9 @@ clock controls alike. The initial state is still the `-A` pipe's status. The gol
 repeated with the control in the set (2026-11-05) the run gave PU1 On at hour 12 and `T1` level 10.90 and 11.38 ft at hours 12 and 24, which are
 EPANET's. **Written**: an EPANET rule with exactly one premise (`TANK`/`NODE` `LEVEL` `BELOW`/`ABOVE`/`<`/`>`; with the pressure candidate flag also
 a junction `PRESSURE`), a THEN that sets a pump's or pipe's `STATUS` (OPEN/CLOSED, ON/OFF for a pump), at most one ELSE of the same kind and
-an optional PRIORITY becomes one control in the same single set as the simple controls (`js/lpn-wtg-export.js`, `carriableRules`). Any other rule
-(AND/OR, several actions, other attributes) is named by rule in the not-written list. A link a written rule acts on gets no frozen clock schedule.
+an optional PRIORITY becomes one control in the same single set as the simple controls (`js/lpn-wtg-export.js`, `carriableRules`). Since 2026-11-09 a rule
+may also have a second premise joined by AND or by OR, and several THEN actions ("Composite controls", below). Any other rule
+(three premises, AND mixed with OR, several ELSE actions, other attributes) is named by rule in the not-written list. A link a written rule acts on gets no frozen clock schedule.
 
 **3. Pressure and time conditions.** Pressure: `SimpleConditionType` 0, `CompareOperator` 1 (greater), `ElementType_Element` the junction,
 `ElementType_Pressure` 60 (psi), `ControlConditionElementType` 50, node attribute 2 (the tank attribute row 1 here, 3 for a tank). Time from
@@ -643,7 +644,7 @@ by the harness. "Evidence" is what shows how WaterGEMS stores it.
 | `[ENERGY]` price pattern, demand charge | yes | `EnergyPricing_EnergyPriceCurve`; `PeakDemandCharge` (8a) | done |
 | `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls in the same control set | the one sample control (Zenodo) | done |
 | `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | yes, as tank-level controls in a control set | Tom's `wtg-control-1` (see "Tank-level controls: the codes") | done; whether WaterGEMS fires them is Tom's test |
-| `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes (the ELSE column and a priority column are in `IdahoControl_ControlType_LogicalType`) | needs a sample with an ELSE |
+| `[RULES]` | yes: ELSE, PRIORITY, two premises joined by AND or OR, several THEN actions | Tom's `ctl-logical-2` and `ctl-composite` | done; see "Composite controls" |
 | `[QUALITY]`, `[REACTIONS]`, `[SOURCES]` | no | trace and constituent tables exist; nothing stored in any file | no |
 | `[TIMES]` duration, hydraulic step, start | yes | | done |
 | `[TIMES]` pattern step, report step | pattern step through each pattern's points; report step written to `EpsType_ReportingTimeStep` in seconds when it differs from the hydraulic step (otherwise the template's 0) | `EpsType_ReportingTimeStep` (the reader reads it, 0 meaning the hydraulic step) | done; `OverrideReportingTimeStep` is left 0, its meaning unseen. No effect on results |
@@ -699,9 +700,48 @@ The second writes `1-tiny`, `2-net3-hour-zero` and `3-net3` under `<dir>`, each 
 the reader out of that branch with `git show` into a cache folder in the system temp directory; the branch is
 never edited.
 
-## Expected readings, 2026-11-09 (kept out of Tom's README so his reading is blind)
+## Composite controls: Tom's `ctl-composite`, 2026-11-09
 
-1-rule: PU1 On at hour 12; T1 level 10.90 ft at hour 12, 11.38 at hour 24. 2-pressure (PU1 closes above 38.5 psi at J1, opens
-below 35): hours 3-8 PU1 On/Off/Off/Off/On/On, J1 38.03/38.44/37.42/35.87/34.68/34.09 psi; T1 8.75 ft at hour 12, 10.36 at hour 24.
-The 11-05 messenger's "Off at hour 5, On at hour 8" was wrong. A mismatch at hours 4-7 means WaterGEMS checks pressure controls at
-other instants than EPANET; a mismatch only in J1 pressure is a modelling difference.
+Compared with `ctl-logical-2` (the same project before the three controls). A composite is a parent row plus children, in the same support-element tables:
+
+| What | Where | Code |
+|---|---|---|
+| Composite condition | `IdahoControlCondition` (parent row) | `ConditionType` **1**, `DefineDescription` 0, `Description` `text`, expanded text `T1 Level < 14.00 ft And J1 Pressure > 30 psi` |
+| Its children | `IdahoControlCondition_ConditionType_CompositeConditionType` (`ControlConditionCollectionCount` 2) and `IdahoControlCondition_ControlConditionCollection` (`ControlConditionCollection_ControlCondition` the child id, in the order stated) | each child is an ordinary simple condition (support type 56, the codes of "Tank-level controls" and `ctl-pressure-time`) |
+| AND / OR | `LogicalOperator` on the collection row | **0** the first child, **1 And**, **2 Or** (the operator joins that child to the ones before it) |
+| The parent also repeats | the first child's `SimpleConditionType`, `..._ElementType` and attribute rows | a pressure child: `ElementType_Element` J1, `ElementType_Pressure` 30, `ControlConditionElementType` 50, `NodeAttribute` 2, operator 1 (greater than) |
+| Composite action | `IdahoControlAction` (parent row) | `ControlActionType` **1**, expanded text `PU1 Pump Status = Off , 2 Pipe Status = Closed ` (children joined by `, `) |
+| Its children | `IdahoControlAction_ControlActionType_CompositeActionType` (`ActionCollectionCount` 2) and `IdahoControlAction_ActionCollection` (`ActionCollection_ControlAction`) | each child is an ordinary simple action (pump: `ElementType` 68, `ActionPumpStatus` 1 is Off; pipe: `ElementType` 69, `ActionPipeStatus` 1 is Closed); the parent repeats the first child's rows |
+| The control | `IdahoControl` | unchanged: `IdahoControl_ControlCondition` and `IdahoControl_ControlAction` name the parent rows; `LogicalType` row with `HasElse` 0 for these three |
+
+His file's other facts, read so nobody repeats them: his control 2 has the tank test in `ElementType_HydraulicGrade` (20) with `ElementType_TankLevel` still 14, and its text reads "T1 Level > 14.00 ft Or ...", so the dialog did not take "Level > 20" as typed (control 2 as saved is not the control he meant, and the writer does not copy it); his control 3's condition holds an unfilled template (`<none> %a < %v %u`, `TankLevel` 20), and the descriptions of controls 2 and 3 are stale (`IF <none> ...`). Only control 1 and the composite action of control 3 are clean examples. The original `ctl-logical-2` control (47) is soft-deleted in the file but still in the set's collection. The element ids it shows (PU1 39, pipe 2 37, J1 34, T1 36) are the ones the writer's own file gets.
+
+**Written** (`js/lpn-wtg-export.js`, `writeCond`, `writeActions`): a rule with one or two premises (two joined by one AND or one OR, each a tank level or, with `candidate.pressureControls`, a junction pressure), one or more THEN actions (a pump or pipe status) and at most one ELSE action. Not written, named by rule in the not-written list: three or more premises (no example of a third collection row), AND mixed with OR (EPANET gives AND precedence; no nesting example), several ELSE actions (the storage of a composite ELSE is unseen), any other attribute. A pressure premise is still held back without the candidate flag (below). Harness: `dev/lpn-spike/wtg-feature-tests-harness.js`, "composite". Test file for Tom: `dev/lpn-spike/wtg-composite-test.js` (`~/tom-files/2026-11-09/wtg-composite-test/`).
+
+## Expected against read, 2026-11-09 (Tom's WaterGEMS after Compute; the expected values were kept out of his README)
+
+| File | Quantity | EPANET | WaterGEMS |
+|---|---|---|---|
+| 1-rule | PU1 hour 12; T1 hours 12 and 24 | On; 10.90, 11.38 | On; 10.90, 11.38 (exact) |
+| 2-pressure | PU1 hours 3-8 | On Off Off Off On On | On On Off Off Off On |
+| 2-pressure | J1 psi hours 3-8 | 38.03 38.44 37.42 35.87 34.68 34.09 | 38.05 38.73 37.58 36.03 33.78 34.08 |
+| 2-pressure | T1 hours 12 and 24 | 8.75, 10.36 | 8.71, 10.34 |
+
+**Conclusion.** The control fires in WaterGEMS and at the same instants as in EPANET, so the file is right. What differs is what is *reported at the instant a pressure control trips* (hours 4 and 7). EPANET resolves the trip inside the same instant and reports the state after it (hour 4: Off, 38.44). WaterGEMS reports the state before it (hour 4: On, 38.73, which is what J1 reads with PU1 running: 38.71 in a run with no control) and the new state from the next hour (hour 5 Off). The first guess, that WaterGEMS acts a whole step later, is wrong: a pump that ran another hour would have left T1 near 20.4 ft and J1 near 38.85 psi at hour 5, and Tom read 37.58 (EPANET 37.42 with the pump off from hour 4). Hour 7 repeats it (Off, 33.78 is the pump-off pressure; EPANET shows On, 34.68 after the trip), and hour 8 agrees (On, 34.08 against 34.09). Away from a trip the two agree to 0.2 psi and 0.04 ft, so the tank levels at hours 12 and 24 match. 1-rule has no pressure test and matches exactly.
+
+**Can the export fix it?** No. Nothing in our file moves it: the trip instants are right and the control is the same row either way. The order of "report" and "apply control" belongs to WaterGEMS's engine, and the `EpaNetEngine` options Tom's files hold (check frequency, trials, hydraulic step) are EPANET's solver settings, not the reporting order. A shorter hydraulic step would only make the lag small and change every other hour's figures. Readings at a trip instant can differ from EPANET's, and only there. The user-facing wording is not changed by this note.
+
+## Expected for `wtg-composite-test`, 2026-11-09 (kept out of Tom's README)
+
+The chlorine network with Tom's three composite controls (`~/tom-files/2026-11-09/wtg-composite-test/ctl-composite-test`), all three held in one control set. Rule 3 never fires on this network (T1 peaks at 17.6 ft), so its second action is only checked by whether the control reads correctly in step 2; rules 1 and 2 are exercised.
+
+EPANET evaluates rules every rule time step, default 6 minutes, so it switches PU1 inside an hour (Off at 3:06, On at 5:06). WaterGEMS has no such setting we know of and may check once an hour. Both are given:
+
+| Hour | EPANET, rule step 6 min | EPANET, rule step 1 h |
+|---|---|---|
+| 6 | PU1 On, T1 14.61 | PU1 Off, T1 14.39 |
+| 12 | On, 11.56 | On, 8.75 |
+| 18 | On, 10.94 | On, 9.02 |
+| 24 | On, 11.69 | On, 10.36 |
+
+The hourly column equals the 2-pressure trajectory (the OR rule 2 does the work of the two pressure controls), and 2-pressure matched WaterGEMS to 0.04 ft; so if WaterGEMS checks once an hour its column is expected to be the right-hand one. A match to the left column means it checks as often as EPANET. A value that is neither means a rule is read differently (an OR taken as AND would leave PU1 On through hour 4; read the step 2 answer first). At a trip instant PU1 may show the state before the trip, as above; hours 6, 12, 18 and 24 are not trip instants in the hourly column.
