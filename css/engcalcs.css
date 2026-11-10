@@ -2538,6 +2538,9 @@ html[lang="zh"] .ec-welcome {
 /* Each section is its own two-column block with the box's tracks (Tom, 2026-10-30); sections stack one after another and never share a row. */
 .lpn-multi-section > .lpn-gprops { row-gap: 0; }
 .lpn-multi-section > summary { font-weight: bold; cursor: pointer; padding: 2px 0; }
+/* A sub-element's section in an assembly's Properties box: a heading titled with its kind and ID, then that element's own rows in the box's tracks. Clipped, never ellipsed. */
+.lpn-asm-section { grid-column: 1 / -1; min-width: 0; margin: .5em 0 0; border-top: var(--ec-box-border); }
+.lpn-asm-head { margin: .25em 0 .1em; font-size: 1em; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: clip; }
 .lpn-multi-note { margin: .2em 0 .4em; font-size: .9em; }
 .lpn-tool-more { position: relative; }
 .lpn-tool-more::after {

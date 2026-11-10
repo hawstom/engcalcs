@@ -663,6 +663,7 @@ $ec_lang['lpn_tool_add_well_tip']='Add a well, its groundwater reservoir, its pu
 $ec_lang['lpn_mode_add_well']='Mode: Add Well. Specify a point on the map to add a well with its groundwater reservoir, pump node, and tank, or specify a pipe to split it and put the well in it. Press Escape or switch to Select mode to stop.';
 $ec_lang['lpn_field_well_static']='Static water level elevation';
 $ec_lang['lpn_field_well_static_tip']='Elevation of the static water level, the groundwater surface with the pump off. The groundwater reservoir and the pump node stand at this elevation.';
+$ec_lang['lpn_well_drawdown_valve']='Drawdown valve';
 $ec_lang['lpn_well_drawdown_curve']='Drawdown curve';
 $ec_lang['lpn_well_drawdown_curve_tip']='The curve in the Libraries box that gives the drawdown below the static water level elevation at each pumping rate. It is a head loss curve and includes the point 0, 0.';
 $ec_lang['lpn_well_pump_curve_tip']='The curve in the Libraries box that gives the head the pump adds at each flow, lifted from the pumping level (the static water level elevation less the drawdown). Several pumps can use the same curve, and editing it there changes all of them.';
@@ -2110,6 +2111,7 @@ $ec_lang['lpn_ts_tip']='Graph one or more assets across an extended period simul
 $ec_lang['lpn_ts_title']='Values versus time';
 $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
+$ec_lang['lpn_pgraph_which']='Graph which sub-asset?';
 $ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
 // The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
 // 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still

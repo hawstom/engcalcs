@@ -38932,7 +38932,43 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			e = linkById(currentPopup.id);
 			return e ? { group: 'link', e: e } : null;
 		}
+		if (currentPopup.kind === 'assembly') { return pgAssemblySubject(assemblyById(currentPopup.id)); }
 		return null;
+	}
+	// **GRAPH WHICH SUB-ASSET?** (Task 822; Tom, 2026-11-09: "we will need a way to ask 'Graph which sub-asset?'"). An assembly's box graphs one of its
+	// members, chosen in a row above the chart and remembered for the session; it opens on the device itself (the pump, the valve). The chart,
+	// its quantity chooser and its frames are the ordinary element's, untouched.
+	var pgAsmPick = {};
+	function pgAssemblySubject(a) {
+		var members = a ? assemblyMembers(a) : [], key, m, i, e;
+		if (!members.length) { return null; }
+		key = pgAsmPick[a.id];
+		for (i = 0; i < members.length; i++) { if (members[i].key === key) { m = members[i]; } }
+		if (!m) { m = members.filter(function (x) { return x.device; })[0] || members[0]; }
+		e = m.group === 'link' ? linkById(m.id) : nodeById(m.id);
+		return e ? { group: m.group, e: e, asm: a, members: members, pick: m.key } : null;
+	}
+	// The sub-elements of an assembly, upstream to downstream, each with the kind and ID that title its section and its graph.
+	function assemblyMembers(a) {
+		var pc = EngCalcs.pageConfig || {}, out = [];
+		function add(group, id, text, device) {
+			if (id && (group === 'link' ? linkById(id) : nodeById(id))) { out.push({ group: group, id: id, key: group + ':' + id, text: text + ' ' + id, device: !!device }); }
+		}
+		var jn = pc.lpn_tool_add_junction || 'Junction';
+		if (a.kind === 'well') {
+			add('node', a.nodes[0], pc.lpn_tool_add_reservoir || 'Reservoir');
+			add('link', a.links[0], pc.lpn_well_drawdown_valve || 'Drawdown valve');
+			add('node', a.nodes[1], jn);
+			add('link', a.links[1], pc.lpn_tool_add_pump || 'Pump', true);
+			add('node', a.nodes[3], jn);
+			add('link', a.links[2], pc.lpn_tool_add_virtual || 'Virtual pipe');
+			add('node', a.nodes[2], pc.lpn_tool_add_tank || 'Tank');
+		} else {
+			add('node', a.up, jn);
+			add('link', a.links[0], a.kind === 'valve' ? (pc.lpn_tool_add_valve || 'Valve') : (pc.lpn_tool_add_pump || 'Pump'), true);
+			add('node', a.down, jn);
+		}
+		return out;
 	}
 	// Every candidate field with its points over the run, keeping only those with a number in them.
 	function pgAvailable(group, e, frames) {
@@ -38982,6 +39018,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		lab.textContent = pc.lpn_ts_menu || 'Time series';
 		row.appendChild(lab);
 		box.appendChild(row);
+		if (subj.members) {
+			(function () {
+				var wrow = document.createElement('div'), wlab = document.createElement('label'), wsel = document.createElement('select');
+				wrow.className = 'lpn-pgraph-row';
+				wlab.htmlFor = 'lpn_pgraph_member';
+				wlab.textContent = pc.lpn_pgraph_which || 'Graph which sub-asset?';
+				wsel.id = 'lpn_pgraph_member';
+				wsel.className = 'lpn-ts-pick';
+				subj.members.forEach(function (m) {
+					var op = document.createElement('option');
+					op.value = m.key; op.textContent = m.text;
+					wsel.appendChild(op);
+				});
+				wsel.value = subj.pick;
+				wsel.addEventListener('change', function () { pgAsmPick[subj.asm.id] = wsel.value; propGraphSync(); });
+				wrow.appendChild(wlab);
+				wrow.appendChild(wsel);
+				box.insertBefore(wrow, row);
+			}());
+		}
 		if (!avail.length) {
 			// A run exists and holds nothing for this element -- one added or renamed since the run,
 			// with Recalculate off. Said, never drawn as empty axes (renderTimeSeries()'s rule).
@@ -40477,16 +40533,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		closedField(fields, pump, pump.id);
 		activeField(fields, pump);
-		if (res && !linkResultHeld(pump) && res.flows[pump.id] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(res.flows[pump.id]), undefined, resultDec('link', 'flow'));
-			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), shownHeadloss(pump, res.headlosses[pump.id]), undefined, resultDec('link', 'headloss'));
-		}
-		if (res && res.pressures[up.id] !== undefined && res.pressures[dn.id] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_assembly_up_head || 'Upstream head', resultUnit('elevhead'), res.heads[up.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-			readonlyUnitField(fields, pc.hw_pressure_up || 'Upstream pressure', resultUnit('pressure'), res.pressures[up.id], undefined, resultDec('node', 'pressure'));
-			readonlyUnitField(fields, pc.lpn_assembly_down_head || 'Downstream head', resultUnit('elevhead'), res.heads[dn.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-			readonlyUnitField(fields, pc.hw_pressure_down || 'Downstream pressure', resultUnit('pressure'), res.pressures[dn.id], undefined, resultDec('node', 'pressure'));
-		}
 		var btn = document.createElement('button');
 		btn.type = 'button';
 		btn.setAttribute('data-assembly-explode', '1');
@@ -40494,15 +40540,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		helpTip(btn, a.kind === 'valve' ? pc.lpn_assembly_explode_valve_tip : pc.lpn_assembly_explode_tip);
 		btn.addEventListener('click', function () { saveUndoSnapshot(); explodeAssembly(id); });
 		fields.appendChild(btn);
+		// Below the entry area, one section per sub-element from upstream to downstream, each with its own results.
+		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', up.id, function (rows) { junctionResultFields(rows, up.id); });
+		asmSection(fields, pc[a.kind === 'valve' ? 'lpn_tool_add_valve' : 'lpn_tool_add_pump'] || (a.kind === 'valve' ? 'Valve' : 'Pump'), pump.id, function (rows) { linkResultFields(rows, pump, pump.id); });
+		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', dn.id, function (rows) { junctionResultFields(rows, dn.id); });
 		lpnPropsGrid(fields);
 		tipsIn(fields);
+	}
+	// **A SECTION PER SUB-ELEMENT IN AN ASSEMBLY'S BOX** (Task 822; Tom, 2026-11-09: "it may be most predictable and sustainable and least
+	// confusing to add headings for the sub-assets"). A heading titled with the element's kind and ID, then the rows that element owns,
+	// built by the ordinary box's own row functions (junctionResultFields(), linkResultFields(), tankDepthFields()...). Not collapsible,
+	// because every edit rebuilds the box and a collapse would be lost with it.
+	function asmSection(fields, kindText, id, build) {
+		var box = document.createElement('section'), head = document.createElement('h5'), rows = document.createElement('div');
+		box.className = 'lpn-asm-section';
+		box.setAttribute('data-asm-member', id);
+		head.className = 'lpn-asm-head';
+		head.textContent = kindText + ' ' + id;
+		box.appendChild(head);
+		box.appendChild(rows);
+		build(rows);
+		lpnPropsGrid(rows);
+		fields.appendChild(box);
+		return rows;
 	}
 	// **A WELL'S BOX** (Task 822): the pump's identity, the ground, the static level, the two curves (drawdown on the
 	// general purpose valve, head lift on the pump), the open-air tank's own numbers and the results that matter. The
 	// ground elevation is the tank's; the static elevation is the reservoir's, and setProp() writes the suction node's too.
 	function renderWellFields(a) {
 		var fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {}, res = lastSolveResult,
-			r = nodeById(a.nodes[0]), s = nodeById(a.nodes[1]), t = nodeById(a.nodes[2]), g = linkById(a.links[0]), pump = linkById(a.links[1]);
+			r = nodeById(a.nodes[0]), s = nodeById(a.nodes[1]), t = nodeById(a.nodes[2]), d = a.nodes[3] ? nodeById(a.nodes[3]) : null,
+			g = linkById(a.links[0]), pump = linkById(a.links[1]), b = a.links[2] ? linkById(a.links[2]) : null;
 		idField(pump.id, function (newId) {
 			applyLinkRename(pump.id, newId);
 			currentPopup = { kind: 'assembly', id: assemblyOfLink(newId).id };
@@ -40514,25 +40582,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tagField(fields, pump);
 		unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 			function () { return effective(t, 'elev'); },
-			function (v) { setProp(t, 'elev', v); updateNode(t.id, true); refreshPopupIfOpen(); },
+			function (v) { setProp(t, 'elev', v); updateNode(t.id, true); if (d) { updateNode(d.id, true); } refreshPopupIfOpen(); },
 			pc.lpn_tank_ground_elev_tip, { el: t, prop: 'elev' });
 		elevationDemRow(fields, t, t.id, function (v) { setProp(t, 'elev', v); updateNode(t.id, true); });
-		unitNumberField(fields, pc.lpn_field_well_static || 'Static elevation', 'lpn_u_elevhead',
+		unitNumberField(fields, pc.lpn_field_well_static || 'Static water level elevation', 'lpn_u_elevhead',
 			function () { return effective(r, 'elev'); },
 			function (v) { setProp(r, 'elev', v); updateNode(r.id, true); updateNode(s.id, true); refreshPopupIfOpen(); },
 			pc.lpn_field_well_static_tip, { el: r, prop: 'elev' });
 		curveChooser(fields, g, 'curveId', 'headloss', pc.lpn_well_drawdown_curve || 'Drawdown curve', pc.lpn_well_drawdown_curve_tip);
 		curveChooser(fields, pump, 'curveId', 'head', pc.lpn_pump_curve_source || 'Pump head curve', pc.lpn_well_pump_curve_tip);
-		tankDepthFields(fields, t, t.id);
 		closedField(fields, pump, pump.id);
 		activeField(fields, pump);
-		if (res && !linkResultHeld(pump) && res.flows[pump.id] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(res.flows[pump.id]), undefined, resultDec('link', 'flow'));
-		}
-		if (res && res.heads[s.id] !== undefined && res.heads[t.id] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_assembly_up_head || 'Upstream head', resultUnit('elevhead'), res.heads[s.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-			readonlyUnitField(fields, pc.lpn_assembly_down_head || 'Downstream head', resultUnit('elevhead'), res.heads[t.id], pc.lpn_result_head_tip, resultDec('node', 'head'));
-		}
 		var btn = document.createElement('button');
 		btn.type = 'button';
 		btn.setAttribute('data-assembly-explode', '1');
@@ -40540,6 +40600,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		helpTip(btn, pc.lpn_assembly_explode_well_tip);
 		btn.addEventListener('click', function () { saveUndoSnapshot(); explodeAssembly(a.id); });
 		fields.appendChild(btn);
+		// One section per sub-element, upstream to downstream: groundwater, drawdown valve, pump node, pump, tee, the tank's virtual pipe, tank.
+		asmSection(fields, pc.lpn_tool_add_reservoir || 'Reservoir', r.id, function (rows) {
+			if (res && res.heads[r.id] !== undefined) { readonlyUnitField(rows, pc.lpn_field_head || 'Head', resultUnit('elevhead'), res.heads[r.id], pc.lpn_result_head_tip, resultDec('node', 'head')); }
+			reservoirResultFields(rows, r);
+		});
+		asmSection(fields, pc.lpn_well_drawdown_valve || 'Drawdown valve', g.id, function (rows) { linkResultFields(rows, g, g.id); });
+		asmSection(fields, pc.lpn_tool_add_junction || 'Junction', s.id, function (rows) { junctionResultFields(rows, s.id); });
+		asmSection(fields, pc.lpn_tool_add_pump || 'Pump', pump.id, function (rows) { linkResultFields(rows, pump, pump.id); });
+		if (d) { asmSection(fields, pc.lpn_tool_add_junction || 'Junction', d.id, function (rows) { junctionResultFields(rows, d.id); }); }
+		if (b) { asmSection(fields, pc.lpn_tool_add_virtual || 'Virtual pipe', b.id, function (rows) { linkResultFields(rows, b, b.id); }); }
+		asmSection(fields, pc.lpn_tool_add_tank || 'Tank', t.id, function (rows) {
+			unitNumberFieldBlank(rows, pc.lpn_field_tank_base_elev || 'Base elevation', 'lpn_u_elevhead',
+				function () { return effective(t, 'bottomElev'); },
+				function (v) { setTankBottom(t, v); updateNode(t.id, true); refreshPopupIfOpen(); },
+				effective(t, 'elev'), pc.lpn_field_tank_base_elev_tip, { el: t, prop: 'bottomElev' });
+			tankDepthFields(rows, t, t.id);
+			tankResultFields(rows, t);
+		});
 		lpnPropsGrid(fields);
 		tipsIn(fields);
 	}
@@ -61175,7 +61253,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} };
 	}
 	function ctxOpenAssetMenu(cx, cy, hit) {
-		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef, rows;
+		var pc = EngCalcs.pageConfig || {}, hasTargets, hitRef, rows, asm;
 		hitRef = { kind: hit.kind, id: hit.id };
 		// A Text has its own two rows and none of an asset's.
 		if (hit.kind === 'label') {
@@ -61210,6 +61288,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
 				run: function () { tsbOpen(hitRef); } }
 		];
+		// **AN ASSEMBLY ASKS WHICH SUB-ASSET** (Task 822): its members share one point, so the press alone cannot say which to graph. One row each,
+		// upstream to downstream, in place of the single row.
+		asm = assemblyOfRef(hit.kind, hit.id);
+		if (asm) {
+			rows.pop();
+			assemblyMembers(asm).forEach(function (m) {
+				rows.push({ label: (pc.lpn_tsb_menu || 'Time series graph') + ': ' + m.text, enabled: tsbHasRun(),
+					tip: pc.lpn_tsb_off_tip || 'Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.',
+					run: function () { tsbOpen({ kind: m.group, id: m.id }); } });
+			});
+		}
 		if (hit.onLabel) { rows.push(ctxResetRow(hitRef)); }
 		openMapContextMenu(cx, cy, rows);
 	}
@@ -76015,6 +76104,49 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function (v) { setProp(n, 'tankDiameter', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 			pc.lpn_field_tank_diameter_tip, { el: n, prop: 'tankDiameter' });
 	}
+	// A junction's solved rows (head, pressure, and what a pressure-driven run delivered), shared by its box and an assembly's sections.
+	function junctionResultFields(fields, nodeId) {
+		var pc = EngCalcs.pageConfig || {};
+		if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
+			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
+				pc.lpn_result_head_tip, resultDec('node', 'head'));
+			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId], undefined, resultDec('node', 'pressure'));
+			// **WHAT THIS JUNCTION RECEIVES, UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762). The
+			// demand above is what it asks for; these two are what the engine delivered and
+			// what it withheld. Present only for a PDA run, where the engine states them.
+			if (lastSolveResult.demandDeficits && lastSolveResult.demandDeficits[nodeId] !== undefined
+				&& lastSolveResult.demands && lastSolveResult.demands[nodeId] !== undefined) {
+				readonlyUnitField(fields, pc.lpn_result_delivered_demand || 'Delivered demand', 'lpn_u_flow',
+					lastSolveResult.demands[nodeId], pc.lpn_result_delivered_demand_tip);
+				readonlyUnitField(fields, pc.lpn_result_demand_deficit || 'Demand deficit', 'lpn_u_flow',
+					lastSolveResult.demandDeficits[nodeId], pc.lpn_result_demand_deficit_tip);
+			}
+		}
+	}
+	// A tank's solved rows (head, pressure, depth, available volume), shared by its box and the Well's tank section.
+	function tankResultFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {};
+		readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'),
+			toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip, resultDec('node', 'head'));
+		// The head above the GROUND, as at any node: the reading the Tables pane, the labels and
+		// the colouring take (tankPressureSI()), so it follows the two elevations as they are typed.
+		if (typeof effective(n, 'elev') === 'number') {
+			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), tankPressureSI(n), undefined, resultDec('node', 'pressure'));
+		}
+		// Depth and usable volume, read the way the Tables pane reads them (Task 783).
+		readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
+			colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
+		readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
+			colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
+	}
+	// A reservoir's pressure row: its head less its elevation, omitted when the ground is unknown.
+	function reservoirResultFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {};
+		if (typeof effective(n, 'elev') === 'number') {
+			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'),
+				toSI(reservoirHead(n) - effective(n, 'elev'), 'lpn_u_elevhead'), undefined, resultDec('node', 'pressure'));
+		}
+	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
@@ -76097,18 +76229,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_reaction_tank_short_tip, { el: n, prop: 'tankCoeff' });
 			}
 			mixingFields(fields, n);
-			readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'),
-				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip, resultDec('node', 'head'));
-			// The head above the GROUND, as at any node: the reading the Tables pane, the labels and
-			// the colouring take (tankPressureSI()), so it follows the two elevations as they are typed.
-			if (typeof effective(n, 'elev') === 'number') {
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), tankPressureSI(n), undefined, resultDec('node', 'pressure'));
-			}
-			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
-			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
-				colorNodeValue(n, 'depth'), pc.lpn_result_depth_tip);
-			readonlyField(fields, (pc.lpn_result_tank_volume || 'Available volume') + ' (' + tankVolumeUnitText() + ')',
-				colorNodeValue(n, 'volume'), pc.lpn_result_tank_volume_tip);
+			tankResultFields(fields, n);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return effective(n, 'elev'); },
@@ -76142,10 +76263,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// conversion between two units the USER chose, not of an input on a unit change.
 			// **OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported reservoir has a
 			// head and no elevation, and a pressure row reading 0 asserts what the file never said.
-			if (typeof effective(n, 'elev') === 'number') {
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'),
-					toSI(reservoirHead(n) - effective(n, 'elev'), 'lpn_u_elevhead'), undefined, resultDec('node', 'pressure'));
-			}
+			reservoirResultFields(fields, n);
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return effective(n, 'elev'); }, function (v) { setProp(n, 'elev', v); updateNode(nodeId, true); }, undefined, { el: n, prop: 'elev' });
@@ -76222,21 +76340,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				emitterToDisplay(effective(n, 'emitter')),
 				function (v) { setProp(n, 'emitter', emitterToStore(v)); refreshPopupIfOpen(); },
 				pc.lpn_field_emitter_tip, { el: n, prop: 'emitter' });
-			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
-				readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
-					pc.lpn_result_head_tip, resultDec('node', 'head'));
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId], undefined, resultDec('node', 'pressure'));
-				// **WHAT THIS JUNCTION RECEIVES, UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762). The
-				// demand above is what it asks for; these two are what the engine delivered and
-				// what it withheld. Present only for a PDA run, where the engine states them.
-				if (lastSolveResult.demandDeficits && lastSolveResult.demandDeficits[nodeId] !== undefined
-					&& lastSolveResult.demands && lastSolveResult.demands[nodeId] !== undefined) {
-					readonlyUnitField(fields, pc.lpn_result_delivered_demand || 'Delivered demand', 'lpn_u_flow',
-						lastSolveResult.demands[nodeId], pc.lpn_result_delivered_demand_tip);
-					readonlyUnitField(fields, pc.lpn_result_demand_deficit || 'Demand deficit', 'lpn_u_flow',
-						lastSolveResult.demandDeficits[nodeId], pc.lpn_result_demand_deficit_tip);
-				}
-			}
+			junctionResultFields(fields, nodeId);
 		}
 		// **THE WATER-QUALITY ANSWER, FOR EVERY KIND OF NODE, IN ONE PLACE.** A junction, a
 		// reservoir and a tank all have a water age and a source share -- the two that SUPPLY the
@@ -77325,6 +77429,53 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// **A LINK'S SOLVED ROWS, in the ordinary box and in each sub-element section of an assembly's** (Task 822): flow, velocity, head or head loss,
+	// gradient, status and the quality rows, exactly as a link's own box shows them.
+	function linkResultFields(fields, l, linkId) {
+		var pc = EngCalcs.pageConfig || {};
+		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]), undefined, resultDec('link', 'flow'));
+			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
+			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
+			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
+			// flow" and is actively misleading. Velocity is a pipe-only result.
+			if (l.type !== 'pump') {
+				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId], undefined, resultDec('link', 'velocity'));
+			}
+			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
+			if (l.type === 'pump') {
+				readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
+			} else {
+				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
+			}
+			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
+			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
+			if (l.type !== 'pump' && !l.virtual && linkLengthSI(l)) {
+				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
+					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip, resultDec('link', 'gradient'));
+			}
+			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
+			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
+			// the INPUT, the status the run starts from, and stays exactly what the user set; this
+			// row is what EPANET reports for the step on screen, the column its own link report
+			// ends on.
+			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
+			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
+			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
+			popRows(fields, '#qresult', function () { linkQualityResultRow(fields, l); });
+			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
+			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
+			// valve, or any other analysis, simply has none and the row does not appear. No unit
+			// FAMILY, like a concentration: reactionRateUnitText() is the document's own label,
+			// converted by nobody, same as qualityResultRow()'s concentration row on a node.
+			var rateVal = linkReactionRate(l);
+			if (rateVal !== undefined) {
+				readonlyField(fields,
+					(pc.lpn_result_reaction_rate || 'Reaction rate') + ' (' + reactionRateUnitText() + ')',
+					rateVal);
+			}
+		}
+	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
@@ -77419,48 +77570,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (l.type === 'pipe') { checkValveField(fields, l); }
 		popRows(fields, '#custom', function () { customPropFields(fields, l); });
 		activeField(fields, l);
-		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]), undefined, resultDec('link', 'flow'));
-			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
-			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
-			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
-			// flow" and is actively misleading. Velocity is a pipe-only result.
-			if (l.type !== 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId], undefined, resultDec('link', 'velocity'));
-			}
-			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
-			if (l.type === 'pump') {
-				readonlyUnitField(fields, pc.lpn_field_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
-			} else {
-				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
-			}
-			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
-			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
-			if (l.type !== 'pump' && !l.virtual && linkLengthSI(l)) {
-				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
-					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip, resultDec('link', 'gradient'));
-			}
-			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
-			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
-			// the INPUT, the status the run starts from, and stays exactly what the user set; this
-			// row is what EPANET reports for the step on screen, the column its own link report
-			// ends on.
-			readonlyField(fields, pc.lpn_result_status || 'Status', linkStatusText(l));
-			// **ANOTHER RESULT, ON THE SAME TERMS** (R-349): a water age, source share or
-			// concentration, exactly as a node's own tail row -- see linkQualityResultRow().
-			popRows(fields, '#qresult', function () { linkQualityResultRow(fields, l); });
-			// **THE FIFTH RESULT, on the same terms as the four above it** (Task 664): a pipe under a
-			// chemical run and nothing else, exactly as linkReactionRate() itself gates -- a pump or
-			// valve, or any other analysis, simply has none and the row does not appear. No unit
-			// FAMILY, like a concentration: reactionRateUnitText() is the document's own label,
-			// converted by nobody, same as qualityResultRow()'s concentration row on a node.
-			var rateVal = linkReactionRate(l);
-			if (rateVal !== undefined) {
-				readonlyField(fields,
-					(pc.lpn_result_reaction_rate || 'Reaction rate') + ' (' + reactionRateUnitText() + ')',
-					rateVal);
-			}
-		}
+		linkResultFields(fields, l, linkId);
 		popRows(fields, '#notes', function () { importNotesField(fields, l); });
 		propsReorder(fields, l.type);
 		lpnPropsGrid(fields);
