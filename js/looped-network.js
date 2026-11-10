@@ -11410,10 +11410,11 @@ var EngCalcs = EngCalcs || {};
 		// The pump's whole volute, tail included, and the valve's two triangles -- see the notes in
 		// buildLinkEls() for why the tail is inside the outline and the waist is not filled across.
 		pump: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z',
-		valve: 'M3 3v18l9-9zM21 3v18l-9-9z',
-		// The Well's casing and its slim pipe (lib/Icons.lib.php), the one body a Well's symbol is.
-		well: 'M7 4H17V11H13.5V20H10.5V11H7Z'
+		valve: 'M3 3v18l9-9zM21 3v18l-9-9z'
 	};
+	// The Well's casing and its slim pipe (lib/Icons.lib.php), the one body a Well's symbol is: backdrop and grab shape. Not in the table
+	// above, which is the four vessels a node or a link can be on its own.
+	var WELL_SILHOUETTE = 'M7 4H17V11H13.5V20H10.5V11H7Z';
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
 	var TANK_HALF_W = 2.1120;
@@ -11454,7 +11455,7 @@ var EngCalcs = EngCalcs || {};
 	// path rides a transform into the symbol's own box, exactly as positionNodeSymbol() places the
 	// drawing, so there is one opinion about where a reservoir is.
 	function nodeHitSilhouette(n) {
-		if (n && n.type === 'tank' && wellRoleOf(n.id) === 'T') { return SYMBOL_SILHOUETTE.well; }
+		if (n && n.type === 'tank' && wellRoleOf(n.id) === 'T') { return WELL_SILHOUETTE; }
 		return (n && (n.type === 'reservoir' || n.type === 'tank')) ? SYMBOL_SILHOUETTE[n.type] : null;
 	}
 	function syncNodeHit(n, hitEl) {
@@ -40276,7 +40277,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (isT && !ne.wellSym) {
 				ne.wellSym = buildMapIconSvg('well', 'lpn-node-symbol lpn-node-symbol-well');
 				sizeSymbolViewport(ne.wellSym);
-				prependSymbolBackdrop(ne.wellSym, 'path', { d: SYMBOL_SILHOUETTE.well }, 'lpn-node-symbol-backdrop');
+				prependSymbolBackdrop(ne.wellSym, 'path', { d: WELL_SILHOUETTE }, 'lpn-node-symbol-backdrop');
 				ne.symbolG.appendChild(ne.wellSym);
 			}
 			if (ne.wellSym) { ne.wellSym.classList.toggle('lpn-asm-hid', !isT); }
