@@ -169,6 +169,13 @@ L.openPopup('V1D', 10, 10);
 t2 = sections().map((s) => s.title);
 ok('Valve+: Junction V1U, Valve V1, Junction V1D', JSON.stringify(t2) === JSON.stringify(['Junction V1U', 'Valve V1', 'Junction V1D']), JSON.stringify(t2));
 
+if (process.argv.includes('--write-fixture')) {
+	// The browser harness opens this project: a Well, a Pump+ and a Valve+ with an extended period run set.
+	const fx = JSON.parse(JSON.stringify(L.serializeProject()));
+	fx.times = Object.assign(EC.lpnTimesDefaults(), { duration: 86400 });
+	require('fs').writeFileSync(ROOT + 'dev/lpn-spike/assembly-sections-fixture.lwn', JSON.stringify(fx));
+	console.log('wrote the fixture');
+}
 console.log('\n--- 4. the graph asks which sub-asset ---');
 doc.times = EC.lpnTimesDefaults(); doc.times.duration = 86400;
 L.runSolve();

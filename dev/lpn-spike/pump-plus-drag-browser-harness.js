@@ -139,7 +139,7 @@ async function main() {
 		ok('and again arms Well, with a face of its own', (await armed()) === 'add-well' && (await faceOf(PUMP)) !== pumpFace && (await faceOf(PUMP)) !== plusFace);
 		await P.click(PUMP); await a.settle(150);
 		ok('and again is back to Pump', (await armed()) === 'add-pump' && (await faceOf(PUMP)) === pumpFace);
-		// A Well: three nodes at one point, dragged as one.
+		// A Well: four nodes at one point, dragged as one.
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		for (let i = 0; i < 4 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
 		ok('key 6 cycles to Well', (await armed()) === 'add-well');
@@ -148,7 +148,7 @@ async function main() {
 		await P.mouse.click(wellAt.x, wellAt.y); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
 		let wc = await wellNodes();
-		ok('a Well is three nodes at one point', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9), JSON.stringify(wc));
+		ok('a Well is four nodes at one point', wc.length === 4 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9), JSON.stringify(wc));
 		// Tom, 2026-11-09: a Well looked like an EPANET reservoir, its drawdown valve and pump drawn on one spot. It is ONE drawing now:
 		// the well's own, with no reservoir, tank, valve or pump symbol showing at its point.
 		const wellSyms = await P.evaluate((pt) => {
@@ -163,7 +163,7 @@ async function main() {
 		ok('a Well is drawn as one symbol: its own, and no reservoir, tank, valve or pump symbol at its point', wellSyms.well === 1 && wellSyms.other.length === 0, JSON.stringify(wellSyms));
 		await drag(wellAt, { x: wellAt.x + 100, y: wellAt.y - 80 });
 		wc = await wellNodes();
-		ok('dragging the Well moves all three, still coincident', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));
+		ok('dragging the Well moves all four, still coincident', wc.length === 4 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));
 		await undo();
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		await P.keyboard.press('5'); await a.settle(150);
