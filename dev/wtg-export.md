@@ -698,3 +698,10 @@ The second writes `1-tiny`, `2-net3-hour-zero` and `3-net3` under `<dir>`, each 
 `.wtg.sqlite` and EPANET's results as CSV. Until `feat/sqlite-reader` merges, `wtg-sqljs.js` takes sql.js and
 the reader out of that branch with `git show` into a cache folder in the system temp directory; the branch is
 never edited.
+
+## Expected readings, 2026-11-09 (kept out of Tom's README so his reading is blind)
+
+1-rule: PU1 On at hour 12; T1 level 10.90 ft at hour 12, 11.38 at hour 24. 2-pressure (PU1 closes above 38.5 psi at J1, opens
+below 35): hours 3-8 PU1 On/Off/Off/Off/On/On, J1 38.03/38.44/37.42/35.87/34.68/34.09 psi; T1 8.75 ft at hour 12, 10.36 at hour 24.
+The 11-05 messenger's "Off at hour 5, On at hour 8" was wrong. A mismatch at hours 4-7 means WaterGEMS checks pressure controls at
+other instants than EPANET; a mismatch only in J1 pressure is a modelling difference.
