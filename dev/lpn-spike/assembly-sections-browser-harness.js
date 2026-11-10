@@ -111,6 +111,8 @@ async function main() {
 		await clickAt('P1U');
 		hs = await heads();
 		ok('Pump+: Junction P1U, Pump P1, Junction P1D', JSON.stringify(hs.map((h) => h.t)) === JSON.stringify(['Junction P1U', 'Pump P1', 'Junction P1D']), hs.map((h) => h.t).join(' | '));
+		const pumpRows = await P.evaluate(() => Array.from(document.querySelectorAll('[data-asm-member="P1"] label, [data-asm-member="P1U"] label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()));
+		ok('with the Pump+ in a run, its sections show results (Flow under the Pump, Head under a junction)', pumpRows.some((x) => /^Flow/.test(x)) && pumpRows.some((x) => /^Head/.test(x)), pumpRows.join(' | '));
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'pump-plus-selected-properties-v6.png') }); }
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

@@ -121,14 +121,16 @@ function network() {
 	const doc = fresh();
 	L.setMode('add-well'); press(200, 150);
 	const j = L.addNode('junction', 600, 150); j._demand = 10;
-	L.addLink('pipe', 'W1D', j.id, []);
+	const j2 = L.addNode('junction', 900, 150); j2._demand = 5;
+	const p1 = L.addLink('pipe', 'W1D', j.id, []), p2 = L.addLink('pipe', j.id, j2.id, []);
 	doc.curves.push({ id: 'DD1', kind: 'headloss', points: DD.map((p) => p.slice()) });
 	doc.curves.push({ id: 'PC1', kind: 'head', points: PH.map((p) => p.slice()) });
 	L.setProp(doc.links[0], 'curveId', 'DD1'); L.setProp(doc.links[1], 'curveId', 'PC1');
 	L.setProp(L.nodeById('W1T'), 'elev', 150); L.setProp(L.nodeById('W1R'), 'elev', 120);
 	L.setProp(L.nodeById('W1T'), 'maxLevel', 3); L.setProp(L.nodeById('W1T'), 'level', 1.5);
-	L.setMode('add-pumpplus'); press(200, 400);
-	L.setMode('add-valveplus'); press(200, 600);
+	// A Pump+ spliced into the pipe from the Well's tee, and a Valve+ into the next one, so both carry flow.
+	L.setMode('add-pumpplus'); press(400, 150, hitLink(p1.id));
+	L.setMode('add-valveplus'); press(750, 150, hitLink(p2.id));
 	return doc;
 }
 (async function () {

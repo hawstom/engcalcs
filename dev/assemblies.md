@@ -172,7 +172,7 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
 
 ### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`)
 
-The Pump button's third form (Pump, Pump+, Well). Five ordinary elements at one point: **R** a reservoir whose head is
+The Pump button's third form (Pump, Pump+, Well). Seven ordinary elements at one point, the last two added by the tee below; the five first built: **R** a reservoir whose head is
 the groundwater's static elevation, **S** the pump's suction (a junction, no demand, same elevation), **T** an open-air
 tank at the ground elevation where the system's pipes attach, **G** a GPV from R to S whose head-loss curve is the
 drawdown against pumping rate (it includes the point 0, 0), **P** the pump from S to T whose curve is the head lifted
@@ -184,12 +184,13 @@ from the pumping level (the static elevation less the drawdown), not from the st
   paths (ground line, casing, slim pipe, drawdown curve), on the tank's node; the other two nodes and both links draw as nothing.
   A new well's static elevation is the ground less 100 ft or 30 m; where the ground waits for the DEM, the static level follows the
   fill, and no door that reads the land surface ever writes R or S.
-- **Grouping:** `{ id: P, kind: 'well', nodes: [R, S, T], links: [G, P] }`; pump and valve groups keep `up` and `down`. The
-  `.inp` comment is `;ASSEMBLY: well R S T G P`, and the reader restores it only when all five exist (R a reservoir, S a
-  junction, T a tank), else `assembly-unresolved`.
-- **Shared values:** x and y reach all three nodes; the static elevation typed on R or S reaches the other of the two; T's
-  elevation is the ground's alone. A pipe that ends on or starts at a well joins T. Splicing into a pipe makes T the node
-  both halves attach to, with the ground interpolated along the pipe.
+- **Grouping:** `{ id: P, kind: 'well', nodes: [R, S, T, D], links: [G, P, B] }`; pump and valve groups keep `up` and `down`. The
+  `.inp` comment is `;ASSEMBLY: well R S T D G P B`, and the reader restores it only when all seven exist (R a reservoir, S and D
+  junctions, T a tank), else `assembly-unresolved`. A slice-1 well, `well R S T G P` (three nodes, two links, no tee), still opens
+  and is written back as it was; its pipes join the tank.
+- **Shared values:** x and y reach every node; the static water level elevation typed on R or S reaches the other of the two; the
+  ground elevation typed on T reaches D and the other way. A pipe that ends on or starts at a well joins D (a slice-1 well: T).
+  Splicing into a pipe makes D the node both halves attach to, with the ground interpolated along the pipe.
 - **Scenarios:** the static elevation and the two curve references (G's and P's `curveId`) are overridable through
   `setProp()` as any node elevation and curve reference is. The tank's ground elevation and depths follow the ordinary
   tank rules.
@@ -198,3 +199,26 @@ from the pumping level (the static elevation less the drawdown), not from the st
   drawdown(Q) plus pump head(Q) to better than 1e-8 m.
 - **Not built:** automatic controls for the open-air tank; the pressure tank (slice 2, waiting on Tom's answers); a drawdown
   picture on the icon; the Assemblies table.
+
+### The Well's tee (Mary, 2026-11-09; `dev/lpn-spike/well-tee-harness.js`)
+
+EPANET's `tankstatus()` (hydstatus.c) shuts the one link whose flow would fill a full tank, so pump -> tank -> system pipes
+silences the pump at full level and the tank alone feeds the system (Tom: "Do we need a tee and an off-line tank"). The Well is
+now R -> G (drawdown valve W1V) -> S (W1U) -> pump W1 -> **D (W1D, the tee)** -> **B (W1B, a virtual pipe)** -> T (W1T, the tank);
+the system's pipes join D. A full tank shuts only B. Measured in both engines on a 10 L/s demand with the tank full: pump 0.0100000316
+m3/s, branch 0; with the tank half full the branch takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6; EPANET's B is the
+stand-in pipe, so D stands a millimetre or two above T). Elevation: T and D share the ground, R and S the static level. Explode keeps all
+seven. Not done: automatic pump controls for the open-air tank; Tom's wish for an exploded view of a selected assembly.
+
+### Sub-element sections and the graph (Tom, 2026-11-09; `assembly-sections-harness.js`, `assembly-sections-browser-harness.js`)
+
+- **The box:** the assembly's own entry area first (ID, Description, Tag, Elevation, Static water level elevation, the two curves, the
+  pump's or valve's own inputs, Closed, Active, Explode), then one heading per sub-element from upstream to downstream, titled with its
+  kind and ID (Well: Reservoir W1R, Drawdown valve W1V, Junction W1U, Pump W1, Junction W1D, Virtual pipe W1B, Tank W1T; Pump+ and
+  Valve+: Junction, Pump or Valve, Junction). Under each, the rows that element owns, from the ordinary box's own row functions
+  (`junctionResultFields`, `linkResultFields`, `tankResultFields`, `reservoirResultFields`, `tankDepthFields`): its solved head,
+  pressure, flow, velocity, head loss and status; the Tank's Base elevation, depths and diameter. Not collapsible: every edit rebuilds the box.
+- **The graph asks "Graph which sub-asset?"** A chooser above the Properties graph lists the members in the same order, opens on the
+  device (pump, valve) and is remembered for the session; the chart is the ordinary element's (`pgAssemblySubject()`). The map's right-click
+  menu shows one Time series graph row per member in place of its single row, and each opens an ordinary bubble. Chosen over a graph in each section
+  because it reuses the one chart host and the one subject finder, and a bubble already takes any node or link.
