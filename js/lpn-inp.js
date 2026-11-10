@@ -3102,6 +3102,16 @@
 		if (movedByScenario.length) { diff('node-coords-scenario', movedByScenario); }
 
 		// ---- links ----
+		// A VIRTUAL PIPE IS ONE MARKED VIRTUAL OR OF LENGTH 0 (Tom, 2026-11-09): length 0 is what the word
+		// means, and EPANET refuses it. Its stand-in is 0.01 m of the project's widest ordinary pipe (the
+		// scenario's own diameters), written with that pipe's own characters; 1000 mm only when there is none.
+		function isVirtualPipe(l) { return l.type === 'pipe' && (l.virtual === true || eff(l, 'length') === 0); }
+		var widest = null;
+		for (i = 0; i < (doc.links || []).length; i++) {
+			lk = doc.links[i];
+			if (lk.type === 'pipe' && isActive(lk) && !isVirtualPipe(lk) && (eff(lk, 'diameter') || 0) > (widest ? eff(widest, 'diameter') : 0)) { widest = lk; }
+		}
+		var standInDia = widest ? n(cDia, widest, '_diameter', eff(widest, 'diameter')) : (sys === 'us' ? '40' : '1000');
 		for (i = 0; i < (doc.links || []).length; i++) {
 			lk = doc.links[i];
 			linkById[lk.id] = lk;
@@ -3190,12 +3200,12 @@
 					typedPipes.push(lk.id);
 					typesUsed[eff(lk, 'typeId')] = true;
 				}
-				if (lk.type === 'pipe' && lk.virtual === true) {
+				if (isVirtualPipe(lk)) {
 					// A VIRTUAL PIPE (Task 822) goes out as the stand-in a curveless pump uses: EPANET
 					// refuses length 0, so 0.01 of a very wide, very smooth pipe, whose loss is below
 					// solver tolerance. The `;VIRTUAL:` line below is what lets it come back as virtual.
 					virtualIds.push(lk.id);
-					pipes.push(row([lk.id, lk.from, lk.to, '0.01', sys === 'us' ? '40' : '1000',
+					pipes.push(row([lk.id, lk.from, lk.to, '0.01', standInDia,
 						roughStandIn(settings.method), '0', pipeStatus]) + descOf(lk));
 				} else {
 					pipes.push(row([lk.id, lk.from, lk.to,

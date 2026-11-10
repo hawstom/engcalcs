@@ -123,7 +123,7 @@ function worst(a, b, ids, field) {
 	console.log('-- 2. what EPANET is handed');
 	const text = EC.lpnToInp(inA.model).inp;
 	const row = text.split('\n').find((l) => /^\s*V1\s/.test(l)) || '';
-	ok('V1 is the stand-in pipe row, 0.01 m of 1000 mm at C 150', /^\s*V1\s+JA\s+J1\s+0\.01\s+1000\s+150\s+0\s+Open\s*$/.test(row), JSON.stringify(row));
+	ok('V1 is the stand-in pipe row, 0.01 m as wide as the widest ordinary pipe (250 mm) at C 150', /^\s*V1\s+JA\s+J1\s+0\.01\s+250\s+150\s+0\s+Open\s*$/.test(row), JSON.stringify(row));
 	ok('no pipe of length 0 goes to EPANET', !/\s0\s+\d+\s+\d+\s+0\s+Open/.test(text));
 
 	console.log('-- 3. the .inp round trip');
@@ -135,7 +135,7 @@ function worst(a, b, ids, field) {
 	ok('export succeeds', out1.ok, JSON.stringify(out1.error));
 	ok('it names the virtual pipe on one ;VIRTUAL: line', /^;VIRTUAL: V1$/m.test(out1.inp));
 	const exRow = out1.inp.split('\n').find((l) => /^V1\s/.test(l.trim()) || /^\s*V1\s/.test(l)) || '';
-	ok('and writes V1 as the stand-in row (SI: 1000 mm)', /^V1\s+JA\s+J1\s+0\.01\s+1000\s+150\s+0\s+Open/.test(exRow.trim()), JSON.stringify(exRow));
+	ok('and writes V1 as the stand-in row (the widest ordinary pipe, 250 mm)', /^V1\s+JA\s+J1\s+0\.01\s+250\s+150\s+0\s+Open/.test(exRow.trim()), JSON.stringify(exRow));
 	const back = EC.lpnInpParse(out1.inp);
 	ok('EPANET\'s own reader would see a plain pipe: the line is a comment', !/^\[VIRTUAL\]/m.test(out1.inp));
 	ok('read back, V1 is virtual', back.ok && back.links.find((l) => l.id === 'V1').virtual === true);
@@ -158,12 +158,35 @@ function worst(a, b, ids, field) {
 	console.log('-- 5. a user-drawn pipe of Length 0 reports velocity 0 (Tom, 2026-11-09: "I say zero")');
 	const plain0 = open(inp(0).replace(' P2  J1  J2  400  150', ' P2  J1  J2  0  150'));
 	const m0 = plain0.model.links.find((l) => l.id === 'P2');
-	ok('P2 is a plain pipe (not marked virtual) of length 0', m0.length === 0 && !m0.virtual, JSON.stringify(m0));
+	ok('P2, a plain pipe of length 0, is a virtual pipe in the model: length 0, no minor loss', m0.length === 0 && m0.k === 0 && m0.virtual === true, JSON.stringify(m0));
 	const n0 = EC.lpnSolve(plain0.model);
 	ok('built-in: it converges, carries flow, and reports velocity 0 and head loss 0', n0.ok && n0.converged && Math.abs(n0.flows.P2) > 1e-4 && n0.velocities.P2 === 0 && n0.headlosses.P2 === 0, 'Q=' + n0.flows.P2 + ' V=' + n0.velocities.P2);
 	ok('built-in: the pipe beside it still reports its own velocity', n0.velocities.P3 > 0, String(n0.velocities.P3));
 	const e0 = await EC.lpnSolveEpanet(plain0.model, { moduleUrl: NODE_ENGINE_URL });
-	ok('EPANET itself refuses a pipe of length 0 (error 211 inside error 200), so there is no engine velocity to report', e0.ok === false && /Error 200/.test(e0.engineError || ''), String(e0.engineError));
+	ok('EPANET solves it too (no Error 200), reporting velocity 0', e0.ok === true && e0.converged && e0.velocities.P2 === 0 && e0.headlosses.P2 === 0, String(e0.engineError));
+	const h0 = worst(n0, e0, ids, 'heads');
+	ok('and the two engines agree on it', h0.w <= HEAD_TOL, h0.w.toExponential(2));
+	const t0 = EC.lpnToInp(plain0.model).inp;
+	ok('EPANET\'s text carries P2 as 0.01 m of 250 mm, the widest ordinary pipe', /^\s*P2\s+J1\s+J2\s+0\.01\s+250\s+150\s+0\s+Open/m.test(t0), JSON.stringify(t0.split('\n').find((l) => /^\s*P2\s/.test(l))));
+	const x0 = EC.lpnExportInp(L.serializeProject(), {});
+	ok('export writes the same stand-in row and a ;VIRTUAL: line naming P2', x0.ok && /^;VIRTUAL: P2$/m.test(x0.inp) && /^P2\s+J1\s+J2\s+0\.01\s+250\s+150/m.test(x0.inp.split('\n').map((l) => l.trim()).join('\n')), JSON.stringify(x0.error));
+	open(x0.inp);
+	ok('reopened, P2 is virtual again, with length 0 in the model', L.getDoc().links.find((l) => l.id === 'P2').virtual === true && L.currentModel().links.find((l) => l.id === 'P2').length === 0);
+	ok('a second export is byte-identical', EC.lpnExportInp(L.serializeProject(), {}).inp === x0.inp);
+
+	console.log('-- 6. the stand-in width is the project maximum');
+	const wide = open(inp(1).replace(' P4  J2  J3  350  100', ' P4  J2  J3  350  400'));
+	const eW = EC.lpnToInp(wide.model).inp;
+	ok('EPANET\'s text: V1 takes 400 mm when the widest ordinary pipe is 400 mm', /^\s*V1\s+JA\s+J1\s+0\.01\s+400\s+/m.test(eW), JSON.stringify(eW.split('\n').find((l) => /^\s*V1\s/.test(l))));
+	const wideOut = EC.lpnExportInp(L.serializeProject(), {});
+	ok('export: V1 takes 400 mm, with the file\'s own characters', wideOut.ok && /^V1\s+JA\s+J1\s+0\.01\s+400\s+/m.test(wideOut.inp.split('\n').map((l) => l.trim()).join('\n')), JSON.stringify(wideOut.error));
+	const eWr = await EC.lpnSolveEpanet(wide.model, { moduleUrl: NODE_ENGINE_URL });
+	ok('EPANET still converges with the wider stand-in', eWr.ok && eWr.converged && eWr.velocities.V1 === 0);
+	const lone = open(['[TITLE]', 'lone', '', '[JUNCTIONS]', ' J1  10', '', '[RESERVOIRS]', ' R1  70', '', '[PIPES]', ' V1  R1  J1  0  250  130  0  Open', '',
+		'[DEMANDS]', ' J1  5', '', '[COORDINATES]', ' R1 0 0', ' J1 100 0', '', '[OPTIONS]', ' Units  LPS', ' Headloss  H-W', '', '[END]', ''].join('\n'));
+	const eL = EC.lpnToInp(lone.model).inp;
+	ok('a project with no other pipe falls back to 1000 mm', /^\s*V1\s+R1\s+J1\s+0\.01\s+1000\s+/m.test(eL), JSON.stringify(eL.split('\n').filter((l) => /V1|PIPES/.test(l))));
+	open(inp(1));
 	const v0 = EC.lpnSolve(inA.model);
 	ok('the marked virtual pipe: velocity 0, flow untouched (15 L/s)', v0.velocities.V1 === 0 && Math.abs(v0.flows.V1 - 0.015) <= FLOW_TOL);
 

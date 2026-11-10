@@ -78565,6 +78565,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(text);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		// A pipe of length 0 is virtual whether or not the box is ticked (Tom, 2026-11-09), and says so.
+		if (l.virtual !== true && linkLengthSI(l) === 0) {
+			var note = document.createElement('div');
+			note.className = 'lpn-virtual-note';
+			note.textContent = pc.lpn_field_virtual_length0 || 'Virtual pipe (length = 0)';
+			fields.appendChild(note);
+		}
 	}
 	// **CHECK VALVE (CV)**, a pipe's third status beside open and closed: the same `status`
 	// property the Closed box writes, so the two boxes are one EPANET status column and ticking
@@ -80021,7 +80028,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// crosses to both solvers with length 0 and no minor loss, and `virtual` rides along so
 			// js/lpn-epanet.js writes the stand-in pipe a curveless pump already uses and both
 			// engines report its velocity and head loss as 0.
-			if (l.type === 'pipe' && l.virtual === true) { out.virtual = true; out.length = 0; out.k = 0; }
+			// A pipe whose effective length is 0 IS a virtual pipe (Tom, 2026-11-09), so the flag and the length 0 are one truth here.
+			if (l.type === 'pipe' && (l.virtual === true || out.length === 0)) { out.virtual = true; out.length = 0; out.k = 0; }
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is why a valve
 				// needs a line here at all. A pressure setting is a head in metres, a flow setting is
