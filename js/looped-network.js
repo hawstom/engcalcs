@@ -3308,6 +3308,7 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
+	var LPN_LEVEL_LEAVE_SYMBOLS = true;
 	var LPN_LEVEL_FULL_FIRST = true, LPN_LEVEL_FULL_SIDES = 16, LPN_LEVEL_REACH_TEXT_HEIGHTS = 5, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
 	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
 	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
@@ -3515,7 +3516,10 @@ var EngCalcs = EngCalcs || {};
 			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
 				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly });
+				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly,
+				// **A LEADER FROM A PIPE SHORTER THAN ITS END SYMBOLS LEAVES THEM** (Tom, 2026-11-09, L185 on Novato: *"would be
+				// reassuringly confirmed if they had leaders"*): the symbol the anchor stands in is not in its way, any other is.
+				leaderClean: LPN_LEVEL_LEAVE_SYMBOLS });
 		});
 		// Every candidate's other forms, measured in one batch.
 		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,
@@ -3645,6 +3649,8 @@ var EngCalcs = EngCalcs || {};
 				if (qok && own < Infinity && other <= own * LPN_AMBIG_PIPE_RATIO) {
 					ground.boxes.forEach(function (o) {
 						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
+						// The symbol the leader starts in is not in its way (a pipe shorter than its end symbols).
+						if (LPN_LEVEL_LEAVE_SYMBOLS && o.kind === 'symbol' && Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2) { return; }
 						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
 					});
 					ground.segments.forEach(function (o) { if (qok && o.kind === 'leader' && o.owner !== r.id && Collide.segmentsCross(qg, o)) { qok = false; } });
@@ -3687,7 +3693,14 @@ var EngCalcs = EngCalcs || {};
 			trial.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
 			trial.forEach(function (sp, i) {
 				sp.priority = trial.length - i;
-				if (sp.sides.length > LPN_LEVEL_FULL_SIDES) { sp.sides = sp.sides.slice(0, LPN_LEVEL_FULL_SIDES); }
+				// **A SAMPLE OF THE SIDES, SPREAD OVER THE RINGS, NOT THE NEAREST FEW**: they are ordered by radius, and the
+				// nearest sixteen are all on the first ring, where a whole label lies across its own pipe. Measured on the 600-junction
+				// network, all of the sides cost half as much time again for the last tenth of the gain.
+				if (sp.sides.length > LPN_LEVEL_FULL_SIDES) {
+					var keep = Math.min(4, sp.sides.length), rest = sp.sides.slice(keep), want = LPN_LEVEL_FULL_SIDES - keep, step = rest.length / want, pick = [], k;
+					for (k = 0; k < want; k++) { pick.push(rest[Math.floor(k * step)]); }
+					sp.sides = sp.sides.slice(0, keep).concat(pick);
+				}
 			});
 			var ground3 = { boxes: base.boxes.slice(), segments: base.segments.slice() };
 			out.forEach(function (r) {
