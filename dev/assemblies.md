@@ -197,7 +197,7 @@ from the pumping level (the static elevation less the drawdown), not from the st
 - **Solvers:** `EngCalcs.lpnDiagnose` no longer refuses a GPV on a reservoir or tank (EPANET's error 219 covers PRV, PSV
   and FCV only; a PBV is still refused). Both engines solve a well; the pump's discharge head equals static elevation less
   drawdown(Q) plus pump head(Q) to better than 1e-8 m.
-- **Not built:** automatic controls for the open-air tank; the pressure tank (slice 2, waiting on Tom's answers); a drawdown
+- **Not built:** the pressure tank (slice 2, waiting on Tom's answers); a drawdown
   picture on the icon; the Assemblies table.
 
 ### The Well's tee (Mary, 2026-11-09; `dev/lpn-spike/well-tee-harness.js`)
@@ -208,7 +208,7 @@ now R -> G (drawdown valve W1V) -> S (W1U) -> pump W1 -> **D (W1D, the tee)** ->
 the system's pipes join D. A full tank shuts only B. Measured in both engines on a 10 L/s demand with the tank full: pump 0.0100000316
 m3/s, branch 0; with the tank half full the branch takes 0.037 m3/s and the pump 0.047 (the engines agree to 5e-6; EPANET's B is the
 stand-in pipe, so D stands a millimetre or two above T). Elevation: T and D share the ground, R and S the static level. Explode keeps all
-seven. Not done: automatic pump controls for the open-air tank; Tom's wish for an exploded view of a selected assembly.
+seven. Not done: Tom's wish for an exploded view of a selected assembly.
 
 ### Sub-element sections and the graph (Tom, 2026-11-09; `assembly-sections-harness.js`, `assembly-sections-browser-harness.js`)
 
@@ -229,9 +229,31 @@ seven. Not done: automatic pump controls for the open-air tank; Tom's wish for a
 - The Well's static water level follows its ground, keeping its depth, until the user types a static value; `staticTyped` on the grouping records that in the project, and an imported well's is typed.
 - A Pump+, Valve+ or Well link label is an obstacle to the aligned pipe labels. A Valve+ on a vertical pipe keeps each node label wholly on its own half. A Well's virtual pipe label takes a quarter the pump's label and leader do not cross.
 
+### The Well's pump controls (Tom, 2026-11-09; `dev/lpn-spike/well-controls-harness.js`, `well-controls-browser-harness.js`)
+
+*"It would be a great convenience to the user if we devised a way to write controls based on the input we request in assembly properties."*
+
+- **Inputs:** "Pump on below" and "Pump off above", tank depths in the Elevation/Head unit as the tank's own depths are, blank meaning no
+  automatic control. In the entry area of the Well's box, directly under the two curves, not under the Tank heading: they are what the
+  user decides about the pump, and the entry area is where the Well's own design inputs sit; the sections below are the sub-elements' readouts.
+- **What is written:** two ordinary simple controls, `LINK pump OPEN IF NODE tank BELOW on` and `LINK pump CLOSED IF NODE tank ABOVE off`,
+  into `doc.controls`, each tagged `asm` with the Well's id. Both engines run them in an extended-period run like any control. Either level
+  alone writes just its own control. The levels live on the grouping (`pumpOn`, `pumpOff`) and ride in the project.
+- **In the Controls editor** they appear as the sentence, read-only, with "Written by well W1. Change it in the Properties box of the well."
+  Read-only because the Well rewrites them on every edit of its inputs; an editable copy would be overwritten, and one fact gets one door.
+- **Explode** removes the tag and leaves two plain controls the user owns. Deleting any member of the Well does the same.
+- **.inp:** the controls are ordinary [CONTROLS] lines. The `;ASSEMBLY:` comment gains `ON=3 OFF=6`. On reading, the Well owns a control only
+  while the file still holds exactly the sentence it would write for that pump and tank at that level; a hand-edited or missing one leaves
+  that level unset and the control ordinary, so such a file always opens. Net1/2/3 and any project without a Well are unchanged.
+- **Validation (`EngCalcs.lpnDiagnose`, code `well-levels`, both engines):** on below off, and each between the tank's minimum and maximum
+  depth, else refused by name ("These wells need a pump-on level below the pump-off level...").
+- **Scenarios:** not overridable. A control is document data in every scenario (the Library is a view of the document), and the Well's
+  levels are the controls' numbers. The tank's depth limits the levels are checked against are the scenario's own.
+- **Measured:** on 3 m / off 6 m over 24 h on a 6 m tank, the built-in loop and EPANET switch the pump at the same 21 times; pump flow agrees to
+  2e-6 m3/s each step and tank level to 2 mm (the tank integrates the flow difference over a cycle).
+
 ### Open, from Tom's round 4 notes (2026-11-09)
 
-- **Controls written from the assembly's own inputs** for an open-air tank too, not only the pressure tank (*"an open-air tank with controls connecting the pump and the tank would be a very nice feature"*): pump-on and pump-off levels asked in the Well's box, written as ordinary controls.
 - **An exploded view of a selected assembly**, its members fanned out along its downstream pipe as Google Earth fans coincident marks (*"I'm not sure whether this assemblies experiment will work. But let's keep experimenting."*).
 - **Detection of an exploded assembly** exists only as the `;ASSEMBLY:` comment on import; he asked whether a menu command ("Detect exploded complex assets") belongs. His 11-06 calls on detection stand.
 - **The umbrella word.** He finds "assembly" eyes-glazed and offers "complex asset", noting a pump or valve is not physically complex. Mary (journal 2026-11-09): "assembly" is Esri Utility Network vocabulary for a point feature containing others, pump assemblies its own example; "complex asset" is not an industry term she found. Visitor strings name the specific thing (Well, Pump+); the umbrella word appears only where one is needed.

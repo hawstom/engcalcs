@@ -651,6 +651,15 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		if (g && p && (!(g.curvePoints && g.curvePoints.length) || !(p.curveSI && p.curveSI.length))) { wellsBare.push(w.id); }
 	});
 	if (wellsBare.length > 0) { issues.push({ code: 'well-no-curve', ids: wellsBare }); }
+	// A WELL'S PUMP CONTROL LEVELS (Task 822): on below off, each between the tank's minimum and maximum depth (metres on the model).
+	var wellsLevels = [];
+	(model.wells || []).forEach(function (w) {
+		var bad = false;
+		['on', 'off'].forEach(function (k) { if (typeof w[k] === 'number' && (w[k] < w.lvMin || w[k] > w.lvMax)) { bad = true; } });
+		if (typeof w.on === 'number' && typeof w.off === 'number' && !(w.on < w.off)) { bad = true; }
+		if (bad) { wellsLevels.push(w.id); }
+	});
+	if (wellsLevels.length > 0) { issues.push({ code: 'well-levels', ids: wellsLevels }); }
 	var badCurves = EngCalcs.lpnGpvsWith(model, 'gpv-order');
 	if (badCurves.length > 0) { issues.push({ code: 'gpv-curve-order', ids: badCurves }); }
 

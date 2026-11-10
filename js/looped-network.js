@@ -40237,7 +40237,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!a.links.every(function (id) { return linkIds[id]; })) { return; }
 			if (a.kind === 'well') {
 				wellOk = Array.isArray(a.nodes) && (a.nodes.length === 3 ? a.links.length === 2 : a.nodes.length === 4 && a.links.length === 3) && a.nodes.every(function (id) { return nodeIds[id]; });
-				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined }); }
+				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined,
+					pumpOn: typeof a.pumpOn === 'number' ? a.pumpOn : undefined, pumpOff: typeof a.pumpOff === 'number' ? a.pumpOff : undefined }); }
 				return;
 			}
 			if (!nodeIds[a.up] || !nodeIds[a.down]) { return; }
@@ -40545,6 +40546,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var a = assemblyById(id);
 		if (!a) { return; }
 		doc.assemblies = doc.assemblies.filter(function (x) { return x !== a; });
+		releaseAssemblyControls(a.id);
 		syncAssemblyGlyphs();
 		assemblyNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
 		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === id) { closePopup(); }
@@ -40558,6 +40560,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (gone.length) {
 			doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; });
+			gone.forEach(function (a) { releaseAssemblyControls(a.id); });
 			syncAssemblyGlyphs();
 			gone.forEach(function (a) { assemblyNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } }); });
 		}
@@ -40568,8 +40571,34 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (a.down === oldId) { a.down = newId; }
 			if (a.nodes) { a.nodes = a.nodes.map(function (x) { return x === oldId ? newId : x; }); }
 			a.links = a.links.map(function (x) { return x === oldId ? newId : x; });
-			if (a.id === oldId) { a.id = newId; }
+			if (a.id === oldId) { a.id = newId; (doc.controls || []).forEach(function (c) { if (c && c.asm === oldId) { c.asm = newId; } }); }
 		});
+	}
+	// **A WELL'S PUMP CONTROLS** (Task 822; Tom, 2026-11-09: "controls connecting the pump and the tank"). The well holds two depths on its
+	// grouping (`pumpOn`, `pumpOff`, in the displayed Elevation/Head unit as a tank's depths are) and writes two ordinary simple controls
+	// from them into doc.controls, each tagged `asm` = the well's id. They are the well's while tagged: the Controls editor shows them
+	// read-only, and Explode (or losing a member) removes the tag and leaves two plain controls. The levels are not scenario-overridable,
+	// because a control is document data in every scenario (the Library is a view of the document).
+	function releaseAssemblyControls(asmId) {
+		(doc.controls || []).forEach(function (c) { if (c && c.asm === asmId) { delete c.asm; } });
+	}
+	function syncWellControls(a) {
+		var pump = a.links[1], tank = a.nodes[2], list = libControls(), at = -1, i, wrote = [];
+		for (i = 0; i < list.length; i++) { if (list[i] && list[i].asm === a.id) { if (at < 0) { at = i; } } }
+		doc.controls = list.filter(function (c) { return !(c && c.asm === a.id); });
+		[['open', 'BELOW', a.pumpOn], ['closed', 'ABOVE', a.pumpOff]].forEach(function (k) {
+			var read;
+			if (typeof k[2] !== 'number' || !isFinite(k[2])) { return; }
+			read = libReadControl('LINK ' + pump + ' ' + k[0].toUpperCase() + ' IF NODE ' + tank + ' ' + k[1] + ' ' + k[2]);
+			if (!read.ok) { return; }
+			read.rec.asm = a.id;
+			wrote.push(read.rec);
+		});
+		if (wrote.length) {
+			if (at < 0 || at > doc.controls.length) { at = doc.controls.length; }
+			doc.controls.splice.apply(doc.controls, [at, 0].concat(wrote));
+		}
+		libCommit();
 	}
 	function openAssemblyPopup(id, sx, sy) {
 		var a = assemblyById(id), le = a && linkEls[a.links[0]], at;
@@ -40666,6 +40695,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_field_well_static_tip, { el: r, prop: 'elev' });
 		curveChooser(fields, g, 'curveId', 'headloss', pc.lpn_well_drawdown_curve || 'Drawdown curve', pc.lpn_well_drawdown_curve_tip);
 		curveChooser(fields, pump, 'curveId', 'head', pc.lpn_pump_curve_source || 'Pump head curve', pc.lpn_well_pump_curve_tip);
+		// The pump's automatic control, asked as tank depths; blank means none. Written as two ordinary controls (syncWellControls()).
+		[['pumpOn', pc.lpn_field_well_pump_on || 'Pump on below', pc.lpn_field_well_pump_on_tip],
+			['pumpOff', pc.lpn_field_well_pump_off || 'Pump off above', pc.lpn_field_well_pump_off_tip]].forEach(function (k) {
+			unitNumberFieldBlank(fields, k[1], 'lpn_u_elevhead',
+				function () { return a[k[0]]; },
+				function (v) {
+					if (v === undefined || !isFinite(v)) { delete a[k[0]]; } else { a[k[0]] = v; }
+					syncWellControls(a); scheduleSolve(); refreshPopupIfOpen();
+				}, undefined, k[2]);
+		});
 		closedField(fields, pump, pump.id);
 		activeField(fields, pump);
 		var btn = document.createElement('button');
@@ -72719,6 +72758,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		list.forEach(function (ctl, i) {
+			// A well's own control: shown as the sentence, read-only, with the well named. It is changed in the well's Properties box.
+			if (ctl && ctl.asm) {
+				var own = libEl('div', 'lpn-lib-entry lpn-lib-owned');
+				own.appendChild(libEl('div', 'lpn-lib-verdict', libControlText(ctl)));
+				own.appendChild(libEl('div', 'lpn-lib-note', (pc.lpn_library_control_owned || 'Written by well {id}. Change it in the Properties box of the well.').replace('{id}', ctl.asm)));
+				host.appendChild(own);
+				return;
+			}
 			var entry = libEl('div', 'lpn-lib-entry'),
 				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row'),
 				headRow = libEl('div', 'lpn-lib-head'),
@@ -80268,7 +80315,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
 			// The wells, so EngCalcs.lpnDiagnose can refuse one that names no curve (Task 822).
-			wells: (doc.assemblies || []).filter(function (a) { return a.kind === 'well'; }).map(function (a) { return { id: a.id, gpv: a.links[0], pump: a.links[1] }; }),
+			wells: (doc.assemblies || []).filter(function (a) { return a.kind === 'well'; }).map(function (a) {
+				var t = nodeById(a.nodes[2]), out = { id: a.id, gpv: a.links[0], pump: a.links[1] };
+				// The pump-on and pump-off depths against the tank's own depth limits, in metres (EngCalcs.lpnDiagnose 'well-levels').
+				if (t && (typeof a.pumpOn === 'number' || typeof a.pumpOff === 'number')) {
+					if (typeof a.pumpOn === 'number') { out.on = toSI(a.pumpOn, 'lpn_u_elevhead'); }
+					if (typeof a.pumpOff === 'number') { out.off = toSI(a.pumpOff, 'lpn_u_elevhead'); }
+					out.lvMin = toSI(effective(t, 'minLevel') || 0, 'lpn_u_elevhead');
+					out.lvMax = toSI(effective(t, 'maxLevel') || 0, 'lpn_u_elevhead');
+				}
+				return out;
+			}),
 			visc: 1.007e-6 * (hyd.viscosity || 1),
 			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
@@ -80439,6 +80496,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		// The two valve data faults (Task 733; Tom, 2026-10-18): EPANET refuses both, so both engines do.
 		if (issue.code === 'valve-conflict') { return (pc.lpn_diag_valve_conflict || 'These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'well-levels') { return (pc.lpn_diag_well_levels || 'These wells need a pump-on level below the pump-off level, both between the minimum and maximum depth of the tank. Correct them in the Properties box of each well:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'well-no-curve') { return (pc.lpn_diag_well_no_curve || 'These wells need a drawdown curve and a pump head curve. Choose both in the Properties box of each well:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
 		// A [RULES] block EPANET would refuse to read, named by rule in both engines (Task 733).
