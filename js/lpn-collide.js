@@ -1263,7 +1263,7 @@ EngCalcs.lpnCollide = (function () {
 				// A node label's leader starts AT its node: that node's own symbol is not in its way
 				// (leaderThroughSymbol() says the same). Without this every far side of a one-line
 				// node label failed here, whatever lay between (Task 812).
-				if (config.ownSymbol && lbl.leaderClean && o.kind === 'symbol' && Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+				if (config.ownSymbol && lbl.leaderClean && o.kind === 'symbol' && anchorInSymbol(o, lbl.anchor)) { continue; }
 				if (segmentInBoxFraction(g, o) > 0) { return false; }
 			}
 			for (i = 0; i < local.segments.length; i++) {
@@ -1640,12 +1640,17 @@ EngCalcs.lpnCollide = (function () {
 	// Does the leader from the anchor to this endpoint pass through a symbol not its own (N3)? The
 	// first-fit draws no leader itself, but the renderer does, so ground reached across another
 	// node's symbol is not clean. The anchor's own symbol is the one that contains the anchor.
+	// The symbol a leader starts in is not in its way. A node symbol is a circle (`round`), so a point in the corner of
+	// its box is outside it, and a leader from there that crosses the circle is a leader through the symbol.
+	function anchorInSymbol(o, a) {
+		return o.round ? Math.hypot(o.cx - a.x, o.cy - a.y) <= o.w / 2 : (Math.abs(o.cx - a.x) <= o.w / 2 && Math.abs(o.cy - a.y) <= o.h / 2);
+	}
 	function leaderThroughSymbol(lbl, c, obs) {
 		var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o;
 		for (i = 0; i < obs.boxes.length; i++) {
 			o = obs.boxes[i];
 			if (o.kind !== 'symbol') { continue; }
-			if (Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+			if (anchorInSymbol(o, lbl.anchor)) { continue; }
 			if (segmentInBoxFraction(g, o) > 0) { return true; }
 		}
 		return false;

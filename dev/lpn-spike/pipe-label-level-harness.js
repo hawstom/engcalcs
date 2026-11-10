@@ -17,7 +17,7 @@
 // labels already draw a few leaders through other nodes' symbols on these views, 1 to 4 a view,
 // which this branch does not touch and the table prints); no view shows fewer labels or fewer
 // values than before; every label drawn before is drawn identically after (the level pass runs last
-// and only on labels that were hidden); every level label drawn without a leader is nearer its own
+// and only on labels that were hidden, or drawn along their pipe with fields shed); every level label drawn without a leader is nearer its own
 // pipe than any other pipe, measured to its rows; and the level pass shows labels on every network. R14 holds
 // by construction: only a label that could not lie along its pipe is ever set level.
 //
@@ -131,6 +131,9 @@ function ok(label, cond, detail) {
 			const ax = +e.getAttribute('x1'), ay = +e.getAttribute('y1'), bx = +e.getAttribute('x2'), by = +e.getAttribute('y2');
 			nsym.forEach((q) => {
 				if (q.id === o.own) { return; }
+				// A pipe's leader starts at its middle: where the pipe is shorter than its end symbols that point is inside
+				// them, and the symbol a leader starts in is not in its way (Task 812, round 5).
+				if (Math.hypot(ax - q.x, ay - q.y) < q.r) { return; }
 				const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy;
 				let t = L2 ? ((q.x - ax) * vx + (q.y - ay) * vy) / L2 : 0; t = Math.max(0, Math.min(1, t));
 				if (Math.hypot(ax + vx * t - q.x, ay + vy * t - q.y) < q.r - eps) { br.N3.push(o.id + ' leader through node ' + q.id); }
@@ -163,10 +166,10 @@ function ok(label, cond, detail) {
 			L.setView({ cx: o.cx, cy: o.cy, s: o.s1 * m });
 			L.refreshLabelText();
 			const c = V.countShown(L), br = measure(L);
-			const sig = {};
-			L.getDoc().links.forEach((l) => { const h = L.linkEls()[l.id]; if (V.shown(h) && !h.levelBeside) { sig['l' + l.id] = h.text.getAttribute('x') + ',' + h.text.getAttribute('y') + ',' + (h.text.getAttribute('transform') || '') + ',' + (h.lines || []).length; } });
+			const sig = {}, shed = {};
+			L.getDoc().links.forEach((l) => { const h = L.linkEls()[l.id]; if (V.shown(h) && !h.levelBeside) { shed['l' + l.id] = (h.allLines || []).length > (h.lines || []).length; sig['l' + l.id] = h.text.getAttribute('x') + ',' + h.text.getAttribute('y') + ',' + (h.text.getAttribute('transform') || '') + ',' + (h.lines || []).length; } });
 			L.getDoc().nodes.forEach((n) => { const h = L.nodeEls()[n.id]; if (V.shown(h)) { sig['n' + n.id] = h.text.getAttribute('x') + ',' + h.text.getAttribute('y') + ',' + (h.lines || []).length; } });
-			views.push({ m: m, c: c, br: br, sig: sig });
+			views.push({ m: m, c: c, br: br, sig: sig, shed: shed });
 		}
 		return views;
 	}
@@ -193,7 +196,8 @@ function ok(label, cond, detail) {
 			ok(tag + ': every level label without a leader is nearer its own pipe than any other', a.br.astray.length === 0,
 				a.br.astray.length + ' of ' + a.c.level + (a.br.astray.length ? ': ' + a.br.astray.slice(0, 4).join(' ') : '') + '; ' + a.br.strandedLevel.length + ' more went without the leader that would have run through a label');
 			ok(tag + ': no fewer labels or values than before', shownA >= shownB && rowsA >= rowsB, shownB + ' -> ' + shownA + ' labels, ' + rowsB + ' -> ' + rowsA + ' values');
-			const moved = Object.keys(b.sig).filter((k) => a.sig[k] !== b.sig[k]);
+			// A label drawn along its pipe with fewer fields than it has may leave for a spot that shows them all (round 5).
+			const moved = Object.keys(b.sig).filter((k) => a.sig[k] !== b.sig[k] && !b.shed[k]);
 			ok(tag + ': every label drawn before is drawn identically after', moved.length === 0,
 				moved.length + ' changed' + (moved.length ? ': ' + moved.slice(0, 3).map((k) => k + ' ' + b.sig[k] + ' vs ' + a.sig[k]).join('; ') : ''));
 		});

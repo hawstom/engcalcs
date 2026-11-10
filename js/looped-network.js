@@ -148,12 +148,12 @@ var EngCalcs = EngCalcs || {};
 	// 807). The dodge depends on the arrows, which come and go with a solve and whose size is in
 	// screen pixels, so measuring a user's offset from it moved his label on every recalculation
 	// and every zoom step. His offset is a fact about the drawing; it is measured from one.
-	function linkLabelMid(l, along) {
+	function linkLabelMid(l, along, pointList) {
 		if (along === undefined && labelIsDragged(l)) {
-			return Geom.pointAlongPolyline(linkPointList(l), LINK_LABEL_ALONG);
+			return Geom.pointAlongPolyline(pointList || linkPointList(l), LINK_LABEL_ALONG);
 		}
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
-		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
+		return Geom.dodgeAlongPolyline(pointList || linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
 	// ---- A LONG PIPE CARRIES ITS LABEL SEVERAL TIMES --------------------------------------------
@@ -3390,8 +3390,11 @@ var EngCalcs = EngCalcs || {};
 		var out = [], s = state.s || 1;
 		reqs.forEach(function (q) {
 			if (!q.m || !(q.m.wPx > 0)) { return; }
-			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
-				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
+			// **TO TEN FIGURES**: one scale reached by two wheel histories differs in its last bit, and a width of pixels over that scale
+			// with it; a side that grazes a box then flips between the two (zoom-pass-determinism-harness.js).
+			function fig(v) { return +v.toPrecision(10); }
+			var n = q.stacked ? q.lines.length : 1, w = fig(q.m.wPx / s), h = fig(dataLabelBoxHeight(n)),
+				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return fig(v / s); }) : null,
 				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
 			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
 			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
@@ -3452,9 +3455,18 @@ var EngCalcs = EngCalcs || {};
 		});
 		return struck;
 	}
+	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT, as copies**: boxes and segments are measured in
+	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
+	// between them, and the picture depends on the history (zoom-pass-determinism-harness.js). Nothing else on the map moves.
+	function snap(v) { return Math.round(v * 1e6) / 1e6; }
+	function snapPt(p) { return { x: snap(p.x), y: snap(p.y) }; }
+	function snapBox(b) { return Object.assign({}, b, { cx: snap(b.cx), cy: snap(b.cy), w: snap(b.w), h: snap(b.h) }); }
+	function snapSeg(g) { return Object.assign({}, g, { ax: snap(g.ax), ay: snap(g.ay), bx: snap(g.bx), by: snap(g.by) }); }
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
-		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
-			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), nearReach = Math.max(home0 * 3, fs * 3), byKey = {}, fsNow = fs + 'px';
+		var fsNow = fs + 'px';
+		fs = snap(fs);
+		var specs = [], min = snap(leaderThreshold()), d = snapPt(defaultLabelOffset()), home0 = snap(Math.hypot(d.x, d.y)),
+			reach = snap(Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS)), nearReach = snap(Math.max(home0 * 3, fs * 3)), byKey = {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (le) { le.levelForm = null; le.levelAt = null; }
@@ -3472,7 +3484,7 @@ var EngCalcs = EngCalcs || {};
 				// properties when there is convenient open space to show everything on a leader."*).
 				shedOnly = !hid && LPN_LEVEL_FULL_FIRST && !!le.allLines && le.allLines.length > (le.lines || []).length && le.allLines.length > 1;
 			if (!(hid || shedOnly)) { return; }
-			var mid = linkLabelMid(l), pts = linkPointList(l), sides = [];
+			var pts = linkPointList(l), mid = snapPt(linkLabelMid(l, undefined, pts)), sides = [];
 			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
 			// side of the pipe, nearest first. `at` marks a point other than the label's own.
 			function sidesAt(p, along, rings, lite) {
@@ -3510,11 +3522,11 @@ var EngCalcs = EngCalcs || {};
 			var ends = [nodeAt(nodeById(l.from)), nodeAt(nodeById(l.to))];
 			if (!shedOnly && ends.some(function (e) { return e && Math.hypot(e.x - mid.x, e.y - mid.y) < home0; })) {
 				LPN_LEVEL_STATIONS.forEach(function (a) {
-					Array.prototype.push.apply(sides, sidesAt(Geom.pointAlongPolyline(pts, a), a, 2));
+					Array.prototype.push.apply(sides, sidesAt(snapPt(Geom.pointAlongPolyline(pts, a)), a, 2));
 				});
 			}
 			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
-				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
+				dragged: false, sides: sides, len: Geom.polylineLength(pts),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly,
 				// **A LEADER FROM A PIPE SHORTER THAN ITS END SYMBOLS LEAVES THEM** (Tom, 2026-11-09, L185 on Novato: *"would be
@@ -3533,7 +3545,7 @@ var EngCalcs = EngCalcs || {};
 				delete sp.reqs;
 				if (f.length) { sp.forms = f; }
 				// The forms showing EVERY field, the smaller footprint first.
-				var all = linkEls[sp.l.id].allLines.length, full = f.filter(function (q) { return q.nVal === all; });
+				var lel = linkEls[sp.l.id], all = (lel.allLines || lel.lines || []).length, full = f.filter(function (q) { return q.nVal === all; });
 				if (full.length) { sp.fullForms = full; sp.allCount = all; }
 				if (sp.shedTrial) {
 					// Its own spec is the first of them, so a side that takes it takes the whole label, never a shed one.
@@ -3555,12 +3567,12 @@ var EngCalcs = EngCalcs || {};
 		prioritise(shedSpecs);
 		// Everything on the map now: the drawing, the stationed labels, the dragged ones, and every
 		// node and free label the passes above placed, with the leaders the renderer will draw.
-		var ground = { boxes: nodeObs.boxes.slice(), segments: nodeObs.segments.slice() };
+		var ground = { boxes: nodeObs.boxes.map(snapBox), segments: nodeObs.segments.map(snapSeg) };
 		function addPlaced(spec, r) {
 			var h = holders[r.id];
 			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed))) { return; }
 			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
-				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+				var c = Collide.box(snap(b.cx), snap(b.cy), snap(b.w), snap(b.h), b.a); c.kind = 'label'; ground.boxes.push(c);
 			});
 			// **A STACK HUNG LEFT IS DRAWN WITH ITS ROWS FLUSH LEFT**, not flush right as
 			// Collide.labelLineBoxes() models it: dataLabelOrigin() puts the text's x at the box's
@@ -3569,11 +3581,11 @@ var EngCalcs = EngCalcs || {};
 			// Chromium: up to 10 px deep on Net3 at 2x).
 			if (!spec.side && spec.lines && spec.lines.length > 1 && r.x < spec.anchor.x) {
 				Collide.labelLineBoxes(Object.assign({}, spec, { side: 'right' }), { x: r.x - spec.w, y: r.y }).forEach(function (b) {
-					b.kind = 'label'; ground.boxes.push(b);
+					b.kind = 'label'; ground.boxes.push(snapBox(b));
 				});
 			}
 			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min || (h && h.leaderDue)) {
-				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
+				ground.segments.push(Collide.segment(snap(spec.anchor.x), snap(spec.anchor.y), snap(r.x), snap(r.y), 'leader', r.id));
 			}
 		}
 		var specOf = {};
@@ -3596,8 +3608,8 @@ var EngCalcs = EngCalcs || {};
 		// -> 129 values). Two sweeps over the same ground: the first with every side within reach 3, as
 		// before; the second only for the labels it dropped, with every side to the full reach, on the
 		// ground the first left. No label that fits near its pipe loses its place to one that reaches.
-		var fitOpts = { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
-			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC };
+		var fitOpts = { pad: snap(fs * LPN_LEVEL_PAD_FRAC), lastPad: snap(fs * LPN_LEVEL_PAD_FRAC), strict: true,
+			leaderMin: snap(levelLeaderMin()), quietMax: min, near: snap(fs * LPN_LEVEL_NEAR_FRAC) };
 		function withSides(sp, keep) {
 			var idx = [], c = Object.assign({}, sp);
 			c.sides = sp.sides.filter(function (q, i) { if (keep(q)) { idx.push(i); return true; } return false; });
@@ -3650,7 +3662,7 @@ var EngCalcs = EngCalcs || {};
 					ground.boxes.forEach(function (o) {
 						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
 						// The symbol the leader starts in is not in its way (a pipe shorter than its end symbols).
-						if (LPN_LEVEL_LEAVE_SYMBOLS && o.kind === 'symbol' && Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2) { return; }
+						if (LPN_LEVEL_LEAVE_SYMBOLS && o.kind === 'symbol' && (o.round ? Math.hypot(o.cx - qa.x, o.cy - qa.y) <= o.w / 2 : (Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2))) { return; }
 						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
 					});
 					ground.segments.forEach(function (o) { if (qok && o.kind === 'leader' && o.owner !== r.id && Collide.segmentsCross(qg, o)) { qok = false; } });
@@ -3702,11 +3714,14 @@ var EngCalcs = EngCalcs || {};
 					sp.sides = sp.sides.slice(0, keep).concat(pick);
 				}
 			});
-			var ground3 = { boxes: base.boxes.slice(), segments: base.segments.slice() };
+			// **THE GROUND TO A MILLIONTH**: boxes and segments are measured in pixels over a scale, and one scale reached by two wheel
+			// histories differs in its last bit; a spot that grazes a box then flips between them
+			// (zoom-pass-determinism-harness.js). Copies, so nothing else on the map moves.
+			var ground3 = { boxes: base.boxes.map(snapBox), segments: base.segments.map(snapSeg) };
 			out.forEach(function (r) {
 				if (r.dropped || going[r.id]) { return; }
-				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground3.boxes.push(b); });
-				if (r.leader) { ground3.segments.push(r.leader); }
+				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground3.boxes.push(snapBox(b)); });
+				if (r.leader) { ground3.segments.push(snapSeg(r.leader)); }
 			});
 			var out2 = fitSpecs(trial, ground3, true), byId2 = {}, trialBy = {};
 			trial.forEach(function (sp) { trialBy[sp.id] = sp; });
