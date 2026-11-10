@@ -139,6 +139,7 @@ function ok(label, cond, detail) {
 		// WHICH PIPE IS IT FOR? A level label with no drawn leader must be nearer its own pipe than
 		// any other, measured to its rows (pre-review, 2026-10-17).
 		br.astray = [];
+		br.strandedLevel = [];   // went without a leader that would have run through another label (dropStruckLeaders())
 		const pipes = ((cap.obs && cap.obs.segments) || []).filter((g) => g.kind === 'link');
 		(cap.level || []).forEach((r) => {
 			const h = linkEls[r.id.slice(2)];
@@ -150,7 +151,7 @@ function ok(label, cond, detail) {
 				const d = Collide.segmentBoxDistance(g, b);
 				if (g.owner === r.id) { own = Math.min(own, d); } else { other = Math.min(other, d); }
 			}));
-			if (other < own) { br.astray.push(r.id); }
+			if (other < own) { (h.leaderStruck ? br.strandedLevel : br.astray).push(r.id); }
 		});
 		return br;
 	}
@@ -190,7 +191,7 @@ function ok(label, cond, detail) {
 			ok(tag + ': no never-rule break added (N1, N3, N5)', added.length === 0,
 				`after N1 ${a.br.N1.length} N3 ${a.br.N3.length} N5 ${a.br.N5.length}, ${added.length} new` + (added.length ? '; e.g. ' + added.slice(0, 3).join('; ') : ''));
 			ok(tag + ': every level label without a leader is nearer its own pipe than any other', a.br.astray.length === 0,
-				a.br.astray.length + ' of ' + a.c.level + (a.br.astray.length ? ': ' + a.br.astray.slice(0, 4).join(' ') : ''));
+				a.br.astray.length + ' of ' + a.c.level + (a.br.astray.length ? ': ' + a.br.astray.slice(0, 4).join(' ') : '') + '; ' + a.br.strandedLevel.length + ' more went without the leader that would have run through a label');
 			ok(tag + ': no fewer labels or values than before', shownA >= shownB && rowsA >= rowsB, shownB + ' -> ' + shownA + ' labels, ' + rowsB + ' -> ' + rowsA + ' values');
 			const moved = Object.keys(b.sig).filter((k) => a.sig[k] !== b.sig[k]);
 			ok(tag + ': every label drawn before is drawn identically after', moved.length === 0,

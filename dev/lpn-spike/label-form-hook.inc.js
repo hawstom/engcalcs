@@ -61,6 +61,47 @@
 			out.stackCands = (g.nodeLabels.filter(function (q) { return q.id === key; })[0] || {}).sides ? g.nodeLabels.filter(function (q) { return q.id === key; })[0].sides.length : null;
 			return out;
 		},
+		// Every drawn leader that runs through a row of another label (Task 812). A row is the tspan that carries an x
+		// and the ones after it; a leader is tested as the segment it is, against the rows as the glyphs fill them,
+		// not against the box round a ragged stack. Labels set along a pipe (rotated) are left out, as the bbox audit did.
+		leaderStrikes: function () {
+			var c = svg.getBoundingClientRect(), L = [], R = [], out = [];
+			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+			function rows(t) {
+				var res = [], cur = null, ts = t.querySelectorAll('tspan'), i, r;
+				for (i = 0; i < ts.length; i++) {
+					r = ts[i].getBoundingClientRect();
+					if (!(r.width > 0)) { continue; }
+					if (ts[i].hasAttribute('x') || !cur) { cur = { l: r.left, t: r.top, r: r.right, b: r.bottom }; res.push(cur); }
+					else { cur.l = Math.min(cur.l, r.left); cur.t = Math.min(cur.t, r.top); cur.r = Math.max(cur.r, r.right); cur.b = Math.max(cur.b, r.bottom); }
+				}
+				if (!res.length) { r = t.getBoundingClientRect(); res.push({ l: r.left, t: r.top, r: r.right, b: r.bottom }); }
+				return res;
+			}
+			function add(k, h) {
+				if (!h) { return; }
+				var e = h.leader;
+				if (e && e.style.display !== 'none' && e.style.visibility !== 'hidden' && e.getAttribute('x1') != null && (!h.text || vis(h.text))) {
+					L.push({ k: k, ax: +e.getAttribute('x1') * state.s + state.tx, ay: +e.getAttribute('y1') * state.s + state.ty, bx: +e.getAttribute('x2') * state.s + state.tx, by: +e.getAttribute('y2') * state.s + state.ty });
+				}
+				if (h.text && vis(h.text) && !/rotate/.test(h.text.getAttribute('transform') || '')) {
+					rows(h.text).forEach(function (r) { R.push({ k: k, l: r.l - c.left, t: r.t - c.top, r: r.r - c.left, b: r.b - c.top }); });
+				}
+			}
+			function hit(g, r) {
+				var t0 = 0, t1 = 1, dx = g.bx - g.ax, dy = g.by - g.ay, p = [-dx, dx, -dy, dy], q = [g.ax - r.l - 1, r.r - 1 - g.ax, g.ay - r.t - 1, r.b - 1 - g.ay], k, u;
+				for (k = 0; k < 4; k++) {
+					if (p[k] === 0) { if (q[k] < 0) { return false; } continue; }
+					u = q[k] / p[k];
+					if (p[k] < 0) { if (u > t1) { return false; } if (u > t0) { t0 = u; } } else { if (u < t0) { return false; } if (u < t1) { t1 = u; } }
+				}
+				return t0 < t1;
+			}
+			doc.nodes.forEach(function (n) { add('N' + n.id, nodeEls[n.id]); });
+			doc.links.forEach(function (l) { add('L' + l.id, linkEls[l.id]); });
+			L.forEach(function (g) { var seen = {}; R.forEach(function (r) { if (r.k !== g.k && !seen[r.k] && hit(g, r)) { seen[r.k] = true; out.push(g.k + ' through ' + r.k); } }); });
+			return out;
+		},
 		// Every label the last crossing hide hid, and which of them cross nothing in the entries it measured.
 		hiddenCrossedAudit: function () {
 			var g = lastFinalGround, E = g ? crossingEntries(g.nodeLabels, g.nodePlaced, g.labels, g.placed, g.obs) : [], pairs = EngCalcs.lpnCollide.labelCrossings(E).pairs, inPair = {}, out = { hidden: [], unjustified: [], forms: window.__lpnForm.nodeForms(['161']) };
@@ -123,7 +164,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], strandedLevel: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -280,7 +321,9 @@
 					// a pipe label's leader starts on its pipe, never inside an end node's symbol
 					return;
 				}
-				// No leader: its own pipe must be the nearest, by `amb`.
+				// No leader: its own pipe must be the nearest, by `amb`. Except a label whose leader would have run
+				// through another label (dropStruckLeaders()): it keeps its place and goes without, counted in `strandedLevel`.
+				if (linkEls[l.id].leaderStruck) { if (other <= own + amb) { v.strandedLevel.push(l.id); } return; }
 				if (other <= own + amb) { v.astray.push(l.id + '(' + (own * s).toFixed(1) + ' px vs ' + who + ' ' + (other * s).toFixed(1) + ')'); }
 			});
 			// N1: rows of two labels, a row on a node symbol, a row on a Text item.

@@ -353,7 +353,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : (d <= leaderThreshold() && !holder.leaderDue)) { holder.leader.style.display = 'none'; return; }
+		if (holder.leaderStruck || (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : (d <= leaderThreshold() && !holder.leaderDue))) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -3400,6 +3400,57 @@ var EngCalcs = EngCalcs || {};
 		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
 		return out;
 	}
+	// **A LEADER THAT RUNS THROUGH ANOTHER LABEL IS NOT DRAWN** (Task 812, pre-review 2026-11-09: leaders
+	// through a neighbour's row on Novato at 4 notches and Net3 at 6, new on this branch). Each pass above
+	// tested the leader it drew against the ground it knew; a label placed, moved or given a line after it
+	// was never tested against that leader, and the level labels came last of all. This is the one check
+	// on the drawing as it stands: every leader the renderer will draw (a node's, a free pipe label's, a
+	// level pipe label's, an ambiguity leader) against the rows of every other label drawn. The label
+	// keeps its place and loses only the leader; no label is hidden for it. It cannot make a new
+	// crossing, so it runs once, last. dev/lpn-spike/label-crossing-final-browser-harness.js.
+	var LPN_DROP_STRUCK = true;
+	function dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders) {
+		var min = leaderThreshold(), lmin = levelLeaderMin(), specs = {}, leaders = [], rows = [], struck = 0, air = effectiveFontSize() * LPN_LEVEL_PAD_FRAC;
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.leaderStruck = false; } });
+		doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le) { le.leaderStruck = false; } });
+		if (!LPN_DROP_STRUCK) { return 0; }
+		nodeLabels.concat(labels).forEach(function (sp) { specs[sp.id] = sp; });
+		function holderOf(id) { return id.charAt(0) === 'n' ? nodeEls[id.slice(2)] : linkEls[id.slice(2)]; }
+		// A row's box is the width the pass measured; the glyphs stand a pixel or two outside it. Air round
+		// the row, so a leader that grazes the box does not graze the letters.
+		function boxesOf(r) { return ((r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : [])).map(function (b) { return Collide.box(b.cx, b.cy, b.w + 2 * air, b.h + 2 * air, b.a); }); }
+		// A level label is drawn whatever it was along its pipe (its hiddenYielded stays set from there).
+		function shown(id) { var h = holderOf(id); return !!h && (!!h.levelBeside || (!h.hiddenDropped && !h.hiddenCrossed && !h.hiddenYielded)); }
+		nodePlaced.forEach(function (r) {
+			var sp = specs[r.id], h = holderOf(r.id), bs = boxesOf(r);
+			if (r.dropped || !sp || !h || !shown(r.id)) { return; }
+			bs.forEach(function (b) { rows.push({ id: r.id, b: b }); });
+			if (!sp.dragged && (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min || h.leaderDue)) {
+				leaders.push({ id: r.id, h: h, g: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+			}
+		});
+		placed.forEach(function (r) {
+			var h = holders[r.id], g = r.leader;
+			if (r.dropped || !h || !shown(r.id)) { return; }
+			boxesOf(r).forEach(function (b) { rows.push({ id: r.id, b: b }); });
+			if (g && !(specs[r.id] && specs[r.id].dragged) && Math.hypot(g.bx - g.ax, g.by - g.ay) > min) { leaders.push({ id: r.id, h: h, g: g }); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id], key = linkLabelKey(l.id);
+			if (!le || !le.levelBeside || !shown(key)) { return; }
+			obs.boxes.forEach(function (o) { if (o.levelOwner === l.id) { rows.push({ id: key, b: Collide.box(o.cx, o.cy, o.w + 2 * air, o.h + 2 * air, o.a) }); } });
+			if (le.levelQuiet) { return; }
+			obs.segments.forEach(function (o) {
+				if (o.kind === 'leader' && o.owner === key && Math.hypot(o.bx - o.ax, o.by - o.ay) > lmin) { leaders.push({ id: key, h: le, g: o }); }
+			});
+		});
+		leaders.forEach(function (ld) {
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i].id !== ld.id && rows[i].b.w > 0 && Collide.segmentInBoxFraction(ld.g, rows[i].b) > 0) { ld.h.leaderStruck = true; struck++; return; }
+			}
+		});
+		return struck;
+	}
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
 			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), nearReach = Math.max(home0 * 3, fs * 3), byKey = {}, fsNow = fs + 'px';
@@ -3781,6 +3832,7 @@ var EngCalcs = EngCalcs || {};
 		perfDebugAccum('  cl:level', function () {
 			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
 		});
+		perfDebugAccum('  cl:struck', function () { dropStruckLeaders(nodeLabels, nodePlaced, labels, placed, obs, holders); });
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
@@ -63787,7 +63839,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
-			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, hiddenDropped: !!h.hiddenDropped,
+			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, leaderDue: !!h.leaderDue, leaderStruck: !!h.leaderStruck, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -63842,7 +63894,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.shedCount = c.shedCount;
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
-		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenCrossed = c.hiddenCrossed; h.leaderDue = !!c.leaderDue; h.leaderStruck = !!c.leaderStruck; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;

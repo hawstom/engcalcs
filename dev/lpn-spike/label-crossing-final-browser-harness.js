@@ -6,6 +6,8 @@
 // wheel's notches 0 to 16 (three scales each, as label-open-side-browser-harness.js does). ASSERTED: every
 // node or pipe label hidden for a crossing is in a flagged pair in the final drawing, and N161 shows at
 // 9 notches; N163 and N164 draw a short leader at 5 to 14 notches (ambiguousShortLeaders()). OPEN_SIDE_NOTCHES=9 narrows it.
+// ALSO: no drawn leader runs through a row of another label (dropStruckLeaders()), counted on the glyph rows
+// as drawn, over Novato at every notch asked and Net3 at 3 to 12 notches from its fit (master: none).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -73,13 +75,14 @@ async function main() {
 		await a.settle(2000);
 		await a.page.evaluate(() => { window.__lpnForm.fit(); window.__lpnForm.centerOn('163'); });
 		await a.settle(2000);
-		let bad = [], hid = 0, n161 = null, views = 0, noLead = [];
+		let bad = [], hid = 0, n161 = null, views = 0, noLead = [], strikes = [];
 		for (const k of NOTCHES) {
 			for (const j of JITTER) {
 				await a.page.evaluate(([f, z]) => { window.__lpnForm.viewAt('163', f * Math.pow(1.1, z)); window.__lpnForm.content(); }, [FIT_SCALE * j, k]);
 				await a.settle(1200);
 				const r = await a.page.evaluate(() => window.__lpnForm.hiddenCrossedAudit());
 				views++; hid += r.hidden.length;
+				(await a.page.evaluate(() => window.__lpnForm.leaderStrikes())).forEach((t) => strikes.push('Novato@' + k + 'x' + j + ' ' + t));
 				r.unjustified.forEach((id) => bad.push(id + '@' + k + 'x' + j));
 				if (k === 9 && j === 1) { n161 = r.forms['161']; }
 				if (k >= 5 && k <= 14 && j === 1) {
@@ -91,7 +94,31 @@ async function main() {
 		ok('no page errors', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		ok('every label hidden for a crossing crosses something in the final drawing (' + hid + ' hides over ' + views + ' views)', bad.length === 0, bad.join(' '));
 		ok('N163 and N164 draw a short leader (another node stands as near their rows) at 5 to 14 notches', noLead.length === 0, noLead.join(' '));
+		ok('no leader runs through another label on Novato (' + views + ' views)', strikes.length === 0, strikes.join('; '));
 		if (NOTCHES.indexOf(9) >= 0) { ok('9 notches: N161 shows', /^(line|stack)/.test(n161), String(n161)); }
+		// Net3, desktop: the same count, 3 to 12 notches out from its fit.
+		{
+			const net = JSON.parse(fs.readFileSync(path.join(REPO, 'dev/water-network-examples/Net3.lwn'), 'utf8'));
+			net.settings = Object.assign({}, net.settings, { labelMaxWidth: null });
+			await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_wheel', txt); }, JSON.stringify(net));
+			await a.reload();
+			await a.answerTrainingPanel().catch(() => {});
+			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+			await a.page.waitForFunction(() => window.__lpnForm && window.__lpnForm.solved(), null, { timeout: 90000 });
+			await a.page.evaluate(() => window.__lpnForm.fields(['id', 'demand', 'elev', 'head', 'pressure'], ['id', 'flow', 'velocity']));
+			await a.settle(1500);
+			await a.page.evaluate(() => window.__lpnForm.fit());
+			await a.settle(1500);
+			const fitS = await a.page.evaluate(() => window.__lpnForm.scale());
+			const centre = await a.page.evaluate(() => window.__lpnForm.ev("(function(){var r=svg.getBoundingClientRect(),c=screenToWorld(r.left+r.width/2,r.top+r.height/2),b=null,bd=1e99;doc.nodes.forEach(function(n){var p=nodeAt(n),d=Math.hypot(p.x-c.x,p.y-c.y);if(d<bd){bd=d;b=n.id;}});return b;}())"));
+			const netStrikes = [];
+			for (let k = 3; k <= 12; k++) {
+				await a.page.evaluate(([id, z]) => { window.__lpnForm.viewAt(id, z); window.__lpnForm.content(); }, [centre, fitS * Math.pow(1.1, k)]);
+				await a.settle(1000);
+				(await a.page.evaluate(() => window.__lpnForm.leaderStrikes())).forEach((t) => netStrikes.push('Net3@' + k + ' ' + t));
+			}
+			ok('no leader runs through another label on Net3 at 3 to 12 notches', netStrikes.length === 0, netStrikes.join('; '));
+		}
 		await a.close();
 	} finally {
 		await browser.close();
