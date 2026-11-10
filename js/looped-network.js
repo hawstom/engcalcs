@@ -344,10 +344,11 @@ var EngCalcs = EngCalcs || {};
 	// data label is left-anchored (box is [pos.x, pos.x+tw], not centered like a Text label), so the
 	// offset compared against trigger is the BOX CENTER's (pos.x + tw/2 - anchor.x) -- the analog of
 	// a Text label's lb.x, which IS its box center's offset since Text is text-anchor:middle.
-	function updateDataLeader(holder, anchor, end) {
+	function updateDataLeader(holder, anchor, end, quiet) {
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
+		if (quiet) { holder.leader.style.display = 'none'; return; }
 		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
@@ -470,7 +471,7 @@ var EngCalcs = EngCalcs || {};
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
-		updateDataLeader(ne, anchor, end);
+		updateDataLeader(ne, anchor, end, assemblyLabelAgainstPoint(assemblyOfNode(id), ne, anchor, end));
 	}
 	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
 	// whenever a vertex or endpoint drags.
@@ -1589,7 +1590,7 @@ var EngCalcs = EngCalcs || {};
 			org = dataLabelOrigin(holder, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
 		// A label hung left is right-justified, flush against its leader (justifyDataLabel()).
 		repositionMultilineText(part.text, justifyDataLabel(part.text, holder.side, end, org), org.y);
-		if (isPrimary) { updateDataLeader(le, anchor, end); }
+		if (isPrimary) { updateDataLeader(le, anchor, end, lone && l.lx === undefined && assemblyLabelAgainstPoint(assemblyOfLink(l.id), le, anchor, end)); }
 	}
 	// **WHAT INSIDE HERE COSTS TOM A SECOND.** `lk:layout` is 1,000-1,530 ms for 119 pipes on his
 	// machine and 16 ms on this one -- 60x -- while building the NODES, which writes just as much
@@ -40182,6 +40183,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tryAt = function (rad) {
 			var best = null, bestA = Infinity;
 			for (ang = 0; ang < 360; ang += 15) {
+				// **NO LEADER WITHIN 30 DEGREES OF VERTICAL, NONE LEVEL** (Tom, 2026-11-09: vertical leaders are an eyesore, and
+				// one that runs down its own label's left edge is unacceptable). The ordinary candidate sets drop every
+				// orthogonal direction (Collide.polarCandidates()); this set stepped through all 24 and, because a label
+				// that must stand wholly clear of the pipe first becomes feasible straight above or below, chose exactly 90.
+				if (ang % 180 === 0 || (ang % 180 > 60 && ang % 180 < 120)) { continue; }
 				ex = at.x + rad * Math.cos(ang * Math.PI / 180); ey = at.y + rad * Math.sin(ang * Math.PI / 180);
 				right = ex >= at.x;
 				x0 = right ? ex : ex - w;
@@ -40203,13 +40209,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			return best;
 		};
-		for (r = half * 0.4 + pad, k = 0; k < 80 && out.length < 3; k++, r += step) {
+		for (r = half * 0.4 + pad, k = 0; k < 120 && out.length < 8; k++, r += step) {
 			var c = tryAt(r);
 			if (!c) { continue; }
 			if (rMin < 0) { rMin = r; }
 			if (r >= rMin + tier * fs * 1.2) { out.push(c); tier++; }
 		}
 		return out.length ? out : null;
+	}
+	// A label of an assembly that stands against its own point needs no leader: the reader sees whose it is. Against
+	// means the label's box is within one and a half symbol radii of the point (Task 822).
+	function assemblyLabelAgainstPoint(a, holder, anchor, end) {
+		var dev, w, fs, x0, y0, h, dx, dy;
+		if (!a || !holder || holder.empty || holder.levelBeside) { return false; }
+		dev = assemblyDeviceLink(a);
+		if (!dev) { return false; }
+		w = labelBoxWidth(holder); fs = effectiveFontSize(); h = dataLabelBoxHeight(holder.lineCount);
+		x0 = holder.side === 'left' ? end.x - w : end.x; y0 = end.y - fs * 0.85;
+		dx = Math.max(x0 - anchor.x, 0, anchor.x - (x0 + w)); dy = Math.max(y0 - anchor.y, 0, anchor.y - (y0 + h));
+		return Math.hypot(dx, dy) <= pumpSymbolSize(dev.type) * 0.75;
 	}
 	function assemblyRefs(a, lastRef) {
 		var refs = assemblyNodeIds(a).map(function (id) { return { kind: 'node', id: id }; }).concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));

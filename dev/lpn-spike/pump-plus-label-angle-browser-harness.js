@@ -58,7 +58,11 @@ const measure = (a) => a.page.evaluate(() => {
 		} catch (x) { /* not a path */ }
 	});
 	const dots = Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node[data-node]')).map((c) => { const r = c.getBoundingClientRect(); return { id: c.getAttribute('data-node'), x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-	return { labels, segs, dots };
+	const leaders = Array.from(document.querySelectorAll('#lpn_canvas line.lpn-leader')).filter((e) => e.style.display !== 'none' && e.style.visibility !== 'hidden').map((e) => {
+		const m = e.getScreenCTM(), x1 = +e.getAttribute('x1'), y1 = +e.getAttribute('y1'), x2 = +e.getAttribute('x2'), y2 = +e.getAttribute('y2');
+		return { x1: m.a * x1 + m.c * y1 + m.e, y1: m.b * x1 + m.d * y1 + m.f, x2: m.a * x2 + m.c * y2 + m.e, y2: m.b * x2 + m.d * y2 + m.f };
+	});
+	return { labels, segs, dots, leaders };
 });
 // A segment touches a box (shrunk by 1 px) when an end is inside it or it crosses one of its four sides.
 function touches(s, b) {
@@ -74,8 +78,17 @@ function touches(s, b) {
 }
 // For every assembly (a U and a D label), is each label clear of every pipe, and is the upstream one on the upstream half?
 function judge(m, centres) {
-	const bad = [], missing = [], wrongHalf = [];
+	const bad = [], missing = [], wrongHalf = [], leaderBad = [];
 	centres.forEach((c) => {
+		// Tom, 2026-11-09: a leader at an assembly's point is never vertical (within 30 degrees) and never runs along or through a
+		// label box. Its far end is a label's text origin, on the box's own edge, so the last tenth is left out of the test.
+		m.leaders.filter((ld) => Math.hypot(ld.x1 - c.x, ld.y1 - c.y) < 5 || Math.hypot(ld.x2 - c.x, ld.y2 - c.y) < 5).forEach((ld) => {
+			const near = Math.hypot(ld.x1 - c.x, ld.y1 - c.y) < 5, ax = near ? ld.x1 : ld.x2, ay = near ? ld.y1 : ld.y2, bx = near ? ld.x2 : ld.x1, by = near ? ld.y2 : ld.y1;
+			const off = Math.atan2(Math.abs(bx - ax), Math.abs(by - ay)) * 180 / Math.PI;
+			if (off < 29) { leaderBad.push(c.tag + ': leader ' + Math.round(off) + ' deg off vertical'); }
+			const cut = { x1: ax, y1: ay, x2: ax + (bx - ax) * 0.9, y2: ay + (by - ay) * 0.9 };
+			m.labels.forEach((b) => { if (touches(cut, { l: b.l + 1, r: b.r - 1, t: b.t + 1, b: b.b - 1 })) { leaderBad.push(c.tag + ': leader runs through label ' + b.id); } });
+		});
 		const up = m.labels.find((x) => x.id === c.u), dn = m.labels.find((x) => x.id === c.d);
 		if (!up || !dn) { missing.push(c.tag); return; }
 		[up, dn].forEach((b) => { if (m.segs.some((s) => touches(s, b))) { bad.push(c.tag + ':' + b.id); } });
@@ -84,7 +97,7 @@ function judge(m, centres) {
 		// A label the placer has set in one line (its inline step, for a label that would not fit as a stack) is its own.
 		if (up.lines > 1 && dn.lines > 1 && !(along(up) < along(dn))) { wrongHalf.push(c.tag); }
 	});
-	return { bad, missing, wrongHalf };
+	return { bad, missing, wrongHalf, leaderBad };
 }
 
 async function open(browser, opts) {
@@ -168,6 +181,7 @@ async function main() {
 			ok(label + ': both labels drawn at every angle', j.missing.length === 0, j.missing.join(' '));
 			ok(label + ': no label box touches a pipe, at any angle, pump or valve', j.bad.length === 0, j.bad.join(' '));
 			ok(label + ': the upstream label stands on the upstream half, the downstream on the downstream', j.wrongHalf.length === 0, j.wrongHalf.join(' '));
+			ok(label + ': no leader at an assembly is vertical or runs through a label', j.leaderBad.length === 0, j.leaderBad.slice(0, 4).join(' | '));
 			return m;
 		};
 		console.log('\n--- the drawing, saved ---');
