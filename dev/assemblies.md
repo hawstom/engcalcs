@@ -228,3 +228,12 @@ seven. Not done: automatic pump controls for the open-air tank; Tom's wish for a
 - A refusal (`lpnDiagnose`, e.g. a Well with no curves) keeps the last results on screen; the banner says why there is no new answer. Every refusal did the opposite before; it is now one rule. An unknown unit still clears them.
 - The Well's static water level follows its ground, keeping its depth, until the user types a static value; `staticTyped` on the grouping records that in the project, and an imported well's is typed.
 - A Pump+, Valve+ or Well link label is an obstacle to the aligned pipe labels. A Valve+ on a vertical pipe keeps each node label wholly on its own half. A Well's virtual pipe label takes a quarter the pump's label and leader do not cross.
+
+### Open, from Tom's round 4 notes (2026-11-09)
+
+- **Controls written from the assembly's own inputs** for an open-air tank too, not only the pressure tank (*"an open-air tank with controls connecting the pump and the tank would be a very nice feature"*): pump-on and pump-off levels asked in the Well's box, written as ordinary controls.
+- **An exploded view of a selected assembly**, its members fanned out along its downstream pipe as Google Earth fans coincident marks (*"I'm not sure whether this assemblies experiment will work. But let's keep experimenting."*).
+- **Detection of an exploded assembly** exists only as the `;ASSEMBLY:` comment on import; he asked whether a menu command ("Detect exploded complex assets") belongs. His 11-06 calls on detection stand.
+- **The umbrella word.** He finds "assembly" eyes-glazed and offers "complex asset", noting a pump or valve is not physically complex. Mary (journal 2026-11-09): "assembly" is Esri Utility Network vocabulary for a point feature containing others, pump assemblies its own example; "complex asset" is not an industry term she found. Visitor strings name the specific thing (Well, Pump+); the umbrella word appears only where one is needed.
+- **The drawdown curve is points joined by straight lines.** Field practice is a curve (Jacob s = BQ + CQ², Rorabaugh s = BQ + CQⁿ); Mary recommends seeding the starter curve from s = BQ + CQ² and, later, a B/C/n entry that writes the points.
+- **Slice 2, the pressure tank** (his answers to Sue): level shown as pressure head, Patm fixed 14.7 psi shown and editable, pump controls written automatically, static level and curves by scenario "OK for now"; reasonable initial values and an example that uses assemblies well (Task 823).
