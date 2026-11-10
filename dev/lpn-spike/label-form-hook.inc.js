@@ -113,6 +113,34 @@
 			return out;
 		},
 		fit: function () { zoomExtent(); },
+		// Pipe labels in the view, counted as drawn: shown, fields shown of fields asked, shed (shown with
+		// fewer fields than asked), hidden, level, leaders. (Task 812, round 5.)
+		pipeFields: function () {
+			var c = svg.getBoundingClientRect(), o = { pipes: 0, shown: 0, rows: 0, asked: 0, shed: 0, hidden: 0, level: 0, leaders: 0 }, byId = {};
+			doc.nodes.forEach(function (n) { byId[n.id] = n; });
+			function inV(p) { var x = p.x * state.s + state.tx, y = p.y * state.s + state.ty; return x >= 0 && x <= c.width && y >= 0 && y <= c.height; }
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], a, b, f, n;
+				if (!le || le.empty) { return; }
+				a = nodeAt(byId[l.from]); b = nodeAt(byId[l.to]);
+				if (!a || !b || !(inV(a) || inV(b))) { return; }
+				o.pipes++; o.asked += (le.allLines || le.lines || []).length;
+				if (le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) {
+					f = le.levelBeside && le.levelForm; n = f ? f.lines.length : (le.lines || []).length;
+					o.shown++; o.rows += n; if (n < (le.allLines || le.lines || []).length) { o.shed++; }
+					if (le.levelBeside) { o.level++; }
+					if (le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden') { o.leaders++; }
+				} else { o.hidden++; }
+			});
+			return o;
+		},
+		// The map at Zoom to fit, then `k` wheel notches (1.1 each) in about its middle.
+		fitNotch: function (k, around) {
+			var p;
+			zoomExtent();
+			p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre();
+			applyView({ cx: p.x, cy: p.y, s: state.s * Math.pow(1.1, k) });
+		},
 		scale: function () { return state.s; },
 		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },
 		rescale: function (s, c) { state.s = s; state.tx = c.tx; state.ty = c.ty; setTransform(); if (state.s !== lastLayoutScale) { onZoomChanged(); } refreshLabelText(); },
