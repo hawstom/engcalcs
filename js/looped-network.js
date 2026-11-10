@@ -1418,6 +1418,9 @@ var EngCalcs = EngCalcs || {};
 	// (`short-line-label-harness.js` catches that by name). Whether a label crowds a symbol is the
 	// collision pass's question.
 	function linkLabelRoom(l, along) {
+		// A Pump+ or Valve+ link is a point, and its label stands beside the symbol, not along a segment: no length
+		// is the room it needs (Task 822; before this it shed every value but the flow).
+		if (assemblyOfLink(l.id)) { return Infinity; }
 		return Geom.segmentAtFraction(linkPointList(l),
 			along === undefined ? LINK_LABEL_ALONG : along).length;
 	}

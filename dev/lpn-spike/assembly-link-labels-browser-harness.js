@@ -145,6 +145,7 @@ async function main() {
 			ok(kind + ': the view is zoomed in', (await spread()) > s0 * 1.3 || !(await spread()), String(Math.round(s0)) + ' -> ' + Math.round(await spread()) + ' px');
 			const lb = m.linkLabels.find((l) => l.id === linkId);
 			ok(kind + ': its link label is drawn', !!lb && !lb.hidden && /Q=/.test(lb.text), lb ? lb.text + (lb.hidden ? ' (hidden)' : '') : 'no element');
+			ok(kind + ': it shows its own ID as well as the flow (not shed to Q alone, Tom 2026-11-09)', !!lb && lb.text.indexOf(linkId) >= 0, lb ? lb.text : '');
 			if (!lb || lb.hidden || !dpt) { continue; }
 			measured++;
 			const here = m.dots.filter((d) => Math.hypot(d.x - dpt.x, d.y - dpt.y) < 4).map((d) => d.id);
