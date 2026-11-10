@@ -415,7 +415,7 @@ console.log('\n--- 9. scenarios: only the static elevation and the two curve ref
 console.log('\n--- 10. the Well button ---');
 {
 	const lang = require('fs').readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
-	ok('the Well tip opens like the Valve+ one', lang.indexOf("$ec_lang['lpn_tool_add_well_tip']='Add a well, its groundwater reservoir, its pump suction node, and its tank at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.';") >= 0);
+	ok('the Well tip opens like the Valve+ one', lang.indexOf("$ec_lang['lpn_tool_add_well_tip']='Add a well, its groundwater reservoir, its pump node, and its tank at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.';") >= 0);
 	const src = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 	ok('Well is the third form of the Pump button, after Pump and Pump+', /slot: 'add-pump'[\s\S]{0,700}mode: 'add-pump'[\s\S]{0,400}mode: 'add-pumpplus'[\s\S]{0,400}mode: 'add-well'/.test(src));
 }
