@@ -173,6 +173,8 @@ function levelBreaks(Collide, v) {
 		const g = P.d.leader;
 		if (g) {
 			v.sym.forEach((c) => {
+				// The symbol a leader starts in is not in its way: a pipe shorter than its end symbols has its middle inside them (round 5).
+				if (Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; }
 				const vx = g.bx - g.ax, vy = g.by - g.ay, L2 = vx * vx + vy * vy;
 				let t = L2 ? ((c.x - g.ax) * vx + (c.y - g.ay) * vy) / L2 : 0; t = Math.max(0, Math.min(1, t));
 				if (Math.hypot(g.ax + vx * t - c.x, g.ay + vy * t - c.y) < c.r - eps) { out.push('N3 l:' + P.d.id + ' leader through node ' + c.id); }
