@@ -222,3 +222,9 @@ seven. Not done: automatic pump controls for the open-air tank; Tom's wish for a
   device (pump, valve) and is remembered for the session; the chart is the ordinary element's (`pgAssemblySubject()`). The map's right-click
   menu shows one Time series graph row per member in place of its single row, and each opens an ordinary bubble. Chosen over a graph in each section
   because it reuses the one chart host and the one subject finder, and a bubble already takes any node or link.
+
+### Perry's round 6 findings, fixed (`assembly-perry-v7-browser-harness.js`)
+
+- A refusal (`lpnDiagnose`, e.g. a Well with no curves) keeps the last results on screen; the banner says why there is no new answer. Every refusal did the opposite before; it is now one rule. An unknown unit still clears them.
+- The Well's static water level follows its ground, keeping its depth, until the user types a static value; `staticTyped` on the grouping records that in the project, and an imported well's is typed.
+- A Pump+, Valve+ or Well link label is an obstacle to the aligned pipe labels. A Valve+ on a vertical pipe keeps each node label wholly on its own half. A Well's virtual pipe label takes a quarter the pump's label and leader do not cross.
