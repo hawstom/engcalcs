@@ -149,6 +149,18 @@ async function main() {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
 		let wc = await wellNodes();
 		ok('a Well is three nodes at one point', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9), JSON.stringify(wc));
+		// Tom, 2026-11-09: a Well looked like an EPANET reservoir, its drawdown valve and pump drawn on one spot. It is ONE drawing now:
+		// the well's own, with no reservoir, tank, valve or pump symbol showing at its point.
+		const wellSyms = await P.evaluate((pt) => {
+			const out = { well: 0, other: [] };
+			Array.from(document.querySelectorAll('#lpn_canvas .lpn-node-symbol, #lpn_canvas .lpn-link-symbol')).forEach((e) => {
+				const r = e.getBoundingClientRect();
+				if (!(r.width > 0) || Math.hypot((r.left + r.right) / 2 - pt.x, (r.top + r.bottom) / 2 - pt.y) > 30) { return; }
+				if (e.classList.contains('lpn-node-symbol-well')) { out.well++; } else { out.other.push(e.getAttribute('class')); }
+			});
+			return out;
+		}, wellAt);
+		ok('a Well is drawn as one symbol: its own, and no reservoir, tank, valve or pump symbol at its point', wellSyms.well === 1 && wellSyms.other.length === 0, JSON.stringify(wellSyms));
 		await drag(wellAt, { x: wellAt.x + 100, y: wellAt.y - 80 });
 		wc = await wellNodes();
 		ok('dragging the Well moves all three, still coincident', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));

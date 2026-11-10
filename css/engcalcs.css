@@ -1938,7 +1938,9 @@ html[lang="zh"] .ec-welcome {
 	   structure, and making them darker than the things they connect made them read as a separate
 	   subject. Colour-by-value still overrides every one of these. */
 }
-.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: var(--lpn-map-ink); }
+.lpn-node-symbol-reservoir, .lpn-node-symbol-tank, .lpn-node-symbol-well { color: var(--lpn-map-ink); }
+/* A Well is drawn as one symbol on its tank's node; its other nodes and both links are not drawn (syncAssemblyGlyphs()). */
+.lpn-asm-hid { display: none; }
 /* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
    water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
    (closed and tall against open and wide, lib/Icons.lib.php), which is what still works in

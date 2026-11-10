@@ -247,7 +247,9 @@ $ec_icons = array(
 	// **VIRTUAL PIPE** (Task 822; Tom's sketch, 2026-10-25): the pipe icon's two end ticks with the run dotted.
 	'virtual'    => '<path d="M5 12H19" stroke-linecap="butt" stroke-dasharray="1.2 2.4"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
 	// **PUMP+** (same sketch): the pump with a small plus on its outlet, which marks the assembly form.
-	'well'       => '<path d="M7 3v17h10V3"/><path d="M7 10h10"/><path d="M12 12.5v4M10 14.5l2 2 2-2"/>',
+	// **WELL** (Tom's sketch, 2026-10-25): the ground line across the top, a casing that steps in to a slim pipe running down, and the
+	// drawdown curve dipping to the pipe from both sides. One drawing, which is also the Well's map symbol.
+	'well'       => '<path d="M3 4H21"/><path d="M7 4V11H10.5V20H13.5V11H17V4"/><path d="M3 15C7 15 9.3 16.5 10.5 19.5M21 15C17 15 14.7 16.5 13.5 19.5"/>',
 	'valveplus'  => '<path d="M3 3v18l9-9z"/><path d="M21 3v18l-9-9z"/><path d="M19 0V10M14 5H24"/>',
 	'pumpplus'   => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/><path d="M19 0V10M14 5H24"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',

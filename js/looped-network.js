@@ -11410,7 +11410,9 @@ var EngCalcs = EngCalcs || {};
 		// The pump's whole volute, tail included, and the valve's two triangles -- see the notes in
 		// buildLinkEls() for why the tail is inside the outline and the waist is not filled across.
 		pump: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z',
-		valve: 'M3 3v18l9-9zM21 3v18l-9-9z'
+		valve: 'M3 3v18l9-9zM21 3v18l-9-9z',
+		// The Well's casing and its slim pipe (lib/Icons.lib.php), the one body a Well's symbol is.
+		well: 'M7 4H17V11H13.5V20H10.5V11H7Z'
 	};
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
@@ -11420,6 +11422,8 @@ var EngCalcs = EngCalcs || {};
 	// map reads as a symbol set rather than as a set of scaled circles.
 	function nodeSymbolSize(n) {
 		var k = symbolFactorFull();   // reservoir and tank only: the declared exceptions (Task 705)
+		// A Well is drawn as one symbol, on its tank's node, twice the tank's size so the drawdown cone reads.
+		if (n && n.type === 'tank' && wellRoleOf(n.id) === 'T') { return { w: 4 * TANK_HALF_W * k, h: 4 * TANK_HALF_H * k }; }
 		if (n && n.type === 'tank') { return { w: 2 * TANK_HALF_W * k, h: 2 * TANK_HALF_H * k }; }
 		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
 	}
@@ -11450,6 +11454,7 @@ var EngCalcs = EngCalcs || {};
 	// path rides a transform into the symbol's own box, exactly as positionNodeSymbol() places the
 	// drawing, so there is one opinion about where a reservoir is.
 	function nodeHitSilhouette(n) {
+		if (n && n.type === 'tank' && wellRoleOf(n.id) === 'T') { return SYMBOL_SILHOUETTE.well; }
 		return (n && (n.type === 'reservoir' || n.type === 'tank')) ? SYMBOL_SILHOUETTE[n.type] : null;
 	}
 	function syncNodeHit(n, hitEl) {
@@ -16078,6 +16083,7 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < (doc.customers || []).length; i++) { buildCustomerEls(doc.customers[i]); }
 		});
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		syncAssemblyGlyphs();
 		perfDebugTime('  labelPass', function () {
 			if (!labelPassDeferred) { refreshLabelText(); }
 		});
@@ -40240,6 +40246,46 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		dx = Math.max(x0 - anchor.x, 0, anchor.x - (x0 + w)); dy = Math.max(y0 - anchor.y, 0, anchor.y - (y0 + h));
 		return Math.hypot(dx, dy) <= pumpSymbolSize(dev.type) * 0.75;
 	}
+	// **A WELL IS DRAWN AS ONE SYMBOL** (Task 822; Tom, 2026-11-09: it "looks like an EPANET reservoir", and its drawdown valve and
+	// pump drew on one spot). Its tank's node carries the Well's own drawing, from the toolbar icon's paths, and the other two
+	// nodes and both links are drawn as nothing: they stay in the document, in the tables and in the solve.
+	function wellRoleOf(id) {
+		var a = assemblyOfNode(id), i;
+		if (!a || a.kind !== 'well') { return null; }
+		i = a.nodes.indexOf(id);
+		return i === 0 ? 'R' : i === 1 ? 'S' : 'T';
+	}
+	function syncAssemblyGlyphs() {
+		var wellLinks = {};
+		assemblyList().forEach(function (a) { if (a.kind === 'well') { a.links.forEach(function (id) { wellLinks[id] = 1; }); } });
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], role = wellRoleOf(n.id), hid = role === 'R' || role === 'S', isT = role === 'T';
+			if (!ne) { return; }
+			[ne.circle, ne.hit, ne.symbolG].forEach(function (e) { if (e) { e.classList.toggle('lpn-asm-hid', hid); } });
+			if (n.type !== 'tank' || !ne.symbol) { return; }
+			if (isT && !ne.wellSym) {
+				ne.wellSym = buildMapIconSvg('well', 'lpn-node-symbol lpn-node-symbol-well');
+				sizeSymbolViewport(ne.wellSym);
+				prependSymbolBackdrop(ne.wellSym, 'path', { d: SYMBOL_SILHOUETTE.well }, 'lpn-node-symbol-backdrop');
+				ne.symbolG.appendChild(ne.wellSym);
+			}
+			if (ne.wellSym) { ne.wellSym.classList.toggle('lpn-asm-hid', !isT); }
+			ne.symbol.classList.toggle('lpn-asm-hid', isT);
+			ne.hit.setAttribute('d', nodeHitSilhouette(n));
+			syncNodeHit(n, ne.hit);
+			positionNodeSymbol(n.id);
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (le && le.symbolG) { le.symbolG.classList.toggle('lpn-asm-hid', !!wellLinks[l.id]); }
+		});
+	}
+	// A node a split has just made takes the group's ID, and the counter its own prefix advanced for it is given back.
+	function renameFresh(node, newId) {
+		var old = node.id, key = LPN_ID_KEY[node.type], prefix = (scnSetting('idPrefixes') || {})[key] || key;
+		applyNodeRename(old, newId);
+		if (nextId[key] > 1 && old === prefix + (nextId[key] - 1)) { nextId[key]--; }
+	}
 	function assemblyRefs(a, lastRef) {
 		var refs = assemblyNodeIds(a).map(function (id) { return { kind: 'node', id: id }; }).concat(a.links.map(function (id) { return { kind: 'link', id: id }; }));
 		if (lastRef) {
@@ -40311,6 +40357,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		a = { id: p.id, kind: 'well', nodes: [r.id, s.id, t.id], links: [g.id, p.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
+		syncAssemblyGlyphs();
 		assemblyNodeIds(a).forEach(function (nid) { layoutNodeLabel(nid); });
 		return a;
 	}
@@ -40344,6 +40391,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var a = assemblyById(id);
 		if (!a) { return; }
 		doc.assemblies = doc.assemblies.filter(function (x) { return x !== a; });
+		syncAssemblyGlyphs();
 		assemblyNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } });
 		if (currentPopup && currentPopup.kind === 'assembly' && currentPopup.id === id) { closePopup(); }
 		setSelectionList(assemblyRefs(a, { kind: 'link', id: a.links[a.kind === 'well' ? 1 : 0] }));
@@ -40356,6 +40404,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (gone.length) {
 			doc.assemblies = doc.assemblies.filter(function (a) { return gone.indexOf(a) < 0; });
+			syncAssemblyGlyphs();
 			gone.forEach(function (a) { assemblyNodeIds(a).forEach(function (nid) { if (nodeEls[nid]) { layoutNodeLabel(nid); } }); });
 		}
 	}

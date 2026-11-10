@@ -1370,7 +1370,8 @@ html[lang="zh"] .ec-welcome {
 :root {
 	--lpn-map-ink: var(--ec-map-asset);
 }
-.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: var(--lpn-map-ink); }
+.lpn-node-symbol-reservoir, .lpn-node-symbol-tank, .lpn-node-symbol-well { color: var(--lpn-map-ink); }
+.lpn-asm-hid { display: none; }
 .lpn-link-symbol-pump { color: var(--lpn-map-ink); }
 .lpn-link-symbol-valve { color: var(--lpn-map-ink); }
 .lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { stroke: none; fill: var(--lpn-map-bg, #fff); }
