@@ -109,10 +109,10 @@ link that reads back as a pipe; the group still restores.
   A pipe of length 0 already has resistance 0 (`lpnResistance`), so no solver change was needed beyond
   reporting velocity 0 and head loss 0.
 - **EPANET:** refuses a pipe of length 0 (error 211), so the model's pipe goes out as the stand-in a curveless
-  pump already uses: 0.01 m of 1000 mm at C 150 (0.0000015 for Darcy-Weisbach, 0.008 for Manning). Its head loss
+  pump already uses: 0.01 m as wide as the project's largest ordinary pipe (1000 mm when there is none) at C 150 (0.0000015 for Darcy-Weisbach, 0.008 for Manning). Its head loss
   is about 1e-7 m at 100 L/s. Velocity and head loss are reported as 0 from the engine too. Not reported as a
   difference: it is exactly what was asked for.
-- **`.inp` export** writes the same stand-in row (0.01, then 40 in or 1000 mm, then C 150 and so on) and one
+- **`.inp` export** writes the same stand-in row (0.01, then the widest ordinary pipe's diameter in its own characters (40 in or 1000 mm if none), then C 150 and so on) and one
   `;VIRTUAL: id id ...` line next to the assembly lines. Import reads the line and marks those pipes virtual;
   the row's numbers are taken as written, so a second export is byte-identical. Plain EPANET sees a short, wide
   pipe: the loss is negligible but the 0.01 m of volume is not exactly zero, and says so here.
@@ -165,8 +165,9 @@ upper right of the bowtie, over the corner as in Tom's sketch, in ink with a pap
   A pipe's end moved afterwards is changed only by typing a node ID in From or To (Tables, Properties); there is no
   dragging of a pipe end, so nothing is guessed there.
 - **Velocity:** a virtual pipe, and any pipe of length 0, reports velocity 0 in the built-in solver; EPANET is handed the
-  stand-in for a virtual pipe and reports 0 for it. A plain pipe of length 0 is refused by the EPANET engine (its
-  Error 211, illegal link property value, inside the Error 200 that opening a file reports); the built-in solver solves it.
+  stand-in for a virtual pipe and reports 0 for it. A pipe of length 0 IS a virtual pipe (derived, not stored: the flag or length 0), in both engines and on export;
+  Properties shows "Virtual pipe (length = 0)" when the box is not ticked. Stand-in width: the largest diameter among the
+  ordinary pipes of the network being run (the scenario's own).
 
 ### Well, slice 1 (Sue's design, 2026-11-09; `dev/lpn-spike/well-harness.js`)
 

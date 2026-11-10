@@ -593,10 +593,10 @@
 				}
 			} else if (link.virtual) {
 				// A VIRTUAL PIPE (Task 822) is the same stand-in a curveless pump uses: EPANET refuses
-				// a pipe of length 0, so it gets 0.01 m of 1000 mm pipe at the smoothest roughness,
+				// a pipe of length 0, so it gets 0.01 m of pipe as wide as the project's widest ordinary pipe, at the smoothest roughness,
 				// whose head loss is below solver tolerance. Not reported: it is exactly what was asked for.
 				pipes.push(' ' + link.id + '  ' + link.from + '  ' + link.to +
-					'  0.01  1000  ' + (method === 'dw' ? '0.0000015' : (method === 'manning' ? '0.008' : '150')) +
+					'  0.01  ' + Number((virtualStandInDiameter(model) * 1000).toPrecision(12)) + '  ' + (method === 'dw' ? '0.0000015' : (method === 'manning' ? '0.008' : '150')) +
 					'  0  ' + (link.status === 'closed' ? 'Closed' : link.status === 'cv' ? 'CV' : 'Open'));
 			} else {
 				// length m, diameter m -> mm, minor-loss coefficient dimensionless.
@@ -1290,6 +1290,17 @@
 			return k + '=' + v;
 		}).join('');
 	}
+	// THE STAND-IN WIDTH OF A VIRTUAL PIPE (Tom, 2026-11-09: "1000mm isn't good enough ... use the
+	// project maximum"): the largest diameter, in metres, among the model's ordinary pipes (not
+	// virtual, not length 0) in the network being run. A project with no other pipe falls back to 1 m.
+	// The model is already the scenario's, so this is the scenario's maximum.
+	function virtualStandInDiameter(model) {
+		var d = 0;
+		(model.links || []).forEach(function (l) {
+			if (l.type === 'pipe' && !l.virtual && l.length > 0 && l.diameter > d) { d = l.diameter; }
+		});
+		return d > 0 ? d : 1;
+	}
 	function signatureOf(model) {
 		var parts = [model.method || 'hw', model.emitterExponent || 0.5], i, n, l;
 		// **EVERY `[OPTIONS]` VALUE IS IN THE SIGNATURE, AND IT HAS TO BE** (Task 553). These are
@@ -1385,7 +1396,7 @@
 				// and error 207 refuses EN_INITSTATUS on one, so turning CV on or off reopens the Project.
 				'\u0001' + (l.type === 'pipe' && l.status === 'cv' ? 'cv' : '') +
 				// A pipe turning virtual (Task 822) is written as a different [PIPES] row, so it reopens.
-				'\u0001' + (l.virtual ? 'v' : ''));
+				'\u0001' + (l.virtual ? 'v' + virtualStandInDiameter(model) : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
