@@ -3525,7 +3525,7 @@ var EngCalcs = EngCalcs || {};
 					Array.prototype.push.apply(sides, sidesAt(snapPt(Geom.pointAlongPolyline(pts, a)), a, 2));
 				});
 			}
-			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
+			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: snapPt(linkLabelBase(l)),
 				dragged: false, sides: sides, len: Geom.polylineLength(pts),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly,
