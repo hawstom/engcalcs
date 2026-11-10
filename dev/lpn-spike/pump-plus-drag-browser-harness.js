@@ -81,9 +81,9 @@ async function main() {
 		ok('a Pump+ is two nodes at one point and a pump', together(cs) && (await nLinks(a)) === 1, JSON.stringify(cs));
 		const home = cs[0];
 		const shown = await labelsShown(a);
-		ok('both nodes keep their own label', shown.length === 2 && shown.some((id) => /^U/.test(id)) && shown.some((id) => /^D/.test(id)), JSON.stringify(shown));
+		ok('both nodes keep their own label', shown.length === 2 && shown.some((id) => /U$/.test(id)) && shown.some((id) => /D$/.test(id)), JSON.stringify(shown));
 		const lblBox = (id) => P.evaluate((i) => { const r = document.querySelector('#lpn_canvas text[data-nodelbl="' + i + '"]').getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; }, id);
-		const ub = await lblBox(shown.filter((id) => /^U/.test(id))[0]), db = await lblBox(shown.filter((id) => /^D/.test(id))[0]);
+		const ub = await lblBox(shown.filter((id) => /U$/.test(id))[0]), db = await lblBox(shown.filter((id) => /D$/.test(id))[0]);
 		ok('the upstream label stands upstream of the point and the downstream label downstream, not overlapping', ub.r <= at.x + 1 && db.l >= at.x - 1 && ub.r <= db.l, JSON.stringify([ub, db, at]));
 
 		console.log('\n--- drag ---');
@@ -143,7 +143,7 @@ async function main() {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		for (let i = 0; i < 4 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
 		ok('key 6 cycles to Well', (await armed()) === 'add-well');
-		const wellNodes = async () => { const all = await circles(a), r = all.find((c) => /^R/.test(c.id)); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
+		const wellNodes = async () => { const all = await circles(a), r = all.find((c) => /R$/.test(c.id)); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
 		const wellAt = { x: at.x + 250, y: at.y + 200 };
 		await P.mouse.click(wellAt.x, wellAt.y); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);

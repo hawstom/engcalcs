@@ -1386,7 +1386,7 @@
 				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
 				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && wn[2].type === 'tank' &&
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
-					assemblies.push({ id: a.links[0], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() });
+					assemblies.push({ id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() });
 				} else { assemblyBad.push(a.links[0]); }
 				return;
 			}

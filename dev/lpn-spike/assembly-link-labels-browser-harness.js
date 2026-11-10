@@ -123,7 +123,7 @@ async function main() {
 		const m0 = await measure(P);
 		const pumpId = (m0.linkLabels.find((l) => /^P\d+$/.test(l.id)) || {}).id, valveId = (m0.linkLabels.find((l) => /^V\d+$/.test(l.id)) || {}).id;
 		ok('a Pump+ and a Valve+ were made', !!pumpId && !!valveId, pumpId + ' ' + valveId);
-		const ups = m0.dots.filter((d) => /^U\d+$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id)), dns = m0.dots.filter((d) => /^D\d+$/.test(d.id));
+		const ups = m0.dots.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id)), dns = m0.dots.filter((d) => /^[PV]\d+D$/.test(d.id));
 		ok('each has its upstream and downstream node', ups.length === 2 && dns.length === 2);
 
 		console.log('\n--- leaders: a node label of an assembly stands under the ordinary rule ---');
@@ -136,12 +136,12 @@ async function main() {
 		const s0 = await spread();
 		let measured = 0;
 		for (const [kind, linkId, idx] of [['pump', pumpId, 0], ['valve', valveId, 1]]) {
-			const here0 = (await measure(P)).dots.filter((d) => /^U\d+$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[idx];
+			const here0 = (await measure(P)).dots.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[idx];
 			await P.mouse.move(here0.x, here0.y);
 			for (let i = 0; i < 9; i++) { await P.mouse.wheel(0, -300); await A.s.settle(120); }
 			await A.s.settle(900);
 			const m = await measure(P);
-			const dpt = m.dots.filter((d) => /^U\d+$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[idx];
+			const dpt = m.dots.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[idx];
 			ok(kind + ': the view is zoomed in', (await spread()) > s0 * 1.3 || !(await spread()), String(Math.round(s0)) + ' -> ' + Math.round(await spread()) + ' px');
 			const lb = m.linkLabels.find((l) => l.id === linkId);
 			ok(kind + ': its link label is drawn', !!lb && !lb.hidden && /Q=/.test(lb.text), lb ? lb.text + (lb.hidden ? ' (hidden)' : '') : 'no element');
@@ -162,7 +162,7 @@ async function main() {
 		const B = await openNet1(browser, net1), Q = B.P;
 		await B.arm('6', 'add-pumpplus'); await B.click(B.at('11')); await B.arm('7', 'add-valveplus'); await B.click(B.at('22')); await B.off(); await B.s.settle(500);
 		const d0 = (await measure(Q)).dots;
-		const pumpPt = d0.filter((d) => /^U\d+$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[0], valvePt = d0.filter((d) => /^U\d+$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[1];
+		const pumpPt = d0.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[0], valvePt = d0.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[1];
 		const nodeEl = (id) => d0.find((d) => d.id === id);
 		await B.arm('5', 'add-pipe'); await B.click(nodeEl('32')); await B.click(pumpPt); await B.off();          // ends on the Pump+
 		await B.arm('5', 'add-pipe'); await B.click(valvePt); await B.click(nodeEl('13')); await B.off();         // starts on the Valve+

@@ -3989,7 +3989,7 @@ var EngCalcs = EngCalcs || {};
 	// M is the meter, and a Customer is what it stands for (Task 247).
 	// S is the Shape (Task 779), map annotation like Text.
 	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X', meter: 'M', shape: 'S' };
-	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1, S: 1, U: 1, D: 1 }; }
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1, S: 1, W: 1 }; }
 	var nextId = newNextId();
 	// Re-derive the counters from the ids actually present, matching against the CURRENT
 	// settings.idPrefixes, not a hardcoded single-letter regex -- a customized prefix can be any
@@ -4014,6 +4014,17 @@ var EngCalcs = EngCalcs || {};
 		if (nextId[key] === undefined) { nextId[key] = 1; }
 		do { id = prefix + (nextId[key]++); } while (used[id]);
 		return id;
+	}
+
+	// **A GROUP'S IDS ARE ONE BASE AND A LETTER EACH** (Task 822; Tom, 2026-11-09: *"Shouldn't V1 have V1D and V1U?"*). The base
+	// is the device's own ID, minted from its own prefix (the pump's, the valve's, the well's); the other members take the base
+	// and a suffix. A base whose members are not all free is passed over whole, so the group never mixes two numbers.
+	function mintGroupBase(key, suffixes) {
+		var prefix = (scnSetting('idPrefixes') || {})[key] || key, used = {}, base;
+		allIds().forEach(function (x) { used[x] = 1; });
+		if (nextId[key] === undefined) { nextId[key] = 1; }
+		do { base = prefix + (nextId[key]++); } while ([''].concat(suffixes).some(function (sfx) { return used[base + sfx]; }));
+		return base;
 	}
 
 	// ---- Project / scenario container (ROADMAP Task 184) ----
@@ -9132,7 +9143,7 @@ var EngCalcs = EngCalcs || {};
 			// M is the structural (internal) letter for Customer (LPN_ID_KEY.meter); its default
 			// DISPLAYED prefix is 'C' (R-229) -- a project stored with the old 'M' default keeps it,
 			// since only the user touches a file's data.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C', S: 'S', U: 'U', D: 'D' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'C', S: 'S', W: 'W' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -40110,7 +40121,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!a.links.every(function (id) { return linkIds[id]; })) { return; }
 			if (a.kind === 'well') {
 				wellOk = Array.isArray(a.nodes) && a.nodes.length === 3 && a.links.length === 2 && a.nodes.every(function (id) { return nodeIds[id]; });
-				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[0], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() }); }
+				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() }); }
 				return;
 			}
 			if (!nodeIds[a.up] || !nodeIds[a.down]) { return; }
@@ -40238,13 +40249,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function assemblyOfRef(kind, id) { return kind === 'node' ? assemblyOfNode(id) : kind === 'link' ? assemblyOfLink(id) : null; }
 	/**
-	 * **PUMP+: TWO COINCIDENT NODES AND A PUMP BETWEEN THEM, GROUPED** (Task 822). The nodes take their IDs
-	 * from the U and D prefixes, the pump from the pump prefix. The caller has taken the undo snapshot.
+	 * **PUMP+: TWO COINCIDENT NODES AND A PUMP BETWEEN THEM, GROUPED** (Task 822). The pump (or valve) takes its prefix's
+	 * next number, say P1, and the nodes take that ID with U and D: P1U and P1D. The caller has taken the undo snapshot.
 	 * Equal x, y and elevation by construction; setProp() keeps them equal after.
 	 */
 	function addAssembly(kind, x, y) {
-		var up = addNode('junction', x, y, mintId('U')), dn = addNode('junction', x, y, mintId('D')),
-			pump = addLink(kind, up.id, dn.id, []), a;
+		var base = mintGroupBase(LPN_ID_KEY[kind], ['U', 'D']),
+			up = addNode('junction', x, y, base + 'U'), dn = addNode('junction', x, y, base + 'D'),
+			pump = addLink(kind, up.id, dn.id, [], base), a;
 		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
@@ -40256,14 +40268,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function spliceAssembly(kind, pipe, wx, wy) {
 		var e1 = nodeById(pipe.from).elev, e2 = nodeById(pipe.to).elev,
 			frac = Geom.nearestFractionOnPolyline(linkPointList(pipe), wx, wy).f,
-			r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a, elevAt;
+			r = breakPipeAtPoint(pipe, 'junction', wx, wy, null), up, dn, pump, a, elevAt,
+			base = mintGroupBase(LPN_ID_KEY[kind], ['U', 'D']);
 		up = r.node;
 		// The elevation along the pipe between its end nodes, by length; blank ends (a DEM fill) leave it to the default.
 		if (typeof e1 === 'number' && typeof e2 === 'number') { elevAt = +(e1 + frac * (e2 - e1)).toFixed(4); up.elev = elevAt; }   // base-write: construction
-		applyNodeRename(up.id, mintId('U'));
-		dn = addNode('junction', up.x, up.y, mintId('D'));
+		renameFresh(up, base + 'U');
+		dn = addNode('junction', up.x, up.y, base + 'D');
 		if (up.elev !== undefined) { dn.elev = up.elev; }   // base-write: construction
-		pump = addLink(kind, up.id, dn.id, []);
+		pump = addLink(kind, up.id, dn.id, [], base);
 		reconnectLinkEnd(r.added, 'from', dn.id);
 		a = { id: pump.id, kind: kind, up: up.id, down: dn.id, links: [pump.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
@@ -40273,6 +40286,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	/**
 	 * **A WELL: THREE NODES AT ONE POINT, TWO LINKS** (Task 822 slice 1; Tom, 2026-11-06: "Pump+ and Well on Pump").
+	 * The pump is the well and carries its ID, W1; the rest take it with a letter: W1R the groundwater reservoir, W1U the pump's
+	 * upstream node, W1V the drawdown valve, W1T the tank (Tom, 2026-11-09).
 	 * R is a reservoir whose head is the groundwater's static elevation; S is the pump's suction, a junction with no demand
 	 * standing at that elevation; T is an open-air tank at the ground, and the system's pipes attach to T. G is a general
 	 * purpose valve from R to S whose head-loss curve is the drawdown against pumping rate; P is the pump from S to T and
@@ -40283,14 +40298,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function completeWell(t) {
 		var ground = typeof t.elev === 'number' ? t.elev : (scnSetting('defaults') || {}).nodeElev,
 			stat = typeof ground === 'number' ? +(ground - wellStaticDepth()).toFixed(4) : undefined,
-			r = addNode('reservoir', t.x, t.y), s = addNode('junction', t.x, t.y, mintId('U')), g, p, a;
+			base = mintGroupBase('W', ['R', 'U', 'V', 'T']),
+			r, s, g, p, a;
+		renameFresh(t, base + 'T');
+		r = addNode('reservoir', t.x, t.y, base + 'R'); s = addNode('junction', t.x, t.y, base + 'U');
 		// The static level is the groundwater's, so neither node reads the land surface.
 		if (stat !== undefined) { r.elev = stat; s.elev = stat; }   // base-write: construction
 		s._demand = 0;   // base-write: construction: the suction draws nothing
-		g = addLink('valve', r.id, s.id, []);
+		g = addLink('valve', r.id, s.id, [], base + 'V');
 		g.valveType = 'GPV'; g._setting = defaultValveSetting('GPV');   // base-write: construction
-		p = addLink('pump', s.id, t.id, []);
-		a = { id: g.id, kind: 'well', nodes: [r.id, s.id, t.id], links: [g.id, p.id] };
+		p = addLink('pump', s.id, t.id, [], base);
+		a = { id: p.id, kind: 'well', nodes: [r.id, s.id, t.id], links: [g.id, p.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		assemblyNodeIds(a).forEach(function (nid) { layoutNodeLabel(nid); });
@@ -64673,9 +64691,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['P', pc.lpn_tool_add_pump || 'Pump'],
 			['V', pc.lpn_tool_add_valve || 'Valve'],
 			['M', pc.lpn_tool_add_meter || 'Customer'],
-			// The two nodes of a Pump+ (Task 822): upstream and downstream, U and D until changed.
-			['U', pc.lpn_prefix_up || 'Upstream node'],
-			['D', pc.lpn_prefix_down || 'Downstream node']
+			// A well's pump is the well, W1; its reservoir, upstream node, drawdown valve and tank are W1R, W1U, W1V and W1T (Task 822).
+			['W', pc.lpn_tool_add_well || 'Well']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps it inside
@@ -75440,7 +75457,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			what = (propsTypeWord(el, currentPopup.kind) + ' ' + el.id).replace(/^ /, '');
 		} else if (currentPopup.kind === 'assembly') {
 			el = assemblyById(currentPopup.id);
-			what = el ? (pc['lpn_tool_add_' + (el.kind === 'well' ? 'well' : el.kind === 'valve' ? 'valveplus' : 'pumpplus')] || '') + ' ' + el.id : '';
+			what = el ? (pc['lpn_tool_add_' + (el.kind === 'well' ? 'well' : el.kind === 'valve' ? 'valveplus' : 'pumpplus')] || '') + ' ' + (assemblyDeviceLink(el) ? assemblyDeviceLink(el).id : el.id) : '';
 			what = what.replace(/^ /, '');
 		} else if (currentPopup.kind === 'customer') {
 			el = customerById(currentPopup.id);
@@ -75704,11 +75721,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// prefixes at once" button cycles become reachable, and the failure would be a corrupted drawing.
 
 	function elementsForIdKey(key) {
-		if (key === 'U' || key === 'D') {
-			return assemblyList().map(function (a) { return nodeById(a.kind === 'well' ? (key === 'U' ? a.nodes[1] : null) : (key === 'U' ? a.up : a.down)); }).filter(Boolean);
-		}
+		// A well's pump is the well: its own prefix's, and the pump prefix's batch leaves it alone.
+		var wellPumps = assemblyList().filter(function (a) { return a.kind === 'well'; }).map(function (a) { return a.links[1]; });
+		if (key === 'W') { return wellPumps.map(linkById).filter(Boolean); }
 		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
-			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
+			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key && wellPumps.indexOf(l.id) < 0; }));
 	}
 	function applyIdPrefixToAll(key) {
 		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,

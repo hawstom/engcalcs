@@ -156,7 +156,7 @@ async function main() {
 			m.dots.forEach((d) => {
 				let best = null, bd = Infinity;
 				list.forEach((c, k) => { const q = Math.hypot(d.x - c.x, d.y - c.y); if (q < bd) { bd = q; best = k; } });
-				if (bd < 8) { (/^U/.test(d.id) ? byCell[best].us : byCell[best].ds).push(d.id); }
+				if (bd < 8) { (/U$/.test(d.id) ? byCell[best].us : byCell[best].ds).push(d.id); }
 			});
 			return { m, byCell };
 		};
