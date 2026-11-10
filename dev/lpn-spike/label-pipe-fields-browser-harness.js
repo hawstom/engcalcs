@@ -48,7 +48,7 @@ const SHOTS = process.env.PIPE_FIELDS_SHOTS ? { dir: process.env.PIPE_FIELDS_SHO
 // notches to take, and where to take the pictures (a clip of the window about a named pipe's middle, or the whole window)
 const SCENES = [
 	{ key: 'novato-desktop', file: NOVATO, view: { width: 1920, height: 1000 }, around: '163', notches: (process.env.PIPE_FIELDS_NOTCHES || '4,6,8,9,10,11,12,13,14,16').split(',').map(Number), named: ['180', '233', '185', '181'], shots: [9, 12, 14] },
-	{ key: 'novato-phone', file: NOVATO, view: { width: 390, height: 844 }, around: '163', notches: [6, 9, 12], named: [], shots: [] },
+	{ key: 'novato-phone', file: NOVATO, view: { width: 390, height: 844 }, around: '163', notches: [6, 9, 12], named: [], shots: [9] },
 	{ key: 'n600-desktop', file: N600, view: { width: 1920, height: 1000 }, around: null, notches: [3, 6, 9], named: [], shots: [9] },
 	{ key: 'net3-phone', file: NET3, view: { width: 390, height: 844 }, around: null, notches: [0, 3, 6], named: [], shots: [6] }
 ];

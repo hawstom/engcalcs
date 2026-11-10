@@ -3545,7 +3545,7 @@ var EngCalcs = EngCalcs || {};
 				delete sp.reqs;
 				if (f.length) { sp.forms = f; }
 				// The forms showing EVERY field, the smaller footprint first.
-				var lel = linkEls[sp.l.id], all = (lel.allLines || lel.lines || []).length, full = f.filter(function (q) { return q.nVal === all; });
+				var lel = linkEls[sp.l.id], all = (lel.allLines || lel.lines || []).length, full = (sp.forms || []).filter(function (q) { return q.nVal === all; });
 				if (full.length) { sp.fullForms = full; sp.allCount = all; }
 				if (sp.shedTrial) {
 					// Its own spec is the first of them, so a side that takes it takes the whole label, never a shed one.
@@ -3718,8 +3718,10 @@ var EngCalcs = EngCalcs || {};
 			// histories differs in its last bit; a spot that grazes a box then flips between them
 			// (zoom-pass-determinism-harness.js). Copies, so nothing else on the map moves.
 			var ground3 = { boxes: base.boxes.map(snapBox), segments: base.segments.map(snapSeg) };
+			// A label that is trying for a whole spot keeps its first one on the ground too (a label never blocks itself): if it finds
+			// none it stays there, and no other may have taken the place.
 			out.forEach(function (r) {
-				if (r.dropped || going[r.id]) { return; }
+				if (r.dropped) { return; }
 				(r.boxes && r.boxes.length ? r.boxes : [r.box]).forEach(function (b) { ground3.boxes.push(snapBox(b)); });
 				if (r.leader) { ground3.segments.push(snapSeg(r.leader)); }
 			});

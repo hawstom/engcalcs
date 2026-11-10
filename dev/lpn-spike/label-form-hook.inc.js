@@ -345,8 +345,8 @@
 				if (g) {
 					v.levelLeader++;
 					if (other < own) { v.leaderNearOther++; }
-					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
-					// a pipe label's leader starts on its pipe, never inside an end node's symbol
+					// The symbol a leader starts in is not in its way: a pipe shorter than its end symbols has its middle inside them (round 5).
+					circles.forEach(function (c) { if (Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; } if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
 					return;
 				}
 				// No leader: its own pipe must be the nearest, by `amb`. Except a label whose leader would have run
