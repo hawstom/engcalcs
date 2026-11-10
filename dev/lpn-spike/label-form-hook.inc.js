@@ -134,6 +134,59 @@
 			});
 			return o;
 		},
+		// Every pipe label in the view as drawn: id -> {shown, values, asked, level, leader}. (Task 812, round 6.)
+		pipeStates: function () {
+			var c = svg.getBoundingClientRect(), o = {}, byId = {};
+			doc.nodes.forEach(function (n) { byId[n.id] = n; });
+			function inV(p) { var x = p.x * state.s + state.tx, y = p.y * state.s + state.ty; return x >= 0 && x <= c.width && y >= 0 && y <= c.height; }
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], a, b, f, vis;
+				if (!le || le.empty) { return; }
+				a = nodeAt(byId[l.from]); b = nodeAt(byId[l.to]);
+				if (!a || !b || !(inV(a) || inV(b))) { return; }
+				vis = !!(le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true }));
+				f = le.levelBeside && le.levelForm;
+				o[l.id] = { shown: vis, values: vis ? (f ? f.lines.length : (le.lines || []).length) : 0, asked: (le.allLines || le.lines || []).length, level: !!le.levelBeside,
+					leader: !!(vis && le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
+					why: vis ? '' : ['hiddenCrowded', 'hiddenBlocked', 'hiddenYielded', 'hiddenCrossed', 'hiddenDropped', 'hiddenShort'].filter(function (k) { return le[k]; }).join('+') || 'other' };
+			});
+			return o;
+		},
+		// What holds the ground round a pipe label's middle, for the label with ALL its fields in its one-line and stacked forms:
+		// each of the sides (any angle, out to 8 text heights) tried against the final ground, the first blocker tallied. (Task 812, round 6.)
+		whyPipe: function (id) {
+			var g = lastFinalGround, l = linkById(id), le = linkEls[id], fs = effectiveFontSize(), pts = linkPointList(l), mid = linkLabelMid(l, undefined, pts),
+				d = defaultLabelOffset(), home = Math.hypot(d.x, d.y), pad = fs * LPN_LEVEL_PAD_FRAC, key = linkLabelKey(id), out = { forms: [] }, gr, reqs, forms, all;
+			gr = { boxes: g.obs.boxes.slice().concat(viewFrameBoxes()), segments: g.obs.segments.slice() };
+			g.nodePlaced.forEach(function (r) {
+				var sp = g.nodeLabels.filter(function (q) { return q.id === r.id; })[0];
+				if (r.dropped || !sp) { return; }
+				(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { var c = Object.assign({}, b); c.tag = r.id; gr.boxes.push(c); });
+			});
+			g.placed.forEach(function (r) { if (r.dropped || r.id === key) { return; } (r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { var c = Object.assign({}, b); c.tag = r.id; gr.boxes.push(c); }); });
+			reqs = levelFormRequests(le); measureLevelForms(reqs, fs + 'px'); forms = levelFormsFrom(reqs);
+			all = (le.allLines || le.lines || []).length;
+			forms.filter(function (q) { return q.nVal === all; }).forEach(function (f) {
+				var sides = Collide.polarCandidates(mid, { start: 0, end: 359.99 }, home, fs * 8, { rings: 8, tol: 0, max: 600, angleStep: 10 }), tally = {}, free = 0,
+					spec = { id: key, anchor: mid, home: mid, w: f.w, h: f.h, lines: f.lines, yOff: -fs * 0.85, sides: sides };
+				sides.forEach(function (c) {
+					var bs = Collide.labelLineBoxes(spec, c), hit = null;
+					bs.forEach(function (b) { gr.boxes.forEach(function (o) {
+						if (!hit && o.w > 0 && o.kind !== 'link' && Collide.boxOverlapDepth(Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a), o) > 0) { hit = (o.kind || '?') + ':' + (o.tag || o.owner || (o.linkOwner !== undefined ? 'L' + o.linkOwner : '') || o.levelOwner || ''); }
+					}); });
+					if (!hit) {
+						var g2 = Collide.segment(mid.x, mid.y, c.x, c.y, 'leader', key), why = null;
+						gr.boxes.forEach(function (o) { if (!why && o.w > 0 && (o.kind === 'label' || o.kind === 'levellabel' || o.kind === 'symbol') && Collide.segmentInBoxFraction(g2, o) > 0) { why = 'leaderThru ' + o.kind + ':' + (o.tag || o.owner || o.levelOwner || ''); } });
+						gr.segments.forEach(function (o) { if (!why && o.kind === 'leader' && o.owner !== key && Collide.segmentsCross(g2, o)) { why = 'leaderCross ' + o.owner; } });
+						if (!why) { free++; }
+						hit = why || 'FREE';
+					}
+					tally[hit] = (tally[hit] || 0) + 1;
+				});
+				out.forms.push({ values: f.nVal, stacked: !!f.stacked, w: Math.round(f.w * state.s), h: Math.round(f.h * state.s), n: sides.length, free: free, tally: tally });
+			});
+			return out;
+		},
 		// The map at Zoom to fit, then `k` wheel notches (1.1 each) in about its middle.
 		fitNotch: function (k, around) {
 			var p;
@@ -141,6 +194,8 @@
 			p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre();
 			applyView({ cx: p.x, cy: p.y, s: state.s * Math.pow(1.1, k) });
 		},
+		// One wheel notch in about `around` (or the middle): the scale times 1.1, nothing else.
+		zoomStep: function (around) { var p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre(); applyView({ cx: p.x, cy: p.y, s: state.s * 1.1 }); },
 		scale: function () { return state.s; },
 		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },
 		rescale: function (s, c) { state.s = s; state.tx = c.tx; state.ty = c.ty; setTransform(); if (state.s !== lastLayoutScale) { onZoomChanged(); } refreshLabelText(); },

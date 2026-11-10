@@ -2227,7 +2227,7 @@ var EngCalcs = EngCalcs || {};
 	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
 	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
 	// only while the instrument is armed, so a shipped page pays one comparison per label.
-	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0 };
+	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0, levelTrials: 0, levelGained: 0 };
 	function perfDebugCount(what, n) {
 		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
 	}
@@ -2317,12 +2317,13 @@ var EngCalcs = EngCalcs || {};
 			'  | label passes ' + perfDebugCounts.labelPasses
 			+ '  | label measurements ' + perfDebugCounts.measures
 			+ '  | pipe label copies ' + perfDebugCounts.stations
+			+ '  | level trials ' + perfDebugCounts.levelTrials + ' gained ' + perfDebugCounts.levelGained
 			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
 			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
 			'  | hold ' + comp;
 		perfDebugRows = [];
 		perfDebugCounts.measures = 0; perfDebugCounts.labelPasses = 0; perfDebugCounts.elements = 0;
-		perfDebugCounts.stations = 0;
+		perfDebugCounts.stations = 0; perfDebugCounts.levelTrials = 0; perfDebugCounts.levelGained = 0;
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
@@ -3308,7 +3309,7 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
-	var LPN_LEVEL_LEAVE_SYMBOLS = true;
+	var LPN_LEVEL_LEAVE_SYMBOLS = true, LPN_LEVEL_SHED_CAP = 16, LPN_LEVEL_TRIAL_CAP = 24;
 	var LPN_LEVEL_FULL_FIRST = true, LPN_LEVEL_FULL_SIDES = 16, LPN_LEVEL_REACH_TEXT_HEIGHTS = 5, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
 	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
 	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
@@ -3455,16 +3456,19 @@ var EngCalcs = EngCalcs || {};
 		});
 		return struck;
 	}
-	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT, as copies**: boxes and segments are measured in
+	// **EVERYTHING THE LEVEL PASS READS IS TAKEN TO A MILLIONTH OF A DRAWING UNIT**: boxes and segments are measured in
 	// pixels over a scale, and one scale reached by two wheel histories differs in its last bit; a spot that grazes a box then flips
 	// between them, and the picture depends on the history (zoom-pass-determinism-harness.js). Nothing else on the map moves.
 	function snap(v) { return Math.round(v * 1e6) / 1e6; }
 	function snapPt(p) { return { x: snap(p.x), y: snap(p.y) }; }
-	function snapBox(b) { return Object.assign({}, b, { cx: snap(b.cx), cy: snap(b.cy), w: snap(b.w), h: snap(b.h) }); }
-	function snapSeg(g) { return Object.assign({}, g, { ax: snap(g.ax), ay: snap(g.ay), bx: snap(g.bx), by: snap(g.by) }); }
+	// In place: a copy made with Object.assign() has another hidden-class shape than Collide's own boxes, and the first fit then ran half again slower
+	// (measured, 600-junction network). A millionth of a drawing unit is nothing to the labels that are drawn from them.
+	function snapBox(b) { b.cx = snap(b.cx); b.cy = snap(b.cy); b.w = snap(b.w); b.h = snap(b.h); return b; }
+	function snapSeg(g) { g.ax = snap(g.ax); g.ay = snap(g.ay); g.bx = snap(g.bx); g.by = snap(g.by); return g; }
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var fsNow = fs + 'px';
 		fs = snap(fs);
+		var shedCands = [];
 		var specs = [], min = snap(leaderThreshold()), d = snapPt(defaultLabelOffset()), home0 = snap(Math.hypot(d.x, d.y)),
 			reach = snap(Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS)), nearReach = snap(Math.max(home0 * 3, fs * 3)), byKey = {};
 		doc.links.forEach(function (l) {
@@ -3484,6 +3488,15 @@ var EngCalcs = EngCalcs || {};
 				// properties when there is convenient open space to show everything on a leader."*).
 				shedOnly = !hid && LPN_LEVEL_FULL_FIRST && !!le.allLines && le.allLines.length > (le.lines || []).length && le.allLines.length > 1;
 			if (!(hid || shedOnly)) { return; }
+			// **THE SHED ONES ARE CAPPED** (Task 812, round 6): each costs a measured set of forms and a trial of sixteen sides, and on a dense
+			// network most find nothing (the 600-junction network at 6 notches: 219 tried, 18 gained). The ones missing the most fields, then the
+			// longest pipes, are tried; the rest stay as they are.
+			if (shedOnly) { shedCands.push({ l: l, le: le, len: Geom.polylineLength(linkPointList(l)), missing: le.allLines.length - (le.lines || []).length }); return; }
+			buildSpec(l, le, false);
+		});
+		shedCands.sort(function (p, q) { return (q.missing - p.missing) || (q.len - p.len) || (p.l.id < q.l.id ? -1 : (p.l.id > q.l.id ? 1 : 0)); });
+		shedCands.slice(0, LPN_LEVEL_SHED_CAP).forEach(function (c) { buildSpec(c.l, c.le, true); });
+		function buildSpec(l, le, shedOnly) {
 			var pts = linkPointList(l), mid = snapPt(linkLabelMid(l, undefined, pts)), sides = [];
 			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
 			// side of the pipe, nearest first. `at` marks a point other than the label's own.
@@ -3528,11 +3541,8 @@ var EngCalcs = EngCalcs || {};
 			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: snapPt(linkLabelBase(l)),
 				dragged: false, sides: sides, len: Geom.polylineLength(pts),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly,
-				// **A LEADER FROM A PIPE SHORTER THAN ITS END SYMBOLS LEAVES THEM** (Tom, 2026-11-09, L185 on Novato: *"would be
-				// reassuringly confirmed if they had leaders"*): the symbol the anchor stands in is not in its way, any other is.
-				leaderClean: LPN_LEVEL_LEAVE_SYMBOLS });
-		});
+				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l, shedTrial: shedOnly });
+		}
 		// Every candidate's other forms, measured in one batch.
 		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,
 		// so a wheel notch at a size not yet measured costs one layout, not one per label.
@@ -3551,6 +3561,7 @@ var EngCalcs = EngCalcs || {};
 					// Its own spec is the first of them, so a side that takes it takes the whole label, never a shed one.
 					delete sp.forms;
 					if (!full.length) { sp.skip = true; return; }
+					sp.has = sp.nVal;
 					sp.w = full[0].w; sp.h = full[0].h; sp.lines = full[0].lines; sp.nVal = full[0].nVal;
 					if (full.length > 1) { sp.forms = full.slice(1); }
 				}
@@ -3567,7 +3578,7 @@ var EngCalcs = EngCalcs || {};
 		prioritise(shedSpecs);
 		// Everything on the map now: the drawing, the stationed labels, the dragged ones, and every
 		// node and free label the passes above placed, with the leaders the renderer will draw.
-		var ground = { boxes: nodeObs.boxes.map(snapBox), segments: nodeObs.segments.map(snapSeg) };
+		var ground = perfDebugAccum('  lv:snap', function () { return { boxes: nodeObs.boxes.map(snapBox), segments: nodeObs.segments.map(snapSeg) }; });
 		function addPlaced(spec, r) {
 			var h = holders[r.id];
 			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed))) { return; }
@@ -3617,7 +3628,7 @@ var EngCalcs = EngCalcs || {};
 			return c;
 		}
 		function backToFullSides(r, c) { if (r.side >= 0 && c._idx) { r.side = c._idx[r.side]; } return r; }
-		function fitSpecs(list, ground, nearOnly) { return perfDebugAccum('  lv:fit', function () {
+		function fitSpecs(list, ground, nearOnly) { return perfDebugAccum(nearOnly ? '  lv:fit2' : '  lv:fit', function () {
 			var near = list.map(function (sp) { return withSides(sp, function (q) { return !q.far; }); }), nearBy = {}, by = {},
 				first, left, second = [], ground2;
 			near.forEach(function (c) { nearBy[c.id] = c; });
@@ -3661,7 +3672,9 @@ var EngCalcs = EngCalcs || {};
 				if (qok && own < Infinity && other <= own * LPN_AMBIG_PIPE_RATIO) {
 					ground.boxes.forEach(function (o) {
 						if (!qok || !(o.w > 0) || o.owner === r.id || (o.kind !== 'label' && o.kind !== 'levellabel' && o.kind !== 'symbol')) { return; }
-						// The symbol the leader starts in is not in its way (a pipe shorter than its end symbols).
+						// **A LEADER FROM A PIPE SHORTER THAN ITS END SYMBOLS LEAVES THEM** (Tom, 2026-11-09, L185 on Novato: *"would be reassuringly
+						// confirmed if they had leaders"*): the symbol the anchor stands in is not in its way, any other is. Only here: as a way to seat a
+						// label in the sweeps it cost Novato 107 pipe labels and 7% of its fields (Chromium, round 6).
 						if (LPN_LEVEL_LEAVE_SYMBOLS && o.kind === 'symbol' && (o.round ? Math.hypot(o.cx - qa.x, o.cy - qa.y) <= o.w / 2 : (Math.abs(o.cx - qa.x) <= o.w / 2 && Math.abs(o.cy - qa.y) <= o.h / 2))) { return; }
 						if (Collide.segmentInBoxFraction(qg, o) > 0) { qok = false; }
 					});
@@ -3695,10 +3708,15 @@ var EngCalcs = EngCalcs || {};
 			if (!LPN_LEVEL_FULL_FIRST || !r || r.dropped || !sp.fullForms) { return; }
 			now = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].nVal : sp.nVal;
 			if (now >= sp.allCount) { return; }
-			var full = sp.fullForms, c = Object.assign({}, sp, { w: full[0].w, h: full[0].h, lines: full[0].lines, nVal: full[0].nVal, forms: full.length > 1 ? full.slice(1) : undefined });
+			var full = sp.fullForms, c = Object.assign({}, sp, { has: now, w: full[0].w, h: full[0].h, lines: full[0].lines, nVal: full[0].nVal, forms: full.length > 1 ? full.slice(1) : undefined });
 			if (!c.forms) { delete c.forms; }
 			trial.push(c); going[sp.id] = true;
 		});
+		// **ONLY SO MANY ARE TRIED**: the ones missing the most fields first, then the longest pipes (the 600-junction network: 129 tried at one view, 4 gained).
+		trial.forEach(function (sp) { sp.miss = sp.allCount - (sp.has || 0); });
+		trial.sort(function (p, q) { return (q.miss - p.miss) || (q.len - p.len) || (p.id < q.id ? -1 : (p.id > q.id ? 1 : 0)); });
+		trial = trial.slice(0, LPN_LEVEL_TRIAL_CAP);
+		shedSpecs = shedSpecs.filter(function (sp) { return trial.indexOf(sp) >= 0; });
 		var fullOf = {};
 		shedSpecs.concat(specs).forEach(function (sp) { fullOf[sp.id] = sp.fullForms; });
 		if (trial.length) {
@@ -3716,8 +3734,8 @@ var EngCalcs = EngCalcs || {};
 			});
 			// **THE GROUND TO A MILLIONTH**: boxes and segments are measured in pixels over a scale, and one scale reached by two wheel
 			// histories differs in its last bit; a spot that grazes a box then flips between them
-			// (zoom-pass-determinism-harness.js). Copies, so nothing else on the map moves.
-			var ground3 = { boxes: base.boxes.map(snapBox), segments: base.segments.map(snapSeg) };
+			// (zoom-pass-determinism-harness.js).
+			var ground3 = perfDebugAccum('  lv:snap3', function () { return { boxes: base.boxes.map(snapBox), segments: base.segments.map(snapSeg) }; });
 			// A label that is trying for a whole spot keeps its first one on the ground too (a label never blocks itself): if it finds
 			// none it stays there, and no other may have taken the place.
 			out.forEach(function (r) {
@@ -3726,6 +3744,8 @@ var EngCalcs = EngCalcs || {};
 				if (r.leader) { ground3.segments.push(snapSeg(r.leader)); }
 			});
 			var out2 = fitSpecs(trial, ground3, true), byId2 = {}, trialBy = {};
+			if (typeof window !== 'undefined') { window.__lvTrials = trial.length; window.__lvSides = out2.filter(function (r) { return !r.dropped; }).map(function (r) { return r.side; }); }
+			perfDebugCount('levelTrials', trial.length); perfDebugCount('levelGained', out2.filter(function (r) { return !r.dropped; }).length);
 			trial.forEach(function (sp) { trialBy[sp.id] = sp; });
 			out2.forEach(function (r) {
 				if (r.dropped) { return; }
