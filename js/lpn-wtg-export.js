@@ -735,17 +735,31 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	const ruleCtl = carriableRules(parsed, (opts.candidate && opts.candidate.pressureControls)).written;
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
-	ruleCtl.forEach((c) => { realLinks[c.link] = 1; if (c.elseAction) { realLinks[c.elseAction.link] = 1; } });
+	ruleCtl.forEach((c) => { c.thenActs.concat(c.elseAct ? [c.elseAct] : []).forEach((a) => { realLinks[a.link] = 1; }); });
 	const fmt2 = (v) => Number(v).toFixed(2);
 	function setRows(table, id, rowObj) { insert(db, table, Object.assign({ SupportElementID: id }, rowObj)); }
 	// One action row set: a pump's action is the pump itself, a pipe's the pipe (status only). Returns its id and text.
-	function writeAction(link, status) {
+	// A composite action (several THEN actions; Tom's ctl-composite save) is a parent row, ControlActionType 1, that repeats its first
+	// action's row set and lists every action in IdahoControlAction_ActionCollection, in the order stated; `kids` are the written ones.
+	const statusText = (link, status) => { const isPump = !!pumpNodeId[link]; return link + (isPump ? ' Pump' : ' Pipe') + ' Status = ' + (isPump ? (status === 'open' ? 'On' : 'Off') : (status === 'open' ? 'Open' : 'Closed')) + ' '; };
+	function writeActions(list) {
+		if (list.length === 1) { return writeAction(list[0].link, list[0].status); }
+		const kids = list.map((a) => writeAction(a.link, a.status));
+		const parent = writeAction(list[0].link, list[0].status, { kids: kids, plain: list.map((a) => statusText(a.link, a.status)).join(', ') });
+		return parent;
+	}
+	function writeAction(link, status, parentOf) {
 		const isPump = !!pumpNodeId[link];
 		const statusWord = isPump ? (status === 'open' ? 'On' : 'Off') : (status === 'open' ? 'Open' : 'Closed');
 		const aId = newId(), aName = statusWord + '-' + link;
-		const actTxt = aName + ' {"' + link + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
+		let actTxt = aName + ' {"' + link + '" ' + (isPump ? 'Pump' : 'Pipe') + ' Status = ' + statusWord + ' }';
 		supportElement(aId, 55, 'A' + aId, '{A' + aId + ':  ' + actTxt.replace(/"/g, '""') + '}');
-		setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
+		if (parentOf) {
+			actTxt = parentOf.plain;
+			setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 0, IdahoControlAction_Description: 'text', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 1 });
+		} else {
+			setRows('IdahoControlAction', aId, { IdahoControlAction_DefineDescription: 1, IdahoControlAction_Description: aName + ' {"%e" %a %o %v %u}', IdahoControlAction_ExpandedDescription: actTxt, ControlActionType: 0 });
+		}
 		setRows('IdahoControlAction_ControlActionType_SimpleActionType', aId, isPump ? { SimpleActionType_Element: pumpNodeId[link], ElementType: 68 } : { SimpleActionType_Element: pipeElId[link], ElementType: 69 });
 		// A pump's action is the pump itself (Tom's ctl-pump-level save, whose run switched the pump by its rule): the pump,
 		// FCV and pump-status rows only, status 0 On and 1 Off. A pipe's carries the full set.
@@ -775,23 +789,36 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			['IdahoControlAction_PRVAttribute_ActionPressureValveStatusType', { ActionPressureValveStatus: 1 }]
 		];
 		aSub.forEach((r) => { setRows(r[0], aId, r[1]); });
+		if (parentOf) {
+			setRows('IdahoControlAction_ControlActionType_CompositeActionType', aId, { ActionCollectionCount: parentOf.kids.length });
+			parentOf.kids.forEach((k) => { insert(db, 'IdahoControlAction_ActionCollection', { SupportElementID: aId, ActionCollection_ControlAction: k.id }); });
+		}
 		return { id: aId, txt: actTxt };
 	}
-	function writeControl(c) {
-		const sym = c.condition.cmp === 'below' ? '<' : '>';
+	// One simple condition. With `parentOf` it is the parent row of a composite condition (Tom's ctl-composite save): ConditionType 1, a
+	// plain-text description, the first condition's rows repeated, and the children listed with the operator that joins each
+	// (LogicalOperator 0 for the first, 1 AND, 2 OR) in IdahoControlCondition_ControlConditionCollection.
+	function writeCond(cd, parentOf) {
+		const sym = cd.cmp === 'below' ? '<' : '>';
 		const cId = newId();
-		const cName = 'Node-' + c.condition.node + '-' + c.condition.cmp + '-' + c.condition.value;
+		const cName = 'Node-' + cd.node + '-' + cd.cmp + '-' + cd.value;
 		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
-		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). That save's control was never
-		// put in the control set, so no run has shown WaterGEMS applying it.
-		const isJ = nodeById[c.condition.node].type === 'junction';
-		const condTxt = cName + ' {"' + c.condition.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(c.condition.value) + (isJ ? ' psi}' : ' ft}');
-		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
-		setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
-		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: c.condition.cmp === 'below' ? 3 : 1 });
+		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). The 2-pressure run (2026-11-09)
+		// showed WaterGEMS applying it, one hydraulic step later than EPANET (dev/wtg-export.md).
+		const isJ = nodeById[cd.node].type === 'junction';
+		const plain = cd.node + (isJ ? ' Pressure' : ' Level') + ' ' + sym + ' ' + fmt2(cd.value) + (isJ ? ' psi' : ' ft');
+		let condTxt = cName + ' {"' + cd.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(cd.value) + (isJ ? ' psi}' : ' ft}');
+		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt.replace(/"/g, '""') + '}');
+		if (parentOf) {
+			condTxt = parentOf.plain;
+			setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 0, IdahoControlCondition_Description: 'text', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 1 });
+		} else {
+			setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 1, IdahoControlCondition_Description: cName + ' {"%e" %a %o %v %u}', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 0 });
+		}
+		setRows('IdahoControlCondition_ConditionType_SimpleConditionType', cId, { SimpleConditionType: 0, CompareOperator: cd.cmp === 'below' ? 3 : 1 });
 		setRows('IdahoControlCondition_SimpleConditionType_ElementType', cId, {
-			ElementType_Element: elId['n:' + c.condition.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? c.condition.value : 0,
-			ElementType_TankLevel: isJ ? 0 : c.condition.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
+			ElementType_Element: elId['n:' + cd.node], ElementType_Demand: 0, ElementType_HydraulicGrade: 0, ElementType_Pressure: isJ ? cd.value : 0,
+			ElementType_TankLevel: isJ ? 0 : cd.value, ElementType_TankTimeToFill: 0, ElementType_TankTimeToDrain: 0, ElementType_Discharge: 0,
 			ElementType_HeadlossCoefficient: 0, ElementType_RelativeSpeedFactor: 0, ElementType_TankPercentFull: 0,
 			ControlConditionPumpStatus: 0, ControlConditionPipeStatus: 0, ControlConditionGPVStatus: 0, ControlConditionValveStatus: 0,
 			ControlConditionElementType: isJ ? 50 : 52
@@ -803,9 +830,27 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 			TCVType: ['ControlConditionTCVType', 'ControlConditionTCVAttribute', 0], HydroTankType: ['ControlConditionHydroTankType', 'HydroTankAttribute', 1],
 			SurgeTankType: ['ControlConditionSurgeTankType', 'SurgeTankAttribute', 1] };
 		Object.keys(cSub).forEach((k) => { const v = cSub[k]; setRows('IdahoControlCondition_ControlConditionElementType_' + v[0], cId, { [v[1]]: v[2] }); });
-		const act = writeAction(c.link, c.action.status);
+		if (parentOf) {
+			setRows('IdahoControlCondition_ConditionType_CompositeConditionType', cId, { ControlConditionCollectionCount: parentOf.kids.length });
+			parentOf.kids.forEach((k, i) => { insert(db, 'IdahoControlCondition_ControlConditionCollection', { SupportElementID: cId, ControlConditionCollection_ControlCondition: k.id, LogicalOperator: i === 0 ? 0 : (parentOf.join === 'OR' ? 2 : 1) }); });
+		}
+		return { id: cId, txt: condTxt, plain: plain };
+	}
+	// A control as the writer holds it: `conds` (one or two) joined by `join` (AND or OR), `thenActs`, an optional `elseAct`, a priority.
+	// A simple control (a tank-level [CONTROLS] line) is the one-condition, one-action case.
+	function writeControl(c) {
+		if (!c.conds) { c = { conds: [c.condition], join: null, thenActs: [{ link: c.link, status: c.action.status }], elseAct: c.elseAction || null, priority: c.priority }; }
+		let cond;
+		if (c.conds.length === 1) { cond = writeCond(c.conds[0]); }
+		else {
+			const kids = c.conds.map((cd) => writeCond(cd));
+			cond = writeCond(c.conds[0], { kids: kids, join: c.join, plain: kids.map((k) => k.plain).join(c.join === 'OR' ? ' Or ' : ' And ') });
+		}
+		const condTxt = cond.txt;
+		const act = writeActions(c.thenActs);
 		const actTxt = act.txt;
-		const elseAct = c.elseAction ? writeAction(c.elseAction.link, c.elseAction.status) : null;
+		const elseAct = c.elseAct ? writeAction(c.elseAct.link, c.elseAct.status) : null;
+		const cId = cond.id;
 		const kId = newId();
 		supportElement(kId, 54, 'LC' + kId, '');
 		// A logical control (Tom's ctl-logical save): the ELSE action's id, a priority and their two flags; otherwise 0, 0, NULL, 0.
@@ -1245,9 +1290,10 @@ function ageTraceCarriable(parsed) {
 // The one coordinate system whose WaterGEMS definition a saved project has shown us.
 var CRS_WRITTEN = 'EPSG:2223';
 
-// [RULES] of the simplest shape, which WaterGEMS holds as a logical control (Tom's ctl-logical save): one premise (a tank level
-// above or below a value, or with `pressure` a junction pressure), one THEN setting a pump's or pipe's status, at most one ELSE
-// of the same kind, and an optional PRIORITY. Everything else is named in `unwritten` (the rule's name) and stays out.
+// [RULES] that WaterGEMS holds as a logical control (Tom's ctl-logical and ctl-composite saves): one or two premises joined by AND or by
+// OR (each a tank level above or below a value, or with `pressure` a junction pressure), one or more THEN actions and at most one ELSE
+// action, each setting a pump's or pipe's status, and an optional PRIORITY. Several ELSE actions have no saved example. Everything
+// else is named in `unwritten` (the rule's name) and stays out.
 function carriableRules(parsed, pressure) {
 	const out = { written: [], unwritten: [] };
 	const lines = parsed.rules || [];
@@ -1262,12 +1308,15 @@ function carriableRules(parsed, pressure) {
 		const no = () => { out.unwritten.push(b.name || '?'); };
 		if (!b.ok || !b.name) { return no(); }
 		const conds = b.clauses.filter((c) => c.part === 'cond'), acts = b.clauses.filter((c) => c.part === 'act'), pr = b.clauses.filter((c) => c.part === 'priority');
-		if (conds.length !== 1 || conds[0].join !== 'IF' || !acts.length || acts.length > 2 || pr.length > 1) { return no(); }
-		const cl = conds[0], cmp = REL[cl.rel];
-		const tankOk = cl.attr === 'LEVEL' && (cl.object === 'TANK' || cl.object === 'NODE') && nodeType(cl.id) === 'tank';
-		const presOk = pressure && cl.attr === 'PRESSURE' && (cl.object === 'JUNCTION' || cl.object === 'NODE') && nodeType(cl.id) === 'junction';
-		if (!cmp || !(tankOk || presOk) || typeof cl.value !== 'number') { return no(); }
-		if (acts[0].join !== 'THEN' || (acts[1] && acts[1].join !== 'ELSE')) { return no(); }
+		if (conds.length < 1 || conds.length > 2 || conds[0].join !== 'IF' || !acts.length || pr.length > 1) { return no(); }
+		if (conds.length === 2 && conds[1].join !== 'AND' && conds[1].join !== 'OR') { return no(); }
+		const cond = (cl) => {
+			const cmp = REL[cl.rel];
+			const tankOk = cl.attr === 'LEVEL' && (cl.object === 'TANK' || cl.object === 'NODE') && nodeType(cl.id) === 'tank';
+			const presOk = pressure && cl.attr === 'PRESSURE' && (cl.object === 'JUNCTION' || cl.object === 'NODE') && nodeType(cl.id) === 'junction';
+			if (!cmp || !(tankOk || presOk) || typeof cl.value !== 'number') { return null; }
+			return { kind: 'node', node: cl.id, cmp: cmp, value: cl.value };
+		};
 		const act = (a) => {
 			const lt = linkType(a.id), v = String(a.valueText).toUpperCase();
 			if (a.attr !== 'STATUS' || !((a.object === 'PUMP' && lt === 'pump') || (a.object === 'PIPE' && lt === 'pipe') || (a.object === 'LINK' && (lt === 'pump' || lt === 'pipe')))) { return null; }
@@ -1275,9 +1324,14 @@ function carriableRules(parsed, pressure) {
 			if (v === 'CLOSED' || (v === 'OFF' && lt === 'pump')) { return { link: a.id, status: 'closed' }; }
 			return null;
 		};
-		const t = act(acts[0]), e = acts[1] ? act(acts[1]) : null;
-		if (!t || (acts[1] && !e) || !(a => a === undefined || (isFinite(a) && a >= 0))(pr[0] && pr[0].value)) { return no(); }
-		out.written.push({ name: b.name, link: t.link, condition: { kind: 'node', node: cl.id, cmp: cmp, value: cl.value }, action: { status: t.status }, elseAction: e, priority: pr[0] ? pr[0].value : null });
+		// THEN, then any AND actions; at most one ELSE action, after them.
+		const ei = acts.findIndex((a) => a.join === 'ELSE');
+		const thenCl = ei < 0 ? acts : acts.slice(0, ei), elseCl = ei < 0 ? [] : acts.slice(ei);
+		if (!thenCl.length || thenCl[0].join !== 'THEN' || thenCl.slice(1).some((a) => a.join !== 'AND') || elseCl.length > 1) { return no(); }
+		const cs = conds.map(cond), thenActs = thenCl.map(act), elseActs = elseCl.map(act);
+		if (cs.some((c) => !c) || thenActs.some((a) => !a) || elseActs.some((a) => !a)) { return no(); }
+		if (!(a => a === undefined || (isFinite(a) && a >= 0))(pr[0] && pr[0].value)) { return no(); }
+		out.written.push({ name: b.name, conds: cs, join: conds.length === 2 ? conds[1].join : null, thenActs: thenActs, elseAct: elseActs[0] || null, priority: pr[0] ? pr[0].value : null });
 	});
 	return out;
 }
