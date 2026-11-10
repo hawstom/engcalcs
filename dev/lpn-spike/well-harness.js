@@ -149,6 +149,34 @@ console.log('\n--- 1b. the default static level, in each unit ---');
 	setUnitSet('si'); fresh(); L.setMode('add-well'); press(200, 150);
 }
 
+console.log('\n--- 1b2. the static level follows the ground until the user has typed it (Perry) ---');
+{
+	setUnitSet('us');
+	const d3 = fresh(); L.setMode('add-well'); press(200, 150);
+	const gR = L.nodeById('W1R'), gS = L.nodeById('W1U'), gT = L.nodeById('W1T'), gD = L.nodeById('W1D');
+	const g0 = gT.elev;
+	L.setProp(gT, 'elev', 690);
+	ok('ground 690: the static level moved with it, keeping its 100 ft depth, at R and S', gR.elev === 590 && gS.elev === 590, gR.elev + ' ' + gS.elev + ' (ground was ' + g0 + ')');
+	ok('and the tank and tee are at the ground', gT.elev === 690 && gD.elev === 690);
+	L.setProp(gD, 'elev', 700);
+	ok('typed on the tee it follows too', gR.elev === 600 && gS.elev === 600, gR.elev + ' ' + gS.elev);
+	ok('nothing is marked typed yet', !d3.assemblies[0].staticTyped);
+	L.setProp(gR, 'elev', 550);
+	ok('a static level typed by the user is marked in the grouping', d3.assemblies[0].staticTyped === true);
+	L.setProp(gT, 'elev', 800);
+	ok('after that the ground moves alone and the typed static level never moves', gR.elev === 550 && gS.elev === 550 && gT.elev === 800, gR.elev + ' ' + gT.elev);
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	ok('the mark is kept in the project file', saved.assemblies[0].staticTyped === true);
+	const d4 = fresh(); L.setMode('add-well'); press(200, 150);
+	const back = JSON.parse(JSON.stringify(L.serializeProject()));
+	ok('an unmarked well is saved without the mark', back.assemblies[0].staticTyped === undefined);
+	L.applySaved(saved);
+	L.setProp(L.nodeById('W1T'), 'elev', 900);
+	ok('a reopened project keeps it typed: the static level stays', L.nodeById('W1R').elev === 550, String(L.nodeById('W1R').elev));
+	L.undo();
+	setUnitSet('si'); fresh();
+}
+
 console.log('\n--- 1c. the ground from the DEM, and the static level that follows it ---');
 {
 	const doc = fresh(); L.setMode('add-well'); press(200, 150);

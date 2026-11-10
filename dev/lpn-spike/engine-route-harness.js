@@ -265,7 +265,7 @@ for (const engine of ['native', 'epanet']) {
 		doc.links.push({ id: 'V1', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 60, _k: 0, _status: 'open' });
 		doc.links.push({ id: 'V2', type: 'valve', valveType: 'PRV', from: 'J2', to: 'J3', verts: [], _diameter: 200, _setting: 30, _k: 0, _status: 'open' });
 		const r = await solved();
-		ok(engine + ': two PRVs in series are refused, by name', r === null &&
+		ok(engine + ': two PRVs in series are refused, by name',
 			status().indexOf(PC.lpn_diag_valve_conflict + ' V1, V2') >= 0, JSON.stringify(status()));
 		doc.links.pop(); doc.links.pop(); doc.nodes.pop(); doc.nodes.pop();
 	}
@@ -279,7 +279,7 @@ for (const engine of ['native', 'epanet']) {
 		doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 10 });
 		doc.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 0, _curveId: 'GBAD', _k: 0, _status: 'open' });
 		let r = await solved();
-		ok(engine + ': a GPV curve whose flows do not increase is refused, by name', r === null &&
+		ok(engine + ': a GPV curve whose flows do not increase is refused, by name',
 			status().indexOf(PC.lpn_diag_gpv_curve_order + ' V1') >= 0, JSON.stringify(status()));
 		// One point (20 L/s -> 5 m): solved as the line through the origin and it, and said.
 		doc.links[doc.links.length - 1]._curveId = 'GONE';

@@ -1020,7 +1020,7 @@ var EngCalcs = EngCalcs || {};
 	// to keep clear of it instead. Its rows and its drawn leader, exactly where the user put them;
 	// the node first-fit, its shed and the gang repair are handed these alongside the drawing's
 	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
-	function withDraggedLabels(obs, fs) {
+	function withDraggedLabels(obs, fs, assemblyOnly) {
 		var boxes = [], segs = [], min = leaderThreshold();
 		function add(key, holder, anchor, home, owner) {
 			if (!holder || holder.empty) { return; }
@@ -1033,14 +1033,35 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		doc.nodes.forEach(function (n) {
-			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
+			if (!assemblyOnly && n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
 		});
 		doc.links.forEach(function (l) {
+			if (assemblyOnly) {
+				if (l.lx === undefined && assemblyOfLink(l.id) && assemblyLinkLabelBase(l, fs)) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), null); }
+				return;
+			}
 			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), l); }
 			else if (assemblyOfLink(l.id) && assemblyLinkLabelBase(l, fs)) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), null); }
 		});
 		if (!boxes.length && !segs.length) { return obs; }
 		return { boxes: obs.boxes.concat(boxes), segments: obs.segments.concat(segs) };
+	}
+	// **A PUMP+ OR VALVE+ LABEL IS A BOX THE ALIGNED PIPE LABELS MUST STEER AROUND** (Task 822, Perry: "LP1 Q=1230.0" lay across
+	// the rotated "L110" label). It has one fixed place, like a hand-placed label, but it is placed after the stationed labels, so
+	// they never knew it was there. This puts its box in `obs` for the duration of `fn` and takes it out again, leaving whatever
+	// `fn` itself committed. A drawing with no assembly gets `fn` and nothing else.
+	function withAssemblyLinkLabelBoxes(obs, fs, fn) {
+		var n0 = obs.boxes.length, s0 = obs.segments.length, wrapped, k, out;
+		if (!(doc.assemblies && doc.assemblies.length)) { return fn(); }
+		wrapped = withDraggedLabels({ boxes: [], segments: [] }, fs, true);
+		k = wrapped.boxes.length;
+		wrapped.boxes.forEach(function (b) { obs.boxes.push(b); });
+		wrapped.segments.forEach(function (g) { obs.segments.push(g); });
+		try { out = fn(); } finally {
+			obs.boxes.splice(n0, k);
+			obs.segments.splice(s0, wrapped.segments.length);
+		}
+		return out;
 	}
 	function predictNodeLabelBoxes(fs) {
 		var specs = [], obs = staticObstacles(), stationed = [];
@@ -1057,7 +1078,7 @@ var EngCalcs = EngCalcs || {};
 			if (!le || le.empty || linkLabelTooShort(l, le)) { return; }
 			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) { stationed.push(l); }
 		});
-		placeStationedLabels(stationed, obs, fs);
+		withAssemblyLinkLabelBoxes(obs, fs, function () { placeStationedLabels(stationed, obs, fs); });
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			// A dragged node label is the user's own placement and never enters the first-fit; it is
@@ -1075,6 +1096,7 @@ var EngCalcs = EngCalcs || {};
 		// reasonable margin for SLIDING a label along its pipe, and not for taking a number off the
 		// drawing. A shed is paid for in information, so it wants real overlap.
 		var obs = staticObstacles(), pad = 0;
+		if (doc.assemblies && doc.assemblies.length) { withDraggedLabels({ boxes: [], segments: [] }, fs, true).boxes.forEach(function (b) { obs.boxes.push(b); }); }
 		// **THE NODE LABELS WHERE predictNodeLabelBoxes() SAYS THEY WILL BE DRAWN**, in the staircase
 		// the placement pass really reserves (Task 406) rather than the block round it -- claiming
 		// the empty ground to the right of a short row would cost a pipe label values nothing is
@@ -3506,7 +3528,7 @@ var EngCalcs = EngCalcs || {};
 		// unplaced. A link label is bound to its pipe and has the fewest choices, so it chooses while
 		// it can; when something has to go it is the link, yielding by SHEDDING values in
 		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
-		perfDebugAccum('  cl:stationed', function () { placeStationedLabels(stationed, obs, fs, true); });
+		perfDebugAccum('  cl:stationed', function () { withAssemblyLinkLabelBoxes(obs, fs, function () { placeStationedLabels(stationed, obs, fs, true); }); });
 		rankNodeLabels(nodeLabels);
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
@@ -5564,11 +5586,28 @@ var EngCalcs = EngCalcs || {};
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
 	// an override. A call site that writes `el._diameter` directly is therefore not merely
 	// impolite: inside a scenario it silently edits Base under every other scenario at once.
+	// **THE WELL'S STATIC WATER LEVEL FOLLOWS THE GROUND UNTIL THE USER HAS TYPED IT** (Task 822; Perry: Elevation 0 -> 690 left the static
+	// level at -100). Following keeps its depth below the ground. A value typed on the reservoir or the suction is the user's own and
+	// never moves again, which `staticTyped` on the grouping records in the project; an imported well's is typed. The program's own
+	// writes (the DEM fill) set `wellStaticAuto` and neither mark nor follow.
+	var wellStaticAuto = false;
+	function wellStaticFollow(asm, el, value) {
+		var idx = asm.nodes.indexOf(el.id), r, was, now;
+		if (wellStaticAuto) { return; }
+		if (idx >= 0 && idx < 2) { asm.staticTyped = true; return; }
+		if (asm.staticTyped) { return; }
+		r = nodeById(asm.nodes[0]);
+		was = +effective(el, 'elev'); now = +value;
+		if (!r || value === '' || value === null || !isFinite(was) || !isFinite(now) || effective(el, 'elev') === '' || effective(el, 'elev') === undefined) { return; }
+		wellStaticAuto = true;
+		try { setProp(r, 'elev', +(+effective(r, 'elev') + (now - was)).toFixed(4)); } finally { wellStaticAuto = false; }
+	}
 	function setProp(el, prop, value) {
 		// **THE TWO NODES OF AN ASSEMBLY SHARE ELEVATION AND PLACE** (Task 822): the partner is written
 		// by the same call, whichever door (Properties, Tables, the marker's tick) the edit came by.
 		if ((prop === 'elev' || prop === 'x' || prop === 'y') && elGroup(el) === 'node' && !assemblyWriting) {
 			var asm = assemblyOfNode(el.id), mates = [];
+			if (asm && asm.kind === 'well' && prop === 'elev') { wellStaticFollow(asm, el, value); }
 			if (asm) {
 				// A well's R and S share the static elevation, and its tank T and tee D the ground's: an elevation reaches only its own pair.
 				mates = (asm.kind === 'well' && prop === 'elev' ? (asm.nodes.indexOf(el.id) < 2 ? asm.nodes.slice(0, 2) : asm.nodes.slice(2)) : assemblyNodeIds(asm)).filter(function (id) { return id !== el.id; });
@@ -20779,7 +20818,7 @@ var EngCalcs = EngCalcs || {};
 			setProp(p.n, 'elev', p.v);
 			// A Well born where the ground was not yet known has no static level yet: it takes the ground less the round depth.
 			r = a && a.kind === 'well' && a.nodes.indexOf(p.n.id) >= 2 ? nodeById(a.nodes[0]) : null;
-			if (r && !terrainHasElev(r)) { setProp(r, 'elev', +(p.v - wellStaticDepth()).toFixed(4)); }
+			if (r && !terrainHasElev(r)) { wellStaticAuto = true; try { setProp(r, 'elev', +(p.v - wellStaticDepth()).toFixed(4)); } finally { wellStaticAuto = false; } }
 		});
 		buildDom();
 		refreshPopupIfOpen();
@@ -40198,7 +40237,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!a.links.every(function (id) { return linkIds[id]; })) { return; }
 			if (a.kind === 'well') {
 				wellOk = Array.isArray(a.nodes) && (a.nodes.length === 3 ? a.links.length === 2 : a.nodes.length === 4 && a.links.length === 3) && a.nodes.every(function (id) { return nodeIds[id]; });
-				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() }); }
+				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: a.staticTyped ? true : undefined }); }
 				return;
 			}
 			if (!nodeIds[a.up] || !nodeIds[a.down]) { return; }
@@ -40241,11 +40280,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// is on. It is the first of the same candidates, so it is as close as a label can stand and still clear the pipes.
 	// A link that is in no assembly, or a label dragged by hand, keeps the ordinary base (linkLabelBase()).
 	function assemblyLinkLabelBase(l, fs) {
-		var a = assemblyOfLink(l.id), le = linkEls[l.id], at, c;
+		var a = assemblyOfLink(l.id), le = linkEls[l.id], at, c, i;
 		if (!a || !le || le.empty || l.lx !== undefined) { return null; }
-		at = linkLabelMid(l);
-		c = assemblyLabelCandidates(a, a.kind === 'well' && a.links[0] === l.id ? -1 : 1, 2, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), at, fs || effectiveFontSize());
-		return c && c.length ? { x: c[0].x, y: c[0].y } : null;
+		at = linkLabelMid(l); fs = fs || effectiveFontSize();
+		c = assemblyLabelCandidates(a, a.kind === 'well' && a.links[0] === l.id ? -1 : 1, 2, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), at, fs);
+		if (!c || !c.length) { return null; }
+		// **A WELL HAS THREE LINKS AT ONE POINT, AND TWO OF THEM (the pump and the tank's virtual pipe) WANT THE SAME QUARTER** (Perry: "LW1"
+		// and "LW1B" drew on top of each other after a reopen). The virtual pipe takes the first of its own candidates that clears the pump's box...
+		if (a.kind === 'well' && a.links[2] === l.id) {
+			// ...and whose leader does not run through the pump's or the drawdown valve's label either (the stand-off it
+			// needs is a leader, and a leader across another label's first letters reads as one garbled label).
+			var bw = labelBoxWidth(le), bh = dataLabelBoxHeight(le.lineCount), gap = fs * 0.3, taken = [], ok2, k2, t, ix, iy;
+			[a.links[1], a.links[0]].forEach(function (id) {
+				var ol = linkById(id), oe = ol && linkEls[id], oc = ol && oe && !oe.empty && ol.lx === undefined && id !== l.id ? assemblyLinkLabelBase(ol, fs) : null, ow;
+				if (!oc) { return; }
+				ow = labelBoxWidth(oe);
+				taken.push({ x0: (oc.x >= at.x ? oc.x : oc.x - ow) - gap, x1: (oc.x >= at.x ? oc.x + ow : oc.x) + gap, y0: oc.y - fs * 0.85 - gap, y1: oc.y - fs * 0.85 + dataLabelBoxHeight(oe.lineCount) + gap });
+			});
+			// Its own candidates run out in the pump's direction, where any leader crosses the pump's label, so the other quarters
+			// follow: the downstream half's usual side, then the upstream half's.
+			c = c.concat(assemblyLabelCandidates(a, 1, 0, bw, bh, at, fs) || [], assemblyLabelCandidates(a, -1, 0, bw, bh, at, fs) || [], assemblyLabelCandidates(a, -1, 2, bw, bh, at, fs) || []);
+			for (i = 0; i < c.length; i++) {
+				var bx0 = c[i].x >= at.x ? c[i].x : c[i].x - bw, by0 = c[i].y - fs * 0.85;
+				ok2 = true;
+				for (k2 = 0; k2 < taken.length && ok2; k2++) {
+					if (!(bx0 >= taken[k2].x1 || bx0 + bw <= taken[k2].x0 || by0 >= taken[k2].y1 || by0 + bh <= taken[k2].y0)) { ok2 = false; }
+					for (t = 0; t <= 24 && ok2; t++) {
+						ix = at.x + (c[i].x - at.x) * t / 24; iy = at.y + (c[i].y - at.y) * t / 24;
+						if (ix > taken[k2].x0 && ix < taken[k2].x1 && iy > taken[k2].y0 && iy < taken[k2].y1) { ok2 = false; }
+					}
+				}
+				if (ok2) { return { x: c[i].x, y: c[i].y }; }
+			}
+			return { x: c[c.length - 1].x, y: c[c.length - 1].y };
+		}
+		return { x: c[0].x, y: c[0].y };
 	}
 	// `sgn` is +1 for the half downstream of the point and -1 for the half upstream; `side` is 0 for the label that
 	// stands on its own half's usual side of the pipe and 2 for the quarter across from the downstream label.
@@ -40292,6 +40361,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				cx = x0 + w / 2 - at.x; cy = ey - fs * 0.85 + h / 2 - at.y;
 				along = sgn * (cx * ux + cy * uy);   // beside, not beyond the wrong end
 				if (along < 0) { continue; }
+				// Where the pipe runs nearly up and down both node labels stand on the same side of it, so the pipe no longer keeps
+				// them apart: each box must lie wholly on its own half of the point, or the two overlap (Perry, Valve+ on a vertical pipe).
+				if (Math.abs(ux) < 0.3) {
+					for (i = 0; i < 4; i++) { if (sgn * ((cs[i][0] - at.x) * ux + (cs[i][1] - at.y) * uy) < 0) { ok = false; break; } }
+					if (!ok) { continue; }
+				}
 				d = -(Math.cos(ang * Math.PI / 180) * ideal.x + Math.sin(ang * Math.PI / 180) * ideal.y);
 				if (d < bestA) { bestA = d; best = { x: ex, y: ey, corner: -1, deg: null }; }
 			}
@@ -82456,7 +82531,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		roughnessNote = roughnessNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
-			lastSolveResult = null;
+			// A refusal says why there is no new answer; it does not take the last one away (the snapshot rule:
+			// stale results stay on screen until Calculate or a deliberate Clear).
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
 			setStatus(issues.map(diagIssueText).join(' '), issues[0].code, true);
 			refreshLabelText();

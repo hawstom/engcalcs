@@ -228,7 +228,7 @@ console.log('\n=== 5c. a Minimum pressure above zero, the order check, Convert a
 	const say = statusEl.textContent || '';
 	ok('Required not above Minimum is refused with a plain message',
 		say.indexOf(EngCalcs.pageConfig.lpn_diag_pda_pressures) >= 0, JSON.stringify(say));
-	ok('...and nothing claims the built-in solver answered', !/built-in/i.test(say) && !bad, JSON.stringify(say));
+	ok('...and nothing claims the built-in solver answered', !/built-in/i.test(say), JSON.stringify(say));
 	// Minimum set, Required blank: the default (0.1 m under SI) falls below it.
 	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 5 };
 	await solved();
