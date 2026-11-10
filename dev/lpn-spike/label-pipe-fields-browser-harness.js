@@ -88,7 +88,8 @@ async function layOut(Session, browser, sc, mode) {
 			const strikes = await a.page.evaluate(() => window.__lpnForm.leaderStrikes().length);
 			const named = sc.named.length ? await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named) : {};
 			const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
-			rows.push({ k: k, pf: pf, strikes: strikes, named: named, ms: ms });
+			const states = await a.page.evaluate(() => window.__lpnForm.pipeStates());
+			rows.push({ k: k, pf: pf, strikes: strikes, named: named, ms: ms, states: states });
 			if (SHOTS && sc.shots.indexOf(k) >= 0 && mode !== 'off') {
 				fs.mkdirSync(SHOTS.dir, { recursive: true });
 				await a.page.screenshot({ path: path.join(SHOTS.dir, sc.key + '-notch' + k + '-' + (mode === 'master' ? 'master' : 'branch') + '-' + SHOTS.tag + '.png') });
@@ -109,12 +110,13 @@ async function main() {
 	if (!executablePath) { console.error(NAME + ': no Chromium found (set CHROME_PATH). SKIPPING.'); env.stopServer(); process.exit(0); }
 	const browser = await chromium.launch({ executablePath });
 	const sum = (rows, f) => rows.reduce((t, r) => t + f(r), 0);
+	const cnt = { lost: 0, noGain: 0, hvm: 0, lng: 0 };
 	const tot = { on: { rows: 0, shed: 0, hidden: 0, strikes: 0, ms: 0, shown: 0, leaders: 0, asked: 0 }, off: { rows: 0, shed: 0, hidden: 0, strikes: 0, ms: 0, shown: 0, leaders: 0, asked: 0 }, master: { rows: 0, shed: 0, hidden: 0, strikes: 0, ms: 0, shown: 0, leaders: 0, asked: 0 } };
 	function add(t, rows) { tot[t].rows += sum(rows, (r) => r.pf.rows); tot[t].shed += sum(rows, (r) => r.pf.shed); tot[t].hidden += sum(rows, (r) => r.pf.hidden); tot[t].strikes += sum(rows, (r) => r.strikes); tot[t].ms += sum(rows, (r) => r.ms); tot[t].shown += sum(rows, (r) => r.pf.shown); tot[t].leaders += sum(rows, (r) => r.pf.leaders); tot[t].asked += sum(rows, (r) => r.pf.asked); }
 	try {
 		for (const sc of SCENES.filter((q) => !process.env.PIPE_FIELDS_ONLY || process.env.PIPE_FIELDS_ONLY.split(',').indexOf(q.key) >= 0)) {
 			const on = await layOut(Session, browser, sc, 'on'), off = await layOut(Session, browser, sc, 'off');
-			const mas = process.env.PIPE_FIELDS_MASTER ? await layOut(Session, browser, sc, 'master') : null;
+			const mas = await layOut(Session, browser, sc, 'master');
 			ok(sc.key + ': no page errors', !on.errors.length && !off.errors.length, (on.errors[0] || off.errors[0] || '').slice(0, 200));
 			add('on', on.rows); add('off', off.rows); if (mas) { add('master', mas.rows); }
 			on.rows.forEach((r, i) => {
@@ -123,10 +125,28 @@ async function main() {
 					sc.named.map((id) => { const n = r.named[id], nb = b.named[id]; const f = (x) => !x ? '?' : (x.shown ? (x.level ? 'level ' : 'along ') + x.values + (x.leader ? ' ldr' : '') : 'hid'); return `; L${id} ${f(nb)} -> ${f(n)}`; }).join(''));
 				ok(sc.key + ' ' + r.k + ': pipe fields shown not fewer', r.pf.rows >= b.pf.rows, `${b.pf.rows} -> ${r.pf.rows}`);
 				ok(sc.key + ' ' + r.k + ': no more pipe labels hidden', r.pf.hidden <= b.pf.hidden, `${b.pf.hidden} -> ${r.pf.hidden}`);
+				// Per label (round 6): a label the rule off shows is never hidden by the rule; a label the rule moves from along its pipe to a
+				// leader gains at least one field; and against master, the labels master shows that are hidden here are counted.
+				const lost = [], noGain = [], hiddenVsMaster = [], leaderNoGain = [];
+				Object.keys(r.states).forEach((id) => {
+					const x = r.states[id], y = b.states[id], z = m && m.states[id];
+					if (y && y.shown && !x.shown) { lost.push('L' + id); }
+					if (y && y.shown && !y.leader && x.shown && x.leader && x.values <= y.values) { noGain.push('L' + id); }
+					if (z && z.shown && !x.shown) { hiddenVsMaster.push('L' + id); }
+					if (z && z.shown && !z.leader && x.shown && x.leader && x.values <= z.values) { leaderNoGain.push('L' + id); }
+				});
+				cnt.lost += lost.length; cnt.noGain += noGain.length; cnt.hvm += hiddenVsMaster.length; cnt.lng += leaderNoGain.length;
+				ok(sc.key + ' ' + r.k + ': no pipe label the rule-off drawing shows is hidden by the rule', !lost.length, lost.join(','));
+				ok(sc.key + ' ' + r.k + ': no label moves from along its pipe to a leader without gaining a field', !noGain.length, noGain.join(','));
+				if (hiddenVsMaster.length || leaderNoGain.length) { console.log(`        ${sc.key} ${r.k}: against master, hidden ${hiddenVsMaster.join(',')}; leader without gain ${leaderNoGain.join(',')}`); }
 				ok(sc.key + ' ' + r.k + ': no more leaders through a label', r.strikes <= b.strikes, `${b.strikes} -> ${r.strikes}`);
 			});
 		}
 		console.log(`        TOTAL pipe fields shown ${process.env.PIPE_FIELDS_MASTER ? tot.master.rows + ' (master) ' : ''}${tot.off.rows} -> ${tot.on.rows}; shed ${tot.off.shed} -> ${tot.on.shed}; hidden ${tot.off.hidden} -> ${tot.on.hidden}; leaders ${tot.off.leaders} -> ${tot.on.leaders}; strikes ${tot.off.strikes} -> ${tot.on.strikes}; pass ${tot.off.ms} -> ${tot.on.ms} ms`);
+		console.log(`        AGAINST MASTER over all views: pipe labels master shows that are hidden here ${cnt.hvm}; moved to a leader without a gain ${cnt.lng}; pipe fields ${tot.master.rows} -> ${tot.on.rows}`);
+		// Round 4 node labels take ground pipe labels held (the accepted node-for-pipe trade): the count against master is a ceiling (87 measured), not zero.
+		ok('pipe fields shown are more than master shows', tot.on.rows > tot.master.rows, `${tot.master.rows} -> ${tot.on.rows}`);
+		ok('pipe labels hidden against master stay within the measured ceiling', cnt.hvm <= (+process.env.PIPE_FIELDS_HVM_CEILING || 100), String(cnt.hvm));
 		ok('over all views, more pipe fields shown', tot.on.rows > tot.off.rows, `${tot.off.rows} -> ${tot.on.rows}`);
 		ok('over all views, fewer pipe labels shed', tot.on.shed < tot.off.shed, `${tot.off.shed} -> ${tot.on.shed}`);
 		ok('the label pass costs at most double the time', tot.on.ms <= 2 * tot.off.ms, `${tot.off.ms} -> ${tot.on.ms} ms`);
