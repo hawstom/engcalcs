@@ -423,8 +423,10 @@
 					var gt = gm[2].split(/\s+/).filter(Boolean);
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
 					else if (gt[0].toLowerCase() === 'well') {
-						// `;ASSEMBLY: well R S T G P`: reservoir, suction, tank, drawdown valve, pump. Anything shorter is not one.
+						// `;ASSEMBLY: well R S T D G P B`: reservoir, pump's upstream node, tank, tee, drawdown valve, pump, virtual pipe to the tank.
+						// A slice-1 well, `well R S T G P` (no tee), is still read. Anything else is not one.
 						if (gt.length === 6) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 4), links: gt.slice(4) }); }
+						else if (gt.length === 8) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 5), links: gt.slice(5) }); }
 					}
 					else if (gt.length >= 4) { markAssemblies.push({ kind: gt[0].toLowerCase(), up: gt[1], down: gt[2], links: gt.slice(3) }); }
 					continue;
@@ -1384,7 +1386,7 @@
 			var un, dn, wn, good;
 			if (a.kind === 'well') {
 				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
-				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && wn[2].type === 'tank' &&
+				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && wn[2].type === 'tank' && (a.nodes.length < 4 || (wn[3] && wn[3].type === 'junction')) &&
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
 					assemblies.push({ id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() });
 				} else { assemblyBad.push(a.links[0]); }

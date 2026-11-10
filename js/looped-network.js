@@ -5570,9 +5570,8 @@ var EngCalcs = EngCalcs || {};
 		if ((prop === 'elev' || prop === 'x' || prop === 'y') && elGroup(el) === 'node' && !assemblyWriting) {
 			var asm = assemblyOfNode(el.id), mates = [];
 			if (asm) {
-				// A well's R and S share the static elevation and T has the ground's, so an elevation reaches only the other of R and S.
-				mates = (asm.kind === 'well' && prop === 'elev' ? asm.nodes.slice(0, 2) : assemblyNodeIds(asm)).filter(function (id) { return id !== el.id; });
-				if (asm.kind === 'well' && prop === 'elev' && asm.nodes.indexOf(el.id) === 2) { mates = []; }
+				// A well's R and S share the static elevation, and its tank T and tee D the ground's: an elevation reaches only its own pair.
+				mates = (asm.kind === 'well' && prop === 'elev' ? (asm.nodes.indexOf(el.id) < 2 ? asm.nodes.slice(0, 2) : asm.nodes.slice(2)) : assemblyNodeIds(asm)).filter(function (id) { return id !== el.id; });
 			}
 			mates.forEach(function (id) {
 				var mate = nodeById(id);
@@ -20779,7 +20778,7 @@ var EngCalcs = EngCalcs || {};
 			var a = assemblyOfNode(p.n.id), r;
 			setProp(p.n, 'elev', p.v);
 			// A Well born where the ground was not yet known has no static level yet: it takes the ground less the round depth.
-			r = a && a.kind === 'well' && a.nodes[2] === p.n.id ? nodeById(a.nodes[0]) : null;
+			r = a && a.kind === 'well' && a.nodes.indexOf(p.n.id) >= 2 ? nodeById(a.nodes[0]) : null;
 			if (r && !terrainHasElev(r)) { setProp(r, 'elev', +(p.v - wellStaticDepth()).toFixed(4)); }
 		});
 		buildDom();
@@ -40109,7 +40108,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function assemblyNodeIds(a) { return a.nodes ? a.nodes.slice() : [a.up, a.down]; }
 	// The link that is the device itself: a pump's or valve's only link, a well's pump (its second).
 	// Where a pipe leaves a device: a pump's or valve's downstream node, a well's tank (the one node its pipes attach to).
-	function assemblyOutNode(a) { return a.kind === 'well' ? a.nodes[2] : a.down; }
+	function assemblyOutNode(a) { return a.kind === 'well' ? wellOutNode(a) : a.down; }
+	// **A WELL'S PIPES JOIN ITS TEE** (Task 822; EPANET's hydstatus.c tankstatus() shuts a link whose flow fills a full tank, so a pump that
+	// fed the system THROUGH the tank would be silenced by a full one): `nodes` is [R, S, T, D] and `links` [G, P, B], D the pump's downstream
+	// node and B a virtual pipe from D to the tank, so a full tank shuts only B. A slice-1 well (three nodes, two links, no tee) is read as it was
+	// and its pipes join the tank.
+	function wellOutNode(a) { return a.nodes[3] || a.nodes[2]; }
 	function assemblyDeviceLink(a) { return linkById(a.kind === 'well' ? a.links[1] : a.links[0]); }
 	function assemblyOfNode(id) {
 		var list = assemblyList(), i;
@@ -40137,7 +40141,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!a || !Array.isArray(a.links) || !a.links.length) { return; }
 			if (!a.links.every(function (id) { return linkIds[id]; })) { return; }
 			if (a.kind === 'well') {
-				wellOk = Array.isArray(a.nodes) && a.nodes.length === 3 && a.links.length === 2 && a.nodes.every(function (id) { return nodeIds[id]; });
+				wellOk = Array.isArray(a.nodes) && (a.nodes.length === 3 ? a.links.length === 2 : a.nodes.length === 4 && a.links.length === 3) && a.nodes.every(function (id) { return nodeIds[id]; });
 				if (wellOk) { out.push({ id: a.id !== undefined ? a.id : a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice() }); }
 				return;
 			}
@@ -40174,7 +40178,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// candidates. The first candidate is the snug one; the next two stand a little further out.
 	function assemblyLabelSides(n, fs, lineCount) {
 		var a = assemblyOfNode(n.id);
-		return a ? assemblyLabelCandidates(a, (a.kind === 'well' ? a.nodes[2] : a.down) === n.id ? 1 : -1, 0, labelBoxWidth(nodeEls[n.id]), dataLabelBoxHeight(lineCount), nodeAt(n), fs) : null;
+		return a ? assemblyLabelCandidates(a, assemblyOutNode(a) === n.id ? 1 : -1, 0, labelBoxWidth(nodeEls[n.id]), dataLabelBoxHeight(lineCount), nodeAt(n), fs) : null;
 	}
 	// **THE PUMP'S OR VALVE'S OWN LABEL** (Task 822; Tom, 2026-11-09: *"I don't see the link labels"*) takes the one
 	// quarter of the symbol the two node labels leave: the downstream half, on the side of the pipe the upstream label
@@ -40264,13 +40268,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var a = assemblyOfNode(id), i;
 		if (!a || a.kind !== 'well') { return null; }
 		i = a.nodes.indexOf(id);
-		return i === 0 ? 'R' : i === 1 ? 'S' : 'T';
+		return i === 0 ? 'R' : i === 1 ? 'S' : i === 2 ? 'T' : 'D';
 	}
 	function syncAssemblyGlyphs() {
 		var wellLinks = {};
 		assemblyList().forEach(function (a) { if (a.kind === 'well') { a.links.forEach(function (id) { wellLinks[id] = 1; }); } });
 		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id], role = wellRoleOf(n.id), hid = role === 'R' || role === 'S', isT = role === 'T';
+			var ne = nodeEls[n.id], role = wellRoleOf(n.id), hid = role === 'R' || role === 'S' || role === 'D', isT = role === 'T';
 			if (!ne) { return; }
 			[ne.circle, ne.hit, ne.symbolG].forEach(function (e) { if (e) { e.classList.toggle('lpn-asm-hid', hid); } });
 			if (n.type !== 'tank' || !ne.symbol) { return; }
@@ -40354,34 +40358,39 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The groundwater's depth below the ground a new Well opens on, a round number in the displayed unit: 100 ft, or 30 m. The unit's
 	// own key is 'fth2o' (head in feet of water), not 'ft'; with the wrong key the 30 m was converted and a Well opened 98.4252 ft down.
 	function wellStaticDepth() { return niceDefault('lpn_u_elevhead', 'fth2o', 100, 30); }
-	function completeWell(t) {
-		var ground = typeof t.elev === 'number' ? t.elev : (scnSetting('defaults') || {}).nodeElev,
-			// Where the ground is still to be read from the DEM, the static level waits for it (terrainFillElevations()).
-			stat = typeof ground === 'number' && !(typeof t.elev !== 'number' && elevSourceIsDem()) ? +(ground - wellStaticDepth()).toFixed(4) : undefined,
-			base = mintGroupBase('W', ['R', 'U', 'V', 'T']),
-			r, s, g, p, a;
-		renameFresh(t, base + 'T');
-		r = addNode('reservoir', t.x, t.y, base + 'R'); s = addNode('junction', t.x, t.y, base + 'U');
+	function completeWell(d, x, y) {
+		var ground = d ? d.elev : undefined,
+			base = mintGroupBase('W', ['R', 'U', 'V', 'T', 'D', 'B']),
+			stat, r, s, g, p, t, b, a;
+		if (typeof ground !== 'number') { ground = (scnSetting('defaults') || {}).nodeElev; }
+		// Where the ground is still to be read from the DEM, the static level waits for it (terrainFillElevations()).
+		stat = typeof ground === 'number' && !(d && typeof d.elev !== 'number' && elevSourceIsDem()) ? +(ground - wellStaticDepth()).toFixed(4) : undefined;
+		if (d) { renameFresh(d, base + 'D'); } else { d = addNode('junction', x, y, base + 'D'); }
+		t = addNode('tank', d.x, d.y, base + 'T');
+		if (typeof d.elev === 'number') { t.elev = d.elev; }   // base-write: construction: the tank stands where the tee stands
+		r = addNode('reservoir', d.x, d.y, base + 'R'); s = addNode('junction', d.x, d.y, base + 'U');
 		// The static level is the groundwater's, so neither node reads the land surface.
 		if (stat !== undefined) { r.elev = stat; s.elev = stat; }   // base-write: construction
 		s._demand = 0;   // base-write: construction: the suction draws nothing
 		g = addLink('valve', r.id, s.id, [], base + 'V');
 		g.valveType = 'GPV'; g._setting = defaultValveSetting('GPV');   // base-write: construction
-		p = addLink('pump', s.id, t.id, [], base);
-		a = { id: p.id, kind: 'well', nodes: [r.id, s.id, t.id], links: [g.id, p.id] };
+		p = addLink('pump', s.id, d.id, [], base);
+		b = addLink('pipe', d.id, t.id, [], base + 'B');
+		b.virtual = true;   // base-write: construction: the tank's own branch, a virtual pipe
+		a = { id: p.id, kind: 'well', nodes: [r.id, s.id, t.id, d.id], links: [g.id, p.id, b.id] };
 		if (!doc.assemblies) { doc.assemblies = []; }
 		doc.assemblies.push(a);
 		syncAssemblyGlyphs();
 		assemblyNodeIds(a).forEach(function (nid) { layoutNodeLabel(nid); });
 		return a;
 	}
-	function addWell(x, y) { return completeWell(addNode('tank', x, y)); }
+	function addWell(x, y) { return completeWell(null, x, y); }
 	// Clicking a pipe splices the well in: the pipe now ends at the tank and its other half starts there, so the tank is the one
 	// node the system sees. The ground elevation is interpolated along the pipe, as for any spliced assembly.
 	function spliceWell(pipe, wx, wy) {
 		var e1 = nodeById(pipe.from).elev, e2 = nodeById(pipe.to).elev,
 			frac = Geom.nearestFractionOnPolyline(linkPointList(pipe), wx, wy).f,
-			r = breakPipeAtPoint(pipe, 'tank', wx, wy, null);
+			r = breakPipeAtPoint(pipe, 'junction', wx, wy, null);
 		if (typeof e1 === 'number' && typeof e2 === 'number') { r.node.elev = +(e1 + frac * (e2 - e1)).toFixed(4); }   // base-write: construction
 		return completeWell(r.node);
 	}
@@ -60594,7 +60603,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// Tom, 2026-11-09): water flows into the device through a pipe that ends there and out through one that
 					// starts there. Silent, because the two nodes lie on one point and the press cannot say which was meant.
 					asmHit = hitId ? assemblyOfNode(hitId) : null;
-				if (asmHit) { hitId = asmHit.kind === 'well' ? asmHit.nodes[2] : pendingLinkFrom ? asmHit.up : asmHit.down; }
+				if (asmHit) { hitId = asmHit.kind === 'well' ? wellOutNode(asmHit) : pendingLinkFrom ? asmHit.up : asmHit.down; }
 				if (asmHit && pendingLinkFrom && assemblyOfNode(pendingLinkFrom) === asmHit) { hitId = pendingLinkFrom; }   // a pipe from a device to itself is nothing
 				if (hitId) {
 					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
@@ -60804,7 +60813,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var node, asmHit = onNode ? assemblyOfNode(onNode) : null, cont;
 		// The same rule as the pipe tool: a leg that ends at a Pump+ or Valve+ ends at its upstream node, and a chain
 		// that starts or goes on from one starts at its downstream node.
-		if (asmHit) { onNode = asmHit.kind === 'well' ? asmHit.nodes[2] : pendingLinkFrom ? (assemblyOfNode(pendingLinkFrom) === asmHit ? pendingLinkFrom : asmHit.up) : asmHit.down; }
+		if (asmHit) { onNode = asmHit.kind === 'well' ? wellOutNode(asmHit) : pendingLinkFrom ? (assemblyOfNode(pendingLinkFrom) === asmHit ? pendingLinkFrom : asmHit.up) : asmHit.down; }
 		if (!pendingLinkFrom) {
 			if (!onNode) {
 				saveUndoSnapshot();
