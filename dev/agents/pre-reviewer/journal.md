@@ -4928,3 +4928,21 @@ SPECULATION: the Net1 refusal may surprise Tom, who named Net1 to test; wording 
 - NOT DONE: label setting with one value vs four (my fixture did not load; labels stayed default); Recalculate off; save-reopen; Explode by hand. Harnesses pump-plus, valve-plus, pump-plus-drag-browser (23/23) pass.
 - Method note: Pump+ placed on pipe via click at SVG path midpoint; label boxes via getBoundingClientRect.
 - OBSERVED (CC, 2026-11-08): the 45/135 defect was fixed in 3e0e73295 with a 15-degree angle sweep harness; not re-reviewed.
+
+## 2026-11-09 feat/assembly round 4 + Well slice 1 (82d965b73..b30b60829)
+- OBSERVED (re-verify): harnesses pass: assembly-link-labels-browser 20/20, pump-plus-drag-browser 27/27, well-harness, virtual-pipe 38, pump-plus-harness.
+- OBSERVED: Pump+ tip sentence 1 correct; link labels P1/V1 and well V2/P2 drawn on Net1; pipes join U/D (harness).
+- OBSERVED DEFECT: Well with defaults (no curves) solves to Q=55,165,528 gpm in EPANET and 26,576,604,447 gpm in built-in; nothing says why.
+- OBSERVED DEFECT: Properties box of a Pump+/Valve+/Well is titled "Properties: Text" (propsBoxTitleText falls through for currentPopup.kind 'assembly'; since 11-06).
+- Method: scratchpad perry.js perry2.js; pictures in _panel/www/img/pump-plus/*-v4.png.
+
+
+## 2026-11-09 feat/label-open-side round 4 (5bba9cc8f), Task 812
+OBSERVED (re-verify; real Chromium, master fba145651 = merge-base vs branch, Novato 1920x1000 at Tom's fields, labelMaxWidth blank; probe in scratchpad p/):
+- N161 hidden on master at 9.25 and 9.5 notches (about N163); branch shows it at all 56 notches swept 7-11; "Q=7565.7" is L179, and on branch it is shown at 9.25, 9.5, 9.75, 10 (master lacked it at 9.0 to 9.0); only 8.75 loses L179 (master had both). The trade is real only at one in-between zoom.
+- Novato full labels 14 notches: values up at 12 of 14 (+3..+64), down 9 at notch 13; leaders +20-30% (58->71 at 0, 60->89 at 4). Median leader length unchanged or shorter, max unchanged. Labels lost that master showed: 5-11 pipe labels at every notch, plus N20 (notches 1, 4), N247 (8).
+- Pipes alone (node labels off), 56 notches 1-12: branch differs from master in 2 views, +2 leaders over 1730. L181 already had a leader on master at 3,4,6,7,9; L185 leaderless at 4.5-9 on both; L233 same. The round's pipe-label work does not change this view.
+- Leader through another label (bbox audit, may over-count): Novato branch has new cases at notches 0,3,4,5,8,12 (N139 over N141, N229 over L261 ...); master also has 0-4 per view.
+- n600 1920 notch 9: 367 -> 510 leaders on 542 labels. n600 phone: 77 -> 145 at notch 9.
+- Net1, Net3 phone: no new overlaps; Net3 phone notch 6 swaps L330 for NRiver.
+- NOT DONE: mutation test of harness; Tom's own window size; a fixed fit scale for non-Novato scenes (fit differs between trees, Net1 notch 12 not comparable).
