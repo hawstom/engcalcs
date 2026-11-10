@@ -48,7 +48,7 @@ async function expected(inp, ruleStep) {
 async function main(outDir) {
 	const env = await ft.setup();
 	const inp = compositeNet();
-	const report = ft.writePair(env, inp, 'ctl-composite-test', { pressureControls: true }, outDir);
+	const report = ft.writePair(env, inp, 'ctl-composite-test', undefined, outDir);
 	return { inp: inp, report: report };
 }
 

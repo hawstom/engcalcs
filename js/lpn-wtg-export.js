@@ -729,10 +729,10 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 	// in the codes Tom's own saved wtg-control-1 showed (dev/wtg-export.md, "Tank-level controls").
 	// A junction-pressure condition has no sample, so its link keeps the frozen clock schedule.
 	const levelCtl = opts.frozenLevelControls ? [] : (parsed.controls || []).filter((c) => c.condition && c.condition.kind === 'node'
-		&& nodeById[c.condition.node] && (nodeById[c.condition.node].type === 'tank' || (opts.candidate && opts.candidate.pressureControls && nodeById[c.condition.node].type === 'junction')) && pipeElId[c.link]
+		&& nodeById[c.condition.node] && (nodeById[c.condition.node].type === 'tank' || nodeById[c.condition.node].type === 'junction') && pipeElId[c.link]
 		&& (c.condition.cmp === 'below' || c.condition.cmp === 'above'));
 	// [RULES] of the simplest shape (carriableRules) join them as logical controls. A link a written rule acts on keeps no frozen schedule.
-	const ruleCtl = carriableRules(parsed, (opts.candidate && opts.candidate.pressureControls)).written;
+	const ruleCtl = carriableRules(parsed).written;
 	const realLinks = {};
 	levelCtl.forEach((c) => { realLinks[c.link] = 1; });
 	ruleCtl.forEach((c) => { c.thenActs.concat(c.elseAct ? [c.elseAct] : []).forEach((a) => { realLinks[a.link] = 1; }); });
@@ -802,7 +802,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const sym = cd.cmp === 'below' ? '<' : '>';
 		const cId = newId();
 		const cName = 'Node-' + cd.node + '-' + cd.cmp + '-' + cd.value;
-		// CANDIDATE (opts.candidate.pressureControls): a junction pressure condition, the codes of Tom's ctl-pressure-time save
+		// A junction pressure condition (written always since 2026-11-09), the codes of Tom's ctl-pressure-time save
 		// (NodeAttribute 2, value in ElementType_Pressure in psi, element type 50, tank row at 1). The 2-pressure run (2026-11-09)
 		// showed WaterGEMS applying it, one hydraulic step later than EPANET (dev/wtg-export.md).
 		const isJ = nodeById[cd.node].type === 'junction';
@@ -1291,10 +1291,11 @@ function ageTraceCarriable(parsed) {
 var CRS_WRITTEN = 'EPSG:2223';
 
 // [RULES] that WaterGEMS holds as a logical control (Tom's ctl-logical and ctl-composite saves): one or two premises joined by AND or by
-// OR (each a tank level above or below a value, or with `pressure` a junction pressure), one or more THEN actions and at most one ELSE
+// OR (each a tank level above or below a value, or a junction pressure), one or more THEN actions and at most one ELSE
 // action, each setting a pump's or pipe's status, and an optional PRIORITY. Several ELSE actions have no saved example. Everything
 // else is named in `unwritten` (the rule's name) and stays out.
-function carriableRules(parsed, pressure) {
+function carriableRules(parsed) {
+	const pressure = true;
 	const out = { written: [], unwritten: [] };
 	const lines = parsed.rules || [];
 	if (!lines.length || !EngCalcs.lpnRuleParse) { if (lines.length) { out.unwritten.push('?'); } return out; }
@@ -1380,12 +1381,12 @@ function plan(doc, opts) {
 	// An energy line that names a price pattern the project does not define (a price, a pattern and a demand charge are written).
 	const price = energyNotWritten(secs.ENERGY || [], (parsed.patterns || []).map((q) => q.id));
 	if (price.length) { notCarried.push({ code: 'energy_price', ids: [] }); }
-	{ const rc = carriableRules(parsed, !!(opts && opts.candidate && opts.candidate.pressureControls)); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
+	{ const rc = carriableRules(parsed); if (rc.unwritten.length) { notCarried.push({ code: 'rules', ids: rc.unwritten }); } }
 	const frozen = [];
 	(parsed.controls || []).forEach((c) => {
 		const cond = c.condition || {};
 		const tankLevel = cond.kind === 'node' && (cond.cmp === 'below' || cond.cmp === 'above')
-			&& nodes.some((n) => n.id === cond.node && n.type === 'tank');
+			&& nodes.some((n) => n.id === cond.node && (n.type === 'tank' || n.type === 'junction'));
 		const clock = cond.kind !== 'node';
 		if (!tankLevel && !clock && frozen.indexOf(c.link) < 0) { frozen.push(c.link); }
 	});

@@ -306,21 +306,17 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			ok('pump level controls: both sit in the control set the operational alternative names', rows(db, 'SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection')[0].c === 2 && rows(db, 'SELECT Operational_IdahoControlSetID AS s FROM Operational_SystemData')[0].s !== null);
 			db.close();
 		}
-		// 3. a junction pressure condition (candidate only: the control in Tom's save was never in the control set)
+		// 3. a junction pressure condition (written always since 2026-11-09: Tom's 2-pressure run showed WaterGEMS applying it)
 		{
 			const inp = sv.CASES['ctl-pressure-time'](base).replace(' LINK PU1 OPEN AT TIME 6', '');
-			const wc = plainWrite(inp, { candidate: { pressureControls: true } });
+			const wc = plainWrite(inp);
 			const db = wrap(wc.bytes);
 			const j1 = elOf(db, 'J1');
 			const e = rows(db, 'SELECT * FROM IdahoControlCondition_SimpleConditionType_ElementType')[0];
 			const op = rows(db, 'SELECT * FROM IdahoControlCondition_ConditionType_SimpleConditionType')[0];
-			ok('pressure condition (candidate): J1, 60 in the pressure column, element type 50, node attribute 2, operator greater (1), as Tom\'s save', e && e.ElementType_Element === j1 && e.ElementType_Pressure === 60 && e.ElementType_TankLevel === 0 && e.ControlConditionElementType === 50
+			ok('pressure condition: J1, 60 in the pressure column, element type 50, node attribute 2, operator greater (1), as Tom\'s save', e && e.ElementType_Element === j1 && e.ElementType_Pressure === 60 && e.ElementType_TankLevel === 0 && e.ControlConditionElementType === 50
 				&& rows(db, 'SELECT NodeAttribute AS a FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType')[0].a === 2 && op.SimpleConditionType === 0 && op.CompareOperator === 1, JSON.stringify(e));
 			db.close();
-			const wp = plainWrite(inp);
-			const dbp = wrap(wp.bytes);
-			ok('without the candidate flag no pressure condition is written', rows(dbp, 'SELECT COUNT(*) AS c FROM IdahoControlCondition_ControlConditionElementType_ControlConditionNodeType WHERE NodeAttribute = 2')[0].c === 0);
-			dbp.close();
 		}
 		// 4. pressure-driven demand: power 0.5, threshold 40 psi
 		{
@@ -385,26 +381,25 @@ function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 			ok('rule without ELSE or priority: 0, 0, NULL, 0', l2.length === 1 && l2[0].LogicalType_HasPriority === 0 && l2[0].LogicalType_HasElse === 0 && l2[0].LogicalType_ElseAction === null && l2[0].ControlPriority === 0, JSON.stringify(l2));
 			db2.close();
 			// two premises: not written, named
-			const two = addRule(base, 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const two = addRule(base, 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nAND NODE J0 PRESSURE ABOVE 20\nTHEN PUMP PU1 STATUS IS OPEN');
 			const w3 = plainWrite(two);
 			const db3 = wrap(w3.bytes);
-			ok('a two-premise AND rule is not written', rows(db3, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 0);
+			ok('a three-premise rule is not written', rows(db3, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 0);
 			db3.close();
 			ok('...and the not-written list names it (rule 7)', unw(two).join() === '7', unw(two).join());
 			// mixed: written rule 1, unwritten rule 7; only 7 is reported
-			const mix = addRule(addRule(base, 'RULE 1\nIF TANK T1 LEVEL BELOW 14\nTHEN PUMP PU1 STATUS IS OPEN\nELSE PUMP PU1 STATUS IS CLOSED\nPRIORITY 3'), 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN');
+			const mix = addRule(addRule(base, 'RULE 1\nIF TANK T1 LEVEL BELOW 14\nTHEN PUMP PU1 STATUS IS OPEN\nELSE PUMP PU1 STATUS IS CLOSED\nPRIORITY 3'), 'RULE 7\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nAND NODE J0 PRESSURE ABOVE 20\nTHEN PUMP PU1 STATUS IS OPEN');
 			const dbm = wrap(plainWrite(mix).bytes);
 			ok('a mix writes rule 1 and reports only rule 7', rows(dbm, 'SELECT COUNT(*) AS c FROM IdahoControl')[0].c === 1 && unw(mix).join() === '7', unw(mix).join());
 			dbm.close();
 			// pressure premise only with the candidate flag
 			const pr = addRule(base, 'RULE 3\nIF NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS CLOSED');
-			ok('a junction pressure rule is held back without the candidate flag and written with it', unw(pr).join() === '3' && unw(pr, true).length === 0);
+			ok('a junction pressure rule is written without any flag', unw(pr).length === 0, unw(pr).join());
 			// composite rules (Tom's ctl-composite save of 2026-11-09): AND, OR and several THEN actions
 			const comp = addRule(base, 'RULE 1\nIF TANK T1 LEVEL BELOW 14\nAND NODE J1 PRESSURE ABOVE 30\nTHEN PUMP PU1 STATUS IS OPEN\n\nRULE 2\nIF TANK T1 LEVEL ABOVE 20\nOR NODE J1 PRESSURE ABOVE 38\nTHEN PUMP PU1 STATUS IS CLOSED\n\nRULE 3\nIF TANK T1 LEVEL ABOVE 22\nTHEN PUMP PU1 STATUS IS CLOSED\nAND PIPE 2 STATUS IS CLOSED');
-			ok('composite: held back without the candidate flag, rules 1 and 2 named (they test a pressure), rule 3 written', unw(comp).join() === '1,2', unw(comp).join());
-			ok('composite: none is left in the not-written list with the candidate flag', unw(comp, true).length === 0, unw(comp, true).join());
-			{
-				const dbc = wrap(plainWrite(comp, { candidate: { pressureControls: true } }).bytes);
+			ok('composite: all three rules written without any flag', unw(comp).length === 0, unw(comp).join());
+						{
+				const dbc = wrap(plainWrite(comp).bytes);
 				const R = (sql, a) => rows(dbc, sql, a);
 				const ctls = R('SELECT SupportElementID AS id, IdahoControl_ControlCondition AS c, IdahoControl_ControlAction AS a FROM IdahoControl ORDER BY SupportElementID');
 				ok('composite: three controls, all in the one control set', ctls.length === 3 && R('SELECT COUNT(*) AS c FROM IdahoLogicalControlSet_LogicalControlCollection')[0].c === 3 && R('SELECT LogicalControlCollectionCount AS n FROM IdahoLogicalControlSet')[0].n === 3, JSON.stringify(ctls));
