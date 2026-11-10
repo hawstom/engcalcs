@@ -808,7 +808,7 @@ function writeWtgBody(SQL, templateBytes, parsed, schedule, opts, hold) {
 		const isJ = nodeById[cd.node].type === 'junction';
 		const plain = cd.node + (isJ ? ' Pressure' : ' Level') + ' ' + sym + ' ' + fmt2(cd.value) + (isJ ? ' psi' : ' ft');
 		let condTxt = cName + ' {"' + cd.node + '" ' + (isJ ? 'Pressure' : 'Level') + ' ' + sym + ' ' + fmt2(cd.value) + (isJ ? ' psi}' : ' ft}');
-		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt.replace(/"/g, '""') + '}');
+		supportElement(cId, 56, 'C' + cId, '{C' + cId + ':  ' + condTxt + '}');
 		if (parentOf) {
 			condTxt = parentOf.plain;
 			setRows('IdahoControlCondition', cId, { IdahoControlCondition_DefineDescription: 0, IdahoControlCondition_Description: 'text', IdahoControlCondition_ExpandedDescription: condTxt, ConditionType: 1 });
