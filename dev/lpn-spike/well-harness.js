@@ -40,6 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\tselected: function () { return selectedRefs(); },\n" +
 	"\t\tsetProp: setProp, effective: effective,\n" +
 	"\t\topenPopup: openPopup, openLinkPopup: openLinkPopup, getPopup: function () { return currentPopup; },\n" +
+	"\t\tterrainFill: terrainFillElevations, wellUnderground: wellUnderground,\n" +
 	"\t\tapplySaved: applySaved, migrateSaved: migrateSaved, serializeProject: serializeProject,\n" +
 	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
 	"\t\tdeleteNode: deleteNode, deleteLink: deleteLink, linkEls: function () { return linkEls; },\n" +
@@ -118,6 +119,7 @@ console.log('\n--- 1. place on open ground ---');
 		JSON.stringify({ id: 'W1', kind: 'well', nodes: ['W1R', 'W1U', 'W1T'], links: ['W1V', 'W1'] }), JSON.stringify(w));
 	const R = L.nodeById('W1R'), S = L.nodeById('W1U'), T = L.nodeById('W1T');
 	ok('the static elevation is the same at R and S, and below the ground', R.elev === S.elev && R.elev < T.elev, R.elev + ' ' + S.elev + ' ' + T.elev);
+	ok('in SI the static elevation opens a round 30 m below the ground', R.elev === +(T.elev - 30).toFixed(4), R.elev + ' vs ground ' + T.elev);
 	ok('the reservoir states no head of its own (it follows the static elevation)', R.head === undefined);
 	ok('the suction node has no demand', !S._demand);
 	ok('one undo step', L.undoDepth() === d0 + 1, L.undoDepth() - d0);
@@ -134,6 +136,27 @@ console.log('\n--- 1. place on open ground ---');
 	ok('undo takes the second away whole', L.getDoc().nodes.length === 5 && L.getDoc().links.length === 2 && L.getDoc().assemblies.length === 1);
 	L.undo();
 	ok('and the first', L.getDoc().nodes.length === 0 && L.getDoc().links.length === 0 && L.getDoc().assemblies.length === 0);
+}
+
+console.log('\n--- 1b. the default static level, in each unit ---');
+{
+	// Tom, 2026-11-09: a Well at ground 0 came in at -98.4252, 30 m shown in feet. In US units it is a round 100 ft.
+	setUnitSet('us');
+	const d2 = fresh(); L.setMode('add-well'); press(200, 150);
+	const R2 = L.nodeById('W1R'), T2 = L.nodeById('W1T');
+	ok('in US units the static elevation opens a round 100 ft below the ground, not 98.4252', R2.elev === +(T2.elev - 100).toFixed(4), R2.elev + ' vs ground ' + T2.elev);
+	setUnitSet('si'); fresh(); L.setMode('add-well'); press(200, 150);
+}
+
+console.log('\n--- 1c. the ground from the DEM, and the static level that follows it ---');
+{
+	const doc = fresh(); L.setMode('add-well'); press(200, 150);
+	ok('the reservoir and the pump node are underground: no door that reads the land surface may write them; the tank is not', L.wellUnderground('W1R') && L.wellUnderground('W1U') && !L.wellUnderground('W1T'));
+	// A Well born where the ground was still to be read has no static level yet; the DEM reading of its tank gives it one.
+	delete L.nodeById('W1R').elev; delete L.nodeById('W1U').elev; delete L.nodeById('W1T').elev;
+	const wrote = L.terrainFill([{ id: 'W1T', meters: 1000 }, { id: 'W1R', meters: 1000 }, { id: 'W1U', meters: 1000 }]);
+	ok('the DEM fill wrote the tank only, from its reading', L.nodeById('W1T').elev === 1000, JSON.stringify(wrote));
+	ok('and the static level is that ground less 30 m, at the reservoir and the pump node alike', L.nodeById('W1R').elev === 970 && L.nodeById('W1U').elev === 970, L.nodeById('W1R').elev + ' ' + L.nodeById('W1U').elev);
 }
 
 console.log('\n--- 2. place by pressing a pipe ---');

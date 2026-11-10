@@ -20553,6 +20553,10 @@ var EngCalcs = EngCalcs || {};
 	// **A NODE THAT ALREADY HAS AN ELEVATION IS NOT IN THE LIST AND IS NOT IN THE WRITE.** The test
 	// is made twice on purpose -- once to build the request, once at the moment of writing -- because
 	// between the two a person may have typed one, and only the user touches a file's numbers.
+	// A Well's groundwater reservoir and pump node stand at the static elevation, below the land surface: no door that reads the land
+	// surface (a new node, Find and replace, Read DEM) ever writes them. The Well's own ground, on its tank, is filled and the static
+	// level follows it (terrainFillElevations()).
+	function wellUnderground(id) { var r = wellRoleOf(id); return r === 'R' || r === 'S'; }
 	function terrainHasElev(n) { var e = effective(n, 'elev'); return typeof e === 'number' && isFinite(e); }
 	/**
 	 * **THE LON/LAT OF NODES SOMEBODY ELSE CHOSE** (Task 542). The two new doors -- a node born on a
@@ -20643,7 +20647,7 @@ var EngCalcs = EngCalcs || {};
 		var out = [];
 		(ids || []).forEach(function (id) {
 			var n = nodeById(id), ll = nodeLonLat(n);
-			if (!n || !ll) { return; }
+			if (!n || !ll || wellUnderground(id)) { return; }
 			out.push({ id: n.id, lon: ll.lon, lat: ll.lat });
 		});
 		return out;
@@ -20652,7 +20656,7 @@ var EngCalcs = EngCalcs || {};
 		if (!projectLocatable()) { return []; }
 		var out = [];
 		doc.nodes.forEach(function (n) {
-			if (terrainHasElev(n)) { return; }
+			if (terrainHasElev(n) || wellUnderground(n.id)) { return; }
 			var ll = nodeLonLat(n);
 			if (!ll) { return; }
 			out.push({ id: n.id, lon: ll.lon, lat: ll.lat });
@@ -20751,7 +20755,7 @@ var EngCalcs = EngCalcs || {};
 		var pending = [];
 		(list || []).forEach(function (e) {
 			var n = nodeById(e.id);
-			if (!n) { return; }
+			if (!n || wellUnderground(e.id)) { return; }
 			// Recorded BEFORE the write is decided, so a reading is remembered even where the
 			// elevation is left alone -- see terrainLastRead's own note.
 			if (typeof e.meters === 'number' && isFinite(e.meters)) { terrainLastRead[e.id] = e.meters; }
@@ -20770,7 +20774,13 @@ var EngCalcs = EngCalcs || {};
 		// said. Returning early without this left the button looking like it had done nothing.
 		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
-		pending.forEach(function (p) { setProp(p.n, 'elev', p.v); });
+		pending.forEach(function (p) {
+			var a = assemblyOfNode(p.n.id), r;
+			setProp(p.n, 'elev', p.v);
+			// A Well born where the ground was not yet known has no static level yet: it takes the ground less the round depth.
+			r = a && a.kind === 'well' && a.nodes[2] === p.n.id ? nodeById(a.nodes[0]) : null;
+			if (r && !terrainHasElev(r)) { setProp(r, 'elev', +(p.v - wellStaticDepth()).toFixed(4)); }
+		});
 		buildDom();
 		refreshPopupIfOpen();
 		scheduleSolve();
@@ -40340,10 +40350,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * its curve is the head it lifts from the pumping level. Every one is an ordinary node or link in `doc.nodes` and
 	 * `doc.links`; the grouping only says they are managed as one. The caller has taken the undo snapshot.
 	 */
-	function wellStaticDepth() { return niceDefault('lpn_u_elevhead', 'ft', 100, 30); }
+	// The groundwater's depth below the ground a new Well opens on, a round number in the displayed unit: 100 ft, or 30 m. The unit's
+	// own key is 'fth2o' (head in feet of water), not 'ft'; with the wrong key the 30 m was converted and a Well opened 98.4252 ft down.
+	function wellStaticDepth() { return niceDefault('lpn_u_elevhead', 'fth2o', 100, 30); }
 	function completeWell(t) {
 		var ground = typeof t.elev === 'number' ? t.elev : (scnSetting('defaults') || {}).nodeElev,
-			stat = typeof ground === 'number' ? +(ground - wellStaticDepth()).toFixed(4) : undefined,
+			// Where the ground is still to be read from the DEM, the static level waits for it (terrainFillElevations()).
+			stat = typeof ground === 'number' && !(typeof t.elev !== 'number' && elevSourceIsDem()) ? +(ground - wellStaticDepth()).toFixed(4) : undefined,
 			base = mintGroupBase('W', ['R', 'U', 'V', 'T']),
 			r, s, g, p, a;
 		renameFresh(t, base + 'T');
@@ -40493,6 +40506,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			function () { return effective(t, 'elev'); },
 			function (v) { setProp(t, 'elev', v); updateNode(t.id, true); refreshPopupIfOpen(); },
 			pc.lpn_tank_ground_elev_tip, { el: t, prop: 'elev' });
+		elevationDemRow(fields, t, t.id, function (v) { setProp(t, 'elev', v); updateNode(t.id, true); });
 		unitNumberField(fields, pc.lpn_field_well_static || 'Static elevation', 'lpn_u_elevhead',
 			function () { return effective(r, 'elev'); },
 			function (v) { setProp(r, 'elev', v); updateNode(r.id, true); updateNode(s.id, true); refreshPopupIfOpen(); },
