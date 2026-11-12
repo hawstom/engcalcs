@@ -28971,7 +28971,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * and no more; a tag is one token of somebody's asset register.
 	 */
 	function paneColDesc() {
-		return { key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
+		return { key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8, headingWidthOnly: true,
 			get: function (el) { return el.desc || ''; },
 			set: function (el, v) {
 				var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
@@ -29807,7 +29807,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Written out here rather than borrowed because a customer's every write goes through
 			// `customerEdited()`, which redraws the symbol and re-solves, and neither borrowed cell
 			// knows that.
-			{ key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
+			{ key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8, headingWidthOnly: true,
 				get: function (c) { return c.desc || ''; },
 				set: function (c, v) {
 					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();

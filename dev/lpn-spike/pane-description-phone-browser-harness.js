@@ -1,3 +1,5 @@
+// (Superseded for desktop by pane-description-heading-width-browser-harness.js: the column now opens at its
+// heading's width, not its content's.)
 // THE DESCRIPTION COLUMN DOES NOT OPEN WIDER THAN THE TABLES PANE ON A PHONE (Tom, 2026-11-08, testing at
 // phone width: "We can't let the Description column be initially so wide on a phone."). The initial width
 // rule (a) holds the longest present content, with no ceiling, so one long Description made the column
@@ -98,7 +100,8 @@ async function main() {
 		ok('390: a dragged width is kept even beyond the pane', d.th > d.pane, d.th + ' vs ' + d.pane);
 		const w = await measure(Session, browser, { width: 1440, height: 900 });
 		console.log('  1440: description column ' + w.th + ' px, pane ' + w.pane + ' px, longest value ' + w.longest + ' chars');
-		ok('1440: the Description column still holds its content (desktop unchanged)', w.th > 800, String(w.th));
+		// Tom 2026-11-09: the column is no longer sized to its contents at any width, so this asserted the defect.
+		ok('1440: the Description column opens at heading width, not content width', w.th < 200, String(w.th));
 	} finally {
 		await browser.close();
 		env.stopServer();
