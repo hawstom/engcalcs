@@ -4964,3 +4964,11 @@ OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale 
 - Stable: same notch reached by three paths, 0 label strings differ, both trees.
 - Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
 NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
+
+
+## 2026-11-11 feat/contour-controls (d563be90d), Task 858
+OBSERVED (re-verify; real Chromium, Net3, master 27710ab0f vs branch; probes in scratchpad q/):
+- Old project, Color nodes by none/head/pressure, box opened: plot image (hash), legend, dots coloured identical to master in all three. Box order and tips as built; phone 390: box 4..386, no overflow.
+- DEFECT: in a child scenario, tick Show node colors, then change Property to plot: map and key follow, the box select snaps back to the old property (stored override says the new one). Not in Base; not without the tick; not on master.
+- DEFECT: choose Property to plot = head in the box, then Settings > Node colors = pressure: dots recolour to pressure, key and plot stay Head. Master had one setting so could not diverge.
+- NOT DONE: mutation test of the builder's harness (worktree has no node_modules, harness not run), light/dark, Tables-row look.
