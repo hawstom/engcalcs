@@ -207,6 +207,51 @@ async function main1(Session, browser) {
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally { await a.close(); }
 }
+async function newScenario(a) {
+	a.answerPromptWith('Child');
+	const label = await a.lang('lpn_scenario_new');
+	await a.page.click('#lpn_scenario_btn');
+	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+	for (const r of await a.page.$$('#lpn_menu_list button.lpn-menu-row')) {
+		if ((await r.textContent()).trim().replace(/^\u2713\s*/, '').replace(/\s*\(\d+\)$/, '') === label.trim()) { await r.click(); break; }
+	}
+	await a.settle(1200);
+}
+async function main2(Session, browser) {
+	console.log('\n--- 5. in a child scenario the Property to plot select keeps what was chosen ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await newScenario(a);
+		ok('a child scenario is open', await a.page.evaluate(() => !/Scenario:\s*Base\b/.test(document.body.innerText)), await a.page.evaluate(() => (document.body.innerText.match(/Scenario:[^|\n]*/) || [''])[0]));
+		await contourFromMenu(a);
+		await setBox(a, 'lpn_contour_node_colors', true);
+		await setBox(a, 'lpn_contour_field', 'head');
+		const f = await facts(a.page);
+		ok('the select shows Head, as the map and the key do', f.field === 'head' && /Head/.test(f.legend), f.field + ' | ' + f.legend.slice(0, 30));
+		await a.close();
+
+		console.log('\n--- 6. Settings and the box never disagree while node colors are on ---');
+		const b = await openNet3(Session, browser, { width: 1440, height: 900 });
+		try {
+			await contourFromMenu(b);
+			await setBox(b, 'lpn_contour_node_colors', true);
+			await setBox(b, 'lpn_contour_field', 'head');
+			await b.toolbarClick(await b.lang('lpn_tool_settings'));
+			await b.settle(400);
+			const setNode = (v) => b.page.evaluate((x) => { const n = document.getElementById('lpn_set_color_node'); n.value = x; n.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+			await setNode('pressure');
+			await b.settle(500);
+			let g = await facts(b.page);
+			ok('Settings Node colors = Pressure: the plot property and the key follow', g.field === 'pressure' && /Pressure/.test(g.legend) && g.coloured > 0, g.field + ' | ' + g.legend.slice(0, 30));
+			await setNode('');
+			await b.settle(500);
+			g = await facts(b.page);
+			ok('Settings Node colors = No color: only the dots clear, the plot keeps Pressure', g.coloured === 0 && g.field === 'pressure' && g.fill && g.nodes === false, JSON.stringify({ c: g.coloured, f: g.field, fill: g.fill, n: g.nodes }));
+			ok('no uncaught page errors', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+		} finally { await b.close(); }
+		return;
+	} catch (e) { await a.close().catch(() => {}); throw e; }
+}
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. a 390-wide phone ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -233,6 +278,7 @@ async function main() {
 	try {
 		await main0(Session, browser);
 		await main1(Session, browser);
+		await main2(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();

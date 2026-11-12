@@ -13586,7 +13586,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
 	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
-	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
+	// The box is rebuilt again once the edit has landed: in a child scenario the write-back to the scenario
+	// comes after this handler, and a rebuild before it reads the old value (Perry, 2026-11-11).
+	function contourChanged() {
+		refreshValueColors(); saveToStorage(); syncColorControls();
+		setTimeout(refreshContourBoxIfOpen, 0);
+	}
 	function buildContourBox() { return withSetboxView(buildContourBoxNow); }
 	function buildContourBoxNow() {
 		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
@@ -28430,7 +28435,12 @@ var EngCalcs = EngCalcs || {};
 				sel.appendChild(opt);
 			});
 			sel.addEventListener('change', function () {
-				if (group === 'node') { settings.colorNodeField = sel.value; }
+				if (group === 'node') {
+					// **ONE PROPERTY WHILE NODE COLORS ARE ON** (Task 858): a property chosen here is the plot's too;
+					// No color clears only the dots, so the plot's property is stated first and kept.
+					settings.contourField = sel.value || contourFieldOf();
+					settings.colorNodeField = sel.value;
+				}
 				else { settings.colorLinkField = sel.value; }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
