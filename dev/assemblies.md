@@ -259,3 +259,17 @@ seven. Not done: Tom's wish for an exploded view of a selected assembly.
 - **The umbrella word.** He finds "assembly" eyes-glazed and offers "complex asset", noting a pump or valve is not physically complex. Mary (journal 2026-11-09): "assembly" is Esri Utility Network vocabulary for a point feature containing others, pump assemblies its own example; "complex asset" is not an industry term she found. Visitor strings name the specific thing (Well, Pump+); the umbrella word appears only where one is needed.
 - **The drawdown curve is points joined by straight lines.** Field practice is a curve (Jacob s = BQ + CQ², Rorabaugh s = BQ + CQⁿ); Mary recommends seeding the starter curve from s = BQ + CQ² and, later, a B/C/n entry that writes the points.
 - **Slice 2, the pressure tank** (his answers to Sue): level shown as pressure head, Patm fixed 14.7 psi shown and editable, pump controls written automatically, static level and curves by scenario "OK for now"; reasonable initial values and an example that uses assemblies well (Task 823).
+
+### Round 6 (Tom, 2026-11-11; `well-simple-harness.js`, `well-round6-browser-harness.js`)
+
+- **Two Well forms on the Pump button** (Pump, Pump+, Well, Well with tank). **Well** is the simple one: reservoir W1R, drawdown valve W1V, pump node W1U, pump W1, discharge node W1D; the pipes join D, which carries the ground elevation and the drawing. `;ASSEMBLY: well R U D V P`. **Well with tank** is the former Well (tee, virtual pipe, tank, Pump on below / Pump off above), unchanged apart from the fixes below. A Well has a tank only if its third node is one (`wellHasTank()`).
+- **The box:** the top holds every input (for the tank form the pump levels and the tank's base elevation, depths and diameter); each member's heading holds results only and always shows its rows, blank before a run.
+- **One label block per assembly**, on its output node, placed by the ordinary node pass (the assembly's own placer is retired). Headed by the assembly ID with the device's values; one row per other member that has values, led by that member's ID; rows shed first-to-last, the heading last. The popup opens beside it, not on it.
+- **Symbol:** symmetrical, smaller, pump below the drawdown level, ground line past the casing; no valve symbol.
+- **Controls editor** redraws when the Well writes or releases a control while it is open.
+
+### Open, from Tom's 2026-11-11 notes
+
+- **Well with tank as a three-point form** (*"I envision that a well with tank will need three points specified by the user (well, tee (unless they are generally at the well head), and tank) and three associated symbols. It's a cross between an assembly and a wizard. It still knows that it's an assembly to simplify controls entry."*): well, tee, tank, three symbols, assembly plus wizard; well with open-air and with pressure tank. Not built.
+- **Auto curve** (*"especially when there are no curves available, to offer 'Auto curve' that creates a reasonable curve given the nearby or project diameters"*), seeded from Jacob's s = BQ + CQ^2.
+- **Whether the Well's controls should be overridable by scenario** (*"Probably they should be [overridable by scenario], but do we currently have a controls alternative category? And what does WTG do?"*).

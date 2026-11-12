@@ -81,7 +81,7 @@ async function main() {
 		const iOn = ls.findIndex((x) => /^Pump on below \(/.test(x)), iOff = ls.findIndex((x) => /^Pump off above \(/.test(x));
 		ok('the entry area has Pump on below and Pump off above, in the length unit, in that order, after the pump curve', iOn > 0 && iOff === iOn + 1 && /Pump head curve/.test(ls[iOn - 1] || ''), ls.join(' | '));
 		const inputOf = (re) => P.evaluateHandle((src) => Array.from(document.querySelectorAll('#lpn_popup_fields > label')).find((l) => new RegExp(src).test(l.textContent)).querySelector('input'), re.source);
-		const typeIn = async (re, v) => { const h = await inputOf(re); await h.click({ clickCount: 3 }); await P.keyboard.type(v); await P.keyboard.press('Tab'); await a.settle(500); };
+		const typeIn = async (re, v) => { const h = await inputOf(re); await h.click({ clickCount: 3 }); if (v === '') { await P.keyboard.press('Backspace'); } else { await P.keyboard.type(v); } await P.keyboard.press('Tab'); await a.settle(500); };
 		const val = (re) => P.evaluate((src) => Array.from(document.querySelectorAll('#lpn_popup_fields > label')).find((l) => new RegExp(src).test(l.textContent)).querySelector('input').value, re.source);
 		ok('both open blank', (await val(/^Pump on below/)) === '' && (await val(/^Pump off above/)) === '');
 		await typeIn(/^Pump on below/, '1');
@@ -93,6 +93,26 @@ async function main() {
 		await clickAt('W1T');
 		ok('and they are still there when the box is opened again', (await val(/^Pump on below/)) === '1' && (await val(/^Pump off above/)) === '2.5');
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-pump-controls-v8.png') }); }
+		// Tom, 2026-11-11: "When I first opened Controls, nothing appeared; when I switched to a different Library then back, two appeared."
+		// The Libraries box stands open on Controls while the Well writes its controls; the section must show them at once.
+		console.log('\n--- the Controls library, open before the Well writes its controls ---');
+		await P.keyboard.press('Escape');
+		await clickAt('W1T');
+		await typeIn(/^Pump on below/, '');
+		await typeIn(/^Pump off above/, '');
+		await a.menuClick(await a.lang('lpn_library_menu'), 'project');
+		await a.settle(700);
+		await P.click('#lpn_libbox_link_controls');
+		await a.settle(500);
+		const owned = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-owned')).map((e) => e.textContent.replace(/\s+/g, ' ').trim()));
+		ok('with the Controls library open and no depth typed, it holds no control of the Well', (await owned()).length === 0);
+		await clickAt('W1T');
+		await typeIn(/^Pump on below/, '1');
+		await typeIn(/^Pump off above/, '2.5');
+		const two = await owned();
+		ok('typing the two depths puts the Well\'s two controls into the open Controls library at once, without a section switch', two.length === 2 && /OPEN IF NODE W1T BELOW 1/i.test(two[0]) && /CLOSED IF NODE W1T ABOVE 2.5/i.test(two[1]) && /Written by well W1/.test(two[0]), two.join(' || '));
+		await typeIn(/^Pump on below/, '');
+		ok('clearing one depth takes its control out of the open library at once', (await owned()).length === 1);
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {
