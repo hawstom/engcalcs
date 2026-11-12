@@ -5,6 +5,9 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0t. Check the Well assembly's recommended connection with one EPANET run, and find one real small-system schematic (2026-11-09)
+Q1's tee recommendation (pump to tee node, tank on a short branch, system on the tee) follows from reading hydstatus.c tankstatus(), but I ran nothing. Cost: one tiny .inp with a full tank on pump->T->pipe vs pump->J with T on a branch; an hour. Also: nobody has counted how many small community systems use each piping layout (SDWIS may not record it); one state's sanitary-survey sample would settle "most common". And the Ten States text itself was not opened: pull the pump, pressure-tank and storage sections before anyone quotes a sizing number.
+
 ## 0s. Run the experiment: Tom's questions against a documented page surface, with Claude in Chrome (2026-10-22)
 Nothing found shows any agent answering an unanticipated hydraulic question through a page API with a measured result (ai-agent-interface.md section 4). The cheapest evidence is a trial: expose read, change-a-scenario-copy and solve as a documented in-page surface, give Claude in Chrome a one-line instruction and ten questions (Tom's five plus five unannounced from Perry or a utility engineer), and record whether it completes change-solve-read loops and whether Tom can see and undo the edits. Cost: a small build on existing code plus an afternoon; it is Tom's call whether to build, and nothing else on this list depends on it. Do not wait for WebMCP (Chrome origin trial to March 2027, no ship date, Claude and Copilot do not yet consume it).
 

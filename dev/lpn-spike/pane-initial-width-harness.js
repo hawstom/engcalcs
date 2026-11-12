@@ -78,9 +78,10 @@ console.log('\n--- 1. real, present content beats the heading (rule a over rule 
 	L.pasteAppend('junctions', 'J1\t0\t0\nJ2\t100\t0');
 	L.pasteAppend('pipes', pipeRow({ id: 'P1', from: 'J1', to: 'J2', desc: longDesc }, keys));
 	const withContent = L.widthEm('pipes', 'desc');
-	// The heading alone ("Description", 11 characters, split per rule b) would draw far less than
-	// a real 74-character sentence measured whole under rule (a).
-	report(withContent > 8, 'a real Description sentence widens the column well past the heading floor', withContent);
+	// Description is the one column sized by its heading alone (Tom, 2026-11-09: "It shouldn't expand to
+	// fit its contents"): a real 74-character sentence, which rule (a) would draw far wider, must not
+	// widen it. (The old assertion here, that it did, encoded the defect.)
+	report(withContent < 8, 'a real Description sentence does not widen the column past its heading', withContent);
 }
 
 console.log('\n--- 2. no content: the heading\'s longest word, SPLIT at 8+ characters (rule b) ---');
