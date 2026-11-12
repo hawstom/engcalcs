@@ -79,11 +79,11 @@ async function main() {
 		const ctl = await P.evaluate(() => ({ labels: document.getElementById('lpn_contour_body').innerText.replace(/\s+/g, ' '), vals: Array.from(document.querySelectorAll('#lpn_contour_body input, #lpn_contour_body select')).map((e) => e.type === 'checkbox' ? e.checked : e.value) }));
 		const needs = ['lpn_contour_show', 'lpn_contour_fill', 'lpn_contour_opacity', 'lpn_contour_lines', 'lpn_contour_interval', 'lpn_contour_buffer'].map(enString);
 		ok('the box holds the controls the chapter lists', needs.every((w) => ctl.labels.indexOf(w) >= 0), ctl.labels.slice(0, 200));
-		ok('...opening on Show contours checked, node colors untouched (none), Smooth, 60 percent, lines on, every 5, buffer 2.5', ctl.vals[0] === true && ctl.vals[1] === '' && ctl.vals[2] === 'smooth' && ctl.vals[3] === '60' && ctl.vals[4] === true && ctl.vals[5] === '5' && ctl.vals[7] === '2.5', JSON.stringify(ctl.vals));
+		ok('...opening on Show contours checked, Property to plot pressure, node colors untouched (off), Smooth, 60 percent, buffer 2.5, lines on, every 5', ctl.vals[0] === true && ctl.vals[1] === 'pressure' && ctl.vals[2] === false && ctl.vals[3] === 'smooth' && ctl.vals[4] === '60' && ctl.vals[5] === '2.5' && ctl.vals[6] === true && ctl.vals[7] === '5', JSON.stringify(ctl.vals));
 		await P.evaluate(() => { const c = document.querySelector('#lpn_contour_body input[type=checkbox]'); c.click(); });
 		await settle(1200);
-		const after = await P.evaluate(() => ({ color: document.querySelector('#lpn_contour_body select').value, nodes: Array.from(document.querySelectorAll('#lpn_canvas circle[data-node]')).filter((c) => c.style.fill || c.getAttribute('fill')).length }));
-		ok('clearing Show contours removes the fill and the lines, and the node coloring stays as it was (none)', (await fillNames()).length <= 1 && after.color === '', JSON.stringify(after));
+		const after = await P.evaluate(() => ({ color: document.getElementById('lpn_contour_node_colors').checked, nodes: Array.from(document.querySelectorAll('#lpn_canvas circle[data-node]')).filter((c) => c.style.fill || c.getAttribute('fill')).length }));
+		ok('clearing Show contours removes the fill and the lines, and the node coloring stays as it was (none)', (await fillNames()).length <= 1 && after.color === false, JSON.stringify(after));
 		ok('no page errors (English)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.context.close().catch(() => {});
 

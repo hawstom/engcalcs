@@ -7651,7 +7651,7 @@ var EngCalcs = EngCalcs || {};
 		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
 		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
-		'contourInterval', 'contourBuffer', 'contourTerrain']],
+		'contourInterval', 'contourBuffer', 'contourTerrain', 'contourField']],
 	// Calculation: Bentley's Calculation Options. **FRICTION METHOD INCLUDED** (Tom, 2026-10-06:
 	// *"I see it indefensible to require somebody to have to save a project for something like
 	// friction method."*). A pipe still holds one roughness number; a scenario's method
@@ -9348,6 +9348,9 @@ var EngCalcs = EngCalcs || {};
 			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
 			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
 			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
+			// The plot's own property. '' = not stated: it follows Color nodes by, else pressure, so a
+			// project (or a scenario) written before the plot had one draws what it always drew.
+			contourField: '',
 			contourFill: '',
 			contourLines: false,
 			contourLabels: true,
@@ -12474,8 +12477,9 @@ var EngCalcs = EngCalcs || {};
 	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
 	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
 	// stay as the user left them, and the colour key shows the plot's field.
-	function contourFieldOf() { return colorFieldOf('node') || 'pressure'; }
-	function contourOrNodeField() { return colorFieldOf('node') || (contourIsOn() ? 'pressure' : ''); }
+	// **THE PLOT HAS ITS OWN PROPERTY** (Tom, 2026-11-09/11, Task 858): never blank, whatever the node colouring says.
+	function contourFieldOf() { return scnSetting('contourField') || colorFieldOf('node') || 'pressure'; }
+	function contourOrNodeField() { return contourIsOn() ? contourFieldOf() : colorFieldOf('node'); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -12584,7 +12588,7 @@ var EngCalcs = EngCalcs || {};
 	function criterionClassCount(group) {
 		var R = ramps(), field, def;
 		if (!R) { return 0; }
-		field = colorFieldOf(group);
+		field = group === 'node' ? contourOrNodeField() : colorFieldOf(group);
 		def = field ? colorModeDef(colorModeOf(group, field)) : null;
 		return (def && def.criterion) ? R.criterionClasses(def.criterion) : 0;
 	}
@@ -13635,11 +13639,22 @@ var EngCalcs = EngCalcs || {};
 			contourChanged();
 		}), pc.lpn_contour_show_tip);
 		var field = contourFieldOf();
-		row(pc.lpn_color_node_field || 'Color nodes by',
-			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), colorFieldOf('node') || '', function (v) {
-				settings.colorNodeField = v; contourChanged();
-			}));
-		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
+		// **TOM'S ORDER, 2026-11-09/11 (Task 858)**: Show plot, Property to plot, Color scheme, Show node colors,
+		// Fill, opacity, buffer, Contour lines, interval, labels, Ground. The property is the plot's own, so it
+		// never reads "No color" over a plot that is drawn in color; Show node colors is the node colouring
+		// (`colorNodeField` not empty), and while it is ticked the dots follow the plot's property.
+		row(pc.lpn_contour_field || 'Property to plot',
+			select('lpn_contour_field', colorFieldOptions('node'), field, function (v) {
+				settings.contourField = v;
+				if (colorFieldOf('node')) { settings.colorNodeField = v; }
+				contourChanged();
+			}), pc.lpn_contour_field_tip);
+		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'), pc.lpn_contour_scheme_tip);
+		row(pc.lpn_contour_node_colors || 'Show node colors', check('lpn_contour_node_colors', !!colorFieldOf('node'), function (on) {
+			// State the property first: an unstated one follows the node colors, which this is about to clear.
+			settings.contourField = contourFieldOf();
+			settings.colorNodeField = on ? settings.contourField : ''; contourChanged();
+		}), pc.lpn_contour_node_colors_tip);
 		row(pc.lpn_contour_fill || 'Fill', select('lpn_contour_fill', [
 			['', pc.lpn_settings_legend_off || 'None'],
 			['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
@@ -13649,6 +13664,9 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
 			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
 		}), null, '%', 3);
+		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
+			settings.contourBuffer = Math.min(20, v); contourChanged();
+		}), pc.lpn_contour_buffer_tip, '', 4);
 		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
 			settings.contourLines = on; contourChanged();
 		}));
@@ -13661,9 +13679,6 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
 			settings.contourLabels = on; contourChanged();
 		}));
-		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
-			settings.contourBuffer = Math.min(20, v); contourChanged();
-		}), pc.lpn_contour_buffer_tip, '', 4);
 		if (contourTerrainOffered()) {
 			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
 			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
@@ -31536,7 +31551,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		colorClassesLink: 'lpn_settings_color_classes', colorReverseNode: 'lpn_settings_color_reverse',
 		colorReverseLink: 'lpn_settings_color_reverse', colorBreaks: 'lpn_settings_color_breaks',
 		colorModes: 'lpn_color_mode', colorLegendPosition: 'lpn_settings_color_key_position',
-		contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
+		contourField: 'lpn_contour_field', contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
 		contourInterval: 'lpn_contour_interval', contourBuffer: 'lpn_contour_buffer',
 		contourTerrain: 'lpn_contour_dem', method: 'bpn_method', engine: 'lpn_settings_engine_native',
 		autoRun: 'lpn_settings_auto_run', 'hydraulics.accuracy': 'lpn_settings_accuracy',
@@ -31573,7 +31588,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
 		'settings.contourLabels': 'lpn_settings_row_contour_labels',
 		// Contour rows say so: in the Settings box they sit under a Contour heading the table lacks.
-		'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
+		'settings.contourField': 'lpn_settings_row_contour_field', 'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
 		'settings.contourInterval': 'lpn_settings_row_contour_interval', 'settings.contourBuffer': 'lpn_settings_row_contour_buffer',
 		'settings.contourTerrain': 'lpn_settings_row_contour_terrain',
 		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
@@ -31816,6 +31831,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (s === 'settings.legendPosition' || s === 'settings.colorLegendPosition') { return legendPositionOptions(pc); }
 		if (s === 'settings.colorNodeField' || s === 'settings.colorLinkField') {
 			return [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions(s === 'settings.colorNodeField' ? 'node' : 'link'));
+		}
+		if (s === 'settings.contourField') {
+			return [['', pc.lpn_contour_field_follow || 'Follow Color nodes by']].concat(colorFieldOptions('node'));
 		}
 		if (s === 'settings.contourFill') {
 			return [['', pc.lpn_settings_legend_off || 'None'], ['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
