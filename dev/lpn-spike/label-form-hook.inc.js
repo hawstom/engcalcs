@@ -196,6 +196,10 @@
 		},
 		// One wheel notch in about `around` (or the middle): the scale times 1.1, nothing else.
 		zoomStep: function (around) { var p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre(); applyView({ cx: p.x, cy: p.y, s: state.s * 1.1 }); },
+		zoomOutStep: function (around) { var p = around ? nodeAt(nodeById(around)) : window.__lpnForm.centre(); applyView({ cx: p.x, cy: p.y, s: state.s / 1.1 }); },
+		// The zoom bank (Task 812, round 7): buckets held, their size as JSON, hits so far, and a switch for the bank.
+		bankStats: function () { var n = Object.keys(labelCache.entries).length, b = 0; Object.keys(labelCache.entries).forEach(function (k) { b += JSON.stringify(labelCache.entries[k]).length; }); return { buckets: n, jsonBytes: b, hits: labelCacheHits }; },
+		bankSwitch: function (on) { labelCacheEnabled = !!on; },
 		scale: function () { return state.s; },
 		linksShown: function () { var o = {}; doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le && le.text && le.text.textContent && le.text.checkVisibility({ visibilityProperty: true, opacityProperty: true })) { o[l.id] = (le.levelBeside ? 'level ' : 'along ') + (le.lines || []).length; } }); return o; },
 		rescale: function (s, c) { state.s = s; state.tx = c.tx; state.ty = c.ty; setTransform(); if (state.s !== lastLayoutScale) { onZoomChanged(); } refreshLabelText(); },
