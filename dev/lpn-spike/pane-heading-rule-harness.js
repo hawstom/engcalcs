@@ -274,7 +274,8 @@ function assertTable(label, report) {
 		// The Pipes table's Vertices column is sized by its heading alone, whatever it holds (Tom,
 		// 2026-10-16: "the Pipes table Vertices column should always be sized based on the heading
 		// rule ignoring the contents"), so a long vertex list is clipped there by design.
-		if (c.key === 'verts') {
+		// Description is likewise sized by its heading alone (Tom, 2026-11-09), so a long one is clipped by design.
+		if (c.key === 'verts' || c.key === 'desc') {
 			ok(name + ': sized by its heading alone, never widened by what it holds', c.thW <= c.basicMax || c.narrowerBreaks === true,
 				'heading cell ' + c.thW.toFixed(1) + 'px > rule ' + c.basicMax.toFixed(1) + 'px');
 		} else if (c.atCap) {
