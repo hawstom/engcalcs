@@ -4964,3 +4964,14 @@ OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale 
 - Stable: same notch reached by three paths, 0 label strings differ, both trees.
 - Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
 NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
+
+
+## 2026-11-11 feat/assembly round 6 (b1c503b3b over a61a2177f), Task 822
+OBSERVED (re-verify; real Chromium, Net1 plus fixture; probes in scratchpad pp/; pictures _panel/www/img/pump-plus/perry-*-v9.png):
+- Valve symbol at a Well: NOT reproduced. Census of every symbol element within 400 px of the Well, both forms (simple on Net1, tank on Net1 and the fixture), at 14 zoom notches, selected, deselected, dragged, undo, redo, in a new scenario, after Explode then undo and redo, after reload, and after a run with curves chosen: only the one Well symbol (and its box and backdrop). Valve and pump symbols appear only after Explode, as they should.
+- Click-vanish: Pump+, Valve+ and Well blocks each stayed drawn through click label, click node, click empty, zoom out 3 and in 3, twice. Label is one block per assembly, headed by ID.
+- Ordinary labels: branch vs a61a2177f, text and pixel positions identical at 7 zoom steps on Net1, Net2, Net3, Novato at 1920, 1500, 1000 and 420 wide (leader counts too).
+- Defect: a Pump+ block crosses a pipe on Net1 (P1 beside L111 at every window size 420-1920); in a nine-Pump+ stress, 6 of 9 blocks cross a pipe.
+- Not reproduced: "block sheds to P1 Q=" on Net1's opening view, at five window sizes.
+- Controls first open shows the two controls; Explode tip text is Tom's exact wording (tank form), simple form has its own.
+NOT DONE: mutation test of the harnesses; DEM; Tom's own window; light/dark; the 30-degree leader rule is gone, only observed as long leaders from ordinary nodes (unchanged from base).
