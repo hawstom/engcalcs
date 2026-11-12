@@ -1366,6 +1366,7 @@ html[lang="zh"] .ec-welcome {
 	cursor: pointer;
 }
 .lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: none; }
+.lpn-node-junction.lpn-asm-host { fill: none; stroke: none; pointer-events: none; }
 .lpn-node-symbol, .lpn-link-symbol { pointer-events: none; }
 :root {
 	--lpn-map-ink: var(--ec-map-asset);

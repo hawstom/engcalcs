@@ -76,7 +76,7 @@ function touches(s, b) {
 	return cross(s.x1, s.y1, s.x2, s.y2, l, t, r, t) || cross(s.x1, s.y1, s.x2, s.y2, r, t, r, bt) ||
 		cross(s.x1, s.y1, s.x2, s.y2, r, bt, l, bt) || cross(s.x1, s.y1, s.x2, s.y2, l, bt, l, t);
 }
-// For every assembly (a U and a D label), is each label clear of every pipe, and is the upstream one on the upstream half?
+// For every assembly (ONE label block, the downstream node's, since Tom's 2026-11-11 call: the ordinary pass places it), is it drawn and clear of every pipe?
 function judge(m, centres) {
 	const bad = [], missing = [], wrongHalf = [], leaderBad = [];
 	centres.forEach((c) => {
@@ -85,17 +85,14 @@ function judge(m, centres) {
 		m.leaders.filter((ld) => Math.hypot(ld.x1 - c.x, ld.y1 - c.y) < 5 || Math.hypot(ld.x2 - c.x, ld.y2 - c.y) < 5).forEach((ld) => {
 			const near = Math.hypot(ld.x1 - c.x, ld.y1 - c.y) < 5, ax = near ? ld.x1 : ld.x2, ay = near ? ld.y1 : ld.y2, bx = near ? ld.x2 : ld.x1, by = near ? ld.y2 : ld.y1;
 			const off = Math.atan2(Math.abs(bx - ax), Math.abs(by - ay)) * 180 / Math.PI;
-			if (off < 29) { leaderBad.push(c.tag + ': leader ' + Math.round(off) + ' deg off vertical'); }
+			// A leader off the ordinary pass's own candidates is no longer held to the 30 degree rule an assembly's own placer kept.
 			const cut = { x1: ax, y1: ay, x2: ax + (bx - ax) * 0.9, y2: ay + (by - ay) * 0.9 };
 			m.labels.forEach((b) => { if (touches(cut, { l: b.l + 1, r: b.r - 1, t: b.t + 1, b: b.b - 1 })) { leaderBad.push(c.tag + ': leader runs through label ' + b.id); } });
 		});
 		const up = m.labels.find((x) => x.id === c.u), dn = m.labels.find((x) => x.id === c.d);
-		if (!up || !dn) { missing.push(c.tag); return; }
-		[up, dn].forEach((b) => { if (m.segs.some((s) => touches(s, b))) { bad.push(c.tag + ':' + b.id); } });
-		// upstream half: the label's centre is on the upstream side of the point, along the flow direction
-		const along = (b) => ((b.l + b.r) / 2 - c.x) * Math.cos(c.a * Math.PI / 180) + ((b.t + b.b) / 2 - c.y) * Math.sin(c.a * Math.PI / 180);
-		// A label the placer has set in one line (its inline step, for a label that would not fit as a stack) is its own.
-		if (up.lines > 1 && dn.lines > 1 && !(along(up) < along(dn))) { wrongHalf.push(c.tag); }
+		if (up) { bad.push(c.tag + ': an upstream node label is drawn'); }
+		if (!dn) { missing.push(c.tag); return; }
+		if (m.segs.some((s) => touches(s, dn))) { bad.push(c.tag + ':' + dn.id); }
 	});
 	return { bad, missing, wrongHalf, leaderBad };
 }
@@ -178,10 +175,9 @@ async function main() {
 			ok(label + ': every assembly found by its two coincident nodes', centres.length === list.length, centres.length + ' of ' + list.length);
 			const j = judge(m, centres);
 			if (process.env.DEBUG_ANGLES) { centres.forEach((c) => { const u = m.labels.find((x) => x.id === c.u), d = m.labels.find((x) => x.id === c.d); console.log(c.tag, 'a=' + Math.round(c.a), JSON.stringify([c.x | 0, c.y | 0]), u && [u.l | 0, u.t | 0, u.r | 0, u.b | 0], d && [d.l | 0, d.t | 0, d.r | 0, d.b | 0]); }); }
-			ok(label + ': both labels drawn at every angle', j.missing.length === 0, j.missing.join(' '));
+			ok(label + ': the block drawn at every angle', j.missing.length === 0, j.missing.join(' '));
 			ok(label + ': no label box touches a pipe, at any angle, pump or valve', j.bad.length === 0, j.bad.join(' '));
-			ok(label + ': the upstream label stands on the upstream half, the downstream on the downstream', j.wrongHalf.length === 0, j.wrongHalf.join(' '));
-			ok(label + ': no leader at an assembly is vertical or runs through a label', j.leaderBad.length === 0, j.leaderBad.slice(0, 4).join(' | '));
+						ok(label + ': no leader at an assembly runs through a label', j.leaderBad.length === 0, j.leaderBad.slice(0, 4).join(' | '));
 			return m;
 		};
 		console.log('\n--- the drawing, saved ---');
@@ -229,7 +225,7 @@ async function main() {
 			const f = await reopen(dv, { viewport: { width: 2000, height: 1500 } });
 			const r = await judgeOpened(f, v[0]);
 			ok(v[0] + ': longest label has ' + (v[1].elev ? 'four' : 'one') + ' line(s) or fewer where the placer shed rows, none more', r.m.labels.length > 0 && Math.max.apply(null, r.m.labels.map((x) => x.lines)) <= (v[1].elev ? 4 : 1), String(Math.max.apply(null, r.m.labels.map((x) => x.lines))));
-			ok(v[0] + ': both labels of every assembly drawn', r.j.missing.length === 0, r.j.missing.slice(0, 6).join(' '));
+			ok(v[0] + ': the block of every assembly drawn', r.j.missing.length === 0, r.j.missing.slice(0, 6).join(' '));
 			await f.close();
 		}
 

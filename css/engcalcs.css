@@ -1906,6 +1906,8 @@ html[lang="zh"] .ec-welcome {
    so nothing that reads the dataset can tell the difference; `.lpn-node-pending`'s red ring, the
    selection ring and the value colour still draw on THIS element, which is all it is for now. */
 .lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: none; }
+/* The simple Well's discharge node carries the Well's drawing, so its disc is only the selection ring (Task 822). */
+.lpn-node-junction.lpn-asm-host { fill: none; stroke: none; pointer-events: none; }
 /* The tank/pump overlay symbols themselves (looped-network.js buildMapIconSvg()) -- purely
    visual, never a click target; the interactive element is always the plain node circle or link
    polyline underneath. `color` is the currentColor the icon paths read for both stroke and the

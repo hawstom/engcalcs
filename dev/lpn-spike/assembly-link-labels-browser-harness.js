@@ -47,7 +47,7 @@ function ok(label, cond, detail) {
 
 const measure = (P) => P.evaluate(() => {
 	const box = (t) => { const r = t.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; };
-	const nodeLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => t.style.visibility !== 'hidden' && t.textContent).map((t) => Object.assign({ id: t.getAttribute('data-nodelbl') }, box(t)));
+	const nodeLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => t.style.visibility !== 'hidden' && t.textContent).map((t) => Object.assign({ id: t.getAttribute('data-nodelbl'), text: t.textContent }, box(t)));
 	const linkLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-linklbl]')).map((t) => Object.assign({ id: t.getAttribute('data-linklbl'), hidden: t.style.visibility === 'hidden', text: t.textContent }, box(t)));
 	const segs = [];
 	Array.from(document.querySelectorAll('#lpn_canvas [data-link]')).forEach((e) => {
@@ -126,12 +126,14 @@ async function main() {
 		const ups = m0.dots.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id)), dns = m0.dots.filter((d) => /^[PV]\d+D$/.test(d.id));
 		ok('each has its upstream and downstream node', ups.length === 2 && dns.length === 2);
 
-		console.log('\n--- leaders: a node label of an assembly stands under the ordinary rule ---');
+		console.log('\n--- one label block per assembly, placed by the ordinary pass (Tom, 2026-11-11) ---');
 		const near = (p, q, r) => Math.hypot(p.x - q.x, p.y - q.y) <= r;
-		const leaderAtAssembly = m0.leaders.filter((ld) => ups.concat(dns).some((d) => near(ld.a, d, 3)));
-		ok('at the opening view, a label that stands away from an assembly node has a leader to it', leaderAtAssembly.length >= 1, leaderAtAssembly.length + ' leader(s)');
+		const blocks0 = m0.nodeLabels.filter((n) => /^[PV]\d+D$/.test(n.id));
+		ok('an assembly draws at most ONE node label, the downstream node\'s (the ordinary pass may drop it where the view is crowded), and no upstream node label and no link label', blocks0.length >= 1 &&
+			!m0.nodeLabels.some((n) => /^[PV]\d+U$/.test(n.id)) && !m0.linkLabels.some((l) => (l.id === pumpId || l.id === valveId) && l.text), blocks0.map((n) => n.id).join(',') + ' / ' + m0.linkLabels.map((l) => l.id).join(','));
+		ok('each block is headed by its device\'s ID', blocks0.length >= 1 && blocks0.every((n) => new RegExp('^' + (n.id.charAt(0)) + '\\d+').test(n.text)), blocks0.map((n) => n.text).join(' | '));
 
-		console.log('\n--- link labels, zoomed in close ---');
+		console.log('\n--- the block, zoomed in close ---');
 		const spread = async () => { const m = await measure(P); const d1 = m.dots.find((d) => d.id === '12'), d2 = m.dots.find((d) => d.id === '13'); return d1 && d2 ? Math.hypot(d1.x - d2.x, d1.y - d2.y) : 0; };
 		const s0 = await spread();
 		let measured = 0;
@@ -143,20 +145,18 @@ async function main() {
 			const m = await measure(P);
 			const dpt = m.dots.filter((d) => /^[PV]\d+U$/.test(d.id)).sort((p, q) => p.id.localeCompare(q.id))[idx];
 			ok(kind + ': the view is zoomed in', (await spread()) > s0 * 1.3 || !(await spread()), String(Math.round(s0)) + ' -> ' + Math.round(await spread()) + ' px');
-			const lb = m.linkLabels.find((l) => l.id === linkId);
-			ok(kind + ': its link label is drawn', !!lb && !lb.hidden && /Q=/.test(lb.text), lb ? lb.text + (lb.hidden ? ' (hidden)' : '') : 'no element');
-			ok(kind + ': it shows its own ID as well as the flow (not shed to Q alone, Tom 2026-11-09)', !!lb && lb.text.indexOf(linkId) >= 0, lb ? lb.text : '');
+			const lb = m.nodeLabels.find((l) => l.id === linkId + 'D');
+			ok(kind + ': its block is drawn', !!lb && !lb.hidden, lb ? lb.text : 'no element');
+			ok(kind + ': it is headed by the device ID and tags each member row with its own ID', !!lb && lb.text.indexOf(linkId) === 0 && lb.text.indexOf(linkId + 'U') > 0 && lb.text.indexOf(linkId + 'D') > 0, lb ? lb.text : '');
 			if (!lb || lb.hidden || !dpt) { continue; }
 			measured++;
-			const here = m.dots.filter((d) => Math.hypot(d.x - dpt.x, d.y - dpt.y) < 4).map((d) => d.id);
 			const c = { x: (lb.l + lb.r) / 2, y: (lb.t + lb.b) / 2 };
 			ok(kind + ': it stands close to its symbol (within 160 px)', Math.hypot(c.x - dpt.x, c.y - dpt.y) <= 160, Math.round(Math.hypot(c.x - dpt.x, c.y - dpt.y)) + ' px');
 			ok(kind + ': it touches no pipe', !m.segs.some((s) => touches(s, lb)), '');
-			const mates = m.nodeLabels.filter((n) => here.indexOf(n.id) >= 0);
-			ok(kind + ': it overlaps neither node label of its assembly', mates.length === 2 && !mates.some((n) => overlap(n, lb)), mates.map((n) => n.id).join(','));
+			ok(kind + ': it carries no leader through its own text', !m.leaders.some((ld) => near(ld.a, dpt, 3) && touches({ x1: ld.a.x, y1: ld.a.y, x2: ld.b.x, y2: ld.b.y }, lb)), '');
 			if (process.env.ASM_SHOT) { await P.screenshot({ path: process.env.ASM_SHOT + '-' + kind + '.png' }); }
 		}
-		ok('both link labels were measured', measured === 2);
+		ok('both blocks were measured', measured === 2);
 
 		console.log('\n--- which node a pipe joins ---');
 		const B = await openNet1(browser, net1), Q = B.P;

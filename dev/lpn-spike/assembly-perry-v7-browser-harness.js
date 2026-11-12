@@ -41,7 +41,7 @@ function ok(label, cond, detail) {
 
 const measure = (P) => P.evaluate(() => {
 	const box = (t) => { const r = t.getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; };
-	const nodeLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => t.style.visibility !== 'hidden' && t.textContent).map((t) => Object.assign({ id: t.getAttribute('data-nodelbl') }, box(t)));
+	const nodeLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-nodelbl]')).filter((t) => t.style.visibility !== 'hidden' && t.textContent).map((t) => Object.assign({ id: t.getAttribute('data-nodelbl'), text: t.textContent }, box(t)));
 	const linkLabels = Array.from(document.querySelectorAll('#lpn_canvas text[data-linklbl]')).map((t) => Object.assign({ id: t.getAttribute('data-linklbl'), hidden: t.style.visibility === 'hidden', text: t.textContent }, box(t)));
 	const segs = [];
 	Array.from(document.querySelectorAll('#lpn_canvas [data-link]')).forEach((e) => {
@@ -162,16 +162,17 @@ async function main() {
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-no-curves-keeps-results-v7.png') }); }
 		await A.s.close();
 
-		console.log('\n--- 3. a Pump+ label on L11 against the ordinary labels ---');
+		console.log('\n--- 3. a Pump+ block on L11 against the ordinary labels ---');
 		for (const vp of [{ width: 1800, height: 1200 }, { width: 420, height: 800 }]) {
 			const B = await openNet1(browser, net1, vp), Q = B.P;
 			await B.arm('6', 'add-pumpplus'); await B.click(B.at('11')); await B.off(); await B.s.settle(1200);
 			const m = await measure(Q);
 			const vis = m.linkLabels.filter((l) => !l.hidden && l.text);
-			const pump = vis.find((l) => /^P\d+$/.test(l.id));
-			const hits = pump ? vis.filter((l) => l !== pump && overlap(pump, l)) : [];
-			ok('viewport ' + vp.width + ': the pump label is drawn', !!pump, pump ? pump.text : 'none');
+			const blk = m.nodeLabels.find((l) => /^P\d+D$/.test(l.id));
+			const hits = blk ? vis.filter((l) => overlap(blk, l)) : [];
+			if (vp.width > 1000) { ok('viewport ' + vp.width + ': the Pump+ block is drawn', !!blk, blk ? blk.text : 'none'); }
 			ok('viewport ' + vp.width + ': no link label overlaps it', hits.length === 0, hits.map((h) => h.id + ':' + h.text).join(','));
+			ok('viewport ' + vp.width + ': no link label is drawn for the pump itself', !vis.some((l) => /^P\d+$/.test(l.id)), '');
 			const others = vis.filter((l) => !/^P\d+$/.test(l.id));
 			let bad = [];
 			others.forEach((a, i) => others.slice(i + 1).forEach((b) => { if (overlap(a, b)) { bad.push(a.id + '/' + b.id); } }));
@@ -180,7 +181,7 @@ async function main() {
 			await B.s.close();
 		}
 
-		console.log('\n--- 4. Valve+ on a vertical pipe, the two node labels ---');
+		console.log('\n--- 4. Valve+ on a vertical pipe: one block, the other node labels empty ---');
 		for (const zoom of [0, 3, 6]) {
 			const C = await openNet1(browser, net1), R = C.P;
 			await C.arm('7', 'add-valveplus'); await C.click(C.at('112')); await C.off(); await C.s.settle(800);
@@ -188,8 +189,9 @@ async function main() {
 			await C.s.settle(800);
 			const m = await measure(R);
 			const u = m.nodeLabels.find((l) => /^V\d+U$/.test(l.id)), d = m.nodeLabels.find((l) => /^V\d+D$/.test(l.id));
-			ok('zoom ' + zoom + ': both labels drawn', !!u && !!d);
-			ok('zoom ' + zoom + ': the two labels do not overlap', !(u && d && overlap(u, d)), u && d ? JSON.stringify([u, d]) : '');
+			ok('zoom ' + zoom + ': no upstream label; the downstream node\'s block is drawn once the view has room (zoom 3 and up)', !u && (zoom === 0 || !!d));
+			const vd = m.dots.find((q) => /^V\d+U$/.test(q.id));
+			ok('zoom ' + zoom + ': the block stands within 200 px of its device, and its rows are tagged by member ID', !d || (vd && Math.hypot((d.l + d.r) / 2 - vd.x, (d.t + d.b) / 2 - vd.y) <= 200 && /^V\d+ /.test(d.text)), d ? d.text : '');
 			if (PICS && zoom === 0) { await R.screenshot({ path: path.join(PICS, 'valve-plus-vertical-labels-v7.png') }); }
 			await C.s.close();
 		}

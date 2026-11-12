@@ -88,7 +88,7 @@ async function main() {
 		const noOverflow = await P.evaluate(() => { const f = document.getElementById('lpn_popup_fields'); return f.scrollWidth <= f.clientWidth + 1; });
 		ok('nothing runs past the box horizontally', noOverflow);
 		const tankInputs = await P.evaluate(() => { const s = document.querySelector('[data-asm-member="W1T"]'); return Array.from(s.querySelectorAll('label')).map((l) => l.textContent.replace(/\s+/g, ' ').trim()); });
-		ok('the Tank section holds its own inputs and results', ['Initial depth', 'Tank diameter', 'Available volume'].every((n) => tankInputs.some((x) => x.indexOf(n) === 0)), tankInputs.join(' | '));
+		ok('the Tank section holds results only (its inputs are in the entry area above)', ['Head', 'Depth', 'Available volume'].every((n) => tankInputs.some((x) => x.indexOf(n) === 0)) && !tankInputs.some((x) => /Initial depth|Tank diameter|Base elevation/.test(x)), tankInputs.join(' | '));
 		const chooser = await P.evaluate(() => { const s = document.getElementById('lpn_pgraph_member'), f = document.getElementById('lpn_pgraph_field'); return s && f ? { val: s.value, below: s.getBoundingClientRect().top < f.getBoundingClientRect().top, n: s.options.length } : null; });
 		ok('the graph at the foot has the "Graph which sub-asset?" chooser above its quantity chooser', !!chooser && chooser.n === 7 && chooser.val === 'link:W1' && chooser.below, JSON.stringify(chooser));
 		if (PICS) { await P.screenshot({ path: path.join(PICS, 'well-selected-properties-v6.png') }); }

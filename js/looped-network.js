@@ -1382,10 +1382,11 @@ var EngCalcs = EngCalcs || {};
 	// the order at all, so shedKeepSet() never reaches it.
 	function nodeShedOrder(lines) {
 		var order = [], i;
+		// An assembly's label block rows state their own rank (`shedRank`, assemblyLabelBlock()): they are not a field of the Drop column.
 		for (i = 0; i < lines.length; i++) {
-			if (typeof labelRank('priority', 'node', lines[i].field) === 'number') { order.push(i); }
+			if (typeof lines[i].shedRank === 'number' || typeof labelRank('priority', 'node', lines[i].field) === 'number') { order.push(i); }
 		}
-		order.sort(function (a, b) { return nodeFieldRank(lines[a].field) - nodeFieldRank(lines[b].field); });
+		order.sort(function (a, b) { return (typeof lines[a].shedRank === 'number' ? lines[a].shedRank : nodeFieldRank(lines[a].field)) - (typeof lines[b].shedRank === 'number' ? lines[b].shedRank : nodeFieldRank(lines[b].field)); });
 		return order;
 	}
 	// **A NODE LABEL READS IN ITS SHOW ORDER, NOT ITS DROP ORDER** (Tom, 2026-09-26, R-329: *"I
@@ -1798,11 +1799,14 @@ var EngCalcs = EngCalcs || {};
 	// bent pipe that linkDirectionAt() already establishes as the correct one: a pipe that leaves
 	// eastward and turns north occupies the east of this node, whatever its other end is doing.
 	function incidentBearings(n) {
-		var ids = incidentLinks[n.id] || [], out = [], i, l, pts, next, at = nodeAt(n);
+		var ids = incidentLinks[n.id] || [], out = [], i, l, pts, next, at = nodeAt(n), asm = assemblyOfNode(n.id), mates;
+		// An assembly's members stand on one point and its one label block belongs to the whole point, so every pipe that leaves
+		// any member of it is a bearing here (Task 822): the block keeps off the upstream pipe as well as the downstream one.
+		if (asm) { mates = assemblyNodeIds(asm); ids = []; mates.forEach(function (mid) { (incidentLinks[mid] || []).forEach(function (lid) { if (ids.indexOf(lid) < 0) { ids.push(lid); } }); }); }
 		for (i = 0; i < ids.length; i++) {
 			l = linkById(ids[i]); if (!l) { continue; }
 			pts = linkPointList(l);
-			next = (l.from === n.id) ? pts[1] : pts[pts.length - 2];
+			next = (l.from === n.id || (asm && assemblyNodeIds(asm).indexOf(l.from) >= 0)) ? pts[1] : pts[pts.length - 2];
 			if (!next) { continue; }
 			// A zero-length link has no direction and must not contribute a spurious bearing of 0,
 			// which would read as "east is occupied" at a node where nothing is.
@@ -40269,7 +40273,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fl = m.group === 'link' ? linkLabelFieldLines(el2, ls, extrema) : nodeLabelFieldLines(el2, ls, extrema);
 				vals = fl.filter(function (x) { return x.field !== 'id'; }).map(function (x) { return x.text; });
 				if (vals.length) { any = true; }
-				if (vals.length || m.device) { lines.push({ text: m.id + (vals.length ? sep + vals.join(sep) : '') }); }
+				// Member rows shed in the order they stand and the heading last, the one row a label keeps: a crowded view takes rows off the block before it drops it.
+				if (vals.length || m.device) { lines.push(m.device ? { text: m.id + (vals.length ? sep + vals.join(sep) : ''), shedRank: 1e6 } : { text: m.id + sep + vals.join(sep), shedRank: lines.length }); }
 			});
 		} finally { assemblyBlockBuilding = false; }
 		return (any || ls.node.id || ls.link.id) ? lines : [];
@@ -40305,7 +40310,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var ne = nodeEls[n.id], role = wellRoleOf(n.id), hid = role === 'R' || role === 'S' || role === 'D', isT = role === 'T';
 			if (!ne) { return; }
 			wellJunctionHost(n, ne, isT);
-			[ne.circle, ne.hit, ne.symbolG].forEach(function (e) { if (e) { e.classList.toggle('lpn-asm-hid', hid || (isT && e === ne.circle && n.type === 'junction')); } });
+			[ne.circle, ne.hit, ne.symbolG].forEach(function (e) { if (e) { e.classList.toggle('lpn-asm-hid', hid); } });
+			// A junction that carries the drawing keeps its circle as the selection ring and draws nothing else of it, as a tank's circle does.
+			if (ne.circle) { ne.circle.classList.toggle('lpn-asm-host', isT && n.type === 'junction'); }
 			if (!ne.symbolG || (n.type !== 'tank' && n.type !== 'junction')) { return; }
 			if (isT && !ne.wellSym) {
 				ne.wellSym = buildMapIconSvg('well', 'lpn-node-symbol lpn-node-symbol-well');

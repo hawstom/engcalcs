@@ -81,10 +81,10 @@ async function main() {
 		ok('a Pump+ is two nodes at one point and a pump', together(cs) && (await nLinks(a)) === 1, JSON.stringify(cs));
 		const home = cs[0];
 		const shown = await labelsShown(a);
-		ok('both nodes keep their own label', shown.length === 2 && shown.some((id) => /U$/.test(id)) && shown.some((id) => /D$/.test(id)), JSON.stringify(shown));
-		const lblBox = (id) => P.evaluate((i) => { const r = document.querySelector('#lpn_canvas text[data-nodelbl="' + i + '"]').getBoundingClientRect(); return { l: r.left, r: r.right, t: r.top, b: r.bottom }; }, id);
-		const ub = await lblBox(shown.filter((id) => /U$/.test(id))[0]), db = await lblBox(shown.filter((id) => /D$/.test(id))[0]);
-		ok('the upstream label stands upstream of the point and the downstream label downstream, not overlapping', ub.r <= at.x + 1 && db.l >= at.x - 1 && ub.r <= db.l, JSON.stringify([ub, db, at]));
+		ok('the assembly draws ONE label block, on its downstream node (Tom, 2026-11-11)', shown.length === 1 && /D$/.test(shown[0]), JSON.stringify(shown));
+		const blk = await P.evaluate(() => { const t = document.querySelector('#lpn_canvas text[data-nodelbl$="D"]'); const r = t.getBoundingClientRect(); return { text: t.textContent, l: r.left, r: r.right, t: r.top, b: r.bottom }; });
+		ok('it is headed by the pump\'s ID', /^P\d+/.test(blk.text), blk.text);
+		ok('and stands close to the point (within 160 px), placed by the ordinary pass', Math.hypot((blk.l + blk.r) / 2 - at.x, (blk.t + blk.b) / 2 - at.y) <= 160, JSON.stringify([blk, at]));
 
 		console.log('\n--- drag ---');
 		const drag = async (from, to) => {
@@ -122,14 +122,14 @@ async function main() {
 		console.log('\n--- toolbar forms: Pump+ on Pump, Virtual pipe on Pipe ---');
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		const armed = () => P.evaluate(() => { const b = document.querySelector('#lpn_toolbar button[aria-pressed="true"]'); return b ? b.dataset.tool : null; });
-		const PUMP = '#lpn_toolbar button[data-tool="add-pump"], #lpn_toolbar button[data-tool="add-pumpplus"], #lpn_toolbar button[data-tool="add-well"]';
+		const PUMP = '#lpn_toolbar button[data-tool="add-pump"], #lpn_toolbar button[data-tool="add-pumpplus"], #lpn_toolbar button[data-tool="add-well"], #lpn_toolbar button[data-tool="add-welltank"]';
 		const faceOf = (sel) => P.evaluate((q) => { const b = document.querySelector(q); return b ? b.innerHTML : null; }, sel);
 		ok('one button for Pump, Pump+ and Well, one for Pipe and Virtual pipe', await P.evaluate((q) => document.querySelectorAll(q).length === 1 &&
 			document.querySelectorAll('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').length === 1, PUMP));
 		ok('both carry the corner triangle', await P.evaluate((q) => document.querySelector(q).classList.contains('lpn-tool-more') &&
 			document.querySelector('#lpn_toolbar button[data-tool="add-pipe"], #lpn_toolbar button[data-tool="add-virtual"]').classList.contains('lpn-tool-more'), PUMP));
 		// Put the button on Pump whatever form was remembered: press until Pump is armed.
-		for (let i = 0; i < 3 && (await armed()) !== 'add-pump'; i++) { await P.click(PUMP); await a.settle(150); }
+		for (let i = 0; i < 5 && (await armed()) !== 'add-pump'; i++) { await P.click(PUMP); await a.settle(150); }
 		const pumpFace = await faceOf(PUMP);
 		ok('Pump armed, showing the Pump face', (await armed()) === 'add-pump');
 		await P.click(PUMP); await a.settle(150);
@@ -137,18 +137,21 @@ async function main() {
 		const plusFace = await faceOf(PUMP);
 		await P.click(PUMP); await a.settle(150);
 		ok('and again arms Well, with a face of its own', (await armed()) === 'add-well' && (await faceOf(PUMP)) !== pumpFace && (await faceOf(PUMP)) !== plusFace);
+		const wellFace = await faceOf(PUMP);
+		await P.click(PUMP); await a.settle(150);
+		ok('and again arms Well with tank, with a face of its own', (await armed()) === 'add-welltank' && (await faceOf(PUMP)) !== wellFace && (await faceOf(PUMP)) !== plusFace && (await faceOf(PUMP)) !== pumpFace);
 		await P.click(PUMP); await a.settle(150);
 		ok('and again is back to Pump', (await armed()) === 'add-pump' && (await faceOf(PUMP)) === pumpFace);
 		// A Well: four nodes at one point, dragged as one.
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
-		for (let i = 0; i < 4 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
+		for (let i = 0; i < 5 && (await armed()) !== 'add-well'; i++) { await P.keyboard.press('6'); await a.settle(150); }
 		ok('key 6 cycles to Well', (await armed()) === 'add-well');
 		const wellNodes = async () => { const all = await circles(a), r = all.find((c) => /R$/.test(c.id)); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
 		const wellAt = { x: at.x + 250, y: at.y + 200 };
 		await P.mouse.click(wellAt.x, wellAt.y); await a.settle(300);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
 		let wc = await wellNodes();
-		ok('a Well is four nodes at one point', wc.length === 4 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9), JSON.stringify(wc));
+		ok('a Well is three nodes at one point', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9), JSON.stringify(wc));
 		// Tom, 2026-11-09: a Well looked like an EPANET reservoir, its drawdown valve and pump drawn on one spot. It is ONE drawing now:
 		// the well's own, with no reservoir, tank, valve or pump symbol showing at its point.
 		const wellSyms = await P.evaluate((pt) => {
@@ -163,8 +166,17 @@ async function main() {
 		ok('a Well is drawn as one symbol: its own, and no reservoir, tank, valve or pump symbol at its point', wellSyms.well === 1 && wellSyms.other.length === 0, JSON.stringify(wellSyms));
 		await drag(wellAt, { x: wellAt.x + 100, y: wellAt.y - 80 });
 		wc = await wellNodes();
-		ok('dragging the Well moves all four, still coincident', wc.length === 4 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));
+		ok('dragging the Well moves all three, still coincident', wc.length === 3 && wc.every((c) => Math.abs(c.x - wc[0].x) < 1e-9 && Math.abs(c.y - wc[0].y) < 1e-9) && Math.abs(wc[0].x - home.x) > 1, JSON.stringify(wc));
 		await undo();
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
+		// Well with tank: four nodes at one point, dragged as one.
+		for (let i = 0; i < 5 && (await armed()) !== 'add-welltank'; i++) { await P.keyboard.press('6'); await a.settle(150); }
+		ok('key 6 cycles on to Well with tank', (await armed()) === 'add-welltank');
+		const tankAt = { x: at.x + 250, y: at.y - 150 };
+		await P.mouse.click(tankAt.x, tankAt.y); await a.settle(300);
+		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(200);
+		const tankNodes = async () => { const all = await circles(a), r = all.find((c) => /W\d+R$/.test(c.id) && Math.abs(c.x - tankAt.x) < 400 && all.filter((d) => Math.abs(d.x - c.x) < 1e-9 && Math.abs(d.y - c.y) < 1e-9).length === 4); return r ? all.filter((c) => Math.abs(c.x - r.x) < 1e-9 && Math.abs(c.y - r.y) < 1e-9) : []; };
+		ok('a Well with tank is four nodes at one point', (await tankNodes()).length === 4);
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape'); await a.settle(150);
 		await P.keyboard.press('5'); await a.settle(150);
 		ok('key 5 arms Pipe', (await armed()) === 'add-pipe');
