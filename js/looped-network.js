@@ -928,17 +928,29 @@ var EngCalcs = EngCalcs || {};
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
+		// **AN ASSEMBLY'S LABEL BLOCK NEVER LIES ON A PIPE, AND A WELL'S LEADER IS KEPT OFF ITS OWN PUMP BOX** (Task 822; Perry's round 6 review:
+		// the block's rows were drawn across a pipe when the last sweep took "a pipe under it or not"). `offLinks` makes the first-fit refuse a side any
+		// pipe runs under, so the pass sheds rows (nodeShedOrder()) and then drops before it crosses; every other label is unchanged.
+		var asmBlock = !!assemblyOfNode(n.id), asmA = asmBlock ? assemblyOfNode(n.id) : null, up, at0 = nodeAt(n);
+		if (asmA && asmA.kind === 'well') {
+			// The Well's pump stands at the bottom of its symbol: candidates whose leader would run over it come after every other.
+			// The pump box is x 9..15, y 17..22 of the symbol's 24-unit frame, centred on the node at (12, 12).
+			var wsz = nodeSymbolSize(n).w, bx0 = at0.x - wsz * 3 / 24 - wsz * 0.04, bx1 = at0.x + wsz * 3 / 24 + wsz * 0.04, by0 = at0.y + wsz * 5 / 24, by1 = at0.y + wsz * 10 / 24 + wsz * 0.04,
+				onPump = function (c) { var t, x, y; for (t = 0; t <= 1; t += 0.02) { x = at0.x + (c.x - at0.x) * t; y = at0.y + (c.y - at0.y) * t; if (x >= bx0 && x <= bx1 && y >= by0 && y <= by1) { return true; } } return false; };
+			up = sides.filter(function (c) { return !onPump(c); });
+			sides = up.concat(sides.filter(function (c) { return onPump(c); }));
+		}
 		// **A ONE-LINE LABEL IS PLACED AS THE STACK IT WAS FIRST, AND THEN SET IN ITS LINE** (Task 734,
 		// tryInlineNodeLabels()): the first-fit sees the stack the shed left (`inlineFrom`, its
 		// measures banked when the line was chosen), so every pass places the drawing's stacks
 		// exactly as the content pass did, and insertInlineNodeLabels() sets the line afterwards.
 		if (f) {
-			return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+			return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
 				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 				w: f.wPx / s0, h: dataLabelBoxHeight(f.lineCount), yOff: -fs * 0.85,
 				lines: f.rowWPx ? f.rowWPx.map(function (v) { return v / s0; }) : null };
 		}
-		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n), offLinks: asmBlock,
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
