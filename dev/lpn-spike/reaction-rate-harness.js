@@ -259,6 +259,19 @@ L.setProp(j2, 'demand', 5);
 	await warmEpanet();
 	const doc = L.getDoc();
 	const settings = L.getSettings();
+	// **NO PAGE-STARTED RUN MAY OVERLAP A RUN THIS FILE STARTED.** Two stray starters, both quiet
+	// when the machine is fast and both live when it is busy (this file fails only inside a busy
+	// check_all, with a heap out-of-memory in section 6):
+	//   1. The page's own 300 ms scheduleSolve(), armed by every setProp() above. The file takes about
+	//      300 ms alone, so alone it exits first. Recalculate off removes it.
+	//   2. applySolveResult() refreshes the run report box when the box counts as open, and the stub's
+	//      bare element counts as open (no display style). With the engine warm and no report text,
+	//      the page then starts its OWN EPANET run (lpnTimeReportAsync) that is still going when our
+	//      next run starts, in the same Workspace, over the same temp.out. The file read back is
+	//      truncated, and the vendored readBinary() allocates until the heap is gone on it. The warm
+	//      state turns 'ready' on a timer, which is why only a slow run meets it. Box closed.
+	L.getSettings().autoRun = false;
+	document.getElementById('lpn_rptbox').style.display = 'none';
 
 	// =========================================================================================
 	head('1. The field is offered, and it is offered by EPANET\'s own name');
