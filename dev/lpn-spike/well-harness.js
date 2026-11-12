@@ -105,7 +105,7 @@ const WELL_IDS = ['W1T', 'W1R', 'W1U'];
 console.log('\n--- 1. place on open ground ---');
 {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	const d0 = L.undoDepth();
 	press(200, 150);
 	const types = doc.nodes.map((n) => n.id + ':' + n.type).sort().join(',');
@@ -124,7 +124,7 @@ console.log('\n--- 1. place on open ground ---');
 	ok('the reservoir states no head of its own (it follows the static elevation)', R.head === undefined);
 	ok('the suction node has no demand', !S._demand);
 	ok('one undo step', L.undoDepth() === d0 + 1, L.undoDepth() - d0);
-	ok('the tool stays armed', L.getMode() === 'add-well');
+	ok('the tool stays armed', L.getMode() === 'add-welltank');
 	ok('Settings holds a well prefix, W, and it rides in the saved project like the others', L.getSettings().idPrefixes.W === 'W' && JSON.parse(JSON.stringify(L.serializeProject())).settings.idPrefixes.W === 'W');
 	ok('the well is its pump: the pump carries W1, the valve W1V', doc.links[1].id === 'W1' && doc.links[0].id === 'W1V');
 	{
@@ -143,16 +143,16 @@ console.log('\n--- 1b. the default static level, in each unit ---');
 {
 	// Tom, 2026-11-09: a Well at ground 0 came in at -98.4252, 30 m shown in feet. In US units it is a round 100 ft.
 	setUnitSet('us');
-	const d2 = fresh(); L.setMode('add-well'); press(200, 150);
+	const d2 = fresh(); L.setMode('add-welltank'); press(200, 150);
 	const R2 = L.nodeById('W1R'), T2 = L.nodeById('W1T');
 	ok('in US units the static elevation opens a round 100 ft below the ground, not 98.4252', R2.elev === +(T2.elev - 100).toFixed(4), R2.elev + ' vs ground ' + T2.elev);
-	setUnitSet('si'); fresh(); L.setMode('add-well'); press(200, 150);
+	setUnitSet('si'); fresh(); L.setMode('add-welltank'); press(200, 150);
 }
 
 console.log('\n--- 1b2. the static level follows the ground until the user has typed it (Perry) ---');
 {
 	setUnitSet('us');
-	const d3 = fresh(); L.setMode('add-well'); press(200, 150);
+	const d3 = fresh(); L.setMode('add-welltank'); press(200, 150);
 	const gR = L.nodeById('W1R'), gS = L.nodeById('W1U'), gT = L.nodeById('W1T'), gD = L.nodeById('W1D');
 	const g0 = gT.elev;
 	L.setProp(gT, 'elev', 690);
@@ -167,7 +167,7 @@ console.log('\n--- 1b2. the static level follows the ground until the user has t
 	ok('after that the ground moves alone and the typed static level never moves', gR.elev === 550 && gS.elev === 550 && gT.elev === 800, gR.elev + ' ' + gT.elev);
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
 	ok('the mark is kept in the project file', saved.assemblies[0].staticTyped === true);
-	const d4 = fresh(); L.setMode('add-well'); press(200, 150);
+	const d4 = fresh(); L.setMode('add-welltank'); press(200, 150);
 	const back = JSON.parse(JSON.stringify(L.serializeProject()));
 	ok('an unmarked well is saved without the mark', back.assemblies[0].staticTyped === undefined);
 	L.applySaved(saved);
@@ -179,7 +179,7 @@ console.log('\n--- 1b2. the static level follows the ground until the user has t
 
 console.log('\n--- 1c. the ground from the DEM, and the static level that follows it ---');
 {
-	const doc = fresh(); L.setMode('add-well'); press(200, 150);
+	const doc = fresh(); L.setMode('add-welltank'); press(200, 150);
 	ok('the reservoir and the pump node are underground: no door that reads the land surface may write them; the tank is not', L.wellUnderground('W1R') && L.wellUnderground('W1U') && !L.wellUnderground('W1T'));
 	// A Well born where the ground was still to be read has no static level yet; the DEM reading of its tank gives it one.
 	delete L.nodeById('W1R').elev; delete L.nodeById('W1U').elev; delete L.nodeById('W1T').elev;
@@ -194,7 +194,7 @@ console.log('\n--- 2. place by pressing a pipe ---');
 	const a = L.addNode('junction', 0, 0).id, b = L.addNode('junction', 400, 0).id;
 	const pipe = L.addLink('pipe', a, b, []);
 	L.nodeById(a).elev = 100; L.nodeById(b).elev = 200;
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 0, hitLink(pipe.id));
 	const T = L.nodeById('W1T');
 	ok('halfway along the pipe the ground is 150', T && T.elev === 150, T && T.elev);
@@ -210,7 +210,7 @@ console.log('\n--- 2. place by pressing a pipe ---');
 console.log('\n--- 3. selection, the box, the shared values, a rename ---');
 {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	L.setMode('select');
 	press(200, 150, hitNode('W1R'));
@@ -244,7 +244,7 @@ console.log('\n--- 3. selection, the box, the shared values, a rename ---');
 console.log('\n--- 4. Explode, undo, delete ---');
 {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	L.setMode('select');
 	press(200, 150, hitNode('W1T'));
@@ -261,12 +261,12 @@ console.log('\n--- 4. Explode, undo, delete ---');
 	L.deleteLink(L.getDoc().links[1].id);
 	ok('deleting the pump dissolves the group', L.getDoc().assemblies.length === 0 && L.getDoc().nodes.length === 4);
 	fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	L.deleteNode('W1R');
 	ok('deleting a node dissolves it too', L.getDoc().assemblies.length === 0);
 	fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	L.setMode('select');
 	press(200, 150, hitNode('W1T'));
@@ -279,7 +279,7 @@ console.log('\n--- 4. Explode, undo, delete ---');
 console.log('\n--- 5. pipes meet the tank ---');
 {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150), j2 = L.addNode('junction', -200, 150);
 	L.setMode('add-pipe');
@@ -299,7 +299,7 @@ const DD = [[0, 0], [20, 4], [40, 14], [60, 30]];          // l/s against m of d
 const PH = [[0, 70], [30, 62], [60, 40]];                 // l/s against m of head
 function wellNetwork() {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 10;
@@ -356,7 +356,7 @@ console.log('\n--- 7. EngCalcs.lpnDiagnose ---');
 console.log('\n--- 7b. a Well with no curve is refused by name in both engines; its box is titled Well ---');
 {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150);
 	L.addLink('pipe', 'W1D', j.id, []);
@@ -444,9 +444,9 @@ console.log('\n--- 9. scenarios: only the static elevation and the two curve ref
 console.log('\n--- 10. the Well button ---');
 {
 	const lang = require('fs').readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
-	ok('the Well tip opens like the Valve+ one', lang.indexOf("$ec_lang['lpn_tool_add_well_tip']='Add a well, its groundwater reservoir, its pump node, and its tank at one point. Specify a point on the map, or specify a pipe to split it and put the well in it.';") >= 0);
+	ok('the Well tip lists its five members and the Well with tank tip its seven', lang.indexOf("$ec_lang['lpn_tool_add_well_tip']='Add a well: its groundwater reservoir, drawdown valve, pump node, pump, and discharge node at one point.") >= 0 && lang.indexOf("$ec_lang['lpn_tool_add_welltank_tip']='Add a well that pumps into a tee with a tank on a branch:") >= 0);
 	const src = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	ok('Well is the third form of the Pump button, after Pump and Pump+', /slot: 'add-pump'[\s\S]{0,700}mode: 'add-pump'[\s\S]{0,400}mode: 'add-pumpplus'[\s\S]{0,400}mode: 'add-well'/.test(src));
+	ok('Well and Well with tank are the third and fourth forms of the Pump button, after Pump and Pump+', /slot: 'add-pump'[\s\S]{0,700}mode: 'add-pump'[\s\S]{0,400}mode: 'add-pumpplus'[\s\S]{0,400}mode: 'add-well'[\s\S]{0,400}mode: 'add-welltank'/.test(src));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));

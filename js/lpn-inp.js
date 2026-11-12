@@ -425,6 +425,7 @@
 					gt = gt.filter(function (tk) { var kv = /^(ON|OFF)=(.+)$/i.exec(tk); if (kv) { gOpt[kv[1].toLowerCase()] = kv[2]; return false; } return true; });
 					if (gm[1].toUpperCase() === 'VIRTUAL') { markVirtual = markVirtual.concat(gt); }
 					else if (gt[0].toLowerCase() === 'well') {
+						// `;ASSEMBLY: well R U D V P` is the simple Well: groundwater reservoir, pump node, discharge node, drawdown valve, pump.
 						// `;ASSEMBLY: well R S T D G P B`: reservoir, pump's upstream node, tank, tee, drawdown valve, pump, virtual pipe to the tank.
 						// A slice-1 well, `well R S T G P` (no tee), is still read. Anything else is not one.
 						if (gt.length === 6) { markAssemblies.push({ kind: 'well', nodes: gt.slice(1, 4), links: gt.slice(4), opt: gOpt }); }
@@ -1388,7 +1389,8 @@
 			var un, dn, wn, good;
 			if (a.kind === 'well') {
 				wn = a.nodes.map(function (id) { return nodeIndex[id]; });
-				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && wn[2].type === 'tank' && (a.nodes.length < 4 || (wn[3] && wn[3].type === 'junction')) &&
+				// A simple Well (no tank) is R, U, D: three nodes, the third a junction. Else the third is the tank.
+				if (wn[0] && wn[1] && wn[2] && wn[0].type === 'reservoir' && wn[1].type === 'junction' && (wn[2].type === 'tank' ? (a.nodes.length < 4 || (wn[3] && wn[3].type === 'junction')) : (wn[2].type === 'junction' && a.nodes.length === 3)) &&
 					a.links.every(function (id) { return !!linkIndex[id]; })) {
 					assemblies.push({ id: a.links[1], kind: 'well', nodes: a.nodes.slice(), links: a.links.slice(), staticTyped: true, _opt: a.opt });
 				} else { assemblyBad.push(a.links[0]); }
@@ -1472,6 +1474,7 @@
 		// ordinary one, so the file always opens.
 		assemblies.forEach(function (a) {
 			var opt = a._opt, tank = a.nodes && a.nodes[2], pump = a.links[1];
+			if (a.kind === 'well' && nodeIndex[tank] && nodeIndex[tank].type !== 'tank') { opt = null; }
 			delete a._opt;
 			if (!opt || a.kind !== 'well') { return; }
 			[['on', 'open', 'below', 'pumpOn'], ['off', 'closed', 'above', 'pumpOff']].forEach(function (k) {

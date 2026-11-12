@@ -95,7 +95,7 @@ const DD = [[0, 0], [20, 4], [40, 14], [60, 30]];
 const PH = [[0, 70], [30, 62], [60, 40]];
 function network(level) {
 	const doc = fresh();
-	L.setMode('add-well');
+	L.setMode('add-welltank');
 	press(200, 150);
 	const j = L.addNode('junction', 600, 150);
 	j._demand = 10;

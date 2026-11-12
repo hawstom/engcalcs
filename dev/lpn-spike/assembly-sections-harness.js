@@ -119,7 +119,7 @@ function entryLabels() {
 }
 function network() {
 	const doc = fresh();
-	L.setMode('add-well'); press(200, 150);
+	L.setMode('add-welltank'); press(200, 150);
 	const j = L.addNode('junction', 600, 150); j._demand = 10;
 	const j2 = L.addNode('junction', 900, 150); j2._demand = 5;
 	const p1 = L.addLink('pipe', 'W1D', j.id, []), p2 = L.addLink('pipe', j.id, j2.id, []);
@@ -146,10 +146,11 @@ const entry = entryLabels();
 console.log('        entry area: ' + entry.join(' | '));
 ok('the entry area comes first and holds the curves and the static level', entry.some((x) => /Static water level elevation/.test(x)) && entry.some((x) => /Drawdown curve/.test(x)) && entry.some((x) => /Pump head curve/.test(x)));
 ok('the field is named Static water level elevation', PC.lpn_field_well_static === 'Static water level elevation');
-ok('the entry area no longer holds the tank\'s depths or its diameter', !entry.some((x) => /Initial depth|Tank diameter|Maximum depth/.test(x)));
+// Tom, 2026-11-11: the top is the entry area and holds every input of the Well; the headings below hold results only.
+const ei = ['Pump on below', 'Pump off above', 'Base elevation', 'Initial depth', 'Minimum depth', 'Maximum depth', 'Tank diameter'].map((n) => entry.findIndex((x) => x.indexOf(n) === 0));
+ok('the entry area holds the pump levels and the tank\'s base elevation, depths and diameter, in that order', ei.every((i) => i >= 0) && ei.every((v, i) => i === 0 || v > ei[i - 1]), entry.join(' | '));
 const tank = secs.find((s) => s.title === 'Tank W1T');
-const ti = ['Initial depth', 'Minimum depth', 'Maximum depth', 'Tank diameter'].map((n) => tank.labels.findIndex((x) => x.indexOf(n) === 0));
-ok('the Tank section holds Initial depth, Minimum depth, Maximum depth and Tank diameter, in that order', ti.every((i) => i >= 0) && ti.every((v, i) => i === 0 || v > ti[i - 1]), tank.labels.join(' | '));
+ok('the Tank section holds results only: Head, Pressure, Depth, Available volume', !tank.labels.some((x) => /Initial depth|Minimum depth|Maximum depth|Tank diameter|Base elevation/.test(x)) && ['Head', 'Pressure', 'Depth', 'Available volume'].every((n) => tank.labels.some((x) => x.indexOf(n) === 0)), tank.labels.join(' | '));
 console.log('        tank section: ' + tank.labels.join(' | '));
 L.runSolve();
 await until(() => L.getDoc() && true, 50);

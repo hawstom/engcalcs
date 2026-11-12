@@ -249,7 +249,11 @@ $ec_icons = array(
 	// **PUMP+** (same sketch): the pump with a small plus on its outlet, which marks the assembly form.
 	// **WELL** (Tom's sketch, 2026-10-25): the ground line across the top, a casing that steps in to a slim pipe running down, and the
 	// drawdown curve dipping to the pipe from both sides. One drawing, which is also the Well's map symbol.
-	'well'       => '<path d="M3 4H21"/><path d="M7 4V11H10.5V20H13.5V11H17V4"/><path d="M3 15C7 15 9.3 16.5 10.5 19.5M21 15C17 15 14.7 16.5 13.5 19.5"/>',
+	// Symmetrical about the pipe; the ground line runs past the casing on both sides; the pump stands at the bottom of the pipe, below the
+	// drawdown curves, which meet the pipe above it (Tom, 2026-11-11, from the same sketch).
+	'well'       => '<path d="M2 4H22"/><path d="M7 4V11H10.5V17"/><path d="M17 4V11H13.5V17"/><path d="M9 17H15V22H9Z"/><path d="M2 13C6 13 9.3 13.8 10.5 15.8M22 13C18 13 14.7 13.8 13.5 15.8"/>',
+	// **WELL WITH TANK**: the well's drawing at 0.62 beside a small tank, the two joined at the ground (strokes keep their width).
+	'welltank'   => '<g transform="translate(0 2.5) scale(.62)"><path vector-effect="non-scaling-stroke" d="M2 4H22"/><path vector-effect="non-scaling-stroke" d="M7 4V11H10.5V17"/><path vector-effect="non-scaling-stroke" d="M17 4V11H13.5V17"/><path vector-effect="non-scaling-stroke" d="M9 17H15V22H9Z"/><path vector-effect="non-scaling-stroke" d="M2 13C6 13 9.3 13.8 10.5 15.8M22 13C18 13 14.7 13.8 13.5 15.8"/></g><path d="M16 9H22V16H16Z"/><path d="M13.5 5H19V9"/>',
 	'valveplus'  => '<path d="M3 3v18l9-9z"/><path d="M21 3v18l-9-9z"/><path d="M19 0V10M14 5H24"/>',
 	'pumpplus'   => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/><path d="M19 0V10M14 5H24"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',

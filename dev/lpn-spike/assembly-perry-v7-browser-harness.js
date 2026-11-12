@@ -153,7 +153,7 @@ async function main() {
 		const A = await openNet1(browser, net1), P = A.P;
 		const before = await labelTexts(P);
 		ok('Net1 shows result labels before the Well', before.length > 5, before.length + ' labels');
-		await A.arm('6', 'add-well');
+		await A.arm('6', 'add-welltank');
 		await A.click({ x: 900, y: 900 }); await A.off(); await A.s.settle(1200);
 		const banner = await P.evaluate(() => (document.getElementById('lpn_status') || document.body).textContent);
 		ok('the banner asks for the drawdown and pump head curves', /drawdown curve and a pump head curve/.test(banner));
@@ -196,7 +196,7 @@ async function main() {
 
 		console.log('\n--- 5. a reopened Well: its labels carry no leader through their own text ---');
 		const W = await openNet1(browser, net1);
-		await W.arm('6', 'add-well'); await W.click({ x: 1500, y: 330 }); await W.off(); await W.s.settle(800);
+		await W.arm('6', 'add-welltank'); await W.click({ x: 1500, y: 330 }); await W.off(); await W.s.settle(800);
 		await W.s.menuClick(await W.s.lang('lpn_file_saveas')); await W.s.settle(600);
 		if (await W.s.dialog()) { await W.s.answerTrainingPanel(); await W.s.settle(1500); }
 		const savedName = (await W.s.listFiles()).filter((f) => /\.(epp|lwn|json)$/i.test(f))[0];
