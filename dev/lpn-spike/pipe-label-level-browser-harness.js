@@ -91,9 +91,10 @@ const HOOK = '\twindow.__lpnLevel = {\n' +
 	'\t\t\tvar asked = { n: 0, l: 0 };\n' +
 	'\t\t\tdoc.nodes.forEach(function (n) { var e = nodeEls[n.id], p = nodeAt(n); if (e && !e.empty && p.x * state.s + state.tx >= 0 && p.x * state.s + state.tx <= W && p.y * state.s + state.ty >= 0 && p.y * state.s + state.ty <= H) { asked.n++; } });\n' +
 	'\t\t\tdoc.links.forEach(function (l) { var e = linkEls[l.id], p = linkLabelMid(l); if (e && !e.empty && p.x * state.s + state.tx >= 0 && p.x * state.s + state.tx <= W && p.y * state.s + state.ty >= 0 && p.y * state.s + state.ty <= H) { asked.l++; } });\n' +
-	// Which pipe is it for: a level label with no leader whose drawn rows lie nearer another pipe.
+	// Which pipe is it for: a level label with no leader whose drawn rows lie nearer another pipe. One that lost its
+	// leader because it would have run through another label (dropStruckLeaders()) keeps its place and is not counted.
 	'\t\t\tvar C = EngCalcs.lpnCollide, segs = []; doc.links.forEach(function (l) { var p = linkPointList(l), i; for (i = 1; i < p.length; i++) { segs.push({ id: l.id, ax: p[i - 1].x, ay: p[i - 1].y, bx: p[i].x, by: p[i].y }); } });\n' +
-	'\t\t\tvar astray = out.filter(function (d) { if (d.kind !== "l" || !d.level || d.leader) { return false; } var own = Infinity, other = Infinity; segs.forEach(function (g) { d.boxes.forEach(function (b) { var x = C.segmentBoxDistance(g, b); if (g.id === d.id) { own = Math.min(own, x); } else { other = Math.min(other, x); } }); }); return other < own; }).map(function (d) { return d.id; });\n' +
+	'\t\t\tvar astray = out.filter(function (d) { if (d.kind !== "l" || !d.level || d.leader || linkEls[d.id].leaderStruck) { return false; } var own = Infinity, other = Infinity; segs.forEach(function (g) { d.boxes.forEach(function (b) { var x = C.segmentBoxDistance(g, b); if (g.id === d.id) { own = Math.min(own, x); } else { other = Math.min(other, x); } }); }); return other < own; }).map(function (d) { return d.id; });\n' +
 	'\t\t\treturn { s: state.s, labels: out, sym: sym, asked: asked, astray: astray };\n' +
 	'\t\t}\n' +
 	'\t};\n';
@@ -172,6 +173,8 @@ function levelBreaks(Collide, v) {
 		const g = P.d.leader;
 		if (g) {
 			v.sym.forEach((c) => {
+				// The symbol a leader starts in is not in its way: a pipe shorter than its end symbols has its middle inside them (round 5).
+				if (Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; }
 				const vx = g.bx - g.ax, vy = g.by - g.ay, L2 = vx * vx + vy * vy;
 				let t = L2 ? ((c.x - g.ax) * vx + (c.y - g.ay) * vy) / L2 : 0; t = Math.max(0, Math.min(1, t));
 				if (Math.hypot(g.ax + vx * t - c.x, g.ay + vy * t - c.y) < c.r - eps) { out.push('N3 l:' + P.d.id + ' leader through node ' + c.id); }
