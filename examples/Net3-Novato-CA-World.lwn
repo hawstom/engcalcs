@@ -836,8 +836,7 @@
 			"tok": {
 				"minLevel": ".1"
 			},
-			"_custom_date_installed": "1971-01-01 00:00:00",
-			"minVolume": 0
+			"_custom_date_installed": "1971-01-01 00:00:00"
 		},
 		{
 			"id": "2",
@@ -849,8 +848,7 @@
 			"minLevel": 6.5,
 			"maxLevel": 40.3,
 			"tankDiameter": 50,
-			"_custom_date_installed": "1983-01-01 00:00:00",
-			"minVolume": 0
+			"_custom_date_installed": "1983-01-01 00:00:00"
 		},
 		{
 			"id": "3",
@@ -867,8 +865,7 @@
 				"_level": "29.0",
 				"minLevel": "4.0"
 			},
-			"_custom_date_installed": "1952-01-01 00:00:00",
-			"minVolume": 0
+			"_custom_date_installed": "1952-01-01 00:00:00"
 		}
 	],
 	"links": [
@@ -2638,8 +2635,7 @@
 		},
 		"tags": {
 			"read": true
-		},
-		"method": "hw"
+		}
 	},
 	"patterns": [
 		{
