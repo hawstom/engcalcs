@@ -776,3 +776,14 @@ Observed from two saves of Tom's WaterGEMS 26.0.0.532 (schema 1.0.54.0), read as
 **Written (candidate)** (`writeScenarios()` and `scenarioOverrides()` in `js/lpn-wtg-export.js`, only with `opts.candidate.scenarios = [{ name, inp | parsed }]`; the page never passes it): each entry is a project scenario's resolved network read as Base is read (`lpnExportInp` with that scenario's resolver, then `lpnInpParse`), a child of Base. If every difference from Base is a pipe's diameter or the base flows of the same demand rows of a junction (same count, same patterns), the scenario is written as above: scenario, modeling-element and `HMIScenarioAlternative` rows, ten inherited calculation options, the QBAT support element once, a child Physical alternative holding the edited pipes' rows, a child Demand alternative holding the edited junctions' rows, the element-type counts, and the `.wtg`'s animation setting and tree node (`patchWtgXml(..., addedScenarios)`). Base stays the active scenario and every Base element keeps the id it has without scenarios (the new ids are the last). **Any other difference** (another property of any asset, an asset in only one of the two, a changed pattern, curve, control, rule or option) is named in `report.scenarios[i].unsupported` and `report.notCarried`, and the scenario is left out whole. Only children of Base are written. Harness: `node dev/lpn-spike/wtg-scenario-harness.js` writes Tom's Scenario - 1 values (J1 300 to 500 gpm, pipe 2 8 to 10 in), resolves the scenario back from the file twice (its own walk up the alternatives, and the reader), and checks one kind at a time, the refusals, the no-override shape against his save, and two scenarios.
 
 **Not proven:** that WaterGEMS opens the file and shows the overrides in Scenario - 1 (computes the same as EPANET on the scenario's `.inp`). Tom's copy is the only test; no ask has been made.
+
+## Expected for `wtg-scenario-test`, 2026-11-13 (kept out of Tom's README)
+
+`~/tom-files/2026-11-13/wtg-scenario-test/` (`node dev/lpn-spike/wtg-scenario-test.js`): the chlorine project of `ctl-composite-test` with one child, Child A (J1 demand 300 to 250 gpm, pipe 2 8 to 10 in), written by the candidate scenario writer. EPANET on the network WaterGEMS holds (pump as a node between two 1 ft pipes):
+
+| | J1 psi, hour 0 | T1 ft, hour 12, rule step 6 min | T1 ft, hour 12, rule step 1 h |
+|---|---|---|---|
+| Base | 35.67 | 11.56 | 8.75 |
+| Child A | 35.74 | 15.49 | 14.48 |
+
+WaterGEMS matched the hourly rule step on 2026-11-09, so the 1 h column is the one to expect. A first draft of Child A at 500 gpm drained T1 to empty and ran negative, so the demand is 250. The harness holds the folder's `.sqlite` to what the writer produces now.

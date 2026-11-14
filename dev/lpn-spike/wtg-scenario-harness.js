@@ -214,7 +214,24 @@ const GPM = 0.22280092967190634 / 100;
 		ok('with no scenario the .wtg is what it was', /<ScenarioAnimationSettingStorageElement ScenarioCount="1">/.test(w0));
 	}
 
-	console.log('\n6. The page path is unchanged');
+	console.log('\n6. The test pair for Tom (dev/lpn-spike/wtg-scenario-test.js)');
+	{
+		const st = require('./wtg-scenario-test.js');
+		const dir = path.join(process.env.HOME || '', 'tom-files', '2026-11-13', 'wtg-scenario-test');
+		const fresh = await st.build(env);
+		ok('Child A is written, integrity ok', fresh.report.integrity === 'ok' && fresh.report.scenarios.length === 1 && fresh.report.scenarios[0].written && fresh.report.scenarios[0].name === 'Child A');
+		const file = path.join(dir, st.NAME + '.wtg.sqlite');
+		if (!fs.existsSync(file)) { console.log('   (the folder for Tom is not on this machine: the comparison is skipped)'); } else {
+			const dump = require('./wtg-dump.js').dump;
+			const a = dump(SQL, fs.readFileSync(file)), b = dump(SQL, Buffer.from(fresh.sqlite));
+			const bad = Object.keys(Object.assign({}, a, b)).filter((t) => JSON.stringify(a[t]) !== JSON.stringify(b[t]));
+			ok('the .wtg.sqlite in Tom\'s folder is what the writer produces now (every table, ids and times masked)', bad.length === 0, bad.join(', '));
+			const w = fs.readFileSync(path.join(dir, st.NAME + '.wtg'), 'utf8').replace(/Id="[0-9a-f-]{36}"/, ''), v = fresh.wtg.replace(/Id="[0-9a-f-]{36}"/, '');
+			ok('and so is the .wtg', w === v);
+		}
+	}
+
+	console.log('\n7. The page path is unchanged');
 	ok('no scenarios asked: the report has no scenario list, no QBAT and the counts of one scenario', !plain.report.scenarios && rows(plain.db, 'SELECT * FROM QBATDefinition').length === 0 && rows(plain.db, 'SELECT * FROM HMIScenario').length === 1);
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall checks passed');
