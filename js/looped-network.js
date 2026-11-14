@@ -8038,7 +8038,7 @@ var EngCalcs = EngCalcs || {};
 	// the .inp readers' carried text, import markers and staging; then keys that are stale, or
 	// migrated and deleted by applySaved().
 	[null, ['customProps', 'fileOptions',
-		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic',
+		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic', 'hydraulics.tok',
 		'sectionsOpen', 'mapHeight', 'fileAutosaveSeconds', 'colorRamp', 'colorClasses', 'colorReverse',
 		'colorThematic', 'colorFrozenBreaks', 'basemapFilter', 'kmDefault', 'labelReadabilityBias']]
 	].forEach(function (g) {
