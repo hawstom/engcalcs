@@ -4975,3 +4975,20 @@ OBSERVED (re-verify; real Chromium, Net1 plus fixture; probes in scratchpad pp/;
 - Not reproduced: "block sheds to P1 Q=" on Net1's opening view, at five window sizes.
 - Controls first open shows the two controls; Explode tip text is Tom's exact wording (tank form), simple form has its own.
 NOT DONE: mutation test of the harnesses; DEM; Tom's own window; light/dark; the 30-degree leader rule is gone, only observed as long leaders from ordinary nodes (unchanged from base).
+
+## 2026-11-13 feat/assembly round 7 (3331c5c9a), Task 822
+OBSERVED (re-verify; real Chromium, Net1 plus curves DD1/PC1 added; probes in the session scratchpad pv/; pictures _panel/www/img/pump-plus/perry-*-v10.png):
+- Panel step 1 says "Map, Insert": the Insert fly-out is under WATER. Pressing Pump cycles Pump, Pump+, Well, Well with tank as written.
+- Without curves a solve is refused (banner) and the Well's block has no numbers; Net1 has no drawdown curve, so Tom must make one in Edit curves. The steps say "run a solve" only. Net1's label settings have no Head, so the W1R and W1D rows do not exist until Head is ticked.
+- Block, Head ticked: stacked only when the placer stacks (zoom 8 on L21): "W1 Z=697.64 Q=1268.1 / W1R H=597.64 / W1D H=572.27 / W1P H=999.41 P=130.76" = his example. At fit and in a free spot it is ONE LINE ("W1 Z=0.00 W1R H=-100.00"), as ordinary multi-field labels are.
+- Well spliced into L21: the whole block is hidden at fit and for 6 zoom notches (2.5 s settle), shown from notch 7. Open ground and L112: shown at every notch.
+- Properties: Flow once above headings, Pressure only under Junction W1P. Confirmed.
+- Symbol: toolbar icon and map symbol read as the sketch; map symbol is a constant 45x39 px at every zoom; upper cylinder filled light blue (sketch is not). Well with tank toolbar icon is a blob at toolbar size.
+- Well with tank, 5 cases (tee at well / on pipe / on junction / on open ground; tank open ground / existing tank): each three presses, prompts right, one Ctrl+Z restores baseline. Tee on a tank refused by name. Escape after press 2 leaves well+tee, tool stays armed, one Undo removes both.
+- Tee at the well's own point: clicking the symbol's exact centre opens Junction J1, not the Well; the Well opens 8 px below centre.
+- Controls: library shows "LINK W1 OPEN IF NODE T1 BELOW 5 / CLOSED ... ABOVE 15", "Written by well W1. Change it in the Properties box of the well."
+- Explode: members stay, well symbol gone, no status-bar notice; the old block (heading W1 + rows) is still drawn after 1.5 s; one Undo restores the Well.
+- Morph: selecting the Pump+, Valve+, Well symbol (box title "Pump+ P1" etc.) and morphing to each offered type separates the group, status bar names it, one Undo restores the group. Tank form: tee J1, tank T1, pipe L2 each separate W1 and one Undo restores. NOT exercised in Chrome: a member picked from a table row (my table selection did not change the selection).
+- Ordinary labels vs CURRENT master (main checkout served on a temporary port): text identical on Net1 at 3 zooms and Novato at 2 zooms; Novato fit shows no labels on either. The master preview on 8100 is STALE (its looped-network.js differs from the main checkout) and differs from the branch in 5-9 Net1 labels.
+- Label drag: Net1 and Novato (dpr 2, fit and +4 notches, 3 alternating drags), master, the branch and stale 8100: pointer stays on the box (0 px worst). First drop of a Novato label ends 29 px lower than the pointer's travel on all three trees. Builder's 31-63 px drift NOT reproduced.
+NOT DONE: mutation test of harnesses; old one-point Well file; Tom's window; light/dark; the label-drag-track harness itself (builder's and another session holds the lock).
