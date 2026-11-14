@@ -4101,13 +4101,14 @@ var EngCalcs = EngCalcs || {};
 	// ink only (`.lpn-stacked`, css/engcalcs.css). The <use> is live, so it follows every move, resize
 	// and show/hide of the label with no code of its own; it only has to be made and removed.
 	// A label not yet in the DOM stays one layer, as before. The layer is made once per label and
-	// hidden while the label is one row: the layout pass rewrites a label's rows many times a settle,
-	// and making and removing an element each time was most of the cost.
+	// points at nothing while the label is one row: the layout pass rewrites a label's rows many times
+	// a settle, and making and removing an element each time was most of the cost, while a <use> that
+	// still pointed at its label rebuilt its copy at every rewrite.
 	var stackHaloSeq = 0;
 	function stackHalo(textEl, stacked) {
 		var u = textEl.lpnHaloUse, parent = textEl.parentNode;
 		if (!stacked) {
-			if (u && haloOn(textEl)) { u.setAttribute('display', 'none'); textEl.classList.remove('lpn-stacked'); }
+			if (u && haloOn(textEl)) { u.removeAttribute('href'); textEl.classList.remove('lpn-stacked'); }
 			return;
 		}
 		if (!parent || !parent.insertBefore) { return; }
@@ -4117,7 +4118,7 @@ var EngCalcs = EngCalcs || {};
 			parent.insertBefore(u, textEl);
 			textEl.lpnHaloUse = u;
 		}
-		if (!haloOn(textEl)) { u.removeAttribute('display'); textEl.classList.add('lpn-stacked'); }
+		if (!haloOn(textEl)) { u.setAttribute('href', '#' + textEl.getAttribute('id')); textEl.classList.add('lpn-stacked'); }
 	}
 	function haloOn(textEl) { return (' ' + (textEl.getAttribute('class') || '') + ' ').indexOf(' lpn-stacked ') >= 0; }
 	// Call wherever a label's <text> is removed, so its halo layer goes with it.
