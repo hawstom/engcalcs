@@ -30,34 +30,9 @@ EngCalcs.dataSingletonsCount = 11;
 EngCalcs.dataColumnsFirstRowCount = 7;
 EngCalcs.dataColumnsOtherRowsCount = 8;
 
-// Darcy-Weisbach friction factor for one line: same 3-regime Swamee-Jain approach
-// as darcy-weisbach.js / irrigation-pressure.js. e is absolute roughness (SI m).
-EngCalcs.bpnDwFriction = function (q, d, e, visc) {
-	'use strict';
-	var a = Math.PI * d * d / 4,
-		v = q / a,
-		re = Math.abs(v) * d / visc,
-		f;
-	if (re === 0) {
-		f = 0;
-	} else if (re < 2000) {
-		f = 64 / re;
-	} else if (re < 4000) {
-		var r = re / 2000,
-			y2 = e / (3.7 * d) + 5.74 / Math.pow(re, 0.9),
-			y3 = -0.86859 * Math.log(e / (3.7 * d) + 5.74 / Math.pow(4000, 0.9)),
-			fa = Math.pow(y3, -2),
-			fb = fa * (2 - 0.00514215 / (y2 * y3)),
-			x1 = 7 * fa - fb,
-			x2 = 0.128 - 17 * fa + 2.5 * fb,
-			x3 = -0.128 + 13 * fa - 2 * fb,
-			x4 = r * (0.032 - 3 * fa + 0.5 * fb);
-		f = x1 + r * (x2 + r * (x3 + x4));
-	} else {
-		f = 0.25 / Math.pow(Math.log10(e / (3.7 * d) + 5.74 / Math.pow(re, 0.9)), 2);
-	}
-	return f;
-};
+// Darcy-Weisbach friction factor for one line: EPANET's, one copy, EngCalcs.dwFriction in
+// js/PipeHydraulics.lib.js (loaded ahead of this file). e is absolute roughness (SI m).
+EngCalcs.bpnDwFriction = EngCalcs.dwFriction;
 
 // Friction head loss (SI m) for one line by the active method.
 //   line.q      flow (m3/s)          line.length  (m)      line.diameter (m)
