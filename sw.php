@@ -34,6 +34,8 @@
  */
 require_once(__DIR__ . '/lib/ServiceWorker.lib.php');
 $ecSwManifest = ecServiceWorkerManifest(__DIR__);
+$ecSwManifest['runtime'] = ecSwRuntimeUnversionedUrls(__DIR__);
+$ecSwDigest = ecSwUnversionedDigest(__DIR__);
 header('Content-Type: application/javascript; charset=utf-8');
 // The one header the scope widening costs. Without it a registration asking for anything wider
 // than '/engcalcs/' -- this script's own directory -- is rejected by the browser, and the suite
@@ -61,6 +63,17 @@ const PAGE_CACHE  = 'engcalcs-pages';
 // requests, and dev/scripts/sw_manifest_check.php renders real pages to prove it.
 const STATIC_ASSETS = <?=$ecSwJson($ecSwManifest['assets'])?>;
 
+// Icons are the one precached asset named with no ?v= (the <link rel="icon"> and the manifest
+// cannot carry one), so their cache key cannot move when the file does (Task 620). This digest
+// is of their CONTENT, and it is why this worker's bytes change when an icon does: the browser
+// then installs the new worker, 'install' re-fetches the icons, and the old entries are overwritten.
+// Same for the runtime-cached engine files below. Do not delete it as unused.
+const UNVERSIONED_DIGEST = <?=$ecSwJson($ecSwDigest)?>;
+
+// Runtime-cached with no ?v= and not precached (the opt-in EPANET engine). Refreshed in place on
+// install, only if the visitor already has them cached; never fetched for a visitor who does not.
+const RUNTIME_UNVERSIONED = <?=$ecSwJson($ecSwManifest['runtime'])?>;
+
 // Calculator pages: network-first, fall back to cache.
 const CALC_PAGES = <?=$ecSwJson($ecSwManifest['pages'])?>;
 
@@ -80,6 +93,7 @@ self.addEventListener('install', event => {
     Promise.all([
       precache(ASSET_CACHE, STATIC_ASSETS),
       precache(PAGE_CACHE, CALC_PAGES),
+      refreshRuntime(ASSET_CACHE, RUNTIME_UNVERSIONED),
     ]).then(() => self.skipWaiting())
   );
 });
@@ -92,6 +106,19 @@ async function precache(cacheName, urls) {
   await Promise.allSettled(urls.map(url => cache.add(
     new Request(url, { cache: 'reload', headers: { 'X-EC-Precache': '1' } })
   )));
+}
+
+// Task 620: an asset with no ?v= that was cached when it was first used has no key that moves
+// when it changes. Re-validate each one that is ALREADY cached; fetch nothing for a visitor who
+// has not got it. 'no-cache' asks the server whether it changed (a 304 costs no body), so this is
+// cheap when only an icon changed and still reaches the visitor when the engine did.
+async function refreshRuntime(cacheName, urls) {
+  const cache = await caches.open(cacheName);
+  await Promise.allSettled(urls.map(async url => {
+    if (await cache.match(url)) {
+      await cache.add(new Request(url, { cache: 'no-cache', headers: { 'X-EC-Precache': '1' } }));
+    }
+  }));
 }
 
 // Activate: drop caches from older schemes, then prune entries this build has superseded.

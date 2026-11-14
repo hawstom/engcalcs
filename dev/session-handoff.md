@@ -39,645 +39,246 @@ lines rather than appending corrections.
   worktrees on production; his commands are `git pull` there and the Apache reload here. If the
   classifier refuses a local cleanup, say so and ask him to allow it, never phrase it as his step.
 
+- **Never cut a branch from a capability branch; cut it from master.** Tom, 2026-10-30: *"You should
+  not have built it on box-design. This puts us in a pickle because box-design is a long-term
+  project. We will stay the course."*
+- **Words for the visitor:** Check for a checkbox, Click for a button, Press for a key, Select on the
+  map, choose in menus (Task 759; Click over Use is his 2026-11-01 call). Brief Wave 0 with them.
+- **Box style:** clip, no ellipsis, no tip on cut text, nothing hover-only (Tom, 2026-11-01: *"On
+  phone, there is no hover"*), and a `?` lands on the exact manual entry in the same words.
+- **English he has ruled on stays.** `lpn_field_auto_length_tip` ("slope length"; Tom, 2026-11-01:
+  *"Slope length is a standard engineering term. Translators should not be confused by it."*) and
+  `lpn_ff_col_more` "How many others" are his wording. Check `english-key-rulings.json` before
+  rewording any string.
+- **No letter to Bentley** (Tom, 2026-11-03: *"No letter to Bentley. Delete that."*). Never build from
+  a decompile; openly licensed samples and public documentation only (Task 749).
+- **Landing copy is written only in epanet-plus-plus.org.** librewaternet.org's landing pages 301
+  there; its `/app/` and `/engcalcs/` stay, because saved projects are per origin.
+- A report line carries `Line N: sev: code: text` (Tom, 2026-09-18). Grep his calls before
+  dictating wording to a builder.
+
 ## TRAPS
 
-- **The Mapbox token is restricted by host.** Allowed hosts include `localhost` and `hawsedc.local`,
-  so a new preview port needs nothing; a new hostname does, and `127.0.0.1` is refused (403). A token being present is not a token
-  being accepted — test with a real tile request.
-- **A clean merge can still break the tree** (a rename on one side, an old call on the other). That
-  is why the suite runs on the merge commit.
-- **`check_all.sh` stamps only a clean tree**, and pre-push refuses an unstamped master commit.
-  Commit, then run. Pre-commit refuses a non-merge commit on master.
-- **Never `git worktree remove --force`** without reading its `git status` first; it once destroyed
-  an agent's uncommitted work.
-- **Check that no agent is already working in a worktree before sending another in.**
-- **An orphaned probe can hold `/tmp/engcalcs-browser.lock` for hours**, and every browser harness in
-  every suite then times out (2026-09-23: a pre-reviewer's hung phone test). Find the holder with
-  `for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q engcalcs-browser.lock && echo $p; done`.
-  The divider harness now prints `NOT RUN` when this happens instead of failing silently.
-- **An agent's report of "committed" is a claim.** Run `git status` in its worktree before you
-  merge; one branch's two harnesses were reported committed and were untracked.
-- **A usage limit kills every running agent at once**; only their commits survive. Brief agents to
-  commit as they go, and relaunch with "read `git log master..HEAD` first".
-- **Preview ports live on jasmine since 2026-10-02**: `~/webdev/worktrees/_panel/ports.conf` lists
-  them (pipe rows with what to test), `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing
-  worktree, writes one Apache vhost per row and reloads Apache (passwordless via
-  `/etc/sudoers.d/previews`; a crontab `@reboot` reruns it). They bind to loopback; Tom reaches them through SSH forwarding, so his browser sees `localhost` (secure
-  context, and a host the Mapbox token accepts). A new port needs a new `LocalForward` line on his
-  side. Apache honours `.htaccess`; jasmine and production both run PHP 8.5 (2026-10-03).
-- **Ask which branch a host is on before explaining what Tom sees.** `dev.hawsedc.com` has sat on
-  an old feature branch; `curl` gets a 401 there. Answer about the surface he named.
+### Git and merges
 
----
-
-- **A worktree's `check_all` never stamps**, because its `.git` is a file; a master push needs its
-  own run in the main checkout. And never switch the main checkout's branch while its run is queued.
-- **The roadmap lags the code.** 2026-09-26 two agents were briefed on Tasks 708 and 696 and found
-  both already shipped. Run `git log --oneline --all --grep=<task>` before briefing one.
+- **Export `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` and `GIT_COMMITTER_*` in the SAME command as every
+  merge**, including a conflicted merge committed later: otherwise it is authored as Tom (met 10-13,
+  10-18, 10-30). If it slips, redo the batch from origin/master (unpushed, so cheap). `git -c
+  user.name=$VAR` breaks on a space.
+- **Master hooks:** pre-commit refuses `--amend` and any non-merge commit; a fast-forward fires no
+  hook, so always `--no-ff` into master. A forgotten generated file goes on a fix branch, then merge.
+  `check_all.sh` stamps only a clean tree, and pre-push refuses an unstamped master commit: commit, then run.
+- **A clean merge can still break the tree** (a rename on one side, an old call on the other), and two
+  branches green alone can fail together. The suite runs on the merge commit; after every master merge
+  into a branch, run the branch's suite (layout, seam checks and the panel guard in
+  `panel-touch-harness.js` all failed this way). Merge master into each live branch the evening it moves.
+- **A pipe hides a refusal** (`new_english_keys.php --write | tail` exits 0 when the generator
+  refused). Start a suite only in its own call, after `git status` is clean: `cmd && merge; setsid
+  check_all &` runs the suite on a conflict, and `a && b && suite &` backgrounds the whole chain.
+  A merge into a worktree holding Tom's uncommitted file refuses silently when piped: merge first.
+- **After any merge** compare lang key sets three ways per language (master, branch, base): one merge
+  dropped a key from 26 files. `git diff --stat master` the agent journals (one merge emptied
+  Perry's, 3892 lines to 0) and grep them for `<<<<<<<` markers.
+- **Generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`,
+  `english_string_hashes.json`, 27 payloads): take master's side, union the rulings JSON, redo the
+  branch's own `--update` hashes and drop those of deleted keys, then `new_english_keys.php --write
+  --force` and regenerate payloads in the merge commit. `--force` is safe only when `git diff master --
+  dev/new-english-keys.md` is empty or purely generated, and never before `git status`/`diff` on that
+  file in that checkout and a harvest: his uncommitted edit may be there. It exits 2 and writes
+  nothing while a merge is unresolved; `new_english_keys.php` without `--write` only prints.
+- **A data file rewritten whole churns or truncates.** `json.dumps` reformats hand-indented JSON
+  (`english-key-rulings.json`, `glossary.json` need indent=4, ensure_ascii False); `open(p,'w')`
+  before `open(p).read()` truncated a journal; `sorted()` churned the unsorted rulings file;
+  `lang_key_order_normalizer.php` with no flags rewrites all 27 language files (`git checkout -- lib/`).
+  Check `git diff --stat` before committing; insert, never re-sort.
+- **Classifier refusals** (the permission check, not a bug): a master merge needs his typed "Merge
+  <branch>" in the session, even from a pasted all-clear (asked for at the top of the report); it
+  refuses killing a queued or superseded run or leaked `php -S` servers, `git reset --hard`, editing the
+  gate files and settings ("self-modification"), and a script writing friction dispositions
+  ("instruction poisoning"; the Edit tool goes through). Say so and ask him to allow it.
+- **Dates:** run `date` before writing one (shell is Phoenix; PHP and the harvest stamp UTC, and a
+  branch name's date is not today's). **Roadmap:** it lags the code (Tasks 708, 696, 727, 617 and others had
+  shipped), so `git log --oneline --all --grep=<task>` before briefing; close a task in the
+  merge that ships it; delete a block by ID, never by line numbers; advance `tom-review-queue.md`'s
+  "Next free" with every row (`review queue parses`); regenerate `dev/features.md` after closing tasks.
 - **A check whose "before" run reads `master` breaks the merge that fixes it**; pin a SHA.
-
-- **A stub harness can pass over the very defect it names.** 2026-09-23 the zoom-control harness
-  emptied the document, so "Tom's exact sequence" passed while the real page went blank, and the
-  build agent then told us Tom had tested an old build. When a stub cannot reproduce his report,
-  send the pre-reviewer to reproduce it in real Chrome before believing either side.
-- **Seven agents each queueing `check_all` serialise on one lock for hours**, and an agent that
-  hands back while waiting queues duplicates. Count queued runs (`/proc/*/fd` on the lock) before
-  launching another track.
-
-- **`git stash` is ONE stack shared by every worktree.** 2026-09-24 one agent's `stash pop` took
-  another worktree's entry. Never stash while agents are live; brief them so.
-- **Ten check_all runs queued at once took four hours to drain** (2026-09-24, ~20 min each). A
-  run's pass is judged on the tree at its END, so an agent that edits while queued re-queues.
-  Stagger build tracks rather than launching seven together.
-- **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
-  running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
-- **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
-  tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
-  check_all.
-
-## STATE — 2026-11-11 (seventy-fifth session, Opus main, Sonnet agents)
-
-- **Merged on his word** (*"Merge if you are ready."*): `feat/wtg-composite` (Task 749 stays open for the rest of `dev/wtg-export.md`). **Merged on green:** `fix/reaction-rate-flake` and `fix/epanet-one-at-a-time` (EPANET solves and period runs share one queue in `js/lpn-epanet.js`; `EngCalcs.lpnCheckOutBytes()` refuses a damaged results file before the vendored `readBinary()`, which otherwise allocates without bound). That overlap was the cause of both load flakes, reaction-rate and scenario-example (57/60 failures pinned to one core before, 0/60 after).
-- **`feat/assembly` (Task 822, 8103, round 6), waits his browser pass.** Pump cycles Pump, Pump+, Well (simple: W1R, W1V, W1U, W1, W1D), Well with tank (the round-5 form). One label block per assembly through the ordinary pass (the assembly placer is deleted; Perry: ordinary labels pixel-identical to before at 7 zooms on four networks). Properties: every input on top, results only under member headings. Well symbol redrawn to his sketch. Perry could not reproduce his valve symbol at a Well: ask which state. **Open, his:** three-point Well with tank (his assembly+wizard), Auto curve (with Mary's Jacob seeding), scenario-overridable controls (Mary: WaterCAD swaps whole control sets in its Operational alternative; we have no controls category). **Seam:** it rewrote functions of the label pass that `feat/label-open-side` also changes (list in its round-6 commit and dev/assemblies.md); expect conflicts in `js/looped-network.js` when the second of the two merges.
-- **`feat/label-open-side` (Task 812, 8101, round 7):** his call: keep round 4's trade. Round 7 built nothing: placements are already kept per wheel notch (Task 681; `label-bucket-cache-harness.js`), and a pipe label taking a node label's spot gained 3 in ~170. Waits his word to merge.
-- **`feat/contour-controls` (Task 858, raised to 100 by CC on his renewed ask; 8105):** his order exactly; the plot has its own Property to plot (`contourField`, falls back to Color nodes by, else pressure, so old projects draw unchanged); Show node colors is a tick bound to Color nodes by; Settings and the box stay in one property. Perry's two defects fixed. Open, his: rename "Contour lines" to "Show contour lines".
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/a395a293-be70-4fef-8104-2213d7510858/scratchpad (his notes verbatim, agent rules).
-
-## STATE — 2026-11-08 night (seventy-second session, Opus main, Sonnet agents)
-
-- **Merged on his word** (*"Merge."*, *"OK to merge. But fix the too wide Description column."*, *"Merge. But peripherally..."*): `feat/override-push` + `feat/override-table` (Task 855 closed) and `feat/properties-title`, then `fix/merge-1108` on green. Push question in his words: "Push override upward? Current value in Base: 18 in." (CC kept the unit; he typed "18", ask). Fixed with them, both also wrong on master before: a Tables column never opens wider than its pane (`paneColInitialEm()`; the pane-heading rule now exempts a column at that cap); the docked empty Properties message spans the box. The push arrow had moved the Properties mark 2.6 px (`vertical-align` on the arrow variant).
-- **Translation sprint: later** (*"Later is fine."*), after the approved branches merge. Still open from 11-06: EPANET's own report printing 1392.49 demand charge, never confirmed.
-
-## STATE — 2026-11-06 (sixty-eighth session, Opus main)
-
-- **Merged on his word** (*"Merge it."*): `fix/wtg-energy-price` after his WaterGEMS test passed (*"All good."*: PU1 222.1 kWh, 22.21), with his look at "Energy price pattern and demand charge." Merged with it on green: `research/label-prepass` (E2 failed; his *"OK. Approved."*).
-- **Labels: Task 812 ("look like your neighbours") at 100, 813 back to 75**, on his *"I agree."* Start from N163 on Novato.
-- **Roadmap on his word:** 822, 847, 848, 849, 853 to 100; 818 to 50.
-- **not-epanet.org archived on GitHub and pulled on the server by him** (*"Done."*).
-
-## STATE — 2026-11-03 night (sixty-fourth session, Opus main, Sonnet agents)
-
-- **`feat/wtg-page-export` merged on his word** (*"Sure. Merge."*); Task 749 stays open for the ten saves in `~/tom-files/2026-11-03/wtg-saves-needed/README.md`, one small branch per item, cut from master. **The round 2-4 "EPANET gets" figures at 5 min were wrong**: our test script (`dev/lpn-spike/wtg-feature-tests.js`) stepped quality once an hour; fixed (751f22db6). Converged EPANET and WaterGEMS agree within ~10 % on the small network, and closely on his Net3 72 h chlorine runs. The product solver was never affected. EPANET's and WaterGEMS's default quality step are both the hydraulic step / 10; the export writes any other stated step. One-point pump: `PumpDefinitionType` 1 (his `tompump1pt` save), so Net1 exports. Dead keys deleted: `lpn_wtg_export_lost_emitters`, `lpn_wtg_export_lost_pump_speed_pattern`.
-- **`feat/wtg-saves` (Task 749, preview 8102), from his ten saves 11-04:** writes pump controls as pump actions (Net3 golden regenerated; ask him to re-export Net3), one-pipe and tank rates, source patterns, pressure-driven demand (minimum 0 only), EPSG:2223 positions. Candidate: pressure controls. Waits his three redos and a Net3 check, `~/tom-files/2026-11-04/wtg-saves-redo/README.md`, then his word to merge. Map text and backdrop live in the `.wtg.dwh`, which we do not write. Energy price: Bentley's public pages do not say a quality run blocks cost; his save will.
-- **`fix/graph-y-range` merged on green** (1ddbdaa31): the time-series y axis had a 1-unit minimum span, so 0 to 0.1 drew as -1 to 1 (his bug report). `series-axis-harness.js`.
-- **Landing sites:** tagline *"the EPANET legacy, extended"* (epp 380089a). librewaternet.org's landing pages 301 to epp (2920746, his "c"); its /app/ and /engcalcs/ stay, because saved projects are per origin; write landing copy only in epp. Disclosures reimagined with his own edits, merged and pushed (epp a421a22, not-epanet.org 5fd7f69). hawsedc.com techdocs.php link follows sewslope's title (653a9cf).
-
-## STATE — 2026-11-03 evening (sixty-third session, Opus main, Sonnet agents)
-
-- **`feat/native-wire` merged on his word** (*"Merge it including the wording changes at epp and lwn etc. We no longer are dependent on the EPANET engine!"*). Task 733 closed. The "one instant only" claims are rewritten on librewaternet.org (3388385), not-epanet.org (404cc64) and epanet-plus-plus.org (f7f795a), with their CLAIMS rows and citations; EPANET stays the default setting, and no copy claims completeness against EPANET. `dev/positioning.md`, `dev/lpn-rulings.md`, scope and water-quality docs follow.
-- **hawsedc.com (b447706, pushed):** sewslope.php title and description carry the sizes (his OK) plus one plumbing-code line for house sewers; peakfact.php's Alberta conversion was done at 3.875 L/gal, so the constant is now 35.94 at 3.785 (6.659 Q^-0.168, Q in L/s). Its snippet stays: he called the proposed one gray-hat SEO.
-- **Sitemap:** he asked whether to resubmit; no, Google rereads a submitted sitemap on its own.
-
-## STATE — 2026-11-03 (sixty-second session, Opus main, Sonnet agents)
-
-- **`feat/wtg-page-export`: his WaterGEMS results (11-03)** are folded in by a Sonnet agent: emitter stored as cfs per psi^n (file B), VSPType 0 = pattern, CalculationType 2 Age / 3 Constituent / 4 Trace (5 hydraulics), TankMixingModel 0 two-compartment (percents summing to 100) / 1 mixed / 2 FIFO / 3 LIFO, source codes 0 Concentration / 1 Flow Paced / 2 Setpoint / 3 Mass. **Open:** two-compartment gave 0.5 at hour 12 against EPANET's 0.170; chlorine reactions were not read (J1 1.0). Round 2 files in `~/tom-files/2026-11-03/wtg-feature-tests-2/`. **No letter to Bentley**, ever (his word 11-01 and 11-03).
-- **Compression confirmed on production** (gzip on css and js, hawsedc.com and epanet-plus-plus.org, after his 11-02 pull).
-- **The epanet-plus-plus.org 404 was `/index.php`**: the suite's site menu linked hawsedc.com pages root-relative, so on both sibling hosts every item but Engineering Calculators 404'd. Fixed (`fix/main-menu-host`, absolute to hawsedc.com there) and a 301 `/index.php` → `/` in epanet-plus-plus.org (0b19f7f). Both need his pull.
-- **Manning Pipe Flow on librewaternet.org already names hawsedc.com as canonical**; my 11-02 question was wrong. Google keeps the copy anyway (position 23). The stronger step, a 301 from librewaternet.org's calculator pages, is his call.
-
-## STATE — 2026-11-02 (sixty-first session, Opus main, Sonnet agents)
-
-- **Merged on his word** (*"Good. Merge."*, *"Yes."*): `feat/settings-solver` (Solver first under Calculation). **Merged on his "Add it":** `feat/theme-log` (Task 824 logging half: theme column on the page-view row from the existing 10 s beacon, `spock.php` tables per bucket; no device storage changed).
-- **`feat/wtg-page-export` (8102):** master merged in; candidate writers behind `opts.candidate` (never on the page); test set `~/tom-files/2026-11-02/wtg-feature-tests/` (README, expected numbers from EPANET). Waits his WaterGEMS test of those files, then his word. Net3 there is a TRACE run, and its quality inputs are not written.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/cf3c25a7-928a-4684-bba7-19501dead35c/scratchpad.
-
-## STATE — 2026-11-01 (fifty-sixth session, Opus main, Sonnet agents)
-
-- **Sprint 1101 merged on master** (Tom: *"Proceed with a translation sprint now."*): 401 keys x 26 languages, Wave 0 (21 English rewrites, `dev/english-friction/1101-wave0.json`), a fix pass after QA, cognate exemptions, drift re-baselined, zero keys left. Most files still said *projection* in the CRS chooser (`lpn_crs_name`, `lpn_crs_count`); all fixed (glossary note on `projection (map)`). Box titles checked in all 26 (Task 809 half done). Notes now say EPANET-MSX is modeled. **Open friction entry:** `lpn_field_auto_length_tip` is Tom's word-for-word English (2026-10-27, `properties-tip-words-harness.js`); three translators queried "slope length"; Tom 11-01: *"Slope length is a standard engineering term. Translators should not be confused by it."* English stays; translations already say "along the slope, with the rise or fall". `lpn_ff_col_more` "How many others" is HIS wording (ruling recorded).
-- **Tom 11-01:** keep **Click** for on-screen buttons, Press for keys (he weighed Use). Box-design changes no English, so the sprint did not pre-empt it.
-- **box-design round 12** (Tom's round-11 notes), commits 0f5f4e248..fe5f43c7a: Units Map-coordinates value clipped with ellipsis; Settings resize keeps the index's section in place (NOT a regression: master loses it too; Perry measured); Scenario names truncate with ellipsis and tip; Libraries Curves/Pipe types/Fittings intros moved into a `?` that opens the manual on click (12b, after Perry found a blue link heading). Perry's review: journal 1ee72f240. **Tom's round-12 notes (11-01):** no ellipsis anywhere in the box style (his 10-28 word was *truncate*; an agent added the ellipsis and credited him), no new tips on cut cells, nothing hover-only (*"On phone, there is no hover"*), and the ? must land on the exact manual entry in the same words. **Round 12c** (91a4a11a4..c81d316da) did all four: clip, tips removed, three Libraries manual entries rendered from the box's own keys, ? opens that entry on click and tap. `adhoc_style_check.php` now also counts CSS ellipses (6), per-box overrides of the shared style (18) and cell/row tips (17), as ratchets (3f0c1b393, on box-design; Tom: *"It shouldn't need a rule if it's in the style and a script checks for ad hoc styling"*). **Merged to master 11-01 on his word** (*"Merge now. I am eager to deploy to production and keep testing this."*); Tasks 827, 828, 829, 842, 845 closed; tier 95 retired, its tasks back at 100; Task 852 (truncation needs a reveal) opened.
-- Still true from 10-31: leftover override `.lpn-contourbox { --lpn-g-valmax: 9.5rem }`; Task 825 re-measures now that box-design has merged.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/21898008-86a0-4f41-8525-5b6c135ed7c9/scratchpad (briefs 12a, 12b, wave0, translate, fix; qa.php).
-
-## STATE — 2026-10-30 evening (fifty-second session, Opus main, Sonnet agents)
-
-- **Tom, 10-30: finish open work before opening new.** *"I would have preferred that this one not be opened ... I would like videos to drive our development for a while."* A translation sprint and videos are next on his side. Every 100/95 task waits on him or a sprint; do not start a fresh slice.
-- **Merged on his typed word 10-30:** `feat/theme-of-day` and `feat/gis-background` (Task 720 closed). **gis-background carried 197 box-design commits (round 6)**, so master now holds box-design minus its round-7 and round-8 commits. Tasks 827/828/829 finish when box-design merges.
-- **box-design round 8, built this session from his round-7 phone pass** (*"Make the "Exit" button in the Select area help box exit only the box, not the mode ... Maybe the button needs to say "Close""*; *"The Properties box has an inappropriate lower width limit. Remove that limit ... this applies to the global style"*). He answered Yes to full-height phone boxes and readable Settings names. Read `git log master..box-design` and Perry's journal there before reporting on it; it waits his pass (port 8103).
-- **Master's suite after the two merges failed 17 harnesses**, all from box-design round 6 riding in on gis-background (its own tip failed them; agents never run the full suite). `fix/master-after-gis` fixed them: mostly harnesses following round 6's design, plus the lost 9-column scenarios table in all 27 guide files, a settings-wrap breakpoint, the GIS form marked session, `lpn_guide_text_demands_box` (new, English only) and a corrected contour example. 
-- **Merged on his typed word 10-30 evening:** `feat/dxf-import` (Task 772 slice 1); his Properties example sentence ("Properties lists inputs and then results") and his "Good" on the demands-box and contour-example strings recorded.
-- **RULING (Tom, 10-30):** *"You should not have built it on box-design. This puts us in a pickle because box-design is a long-term project. We will stay the course."* Never cut a branch from a capability branch; cut it from master.
-- **Waiting his word:** `feat/report-widths` (8110, his "Merge" stands) rides on box-design. **Parked on his word:** `feat/import-alternative` (8107): *"Ask me later."* Do not touch or re-ask unprompted.
-- **CC shells (Tom asked 10-30 that the count be accurate):** before saying done, every background shell and agent this session started has exited or been stopped (TaskStop), and `ps` shows no `sleep` loop, `php -S`, or harness left by it. Agent briefs forbid polling loops and leftover servers. The final report states the count.
-- **Trap met (10-30):** an agent's merge of master into a branch dropped a lang key from 26 files; after any merge, run a three-way key-set comparison (master, branch, merge base) per language.
-- **Trap met (10-30):** `new_english_keys.php --write` refuses after a `--theirs` checkout of the generated file; `--force` is right only when the diff is purely generated content.
-- **Trap met (10-30):** `git merge` on master takes the author from the environment only for the commit it makes itself; a conflicted merge committed later in another shell call is authored as Tom. Export `GIT_AUTHOR_*` in the same call as the commit.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/9eca90e2-5a59-420c-8f3e-01d61c7e6527/scratchpad.
-
-## STATE — 2026-10-30 small hours (forty-ninth session)
-
-- He wants to proofread spock.php once deployed. Task 824 holds his theme-of-the-day words.
-- **Trap met:** the master preview (8100) sat on the previous master after a push, so he tested stale code. Run `sh ~/webdev/worktrees/_panel/generate.sh` after every master push.
-- **Trap met:** `git commit --amend` on master is refused by pre-commit, and the classifier refuses `git reset --hard`. Set `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` before `git merge` on master.
-
-## STATE — 2026-10-29 afternoon (forty-seventh session, Opus main, Sonnet agents)
-
-- **Merged on green with this handoff:** `fix/manual-search` (User Manual: every hit marked, a chapter result opens on its first hit, heading hits indented under their chapter) and `chore/test-trim` (pass 3: four pixel/timing harnesses on demand via `dev/scripts/on_demand_harnesses.txt`, `run_harnesses.sh --all` runs them; the selftest and doc-bookkeeping check lines retired, scripts kept on disk and listed in `dev/automated-checks.md`; new ratchet `adhoc_style_check.php`, baseline 137 lines, 122 in looped-network.js). The four visitor-string checks (struck public claims, em dash, plain-English swaps, select/choose) stay live.
-- **Test-trim pass 2** (merge harness families: user-guide, pane, scenario, label) is approved by Tom and waits until `box-design` merges: box-design edits those same harnesses.
-- **Translations owed at the next sprint** (his word only; phased recommended, anchors first): `lpn_full_col_time` now "Time (hr)" in en only; `lpn_ff_col_more` "And others"; the two reworded guide strings (26 languages carry a literal "(hr)" stand-in in the guide table); the Auto length and fittings tips; tr `lpn_field_km_short`.
-- **Trap met:** a build agent's commit landed on a detached HEAD while its branch stayed put, and its report said "committed". Check `git branch --show-current` in each worktree before merging; `git checkout -B <branch> <sha>` recovers it.
-- **Trap met:** a Perry run wrote his journal into the main checkout; brief him to write in the branch's worktree.
-- **AGENTS NEVER RUN THE FULL SUITE** (Tom 10-27: *"Everything has been slow for the last two days."*). Agents stop at `--fast`, `--node-only` and their own harnesses; the orchestrator runs one full suite per merge batch.
-- **His bottom-pane 3 s slowdown is NOT reproduced** (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
-- **Trap:** a worktree has no `dev/browser-pass/node_modules`; symlink it from the main checkout before any browser harness (ignored by git).
-- **Trap:** an automated browser opens with no first-view docks (`navigator.webdriver`) unless `window.EC_DEFAULT_DOCKS=true`.
-- **Trap:** start long suites with the Bash tool's background mode, not `nohup`, so they show in Tom's shell list.
-- **Trap:** Playwright's `page.route()` disables Chrome's form restore; a form-restore harness must not route.
-- **Trap:** a merged-to-master fix leaves every feature branch behind; merge master into each live branch the same evening, before asking him to test.
-- Unchanged wait: Task 825, his audit pass.
-- SCRATCH: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/4e77bea5-26bf-421e-a279-762cbbbddc50/scratchpad (brief-common.md, ida-phone-boxes.md, test-trim-proposal.md).
-
-## STATE — 2026-10-24 (thirty-eighth session)
-
-- **Merged 2026-10-23 on his word, pushed e583a7cc6:** `feat/import-new-scenario` (Task 814) and `feat/theme-whimsy` (Task 811, now closed). `fix/settings-spinners` merged on green with this handoff (no spinner arrows anywhere; a wheel over a focused number box scrolls instead of stepping; the cause was that a spinner step fires `input` but the Settings boxes apply on `change`).
-- **His interview answers are in `dev/assemblies.md`** (Task 822, still negotiating; his questions are answered in messenger.md). Expert levels: *"Day 1 must be pure joy and fun"*; he wants a coach-marks mockup. WaterGEMS menu name: "Export > .wtg.sqlite file…".
-- **`feat/wtg-page-export`** (no port yet): File > Export > .wtg.sqlite file from the page, built on `feat/wtg-export`; never merges before his word. Its suite was unfinished at /clear: read `git log` in its worktree and the log `feat-wtg-page-export-full*.log` in this session's scratch.
-- Task 812 Step 2 (`fix/label-last-pad`) measured and rejected; what is left is design work, not a port.
-- Tasks 733 slice 7, 737 sprint, 681 wait on his word.
-- **Trap met:** a harness DOM stub lacks `hasAttribute`; page code using it threw in 150 harnesses. Use `getAttribute`.
-- **Trap met:** a Settings list built as `div > span` was hidden by the box's positional CSS; a harness for anything drawn checks visibility and width.
-- **Trap met:** a usage limit kills every agent; detached suites and commits survive. Resume with SendMessage, not a new agent.
-- SCRATCH for this session: /tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/1a7bdf36-0009-45e7-8601-e5252dbb9d6a/scratchpad
-
-## STATE — 2026-10-22 evening (thirty-sixth session, Arizona time)
-
-- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides (pushed 1c75721e0); then fix/energy-count (Task 821, his call "Count as EPANET does").
-- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions. The 2026-10-22 report there holds his open questions: read it before reporting.
-- Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
-- His "Ask your AI agent" idea (Task 818): on hold. Tom, 2026-10-22: *"It may be premature to do much about this, but maybe Mary can guide us. I need to focus on wtg export."* Mary's answer so far: `dev/agents/market-researcher/ai-agent-interface.md`.
-- WaterGEMS export (`feat/wtg-export`, his focus): his 10-22 test of the first files: tiny, Net3 at hour zero and full Net3 all open and give the same results, no messages; only the symbols came in very tiny. Fixed (symbol and text size from the map extent); valves, volume curves, pump speed and head patterns added. New files `~/tom-files/2026-10-22/wtg-export-2/` (readme inside). Three one-thing asks of him (tank-level control, emitter, five-point pump curve), click steps in `git show feat/wtg-export:dev/wtg-export.md`; the control one also settles whether our clock controls fire.
-- Load flakes seen 2026-10-22 in master's suite: `new-project-pan-harness.js` (passed alone twice), `label-form-n600-browser-harness` (an agent's run).
-
-### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
-
-- `feat/wtg-export` (no port; a spike, dev scripts only): see above.
-- `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
-- `feat/desktop`, `fix/bottom-pane-lag`: untouched.
-
-### Traps met 2026-10-21 (thirty-third session)
-
-- **Agents sharing one scratchpad overwrote each other's `full.log`.** Brief each agent to name its
-  logs after its branch.
-- **Tom's sample files can change under a branch**: he saved a bigger WTG-tgh-1 over the old one, and
-  the branch's harness failed on a fixture nobody had touched in git. Check file dates in tom-files first.
-- **`new_english_keys.php --write` refuses after a conflicted merge** even when the file equals
-  master's; check `git diff master -- dev/new-english-keys.md` is empty before `--force`.
-
-### Traps met 2026-10-20 (thirty-first session)
-
-- **A merge into a worktree with Tom's uncommitted file in it refuses silently** when piped to
-  `tail`. Merge first, copy his edited file in after.
-- **An outward-looking agent wrote its journal in the main checkout** while nothing was running;
-  brief every agent to write journals to the scratchpad, always.
-- **A menu item's language key is its command ID** (`lib/lpn-commands.json`, usage counts). Reusing
-  another key for a menu row renamed the command; `lpn_file_export_item_msx` was restored for that.
-  Never point a menu row at a borrowed key. Only the full suite's browser harness caught it.
-- **`git -c user.name=$VAR` with spaces in the variable breaks**; set `GIT_AUTHOR_NAME` /
-  `GIT_COMMITTER_NAME` in the environment instead.
-
-### Traps met 2026-10-20 (thirtieth session)
-
-- **The review queue declares its next free R-number.** Adding R-418..420 without advancing it failed
-  `review queue parses` and a full run was wasted. Advance the "Next free" line with every new row.
-- **`git merge --ff-only` of a chore branch put a plain commit on master** (hooks never fire on a
-  fast-forward). Always `--no-ff` into master.
-- **A new worktree has no `dev/browser-pass/node_modules`**: every browser harness then fails with
-  "Cannot find module playwright-core". Symlink it to the main checkout's when making a worktree.
-- **Four branch suites at once plus a Perry browser run** failed contour, label-drag-track,
-  setting-scope and settings-select-lag; all passed alone.
-
-### Traps met 2026-10-20 (twenty-ninth session)
-
-- **Editing the main checkout while its suite runs** dirties the tree and the run cannot stamp. Make
-  even one-line roadmap edits in a chore worktree.
-- **A subagent's harness compared the branch with its own layout, not master**, so it passed while
-  Net3 labels lost fields. Perry caught it in Chromium; label harnesses now compare with master.
-- **Deleting a roadmap block by line count removed a neighbour heading** (roadmap 146.09). Delete a
-  block by its ID, never by line numbers read before an earlier edit.
-
-### Traps met 2026-10-19 evening (twenty-eighth session)
-
-- **A Python one-liner truncated Sue's journal**: `open(p,'w').write(x+open(p).read())` opens for
-  writing (truncating) before the read. Caught by the diff stat (3,016 deletions), restored. Read first.
-- **A subagent that waits on its own background check_all re-sends its report on every wake.** Stop it
-  with TaskStop once its suite is detached (setsid) and watch the log yourself.
-- **An agent's "byte-identical before and after" was wrong**: help-menu, tool-keys and all-calcs-smoke
-  caught the in-app Guide refactor. Run the suite before believing a refactor claim.
-- **new-project-pan-harness.js failed once under load**, passed alone.
-
-### Traps met 2026-10-19 (twenty-seventh session)
-
-- **`example-open-guard-harness.js` prints four FAIL lines on purpose** (its mutation control) and passes.
-  Grep for `FAILED:`, not `FAIL`, in a harness log.
-- **`label-pass-economy-browser-harness.js` and `settings-select-lag-harness.js` fail under load only**
-  (a label hit box differing at the 8th decimal; lag timing). Both passed alone.
-
-### Traps met 2026-10-18 (twenty-sixth session)
-
-- **My briefs told agents to add new keys to all 27 files**; the rule is English only (the others fall
-  back). It failed `lang syntax rules A-D` (identical-to-english). Brief: new keys in lib/lang.ec.en.php only.
-- **A merge run without GIT_AUTHOR_NAME took Tom as author.** Export the author env in the SAME command as
-  every merge; redo the batch from origin/master if it slips (unpushed, so cheap).
-- **His edit of new-english-keys.md arrived mid-suite in the main checkout**: moved by patch to a chore
-  worktree, then `git checkout --` in main before the suite ended, so the stamp still landed.
-- **Ida proposed restyling one consent button to stand out**; CLAUDE.md forbids it. Read seat advice against
-  the house rules before forwarding it.
-- **scenario-settings-routing-harness failed in five branch suites**: stray page debounces between cases
-  (fixed in the harness, fix/routing-harness-flake). Other multi-case harnesses may share the exposure.
-- **The previous session's open questions were invisible to him after /clear.** Read the last session's
-  final messages for unanswered questions before reporting.
-
-### Traps met 2026-10-17 (twenty-fifth session)
-
-- **The classifier refused the sprint's master merge** though his message authorized the sprint. Ask
-  for "Merge chore/sprint-1017" typed, at the top of the report.
-- **A script writing friction dispositions was refused as "instruction poisoning"**; the same edits by
-  the Edit tool went through. Write dispositions with Edit.
-- **Translators told "subject word first" made bad titles**: "Complete: report" for Full report (ar,
-  fa, km), an invented subject ("Network: full report", pt, fr, it), and my changed placeholder colons
-  to dodge the identical check. Read every box-title change in the sprint diff.
-- **A Wave 0 rewrite that repeats a placeholder** ({name} twice) trips `language placeholders` until
-  every `.replace('{name}'` is global.
-- **The Guide harnesses compared the Spanish page with the English** and broke when the sprint
-  translated it. They now use `esString()` from `user-guide-chapter-lib.js`.
-- **The regex parsers miss keys joined onto one physical line**; QA found five dead ones in 26 files.
-  PHP `include` sees them: count orphans with it, not with `^`-anchored greps.
-
-### Traps met 2026-10-16 (twenty-fourth session)
-
-- **The harvester keeps the LAST copy of a key**, so a key listed under several branches lost his marks
-  (174 of them) to an unmarked duplicate. Fixed at the source: a branch already merged into another
-  listed branch is named in one line. If a key ever appears twice again, harvest from a copy with the
-  duplicate sections stripped.
-- **"Regression" reports can be data.** Fotobi's Error 110 was metric numbers under declared US units;
-  bisecting found no code change. Read the file's declared units before bisecting.
-- **Harvest stamps UTC dates** (2026-10-17 at 19:45 MST). sed the day back before committing.
-- **Two harnesses fail only under load** (setting-scope "stored as both", table-divider-align): both
-  were harness timing, fixed 10-16. Run a red browser harness alone before calling it a defect.
-- **A bare preview link to a port's root is a 403**: link the page, or point him at the Branch
-  previews page row.
-
-### Traps met 2026-10-16 (twenty-third session)
-
-- **Two small branches green alone broke three harnesses together** (description-lines + retire-mark-extrema:
-  halo-under-ink pinned the extrema code, Tab order, setting-scope inventory). The suite on the merge caught it.
-- **His uncommitted edit arrived mid-suite** in the main checkout, and another session merged into master
-  in the same checkout during a run. Commit his edits in a worktree copy; tell peer sessions before a run.
-- **A sub-branch builder's "fails on base too" is worth collecting**: three of them independently found
-  bentley-interop's own head red, which nobody had run since 9b9f74f3.
-- **The classifier refused killing leaked `php -S` servers** (parent 1, days old). Ask him to allow it.
-
-### Traps met 2026-10-15 (twenty-first session)
-
-- **"Ledger" was CC's word; he did not know it.** Relay in his words.
-- **He retired the all-clear file, both freezes, the deploy-blocker list and the pre-merge hook**
-  (10-15/16): they duplicated the classifier and choked merges. Do not rebuild them.
-
-- **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
-  and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
-- **json.dumps on a hand-indented JSON reformats all of it.** Check `git diff --stat` before committing;
-  english-key-rulings.json and glossary.json round-trip only with indent=4, ensure_ascii False.
-- **The sprint brief's grep loop was mis-escaped** (`\$` in double quotes); agents fell back to python.
-- **A transliterated "halo" reads "hello"** in am, bn, hi, my. Read new loanwords back.
-- **The tip-door harness's "link's WORDS" check failed once under load** and passed 75/75 twice alone.
-- **CC dated the whole day 2026-10-16 from the session's date and PHP's UTC clock**; Arizona was still the
-  15th. Run `date` before writing any date; PHP scripts stamp UTC (english_string_hashes "updated").
-- **The classifier refuses CC editing the gate files and settings** ("self-modification"), even on his
-  typed word; it allowed committing his own edit of them under his name but not merging that to master.
-
-### Traps met 2026-10-15 (twentieth session)
-
-- **CC dated a whole batch 2026-10-15** (roadmap, glossary, handoff) from the date in a branch name. Use
-  `date` in Arizona; the shell is on Phoenix time.
-- **A plural mechanism was built before he could say no**: he prefers "overrides (1)". Then the rewording
-  agent changed 23 strings he had approved; check `english-key-rulings.json` before rewording English.
-- **A translator narrows an ambiguous English word** (am, fa, hi turned the Select-mode "label" into Text).
-  Read each sprint diff for the keys more than one agent flags.
-
-### Traps met 2026-10-14 (eighteenth session)
-
-- **CC killed master's RUNNING suite thinking it was queued.** `flock` is not a queue: a waiting suite
-  shows the same processes. Read the log's last line before killing anything.
-- **Slot starvation**: with all four slots busy, a branch suite waited over an hour. EC_CHECK_SLOTS=6..8
-  gives a run its own slot; leaked `php -S` servers from a killed run must be killed by PID.
-- **A stray EPANET source file (inpfile.c) appeared in the main checkout** from an agent's research.
-  Brief research agents to use the scratchpad.
-
-### Traps met 2026-10-14 (seventeenth session)
-
-- **Wave 0 undid his word calls** (Check for a checkbox, click for a button; Task 759). Brief Wave 0 with them.
-- **A pre-reviewer wrote its journal into the main checkout** while master's suite ran there. Tell Perry
-  which worktree to write in.
-- **The classifier refused killing a superseded suite run.** Let it finish; do not edit its tree meanwhile.
-- **A master merge broke a branch harness through layout**: three new pane tabs wrapped the tab strip, which
-  exposed a missing refresh on workspace import. Run the branch suite after every master merge into it.
-
-### Traps met 2026-10-13 (sixteenth session)
-
-- **A merge commit run in a worktree took Tom as author.** Use GIT_AUTHOR_NAME/EMAIL or amend before push.
-- **A harness enshrined a defect** ("Its 1 overrides" checked as `{n}`=1). Read what a check asserts.
-- **A preview note CC wrote named quantities CC had not read.** Read the code before describing it.
-- **CC told him a .prj was hidden by Windows.** He had shown it was absent; take his facts first.
-
-### Traps met 2026-10-12 (fourteenth session)
-
-- **The classifier refused the master merge of three green branches**, with no pasted approval involved.
-  Merging to master needs his typed word every session; ask at the top of the report.
-- **CC's own brief was wrong** (SI twins: "coordinates unchanged"): the scale bar read metres on a feet
-  drawing. A unit conversion converts the drawing too.
-- **Two translators returned "placeholder" as their report** with correct edits on disk. Read the diff.
-- **One agent's `pkill -f check_all.sh` killed every suite on the machine** (master twice, five agents). The
-  wait-loop guard now refuses a pkill/killall by a shared name; kill by PID after checking its cwd.
-- **A background Bash job of CC's died when a plugin was installed mid-run.** Start long suites with
-  `setsid nohup sh -c '... ; echo exit=$? >> log'` and wait with wait_for.sh --sentinel.
-- **Harnesses that hard-code an English fallback break the day the sprint translates the key** (three did).
-  Read the expected label from pageConfig or the language file.
-- **A sprint empties new-english-keys.md**: keys Tom had not read were translated before he read them.
-- **An agent re-added a tip Tom had deleted** because CC's brief asked to "update" it. Check
-  english-key-rulings and the deleted-key harness before briefing a string.
-
-### Traps met 2026-10-11 (thirteenth session)
-
-- **The classifier refused an all-clear from his PASTED message again**, though his global CLAUDE.md says
-  pasted is his. He typed "Merge feat/user-guide" and it went through. Ask for the typed word at once.
-- **Two branches green alone broke one harness together** (user-guide's Find word list vs tank-volume's new
-  Find fields). The suite on the merge commit caught it; fix on a fix branch, merge, rerun.
-- **An agent's background check_all outlived its report**; CC's merge into that worktree then ran under
-  it. Before merging into an agent's worktree, `ps` for its suite and stop it.
-- **A merge left orphaned conflict markers in an agent journal** (`<<<<<<< HEAD` / `>>>>>>> theirs`
-  with no separator). grep journals for markers after any merge.
-- **Slots congest**: with four branch suites queued, master's run took ~2 h. Merge master's batches before
-  launching branch suites.
-
-### Traps met 2026-10-10 (twelfth session)
-
-- **A feature merged to master can break a branch's seam check**: split pipe walked `sc.overrides`, fine on
-  master, a defect on bentley-interop where values also live in alternatives. Run the branch suite after
-  every master merge into it.
-- **A harness that tests one message kind passes over another**: hide-on-reload passed for diagnostics while
-  Tom hid a run message. Ask which message, or test every kind.
-
-### Traps met 2026-10-09 (eleventh session)
-
-- **Merging two branches that each regenerated payloads conflicts in all 27 payloads and new-english-keys.md**:
-  take either side, then `new_english_keys.php --write --force` (both sides were generated, so --force loses
-  nothing) and regenerate payloads, all in the merge commit.
-
-### Traps met 2026-10-08 (tenth session)
-
-- **A builder reported "all lpn harnesses passed" and six failed on master** after its merge (the N/L
-  example prefixes; harnesses expected bare IDs). Run the suite on the merge commit before pushing, always.
-- **`git commit --amend` on a merge commit is refused on master** (pre-commit sees a non-merge commit).
-  Put a forgotten generated file on a fix branch and merge it.
-- **`new_english_keys.php` without `--write` only prints**; check_all then fails "new english keys listed".
-
-### Traps met 2026-10-08 (ninth session)
-
-- **A key renamed when its meaning flipped kept its old translations under a baselined hash**:
-  lpn_settings_engine_native ("Use the built-in solver when possible") said "Solve with the EPANET solver"
-  in all 26 languages since 09-06, invisible to the drift check. Found by the pt translator, fixed in the
-  sprint. A rename that changes meaning must delete the translations, never carry them.
-- **The drift list is much bigger than the payload**: 224 missing keys, but 343 CHANGED. Build a resync
-  file per language from `detect_english_drift.php --json` and brief both jobs in one sprint.
-- **A sprint changes harness inputs**: Chinese menus gained "…" rows and menu-mnemonic-harness's all-Han
-  regex broke. Run the suite on the sprint merge before pushing.
-- **Merging master into a branch conflicts in english_string_hashes.json** when both sides re-baselined:
-  take master's, then redo the branch's own --update entries and drop hashes of keys the branch deleted.
-
-### Traps met 2026-10-08 (eighth session)
-
-- **Nine agents' suites at once ran ~60 min each** (slots full, the rest queued). Brief builders to run
-  check_all once, at the end, and merge master's batch while slots are free.
-- **Agents symlinked node_modules at the worktree ROOT** as well as dev/browser-pass/; the stray
-  `node_modules` shows as untracked and blocks `git worktree remove`. `rm` the symlink first.
-- **A Wave 0 file named `<id>-wave0.json` needs `--sprint=<id>-wave0`**; `--sprint=<id>` exits 2.
-- **After feat/workspace merges, a browser with `navigator.webdriver` gets no default docks**; a harness
-  that wants them sets `window.EC_DEFAULT_DOCKS = true` in an init script (dev/testing-notes.md).
-- **Perry caught what the builder's English-only harness could not**: the Guide's showpiece query failed on
-  every non-English page. Brief builders of anything language-sensitive to test one non-English page.
-
-### Traps met 2026-10-07 (seventh session)
-
-- **Six green branches merged in a row broke two harnesses together** (geojson moved Export EPANET file
-  into a submenu; two other branches' harnesses still clicked the old row). Every branch suite queued
-  after that failed the same two. Fix master first, in a fifth slot (`EC_CHECK_SLOTS=5`).
-- **A rewritten string can trip `harness wording pins`** by coincidence: "the project is unchanged" was a
-  check label in three harnesses. Reword the labels and lower the baseline.
-- **Applying interview answers by whole-value replace dropped two sentences** the page had shown only in
-  part (lpn_settings_runbox_tip). Diff every replaced value against the original before committing.
-- **The rulings file is not sorted**; a `sorted()` rewrite churned 200 lines. Insert, never re-sort.
-- **JS fallbacks drift with every English rewrite** (22 after technical English): fix with
-  `js_fallback_string_check.php --list`, watch double-escaped apostrophes.
-
-### Traps met 2026-10-06 (sixth session)
-
-- **Perry's corrected wording lives in his REPORT, not his journal.** CC told a builder to read the
-  journal; it found no wording and wrote its own, repeating one inaccuracy. Paste the text into the
-  brief.
-- **A merge of master into a branch emptied `dev/agents/pre-reviewer/journal.md`** (feat/screenshot,
-  3892 lines to 0); Perry caught it. After any branch's merge, `git diff --stat master` the journals.
-- **Six suites queued at once took over an hour each to start.** One agent used `EC_CHECK_SLOTS=5`
-  to take a fifth slot; it worked. Stagger fix rounds.
-- **`wait_for.sh --sentinel` returned before the log had EXIT=** once (the job was alive); read the
-  log before pushing, never the waiter's exit code.
-- **`delete_lang_key.php` left `count` stale** in english_string_hashes.json (fixed on
-  `fix/delete-key-count`).
-- **Perry earned his keep on every branch**: invisible attributes in six languages (DXF), a menu
-  clipped by its box (screenshot), one Esc closing two boxes and 14 empty help entries (Guide), a
-  zip entry with a slash (table export), a repeat-use ratio over 100% (dedupe), n moved by row
-  number (paste). None was caught by the builder's own harness.
-
-### Traps met 2026-10-07 (fifth session)
-
-- **A harness wrapped in `flock /tmp/engcalcs-browser.lock` by hand timed out** while suites held it;
-  harnesses take the lock themselves. Run them bare.
-- **A stub DOM hid a real-browser crash** (`feat/dxf`: `children.forEach` on an SVG element). Any
-  export or menu action needs one real-Chromium harness that clicks the real row.
-- **The roadmap lagged again**: Task 617's first step (Basemap style) had shipped weeks earlier.
-
-### Traps met 2026-10-06 (fourth session)
-
-- **`>>` onto `ports.conf` glued a new row to the last one** (the file had no trailing newline), so
-  `generate.sh` silently made no vhost and the port refused. Edit it with a script that keeps the
-  newline, then curl the port.
-- **CC's own brief contradicted one of his calls** (told an agent to drop report-line codes; he ruled
-  2026-09-18 that a report line carries `Line N: sev: code: text`). The agent caught it. Grep his
-  calls before dictating wording to a builder.
-- **"Proceed" after a list of fixes is not "Merge."** The other branches got the merge word; read
-  an ambiguous one as the conservative instruction and ask.
-- **jasmine has no MTA** (`sendmail` missing): any preview that mails shows its failure path.
-- **Chrome delivers one download per click by default**; a page must never fire two.
-
-### Traps met 2026-10-06 (third session)
-
-- **"Possibly" in his request is not a ruling.** He asked for tip paragraphs "possibly with poor-boy
-  headings"; the build shipped ALL-CAPS headings and he said *"I am not ruling on ALL CAPS tips
-  headings. I am asking for advice."* Build the certain part; bring the "possibly" back as advice.
-- **`delete_lang_key.php` also deletes the key's entry in `english-key-rulings.json`**, and deleting a
-  key that a new English key replaced strips the TRANSLATED text from 26 languages until a sprint.
-  Perry caught it on feat/feedback; keep the old key as the fallback.
-- **A GitHub push failed once with "Permission denied (publickey)"** and the same push worked a
-  minute later. Retry before diagnosing.
-- **A builder's harness tested the conversion, not the hydraulics**: tank -> reservoir passed every
-  kept/lost check while dropping the head 120 ft. Brief builders of model edits to solve before/after.
-
-### Traps met 2026-10-06 (second session)
-
-- **A harness written by the builder shared the builder's blind spot**: backdrop-attach's 14 checks
-  all used OFFSET 0 and a same-shape picture, so the wrong OFFSET sign and fit rule passed. Perry
-  found both from EPANET's Delphi source. Brief builders to cite the source for any file-format
-  semantics, never guess a sign.
-- **Uncommitted adviser journals in a worktree block `git merge master`** when master touches the
-  same journal. Commit advisers' files before a build agent merges.
-- **A master defect found on a feature branch** (geo DIMENSIONS): split the hunk onto a fix
-  branch from master with its own harness, rather than waiting on his all-clear.
-
-### Traps met 2026-10-05
-
+- **A GitHub push once failed "Permission denied (publickey)"** and worked a minute later: retry.
+
+### Agents and worktrees
+
+- **Every brief says: never `git stash` (one stack shared by every worktree; `stash pop` took
+  another's entry, three times), never touch the main checkout, write journals and research files to
+  the scratchpad or the branch's own worktree (`cd` and check the branch name first).** Perry,
+  advisers and outward-looking agents all broke this, dirtying a running suite and leaving a stray
+  `inpfile.c`. Uncommitted adviser journals block `git merge master`: commit them first.
+- **An agent's "committed" is a claim.** Run `git status` and `git branch --show-current` in its
+  worktree (a commit once landed on a detached HEAD, recovered with `git checkout -B <branch> <sha>`;
+  two harnesses were reported committed and were untracked). Its "all harnesses passed" and
+  "byte-identical" are claims too; the suite on the merge commit has caught both.
+- **A builder's harness shares the builder's blind spot**: all-zero OFFSET hid a wrong sign (cite the
+  source for file-format semantics, never guess); a stub DOM hid a real-browser crash (one real-Chromium
+  harness per menu action or export) and a document-emptying stub passed Tom's sequence; a conversion
+  test dropped a tank head 120 ft (solve before and after); a layout harness compared the branch with
+  itself, not master; a check enshrined a defect (`{n}`=1). When a stub cannot reproduce his report,
+  send Perry to reproduce it in real Chrome. Brief language-sensitive builders to test a non-English page.
+- **A usage limit, a network drop (EAI_AGAIN), a machine restart or Ctrl+C in his terminal kills agents**;
+  commits and detached suites survive. Brief them to commit as they go; resume with SendMessage "read
+  `git log master..HEAD` and `git status` first"; after Ctrl+C the harness refuses SendMessage, so only
+  his word relaunches. Ctrl+B in his terminal backgrounds CC's wait, not the suite.
+- **Check that no agent is working in a worktree before merging into it or sending another in**: `ps`
+  for its suite and stop it. An agent that waits on its own background check_all re-sends its report
+  on every wake (TaskStop it once the suite is detached) and queues duplicates if it hands back.
+- **A new worktree needs `dev/browser-pass/node_modules` symlinked** to the main checkout's
+  (`generate.sh` does it; hand-made and fix-branch worktrees do not, and 10 browser harnesses then
+  read as defects with "playwright-core is not installed"). Symlink only there: a root-level
+  `node_modules` link shows untracked and blocks `git worktree remove` (`rm` it first).
+- **A worktree's `check_all` never stamps** (its `.git` is a file); a master push needs its own run in
+  the main checkout, whose branch you never switch while a run is queued. Editing the main checkout
+  mid-run dirties the tree: make even one-line edits in a chore worktree; his edit arriving mid-run
+  goes by patch to a worktree, then `git checkout --` in main.
+- **Never `git worktree remove --force`** without reading its `git status` (it destroyed uncommitted work).
+- **Agents never write a ruling** into `english-key-rulings.json`; only the orchestrator, from his
+  words. Agents also re-added a tip he had deleted because a brief said "update": check the rulings
+  and the deleted-key harness before briefing a string. New keys go in `lib/lang.ec.en.php` only
+  (the others fall back; all 27 fails `lang syntax rules A-D`). Read seat advice against the house
+  rules (Ida proposed restyling a consent button). Perry's corrected wording lives in his report, not
+  his journal: paste it into the brief.
+- **Agents' CC shells:** before saying done, every background shell and agent has exited, `ps` shows no
+  `sleep` loop, `php -S` or harness left, and the report states the count.
+
+### Suites and harnesses
+
+- **Agents never run the full suite** (Tom 10-27: *"Everything has been slow for the last two days."*): they stop at
+  `--fast`, `--node-only` and their own harnesses; the orchestrator runs one per merge batch.
+- **Queues:** with four slots busy a branch suite waited over an hour; nine agents' suites ran ~60 min
+  each, ten took four hours to drain, and master's own run took ~2 h behind four. Count queued runs
+  (`/proc/*/fd` on the lock) before launching a track, stagger builds, merge master's batch before
+  launching branch suites; `EC_CHECK_SLOTS=5..8` gives a run its own slot. A run is judged on the tree
+  at its END, so an agent that edits while queued re-queues. `flock` is not a queue: a waiting suite
+  shows the same processes, so read the log's last line before killing anything.
+- **Kill by PID only, after checking its cwd** (`pkill -f check_all.sh` killed every session's run,
+  twice, exit 144). A setsid'd run survives `kill -- -PGID` in part: kill by session (`ps -eo
+  pid,sess,args | awk '$2==SID'`). Browser-pass runs and killed harnesses leak `php -S` servers:
+  `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1 or 449.
+- **An orphaned probe can hold `/tmp/engcalcs-browser.lock` for hours**; every browser harness then
+  times out. Find the holder: `for p in /proc/[0-9]*; do ls -l $p/fd 2>/dev/null | grep -q
+  engcalcs-browser.lock && echo $p; done`. The divider harness prints `NOT RUN` meanwhile.
+- **Start long suites with the Bash tool's background mode** (not `nohup`, so Tom's shell list shows
+  them), one run per branch with a log named after the branch (agents sharing a scratchpad overwrote each
+  other's `full.log`). Match the log's start time to the head's commit time (a log began on the
+  previous commit); read it for `EXIT=` and `FAILED:` before pushing, never `wait_for.sh --sentinel`'s
+  exit code (it once returned early). `example-open-guard-harness.js` prints four FAIL lines on
+  purpose (its mutation control).
+- **Red alone before red under load:** rerun a failing browser harness alone before calling it a defect,
+  but a flake can be a real race (`menu-keyboard-harness.js`: a starved `setTimeout(0)`, fixed in the
+  page). Seen only under load, green alone: `run-progress-harness.js`, `new-project-pan-harness.js`,
+  `label-pass-economy-browser-harness.js`, `start-fresh-consent-harness.js`, `projection-harness.js`
+  (300 s hang), `label-measure-cache` and `pane-follows-doc` (ALL PASS, no exit), the tip-door "link's
+  WORDS" check; browser-pass `basemap.js` and `firstproject.js` tile counts. Pre-existing:
+  `scale-publish-harness.js` (2 checks). `node dev/browser-pass/run.js` was green 1853/1853
+  (2026-10-04); its specs are not in check_all.
+- **Harness conventions:** click a dialog button with a MouseEvent `detail: 1` (a bare `el.click()` reads
+  as an unarmed keypress); an automated browser has no first-view docks unless `window.EC_DEFAULT_DOCKS
+  = true`; Playwright's `page.route()` disables form restore; a DOM stub lacks `hasAttribute` (use
+  `getAttribute`); anything drawn needs a visibility and width check (a `div > span` list was hidden by
+  positional CSS). Read the expected label from pageConfig or `esString()`, never a hard-coded English
+  fallback (breaks the day a sprint translates it); a label like "the project is unchanged" can trip
+  `harness wording pins`. Read what a check asserts; a harness that tests one message kind passes over another.
+- **A menu item's language key is its command ID** (`lib/lpn-commands.json`, usage counts): never
+  point a menu row at a borrowed key. Only the full suite's browser harness caught a rename.
+- **A panel guard** fails on a branch's undeclared show/hide: declare it in `panel-touch-harness.js`.
+- **The shipped Net1 example departs from EPA's Net1 from 10 AM by design** (his two rules,
+  2026-09-08); compare with those rules. **A "regression" can be data**: read the file's declared units
+  before bisecting (Fotobi's Error 110 was metric numbers under US units). **His sample files can change
+  under a branch** (a bigger WTG-tgh-1 saved over the old one): check dates in tom-files first.
+- **Chrome delivers one download per click**; a page never fires two. **jasmine has no MTA**: a preview
+  that mails shows its failure path. `/engcalcs/` absolute paths work on every host; only RELATIVE
+  ones break under `/app/`, so do not "fix" them.
+
+### Translation and strings
+
+- **Read every sprint diff**, for the keys more than one agent flags: translators narrowed an ambiguous
+  English word (Select-mode "label" became Text in am, fa, hi); "subject word first" made bad titles
+  ("Complete: report", an invented subject); a transliterated "halo" reads "hello" (am, bn, hi, my);
+  two returned "placeholder" as their report with correct edits on disk. Read new loanwords back.
+- **A rename that changes meaning must delete the translations** (`lpn_settings_engine_native` said
+  "Solve with the EPANET solver" in 26 languages for a month, invisible to the drift check). The drift
+  list is bigger than the payload (224 missing, 343 CHANGED): brief resync files and the sprint together.
+- **A sprint changes harness inputs** (Chinese menus gained "…" rows; the Guide harnesses compared the
+  Spanish page with English): run the suite on the sprint merge before pushing. A sprint empties
+  `new-english-keys.md`, so keys he had not read get translated first. A Wave 0 rewrite repeating a
+  placeholder trips `language placeholders` until every `.replace('{name}'` is global; a Wave 0 file
+  `<id>-wave0.json` needs `--sprint=<id>-wave0`.
+- **`delete_lang_key.php` also deletes the key's `english-key-rulings.json` entry**, and deleting a key
+  a new English key replaced strips the TRANSLATED text from 26 languages until a sprint: keep the old
+  key as the fallback. After English rewrites run `js_fallback_string_check.php --list` (22 drifted;
+  watch double-escaped apostrophes). The regex parsers miss keys joined on one line; count orphans with
+  PHP `include`. Diff every whole-value replace against the original (two sentences were dropped).
+- **Harvest first** (`harvest_english_rulings.php`): his hand edits to `new-english-keys.md` fail
+  `english rulings harvested` on every branch until harvested; a bullet that lost its `- ` is not
+  parsed; the harvester keeps the LAST copy of a key and mis-filed one synonym ruling (check
+  `plain-sentence-rulings.json` by eye); his stale copy shows OLD English as a false "EDIT" (check
+  `git log -S`); commit his edit on a chore branch before regenerating, never regenerate over it.
+  He may write two edits for one key; "Possibly" in his request is advice to bring back, not a ruling.
+
+### Previews, reporting, other
+
+- **Preview ports live on jasmine since 2026-10-02**: `~/webdev/worktrees/_panel/ports.conf` lists them
+  (pipe rows with what to test), `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing
+  worktree, writes one Apache vhost per row and reloads Apache (passwordless via
+  `/etc/sudoers.d/previews`; a crontab `@reboot` reruns it). They bind to loopback; Tom reaches them
+  through SSH forwarding, so his browser sees `localhost` (secure context, and a host the Mapbox token
+  accepts). A new port needs a new `LocalForward` line on his side. Apache honours `.htaccess`.
+- **Run `generate.sh` after every master push** (port 8100 shows origin/master only then; twice he
+  tested stale code), and the Branch previews page must show a branch before he is asked to test it
+  (row, `generate.sh`, grep the generated index). Never `>>` onto `ports.conf` (no trailing newline
+  glues the row to the last; `generate.sh` then makes no vhost): edit with a script, then curl the port.
+  A bare port-root link is a 403: link the page. Name work by branch, never by port.
+- **Ask which branch a host is on before explaining what Tom sees.** `dev.hawsedc.com` has sat on an
+  old feature branch; `curl` gets a 401 there. Answer about the surface he named.
+- **The Mapbox token is restricted by host.** Allowed hosts include `localhost` and `hawsedc.local`, so a
+  new preview port needs nothing; a new hostname does, and `127.0.0.1` is refused (403). A token being
+  present is not a token being accepted: test with a real tile request.
+- **Relay in his words, and his facts first**: "ledger" was CC's word, not his; CC told him a `.prj`
+  was hidden by Windows when he had shown it absent; a preview note named quantities CC had not read.
+  Read the code before describing it; read the last session's final messages for unanswered questions
+  (invisible to him after /clear). "Proceed" after a list of fixes is not "Merge"; ask. A unit
+  conversion converts the drawing too (a brief's "coordinates unchanged" put metres on a feet scale bar).
+- **He cannot paste images over ssh/tmux**: he saves the screenshot and runs `scp
+  $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
 - **The DMARC mailbox is readable from here**: `ssh jconstru`, `~/mail/constructionnotesmanager.com/dmarc/{new,cur}`;
   tar it down and parse the gz/zip XML locally. The reports are not in his Gmail.
-- **The harvester mis-filed one synonym ruling** (consent_body): it stored his edited synonym as the
-  English. Check `plain-sentence-rulings.json` by eye after any harvest with an edited plain sentence.
-- **He wrote two different edits of one key** (lpn_ds_search_note) in two sections of the file; the
-  questions-section edit was applied. Expect it when a key is both new and questioned.
 
-- **The roadmap lagged FOUR more times in one session** (764, 726/608, 695, plus 710/719/755/762
-  never closed on merge). Close a task in the merge that ships it.
-- **Perry wrote his journal into the MAIN checkout** while reviewing a worktree, mid master suite.
-  Brief reviewers: `cd` to the worktree and check the branch name before any write.
-- **The shipped Net1 example departs from EPA's Net1 from 10 AM by design** (his two rules,
-  2026-09-08). Compare it against Net1.inp WITH those rules; a bare comparison looks like a defect.
+## STATE — 2026-11-14 (seventy-seventh session, Opus main, Sonnet agents)
 
-### How he wants to be asked (2026-10-04)
+- **Housekeeping batch on his word** (*"this would be a very good time to recommend and execute housekeeping that needs little from me"*), merged on green: `fix/icon-precache` (Task 620), `fix/viscosity` (one EPANET viscosity, g and transitional friction factor in `js/PipeHydraulics.lib.js`; D-W heads move up to ~1.4 % of head lost, bpn_ transition too), `chore/dead-functions` (18 deleted; walk fixed), `chore/code-audit` (`dev/code-audit-2026-11.md`), `chore/review-queue` (31 rows done, 5 back to him), this handoff (693 -> ~280 lines).
+- **Ponytail plugin uninstalled and every leftover deleted** (his *"delete the ponytail leftovers"*); its two rules are CLAUDE.md's "Changing code".
+- **`fix/inp-fidelity` (pushed, not merged), waits his call:** a US D-W `.inp` gives roughness in millifeet, which the page lacks; the branch refuses its solve with a bare code. (a) add millifeet as a Roughness unit (recommended) or (b) approve a refusal sentence. Also his: `;` in a label (kept whole, EPANET cuts it), stale `lpn_inp_drop_headloss` wording, "Relative viscosity" label, MinVol/Overflow as Properties.
+- **`fix/label-halo` (harness only, not merged):** the two-layer fix cost ~40 % label settle and no cheaper way worked; code reverted, the stack probe watches the 17-pixel nibble. Joins the next batch.
+- **`fix/legend-tank-phone` merged, then taken back out of master (Task 851 reopened):** dropping an example's saved view on a phone runs the label-aware fit on open; `fresh-open-harness.js` Phone Net3 longest block 1.5 s -> 2.7 s, over its 2 s limit. Waits his price call.
+- **Audit leftovers, his:** PBV/GPV on a fixed head refused though EPANET solves it (comment says deliberate); single-pipe dw_/ip_/mhp_ keep the old transitional friction factor; valve setting-unit rule in three places (no fix yet). Not audited: msx, wtg-export, geojson/dxf, survey, ramps, contour, criticality, collide, geom, georef, EPS against EPANET.
+- **Flaky under load, green alone:** `contour-harness.js` (three agents met it 11-14).
 
-- **Name work by branch, never by port.** A port only in brackets.
-- **The Branch previews page must show a branch before he is asked to test it**: ports.conf row,
-  `generate.sh`, then grep the generated index for the branch. His tunnel does not carry 8106/8107.
+## STATE — 2026-11-13/14 (seventy-sixth session, Opus main, Sonnet agents)
 
-### Traps met 2026-10-04
+- **Merged on his word** (*"I really like it. Merge."*): `feat/label-open-side`. It broke 7 browser harnesses on master; `fix/master-1113` fixed them on green: one code fix (a one-line node label restacked on mouse-down and jumped from the pointer; now restacks when the drag arms) and six harnesses that encoded the old placement (label-pipe-fields pinned to 20550276b). **Merged on green:** `fix/munday-elevations` (his *"Yes. That is what I want."*; ground from Mapbox DEM fixed in `dev/scripts/starter_example_dem.json`; TANK-1 on a 100 ft tower, his to confirm).
+- **`feat/assembly` round 7 (8103), Perry-reviewed, fixed, waits his pass.** W1R/W1D/W1P (valve W1V, no label row), heading Z then Q, block always rows (exempt from the line form), flow once, pressure only at W1P, two-cylinder symbol (`EC_WELL_UPPER_HALF`), three-press Well with tank (one-point form deleted; old files open as members), Morph separates a member's group, Explode says so. Test project `well-test-net1.lwn` (Net1 + curves). **His to rule:** Q before Z; L21 block hidden to notch 4 (honest crowding); outline vs filled upper cylinder; icons from the proofs artifact https://claude.ai/artifact/6NtpK9vVYTRFFY22eYWRmn. Still open: pressure tank, Auto curve, three-point exploded view.
+- **`feat/contour-controls` (8105), round 3, Perry-reviewed, waits his pass.** Color scheme is one value with Settings; Property to plot equals Color nodes by while Show node colors is ticked, else the plot keeps its own. All three doors (box, Settings, Tables Settings) agree while the box is open; tips under 160 chars; "Show contour lines". Key deleted: `lpn_contour_field_follow`.
+- **`feat/library-order` (8106, Task 859 at 100), Perry-reviewed, fixed, waits his pass.** Move to top/up/down/bottom in six Libraries sections; moving a control or rule can change a run (measured), the tips say so.
+- **`feat/wtg-scenario` (Task 749):** his `-w-scenario` save overrode nothing (edits landed in Base); child-scenario writer built from his 10-21 TGH-1 save, candidate only. Waits his test `~/tom-files/2026-11-13/wtg-scenario-test/README.md` (expected T1 at hour 12: Base 8.75, Child A 14.48 ft, hourly rule check).
+- **`feat/usage-using` (8108), waits his look:** Using table counts browser-days (logs hold no visit id); headings Browsers (said yes) / Visits (said yes) / Visits (others) on Looking, Calculations on Calculating. True visits need a per-load token in the beacon: consent wording, his call.
+- **Task 860 (75) opened:** controls by scenario; Sue says whole named sets are sounder than per-control overrides. Mary: LoadBuilder = bulk meter-to-network assignment; we do it one customer at a time.
+- **Pushed master ac85c45ae** (three full runs: the first failed 7 label harnesses, the second timed out `label-drag-track-harness.js` at 260 s alone against the runner's 300 s; Net3 now runs once, 152 s). Master merged into all five waiting branches after the push.
 
-- **The classifier refused all-clears from his pasted message and reading the wish lists.** He
-  typed the merge words instead, and added an `autoMode.environment` note to ~/.claude/settings.json
-  that pasted messages are his own; untested until a new session.
-- **A dialog button pressed with a bare `el.click()` is ignored** since dialog-audit (`detail: 0`
-  reads as an unarmed keyboard press). Harnesses must dispatch a MouseEvent with `detail: 1`.
-- **A `cmd && git branch -d ... && suite &` line backgrounds the whole chain**, so when one step
-  fails, the suite silently never starts while "started" still prints. Start a suite in its own call.
-- **An agent reported a check_all log that started on its PREVIOUS commit**; its fix landed mid-run.
-  Match the log's start time to the head's commit time before believing it.
-- **`projection-harness.js` can hang 300 s under load** (event loop held open) and pass in 0.3 s
-  alone.
+## STATE — carried from earlier sessions (still open, recorded nowhere else)
 
-- **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
-  (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit
-  on a chore branch first, harvest, then regenerate; never regenerate over it.
-- **A harness that prints ALL PASS can still fail by not exiting** within 300 s under load
-  (label-measure-cache, pane-follows-doc). Read the log before calling it a defect; rerun.
-- **Agents' generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`) on every
-  merge: take master's side, union the rulings JSON, regenerate on a chore branch.
-- **A stale copy's marks make the harvest print false "EDIT" lines**: his old copy shows the OLD
-  English, so the harvester reports it as his rewrite. Before applying an EDIT, check the "now" text
-  is not simply an earlier version in `git log -S`.
-- **The roadmap lagged again**: Task 727 had shipped nine days earlier. `git log --all --grep` and a
-  grep of the code before briefing, every time.
-- **Killing a setsid'd check_all with `kill -- -PGID` left run_harnesses.sh and a harness alive**
-  (they sit in the session, not the group). Kill by session: `ps -eo pid,sess,args | awk '$2==SID'`.
-- **A worktree that never had `dev/browser-pass/node_modules` symlinked prints "playwright-core is
-  not installed"**: symlink it when making any worktree, fix branches too.
-- **An agent wrote Tom's approval into `english-key-rulings.json`** for a label it had interpreted
-  ("Above"); it happened to be his literal word. Brief agents: never write a ruling, only the
-  orchestrator does, from his words.
-- **`lang_key_order_normalizer.php` with no flags rewrites all 27 language files**; an agent ran it
-  by accident. Revert with `git checkout -- lib/`.
-- **Two merges that each pass can fail together**: setting-scope's nowrap marker broke the Task 760
-  phone harness only once both were on master. The suite on the merge commit is what caught it.
-- **The pre-reviewer earns his keep on large mechanical conversions**: the dialog conversion was
-  reported finished and green; Perry found held Enter deleting a network and 18 alerts quietly
-  downgraded to fading strips.
-
-### Traps met 2026-10-03
-
-- **Port 8100 shows origin/master only after `sh ~/webdev/worktrees/_panel/generate.sh`.** Run it
-  after every master push; once it was skipped and he saw no fix that was already pushed.
-- **He cannot paste images over ssh/tmux.** He saves the screenshot and runs
-  `scp $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
-
-- **A harness that flakes only under load can be a real race.** `menu-keyboard-harness.js` failed
-  3 times in check_all: a starved `setTimeout(0)` focus restore from one menu ran after the next
-  menu opened. Fixed in the page (`menuRestoreSeq`); proved with 24 busy loops, 8/10 to 12/12.
-
-- **A `cmd && merge && ...; setsid check_all &` line starts the suite even when the merge
-  conflicts** (the `;` runs on). Start a suite only in its own command, after `git status` is clean.
-- **Ctrl+B in his terminal backgrounds CC's running wait**, not the suite. He meant tmux detach.
-
-### Traps met 2026-10-02
-
-- **Ctrl+C in his terminal stops every background agent**, and the harness then refuses SendMessage
-  to them. Only his word relaunches them; fresh agents resumed from each branch's commits fine.
-- **A merge of master into a branch can fail the new panel guard** on that branch's own undeclared
-  show/hide (property-graph's `propGraphSync`): declare it in `panel-touch-harness.js`, do not hide it.
-- **Running `new_english_keys.php --write` while a merge is unresolved exits 2 and writes nothing**;
-  resolve, commit, then regenerate and commit again.
-
-### Traps met 2026-10-01
-
-- **Two runs per branch queue up when an agent hands back while its run waits, and the classifier
-  refuses CC killing a queued waiter.** Brief agents to detach ONE run with a unique log name.
-- **`start-fresh-consent-harness.js` flakes under load** ("the banner is showing again"); 11/11 alone.
-- **Closing roadmap tasks makes `dev/features.md` stale**: regenerate with `generate_features.php`.
-
-### Traps met 2026-09-30 (night)
-
-- **The machine restarted mid-session** (kernel changed; scratchpad wiped; a master run lost). Every
-  agent had committed, so nothing was lost; branches are now also pushed to GitHub as backup.
-- **CC force-regenerated `dev/new-english-keys.md` in the main checkout without first checking it for
-  his uncommitted edits.** He may have lost an edit. Before ANY `--force`: `git status` and `git diff`
-  on that file in that checkout, and harvest first.
-- **A long check_all queue gets a background command killed at its time limit.** Start master's run
-  detached (`setsid nohup sh -c '...; echo EXIT=$? >> LOG'`) and wait with `dev/scripts/wait_for.sh`.
-
-### Traps met 2026-09-30 (evening)
-
-- **`flock` is not a queue.** With seven suites waiting, master's run waited over two hours while branch
-  runs kept winning the lock. Merge master's batch early, before launching branch builds.
-- **An agent ran `git stash`/`pop` again** (graph-tab-keys) and applied another branch's stash; it reset
-  its own tree and the stash list survived. The rule is in every brief and still broke.
-- **A forced `new_english_keys.php --write --force` is safe only when the file equals master's generated
-  copy** (`git diff master -- dev/new-english-keys.md` empty). Check that first, every time.
-
-### Traps met 2026-09-30
-
-- **The auto-mode classifier refuses CC writing an all-clear taken from a pasted message.** Ask him to
-  type the merge word in the session itself.
-- **The label bench's parallel scorers (3 x node at 3 GB) saturate 4 cores and once filled the 6 GB
-  RAM-backed /tmp**; every check_all then took 1-3 hours. Brief the label agent to run on disk
-  (`/home/haws/label-trials-work`, 1.1 GB, reproducible) and with one worker while suites queue.
-- **His hand edits to `dev/new-english-keys.md` reach master uncommitted-then-committed and fail
-  "english rulings harvested" on every branch** until harvested: harvest first thing, and fix a bullet
-  that lost its `- ` so the parser reads it.
-- **A branch's check_all can go green but for a failure master has already fixed** (the Shift-hint JS
-  fallback): read the failure before re-running.
-
-### Traps met 2026-09-29
-
-- **Worktrees had no `dev/browser-pass/node_modules`**, so 10 browser harnesses failed "playwright-core
-  is not installed" and read like defects. Symlink the main checkout's into each new worktree.
-- **Perry ran `git stash pop`** despite the rule and pulled another session's stash into a worktree;
-  a translator edited the main checkout by mistake and reverted it. Put "never stash, never touch the
-  main checkout" in EVERY brief, reviewers included.
-- **`/engcalcs/` absolute paths work on every host**; only RELATIVE ones break under `/app/`. Do
-  not "fix" an absolute `/engcalcs/` path for librewaternet.org.
-
-### Traps met 2026-09-28/29
-
-- **A broad `pkill -f check_all.sh` kills every session's run** (an agent did it; master's run died
-  with 144). Brief agents: kill only by PID, and only their own.
-- **Network drops (EAI_AGAIN) kill agents mid-work**; resume with SendMessage, "git status first".
-- **The four gallery FAIL lines in example-open-guard-harness are its own mutation tests**; the
-  verdict is the exit code. Read `FAILED:` lines, not raw FAIL lines.
-- **Agents writing journals into the main checkout dirty a running suite.** Brief them to the
-  scratchpad while a suite runs there.
-- **The master pre-commit refuses `--amend` too**: regenerate payloads on a chore branch and merge.
+- **11-08:** EPANET 2.2's own report prints 1392.49 for the PU1 demand charge where the page computes 116.04 (the charge enters twice; `dev/wtg-export.md` §8); never confirmed with a run of his.
+- **11-08:** the next translation sprint is *"Later is fine."*, after the approved branches merge; his word only, with the waiting count.
+- **10-29:** test-trim pass 2 (merge the user-guide, pane, scenario and label harness families) is approved by Tom; it waited on `box-design`, which merged 11-01, and no commit has done it.
+- **10-29:** his bottom-pane 3 s slowdown is NOT reproduced (flat over 80 toggles). Owed by him: which tab, toggle count or time since load, a Chrome Performance trace.
+- **10-30:** he wants to proofread `spock.php` once deployed (Task 824 holds his theme-of-the-day words).
+- **11-03:** a 301 from librewaternet.org's calculator pages to hawsedc.com is his call (Manning Pipe Flow there already names hawsedc.com canonical; Google keeps the copy at position 23).
+- **10-22:** owed by him on `feat/sqlite-reader`: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
 
 ## Commands to hand Tom with any panel change
 

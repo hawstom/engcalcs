@@ -70,35 +70,8 @@ var LPN_AT_REST = 1e-6;
 // The Hazen-Williams constants are the whole suite's single pair (EPANET's), in
 // js/PipeHydraulics.lib.js. There is nothing to select between here.
 
-// Darcy-Weisbach friction factor, 3-regime Swamee-Jain. Identical to
-// EngCalcs.bpnDwFriction -- a private copy; change both together, or fold them into
-// js/PipeHydraulics.lib.js.
-EngCalcs.lpnDwFriction = function (q, d, e, visc) {
-	'use strict';
-	var a = Math.PI * d * d / 4,
-		v = q / a,
-		re = Math.abs(v) * d / visc,
-		f;
-	if (re === 0) {
-		f = 0;
-	} else if (re < 2000) {
-		f = 64 / re;
-	} else if (re < 4000) {
-		var r = re / 2000,
-			y2 = e / (3.7 * d) + 5.74 / Math.pow(re, 0.9),
-			y3 = -0.86859 * Math.log(e / (3.7 * d) + 5.74 / Math.pow(4000, 0.9)),
-			fa = Math.pow(y3, -2),
-			fb = fa * (2 - 0.00514215 / (y2 * y3)),
-			x1 = 7 * fa - fb,
-			x2 = 0.128 - 17 * fa + 2.5 * fb,
-			x3 = -0.128 + 13 * fa - 2 * fb,
-			x4 = r * (0.032 - 3 * fa + 0.5 * fb);
-		f = x1 + r * (x2 + r * (x3 + x4));
-	} else {
-		f = 0.25 / Math.pow(Math.log10(e / (3.7 * d) + 5.74 / Math.pow(re, 0.9)), 2);
-	}
-	return f;
-};
+// Darcy-Weisbach friction factor: EPANET's, one copy, EngCalcs.dwFriction in js/PipeHydraulics.lib.js.
+EngCalcs.lpnDwFriction = EngCalcs.dwFriction;
 
 // Resistance coefficient r and exponent n for h = r |Q|^(n-1) Q.
 //
@@ -132,7 +105,7 @@ EngCalcs.lpnResistance = function (link, method, visc) {
 	// the previous iteration's flow and treats it as frozen when forming the
 	// derivative -- what EPANET does, and convergence stays fast.
 	a = Math.PI * d * d / 4;
-	return { r: link.f * L / (d * 2 * EngCalcs.lpnG * a * a), n: 2 };
+	return { r: link.f * L / (d * 2 * EngCalcs.EPANET_G_DW * a * a), n: 2 };
 };
 
 // DENSE Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
@@ -781,7 +754,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	'use strict';
 	var opts = options || {},
 		method = model.method || 'hw',
-		visc = model.visc || 1.007e-6,
+		visc = model.visc || EngCalcs.EPANET_VISCOS,
 		// Relative flow change. EPANET's default is 1e-3; this is far tighter
 		// because at the 10-20 node target the extra iterations are free, and
 		// because Darcy-Weisbach carries an additional inconsistency of the same
@@ -1526,12 +1499,6 @@ EngCalcs.lpnSolve = function (model, options) {
 				// A PBV or a GPV: no friction (it has no length) and its own law, from above.
 				if (String(link.valveType).toUpperCase() === 'PBV') { pbvCoeff(k); } else { gpvCoeff(k); }
 			} else {
-				if (!resFixed && !opts.epAcc) {
-					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
-					res = EngCalcs.lpnResistance(link, method, visc);
-					linkR[k] = res.r;
-					linkN[k] = res.n;
-				}
 				// A VALVE ARRIVES HERE, and needs no branch of its own: lpnResistance returns
 				// r = 0 for a zero-length link, so the friction term vanishes and what is left is
 				// exactly the minor loss -- which is what a throttle valve IS. lpnLinkK() is the
@@ -1544,11 +1511,14 @@ EngCalcs.lpnSolve = function (model, options) {
 					// twice. One Math.pow, two uses, same value.
 					pw = Math.pow(aq, nk - 1);
 
-				if (!resFixed && opts.epAcc) {
-					// hydcoeffs.c dwpipecoeff() and frictionFactor(): Hagen-Poiseuille up to Re 2000 (a straight line in Q), then
+				if (!resFixed) {
+					// hydcoeffs.c DWpipecoeff() and frictionFactor(): Hagen-Poiseuille up to Re 2000 (a straight line in Q), then
 					// Swamee-Jain or Dunlop's polynomial, and the derivative carries the friction factor's own dependence on Q.
-					// Only the extended-period loop asks (`opts.epAcc`), so its trial count is EPANET's.
-					var dd = link.diameter, dl = link.length, dArea = Math.PI * dd * dd / 4, dr = dl > 0 ? dl / (dd * 2 * EngCalcs.lpnG * dArea * dArea) : 0,
+					// EVERY Darcy-Weisbach solve takes this branch. It used to freeze f at the last iteration's flow outside the
+					// extended-period loop, which does not converge in the transition: Dunlop's f RISES with Q between Re 2000 and
+					// 4000, so a frozen f overshoots, and a 10-pipe network with 50 mm pipes ran 100 iterations, reported
+					// unconverged and sat 0.5 % of flow away from EPANET's answer (dev/lpn-spike/dw-vs-epanet-harness.js).
+					var dd = link.diameter, dl = link.length, dArea = Math.PI * dd * dd / 4, dr = dl > 0 ? dl / (dd * 2 * EngCalcs.EPANET_G_DW * dArea * dArea) : 0,
 						ds = visc * dd, dw = aq / ds, dEr = link.roughness / dd, dy1, dy2, dy3, df, dDfdq = 0, dfa, dfb, dxr, dx1, dx2, dx3, dx4, dr1;
 					if (dw <= 1570.79633) {
 						var rLam = 16 * Math.PI * ds * dr;
