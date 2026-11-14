@@ -103,7 +103,7 @@ const pat = (id, multipliers) => ({ id, multipliers });
 
 function constructed(o) {
 	return {
-		method: 'hw', visc: 1.007e-6,
+		method: 'hw', visc: EngCalcs.EPANET_VISCOS,
 		nodes: o.nodes, links: o.links,
 		time: { times: Object.assign(EngCalcs.lpnTimesDefaults(), o.times), patterns: o.patterns || [],
 			defaultPattern: null, controls: [], warnings: [] }
