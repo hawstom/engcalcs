@@ -79783,12 +79783,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// they belong beside `method` rather than in one engine's argument list.
 		//
 		// **`visc` IS AN ABSOLUTE VISCOSITY AND THE OPTION IS A RELATIVE ONE.** EPANET's
-		// `Viscosity 1.3` means 1.3 times water at 20 degC, which is the 1.007e-6 m2/s that has been
-		// hard-coded here since the solver was written. Multiplying is the whole conversion, and an
-		// absent option leaves the number exactly as it was.
+		// `Viscosity 1.3` means 1.3 times its own 1.1e-5 ft2/s (input1.c adjustdata()), which is
+		// EngCalcs.EPANET_VISCOS, the one default in js/PipeHydraulics.lib.js: the built-in solver
+		// and EPANET run the same fluid. Multiplying is the whole conversion.
 		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
-			visc: 1.007e-6 * (hyd.viscosity || 1),
+			visc: EngCalcs.EPANET_VISCOS * (hyd.viscosity || 1),
 			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
