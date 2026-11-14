@@ -17663,28 +17663,8 @@ var EngCalcs = EngCalcs || {};
 			// Placed inside the BASE margins: the edges the settle reserved for the legend and the
 			// scale bar are what the cap gives up, and centring in them pushed Net2's west end off
 			// the map (a 145 px right reserve on a 358 px map).
-			// **BUT AN EDGE THE SETTLE RESERVED IS KEPT ON ANY AXIS WHERE THE NETWORK STILL FITS
-			// INSIDE IT AT THE CAP'S SCALE** (Task 851: Net1 at 390 x 844 has 8% to spare in height,
-			// and the Labels legend sat over the Tank). There the network is slid to the far side of
-			// the reserve -- lettering clear of the legend, the overhang at the other edge -- and
-			// never so far that a node leaves the map: the network's own window bounds it. An axis
-			// where it does not fit keeps the base margins, as before.
-			var settled = [padLeft, padRight, padTop, padBottom], ink = modelItems.concat(drawnInkItems());
-			function reservedT(key, lo, hi, span, i0) {
-				var pl = settled[i0], ph = settled[i0 + 1], bl = basePads[i0], bh = basePads[i0 + 1], wn, wa, v;
-				if (pl <= bl && ph <= bh) { return null; }
-				if (fitScaleFor(netItems, key, lo, hi, span, pl, ph) < floor) { return null; }
-				wn = fitWindow(netItems, floor, key, lo, hi, span, pl, ph);
-				wa = fitWindow(fittable(ink, lo, hi, span, pl, ph), floor, key, lo, hi, span, pl, ph);
-				v = (ph > bh && pl <= bl) ? wa.room : ((pl > bl && ph <= bh) ? wa.need : (wa.need + wa.room) / 2);
-				return Math.max(wn.need, Math.min(wn.room, v));
-			}
-			var kx = reservedT('x', 'l', 'r', r.width, 0), ky = reservedT('y', 't', 'b', r.height, 2), at;
 			padLeft = basePads[0]; padRight = basePads[1]; padTop = basePads[2]; padBottom = basePads[3];
-			at = place(floor, netItems);
-			if (kx !== null) { at.tx = kx; }
-			if (ky !== null) { at.ty = ky; }
-			apply(floor, at);
+			apply(floor, place(floor, netItems));
 		}
 		s = solve(labelTuning().fitRoom * scnSetting('textSize'));
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
@@ -42321,14 +42301,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var saved = acceptImportedText(text);
 				if (perfFetch0) { perfDebugRows.push('parse ' + (performance.now() - perfParse0).toFixed(1) + 'ms'); }
 				if (!saved) { return; }
-				// **AN EXAMPLE'S SAVED VIEW IS THE ONE ITS AUTHOR FRAMED ON A DESKTOP, and a phone is
-				// not that window** (Task 851; Perry, 2026-10-30, Net1 at 390 x 844: the Labels legend
-				// over the Tank). A view is a centre and a scale in pixels per drawing unit, so
-				// applied to a map a quarter as wide it crops the network and leaves the legend over
-				// lettering; the fit instead frames the network and makes room for the furniture.
-				// Only a gallery example, whose file is ours: a project of the visitor's own keeps
-				// the view it was saved with.
-				if (smallScreen()) { delete saved.view; }
 				var id = importProject(saved);
 				if (!id) { return; }
 				// **WHICH EXAMPLE THIS CAME FROM, so a later Save is not counted as naming.** Set
