@@ -629,7 +629,9 @@
 			// The token positions are the file's own two-word keywords: `Specific Gravity 1.0` puts
 			// the number at r[2] exactly as `Demand Multiplier` and `Emitter Exponent` do, while
 			// one-word keywords put it at r[1].
-			else if (key === 'VISCOSITY' && r[1]) { hydraulics.viscosity = num(r[1], 1); }
+			// **THE FILE'S OWN CHARACTERS RIDE WITH IT** (`Viscosity 1.10`, `Viscosity 1.1e-5`), and the value is
+			// the number as written, whichever of EPANET's two readings it has (EngCalcs.lpnFluidOptionRead).
+			else if (key === 'VISCOSITY' && r[1]) { hydraulics.viscosity = mergeTok(hydraulics, 'viscosity', r[1], num(r[1], 1)); }
 			else if (key === 'SPECIFIC' && r[2]) { hydraulics.specificGravity = num(r[2], 1); }
 			else if (key === 'TRIALS' && r[1]) { hydraulics.trials = num(r[1], 40); }
 			else if (key === 'ACCURACY' && r[1]) { hydraulics.accuracy = num(r[1], 0.001); }
@@ -1851,6 +1853,30 @@
 	};
 
 	/**
+	 * **VISCOSITY AND DIFFUSIVITY, READ AS EPANET READS THEM** (EPANET 2.2 input1.c adjustdata(),
+	 * measured on the vendored engine). A value above the threshold (1e-3 for Viscosity, 1e-4 for
+	 * Diffusivity) is RELATIVE: that many times EPANET's own default (1.1e-5 ft2/s and 1.3e-8
+	 * ft2/s). At or below it the value is ABSOLUTE, in the file's own system: ft2/s for a US flow
+	 * keyword, m2/s for an SI one. Zero is "not stated", EPANET's default.
+	 *
+	 * Returns the RELATIVE number, which is the one form both engines take: the built-in solver
+	 * multiplies it into the default, and the EPANET bridge writes it into a file whose own system
+	 * does not matter for a relative value. The file's own number is never changed; this reads it.
+	 * `flowUnit`, `lengthUnit` and `diameterUnit` are the project's, decided the way the writer
+	 * decides which system a file is in.
+	 */
+	var FLUID_OPTIONS = { viscosity: { limit: 1e-3, ft2s: 1.1e-5 }, diffusivity: { limit: 1e-4, ft2s: 1.3e-8 } };
+	EngCalcs.lpnFluidOptionRead = function (kind, value, flowUnit, lengthUnit, diameterUnit) {
+		var o = FLUID_OPTIONS[kind], kw, sys = null;
+		if (!o || typeof value !== 'number' || !(value > 0) || value > o.limit) { return value; }
+		for (kw in FLOW_KEYWORD_UNIT) {
+			if (FLOW_KEYWORD_UNIT[kw] === flowUnit) { sys = FLOW_UNITS[kw].system; break; }
+		}
+		if (!sys) { sys = (lengthUnit === 'ft' || diameterUnit === 'in') ? 'us' : 'si'; }
+		return (sys === 'us' ? value : value / (FT * FT)) / o.ft2s;
+	};
+
+	/**
 	 * **WHICH ELEMENTS A [RULES] BLOCK NAMES, WITHOUT UNDERSTANDING A RULE** (ROADMAP Task 248.03).
 	 *
 	 * This page does not model rule-based controls and this function does not pretend to. It reads
@@ -2753,7 +2779,7 @@
 		}
 		LPN_OPT_LINES.forEach(function (pair) {
 			if (h[pair[0]] === undefined || h[pair[0]] === null) { return; }
-			out += row([pair[1], String(h[pair[0]])]) + '\n';
+			out += row([pair[1], typeof h[pair[0]] === 'number' ? EngCalcs.lpnNumText(h, pair[0], h[pair[0]]) : String(h[pair[0]])]) + '\n';
 		});
 		// **PRESSURE-DRIVEN ANALYSIS** (Task 762), EPANET's own order, sparse like every line above.
 		// The pressures are stored in the project's pressure unit; `pressNum` writes them in the

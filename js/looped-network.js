@@ -12167,7 +12167,11 @@ var EngCalcs = EngCalcs || {};
 			// not a nicety: it is EPANET's parcel-merging tolerance and it decides how much of the
 			// concentration profile survives the transport (dev/lpn-spike/reaction-anchor-harness.js).
 			out.tolerance = numOrUndef(qo.tolerance);
+			// Relative above 1e-4, absolute (ft2/s US, m2/s SI) at or below, as EPANET reads it.
 			out.diffusivity = numOrUndef(qo.diffusivity);
+			if (typeof out.diffusivity === 'number') {
+				out.diffusivity = EngCalcs.lpnFluidOptionRead('diffusivity', out.diffusivity, unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+			}
 		}
 		// **EPANET-MSX (Task 717)**: the species shown is a choice of what to LOOK at, not of what
 		// to run -- every species in the `.msx` runs. '' means the file's first species.
@@ -79914,6 +79918,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// js/lpn-epanet.js folds these into the same warnings array a dropped control uses, so
 			// there is one place a reader looks for "what did we ignore" and one message design.
 			ruleWarnings: ruleWarningsOut };
+		// **VISCOSITY AS EPANET READS IT** (audit 2026-11): above 1e-3 the option is relative, at or
+		// below it an absolute kinematic viscosity in the file's own system (ft2/s US, m2/s SI). Both
+		// engines are handed the RELATIVE number (the bridge writes it, the built-in solver
+		// multiplies it into the default), so an absolute one is turned into it here. The base is
+		// EPANET's own default, read from js/PipeHydraulics.lib.js where it is defined once.
+		if (typeof hyd.viscosity === 'number') {
+			var relVisc = EngCalcs.lpnFluidOptionRead('viscosity', hyd.viscosity, unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+			if (relVisc !== hyd.viscosity) {
+				model.visc = (EngCalcs.EPANET_VISCOS || 1.1e-5 * 0.3048 * 0.3048) * relVisc;
+				model.hydraulics.viscosity = relVisc;
+			}
+		}
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }

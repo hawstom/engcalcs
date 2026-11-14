@@ -381,6 +381,67 @@ ${labels}
 		ok('a project name with a `;` exports whole', titleOf(exportOf(named).inp) === 'Smith; phase 2');
 	}
 
+	// =============================================================================================
+	console.log('\n3b. VISCOSITY IS RELATIVE ABOVE 1e-3 AND ABSOLUTE AT OR BELOW IT, as EPANET reads it');
+	// One laminar Darcy-Weisbach pipe, where the head loss is directly proportional to the viscosity.
+	const VISC = (units, opt, tail) => `[TITLE]
+viscosity probe
+
+[JUNCTIONS]
+ J1 0 ${units === 'LPS' ? '0.02' : '0.3'}
+
+[RESERVOIRS]
+ R1 100
+
+[PIPES]
+ P1 R1 J1 1000 50 0.1 0 Open
+
+[COORDINATES]
+ J1 0 0
+ R1 -100 0
+
+[OPTIONS]
+ Units ${units}
+ Headloss D-W
+${opt}
+[END]
+`;
+	for (const [label, v] of [['relative 2', ' Viscosity 2.00'], ['absolute 1.0219e-6 m2/s (EPANET\'s own default)', ' Viscosity 1.0219e-6'],
+		['absolute 2.0438e-6 m2/s', ' Viscosity 2.0438e-6'], ['absolute 1e-6 m2/s', ' Viscosity 1e-6']]) {
+		const text = VISC('LPS', v);
+		const { parsed, doc } = importDoc(text);
+		const out = exportOf(doc);
+		ok('viscosity ' + label + ': the option comes back as the file wrote it', rowsOf(out.inp, 'OPTIONS').indexOf(v.trim().replace(/ +/, ' ')) >= 0, JSON.stringify(rowsOf(out.inp, 'OPTIONS')));
+		open(doc);
+		const ref = await rawHeads(text);
+		const nat = EC.lpnSolve(L.assembleModel(), { tol: 1e-12 });
+		const ep = await EC.lpnSolveEpanet(L.assembleModel(), {});
+		const refLoss = 100 - ref.J1, natLoss = 100 - nat.heads.J1, epLoss = 100 - ep.heads.J1;
+		// 3 %: until the one default viscosity is shared (fix/viscosity) the two engines' water differs by 1.5 %.
+		ok('viscosity ' + label + ': the built-in solver loses the head EPANET does (' + natLoss.toFixed(5) + ' vs ' + refLoss.toFixed(5) + ' m)',
+			Math.abs(natLoss - refLoss) / refLoss < 0.03);
+		ok('viscosity ' + label + ': the EPANET bridge loses the head EPANET does (' + epLoss.toFixed(5) + ')', Math.abs(epLoss - refLoss) / refLoss < 0.001);
+	}
+	{
+		// A US file states it in ft2/s: 2.2e-5 is twice EPANET's own 1.1e-5. The model is handed the
+		// relative 2 and the matching absolute viscosity, and the file's characters survive.
+		const { doc } = importDoc(VISC('GPM', ' Viscosity 2.20e-5'));
+		const out = exportOf(doc);
+		ok('US viscosity 2.20e-5: the option comes back as the file wrote it', rowsOf(out.inp, 'OPTIONS').indexOf('Viscosity 2.20e-5') >= 0, JSON.stringify(rowsOf(out.inp, 'OPTIONS')));
+		open(doc);
+		const m = L.assembleModel();
+		ok('US viscosity 2.20e-5 ft2/s reaches both engines as the relative 2', Math.abs(m.hydraulics.viscosity - 2) < 1e-9, String(m.hydraulics.viscosity));
+		ok('...and the built-in solver\'s water is twice EPANET\'s default', Math.abs(m.visc / (1.1e-5 * 0.3048 * 0.3048) - 2) < 1e-9, String(m.visc));
+		const rel = import_relative();
+		ok('a relative Viscosity 1.30 is left as the file wrote it', rel);
+	}
+	function import_relative() {
+		const { doc } = importDoc(VISC('LPS', ' Viscosity 1.30'));
+		open(doc);
+		const m = L.assembleModel();
+		return m.hydraulics.viscosity === 1.3 && rowsOf(exportOf(doc).inp, 'OPTIONS').indexOf('Viscosity 1.30') >= 0;
+	}
+
 	// EPA's own Net1, Net2 and Net3: the title (two lines in Net1) now goes back out as the file wrote
 	// it, and the sections the other round-trip harnesses hold token for token are unchanged.
 	console.log('\n4. EPA NETWORKS STILL EXPORT THEMSELVES');
