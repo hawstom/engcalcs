@@ -52,7 +52,7 @@
 			"type": "junction",
 			"x": 220.1,
 			"y": 619.9,
-			"elev": 1200,
+			"elev": 1202.76,
 			"_demand": 0,
 			"desc": "Test pressure hydrant. Reads the pressure during the hydrant flow test: 62 psi static, 56 psi at 600 gpm, 48 psi at 1,200 gpm."
 		},
@@ -61,7 +61,7 @@
 			"type": "junction",
 			"x": 394.5,
 			"y": 626.2,
-			"elev": 1202,
+			"elev": 1209.65,
 			"_demand": 0,
 			"desc": "Test flow hydrant, on the existing 12 inch main. The flow test draws 600 and 1,200 gpm here. The extension ties in at this junction."
 		},
@@ -70,7 +70,7 @@
 			"type": "junction",
 			"x": 739.9,
 			"y": 639.1,
-			"elev": 1205,
+			"elev": 1217.19,
 			"_demand": 6,
 			"desc": "First junction of the loop, two houses."
 		},
@@ -79,7 +79,7 @@
 			"type": "junction",
 			"x": 727.8,
 			"y": 993.5,
-			"elev": 1215,
+			"elev": 1207.68,
 			"_demand": 12,
 			"desc": "Four houses."
 		},
@@ -88,9 +88,9 @@
 			"type": "junction",
 			"x": 1085.4,
 			"y": 1006.1,
-			"elev": 1228,
+			"elev": 1210.63,
 			"_demand": 0,
-			"desc": "Fire hydrant junction, the high point of the loop and the design point for fire flow: 1,500 gpm with 20 psi residual.",
+			"desc": "Fire hydrant junction, the far end of the loop and the design point for fire flow: 1,500 gpm with 20 psi residual.",
 			"_fireFlow": 1500
 		},
 		{
@@ -98,7 +98,7 @@
 			"type": "junction",
 			"x": 1093,
 			"y": 652.1,
-			"elev": 1218,
+			"elev": 1218.83,
 			"_demand": 10,
 			"desc": "Three houses."
 		},
@@ -107,7 +107,7 @@
 			"type": "reservoir",
 			"x": 45.8,
 			"y": 613.6,
-			"_head": 1200,
+			"_head": 1202.76,
 			"desc": "System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test."
 		}
 	],
