@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**86 open tasks.** Next (100): 4 · Soon (75): 14 · Someday (50): 32 · Maybe (25): 17 · Parked (5): 19
+**84 open tasks.** Next (100): 4 · Soon (75): 13 · Someday (50): 31 · Maybe (25): 17 · Parked (5): 19
 
 ## 100 — Next (4)
 
@@ -16,7 +16,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 822 — Pump and valve assemblies: one point on the map, two nodes underneath.
 - Task 858 — Contour plot controls that say what is plotted.
 
-## 75 — Soon (14)
+## 75 — Soon (13)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the Run concept, extracted from 530.
@@ -28,12 +28,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 - Task 823 — Starter examples a new user can build from.
-- Task 851 — Net1's legend box covers the Tank label on a phone.
 - ! Task 854 — A Text drawn in a scenario starts empty and vanishes if left empty.
 - Task 857 — A Volume unit in Settings for tank volumes.
 - Task 860 — Controls that differ by scenario.
 
-## 50 — Someday (32)
+## 50 — Someday (31)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -42,7 +41,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
-- Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
@@ -114,5 +112,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-78 of 86 titles are within 4–12 words. `!` marks the rest;
+76 of 84 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

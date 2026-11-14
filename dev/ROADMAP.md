@@ -115,7 +115,6 @@ the block.
 - 25|824| **Randomly vary a new browser's theme and expert level, and log engagement.** Tom, 2026-10-23, disclosed in the messenger (*"This new browser has been randomly served the Prairie theme and the Tutorial expert level"*). Measured 2026-10-29 (published report, window 10-01..10-26): 310 said-yes browsers in 18 days, 186 on Manning Pipe Flow (154 calculated, 83%), 15 on the looped network. Two costs to weigh before building: hundreds of monthly views split across ten themes and several levels leave a few dozen per cell, too few to separate anything short of a large effect; and logging the assignment per browser is storage and analytics, so it is gated on consent (`dev/storage-rulings.md`). Priority set by CC. The logging half is built on branch feat/theme-log: the page-view row carries the theme (chosen name or day), and spock.php splits it by consent bucket.
   **Theme of the day** (CC proposal, Tom 2026-10-29: *"I like this 'theme of the day' idea, and it could become actionable"*; *"I see no reason not to store 'System' if it's a choice."*): a browser that never picked a theme sees one of a short list of the best themes, the same for everyone on a given day, steady across a session; any pick, System included (then stored as the word "system"), ends it. No consent change. Owed by him: the list (he named Prairie and Desktop).
   **His list, 2026-10-30:** *"Days of the week starting at noon UTC, Newspaper on Sunday, Desktop on Monday, Prairie on Tuesday, System on Wednesday, Platinum on Thursday, Rounded on Friday, Space on Saturday."* Merged 2026-10-30 on his word (`feat/theme-of-day`). The random variation and logging above stay open.
-- 75|851| **Net1's legend box covers the Tank label on a phone.** Perry, 2026-10-30, in every theme at 390x844: the legend overlaps the "Tank" label and the top of its pipe. Priority set by CC.
 - 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Cadence, Tom 2026-10-17: no more than about once a week; sprint 1017 took 3 h 20 min and 10% of his weekly budget. Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
   Tom, 2026-10-20: *"For our next translation sprint, I want to ensure that all the dockable box titles are translated with their key words first like \"Incendios: caudal contra\", \"Escenarios: administrator\". I leave the ultimate judgment to the translator, but they need to be aware that these may be docked on auto-hide with only a part of their title visible. So each one needs a unique beginning.\"* The `box title` note in `dev/language-strings.md` already says this to every payload; **Box titles done in sprint 1101 (2026-11-01):** every translator read its 18 box titles for a subject-first, distinct beginning; QA read them all. Left: am and my still share the Scenario and Status word outside the box titles (Task 737).
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
@@ -389,24 +388,6 @@ the block.
     those queries decides which, and `market-researcher` is the seat that can look.
   - **The page is in no repository** — `~/webdev/hawsedc.subset/` is a hand-kept subset, not a
     checkout — so an edit ships by hand, and clicks split across `hawsedc.com` and `www.hawsedc.com`.
-- 50|620| **[H] A changed icon never reaches a returning visitor.**
-  The precache cannot invalidate it. Found 2026-09-10, the day the water tower shipped: it appeared instantly on librewaternet.org and
-  not-epanet.org and NOT on the app. Tom: *"I see it at LWN and NOT, but not at lpn."* Ctrl+F5 fixed
-  it for him, which no ordinary visitor will do.
-  - **The cause is a deliberate design with one uncovered case.** `CACHE_VERSION` was removed on
-    purpose (`lib/ServiceWorker.lib.php`) and invalidation rides entirely on `?v=<filemtime>` in the
-    URL, so a changed file changes its own cache key and nothing has to be remembered. But
-    `ecSwAssetUrl()` deliberately puts no query on an image, because `<link rel="icon">` and
-    `manifest.json` name icons without one -- and `ecSwAssetFiles()` precaches
-    `icons/*.{svg,png,ico}` anyway. **An icon is therefore the one precached asset whose content can
-    change while its cache key cannot.** JS and CSS are fine; this is not a general cache bug.
-  - Two candidate fixes, and the second is probably right: bust `?v=` onto icon URLs at BOTH ends
-    (the pages and `ecSwAssetUrl()`, which `sw_manifest_check.php` already holds identical), or make
-    the generated worker's own bytes change when any precached asset's mtime does, so `install` re-runs
-    and `addAll` overwrites. The second fixes every icon at once and touches no public URL; check
-    whether `addAll` would then be served from the HTTP cache anyway.
-  - Nothing is broken today -- the icon on disk is correct and a new visitor sees it. This is about
-    the NEXT icon change, and about anything else precached that is named without a query.
 - 50|622| **[H] A refused terrain lookup is reported as an unreachable one.**
   The message says "You may be offline" when we reached the service and it refused us. Found 2026-09-10 while diagnosing KDH's report that DEM and satellite were down at
   librewaternet.org/app. They were: the Mapbox token is URL-restricted to hawsedc.com, so every

@@ -319,6 +319,13 @@ police the wording or layout of documentation, or that check other checks.
 Tom will not read code. Save his attention for naming, scope, wording, and whether an
 unreferenced key is debt.
 
+## Changing code
+
+- **Before writing new code, look for a helper, module or harness that already does the job**, and
+  use it the way the surrounding code does.
+- **Before fixing a bug, find every caller of the function you change**, and fix the cause once, in
+  the shared code.
+
 ## Testing
 
 Prefer a harness in `dev/lpn-spike/` or `dev/calc-spike/` to asking Tom for a browser pass.
