@@ -4972,3 +4972,12 @@ OBSERVED (re-verify; real Chromium, Net3, master 27710ab0f vs branch; probes in 
 - DEFECT: in a child scenario, tick Show node colors, then change Property to plot: map and key follow, the box select snaps back to the old property (stored override says the new one). Not in Base; not without the tick; not on master.
 - DEFECT: choose Property to plot = head in the box, then Settings > Node colors = pressure: dots recolour to pressure, key and plot stay Head. Master had one setting so could not diverge.
 - NOT DONE: mutation test of the builder's harness (worktree has no node_modules, harness not run), light/dark, Tables-row look.
+
+## 2026-11-13 feat/contour-controls round 2 (2cd401111), Task 858
+OBSERVED (re-verify; real Chromium, Net1 Base and a child scenario; probes in scratchpad r2/; pictures perry-*-r2.png):
+- Base: ~20 chained moves across box, Settings box, Tables row (property, No color, ramp; Net1 and an old project with colorNodeField head and none, no contourField): box, Settings, Tables, key and dots agree in every step. Option values are elev / demandActual / demand (= "Base demand"); a probe using 'elevation' is an invalid option.
+- DEFECT: Tables row edit with the Contour box open leaves the box showing the old property and tick (plot and Settings are right; reopening the box fixes it).
+- DEFECT: in a child scenario, Settings Color nodes by changed with the box open: box select and tick lag (plot right); reopening fixes it. Builder's setTimeout rebuild is only in the box's own handler.
+- DEFECT (panel step): Net1 opens with Show node colors cleared; the step "change Property to plot in the box and look at Color nodes by" shows No color unless the tick is set first.
+- In the box a ? opens on click, hover on the ? alone showed nothing in 1.5 s (step says hover).
+NOT DONE: mutation test of builder's harness; touch; phone; other languages.
