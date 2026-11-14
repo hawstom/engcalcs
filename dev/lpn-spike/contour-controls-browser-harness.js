@@ -268,8 +268,12 @@ async function main3(Session, browser) {
 	try {
 		await contourFromMenu(a);
 		await setBox(a, 'lpn_contour_node_colors', true);
-		await a.page.hover('.lpn-grow:has(#lpn_contour_field) .ec-help');
-		await a.settle(700);
+		{
+			const bb = await (await a.page.$('.lpn-grow:has(#lpn_contour_field) .ec-help')).boundingBox();
+			await a.page.mouse.move(bb.x + 20, bb.y + bb.height / 2, { steps: 5 });
+			await a.page.mouse.move(bb.x + 24, bb.y + bb.height / 2, { steps: 5 });
+			await a.settle(900);
+		}
 		await shot(a.page, 'tip-box-property');
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await a.settle(500);
