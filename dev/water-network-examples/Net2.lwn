@@ -486,7 +486,8 @@
 				"x": "33.00",
 				"y": "76.00"
 			},
-			"_initQuality": 1
+			"_initQuality": 1,
+			"minVolume": 0
 		}
 	],
 	"links": [

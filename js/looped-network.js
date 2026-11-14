@@ -80017,8 +80017,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
-		// The wording of this one is Tom's to rule on; until it is, the code and the unit name stand.
-		if (issue.code === 'roughness-unit') { return (pc.lpn_diag_roughness_unit || 'roughness-unit') + ': ' + issue.ids.join(', '); }
+		// NO VISITOR WORDING YET: the sentence for this one is Tom's to approve, so the code and the
+		// unit name stand until it is added as a key.
+		if (issue.code === 'roughness-unit') { return 'roughness-unit: ' + issue.ids.join(', '); }
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }

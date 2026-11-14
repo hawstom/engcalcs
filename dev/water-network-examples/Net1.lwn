@@ -165,7 +165,8 @@
 				"x": "50.00",
 				"y": "90.00"
 			},
-			"_initQuality": 1
+			"_initQuality": 1,
+			"minVolume": 0
 		}
 	],
 	"links": [
@@ -346,7 +347,8 @@
 			"b": 2,
 			"lx": -1.5917033570596484,
 			"ly": 8.15802127861268,
-			"curveId": "1"
+			"curveId": "1",
+			"_curveId": "1"
 		}
 	],
 	"labels": [

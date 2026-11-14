@@ -34,7 +34,11 @@ const APPLY = process.argv.indexOf('--apply') >= 0;
 const PAIRS = [
 	['Net1', 'dev/water-network-examples/Net1.lwn', 'dev/lpn-spike/reference/Net1.inp'],
 	['Net2', 'dev/water-network-examples/Net2.lwn', 'dev/lpn-spike/reference/Net2.inp'],
-	['Net3', 'dev/water-network-examples/Net3.lwn', 'dev/lpn-spike/reference/Net3.inp']
+	['Net3', 'dev/water-network-examples/Net3.lwn', 'dev/lpn-spike/reference/Net3.inp'],
+	// The two placed examples are published and audited against the same sources
+	// (examples-audit-harness.js), so a field the importer learns reaches them here too.
+	['Net2-Branford-CT', 'dev/water-network-examples/Net2-Branford-CT.lwn', 'dev/lpn-spike/reference/Net2.inp'],
+	['Net3-Novato-CA-World', 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'dev/lpn-spike/reference/Net3.inp']
 ];
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('../lpn-spike/lpn-dom-stub.js');
@@ -121,6 +125,28 @@ PAIRS.forEach(function (pair) {
 		if (freshPat[n.id] && !n.demandPattern) { n.demandPattern = freshPat[n.id]; patNodes++; }
 	});
 	if (patNodes) { clockAdded.push('demandPattern x' + patNodes); }
+	// **A TANK'S MinVol AND Overflow, AND THE FILE'S HEAD LOSS FORMULA** (audit 2026-11, F1/F2). The
+	// importer reads them now; a stored example written before then states neither. Copied from the
+	// fresh import, with MinVol's own characters, only where the example has none.
+	var modelAdded = [];
+	var freshTank = {};
+	fresh.nodes.forEach(function (n) { if (n.type === 'tank') { freshTank[n.id] = n; } });
+	(ex.nodes || []).forEach(function (n) {
+		var f = freshTank[n.id];
+		if (!f || n.type !== 'tank') { return; }
+		if (typeof f.minVolume === 'number' && n.minVolume === undefined) {
+			n.minVolume = f.minVolume;
+			if (f.tok && f.tok.minVolume) { (n.tok || (n.tok = {})).minVolume = f.tok.minVolume; }
+			modelAdded.push('minVolume ' + n.id);
+		}
+		if (f.overflow && n.overflow === undefined) { n.overflow = f.overflow; modelAdded.push('overflow ' + n.id); }
+	});
+	var fileMethod = global.EngCalcs.lpnInpHeadlossMethod[String(global.EngCalcs.lpnInpParse(fs.readFileSync(inpPath, 'utf8')).headloss).toUpperCase()];
+	if (fileMethod && ex.settings && ex.settings.method === undefined) {
+		ex.settings.method = fileMethod;
+		modelAdded.push('settings.method');
+	}
+	if (modelAdded.length) { clockAdded.push(modelAdded.length + ' model field(s)'); }
 	let added = 0, already = 0, unmatched = 0;
 	function merge(target, key) {
 		const t = bag[key];

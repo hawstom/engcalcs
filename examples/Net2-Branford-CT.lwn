@@ -383,7 +383,8 @@
 			"maxLevel": 70,
 			"tankDiameter": 50,
 			"tok": {},
-			"_initQuality": 1
+			"_initQuality": 1,
+			"minVolume": 0
 		}
 	],
 	"links": [

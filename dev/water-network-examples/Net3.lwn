@@ -856,7 +856,8 @@
 			"tankDiameter": 85,
 			"tok": {
 				"minLevel": ".1"
-			}
+			},
+			"minVolume": 0
 		},
 		{
 			"id": "2",
@@ -867,7 +868,8 @@
 			"_level": 23.5,
 			"minLevel": 6.5,
 			"maxLevel": 40.3,
-			"tankDiameter": 50
+			"tankDiameter": 50,
+			"minVolume": 0
 		},
 		{
 			"id": "3",
@@ -883,7 +885,8 @@
 				"elev": "129.0",
 				"_level": "29.0",
 				"minLevel": "4.0"
-			}
+			},
+			"minVolume": 0
 		}
 	],
 	"links": [
@@ -2439,7 +2442,8 @@
 				]
 			],
 			"curveRef": null,
-			"curveId": "1"
+			"curveId": "1",
+			"_curveId": "1"
 		},
 		{
 			"id": "335",
@@ -2465,7 +2469,8 @@
 				]
 			],
 			"curveRef": null,
-			"curveId": "2"
+			"curveId": "2",
+			"_curveId": "2"
 		}
 	],
 	"labels": [
