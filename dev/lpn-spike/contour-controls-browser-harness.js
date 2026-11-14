@@ -336,11 +336,11 @@ async function main3(Session, browser) {
 				boxField: tipOf('lpn_contour_field'), setField: tipOf('lpn_set_color_node'), setRampTip: tipOf('lpn_set_ramp_node') };
 		});
 		const P = t.pc, there = enValue('lpn_settings_sec_symbology') + ', ' + enValue('lpn_settings_sym_node_colors'), here = P.water + ', ' + P.graphs + ', ' + P.contour;
-		ok('Property to plot tip names Color nodes by in ' + there, P.field.indexOf(P.colorNodes) >= 0 && P.field.indexOf(there) >= 0 && /same setting/.test(P.field), P.field.slice(0, 80));
-		ok('Property to plot tip says what the plot shows with No color', /No color/.test(P.field) && /pressure/.test(P.field));
+		ok('Property to plot tip names Color nodes by in ' + there, P.field.indexOf(P.colorNodes) >= 0 && P.field.indexOf(there) >= 0 && /cleared/.test(P.field) && /keeps/.test(P.field), P.field.slice(0, 80));
+		ok('every tip is short (160 characters or fewer)', [P.field, P.scheme, P.nodes, P.setField, P.setRamp].every((x) => x.length <= 160), [P.field, P.scheme, P.nodes, P.setField, P.setRamp].map((x) => x.length).join(','));
 		ok('Color scheme tip names Color scheme in ' + there, P.scheme.indexOf(P.scheme_l) >= 0 && P.scheme.indexOf(there) >= 0 && /same setting/.test(P.scheme), P.scheme.slice(0, 80));
 		ok('Show node colors tip names Color nodes by in ' + there, P.nodes.indexOf(P.colorNodes) >= 0 && P.nodes.indexOf(there) >= 0);
-		ok('Settings Color nodes by tip names Property to plot in ' + here, P.setField.indexOf(P.plot) >= 0 && P.setField.indexOf(here) >= 0 && /same setting/.test(P.setField) && /No color/.test(P.setField), P.setField.slice(0, 80));
+		ok('Settings Color nodes by tip names Property to plot in ' + here, P.setField.indexOf(P.plot) >= 0 && P.setField.indexOf(here) >= 0 && /keeps/.test(P.setField) && /No color/.test(P.setField), P.setField.slice(0, 80));
 		ok('Settings Color scheme tip names Color scheme in ' + here, P.setRamp.indexOf(P.scheme_l) >= 0 && P.setRamp.indexOf(here) >= 0 && /same setting/.test(P.setRamp), P.setRamp.slice(0, 80));
 		ok('the tips are on the rows themselves', t.boxField === P.field && t.setField === P.setField && t.setRampTip === P.setRamp, JSON.stringify([t.boxField.length, t.setField.length, t.setRampTip.length]));
 		// Pictures of the two tips, for the browser pass (CONTOUR_SHOT).
@@ -399,6 +399,175 @@ async function main4(Session, browser) {
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally { await a.close(); }
 }
+// The box follows every door while it is open (Perry, 2026-11-13), and the open Tables pane follows the box.
+async function main5(Session, browser) {
+	console.log('\n--- 9. an open box follows Settings, the Tables row and Undo; the open Tables pane follows the box ---');
+	const boxNow = (a) => a.page.evaluate(() => ({ field: document.getElementById('lpn_contour_field').value, tick: document.getElementById('lpn_contour_node_colors').checked }));
+	const setNode = (a, v) => a.page.evaluate((x) => { const n = document.getElementById('lpn_set_color_node'); n.value = x; n.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+	// 9a. a child scenario, Settings changes Color nodes by with the box open.
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await newScenario(a);
+		await contourFromMenu(a);
+		await setBox(a, 'lpn_contour_node_colors', false);
+		let f = await boxNow(a);
+		ok('child scenario: the box opens with the dots plain', f.tick === false, JSON.stringify(f));
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.settle(500);
+		await setNode(a, 'head');
+		await a.settle(900);
+		f = await boxNow(a);
+		ok('child scenario: Settings Color nodes by = Head: the open box reads Head and ticks Show node colors', f.field === 'head' && f.tick === true, JSON.stringify(f));
+		await setNode(a, '');
+		await a.settle(900);
+		f = await boxNow(a);
+		ok('child scenario: Settings No color: the open box clears its tick and keeps Head', f.field === 'head' && f.tick === false, JSON.stringify(f));
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally { await a.close(); }
+
+	// 9b and Undo: Base, the Tables row.
+	const b = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		const P = await b.page.evaluate(() => ({ plot: EngCalcs.pageConfig.lpn_settings_row_contour_field, node: EngCalcs.pageConfig.lpn_settings_color_node_field }));
+		await contourFromMenu(b);
+		await b.toolbarClick(await b.lang('lpn_pane_toggle'));
+		await b.settle(500);
+		await b.page.click('#lpn_pane_tab_settings');
+		await b.settle(700);
+		const row = (label) => b.page.evaluate((l) => {
+			const out = [];
+			document.querySelectorAll('#lpn_pane_settings tbody tr').forEach((tr) => {
+				const o = {}; tr.querySelectorAll('td').forEach((td) => {
+					const inp = td.querySelector('select');
+					o[td._lpnPaneKey] = inp ? (inp.options[inp.selectedIndex] || { text: '' }).text : td.textContent.trim();
+					if (td._lpnPaneKey === 'st_value') { o.id = td._lpnPaneId; }
+				});
+				out.push(o);
+			});
+			return out.filter((o) => o.st_setting === l)[0] || null;
+		}, label);
+		const typeVal = async (id, v) => {
+			await b.page.evaluate(([k, x]) => {
+				const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
+				const inp = td.querySelector('select'); inp.value = x; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			}, [id, v]);
+			await b.settle(1500);
+		};
+		let f = await boxNow(b), r = await row(P.plot);
+		ok('Base: the box opens on Pressure with Show node colors ticked (Net3)', f.field === 'pressure' && f.tick === true, JSON.stringify(f));
+		await typeVal(r.id, 'head');
+		f = await boxNow(b);
+		ok('Base: Tables Contour property to plot = Head: the open box reads Head, tick kept', f.field === 'head' && f.tick === true, JSON.stringify(f));
+		await b.page.mouse.click(5, 5);   // focus off the table, so the key is the page's
+		await b.page.keyboard.press('Control+z');
+		await b.settle(1200);
+		f = await boxNow(b);
+		ok('Undo: the open box goes back to Pressure', f.field === 'pressure' && f.tick === true, JSON.stringify(f));
+		await b.page.keyboard.press('Control+y');
+		await b.settle(1200);
+		f = await boxNow(b);
+		ok('Redo: the open box reads Head again', f.field === 'head', JSON.stringify(f));
+		// The open Tables pane after an edit made in the box.
+		await setBox(b, 'lpn_contour_field', 'demand');
+		await b.settle(800);
+		r = await row(P.plot);
+		const n = await row(P.node);
+		ok('the open Tables pane follows an edit made in the box (Contour row and Node color row)', /demand/i.test(r.st_value) && /demand/i.test(n.st_value), JSON.stringify([r.st_value, n.st_value]));
+		await setBox(b, 'lpn_contour_node_colors', false);
+		await b.settle(800);
+		const n2 = await row(P.node);
+		ok('...and Show node colors cleared shows as No color in the Tables pane', n2.st_value === (await b.page.evaluate(() => EngCalcs.pageConfig.lpn_color_none)), n2.st_value);
+		ok('no uncaught page errors', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+	} finally { await b.close(); }
+}
+// THE PANEL'S STEPS, WALKED AS WRITTEN (ports.conf row feat-contour-controls). Any change to those steps is walked here first.
+async function main6(Session, browser) {
+	console.log('\n--- 10. the panel steps, as written, on Net1 ---');
+	const a = await Session.open(browser, NAME, { viewport: { width: 1440, height: 900 } });
+	try {
+		await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		await a.goto('Looped-Network.php');
+		await a.answerTrainingPanel().catch(() => {});
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
+		await a.settle(1500);
+		const boxNow = () => a.page.evaluate(() => ({ field: document.getElementById('lpn_contour_field').value, tick: document.getElementById('lpn_contour_node_colors').checked,
+			dots: Array.from(document.querySelectorAll('#lpn_canvas circle.lpn-node-junction')).filter((c) => c.style.color).length }));
+		const setNode = (v) => a.page.evaluate((x) => { const n = document.getElementById('lpn_set_color_node'); n.value = x; n.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+		// The box's ? is a glyph that opens on a click; a Settings label is a name tip that opens when the pointer rests on it.
+		const pointAt = async (scope, labelText, glyph) => {
+			const bb = await a.page.evaluate(([sc, t, g]) => {
+				const l = Array.from(document.querySelectorAll(sc + ' .ec-help')).find((e) => e.textContent.trim().indexOf(t) === 0);
+				const target = l && (g ? l.querySelector('.ec-tip') : l);
+				if (!target) { return null; }
+				const r = target.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+			}, [scope, labelText, glyph]);
+			if (!bb) { return false; }
+			await a.page.mouse.move(bb.x - 30, bb.y);
+			await a.page.mouse.move(bb.x, bb.y, { steps: 4 });
+			if (glyph) { await a.page.mouse.click(bb.x, bb.y); }
+			await a.settle(1000);
+			return true;
+		};
+		const tipShown = (first) => a.page.evaluate((t) => Array.from(document.querySelectorAll('.tooltip-inner, .tooltip')).some((e) => e.offsetParent !== null && e.textContent.indexOf(t) >= 0), first);
+		const pc = await a.page.evaluate(() => EngCalcs.pageConfig);
+
+		console.log('step 1: open Net1, choose Water, Graphs, Contour');
+		await contourFromMenu(a);
+		let f = await boxNow();
+		ok('step 1: the box is open, Show node colors is cleared, the dots are plain, Property to plot reads Pressure', f.tick === false && f.dots === 0 && f.field === 'pressure', JSON.stringify(f));
+		console.log('step 2: click the ? beside Property to plot');
+		ok('step 2: there is a ? beside Property to plot to click', await pointAt('#lpn_contour_body', pc.lpn_contour_field, true));
+		ok('step 2: its tip opens on the click', await tipShown(pc.lpn_contour_field_tip.slice(0, 30)));
+		await shot(a.page, 'steps-2-tip-click');
+		await a.page.keyboard.press('Escape');
+		console.log('step 3: tick Show node colors, choose Head, open Settings');
+		await setBox(a, 'lpn_contour_node_colors', true);
+		f = await boxNow();
+		ok('step 3: ticked, the dots are colored', f.tick === true && f.dots > 0, JSON.stringify(f));
+		await setBox(a, 'lpn_contour_field', 'head');
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.settle(500);
+		const node = () => a.page.evaluate(() => document.getElementById('lpn_set_color_node').value);
+		ok('step 3: Settings, Symbology, Node colors: Color nodes by reads Head', await node() === 'head');
+		ok('step 3: resting the pointer on Color nodes by in Settings opens its tip', await pointAt('#lpn_settings_box', pc.lpn_color_node_field, false) && await tipShown(pc.lpn_settings_color_node_field_tip.slice(0, 30)));
+		await shot(a.page, 'steps-3-settings-tip');
+		await a.page.keyboard.press('Escape');
+		console.log('step 4: in Settings choose Pressure');
+		await setNode('pressure'); await a.settle(700);
+		f = await boxNow();
+		ok('step 4: the open box reads Pressure', f.field === 'pressure' && f.tick === true, JSON.stringify(f));
+		console.log('step 5: in Settings choose No color');
+		await setNode(''); await a.settle(700);
+		f = await boxNow();
+		ok('step 5: the dots go plain, the box clears Show node colors and keeps Pressure', f.dots === 0 && f.tick === false && f.field === 'pressure', JSON.stringify(f));
+		console.log('step 6: Tables pane, Settings tab, Contour property to plot');
+		await a.page.keyboard.press('Escape');
+		await a.toolbarClick(await a.lang('lpn_pane_toggle'));
+		await a.settle(500);
+		await a.page.click('#lpn_pane_tab_settings');
+		await a.settle(700);
+		const rowId = await a.page.evaluate((l) => {
+			let id = null; document.querySelectorAll('#lpn_pane_settings tbody tr').forEach((tr) => { let hit = false, vid = null; tr.querySelectorAll('td').forEach((td) => { if (td._lpnPaneKey === 'st_setting' && td.textContent.trim() === l) { hit = true; } if (td._lpnPaneKey === 'st_value') { vid = td._lpnPaneId; } }); if (hit) { id = vid; } });
+			return id;
+		}, pc.lpn_settings_row_contour_field);
+		ok('step 6: the Settings tab has the row Contour property to plot', !!rowId);
+		await a.page.evaluate(([k, x]) => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
+			const inp = td.querySelector('select'); inp.value = x; inp.dispatchEvent(new Event('change', { bubbles: true }));
+		}, [rowId, 'head']);
+		await a.settle(1500);
+		f = await boxNow();
+		ok('step 6: choosing Head there, the box reads Head', f.field === 'head', JSON.stringify(f));
+		await a.page.mouse.click(5, 5);
+		await a.page.keyboard.press('Control+z');
+		await a.settle(1200);
+		f = await boxNow();
+		ok('step 6: Ctrl+Z puts the box back to Pressure', f.field === 'pressure', JSON.stringify(f));
+		ok('the box label reads Show contour lines', await a.page.evaluate(() => /Show contour lines/.test(document.getElementById('lpn_contour_lines').closest('.lpn-grow').textContent)));
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally { await a.close(); }
+}
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. a 390-wide phone ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -428,6 +597,8 @@ async function main() {
 		await main2(Session, browser);
 		await main3(Session, browser);
 		await main4(Session, browser);
+		await main5(Session, browser);
+		await main6(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();

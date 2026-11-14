@@ -12518,6 +12518,8 @@ var EngCalcs = EngCalcs || {};
 		keepSetboxControl(buildColoringSection);
 		// ...and the contour box, the second view of the node colouring (Task 600).
 		refreshContourBoxIfOpen();
+		// ...and the Tables pane, whose Settings tab holds the same values as rows.
+		refreshPaneIfOpen();
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -12902,6 +12904,7 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
 		refreshContour();
 		renderColorLegend();
+		contourBoxFollowSoon();
 	}
 	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
 	// starts with. buildLinkEls() draws it once; this keeps it true on every solve and every step
@@ -13587,6 +13590,25 @@ var EngCalcs = EngCalcs || {};
 		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
 	}
 	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
+	// **THE BOX FOLLOWS EVERY DOOR** (Task 858, Perry 2026-11-13): Settings, the Tables row, Undo and a scenario switch all
+	// end in refreshValueColors(), which calls this. The box is rebuilt only when what it shows has changed, so a field
+	// being typed in is never rebuilt under the cursor; it is looked at again after the event, because a child scenario's
+	// write-back lands after the handler that started it.
+	var contourBoxSig = '';
+	function contourBoxSigNow() {
+		return JSON.stringify([contourIsOn(), contourFieldOf(), !!colorFieldOf('node'), colorRampKey('node'), colorClassCount('node'),
+			contourFillMode(), contourOpacityOf(), contourBufferOf(), !!settings.contourLines, settings.contourLabels !== false,
+			settings.contourInterval || null, !!scnSetting('contourTerrain')]);
+	}
+	function contourBoxFollow() {
+		if (!contourBoxIsOpen()) { return; }
+		if (contourBoxSig !== contourBoxSigNow()) { buildContourBox(); }
+	}
+	function contourBoxFollowSoon() {
+		if (!contourBoxIsOpen()) { return; }
+		contourBoxFollow();
+		setTimeout(contourBoxFollow, 0);
+	}
 	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
 	// The box is rebuilt again once the edit has landed: in a child scenario the write-back to the scenario
 	// comes after this handler, and a rebuild before it reads the old value (Perry, 2026-11-11).
@@ -13708,6 +13730,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
 		initTipsIn(body);
+		contourBoxSig = contourBoxSigNow();
 	}
 	// **A WHOLE-DRAWING BUILD MEASURES EVERY NODE LABEL IN ONE READ, AFTER THE LAST ONE IS APPENDED.**
 	// A getBBox() between two appends forces a layout of the half-built drawing, once per node; on a
