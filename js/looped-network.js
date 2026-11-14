@@ -8210,7 +8210,6 @@ var EngCalcs = EngCalcs || {};
 		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['labelSettings'].concat(path || [])));
 	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
-	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
 	// block itself. Raw: it asks no table, which is what lets the load-time sanitizer remove what
 	// setScenarioSetting() would refuse to touch.
@@ -22123,8 +22122,6 @@ var EngCalcs = EngCalcs || {};
 	// whose placement is KEPT while the map is hidden reads as detached, and that includes an older
 	// file saved with the map hidden (Perry's review, 2026-09-22, point 4).
 	function worldMapAttached() { return basemapOn(); }
-	// A grid project with a placement on file, whether or not the map is showing.
-	function worldMapPlacementKept() { return xyMapAttachable() && xyGeorefOk(); }
 	/**
 	 * **ATTACH, WIDENED PAST THE GRID CASE** (Tom, 2026-09-22, on a project he could not see this row
 	 * on at all: *"georeference xy -- I don't see this work merged... The map menu should have
@@ -25489,11 +25486,6 @@ var EngCalcs = EngCalcs || {};
 		return { ok: true, ast: ast };
 	}
 	function findAstIsCond(ast) { return !!ast && ast.t === 'cond'; }
-	function findAstHasConnection(ast) {
-		if (!ast) { return false; }
-		if (ast.t === 'cond') { return findPropIsConnection(ast.prop); }
-		return findAstHasConnection(ast.a) || findAstHasConnection(ast.b);
-	}
 	// Does the typed query ask a question that needs somewhere to walk TO? Only then is the
 	// no-source note true -- a query of nothing but "no links" is answerable on a bare drawing.
 	function findAstNeedsSource(ast) {
@@ -31440,10 +31432,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var cols = paneCols(spec), i;
 		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return cols[i]; } }
 		return null;
-	}
-	function paneCellValue(spec, el, key) {
-		var c = paneColByKey(spec, key);
-		return c ? c.get(el) : undefined;
 	}
 	function panePresent(v) {
 		return v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && !isFinite(v));
@@ -43093,16 +43081,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		for (var i = 0; i < library.projects.length; i++) { if (library.projects[i].id === id) { return library.projects[i]; } }
 		return null;
 	}
-	// Nodes/links/labels only -- NOT scenarios/settings/backdrop, which every new project inherits
-	// from whichever one was open (see newProject()) and so are never evidence that THIS project was
-	// touched. Reads the live doc for the open project rather than round-tripping through storage,
-	// since that is always current; a background tab is read from its own saved JSON.
-	function projectIsEmpty(id) {
-		var saved = id === library.openId ? doc : readJSON(projectKey(id));
-		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) &&
-			!(saved.labels && saved.labels.length) && !(saved.customers && saved.customers.length) &&
-			!(saved.shapes && saved.shapes.length);
-	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
 	// NOT a flag set by saveToStorage(): a great deal that is not a mutation funnels through there
@@ -50168,13 +50146,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		};
 		reader.onerror = function () { setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsArrayBuffer(file);
-	}
-	// **AN UPLOAD, NOT A LIVE FILE HANDLE, in every browser.** What comes out of this is a placed
-	// copy that is no longer the drawing on the disk, so a Save writing back over the original would
-	// be the command doing something other than its name. Save as gives it a home of its own.
-	function pickGeoFile() {
-		var input = document.getElementById('lpn_geo_file');
-		if (input) { input.click(); }
 	}
 	// ---- FILE, CONVERT AS... (ROADMAP Task 696, absorbing Tasks 688 and 693) ----------------------
 	//
@@ -60717,11 +60688,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return out;
 	}
-	// The heading of a column, for the notice that names what was not pasted.
-	function matchColName(c) {
-		var pc = EngCalcs.pageConfig || {};
-		return typeof c.label === 'function' ? String(c.label()) : String(pc[c.label] || c.key);
-	}
 	// Writes what differs; counts what it could not. ctx = {changed, skip:{breakdown,valve}, before}.
 	function matchWrite(clip, dst, ctx) {
 		var pairs = matchPairs(clip, dst), done = {}, pass;
@@ -68393,18 +68359,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			dockAct(d, act);
 		});
 		return b;
-	}
-	// The box's one `?` (Q5): the JS twin of ecTipLabel() with no label text, so the glyph IS the
-	// whole tip target. EngCalcs.initTips() makes the glyph the tab stop and the one door, as on
-	// every other `?` (Task 759), so the wrapper is not focusable itself: one `?`, one tab stop.
-	function cornerHelp(tip) {
-		var help = document.createElement('span'), glyph = document.createElement('span');
-		help.className = 'ec-help lpn-corner-help';
-		help.title = tip;
-		glyph.className = 'ec-tip';
-		glyph.textContent = '?';
-		help.appendChild(glyph);
-		return help;
 	}
 	// **THE ONE "?" OF EVERY STANDING BOX** (Tom, 2026-10-07; Ida): the last glyph before the X, with
 	// the tip "Help for this box", opening that box's entry in the Guide. F1 inside the box does the
@@ -77611,7 +77565,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// opening or closing) moves the box with the words and keeps it open.
 	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
 	var textEditor = null;
-	function textEditorOpen() { return !!textEditor; }
 	// **THE LAYOUT'S WIDTH, NOT innerWidth** (R-392). Chrome on a phone reports innerWidth as the
 	// VISIBLE width, so the zoom it makes onto a field typed in at a small size reads as a narrower
 	// window, and the editor closed the moment it opened. Only rotating or resizing the window
@@ -78978,7 +78931,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// is "1" if there is one; otherwise the demand is constant. `doc.defaultPattern` stays only
 	// what the file stated (so an export writes no Pattern line the file did not have); every
 	// RESOLUTION goes through here.
-	// In a scenario the stated pattern is the scenario's own, through scnDefaultPattern().
+	// In a scenario the stated pattern is the scenario's own, through scenarioDefaultPatternFor().
 	function effDefaultPattern() { return scenarioDefaultPatternFor(activeScenario()); }
 	// The same answer for any scenario, open or not: what a rename or a delete of a pattern asks of
 	// every scenario at once.
@@ -79430,19 +79383,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		s.times.text = s.times.text || {};
 		s.times.text[key] = raw;
 		return true;
-	}
-	// The text a cell shows for one of these on one scenario: its own, or '' when it inherits; for
-	// Base, the project's own value (Base has no other).
-	function scenarioTimeText(s, key) {
-		var pt, v;
-		if (s.isBase && !writeTargetFor(s, 'calculation')) {
-			pt = projectTimes();
-			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(pt, key, pt[key] || 0) : String(pt[key] || 0);
-		}
-		s = calcTargetOf(s);
-		v = scenarioTimeValue(s, key);
-		if (v === undefined) { return ''; }
-		return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(s.times, key, v) : String(v);
 	}
 	// A file is read, never trusted: a scenario's block keeps only what this page can run, Base
 	// holds none, and an empty block goes. An older project has none anywhere and is untouched.
@@ -86421,7 +86361,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function smSelValid() {
 		return smState.sel !== null && (smIsBaseKey(smState.tree, smState.sel) || !!smRecord(smState.tree, smState.sel));
 	}
-	function smTip(key) { return (EngCalcs.pageConfig || {})[key] || ''; }
 	function smButton(host, text, tip, fn) {
 		var b = document.createElement('button');
 		b.type = 'button';
@@ -88036,12 +87975,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.map(csvField).join(','));
 		});
 		return lines.join('\r\n') + '\r\n';
-	}
-	// **A NAME SAFE ON EVERY FILESYSTEM THIS SUITE'S USERS ACTUALLY WRITE TO** -- Windows refuses
-	// `\ / : * ? " < > |` in a filename outright, so those become a hyphen rather than being handed
-	// to the browser to reject silently.
-	function sanitizeFilename(name) {
-		return String(name || '').replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
 	}
 	function downloadTextFile(filename, text, mime) {
 		var blob = new Blob([text], { type: mime || 'text/plain' }), url = URL.createObjectURL(blob),
