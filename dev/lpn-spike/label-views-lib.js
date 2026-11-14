@@ -104,7 +104,8 @@ function countShown(L) {
 	const inView = (p) => { const x = p.x * st.s + st.tx, y = p.y * st.s + st.ty; return x >= 0 && x <= W && y >= 0 && y <= H; };
 	const byId = {}; doc.nodes.forEach((n) => { byId[n.id] = n; });
 	const c = { pipes: 0, pipesShown: 0, pipeRows: 0, pipeRowsAsked: 0, nodes: 0, nodesShown: 0, nodeRows: 0, nodeRowsAsked: 0, level: 0, along: 0,
-		levelStacked: 0, levelInline: 0, levelGrown: 0, nodeInline: 0, nodeStacked: 0 };
+		levelStacked: 0, levelInline: 0, levelGrown: 0, nodeInline: 0, nodeStacked: 0, leaders: 0 };
+	const led = (h) => !!h.leader && h.leader.style.display !== 'none' && h.leader.style.visibility !== 'hidden';
 	doc.links.forEach((l) => {
 		const le = linkEls[l.id]; if (!le || le.empty) { return; }
 		const a = L.nodeAt(byId[l.from]), b = L.nodeAt(byId[l.to]);
@@ -113,6 +114,7 @@ function countShown(L) {
 		if (shown(le)) {
 			// A level label drawn in another form shows that form's values (Task 812).
 			const f = le.levelBeside && le.levelForm;
+			if (led(le)) { c.leaders++; }
 			c.pipesShown++; c.pipeRows += f ? f.lines.length : (le.lines || []).length;
 			if (le.levelBeside) {
 				c.level++;
@@ -125,6 +127,7 @@ function countShown(L) {
 		const ne = nodeEls[n.id]; if (!ne || ne.empty || !inView(L.nodeAt(n))) { return; }
 		c.nodes++; c.nodeRowsAsked += (ne.allLines || ne.lines || []).length;
 		if (shown(ne)) {
+			if (led(ne)) { c.leaders++; }
 			c.nodesShown++; c.nodeRows += (ne.lines || []).length;
 			if ((ne.lines || []).length > 1) { if (ne.inline) { c.nodeInline++; } else { c.nodeStacked++; } }
 		}
