@@ -3,9 +3,9 @@
 // Load this BEFORE any calculator script that uses it. Under Node it is pulled in
 // by require() from js/lpn-solver.js.
 //
-// Scope today is Hazen-Williams only. The Darcy-Weisbach and Manning kernels are
-// still duplicated in js/branched-network.js and js/lpn-solver.js; they belong
-// here, and moving them needs a behavior-preserving diff.
+// Scope today is Hazen-Williams, EPANET's default viscosity and gravity, and the
+// Darcy-Weisbach friction factor. The Manning kernel is still duplicated in
+// js/branched-network.js and js/lpn-solver.js.
 
 var EngCalcs = EngCalcs || {};
 
@@ -63,6 +63,53 @@ EngCalcs.hwSlope = function (q, d, c) {
 	if (!(d > 0) || !(c > 0)) { return 0; }
 	return EngCalcs.hwCoef * Math.pow(Math.abs(q), EngCalcs.hwExp) /
 		(Math.pow(c, EngCalcs.hwExp) * Math.pow(d, EngCalcs.hwDiaExp));
+};
+
+// ---------------------------------------------------------------------------
+// Darcy-Weisbach, on EPANET's constants.
+//
+// EPANET's default kinematic viscosity is VISCOS = 1.1e-5 ft2/s (types.h), which is 1.0219e-6 m2/s.
+// It is NOT water at 20 degC (1.004e-6) and the looped network once hard-coded 1.007e-6 in its own
+// model, so the built-in solver and EPANET ran different fluids. One definition, here. A relative
+// "Viscosity 1.3" option multiplies this; js/lpn-native-run.js reads the ft2/s form.
+EngCalcs.EPANET_VISCOS_FT2S = 1.1e-5;
+EngCalcs.EPANET_VISCOS = EngCalcs.EPANET_VISCOS_FT2S * 0.3048 * 0.3048;
+
+// EPANET's hydcoeffs.c resistcoeff() writes a Darcy-Weisbach pipe's resistance with g = 32.2 ft/s2,
+// not 32.174, which is 9.81456 m/s2 against the suite's EngCalcs.G = 9.80665 (0.08 % more head loss).
+// Used for the friction term only: EPANET's minor loss has its own rounded 0.02517 (see lpn-solver.js).
+EngCalcs.EPANET_G_DW = 32.2 * 0.3048;
+
+// Darcy-Weisbach friction factor, branch for branch with EPANET's hydcoeffs.c frictionFactor():
+//   Re <= 2000   Hagen-Poiseuille, f = 64/Re
+//   Re >= 4000   Swamee-Jain, f = 0.25 / log10(e/(3.7 d) + 5.74/Re^0.9)^2
+//   between      Dunlop's cubic in Re/2000, whose two anchors (fa, fb) are Swamee-Jain at Re = 4000,
+//                so y2 below carries 5.74/4000^0.9 and NOT the actual Re. A copy that put the actual
+//                Re there ran 1 to 2.6 % off EPANET's head loss between Re 2000 and 4000.
+// q flow (m3/s, sign ignored), d diameter (m), e roughness LENGTH (m), visc kinematic viscosity (m2/s).
+// Returns 0 at no flow. The constants are EPANET's own (hydcoeffs.c A1 to AC), not rounded.
+EngCalcs.dwFriction = function (q, d, e, visc) {
+	'use strict';
+	var w = Math.abs(q) / (visc * d),      // Re * pi / 4
+		r = e / (3.7 * d),
+		y1, y2, y3, fa, fb, x, x1, x2, x3, x4;
+	if (!(w > 0)) { return 0; }
+	if (w <= 1570.7963267948966) { return 16 * Math.PI / w; }
+	if (w >= 3141.592653589793) {
+		y1 = 4.618413198590667 / Math.pow(w, 0.9);
+		y3 = -0.8685889638065037 * Math.log(r + y1);
+		return 1 / (y3 * y3);
+	}
+	y2 = r + 3.2889547634539906e-3;
+	y3 = -0.8685889638065037 * Math.log(y2);
+	fa = 1 / (y3 * y3);
+	fb = (2 - 5.142149657990939e-3 / (y2 * y3)) * fa;
+	x = w / 1570.7963267948966;
+	x1 = 7 * fa - fb;
+	x2 = 0.128 - 17 * fa + 2.5 * fb;
+	x3 = -0.128 + 13 * fa - 2 * fb;
+	x4 = 0.032 - 3 * fa + 0.5 * fb;
+	return x1 + x * (x2 + x * (x3 + x * x4));
 };
 
 if (typeof module !== 'undefined' && module.exports) {

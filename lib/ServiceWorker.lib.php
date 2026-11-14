@@ -129,6 +129,21 @@ function ecSwAssetExclusions() {
 }
 
 /**
+ * Assets that are cached AT RUNTIME by a URL with no ?v= query, though they are not precached.
+ *
+ * epanet-js.js is imported by looped-network.js with a bare path, so cacheFirst() keeps whatever
+ * it fetched first for ever, exactly as it would an icon. Same defect class as an icon (Task 620),
+ * and covered the same way: its content is in ecSwUnversionedDigest(), and the worker refreshes
+ * the entry in place when it is already cached. sql-wasm.js is not here: its callers add a ?v=.
+ */
+function ecSwRuntimeUnversioned() {
+    return [
+        'js/vendor/epanet-js.js'  => 'imported with no query by js/lpn-epanet.js',
+        'js/vendor/slim/index.js' => 'imported with no query by epanet-js.js; idle-prefetched with it (Task 726)',
+    ];
+}
+
+/**
  * Root .php pages deliberately NOT precached, and why. Every other root page is precached.
  */
 function ecSwPageExclusions() {
@@ -217,13 +232,69 @@ function ecSwAssetFiles($root) {
  *
  * Scripts and stylesheets carry '?v=<filemtime>' because lib/HeadersFooters.lib.php and every
  * calculator page emit them that way. Images do not: icons are named by manifest.json and by
- * <link rel="icon">, neither of which busts a query onto them.
+ * <link rel="icon">, neither of which busts a query onto them. Their invalidation is the worker's
+ * own bytes instead: ecSwUnversionedDigest().
  */
 function ecSwAssetUrl($rel, $root) {
     $url = EC_SW_BASE . $rel;
-    $ext = strtolower(pathinfo($rel, PATHINFO_EXTENSION));
-    if ($ext === 'js' || $ext === 'css') {
+    if (ecSwAssetIsVersioned($rel)) {
         $url .= '?v=' . filemtime($root . '/' . $rel);
     }
     return $url;
+}
+
+/**
+ * Is this asset's URL keyed by its own mtime? Scripts and stylesheets are; images are not.
+ */
+function ecSwAssetIsVersioned($rel) {
+    $ext = strtolower(pathinfo($rel, PATHINFO_EXTENSION));
+    return $ext === 'js' || $ext === 'css';
+}
+
+/**
+ * Repo-relative files the worker keeps under a URL with NO query: every precached image, and the
+ * runtime-cached ones in ecSwRuntimeUnversioned(). The cache key of each is its path alone, so
+ * nothing but the worker's own bytes can tell a returning browser that the file changed.
+ *
+ * @return string[]
+ */
+function ecSwUnversionedFiles($root = null) {
+    $root = $root === null ? dirname(__DIR__) : rtrim($root, '/');
+    $excluded = ecSwAssetExclusions();
+    $files = [];
+    foreach (ecSwAssetFiles($root) as $rel) {
+        if (!isset($excluded[$rel]) && !ecSwAssetIsVersioned($rel)) $files[] = $rel;
+    }
+    foreach (array_keys(ecSwRuntimeUnversioned()) as $rel) {
+        if (is_file($root . '/' . $rel)) $files[] = $rel;
+    }
+    sort($files);
+    return $files;
+}
+
+/**
+ * A digest of the CONTENT of every file in ecSwUnversionedFiles(), written into the generated
+ * worker (Task 620). A changed icon then changes the worker's bytes, so the browser installs the
+ * new worker, `install` re-fetches the icon with cache:'reload' and cache.add() overwrites the old
+ * entry; no public URL changes. Content, not mtime: `git pull` rewrites only files that changed, but
+ * a branch switch, a restore or a touch changes an mtime and not a byte, and none of those should
+ * make a returning visitor reinstall.
+ */
+function ecSwUnversionedDigest($root = null) {
+    $root = $root === null ? dirname(__DIR__) : rtrim($root, '/');
+    $lines = [];
+    foreach (ecSwUnversionedFiles($root) as $rel) {
+        $lines[] = $rel . ':' . sha1_file($root . '/' . $rel);
+    }
+    return substr(sha1(implode("\n", $lines)), 0, 16);
+}
+
+/** Web URLs of ecSwRuntimeUnversioned(), for the worker's in-place refresh. */
+function ecSwRuntimeUnversionedUrls($root = null) {
+    $root = $root === null ? dirname(__DIR__) : rtrim($root, '/');
+    $urls = [];
+    foreach (array_keys(ecSwRuntimeUnversioned()) as $rel) {
+        if (is_file($root . '/' . $rel)) $urls[] = EC_SW_BASE . $rel;
+    }
+    return $urls;
 }
