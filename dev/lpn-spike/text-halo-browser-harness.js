@@ -39,7 +39,7 @@ async function main() {
 		await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 		await a.settle(800);
 		const halo = () => a.page.evaluate(() => {
-			const t = Array.from(document.querySelectorAll('text.lpn-lbl')).find((e) => (e.textContent || '').trim() && getComputedStyle(e).visibility !== 'hidden');
+			const t = Array.from(document.querySelectorAll('text.lpn-lbl')).find((e) => (e.textContent || '').trim() && getComputedStyle(e).visibility !== 'hidden' && !e.classList.contains('lpn-stacked'));   // a stack is ink only: its halo is the layer beneath it (halo-under-ink-browser-harness.js)
 			if (!t) { return null; }
 			const c = getComputedStyle(t), fs = parseFloat(c.fontSize);
 			return { sw: parseFloat(c.strokeWidth), fs, ratio: parseFloat(c.strokeWidth) / fs, paint: c.paintOrder, stroke: c.stroke };

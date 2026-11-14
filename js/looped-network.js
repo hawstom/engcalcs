@@ -4100,21 +4100,26 @@ var EngCalcs = EngCalcs || {};
 	// layers: a <use> of the label beneath it that paints the halo only, and the label itself, now
 	// ink only (`.lpn-stacked`, css/engcalcs.css). The <use> is live, so it follows every move, resize
 	// and show/hide of the label with no code of its own; it only has to be made and removed.
-	// A label not yet in the DOM stays one layer, as before.
+	// A label not yet in the DOM stays one layer, as before. The layer is made once per label and
+	// hidden while the label is one row: the layout pass rewrites a label's rows many times a settle,
+	// and making and removing an element each time was most of the cost.
 	var stackHaloSeq = 0;
 	function stackHalo(textEl, stacked) {
 		var u = textEl.lpnHaloUse, parent = textEl.parentNode;
-		if (!stacked || !parent || !parent.insertBefore) {
-			dropStackHalo(textEl);
+		if (!stacked) {
+			if (u && haloOn(textEl)) { u.setAttribute('display', 'none'); textEl.classList.remove('lpn-stacked'); }
 			return;
 		}
-		if (u && u.parentNode === parent) { return; }
-		if (!textEl.getAttribute('id')) { textEl.setAttribute('id', 'lpn-lbl-' + (++stackHaloSeq)); }
-		u = el('use', { 'class': 'lpn-halo-use', href: '#' + textEl.getAttribute('id') });
-		parent.insertBefore(u, textEl);
-		textEl.lpnHaloUse = u;
-		textEl.classList.add('lpn-stacked');
+		if (!parent || !parent.insertBefore) { return; }
+		if (!u || u.parentNode !== parent) {
+			if (!textEl.getAttribute('id')) { textEl.setAttribute('id', 'lpn-lbl-' + (++stackHaloSeq)); }
+			u = el('use', { 'class': 'lpn-halo-use', href: '#' + textEl.getAttribute('id') });
+			parent.insertBefore(u, textEl);
+			textEl.lpnHaloUse = u;
+		}
+		if (!haloOn(textEl)) { u.removeAttribute('display'); textEl.classList.add('lpn-stacked'); }
 	}
+	function haloOn(textEl) { return (' ' + (textEl.getAttribute('class') || '') + ' ').indexOf(' lpn-stacked ') >= 0; }
 	// Call wherever a label's <text> is removed, so its halo layer goes with it.
 	function dropStackHalo(textEl) {
 		var u = textEl && textEl.lpnHaloUse;
@@ -14691,6 +14696,7 @@ var EngCalcs = EngCalcs || {};
 		if (lines.length < 2) {
 			while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 			textEl.textContent = lines[0];
+			stackHalo(textEl, false);
 			return;
 		}
 		setMultilineText(textEl, x, lines.map(function (t) { return [{ text: t }]; }), textLabelFirstDy(lb));

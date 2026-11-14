@@ -96,7 +96,9 @@ const SKIP = new Set(['children', 'parentNode', 'classList', 'style', '_listener
 function dump(e, depth) {
 	if (!e || depth > 60) { return ''; }
 	if (e.nodeType === 3) { return JSON.stringify(e.textContent || e._text || ''); }
-	const attrs = Object.keys(e).filter((k) => !SKIP.has(k) && typeof e[k] !== 'function' &&
+	// A stack's halo layer (stackHalo()) follows its label, whose own `lpn-stacked` class says whether it is on; its counter id is not compared.
+	if ((e._tag || e.tagName) === 'use') { return ''; }
+	const attrs = Object.keys(e).filter((k) => !SKIP.has(k) && !(k === 'id' && /^lpn-lbl-\d+$/.test(e[k])) && typeof e[k] !== 'function' &&
 		(e[k] === null || typeof e[k] !== 'object')).sort().map((k) => k + '=' + JSON.stringify(e[k]));
 	const st = e.style && e.style._props ? JSON.stringify(Object.keys(e.style).filter((k) => k !== '_props' && typeof e.style[k] !== 'function').sort().map((k) => [k, e.style[k]]).concat(Object.keys(e.style._props).sort().map((k) => [k, e.style._props[k]]))) : '';
 	return '<' + (e._tag || e.tagName) + ' ' + attrs.join(' ') + ' ' + st + '>' +
