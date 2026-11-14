@@ -122,7 +122,7 @@ const CASES = [
 		// shows only that the valve logic is the same under the other friction law.
 		name: 'PRV active, Darcy-Weisbach',
 		model: (function () {
-			const m = Object.assign(line('PRV', 40), { method: 'dw', visc: 1.007e-6 });
+			const m = Object.assign(line('PRV', 40), { method: 'dw', visc: EngCalcs.EPANET_VISCOS });
 			m.links.forEach((l) => { if (l.type === 'pipe') { l.roughness = 0.15e-3; } });
 			return m;
 		}()),
@@ -185,7 +185,7 @@ function toSolverModel(parsed) {
 		}
 		return out;
 	});
-	return { nodes, links, method: 'hw', visc: 1.007e-6 };
+	return { nodes, links, method: 'hw', visc: EngCalcs.EPANET_VISCOS };
 }
 
 function loadNet(file) {
