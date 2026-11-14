@@ -70021,10 +70021,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		rules: { byId: false }
 	};
 	var LIB_MOVES = [
-		{ how: 'top', icon: 'move-top', key: 'lpn_library_move_top', fallback: 'Move to top' },
-		{ how: 'up', icon: 'move-up', key: 'lpn_library_move_up', fallback: 'Move up' },
-		{ how: 'down', icon: 'move-down', key: 'lpn_library_move_down', fallback: 'Move down' },
-		{ how: 'bottom', icon: 'move-bottom', key: 'lpn_library_move_bottom', fallback: 'Move to bottom' }
+		{ how: 'top', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-top', n, t); }, key: 'lpn_library_move_top', fallback: 'Move to top' },
+		{ how: 'up', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-up', n, t); }, key: 'lpn_library_move_up', fallback: 'Move up' },
+		{ how: 'down', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-down', n, t); }, key: 'lpn_library_move_down', fallback: 'Move down' },
+		{ how: 'bottom', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-bottom', n, t); }, key: 'lpn_library_move_bottom', fallback: 'Move to bottom' }
 	];
 	// Which project the selection was made in: the same id in another project is not the same item.
 	function libProjKey() { return String((library && library.openId) || ''); }
@@ -70131,7 +70131,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			b.id = 'lpn_lib_move_' + m.how;
 			b.className = 'lpn-lib-move';
 			b.setAttribute('data-move', m.how);
-			EngCalcs.setIconLabel(b, m.icon, pc[m.key] || m.fallback, tip);
+			m.icon(b, pc[m.key] || m.fallback, tip);
 			b.addEventListener('click', function () { libOrderMove(sec, m.how); });
 			group.appendChild(b);
 		});
