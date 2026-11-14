@@ -70022,8 +70022,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	};
 	var LIB_MOVES = [
 		{ how: 'top', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-top', n, t); }, key: 'lpn_library_move_top', fallback: 'Move to top' },
-		{ how: 'up', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-up', n, t); }, key: 'lpn_library_move_up', fallback: 'Move up' },
-		{ how: 'down', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-down', n, t); }, key: 'lpn_library_move_down', fallback: 'Move down' },
+		{ how: 'up', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-up', n, t); }, key: 'lpn_pane_manage_cols_up', fallback: 'Move up' },
+		{ how: 'down', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-down', n, t); }, key: 'lpn_pane_manage_cols_down', fallback: 'Move down' },
 		{ how: 'bottom', icon: function (b, n, t) { EngCalcs.setIconLabel(b, 'move-bottom', n, t); }, key: 'lpn_library_move_bottom', fallback: 'Move to bottom' }
 	];
 	// Which project the selection was made in: the same id in another project is not the same item.
