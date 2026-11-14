@@ -4964,3 +4964,11 @@ OBSERVED (re-verify; real Chromium, master bff7bd03e vs branch, identical scale 
 - Stable: same notch reached by three paths, 0 label strings differ, both trees.
 - Leaders through a label/node: no net regression; leader starting inside own end symbol (short pipes) 1-7 per view, 0 on master (by design).
 NOT DONE: mutation test of harnesses; builder's own harnesses; Tom's window; light/dark.
+
+## 2026-11-13 feat/library-order (c15ce4678..448c70096), Task 859
+OBSERVED (re-verify; real Chromium, branch worktree vs master 947d5ad31; probes in scratchpad p1-p4.js, cmp.js; pictures _panel/www/img/library-order/perry-*.png):
+- Buttons present and working in all six sections (Net1; Patterns/Curves/Pipe types/Fittings show none until 2+ items). Click selects (blue bar); top/up/down/bottom move; one Ctrl+Z per move; Ctrl+Y redoes; selection follows an item by id. Phone 420 px: row fits (buttons 31x23 px), sticky row holds while scrolling, touch tap selects and moves.
+- LEAK check: entry HTML after Add / typing / Delete identical master vs branch in all six sections (0 differences); entries sit 6 px lower when the tool row shows; Add button stays visible on scroll (sticky) where master's scrolls away. No console errors, no new dialogs.
+- DEFECT (OBSERVED): renaming the selected item's ID (type, then blur or press a Move button) loses the selection: buttons go grey, and a Move pressed straight after typing is swallowed (the box rebuilds under the click). Curves, Patterns checked; touch and mouse.
+- UX note: the first view is four grey buttons with no visible cue to select; the only hint is the hover tip (it does show on a disabled button). Tap targets 31x23 px.
+- library-order-harness.js 159 checks pass (it extracts the real functions). NOT DONE: mutation test, saved-on-master file opened literally (verified by diff: no load/serialize code touched, and Net1's list order identical on both trees), .inp export byte-exactness re-run, Tom's own window, light/dark.
