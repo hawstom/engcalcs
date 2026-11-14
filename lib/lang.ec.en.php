@@ -4630,6 +4630,14 @@ $ec_lang['lpn_library_rule_add']='Add a rule';
 $ec_lang['lpn_library_rule_tip']='One clause per line. Descriptions with examples in "ALL CAPS" follow. Line 1: Name of rule, "RULE 1". Line 2: A condition, "IF TANK 2 LEVEL BELOW 17.1". Line 3: An action, "THEN PUMP 9 STATUS IS OPEN". Line 4: A priority, "PRIORITY 1". Add "AND" or "OR" lines to test more than one condition, and "ELSE" lines to specify the action when the condition is false. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Use consistent project units. Keywords must be in English.';
 $ec_lang['lpn_library_rule_ok']='✓ This rule was read';
 $ec_lang['lpn_library_rule_bad']='⚠ This rule could not be read';
+$ec_lang['lpn_library_move_top']='Move to top';
+$ec_lang['lpn_library_move_up']='Move up';
+$ec_lang['lpn_library_move_down']='Move down';
+$ec_lang['lpn_library_move_bottom']='Move to bottom';
+$ec_lang['lpn_library_move_group']='Move the selected item';
+$ec_lang['lpn_library_move_tip']='Moves the selected item. Click an item to select it. The order is saved with the project.';
+$ec_lang['lpn_library_move_tip_controls']='When two controls act on one link at the same time, the later one in the list wins, so moving a control can change a run.';
+$ec_lang['lpn_library_move_tip_rules']='When two rules call for conflicting actions on one link at equal priority, the earlier rule in the list wins, so moving a rule can change a run.';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.

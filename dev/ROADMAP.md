@@ -56,6 +56,7 @@ the block.
 ## 100 — Next.
 
 
+- 100|859| **Libraries: Move to top, up, down and bottom buttons.** Tom, 2026-11-13: *"High priority roadmap item, perhaps, in Libraries, the Curves don't seem to sort alphabetically. While this may seem defensible from the perspective of 'Leave them in the order the user gave', that falls apart because we don't provide a way to change the order. I think that all Libraries need either automatic sorting by id or, arguably better, buttons to 'Move up', 'Move Down', 'Move to Top', 'Move to bottom', similar shape icons, or draggability or both buttons and dragging."* Buttons built on `feat/library-order`; dragging is not built. Priority set by CC.
 - 75|854| **A Text drawn in a scenario starts empty and vanishes if left empty.** Tom, 2026-11-06: *"When Text is created in a child scenario, it is non-intuitive to see the word "Text" in the Text table. Would it be feasible to create Text with an empty string by default and to cancel or delete it if nothing is entered?"* Feasible: `addText()` writes `lpn_new_text` into Base, where the Text is born inactive (`bornInScenario()`), so parent scenarios list the placeholder. Priority set by CC.
 - 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
   **E2 ran and failed (inquiry §6a); back to 75, 2026-11-06**, when Tom chose Task 812's "look like your neighbours" over experiment E3 (fit-at-home count). Next research leads: §4.3 conflict graph, §4.5 open space.

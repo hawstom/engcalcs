@@ -798,6 +798,13 @@ $ec_icons = array(
 	// the swap two opposed arrows make, the mark every editor uses for "exchange".
 	'retype'     => '<path d="M4 8h15"/><path d="M15 4l4 4-4 4"/><path d="M20 16H5"/><path d="M9 12l-4 4 4 4"/>',
 
+	// Libraries box, Move to top / up / down / bottom (Tom, 2026-11-13): an arrow, and for the two ends an arrow
+	// against a bar, the shapes every list editor uses for "to the end".
+	'move-up'     => '<path d="M12 19V6"/><path d="M6 12l6-6 6 6"/>',
+	'move-down'   => '<path d="M12 5v13"/><path d="M6 12l6 6 6-6"/>',
+	'move-top'    => '<path d="M5 4h14"/><path d="M12 20V9"/><path d="M6 14l6-6 6 6"/>',
+	'move-bottom' => '<path d="M5 20h14"/><path d="M12 4v11"/><path d="M6 10l6 6 6-6"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is

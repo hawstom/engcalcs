@@ -6792,6 +6792,15 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-lib-head { display: flex; align-items: center; gap: 6px; }
 .lpn-lib-head .lpn-lib-id { width: 9em; }
 .lpn-lib-del { margin-left: auto; }
+/* THE ORDER BUTTONS (Libraries, Move to top/up/down/bottom): the Add button and the four icon buttons share the box's sticky
+   `.lpn-box-tools` row. The entry the buttons act on carries a bar and a tint in the selection colours. An entry scrolled into
+   view stops below the sticky row (scroll-margin). */
+.lpn-lib-toolrow { align-items: center; }
+.lpn-lib-order { display: inline-flex; gap: 2px; }
+.lpn-lib-move { padding: 2px 6px; line-height: 1; }
+.lpn-lib-move > .ec-icon { margin-inline-end: 0; }
+.lpn-lib-entry { scroll-margin-top: 3em; }
+.lpn-lib-entry-sel { background: var(--ec-accent-hover-bg); box-shadow: inset 3px 0 0 var(--ec-select); }
 /* A fitting's quantity is a small whole number; the fitting NAME beside it is what needs the room. */
 .lpn-lib-qty { width: 5em; }
 /* THE CURVE EDITOR'S TWO HEADER LINES (Tom, 2026-09-05: "put pump ID (with new ID label above it)

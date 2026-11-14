@@ -69992,6 +69992,158 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		libSection = id;
 		rebuildLibraryBox();
 	}
+	// ---- THE ORDER OF A LIBRARY'S ITEMS (Task 859) ------------------------------------
+	//
+	// **THE ORDER IS THE STORED ORDER** (Tom, 2026-11-13: *"the Curves don't seem to sort
+	// alphabetically ... we don't provide a way to change the order"*). Four buttons, Move to top, Move up,
+	// Move down and Move to bottom, act on the SELECTED item of the section on screen: the item whose entry
+	// was last clicked or tabbed into. The array is moved in place, so the order is the one the project saves, the one every
+	// list reads and the one the `.inp` export writes (patterns, curves, controls and rules go out in list order; pipe types and
+	// fittings lists are not in an `.inp` and keep the order in the project file). One move is one Undo step.
+	//
+	// **WHETHER A MOVE CHANGES A RUN** (checked in js/lpn-native-run.js, which follows EPANET's hydraul.c and rules.c):
+	// controls fire in list order and the LAST one to act on a link wins; a rule's action stands over an earlier rule's
+	// only when its PRIORITY is strictly higher, so the FIRST of two equal-priority rules wins. Patterns, curves, pipe types and
+	// fittings lists are looked up by id, so their order never changes a result.
+	//
+	// **A RULE IS A RUN OF LINES IN ONE FLAT TEXT**, so it is moved as its block (its description comments and its
+	// lines) and every blank line and heading between the blocks stays where it was (libRulesMoved()).
+	//
+	// This is wired from rebuildLibraryBox() after a section is built, not from each section's builder, so the six builders
+	// (and the Curves section another branch is changing) are untouched.
+	var libSel = {};
+	var LIB_ORDER = {
+		patterns: { read: libPatternsRead, write: libPatterns, byId: true },
+		curves: { read: libCurvesRead, write: libCurves, byId: true },
+		pipetypes: { read: libPipeTypesRead, write: libPipeTypes, byId: true },
+		fittings: { read: libFittingSetsRead, write: libFittingSets, byId: true },
+		controls: { read: libControlsRead, write: libControls, byId: false },
+		rules: { byId: false }
+	};
+	var LIB_MOVES = [
+		{ how: 'top', icon: 'move-top', key: 'lpn_library_move_top', fallback: 'Move to top' },
+		{ how: 'up', icon: 'move-up', key: 'lpn_library_move_up', fallback: 'Move up' },
+		{ how: 'down', icon: 'move-down', key: 'lpn_library_move_down', fallback: 'Move down' },
+		{ how: 'bottom', icon: 'move-bottom', key: 'lpn_library_move_bottom', fallback: 'Move to bottom' }
+	];
+	// Which project the selection was made in: the same id in another project is not the same item.
+	function libProjKey() { return String((library && library.openId) || ''); }
+	function libOrderCount(sec) {
+		return sec === 'rules' ? libRuleEntries(libRulesRead()).length : LIB_ORDER[sec].read().length;
+	}
+	// The first index an item may take. A `[RULES]` text can open with lines that are not a rule (no RULE line above them); that
+	// block cannot be moved and nothing may be moved above it, or its lines would become part of the rule that landed there.
+	function libOrderFirst(sec) {
+		var e;
+		if (sec !== 'rules') { return 0; }
+		e = libRuleEntries(libRulesRead())[0];
+		return e && !e.name ? 1 : 0;
+	}
+	function libOrderSelIndex(sec) {
+		var s = libSel[sec], n, a, i;
+		if (!s || s.proj !== libProjKey()) { return -1; }
+		n = libOrderCount(sec);
+		if (!LIB_ORDER[sec].byId) { return (s.n === n && s.i >= 0 && s.i < n) ? s.i : -1; }
+		a = LIB_ORDER[sec].read();
+		for (i = 0; i < a.length; i++) { if (String(a[i].id) === s.id) { return i; } }
+		return -1;
+	}
+	function libOrderSelect(sec, i) {
+		var o = LIB_ORDER[sec], proj = libProjKey();
+		libSel[sec] = o.byId ? { proj: proj, id: String(o.read()[i].id) } : { proj: proj, i: i, n: libOrderCount(sec) };
+	}
+	// Undo restores the whole document, and an item with no id is selected by its position, which Undo has changed.
+	function libSelForgetIndexed() { delete libSel.controls; delete libSel.rules; }
+	function libOrderTarget(how, i, n, first) {
+		return how === 'top' ? first : how === 'bottom' ? n - 1 : how === 'up' ? Math.max(first, i - 1) : Math.min(n - 1, i + 1);
+	}
+	function libArrayMove(arr, from, to) { arr.splice(to, 0, arr.splice(from, 1)[0]); }
+	// The `[RULES]` lines with rule `from` moved to position `to`. The text is cut into the rules' blocks (a rule's own description
+	// comments through its last line) and the gaps around them (blank lines, headings, trailing comments); the blocks are
+	// permuted and the gaps stay put, so no line is added, dropped or changed.
+	function libRulesMoved(lines, from, to) {
+		var es = libRuleEntries(lines), gaps = [], blocks = [], out = [], at = 0, order;
+		if (from === to || !es[from] || !es[to]) { return lines.slice(); }
+		es.forEach(function (e) {
+			var s = Math.max(e.descStart, at);
+			gaps.push(lines.slice(at, s));
+			blocks.push(lines.slice(s, e.end));
+			at = e.end;
+		});
+		gaps.push(lines.slice(at));
+		order = es.map(function (e, k) { return k; });
+		order.splice(to, 0, order.splice(from, 1)[0]);
+		order.forEach(function (k, p) { out = out.concat(gaps[p], blocks[k]); });
+		return out.concat(gaps[es.length]);
+	}
+	// One move of the selected item of `sec`; false when nothing could move (no selection, or already at that end).
+	function libOrderMove(sec, how) {
+		var i = libOrderSelIndex(sec), n = libOrderCount(sec), first = libOrderFirst(sec), to, b, sel;
+		if (i < first) { return false; }
+		to = libOrderTarget(how, i, n, first);
+		if (to === i) { return false; }
+		saveUndoSnapshot();
+		if (sec === 'rules') { doc.rules = libRulesMoved(libRulesRead(), i, to); }
+		else { libArrayMove(LIB_ORDER[sec].write(), i, to); }
+		libOrderSelect(sec, to);
+		libCommit();
+		rebuildLibraryBox();
+		// The buttons were rebuilt, so the one that was pressed is a new element. Focus returns to it, or to the first one that can
+		// still act when this move took the item to an end, so a keyboard user can keep going.
+		b = document.getElementById('lpn_lib_move_' + how);
+		if (!b || b.disabled) { b = document.querySelector('#lpn_libbox_content .lpn-lib-move:not(:disabled)'); }
+		if (b) { b.focus(); }
+		sel = document.querySelector('#lpn_libbox_content .lpn-lib-entry-sel');
+		if (sel && sel.scrollIntoView) { sel.scrollIntoView({ block: 'nearest' }); }
+		return true;
+	}
+	// The four buttons' enabled state and the selected entry's mark, from the selection, without rebuilding anything.
+	function libOrderRefresh(secEl, sec) {
+		var i = libOrderSelIndex(sec), n = libOrderCount(sec), first = libOrderFirst(sec), can = i >= first;
+		Array.prototype.forEach.call(secEl.querySelectorAll('.lpn-lib-entry'), function (en, k) {
+			var on = k === i;
+			en.classList.toggle('lpn-lib-entry-sel', on);
+			if (on) { en.setAttribute('aria-current', 'true'); } else { en.removeAttribute('aria-current'); }
+		});
+		Array.prototype.forEach.call(secEl.querySelectorAll('.lpn-lib-move'), function (b) {
+			var how = b.getAttribute('data-move');
+			b.disabled = !can || ((how === 'top' || how === 'up') ? i <= first : i >= n - 1);
+		});
+	}
+	function libOrderWire(secEl, sec) {
+		var pc = EngCalcs.pageConfig || {}, n = libOrderCount(sec), entries = secEl.querySelectorAll('.lpn-lib-entry'),
+			add = Array.prototype.filter.call(secEl.children, function (c) { return c.tagName === 'BUTTON'; })[0],
+			row, group, tip;
+		if (n < 2 || entries.length !== n) { return; }
+		tip = (pc.lpn_library_move_tip || 'Moves the selected item. Click an item to select it. The order is saved with the project.') +
+			(sec === 'controls' ? ' ' + (pc.lpn_library_move_tip_controls || 'When two controls act on one link at the same time, the later one in the list wins, so moving a control can change a run.')
+				: sec === 'rules' ? ' ' + (pc.lpn_library_move_tip_rules || 'When two rules call for conflicting actions on one link at equal priority, the earlier rule in the list wins, so moving a rule can change a run.') : '');
+		// The shared box style's own row for a box's buttons: sticky, so the four stay in reach down a long list.
+		row = libEl('div', 'lpn-box-tools lpn-lib-toolrow');
+		secEl.insertBefore(row, add || entries[0]);
+		if (add) { row.appendChild(add); }
+		group = libEl('div', 'lpn-lib-order');
+		group.setAttribute('role', 'group');
+		group.setAttribute('aria-label', pc.lpn_library_move_group || 'Move the selected item');
+		LIB_MOVES.forEach(function (m) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.id = 'lpn_lib_move_' + m.how;
+			b.className = 'lpn-lib-move';
+			b.setAttribute('data-move', m.how);
+			EngCalcs.setIconLabel(b, m.icon, pc[m.key] || m.fallback, tip);
+			b.addEventListener('click', function () { libOrderMove(sec, m.how); });
+			group.appendChild(b);
+		});
+		row.appendChild(group);
+		// An entry is selected by pressing or tabbing into anything in it, so the keyboard reaches it as the pointer does.
+		Array.prototype.forEach.call(entries, function (en, k) {
+			function pick() { if (libOrderSelIndex(sec) !== k) { libOrderSelect(sec, k); libOrderRefresh(secEl, sec); } }
+			en.addEventListener('mousedown', pick);
+			en.addEventListener('focusin', pick);
+		});
+		libOrderRefresh(secEl, sec);
+	}
 	// Rebuilt whole on every open and after every structural change (an add, a delete, a rename),
 	// for the same reason the Settings box is: a box built once and repainted by the paths that
 	// remember is a box that shows stale numbers the first time somebody forgets. A VALUE edit does
@@ -70013,6 +70165,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
 		libSheetFields(sec);
+		libOrderWire(sec, cur.id);
 		initTipsIn(content);
 	}
 	// **THE LIBRARY'S ENTRY FIELDS ARE SHEET ROWS** (round 10b, the sheet-style audit, A7). Each entry builder makes its ID, Description, Curve type and
@@ -78289,6 +78442,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Unconditional, exactly as every library edit calls it: rebuildLibraryBox() returns at its
 		// first line when the box is not in the page, so a project undone with the box closed costs
 		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
+		libSelForgetIndexed();
 		rebuildLibraryBox();
 		// **AND THE TABLE UNDER THE MAP, FOR THE SAME REASON** (ROADMAP Task 689). A table edit is
 		// now undoable from inside the table, so the pane is a place a person watches an undo
