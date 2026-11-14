@@ -12477,8 +12477,10 @@ var EngCalcs = EngCalcs || {};
 	// THE FIELD A CONTOUR PLOT SPREADS: the node colouring's own field when the user has set one, else pressure. Showing
 	// contours never writes the node colouring (Tom, 2026-10-29: opening the box turned on Settings Colors); the nodes
 	// stay as the user left them, and the colour key shows the plot's field.
-	// **THE PLOT HAS ITS OWN PROPERTY** (Tom, 2026-11-09/11, Task 858): never blank, whatever the node colouring says.
-	function contourFieldOf() { return scnSetting('contourField') || colorFieldOf('node') || 'pressure'; }
+	// **ONE PROPERTY WHILE THE NODES ARE COLORED** (Tom, 2026-11-09/13, Task 858): Color nodes by (Settings) and Property to
+	// plot (Contour box) are one setting, so whenever the dots are colored the plot follows `colorNodeField`, whichever
+	// door wrote it. Only with No color does the plot read its own `contourField` (the property last chosen), else pressure.
+	function contourFieldOf() { return colorFieldOf('node') || scnSetting('contourField') || 'pressure'; }
 	function contourOrNodeField() { return contourIsOn() ? contourFieldOf() : colorFieldOf('node'); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
@@ -28467,10 +28469,10 @@ var EngCalcs = EngCalcs || {};
 				R2 = ramps(), i;
 			setboxTag(rowIn(target, (group === 'node'
 				? (pc.lpn_color_node_field || 'Color nodes by')
-				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group)), [['settings', 'color' + (group === 'node' ? 'Node' : 'Link') + 'Field']]);
+				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group), group === 'node' ? pc.lpn_settings_color_node_field_tip : null), [['settings', 'color' + (group === 'node' ? 'Node' : 'Link') + 'Field']]);
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
-			setboxTag(rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group)), [['settings', 'colorRamp' + (group === 'node' ? 'Node' : 'Link')]]);
+			setboxTag(rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group), group === 'node' ? pc.lpn_settings_color_ramp_node_tip : null), [['settings', 'colorRamp' + (group === 'node' ? 'Node' : 'Link')]]);
 			// **AND A POINTER TO THE ACKNOWLEDGEMENT, UNDER THE PICKER IT IS ABOUT** (Tom,
 			// 2026-08-20: "Were we going to put a Credits link near the color pickers? Maybe under
 			// the Color scheme label?"). It SCROLLS to the footer copy and marks it for a moment; it

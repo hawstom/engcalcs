@@ -6,6 +6,9 @@
 //   3. an old project (Color nodes by chosen, no Property to plot stated) opens showing the same plot:
 //      the box reads that property and Show node colors is ticked; clearing it leaves the plot alone.
 //   4. ticking Show node colors colors the dots; changing the property carries them; the plot follows.
+//   5. Tom, 2026-11-13: Property to plot and Color scheme in the box ARE Color nodes by and Color scheme
+//      under Settings, Symbology, Node colors. A change in either place reads the same in the other (both
+//      directions); with No color the plot keeps its property; each ? tip names the other place.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/contour-controls-browser-harness.js
 // CONTOUR_SHOT=<dir> also writes a screenshot of each view there.
@@ -252,6 +255,96 @@ async function main2(Session, browser) {
 		return;
 	} catch (e) { await a.close().catch(() => {}); throw e; }
 }
+// The two Settings names the tips quote are not sent to the page; the language file is their source.
+function enValue(key) {
+	const src = require('fs').readFileSync(path.join(REPO, 'lib', 'lang.ec.en.php'), 'utf8');
+	const m = src.match(new RegExp("^\\$ec_lang\\['" + key + "'\\]='(.*)';$", 'm'));
+	if (!m) { throw new Error('no English value for ' + key); }
+	return m[1].replace(/\\'/g, "'");
+}
+async function main3(Session, browser) {
+	console.log('\n--- 7. the box and Settings are one setting, and each tip says so ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		await contourFromMenu(a);
+		await setBox(a, 'lpn_contour_node_colors', true);
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.settle(500);
+		const read = () => a.page.evaluate(() => {
+			const q = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
+			const ramp = (id) => { const e = document.getElementById(id); return e ? e.title : null; };
+			return { boxField: q('lpn_contour_field'), setField: q('lpn_set_color_node'),
+				boxRamp: ramp('lpn_set_ramp_node_contour'), setRamp: ramp('lpn_set_ramp_node'),
+				legend: (document.getElementById('lpn_color_legend') || {}).textContent || '' };
+		});
+		const setNode = (v) => a.page.evaluate((x) => { const n = document.getElementById('lpn_set_color_node'); n.value = x; n.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+		const pick = (btnId, key) => a.page.evaluate(([b, k]) => {
+			document.getElementById(b).click();
+			const o = document.querySelector('#' + b.replace('lpn_set_ramp_', 'lpn_set_ramp_list_') + ' [data-ramp="' + k + '"]');
+			if (o) { o.click(); }
+			return !!o;
+		}, [btnId, key]);
+
+		// Property, box to Settings.
+		await setBox(a, 'lpn_contour_field', 'head');
+		let r = await read();
+		ok('box: Property to plot = Head, Settings Color nodes by reads Head', r.boxField === 'head' && r.setField === 'head', JSON.stringify(r));
+		// Property, Settings to box.
+		await setNode('pressure');
+		await a.settle(500);
+		r = await read();
+		ok('Settings: Color nodes by = Pressure, the box Property to plot reads Pressure', r.boxField === 'pressure' && r.setField === 'pressure', JSON.stringify(r));
+		// No color: only the dots clear; the plot keeps its property.
+		await setNode('');
+		await a.settle(500);
+		r = await read();
+		ok('Settings No color: Color nodes by reads No color, the box keeps Pressure', r.setField === '' && r.boxField === 'pressure', JSON.stringify(r));
+		await setBox(a, 'lpn_contour_field', 'head');
+		r = await read();
+		ok('with No color a property chosen in the box is the plot\'s only: Settings stays No color', r.setField === '' && r.boxField === 'head', JSON.stringify(r));
+		await setBox(a, 'lpn_contour_node_colors', true);
+		r = await read();
+		ok('Show node colors checked: Color nodes by takes the plot\'s property (Head)', r.setField === 'head' && r.boxField === 'head', JSON.stringify(r));
+
+		// Scheme, both directions.
+		ok('box: the Color scheme list offers Viridis', await pick('lpn_set_ramp_node_contour', 'viridis'));
+		await a.settle(400);
+		r = await read();
+		ok('box: Color scheme changed, Settings Color scheme reads the same', !!r.boxRamp && r.boxRamp === r.setRamp, r.boxRamp + ' | ' + r.setRamp);
+		const first = r.boxRamp;
+		ok('Settings: the Color scheme list offers Gray', await pick('lpn_set_ramp_node', 'gray'));
+		await a.settle(400);
+		r = await read();
+		ok('Settings: Color scheme changed, the box reads the same', !!r.boxRamp && r.boxRamp === r.setRamp && r.boxRamp !== first, r.boxRamp + ' | ' + r.setRamp);
+
+		// The tips name the other place, in the suite's own words.
+		const t = await a.page.evaluate(() => {
+			const pc = EngCalcs.pageConfig;
+			const tipOf = (id) => { const e = document.getElementById(id), row = e && e.closest('.lpn-set-row, .lpn-grow'), l = row && row.querySelector('.ec-help'); return l ? (l.title || l.getAttribute('data-bs-original-title') || '') : ''; };
+			return { pc: { field: pc.lpn_contour_field_tip, scheme: pc.lpn_contour_scheme_tip, nodes: pc.lpn_contour_node_colors_tip,
+				setField: pc.lpn_settings_color_node_field_tip, setRamp: pc.lpn_settings_color_ramp_node_tip,
+				colorNodes: pc.lpn_color_node_field, scheme_l: pc.lpn_settings_color_ramp, graphs: pc.lpn_graphs_menu, contour: pc.lpn_contour_menu,
+				plot: pc.lpn_contour_field, water: pc.lpn_menu_project },
+				boxField: tipOf('lpn_contour_field'), setField: tipOf('lpn_set_color_node'), setRampTip: tipOf('lpn_set_ramp_node') };
+		});
+		const P = t.pc, there = enValue('lpn_settings_sec_symbology') + ', ' + enValue('lpn_settings_sym_node_colors'), here = P.water + ', ' + P.graphs + ', ' + P.contour;
+		ok('Property to plot tip names Color nodes by in ' + there, P.field.indexOf(P.colorNodes) >= 0 && P.field.indexOf(there) >= 0 && /same setting/.test(P.field), P.field.slice(0, 80));
+		ok('Property to plot tip says what the plot shows with No color', /No color/.test(P.field) && /pressure/.test(P.field));
+		ok('Color scheme tip names Color scheme in ' + there, P.scheme.indexOf(P.scheme_l) >= 0 && P.scheme.indexOf(there) >= 0 && /same setting/.test(P.scheme), P.scheme.slice(0, 80));
+		ok('Show node colors tip names Color nodes by in ' + there, P.nodes.indexOf(P.colorNodes) >= 0 && P.nodes.indexOf(there) >= 0);
+		ok('Settings Color nodes by tip names Property to plot in ' + here, P.setField.indexOf(P.plot) >= 0 && P.setField.indexOf(here) >= 0 && /same setting/.test(P.setField) && /No color/.test(P.setField), P.setField.slice(0, 80));
+		ok('Settings Color scheme tip names Color scheme in ' + here, P.setRamp.indexOf(P.scheme_l) >= 0 && P.setRamp.indexOf(here) >= 0 && /same setting/.test(P.setRamp), P.setRamp.slice(0, 80));
+		ok('the tips are on the rows themselves', t.boxField === P.field && t.setField === P.setField && t.setRampTip === P.setRamp, JSON.stringify([t.boxField.length, t.setField.length, t.setRampTip.length]));
+		// Pictures of the two tips, for the browser pass (CONTOUR_SHOT).
+		await a.page.hover('.lpn-grow:has(#lpn_contour_field) .ec-help');
+		await a.settle(700);
+		await shot(a.page, 'tip-box-property');
+		await a.page.hover('.lpn-set-row:has(#lpn_set_color_node) .ec-help');
+		await a.settle(700);
+		await shot(a.page, 'tip-settings-color-nodes-by');
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally { await a.close(); }
+}
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. a 390-wide phone ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -279,6 +372,7 @@ async function main() {
 		await main0(Session, browser);
 		await main1(Session, browser);
 		await main2(Session, browser);
+		await main3(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();
