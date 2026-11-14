@@ -169,6 +169,12 @@ async function main() {
 		await U.openProperties(ctx, 'node', '21');
 		b = await box();
 		ok('R7 selecting another junction retitles the open box', b.shown && /\b21\b/.test(b.title), b.title);
+		// The Properties box opens beside the junction's label, so where it lands depends on the label's width and
+		// side; put the demand box clear of it (it is raised above, and is meant to be) before pressing its button.
+		await P.evaluate(() => {
+			const pr = document.getElementById('lpn_popup').getBoundingClientRect(), b = document.getElementById('lpn_demands_box'), w = b.getBoundingClientRect().width;
+			b.style.left = (pr.right + 12 + w <= window.innerWidth ? pr.right + 12 : Math.max(4, pr.left - 12 - w)) + 'px';
+		});
 		await P.click('#lpn_demands_box .lpn-corner-btn[data-dock="right"]');
 		await a.settle(600);
 		const dw = await P.evaluate(() => { const bx = document.getElementById('lpn_demands_box'); return { w: Math.round(bx.getBoundingClientRect().width), floor: parseFloat(getComputedStyle(document.documentElement).fontSize) * 20.5 }; });

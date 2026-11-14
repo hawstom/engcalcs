@@ -34,7 +34,7 @@
 			"type": "junction",
 			"x": 450.1,
 			"y": 43.6,
-			"elev": 1485,
+			"elev": 1484.91,
 			"_demand": 0,
 			"desc": "Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.",
 			"demandPattern": "DAILY"
@@ -44,7 +44,7 @@
 			"type": "junction",
 			"x": 442.8,
 			"y": 196.6,
-			"elev": 1480,
+			"elev": 1484.91,
 			"_demand": 0,
 			"desc": "Where the well supply enters the loop.",
 			"demandPattern": "DAILY"
@@ -54,7 +54,7 @@
 			"type": "junction",
 			"x": 437,
 			"y": 466,
-			"elev": 1478,
+			"elev": 1484.91,
 			"_demand": 6,
 			"desc": "Thirteen houses.",
 			"demandPattern": "DAILY"
@@ -64,7 +64,7 @@
 			"type": "junction",
 			"x": 429.3,
 			"y": 718.5,
-			"elev": 1476,
+			"elev": 1484.91,
 			"_demand": 5,
 			"desc": "Eleven houses.",
 			"demandPattern": "DAILY"
@@ -74,7 +74,7 @@
 			"type": "junction",
 			"x": 691.2,
 			"y": 723.1,
-			"elev": 1474,
+			"elev": 1484.58,
 			"_demand": 5,
 			"desc": "Eleven houses. The tank connects here, the only tank connection.",
 			"demandPattern": "DAILY"
@@ -84,7 +84,7 @@
 			"type": "junction",
 			"x": 692.9,
 			"y": 470.3,
-			"elev": 1476,
+			"elev": 1484.58,
 			"_demand": 4,
 			"desc": "Nine houses.",
 			"demandPattern": "DAILY"
@@ -94,7 +94,7 @@
 			"type": "junction",
 			"x": 694.7,
 			"y": 200.7,
-			"elev": 1478,
+			"elev": 1484.58,
 			"_demand": 4,
 			"desc": "Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: 500 gpm with 20 psi residual, for two hours from the tank and the pump.",
 			"demandPattern": "DAILY",
@@ -105,21 +105,21 @@
 			"type": "reservoir",
 			"x": 358.6,
 			"y": 44.6,
-			"_head": 1330,
-			"desc": "Community well, as a fixed head at its pumping water level, 160 ft below the 1,490 ft ground at the wellhead."
+			"_head": 1324.91,
+			"desc": "Community well, as a fixed head at its pumping water level, 160 ft below the 1,485 ft ground at the wellhead."
 		},
 		{
 			"id": "TANK-1",
 			"type": "tank",
 			"x": 691.1,
 			"y": 1122.4,
-			"elev": 1590,
-			"bottomElev": 1590,
+			"elev": 1584.58,
+			"bottomElev": 1584.58,
 			"_level": 17,
 			"minLevel": 2,
 			"maxLevel": 20,
 			"tankDiameter": 24,
-			"desc": "Elevated tank, 24 ft in diameter and 20 ft high, about 67,000 gal, with its floor about 116 ft above C-4, the junction it connects to."
+			"desc": "Elevated tank, 24 ft in diameter and 20 ft high, about 67,000 gal, with its floor about 100 ft above C-4, the junction it connects to."
 		}
 	],
 	"links": [

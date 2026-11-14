@@ -39,6 +39,14 @@ const PC = global.EngCalcs.pageConfig;   // the page's own preset scenario names
 const FT = 0.3048, GPM_LPS = 1 / 15850.323141488905 * 1000, FTUS = 1200 / 3937;
 const round = (x, d) => Number(x.toFixed(d));
 
+// GROUND ELEVATIONS: fixed readings from Mapbox Terrain-RGB, zoom 14, taken 2026-11-13 by
+// dev/scripts/sample_example_dem.js (one pixel per node, as the page's "From Mapbox DEM" reads it).
+// Nothing is fetched when this generator runs. Metres are kept to the raster's 0.1 m; the US file
+// takes them in feet to two decimals, as the page writes a filled elevation. Held by
+// dev/lpn-spike/starter-examples-harness.js.
+const DEM = require('./starter_example_dem.json');
+const ground = (example, id, si) => si ? DEM.metres[example][id] : round(DEM.metres[example][id] / FT, 2);
+
 // ---------------------------------------------------------------------------------------------
 // TWO UNIT SYSTEMS, TWO DESIGNS. The SI twin is written as a metric design with round metric numbers
 // (120 m, 0.4 L/s, 7.5 m), never a conversion of the US numbers; v(us, si) picks one.
@@ -74,18 +82,19 @@ function extension(si) {
 	const v = (us, m) => si ? m : us;
 	const flow = (us, m) => si ? m + ' L/s' : fmt(us) + ' gpm';
 	const res = v('20 psi', '14 m');
+	const g = (id) => ground('extension', id, si);
 	const nodes = [
-		{ id: 'SYS', type: 'reservoir', ll: [-98.411993, 30.276713], head: v(1200, 366),
+		{ id: 'SYS', type: 'reservoir', ll: [-98.411993, 30.276713], head: g('HYD-P'),
 			desc: 'System reservoir. Stands for the existing distribution system, as a fixed head at the elevation of the pressure hydrant, with PMP-1 giving its pressure and flow from the hydrant flow test.' },
-		{ id: 'HYD-P', ll: [-98.4114405, 30.276722], elev: v(1200, 366), demand: 0,
+		{ id: 'HYD-P', ll: [-98.4114405, 30.276722], elev: g('HYD-P'), demand: 0,
 			desc: 'Test pressure hydrant. Reads the pressure during the hydrant flow test: ' + v('62 psi static, 56 psi at 600 gpm, 48 psi at 1,200 gpm.', '43.5 m static, 39.5 m at 38 L/s, 34 m at 76 L/s.') },
-		{ id: 'HYD-F', ll: [-98.410888, 30.276731], elev: v(1202, 366.5), demand: 0,
+		{ id: 'HYD-F', ll: [-98.410888, 30.276731], elev: g('HYD-F'), demand: 0,
 			desc: 'Test flow hydrant, on the existing ' + v('12 inch', '300 mm') + ' main. The flow test draws ' + v('600 and 1,200 gpm', '38 and 76 L/s') + ' here. The extension ties in at this junction.' },
-		{ id: 'EXT-1', ll: [-98.409793, 30.27675], elev: v(1205, 367.5), demand: v(6, 0.4), desc: 'First junction of the loop, two houses.' },
-		{ id: 'EXT-2', ll: [-98.409812, 30.277725], elev: v(1215, 370.5), demand: v(12, 0.8), desc: 'Four houses.' },
-		{ id: 'FH-1', ll: [-98.4086786, 30.2777426], elev: v(1228, 374), demand: 0, fireFlow: v(1500, 95),
-			desc: 'Fire hydrant junction, the high point of the loop and the design point for fire flow: ' + flow(1500, 95) + ' with ' + res + ' residual.' },
-		{ id: 'EXT-3', ll: [-98.408674, 30.276769], elev: v(1218, 371.5), demand: v(10, 0.6), desc: 'Three houses.' }
+		{ id: 'EXT-1', ll: [-98.409793, 30.27675], elev: g('EXT-1'), demand: v(6, 0.4), desc: 'First junction of the loop, two houses.' },
+		{ id: 'EXT-2', ll: [-98.409812, 30.277725], elev: g('EXT-2'), demand: v(12, 0.8), desc: 'Four houses.' },
+		{ id: 'FH-1', ll: [-98.4086786, 30.2777426], elev: g('FH-1'), demand: 0, fireFlow: v(1500, 95),
+			desc: 'Fire hydrant junction, the far end of the loop and the design point for fire flow: ' + flow(1500, 95) + ' with ' + res + ' residual.' },
+		{ id: 'EXT-3', ll: [-98.408674, 30.276769], elev: g('EXT-3'), demand: v(10, 0.6), desc: 'Three houses.' }
 	];
 	const orgUs = locate(nodes, 'EPSG:2277', si);   // Texas Central, Johnson City
 	const big = v(12, 300), small = v(8, 200);
@@ -123,19 +132,25 @@ function well(si) {
 	const v = (us, m) => si ? m : us;
 	const flow = (us, m) => si ? m + ' L/s' : fmt(us) + ' gpm';
 	const res = v('20 psi', '14 m');
+	const g = (id) => ground('well', id, si);
+	// The well's pumping level is not ground: it stands a fixed depth under the wellhead ground. TANK-1's
+	// floor is the ground at the tank plus the tower, which is what makes it an elevated tank.
+	const dep = v(DEM.design.well.pumpingLevelBelowGroundFt, DEM.design.well.pumpingLevelBelowGroundM);
+	const tower = v(DEM.design.well.towerFt, DEM.design.well.towerM);
+	const floorEl = round(g('TANK-1') + tower, 2);
 	const nodes = [
-		{ id: 'WELL-1', type: 'reservoir', ll: [-99.6315968, 33.4492181], head: v(1330, 405.5),
-			desc: 'Community well, as a fixed head at its pumping water level, ' + v('160 ft below the 1,490 ft', '49 m below the 454.5 m') + ' ground at the wellhead.' },
-		{ id: 'WH-1', ll: [-99.6312968, 33.4492181], elev: v(1485, 454.5), demand: 0, desc: 'Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.' },
-		{ id: 'C-1', ll: [-99.6313264, 33.4496383], elev: v(1480, 451), demand: 0, desc: 'Where the well supply enters the loop.' },
-		{ id: 'C-2', ll: [-99.6313548, 33.4503786], elev: v(1478, 450.5), demand: v(6, 0.4), desc: 'Thirteen houses.' },
-		{ id: 'C-3', ll: [-99.631389, 33.4510723], elev: v(1476, 450), demand: v(5, 0.3), desc: 'Eleven houses.' },
-		{ id: 'C-4', ll: [-99.6305304, 33.4510928], elev: v(1474, 449.5), demand: v(5, 0.3), desc: 'Eleven houses. The tank connects here, the only tank connection.' },
-		{ id: 'C-5', ll: [-99.6305159, 33.4503979], elev: v(1476, 450), demand: v(4, 0.3), desc: 'Nine houses.' },
-		{ id: 'FH-1', ll: [-99.6305005, 33.4496572], elev: v(1478, 450.5), demand: v(4, 0.3), fireFlow: v(500, 32),
+		{ id: 'WELL-1', type: 'reservoir', ll: [-99.6315968, 33.4492181], head: round(g('WH-1') - dep, 2),
+			desc: 'Community well, as a fixed head at its pumping water level, ' + v(dep + ' ft below the ' + fmt(Math.round(g('WH-1'))) + ' ft', dep + ' m below the ' + g('WH-1') + ' m') + ' ground at the wellhead.' },
+		{ id: 'WH-1', ll: [-99.6312968, 33.4492181], elev: g('WH-1'), demand: 0, desc: 'Wellhead and pump discharge. The discharge check valve is CV-1. This is the wellhead, not a fire flow point, so a fire flow sweep that fails it is expected.' },
+		{ id: 'C-1', ll: [-99.6313264, 33.4496383], elev: g('C-1'), demand: 0, desc: 'Where the well supply enters the loop.' },
+		{ id: 'C-2', ll: [-99.6313548, 33.4503786], elev: g('C-2'), demand: v(6, 0.4), desc: 'Thirteen houses.' },
+		{ id: 'C-3', ll: [-99.631389, 33.4510723], elev: g('C-3'), demand: v(5, 0.3), desc: 'Eleven houses.' },
+		{ id: 'C-4', ll: [-99.6305304, 33.4510928], elev: g('C-4'), demand: v(5, 0.3), desc: 'Eleven houses. The tank connects here, the only tank connection.' },
+		{ id: 'C-5', ll: [-99.6305159, 33.4503979], elev: g('C-5'), demand: v(4, 0.3), desc: 'Nine houses.' },
+		{ id: 'FH-1', ll: [-99.6305005, 33.4496572], elev: g('FH-1'), demand: v(4, 0.3), fireFlow: v(500, 32),
 			desc: 'Fire hydrant junction, the point of the loop farthest from the tank and the design point for fire flow: ' + flow(500, 32) + ' with ' + res + ' residual, for two hours from the tank and the pump.' },
-		{ id: 'TANK-1', type: 'tank', ll: [-99.630545, 33.45219], elev: v(1590, 485), init: v(17, 5.2), min: v(2, 0.6), max: v(20, 6), dia: v(24, 7.5),
-			desc: 'Elevated tank, ' + v('24 ft in diameter and 20 ft high, about 67,000 gal', '7.5 m in diameter and 6 m high, about 265 cubic meters') + ', with its floor about ' + v('116 ft', '35.5 m') + ' above C-4, the junction it connects to.' }
+		{ id: 'TANK-1', type: 'tank', ll: [-99.630545, 33.45219], elev: floorEl, init: v(17, 5.2), min: v(2, 0.6), max: v(20, 6), dia: v(24, 7.5),
+			desc: 'Elevated tank, ' + v('24 ft in diameter and 20 ft high, about 67,000 gal', '7.5 m in diameter and 6 m high, about 265 cubic meters') + ', with its floor about ' + v(Math.round(floorEl - g('C-4')) + ' ft', round(floorEl - g('C-4'), 1) + ' m') + ' above C-4, the junction it connects to.' }
 	];
 	const orgUs = locate(nodes, 'EPSG:2276', si);   // Texas North Central, Munday
 	const links = [

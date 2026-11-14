@@ -58,6 +58,7 @@ function ok(name, cond, extra) {
 	console.log('  FAIL ' + name + (extra === undefined ? '' : '  -- ' + extra));
 }
 const PSI_PER_M = 0.4333 / 0.3048, GPM = 15850.32, FT = 0.3048;
+const DEM = JSON.parse(fs.readFileSync(path.join(ROOT, 'dev', 'scripts', 'starter_example_dem.json'), 'utf8'));
 
 const FILES = [
 	{ file: 'Fire-flow-extension.lwn', si: false, kind: 'ext', crs: 'EPSG:2277', place: [30.2767, -98.4115], key: 'extension' },
@@ -131,6 +132,25 @@ function loopCount(doc) { return doc.links.length - doc.nodes.length + 1; }   //
 		if (!saved) { continue; }
 		const doc = L.getDoc();
 		const byId = (id) => doc.nodes.filter((n) => n.id === id)[0] || doc.links.filter((l) => l.id === id)[0];
+		// The ground under every node is the fixed Mapbox Terrain-RGB reading in dev/scripts/starter_example_dem.json
+		// (taken once by dev/scripts/sample_example_dem.js), so nobody retypes an elevation unnoticed.
+		// Within 0.1 ft, in the file's own units. The well's head is the pumping level under the wellhead ground;
+		// SYS stands at the pressure hydrant's ground; TANK-1's floor is its ground plus the tower.
+		{
+			const ex = f.kind === 'ext' ? 'extension' : 'well', dem = DEM.metres[ex], dsg = DEM.design.well;
+			const u = (m) => f.si ? m : m / FT;             // a DEM reading, in the file's own length unit
+			const want = {};                                // id -> [property, expected number in the file's unit]
+			Object.keys(dem).forEach((id) => { want[id] = ['elev', u(dem[id])]; });
+			if (f.kind === 'ext') { want.SYS = ['_head', u(dem['HYD-P'])]; }
+			else {
+				want['WELL-1'] = ['_head', u(dem['WH-1']) - (f.si ? dsg.pumpingLevelBelowGroundM : dsg.pumpingLevelBelowGroundFt)];
+				want['TANK-1'] = ['elev', u(dem['TANK-1']) + (f.si ? dsg.towerM : dsg.towerFt)];
+			}
+			const tol = f.si ? 0.1 * FT : 0.1;              // 0.1 ft, in the file's unit
+			const off = Object.keys(want).filter((id) => { const n = byId(id); return !n || typeof n[want[id][0]] !== 'number' || Math.abs(n[want[id][0]] - want[id][1]) > tol; });
+			ok('every elevation equals its fixed Mapbox DEM reading within 0.1 ft (' + Object.keys(want).length + ' nodes)', off.length === 0,
+				off.map((id) => id + ' ' + (byId(id) && byId(id)[want[id][0]]) + ' vs ' + want[id][1].toFixed(2)).join('; '));
+		}
 		ok('it has exactly one loop', loopCount(doc) === 1, doc.nodes.length + ' nodes, ' + doc.links.length + ' links');
 		ok('the key elements carry a plain Description', DESCRIBED[f.kind].every((id) => {
 			const e = byId(id); return e && e.desc && e.desc.length >= 25 && /[.]$/.test(e.desc) && !/[—–]/.test(e.desc);

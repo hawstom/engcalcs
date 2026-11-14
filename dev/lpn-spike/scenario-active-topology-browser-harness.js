@@ -209,7 +209,20 @@ async function main() {
 		});
 		await settle(1200);
 		ok('4.2 selected: 22 is active in B and no longer greyed', !/lpn-inactive/.test(await nodeClass('22') || '') && await boxOf('22') === true, await nodeClass('22'));
-		await page.mouse.click(800, 300);
+		// An empty spot found on the page, not a fixed point: a pipe or node label can lie at any fixed
+		// coordinate, and a click on a label opens that element's Properties box over the map.
+		const blank = await page.evaluate(() => {
+			const q = document.getElementById('lpn_canvas').getBoundingClientRect();
+			for (let y = q.top + 40; y < q.bottom - 40; y += 20) {
+				for (let x = q.left + 40; x < q.right - 40; x += 20) {
+					const e = document.elementFromPoint(x, y);
+					if (e && e.closest('#lpn_canvas') && !e.closest('[data-node],[data-link],[data-nodelbl],[data-linklbl],[data-cust],[data-text]') && !e.closest('.lpn-hit')) { return { x, y }; }
+				}
+			}
+			return null;
+		});
+		ok('4.2b the map has an empty spot to click', !!blank);
+		await page.mouse.click(blank.x, blank.y);
 		await page.keyboard.press('Escape');
 		await page.keyboard.press('Control+z');
 		await settle(1200);
