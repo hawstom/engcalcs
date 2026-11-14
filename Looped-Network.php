@@ -2572,7 +2572,6 @@ EngCalcs.pageConfig = {
 	lpn_contour_show_tip: <?=json_encode($ec_lang['lpn_contour_show_tip'])?>,
 	lpn_contour_field: <?=json_encode($ec_lang['lpn_contour_field'])?>,
 	lpn_contour_field_tip: <?=json_encode($ec_lang['lpn_contour_field_tip'])?>,
-	lpn_contour_field_follow: <?=json_encode($ec_lang['lpn_contour_field_follow'])?>,
 	lpn_contour_scheme_tip: <?=json_encode($ec_lang['lpn_contour_scheme_tip'])?>,
 	lpn_contour_node_colors: <?=json_encode($ec_lang['lpn_contour_node_colors'])?>,
 	lpn_contour_node_colors_tip: <?=json_encode($ec_lang['lpn_contour_node_colors_tip'])?>,

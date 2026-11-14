@@ -2127,7 +2127,6 @@ $ec_lang['lpn_contour_show']='Show plot';
 $ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; check to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_field']='Property to plot';
 $ec_lang['lpn_contour_field_tip']='The node value the plot spreads along and beside the pipes. While Show node colors is checked, this is the same setting as Color nodes by in Settings, Symbology, Node colors, and a change in either place appears in the other. When Show node colors is cleared, Color nodes by reads No color and the plot keeps the property chosen here, or pressure if none was chosen.';
-$ec_lang['lpn_contour_field_follow']='Follow Color nodes by';
 $ec_lang['lpn_contour_scheme_tip']='Colors the plot, its fill and its color key. This is the same setting as Color scheme in Settings, Symbology, Node colors, and a change in either place appears in the other. When Show node colors is checked, the nodes wear the same colors.';
 $ec_lang['lpn_contour_node_colors']='Show node colors';
 $ec_lang['lpn_contour_node_colors_tip']='Check to color the nodes by the Property to plot as well; this sets Color nodes by in Settings, Symbology, Node colors to that property. Clear to set it to No color and leave the nodes plain; the plot is unchanged.';

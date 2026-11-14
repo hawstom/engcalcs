@@ -9,6 +9,7 @@
 //   5. Tom, 2026-11-13: Property to plot and Color scheme in the box ARE Color nodes by and Color scheme
 //      under Settings, Symbology, Node colors. A change in either place reads the same in the other (both
 //      directions); with No color the plot keeps its property; each ? tip names the other place.
+//      The Tables Settings row "Contour property to plot" is the third door, and behaves the same.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/contour-controls-browser-harness.js
 // CONTOUR_SHOT=<dir> also writes a screenshot of each view there.
@@ -349,6 +350,55 @@ async function main3(Session, browser) {
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally { await a.close(); }
 }
+// The third door: the Tables Settings tab's "Contour property to plot" row.
+async function main4(Session, browser) {
+	console.log('\n--- 8. the Tables Settings row is the same Property to plot ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		const P = await a.page.evaluate(() => ({ plot: EngCalcs.pageConfig.lpn_settings_row_contour_field, node: EngCalcs.pageConfig.lpn_settings_color_node_field, none: EngCalcs.pageConfig.lpn_color_none }));
+		await contourFromMenu(a);   // the plot is shown, so its key is on the page whatever the dots do
+		await a.toolbarClick(await a.lang('lpn_pane_toggle'));
+		await a.settle(500);
+		await a.page.click('#lpn_pane_tab_settings');
+		await a.settle(700);
+		const row = (label) => a.page.evaluate((l) => {
+			const out = [];
+			document.querySelectorAll('#lpn_pane_settings tbody tr').forEach((tr) => {
+				const o = {}; tr.querySelectorAll('td').forEach((td) => {
+					const inp = td.querySelector('select');
+					o[td._lpnPaneKey] = inp ? (inp.options[inp.selectedIndex] || { text: '' }).text : td.textContent.trim();
+					if (td._lpnPaneKey === 'st_value') { o.id = td._lpnPaneId; o.opts = inp ? Array.from(inp.options).map((x) => x.value) : null; }
+				});
+				out.push(o);
+			});
+			return out.filter((o) => o.st_setting === l)[0] || null;
+		}, label);
+		const typeVal = async (id, v) => {
+			await a.page.evaluate(([k, x]) => {
+				const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
+				const inp = td.querySelector('select'); inp.value = x; inp.dispatchEvent(new Event('change', { bubbles: true }));
+			}, [id, v]);
+			await a.settle(1500);
+		};
+		let r = await row(P.plot), n = await row(P.node);
+		ok('an old project (Property to plot never stated, Color nodes by Pressure): the row reads Pressure', r && /pressure/i.test(r.st_value) && n && /pressure/i.test(n.st_value), JSON.stringify([r && r.st_value, n && n.st_value]));
+		ok('the row offers the box\'s properties and no "follow" or blank choice', r && r.opts.length >= 5 && r.opts.indexOf('') < 0 && r.opts.indexOf('pressure') >= 0, JSON.stringify(r && r.opts));
+		ok('the plot of that old project is still Pressure', await a.page.evaluate(() => /Pressure/.test((document.getElementById('lpn_color_legend') || {}).textContent || '')));
+		await typeVal(r.id, 'head');
+		r = await row(P.plot); n = await row(P.node);
+		ok('Tables: Contour property to plot = Head, the Node color row reads Head too (nodes are colored)', /head/i.test(r.st_value) && /head/i.test(n.st_value), JSON.stringify([r.st_value, n.st_value]));
+		ok('...and the key shows Head', await a.page.evaluate(() => /Head/.test((document.getElementById('lpn_color_legend') || {}).textContent || '')));
+		await typeVal(n.id, '');
+		r = await row(P.plot); n = await row(P.node);
+		ok('Tables: Node color = No color clears only the dots; the Contour row keeps Head', n.st_value === P.none && /head/i.test(r.st_value), JSON.stringify([r.st_value, n.st_value]));
+		const lg = await a.page.evaluate(() => (document.getElementById('lpn_color_legend') || {}).textContent || '');
+		ok('...and the key still shows Head', /Head/.test(lg), lg.slice(0, 60));
+		await typeVal(r.id, 'pressure');
+		r = await row(P.plot); n = await row(P.node);
+		ok('Tables: with No color a property written to the Contour row leaves Node color at No color', n.st_value === P.none && /pressure/i.test(r.st_value), JSON.stringify([r.st_value, n.st_value]));
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally { await a.close(); }
+}
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. a 390-wide phone ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -377,6 +427,7 @@ async function main() {
 		await main1(Session, browser);
 		await main2(Session, browser);
 		await main3(Session, browser);
+		await main4(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();

@@ -31844,9 +31844,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (s === 'settings.colorNodeField' || s === 'settings.colorLinkField') {
 			return [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions(s === 'settings.colorNodeField' ? 'node' : 'link'));
 		}
-		if (s === 'settings.contourField') {
-			return [['', pc.lpn_contour_field_follow || 'Follow Color nodes by']].concat(colorFieldOptions('node'));
-		}
+		// The box's own list: no "follow" choice, because following Color nodes by is now the rule, not a choice.
+		if (s === 'settings.contourField') { return colorFieldOptions('node'); }
 		if (s === 'settings.contourFill') {
 			return [['', pc.lpn_settings_legend_off || 'None'], ['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
 				['bands', pc.lpn_contour_fill_bands || 'Bands']];
@@ -32019,10 +32018,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
 			return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 		}
+		// The Contour box's Property to plot, in this scenario: Color nodes by while the nodes are colored, else the
+		// plot's own, else pressure. Never unstated, so a project that stored '' reads what its plot draws.
+		if (row.path.join('.') === 'settings.contourField') {
+			return settingFor(scn, ['settings', 'colorNodeField']) || settingFor(scn, ['settings', 'contourField']) || 'pressure';
+		}
 		v = settingFor(scn, row.path);
 		return v === null ? undefined : v;
 	}
 	// A select row (a choice, or a yes/no) shows the Settings box's own options.
+	// A blank option that is a real value (No color) is written; only the "Not stated" blank means no write.
+	function settingRowBlankIsChoice(row) {
+		return row.home !== 'cp' && (settingTableChoices(row.path) || []).some(function (o) { return o[0] === ''; });
+	}
 	function settingRowIsSelect(row) { return row.kind === 'choice' || row.kind === 'bool'; }
 	function settingRowOptions(row, scn) {
 		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : (row.home === 'cp' ? customPropRowChoices(row) : settingTableChoices(row.path)) || [],
@@ -32159,6 +32167,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// calculation set it names), through setScenarioSetting(); Base writes the project's own object.
 	function settingRowWrite(row, scn, p) {
 		var root, node, i, k = row.path[1], times, d;
+		// **THE BOX'S PROPERTY TO PLOT** (Task 858): while the nodes are colored, a property written here is also
+		// Color nodes by, as it is in the Contour box.
+		if (row.path.join('.') === 'settings.contourField' && p.v && settingFor(scn, ['settings', 'colorNodeField'])) {
+			settingRowWrite(Object.assign({}, row, { path: ['settings', 'colorNodeField'] }), scn, p);
+		}
+		// And clearing Color nodes by here states the plot's property first, as the Settings box does, so the plot keeps it.
+		if (row.path.join('.') === 'settings.colorNodeField' && !p.v && settingFor(scn, ['settings', 'colorNodeField'])) {
+			settingRowWrite(Object.assign({}, row, { path: ['settings', 'contourField'] }), scn, { ok: true, v: settingFor(scn, ['settings', 'colorNodeField']) });
+		}
 		// A custom property's design is the project's in every scenario.
 		if (row.home === 'cp') {
 			d = customPropRowDef(row);
@@ -32319,12 +32336,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// blank option of an unstated select is "leave it unstated": no write.
 				parse: function (t, r) {
 					if (!row(r)) { return { ok: false }; }
-					if (settingRowIsSelect(r) && t === '') { return { ok: true, v: '' }; }
+					if (settingRowIsSelect(r) && t === '' && !settingRowBlankIsChoice(r)) { return { ok: true, v: '' }; }
 					return settingRowParse(r, t).ok ? { ok: true, v: t } : { ok: false };
 				},
 				set: function (r, v) {
 					var p;
-					if (!row(r) || (settingRowIsSelect(r) && v === '')) { return; }
+					if (!row(r) || (settingRowIsSelect(r) && v === '' && !settingRowBlankIsChoice(r))) { return; }
 					p = settingRowParse(r, v);
 					if (!p.ok || !settingRowWrite(r, activeScenario(), p)) { return; }
 					settingTableAfterEdit();
