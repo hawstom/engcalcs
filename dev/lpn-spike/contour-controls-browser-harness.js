@@ -268,6 +268,9 @@ async function main3(Session, browser) {
 	try {
 		await contourFromMenu(a);
 		await setBox(a, 'lpn_contour_node_colors', true);
+		await a.page.hover('.lpn-grow:has(#lpn_contour_field) .ec-help');
+		await a.settle(700);
+		await shot(a.page, 'tip-box-property');
 		await a.toolbarClick(await a.lang('lpn_tool_settings'));
 		await a.settle(500);
 		const read = () => a.page.evaluate(() => {
@@ -336,9 +339,6 @@ async function main3(Session, browser) {
 		ok('Settings Color scheme tip names Color scheme in ' + here, P.setRamp.indexOf(P.scheme_l) >= 0 && P.setRamp.indexOf(here) >= 0 && /same setting/.test(P.setRamp), P.setRamp.slice(0, 80));
 		ok('the tips are on the rows themselves', t.boxField === P.field && t.setField === P.setField && t.setRampTip === P.setRamp, JSON.stringify([t.boxField.length, t.setField.length, t.setRampTip.length]));
 		// Pictures of the two tips, for the browser pass (CONTOUR_SHOT).
-		await a.page.hover('.lpn-grow:has(#lpn_contour_field) .ec-help');
-		await a.settle(700);
-		await shot(a.page, 'tip-box-property');
 		await a.page.hover('.lpn-set-row:has(#lpn_set_color_node) .ec-help');
 		await a.settle(700);
 		await shot(a.page, 'tip-settings-color-nodes-by');

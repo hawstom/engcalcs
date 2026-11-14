@@ -13674,7 +13674,7 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_contour_buffer || 'Buffer (× median pipe length)', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
 			settings.contourBuffer = Math.min(20, v); contourChanged();
 		}), pc.lpn_contour_buffer_tip, '', 4);
-		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
+		row(pc.lpn_contour_lines || 'Show contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
 			settings.contourLines = on; contourChanged();
 		}));
 		var cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
