@@ -639,4 +639,5 @@ Per-pipe user length override and a 3D (x,y,z) length exist in WaterGEMS (docs.b
 ## 2026-10-29 note
 Wish: get one licensed WaterGEMS screenshot of the Properties grid for a pipe (category order), the only gap in the row-order comparison. (SPECULATION: low cost, high value; a person with a licence is Tom.)
 
-- 2026-11-11: Open the WaterCAD data sheet PDF and confirm the tier feature list. A controls alternative category, keyed per control. Check whether the customer work covers LoadBuilder-style demand allocation.
+- 2026-11-11: Open the WaterCAD data sheet PDF and confirm the tier feature list. A controls alternative category, keyed per control.
+- 2026-11-13: LoadBuilder check DONE: Customer covers the manual nearest-pipe case only. Open: find one small utility (county, rural water district, irrigation district) that holds a geocoded meter list and say what they now do with it; without one, bulk assignment is a plausible guess, not a finding. Read Bentley community wiki 10862 once through a login to confirm method details.
