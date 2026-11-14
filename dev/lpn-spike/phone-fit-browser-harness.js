@@ -122,11 +122,15 @@ async function main() {
 	// Net3 (both twins) was 8110.764038908496 / 8181.520385005933, in degrees, until Task 826 put them on California zone 3; before that, in gpm, until Task 734/812
 	// (feat/label-form): its one-line node labels at the network's edge are lettering to frame too,
 	// and there the fit closes in a little.
+	// Task 812 round 5 (feat/label-open-side, 2026-11-13) moved the lettering again (far-side one-line labels, a
+	// stack that turns to a line, leaders from 3.4 text-sizes), and the fit frames the lettering: Net3 (gpm) 0.02720 ->
+	// 0.02853, Net2 (L/s) 0.1722 -> 0.1653, Net2 0.05249 -> 0.05092, Net1 (L/s) 26.11 -> 26.98, Net1 7.960 -> 8.224
+	// (-4% to +5%, both ways). Checked by screenshot on Net3 and Net1: every label inside the map, the network filling it.
 	const DESK = {
-		lpn_ex_net3_si_title: 0.09285952936161293, lpn_ex_net3_title: 0.02719966817844265,
-		lpn_ex_net2_si_title: 0.1722048547892766, lpn_ex_net2_title: 0.052488039708116024,
-		lpn_ex_elm_street_title: 1.4334291332773326, lpn_ex_net1_si_title: 26.1141072219296,
-		lpn_ex_net1_title: 7.959579890262752
+		lpn_ex_net3_si_title: 0.09285952936161293, lpn_ex_net3_title: 0.028533478934342323,
+		lpn_ex_net2_si_title: 0.16527172379778893, lpn_ex_net2_title: 0.05091865060723511,
+		lpn_ex_elm_street_title: 1.4334291332773326, lpn_ex_net1_si_title: 26.981426524874188,
+		lpn_ex_net1_title: 8.223938814099792
 	};
 	try {
 		for (const [w, h] of [[360, 800], [390, 844], [412, 915]]) {

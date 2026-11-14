@@ -60768,19 +60768,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
 				// **A LABEL PICKED UP IS A STACK** (Task 734): its one-line form is the placement's
 				// answer to a crowded view, and a label the user places is the user's, as a dragged
-				// pipe label stacks (composeRows()). Restacked before the grab point is measured.
-				if (nodeEls[t.dataset.nodelbl] && nodeEls[t.dataset.nodelbl].inline) {
-					writeNodeLabelGlyphs(nodeEls[t.dataset.nodelbl], nn, nodeEls[t.dataset.nodelbl].lines, effectiveFontSize() + 'px', false);
-					measureLabelWidths(nodeEls[t.dataset.nodelbl]);
-					layoutNodeLabel(t.dataset.nodelbl);
-				}
-				var neN = nodeEls[t.dataset.nodelbl],
-					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
-				// A label restacked under the cursor is narrower than the line that was grabbed: the grab
-				// point is held within the stack, so the stack comes to the cursor rather than the cursor
-				// being left beside it.
+				// pipe label stacks (composeRows()). **IT RESTACKS WHEN THE DRAG ARMS, NOT ON THE PRESS**
+				// (restackNodeLabelInHand()): a press that has not yet travelled its slop leaves a long
+				// one-line label as it is under the pointer, instead of shrinking it to its left end,
+				// a label's width away, until the first frame of the drag brings it back.
+				var neN = nodeEls[t.dataset.nodelbl], restackN = !!(neN && neN.inline),
+					gxN = (neN && !restackN) ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
 				if (neN && gxN !== null) { gxN = Math.max(0, Math.min(labelBoxWidth(neN), gxN)); }
-				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
+				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN,
+					restack: restackN ? { w: w4, pos: posN } : null };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
 				// GRABBING A REPEAT COLLAPSES THE CHAIN TO WHERE IT WAS GRABBED, and this line is the
@@ -61966,6 +61962,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		drag.snapped = true;
 		saveUndoSnapshot();
 	}
+	// The restack a pick-up owes a one-line node label (Task 734), done on the first frame of the drag. The grab
+	// point is held within the narrower stack, so the stack comes to the cursor rather than the cursor being
+	// left beside it.
+	function restackNodeLabelInHand() {
+		var r = drag.restack, id = drag.id, nn = nodeById(id), ne = nodeEls[id], bw;
+		if (!r) { return; }
+		drag.restack = null;
+		if (!nn || !ne) { return; }
+		if (ne.inline) {
+			writeNodeLabelGlyphs(ne, nn, ne.lines, effectiveFontSize() + 'px', false);
+			measureLabelWidths(ne);
+			layoutNodeLabel(id);
+		}
+		bw = labelBoxWidth(ne);
+		drag.gx = Math.max(0, Math.min(bw, r.w.x - (ne.side === 'left' ? r.pos.x - bw : r.pos.x)));
+	}
 	function applyDrag() {
 		if (drag.type === 'pinch') {
 			if (pointers.size !== 2) { return; }
@@ -62163,6 +62175,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			scheduleSolve();
 		} else if (drag.type === 'nodelbl') {
 			snapshotDragOnce();
+			restackNodeLabelInHand();
 			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id),
 				held6 = (drag.gx !== null && drag.gx !== undefined && nodeEls[drag.id])
 					? heldLabelEnd(nodeEls[drag.id], nn2, w6, drag) : { x: w6.x + drag.offX, y: w6.y + drag.offY },
